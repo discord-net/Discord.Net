@@ -66,10 +66,10 @@ namespace Discord.Rest
         public Task<RestGuildEmbed?> GetGuildEmbedAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildEmbedAsync(this, id, options);
         /// <inheritdoc />
-        public IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(RequestOptions options = null)
+        public IAsyncEnumerable<RestUserGuild> GetGuildSummariesAsync(RequestOptions options = null)
             => ClientHelper.GetGuildSummariesAsync(this, null, null, options);
         /// <inheritdoc />
-        public IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(ulong fromGuildId, int limit, RequestOptions options = null)
+        public IAsyncEnumerable<RestUserGuild> GetGuildSummariesAsync(ulong fromGuildId, int limit, RequestOptions options = null)
             => ClientHelper.GetGuildSummariesAsync(this, fromGuildId, limit, options);
         /// <inheritdoc />
         public Task<IReadOnlyCollection<RestGuild>> GetGuildsAsync(RequestOptions options = null)

@@ -13,7 +13,7 @@ namespace Discord.Commands
         public override async Task<TypeReaderResult> Read(ICommandContext context, string input)
         {
             var results = new Dictionary<ulong, TypeReaderValue>();
-            IReadOnlyCollection<IUser> channelUsers = (await context.Channel.GetUsersAsync(CacheMode.CacheOnly).Flatten().ConfigureAwait(false)).ToArray(); //TODO: must be a better way?
+            IReadOnlyCollection<IUser> channelUsers = await context.Channel.GetUsersAsync(CacheMode.CacheOnly).ToArray().ConfigureAwait(false); //TODO: must be a better way?
             IReadOnlyCollection<IGuildUser> guildUsers = ImmutableArray.Create<IGuildUser>();
             ulong id;
 

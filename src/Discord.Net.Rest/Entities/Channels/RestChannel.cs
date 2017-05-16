@@ -50,7 +50,7 @@ namespace Discord.Rest
 
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null); //Overriden
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
-            => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overriden
+        IAsyncEnumerable<IUser> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
+            => AsyncEnumerable.Empty<IUser>(); //Overriden
     }
 }

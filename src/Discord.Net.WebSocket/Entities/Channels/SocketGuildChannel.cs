@@ -146,14 +146,14 @@ namespace Discord.WebSocket
         async Task IGuildChannel.RemovePermissionOverwriteAsync(IUser user, RequestOptions options)
             => await RemovePermissionOverwriteAsync(user, options).ConfigureAwait(false);
         
-        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
-            => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
+        IAsyncEnumerable<IGuildUser> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
+            => ImmutableArray.Create<IGuildUser>(Users.ToArray()).ToAsyncEnumerable();
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(GetUser(id));
 
         //IChannel
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
-            => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable(); //Overriden in Text/Voice
+        IAsyncEnumerable<IUser> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
+            => ImmutableArray.Create<IUser>(Users.ToArray()).ToAsyncEnumerable(); //Overriden in Text/Voice
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(id)); //Overriden in Text/Voice
     }

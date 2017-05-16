@@ -18,11 +18,11 @@ namespace Discord.Rest
         /// <summary> Gets a message from this message channel with the given id, or null if not found. </summary>
         Task<RestMessage> GetMessageAsync(ulong id, RequestOptions options = null);
         /// <summary> Gets the last N messages from this message channel. </summary>
-        IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null);
+        IAsyncEnumerable<RestMessage> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null);
         /// <summary> Gets a collection of messages in this channel. </summary>
-        IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null);
+        IAsyncEnumerable<RestMessage> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null);
         /// <summary> Gets a collection of messages in this channel. </summary>
-        IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null);
+        IAsyncEnumerable<RestMessage> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null);
         /// <summary> Gets a collection of pinned messages in this channel. </summary>
         new Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null);
     }

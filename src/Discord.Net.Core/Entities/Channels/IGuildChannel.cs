@@ -41,7 +41,7 @@ namespace Discord
         Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null);
 
         /// <summary> Gets a collection of all users in this channel. </summary>
-        new IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        new IAsyncEnumerable<IGuildUser> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Gets a user in this channel with the provided id.</summary>
         new Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
     }

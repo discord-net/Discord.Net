@@ -96,7 +96,7 @@ namespace Discord.Rest
             var author = GetAuthor(client, guild, model.Author.Value, model.WebhookId.ToNullable());
             return RestMessage.Create(client, channel, author, model);
         }
-        public static IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessageChannel channel, BaseDiscordClient client, 
+        public static IAsyncEnumerable<RestMessage> GetMessagesAsync(IMessageChannel channel, BaseDiscordClient client, 
             ulong? fromMessageId, Direction dir, int limit, RequestOptions options)
         {
             if (dir == Direction.Around)
@@ -238,7 +238,7 @@ namespace Discord.Rest
 
             return user;
         }
-        public static IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(IGuildChannel channel, IGuild guild, BaseDiscordClient client,
+        public static IAsyncEnumerable<RestGuildUser> GetUsersAsync(IGuildChannel channel, IGuild guild, BaseDiscordClient client,
             ulong? fromUserId, int? limit, RequestOptions options)
         {
             return new PagedAsyncEnumerable<RestGuildUser>(

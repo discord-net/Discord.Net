@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    internal class PagedAsyncEnumerable<T> : IAsyncEnumerable<IReadOnlyCollection<T>>
+    internal class PagedAsyncEnumerable<T> : IAsyncEnumerable<T>
     {
         public int PageSize { get; }
 
@@ -25,13 +25,15 @@ namespace Discord
             _nextPage = nextPage;
         }
 
-        public IAsyncEnumerator<IReadOnlyCollection<T>> GetEnumerator() => new Enumerator(this);
-        internal class Enumerator : IAsyncEnumerator<IReadOnlyCollection<T>>
+        public IAsyncEnumerator<T> GetEnumerator() => new Enumerator(this);
+        internal class Enumerator : IAsyncEnumerator<T>
         {
             private readonly PagedAsyncEnumerable<T> _source;
             private readonly PageInfo _info;
+            private IReadOnlyCollection<T> _currentPage;
+            private IEnumerator<T> _currentPageEnumerator;
 
-            public IReadOnlyCollection<T> Current { get; private set; }
+            public T Current => _currentPageEnumerator.Current;
 
             public Enumerator(PagedAsyncEnumerable<T> source)
             {
@@ -44,34 +46,43 @@ namespace Discord
                 if (_info.Remaining == 0)
                     return false;
 
-                var data = await _source._getPage(_info, cancelToken).ConfigureAwait(false);
-                Current = new Page<T>(_info, data);
-
-                _info.Page++;
-                if (_info.Remaining != null)
+                if (_currentPage == null || _currentPageEnumerator == null || !_currentPageEnumerator.MoveNext())
                 {
-                    if (Current.Count >= _info.Remaining)
-                        _info.Remaining = 0;
+                    _currentPageEnumerator?.Dispose();
+
+                    var data = await _source._getPage(_info, cancelToken).ConfigureAwait(false);
+                    _currentPage = new Page<T>(_info, data);
+                    _currentPageEnumerator = _currentPage.GetEnumerator();
+
+                    _info.Page++;
+                    if (_info.Remaining != null)
+                    {
+                        if (_currentPage.Count >= _info.Remaining)
+                            _info.Remaining = 0;
+                        else
+                            _info.Remaining -= _currentPage.Count;
+                    }
                     else
-                        _info.Remaining -= Current.Count;
-                }
-                else
-                {
-                    if (Current.Count == 0)
-                        _info.Remaining = 0;
-                }
-                _info.PageSize = _info.Remaining != null ? (int)Math.Min(_info.Remaining.Value, _source.PageSize) : _source.PageSize;
+                    {
+                        if (_currentPage.Count == 0)
+                            _info.Remaining = 0;
+                    }
+                    _info.PageSize = _info.Remaining != null ? Math.Min(_info.Remaining.Value, _source.PageSize) : _source.PageSize;
 
-                if (_info.Remaining != 0)
-                {
-                    if (!_source._nextPage(_info, data))
-                        _info.Remaining = 0;
+                    if (_info.Remaining != 0)
+                    {
+                        if (!_source._nextPage(_info, data))
+                            _info.Remaining = 0;
+                    }
                 }
 
                 return true;
             }
             
-            public void Dispose() { Current = null; }
+            public void Dispose()
+            {
+                _currentPageEnumerator.Dispose();
+            }
         }
     }
 }

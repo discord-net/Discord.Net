@@ -227,7 +227,7 @@ namespace Discord.Rest
         }
 
         //Users
-        public IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(RequestOptions options = null)
+        public IAsyncEnumerable<RestGuildUser> GetUsersAsync(RequestOptions options = null)
             => GuildHelper.GetUsersAsync(this, Discord, null, null, options);
         public Task<RestGuildUser> GetUserAsync(ulong id, RequestOptions options = null)
             => GuildHelper.GetUserAsync(this, Discord, id, options);
@@ -356,7 +356,7 @@ namespace Discord.Rest
         async Task<IReadOnlyCollection<IGuildUser>> IGuild.GetUsersAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
-                return (await GetUsersAsync(options).Flatten().ConfigureAwait(false)).ToImmutableArray();
+                return (await GetUsersAsync(options).ToArray().ConfigureAwait(false)).ToImmutableArray();
             else
                 return ImmutableArray.Create<IGuildUser>();
         }

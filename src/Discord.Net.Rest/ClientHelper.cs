@@ -75,7 +75,7 @@ namespace Discord.Rest
                 return RestGuildEmbed.Create(model);
             return null;
         }
-        public static IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(BaseDiscordClient client, 
+        public static IAsyncEnumerable<RestUserGuild> GetGuildSummariesAsync(BaseDiscordClient client, 
             ulong? fromGuildId, int? limit, RequestOptions options)
         {
             return new PagedAsyncEnumerable<RestUserGuild>(
@@ -106,7 +106,7 @@ namespace Discord.Rest
         }
         public static async Task<IReadOnlyCollection<RestGuild>> GetGuildsAsync(BaseDiscordClient client, RequestOptions options)
         {
-            var summaryModels = await GetGuildSummariesAsync(client, null, null, options).Flatten();
+            var summaryModels = GetGuildSummariesAsync(client, null, null, options).ToEnumerable();
             var guilds = ImmutableArray.CreateBuilder<RestGuild>();
             foreach (var summaryModel in summaryModels)
             {

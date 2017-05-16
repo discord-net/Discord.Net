@@ -209,7 +209,7 @@ namespace Discord.Rest
         {
             return await GetUserAsync(guild, client, client.CurrentUser.Id, options).ConfigureAwait(false);
         }
-        public static IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(IGuild guild, BaseDiscordClient client,
+        public static IAsyncEnumerable<RestGuildUser> GetUsersAsync(IGuild guild, BaseDiscordClient client,
             ulong? fromUserId, int? limit, RequestOptions options)
         {
             return new PagedAsyncEnumerable<RestGuildUser>(

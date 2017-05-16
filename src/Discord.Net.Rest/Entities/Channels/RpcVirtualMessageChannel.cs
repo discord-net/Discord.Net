@@ -24,11 +24,11 @@ namespace Discord.Rest
         
         public Task<RestMessage> GetMessageAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetMessageAsync(this, Discord, id, options);
-        public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
+        public IAsyncEnumerable<RestMessage> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => ChannelHelper.GetMessagesAsync(this, Discord, null, Direction.Before, limit, options);
-        public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
+        public IAsyncEnumerable<RestMessage> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => ChannelHelper.GetMessagesAsync(this, Discord, fromMessageId, dir, limit, options);
-        public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
+        public IAsyncEnumerable<RestMessage> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => ChannelHelper.GetMessagesAsync(this, Discord, fromMessage.Id, dir, limit, options);
         public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
@@ -60,26 +60,26 @@ namespace Discord.Rest
             else
                 return null;
         }
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(int limit, CacheMode mode, RequestOptions options)
+        IAsyncEnumerable<IMessage> IMessageChannel.GetMessagesAsync(int limit, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
                 return GetMessagesAsync(limit, options);
             else
-                return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
+                return AsyncEnumerable.Empty<IMessage>();
         }
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId, Direction dir, int limit, CacheMode mode, RequestOptions options)
+        IAsyncEnumerable<IMessage> IMessageChannel.GetMessagesAsync(ulong fromMessageId, Direction dir, int limit, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
                 return GetMessagesAsync(fromMessageId, dir, limit, options);
             else
-                return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
+                return AsyncEnumerable.Empty<IMessage>();
         }
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(IMessage fromMessage, Direction dir, int limit, CacheMode mode, RequestOptions options)
+        IAsyncEnumerable<IMessage> IMessageChannel.GetMessagesAsync(IMessage fromMessage, Direction dir, int limit, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
                 return GetMessagesAsync(fromMessage, dir, limit, options);
             else
-                return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
+                return AsyncEnumerable.Empty<IMessage>();
         }
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
             => await GetPinnedMessagesAsync(options);
@@ -98,7 +98,7 @@ namespace Discord.Rest
         //IChannel
         string IChannel.Name { get { throw new NotSupportedException(); } }
         bool IChannel.IsNsfw { get { throw new NotSupportedException(); } }
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
+        IAsyncEnumerable<IUser> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
         {
             throw new NotSupportedException();
         }

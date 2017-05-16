@@ -8,17 +8,17 @@ namespace Discord.WebSocket
 {
     internal static class SocketChannelHelper
     {
-        public static IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ISocketMessageChannel channel, DiscordSocketClient discord, MessageCache messages,
+        public static IAsyncEnumerable<IMessage> GetMessagesAsync(ISocketMessageChannel channel, DiscordSocketClient discord, MessageCache messages,
             ulong? fromMessageId, Direction dir, int limit, CacheMode mode, RequestOptions options)
         {
             if (dir == Direction.Around)
                 throw new NotImplementedException(); //TODO: Impl
 
             IReadOnlyCollection<SocketMessage> cachedMessages = null;
-            IAsyncEnumerable<IReadOnlyCollection<IMessage>> result = null;
+            IAsyncEnumerable<IMessage> result = null;
             
             if (dir == Direction.After && fromMessageId == null)
-                return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
+                return AsyncEnumerable.Empty<IMessage>();
 
             if (dir == Direction.Before || mode == CacheMode.CacheOnly)
             {
@@ -26,7 +26,7 @@ namespace Discord.WebSocket
                     cachedMessages = messages.GetMany(fromMessageId, dir, limit);
                 else
                     cachedMessages = ImmutableArray.Create<SocketMessage>();
-                result = ImmutableArray.Create(cachedMessages).ToAsyncEnumerable<IReadOnlyCollection<IMessage>>();
+                result = ImmutableArray.Create(cachedMessages.ToArray()).ToAsyncEnumerable<IMessage>();
             }
 
             if (dir == Direction.Before)

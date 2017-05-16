@@ -80,7 +80,7 @@ namespace Discord.Rpc
         {
             throw new NotSupportedException();
         }
-        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
+        IAsyncEnumerable<IGuildUser> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
         {
             throw new NotSupportedException();
         }
@@ -90,7 +90,7 @@ namespace Discord.Rpc
         }
 
         //IChannel
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
+        IAsyncEnumerable<IUser> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
         {
             throw new NotSupportedException();
         }

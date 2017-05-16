@@ -19,13 +19,13 @@ namespace Discord
         /// <summary> Gets a message from this message channel with the given id, or null if not found. </summary>
         Task<IMessage> GetMessageAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Gets the last N messages from this message channel. </summary>
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, 
+        IAsyncEnumerable<IMessage> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, 
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Gets a collection of messages in this channel. </summary>
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, 
+        IAsyncEnumerable<IMessage> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, 
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Gets a collection of messages in this channel. </summary>
-        IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, 
+        IAsyncEnumerable<IMessage> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, 
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Gets a collection of pinned messages in this channel. </summary>
         Task<IReadOnlyCollection<IMessage>> GetPinnedMessagesAsync(RequestOptions options = null);

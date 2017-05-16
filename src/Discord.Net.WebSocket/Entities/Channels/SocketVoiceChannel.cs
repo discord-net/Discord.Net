@@ -59,7 +59,7 @@ namespace Discord.WebSocket
         //IGuildChannel
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(GetUser(id));
-        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
-            => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
+        IAsyncEnumerable<IGuildUser> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
+            => ImmutableArray.Create<IGuildUser>(Users.ToArray()).ToAsyncEnumerable();
     }
 }
