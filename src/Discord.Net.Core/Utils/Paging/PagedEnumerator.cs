@@ -43,12 +43,12 @@ namespace Discord
 
             public async Task<bool> MoveNext(CancellationToken cancelToken)
             {
-                if (_info.Remaining == 0)
-                    return false;
-
                 if (_currentPage == null || _currentPageEnumerator == null || !_currentPageEnumerator.MoveNext())
                 {
                     _currentPageEnumerator?.Dispose();
+
+                    if (_info.Remaining == 0)
+                        return false;
 
                     var data = await _source._getPage(_info, cancelToken).ConfigureAwait(false);
                     _currentPage = new Page<T>(_info, data);
@@ -75,7 +75,7 @@ namespace Discord
                             _info.Remaining = 0;
                     }
 
-                    _currentPageEnumerator.MoveNext();
+                    return _currentPageEnumerator.MoveNext();
                 }
 
                 return true;
