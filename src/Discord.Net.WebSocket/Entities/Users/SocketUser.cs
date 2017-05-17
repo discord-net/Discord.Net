@@ -66,8 +66,8 @@ namespace Discord.WebSocket
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
 
         //IUser
-        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options)
-            => Task.FromResult<IDMChannel>(GlobalUser.DMChannel);
+        async Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options)
+            => await Task.FromResult<IDMChannel>(GlobalUser.DMChannel ?? await CreateDMChannelAsync(options) as IDMChannel);
         async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
             => await CreateDMChannelAsync(options).ConfigureAwait(false);
     }
