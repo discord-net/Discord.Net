@@ -86,7 +86,7 @@ namespace Discord
             
             public void Dispose()
             {
-                _currentPageEnumerator.Dispose();
+                _currentPageEnumerator?.Dispose();
             }
         }
     }
