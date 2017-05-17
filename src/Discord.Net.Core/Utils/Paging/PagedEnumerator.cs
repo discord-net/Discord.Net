@@ -43,6 +43,9 @@ namespace Discord
 
             public async Task<bool> MoveNext(CancellationToken cancelToken)
             {
+                if (cancelToken.IsCancellationRequested) 
+                    return false;
+
                 if (_currentPage == null || _currentPageEnumerator == null || !_currentPageEnumerator.MoveNext())
                 {
                     _currentPageEnumerator?.Dispose();
