@@ -1,6 +1,9 @@
 ﻿using Discord.Rest;
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Role;
 
@@ -22,6 +25,8 @@ namespace Discord.WebSocket
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public bool IsEveryone => Id == Guild.Id;
         public string Mention => MentionUtils.MentionRole(Id);
+        public IReadOnlyCollection<SocketGuildUser> Members 
+            => Guild.Users.Where(x => x.Roles.Any(r => r.Id == Id)).ToImmutableArray();
 
         internal SocketRole(SocketGuild guild, ulong id)
             : base(guild.Discord, id)
