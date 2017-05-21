@@ -222,4 +222,5 @@ For reference, view an [annotated example] of this structure.
 It is important to know that the recommended design pattern of bots
 should be to separate the program (initialization and command handler),
 the modules (handle commands), and the services (persistent storage,
-pure functions, data manipulation).
+		
+**todo:** diagram of bot structure
