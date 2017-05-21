@@ -210,7 +210,7 @@ namespace Discord.Commands
                 else if (attribute is RemainderAttribute)
                 {
                     if (position != count-1)
-                        throw new InvalidOperationException("Remainder parameters must be the last parameter in a command.");
+                        throw new InvalidOperationException($"Remainder parameters must be the last parameter in a command. Parameter: {paramInfo.Name} in {paramInfo.Member.DeclaringType.Name}.{paramInfo.Member.Name}");
                     
                     builder.IsRemainder = true;
                 }
