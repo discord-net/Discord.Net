@@ -211,7 +211,7 @@ For your reference, you may view the [completed program].
 # Building a bot with commands
 
 This section will show you how to write a program that is ready for
-[commands](commands.md). Note that this will not be explaining _how_
+[commands](commands/commands.md). Note that this will not be explaining _how_
 to write commands or services, it will only be covering the general
 structure.
 
