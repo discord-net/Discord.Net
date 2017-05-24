@@ -45,7 +45,7 @@ Discord.Net's implementation of Modules is influenced heavily from
 ASP.Net Core's Controller pattern. This means that the lifetime of a
 module instance is only as long as the command being invoked.
 
-**Avoid using long-running code** in your modules whereever possible.
+**Avoid using long-running code** in your modules wherever possible.
 You should **not** be implementing very much logic into your modules;
 outsource to a service for that.
 
@@ -167,8 +167,8 @@ a dependency map.
 
 Modules are constructed using Dependency Injection. Any parameters
 that are placed in the constructor must be injected into an
-@Discord.Commands.IDependencyMap. Alternatively, you may accept an
-IDependencyMap as an argument and extract services yourself.
+@System.IServiceProvider. Alternatively, you may accept an
+IServiceProvider as an argument and extract services yourself.
 
 ### Module Properties
 
@@ -205,21 +205,20 @@ you use DI when writing your modules.
 
 ### Setup
 
-First, you need to create an @Discord.Commands.IDependencyMap.
-The library includes @Discord.Commands.DependencyMap to help with
-this, however you may create your own IDependencyMap if you wish.
+First, you need to create an @System.IServiceProvider
+You may create your own IServiceProvider if you wish.
 
 Next, add the dependencies your modules will use to the map.
 
 Finally, pass the map into the `LoadAssembly` method.
 Your modules will automatically be loaded with this dependency map.
 
-[!code-csharp[DependencyMap Setup](samples/dependency_map_setup.cs)]
+[!code-csharp[IServiceProvider Setup](samples/dependency_map_setup.cs)]
 
 ### Usage in Modules
 
 In the constructor of your module, any parameters will be filled in by
-the @Discord.Commands.IDependencyMap you pass into `LoadAssembly`.
+the @System.IServiceProvider you pass into `LoadAssembly`.
 
 Any publicly settable properties will also be filled in the same manner.
 
@@ -228,12 +227,12 @@ Any publicly settable properties will also be filled in the same manner.
 being injected.
 
 >[!NOTE]
->If you accept `CommandService` or `IDependencyMap`  as a parameter in
+>If you accept `CommandService` or `IServiceProvider`  as a parameter in
 your constructor or as an injectable property, these entries will be filled
-by the CommandService the module was loaded from, and the DependencyMap passed
+by the CommandService the module was loaded from, and the ServiceProvider passed
 into it, respectively.
 
-[!code-csharp[DependencyMap in Modules](samples/dependency_module.cs)]
+[!code-csharp[ServiceProvider in Modules](samples/dependency_module.cs)]
 
 # Preconditions
 
