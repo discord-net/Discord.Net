@@ -235,13 +235,15 @@ namespace Discord.Commands
         }
 
         //Execution
-        public SearchResult Search(ICommandContext context, int argPos) 
+        public SearchResult Search(ICommandContext context, int argPos)
             => Search(context, context.Message.Content.Substring(argPos));
         public SearchResult Search(ICommandContext context, string input)
         {
             string searchInput = _caseSensitive ? input : input.ToLowerInvariant();
-            var matches = _map.GetCommands(searchInput).OrderByDescending(x => x.Command.Priority).ToImmutableArray();
-            
+
+            // We sort by Ascending priority here because the collection is looped over backwards later.
+            var matches = _map.GetCommands(searchInput).OrderBy(x => x.Command.Priority).ToImmutableArray();
+
             if (matches.Length > 0)
                 return SearchResult.FromSuccess(input, matches);
             else
