@@ -68,18 +68,48 @@ namespace Discord.Commands
         {
             services = services ?? EmptyServiceProvider.Instance;
 
-            foreach (PreconditionAttribute precondition in Module.Preconditions)
+            foreach (IGrouping<int, PreconditionAttribute> preconditionGroup in Module.Preconditions.GroupBy(p => p.Group))
             {
-                var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
-                if (!result.IsSuccess)
-                    return result;
+                if (preconditionGroup.Key == 0)
+                {
+                    foreach (PreconditionAttribute precondition in preconditionGroup)
+                    {
+                        var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
+                        if (!result.IsSuccess)
+                            return result;
+                    }
+                }
+                else
+                {
+                    var results = new List<PreconditionResult>();
+                    foreach (PreconditionAttribute precondition in preconditionGroup)
+                        results.Add(await precondition.CheckPermissions(context, this, services).ConfigureAwait(false));
+
+                    if (!results.Any(p => p.IsSuccess))
+                        return results[0];
+                }
             }
 
-            foreach (PreconditionAttribute precondition in Preconditions)
+            foreach (IGrouping<int, PreconditionAttribute> preconditionGroup in Module.Preconditions.GroupBy(p => p.Group))
             {
-                var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
-                if (!result.IsSuccess)
-                    return result;
+                if (preconditionGroup.Key == 0)
+                {
+                    foreach (PreconditionAttribute precondition in Preconditions)
+                    {
+                        var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
+                        if (!result.IsSuccess)
+                            return result;
+                    }
+                }
+                else
+                {
+                    var results = new List<PreconditionResult>();
+                    foreach (PreconditionAttribute precondition in preconditionGroup)
+                        results.Add(await precondition.CheckPermissions(context, this, services).ConfigureAwait(false));
+
+                    if (!results.Any(p => p.IsSuccess))
+                        return results[0];
+                }
             }
 
             return PreconditionResult.FromSuccess();
