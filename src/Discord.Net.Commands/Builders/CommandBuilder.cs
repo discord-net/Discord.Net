@@ -20,6 +20,7 @@ namespace Discord.Commands.Builders
         public string Remarks { get; set; }
         public string PrimaryAlias { get; set; }
         public RunMode RunMode { get; set; }
+        public PreconditionsMode PreconditionsMode { get; set; }
         public int Priority { get; set; }
 
         public IReadOnlyList<PreconditionAttribute> Preconditions => _preconditions;
@@ -65,6 +66,11 @@ namespace Discord.Commands.Builders
         public CommandBuilder WithRunMode(RunMode runMode)
         {
             RunMode = runMode;
+            return this;
+        }
+        public CommandBuilder WithPreconditionsMode(PreconditionsMode preconditionsMode)
+        {
+            PreconditionsMode = preconditionsMode;
             return this;
         }
         public CommandBuilder WithPriority(int priority)
