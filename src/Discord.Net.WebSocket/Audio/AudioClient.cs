@@ -142,31 +142,31 @@ namespace Discord.Audio
 
         public AudioOutStream CreateOpusStream(int bufferMillis)
         {
-            var outputStream = new OutputStream(ApiClient);
-            var sodiumEncrypter = new SodiumEncryptStream( outputStream, this);
-            var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc);
-            return new BufferedWriteStream(rtpWriter, this, bufferMillis, _connection.CancelToken, _audioLogger);
+            var outputStream = new OutputStream(ApiClient); //Ignores header
+            var sodiumEncrypter = new SodiumEncryptStream( outputStream, this); //Passes header
+            var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header, passes
+            return new BufferedWriteStream(rtpWriter, this, bufferMillis, _connection.CancelToken, _audioLogger); //Generates header
         }
         public AudioOutStream CreateDirectOpusStream()
         {
-            var outputStream = new OutputStream(ApiClient);
-            var sodiumEncrypter = new SodiumEncryptStream(outputStream, this);
-            return new RTPWriteStream(sodiumEncrypter, _ssrc);
+            var outputStream = new OutputStream(ApiClient); //Ignores header
+            var sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
+            return new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header (external input), passes
         }
         public AudioOutStream CreatePCMStream(AudioApplication application, int? bitrate, int bufferMillis)
         {
-            var outputStream = new OutputStream(ApiClient);
-            var sodiumEncrypter = new SodiumEncryptStream(outputStream, this);
-            var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc);
-            var bufferedStream = new BufferedWriteStream(rtpWriter, this, bufferMillis, _connection.CancelToken, _audioLogger);
-            return new OpusEncodeStream(bufferedStream, bitrate ?? (96 * 1024), application);
+            var outputStream = new OutputStream(ApiClient); //Ignores header
+            var sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
+            var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header, passes
+            var bufferedStream = new BufferedWriteStream(rtpWriter, this, bufferMillis, _connection.CancelToken, _audioLogger); //Ignores header, generates header
+            return new OpusEncodeStream(bufferedStream, bitrate ?? (96 * 1024), application); //Generates header
         }
         public AudioOutStream CreateDirectPCMStream(AudioApplication application, int? bitrate)
         {
-            var outputStream = new OutputStream(ApiClient);
-            var sodiumEncrypter = new SodiumEncryptStream(outputStream, this);
-            var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc);
-            return new OpusEncodeStream(rtpWriter, bitrate ?? (96 * 1024), application);
+            var outputStream = new OutputStream(ApiClient); //Ignores header
+            var sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
+            var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header, passes
+            return new OpusEncodeStream(rtpWriter, bitrate ?? (96 * 1024), application); //Generates header
         }
 
         internal async Task CreateInputStreamAsync(ulong userId)
@@ -174,11 +174,11 @@ namespace Discord.Audio
             //Assume Thread-safe
             if (!_streams.ContainsKey(userId))
             {
-                var readerStream = new InputStream();
-                var opusDecoder = new OpusDecodeStream(readerStream);
+                var readerStream = new InputStream(); //Consumes header
+                var opusDecoder = new OpusDecodeStream(readerStream); //Passes header
                 //var jitterBuffer = new JitterBuffer(opusDecoder, _audioLogger);
-                var rtpReader = new RTPReadStream(opusDecoder);
-                var decryptStream = new SodiumDecryptStream(rtpReader, this);
+                var rtpReader = new RTPReadStream(opusDecoder); //Generates header
+                var decryptStream = new SodiumDecryptStream(rtpReader, this); //No header
                 _streams.TryAdd(userId, new StreamPair(readerStream, decryptStream));
                 await _streamCreatedEvent.InvokeAsync(userId, readerStream);
             }

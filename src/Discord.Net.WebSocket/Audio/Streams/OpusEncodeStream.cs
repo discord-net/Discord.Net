@@ -13,6 +13,8 @@ namespace Discord.Audio.Streams
         private readonly OpusEncoder _encoder;
         private readonly byte[] _buffer;
         private int _partialFramePos;
+        private ushort _seq;
+        private uint _timestamp;
 
         public OpusEncodeStream(AudioStream next, int bitrate, AudioApplication application)
         {
@@ -21,7 +23,7 @@ namespace Discord.Audio.Streams
             _buffer = new byte[OpusConverter.FrameBytes];
         }
 
-        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
             //Assume threadsafe
             while (count > 0)
@@ -30,10 +32,13 @@ namespace Discord.Audio.Streams
                 {
                     //We have enough data and no partial frames. Pass the buffer directly to the encoder
                     int encFrameSize = _encoder.EncodeFrame(buffer, offset, _buffer, 0);
-                    await _next.WriteAsync(_buffer, 0, encFrameSize, cancellationToken).ConfigureAwait(false);
+                    _next.WriteHeader(_seq, _timestamp, false);
+                    await _next.WriteAsync(_buffer, 0, encFrameSize, cancelToken).ConfigureAwait(false);
 
                     offset += OpusConverter.FrameBytes;
                     count -= OpusConverter.FrameBytes;
+                    _seq++;
+                    _timestamp += OpusConverter.FrameBytes;
                 }
                 else if (_partialFramePos + count >= OpusConverter.FrameBytes)
                 {
@@ -41,11 +46,14 @@ namespace Discord.Audio.Streams
                     int partialSize = OpusConverter.FrameBytes - _partialFramePos;
                     Buffer.BlockCopy(buffer, offset, _buffer, _partialFramePos, partialSize);
                     int encFrameSize = _encoder.EncodeFrame(_buffer, 0, _buffer, 0);
-                    await _next.WriteAsync(_buffer, 0, encFrameSize, cancellationToken).ConfigureAwait(false);
+                    _next.WriteHeader(_seq, _timestamp, false);
+                    await _next.WriteAsync(_buffer, 0, encFrameSize, cancelToken).ConfigureAwait(false);
 
                     offset += partialSize;
                     count -= partialSize;
                     _partialFramePos = 0;
+                    _seq++;
+                    _timestamp += OpusConverter.FrameBytes;
                 }
                 else
                 {
@@ -57,8 +65,8 @@ namespace Discord.Audio.Streams
             }
         }
 
-        /*
-        public override async Task FlushAsync(CancellationToken cancellationToken)
+        /* //Opus throws memory errors on bad frames
+        public override async Task FlushAsync(CancellationToken cancelToken)
         {
             try
             {
@@ -67,7 +75,7 @@ namespace Discord.Audio.Streams
             }
             catch (Exception) { } //Incomplete frame
             _partialFramePos = 0;
-            await base.FlushAsync(cancellationToken).ConfigureAwait(false);
+            await base.FlushAsync(cancelToken).ConfigureAwait(false);
         }*/
 
         public override async Task FlushAsync(CancellationToken cancelToken)

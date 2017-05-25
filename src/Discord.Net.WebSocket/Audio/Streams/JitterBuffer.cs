@@ -1,4 +1,4 @@
-using Discord.Logging;
+/*using Discord.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
@@ -243,4 +243,4 @@ namespace Discord.Audio.Streams
             return Task.Delay(0);
         }
     }
-}
+}*/

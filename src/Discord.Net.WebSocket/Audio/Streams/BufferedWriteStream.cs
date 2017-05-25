@@ -88,11 +88,12 @@ namespace Discord.Audio.Streams
                             if (_queuedFrames.TryDequeue(out Frame frame))
                             {
                                 await _client.SetSpeakingAsync(true).ConfigureAwait(false);
-                                _next.WriteHeader(seq++, timestamp, false);
+                                _next.WriteHeader(seq, timestamp, false);
                                 await _next.WriteAsync(frame.Buffer, 0, frame.Bytes).ConfigureAwait(false);
                                 _bufferPool.Enqueue(frame.Buffer);
                                 _queueLock.Release();
                                 nextTick += _ticksPerFrame;
+                                seq++;
                                 timestamp += OpusEncoder.FrameSamplesPerChannel;
                                 _silenceFrames = 0;
 #if DEBUG
@@ -105,12 +106,13 @@ namespace Discord.Audio.Streams
                                 {
                                     if (_silenceFrames++ < MaxSilenceFrames)
                                     {
-                                        _next.WriteHeader(seq++, timestamp, false);
+                                        _next.WriteHeader(seq, timestamp, false);
                                         await _next.WriteAsync(_silenceFrame, 0, _silenceFrame.Length).ConfigureAwait(false);
                                     }
                                     else
                                         await _client.SetSpeakingAsync(false).ConfigureAwait(false);
                                     nextTick += _ticksPerFrame;
+                                    seq++;
                                     timestamp += OpusEncoder.FrameSamplesPerChannel;
                                 }
 #if DEBUG
@@ -126,6 +128,7 @@ namespace Discord.Audio.Streams
             });
         }
 
+        public override void WriteHeader(ushort seq, uint timestamp, bool missed) { } //Ignore, we use our own timing
         public override async Task WriteAsync(byte[] data, int offset, int count, CancellationToken cancelToken)
         {
             if (cancelToken.CanBeCanceled)
