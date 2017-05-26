@@ -28,6 +28,7 @@ namespace Discord.Commands
         internal readonly bool _caseSensitive, _throwOnError;
         internal readonly char _separatorChar;
         internal readonly RunMode _defaultRunMode;
+        internal readonly PreconditionsMode _defaultPreconditionsMode;
         internal readonly Logger _cmdLogger;
         internal readonly LogManager _logManager;
 
@@ -44,6 +45,9 @@ namespace Discord.Commands
             _defaultRunMode = config.DefaultRunMode;
             if (_defaultRunMode == RunMode.Default)
                 throw new InvalidOperationException("The default run mode cannot be set to Default.");
+            _defaultPreconditionsMode = config.DefaultPreconditionsMode;
+            if (_defaultPreconditionsMode == PreconditionsMode.Default)
+                throw new InvalidOperationException("The default preconditions mode cannot be set to Default.");
 
             _logManager = new LogManager(config.LogLevel);
             _logManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);

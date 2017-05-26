@@ -27,6 +27,7 @@ namespace Discord.Commands
         public int Priority { get; }
         public bool HasVarArgs { get; }
         public RunMode RunMode { get; }
+        public PreconditionsMode PreconditionsMode { get; }
 
         public IReadOnlyList<string> Aliases { get; }
         public IReadOnlyList<ParameterInfo> Parameters { get; }
@@ -41,6 +42,7 @@ namespace Discord.Commands
             Remarks = builder.Remarks;
 
             RunMode = (builder.RunMode == RunMode.Default ? service._defaultRunMode : builder.RunMode);
+            PreconditionsMode = (builder.PreconditionsMode == PreconditionsMode.Default ? service._defaultPreconditionsMode : builder.PreconditionsMode);
             Priority = builder.Priority;
             
             Aliases = module.Aliases
@@ -75,11 +77,23 @@ namespace Discord.Commands
                     return result;
             }
 
-            foreach (PreconditionAttribute precondition in Preconditions)
+            if (PreconditionsMode == PreconditionsMode.RequireAll)
             {
-                var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
-                if (!result.IsSuccess)
-                    return result;
+                foreach (PreconditionAttribute precondition in Preconditions)
+                {
+                    var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
+                    if (!result.IsSuccess)
+                        return result;
+                }
+            }
+            else
+            {
+                foreach (PreconditionAttribute precondition in Preconditions)
+                {
+                    var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
+                    if (result.IsSuccess)
+                        return result;
+                }
             }
 
             return PreconditionResult.FromSuccess();
