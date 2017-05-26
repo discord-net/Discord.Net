@@ -90,7 +90,7 @@ namespace Discord.Commands
                 }
             }
 
-            foreach (IGrouping<int, PreconditionAttribute> preconditionGroup in Module.Preconditions.GroupBy(p => p.Group))
+            foreach (IGrouping<int, PreconditionAttribute> preconditionGroup in Preconditions.GroupBy(p => p.Group))
             {
                 if (preconditionGroup.Key == 0)
                 {
