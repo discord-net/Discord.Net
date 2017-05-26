@@ -518,6 +518,7 @@ namespace Discord.WebSocket
                                             await GuildAvailableAsync(guild).ConfigureAwait(false);
                                     }
 
+                                    await _readyEvent.InvokeAsync().ConfigureAwait(false);
                                     await _gatewayLogger.InfoAsync("Resumed previous session").ConfigureAwait(false);
                                 }
                                 break;
