@@ -14,7 +14,7 @@ namespace Discord.Commands
             if (context.Channel.IsNsfw)
                 return Task.FromResult(PreconditionResult.FromSuccess());
             else
-                return Task.FromResult(PreconditionResult.FromError("This command may only be invoked in an NSFW channel."));
+                return Task.FromResult(PreconditionResult.FromError("This command may only be invoked in a NSFW channel."));
         }
     }
 }
