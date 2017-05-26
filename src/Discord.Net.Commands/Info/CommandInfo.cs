@@ -94,7 +94,7 @@ namespace Discord.Commands
             {
                 if (preconditionGroup.Key == 0)
                 {
-                    foreach (PreconditionAttribute precondition in Preconditions)
+                    foreach (PreconditionAttribute precondition in preconditionGroup)
                     {
                         var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
                         if (!result.IsSuccess)
