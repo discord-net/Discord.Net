@@ -28,6 +28,7 @@ namespace Discord.Audio.Streams
 
             _nextSeq = seq;
             _nextTimestamp = timestamp;
+            _hasHeader = true;
         }
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
