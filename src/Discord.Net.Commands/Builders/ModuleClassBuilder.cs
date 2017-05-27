@@ -12,12 +12,12 @@ namespace Discord.Commands
     {
         private static readonly TypeInfo _moduleTypeInfo = typeof(IModuleBase).GetTypeInfo();
 
-        public static IEnumerable<TypeInfo> Search(Assembly assembly)
+        public static IEnumerable<TypeInfo> Search(Assembly assembly, CommandService service)
         {
             foreach (var type in assembly.ExportedTypes)
             {
                 var typeInfo = type.GetTypeInfo();
-                if (IsValidModuleDefinition(typeInfo) &&
+                if (IsValidModuleDefinition(typeInfo, service) &&
                     !typeInfo.IsDefined(typeof(DontAutoLoadAttribute)))
                 {
                     yield return typeInfo;
@@ -59,7 +59,7 @@ namespace Discord.Commands
         {
             foreach (var typeInfo in subTypes)
             {
-                if (!IsValidModuleDefinition(typeInfo))
+                if (!IsValidModuleDefinition(typeInfo, service))
                     continue;
                 
                 if (builtTypes.Contains(typeInfo))
@@ -249,10 +249,13 @@ namespace Discord.Commands
             return reader;
         }
 
-        private static bool IsValidModuleDefinition(TypeInfo typeInfo)
+        private static bool IsValidModuleDefinition(TypeInfo typeInfo, CommandService service)
         {
+            if (typeInfo.IsNotPublic)
+                service._cmdLogger.WarningAsync($"Module class {typeInfo.FullName} is not public. Commands from this module will be ignored.");
+
             return _moduleTypeInfo.IsAssignableFrom(typeInfo) &&
-                   !typeInfo.IsAbstract;
+                !typeInfo.IsAbstract;
         }
 
         private static bool IsValidCommandDefinition(MethodInfo methodInfo)
