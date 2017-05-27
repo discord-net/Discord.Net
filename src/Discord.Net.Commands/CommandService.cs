@@ -114,7 +114,7 @@ namespace Discord.Commands
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                var types = ModuleClassBuilder.Search(assembly).ToArray();
+                var types = ModuleClassBuilder.Search(assembly, this).ToArray();
                 var moduleDefs = ModuleClassBuilder.Build(types, this);
 
                 foreach (var info in moduleDefs)
