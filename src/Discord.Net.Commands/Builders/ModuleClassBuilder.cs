@@ -228,7 +228,6 @@ namespace Discord.Commands
 
             foreach (var attribute in attributes)
             {
-                // TODO: C#7 type switch
                 switch (attribute)
                 {
                     case SummaryAttribute summary:
