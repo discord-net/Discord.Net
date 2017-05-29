@@ -14,6 +14,10 @@ namespace Discord.Commands
         {
             return await Context.Channel.SendMessageAsync(message, isTTS, embed, options).ConfigureAwait(false);
         }
+        
+        protected virtual void OnContextSet()
+        {
+        }
 
         protected virtual void BeforeExecute()
         {
@@ -30,6 +34,7 @@ namespace Discord.Commands
             if (newValue == null)
                 throw new InvalidOperationException($"Invalid context type. Expected {typeof(T).Name}, got {context.GetType().Name}");
             Context = newValue;
+            OnContextSet();
         }
 
         void IModuleBase.BeforeExecute() => BeforeExecute();
