@@ -9,6 +9,8 @@
         /// <summary> Users must fulfill the requirements of Low, and be registered on Discord for at least 5 minutes. </summary>
         Medium = 2,
         /// <summary> Users must fulfill the requirements of Medium, and be a member of this guild for at least 10 minutes. </summary>
-        High = 3
+        High = 3,
+        /// <summary> Users must fulfill the requirements of High, and must have a verified phone on their Discord account. </summary>
+        Extreme = 4
     }
 }
