@@ -30,8 +30,8 @@ class Program
             LogLevel = LogSeverity.Info,
             
             // If you or another service needs to do anything with messages
-            // (eg. checking Reactions), you should probably
-            // set the MessageCacheSize here.
+            // (eg. checking Reactions, checking the content of edited/deleted messages),
+            // you must set the MessageCacheSize. You may adjust the number as needed.
             //MessageCacheSize = 50,
 
             // If your platform doesn't have native websockets,
@@ -41,7 +41,7 @@ class Program
         });
     }
 
-    // Create a named logging handler, so it can be re-used by addons
+    // Example of a logging handler. This can be re-used by addons
     // that ask for a Func<LogMessage, Task>.
     private static Task Logger(LogMessage message)
     {
@@ -65,6 +65,11 @@ class Program
         }
         Console.WriteLine($"{DateTime.Now,-19} [{message.Severity,8}] {message.Source}: {message.Message}");
         Console.ForegroundColor = cc;
+        
+        // If you get an error saying 'CompletedTask' doesn't exist,
+        // your project is targeting .NET 4.5.2 or lower. You'll need
+        // to adjust your project's target framework to 4.6 or higher
+        // (instructions for this are easily Googled).
         return Task.CompletedTask;
     }
 
@@ -120,7 +125,7 @@ class Program
         // commands to be invoked by mentioning the bot instead.
         if (msg.HasCharPrefix('!', ref pos) /* || msg.HasMentionPrefix(_client.CurrentUser, ref pos) */)
         {
-            // Create a Command Context
+            // Create a Command Context.
             var context = new SocketCommandContext(_client, msg);
             
             // Execute the command. (result does not indicate a return value, 
