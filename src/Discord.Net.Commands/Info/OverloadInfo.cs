@@ -18,7 +18,7 @@ namespace Discord.Commands
         private static readonly MethodInfo _convertParamsMethod = typeof(OverloadInfo).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<object>, object>> _arrayConverters = new ConcurrentDictionary<Type, Func<IEnumerable<object>, object>>();
 
-        private readonly Func<ICommandContext, object[], IServiceProvider, Task> _action;
+        private readonly Func<ICommandContext, object[], IServiceProvider, OverloadInfo, Task> _action;
 
         public CommandInfo Command { get; }
         public int Priority { get; }
@@ -65,7 +65,7 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
 
-        public async Task<ParseResult> ParseAsync(ICommandContext context, SearchResult searchResult, PreconditionResult? preconditionResult = null)
+        public async Task<ParseResult> ParseAsync(ICommandContext context, IServiceProvider services, SearchResult searchResult, PreconditionResult? preconditionResult = null)
         {
             if (!searchResult.IsSuccess)
                 return ParseResult.FromError(searchResult);
@@ -84,7 +84,7 @@ namespace Discord.Commands
 
             input = input.Substring(matchingAlias.Length);
 
-            return await CommandParser.ParseArgs(this, context, input, 0).ConfigureAwait(false);
+            return await CommandParser.ParseArgs(this, context, services, input, 0).ConfigureAwait(false);
         }
 
         public Task<ExecuteResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)
@@ -140,7 +140,7 @@ namespace Discord.Commands
             await Command.Module.Service._cmdLogger.DebugAsync($"Executing {GetLogText(context)}").ConfigureAwait(false);
             try
             {
-                await _action(context, args, map).ConfigureAwait(false);
+                await _action(context, args, map, this).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

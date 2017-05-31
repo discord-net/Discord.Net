@@ -15,11 +15,11 @@ namespace Discord.Commands
             return await Context.Channel.SendMessageAsync(message, isTTS, embed, options).ConfigureAwait(false);
         }
 
-        protected virtual void BeforeExecute()
+        protected virtual void BeforeExecute(OverloadInfo overload)
         {
         }
 
-        protected virtual void AfterExecute()
+        protected virtual void AfterExecute(OverloadInfo overload)
         {
         }
 
@@ -32,8 +32,8 @@ namespace Discord.Commands
             Context = newValue;
         }
 
-        void IModuleBase.BeforeExecute() => BeforeExecute();
+        void IModuleBase.BeforeExecute(OverloadInfo overload) => BeforeExecute(overload);
 
-        void IModuleBase.AfterExecute() => AfterExecute();
+        void IModuleBase.AfterExecute(OverloadInfo overload) => AfterExecute(overload);
     }
 }

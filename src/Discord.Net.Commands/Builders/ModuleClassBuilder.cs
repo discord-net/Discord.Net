@@ -198,19 +198,20 @@ namespace Discord.Commands
 
             var createInstance = ReflectionUtils.CreateBuilder<IModuleBase>(typeInfo, service);
 
-            builder.Callback = async (ctx, args, map) => 
+            builder.Callback = async (ctx, args, map, overload) => 
             {
                 var instance = createInstance(map);
                 instance.SetContext(ctx);
+
                 try
                 {
-                    instance.BeforeExecute();
+                    instance.BeforeExecute(overload);
                     var task = method.Invoke(instance, args) as Task ?? Task.Delay(0);
                     await task.ConfigureAwait(false);
                 }
                 finally
                 {
-                    instance.AfterExecute();
+                    instance.AfterExecute(overload);
                     (instance as IDisposable)?.Dispose();
                 }
             };

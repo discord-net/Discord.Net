@@ -27,7 +27,7 @@ namespace Discord.Commands
             _score = score;
         }
 
-        public override Task<TypeReaderResult> Read(ICommandContext context, string input)
+        public override Task<TypeReaderResult> Read(ICommandContext context, string input, IServiceProvider services)
         {
             T value;
             if (_tryParse(input, out value))

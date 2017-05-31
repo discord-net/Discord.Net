@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Discord.Commands
@@ -6,7 +7,7 @@ namespace Discord.Commands
     internal class MessageTypeReader<T> : TypeReader
         where T : class, IMessage
     {
-        public override async Task<TypeReaderResult> Read(ICommandContext context, string input)
+        public override async Task<TypeReaderResult> Read(ICommandContext context, string input, IServiceProvider services)
         {
             ulong id;
 

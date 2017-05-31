@@ -168,8 +168,7 @@ namespace Discord.Commands
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                ModuleInfo module;
-                if (!_typedModuleDefs.TryRemove(type, out module))
+                if (!_typedModuleDefs.TryRemove(type, out var module))
                     return false;
 
                 return RemoveModuleInternal(module);
@@ -208,15 +207,13 @@ namespace Discord.Commands
         }
         internal IDictionary<Type, TypeReader> GetTypeReaders(Type type)
         {
-            ConcurrentDictionary<Type, TypeReader> definedTypeReaders;
-            if (_typeReaders.TryGetValue(type, out definedTypeReaders))
+            if (_typeReaders.TryGetValue(type, out var definedTypeReaders))
                 return definedTypeReaders;
             return null;
         }
         internal TypeReader GetDefaultTypeReader(Type type)
         {
-            TypeReader reader;
-            if (_defaultTypeReaders.TryGetValue(type, out reader))
+            if (_defaultTypeReaders.TryGetValue(type, out var reader))
                 return reader;
             var typeInfo = type.GetTypeInfo();
 
@@ -287,7 +284,7 @@ namespace Discord.Commands
                 var rawParseResults = new List<ParseResult>();
                 foreach (var overload in overloads)
                 {
-                    rawParseResults.Add(await overload.ParseAsync(context, searchResult, preconditionResult).ConfigureAwait(false));
+                    rawParseResults.Add(await overload.ParseAsync(context, services, searchResult, preconditionResult).ConfigureAwait(false));
                 }
 
                 //order by average score

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-using CommandCallback = System.Func<Discord.Commands.ICommandContext, object[], System.IServiceProvider, System.Threading.Tasks.Task>;
+using CommandCallback = System.Func<Discord.Commands.ICommandContext, object[], System.IServiceProvider, Discord.Commands.OverloadInfo, System.Threading.Tasks.Task>;
 
 namespace Discord.Commands.Builders
 {
