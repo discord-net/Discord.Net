@@ -10,7 +10,7 @@ namespace Discord.Commands
     internal class UserTypeReader<T> : TypeReader
         where T : class, IUser
     {
-        public override async Task<TypeReaderResult> Read(ICommandContext context, string input)
+        public override async Task<TypeReaderResult> Read(ICommandContext context, string input, IServiceProvider services)
         {
             var results = new Dictionary<ulong, TypeReaderValue>();
             IReadOnlyCollection<IUser> channelUsers = (await context.Channel.GetUsersAsync(CacheMode.CacheOnly).Flatten().ConfigureAwait(false)).ToArray(); //TODO: must be a better way?

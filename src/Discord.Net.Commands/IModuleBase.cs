@@ -4,8 +4,8 @@
     {
         void SetContext(ICommandContext context);
 
-        void BeforeExecute();
+        void BeforeExecute(OverloadInfo overload);
         
-        void AfterExecute();
+        void AfterExecute(OverloadInfo overload);
     }
 }

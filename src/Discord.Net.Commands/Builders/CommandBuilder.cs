@@ -8,22 +8,17 @@ namespace Discord.Commands.Builders
 {
     public class CommandBuilder
     {
-        private readonly List<PreconditionAttribute> _preconditions;
-        private readonly List<ParameterBuilder> _parameters;
+        private readonly List<OverloadBuilder> _overloads;
         private readonly List<string> _aliases;
 
         public ModuleBuilder Module { get; }
-        internal Func<ICommandContext, object[], IServiceProvider, Task> Callback { get; set; }
 
         public string Name { get; set; }
         public string Summary { get; set; }
         public string Remarks { get; set; }
         public string PrimaryAlias { get; set; }
-        public RunMode RunMode { get; set; }
-        public int Priority { get; set; }
 
-        public IReadOnlyList<PreconditionAttribute> Preconditions => _preconditions;
-        public IReadOnlyList<ParameterBuilder> Parameters => _parameters;
+        public IReadOnlyList<OverloadBuilder> Overloads => _overloads;
         public IReadOnlyList<string> Aliases => _aliases;
 
         //Automatic
@@ -31,20 +26,23 @@ namespace Discord.Commands.Builders
         {
             Module = module;
 
-            _preconditions = new List<PreconditionAttribute>();
-            _parameters = new List<ParameterBuilder>();
+            _overloads = new List<OverloadBuilder>();
             _aliases = new List<string>();
         }
         //User-defined
-        internal CommandBuilder(ModuleBuilder module, string primaryAlias, Func<ICommandContext, object[], IServiceProvider, Task> callback)
+        internal CommandBuilder(ModuleBuilder module, string primaryAlias, Action<OverloadBuilder> defaultOverloadBuilder)
             : this(module)
         {
             Discord.Preconditions.NotNull(primaryAlias, nameof(primaryAlias));
-            Discord.Preconditions.NotNull(callback, nameof(callback));
+            Discord.Preconditions.NotNull(defaultOverloadBuilder, nameof(defaultOverloadBuilder));
 
-            Callback = callback;
             PrimaryAlias = primaryAlias;
             _aliases.Add(primaryAlias);
+
+            var defaultOverload = new OverloadBuilder(this);
+            defaultOverloadBuilder(defaultOverload);
+
+            _overloads.Add(defaultOverload);
         }
 
         public CommandBuilder WithName(string name)
@@ -62,16 +60,6 @@ namespace Discord.Commands.Builders
             Remarks = remarks;
             return this;
         }
-        public CommandBuilder WithRunMode(RunMode runMode)
-        {
-            RunMode = runMode;
-            return this;
-        }
-        public CommandBuilder WithPriority(int priority)
-        {
-            Priority = priority;
-            return this;
-        }
 
         public CommandBuilder AddAliases(params string[] aliases)
         {
@@ -83,30 +71,12 @@ namespace Discord.Commands.Builders
             }
             return this;
         }
-        public CommandBuilder AddPrecondition(PreconditionAttribute precondition)
+
+        public CommandBuilder AddOverload(Action<OverloadBuilder> overloadBuilder)
         {
-            _preconditions.Add(precondition);
-            return this;
-        }
-        public CommandBuilder AddParameter<T>(string name, Action<ParameterBuilder> createFunc)
-        {
-            var param = new ParameterBuilder(this, name, typeof(T));
-            createFunc(param);
-            _parameters.Add(param);
-            return this;
-        }
-        public CommandBuilder AddParameter(string name, Type type, Action<ParameterBuilder> createFunc)
-        {
-            var param = new ParameterBuilder(this, name, type);
-            createFunc(param);
-            _parameters.Add(param);
-            return this;
-        }
-        internal CommandBuilder AddParameter(Action<ParameterBuilder> createFunc)
-        {
-            var param = new ParameterBuilder(this);
-            createFunc(param);
-            _parameters.Add(param);
+            var overload = new OverloadBuilder(this);
+            overloadBuilder(overload);
+            _overloads.Add(overload);
             return this;
         }
 
@@ -115,19 +85,6 @@ namespace Discord.Commands.Builders
             //Default name to primary alias
             if (Name == null)
                 Name = PrimaryAlias;
-
-            if (_parameters.Count > 0)
-            {
-                var lastParam = _parameters[_parameters.Count - 1];
-
-                var firstMultipleParam = _parameters.FirstOrDefault(x => x.IsMultiple);
-                if ((firstMultipleParam != null) && (firstMultipleParam != lastParam))
-                    throw new InvalidOperationException("Only the last parameter in a command may have the Multiple flag.");
-                
-                var firstRemainderParam = _parameters.FirstOrDefault(x => x.IsRemainder);
-                if ((firstRemainderParam != null) && (firstRemainderParam != lastParam))
-                    throw new InvalidOperationException("Only the last parameter in a command may have the Remainder flag.");
-            }
 
             return new CommandInfo(this, info, service);
         }

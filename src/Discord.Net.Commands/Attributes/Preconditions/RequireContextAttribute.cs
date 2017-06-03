@@ -38,7 +38,7 @@ namespace Discord.Commands
             Contexts = contexts;
         }
 
-        public override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider services)
+        public override Task<PreconditionResult> CheckPermissions(ICommandContext context, OverloadInfo overload, IServiceProvider services)
         {
             bool isValid = false;
 

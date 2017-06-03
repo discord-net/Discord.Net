@@ -12,6 +12,7 @@ namespace Discord.Commands
         private readonly TypeReader _reader;
 
         public CommandInfo Command { get; }
+        public OverloadInfo Overload { get; }
         public string Name { get; }
         public string Summary { get; }
         public bool IsOptional { get; }
@@ -22,9 +23,10 @@ namespace Discord.Commands
 
         public IReadOnlyList<ParameterPreconditionAttribute> Preconditions { get; }
 
-        internal ParameterInfo(ParameterBuilder builder, CommandInfo command, CommandService service)
+        internal ParameterInfo(ParameterBuilder builder, OverloadInfo overload, CommandService service)
         {
-            Command = command;
+            Command = overload.Command;
+            Overload = overload;
 
             Name = builder.Name;
             Summary = builder.Summary;
@@ -54,9 +56,11 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
 
-        public async Task<TypeReaderResult> Parse(ICommandContext context, string input)
+        public async Task<TypeReaderResult> Parse(ICommandContext context, string input, IServiceProvider services)
         {
-            return await _reader.Read(context, input).ConfigureAwait(false);
+            services = services ?? EmptyServiceProvider.Instance;
+
+            return await _reader.Read(context, input, services).ConfigureAwait(false);
         }
 
         public override string ToString() => Name;

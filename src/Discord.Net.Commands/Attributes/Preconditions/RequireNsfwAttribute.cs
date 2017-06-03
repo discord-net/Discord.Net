@@ -9,7 +9,7 @@ namespace Discord.Commands
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class RequireNsfwAttribute : PreconditionAttribute
     {
-        public override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider services)
+        public override Task<PreconditionResult> CheckPermissions(ICommandContext context, OverloadInfo overload, IServiceProvider services)
         {
             if (context.Channel.IsNsfw)
                 return Task.FromResult(PreconditionResult.FromSuccess());

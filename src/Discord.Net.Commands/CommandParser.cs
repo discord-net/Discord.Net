@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,7 +14,7 @@ namespace Discord.Commands
             QuotedParameter
         }
         
-        public static async Task<ParseResult> ParseArgs(CommandInfo command, ICommandContext context, string input, int startPos)
+        public static async Task<ParseResult> ParseArgs(OverloadInfo overload, ICommandContext context, IServiceProvider services, string input, int startPos)
         {
             ParameterInfo curParam = null;
             StringBuilder argBuilder = new StringBuilder(input.Length);
@@ -66,7 +67,7 @@ namespace Discord.Commands
                     else
                     {
                         if (curParam == null)
-                            curParam = command.Parameters.Count > argList.Count ? command.Parameters[argList.Count] : null;
+                            curParam = overload.Parameters.Count > argList.Count ? overload.Parameters[argList.Count] : null;
 
                         if (curParam != null && curParam.IsRemainder)
                         {
@@ -110,7 +111,7 @@ namespace Discord.Commands
                     if (curParam == null)
                         return ParseResult.FromError(CommandError.BadArgCount, "The input text has too many parameters.");
 
-                    var typeReaderResult = await curParam.Parse(context, argString).ConfigureAwait(false);
+                    var typeReaderResult = await curParam.Parse(context, argString, services).ConfigureAwait(false);
                     if (!typeReaderResult.IsSuccess && typeReaderResult.Error != CommandError.MultipleMatches)
                         return ParseResult.FromError(typeReaderResult);
 
@@ -133,7 +134,7 @@ namespace Discord.Commands
 
             if (curParam != null && curParam.IsRemainder)
             {
-                var typeReaderResult = await curParam.Parse(context, argBuilder.ToString()).ConfigureAwait(false);
+                var typeReaderResult = await curParam.Parse(context, argBuilder.ToString(), services).ConfigureAwait(false);
                 if (!typeReaderResult.IsSuccess)
                     return ParseResult.FromError(typeReaderResult);
                 argList.Add(typeReaderResult);
@@ -145,9 +146,9 @@ namespace Discord.Commands
                 return ParseResult.FromError(CommandError.ParseFailed, "A quoted parameter is incomplete");
             
             //Add missing optionals
-            for (int i = argList.Count; i < command.Parameters.Count; i++)
+            for (int i = argList.Count; i < overload.Parameters.Count; i++)
             {
-                var param = command.Parameters[i];
+                var param = overload.Parameters[i];
                 if (param.IsMultiple)
                     continue;
                 if (!param.IsOptional)
@@ -155,7 +156,7 @@ namespace Discord.Commands
                 argList.Add(TypeReaderResult.FromSuccess(param.DefaultValue));
             }
             
-            return ParseResult.FromSuccess(argList.ToImmutable(), paramList.ToImmutable());
+            return ParseResult.FromSuccess(overload, argList.ToImmutable(), paramList.ToImmutable());
         }
     }
 }
