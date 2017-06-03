@@ -102,7 +102,8 @@ namespace Discord.Commands
                 if (_typedModuleDefs.ContainsKey(type))
                     throw new ArgumentException($"This module has already been added.");
 
-                var module = ModuleClassBuilder.Build(this, typeInfo).FirstOrDefault();
+                var module = (await ModuleClassBuilder.Build(this, typeInfo).ConfigureAwait(false))
+                    .FirstOrDefault();
 
                 if (module.Value == default(ModuleInfo))
                     throw new InvalidOperationException($"Could not build the module {type.FullName}, did you pass an invalid type?");
@@ -121,8 +122,8 @@ namespace Discord.Commands
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                var types = ModuleClassBuilder.Search(assembly).ToArray();
-                var moduleDefs = ModuleClassBuilder.Build(types, this);
+                var types = await ModuleClassBuilder.Search(assembly, this).ConfigureAwait(false);
+                var moduleDefs = await ModuleClassBuilder.Build(types, this).ConfigureAwait(false);
 
                 foreach (var info in moduleDefs)
                 {

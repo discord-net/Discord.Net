@@ -12,21 +12,37 @@ namespace Discord.Commands
     {
         private static readonly TypeInfo _moduleTypeInfo = typeof(IModuleBase).GetTypeInfo();
 
-        public static IEnumerable<TypeInfo> Search(Assembly assembly)
+        public static async Task<IReadOnlyList<TypeInfo>> Search(Assembly assembly, CommandService service)
         {
-            foreach (var type in assembly.ExportedTypes)
+            bool IsLoadableModule(TypeInfo info)
             {
-                var typeInfo = type.GetTypeInfo();
-                if (IsValidModuleDefinition(typeInfo) &&
-                    !typeInfo.IsDefined(typeof(DontAutoLoadAttribute)))
+                return info.DeclaredMethods.Any(x => x.GetCustomAttribute<CommandAttribute>() != null) &&
+                    info.GetCustomAttribute<DontAutoLoadAttribute>() == null;
+            }
+
+            List<TypeInfo> result = new List<TypeInfo>();
+
+            foreach (var typeInfo in assembly.DefinedTypes)
+            {
+                if (typeInfo.IsPublic)
                 {
-                    yield return typeInfo;
+                    if (IsValidModuleDefinition(typeInfo) &&
+                        !typeInfo.IsDefined(typeof(DontAutoLoadAttribute)))
+                    {
+                        result.Add(typeInfo);
+                    }
+                }
+                else if (IsLoadableModule(typeInfo))
+                {
+                    await service._cmdLogger.WarningAsync($"Class {typeInfo.FullName} is not public and cannot be loaded. To suppress this message, mark the class with {nameof(DontAutoLoadAttribute)}.");
                 }
             }
+
+            return result;
         }
 
-        public static Dictionary<Type, ModuleInfo> Build(CommandService service, params TypeInfo[] validTypes) => Build(validTypes, service);
-        public static Dictionary<Type, ModuleInfo> Build(IEnumerable<TypeInfo> validTypes, CommandService service)
+        public static Task<Dictionary<Type, ModuleInfo>> Build(CommandService service, params TypeInfo[] validTypes) => Build(validTypes, service);
+        public static async Task<Dictionary<Type, ModuleInfo>> Build(IEnumerable<TypeInfo> validTypes, CommandService service)
         {
             /*if (!validTypes.Any())
                 throw new InvalidOperationException("Could not find any valid modules from the given selection");*/
@@ -51,6 +67,8 @@ namespace Discord.Commands
 
                 result[typeInfo.AsType()] = module.Build(service);
             }
+
+            await service._cmdLogger.DebugAsync($"Successfully loaded {builtTypes.Count} modules.").ConfigureAwait(false);
 
             return result;
         }
