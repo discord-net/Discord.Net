@@ -95,7 +95,7 @@ namespace Discord.Commands
                 if (_typedModuleDefs.ContainsKey(type))
                     throw new ArgumentException($"This module has already been added.");
 
-                var module = ModuleClassBuilder.Build(this, typeInfo).FirstOrDefault();
+                var module = (await ModuleClassBuilder.BuildAsync(this, typeInfo).ConfigureAwait(false)).FirstOrDefault();
 
                 if (module.Value == default(ModuleInfo))
                     throw new InvalidOperationException($"Could not build the module {type.FullName}, did you pass an invalid type?");
@@ -114,8 +114,8 @@ namespace Discord.Commands
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                var types = ModuleClassBuilder.Search(assembly).ToArray();
-                var moduleDefs = ModuleClassBuilder.Build(types, this);
+                var types = await ModuleClassBuilder.SearchAsync(assembly, this).ConfigureAwait(false);
+                var moduleDefs = await ModuleClassBuilder.BuildAsync(types, this).ConfigureAwait(false);
 
                 foreach (var info in moduleDefs)
                 {
@@ -161,8 +161,7 @@ namespace Discord.Commands
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                ModuleInfo module;
-                if (!_typedModuleDefs.TryRemove(type, out module))
+                if (!_typedModuleDefs.TryRemove(type, out var module))
                     return false;
 
                 return RemoveModuleInternal(module);
@@ -201,15 +200,13 @@ namespace Discord.Commands
         }
         internal IDictionary<Type, TypeReader> GetTypeReaders(Type type)
         {
-            ConcurrentDictionary<Type, TypeReader> definedTypeReaders;
-            if (_typeReaders.TryGetValue(type, out definedTypeReaders))
+            if (_typeReaders.TryGetValue(type, out var definedTypeReaders))
                 return definedTypeReaders;
             return null;
         }
         internal TypeReader GetDefaultTypeReader(Type type)
         {
-            TypeReader reader;
-            if (_defaultTypeReaders.TryGetValue(type, out reader))
+            if (_defaultTypeReaders.TryGetValue(type, out var reader))
                 return reader;
             var typeInfo = type.GetTypeInfo();
 

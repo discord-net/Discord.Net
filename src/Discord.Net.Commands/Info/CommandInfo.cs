@@ -18,7 +18,7 @@ namespace Discord.Commands
         private static readonly System.Reflection.MethodInfo _convertParamsMethod = typeof(CommandInfo).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<object>, object>> _arrayConverters = new ConcurrentDictionary<Type, Func<IEnumerable<object>, object>>();
 
-        private readonly Func<ICommandContext, object[], IServiceProvider, Task> _action;
+        private readonly Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> _action;
 
         public ModuleInfo Module { get; }
         public string Name { get; }
@@ -181,7 +181,7 @@ namespace Discord.Commands
             await Module.Service._cmdLogger.DebugAsync($"Executing {GetLogText(context)}").ConfigureAwait(false);
             try
             {
-                await _action(context, args, services).ConfigureAwait(false);
+                await _action(context, args, services, this).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
