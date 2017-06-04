@@ -21,10 +21,9 @@ namespace Discord.Commands
             _tryParse = PrimitiveParsers.Get<T>();
         }
 
-        public override Task<TypeReaderResult> Read(ICommandContext context, string input)
+        public override Task<TypeReaderResult> Read(ICommandContext context, string input, IServiceProvider services)
         {
-            T value;
-            if (_tryParse(input, out value))
+            if (_tryParse(input, out T value))
                 return Task.FromResult(TypeReaderResult.FromSuccess(value));
             return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Failed to parse {typeof(T).Name}"));
         }
