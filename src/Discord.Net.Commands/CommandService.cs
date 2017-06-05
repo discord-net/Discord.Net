@@ -258,7 +258,6 @@ namespace Discord.Commands
             if (!searchResult.IsSuccess)
                 return searchResult;
 
-            //Group commands by their alias
             var commands = searchResult.Commands;
             var preconditionResults = new Dictionary<CommandMatch, PreconditionResult>();
 
@@ -307,16 +306,10 @@ namespace Discord.Commands
             float CalculateScore(CommandMatch match, ParseResult parseResult)
             {
                 //TODO: is this calculation correct?
-                var argValuesScore = parseResult.ArgValues.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score);
-                var paramValuesScore = parseResult.ParamValues.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score);
+                var argValuesScore = parseResult.ArgValues.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) / match.Command.Parameters.Count;
+                var paramValuesScore = parseResult.ParamValues.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) / match.Command.Parameters.Count;
 
-                /* Since argValuesScore and paramValuesScore are in the range [0, numOfParams]
-                 * we multiply the priority by the number of parameters plus one, so that it is
-                 * always the most important value.
-                 */
-                var priorityScore = match.Command.Priority * (match.Command.Parameters.Count + 1);
-
-                return priorityScore + argValuesScore + paramValuesScore;
+                return match.Command.Priority + argValuesScore + paramValuesScore;
             }
 
             //Order the parse results by their score so that we choose the most likely result to execute
@@ -328,7 +321,6 @@ namespace Discord.Commands
             if (successfulParses.Length == 0)
             {
                 //All parses failed, return the one from the highest priority command, using score as a tie breaker
-
                 var bestMatch = parseResults
                     .FirstOrDefault(x => !x.Value.IsSuccess);
                 return bestMatch.Value;
