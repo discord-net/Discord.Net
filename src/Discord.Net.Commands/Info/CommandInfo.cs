@@ -86,7 +86,7 @@ namespace Discord.Commands
                         results.Add(await precondition.CheckPermissions(context, this, services).ConfigureAwait(false));
 
                     if (!results.Any(p => p.IsSuccess))
-                        return results[0];
+                        return PreconditionResult.FromError($"Module precondition group {preconditionGroup.Key} failed: {String.Join("\n", results.Select(r => r.ErrorReason))}.");
                 }
             }
 
@@ -108,7 +108,7 @@ namespace Discord.Commands
                         results.Add(await precondition.CheckPermissions(context, this, services).ConfigureAwait(false));
 
                     if (!results.Any(p => p.IsSuccess))
-                        return results[0];
+                        return PreconditionResult.FromError($"Command precondition group {preconditionGroup.Key} failed: {String.Join("\n", results.Select(r => r.ErrorReason))}.");
                 }
             }
 
