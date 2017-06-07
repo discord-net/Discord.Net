@@ -99,15 +99,15 @@ class Program
         // and other dependencies that your commands might need.
         _map.AddSingleton(new SomeServiceClass());
 
-        // Either search the program and add all Module classes that can be found:
-        await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
-        // Or add Modules manually if you prefer to be a little more explicit:
-        await _commands.AddModuleAsync<SomeModule>();
-
         // When all your required services are in the collection, build the container.
         // Tip: There's an overload taking in a 'validateScopes' bool to make sure
         // you haven't made any mistakes in your dependency graph.
         _services = _map.BuildServiceProvider();
+
+        // Either search the program and add all Module classes that can be found:
+        await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
+        // Or add Modules manually if you prefer to be a little more explicit:
+        await _commands.AddModuleAsync<SomeModule>();
 
         // Subscribe a handler to see if a message invokes a command.
         _client.MessageReceived += HandleCommandAsync;
