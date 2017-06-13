@@ -104,7 +104,8 @@ class Program
         // you haven't made any mistakes in your dependency graph.
         _services = _map.BuildServiceProvider();
 
-        // Either search the program and add all Module classes that can be found:
+        // Either search the program and add all Module classes that can be found.
+        // Module classes *must* be marked 'public' or they will be ignored.
         await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
         // Or add Modules manually if you prefer to be a little more explicit:
         await _commands.AddModuleAsync<SomeModule>();
