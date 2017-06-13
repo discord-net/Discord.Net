@@ -1,4 +1,5 @@
 using Discord.Commands;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,37 +15,40 @@ namespace Discord.Net.Commands.Tests
         public async Task CommandSeparators(CommandServiceConfig config, char separatorChar)
         {
             var service = new CommandService(config);
-            var module = await service.AddModuleAsync(typeof(DummyModule)).ConfigureAwait(false);
+            await service.AddModuleAsync(typeof(DummyModule)).ConfigureAwait(false);
 
-            Assert.True(CommandsLoaded(service, separatorChar));
+            var contextMock = new Mock<ICommandContext>();
+            var context = contextMock.Object;
 
-            var dummyContext = new DummyCommandContext();
-
-            foreach (var _alias in DefaultAliases)
+            foreach (var _name in DummyModule.CommandNames)
             {
-                var alias = _alias.Replace(' ', separatorChar);
+                var name = _name.Replace(' ', separatorChar);
 
-                var result = service.Search(dummyContext, alias);
+                var result = service.Search(context, name);
                 Assert.True(result.IsSuccess, result.ErrorReason);
             }
         }
 
-        public bool CommandsLoaded(CommandService service, char separatorChar)
+        [Theory]
+        [MemberData(nameof(CaseSensitivityTestData), MemberType = typeof(CommandServiceConfigTests))]
+        public async Task CaseSensitivity(bool caseSensitive, bool upperCase)
         {
-            if (!service.Commands.Any())
-                return false;
+            var service = new CommandService(new CommandServiceConfig { CaseSensitiveCommands = caseSensitive });
+            await service.AddModuleAsync(typeof(DummyModule)).ConfigureAwait(false);
 
-            var loadedAliases = service.Commands.SelectMany(x => x.Aliases);
+            var contextMock = new Mock<ICommandContext>();
+            var context = contextMock.Object;
 
-            foreach (var alias in DefaultAliases)
+            foreach (var _name in DummyModule.CommandNames)
             {
-                if (!loadedAliases.Contains(alias.Replace(' ', separatorChar)))
-                {
-                    return false;
-                }
-            }
+                var name = upperCase ? _name.ToUpper() : _name;
 
-            return true;
+                var result = service.Search(context, name);
+                if (caseSensitive && upperCase)
+                    Assert.False(result.IsSuccess, $"Searching for `{name}` returned successfully");
+                else
+                    Assert.True(result.IsSuccess, result.ErrorReason);
+            }
         }
     }
 }

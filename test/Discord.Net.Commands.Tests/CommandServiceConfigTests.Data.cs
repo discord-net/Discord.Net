@@ -16,11 +16,13 @@ namespace Discord.Net.Commands.Tests
             new CommandServiceConfig{ SeparatorChar = '"'}
         }.Select(x => new object[] { x, x.SeparatorChar });
 
-        public static IEnumerable<string> DefaultAliases => _defaultAliases;
-        private static readonly IEnumerable<string> _defaultAliases = new List<string>
+        public static IEnumerable<object[]> CaseSensitivityTestData => _caseSensitivityTestData;
+        private static readonly IEnumerable<object[]> _caseSensitivityTestData = new object[][]
         {
-            "debug ping",
-            "debug pong"
+            new object[]{  true, false },
+            new object[]{  true,  true },
+            new object[]{ false,  true },
+            new object[]{ false, false }
         };
     }
 }

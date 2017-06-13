@@ -20,5 +20,19 @@ namespace Discord.Net.Commands.Tests
         {
             return Task.Delay(0);
         }
+
+        //NOTE: do not add this to CommandNames: it is intentional for this command to not be loaded!
+        [Command("doesNotLoad")]
+        private Task DoesNotLoadAsync()
+        {
+            return Task.Delay(0);
+        }
+
+        public static IEnumerable<string> CommandNames => _commandNames;
+        private static readonly IEnumerable<string> _commandNames = new List<string>
+        {
+            "debug ping",
+            "debug pong"
+        };
     }
 }
