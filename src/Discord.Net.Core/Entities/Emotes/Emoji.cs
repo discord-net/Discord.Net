@@ -7,7 +7,7 @@
     {
         // TODO: need to constrain this to unicode-only emojis somehow
         /// <summary>
-        /// Creates a unciode emoji.
+        /// Creates a unicode emoji.
         /// </summary>
         /// <param name="unicode">The pure UTF-8 encoding of an emoji</param>
         public Emoji(string unicode)
