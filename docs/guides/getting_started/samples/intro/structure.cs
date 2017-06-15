@@ -30,8 +30,8 @@ class Program
             LogLevel = LogSeverity.Info,
             
             // If you or another service needs to do anything with messages
-            // (eg. checking Reactions), you should probably
-            // set the MessageCacheSize here.
+            // (eg. checking Reactions, checking the content of edited/deleted messages),
+            // you must set the MessageCacheSize. You may adjust the number as needed.
             //MessageCacheSize = 50,
 
             // If your platform doesn't have native websockets,
@@ -41,7 +41,7 @@ class Program
         });
     }
 
-    // Create a named logging handler, so it can be re-used by addons
+    // Example of a logging handler. This can be re-used by addons
     // that ask for a Func<LogMessage, Task>.
     private static Task Logger(LogMessage message)
     {
@@ -65,6 +65,13 @@ class Program
         }
         Console.WriteLine($"{DateTime.Now,-19} [{message.Severity,8}] {message.Source}: {message.Message}");
         Console.ForegroundColor = cc;
+        
+        // If you get an error saying 'CompletedTask' doesn't exist,
+        // your project is targeting .NET 4.5.2 or lower. You'll need
+        // to adjust your project's target framework to 4.6 or higher
+        // (instructions for this are easily Googled).
+        // If you *need* to run on .NET 4.5 for compat/other reasons,
+        // the alternative is to 'return Task.Delay(0);' instead.
         return Task.CompletedTask;
     }
 
@@ -92,15 +99,16 @@ class Program
         // and other dependencies that your commands might need.
         _map.AddSingleton(new SomeServiceClass());
 
-        // Either search the program and add all Module classes that can be found:
-        await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
-        // Or add Modules manually if you prefer to be a little more explicit:
-        await _commands.AddModuleAsync<SomeModule>();
-
         // When all your required services are in the collection, build the container.
         // Tip: There's an overload taking in a 'validateScopes' bool to make sure
         // you haven't made any mistakes in your dependency graph.
         _services = _map.BuildServiceProvider();
+
+        // Either search the program and add all Module classes that can be found.
+        // Module classes *must* be marked 'public' or they will be ignored.
+        await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
+        // Or add Modules manually if you prefer to be a little more explicit:
+        await _commands.AddModuleAsync<SomeModule>();
 
         // Subscribe a handler to see if a message invokes a command.
         _client.MessageReceived += HandleCommandAsync;
@@ -120,7 +128,7 @@ class Program
         // commands to be invoked by mentioning the bot instead.
         if (msg.HasCharPrefix('!', ref pos) /* || msg.HasMentionPrefix(_client.CurrentUser, ref pos) */)
         {
-            // Create a Command Context
+            // Create a Command Context.
             var context = new SocketCommandContext(_client, msg);
             
             // Execute the command. (result does not indicate a return value, 
