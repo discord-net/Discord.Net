@@ -8,14 +8,14 @@ namespace Discord.API
     {
         [JsonProperty("title")]
         public string Title { get; set; }
-        [JsonProperty("type")]
-        public string Type { get; set; }
         [JsonProperty("description")]
         public string Description { get; set; }
         [JsonProperty("url")]
         public string Url { get; set; }
         [JsonProperty("color")]
         public uint? Color { get; set; }
+        [JsonProperty("type")]
+        public EmbedType Type { get; set; }
         [JsonProperty("timestamp")]
         public DateTimeOffset? Timestamp { get; set; }
         [JsonProperty("author")]

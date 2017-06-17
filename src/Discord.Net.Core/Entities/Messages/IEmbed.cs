@@ -6,9 +6,9 @@ namespace Discord
     public interface IEmbed
     {
         string Url { get; }
-        string Type { get; }
         string Title { get; }
         string Description { get; }
+        EmbedType Type { get; }
         DateTimeOffset? Timestamp { get; }
         Color? Color { get; }
         EmbedImage? Image { get; }

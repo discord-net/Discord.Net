@@ -10,7 +10,7 @@ namespace Discord
 
         public EmbedBuilder()
         {
-            _embed = new Embed("rich");
+            _embed = new Embed(EmbedType.Rich);
             Fields = new List<EmbedFieldBuilder>();
         }
 
