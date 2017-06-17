@@ -20,6 +20,6 @@ namespace Discord
         string Username { get; }
 
         /// <summary> Returns a private message channel to this user, creating one if it does not already exist. </summary>
-        Task<IDMChannel> GetDMChannelAsync(RequestOptions options = null);
+        Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null);
     }
 }
