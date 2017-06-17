@@ -64,11 +64,11 @@ namespace Discord.Commands
             _action = builder.Callback;
         }
 
-        public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, IServiceProvider services = null)
+        public async Task<IResult> CheckPreconditionsAsync(ICommandContext context, IServiceProvider services = null)
         {
             services = services ?? EmptyServiceProvider.Instance;
 
-            async Task<PreconditionResult> CheckGroups(IEnumerable<PreconditionAttribute> preconditions, string type)
+            async Task<PreconditionGroupResult> CheckGroups(IEnumerable<PreconditionAttribute> preconditions, string type)
             {
                 foreach (IGrouping<int, PreconditionAttribute> preconditionGroup in preconditions.GroupBy(p => p.Group))
                 {
@@ -78,7 +78,7 @@ namespace Discord.Commands
                         {
                             var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
                             if (!result.IsSuccess)
-                                return result;
+                                return PreconditionGroupResult.FromError($"{type} default precondition group failed", new[] { result });
                         }
                     }
                     else
@@ -88,10 +88,10 @@ namespace Discord.Commands
                             results.Add(await precondition.CheckPermissions(context, this, services).ConfigureAwait(false));
 
                         if (!results.Any(p => p.IsSuccess))
-                            return PreconditionResult.FromError($"{type} precondition group {preconditionGroup.Key} failed: {String.Join("\n", results.Select(r => r.ErrorReason))}.");
+                            return PreconditionGroupResult.FromError($"{type} precondition group {preconditionGroup.Key} failed", results);
                     }
                 }
-                return PreconditionResult.FromSuccess();
+                return PreconditionGroupResult.FromSuccess();
             }
 
             var moduleResult = await CheckGroups(Module.Preconditions, "Module");
