@@ -1,6 +1,7 @@
 ﻿#pragma warning disable CS1591
 using System;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Discord.API
 {
@@ -14,7 +15,7 @@ namespace Discord.API
         public string Url { get; set; }
         [JsonProperty("color")]
         public uint? Color { get; set; }
-        [JsonProperty("type")]
+        [JsonProperty("type"), JsonConverter(typeof(StringEnumConverter))]
         public EmbedType Type { get; set; }
         [JsonProperty("timestamp")]
         public DateTimeOffset? Timestamp { get; set; }
