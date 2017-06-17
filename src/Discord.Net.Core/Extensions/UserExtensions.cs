@@ -10,7 +10,7 @@ namespace Discord
             Embed embed = null, 
             RequestOptions options = null)
         {
-            return await (await user.GetOrCreateDMChannelAsync()).SendMessageAsync(text, isTTS, embed, options);
+            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
         }
     }
 }
