@@ -146,11 +146,7 @@ namespace Discord.WebSocket
         IGuild IGuildUser.Guild => Guild;
         ulong IGuildUser.GuildId => Guild.Id;
         IReadOnlyCollection<ulong> IGuildUser.RoleIds => _roleIds;
-
-        //IUser
-        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options) 
-            => Task.FromResult<IDMChannel>(GlobalUser.DMChannel);
-
+        
         //IVoiceState
         IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;
     }

@@ -53,10 +53,10 @@ namespace Discord.WebSocket
                 hasChanges = true;
             }
             return hasChanges;
-        }
+        } 
 
-        public Task<RestDMChannel> CreateDMChannelAsync(RequestOptions options = null)
-            => UserHelper.CreateDMChannelAsync(this, Discord, options);
+        public async Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
+            => GlobalUser.DMChannel ?? await UserHelper.CreateDMChannelAsync(this, Discord, options) as IDMChannel;
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
@@ -64,11 +64,5 @@ namespace Discord.WebSocket
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
-
-        //IUser
-        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options)
-            => Task.FromResult<IDMChannel>(GlobalUser.DMChannel);
-        async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
-            => await CreateDMChannelAsync(options).ConfigureAwait(false);
     }
 }

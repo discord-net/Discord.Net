@@ -49,7 +49,7 @@ namespace Discord.Rpc
                 Username = model.Username.Value;
         }
 
-        public Task<RestDMChannel> CreateDMChannelAsync(RequestOptions options = null)
+        public Task<RestDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
             => UserHelper.CreateDMChannelAsync(this, Discord, options);
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
@@ -59,9 +59,7 @@ namespace Discord.Rpc
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
 
         //IUser
-        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options)
-            => Task.FromResult<IDMChannel>(null);
-        async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
-            => await CreateDMChannelAsync(options).ConfigureAwait(false);
+        async Task<IDMChannel> IUser.GetOrCreateDMChannelAsync(RequestOptions options)
+            => await GetOrCreateDMChannelAsync(options);
     }
 }

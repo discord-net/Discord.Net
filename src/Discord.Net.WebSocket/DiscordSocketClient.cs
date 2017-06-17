@@ -1634,6 +1634,9 @@ namespace Discord.WebSocket
         {
             var channel = SocketChannel.CreatePrivate(this, state, model);
             state.AddChannel(channel as SocketChannel);
+            if (channel is SocketDMChannel dm)
+                dm.Recipient.GlobalUser.DMChannel = dm;
+
             return channel;
         }
         internal ISocketPrivateChannel RemovePrivateChannel(ulong id)
@@ -1641,6 +1644,9 @@ namespace Discord.WebSocket
             var channel = State.RemoveChannel(id) as ISocketPrivateChannel;
             if (channel != null)
             {
+                if (channel is SocketDMChannel dmChannel)
+                    dmChannel.Recipient.GlobalUser.DMChannel = null;
+
                 foreach (var recipient in channel.Recipients)
                     recipient.GlobalUser.RemoveRef(this);
             }
