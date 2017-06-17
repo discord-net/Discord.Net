@@ -47,7 +47,7 @@ namespace Discord.WebSocket
         GuildPermissions IGuildUser.GuildPermissions => GuildPermissions.Webhook;
 
         ChannelPermissions IGuildUser.GetPermissions(IGuildChannel channel) => Permissions.ToChannelPerms(channel, GuildPermissions.Webhook.RawValue);
-        Task IGuildUser.KickAsync(RequestOptions options)
+        Task IGuildUser.KickAsync(string reason, RequestOptions options)
         {
             throw new NotSupportedException("Webhook users cannot be kicked.");
         }

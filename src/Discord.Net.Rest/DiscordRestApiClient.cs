@@ -803,7 +803,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            await SendAsync("PUT", () => $"guilds/{guildId}/bans/{userId}?delete-message-days={args.DeleteMessageDays}", ids, options: options).ConfigureAwait(false);
+            await SendAsync("PUT", () => $"guilds/{guildId}/bans/{userId}?delete-message-days={args.DeleteMessageDays}&reason={args.Reason}", ids, options: options).ConfigureAwait(false);
         }
         public async Task RemoveGuildBanAsync(ulong guildId, ulong userId, RequestOptions options = null)
         {
@@ -980,14 +980,14 @@ namespace Discord.API
             Expression<Func<string>> endpoint = () => $"guilds/{guildId}/members?limit={limit}&after={afterUserId}";
             return await SendAsync<IReadOnlyCollection<GuildMember>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
-        public async Task RemoveGuildMemberAsync(ulong guildId, ulong userId, RequestOptions options = null)
+        public async Task RemoveGuildMemberAsync(ulong guildId, ulong userId, string reason, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            await SendAsync("DELETE", () => $"guilds/{guildId}/members/{userId}", ids, options: options).ConfigureAwait(false);
+            await SendAsync("DELETE", () => $"guilds/{guildId}/members/{userId}?reason={reason}", ids, options: options).ConfigureAwait(false);
         }
         public async Task ModifyGuildMemberAsync(ulong guildId, ulong userId, Rest.ModifyGuildMemberParams args, RequestOptions options = null)
         {
