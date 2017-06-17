@@ -68,49 +68,39 @@ namespace Discord.Commands
         {
             services = services ?? EmptyServiceProvider.Instance;
 
-            foreach (IGrouping<int, PreconditionAttribute> preconditionGroup in Module.Preconditions.GroupBy(p => p.Group))
+            async Task<PreconditionResult> CheckGroups(IEnumerable<PreconditionAttribute> preconditions, string type)
             {
-                if (preconditionGroup.Key == 0)
+                foreach (IGrouping<int, PreconditionAttribute> preconditionGroup in preconditions.GroupBy(p => p.Group))
                 {
-                    foreach (PreconditionAttribute precondition in preconditionGroup)
+                    if (preconditionGroup.Key == 0)
                     {
-                        var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
-                        if (!result.IsSuccess)
-                            return result;
+                        foreach (PreconditionAttribute precondition in preconditionGroup)
+                        {
+                            var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
+                            if (!result.IsSuccess)
+                                return result;
+                        }
+                    }
+                    else
+                    {
+                        var results = new List<PreconditionResult>();
+                        foreach (PreconditionAttribute precondition in preconditionGroup)
+                            results.Add(await precondition.CheckPermissions(context, this, services).ConfigureAwait(false));
+
+                        if (!results.Any(p => p.IsSuccess))
+                            return PreconditionResult.FromError($"{type} precondition group {preconditionGroup.Key} failed: {String.Join("\n", results.Select(r => r.ErrorReason))}.");
                     }
                 }
-                else
-                {
-                    var results = new List<PreconditionResult>();
-                    foreach (PreconditionAttribute precondition in preconditionGroup)
-                        results.Add(await precondition.CheckPermissions(context, this, services).ConfigureAwait(false));
-
-                    if (!results.Any(p => p.IsSuccess))
-                        return PreconditionResult.FromError($"Module precondition group {preconditionGroup.Key} failed: {String.Join("\n", results.Select(r => r.ErrorReason))}.");
-                }
+                return PreconditionResult.FromSuccess();
             }
 
-            foreach (IGrouping<int, PreconditionAttribute> preconditionGroup in Preconditions.GroupBy(p => p.Group))
-            {
-                if (preconditionGroup.Key == 0)
-                {
-                    foreach (PreconditionAttribute precondition in preconditionGroup)
-                    {
-                        var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
-                        if (!result.IsSuccess)
-                            return result;
-                    }
-                }
-                else
-                {
-                    var results = new List<PreconditionResult>();
-                    foreach (PreconditionAttribute precondition in preconditionGroup)
-                        results.Add(await precondition.CheckPermissions(context, this, services).ConfigureAwait(false));
+            var moduleResult = await CheckGroups(Module.Preconditions, "Module");
+            if (!moduleResult.IsSuccess)
+                return moduleResult;
 
-                    if (!results.Any(p => p.IsSuccess))
-                        return PreconditionResult.FromError($"Command precondition group {preconditionGroup.Key} failed: {String.Join("\n", results.Select(r => r.ErrorReason))}.");
-                }
-            }
+            var commandResult = await CheckGroups(Preconditions, "Command");
+            if (!commandResult.IsSuccess)
+                return commandResult;
 
             return PreconditionResult.FromSuccess();
         }
