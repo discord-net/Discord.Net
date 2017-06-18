@@ -13,18 +13,18 @@ namespace Discord.Commands
 
         public bool IsSuccess => !Error.HasValue;
 
-        public IEnumerable<PreconditionResult> Preconditions { get; }
+        public IReadOnlyCollection<PreconditionResult> Preconditions { get; }
 
-        private PreconditionGroupResult(CommandError? error, string errorReason, IEnumerable<PreconditionResult> preconditions)
+        private PreconditionGroupResult(CommandError? error, string errorReason, ICollection<PreconditionResult> preconditions)
         {
             Error = error;
             ErrorReason = errorReason;
-            Preconditions = preconditions ?? Enumerable.Empty<PreconditionResult>();
+            Preconditions = (preconditions ?? Enumerable.Empty<PreconditionResult>().ToList()).ToReadOnlyCollection();
         }
 
         public static PreconditionGroupResult FromSuccess()
             => new PreconditionGroupResult(null, null, null);
-        public static PreconditionGroupResult FromError(string reason, IEnumerable<PreconditionResult> preconditions)
+        public static PreconditionGroupResult FromError(string reason, ICollection<PreconditionResult> preconditions)
             => new PreconditionGroupResult(CommandError.UnmetPrecondition, reason, preconditions);
         public static PreconditionGroupResult FromError(IResult result) //needed?
             => new PreconditionGroupResult(result.Error, result.ErrorReason, null);
