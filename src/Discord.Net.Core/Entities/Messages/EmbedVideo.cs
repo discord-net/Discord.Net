@@ -1,15 +1,16 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace Discord
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct EmbedVideo
     {
-        public string Url { get; }
+        public Uri Url { get; }
         public int? Height { get; }
         public int? Width { get; }
 
-        internal EmbedVideo(string url, int? height, int? width)
+        internal EmbedVideo(Uri url, int? height, int? width)
         {
             Url = url;
             Height = height;
@@ -17,6 +18,6 @@ namespace Discord
         }
 
         private string DebuggerDisplay => $"{Url} ({(Width != null && Height != null ? $"{Width}x{Height}" : "0x0")})";
-        public override string ToString() => Url;
+        public override string ToString() => Url.ToString();
     }
 }

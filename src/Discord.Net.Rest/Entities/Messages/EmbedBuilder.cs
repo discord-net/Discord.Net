@@ -38,11 +38,11 @@ namespace Discord
             }
         }
 
-        public string Url { get { return _embed.Url; } set { _embed.Url = value; } }
-        public string ThumbnailUrl { get { return _embed.Thumbnail?.Url; } set { _embed.Thumbnail = new EmbedThumbnail(value, null, null, null); } }
-        public string ImageUrl { get { return _embed.Image?.Url; } set { _embed.Image = new EmbedImage(value, null, null, null); } }
-        public DateTimeOffset? Timestamp { get { return _embed.Timestamp; } set { _embed.Timestamp = value; } }
-        public Color? Color { get { return _embed.Color; } set { _embed.Color = value; } }
+        public Uri Url { get => _embed.Url; set { _embed.Url = value; } }
+        public Uri ThumbnailUrl { get => _embed.Thumbnail?.Url; set { _embed.Thumbnail = new EmbedThumbnail(value, null, null, null); } }
+        public Uri ImageUrl { get => _embed.Image?.Url; set { _embed.Image = new EmbedImage(value, null, null, null); } }
+        public DateTimeOffset? Timestamp { get => _embed.Timestamp; set { _embed.Timestamp = value; } }
+        public Color? Color { get => _embed.Color; set { _embed.Color = value; } }
 
         public EmbedAuthorBuilder Author { get; set; }
         public EmbedFooterBuilder Footer { get; set; }
@@ -69,17 +69,17 @@ namespace Discord
             Description = description;
             return this;
         }
-        public EmbedBuilder WithUrl(string url)
+        public EmbedBuilder WithUrl(Uri url)
         {
             Url = url;
             return this;
         }
-        public EmbedBuilder WithThumbnailUrl(string thumbnailUrl)
+        public EmbedBuilder WithThumbnailUrl(Uri thumbnailUrl)
         {
             ThumbnailUrl = thumbnailUrl;
             return this;
         }
-        public EmbedBuilder WithImageUrl(string imageUrl)
+        public EmbedBuilder WithImageUrl(Uri imageUrl)
         {
             ImageUrl = imageUrl;
             return this;
@@ -186,7 +186,8 @@ namespace Discord
             get => _field.Name;
             set
             {
-                if (value?.Length > MaxFieldNameLength) throw new ArgumentException($"Field name length must be less than or equal to {MaxFieldNameLength}.");
+                if (string.IsNullOrEmpty(value)) throw new ArgumentException($"Field name must not be null or empty");
+                if (value.Length > MaxFieldNameLength) throw new ArgumentException($"Field name length must be less than or equal to {MaxFieldNameLength}.");
                 _field.Name = value;
             }
         }
@@ -197,11 +198,12 @@ namespace Discord
             set
             {
                 var stringValue = value.ToString();
+                if (string.IsNullOrEmpty(stringValue)) throw new ArgumentException($"Field value must not be null or empty");
                 if (stringValue.Length > MaxFieldValueLength) throw new ArgumentException($"Field value length must be less than or equal to {MaxFieldValueLength}.");
                 _field.Value = stringValue;
             }
         }
-        public bool IsInline { get { return _field.Inline; } set { _field.Inline = value; } }
+        public bool IsInline { get => _field.Inline; set { _field.Inline = value; } }
 
         public EmbedFieldBuilder()
         {
@@ -243,8 +245,8 @@ namespace Discord
                 _author.Name = value;
             }
         }
-        public string Url { get { return _author.Url; } set { _author.Url = value; } }
-        public string IconUrl { get { return _author.IconUrl; } set { _author.IconUrl = value; } }
+        public Uri Url { get => _author.Url; set { _author.Url = value; } }
+        public Uri IconUrl { get => _author.IconUrl; set { _author.IconUrl = value; } }
 
         public EmbedAuthorBuilder()
         {
@@ -256,12 +258,12 @@ namespace Discord
             Name = name;
             return this;
         }
-        public EmbedAuthorBuilder WithUrl(string url)
+        public EmbedAuthorBuilder WithUrl(Uri url)
         {
             Url = url;
             return this;
         }
-        public EmbedAuthorBuilder WithIconUrl(string iconUrl)
+        public EmbedAuthorBuilder WithIconUrl(Uri iconUrl)
         {
             IconUrl = iconUrl;
             return this;
@@ -286,7 +288,7 @@ namespace Discord
                 _footer.Text = value;
             }
         }
-        public string IconUrl { get { return _footer.IconUrl; } set { _footer.IconUrl = value; } }
+        public Uri IconUrl { get => _footer.IconUrl; set { _footer.IconUrl = value; } }
 
         public EmbedFooterBuilder()
         {
@@ -298,7 +300,7 @@ namespace Discord
             Text = text;
             return this;
         }
-        public EmbedFooterBuilder WithIconUrl(string iconUrl)
+        public EmbedFooterBuilder WithIconUrl(Uri iconUrl)
         {
             IconUrl = iconUrl;
             return this;

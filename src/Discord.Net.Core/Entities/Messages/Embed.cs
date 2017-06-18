@@ -10,7 +10,7 @@ namespace Discord
         public string Type { get; }
 
         public string Description { get; internal set; }
-        public string Url { get; internal set; }
+        public Uri Url { get; internal set; }
         public string Title { get; internal set; }
         public DateTimeOffset? Timestamp { get; internal set; }
         public Color? Color { get; internal set; }
@@ -30,7 +30,7 @@ namespace Discord
         internal Embed(string type, 
             string title,
             string description,
-            string url,
+            Uri url,
             DateTimeOffset? timestamp,
             Color? color,
             EmbedImage? image,

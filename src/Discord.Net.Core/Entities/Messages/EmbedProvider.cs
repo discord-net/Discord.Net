@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace Discord
 {
@@ -6,9 +7,9 @@ namespace Discord
     public struct EmbedProvider
     {
         public string Name { get; }
-        public string Url { get; }
+        public Uri Url { get; }
 
-        internal EmbedProvider(string name, string url)
+        internal EmbedProvider(string name, Uri url)
         {
             Name = name;
             Url = url;
