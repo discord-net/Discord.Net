@@ -64,7 +64,7 @@ namespace Discord.Commands
             _action = builder.Callback;
         }
 
-        public async Task<IResult> CheckPreconditionsAsync(ICommandContext context, IServiceProvider services = null)
+        public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, IServiceProvider services = null)
         {
             services = services ?? EmptyServiceProvider.Instance;
 
@@ -105,7 +105,7 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
         
-        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, IResult preconditionResult = null)
+        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult preconditionResult = null)
         {
             if (!searchResult.IsSuccess)
                 return ParseResult.FromError(searchResult);
