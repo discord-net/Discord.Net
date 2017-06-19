@@ -8,10 +8,10 @@ namespace Discord.Commands
     {
         /// <summary>
         /// Specify a group that this precondition belongs to. Preconditions of the same group require only one
-        /// of the preconditions to pass in order to be successful (A || B). Specifying <see cref="Group"/> = 0
+        /// of the preconditions to pass in order to be successful (A || B). Specifying <see cref="Group"/> = <see cref="null"/>
         /// or not at all will require *all* preconditions to pass, just like normal (A &amp;&amp; B).
         /// </summary>
-        public int Group { get; set; } = 0;
+        public string Group { get; set; } = null;
 
         public abstract Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider services);
     }

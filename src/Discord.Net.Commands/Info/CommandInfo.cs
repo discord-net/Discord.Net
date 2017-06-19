@@ -70,9 +70,9 @@ namespace Discord.Commands
 
             async Task<PreconditionGroupResult> CheckGroups(IEnumerable<PreconditionAttribute> preconditions, string type)
             {
-                foreach (IGrouping<int, PreconditionAttribute> preconditionGroup in preconditions.GroupBy(p => p.Group))
+                foreach (IGrouping<string, PreconditionAttribute> preconditionGroup in preconditions.GroupBy(p => p.Group))
                 {
-                    if (preconditionGroup.Key == 0)
+                    if (preconditionGroup.Key == null)
                     {
                         foreach (PreconditionAttribute precondition in preconditionGroup)
                         {
