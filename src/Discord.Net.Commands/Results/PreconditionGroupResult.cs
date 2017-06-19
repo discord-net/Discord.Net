@@ -7,12 +7,12 @@ namespace Discord.Commands
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class PreconditionGroupResult : PreconditionResult
     {
-        public IReadOnlyCollection<PreconditionResult> Preconditions { get; }
+        public IReadOnlyCollection<PreconditionResult> PreconditionResults { get; }
 
         protected PreconditionGroupResult(CommandError? error, string errorReason, ICollection<PreconditionResult> preconditions)
             : base(error, errorReason)
         {
-            Preconditions = (preconditions ?? Enumerable.Empty<PreconditionResult>().ToList()).ToReadOnlyCollection();
+            PreconditionResults = (preconditions ?? Enumerable.Empty<PreconditionResult>().ToList()).ToReadOnlyCollection();
         }
 
         public static new PreconditionGroupResult FromSuccess()
