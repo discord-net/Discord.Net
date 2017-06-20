@@ -23,7 +23,7 @@ namespace Discord
             get => _embed.Title;
             set
             {
-                if (value?.Length > MaxTitleLength) throw new ArgumentException($"Title length must be less than or equal to {MaxTitleLength}.");
+                if (value?.Length > MaxTitleLength) throw new ArgumentException($"Title length must be less than or equal to {MaxTitleLength}.", nameof(Title));
                 _embed.Title = value;
             }
         }
@@ -33,7 +33,7 @@ namespace Discord
             get => _embed.Description;
             set
             {
-                if (value?.Length > MaxDescriptionLength) throw new ArgumentException($"Description length must be less than or equal to {MaxDescriptionLength}.");
+                if (value?.Length > MaxDescriptionLength) throw new ArgumentException($"Description length must be less than or equal to {MaxDescriptionLength}.", nameof(Description));
                 _embed.Description = value;
             }
         }
@@ -53,8 +53,8 @@ namespace Discord
             set
             {
 
-                if (value == null) throw new ArgumentNullException("Cannot set an embed builder's fields collection to null", nameof(value));
-                if (value.Count > MaxFieldCount) throw new ArgumentException($"Field count must be less than or equal to {MaxFieldCount}.");
+                if (value == null) throw new ArgumentNullException("Cannot set an embed builder's fields collection to null", nameof(Fields));
+                if (value.Count > MaxFieldCount) throw new ArgumentException($"Field count must be less than or equal to {MaxFieldCount}.", nameof(Fields));
                 _fields = value;
             }
         }
@@ -147,7 +147,7 @@ namespace Discord
         {
             if (Fields.Count >= MaxFieldCount)
             {
-                throw new ArgumentException($"Field count must be less than or equal to {MaxFieldCount}.");
+                throw new ArgumentException($"Field count must be less than or equal to {MaxFieldCount}.", nameof(field));
             }
 
             Fields.Add(field);
@@ -186,8 +186,8 @@ namespace Discord
             get => _field.Name;
             set
             {
-                if (string.IsNullOrEmpty(value)) throw new ArgumentException($"Field name must not be null or empty");
-                if (value.Length > MaxFieldNameLength) throw new ArgumentException($"Field name length must be less than or equal to {MaxFieldNameLength}.");
+                if (string.IsNullOrEmpty(value)) throw new ArgumentException($"Field name must not be null or empty.", nameof(Name));
+                if (value.Length > MaxFieldNameLength) throw new ArgumentException($"Field name length must be less than or equal to {MaxFieldNameLength}.", nameof(Name));
                 _field.Name = value;
             }
         }
@@ -198,8 +198,8 @@ namespace Discord
             set
             {
                 var stringValue = value.ToString();
-                if (string.IsNullOrEmpty(stringValue)) throw new ArgumentException($"Field value must not be null or empty");
-                if (stringValue.Length > MaxFieldValueLength) throw new ArgumentException($"Field value length must be less than or equal to {MaxFieldValueLength}.");
+                if (string.IsNullOrEmpty(stringValue)) throw new ArgumentException($"Field value must not be null or empty.", nameof(Value));
+                if (stringValue.Length > MaxFieldValueLength) throw new ArgumentException($"Field value length must be less than or equal to {MaxFieldValueLength}.", nameof(Value));
                 _field.Value = stringValue;
             }
         }
@@ -241,7 +241,7 @@ namespace Discord
             get => _author.Name;
             set
             {
-                if (value?.Length > MaxAuthorNameLength) throw new ArgumentException($"Author name length must be less than or equal to {MaxAuthorNameLength}.");
+                if (value?.Length > MaxAuthorNameLength) throw new ArgumentException($"Author name length must be less than or equal to {MaxAuthorNameLength}.", nameof(Name));
                 _author.Name = value;
             }
         }
@@ -284,7 +284,7 @@ namespace Discord
             get => _footer.Text;
             set
             {
-                if (value?.Length > MaxFooterTextLength) throw new ArgumentException($"Footer text length must be less than or equal to {MaxFooterTextLength}.");
+                if (value?.Length > MaxFooterTextLength) throw new ArgumentException($"Footer text length must be less than or equal to {MaxFooterTextLength}.", nameof(Text));
                 _footer.Text = value;
             }
         }
