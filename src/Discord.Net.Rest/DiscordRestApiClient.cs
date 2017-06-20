@@ -1059,6 +1059,21 @@ namespace Discord.API
             return await SendJsonAsync<IReadOnlyCollection<Role>>("PATCH", () => $"guilds/{guildId}/roles", args, ids, options: options).ConfigureAwait(false);
         }
 
+        //Audit logs
+        public async Task<AuditLog> GetAuditLogsAsync(ulong guildId, GetAuditLogsParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+            options = RequestOptions.CreateOrClone(options);
+
+            int limit = args.Limit.GetValueOrDefault(int.MaxValue);
+            ulong afterEntryId = args.AfterEntryId.GetValueOrDefault(0);
+
+            var ids = new BucketIds(guildId: guildId);
+            Expression<Func<string>> endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}&after={afterEntryId}";
+            return await SendAsync<AuditLog>("GET", endpoint, ids, options: options).ConfigureAwait(false);
+        }
+
         //Users
         public async Task<User> GetUserAsync(ulong userId, RequestOptions options = null)
         {
