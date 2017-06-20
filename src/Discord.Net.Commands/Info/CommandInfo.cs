@@ -78,7 +78,7 @@ namespace Discord.Commands
                         {
                             var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
                             if (!result.IsSuccess)
-                                return PreconditionGroupResult.FromError($"{type} default precondition group failed", new[] { result });
+                                return PreconditionGroupResult.FromError($"{type} default precondition group failed.", new[] { result });
                         }
                     }
                     else
@@ -88,7 +88,7 @@ namespace Discord.Commands
                             results.Add(await precondition.CheckPermissions(context, this, services).ConfigureAwait(false));
 
                         if (!results.Any(p => p.IsSuccess))
-                            return PreconditionGroupResult.FromError($"{type} precondition group {preconditionGroup.Key} failed", results);
+                            return PreconditionGroupResult.FromError($"{type} precondition group {preconditionGroup.Key} failed.", results);
                     }
                 }
                 return PreconditionGroupResult.FromSuccess();
