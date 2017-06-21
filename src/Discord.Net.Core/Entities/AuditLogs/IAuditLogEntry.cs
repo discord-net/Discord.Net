@@ -19,7 +19,7 @@ namespace Discord
         /// <summary>
         /// The changes which occured within this entry. May be empty if no changes occured.
         /// </summary>
-        IReadOnlyCollection<IAuditLogChange> Changes { get; }
+        IAuditLogChanges Changes { get; }
 
         /// <summary>
         /// Any options which apply to this entry. If no options were provided, this may be <see cref="null"/>.
@@ -27,9 +27,9 @@ namespace Discord
         IAuditLogOptions Options { get; }
 
         /// <summary>
-        /// The id which the target applies to
+        /// The id which the target applies to, or null if it does not apply to anything specific.
         /// </summary>
-        ulong TargetId { get; }
+        ulong? TargetId { get; }
 
         /// <summary>
         /// The user responsible for causing the changes

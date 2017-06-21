@@ -260,7 +260,7 @@ namespace Discord.Rest
                         Limit = info.PageSize
                     };
                     if (info.Position != null)
-                        args.AfterEntryId = info.Position.Value;
+                        args.BeforeEntryId = info.Position.Value;
                     var model = await client.ApiClient.GetAuditLogsAsync(guild.Id, args, options);
                     return model.Entries.Select((x) => RestAuditLogEntry.Create(client, model, x)).ToImmutableArray();
                 },
@@ -268,7 +268,7 @@ namespace Discord.Rest
                 {
                     if (lastPage.Count != DiscordConfig.MaxAuditLogEntriesPerBatch)
                         return false;
-                    info.Position = lastPage.Max(x => x.Id);
+                    info.Position = lastPage.Min(x => x.Id);
                     return true;
                 },
                 start: from,

@@ -1,47 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
+﻿using System.Linq;
 
-using FullModel = Discord.API.AuditLog;
-using Model = Discord.API.AuditLogEntry;
+using Model = Discord.API.AuditLog;
+using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
     public class RestAuditLogEntry : RestEntity<ulong>, IAuditLogEntry
     {
-        internal RestAuditLogEntry(BaseDiscordClient discord, Model model, API.User user)
+        private RestAuditLogEntry(BaseDiscordClient discord, Model fullLog, EntryModel model, IUser user)
             : base(discord, model.Id)
         {
             Action = model.Action;
-            if (model.Changes != null)
-                Changes = model.Changes
-                    .Select(x => AuditLogHelper.CreateChange(discord, model, x))
-                    .ToReadOnlyCollection(() => model.Changes.Length);
-            else
-                Changes = ImmutableArray.Create<IAuditLogChange>();
 
+            if (model.Changes != null)
+                Changes = AuditLogHelper.CreateChange(discord, fullLog, model, model.Changes);
             if (model.Options != null)
-                Options = AuditLogHelper.CreateOptions(discord, model, model.Options);
+                Options = AuditLogHelper.CreateOptions(discord, fullLog, model, model.Options);
 
             TargetId = model.TargetId;
-            User = RestUser.Create(discord, user);
+            User = user;
 
             Reason = model.Reason;
         }
 
-        internal static RestAuditLogEntry Create(BaseDiscordClient discord, FullModel fullLog, Model model)
+        internal static RestAuditLogEntry Create(BaseDiscordClient discord, Model fullLog, EntryModel model)
         {
-            var user = fullLog.Users.FirstOrDefault(x => x.Id == model.UserId);
+            var userInfo = fullLog.Users.FirstOrDefault(x => x.Id == model.UserId);
+            IUser user = null;
+            if (userInfo != null)
+                user = RestUser.Create(discord, userInfo);
 
-            return new RestAuditLogEntry(discord, model, user);
+            return new RestAuditLogEntry(discord, fullLog, model, user);
         }
 
         public ActionType Action { get; }
-        public IReadOnlyCollection<IAuditLogChange> Changes { get; }
+
+        public IAuditLogChanges Changes { get; }
         public IAuditLogOptions Options { get; }
-        public ulong TargetId { get; }
+
+        public ulong? TargetId { get; } //TODO: if we're exposing this on the changes instead, do we need this?
         public IUser User { get; }
+
         public string Reason { get; }
     }
 }

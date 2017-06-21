@@ -9,8 +9,6 @@ namespace Discord
     /// <summary>
     /// Represents changes which may occur within a <see cref="IAuditLogEntry"/>
     /// </summary>
-    public interface IAuditLogChange
-    {
-
-    }
+    public interface IAuditLogChanges
+    { }
 }

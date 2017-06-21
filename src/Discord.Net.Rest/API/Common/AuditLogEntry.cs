@@ -5,7 +5,7 @@ namespace Discord.API
     internal class AuditLogEntry
     {
         [JsonProperty("target_id")]
-        public ulong TargetId { get; set; }
+        public ulong? TargetId { get; set; }
         [JsonProperty("user_id")]
         public ulong UserId { get; set; }
 

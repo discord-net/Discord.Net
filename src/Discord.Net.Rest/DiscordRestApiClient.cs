@@ -1067,10 +1067,15 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             int limit = args.Limit.GetValueOrDefault(int.MaxValue);
-            ulong afterEntryId = args.AfterEntryId.GetValueOrDefault(0);
 
             var ids = new BucketIds(guildId: guildId);
-            Expression<Func<string>> endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}&after={afterEntryId}";
+            Expression<Func<string>> endpoint;
+
+            if (args.BeforeEntryId.IsSpecified)
+                endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}&before={args.BeforeEntryId.Value}";
+            else
+                endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}";
+
             return await SendAsync<AuditLog>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
 
