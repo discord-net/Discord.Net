@@ -11,7 +11,7 @@ public class Program
 		// When working with events that have Cacheable<IMessage, ulong> parameters,
 		// you must enable the message cache in your config settings if you plan to
 		// use the cached message entity. 
-		_config = new DiscordSocketConfig { MessageCacheSize = 100 };
+		var _config = new DiscordSocketConfig { MessageCacheSize = 100 };
 		_client = new DiscordSocketClient(_config);
 
 		await _client.LoginAsync(TokenType.Bot, "bot token");
