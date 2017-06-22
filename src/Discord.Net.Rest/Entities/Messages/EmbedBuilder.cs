@@ -11,6 +11,7 @@ namespace Discord
         public const int MaxFieldCount = 25;
         public const int MaxTitleLength = 256;
         public const int MaxDescriptionLength = 2048;
+        public const int MaxEmbedLength = 6000; // user bot limit is 2000, but we don't validate that here.
 
         public EmbedBuilder()
         {
@@ -169,6 +170,12 @@ namespace Discord
             for (int i = 0; i < Fields.Count; i++)
                 fields.Add(Fields[i].Build());
             _embed.Fields = fields.ToImmutable();
+
+            if (_embed.Length > MaxEmbedLength)
+            {
+                throw new InvalidOperationException($"Total embed length must be less than or equal to {MaxEmbedLength}");
+            }
+
             return _embed;
         }
         public static implicit operator Embed(EmbedBuilder builder) => builder?.Build();

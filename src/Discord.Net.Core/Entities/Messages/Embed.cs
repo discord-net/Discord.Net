@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Discord
 {
@@ -55,6 +56,8 @@ namespace Discord
             Thumbnail = thumbnail;
             Fields = fields;
         }
+
+        public int Length => Title?.Length + Author?.Name?.Length + Description?.Length + Footer?.Text?.Length + Fields.Sum(f => f.Name.Length + f.Value.ToString().Length) ?? 0;
 
         public override string ToString() => Title;
         private string DebuggerDisplay => $"{Title} ({Type})";
