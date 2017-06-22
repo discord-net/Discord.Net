@@ -1,26 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
-using ChangeModel = Discord.API.AuditLogChange;
 
 namespace Discord.Rest
 {
-    public class MemberRoleChanges : IAuditLogChanges
+    public class MemberRoleAuditLogData : IAuditLogData
     {
-        private MemberRoleChanges(IReadOnlyCollection<RoleInfo> roles, IUser target)
+        private MemberRoleAuditLogData(IReadOnlyCollection<RoleInfo> roles, IUser target)
         {
             Roles = roles;
             TargetUser = target;
         }
 
-        internal static MemberRoleChanges Create(BaseDiscordClient discord, Model log, EntryModel entry, ChangeModel[] models)
+        internal static MemberRoleAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var roleInfos = models.SelectMany(x => x.NewValue.ToObject<API.Role[]>(),
+            var changes = entry.Changes;
+
+            var roleInfos = changes.SelectMany(x => x.NewValue.ToObject<API.Role[]>(),
                 (model, role) => new { model.ChangedProperty, Role = role })
                 .Select(x => new RoleInfo(x.Role.Name, x.Role.Id, x.ChangedProperty == "$add"))
                 .ToList();
@@ -28,7 +27,7 @@ namespace Discord.Rest
             var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
             var user = RestUser.Create(discord, userInfo);
 
-            return new MemberRoleChanges(roleInfos.ToReadOnlyCollection(), user);
+            return new MemberRoleAuditLogData(roleInfos.ToReadOnlyCollection(), user);
         }
 
         public IReadOnlyCollection<RoleInfo> Roles { get; }

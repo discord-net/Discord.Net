@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    /// Represents options which may be applied to an <see cref="IAuditLogEntry"/>
+    /// Represents data applied to an <see cref="IAuditLogEntry"/>
     /// </summary>
-    public interface IAuditLogOptions
-    {
-
-    }
+    public interface IAuditLogData
+    { }
 }

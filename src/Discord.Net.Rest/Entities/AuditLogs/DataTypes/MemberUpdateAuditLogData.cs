@@ -6,24 +6,26 @@ using ChangeModel = Discord.API.AuditLogChange;
 
 namespace Discord.Rest
 {
-    public class MemberUpdateChanges : IAuditLogChanges
+    public class MemberUpdateAuditLogData : IAuditLogData
     {
-        private MemberUpdateChanges(IUser user, string newNick, string oldNick)
+        private MemberUpdateAuditLogData(IUser user, string newNick, string oldNick)
         {
             User = user;
             NewNick = newNick;
             OldNick = oldNick;
         }
 
-        internal static MemberUpdateChanges Create(BaseDiscordClient discord, Model log, EntryModel entry, ChangeModel model)
+        internal static MemberUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var newNick = model.NewValue?.ToObject<string>();
-            var oldNick = model.OldValue?.ToObject<string>();
+            var changes = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "nick"); //TODO: only change?
+
+            var newNick = changes.NewValue?.ToObject<string>();
+            var oldNick = changes.OldValue?.ToObject<string>();
 
             var targetInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
             var user = RestUser.Create(discord, targetInfo);
 
-            return new MemberUpdateChanges(user, newNick, oldNick);
+            return new MemberUpdateAuditLogData(user, newNick, oldNick);
         }
 
         public IUser User { get; }

@@ -17,19 +17,9 @@ namespace Discord
         ActionType Action { get; }
 
         /// <summary>
-        /// The changes which occured within this entry. May be empty if no changes occured.
+        /// The data for this entry. May be <see cref="null"/> if no data was available.
         /// </summary>
-        IAuditLogChanges Changes { get; }
-
-        /// <summary>
-        /// Any options which apply to this entry. If no options were provided, this may be <see cref="null"/>.
-        /// </summary>
-        IAuditLogOptions Options { get; }
-
-        /// <summary>
-        /// The id which the target applies to, or null if it does not apply to anything specific.
-        /// </summary>
-        ulong? TargetId { get; }
+        IAuditLogData Data { get; }
 
         /// <summary>
         /// The user responsible for causing the changes

@@ -1,13 +1,13 @@
 ﻿using System.Linq;
 
 using Model = Discord.API.AuditLog;
-using ChangeModel = Discord.API.AuditLogChange;
+using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
-    public class InviteCreateChanges : IAuditLogChanges
+    public class InviteCreateAuditLogData : IAuditLogData
     {
-        private InviteCreateChanges(int maxAge, string code, bool temporary, IUser inviter, ulong channelId, int uses, int maxUses)
+        private InviteCreateAuditLogData(int maxAge, string code, bool temporary, IUser inviter, ulong channelId, int uses, int maxUses)
         {
             MaxAge = maxAge;
             Code = code;
@@ -18,16 +18,17 @@ namespace Discord.Rest
             MaxUses = maxUses;
         }
 
-        internal static InviteCreateChanges Create(BaseDiscordClient discord, Model log, ChangeModel[] models)
+        internal static InviteCreateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            //Again, FirstOrDefault to protect against ordering changes
-            var maxAgeModel = models.FirstOrDefault(x => x.ChangedProperty == "max_age");
-            var codeModel = models.FirstOrDefault(x => x.ChangedProperty == "code");
-            var temporaryModel = models.FirstOrDefault(x => x.ChangedProperty == "temporary");
-            var inviterIdModel = models.FirstOrDefault(x => x.ChangedProperty == "inviter_id");
-            var channelIdModel = models.FirstOrDefault(x => x.ChangedProperty == "channel_id");
-            var usesModel = models.FirstOrDefault(x => x.ChangedProperty == "uses");
-            var maxUsesModel = models.FirstOrDefault(x => x.ChangedProperty == "max_uses");
+            var changes = entry.Changes;
+
+            var maxAgeModel = changes.FirstOrDefault(x => x.ChangedProperty == "max_age");
+            var codeModel = changes.FirstOrDefault(x => x.ChangedProperty == "code");
+            var temporaryModel = changes.FirstOrDefault(x => x.ChangedProperty == "temporary");
+            var inviterIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "inviter_id");
+            var channelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "channel_id");
+            var usesModel = changes.FirstOrDefault(x => x.ChangedProperty == "uses");
+            var maxUsesModel = changes.FirstOrDefault(x => x.ChangedProperty == "max_uses");
 
             var maxAge = maxAgeModel.NewValue.ToObject<int>();
             var code = codeModel.NewValue.ToObject<string>();
@@ -40,7 +41,7 @@ namespace Discord.Rest
             var inviterInfo = log.Users.FirstOrDefault(x => x.Id == inviterId);
             var inviter = RestUser.Create(discord, inviterInfo);
 
-            return new InviteCreateChanges(maxAge, code, temporary, inviter, channelId, uses, maxUses);
+            return new InviteCreateAuditLogData(maxAge, code, temporary, inviter, channelId, uses, maxUses);
         }
 
         public int MaxAge { get; }

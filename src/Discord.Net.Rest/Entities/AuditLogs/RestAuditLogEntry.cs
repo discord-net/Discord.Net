@@ -13,11 +13,8 @@ namespace Discord.Rest
             Action = model.Action;
 
             if (model.Changes != null)
-                Changes = AuditLogHelper.CreateChange(discord, fullLog, model, model.Changes);
-            if (model.Options != null)
-                Options = AuditLogHelper.CreateOptions(discord, fullLog, model, model.Options);
+                Data = AuditLogHelper.CreateData(discord, fullLog, model);
 
-            TargetId = model.TargetId;
             User = user;
 
             Reason = model.Reason;
@@ -33,14 +30,13 @@ namespace Discord.Rest
             return new RestAuditLogEntry(discord, fullLog, model, user);
         }
 
+        /// <inheritdoc/>
         public ActionType Action { get; }
-
-        public IAuditLogChanges Changes { get; }
-        public IAuditLogOptions Options { get; }
-
-        public ulong? TargetId { get; } //TODO: if we're exposing this on the changes instead, do we need this?
+        /// <inheritdoc/>
+        public IAuditLogData Data { get; }
+        /// <inheritdoc/>
         public IUser User { get; }
-
+        /// <inheritdoc/>
         public string Reason { get; }
     }
 }

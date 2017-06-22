@@ -11,19 +11,21 @@ using OptionModel = Discord.API.AuditLogOptions;
 
 namespace Discord.Rest
 {
-    public class OverwriteDeleteChanges : IAuditLogChanges
+    public class OverwriteDeleteAuditLogData : IAuditLogData
     {
-        private OverwriteDeleteChanges(Overwrite deletedOverwrite)
+        private OverwriteDeleteAuditLogData(Overwrite deletedOverwrite)
         {
             Overwrite = deletedOverwrite;
         }
 
-        internal static OverwriteDeleteChanges Create(BaseDiscordClient discord, Model log, EntryModel entry, ChangeModel[] models)
+        internal static OverwriteDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var denyModel = models.FirstOrDefault(x => x.ChangedProperty == "deny");
-            var typeModel = models.FirstOrDefault(x => x.ChangedProperty == "type");
-            var idModel = models.FirstOrDefault(x => x.ChangedProperty == "id");
-            var allowModel = models.FirstOrDefault(x => x.ChangedProperty == "allow");
+            var changes = entry.Changes;
+
+            var denyModel = changes.FirstOrDefault(x => x.ChangedProperty == "deny");
+            var typeModel = changes.FirstOrDefault(x => x.ChangedProperty == "type");
+            var idModel = changes.FirstOrDefault(x => x.ChangedProperty == "id");
+            var allowModel = changes.FirstOrDefault(x => x.ChangedProperty == "allow");
 
             var deny = denyModel.OldValue.ToObject<ulong>();
             var type = typeModel.OldValue.ToObject<string>(); //'role' or 'member', can't use PermissionsTarget :(
@@ -37,7 +39,7 @@ namespace Discord.Rest
             else
                 target = PermissionTarget.Role;
 
-            return new OverwriteDeleteChanges(new Overwrite(id, target, new OverwritePermissions(allow, deny)));
+            return new OverwriteDeleteAuditLogData(new Overwrite(id, target, new OverwritePermissions(allow, deny)));
         }
 
         public Overwrite Overwrite { get; }
