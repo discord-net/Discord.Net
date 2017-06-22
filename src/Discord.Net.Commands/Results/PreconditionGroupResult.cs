@@ -12,7 +12,7 @@ namespace Discord.Commands
         protected PreconditionGroupResult(CommandError? error, string errorReason, ICollection<PreconditionResult> preconditions)
             : base(error, errorReason)
         {
-            PreconditionResults = (preconditions ?? Enumerable.Empty<PreconditionResult>().ToList()).ToReadOnlyCollection();
+            PreconditionResults = (preconditions ?? new List<PreconditionResult>(0)).ToReadOnlyCollection();
         }
 
         public static new PreconditionGroupResult FromSuccess()
