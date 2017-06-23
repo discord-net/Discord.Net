@@ -153,20 +153,20 @@ namespace Discord.Audio
             var sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
             return new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header (external input), passes
         }
-        public AudioOutStream CreatePCMStream(AudioApplication application, int? bitrate, int bufferMillis)
+        public AudioOutStream CreatePCMStream(AudioApplication application, int? bitrate, int bufferMillis, int packetLoss)
         {
             var outputStream = new OutputStream(ApiClient); //Ignores header
             var sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
             var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header, passes
             var bufferedStream = new BufferedWriteStream(rtpWriter, this, bufferMillis, _connection.CancelToken, _audioLogger); //Ignores header, generates header
-            return new OpusEncodeStream(bufferedStream, bitrate ?? (96 * 1024), application); //Generates header
+            return new OpusEncodeStream(bufferedStream, bitrate ?? (96 * 1024), application, packetLoss); //Generates header
         }
-        public AudioOutStream CreateDirectPCMStream(AudioApplication application, int? bitrate)
+        public AudioOutStream CreateDirectPCMStream(AudioApplication application, int? bitrate, int packetLoss)
         {
             var outputStream = new OutputStream(ApiClient); //Ignores header
             var sodiumEncrypter = new SodiumEncryptStream(outputStream, this); //Passes header
             var rtpWriter = new RTPWriteStream(sodiumEncrypter, _ssrc); //Consumes header, passes
-            return new OpusEncodeStream(rtpWriter, bitrate ?? (96 * 1024), application); //Generates header
+            return new OpusEncodeStream(rtpWriter, bitrate ?? (96 * 1024), application, packetLoss); //Generates header
         }
 
         internal async Task CreateInputStreamAsync(ulong userId)
