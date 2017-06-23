@@ -68,7 +68,7 @@ namespace Discord.Commands
         {
             services = services ?? EmptyServiceProvider.Instance;
 
-            async Task<PreconditionGroupResult> CheckGroups(IEnumerable<PreconditionAttribute> preconditions, string type)
+            async Task<PreconditionResult> CheckGroups(IEnumerable<PreconditionAttribute> preconditions, string type)
             {
                 foreach (IGrouping<string, PreconditionAttribute> preconditionGroup in preconditions.GroupBy(p => p.Group, StringComparer.Ordinal))
                 {
@@ -78,7 +78,7 @@ namespace Discord.Commands
                         {
                             var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
                             if (!result.IsSuccess)
-                                return PreconditionGroupResult.FromError($"{type} default precondition group failed.", new[] { result });
+                                return result;
                         }
                     }
                     else
