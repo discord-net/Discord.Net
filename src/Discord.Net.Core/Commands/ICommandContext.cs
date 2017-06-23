@@ -7,5 +7,6 @@
         IMessageChannel Channel { get; }
         IUser User { get; }
         IUserMessage Message { get; }
+        bool IsPrivate { get; }
     }
 }
