@@ -360,7 +360,7 @@ namespace Discord.WebSocket
         private async Task SendStatusAsync()
         {
             if (CurrentUser == null)
-                throw new InvalidOperationException("Presence data cannot be sent before the client has logged in.");
+                return;
             var game = Game;
             var status = Status;
             var statusSince = _statusSince;
