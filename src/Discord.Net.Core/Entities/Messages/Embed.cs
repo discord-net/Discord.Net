@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Discord
 {
@@ -10,7 +11,7 @@ namespace Discord
         public string Type { get; }
 
         public string Description { get; internal set; }
-        public string Url { get; internal set; }
+        public Uri Url { get; internal set; }
         public string Title { get; internal set; }
         public DateTimeOffset? Timestamp { get; internal set; }
         public Color? Color { get; internal set; }
@@ -30,7 +31,7 @@ namespace Discord
         internal Embed(string type, 
             string title,
             string description,
-            string url,
+            Uri url,
             DateTimeOffset? timestamp,
             Color? color,
             EmbedImage? image,
@@ -55,6 +56,8 @@ namespace Discord
             Thumbnail = thumbnail;
             Fields = fields;
         }
+
+        public int Length => Title?.Length + Author?.Name?.Length + Description?.Length + Footer?.Text?.Length + Fields.Sum(f => f.Name.Length + f.Value.ToString().Length) ?? 0;
 
         public override string ToString() => Title;
         private string DebuggerDisplay => $"{Title} ({Type})";

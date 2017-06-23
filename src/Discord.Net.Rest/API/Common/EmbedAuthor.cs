@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace Discord.API
 {
@@ -7,10 +8,10 @@ namespace Discord.API
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("url")]
-        public string Url { get; set; }
+        public Uri Url { get; set; }
         [JsonProperty("icon_url")]
-        public string IconUrl { get; set; }
+        public Uri IconUrl { get; set; }
         [JsonProperty("proxy_icon_url")]
-        public string ProxyIconUrl { get; set; }
+        public Uri ProxyIconUrl { get; set; }
     }
 }

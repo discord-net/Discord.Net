@@ -13,7 +13,7 @@ namespace Discord.API
         [JsonProperty("description")]
         public string Description { get; set; }
         [JsonProperty("url")]
-        public string Url { get; set; }
+        public Uri Url { get; set; }
         [JsonProperty("color")]
         public uint? Color { get; set; }
         [JsonProperty("timestamp")]

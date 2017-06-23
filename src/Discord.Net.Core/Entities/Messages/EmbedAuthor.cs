@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace Discord
 {
@@ -6,11 +7,11 @@ namespace Discord
     public struct EmbedAuthor
     {
         public string Name { get; internal set; }
-        public string Url { get; internal set; }
-        public string IconUrl { get; internal set; }
-        public string ProxyIconUrl { get; internal set; }
+        public Uri Url { get; internal set; }
+        public Uri IconUrl { get; internal set; }
+        public Uri ProxyIconUrl { get; internal set; }
 
-        internal EmbedAuthor(string name, string url, string iconUrl, string proxyIconUrl)
+        internal EmbedAuthor(string name, Uri url, Uri iconUrl, Uri proxyIconUrl)
         {
             Name = name;
             Url = url;

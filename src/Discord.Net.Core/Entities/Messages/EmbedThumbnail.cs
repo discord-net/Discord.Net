@@ -1,16 +1,17 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace Discord
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct EmbedThumbnail
     {
-        public string Url { get; }
-        public string ProxyUrl { get; }
+        public Uri Url { get; }
+        public Uri ProxyUrl { get; }
         public int? Height { get; }
         public int? Width { get; }
 
-        internal EmbedThumbnail(string url, string proxyUrl, int? height, int? width)
+        internal EmbedThumbnail(Uri url, Uri proxyUrl, int? height, int? width)
         {
             Url = url;
             ProxyUrl = proxyUrl;
@@ -19,6 +20,6 @@ namespace Discord
         }
 
         private string DebuggerDisplay => $"{Url} ({(Width != null && Height != null ? $"{Width}x{Height}" : "0x0")})";
-        public override string ToString() => Url;
+        public override string ToString() => Url.ToString();
     }
 }
