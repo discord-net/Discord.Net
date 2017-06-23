@@ -68,29 +68,49 @@ namespace Discord.Commands
         {
             services = services ?? EmptyServiceProvider.Instance;
 
-            foreach (PreconditionAttribute precondition in Module.Preconditions)
+            async Task<PreconditionGroupResult> CheckGroups(IEnumerable<PreconditionAttribute> preconditions, string type)
             {
-                var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
-                if (!result.IsSuccess)
-                    return result;
+                foreach (IGrouping<string, PreconditionAttribute> preconditionGroup in preconditions.GroupBy(p => p.Group, StringComparer.Ordinal))
+                {
+                    if (preconditionGroup.Key == null)
+                    {
+                        foreach (PreconditionAttribute precondition in preconditionGroup)
+                        {
+                            var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
+                            if (!result.IsSuccess)
+                                return PreconditionGroupResult.FromError($"{type} default precondition group failed.", new[] { result });
+                        }
+                    }
+                    else
+                    {
+                        var results = new List<PreconditionResult>();
+                        foreach (PreconditionAttribute precondition in preconditionGroup)
+                            results.Add(await precondition.CheckPermissions(context, this, services).ConfigureAwait(false));
+
+                        if (!results.Any(p => p.IsSuccess))
+                            return PreconditionGroupResult.FromError($"{type} precondition group {preconditionGroup.Key} failed.", results);
+                    }
+                }
+                return PreconditionGroupResult.FromSuccess();
             }
 
-            foreach (PreconditionAttribute precondition in Preconditions)
-            {
-                var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
-                if (!result.IsSuccess)
-                    return result;
-            }
+            var moduleResult = await CheckGroups(Module.Preconditions, "Module");
+            if (!moduleResult.IsSuccess)
+                return moduleResult;
+
+            var commandResult = await CheckGroups(Preconditions, "Command");
+            if (!commandResult.IsSuccess)
+                return commandResult;
 
             return PreconditionResult.FromSuccess();
         }
         
-        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult? preconditionResult = null)
+        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult preconditionResult = null)
         {
             if (!searchResult.IsSuccess)
                 return ParseResult.FromError(searchResult);
-            if (preconditionResult != null && !preconditionResult.Value.IsSuccess)
-                return ParseResult.FromError(preconditionResult.Value);
+            if (preconditionResult != null && !preconditionResult.IsSuccess)
+                return ParseResult.FromError(preconditionResult);
             
             string input = searchResult.Text.Substring(startIndex);
             return await CommandParser.ParseArgs(this, context, input, 0).ConfigureAwait(false);
