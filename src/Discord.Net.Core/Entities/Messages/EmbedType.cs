@@ -6,6 +6,7 @@
         Link,
         Video,
         Image,
-        Gifv
+        Gifv,
+        Article
     }
 }
