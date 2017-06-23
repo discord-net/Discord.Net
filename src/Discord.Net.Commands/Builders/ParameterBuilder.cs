@@ -49,7 +49,7 @@ namespace Discord.Commands.Builders
                 TypeReader = Command.Module.Service.GetDefaultTypeReader(type);
 
             if (TypeReader == null)
-                throw new InvalidOperationException($"{type} does not have a TypeReader registered for it");            
+                throw new InvalidOperationException($"{type} does not have a TypeReader registered for it. Parameter: {Name} in {Command.PrimaryAlias}");            
 
             if (type.GetTypeInfo().IsValueType)
                 DefaultValue = Activator.CreateInstance(type);
