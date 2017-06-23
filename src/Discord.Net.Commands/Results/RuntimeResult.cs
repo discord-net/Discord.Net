@@ -8,7 +8,7 @@ namespace Discord.Commands
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RuntimeResult : IResult
     {
-        private RuntimeResult(CommandError? error, string reason)
+        protected RuntimeResult(CommandError? error, string reason)
         {
             Error = error;
             Reason = reason;
