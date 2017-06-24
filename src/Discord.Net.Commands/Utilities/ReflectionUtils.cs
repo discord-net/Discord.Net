@@ -58,7 +58,7 @@ namespace Discord.Commands
             {
                 foreach (var prop in ownerType.DeclaredProperties)
                 {
-                    if (prop.GetMethod.IsStatic && prop.SetMethod?.IsPublic == true && prop.GetCustomAttribute<DontInjectAttribute>() == null)
+                    if (!prop.GetMethod.IsStatic && prop.SetMethod?.IsPublic == true && prop.GetCustomAttribute<DontInjectAttribute>() == null)
                         result.Add(prop);
                 }
                 ownerType = ownerType.BaseType.GetTypeInfo();
