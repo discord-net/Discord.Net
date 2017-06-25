@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-using Model = Discord.API.AuditLog;
+﻿using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
@@ -35,7 +32,7 @@ namespace Discord.Rest
                 case ActionType.Ban:
                     return BanAuditLogData.Create(discord, log, entry);
                 case ActionType.Unban:
-                    break;
+                    return UnbanAuditLogData.Create(discord, log, entry);
                 case ActionType.MemberUpdated:
                     return MemberUpdateAuditLogData.Create(discord, log, entry);
                 case ActionType.MemberRoleUpdated:
@@ -53,14 +50,14 @@ namespace Discord.Rest
                 case ActionType.InviteUpdated:
                     break;
                 case ActionType.InviteDeleted:
-                    break;
+                    return InviteDeleteAuditLogData.Create(discord, log, entry);
 
                 case ActionType.WebhookCreated: //50
-                    break;
+                    return WebhookCreateAuditLogData.Create(discord, log, entry);
                 case ActionType.WebhookUpdated:
-                    break;
+                    return WebhookUpdateAuditLogData.Create(discord, log, entry);
                 case ActionType.WebhookDeleted:
-                    break;
+                    return WebhookDeleteAuditLogData.Create(discord, log, entry);
 
                 case ActionType.EmojiCreated: //60
                     return EmoteCreateAuditLogData.Create(discord, log, entry);
@@ -71,7 +68,8 @@ namespace Discord.Rest
 
                 case ActionType.MessageDeleted: //72
                     return MessageDeleteAuditLogData.Create(discord, log, entry);
-                default:
+
+                default: //Unknown
                     return null;
             }
             return null;

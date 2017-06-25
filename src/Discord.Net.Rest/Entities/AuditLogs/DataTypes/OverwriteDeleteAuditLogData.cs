@@ -32,12 +32,7 @@ namespace Discord.Rest
             var id = idModel.OldValue.ToObject<ulong>();
             var allow = allowModel.OldValue.ToObject<ulong>();
 
-            PermissionTarget target;
-
-            if (type == "member")
-                target = PermissionTarget.User;
-            else
-                target = PermissionTarget.Role;
+            PermissionTarget target = type == "member" ? PermissionTarget.User : PermissionTarget.Role;
 
             return new OverwriteDeleteAuditLogData(new Overwrite(id, target, new OverwritePermissions(allow, deny)));
         }

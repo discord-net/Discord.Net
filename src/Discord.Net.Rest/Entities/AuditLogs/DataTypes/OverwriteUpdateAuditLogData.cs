@@ -30,11 +30,7 @@ namespace Discord.Rest
             var beforePermissions = new OverwritePermissions(beforeAllow ?? 0, beforeDeny ?? 0);
             var afterPermissions = new OverwritePermissions(afterAllow ?? 0, afterDeny ?? 0);
 
-            PermissionTarget target;
-            if (entry.Options.OverwriteType == "member")
-                target = PermissionTarget.User;
-            else
-                target = PermissionTarget.Role;
+            PermissionTarget target = entry.Options.OverwriteType == "member" ? PermissionTarget.User : PermissionTarget.Role;
 
             return new OverwriteUpdateAuditLogData(beforePermissions, afterPermissions, entry.Options.OverwriteTargetId.Value, target);
         }

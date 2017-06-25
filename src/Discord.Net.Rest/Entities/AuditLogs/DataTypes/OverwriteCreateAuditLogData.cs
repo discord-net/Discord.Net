@@ -27,11 +27,7 @@ namespace Discord.Rest
             var id = entry.Options.OverwriteTargetId.Value;
             var type = entry.Options.OverwriteType;
 
-            PermissionTarget target;
-            if (type == "member")
-                target = PermissionTarget.User;
-            else
-                target = PermissionTarget.Role;
+            PermissionTarget target = type == "member" ? PermissionTarget.User : PermissionTarget.Role;
 
             return new OverwriteCreateAuditLogData(new Overwrite(id, target, permissions));
         }
