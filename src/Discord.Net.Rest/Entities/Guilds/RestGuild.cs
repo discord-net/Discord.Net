@@ -138,9 +138,9 @@ namespace Discord.Rest
             => GuildHelper.GetBansAsync(this, Discord, options);
 
         public Task AddBanAsync(IUser user, int pruneDays = 0, string reason = null, RequestOptions options = null)
-            => GuildHelper.AddBanAsync(this, Discord, user.Id, pruneDays, options);
+            => GuildHelper.AddBanAsync(this, Discord, user.Id, pruneDays, reason, options);
         public Task AddBanAsync(ulong userId, int pruneDays = 0, string reason = null, RequestOptions options = null)
-            => GuildHelper.AddBanAsync(this, Discord, userId, pruneDays, options);
+            => GuildHelper.AddBanAsync(this, Discord, userId, pruneDays, reason, options);
 
         public Task RemoveBanAsync(IUser user, RequestOptions options = null)
             => GuildHelper.RemoveBanAsync(this, Discord, user.Id, options);

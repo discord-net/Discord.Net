@@ -5,7 +5,6 @@ namespace Discord
     public class RequestOptions
     {
         public static RequestOptions Default => new RequestOptions();
-        public static RequestOptions WithReason(string reason) => new RequestOptions { AuditLogReason = reason };
 
         /// <summary> 
         /// The max time, in milliseconds, to wait for this request to complete. If null, a request will not time out. 

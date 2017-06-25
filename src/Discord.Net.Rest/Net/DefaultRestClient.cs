@@ -67,7 +67,7 @@ namespace Discord.Net.Rest
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
-                if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", reason);
+                if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
                 return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
             }
         }
@@ -76,7 +76,7 @@ namespace Discord.Net.Rest
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
-                if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", reason);
+                if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
                 restRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
                 return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
             }
@@ -86,7 +86,7 @@ namespace Discord.Net.Rest
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
-                if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", reason);
+                if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
                 var content = new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
                 if (multipartParams != null)
                 {
