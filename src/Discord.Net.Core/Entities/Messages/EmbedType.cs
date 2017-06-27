@@ -7,6 +7,7 @@
         Video,
         Image,
         Gifv,
-        Article
+        Article,
+        Tweet
     }
 }
