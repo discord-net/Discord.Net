@@ -19,5 +19,7 @@
         /// The unicode representation of this emote.
         /// </summary>
         public string Name { get; }
+
+        public override string ToString() => Name;
     }
 }

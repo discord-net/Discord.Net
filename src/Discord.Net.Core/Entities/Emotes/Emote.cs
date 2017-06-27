@@ -58,6 +58,6 @@ namespace Discord
         }
 
         private string DebuggerDisplay => $"{Name} ({Id})";
-        public override string ToString() => Name;
+        public override string ToString() => $"<:{Name}:{Id}>";
     }
 }
