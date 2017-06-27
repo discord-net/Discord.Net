@@ -235,13 +235,13 @@ namespace Discord.Commands
         }
 
         //Execution
-        public SearchResult Search(ICommandContext context, int argPos) 
+        public SearchResult Search(ICommandContext context, int argPos)
             => Search(context, context.Message.Content.Substring(argPos));
         public SearchResult Search(ICommandContext context, string input)
         {
             string searchInput = _caseSensitive ? input : input.ToLowerInvariant();
             var matches = _map.GetCommands(searchInput).OrderByDescending(x => x.Command.Priority).ToImmutableArray();
-            
+
             if (matches.Length > 0)
                 return SearchResult.FromSuccess(input, matches);
             else
@@ -298,7 +298,7 @@ namespace Discord.Commands
                 return await commands[i].ExecuteAsync(context, parseResult, services).ConfigureAwait(false);
             }
 
-            return SearchResult.FromError(CommandError.UnknownCommand, "This input does not match any overload.");
+            return SearchResult.FromError(CommandError.UnknownOverload, "This input does not match any overload.");
         }
     }
 }

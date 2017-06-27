@@ -4,6 +4,7 @@
     {
         //Search
         UnknownCommand = 1,
+        UnknownOverload,
 
         //Parse
         ParseFailed,
