@@ -281,7 +281,7 @@ namespace Discord.Commands
 
             //If we get this far, at least one precondition was successful.
 
-            var parseResults = new Dictionary<CommandMatch, ParseResult>();
+            var parseResultsDict = new Dictionary<CommandMatch, ParseResult>();
             foreach (var pair in successfulPreconditions)
             {
                 var parseResult = await pair.Key.ParseAsync(context, searchResult, pair.Value, services).ConfigureAwait(false);
@@ -299,7 +299,7 @@ namespace Discord.Commands
                     }
                 }
 
-                parseResults[pair.Key] = parseResult;
+                parseResultsDict[pair.Key] = parseResult;
             }
 
             // Calculates the 'score' of a command given a parse result
@@ -313,9 +313,11 @@ namespace Discord.Commands
             }
 
             //Order the parse results by their score so that we choose the most likely result to execute
+            var parseResults = parseResultsDict
+                .OrderByDescending(x => CalculateScore(x.Key, x.Value));
+
             var successfulParses = parseResults
                 .Where(x => x.Value.IsSuccess)
-                .OrderByDescending(x => CalculateScore(x.Key, x.Value))
                 .ToArray();
 
             if (successfulParses.Length == 0)
