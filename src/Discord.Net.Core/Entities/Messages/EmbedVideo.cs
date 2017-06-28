@@ -6,11 +6,11 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct EmbedVideo
     {
-        public Uri Url { get; }
+        public string Url { get; }
         public int? Height { get; }
         public int? Width { get; }
 
-        internal EmbedVideo(Uri url, int? height, int? width)
+        internal EmbedVideo(string url, int? height, int? width)
         {
             Url = url;
             Height = height;

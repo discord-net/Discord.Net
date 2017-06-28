@@ -7,7 +7,7 @@ namespace Discord.API
     internal class EmbedVideo
     {
         [JsonProperty("url")]
-        public Uri Url { get; set; }
+        public string Url { get; set; }
         [JsonProperty("height")]
         public Optional<int> Height { get; set; }
         [JsonProperty("width")]
