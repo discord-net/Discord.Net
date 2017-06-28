@@ -21,5 +21,18 @@
         public string Name { get; }
 
         public override string ToString() => Name;
+
+        public override bool Equals(object other)
+        {
+            if (other == null) return false;
+            if (other == this) return true;
+
+            var otherEmoji = other as Emoji;
+            if (otherEmoji == null) return false;
+
+            return string.Equals(Name, otherEmoji.Name);
+        }
+
+        public override int GetHashCode() => Name.GetHashCode();
     }
 }
