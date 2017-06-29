@@ -309,7 +309,8 @@ namespace Discord.Commands
                 var argValuesScore = parseResult.ArgValues.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) / match.Command.Parameters.Count;
                 var paramValuesScore = parseResult.ParamValues.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) / match.Command.Parameters.Count;
 
-                return match.Command.Priority + argValuesScore + paramValuesScore;
+                var totalArgsScore = (argValuesScore + paramValuesScore) / 2;
+                return match.Command.Priority + totalArgsScore * 0.99f;
             }
 
             //Order the parse results by their score so that we choose the most likely result to execute
