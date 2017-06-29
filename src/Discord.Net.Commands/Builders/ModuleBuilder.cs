@@ -66,7 +66,7 @@ namespace Discord.Commands.Builders
         {
             for (int i = 0; i < aliases.Length; i++)
             {
-                var alias = aliases[i] ?? "";
+                string alias = aliases[i] ?? "";
                 if (!_aliases.Contains(alias))
                     _aliases.Add(alias);
             }

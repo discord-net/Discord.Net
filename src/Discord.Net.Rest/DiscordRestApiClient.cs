@@ -30,7 +30,7 @@ namespace Discord.API
 
         protected readonly JsonSerializer _serializer;
         protected readonly SemaphoreSlim _stateLock;
-        private readonly RestClientProvider RestClientProvider;
+        private readonly RestClientProvider _restClientProvider;
 
         protected bool _isDisposed;
         private CancellationTokenSource _loginCancelToken;
@@ -48,7 +48,7 @@ namespace Discord.API
         public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, 
             JsonSerializer serializer = null)
         {
-            RestClientProvider = restClientProvider;
+            _restClientProvider = restClientProvider;
             UserAgent = userAgent;
             DefaultRetryMode = defaultRetryMode;
             _serializer = serializer ?? new JsonSerializer { DateFormatString = "yyyy-MM-ddTHH:mm:ssZ", ContractResolver = new DiscordContractResolver() };
@@ -60,7 +60,7 @@ namespace Discord.API
         }
         internal void SetBaseUrl(string baseUrl)
         {
-            RestClient = RestClientProvider(baseUrl);
+            RestClient = _restClientProvider(baseUrl);
             RestClient.SetHeader("accept", "*/*");
             RestClient.SetHeader("user-agent", UserAgent);
             RestClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, AuthToken));
@@ -189,7 +189,7 @@ namespace Discord.API
             options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
             options.IsClientBucket = AuthTokenType == TokenType.User;
 
-            var json = payload != null ? SerializeJson(payload) : null;
+            string json = payload != null ? SerializeJson(payload) : null;
             var request = new JsonRestRequest(RestClient, method, endpoint, json, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
         }
@@ -233,7 +233,7 @@ namespace Discord.API
             options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
             options.IsClientBucket = AuthTokenType == TokenType.User;
 
-            var json = payload != null ? SerializeJson(payload) : null;
+            string json = payload != null ? SerializeJson(payload) : null;
             var request = new JsonRestRequest(RestClient, method, endpoint, json, options);
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
         }

@@ -154,7 +154,7 @@ namespace Discord.Commands
                 for (int position = 0; position < Parameters.Count; position++)
                 {
                     var parameter = Parameters[position];
-                    var argument = args[position];
+                    object argument = args[position];
                     var result = await parameter.CheckPreconditionsAsync(context, argument, services).ConfigureAwait(false);
                     if (!result.IsSuccess)
                         return ExecuteResult.FromError(result);
@@ -232,7 +232,7 @@ namespace Discord.Commands
                 argCount--;
 
             int i = 0;
-            foreach (var arg in argList)
+            foreach (object arg in argList)
             {
                 if (i == argCount)
                     throw new InvalidOperationException("Command was invoked with too many parameters");

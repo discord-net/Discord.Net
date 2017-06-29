@@ -20,7 +20,7 @@ namespace Discord.Commands
                     info.GetCustomAttribute<DontAutoLoadAttribute>() == null;
             }
 
-            List<TypeInfo> result = new List<TypeInfo>();
+            var result = new List<TypeInfo>();
 
             foreach (var typeInfo in assembly.DefinedTypes)
             {
