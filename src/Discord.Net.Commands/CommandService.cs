@@ -305,9 +305,13 @@ namespace Discord.Commands
             // Calculates the 'score' of a command given a parse result
             float CalculateScore(CommandMatch match, ParseResult parseResult)
             {
-                //TODO: is this calculation correct?
-                var argValuesScore = parseResult.ArgValues.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) / match.Command.Parameters.Count;
-                var paramValuesScore = parseResult.ParamValues.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) / match.Command.Parameters.Count;
+                float argValuesScore = 0, paramValuesScore = 0;
+                
+                if (match.Command.Parameters.Count > 0)
+                {
+                    argValuesScore = parseResult.ArgValues.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) / match.Command.Parameters.Count;
+                    paramValuesScore = parseResult.ParamValues.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) / match.Command.Parameters.Count;
+                }
 
                 var totalArgsScore = (argValuesScore + paramValuesScore) / 2;
                 return match.Command.Priority + totalArgsScore * 0.99f;
