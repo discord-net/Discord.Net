@@ -245,9 +245,10 @@ namespace Discord.Commands
 
                         builder.IsRemainder = true;
                         break;
+                    default:
+                        builder.AddAttributes(attribute);
+                        break;
                 }
-                else
-                    builder.AddAttributes(attribute);
             }
 
             builder.ParameterType = paramType;
