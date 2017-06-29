@@ -74,7 +74,7 @@ namespace Discord.Commands.Builders
             _preconditions.Add(precondition);
             return this;
         }
-        public ModuleBuilder AddCommand(string primaryAlias, Func<ICommandContext, object[], IServiceProvider, Task> callback, Action<CommandBuilder> createFunc)
+        public ModuleBuilder AddCommand(string primaryAlias, Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> callback, Action<CommandBuilder> createFunc)
         {
             var builder = new CommandBuilder(this, primaryAlias, callback);
             createFunc(builder);

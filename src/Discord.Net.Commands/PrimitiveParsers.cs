@@ -31,11 +31,6 @@ namespace Discord.Commands
             parserBuilder[typeof(DateTimeOffset)] = (TryParseDelegate<DateTimeOffset>)DateTimeOffset.TryParse;
             parserBuilder[typeof(TimeSpan)] = (TryParseDelegate<TimeSpan>)TimeSpan.TryParse;
             parserBuilder[typeof(char)] = (TryParseDelegate<char>)char.TryParse;
-            parserBuilder[typeof(string)] = (TryParseDelegate<string>)delegate (string str, out string value)
-            {
-                value = str;
-                return true;
-            };
             return parserBuilder.ToImmutable();
         }
 

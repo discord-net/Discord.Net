@@ -13,7 +13,7 @@ namespace Discord.Commands.Builders
         private readonly List<string> _aliases;
 
         public ModuleBuilder Module { get; }
-        internal Func<ICommandContext, object[], IServiceProvider, Task> Callback { get; set; }
+        internal Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> Callback { get; set; }
 
         public string Name { get; set; }
         public string Summary { get; set; }
@@ -36,7 +36,7 @@ namespace Discord.Commands.Builders
             _aliases = new List<string>();
         }
         //User-defined
-        internal CommandBuilder(ModuleBuilder module, string primaryAlias, Func<ICommandContext, object[], IServiceProvider, Task> callback)
+        internal CommandBuilder(ModuleBuilder module, string primaryAlias, Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> callback)
             : this(module)
         {
             Discord.Preconditions.NotNull(primaryAlias, nameof(primaryAlias));

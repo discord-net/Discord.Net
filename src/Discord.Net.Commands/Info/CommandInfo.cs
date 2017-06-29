@@ -18,7 +18,7 @@ namespace Discord.Commands
         private static readonly System.Reflection.MethodInfo _convertParamsMethod = typeof(CommandInfo).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<object>, object>> _arrayConverters = new ConcurrentDictionary<Type, Func<IEnumerable<object>, object>>();
 
-        private readonly Func<ICommandContext, object[], IServiceProvider, Task> _action;
+        private readonly Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> _action;
 
         public ModuleInfo Module { get; }
         public string Name { get; }
@@ -105,15 +105,17 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
         
-        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult preconditionResult = null)
+        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult preconditionResult = null, IServiceProvider services = null)
         {
+            services = services ?? EmptyServiceProvider.Instance;
+
             if (!searchResult.IsSuccess)
                 return ParseResult.FromError(searchResult);
             if (preconditionResult != null && !preconditionResult.IsSuccess)
                 return ParseResult.FromError(preconditionResult);
             
             string input = searchResult.Text.Substring(startIndex);
-            return await CommandParser.ParseArgs(this, context, input, 0).ConfigureAwait(false);
+            return await CommandParser.ParseArgs(this, context, services, input, 0).ConfigureAwait(false);
         }
 
         public Task<ExecuteResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)
@@ -181,7 +183,7 @@ namespace Discord.Commands
             await Module.Service._cmdLogger.DebugAsync($"Executing {GetLogText(context)}").ConfigureAwait(false);
             try
             {
-                await _action(context, args, services).ConfigureAwait(false);
+                await _action(context, args, services, this).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
