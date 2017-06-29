@@ -14,6 +14,10 @@ namespace Discord
         public CancellationToken CancelToken { get; set; } = CancellationToken.None;
         public RetryMode? RetryMode { get; set; }
         public bool HeaderOnly { get; internal set; }
+        /// <summary>
+        /// The reason for this action in the guild's audit log
+        /// </summary>
+        public string AuditLogReason { get; set; }
 
         internal bool IgnoreState { get; set; }
         internal string BucketId { get; set; }
