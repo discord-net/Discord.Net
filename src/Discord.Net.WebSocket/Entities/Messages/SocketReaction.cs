@@ -29,5 +29,27 @@ namespace Discord.WebSocket
                 emote = new Emoji(model.Emoji.Name);
             return new SocketReaction(channel, model.MessageId, message, model.UserId, user, emote);
         }
+
+        public override bool Equals(object other)
+        {
+            if (other == null) return false;
+            if (other == this) return true;
+
+            var otherReaction = other as SocketReaction;
+            if (otherReaction == null) return false;
+
+            return UserId == otherReaction.UserId && MessageId == otherReaction.MessageId && Emote.Equals(otherReaction.Emote);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = UserId.GetHashCode();
+                hashCode = (hashCode * 397) ^ MessageId.GetHashCode();
+                hashCode = (hashCode * 397) ^ Emote.GetHashCode();
+                return hashCode;
+            }
+        }
     }
 }
