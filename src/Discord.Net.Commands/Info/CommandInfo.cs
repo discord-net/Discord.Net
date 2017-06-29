@@ -36,14 +36,14 @@ namespace Discord.Commands
         internal CommandInfo(CommandBuilder builder, ModuleInfo module, CommandService service)
         {
             Module = module;
-            
+
             Name = builder.Name;
             Summary = builder.Summary;
             Remarks = builder.Remarks;
 
             RunMode = (builder.RunMode == RunMode.Default ? service._defaultRunMode : builder.RunMode);
             Priority = builder.Priority;
-            
+
             Aliases = module.Aliases
                 .Permutate(builder.Aliases, (first, second) =>
                 {
@@ -106,7 +106,7 @@ namespace Discord.Commands
 
             return PreconditionResult.FromSuccess();
         }
-        
+
         public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult preconditionResult = null, IServiceProvider services = null)
         {
             services = services ?? EmptyServiceProvider.Instance;
@@ -115,35 +115,35 @@ namespace Discord.Commands
                 return ParseResult.FromError(searchResult);
             if (preconditionResult != null && !preconditionResult.IsSuccess)
                 return ParseResult.FromError(preconditionResult);
-            
+
             string input = searchResult.Text.Substring(startIndex);
             return await CommandParser.ParseArgs(this, context, services, input, 0).ConfigureAwait(false);
         }
 
-        public Task<ExecuteResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)
+        public Task<IResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)
         {
             if (!parseResult.IsSuccess)
-                return Task.FromResult(ExecuteResult.FromError(parseResult));
+                return Task.FromResult((IResult)ExecuteResult.FromError(parseResult));
 
             var argList = new object[parseResult.ArgValues.Count];
             for (int i = 0; i < parseResult.ArgValues.Count; i++)
             {
                 if (!parseResult.ArgValues[i].IsSuccess)
-                    return Task.FromResult(ExecuteResult.FromError(parseResult.ArgValues[i]));
+                    return Task.FromResult((IResult)ExecuteResult.FromError(parseResult.ArgValues[i]));
                 argList[i] = parseResult.ArgValues[i].Values.First().Value;
             }
-            
+
             var paramList = new object[parseResult.ParamValues.Count];
             for (int i = 0; i < parseResult.ParamValues.Count; i++)
             {
                 if (!parseResult.ParamValues[i].IsSuccess)
-                    return Task.FromResult(ExecuteResult.FromError(parseResult.ParamValues[i]));
+                    return Task.FromResult((IResult)ExecuteResult.FromError(parseResult.ParamValues[i]));
                 paramList[i] = parseResult.ParamValues[i].Values.First().Value;
             }
 
             return ExecuteAsync(context, argList, paramList, services);
         }
-        public async Task<ExecuteResult> ExecuteAsync(ICommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList, IServiceProvider services)
+        public async Task<IResult> ExecuteAsync(ICommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList, IServiceProvider services)
         {
             services = services ?? EmptyServiceProvider.Instance;
 
@@ -163,10 +163,9 @@ namespace Discord.Commands
                 switch (RunMode)
                 {
                     case RunMode.Sync: //Always sync
-                        await ExecuteAsyncInternal(context, args, services).ConfigureAwait(false);
-                        break;
+                        return await ExecuteAsyncInternal(context, args, services).ConfigureAwait(false);
                     case RunMode.Async: //Always async
-                        var t2 = Task.Run(async () => 
+                        var t2 = Task.Run(async () =>
                         {
                             await ExecuteAsyncInternal(context, args, services).ConfigureAwait(false);
                         });
@@ -180,12 +179,26 @@ namespace Discord.Commands
             }
         }
 
-        private async Task ExecuteAsyncInternal(ICommandContext context, object[] args, IServiceProvider services)
+        private async Task<IResult> ExecuteAsyncInternal(ICommandContext context, object[] args, IServiceProvider services)
         {
             await Module.Service._cmdLogger.DebugAsync($"Executing {GetLogText(context)}").ConfigureAwait(false);
             try
             {
-                await _action(context, args, services, this).ConfigureAwait(false);
+                var task = _action(context, args, services, this);
+                if (task is Task<IResult> resultTask)
+                {
+                    var result = await resultTask.ConfigureAwait(false);
+                    if (result is RuntimeResult execResult)
+                        return execResult;
+                }
+                else if (task is Task<ExecuteResult> execTask)
+                {
+                    return await execTask.ConfigureAwait(false);
+                }
+                else
+                    await task.ConfigureAwait(false);
+
+                return ExecuteResult.FromSuccess();
             }
             catch (Exception ex)
             {
@@ -202,8 +215,13 @@ namespace Discord.Commands
                     else
                         ExceptionDispatchInfo.Capture(ex).Throw();
                 }
+
+                return ExecuteResult.FromError(CommandError.Exception, ex.Message);
             }
-            await Module.Service._cmdLogger.VerboseAsync($"Executed {GetLogText(context)}").ConfigureAwait(false);
+            finally
+            {
+                await Module.Service._cmdLogger.VerboseAsync($"Executed {GetLogText(context)}").ConfigureAwait(false);
+            }
         }
 
         private object[] GenerateArgs(IEnumerable<object> argList, IEnumerable<object> paramsList)
@@ -240,7 +258,7 @@ namespace Discord.Commands
             => paramsList.Cast<T>().ToArray();
 
         internal string GetLogText(ICommandContext context)
-        {            
+        {
             if (context.Guild != null)
                 return $"\"{Name}\" for {context.User} in {context.Guild}/{context.Channel}";
             else

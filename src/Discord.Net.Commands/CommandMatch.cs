@@ -20,9 +20,9 @@ namespace Discord.Commands
             => Command.CheckPreconditionsAsync(context, services);
         public Task<ParseResult> ParseAsync(ICommandContext context, SearchResult searchResult, PreconditionResult preconditionResult = null, IServiceProvider services = null)
             => Command.ParseAsync(context, Alias.Length, searchResult, preconditionResult, services);
-        public Task<ExecuteResult> ExecuteAsync(ICommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList, IServiceProvider services)
+        public Task<IResult> ExecuteAsync(ICommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList, IServiceProvider services)
             => Command.ExecuteAsync(context, argList, paramList, services);
-        public Task<ExecuteResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)
+        public Task<IResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)
             => Command.ExecuteAsync(context, parseResult, services);
     }
 }

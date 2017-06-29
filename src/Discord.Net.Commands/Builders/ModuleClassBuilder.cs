@@ -197,22 +197,34 @@ namespace Discord.Commands
 
             var createInstance = ReflectionUtils.CreateBuilder<IModuleBase>(typeInfo, service);
 
-            builder.Callback = async (ctx, args, map, cmd) => 
+            async Task<IResult> ExecuteCallback(ICommandContext context, object[] args, IServiceProvider services, CommandInfo cmd)
             {
-                var instance = createInstance(map);
-                instance.SetContext(ctx);
+                var instance = createInstance(services);
+                instance.SetContext(context);
+
                 try
                 {
                     instance.BeforeExecute(cmd);
+
                     var task = method.Invoke(instance, args) as Task ?? Task.Delay(0);
-                    await task.ConfigureAwait(false);
+                    if (task is Task<RuntimeResult> resultTask)
+                    {
+                        return await resultTask.ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        await task.ConfigureAwait(false);
+                        return ExecuteResult.FromSuccess();
+                    }
                 }
                 finally
                 {
                     instance.AfterExecute(cmd);
                     (instance as IDisposable)?.Dispose();
                 }
-            };
+            }
+
+            builder.Callback = ExecuteCallback;
         }
 
         private static void BuildParameter(ParameterBuilder builder, System.Reflection.ParameterInfo paramInfo, int position, int count, CommandService service)
@@ -293,7 +305,7 @@ namespace Discord.Commands
         private static bool IsValidCommandDefinition(MethodInfo methodInfo)
         {
             return methodInfo.IsDefined(typeof(CommandAttribute)) &&
-                   (methodInfo.ReturnType == typeof(Task) || methodInfo.ReturnType == typeof(void)) &&
+                   (methodInfo.ReturnType == typeof(Task) || methodInfo.ReturnType == typeof(Task<RuntimeResult>)) &&
                    !methodInfo.IsStatic &&
                    !methodInfo.IsGenericMethod;
         }

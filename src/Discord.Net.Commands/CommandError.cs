@@ -18,6 +18,9 @@
         UnmetPrecondition,
 
         //Execute
-        Exception
+        Exception,
+
+        //Runtime
+        Unsuccessful
     }
 }
