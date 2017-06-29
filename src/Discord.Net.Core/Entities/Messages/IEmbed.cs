@@ -5,7 +5,7 @@ namespace Discord
 {
     public interface IEmbed
     {
-        Uri Url { get; }
+        string Url { get; }
         string Title { get; }
         string Description { get; }
         EmbedType Type { get; }

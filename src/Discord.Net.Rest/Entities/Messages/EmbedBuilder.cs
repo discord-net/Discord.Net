@@ -39,9 +39,33 @@ namespace Discord
             }
         }
 
-        public Uri Url { get => _embed.Url; set { _embed.Url = value; } }
-        public Uri ThumbnailUrl { get => _embed.Thumbnail?.Url; set { _embed.Thumbnail = new EmbedThumbnail(value, null, null, null); } }
-        public Uri ImageUrl { get => _embed.Image?.Url; set { _embed.Image = new EmbedImage(value, null, null, null); } }
+        public string Url
+        {
+            get => _embed.Url;
+            set
+            {
+                if (!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("Url must be a well-formed URI", nameof(Url));
+                _embed.Url = value;
+            }
+        }
+        public string ThumbnailUrl
+        {
+            get => _embed.Thumbnail?.Url;
+            set
+            {
+                if (!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("Url must be a well-formed URI", nameof(ThumbnailUrl));
+                _embed.Thumbnail = new EmbedThumbnail(value, null, null, null);
+            }
+        }
+        public string ImageUrl
+        {
+            get => _embed.Image?.Url;
+            set
+            {
+                if (!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("Url must be a well-formed URI", nameof(ImageUrl));
+                _embed.Image = new EmbedImage(value, null, null, null);
+            }
+        }
         public DateTimeOffset? Timestamp { get => _embed.Timestamp; set { _embed.Timestamp = value; } }
         public Color? Color { get => _embed.Color; set { _embed.Color = value; } }
 
@@ -70,17 +94,17 @@ namespace Discord
             Description = description;
             return this;
         }
-        public EmbedBuilder WithUrl(Uri url)
+        public EmbedBuilder WithUrl(string url)
         {
             Url = url;
             return this;
         }
-        public EmbedBuilder WithThumbnailUrl(Uri thumbnailUrl)
+        public EmbedBuilder WithThumbnailUrl(string thumbnailUrl)
         {
             ThumbnailUrl = thumbnailUrl;
             return this;
         }
-        public EmbedBuilder WithImageUrl(Uri imageUrl)
+        public EmbedBuilder WithImageUrl(string imageUrl)
         {
             ImageUrl = imageUrl;
             return this;
@@ -252,8 +276,24 @@ namespace Discord
                 _author.Name = value;
             }
         }
-        public Uri Url { get => _author.Url; set { _author.Url = value; } }
-        public Uri IconUrl { get => _author.IconUrl; set { _author.IconUrl = value; } }
+        public string Url
+        {
+            get => _author.Url;
+            set
+            {
+                if (!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("Url must be a well-formed URI", nameof(Url));
+                _author.Url = value;
+            }
+        }
+        public string IconUrl
+        {
+            get => _author.IconUrl;
+            set
+            {
+                if (!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("Url must be a well-formed URI", nameof(IconUrl));
+                _author.IconUrl = value;
+            }
+        }
 
         public EmbedAuthorBuilder()
         {
@@ -265,12 +305,12 @@ namespace Discord
             Name = name;
             return this;
         }
-        public EmbedAuthorBuilder WithUrl(Uri url)
+        public EmbedAuthorBuilder WithUrl(string url)
         {
             Url = url;
             return this;
         }
-        public EmbedAuthorBuilder WithIconUrl(Uri iconUrl)
+        public EmbedAuthorBuilder WithIconUrl(string iconUrl)
         {
             IconUrl = iconUrl;
             return this;
@@ -295,7 +335,15 @@ namespace Discord
                 _footer.Text = value;
             }
         }
-        public Uri IconUrl { get => _footer.IconUrl; set { _footer.IconUrl = value; } }
+        public string IconUrl
+        {
+            get => _footer.IconUrl;
+            set
+            {
+                if (!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("Url must be a well-formed URI", nameof(IconUrl));
+                _footer.IconUrl = value;
+            }
+        }
 
         public EmbedFooterBuilder()
         {
@@ -307,7 +355,7 @@ namespace Discord
             Text = text;
             return this;
         }
-        public EmbedFooterBuilder WithIconUrl(Uri iconUrl)
+        public EmbedFooterBuilder WithIconUrl(string iconUrl)
         {
             IconUrl = iconUrl;
             return this;

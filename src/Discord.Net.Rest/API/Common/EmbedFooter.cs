@@ -8,8 +8,8 @@ namespace Discord.API
         [JsonProperty("text")]
         public string Text { get; set; }
         [JsonProperty("icon_url")]
-        public Uri IconUrl { get; set; }
+        public string IconUrl { get; set; }
         [JsonProperty("proxy_icon_url")]
-        public Uri ProxyIconUrl { get; set; }
+        public string ProxyIconUrl { get; set; }
     }
 }

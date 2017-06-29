@@ -6,12 +6,12 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct EmbedThumbnail
     {
-        public Uri Url { get; }
-        public Uri ProxyUrl { get; }
+        public string Url { get; }
+        public string ProxyUrl { get; }
         public int? Height { get; }
         public int? Width { get; }
 
-        internal EmbedThumbnail(Uri url, Uri proxyUrl, int? height, int? width)
+        internal EmbedThumbnail(string url, string proxyUrl, int? height, int? width)
         {
             Url = url;
             ProxyUrl = proxyUrl;

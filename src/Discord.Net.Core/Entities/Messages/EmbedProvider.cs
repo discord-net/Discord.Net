@@ -7,9 +7,9 @@ namespace Discord
     public struct EmbedProvider
     {
         public string Name { get; }
-        public Uri Url { get; }
+        public string Url { get; }
 
-        internal EmbedProvider(string name, Uri url)
+        internal EmbedProvider(string name, string url)
         {
             Name = name;
             Url = url;
