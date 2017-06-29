@@ -8,7 +8,8 @@ namespace Discord.Commands.Builders
 {
     public class ParameterBuilder
     {
-        private readonly List<ParameterPreconditionAttribute> _preconditions; 
+        private readonly List<ParameterPreconditionAttribute> _preconditions;
+        private readonly List<Attribute> _attributes;
 
         public CommandBuilder Command { get; }
         public string Name { get; internal set; }
@@ -22,11 +23,13 @@ namespace Discord.Commands.Builders
         public string Summary { get; set; }
 
         public IReadOnlyList<ParameterPreconditionAttribute> Preconditions => _preconditions;
+        public IReadOnlyList<Attribute> Attributes => _attributes;
 
         //Automatic
         internal ParameterBuilder(CommandBuilder command)
         {
             _preconditions = new List<ParameterPreconditionAttribute>();
+            _attributes = new List<Attribute>();
 
             Command = command;
         }
@@ -84,6 +87,11 @@ namespace Discord.Commands.Builders
             return this;
         }
 
+        public ParameterBuilder AddAttributes(params Attribute[] attributes)
+        {
+            _attributes.AddRange(attributes);
+            return this;
+        }
         public ParameterBuilder AddPrecondition(ParameterPreconditionAttribute precondition)
         {
             _preconditions.Add(precondition);

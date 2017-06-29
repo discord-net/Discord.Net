@@ -21,6 +21,7 @@ namespace Discord.Commands
         public object DefaultValue { get; }
 
         public IReadOnlyList<ParameterPreconditionAttribute> Preconditions { get; }
+        public IReadOnlyList<Attribute> Attributes { get; }
 
         internal ParameterInfo(ParameterBuilder builder, CommandInfo command, CommandService service)
         {
@@ -36,6 +37,7 @@ namespace Discord.Commands
             DefaultValue = builder.DefaultValue;
 
             Preconditions = builder.Preconditions.ToImmutableArray();
+            Attributes = builder.Attributes.ToImmutableArray();
 
             _reader = builder.TypeReader;
         }

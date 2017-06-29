@@ -122,6 +122,9 @@ namespace Discord.Commands
                     case PreconditionAttribute precondition:
                         builder.AddPrecondition(precondition);
                         break;
+                    default:
+                        builder.AddAttributes(attribute);
+                        break;
                 }
             }
 
@@ -172,6 +175,9 @@ namespace Discord.Commands
                         break;
                     case PreconditionAttribute precondition:
                         builder.AddPrecondition(precondition);
+                        break;
+                    default:
+                        builder.AddAttributes(attribute);
                         break;
                 }
             }
@@ -238,6 +244,9 @@ namespace Discord.Commands
                             throw new InvalidOperationException($"Remainder parameters must be the last parameter in a command. Parameter: {paramInfo.Name} in {paramInfo.Member.DeclaringType.Name}.{paramInfo.Member.Name}");
 
                         builder.IsRemainder = true;
+                        break;
+                    default:
+                        builder.AddAttributes(attribute);
                         break;
                 }
             }

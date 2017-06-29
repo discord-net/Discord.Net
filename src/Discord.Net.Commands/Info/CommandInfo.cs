@@ -31,6 +31,7 @@ namespace Discord.Commands
         public IReadOnlyList<string> Aliases { get; }
         public IReadOnlyList<ParameterInfo> Parameters { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
+        public IReadOnlyList<Attribute> Attributes { get; }
 
         internal CommandInfo(CommandBuilder builder, ModuleInfo module, CommandService service)
         {
@@ -57,6 +58,7 @@ namespace Discord.Commands
                 .ToImmutableArray();
 
             Preconditions = builder.Preconditions.ToImmutableArray();
+            Attributes = builder.Attributes.ToImmutableArray();
 
             Parameters = builder.Parameters.Select(x => x.Build(this)).ToImmutableArray();
             HasVarArgs = builder.Parameters.Count > 0 ? builder.Parameters[builder.Parameters.Count - 1].IsMultiple : false;
