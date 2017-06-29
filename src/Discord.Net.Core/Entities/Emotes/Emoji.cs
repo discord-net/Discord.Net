@@ -6,6 +6,14 @@
     public class Emoji : IEmote
     {
         // TODO: need to constrain this to unicode-only emojis somehow
+
+        /// <summary>
+        /// The unicode representation of this emote.
+        /// </summary>
+        public string Name { get; }
+
+        public override string ToString() => Name;
+
         /// <summary>
         /// Creates a unicode emoji.
         /// </summary>
@@ -14,13 +22,6 @@
         {
             Name = unicode;
         }
-
-        /// <summary>
-        /// The unicode representation of this emote.
-        /// </summary>
-        public string Name { get; }
-
-        public override string ToString() => Name;
 
         public override bool Equals(object other)
         {
