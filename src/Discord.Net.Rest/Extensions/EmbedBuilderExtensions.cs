@@ -15,9 +15,9 @@ namespace Discord
             builder.WithColor(new Color(r, g, b));
 
         public static EmbedBuilder WithAuthor(this EmbedBuilder builder, IUser user) =>
-            builder.WithAuthor($"{user.Username}#{user.Discriminator}", user.AvatarUrl);
+            builder.WithAuthor($"{user.Username}#{user.Discriminator}", user.GetAvatarUrl());
 
         public static EmbedBuilder WithAuthor(this EmbedBuilder builder, IGuildUser user) =>
-            builder.WithAuthor($"{user.Nickname ?? user.Username}#{user.Discriminator}", user.AvatarUrl);
+            builder.WithAuthor($"{user.Nickname ?? user.Username}#{user.Discriminator}", user.GetAvatarUrl());
     }
 }
