@@ -131,8 +131,11 @@ namespace Discord.WebSocket
         public Task RemoveAllReactionsAsync(RequestOptions options = null)
             => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
 
+        [Obsolete("GetReactionUsersAsync(string...) is deprecated, use GetReactionUsersAsync(IEmote...)")]
         public Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(string emoji, int limit = 100, ulong? afterUserId = null, RequestOptions options = null)
-            => MessageHelper.GetReactionUsersAsync(this, emoji, x => { x.Limit = limit; x.AfterUserId = afterUserId.HasValue ? afterUserId.Value : Optional.Create<ulong>(); }, Discord, options);
+            => MessageHelper.GetReactionUsersAsync(this, new Emoji(emoji), x => { x.Limit = limit; x.AfterUserId = afterUserId ?? Optional.Create<ulong>(); }, Discord, options);
+        public Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit = 100, ulong? afterUserId = null, RequestOptions options = null)
+            => MessageHelper.GetReactionUsersAsync(this, emote, x => { x.Limit = limit; x.AfterUserId = afterUserId ?? Optional.Create<ulong>(); }, Discord, options);
 
         public Task PinAsync(RequestOptions options = null)
             => MessageHelper.PinAsync(this, Discord, options);

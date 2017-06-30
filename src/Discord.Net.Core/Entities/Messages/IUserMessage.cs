@@ -22,7 +22,9 @@ namespace Discord
         Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null);
         /// <summary> Removes all reactions from this message. </summary>
         Task RemoveAllReactionsAsync(RequestOptions options = null);
+        [Obsolete("GetReactionUsersAsync(string...) is deprecated, use GetReactionUsersAsync(IEmote...)")]
         Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(string emoji, int limit = 100, ulong? afterUserId = null, RequestOptions options = null);
+        Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit = 100, ulong? afterUserId = null, RequestOptions options = null);
 
         /// <summary> Transforms this message's text into a human readable form by resolving its tags. </summary>
         string Resolve(
