@@ -260,7 +260,7 @@ namespace Discord
             get => _field.Value;
             set
             {
-                var stringValue = value.ToString();
+                var stringValue = value?.ToString();
                 if (string.IsNullOrEmpty(stringValue)) throw new ArgumentException($"Field value must not be null or empty.", nameof(Value));
                 if (stringValue.Length > MaxFieldValueLength) throw new ArgumentException($"Field value length must be less than or equal to {MaxFieldValueLength}.", nameof(Value));
                 _field.Value = stringValue;
