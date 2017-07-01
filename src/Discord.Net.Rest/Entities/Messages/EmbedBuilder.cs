@@ -372,7 +372,7 @@ namespace Discord
             get => _footer.IconUrl;
             set
             {
-                if (!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("Url must be a well-formed URI", nameof(IconUrl));
+                if (value != null && !Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("Url must be a well-formed URI", nameof(IconUrl));
                 _footer.IconUrl = value;
             }
         }
