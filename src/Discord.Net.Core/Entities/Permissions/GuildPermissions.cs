@@ -28,6 +28,8 @@ namespace Discord
         public bool ManageChannels => Permissions.GetValue(RawValue, GuildPermission.ManageChannels);
         /// <summary> If True, a user may adjust guild properties. </summary>
         public bool ManageGuild => Permissions.GetValue(RawValue, GuildPermission.ManageGuild);
+        /// <summary> If True, a user may view guild audit logs. </summary>
+        public bool ViewAuditLog => Permissions.GetValue(RawValue, GuildPermission.ViewAuditLog);
         
         /// <summary> If true, a user may add reactions. </summary>
         public bool AddReactions => Permissions.GetValue(RawValue, GuildPermission.AddReactions);
@@ -79,7 +81,7 @@ namespace Discord
 
         private GuildPermissions(ulong initialValue, bool? createInstantInvite = null, bool? kickMembers = null, 
             bool? banMembers = null, bool? administrator = null, bool? manageChannel = null,  bool? manageGuild = null,
-            bool? addReactions = null,
+            bool? viewAuditLog = null, bool? addReactions = null,
             bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null,  bool? manageMessages = null, 
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null,  bool? mentionEveryone = null, 
             bool? userExternalEmojis = null, bool? connect = null, bool? speak = null, bool? muteMembers = null,  bool? deafenMembers = null, 
@@ -94,6 +96,7 @@ namespace Discord
             Permissions.SetValue(ref value, administrator, GuildPermission.Administrator);
             Permissions.SetValue(ref value, manageChannel, GuildPermission.ManageChannels);
             Permissions.SetValue(ref value, manageGuild, GuildPermission.ManageGuild);
+            Permissions.SetValue(ref value, viewAuditLog, GuildPermission.ViewAuditLog);
             Permissions.SetValue(ref value, addReactions, GuildPermission.AddReactions);
             Permissions.SetValue(ref value, readMessages, GuildPermission.ReadMessages);
             Permissions.SetValue(ref value, sendMessages, GuildPermission.SendMessages);
@@ -122,29 +125,29 @@ namespace Discord
         /// <summary> Creates a new GuildPermissions with the provided permissions. </summary>
         public GuildPermissions(bool createInstantInvite = false, bool kickMembers = false, 
             bool banMembers = false, bool administrator = false, bool manageChannels = false, bool manageGuild = false,
-            bool addReactions = false,
+            bool viewAuditLog = false, bool addReactions = false,
             bool readMessages = false, bool sendMessages = false, bool sendTTSMessages = false, bool manageMessages = false,
             bool embedLinks = false, bool attachFiles = false, bool readMessageHistory = false, bool mentionEveryone = false,
             bool useExternalEmojis = false, bool connect = false, bool speak = false, bool muteMembers = false, bool deafenMembers = false,
             bool moveMembers = false, bool useVoiceActivation = false, bool? changeNickname = false, bool? manageNicknames = false, 
             bool manageRoles = false, bool manageWebhooks = false, bool manageEmojis = false)
-            : this(0, createInstantInvite, manageRoles, kickMembers, banMembers, manageChannels, manageGuild, addReactions, 
+            : this(0, createInstantInvite, manageRoles, kickMembers, banMembers, manageChannels, manageGuild, viewAuditLog, addReactions, 
                 readMessages, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles, mentionEveryone, useExternalEmojis, connect, 
                 manageWebhooks, manageEmojis) { }
 
         /// <summary> Creates a new GuildPermissions from this one, changing the provided non-null permissions. </summary>
         public GuildPermissions Modify(bool? createInstantInvite = null,  bool? kickMembers = null, 
             bool? banMembers = null, bool? administrator = null, bool? manageChannels = null, bool? manageGuild = null,
-            bool? addReactions = null,
+            bool? viewAuditLog = null, bool? addReactions = null,
             bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
             bool? useExternalEmojis = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
             bool? moveMembers = null, bool? useVoiceActivation = null, bool? changeNickname = null, bool? manageNicknames = null, 
             bool? manageRoles = null, bool? manageWebhooks = null, bool? manageEmojis = null)
-            => new GuildPermissions(RawValue, createInstantInvite, manageRoles, kickMembers, banMembers, manageChannels, manageGuild, addReactions,  
-                readMessages, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles, mentionEveryone, useExternalEmojis, connect, 
-                speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, changeNickname, manageNicknames, manageRoles,
-                manageWebhooks, manageEmojis);
+            => new GuildPermissions(RawValue, createInstantInvite, manageRoles, kickMembers, banMembers, manageChannels, manageGuild, viewAuditLog,
+                addReactions, readMessages, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles, mentionEveryone, 
+                useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, changeNickname, 
+                manageNicknames, manageRoles, manageWebhooks, manageEmojis);
 
         public bool Has(GuildPermission permission) => Permissions.GetValue(RawValue, permission);
 

@@ -9,6 +9,7 @@
         Administrator = 3,
         ManageChannels = 4,
         ManageGuild = 5,
+        ViewAuditLog = 7,
 
         //Text
         AddReactions = 6,
