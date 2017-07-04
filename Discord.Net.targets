@@ -1,7 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <VersionPrefix>1.0.2</VersionPrefix>
-        <VersionSuffix></VersionSuffix>
         <Authors>RogueException</Authors>
         <PackageTags>discord;discordapp</PackageTags>
         <PackageProjectUrl>https://github.com/RogueException/Discord.Net</PackageProjectUrl>
@@ -10,12 +9,10 @@
         <RepositoryUrl>git://github.com/RogueException/Discord.Net</RepositoryUrl>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(BuildNumber)' == '' ">
-        <VersionSuffix Condition=" '$(VersionSuffix)' != ''">$(VersionSuffix)-dev</VersionSuffix>
-        <VersionSuffix Condition=" '$(VersionSuffix)' == ''">dev</VersionSuffix>
+        <VersionSuffix>dev</VersionSuffix>
     </PropertyGroup>
-    <PropertyGroup Condition=" '$(BuildNumber)' != '' And '$(IsTagBuild)' != 'true' ">
-        <VersionSuffix Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)-$(BuildNumber)</VersionSuffix>
-        <VersionSuffix Condition=" '$(VersionSuffix)' == '' ">build-$(BuildNumber)</VersionSuffix>
+    <PropertyGroup Condition=" '$(BuildNumber)' != '' ">
+        <VersionSuffix>$(BuildNumber)</VersionSuffix>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' Or '$(TargetFramework)' == 'net45' ">
         <DefineConstants>$(DefineConstants);FILESYSTEM;DEFAULTUDPCLIENT;DEFAULTWEBSOCKET</DefineConstants>
