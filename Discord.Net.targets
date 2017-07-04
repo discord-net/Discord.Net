@@ -8,7 +8,7 @@
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>git://github.com/RogueException/Discord.Net</RepositoryUrl>
     </PropertyGroup>
-    <PropertyGroup Condition=" '$(BuildNumber)' == '' ">
+    <PropertyGroup Condition=" '$(BuildNumber)' == '' And '$(IsTaggedBuild)' != 'true' ">
         <VersionSuffix>dev</VersionSuffix>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(BuildNumber)' != '' ">
