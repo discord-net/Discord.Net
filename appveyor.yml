@@ -19,6 +19,7 @@ environment:
 init:
 - ps: $Env:BUILD = "$($Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0"))"
 
+
 build_script:
 - ps: appveyor-retry dotnet restore Discord.Net.sln -v Minimal /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
 - ps: dotnet build Discord.Net.sln -c "Release" /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
@@ -34,7 +35,7 @@ after_build:
     if ($Env:APPVEYOR_REPO_TAG -eq "true") {
       nuget pack src\Discord.Net\Discord.Net.nuspec -OutputDirectory "artifacts"
     } else {
-      nuget pack src\Discord.Net\Discord.Net.nuspec -OutputDirectory "artifacts" -suffix "$Env:BUILD"
+      nuget pack src\Discord.Net\Discord.Net.nuspec -OutputDirectory "artifacts" -suffix "$Env:BUILD" -properties suffix="build"
     }
 - ps: Get-ChildItem artifacts\*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 
