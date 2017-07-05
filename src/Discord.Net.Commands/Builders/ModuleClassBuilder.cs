@@ -251,6 +251,9 @@ namespace Discord.Commands
                         builder.IsMultiple = true;
                         paramType = paramType.GetElementType();
                         break;
+                    case ParameterPreconditionAttribute precon:
+                        builder.AddPrecondition(precon);
+                        break;
                     case RemainderAttribute _:
                         if (position != count - 1)
                             throw new InvalidOperationException($"Remainder parameters must be the last parameter in a command. Parameter: {paramInfo.Name} in {paramInfo.Member.DeclaringType.Name}.{paramInfo.Member.Name}");
