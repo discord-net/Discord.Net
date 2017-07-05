@@ -309,8 +309,11 @@ namespace Discord.Commands
                 
                 if (match.Command.Parameters.Count > 0)
                 {
-                    argValuesScore = parseResult.ArgValues.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) / match.Command.Parameters.Count;
-                    paramValuesScore = parseResult.ParamValues.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) / match.Command.Parameters.Count;
+                    var argValuesSum = parseResult.ArgValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
+                    var paramValuesSum = parseResult.ParamValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
+
+                    argValuesScore = argValuesSum / match.Command.Parameters.Count;
+                    paramValuesScore = paramValuesSum / match.Command.Parameters.Count;
                 }
 
                 var totalArgsScore = (argValuesScore + paramValuesScore) / 2;
