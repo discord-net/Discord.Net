@@ -24,7 +24,7 @@ namespace Discord.Commands
 
             foreach (var typeInfo in assembly.DefinedTypes)
             {
-                if (typeInfo.IsPublic)
+                if (typeInfo.IsPublic || typeInfo.IsNestedPublic)
                 {
                     if (IsValidModuleDefinition(typeInfo) &&
                         !typeInfo.IsDefined(typeof(DontAutoLoadAttribute)))
@@ -70,7 +70,7 @@ namespace Discord.Commands
                 result[typeInfo.AsType()] = module.Build(service);
             }
 
-            await service._cmdLogger.DebugAsync($"Successfully built and loaded {builtTypes.Count} modules.").ConfigureAwait(false);
+            await service._cmdLogger.DebugAsync($"Successfully built {builtTypes.Count} modules.").ConfigureAwait(false);
 
             return result;
         }
