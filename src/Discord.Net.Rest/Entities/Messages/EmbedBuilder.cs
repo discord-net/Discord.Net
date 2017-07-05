@@ -44,7 +44,7 @@ namespace Discord
             get => _embed.Url;
             set
             {
-                if (!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("Url must be a well-formed URI", nameof(Url));
+                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(Url));
                 _embed.Url = value;
             }
         }
@@ -53,7 +53,7 @@ namespace Discord
             get => _embed.Thumbnail?.Url;
             set
             {
-                if (!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("Url must be a well-formed URI", nameof(ThumbnailUrl));
+                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(ThumbnailUrl));
                 _embed.Thumbnail = new EmbedThumbnail(value, null, null, null);
             }
         }
@@ -62,7 +62,7 @@ namespace Discord
             get => _embed.Image?.Url;
             set
             {
-                if (!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("Url must be a well-formed URI", nameof(ImageUrl));
+                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(ImageUrl));
                 _embed.Image = new EmbedImage(value, null, null, null);
             }
         }
@@ -260,7 +260,7 @@ namespace Discord
             get => _field.Value;
             set
             {
-                var stringValue = value.ToString();
+                var stringValue = value?.ToString();
                 if (string.IsNullOrEmpty(stringValue)) throw new ArgumentException($"Field value must not be null or empty.", nameof(Value));
                 if (stringValue.Length > MaxFieldValueLength) throw new ArgumentException($"Field value length must be less than or equal to {MaxFieldValueLength}.", nameof(Value));
                 _field.Value = stringValue;
@@ -313,7 +313,7 @@ namespace Discord
             get => _author.Url;
             set
             {
-                if (!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("Url must be a well-formed URI", nameof(Url));
+                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(Url));
                 _author.Url = value;
             }
         }
@@ -322,7 +322,7 @@ namespace Discord
             get => _author.IconUrl;
             set
             {
-                if (!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("Url must be a well-formed URI", nameof(IconUrl));
+                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(IconUrl));
                 _author.IconUrl = value;
             }
         }
@@ -372,7 +372,7 @@ namespace Discord
             get => _footer.IconUrl;
             set
             {
-                if (!Uri.IsWellFormedUriString(value, UriKind.Absolute)) throw new ArgumentException("Url must be a well-formed URI", nameof(IconUrl));
+                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(IconUrl));
                 _footer.IconUrl = value;
             }
         }
