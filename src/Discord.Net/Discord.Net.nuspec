@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Discord.Net</id>
-    <version>1.0.1-build$suffix$</version>
+    <version>1.0.2</version>
     <title>Discord.Net</title>
     <authors>RogueException</authors>
     <owners>RogueException</owners>
@@ -13,28 +13,28 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <dependencies>
         <group targetFramework="net45">
-            <dependency id="Discord.Net.Core" version="1.0.1-build$suffix$" />
-            <dependency id="Discord.Net.Rest" version="1.0.1-build$suffix$" />
-            <dependency id="Discord.Net.WebSocket" version="1.0.1-build$suffix$" />
-            <dependency id="Discord.Net.Rpc" version="1.0.1-build$suffix$" />
-            <dependency id="Discord.Net.Commands" version="1.0.1-build$suffix$" />
-            <dependency id="Discord.Net.Webhook" version="1.0.1-build$suffix$" />
+            <dependency id="Discord.Net.Core" version="1.0.2" />
+            <dependency id="Discord.Net.Rest" version="1.0.2" />
+            <dependency id="Discord.Net.WebSocket" version="1.0.2" />
+            <dependency id="Discord.Net.Rpc" version="1.0.2" />
+            <dependency id="Discord.Net.Commands" version="1.0.2" />
+            <dependency id="Discord.Net.Webhook" version="1.0.2" />
         </group>
         <group targetFramework="netstandard1.1">
-            <dependency id="Discord.Net.Core" version="1.0.1-build$suffix$" />
-            <dependency id="Discord.Net.Rest" version="1.0.1-build$suffix$" />
-            <dependency id="Discord.Net.WebSocket" version="1.0.1-build$suffix$" />
-            <dependency id="Discord.Net.Rpc" version="1.0.1-build$suffix$" />
-            <dependency id="Discord.Net.Commands" version="1.0.1-build$suffix$" />
-            <dependency id="Discord.Net.Webhook" version="1.0.1-build$suffix$" />
+            <dependency id="Discord.Net.Core" version="1.0.2" />
+            <dependency id="Discord.Net.Rest" version="1.0.2" />
+            <dependency id="Discord.Net.WebSocket" version="1.0.2" />
+            <dependency id="Discord.Net.Rpc" version="1.0.2" />
+            <dependency id="Discord.Net.Commands" version="1.0.2" />
+            <dependency id="Discord.Net.Webhook" version="1.0.2" />
         </group>
         <group targetFramework="netstandard1.3">
-            <dependency id="Discord.Net.Core" version="1.0.1-build$suffix$" />
-            <dependency id="Discord.Net.Rest" version="1.0.1-build$suffix$" />
-            <dependency id="Discord.Net.WebSocket" version="1.0.1-build$suffix$" />
-            <dependency id="Discord.Net.Rpc" version="1.0.1-build$suffix$" />
-            <dependency id="Discord.Net.Commands" version="1.0.1-build$suffix$" />
-            <dependency id="Discord.Net.Webhook" version="1.0.1-build$suffix$" />
+            <dependency id="Discord.Net.Core" version="1.0.2" />
+            <dependency id="Discord.Net.Rest" version="1.0.2" />
+            <dependency id="Discord.Net.WebSocket" version="1.0.2" />
+            <dependency id="Discord.Net.Rpc" version="1.0.2" />
+            <dependency id="Discord.Net.Commands" version="1.0.2" />
+            <dependency id="Discord.Net.Webhook" version="1.0.2" />
         </group>
     </dependencies>
   </metadata>
