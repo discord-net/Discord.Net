@@ -72,8 +72,8 @@ namespace Discord
         /// <summary> If True, a user may use voice-activity-detection rather than push-to-talk. </summary>
         public bool UseVAD => Permissions.GetValue(RawValue, ChannelPermission.UseVAD);
 
-        /// <summary> If True, a user may adjust permissions. This also implictly grants all other permissions. </summary>
-        public bool ManagePermissions => Permissions.GetValue(RawValue, ChannelPermission.ManageRoles);
+        /// <summary> If True, a user may adjust role permissions. This also implictly grants all other permissions. </summary>
+        public bool ManageRoles => Permissions.GetValue(RawValue, ChannelPermission.ManageRoles);
         /// <summary> If True, a user may edit the webhooks for this channel. </summary>
         public bool ManageWebhooks => Permissions.GetValue(RawValue, ChannelPermission.ManageWebhooks);
 
