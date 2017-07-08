@@ -85,7 +85,7 @@ namespace Discord
             bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
             bool? useExternalEmojis = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
-            bool? moveMembers = null, bool? useVoiceActivation = null, bool? managePermissions = null, bool? manageWebhooks = null)
+            bool? moveMembers = null, bool? useVoiceActivation = null, bool? manageRoles = null, bool? manageWebhooks = null)
         {
             ulong value = initialValue;
 
@@ -107,7 +107,7 @@ namespace Discord
             Permissions.SetValue(ref value, deafenMembers, ChannelPermission.DeafenMembers);
             Permissions.SetValue(ref value, moveMembers, ChannelPermission.MoveMembers);
             Permissions.SetValue(ref value, useVoiceActivation, ChannelPermission.UseVAD);
-            Permissions.SetValue(ref value, managePermissions, ChannelPermission.ManageRoles);
+            Permissions.SetValue(ref value, manageRoles, ChannelPermission.ManageRoles);
             Permissions.SetValue(ref value, manageWebhooks, ChannelPermission.ManageWebhooks);
 
             RawValue = value;
@@ -119,10 +119,10 @@ namespace Discord
             bool readMessages = false, bool sendMessages = false, bool sendTTSMessages = false, bool manageMessages = false,
             bool embedLinks = false, bool attachFiles = false, bool readMessageHistory = false, bool mentionEveryone = false,
             bool useExternalEmojis = false, bool connect = false, bool speak = false, bool muteMembers = false, bool deafenMembers = false,
-            bool moveMembers = false, bool useVoiceActivation = false, bool managePermissions = false, bool manageWebhooks = false)
+            bool moveMembers = false, bool useVoiceActivation = false, bool manageRoles = false, bool manageWebhooks = false)
             : this(0, createInstantInvite, manageChannel, addReactions, readMessages, sendMessages, sendTTSMessages, manageMessages,
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect,
-                speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, managePermissions, manageWebhooks)
+                speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, manageRoles, manageWebhooks)
         { }
 
         /// <summary> Creates a new ChannelPermissions from this one, changing the provided non-null permissions. </summary>
@@ -131,10 +131,10 @@ namespace Discord
             bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
             bool useExternalEmojis = false, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
-            bool? moveMembers = null, bool? useVoiceActivation = null, bool? managePermissions = null, bool? manageWebhooks = null)
+            bool? moveMembers = null, bool? useVoiceActivation = null, bool? manageRoles = null, bool? manageWebhooks = null)
             => new ChannelPermissions(RawValue, createInstantInvite, manageChannel, addReactions, readMessages, sendMessages, sendTTSMessages, manageMessages,
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect,
-                speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, managePermissions, manageWebhooks);
+                speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, manageRoles, manageWebhooks);
 
         public bool Has(ChannelPermission permission) => Permissions.GetValue(RawValue, permission);
 
