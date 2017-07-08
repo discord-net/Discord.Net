@@ -80,7 +80,7 @@ namespace Discord
         public GuildPermissions(ulong rawValue) { RawValue = rawValue; }
 
         private GuildPermissions(ulong initialValue, bool? createInstantInvite = null, bool? kickMembers = null,
-            bool? banMembers = null, bool? administrator = null, bool? manageChannel = null, bool? manageGuild = null,
+            bool? banMembers = null, bool? administrator = null, bool? manageChannels = null, bool? manageGuild = null,
             bool? addReactions = null,
             bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
@@ -94,7 +94,7 @@ namespace Discord
             Permissions.SetValue(ref value, banMembers, GuildPermission.BanMembers);
             Permissions.SetValue(ref value, kickMembers, GuildPermission.KickMembers);
             Permissions.SetValue(ref value, administrator, GuildPermission.Administrator);
-            Permissions.SetValue(ref value, manageChannel, GuildPermission.ManageChannels);
+            Permissions.SetValue(ref value, manageChannels, GuildPermission.ManageChannels);
             Permissions.SetValue(ref value, manageGuild, GuildPermission.ManageGuild);
             Permissions.SetValue(ref value, addReactions, GuildPermission.AddReactions);
             Permissions.SetValue(ref value, readMessages, GuildPermission.ReadMessages);
@@ -124,7 +124,7 @@ namespace Discord
 
         /// <summary> Creates a new GuildPermissions with the provided permissions. </summary>
         public GuildPermissions(bool createInstantInvite = false, bool kickMembers = false,
-            bool banMembers = false, bool administrator = false, bool manageChannel = false, bool manageGuild = false,
+            bool banMembers = false, bool administrator = false, bool manageChannels = false, bool manageGuild = false,
             bool addReactions = false,
             bool readMessages = false, bool sendMessages = false, bool sendTTSMessages = false, bool manageMessages = false,
             bool embedLinks = false, bool attachFiles = false, bool readMessageHistory = false, bool mentionEveryone = false,
@@ -133,7 +133,7 @@ namespace Discord
             bool manageRoles = false, bool manageWebhooks = false, bool manageEmojis = false,
             bool viewAuditLog = false)
             : this( initialValue: 0, createInstantInvite: createInstantInvite, kickMembers: kickMembers, banMembers: banMembers,
-                  administrator: administrator, manageChannel: manageChannel, manageGuild: manageGuild, addReactions: addReactions,
+                  administrator: administrator, manageChannels: manageChannels, manageGuild: manageGuild, addReactions: addReactions,
                   readMessages: readMessages, sendMessages: sendMessages, sendTTSMessages: sendTTSMessages, manageMessages: manageMessages,
                   embedLinks: embedLinks, attachFiles: attachFiles, readMessageHistory: readMessageHistory, mentionEveryone: mentionEveryone,
                   useExternalEmojis: useExternalEmojis, connect: connect, speak: speak, muteMembers: muteMembers, deafenMembers: deafenMembers,
@@ -144,7 +144,7 @@ namespace Discord
 
         /// <summary> Creates a new GuildPermissions from this one, changing the provided non-null permissions. </summary>
         public GuildPermissions Modify(bool? createInstantInvite = null, bool? kickMembers = null,
-            bool? banMembers = null, bool? administrator = null, bool? manageChannel = null, bool? manageGuild = null,
+            bool? banMembers = null, bool? administrator = null, bool? manageChannels = null, bool? manageGuild = null,
             bool? addReactions = null,
             bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
@@ -152,7 +152,7 @@ namespace Discord
             bool? moveMembers = null, bool? useVoiceActivation = null, bool? changeNickname = null, bool? manageNicknames = null,
             bool? manageRoles = null, bool? manageWebhooks = null, bool? manageEmojis = null, bool? viewAuditLog = null)
             => new GuildPermissions(RawValue, createInstantInvite: createInstantInvite, kickMembers: kickMembers, banMembers: banMembers,
-                  administrator: administrator, manageChannel: manageChannel, manageGuild: manageGuild, addReactions: addReactions,
+                  administrator: administrator, manageChannels: manageChannels, manageGuild: manageGuild, addReactions: addReactions,
                   readMessages: readMessages, sendMessages: sendMessages, sendTTSMessages: sendTTSMessages, manageMessages: manageMessages,
                   embedLinks: embedLinks, attachFiles: attachFiles, readMessageHistory: readMessageHistory, mentionEveryone: mentionEveryone,
                   useExternalEmojis: useExternalEmojis, connect: connect, speak: speak, muteMembers: muteMembers, deafenMembers: deafenMembers,
