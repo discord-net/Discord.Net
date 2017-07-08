@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord
@@ -21,47 +22,47 @@ namespace Discord
         public ulong DenyValue { get; }
 
         /// <summary> If Allowed, a user may create invites. </summary>
-        public PermValue CreateInstantInvite => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.CreateInstantInvite);
+        public PermValue CreateInstantInvite => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.CREATE_INSTANT_INVITE);
         /// <summary> If Allowed, a user may create, delete and modify this channel. </summary>
-        public PermValue ManageChannel => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManageChannel);
+        public PermValue ManageChannel => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.MANAGE_CHANNELS);
         /// <summary> If Allowed, a user may add reactions. </summary>
-        public PermValue AddReactions => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.AddReactions);
+        public PermValue AddReactions => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ADD_REACTIONS);
         /// <summary> If Allowed, a user may join channels. </summary>
-        public PermValue ReadMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ReadMessages);
+        public PermValue ReadMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.READ_MESSAGES);
         /// <summary> If Allowed, a user may send messages. </summary>
-        public PermValue SendMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SendMessages);
+        public PermValue SendMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SEND_MESSAGES);
         /// <summary> If Allowed, a user may send text-to-speech messages. </summary>
-        public PermValue SendTTSMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SendTTSMessages);
+        public PermValue SendTTSMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SEND_TTS_MESSAGES);
         /// <summary> If Allowed, a user may delete messages. </summary>
-        public PermValue ManageMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManageMessages);
+        public PermValue ManageMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.MANAGE_MESSAGES);
         /// <summary> If Allowed, Discord will auto-embed links sent by this user. </summary>
-        public PermValue EmbedLinks => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.EmbedLinks);
+        public PermValue EmbedLinks => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.EMBED_LINKS);
         /// <summary> If Allowed, a user may send files. </summary>
-        public PermValue AttachFiles => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.AttachFiles);
+        public PermValue AttachFiles => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ATTACH_FILES);
         /// <summary> If Allowed, a user may read previous messages. </summary>
-        public PermValue ReadMessageHistory => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ReadMessageHistory);
+        public PermValue ReadMessageHistory => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.READ_MESSAGE_HISTORY);
         /// <summary> If Allowed, a user may mention @everyone. </summary>
-        public PermValue MentionEveryone => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.MentionEveryone);
+        public PermValue MentionEveryone => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.MENTION_EVERYONE);
         /// <summary> If Allowed, a user may use custom emoji from other guilds. </summary>
-        public PermValue UseExternalEmojis => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.UseExternalEmojis);
+        public PermValue UseExternalEmojis => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.USE_EXTERNAL_EMOJIS);
 
         /// <summary> If Allowed, a user may connect to a voice channel. </summary>
-        public PermValue Connect => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.Connect);
+        public PermValue Connect => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.CONNECT);
         /// <summary> If Allowed, a user may speak in a voice channel. </summary>
-        public PermValue Speak => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.Speak);
+        public PermValue Speak => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SPEAK);
         /// <summary> If Allowed, a user may mute users. </summary>
-        public PermValue MuteMembers => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.MuteMembers);
+        public PermValue MuteMembers => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.MUTE_MEMBERS);
         /// <summary> If Allowed, a user may deafen users. </summary>
-        public PermValue DeafenMembers => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.DeafenMembers);
+        public PermValue DeafenMembers => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.DEAFEN_MEMBERS);
         /// <summary> If Allowed, a user may move other users between voice channels. </summary>
-        public PermValue MoveMembers => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.MoveMembers);
+        public PermValue MoveMembers => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.MOVE_MEMBERS);
         /// <summary> If Allowed, a user may use voice-activity-detection rather than push-to-talk. </summary>
-        public PermValue UseVAD => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.UseVAD);
+        public PermValue UseVAD => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.USE_VAD);
 
         /// <summary> If Allowed, a user may adjust permissions. This also implictly grants all other permissions. </summary>
-        public PermValue ManagePermissions => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManagePermissions);
+        public PermValue ManagePermissions => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.MANAGE_ROLES);
         /// <summary> If True, a user may edit the webhooks for this channel. </summary>
-        public PermValue ManageWebhooks => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManageWebhooks);
+        public PermValue ManageWebhooks => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.MANAGE_WEBHOOKS);
 
         /// <summary> Creates a new OverwritePermissions with the provided allow and deny packed values. </summary>
         public OverwritePermissions(ulong allowValue, ulong denyValue)
@@ -78,26 +79,26 @@ namespace Discord
             PermValue? deafenMembers = null, PermValue? moveMembers = null, PermValue? useVoiceActivation = null, PermValue? managePermissions = null, 
             PermValue? manageWebhooks = null)
         {
-            Permissions.SetValue(ref allowValue, ref denyValue, createInstantInvite, ChannelPermission.CreateInstantInvite);
-            Permissions.SetValue(ref allowValue, ref denyValue, manageChannel, ChannelPermission.ManageChannel);
-            Permissions.SetValue(ref allowValue, ref denyValue, addReactions, ChannelPermission.AddReactions);
-            Permissions.SetValue(ref allowValue, ref denyValue, readMessages, ChannelPermission.ReadMessages);
-            Permissions.SetValue(ref allowValue, ref denyValue, sendMessages, ChannelPermission.SendMessages);
-            Permissions.SetValue(ref allowValue, ref denyValue, sendTTSMessages, ChannelPermission.SendTTSMessages);
-            Permissions.SetValue(ref allowValue, ref denyValue, manageMessages, ChannelPermission.ManageMessages);
-            Permissions.SetValue(ref allowValue, ref denyValue, embedLinks, ChannelPermission.EmbedLinks);
-            Permissions.SetValue(ref allowValue, ref denyValue, attachFiles, ChannelPermission.AttachFiles);
-            Permissions.SetValue(ref allowValue, ref denyValue, readMessageHistory, ChannelPermission.ReadMessageHistory);
-            Permissions.SetValue(ref allowValue, ref denyValue, mentionEveryone, ChannelPermission.MentionEveryone);
-            Permissions.SetValue(ref allowValue, ref denyValue, useExternalEmojis, ChannelPermission.UseExternalEmojis);
-            Permissions.SetValue(ref allowValue, ref denyValue, connect, ChannelPermission.Connect);
-            Permissions.SetValue(ref allowValue, ref denyValue, speak, ChannelPermission.Speak);
-            Permissions.SetValue(ref allowValue, ref denyValue, muteMembers, ChannelPermission.MuteMembers);
-            Permissions.SetValue(ref allowValue, ref denyValue, deafenMembers, ChannelPermission.DeafenMembers);
-            Permissions.SetValue(ref allowValue, ref denyValue, moveMembers, ChannelPermission.MoveMembers);
-            Permissions.SetValue(ref allowValue, ref denyValue, useVoiceActivation, ChannelPermission.UseVAD);
-            Permissions.SetValue(ref allowValue, ref denyValue, managePermissions, ChannelPermission.ManagePermissions);
-            Permissions.SetValue(ref allowValue, ref denyValue, manageWebhooks, ChannelPermission.ManageWebhooks);
+            Permissions.SetValue(ref allowValue, ref denyValue, createInstantInvite, ChannelPermission.CREATE_INSTANT_INVITE);
+            Permissions.SetValue(ref allowValue, ref denyValue, manageChannel, ChannelPermission.MANAGE_CHANNELS);
+            Permissions.SetValue(ref allowValue, ref denyValue, addReactions, ChannelPermission.ADD_REACTIONS);
+            Permissions.SetValue(ref allowValue, ref denyValue, readMessages, ChannelPermission.READ_MESSAGES);
+            Permissions.SetValue(ref allowValue, ref denyValue, sendMessages, ChannelPermission.SEND_MESSAGES);
+            Permissions.SetValue(ref allowValue, ref denyValue, sendTTSMessages, ChannelPermission.SEND_TTS_MESSAGES);
+            Permissions.SetValue(ref allowValue, ref denyValue, manageMessages, ChannelPermission.MANAGE_MESSAGES);
+            Permissions.SetValue(ref allowValue, ref denyValue, embedLinks, ChannelPermission.EMBED_LINKS);
+            Permissions.SetValue(ref allowValue, ref denyValue, attachFiles, ChannelPermission.ATTACH_FILES);
+            Permissions.SetValue(ref allowValue, ref denyValue, readMessageHistory, ChannelPermission.READ_MESSAGE_HISTORY);
+            Permissions.SetValue(ref allowValue, ref denyValue, mentionEveryone, ChannelPermission.MENTION_EVERYONE);
+            Permissions.SetValue(ref allowValue, ref denyValue, useExternalEmojis, ChannelPermission.USE_EXTERNAL_EMOJIS);
+            Permissions.SetValue(ref allowValue, ref denyValue, connect, ChannelPermission.CONNECT);
+            Permissions.SetValue(ref allowValue, ref denyValue, speak, ChannelPermission.SPEAK);
+            Permissions.SetValue(ref allowValue, ref denyValue, muteMembers, ChannelPermission.MUTE_MEMBERS);
+            Permissions.SetValue(ref allowValue, ref denyValue, deafenMembers, ChannelPermission.DEAFEN_MEMBERS);
+            Permissions.SetValue(ref allowValue, ref denyValue, moveMembers, ChannelPermission.MOVE_MEMBERS);
+            Permissions.SetValue(ref allowValue, ref denyValue, useVoiceActivation, ChannelPermission.USE_VAD);
+            Permissions.SetValue(ref allowValue, ref denyValue, managePermissions, ChannelPermission.MANAGE_ROLES);
+            Permissions.SetValue(ref allowValue, ref denyValue, manageWebhooks, ChannelPermission.MANAGE_WEBHOOKS);
 
             AllowValue = allowValue;
             DenyValue = denyValue;
@@ -128,22 +129,22 @@ namespace Discord
         public List<ChannelPermission> ToAllowList()
         {
             var perms = new List<ChannelPermission>();
-            ulong x = 1;
-            for (byte i = 0; i < Permissions.MaxBits; i++, x <<= 1)
+            for (byte i = 0; i < Permissions.MaxBits; i++)
             {
-                if ((AllowValue & x) != 0)
-                    perms.Add((ChannelPermission)i);
+                ulong flag = (ulong)Math.Pow(2, i);
+                if ((AllowValue & flag) != 0)
+                    perms.Add((ChannelPermission)flag);
             }
             return perms;
         }
         public List<ChannelPermission> ToDenyList()
         {
             var perms = new List<ChannelPermission>();
-            ulong x = 1;
-            for (byte i = 0; i < Permissions.MaxBits; i++, x <<= 1)
+            for (byte i = 0; i < Permissions.MaxBits; i++)
             {
-                if ((DenyValue & x) != 0)
-                    perms.Add((ChannelPermission)i);
+                ulong flag = (ulong)Math.Pow(2, i);
+                if ((DenyValue & flag) != 0)
+                    perms.Add((ChannelPermission)flag);
             }
             return perms;
         }

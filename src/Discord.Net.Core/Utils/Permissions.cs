@@ -7,84 +7,84 @@ namespace Discord
         public const int MaxBits = 53;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static PermValue GetValue(ulong allow, ulong deny, ChannelPermission bit)
-            => GetValue(allow, deny, (byte)bit);
+        public static PermValue GetValue(ulong allow, ulong deny, ChannelPermission flag)
+            => GetValue(allow, deny, (ulong)flag);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static PermValue GetValue(ulong allow, ulong deny, GuildPermission bit)
-            => GetValue(allow, deny, (byte)bit);
+        public static PermValue GetValue(ulong allow, ulong deny, GuildPermission flag)
+            => GetValue(allow, deny, (ulong)flag);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static PermValue GetValue(ulong allow, ulong deny, byte bit)
+        public static PermValue GetValue(ulong allow, ulong deny, ulong flag)
         {
-            if (HasBit(allow, bit))
+            if (HasFlag(allow, flag))
                 return PermValue.Allow;
-            else if (HasBit(deny, bit))
+            else if (HasFlag(deny, flag))
                 return PermValue.Deny;
             else
                 return PermValue.Inherit;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool GetValue(ulong value, ChannelPermission bit)
-            => GetValue(value, (byte)bit);
+        public static bool GetValue(ulong value, ChannelPermission flag)
+            => GetValue(value, (ulong)flag);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool GetValue(ulong value, GuildPermission bit)
-            => GetValue(value, (byte)bit);
+        public static bool GetValue(ulong value, GuildPermission flag)
+            => GetValue(value, (ulong)flag);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool GetValue(ulong value, byte bit) => HasBit(value, bit);
+        public static bool GetValue(ulong value, ulong flag) => HasFlag(value, flag);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetValue(ref ulong rawValue, bool? value, ChannelPermission bit)
-            => SetValue(ref rawValue, value, (byte)bit);
+        public static void SetValue(ref ulong rawValue, bool? value, ChannelPermission flag)
+            => SetValue(ref rawValue, value, (ulong)flag);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetValue(ref ulong rawValue, bool? value, GuildPermission bit)
-            => SetValue(ref rawValue, value, (byte)bit);
+        public static void SetValue(ref ulong rawValue, bool? value, GuildPermission flag)
+            => SetValue(ref rawValue, value, (ulong)flag);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetValue(ref ulong rawValue, bool? value, byte bit)
+        public static void SetValue(ref ulong rawValue, bool? value, ulong flag)
         {
             if (value.HasValue)
             {
                 if (value == true)
-                    SetBit(ref rawValue, bit);
+                    SetFlag(ref rawValue, flag);
                 else
-                    UnsetBit(ref rawValue, bit);
+                    UnsetFlag(ref rawValue, flag);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetValue(ref ulong allow, ref ulong deny, PermValue? value, ChannelPermission bit)
-            => SetValue(ref allow, ref deny, value, (byte)bit);
+        public static void SetValue(ref ulong allow, ref ulong deny, PermValue? value, ChannelPermission flag)
+            => SetValue(ref allow, ref deny, value, (ulong)flag);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetValue(ref ulong allow, ref ulong deny, PermValue? value, GuildPermission bit)
-            => SetValue(ref allow, ref deny, value, (byte)bit);
+        public static void SetValue(ref ulong allow, ref ulong deny, PermValue? value, GuildPermission flag)
+            => SetValue(ref allow, ref deny, value, (ulong)flag);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetValue(ref ulong allow, ref ulong deny, PermValue? value, byte bit)
+        public static void SetValue(ref ulong allow, ref ulong deny, PermValue? value, ulong flag)
         {
             if (value.HasValue)
             {
                 switch (value)
                 {
                     case PermValue.Allow:
-                        SetBit(ref allow, bit);
-                        UnsetBit(ref deny, bit);
+                        SetFlag(ref allow, flag);
+                        UnsetFlag(ref deny, flag);
                         break;
                     case PermValue.Deny:
-                        UnsetBit(ref allow, bit);
-                        SetBit(ref deny, bit);
+                        UnsetFlag(ref allow, flag);
+                        SetFlag(ref deny, flag);
                         break;
                     default:
-                        UnsetBit(ref allow, bit);
-                        UnsetBit(ref deny, bit);
+                        UnsetFlag(ref allow, flag);
+                        UnsetFlag(ref deny, flag);
                         break;
                 }
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool HasBit(ulong value, byte bit) => (value & (1U << bit)) != 0;
+        private static bool HasFlag(ulong value, ulong flag) => (value & flag) != 0;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetBit(ref ulong value, byte bit) => value |= (1U << bit);
+        public static void SetFlag(ref ulong value, ulong flag) => value |= flag;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void UnsetBit(ref ulong value, byte bit) => value &= ~(1U << bit);
+        public static void UnsetFlag(ref ulong value, ulong flag) => value &= ~flag;
 
         public static ChannelPermissions ToChannelPerms(IGuildChannel channel, ulong guildPermissions)
             => new ChannelPermissions(guildPermissions & ChannelPermissions.All(channel).RawValue);
@@ -100,7 +100,7 @@ namespace Discord
             {
                 foreach (var roleId in user.RoleIds)
                     resolvedPermissions |= guild.GetRole(roleId)?.Permissions.RawValue ?? 0;
-                if (GetValue(resolvedPermissions, GuildPermission.Administrator))
+                if (GetValue(resolvedPermissions, GuildPermission.ADMINISTRATOR))
                     resolvedPermissions = GuildPermissions.All.RawValue; //Administrators always have all permissions
             }
             return resolvedPermissions;
@@ -115,7 +115,7 @@ namespace Discord
             ulong resolvedPermissions = 0;
 
             ulong mask = ChannelPermissions.All(channel).RawValue;
-            if (GetValue(guildPermissions, GuildPermission.Administrator)) //Includes owner
+            if (GetValue(guildPermissions, GuildPermission.ADMINISTRATOR)) //Includes owner
                 resolvedPermissions = mask; //Owners and administrators always have all permissions
             else
             {
@@ -152,18 +152,18 @@ namespace Discord
 
                 if (channel is ITextChannel textChannel)
                 {
-                    if (!GetValue(resolvedPermissions, ChannelPermission.ReadMessages))
+                    if (!GetValue(resolvedPermissions, ChannelPermission.READ_MESSAGES))
                     {
                         //No read permission on a text channel removes all other permissions
                         resolvedPermissions = 0;
                     }
-                    else if (!GetValue(resolvedPermissions, ChannelPermission.SendMessages))
+                    else if (!GetValue(resolvedPermissions, ChannelPermission.SEND_MESSAGES))
                     {
                         //No send permissions on a text channel removes all send-related permissions
-                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.SendTTSMessages);
-                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.MentionEveryone);
-                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.EmbedLinks);
-                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.AttachFiles);
+                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.SEND_TTS_MESSAGES);
+                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.MENTION_EVERYONE);
+                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.EMBED_LINKS);
+                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.ATTACH_FILES);
                     }
                 }
                 resolvedPermissions &= mask; //Ensure we didnt get any permissions this channel doesnt support (from guildPerms, for example)
