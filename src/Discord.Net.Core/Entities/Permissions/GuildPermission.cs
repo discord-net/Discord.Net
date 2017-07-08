@@ -1,5 +1,8 @@
-﻿namespace Discord
+﻿using System;
+
+namespace Discord
 {
+    [FlagsAttribute]
     public enum GuildPermission : ulong
     {
         CreateInstantInvite = 0x00000001,
