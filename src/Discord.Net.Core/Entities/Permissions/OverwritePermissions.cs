@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord
@@ -131,7 +130,8 @@ namespace Discord
             var perms = new List<ChannelPermission>();
             for (byte i = 0; i < Permissions.MaxBits; i++)
             {
-                ulong flag = (ulong)Math.Pow(2, i);
+                // first operand must be long or ulong to shift >31 bits
+                ulong flag = ((ulong)1 << i);
                 if ((AllowValue & flag) != 0)
                     perms.Add((ChannelPermission)flag);
             }
@@ -142,7 +142,7 @@ namespace Discord
             var perms = new List<ChannelPermission>();
             for (byte i = 0; i < Permissions.MaxBits; i++)
             {
-                ulong flag = (ulong)Math.Pow(2, i);
+                ulong flag = ((ulong)1 << i);
                 if ((DenyValue & flag) != 0)
                     perms.Add((ChannelPermission)flag);
             }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord
@@ -161,7 +160,7 @@ namespace Discord
             // each of the GuildPermissions increments by 2^i from 0 to MaxBits
             for (byte i = 0; i < Permissions.MaxBits; i++)
             {
-                ulong flag = (ulong)Math.Pow(2, i);
+                ulong flag = ((ulong)1 << i);
                 if ((RawValue & flag) != 0)
                     perms.Add((GuildPermission)flag);
             }

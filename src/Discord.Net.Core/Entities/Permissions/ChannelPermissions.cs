@@ -143,7 +143,7 @@ namespace Discord
             var perms = new List<ChannelPermission>();
             for (byte i = 0; i < Permissions.MaxBits; i++)
             {
-                ulong flag = (ulong)Math.Pow(2, i);
+                ulong flag = ((ulong)1 << i);
                 if ((RawValue & flag) != 0)
                     perms.Add((ChannelPermission)flag);
             }
