@@ -5,12 +5,15 @@ namespace Discord
     [FlagsAttribute]
     public enum GuildPermission : ulong
     {
+        // General
         CreateInstantInvite = 0x00000001,
         KickMembers = 0x00000002,
         BanMembers = 0x00000004,
         Administrator = 0x00000008,
         ManageChannels = 0x00000010,
         ManageGuild = 0x00000020,
+
+        // Text
         AddReactions = 0x00000040,
         ViewAuditLog = 0x00000080,
         ReadMessages = 0x00000400,
@@ -22,12 +25,16 @@ namespace Discord
         ReadMessageHistory = 0x00010000,
         MentionEveryone = 0x00020000,
         UseExternalEmojis = 0x00040000,
+
+        // Voice
         Connect = 0x00100000,
         Speak = 0x00200000,
         MuteMembers = 0x00400000,
         DeafenMembers = 0x00800000,
         MoveMembers = 0x01000000,
         UseVAD = 0x02000000,
+
+        // General 2
         ChangeNickname = 0x04000000,
         ManageNicknames = 0x08000000,
         ManageRoles = 0x10000000,
