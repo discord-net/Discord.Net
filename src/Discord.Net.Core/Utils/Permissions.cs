@@ -100,7 +100,7 @@ namespace Discord
             {
                 foreach (var roleId in user.RoleIds)
                     resolvedPermissions |= guild.GetRole(roleId)?.Permissions.RawValue ?? 0;
-                if (GetValue(resolvedPermissions, GuildPermission.ADMINISTRATOR))
+                if (GetValue(resolvedPermissions, GuildPermission.Administrator))
                     resolvedPermissions = GuildPermissions.All.RawValue; //Administrators always have all permissions
             }
             return resolvedPermissions;
@@ -115,7 +115,7 @@ namespace Discord
             ulong resolvedPermissions = 0;
 
             ulong mask = ChannelPermissions.All(channel).RawValue;
-            if (GetValue(guildPermissions, GuildPermission.ADMINISTRATOR)) //Includes owner
+            if (GetValue(guildPermissions, GuildPermission.Administrator)) //Includes owner
                 resolvedPermissions = mask; //Owners and administrators always have all permissions
             else
             {
@@ -152,18 +152,18 @@ namespace Discord
 
                 if (channel is ITextChannel textChannel)
                 {
-                    if (!GetValue(resolvedPermissions, ChannelPermission.READ_MESSAGES))
+                    if (!GetValue(resolvedPermissions, ChannelPermission.ReadMessages))
                     {
                         //No read permission on a text channel removes all other permissions
                         resolvedPermissions = 0;
                     }
-                    else if (!GetValue(resolvedPermissions, ChannelPermission.SEND_MESSAGES))
+                    else if (!GetValue(resolvedPermissions, ChannelPermission.SendMessages))
                     {
                         //No send permissions on a text channel removes all send-related permissions
-                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.SEND_TTS_MESSAGES);
-                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.MENTION_EVERYONE);
-                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.EMBED_LINKS);
-                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.ATTACH_FILES);
+                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.SendTTSMessages);
+                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.MentionEveryone);
+                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.EmbedLinks);
+                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.AttachFiles);
                     }
                 }
                 resolvedPermissions &= mask; //Ensure we didnt get any permissions this channel doesnt support (from guildPerms, for example)

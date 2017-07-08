@@ -34,48 +34,48 @@ namespace Discord
         public ulong RawValue { get; }
 
         /// <summary> If True, a user may create invites. </summary>
-        public bool CreateInstantInvite => Permissions.GetValue(RawValue, ChannelPermission.CREATE_INSTANT_INVITE);
+        public bool CreateInstantInvite => Permissions.GetValue(RawValue, ChannelPermission.CreateInstantInvite);
         /// <summary> If True, a user may create, delete and modify this channel. </summary>
-        public bool ManageChannel => Permissions.GetValue(RawValue, ChannelPermission.MANAGE_CHANNELS);
+        public bool ManageChannel => Permissions.GetValue(RawValue, ChannelPermission.ManageChannels);
 
         /// <summary> If true, a user may add reactions. </summary>
-        public bool AddReactions => Permissions.GetValue(RawValue, ChannelPermission.ADD_REACTIONS);
+        public bool AddReactions => Permissions.GetValue(RawValue, ChannelPermission.AddReactions);
         /// <summary> If True, a user may join channels. </summary>
-        public bool ReadMessages => Permissions.GetValue(RawValue, ChannelPermission.READ_MESSAGES);
+        public bool ReadMessages => Permissions.GetValue(RawValue, ChannelPermission.ReadMessages);
         /// <summary> If True, a user may send messages. </summary>
-        public bool SendMessages => Permissions.GetValue(RawValue, ChannelPermission.SEND_MESSAGES);
+        public bool SendMessages => Permissions.GetValue(RawValue, ChannelPermission.SendMessages);
         /// <summary> If True, a user may send text-to-speech messages. </summary>
-        public bool SendTTSMessages => Permissions.GetValue(RawValue, ChannelPermission.SEND_TTS_MESSAGES);
+        public bool SendTTSMessages => Permissions.GetValue(RawValue, ChannelPermission.SendTTSMessages);
         /// <summary> If True, a user may delete messages. </summary>
-        public bool ManageMessages => Permissions.GetValue(RawValue, ChannelPermission.MANAGE_MESSAGES);
+        public bool ManageMessages => Permissions.GetValue(RawValue, ChannelPermission.ManageMessages);
         /// <summary> If True, Discord will auto-embed links sent by this user. </summary>
-        public bool EmbedLinks => Permissions.GetValue(RawValue, ChannelPermission.EMBED_LINKS);
+        public bool EmbedLinks => Permissions.GetValue(RawValue, ChannelPermission.EmbedLinks);
         /// <summary> If True, a user may send files. </summary>
-        public bool AttachFiles => Permissions.GetValue(RawValue, ChannelPermission.ATTACH_FILES);
+        public bool AttachFiles => Permissions.GetValue(RawValue, ChannelPermission.AttachFiles);
         /// <summary> If True, a user may read previous messages. </summary>
-        public bool ReadMessageHistory => Permissions.GetValue(RawValue, ChannelPermission.READ_MESSAGE_HISTORY);
+        public bool ReadMessageHistory => Permissions.GetValue(RawValue, ChannelPermission.ReadMessageHistory);
         /// <summary> If True, a user may mention @everyone. </summary>
-        public bool MentionEveryone => Permissions.GetValue(RawValue, ChannelPermission.MENTION_EVERYONE);
+        public bool MentionEveryone => Permissions.GetValue(RawValue, ChannelPermission.MentionEveryone);
         /// <summary> If True, a user may use custom emoji from other guilds. </summary>
-        public bool UseExternalEmojis => Permissions.GetValue(RawValue, ChannelPermission.USE_EXTERNAL_EMOJIS);
+        public bool UseExternalEmojis => Permissions.GetValue(RawValue, ChannelPermission.UseExternalEmojis);
 
         /// <summary> If True, a user may connect to a voice channel. </summary>
-        public bool Connect => Permissions.GetValue(RawValue, ChannelPermission.CONNECT);
+        public bool Connect => Permissions.GetValue(RawValue, ChannelPermission.Connect);
         /// <summary> If True, a user may speak in a voice channel. </summary>
-        public bool Speak => Permissions.GetValue(RawValue, ChannelPermission.SPEAK);
+        public bool Speak => Permissions.GetValue(RawValue, ChannelPermission.Speak);
         /// <summary> If True, a user may mute users. </summary>
-        public bool MuteMembers => Permissions.GetValue(RawValue, ChannelPermission.MUTE_MEMBERS);
+        public bool MuteMembers => Permissions.GetValue(RawValue, ChannelPermission.MuteMembers);
         /// <summary> If True, a user may deafen users. </summary>
-        public bool DeafenMembers => Permissions.GetValue(RawValue, ChannelPermission.DEAFEN_MEMBERS);
+        public bool DeafenMembers => Permissions.GetValue(RawValue, ChannelPermission.DeafenMembers);
         /// <summary> If True, a user may move other users between voice channels. </summary>
-        public bool MoveMembers => Permissions.GetValue(RawValue, ChannelPermission.MOVE_MEMBERS);
+        public bool MoveMembers => Permissions.GetValue(RawValue, ChannelPermission.MoveMembers);
         /// <summary> If True, a user may use voice-activity-detection rather than push-to-talk. </summary>
-        public bool UseVAD => Permissions.GetValue(RawValue, ChannelPermission.USE_VAD);
+        public bool UseVAD => Permissions.GetValue(RawValue, ChannelPermission.UseVAD);
 
         /// <summary> If True, a user may adjust permissions. This also implictly grants all other permissions. </summary>
-        public bool ManagePermissions => Permissions.GetValue(RawValue, ChannelPermission.MANAGE_ROLES);
+        public bool ManagePermissions => Permissions.GetValue(RawValue, ChannelPermission.ManageRoles);
         /// <summary> If True, a user may edit the webhooks for this channel. </summary>
-        public bool ManageWebhooks => Permissions.GetValue(RawValue, ChannelPermission.MANAGE_WEBHOOKS);
+        public bool ManageWebhooks => Permissions.GetValue(RawValue, ChannelPermission.ManageWebhooks);
 
         /// <summary> Creates a new ChannelPermissions with the provided packed value. </summary>
         public ChannelPermissions(ulong rawValue) { RawValue = rawValue; }
@@ -89,26 +89,26 @@ namespace Discord
         {
             ulong value = initialValue;
 
-            Permissions.SetValue(ref value, createInstantInvite, ChannelPermission.CREATE_INSTANT_INVITE);
-            Permissions.SetValue(ref value, manageChannel, ChannelPermission.MANAGE_CHANNELS);
-            Permissions.SetValue(ref value, addReactions, ChannelPermission.ADD_REACTIONS);
-            Permissions.SetValue(ref value, readMessages, ChannelPermission.READ_MESSAGES);
-            Permissions.SetValue(ref value, sendMessages, ChannelPermission.SEND_MESSAGES);
-            Permissions.SetValue(ref value, sendTTSMessages, ChannelPermission.SEND_TTS_MESSAGES);
-            Permissions.SetValue(ref value, manageMessages, ChannelPermission.MANAGE_MESSAGES);
-            Permissions.SetValue(ref value, embedLinks, ChannelPermission.EMBED_LINKS);
-            Permissions.SetValue(ref value, attachFiles, ChannelPermission.ATTACH_FILES);
-            Permissions.SetValue(ref value, readMessageHistory, ChannelPermission.READ_MESSAGE_HISTORY);
-            Permissions.SetValue(ref value, mentionEveryone, ChannelPermission.MENTION_EVERYONE);
-            Permissions.SetValue(ref value, useExternalEmojis, ChannelPermission.USE_EXTERNAL_EMOJIS);
-            Permissions.SetValue(ref value, connect, ChannelPermission.CONNECT);
-            Permissions.SetValue(ref value, speak, ChannelPermission.SPEAK);
-            Permissions.SetValue(ref value, muteMembers, ChannelPermission.MUTE_MEMBERS);
-            Permissions.SetValue(ref value, deafenMembers, ChannelPermission.DEAFEN_MEMBERS);
-            Permissions.SetValue(ref value, moveMembers, ChannelPermission.MOVE_MEMBERS);
-            Permissions.SetValue(ref value, useVoiceActivation, ChannelPermission.USE_VAD);
-            Permissions.SetValue(ref value, managePermissions, ChannelPermission.MANAGE_ROLES);
-            Permissions.SetValue(ref value, manageWebhooks, ChannelPermission.MANAGE_WEBHOOKS);
+            Permissions.SetValue(ref value, createInstantInvite, ChannelPermission.CreateInstantInvite);
+            Permissions.SetValue(ref value, manageChannel, ChannelPermission.ManageChannels);
+            Permissions.SetValue(ref value, addReactions, ChannelPermission.AddReactions);
+            Permissions.SetValue(ref value, readMessages, ChannelPermission.ReadMessages);
+            Permissions.SetValue(ref value, sendMessages, ChannelPermission.SendMessages);
+            Permissions.SetValue(ref value, sendTTSMessages, ChannelPermission.SendTTSMessages);
+            Permissions.SetValue(ref value, manageMessages, ChannelPermission.ManageMessages);
+            Permissions.SetValue(ref value, embedLinks, ChannelPermission.EmbedLinks);
+            Permissions.SetValue(ref value, attachFiles, ChannelPermission.AttachFiles);
+            Permissions.SetValue(ref value, readMessageHistory, ChannelPermission.ReadMessageHistory);
+            Permissions.SetValue(ref value, mentionEveryone, ChannelPermission.MentionEveryone);
+            Permissions.SetValue(ref value, useExternalEmojis, ChannelPermission.UseExternalEmojis);
+            Permissions.SetValue(ref value, connect, ChannelPermission.Connect);
+            Permissions.SetValue(ref value, speak, ChannelPermission.Speak);
+            Permissions.SetValue(ref value, muteMembers, ChannelPermission.MuteMembers);
+            Permissions.SetValue(ref value, deafenMembers, ChannelPermission.DeafenMembers);
+            Permissions.SetValue(ref value, moveMembers, ChannelPermission.MoveMembers);
+            Permissions.SetValue(ref value, useVoiceActivation, ChannelPermission.UseVAD);
+            Permissions.SetValue(ref value, managePermissions, ChannelPermission.ManageRoles);
+            Permissions.SetValue(ref value, manageWebhooks, ChannelPermission.ManageWebhooks);
 
             RawValue = value;
         }

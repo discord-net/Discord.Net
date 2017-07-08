@@ -22,7 +22,7 @@ namespace Discord.WebSocket
         public override IReadOnlyCollection<SocketGuildUser> Users
             => Guild.Users.Where(x => Permissions.GetValue(
                 Permissions.ResolveChannel(Guild, x, this, Permissions.ResolveGuild(Guild, x)), 
-                ChannelPermission.READ_MESSAGES)).ToImmutableArray();
+                ChannelPermission.ReadMessages)).ToImmutableArray();
         
         internal SocketTextChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
             : base(discord, id, guild)
@@ -103,7 +103,7 @@ namespace Discord.WebSocket
             {
                 var guildPerms = Permissions.ResolveGuild(Guild, user);
                 var channelPerms = Permissions.ResolveChannel(Guild, user, this, guildPerms);
-                if (Permissions.GetValue(channelPerms, ChannelPermission.READ_MESSAGES))
+                if (Permissions.GetValue(channelPerms, ChannelPermission.ReadMessages))
                     return user;
             }
             return null;

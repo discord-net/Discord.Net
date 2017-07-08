@@ -18,65 +18,65 @@ namespace Discord
         public ulong RawValue { get; }
 
         /// <summary> If True, a user may create invites. </summary>
-        public bool CreateInstantInvite => Permissions.GetValue(RawValue, GuildPermission.CREATE_INSTANT_INVITE);
+        public bool CreateInstantInvite => Permissions.GetValue(RawValue, GuildPermission.CreateInstantInvite);
         /// <summary> If True, a user may ban users from the guild. </summary>
-        public bool BanMembers => Permissions.GetValue(RawValue, GuildPermission.BAN_MEMBERS);
+        public bool BanMembers => Permissions.GetValue(RawValue, GuildPermission.BanMembers);
         /// <summary> If True, a user may kick users from the guild. </summary>
-        public bool KickMembers => Permissions.GetValue(RawValue, GuildPermission.KICK_MEMBERS);
+        public bool KickMembers => Permissions.GetValue(RawValue, GuildPermission.KickMembers);
         /// <summary> If True, a user is granted all permissions, and cannot have them revoked via channel permissions. </summary>
-        public bool Administrator => Permissions.GetValue(RawValue, GuildPermission.ADMINISTRATOR);
+        public bool Administrator => Permissions.GetValue(RawValue, GuildPermission.Administrator);
         /// <summary> If True, a user may create, delete and modify channels. </summary>
-        public bool ManageChannels => Permissions.GetValue(RawValue, GuildPermission.MANAGE_CHANNELS);
+        public bool ManageChannels => Permissions.GetValue(RawValue, GuildPermission.ManageChannels);
         /// <summary> If True, a user may adjust guild properties. </summary>
-        public bool ManageGuild => Permissions.GetValue(RawValue, GuildPermission.MANAGE_GUILD);
+        public bool ManageGuild => Permissions.GetValue(RawValue, GuildPermission.ManageGuild);
         
         /// <summary> If true, a user may add reactions. </summary>
-        public bool AddReactions => Permissions.GetValue(RawValue, GuildPermission.ADD_REACTIONS);
+        public bool AddReactions => Permissions.GetValue(RawValue, GuildPermission.AddReactions);
         /// <summary> If true, a user may view the audit log. </summary>
-        public bool ViewAuditLog => Permissions.GetValue(RawValue, GuildPermission.VIEW_AUDIT_LOG);
+        public bool ViewAuditLog => Permissions.GetValue(RawValue, GuildPermission.ViewAuditLog);
 
         /// <summary> If True, a user may join channels. </summary>
-        public bool ReadMessages => Permissions.GetValue(RawValue, GuildPermission.READ_MESSAGES);
+        public bool ReadMessages => Permissions.GetValue(RawValue, GuildPermission.ReadMessages);
         /// <summary> If True, a user may send messages. </summary>
-        public bool SendMessages => Permissions.GetValue(RawValue, GuildPermission.SEND_MESSAGES);
+        public bool SendMessages => Permissions.GetValue(RawValue, GuildPermission.SendMessages);
         /// <summary> If True, a user may send text-to-speech messages. </summary>
-        public bool SendTTSMessages => Permissions.GetValue(RawValue, GuildPermission.SEND_TTS_MESSAGES);
+        public bool SendTTSMessages => Permissions.GetValue(RawValue, GuildPermission.SendTTSMessages);
         /// <summary> If True, a user may delete messages. </summary>
-        public bool ManageMessages => Permissions.GetValue(RawValue, GuildPermission.MANAGE_MESSAGES);
+        public bool ManageMessages => Permissions.GetValue(RawValue, GuildPermission.ManageMessages);
         /// <summary> If True, Discord will auto-embed links sent by this user. </summary>
-        public bool EmbedLinks => Permissions.GetValue(RawValue, GuildPermission.EMBED_LINKS);
+        public bool EmbedLinks => Permissions.GetValue(RawValue, GuildPermission.EmbedLinks);
         /// <summary> If True, a user may send files. </summary>
-        public bool AttachFiles => Permissions.GetValue(RawValue, GuildPermission.ATTACH_FILES);
+        public bool AttachFiles => Permissions.GetValue(RawValue, GuildPermission.AttachFiles);
         /// <summary> If True, a user may read previous messages. </summary>
-        public bool ReadMessageHistory => Permissions.GetValue(RawValue, GuildPermission.READ_MESSAGE_HISTORY);
+        public bool ReadMessageHistory => Permissions.GetValue(RawValue, GuildPermission.ReadMessageHistory);
         /// <summary> If True, a user may mention @everyone. </summary>
-        public bool MentionEveryone => Permissions.GetValue(RawValue, GuildPermission.MENTION_EVERYONE);
+        public bool MentionEveryone => Permissions.GetValue(RawValue, GuildPermission.MentionEveryone);
         /// <summary> If True, a user may use custom emoji from other guilds. </summary>
-        public bool UseExternalEmojis => Permissions.GetValue(RawValue, GuildPermission.USE_EXTERNAL_EMOJIS);
+        public bool UseExternalEmojis => Permissions.GetValue(RawValue, GuildPermission.UseExternalEmojis);
 
         /// <summary> If True, a user may connect to a voice channel. </summary>
-        public bool Connect => Permissions.GetValue(RawValue, GuildPermission.CONNECT);
+        public bool Connect => Permissions.GetValue(RawValue, GuildPermission.Connect);
         /// <summary> If True, a user may speak in a voice channel. </summary>
-        public bool Speak => Permissions.GetValue(RawValue, GuildPermission.SPEAK);
+        public bool Speak => Permissions.GetValue(RawValue, GuildPermission.Speak);
         /// <summary> If True, a user may mute users. </summary>
-        public bool MuteMembers => Permissions.GetValue(RawValue, GuildPermission.MUTE_MEMBERS);
+        public bool MuteMembers => Permissions.GetValue(RawValue, GuildPermission.MuteMembers);
         /// <summary> If True, a user may deafen users. </summary>
-        public bool DeafenMembers => Permissions.GetValue(RawValue, GuildPermission.DEAFEN_MEMBERS);
+        public bool DeafenMembers => Permissions.GetValue(RawValue, GuildPermission.DeafenMembers);
         /// <summary> If True, a user may move other users between voice channels. </summary>
-        public bool MoveMembers => Permissions.GetValue(RawValue, GuildPermission.MOVE_MEMBERS);
+        public bool MoveMembers => Permissions.GetValue(RawValue, GuildPermission.MoveMembers);
         /// <summary> If True, a user may use voice-activity-detection rather than push-to-talk. </summary>
-        public bool UseVAD => Permissions.GetValue(RawValue, GuildPermission.USE_VAD);
+        public bool UseVAD => Permissions.GetValue(RawValue, GuildPermission.UseVAD);
 
         /// <summary> If True, a user may change their own nickname. </summary>
-        public bool ChangeNickname => Permissions.GetValue(RawValue, GuildPermission.CHANGE_NICKNAME);
+        public bool ChangeNickname => Permissions.GetValue(RawValue, GuildPermission.ChangeNickname);
         /// <summary> If True, a user may change the nickname of other users. </summary>
-        public bool ManageNicknames => Permissions.GetValue(RawValue, GuildPermission.MANAGE_NICKNAMES);
+        public bool ManageNicknames => Permissions.GetValue(RawValue, GuildPermission.ManageNicknames);
         /// <summary> If True, a user may adjust roles. </summary>
-        public bool ManageRoles => Permissions.GetValue(RawValue, GuildPermission.MANAGE_ROLES);
+        public bool ManageRoles => Permissions.GetValue(RawValue, GuildPermission.ManageRoles);
         /// <summary> If True, a user may edit the webhooks for this guild. </summary>
-        public bool ManageWebhooks => Permissions.GetValue(RawValue, GuildPermission.MANAGE_WEBHOOKS);
+        public bool ManageWebhooks => Permissions.GetValue(RawValue, GuildPermission.ManageWebhooks);
         /// <summary> If True, a user may edit the emojis for this guild. </summary>
-        public bool ManageEmojis => Permissions.GetValue(RawValue, GuildPermission.MANAGE_EMOJIS);
+        public bool ManageEmojis => Permissions.GetValue(RawValue, GuildPermission.ManageEmojis);
 
         /// <summary> Creates a new GuildPermissions with the provided packed value. </summary>
         public GuildPermissions(ulong rawValue) { RawValue = rawValue; }
@@ -92,34 +92,34 @@ namespace Discord
         {
             ulong value = initialValue;
 
-            Permissions.SetValue(ref value, createInstantInvite, GuildPermission.CREATE_INSTANT_INVITE);
-            Permissions.SetValue(ref value, banMembers, GuildPermission.BAN_MEMBERS);
-            Permissions.SetValue(ref value, kickMembers, GuildPermission.KICK_MEMBERS);
-            Permissions.SetValue(ref value, administrator, GuildPermission.ADMINISTRATOR);
-            Permissions.SetValue(ref value, manageChannels, GuildPermission.MANAGE_CHANNELS);
-            Permissions.SetValue(ref value, manageGuild, GuildPermission.MANAGE_GUILD);
-            Permissions.SetValue(ref value, addReactions, GuildPermission.ADD_REACTIONS);
-            Permissions.SetValue(ref value, viewAuditLog, GuildPermission.VIEW_AUDIT_LOG);
-            Permissions.SetValue(ref value, readMessages, GuildPermission.READ_MESSAGES);
-            Permissions.SetValue(ref value, sendMessages, GuildPermission.SEND_MESSAGES);
-            Permissions.SetValue(ref value, sendTTSMessages, GuildPermission.SEND_TTS_MESSAGES);
-            Permissions.SetValue(ref value, manageMessages, GuildPermission.MANAGE_MESSAGES);
-            Permissions.SetValue(ref value, embedLinks, GuildPermission.EMBED_LINKS);
-            Permissions.SetValue(ref value, attachFiles, GuildPermission.ATTACH_FILES);
-            Permissions.SetValue(ref value, readMessageHistory, GuildPermission.READ_MESSAGE_HISTORY);
-            Permissions.SetValue(ref value, mentionEveryone, GuildPermission.MENTION_EVERYONE);
-            Permissions.SetValue(ref value, useExternalEmojis, GuildPermission.USE_EXTERNAL_EMOJIS);
-            Permissions.SetValue(ref value, connect, GuildPermission.CONNECT);
-            Permissions.SetValue(ref value, speak, GuildPermission.SPEAK);
-            Permissions.SetValue(ref value, muteMembers, GuildPermission.MUTE_MEMBERS);
-            Permissions.SetValue(ref value, deafenMembers, GuildPermission.DEAFEN_MEMBERS);
-            Permissions.SetValue(ref value, moveMembers, GuildPermission.MOVE_MEMBERS);
-            Permissions.SetValue(ref value, useVoiceActivation, GuildPermission.USE_VAD);
-            Permissions.SetValue(ref value, changeNickname, GuildPermission.CHANGE_NICKNAME);
-            Permissions.SetValue(ref value, manageNicknames, GuildPermission.MANAGE_NICKNAMES);
-            Permissions.SetValue(ref value, manageRoles, GuildPermission.MANAGE_ROLES);
-            Permissions.SetValue(ref value, manageWebhooks, GuildPermission.MANAGE_WEBHOOKS);
-            Permissions.SetValue(ref value, manageEmojis, GuildPermission.MANAGE_EMOJIS);
+            Permissions.SetValue(ref value, createInstantInvite, GuildPermission.CreateInstantInvite);
+            Permissions.SetValue(ref value, banMembers, GuildPermission.BanMembers);
+            Permissions.SetValue(ref value, kickMembers, GuildPermission.KickMembers);
+            Permissions.SetValue(ref value, administrator, GuildPermission.Administrator);
+            Permissions.SetValue(ref value, manageChannels, GuildPermission.ManageChannels);
+            Permissions.SetValue(ref value, manageGuild, GuildPermission.ManageGuild);
+            Permissions.SetValue(ref value, addReactions, GuildPermission.AddReactions);
+            Permissions.SetValue(ref value, viewAuditLog, GuildPermission.ViewAuditLog);
+            Permissions.SetValue(ref value, readMessages, GuildPermission.ReadMessages);
+            Permissions.SetValue(ref value, sendMessages, GuildPermission.SendMessages);
+            Permissions.SetValue(ref value, sendTTSMessages, GuildPermission.SendTTSMessages);
+            Permissions.SetValue(ref value, manageMessages, GuildPermission.ManageMessages);
+            Permissions.SetValue(ref value, embedLinks, GuildPermission.EmbedLinks);
+            Permissions.SetValue(ref value, attachFiles, GuildPermission.AttachFiles);
+            Permissions.SetValue(ref value, readMessageHistory, GuildPermission.ReadMessageHistory);
+            Permissions.SetValue(ref value, mentionEveryone, GuildPermission.MentionEveryone);
+            Permissions.SetValue(ref value, useExternalEmojis, GuildPermission.UseExternalEmojis);
+            Permissions.SetValue(ref value, connect, GuildPermission.Connect);
+            Permissions.SetValue(ref value, speak, GuildPermission.Speak);
+            Permissions.SetValue(ref value, muteMembers, GuildPermission.MuteMembers);
+            Permissions.SetValue(ref value, deafenMembers, GuildPermission.DeafenMembers);
+            Permissions.SetValue(ref value, moveMembers, GuildPermission.MoveMembers);
+            Permissions.SetValue(ref value, useVoiceActivation, GuildPermission.UseVAD);
+            Permissions.SetValue(ref value, changeNickname, GuildPermission.ChangeNickname);
+            Permissions.SetValue(ref value, manageNicknames, GuildPermission.ManageNicknames);
+            Permissions.SetValue(ref value, manageRoles, GuildPermission.ManageRoles);
+            Permissions.SetValue(ref value, manageWebhooks, GuildPermission.ManageWebhooks);
+            Permissions.SetValue(ref value, manageEmojis, GuildPermission.ManageEmojis);
 
             RawValue = value;
         }
