@@ -10,7 +10,7 @@ namespace Discord.Commands
     internal class UserTypeReader<T> : TypeReader
         where T : class, IUser
     {
-        public override async Task<TypeReaderResult> Read(ICommandContext context, string input)
+        public override async Task<TypeReaderResult> Read(ICommandContext context, string input, IServiceProvider services)
         {
             var results = new Dictionary<ulong, TypeReaderValue>();
             IReadOnlyCollection<IUser> channelUsers = await context.Channel.GetUsersAsync(CacheMode.CacheOnly).ToArray().ConfigureAwait(false); //TODO: must be a better way?
@@ -43,8 +43,7 @@ namespace Discord.Commands
             if (index >= 0)
             {
                 string username = input.Substring(0, index);
-                ushort discriminator;
-                if (ushort.TryParse(input.Substring(index + 1), out discriminator))
+                if (ushort.TryParse(input.Substring(index + 1), out ushort discriminator))
                 {
                     var channelUser = channelUsers.FirstOrDefault(x => x.DiscriminatorValue == discriminator &&
                         string.Equals(username, x.Username, StringComparison.OrdinalIgnoreCase));

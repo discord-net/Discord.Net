@@ -28,8 +28,8 @@ namespace Discord.Audio
         /// <summary>Creates a new outgoing stream accepting Opus-encoded data. This is a direct stream with no internal timer.</summary>
         AudioOutStream CreateDirectOpusStream();
         /// <summary>Creates a new outgoing stream accepting PCM (raw) data.</summary>
-        AudioOutStream CreatePCMStream(AudioApplication application, int? bitrate = null, int bufferMillis = 1000);
+        AudioOutStream CreatePCMStream(AudioApplication application, int? bitrate = null, int bufferMillis = 1000, int packetLoss = 30);
         /// <summary>Creates a new direct outgoing stream accepting PCM (raw) data. This is a direct stream with no internal timer.</summary>
-        AudioOutStream CreateDirectPCMStream(AudioApplication application, int? bitrate = null);
+        AudioOutStream CreateDirectPCMStream(AudioApplication application, int? bitrate = null, int packetLoss = 30);
     }
 }

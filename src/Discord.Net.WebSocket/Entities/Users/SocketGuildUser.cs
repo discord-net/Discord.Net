@@ -122,8 +122,8 @@ namespace Discord.WebSocket
         
         public Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null)
             => UserHelper.ModifyAsync(this, Discord, func, options);
-        public Task KickAsync(RequestOptions options = null)
-            => UserHelper.KickAsync(this, Discord, options);
+        public Task KickAsync(string reason = null, RequestOptions options = null)
+            => UserHelper.KickAsync(this, Discord, reason, options);
         /// <inheritdoc />
         public Task AddRoleAsync(IRole role, RequestOptions options = null)
             => AddRolesAsync(new[] { role }, options);
@@ -146,11 +146,7 @@ namespace Discord.WebSocket
         IGuild IGuildUser.Guild => Guild;
         ulong IGuildUser.GuildId => Guild.Id;
         IReadOnlyCollection<ulong> IGuildUser.RoleIds => _roleIds;
-
-        //IUser
-        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options) 
-            => Task.FromResult<IDMChannel>(GlobalUser.DMChannel);
-
+        
         //IVoiceState
         IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;
     }

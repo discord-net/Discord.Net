@@ -42,7 +42,7 @@ events are delegates, but are still registered the same.
 For example, let's look at [DiscordSocketClient.MessageReceived](xref:Discord.WebSocket.DiscordSocketClient#Discord_WebSocket_DiscordSocketClient_MessageReceived)
 
 To hook an event into MessageReceived, we now use the following code:  
-[!code-csharp[Event Registration](guides/samples/migrating/event.cs)]
+[!code-csharp[Event Registration](samples/event.cs)]
 
 > **All Event Handlers in 1.0 MUST return Task!**
 
@@ -50,7 +50,7 @@ If your event handler is marked as `async`, it will automatically return `Task`.
 if you do not need to execute asynchronus code, do _not_ mark your handler as `async`, and instead,
 stick a `return Task.CompletedTask` at the bottom.
 
-[!code-csharp[Sync Event Registration](guides/samples/migrating/sync_event.cs)]
+[!code-csharp[Sync Event Registration](samples/sync_event.cs)]
 
 **Event handlers no longer require a sender.** The only arguments your event handler needs to accept
 are the parameters used by the event. It is recommended to look at the event in IntelliSense or on the

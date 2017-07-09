@@ -4,8 +4,8 @@
     {
         void SetContext(ICommandContext context);
 
-        void BeforeExecute();
+        void BeforeExecute(CommandInfo command);
         
-        void AfterExecute();
+        void AfterExecute(CommandInfo command);
     }
 }

@@ -7,12 +7,11 @@ public class Commands
 {
     public async Task Install(DiscordSocketClient client)
     {
-        // Here, we will inject the Dependency Map with 
+        // Here, we will inject the ServiceProvider with 
         // all of the services our client will use.
-        _map.Add(client);
-        _map.Add(commands);
-        _map.Add(new NotificationService(_map));
-        _map.Add(new DatabaseService(_map));
+        _serviceCollection.AddSingleton(client)
+        _serviceCollection.AddSingleton(new NotificationService())
+        _serviceCollection.AddSingleton(new DatabaseService())
         // ...
         await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
     }

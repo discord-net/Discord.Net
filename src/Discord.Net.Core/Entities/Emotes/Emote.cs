@@ -25,6 +25,25 @@ namespace Discord
             Name = name;
         }
 
+        public override bool Equals(object other)
+        {
+            if (other == null) return false;
+            if (other == this) return true;
+
+            var otherEmote = other as Emote;
+            if (otherEmote == null) return false;
+
+            return string.Equals(Name, otherEmote.Name) && Id == otherEmote.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Name.GetHashCode() * 397) ^ Id.GetHashCode();
+            }
+        }
+
         /// <summary>
         /// Parse an Emote from its raw format
         /// </summary>
@@ -58,6 +77,6 @@ namespace Discord
         }
 
         private string DebuggerDisplay => $"{Name} ({Id})";
-        public override string ToString() => Name;
+        public override string ToString() => $"<:{Name}:{Id}>";
     }
 }

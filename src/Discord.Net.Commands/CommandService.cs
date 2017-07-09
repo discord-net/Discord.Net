@@ -33,7 +33,7 @@ namespace Discord.Commands
 
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
         public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
-        public ILookup<Type, TypeReader> TypeReaders => _typeReaders.SelectMany(x => x.Value.Select(y => new {y.Key, y.Value})).ToLookup(x => x.Key, x => x.Value);
+        public ILookup<Type, TypeReader> TypeReaders => _typeReaders.SelectMany(x => x.Value.Select(y => new { y.Key, y.Value })).ToLookup(x => x.Key, x => x.Value);
 
         public CommandService() : this(new CommandServiceConfig()) { }
         public CommandService(CommandServiceConfig config)
@@ -58,6 +58,9 @@ namespace Discord.Commands
             _defaultTypeReaders = new ConcurrentDictionary<Type, TypeReader>();
             foreach (var type in PrimitiveParsers.SupportedTypes)
                 _defaultTypeReaders[type] = PrimitiveTypeReader.Create(type);
+
+            _defaultTypeReaders[typeof(string)] =
+                new PrimitiveTypeReader<string>((string x, out string y) => { y = x; return true; }, 0);
 
             var entityTypeReaders = ImmutableList.CreateBuilder<Tuple<Type, Type>>();
             entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IMessage), typeof(MessageTypeReader<>)));
@@ -95,7 +98,7 @@ namespace Discord.Commands
                 if (_typedModuleDefs.ContainsKey(type))
                     throw new ArgumentException($"This module has already been added.");
 
-                var module = ModuleClassBuilder.Build(this, typeInfo).FirstOrDefault();
+                var module = (await ModuleClassBuilder.BuildAsync(this, typeInfo).ConfigureAwait(false)).FirstOrDefault();
 
                 if (module.Value == default(ModuleInfo))
                     throw new InvalidOperationException($"Could not build the module {type.FullName}, did you pass an invalid type?");
@@ -114,8 +117,8 @@ namespace Discord.Commands
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                var types = ModuleClassBuilder.Search(assembly).ToArray();
-                var moduleDefs = ModuleClassBuilder.Build(types, this);
+                var types = await ModuleClassBuilder.SearchAsync(assembly, this).ConfigureAwait(false);
+                var moduleDefs = await ModuleClassBuilder.BuildAsync(types, this).ConfigureAwait(false);
 
                 foreach (var info in moduleDefs)
                 {
@@ -161,8 +164,7 @@ namespace Discord.Commands
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                ModuleInfo module;
-                if (!_typedModuleDefs.TryRemove(type, out module))
+                if (!_typedModuleDefs.TryRemove(type, out var module))
                     return false;
 
                 return RemoveModuleInternal(module);
@@ -196,20 +198,18 @@ namespace Discord.Commands
         }
         public void AddTypeReader(Type type, TypeReader reader)
         {
-            var readers = _typeReaders.GetOrAdd(type, x=> new ConcurrentDictionary<Type, TypeReader>());
+            var readers = _typeReaders.GetOrAdd(type, x => new ConcurrentDictionary<Type, TypeReader>());
             readers[reader.GetType()] = reader;
         }
         internal IDictionary<Type, TypeReader> GetTypeReaders(Type type)
         {
-            ConcurrentDictionary<Type, TypeReader> definedTypeReaders;
-            if (_typeReaders.TryGetValue(type, out definedTypeReaders))
+            if (_typeReaders.TryGetValue(type, out var definedTypeReaders))
                 return definedTypeReaders;
             return null;
         }
         internal TypeReader GetDefaultTypeReader(Type type)
         {
-            TypeReader reader;
-            if (_defaultTypeReaders.TryGetValue(type, out reader))
+            if (_defaultTypeReaders.TryGetValue(type, out var reader))
                 return reader;
             var typeInfo = type.GetTypeInfo();
 
@@ -235,13 +235,13 @@ namespace Discord.Commands
         }
 
         //Execution
-        public SearchResult Search(ICommandContext context, int argPos) 
+        public SearchResult Search(ICommandContext context, int argPos)
             => Search(context, context.Message.Content.Substring(argPos));
         public SearchResult Search(ICommandContext context, string input)
         {
             string searchInput = _caseSensitive ? input : input.ToLowerInvariant();
             var matches = _map.GetCommands(searchInput).OrderByDescending(x => x.Command.Priority).ToImmutableArray();
-            
+
             if (matches.Length > 0)
                 return SearchResult.FromSuccess(input, matches);
             else
@@ -259,46 +259,86 @@ namespace Discord.Commands
                 return searchResult;
 
             var commands = searchResult.Commands;
-            for (int i = 0; i < commands.Count; i++)
+            var preconditionResults = new Dictionary<CommandMatch, PreconditionResult>();
+
+            foreach (var match in commands)
             {
-                var preconditionResult = await commands[i].CheckPreconditionsAsync(context, services).ConfigureAwait(false);
-                if (!preconditionResult.IsSuccess)
-                {
-                    if (commands.Count == 1)
-                        return preconditionResult;
-                    else
-                        continue;
-                }
-
-                var parseResult = await commands[i].ParseAsync(context, searchResult, preconditionResult).ConfigureAwait(false);
-                if (!parseResult.IsSuccess)
-                {
-                    if (parseResult.Error == CommandError.MultipleMatches)
-                    {
-                        IReadOnlyList<TypeReaderValue> argList, paramList;
-                        switch (multiMatchHandling)
-                        {
-                            case MultiMatchHandling.Best:
-                                argList = parseResult.ArgValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
-                                paramList = parseResult.ParamValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
-                                parseResult = ParseResult.FromSuccess(argList, paramList);
-                                break;
-                        }
-                    }
-
-                    if (!parseResult.IsSuccess)
-                    {
-                        if (commands.Count == 1)
-                            return parseResult;
-                        else
-                            continue;
-                    }
-                }
-
-                return await commands[i].ExecuteAsync(context, parseResult, services).ConfigureAwait(false);
+                preconditionResults[match] = await match.Command.CheckPreconditionsAsync(context, services).ConfigureAwait(false);
             }
 
-            return SearchResult.FromError(CommandError.UnknownCommand, "This input does not match any overload.");
+            var successfulPreconditions = preconditionResults
+                .Where(x => x.Value.IsSuccess)
+                .ToArray();
+
+            if (successfulPreconditions.Length == 0)
+            {
+                //All preconditions failed, return the one from the highest priority command
+                var bestCandidate = preconditionResults
+                    .OrderByDescending(x => x.Key.Command.Priority)
+                    .FirstOrDefault(x => !x.Value.IsSuccess);
+                return bestCandidate.Value;
+            }
+
+            //If we get this far, at least one precondition was successful.
+
+            var parseResultsDict = new Dictionary<CommandMatch, ParseResult>();
+            foreach (var pair in successfulPreconditions)
+            {
+                var parseResult = await pair.Key.ParseAsync(context, searchResult, pair.Value, services).ConfigureAwait(false);
+
+                if (parseResult.Error == CommandError.MultipleMatches)
+                {
+                    IReadOnlyList<TypeReaderValue> argList, paramList;
+                    switch (multiMatchHandling)
+                    {
+                        case MultiMatchHandling.Best:
+                            argList = parseResult.ArgValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
+                            paramList = parseResult.ParamValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
+                            parseResult = ParseResult.FromSuccess(argList, paramList);
+                            break;
+                    }
+                }
+
+                parseResultsDict[pair.Key] = parseResult;
+            }
+
+            // Calculates the 'score' of a command given a parse result
+            float CalculateScore(CommandMatch match, ParseResult parseResult)
+            {
+                float argValuesScore = 0, paramValuesScore = 0;
+                
+                if (match.Command.Parameters.Count > 0)
+                {
+                    var argValuesSum = parseResult.ArgValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
+                    var paramValuesSum = parseResult.ParamValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
+
+                    argValuesScore = argValuesSum / match.Command.Parameters.Count;
+                    paramValuesScore = paramValuesSum / match.Command.Parameters.Count;
+                }
+
+                var totalArgsScore = (argValuesScore + paramValuesScore) / 2;
+                return match.Command.Priority + totalArgsScore * 0.99f;
+            }
+
+            //Order the parse results by their score so that we choose the most likely result to execute
+            var parseResults = parseResultsDict
+                .OrderByDescending(x => CalculateScore(x.Key, x.Value));
+
+            var successfulParses = parseResults
+                .Where(x => x.Value.IsSuccess)
+                .ToArray();
+
+            if (successfulParses.Length == 0)
+            {
+                //All parses failed, return the one from the highest priority command, using score as a tie breaker
+                var bestMatch = parseResults
+                    .FirstOrDefault(x => !x.Value.IsSuccess);
+                return bestMatch.Value;
+            }
+
+            //If we get this far, at least one parse was successful. Execute the most likely overload.
+            var chosenOverload = successfulParses[0];
+            return await chosenOverload.Key.ExecuteAsync(context, chosenOverload.Value, services).ConfigureAwait(false);
         }
     }
 }

@@ -53,9 +53,9 @@ namespace Discord.Rest
         }
 
         public static async Task KickAsync(IGuildUser user, BaseDiscordClient client,
-            RequestOptions options)
+            string reason, RequestOptions options)
         {
-            await client.ApiClient.RemoveGuildMemberAsync(user.GuildId, user.Id, options).ConfigureAwait(false);
+            await client.ApiClient.RemoveGuildMemberAsync(user.GuildId, user.Id, reason, options).ConfigureAwait(false);
         }
 
         public static async Task<RestDMChannel> CreateDMChannelAsync(IUser user, BaseDiscordClient client,

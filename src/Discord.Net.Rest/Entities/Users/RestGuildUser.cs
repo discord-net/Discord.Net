@@ -85,8 +85,8 @@ namespace Discord.Rest
             else if (args.RoleIds.IsSpecified)
                 UpdateRoles(args.RoleIds.Value.ToArray());
         }
-        public Task KickAsync(RequestOptions options = null)
-            => UserHelper.KickAsync(this, Discord, options);
+        public Task KickAsync(string reason = null, RequestOptions options = null)
+            => UserHelper.KickAsync(this, Discord, reason, options);
         /// <inheritdoc />
         public Task AddRoleAsync(IRole role, RequestOptions options = null)
             => AddRolesAsync(new[] { role }, options);

@@ -62,26 +62,31 @@ namespace Discord.Net.Rest
             _cancelToken = cancelToken;
         }
 
-        public async Task<RestResponse> SendAsync(string method, string endpoint, CancellationToken cancelToken, bool headerOnly)
-        {
-            string uri = Path.Combine(_baseUrl, endpoint);
-            using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
-                return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
-        }
-        public async Task<RestResponse> SendAsync(string method, string endpoint, string json, CancellationToken cancelToken, bool headerOnly)
+        public async Task<RestResponse> SendAsync(string method, string endpoint, CancellationToken cancelToken, bool headerOnly, string reason = null)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
+                if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
+                return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
+            }
+        }
+        public async Task<RestResponse> SendAsync(string method, string endpoint, string json, CancellationToken cancelToken, bool headerOnly, string reason = null)
+        {
+            string uri = Path.Combine(_baseUrl, endpoint);
+            using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
+            {
+                if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
                 restRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
                 return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
             }
         }
-        public async Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly)
+        public async Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly, string reason = null)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
+                if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
                 var content = new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
                 if (multipartParams != null)
                 {

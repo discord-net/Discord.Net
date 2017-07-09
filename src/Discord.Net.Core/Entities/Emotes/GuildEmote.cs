@@ -20,7 +20,7 @@ namespace Discord
             RoleIds = roleIds;
         }
 
-        public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
+        public override string ToString() => $"<:{Name}:{Id}>";
     }
 }

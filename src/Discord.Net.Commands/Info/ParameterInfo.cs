@@ -21,6 +21,7 @@ namespace Discord.Commands
         public object DefaultValue { get; }
 
         public IReadOnlyList<ParameterPreconditionAttribute> Preconditions { get; }
+        public IReadOnlyList<Attribute> Attributes { get; }
 
         internal ParameterInfo(ParameterBuilder builder, CommandInfo command, CommandService service)
         {
@@ -36,6 +37,7 @@ namespace Discord.Commands
             DefaultValue = builder.DefaultValue;
 
             Preconditions = builder.Preconditions.ToImmutableArray();
+            Attributes = builder.Attributes.ToImmutableArray();
 
             _reader = builder.TypeReader;
         }
@@ -54,9 +56,10 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
 
-        public async Task<TypeReaderResult> Parse(ICommandContext context, string input)
+        public async Task<TypeReaderResult> Parse(ICommandContext context, string input, IServiceProvider services = null)
         {
-            return await _reader.Read(context, input).ConfigureAwait(false);
+            services = services ?? EmptyServiceProvider.Instance;
+            return await _reader.Read(context, input, services).ConfigureAwait(false);
         }
 
         public override string ToString() => Name;

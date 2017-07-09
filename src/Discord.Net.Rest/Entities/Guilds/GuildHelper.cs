@@ -107,9 +107,9 @@ namespace Discord.Rest
         }
 
         public static async Task AddBanAsync(IGuild guild, BaseDiscordClient client,
-            ulong userId, int pruneDays, RequestOptions options)
+            ulong userId, int pruneDays, string reason, RequestOptions options)
         {
-            var args = new CreateGuildBanParams { DeleteMessageDays = pruneDays };
+            var args = new CreateGuildBanParams { DeleteMessageDays = pruneDays, Reason = reason };
             await client.ApiClient.CreateGuildBanAsync(guild.Id, userId, args, options).ConfigureAwait(false);
         }
         public static async Task RemoveBanAsync(IGuild guild, BaseDiscordClient client,

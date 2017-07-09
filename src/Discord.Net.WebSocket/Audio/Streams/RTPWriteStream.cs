@@ -33,14 +33,14 @@ namespace Discord.Audio.Streams
         {
             if (_hasHeader)
                 throw new InvalidOperationException("Header received with no payload");
+                
             _hasHeader = true;
             _nextSeq = seq;
             _nextTimestamp = timestamp;
         }
-        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
+            cancelToken.ThrowIfCancellationRequested();
             if (!_hasHeader)
                 throw new InvalidOperationException("Received payload without an RTP header");
             _hasHeader = false;
@@ -57,6 +57,7 @@ namespace Discord.Audio.Streams
             Buffer.BlockCopy(_header, 0, _buffer, 0, 12); //Copy RTP header from to the buffer
             Buffer.BlockCopy(buffer, offset, _buffer, 12, count);
 
+            _next.WriteHeader(_nextSeq, _nextTimestamp, false);
             await _next.WriteAsync(_buffer, 0, count + 12).ConfigureAwait(false);
         }
 

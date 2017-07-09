@@ -17,7 +17,7 @@ namespace Discord.Audio
         public AudioApplication Application { get; }
         public int BitRate { get;}
 
-        public OpusEncoder(int bitrate, AudioApplication application)
+        public OpusEncoder(int bitrate, AudioApplication application, int packetLoss)
         {
             if (bitrate < 1 || bitrate > DiscordVoiceAPIClient.MaxBitrate)
                 throw new ArgumentOutOfRangeException(nameof(bitrate));
@@ -48,7 +48,7 @@ namespace Discord.Audio
             _ptr = CreateEncoder(SamplingRate, Channels, (int)opusApplication, out var error);
             CheckError(error);
             CheckError(EncoderCtl(_ptr, OpusCtl.SetSignal, (int)opusSignal));
-            CheckError(EncoderCtl(_ptr, OpusCtl.SetPacketLossPercent, 30)); //%
+            CheckError(EncoderCtl(_ptr, OpusCtl.SetPacketLossPercent, packetLoss)); //%
             CheckError(EncoderCtl(_ptr, OpusCtl.SetInbandFEC, 1)); //True
             CheckError(EncoderCtl(_ptr, OpusCtl.SetBitrate, bitrate));
         }
