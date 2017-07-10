@@ -17,6 +17,9 @@ namespace Discord.Commands
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
 
+        public event Func<CommandInfo, ICommandContext, IResult, Task> CommandExecuted { add { _commandExecutedEvent.Add(value); } remove { _commandExecutedEvent.Remove(value); } }
+        internal readonly AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>> _commandExecutedEvent = new AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>>();
+
         private readonly SemaphoreSlim _moduleLock;
         private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
         private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>> _typeReaders;
