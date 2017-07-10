@@ -1077,12 +1077,17 @@ namespace Discord.API
         //Relationships
         public async Task<IReadOnlyCollection<Relationship>> GetRelationshipsAsync(RequestOptions options = null)
         {
+            Preconditions.LoggedInAs(TokenType.User, AuthTokenType);
+
             options = RequestOptions.CreateOrClone(options);
+
             return await SendAsync<IReadOnlyCollection<Relationship>>("GET", () => "users/@me/relationships", new BucketIds(), options: options).ConfigureAwait(false);
         }
         public async Task AddFriendAsync(ulong userId, RequestOptions options = null)
         {
             Preconditions.NotEqual(userId, 0, nameof(userId));
+            Preconditions.LoggedInAs(TokenType.User, AuthTokenType);
+
             options = RequestOptions.CreateOrClone(options);
 
             await SendJsonAsync("PUT", () => $"users/@me/relationships/{userId}", new object(), new BucketIds(), options: options).ConfigureAwait(false);
@@ -1090,6 +1095,8 @@ namespace Discord.API
         public async Task BlockUserAsync(ulong userId, RequestOptions options = null)
         {
             Preconditions.NotEqual(userId, 0, nameof(userId));
+            Preconditions.LoggedInAs(TokenType.User, AuthTokenType);
+
             options = RequestOptions.CreateOrClone(options);
 
             await SendJsonAsync("PUT", () => $"users/@me/relationships/{userId}", new { type = 2 }, new BucketIds(), options: options).ConfigureAwait(false);
@@ -1097,6 +1104,8 @@ namespace Discord.API
         public async Task RemoveRelationshipAsync(ulong userId, RequestOptions options = null)
         {
             Preconditions.NotEqual(userId, 0, nameof(userId));
+            Preconditions.LoggedInAs(TokenType.User, AuthTokenType);
+
             options = RequestOptions.CreateOrClone(options);
 
             await SendAsync("DELETE", () => $"users/@me/relationships/{userId}", new BucketIds(), options: options).ConfigureAwait(false);
