@@ -156,7 +156,16 @@ namespace Discord.Rest
         public static async Task<IReadOnlyCollection<RestRelationship>> GetRelationshipsAsync(BaseDiscordClient client)
         {
             var models = await client.ApiClient.GetRelationshipsAsync().ConfigureAwait(false);
-            return models.Select(r => RestRelationship.Create(client, r)).ToImmutableArray();
+            return models.Select(r => RestRelationship.Create(client, r)).ToReadOnlyCollection(models);
         }
+
+        public static async Task AddFriendAsync(BaseDiscordClient client, ulong user, RequestOptions options) 
+            => await client.ApiClient.AddFriendAsync(user, options).ConfigureAwait(false);
+
+        public static async Task BlockUserAsync(BaseDiscordClient client, ulong user, RequestOptions options)
+            => await client.ApiClient.BlockUserAsync(user, options).ConfigureAwait(false);
+
+        public static async Task RemoveRelationshipAsync(BaseDiscordClient client, ulong user, RequestOptions options)
+            => await client.ApiClient.RemoveRelationshipAsync(user, options).ConfigureAwait(false);
     }
 }

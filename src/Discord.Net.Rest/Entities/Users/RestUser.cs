@@ -62,13 +62,13 @@ namespace Discord.Rest
 
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
-        
+
         public Task AddFriendAsync(RequestOptions options = null)
-            => Discord.ApiClient.AddFriendAsync(Id, options);
+            => ClientHelper.AddFriendAsync(Discord, Id, options);
         public Task BlockUserAsync(RequestOptions options = null)
-            => Discord.ApiClient.BlockUserAsync(Id, options);
+            => ClientHelper.BlockUserAsync(Discord, Id, options);
         public Task RemoveRelationshipAsync(RequestOptions options = null)
-            => Discord.ApiClient.RemoveRelationshipAsync(Id, options);
+            => ClientHelper.RemoveRelationshipAsync(Discord, Id, options);
 
         //IUser
         async Task<IDMChannel> IUser.GetOrCreateDMChannelAsync(RequestOptions options)

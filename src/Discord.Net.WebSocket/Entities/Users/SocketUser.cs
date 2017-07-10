@@ -65,12 +65,12 @@ namespace Discord.WebSocket
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
-        
+
         public async Task AddFriendAsync(RequestOptions options = null)
-            => await Discord.ApiClient.AddFriendAsync(Id, options);
+            => await ClientHelper.AddFriendAsync(Discord, Id, options);
         public async Task BlockUserAsync(RequestOptions options = null)
-            => await Discord.ApiClient.BlockUserAsync(Id, options);
+            => await ClientHelper.BlockUserAsync(Discord, Id, options);
         public async Task RemoveRelationshipAsync(RequestOptions options = null)
-            => await Discord.ApiClient.RemoveRelationshipAsync(Id, options);
+            => await ClientHelper.RemoveRelationshipAsync(Discord, Id, options);
     }
 }
