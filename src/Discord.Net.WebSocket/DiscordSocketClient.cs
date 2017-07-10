@@ -1509,7 +1509,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (RELATIONSHIP_ADD)").ConfigureAwait(false);
 
                                     var addedModel = (payload as JToken).ToObject<Relationship>(_serializer);
-                                    var before = State.GetRelationship(addedModel.Id);
+                                    var before = State.GetRelationship(addedModel.Id) ?? SocketRelationship.Create(this, State, new Relationship { Id = addedModel.Id, Type = RelationshipType.None, User = addedModel.User });
                                     var after = AddRelationship(addedModel, State);
 
                                     await _relationshipAddedEvent.InvokeAsync(before, after);

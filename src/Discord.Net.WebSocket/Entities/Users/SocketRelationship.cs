@@ -1,7 +1,9 @@
-﻿using Model = Discord.API.Relationship;
+﻿using System.Diagnostics;
+using Model = Discord.API.Relationship;
 
 namespace Discord.WebSocket
 {
+    [DebuggerDisplay("{Type} - {User}")]
     public class SocketRelationship : IRelationship
     {
         public RelationshipType Type { get; internal set; }

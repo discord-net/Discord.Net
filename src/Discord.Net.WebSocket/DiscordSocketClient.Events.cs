@@ -217,7 +217,7 @@ namespace Discord.WebSocket
         private readonly AsyncEvent<Func<SocketGroupUser, Task>> _recipientRemovedEvent = new AsyncEvent<Func<SocketGroupUser, Task>>();
         
         // relationships
-        public event Func<SocketRelationship, SocketRelationship, Task> RelationshipAdd
+        public event Func<SocketRelationship, SocketRelationship, Task> RelationshipAdded
         {
             add { _relationshipAddedEvent.Add(value); }
             remove { _relationshipAddedEvent.Remove(value); }
