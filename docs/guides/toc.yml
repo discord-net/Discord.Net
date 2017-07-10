@@ -1,15 +1,27 @@
-
 - name: Getting Started
-  href: intro.md
-- name: Terminology
-  href: terminology.md
-- name: Logging
-  href: logging.md
-- name: Commands
-  href: commands.md
+  items:
+    - name: Installation
+      href: getting_started/installing.md
+    - name: Your First Bot
+      href: getting_started/intro.md
+    - name: Terminology
+      href: getting_started/terminology.md
+- name: Basic Concepts
+  items:
+    - name: Logging Data
+      href: concepts/logging.md
+    - name: Working with Events
+      href: concepts/events.md
+    - name: Managing Connections
+      href: concepts/connections.md
+    - name: Entities
+      href: concepts/entities.md
+- name: The Command Service
+  items:
+    - name: Command Guide
+      href: commands/commands.md
 - name: Voice
-  href: voice.md
-- name: Events
-  href: events.md
-- name: Code Samples
-  href: samples.md
+  items:
+    - name: Voice Guide
+      href: voice/sending-voice.md
+- name: Migrating from 0.9

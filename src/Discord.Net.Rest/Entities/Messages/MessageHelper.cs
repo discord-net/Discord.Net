@@ -28,19 +28,14 @@ namespace Discord.Rest
             await client.ApiClient.DeleteMessageAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
         }
 
-        public static async Task AddReactionAsync(IMessage msg, Emoji emoji, BaseDiscordClient client, RequestOptions options)
-            => await AddReactionAsync(msg, $"{emoji.Name}:{emoji.Id}", client, options).ConfigureAwait(false);
-        public static async Task AddReactionAsync(IMessage msg, string emoji, BaseDiscordClient client, RequestOptions options)
+        public static async Task AddReactionAsync(IMessage msg, IEmote emote, BaseDiscordClient client, RequestOptions options)
         {
-            await client.ApiClient.AddReactionAsync(msg.Channel.Id, msg.Id, emoji, options).ConfigureAwait(false);
+            await client.ApiClient.AddReactionAsync(msg.Channel.Id, msg.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
         }
 
-        public static async Task RemoveReactionAsync(IMessage msg, IUser user, Emoji emoji, BaseDiscordClient client, RequestOptions options)
-            => await RemoveReactionAsync(msg, user, emoji.Id == 0 ? emoji.Name : $"{emoji.Name}:{emoji.Id}", client, options).ConfigureAwait(false);
-        public static async Task RemoveReactionAsync(IMessage msg, IUser user, string emoji, BaseDiscordClient client,
-            RequestOptions options)
+        public static async Task RemoveReactionAsync(IMessage msg, IUser user, IEmote emote, BaseDiscordClient client, RequestOptions options)
         {
-            await client.ApiClient.RemoveReactionAsync(msg.Channel.Id, msg.Id, user.Id, emoji, options).ConfigureAwait(false);
+            await client.ApiClient.RemoveReactionAsync(msg.Channel.Id, msg.Id, user.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
         }
 
         public static async Task RemoveAllReactionsAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
@@ -53,7 +48,7 @@ namespace Discord.Rest
         {
             var args = new GetReactionUsersParams();
             func(args);
-            return (await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false)).Select(u => u as IUser).Where(u => u != null).ToImmutableArray();
+            return (await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false)).Select(u => RestUser.Create(client, u)).ToImmutableArray();
         }
 
         public static async Task PinAsync(IMessage msg, BaseDiscordClient client,
@@ -67,7 +62,7 @@ namespace Discord.Rest
             await client.ApiClient.RemovePinAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
         }
 
-        public static ImmutableArray<ITag> ParseTags(string text, IMessageChannel channel, IGuild guild, ImmutableArray<IUser> userMentions)
+        public static ImmutableArray<ITag> ParseTags(string text, IMessageChannel channel, IGuild guild, IReadOnlyCollection<IUser> userMentions)
         {
             var tags = ImmutableArray.CreateBuilder<ITag>();
             
@@ -80,8 +75,7 @@ namespace Discord.Rest
                 if (endIndex == -1) break;
                 string content = text.Substring(index, endIndex - index + 1);
 
-                ulong id;
-                if (MentionUtils.TryParseUser(content, out id))
+                if (MentionUtils.TryParseUser(content, out ulong id))
                 {
                     IUser mentionedUser = null;
                     foreach (var mention in userMentions)
@@ -110,11 +104,12 @@ namespace Discord.Rest
                         mentionedRole = guild.GetRole(id);
                     tags.Add(new Tag<IRole>(TagType.RoleMention, index, content.Length, id, mentionedRole));
                 }
-                else
+                else if (Emote.TryParse(content, out var emoji))
+                    tags.Add(new Tag<Emote>(TagType.Emoji, index, content.Length, emoji.Id, emoji));
+                else //Bad Tag
                 {
-                    Emoji emoji;
-                    if (Emoji.TryParse(content, out emoji))
-                        tags.Add(new Tag<Emoji>(TagType.Emoji, index, content.Length, id, emoji));
+                    index = index + 1;
+                    continue;
                 }
                 index = endIndex + 1;
             }
@@ -125,7 +120,9 @@ namespace Discord.Rest
                 index = text.IndexOf("@everyone", index);
                 if (index == -1) break;
 
-                tags.Add(new Tag<object>(TagType.EveryoneMention, index, "@everyone".Length, 0, null));
+                var tagIndex = FindIndex(tags, index);
+                if (tagIndex.HasValue)
+                    tags.Insert(tagIndex.Value, new Tag<object>(TagType.EveryoneMention, index, "@everyone".Length, 0, null));
                 index++;
             }
 
@@ -135,11 +132,26 @@ namespace Discord.Rest
                 index = text.IndexOf("@here", index);
                 if (index == -1) break;
 
-                tags.Add(new Tag<object>(TagType.HereMention, index, "@here".Length, 0, null));
+                var tagIndex = FindIndex(tags, index);
+                if (tagIndex.HasValue)
+                    tags.Insert(tagIndex.Value, new Tag<object>(TagType.HereMention, index, "@here".Length, 0, null));
                 index++;
             }
 
             return tags.ToImmutable();
+        }
+        private static int? FindIndex(IReadOnlyList<ITag> tags, int index)
+        {
+            int i = 0;
+            for (; i < tags.Count; i++)
+            {
+                var tag = tags[i];
+                if (index < tag.Index)
+                    break; //Position before this tag
+            }
+            if (i > 0 && index < tags[i - 1].Index + tags[i - 1].Length)
+                return null; //Overlaps tag before this
+            return i;
         }
         public static ImmutableArray<ulong> FilterTagsByKey(TagType type, ImmutableArray<ITag> tags)
         {
@@ -155,6 +167,17 @@ namespace Discord.Rest
                 .Select(x => (T)x.Value)
                 .Where(x => x != null)
                 .ToImmutableArray();
+        }
+
+        public static MessageSource GetSource(Model msg)
+        {
+            if (msg.Type != MessageType.Default)
+                return MessageSource.System;
+            else if (msg.WebhookId.IsSpecified)
+                return MessageSource.Webhook;
+            else if (msg.Author.GetValueOrDefault()?.Bot.GetValueOrDefault(false) == true)
+                return MessageSource.Bot;
+            return MessageSource.User;
         }
     }
 }

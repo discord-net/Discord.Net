@@ -42,7 +42,7 @@ namespace Discord.Rpc
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
 
-        //IVoiceChannel
-        Task<IAudioClient> IVoiceChannel.ConnectAsync() { throw new NotSupportedException(); }
+        //IAudioChannel
+        Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) { throw new NotSupportedException(); }
     }
 }

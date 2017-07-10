@@ -10,14 +10,14 @@ namespace Discord.Rpc
         public MessageType Type { get; private set; }
 
         internal RpcSystemMessage(DiscordRpcClient discord, ulong id, RestVirtualMessageChannel channel, RpcUser author)
-            : base(discord, id, channel, author)
+            : base(discord, id, channel, author, MessageSource.System)
         {
         }
         internal new static RpcSystemMessage Create(DiscordRpcClient discord, ulong channelId, Model model)
         {
             var entity = new RpcSystemMessage(discord, model.Id,
                 RestVirtualMessageChannel.Create(discord, channelId),
-                RpcUser.Create(discord, model.Author.Value));
+                RpcUser.Create(discord, model.Author.Value, model.WebhookId.ToNullable()));
             entity.Update(model);
             return entity;
         }

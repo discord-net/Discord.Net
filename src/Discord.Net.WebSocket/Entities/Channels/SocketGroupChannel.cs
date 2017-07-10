@@ -97,7 +97,7 @@ namespace Discord.WebSocket
 
         public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
-#if NETSTANDARD1_3
+#if FILESYSTEM
         public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, options);
 #endif
@@ -105,7 +105,9 @@ namespace Discord.WebSocket
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, options);
 
         public Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null)
-            => ChannelHelper.DeleteMessagesAsync(this, Discord, messages, options);
+            => ChannelHelper.DeleteMessagesAsync(this, Discord, messages.Select(x => x.Id), options);
+        public Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null)
+            => ChannelHelper.DeleteMessagesAsync(this, Discord, messageIds, options);
 
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);
@@ -120,27 +122,25 @@ namespace Discord.WebSocket
         //Users
         public new SocketGroupUser GetUser(ulong id)
         {
-            SocketGroupUser user;
-            if (_users.TryGetValue(id, out user))
+            if (_users.TryGetValue(id, out SocketGroupUser user))
                 return user;
             return null;
         }
-        internal SocketGroupUser AddUser(UserModel model)
+        internal SocketGroupUser GetOrAddUser(UserModel model)
         {
-            SocketGroupUser user;
-            if (_users.TryGetValue(model.Id, out user))
+            if (_users.TryGetValue(model.Id, out SocketGroupUser user))
                 return user as SocketGroupUser;
             else
             {
                 var privateUser = SocketGroupUser.Create(this, Discord.State, model);
+                privateUser.GlobalUser.AddRef();
                 _users[privateUser.Id] = privateUser;
                 return privateUser;
             }
         }
         internal SocketGroupUser RemoveUser(ulong id)
         {
-            SocketGroupUser user;
-            if (_users.TryRemove(id, out user))
+            if (_users.TryRemove(id, out SocketGroupUser user))
             {
                 user.GlobalUser.RemoveRef(Discord);
                 return user as SocketGroupUser;
@@ -158,15 +158,13 @@ namespace Discord.WebSocket
         }
         internal SocketVoiceState? GetVoiceState(ulong id)
         {
-            SocketVoiceState voiceState;
-            if (_voiceStates.TryGetValue(id, out voiceState))
+            if (_voiceStates.TryGetValue(id, out SocketVoiceState voiceState))
                 return voiceState;
             return null;
         }
         internal SocketVoiceState? RemoveVoiceState(ulong id)
         {
-            SocketVoiceState voiceState;
-            if (_voiceStates.TryRemove(id, out voiceState))
+            if (_voiceStates.TryRemove(id, out SocketVoiceState voiceState))
                 return voiceState;
             return null;
         }
@@ -201,7 +199,7 @@ namespace Discord.WebSocket
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessage.Id, dir, limit, mode, options);
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
-#if NETSTANDARD1_3
+#if FILESYSTEM
         async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, RequestOptions options)
             => await SendFileAsync(filePath, text, isTTS, options).ConfigureAwait(false);
 #endif
@@ -211,6 +209,9 @@ namespace Discord.WebSocket
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
         IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
             => EnterTypingState(options);
+
+        //IAudioChannel
+        Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) { throw new NotSupportedException(); }
 
         //IChannel        
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)

@@ -11,12 +11,12 @@ namespace Discord.API
         [JsonProperty("nick")]
         public Optional<string> Nick { get; set; }
         [JsonProperty("roles")]
-        public ulong[] Roles { get; set; }
+        public Optional<ulong[]> Roles { get; set; }
         [JsonProperty("joined_at")]
         public Optional<DateTimeOffset> JoinedAt { get; set; }
         [JsonProperty("deaf")]
-        public bool Deaf { get; set; }
+        public Optional<bool> Deaf { get; set; }
         [JsonProperty("mute")]
-        public bool Mute { get; set; }
+        public Optional<bool> Mute { get; set; }
     }
 }

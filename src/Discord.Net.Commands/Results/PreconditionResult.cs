@@ -3,14 +3,14 @@
 namespace Discord.Commands
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct PreconditionResult : IResult
+    public class PreconditionResult : IResult
     {
         public CommandError? Error { get; }
         public string ErrorReason { get; }
 
         public bool IsSuccess => !Error.HasValue;
 
-        private PreconditionResult(CommandError? error, string errorReason)
+        protected PreconditionResult(CommandError? error, string errorReason)
         {
             Error = error;
             ErrorReason = errorReason;

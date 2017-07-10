@@ -10,7 +10,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     internal class RestVirtualMessageChannel : RestEntity<ulong>, IMessageChannel
     {
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public string Mention => MentionUtils.MentionChannel(Id);
 
         internal RestVirtualMessageChannel(BaseDiscordClient discord, ulong id)
@@ -35,7 +35,7 @@ namespace Discord.Rest
 
         public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
-#if NETSTANDARD1_3
+#if FILESYSTEM
         public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, options);
 #endif
@@ -43,7 +43,9 @@ namespace Discord.Rest
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, options);
 
         public Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null)
-            => ChannelHelper.DeleteMessagesAsync(this, Discord, messages, options);
+            => ChannelHelper.DeleteMessagesAsync(this, Discord, messages.Select(x => x.Id), options);
+        public Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null)
+            => ChannelHelper.DeleteMessagesAsync(this, Discord, messageIds, options);
 
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);
@@ -84,7 +86,7 @@ namespace Discord.Rest
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
             => await GetPinnedMessagesAsync(options);
 
-#if NETSTANDARD1_3
+#if FILESYSTEM
         async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, RequestOptions options)
             => await SendFileAsync(filePath, text, isTTS, options);
 #endif
@@ -97,6 +99,7 @@ namespace Discord.Rest
 
         //IChannel
         string IChannel.Name { get { throw new NotSupportedException(); } }
+        bool IChannel.IsNsfw { get { throw new NotSupportedException(); } }
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
         {
             throw new NotSupportedException();

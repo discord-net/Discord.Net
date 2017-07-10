@@ -9,7 +9,7 @@ namespace Discord.Commands
     internal class ChannelTypeReader<T> : TypeReader
         where T : class, IChannel
     {
-        public override async Task<TypeReaderResult> Read(ICommandContext context, string input)
+        public override async Task<TypeReaderResult> Read(ICommandContext context, string input, IServiceProvider services)
         {
             if (context.Guild != null)
             {
@@ -30,7 +30,7 @@ namespace Discord.Commands
                     AddResult(results, channel as T, channel.Name == input ? 0.80f : 0.70f);
 
                 if (results.Count > 0)
-                    return TypeReaderResult.FromSuccess(results.Values);
+                    return TypeReaderResult.FromSuccess(results.Values.ToReadOnlyCollection());
             }
 
             return TypeReaderResult.FromError(CommandError.ObjectNotFound, "Channel not found.");

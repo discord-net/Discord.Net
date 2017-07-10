@@ -378,8 +378,7 @@ namespace Discord.API
 
         private bool ProcessMessage(API.Rpc.RpcFrame msg)
         {
-            RpcRequest requestTracker;
-            if (_requests.TryGetValue(msg.Nonce.Value.Value, out requestTracker))
+            if (_requests.TryGetValue(msg.Nonce.Value.Value, out RpcRequest requestTracker))
             {
                 if (msg.Event.GetValueOrDefault("") == "ERROR")
                 {

@@ -114,9 +114,8 @@ namespace Discord.Net.Queue
                     var now = DateTimeOffset.UtcNow;
                     foreach (var bucket in _buckets.Select(x => x.Value))
                     {
-                        RequestBucket ignored;
                         if ((now - bucket.LastAttemptAt).TotalMinutes > 1.0)
-                            _buckets.TryRemove(bucket.Id, out ignored);
+                            _buckets.TryRemove(bucket.Id, out RequestBucket ignored);
                     }
                     await Task.Delay(60000, _cancelToken.Token); //Runs each minute
                 }

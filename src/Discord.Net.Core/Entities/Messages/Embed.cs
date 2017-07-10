@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Discord
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Embed : IEmbed
     {
-        public string Type { get; }
+        public EmbedType Type { get; }
 
         public string Description { get; internal set; }
         public string Url { get; internal set; }
@@ -22,12 +23,12 @@ namespace Discord
         public EmbedThumbnail? Thumbnail { get; internal set; }
         public ImmutableArray<EmbedField> Fields { get; internal set; }
 
-        internal Embed(string type)
+        internal Embed(EmbedType type)
         {
             Type = type;
             Fields = ImmutableArray.Create<EmbedField>();
         }
-        internal Embed(string type, 
+        internal Embed(EmbedType type, 
             string title,
             string description,
             string url,
@@ -55,6 +56,8 @@ namespace Discord
             Thumbnail = thumbnail;
             Fields = fields;
         }
+
+        public int Length => Title?.Length + Author?.Name?.Length + Description?.Length + Footer?.Text?.Length + Fields.Sum(f => f.Name.Length + f.Value.ToString().Length) ?? 0;
 
         public override string ToString() => Title;
         private string DebuggerDisplay => $"{Title} ({Type})";

@@ -44,15 +44,13 @@ namespace Discord.WebSocket
 
         internal SocketChannel GetChannel(ulong id)
         {
-            SocketChannel channel;
-            if (_channels.TryGetValue(id, out channel))
+            if (_channels.TryGetValue(id, out SocketChannel channel))
                 return channel;
             return null;
         }
         internal SocketDMChannel GetDMChannel(ulong userId)
         {
-            SocketDMChannel channel;
-            if (_dmChannels.TryGetValue(userId, out channel))
+            if (_dmChannels.TryGetValue(userId, out SocketDMChannel channel))
                 return channel;
             return null;
         }
@@ -60,32 +58,28 @@ namespace Discord.WebSocket
         {
             _channels[channel.Id] = channel;
 
-            var dmChannel = channel as SocketDMChannel;
-            if (dmChannel != null)
-                _dmChannels[dmChannel.Recipient.Id] = dmChannel;
-            else
+            switch (channel)
             {
-                var groupChannel = channel as SocketGroupChannel;
-                if (groupChannel != null)
+                case SocketDMChannel dmChannel:
+                    _dmChannels[dmChannel.Recipient.Id] = dmChannel;
+                    break;
+                case SocketGroupChannel groupChannel:
                     _groupChannels.TryAdd(groupChannel.Id);
+                    break;
             }
         }
         internal SocketChannel RemoveChannel(ulong id)
         {
-            SocketChannel channel;
-            if (_channels.TryRemove(id, out channel))
+            if (_channels.TryRemove(id, out SocketChannel channel))
             {
-                var dmChannel = channel as SocketDMChannel;
-                if (dmChannel != null)
+                switch (channel)
                 {
-                    SocketDMChannel ignored;
-                    _dmChannels.TryRemove(dmChannel.Recipient.Id, out ignored);
-                }
-                else
-                {
-                    var groupChannel = channel as SocketGroupChannel;
-                    if (groupChannel != null)
+                    case SocketDMChannel dmChannel:
+                        _dmChannels.TryRemove(dmChannel.Recipient.Id, out var ignored);
+                        break;
+                    case SocketGroupChannel groupChannel:
                         _groupChannels.TryRemove(id);
+                        break;
                 }
                 return channel;
             }
@@ -94,8 +88,7 @@ namespace Discord.WebSocket
 
         internal SocketGuild GetGuild(ulong id)
         {
-            SocketGuild guild;
-            if (_guilds.TryGetValue(id, out guild))
+            if (_guilds.TryGetValue(id, out SocketGuild guild))
                 return guild;
             return null;
         }
@@ -105,16 +98,14 @@ namespace Discord.WebSocket
         }
         internal SocketGuild RemoveGuild(ulong id)
         {
-            SocketGuild guild;
-            if (_guilds.TryRemove(id, out guild))
+            if (_guilds.TryRemove(id, out SocketGuild guild))
                 return guild;
             return null;
         }
 
         internal SocketGlobalUser GetUser(ulong id)
         {
-            SocketGlobalUser user;
-            if (_users.TryGetValue(id, out user))
+            if (_users.TryGetValue(id, out SocketGlobalUser user))
                 return user;
             return null;
         }
@@ -124,8 +115,7 @@ namespace Discord.WebSocket
         }
         internal SocketGlobalUser RemoveUser(ulong id)
         {
-            SocketGlobalUser user;
-            if (_users.TryRemove(id, out user))
+            if (_users.TryRemove(id, out SocketGlobalUser user))
                 return user;
             return null;
         }

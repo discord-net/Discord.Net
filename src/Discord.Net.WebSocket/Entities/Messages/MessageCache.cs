@@ -27,24 +27,20 @@ namespace Discord.WebSocket
             {
                 _orderedMessages.Enqueue(message.Id);
 
-                ulong msgId;
-                SocketMessage msg;
-                while (_orderedMessages.Count > _size && _orderedMessages.TryDequeue(out msgId))
-                    _messages.TryRemove(msgId, out msg);
+                while (_orderedMessages.Count > _size && _orderedMessages.TryDequeue(out ulong msgId))
+                    _messages.TryRemove(msgId, out SocketMessage msg);
             }
         }
 
         public SocketMessage Remove(ulong id)
         {
-            SocketMessage msg;
-            _messages.TryRemove(id, out msg);
+            _messages.TryRemove(id, out SocketMessage msg);
             return msg;
         }
 
         public SocketMessage Get(ulong id)
         {
-            SocketMessage result;
-            if (_messages.TryGetValue(id, out result))
+            if (_messages.TryGetValue(id, out SocketMessage result))
                 return result;
             return null;
         }
@@ -67,8 +63,7 @@ namespace Discord.WebSocket
             return cachedMessageIds
                 .Select(x =>
                 {
-                    SocketMessage msg;
-                    if (_messages.TryGetValue(x, out msg))
+                    if (_messages.TryGetValue(x, out SocketMessage msg))
                         return msg;
                     return null;
                 })

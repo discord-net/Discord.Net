@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD1_3
+﻿#if DEFAULTUDPCLIENT
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -18,6 +18,8 @@ namespace Discord.Net.Udp
         private CancellationToken _cancelToken, _parentToken;
         private Task _task;
         private bool _isDisposed;
+        
+        public ushort Port => (ushort)((_udp?.Client.LocalEndPoint as IPEndPoint)?.Port ?? 0);
 
         public DefaultUdpSocket()
         {
@@ -83,16 +85,19 @@ namespace Discord.Net.Udp
 
             if (_udp != null)
             {
+#if UDPDISPOSE
                 try { _udp.Dispose(); }
+#else
+                try { _udp.Close(); }
+#endif
                 catch { }
                 _udp = null;
             }
         }
 
-        public void SetDestination(string host, int port)
+        public void SetDestination(string ip, int port)
         {
-            var entry = Dns.GetHostEntryAsync(host).GetAwaiter().GetResult();
-            _destination = new IPEndPoint(entry.AddressList[0], port);
+            _destination = new IPEndPoint(IPAddress.Parse(ip), port);
         }
         public void SetCancelToken(CancellationToken cancelToken)
         {

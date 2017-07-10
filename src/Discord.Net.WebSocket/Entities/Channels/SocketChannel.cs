@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Rest;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class SocketChannel : SocketEntity<ulong>, IChannel
     {
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public IReadOnlyCollection<SocketUser> Users => GetUsersInternal();
 
         internal SocketChannel(DiscordSocketClient discord, ulong id)
@@ -40,6 +41,7 @@ namespace Discord.WebSocket
 
         //IChannel
         string IChannel.Name => null;
+        bool IChannel.IsNsfw => ChannelHelper.IsNsfw(this);
 
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null); //Overridden

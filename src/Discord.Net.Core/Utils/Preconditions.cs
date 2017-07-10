@@ -46,7 +46,7 @@ namespace Discord
 
         private static ArgumentException CreateNotEmptyException(string name, string msg)
         {
-            if (msg == null) return new ArgumentException(name, "Argument cannot be blank.");
+            if (msg == null) return new ArgumentException("Argument cannot be blank", name);
             else return new ArgumentException(name, msg);
         }
 
@@ -185,9 +185,12 @@ namespace Discord
         // Bulk Delete
         public static void YoungerThanTwoWeeks(ulong[] collection, string name)
         {
-            var minimum = DateTimeUtils.ToSnowflake(DateTimeOffset.Now.Subtract(TimeSpan.FromMilliseconds(1209540000)));
+            var minimum = SnowflakeUtils.ToSnowflake(DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(14)));
             for (var i = 0; i < collection.Length; i++)
-                if (collection[i] <= minimum) throw new ArgumentOutOfRangeException(name, "Messages must be younger than two weeks to delete.");
+            {
+                if (collection[i] <= minimum) 
+                    throw new ArgumentOutOfRangeException(name, "Messages must be younger than two weeks old.");
+            }
         }
     }
 }

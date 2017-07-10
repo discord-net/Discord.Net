@@ -86,12 +86,16 @@ namespace Discord
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void UnsetBit(ref ulong value, byte bit) => value &= ~(1U << bit);
 
+        public static ChannelPermissions ToChannelPerms(IGuildChannel channel, ulong guildPermissions)
+            => new ChannelPermissions(guildPermissions & ChannelPermissions.All(channel).RawValue);
         public static ulong ResolveGuild(IGuild guild, IGuildUser user)
         {
             ulong resolvedPermissions = 0;
 
             if (user.Id == guild.OwnerId)
                 resolvedPermissions = GuildPermissions.All.RawValue; //Owners always have all permissions
+            else if (user.IsWebhook)
+                resolvedPermissions = GuildPermissions.Webhook.RawValue;
             else
             {
                 foreach (var roleId in user.RoleIds)
@@ -111,20 +115,25 @@ namespace Discord
             ulong resolvedPermissions = 0;
 
             ulong mask = ChannelPermissions.All(channel).RawValue;
-            if (/*user.Id == user.Guild.OwnerId || */GetValue(guildPermissions, GuildPermission.Administrator))
+            if (GetValue(guildPermissions, GuildPermission.Administrator)) //Includes owner
                 resolvedPermissions = mask; //Owners and administrators always have all permissions
             else
             {
+                OverwritePermissions? perms;
+
                 //Start with this user's guild permissions
                 resolvedPermissions = guildPermissions;
 
+                //Give/Take Everyone permissions
+                perms = channel.GetPermissionOverwrite(guild.EveryoneRole);
+                if (perms != null)
+                    resolvedPermissions = (resolvedPermissions & ~perms.Value.DenyValue) | perms.Value.AllowValue;
+
                 //Give/Take Role permissions
-                OverwritePermissions? perms;
-                var roleIds = user.RoleIds;
-                if (roleIds.Count > 0)
+                ulong deniedPermissions = 0UL, allowedPermissions = 0UL;
+                foreach (var roleId in user.RoleIds)
                 {
-                    ulong deniedPermissions = 0UL, allowedPermissions = 0UL;
-                    foreach (var roleId in roleIds)
+                    if (roleId != guild.EveryoneRole.Id)
                     {
                         perms = channel.GetPermissionOverwrite(guild.GetRole(roleId));
                         if (perms != null)
@@ -133,21 +142,30 @@ namespace Discord
                             deniedPermissions |= perms.Value.DenyValue;
                         }
                     }
-                    resolvedPermissions = (resolvedPermissions | allowedPermissions) & ~deniedPermissions;
                 }
+                resolvedPermissions = (resolvedPermissions & ~deniedPermissions) | allowedPermissions;
 
                 //Give/Take User permissions
                 perms = channel.GetPermissionOverwrite(user);
                 if (perms != null)
-                    resolvedPermissions = (resolvedPermissions | perms.Value.AllowValue)  & ~perms.Value.DenyValue;
+                    resolvedPermissions = (resolvedPermissions  & ~perms.Value.DenyValue) | perms.Value.AllowValue;
 
-                //TODO: C#7 Typeswitch candidate
-                var textChannel = channel as ITextChannel;
-                var voiceChannel = channel as IVoiceChannel;
-                if (textChannel != null && !GetValue(resolvedPermissions, ChannelPermission.ReadMessages))
-                    resolvedPermissions = 0; //No read permission on a text channel removes all other permissions
-                else if (voiceChannel != null && !GetValue(resolvedPermissions, ChannelPermission.Connect))
-                    resolvedPermissions = 0; //No connect permission on a voice channel removes all other permissions
+                if (channel is ITextChannel textChannel)
+                {
+                    if (!GetValue(resolvedPermissions, ChannelPermission.ReadMessages))
+                    {
+                        //No read permission on a text channel removes all other permissions
+                        resolvedPermissions = 0;
+                    }
+                    else if (!GetValue(resolvedPermissions, ChannelPermission.SendMessages))
+                    {
+                        //No send permissions on a text channel removes all send-related permissions
+                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.SendTTSMessages);
+                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.MentionEveryone);
+                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.EmbedLinks);
+                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.AttachFiles);
+                    }
+                }
                 resolvedPermissions &= mask; //Ensure we didnt get any permissions this channel doesnt support (from guildPerms, for example)
             }
 

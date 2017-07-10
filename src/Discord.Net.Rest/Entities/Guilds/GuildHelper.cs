@@ -75,23 +75,16 @@ namespace Discord.Rest
 
             return await client.ApiClient.ModifyGuildEmbedAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
-        public static async Task ModifyChannelsAsync(IGuild guild, BaseDiscordClient client,
-            IEnumerable<BulkGuildChannelProperties> args, RequestOptions options)
+        public static async Task ReorderChannelsAsync(IGuild guild, BaseDiscordClient client,
+            IEnumerable<ReorderChannelProperties> args, RequestOptions options)
         {
             var apiArgs = args.Select(x => new API.Rest.ModifyGuildChannelsParams(x.Id, x.Position));
             await client.ApiClient.ModifyGuildChannelsAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
-        public static async Task<IReadOnlyCollection<RoleModel>> ModifyRolesAsync(IGuild guild, BaseDiscordClient client,
-            IEnumerable<BulkRoleProperties> args, RequestOptions options)
+        public static async Task<IReadOnlyCollection<RoleModel>> ReorderRolesAsync(IGuild guild, BaseDiscordClient client,
+            IEnumerable<ReorderRoleProperties> args, RequestOptions options)
         {
-            var apiArgs = args.Select(x => new API.Rest.ModifyGuildRolesParams(x.Id)
-            {
-                Color = x.Color.IsSpecified ? x.Color.Value.RawValue : Optional.Create<uint>(),
-                Hoist = x.Hoist,
-                Name = x.Name,
-                Permissions = x.Permissions.IsSpecified ? x.Permissions.Value.RawValue : Optional.Create<ulong>(),
-                Position = x.Position
-            });
+            var apiArgs = args.Select(x => new API.Rest.ModifyGuildRolesParams(x.Id, x.Position));
             return await client.ApiClient.ModifyGuildRolesAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task LeaveAsync(IGuild guild, BaseDiscordClient client,
@@ -114,9 +107,9 @@ namespace Discord.Rest
         }
 
         public static async Task AddBanAsync(IGuild guild, BaseDiscordClient client,
-            ulong userId, int pruneDays, RequestOptions options)
+            ulong userId, int pruneDays, string reason, RequestOptions options)
         {
-            var args = new CreateGuildBanParams { DeleteMessageDays = pruneDays };
+            var args = new CreateGuildBanParams { DeleteMessageDays = pruneDays, Reason = reason };
             await client.ApiClient.CreateGuildBanAsync(guild.Id, userId, args, options).ConfigureAwait(false);
         }
         public static async Task RemoveBanAsync(IGuild guild, BaseDiscordClient client,

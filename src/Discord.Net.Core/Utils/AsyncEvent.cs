@@ -11,6 +11,7 @@ namespace Discord
         private readonly object _subLock = new object();
         internal ImmutableArray<T> _subscriptions;
 
+        public bool HasSubscribers => _subscriptions.Length != 0;
         public IReadOnlyList<T> Subscriptions => _subscriptions;
 
         public AsyncEvent()
@@ -37,11 +38,8 @@ namespace Discord
         public static async Task InvokeAsync(this AsyncEvent<Func<Task>> eventHandler)
         {
             var subscribers = eventHandler.Subscriptions;
-            if (subscribers.Count > 0)
-            {
-                for (int i = 0; i < subscribers.Count; i++)
-                    await subscribers[i].Invoke().ConfigureAwait(false);
-            }
+            for (int i = 0; i < subscribers.Count; i++)
+                await subscribers[i].Invoke().ConfigureAwait(false);
         }
         public static async Task InvokeAsync<T>(this AsyncEvent<Func<T, Task>> eventHandler, T arg)
         {

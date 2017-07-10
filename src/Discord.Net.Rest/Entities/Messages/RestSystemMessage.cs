@@ -9,7 +9,7 @@ namespace Discord.Rest
         public MessageType Type { get; private set; }
 
         internal RestSystemMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author)
-            : base(discord, id, channel, author)
+            : base(discord, id, channel, author, MessageSource.System)
         {
         }
         internal new static RestSystemMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author, Model model)

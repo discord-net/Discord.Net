@@ -73,7 +73,7 @@ namespace Discord.WebSocket
 
         public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
-#if NETSTANDARD1_3
+#if FILESYSTEM
         public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, options);
 #endif
@@ -81,7 +81,9 @@ namespace Discord.WebSocket
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, options);
 
         public Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null)
-            => ChannelHelper.DeleteMessagesAsync(this, Discord, messages, options);
+            => ChannelHelper.DeleteMessagesAsync(this, Discord, messages.Select(x => x.Id), options);
+        public Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null)
+            => ChannelHelper.DeleteMessagesAsync(this, Discord, messageIds, options);
 
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);
@@ -132,7 +134,7 @@ namespace Discord.WebSocket
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessage.Id, dir, limit, mode, options);
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
-#if NETSTANDARD1_3
+#if FILESYSTEM
         async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, RequestOptions options)
             => await SendFileAsync(filePath, text, isTTS, options).ConfigureAwait(false);
 #endif

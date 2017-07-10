@@ -15,7 +15,7 @@ namespace Discord
         {
             Stream = stream;
         }
-#if NETSTANDARD1_3
+#if FILESYSTEM
         /// <summary>
         /// Create the image from a file path.
         /// </summary>

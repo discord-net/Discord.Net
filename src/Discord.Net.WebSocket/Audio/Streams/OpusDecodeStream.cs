@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord.Audio.Streams
@@ -6,21 +7,51 @@ namespace Discord.Audio.Streams
     ///<summary> Converts Opus to PCM </summary>
     public class OpusDecodeStream : AudioOutStream
     {
-        private readonly AudioOutStream _next;
-        private readonly byte[] _buffer;
-        private readonly OpusDecoder _decoder;
+        public const int SampleRate = OpusEncodeStream.SampleRate;
 
-        public OpusDecodeStream(AudioOutStream next, int samplingRate, int channels = OpusConverter.MaxChannels, int bufferSize = 4000)
+        private readonly AudioStream _next;
+        private readonly OpusDecoder _decoder;
+        private readonly byte[] _buffer;
+        private bool _nextMissed;
+        private bool _hasHeader;
+
+        public OpusDecodeStream(AudioStream next)
         {
             _next = next;
-            _buffer = new byte[bufferSize];
-            _decoder = new OpusDecoder(samplingRate, channels);
+            _buffer = new byte[OpusConverter.FrameBytes];
+            _decoder = new OpusDecoder();
         }
 
-        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        public override void WriteHeader(ushort seq, uint timestamp, bool missed)
         {
-            count = _decoder.DecodeFrame(buffer, offset, count, _buffer, 0);
-            await _next.WriteAsync(_buffer, 0, count, cancellationToken).ConfigureAwait(false);
+            if (_hasHeader)
+                throw new InvalidOperationException("Header received with no payload");                
+            _hasHeader = true;
+
+            _nextMissed = missed;
+            _next.WriteHeader(seq, timestamp, missed);
+        }
+        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
+        {
+            if (!_hasHeader)
+                throw new InvalidOperationException("Received payload without an RTP header");
+            _hasHeader = false;
+
+            if (!_nextMissed)
+            {
+                count = _decoder.DecodeFrame(buffer, offset, count, _buffer, 0, false);
+                await _next.WriteAsync(_buffer, 0, count, cancelToken).ConfigureAwait(false);
+            }
+            else if (count > 0)
+            {
+                count = _decoder.DecodeFrame(buffer, offset, count, _buffer, 0, true);
+                await _next.WriteAsync(_buffer, 0, count, cancelToken).ConfigureAwait(false);
+            }
+            else
+            {
+                count = _decoder.DecodeFrame(null, 0, 0, _buffer, 0, true);
+                await _next.WriteAsync(_buffer, 0, count, cancelToken).ConfigureAwait(false);
+            }
         }
 
         public override async Task FlushAsync(CancellationToken cancelToken)

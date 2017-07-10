@@ -8,8 +8,10 @@ namespace Discord.Net.Udp
     {
         event Func<byte[], int, int, Task> ReceivedDatagram;
 
+        ushort Port { get; }
+
         void SetCancelToken(CancellationToken cancelToken);
-        void SetDestination(string host, int port);
+        void SetDestination(string ip, int port);
 
         Task StartAsync();
         Task StopAsync();

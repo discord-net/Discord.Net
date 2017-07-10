@@ -1,13 +1,14 @@
+using Discord.Commands.Builders;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
-using System.Reflection;
-
-using Discord.Commands.Builders;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.ExceptionServices;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands
 {
@@ -17,7 +18,7 @@ namespace Discord.Commands
         private static readonly System.Reflection.MethodInfo _convertParamsMethod = typeof(CommandInfo).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<object>, object>> _arrayConverters = new ConcurrentDictionary<Type, Func<IEnumerable<object>, object>>();
 
-        private readonly Func<ICommandContext, object[], IDependencyMap, Task> _action;
+        private readonly Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> _action;
 
         public ModuleInfo Module { get; }
         public string Name { get; }
@@ -30,18 +31,19 @@ namespace Discord.Commands
         public IReadOnlyList<string> Aliases { get; }
         public IReadOnlyList<ParameterInfo> Parameters { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
+        public IReadOnlyList<Attribute> Attributes { get; }
 
         internal CommandInfo(CommandBuilder builder, ModuleInfo module, CommandService service)
         {
             Module = module;
-            
+
             Name = builder.Name;
             Summary = builder.Summary;
             Remarks = builder.Remarks;
 
             RunMode = (builder.RunMode == RunMode.Default ? service._defaultRunMode : builder.RunMode);
             Priority = builder.Priority;
-            
+
             Aliases = module.Aliases
                 .Permutate(builder.Aliases, (first, second) =>
                 {
@@ -56,6 +58,7 @@ namespace Discord.Commands
                 .ToImmutableArray();
 
             Preconditions = builder.Preconditions.ToImmutableArray();
+            Attributes = builder.Attributes.ToImmutableArray();
 
             Parameters = builder.Parameters.Select(x => x.Build(this)).ToImmutableArray();
             HasVarArgs = builder.Parameters.Count > 0 ? builder.Parameters[builder.Parameters.Count - 1].IsMultiple : false;
@@ -63,74 +66,96 @@ namespace Discord.Commands
             _action = builder.Callback;
         }
 
-        public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, IDependencyMap map = null)
+        public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, IServiceProvider services = null)
         {
-            if (map == null)
-                map = DependencyMap.Empty;
+            services = services ?? EmptyServiceProvider.Instance;
 
-            foreach (PreconditionAttribute precondition in Module.Preconditions)
+            async Task<PreconditionResult> CheckGroups(IEnumerable<PreconditionAttribute> preconditions, string type)
             {
-                var result = await precondition.CheckPermissions(context, this, map).ConfigureAwait(false);
-                if (!result.IsSuccess)
-                    return result;
+                foreach (IGrouping<string, PreconditionAttribute> preconditionGroup in preconditions.GroupBy(p => p.Group, StringComparer.Ordinal))
+                {
+                    if (preconditionGroup.Key == null)
+                    {
+                        foreach (PreconditionAttribute precondition in preconditionGroup)
+                        {
+                            var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
+                            if (!result.IsSuccess)
+                                return result;
+                        }
+                    }
+                    else
+                    {
+                        var results = new List<PreconditionResult>();
+                        foreach (PreconditionAttribute precondition in preconditionGroup)
+                            results.Add(await precondition.CheckPermissions(context, this, services).ConfigureAwait(false));
+
+                        if (!results.Any(p => p.IsSuccess))
+                            return PreconditionGroupResult.FromError($"{type} precondition group {preconditionGroup.Key} failed.", results);
+                    }
+                }
+                return PreconditionGroupResult.FromSuccess();
             }
 
-            foreach (PreconditionAttribute precondition in Preconditions)
-            {
-                var result = await precondition.CheckPermissions(context, this, map).ConfigureAwait(false);
-                if (!result.IsSuccess)
-                    return result;
-            }
+            var moduleResult = await CheckGroups(Module.Preconditions, "Module");
+            if (!moduleResult.IsSuccess)
+                return moduleResult;
+
+            var commandResult = await CheckGroups(Preconditions, "Command");
+            if (!commandResult.IsSuccess)
+                return commandResult;
 
             return PreconditionResult.FromSuccess();
         }
-        
-        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult? preconditionResult = null)
+
+        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult preconditionResult = null, IServiceProvider services = null)
         {
+            services = services ?? EmptyServiceProvider.Instance;
+
             if (!searchResult.IsSuccess)
                 return ParseResult.FromError(searchResult);
-            if (preconditionResult != null && !preconditionResult.Value.IsSuccess)
-                return ParseResult.FromError(preconditionResult.Value);
-            
+            if (preconditionResult != null && !preconditionResult.IsSuccess)
+                return ParseResult.FromError(preconditionResult);
+
             string input = searchResult.Text.Substring(startIndex);
-            return await CommandParser.ParseArgs(this, context, input, 0).ConfigureAwait(false);
+            return await CommandParser.ParseArgs(this, context, services, input, 0).ConfigureAwait(false);
         }
 
-        public Task<ExecuteResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IDependencyMap map)
+        public Task<IResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)
         {
             if (!parseResult.IsSuccess)
-                return Task.FromResult(ExecuteResult.FromError(parseResult));
+                return Task.FromResult((IResult)ExecuteResult.FromError(parseResult));
 
             var argList = new object[parseResult.ArgValues.Count];
             for (int i = 0; i < parseResult.ArgValues.Count; i++)
             {
                 if (!parseResult.ArgValues[i].IsSuccess)
-                    return Task.FromResult(ExecuteResult.FromError(parseResult.ArgValues[i]));
+                    return Task.FromResult((IResult)ExecuteResult.FromError(parseResult.ArgValues[i]));
                 argList[i] = parseResult.ArgValues[i].Values.First().Value;
             }
-            
+
             var paramList = new object[parseResult.ParamValues.Count];
             for (int i = 0; i < parseResult.ParamValues.Count; i++)
             {
                 if (!parseResult.ParamValues[i].IsSuccess)
-                    return Task.FromResult(ExecuteResult.FromError(parseResult.ParamValues[i]));
+                    return Task.FromResult((IResult)ExecuteResult.FromError(parseResult.ParamValues[i]));
                 paramList[i] = parseResult.ParamValues[i].Values.First().Value;
             }
 
-            return ExecuteAsync(context, argList, paramList, map);
+            return ExecuteAsync(context, argList, paramList, services);
         }
-        public async Task<ExecuteResult> ExecuteAsync(ICommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList, IDependencyMap map)
+        public async Task<IResult> ExecuteAsync(ICommandContext context, IEnumerable<object> argList, IEnumerable<object> paramList, IServiceProvider services)
         {
-            if (map == null)
-                map = DependencyMap.Empty;
+            services = services ?? EmptyServiceProvider.Instance;
 
             try
             {
                 object[] args = GenerateArgs(argList, paramList);
 
-                foreach (var parameter in Parameters)
+                for (int position = 0; position < Parameters.Count; position++)
                 {
-                    var result = await parameter.CheckPreconditionsAsync(context, args, map).ConfigureAwait(false);
+                    var parameter = Parameters[position];
+                    object argument = args[position];
+                    var result = await parameter.CheckPreconditionsAsync(context, argument, services).ConfigureAwait(false);
                     if (!result.IsSuccess)
                         return ExecuteResult.FromError(result);
                 }
@@ -138,13 +163,12 @@ namespace Discord.Commands
                 switch (RunMode)
                 {
                     case RunMode.Sync: //Always sync
-                        await _action(context, args, map).ConfigureAwait(false);
-                        break;
-                    case RunMode.Mixed: //Sync until first await statement
-                        var t1 = _action(context, args, map);
-                        break;
+                        return await ExecuteAsyncInternal(context, args, services).ConfigureAwait(false);
                     case RunMode.Async: //Always async
-                        var t2 = Task.Run(() => _action(context, args, map));
+                        var t2 = Task.Run(async () =>
+                        {
+                            await ExecuteAsyncInternal(context, args, services).ConfigureAwait(false);
+                        });
                         break;
                 }
                 return ExecuteResult.FromSuccess();
@@ -152,6 +176,51 @@ namespace Discord.Commands
             catch (Exception ex)
             {
                 return ExecuteResult.FromError(ex);
+            }
+        }
+
+        private async Task<IResult> ExecuteAsyncInternal(ICommandContext context, object[] args, IServiceProvider services)
+        {
+            await Module.Service._cmdLogger.DebugAsync($"Executing {GetLogText(context)}").ConfigureAwait(false);
+            try
+            {
+                var task = _action(context, args, services, this);
+                if (task is Task<IResult> resultTask)
+                {
+                    var result = await resultTask.ConfigureAwait(false);
+                    if (result is RuntimeResult execResult)
+                        return execResult;
+                }
+                else if (task is Task<ExecuteResult> execTask)
+                {
+                    return await execTask.ConfigureAwait(false);
+                }
+                else
+                    await task.ConfigureAwait(false);
+
+                return ExecuteResult.FromSuccess();
+            }
+            catch (Exception ex)
+            {
+                var originalEx = ex;
+                while (ex is TargetInvocationException) //Happens with void-returning commands
+                    ex = ex.InnerException;
+
+                var wrappedEx = new CommandException(this, context, ex);
+                await Module.Service._cmdLogger.ErrorAsync(wrappedEx).ConfigureAwait(false);
+                if (Module.Service._throwOnError)
+                {
+                    if (ex == originalEx)
+                        throw;
+                    else
+                        ExceptionDispatchInfo.Capture(ex).Throw();
+                }
+
+                return ExecuteResult.FromError(CommandError.Exception, ex.Message);
+            }
+            finally
+            {
+                await Module.Service._cmdLogger.VerboseAsync($"Executed {GetLogText(context)}").ConfigureAwait(false);
             }
         }
 
@@ -163,7 +232,7 @@ namespace Discord.Commands
                 argCount--;
 
             int i = 0;
-            foreach (var arg in argList)
+            foreach (object arg in argList)
             {
                 if (i == argCount)
                     throw new InvalidOperationException("Command was invoked with too many parameters");
@@ -187,5 +256,13 @@ namespace Discord.Commands
 
         private static T[] ConvertParamsList<T>(IEnumerable<object> paramsList)
             => paramsList.Cast<T>().ToArray();
+
+        internal string GetLogText(ICommandContext context)
+        {
+            if (context.Guild != null)
+                return $"\"{Name}\" for {context.User} in {context.Guild}/{context.Channel}";
+            else
+                return $"\"{Name}\" for {context.User} in {context.Channel}";
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace Discord
 {
@@ -17,6 +18,6 @@ namespace Discord
         }
 
         private string DebuggerDisplay => $"{Url} ({(Width != null && Height != null ? $"{Width}x{Height}" : "0x0")})";
-        public override string ToString() => Url;
+        public override string ToString() => Url.ToString();
     }
 }

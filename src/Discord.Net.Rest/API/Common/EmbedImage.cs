@@ -1,4 +1,5 @@
 ﻿#pragma warning disable CS1591
+using System;
 using Newtonsoft.Json;
 
 namespace Discord.API

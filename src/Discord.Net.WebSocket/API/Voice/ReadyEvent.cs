@@ -7,6 +7,8 @@ namespace Discord.API.Voice
     {
         [JsonProperty("ssrc")]
         public uint SSRC { get; set; }
+        [JsonProperty("ip")]
+        public string Ip { get; set; }
         [JsonProperty("port")]
         public ushort Port { get; set; }
         [JsonProperty("modes")]

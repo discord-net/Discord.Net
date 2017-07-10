@@ -1,6 +1,8 @@
 ﻿using Discord.Rest;
 using System;
+using System.Collections.Generic;  
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Role;
 
@@ -19,9 +21,11 @@ namespace Discord.WebSocket
         public GuildPermissions Permissions { get; private set; }
         public int Position { get; private set; }
 
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public bool IsEveryone => Id == Guild.Id;
         public string Mention => MentionUtils.MentionRole(Id);
+        public IEnumerable<SocketGuildUser> Members 
+            => Guild.Users.Where(x => x.Roles.Any(r => r.Id == Id));
 
         internal SocketRole(SocketGuild guild, ulong id)
             : base(guild.Discord, id)

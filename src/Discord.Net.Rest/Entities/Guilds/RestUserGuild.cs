@@ -14,7 +14,7 @@ namespace Discord.Rest
         public bool IsOwner { get; private set; }
         public GuildPermissions Permissions { get; private set; }
 
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public string IconUrl => CDN.GetGuildIconUrl(Id, _iconId);
 
         internal RestUserGuild(BaseDiscordClient discord, ulong id)

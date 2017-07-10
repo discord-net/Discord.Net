@@ -203,3 +203,6 @@ project.lock.json
 *.pyc
 /.editorconfig
 .vscode/
+docs/api/\.manifest
+
+\.idea/

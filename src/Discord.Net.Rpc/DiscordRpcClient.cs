@@ -468,7 +468,7 @@ namespace Discord.Rpc
         //IDiscordClient
         ConnectionState IDiscordClient.ConnectionState => _connection.State;
 
-        Task<IApplication> IDiscordClient.GetApplicationInfoAsync() => Task.FromResult<IApplication>(ApplicationInfo);
+        Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options) => Task.FromResult<IApplication>(ApplicationInfo);
 
         async Task IDiscordClient.StartAsync()
             => await StartAsync().ConfigureAwait(false);

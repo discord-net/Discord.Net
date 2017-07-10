@@ -20,7 +20,7 @@ namespace Discord.Net
         private static string CreateMessage(HttpStatusCode httpCode, int? discordCode = null, string reason = null)
         {   
             string msg;
-            if (discordCode != null)
+            if (discordCode != null && discordCode != 0)
             {
                 if (reason != null)
                     msg = $"The server responded with error {(int)discordCode}: {reason}";

@@ -9,7 +9,7 @@ namespace Discord.Commands
     internal class RoleTypeReader<T> : TypeReader
         where T : class, IRole
     {
-        public override Task<TypeReaderResult> Read(ICommandContext context, string input)
+        public override Task<TypeReaderResult> Read(ICommandContext context, string input, IServiceProvider services)
         {
             ulong id;
 
@@ -31,7 +31,7 @@ namespace Discord.Commands
                     AddResult(results, role as T, role.Name == input ? 0.80f : 0.70f);
 
                 if (results.Count > 0)
-                    return Task.FromResult(TypeReaderResult.FromSuccess(results.Values));
+                    return Task.FromResult(TypeReaderResult.FromSuccess(results.Values.ToReadOnlyCollection()));
             }
             return Task.FromResult(TypeReaderResult.FromError(CommandError.ObjectNotFound, "Role not found."));
         }

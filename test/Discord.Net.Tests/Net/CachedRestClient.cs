@@ -5,11 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Splat;
-using System.Reactive.Concurrency;
 
 namespace Discord.Net
 {
@@ -66,7 +66,7 @@ namespace Discord.Net
             _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
         }
 
-        public async Task<RestResponse> SendAsync(string method, string endpoint, CancellationToken cancelToken, bool headerOnly)
+        public async Task<RestResponse> SendAsync(string method, string endpoint, CancellationToken cancelToken, bool headerOnly, string reason = null)
         {
             if (method != "GET")
                 throw new InvalidOperationException("This RestClient only supports GET requests.");
@@ -75,11 +75,11 @@ namespace Discord.Net
             var bytes = await _blobCache.DownloadUrl(uri, _headers);
             return new RestResponse(HttpStatusCode.OK, _headers, new MemoryStream(bytes));
         }
-        public Task<RestResponse> SendAsync(string method, string endpoint, string json, CancellationToken cancelToken, bool headerOnly)
+        public Task<RestResponse> SendAsync(string method, string endpoint, string json, CancellationToken cancelToken, bool headerOnly, string reason = null)
         {
             throw new InvalidOperationException("This RestClient does not support payloads.");
         }
-        public Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly)
+        public Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly, string reason = null)
         {
             throw new InvalidOperationException("This RestClient does not support multipart requests.");
         }

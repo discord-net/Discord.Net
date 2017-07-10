@@ -61,28 +61,24 @@ namespace Discord.WebSocket
         public static void AddMessage(ISocketMessageChannel channel, DiscordSocketClient discord,
             SocketMessage msg)
         {
-            //TODO: C#7 Candidate for pattern matching
-            if (channel is SocketDMChannel)
-                (channel as SocketDMChannel).AddMessage(msg);
-            else if (channel is SocketGroupChannel)
-                (channel as SocketGroupChannel).AddMessage(msg);
-            else if (channel is SocketTextChannel)
-                (channel as SocketTextChannel).AddMessage(msg);
-            else
-                throw new NotSupportedException("Unexpected ISocketMessageChannel type");
+            switch (channel)
+            {
+                case SocketDMChannel dmChannel: dmChannel.AddMessage(msg); break;
+                case SocketGroupChannel groupChannel: groupChannel.AddMessage(msg); break;
+                case SocketTextChannel textChannel: textChannel.AddMessage(msg); break;
+                default: throw new NotSupportedException("Unexpected ISocketMessageChannel type");
+            }
         }
         public static SocketMessage RemoveMessage(ISocketMessageChannel channel, DiscordSocketClient discord,
             ulong id)
         {
-            //TODO: C#7 Candidate for pattern matching
-            if (channel is SocketDMChannel)
-                return (channel as SocketDMChannel).RemoveMessage(id);
-            else if (channel is SocketGroupChannel)
-                return (channel as SocketGroupChannel).RemoveMessage(id);
-            else if (channel is SocketTextChannel)
-                return (channel as SocketTextChannel).RemoveMessage(id);
-            else
-                throw new NotSupportedException("Unexpected ISocketMessageChannel type");
+            switch (channel)
+            {
+                case SocketDMChannel dmChannel: return dmChannel.RemoveMessage(id);
+                case SocketGroupChannel groupChannel: return groupChannel.RemoveMessage(id);
+                case SocketTextChannel textChannel: return textChannel.RemoveMessage(id);
+                default: throw new NotSupportedException("Unexpected ISocketMessageChannel type");
+            }
         }
     }
 }

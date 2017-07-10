@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands.Builders
 {
@@ -9,6 +10,7 @@ namespace Discord.Commands.Builders
         private readonly List<CommandBuilder> _commands;
         private readonly List<ModuleBuilder> _submodules;
         private readonly List<PreconditionAttribute> _preconditions;
+        private readonly List<Attribute> _attributes;
         private readonly List<string> _aliases;
 
         public CommandService Service { get; }
@@ -20,6 +22,7 @@ namespace Discord.Commands.Builders
         public IReadOnlyList<CommandBuilder> Commands => _commands;
         public IReadOnlyList<ModuleBuilder> Modules => _submodules;
         public IReadOnlyList<PreconditionAttribute> Preconditions => _preconditions;
+        public IReadOnlyList<Attribute> Attributes => _attributes;
         public IReadOnlyList<string> Aliases => _aliases;
 
         //Automatic
@@ -31,6 +34,7 @@ namespace Discord.Commands.Builders
             _commands = new List<CommandBuilder>();
             _submodules = new List<ModuleBuilder>();
             _preconditions = new List<PreconditionAttribute>();
+            _attributes = new List<Attribute>();
             _aliases = new List<string>();
         }
         //User-defined
@@ -62,10 +66,15 @@ namespace Discord.Commands.Builders
         {
             for (int i = 0; i < aliases.Length; i++)
             {
-                var alias = aliases[i] ?? "";
+                string alias = aliases[i] ?? "";
                 if (!_aliases.Contains(alias))
                     _aliases.Add(alias);
             }
+            return this;
+        }
+        public ModuleBuilder AddAttributes(params Attribute[] attributes)
+        {
+            _attributes.AddRange(attributes);
             return this;
         }
         public ModuleBuilder AddPrecondition(PreconditionAttribute precondition)
@@ -73,7 +82,7 @@ namespace Discord.Commands.Builders
             _preconditions.Add(precondition);
             return this;
         }
-        public ModuleBuilder AddCommand(string primaryAlias, Func<ICommandContext, object[], IDependencyMap, Task> callback, Action<CommandBuilder> createFunc)
+        public ModuleBuilder AddCommand(string primaryAlias, Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> callback, Action<CommandBuilder> createFunc)
         {
             var builder = new CommandBuilder(this, primaryAlias, callback);
             createFunc(builder);

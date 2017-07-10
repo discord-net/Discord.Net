@@ -8,7 +8,7 @@ namespace Discord.Rest
 {
     public abstract class RestChannel : RestEntity<ulong>, IChannel, IUpdateable
     {
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
         internal RestChannel(BaseDiscordClient discord, ulong id)
             : base(discord, id)
@@ -46,6 +46,7 @@ namespace Discord.Rest
 
         //IChannel
         string IChannel.Name => null;
+        bool IChannel.IsNsfw => ChannelHelper.IsNsfw(this);
 
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null); //Overriden

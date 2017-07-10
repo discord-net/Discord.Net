@@ -13,10 +13,15 @@ namespace Discord
         IChannel Channel { get; }
         /// <summary> Gets the id of the channel this invite is linked to. </summary>
         ulong ChannelId { get; }
+        /// <summary> Gets the name of the channel this invite is linked to. </summary>
+        string ChannelName { get; }
+
         /// <summary> Gets the guild this invite is linked to. </summary>
         IGuild Guild { get; }
         /// <summary> Gets the id of the guild this invite is linked to. </summary>
         ulong GuildId { get; }
+        /// <summary> Gets the name of the guild this invite is linked to. </summary>
+        string GuildName { get; }
 
         /// <summary> Accepts this invite and joins the target guild. This will fail on bot accounts. </summary>
         Task AcceptAsync(RequestOptions options = null);

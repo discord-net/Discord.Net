@@ -19,8 +19,7 @@ namespace Discord.Net.Rest
         private readonly HttpClient _client;
         private readonly string _baseUrl;
         private readonly JsonSerializer _errorDeserializer;
-        private CancellationTokenSource _cancelTokenSource;
-        private CancellationToken _cancelToken, _parentToken;
+        private CancellationToken _cancelToken;
         private bool _isDisposed;
 
         public DefaultRestClient(string baseUrl)
@@ -35,9 +34,7 @@ namespace Discord.Net.Rest
             });
             SetHeader("accept-encoding", "gzip, deflate");
 
-            _cancelTokenSource = new CancellationTokenSource();
             _cancelToken = CancellationToken.None;
-            _parentToken = CancellationToken.None;
             _errorDeserializer = new JsonSerializer();
         }
         private void Dispose(bool disposing)
@@ -62,50 +59,59 @@ namespace Discord.Net.Rest
         }
         public void SetCancelToken(CancellationToken cancelToken)
         {
-            _parentToken = cancelToken;
-            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
+            _cancelToken = cancelToken;
         }
 
-        public async Task<RestResponse> SendAsync(string method, string endpoint, CancellationToken cancelToken, bool headerOnly)
-        {
-            string uri = Path.Combine(_baseUrl, endpoint);
-            using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
-                return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
-        }
-        public async Task<RestResponse> SendAsync(string method, string endpoint, string json, CancellationToken cancelToken, bool headerOnly)
+        public async Task<RestResponse> SendAsync(string method, string endpoint, CancellationToken cancelToken, bool headerOnly, string reason = null)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
+                if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
+                return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
+            }
+        }
+        public async Task<RestResponse> SendAsync(string method, string endpoint, string json, CancellationToken cancelToken, bool headerOnly, string reason = null)
+        {
+            string uri = Path.Combine(_baseUrl, endpoint);
+            using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
+            {
+                if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
                 restRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
                 return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
             }
         }
-        public async Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly)
+        public async Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly, string reason = null)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
+                if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
                 var content = new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
                 if (multipartParams != null)
                 {
                     foreach (var p in multipartParams)
                     {
-                        //TODO: C#7 Typeswitch candidate
-                        var stringValue = p.Value as string;
-                        if (stringValue != null) { content.Add(new StringContent(stringValue), p.Key); continue; }
-                        var byteArrayValue = p.Value as byte[];
-                        if (byteArrayValue != null) { content.Add(new ByteArrayContent(byteArrayValue), p.Key); continue; }
-                        var streamValue = p.Value as Stream;
-                        if (streamValue != null) { content.Add(new StreamContent(streamValue), p.Key); continue; }
-                        if (p.Value is MultipartFile)
+                        switch (p.Value)
                         {
-                            var fileValue = (MultipartFile)p.Value;
-                            content.Add(new StreamContent(fileValue.Stream), p.Key, fileValue.Filename);
-                            continue;
+                            case string stringValue: { content.Add(new StringContent(stringValue), p.Key); continue; }
+                            case byte[] byteArrayValue: { content.Add(new ByteArrayContent(byteArrayValue), p.Key); continue; }
+                            case Stream streamValue: { content.Add(new StreamContent(streamValue), p.Key); continue; }
+                            case MultipartFile fileValue:
+                            {
+                                var stream = fileValue.Stream;
+                                if (!stream.CanSeek)
+                                {
+                                    var memoryStream = new MemoryStream();
+                                    await stream.CopyToAsync(memoryStream).ConfigureAwait(false);
+                                    memoryStream.Position = 0;
+                                    stream = memoryStream;
+                                }
+                                content.Add(new StreamContent(stream), p.Key, fileValue.Filename);
+                                continue;
+                            }
+                            default: throw new InvalidOperationException($"Unsupported param type \"{p.Value.GetType().Name}\"");
                         }
-
-                        throw new InvalidOperationException($"Unsupported param type \"{p.Value.GetType().Name}\"");
                     }
                 }
                 restRequest.Content = content;
@@ -115,16 +121,13 @@ namespace Discord.Net.Rest
 
         private async Task<RestResponse> SendInternalAsync(HttpRequestMessage request, CancellationToken cancelToken, bool headerOnly)
         {
-            while (true)
-            {
-                cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken, cancelToken).Token;
-                HttpResponseMessage response = await _client.SendAsync(request, cancelToken).ConfigureAwait(false);
-                
-                var headers = response.Headers.ToDictionary(x => x.Key, x => x.Value.FirstOrDefault(), StringComparer.OrdinalIgnoreCase);
-                var stream = !headerOnly ? await response.Content.ReadAsStreamAsync().ConfigureAwait(false) : null;
+            cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelToken, cancelToken).Token;
+            HttpResponseMessage response = await _client.SendAsync(request, cancelToken).ConfigureAwait(false);
+            
+            var headers = response.Headers.ToDictionary(x => x.Key, x => x.Value.FirstOrDefault(), StringComparer.OrdinalIgnoreCase);
+            var stream = !headerOnly ? await response.Content.ReadAsStreamAsync().ConfigureAwait(false) : null;
 
-                return new RestResponse(response.StatusCode, headers, stream);
-            }
+            return new RestResponse(response.StatusCode, headers, stream);
         }
 
         private static readonly HttpMethod _patch = new HttpMethod("PATCH");

@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../Discord.Net.targets" />
+  <PropertyGroup>
+    <AssemblyName>Discord.Net.Relay</AssemblyName>
+    <RootNamespace>Discord.Relay</RootNamespace>
+    <Description>A core Discord.Net library containing the Relay server.</Description>
+    <TargetFrameworks>netstandard1.3</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
+    <ProjectReference Include="..\Discord.Net.Rest\Discord.Net.Rest.csproj" />
+    <ProjectReference Include="..\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.WebSockets" Version="1.0.2" />
+  </ItemGroup>
+</Project>

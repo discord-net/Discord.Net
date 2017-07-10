@@ -1,11 +1,13 @@
-﻿using Discord.Rest;
+﻿using Discord.Audio;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Model = Discord.API.GuildMember;
+using UserModel = Discord.API.User;
+using MemberModel = Discord.API.GuildMember;
 using PresenceModel = Discord.API.Presence;
 
 namespace Discord.WebSocket
@@ -25,18 +27,21 @@ namespace Discord.WebSocket
         public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
         public GuildPermissions GuildPermissions => new GuildPermissions(Permissions.ResolveGuild(Guild, this));
-        internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
+        internal override SocketPresence Presence { get; set; }
 
+        public override bool IsWebhook => false;
         public bool IsSelfDeafened => VoiceState?.IsSelfDeafened ?? false;
         public bool IsSelfMuted => VoiceState?.IsSelfMuted ?? false;
         public bool IsSuppressed => VoiceState?.IsSuppressed ?? false;
         public bool IsDeafened => VoiceState?.IsDeafened ?? false;
         public bool IsMuted => VoiceState?.IsMuted ?? false;
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
-        public IEnumerable<SocketRole> Roles => _roleIds.Select(id => Guild.GetRole(id)).ToReadOnlyCollection(() => _roleIds.Count());
+        public IReadOnlyCollection<SocketRole> Roles 
+            => _roleIds.Select(id => Guild.GetRole(id)).Where(x => x != null).ToReadOnlyCollection(() => _roleIds.Length);
         public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
         public string VoiceSessionId => VoiceState?.VoiceSessionId ?? "";
         public SocketVoiceState? VoiceState => Guild.GetVoiceState(Id);
+        public AudioInStream AudioStream => Guild.GetAudioStream(Id);
 
         /// <summary> The position of the user within the role hirearchy. </summary>
         /// <remarks> The returned value equal to the position of the highest role the user has, 
@@ -65,7 +70,14 @@ namespace Discord.WebSocket
             Guild = guild;
             GlobalUser = globalUser;
         }
-        internal static SocketGuildUser Create(SocketGuild guild, ClientState state, Model model)
+        internal static SocketGuildUser Create(SocketGuild guild, ClientState state, UserModel model)
+        {
+            var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model));
+            entity.Update(state, model);
+            entity.UpdateRoles(new ulong[0]);
+            return entity;
+        }
+        internal static SocketGuildUser Create(SocketGuild guild, ClientState state, MemberModel model)
         {
             var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
             entity.Update(state, model);
@@ -74,25 +86,30 @@ namespace Discord.WebSocket
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, PresenceModel model)
         {
             var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
-            entity.Update(state, model);
+            entity.Update(state, model, false);
             return entity;
         }
-        internal void Update(ClientState state, Model model)
+        internal void Update(ClientState state, MemberModel model)
         {
             base.Update(state, model.User);
             if (model.JoinedAt.IsSpecified)
                 _joinedAtTicks = model.JoinedAt.Value.UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
-            UpdateRoles(model.Roles);
-        }
-        internal override void Update(ClientState state, PresenceModel model)
-        {
-            base.Update(state, model);
             if (model.Roles.IsSpecified)
                 UpdateRoles(model.Roles.Value);
+        }
+        internal void Update(ClientState state, PresenceModel model, bool updatePresence)
+        {
+            if (updatePresence)
+            {
+                Presence = SocketPresence.Create(model);
+                GlobalUser.Update(state, model);
+            }
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
+            if (model.Roles.IsSpecified)
+                UpdateRoles(model.Roles.Value);
         }
         private void UpdateRoles(ulong[] roleIds)
         {
@@ -105,8 +122,20 @@ namespace Discord.WebSocket
         
         public Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null)
             => UserHelper.ModifyAsync(this, Discord, func, options);
-        public Task KickAsync(RequestOptions options = null)
-            => UserHelper.KickAsync(this, Discord, options);
+        public Task KickAsync(string reason = null, RequestOptions options = null)
+            => UserHelper.KickAsync(this, Discord, reason, options);
+        /// <inheritdoc />
+        public Task AddRoleAsync(IRole role, RequestOptions options = null)
+            => AddRolesAsync(new[] { role }, options);
+        /// <inheritdoc />
+        public Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
+            => UserHelper.AddRolesAsync(this, Discord, roles, options);
+        /// <inheritdoc />
+        public Task RemoveRoleAsync(IRole role, RequestOptions options = null)
+            => RemoveRolesAsync(new[] { role }, options);
+        /// <inheritdoc />
+        public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
+            => UserHelper.RemoveRolesAsync(this, Discord, roles, options);
 
         public ChannelPermissions GetPermissions(IGuildChannel channel)
             => new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, GuildPermissions.RawValue));
@@ -117,11 +146,7 @@ namespace Discord.WebSocket
         IGuild IGuildUser.Guild => Guild;
         ulong IGuildUser.GuildId => Guild.Id;
         IReadOnlyCollection<ulong> IGuildUser.RoleIds => _roleIds;
-
-        //IUser
-        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options) 
-            => Task.FromResult<IDMChannel>(GlobalUser.DMChannel);
-
+        
         //IVoiceState
         IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;
     }

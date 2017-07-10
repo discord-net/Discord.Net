@@ -14,16 +14,12 @@ namespace Discord
         Task UnpinAsync(RequestOptions options = null);
 
         /// <summary> Returns all reactions included in this message. </summary>
-        IReadOnlyDictionary<Emoji, int> Reactions { get; }
+        IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions { get; }
 
         /// <summary> Adds a reaction to this message. </summary>
-        Task AddReactionAsync(Emoji emoji, RequestOptions options = null);
-        /// <summary> Adds a reaction to this message. </summary>
-        Task AddReactionAsync(string emoji, RequestOptions options = null);
+        Task AddReactionAsync(IEmote emote, RequestOptions options = null);
         /// <summary> Removes a reaction from message. </summary>
-        Task RemoveReactionAsync(Emoji emoji, IUser user, RequestOptions options = null);
-        /// <summary> Removes a reaction from this message. </summary>
-        Task RemoveReactionAsync(string emoji, IUser user, RequestOptions options = null);
+        Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null);
         /// <summary> Removes all reactions from this message. </summary>
         Task RemoveAllReactionsAsync(RequestOptions options = null);
         Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(string emoji, int limit = 100, ulong? afterUserId = null, RequestOptions options = null);

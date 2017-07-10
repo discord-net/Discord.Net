@@ -1,9 +1,9 @@
+using Discord.Commands.Builders;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
-
-using Discord.Commands.Builders;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands
 {
@@ -21,6 +21,7 @@ namespace Discord.Commands
         public object DefaultValue { get; }
 
         public IReadOnlyList<ParameterPreconditionAttribute> Preconditions { get; }
+        public IReadOnlyList<Attribute> Attributes { get; }
 
         internal ParameterInfo(ParameterBuilder builder, CommandInfo command, CommandService service)
         {
@@ -36,23 +37,18 @@ namespace Discord.Commands
             DefaultValue = builder.DefaultValue;
 
             Preconditions = builder.Preconditions.ToImmutableArray();
+            Attributes = builder.Attributes.ToImmutableArray();
 
             _reader = builder.TypeReader;
         }
 
-        public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, object[] args, IDependencyMap map = null)
+        public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, object arg, IServiceProvider services = null)
         {
-            if (map == null)
-                map = DependencyMap.Empty;
-
-            int position = 0;
-            for(position = 0; position < Command.Parameters.Count; position++)
-                if (Command.Parameters[position] == this)
-                    break;
+            services = services ?? EmptyServiceProvider.Instance;
 
             foreach (var precondition in Preconditions)
             {
-                var result = await precondition.CheckPermissions(context, this, args[position], map).ConfigureAwait(false);
+                var result = await precondition.CheckPermissions(context, this, arg, services).ConfigureAwait(false);
                 if (!result.IsSuccess)
                     return result;
             }
@@ -60,9 +56,10 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
 
-        public async Task<TypeReaderResult> Parse(ICommandContext context, string input)
+        public async Task<TypeReaderResult> Parse(ICommandContext context, string input, IServiceProvider services = null)
         {
-            return await _reader.Read(context, input).ConfigureAwait(false);
+            services = services ?? EmptyServiceProvider.Instance;
+            return await _reader.Read(context, input, services).ConfigureAwait(false);
         }
 
         public override string ToString() => Name;

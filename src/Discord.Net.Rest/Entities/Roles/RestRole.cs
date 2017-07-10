@@ -17,7 +17,7 @@ namespace Discord.Rest
         public GuildPermissions Permissions { get; private set; }
         public int Position { get; private set; }
 
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public bool IsEveryone => Id == Guild.Id;
         public string Mention => MentionUtils.MentionRole(Id);
 

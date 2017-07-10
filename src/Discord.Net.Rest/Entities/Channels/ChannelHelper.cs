@@ -91,7 +91,9 @@ namespace Discord.Rest
             var guildId = (channel as IGuildChannel)?.GuildId;
             var guild = guildId != null ? await (client as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).ConfigureAwait(false) : null;
             var model = await client.ApiClient.GetChannelMessageAsync(channel.Id, id, options).ConfigureAwait(false);
-            var author = GetAuthor(client, guild, model.Author.Value);
+            if (model == null)
+                return null;
+            var author = GetAuthor(client, guild, model.Author.Value, model.WebhookId.ToNullable());
             return RestMessage.Create(client, channel, author, model);
         }
         public static IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessageChannel channel, BaseDiscordClient client, 
@@ -119,7 +121,7 @@ namespace Discord.Rest
                     var builder = ImmutableArray.CreateBuilder<RestMessage>();
                     foreach (var model in models)
                     {
-                        var author = GetAuthor(client, guild, model.Author.Value);
+                        var author = GetAuthor(client, guild, model.Author.Value, model.WebhookId.ToNullable());
                         builder.Add(RestMessage.Create(client, channel, author, model));                        
                     }
                     return builder.ToImmutable();
@@ -147,7 +149,7 @@ namespace Discord.Rest
             var builder = ImmutableArray.CreateBuilder<RestMessage>();
             foreach (var model in models)
             {
-                var author = GetAuthor(client, guild, model.Author.Value);
+                var author = GetAuthor(client, guild, model.Author.Value, model.WebhookId.ToNullable());
                 builder.Add(RestMessage.Create(client, channel, author, model));
             }
             return builder.ToImmutable();
@@ -161,7 +163,7 @@ namespace Discord.Rest
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }
 
-#if NETSTANDARD1_3
+#if FILESYSTEM
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             string filePath, string text, bool isTTS, RequestOptions options)
         {
@@ -176,13 +178,27 @@ namespace Discord.Rest
             var args = new UploadFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS };
             var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
-        }
+        }     
 
-        public static async Task DeleteMessagesAsync(IMessageChannel channel, BaseDiscordClient client, 
-            IEnumerable<IMessage> messages, RequestOptions options)
+        public static async Task DeleteMessagesAsync(IMessageChannel channel, BaseDiscordClient client,
+            IEnumerable<ulong> messageIds, RequestOptions options)
         {
-            var args = new DeleteMessagesParams(messages.Select(x => x.Id).ToArray());
-            await client.ApiClient.DeleteMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
+            var msgs = messageIds.ToArray();
+            if (msgs.Length < 100)
+            {
+                var args = new DeleteMessagesParams(msgs);
+                await client.ApiClient.DeleteMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
+            }
+            else
+            {
+                var batch = new ulong[100];
+                for (int i = 0; i < (msgs.Length + 99) / 100; i++)
+                {
+                    Array.Copy(msgs, i * 100, batch, 0, Math.Min(msgs.Length - (100 * i), 100));
+                    var args = new DeleteMessagesParams(batch);
+                    await client.ApiClient.DeleteMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
+                }
+            }
         }
 
         //Permission Overwrites
@@ -264,14 +280,19 @@ namespace Discord.Rest
             => new TypingNotifier(client, channel, options);
 
         //Helpers
-        private static IUser GetAuthor(BaseDiscordClient client, IGuild guild, UserModel model)
+        private static IUser GetAuthor(BaseDiscordClient client, IGuild guild, UserModel model, ulong? webhookId)
         {
             IUser author = null;
             if (guild != null)
                 author = guild.GetUserAsync(model.Id, CacheMode.CacheOnly).Result;
             if (author == null)
-                author = RestUser.Create(client, model);
+                author = RestUser.Create(client, guild, model, webhookId);
             return author;
         }
+
+        public static bool IsNsfw(IChannel channel) =>
+            IsNsfw(channel.Name);
+        public static bool IsNsfw(string channelName) =>
+            channelName == "nsfw" || channelName.StartsWith("nsfw-");
     }
 }

@@ -25,8 +25,17 @@ namespace Discord
         ChannelPermissions GetPermissions(IGuildChannel channel);
 
         /// <summary> Kicks this user from this guild. </summary>
-        Task KickAsync(RequestOptions options = null);
+        Task KickAsync(string reason = null, RequestOptions options = null);
         /// <summary> Modifies this user's properties in this guild. </summary>
         Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null);
+
+        /// <summary> Adds a role to this user in this guild. </summary>
+        Task AddRoleAsync(IRole role, RequestOptions options = null);
+        /// <summary> Adds roles to this user in this guild. </summary>
+        Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null);
+        /// <summary> Removes a role from this user in this guild. </summary>
+        Task RemoveRoleAsync(IRole role, RequestOptions options = null);
+        /// <summary> Removes roles from this user in this guild. </summary>
+        Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null);
     }
 }

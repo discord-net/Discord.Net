@@ -15,6 +15,8 @@ namespace Discord.WebSocket
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
         internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
 
+        public override bool IsWebhook => false;
+
         internal SocketGroupUser(SocketGroupChannel channel, SocketGlobalUser globalUser)
             : base(channel.Discord, globalUser.Id)
         {

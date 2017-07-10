@@ -8,7 +8,8 @@ namespace Discord.Commands.Builders
 {
     public class ParameterBuilder
     {
-        private readonly List<ParameterPreconditionAttribute> _preconditions; 
+        private readonly List<ParameterPreconditionAttribute> _preconditions;
+        private readonly List<Attribute> _attributes;
 
         public CommandBuilder Command { get; }
         public string Name { get; internal set; }
@@ -22,11 +23,13 @@ namespace Discord.Commands.Builders
         public string Summary { get; set; }
 
         public IReadOnlyList<ParameterPreconditionAttribute> Preconditions => _preconditions;
+        public IReadOnlyList<Attribute> Attributes => _attributes;
 
         //Automatic
         internal ParameterBuilder(CommandBuilder command)
         {
             _preconditions = new List<ParameterPreconditionAttribute>();
+            _attributes = new List<Attribute>();
 
             Command = command;
         }
@@ -49,7 +52,7 @@ namespace Discord.Commands.Builders
                 TypeReader = Command.Module.Service.GetDefaultTypeReader(type);
 
             if (TypeReader == null)
-                throw new InvalidOperationException($"{type} does not have a TypeReader registered for it");            
+                throw new InvalidOperationException($"{type} does not have a TypeReader registered for it. Parameter: {Name} in {Command.PrimaryAlias}");            
 
             if (type.GetTypeInfo().IsValueType)
                 DefaultValue = Activator.CreateInstance(type);
@@ -84,6 +87,11 @@ namespace Discord.Commands.Builders
             return this;
         }
 
+        public ParameterBuilder AddAttributes(params Attribute[] attributes)
+        {
+            _attributes.AddRange(attributes);
+            return this;
+        }
         public ParameterBuilder AddPrecondition(ParameterPreconditionAttribute precondition)
         {
             _preconditions.Add(precondition);
@@ -93,7 +101,7 @@ namespace Discord.Commands.Builders
         internal ParameterInfo Build(CommandInfo info)
         {
             if (TypeReader == null)
-                throw new InvalidOperationException($"No default TypeReader found, one must be specified");
+                throw new InvalidOperationException($"No type reader found for type {ParameterType.Name}, one must be specified");
 
             return new ParameterInfo(this, info, Command.Module.Service);
         }

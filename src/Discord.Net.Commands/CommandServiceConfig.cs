@@ -8,5 +8,11 @@
         public char SeparatorChar { get; set; } = ' ';
         /// <summary> Should commands be case-sensitive? </summary>
         public bool CaseSensitiveCommands { get; set; } = false;
+
+        /// <summary> Gets or sets the minimum log level severity that will be sent to the Log event. </summary>
+        public LogSeverity LogLevel { get; set; } = LogSeverity.Info;
+
+        /// <summary> Gets or sets whether RunMode.Sync commands should push exceptions up to the caller. </summary>
+        public bool ThrowOnError { get; set; } = true;
     }
 }

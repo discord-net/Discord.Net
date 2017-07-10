@@ -9,6 +9,8 @@ namespace Discord.Audio.Streams
     ///<summary> Wraps another stream with a timed buffer. </summary>
     public class BufferedWriteStream : AudioOutStream
     {
+        private const int MaxSilenceFrames = 10;
+
         private struct Frame
         {
             public Frame(byte[] buffer, int bytes)
@@ -23,7 +25,8 @@ namespace Discord.Audio.Streams
 
         private static readonly byte[] _silenceFrame = new byte[0];
 
-        private readonly AudioOutStream _next;
+        private readonly AudioClient _client;
+        private readonly AudioStream _next;
         private readonly CancellationTokenSource _cancelTokenSource;
         private readonly CancellationToken _cancelToken;
         private readonly Task _task;
@@ -33,14 +36,16 @@ namespace Discord.Audio.Streams
         private readonly Logger _logger;
         private readonly int _ticksPerFrame, _queueLength;
         private bool _isPreloaded;
+        private int _silenceFrames;
 
-        public BufferedWriteStream(AudioOutStream next, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, int maxFrameSize = 1500)
-            : this(next, samplesPerFrame, bufferMillis, cancelToken, null, maxFrameSize) { }
-        internal BufferedWriteStream(AudioOutStream next, int samplesPerFrame, int bufferMillis, CancellationToken cancelToken, Logger logger, int maxFrameSize = 1500)
+        public BufferedWriteStream(AudioStream next, IAudioClient client, int bufferMillis, CancellationToken cancelToken, int maxFrameSize = 1500)
+            : this(next, client as AudioClient, bufferMillis, cancelToken, null, maxFrameSize) { }
+        internal BufferedWriteStream(AudioStream next, AudioClient client, int bufferMillis, CancellationToken cancelToken, Logger logger, int maxFrameSize = 1500)
         {
             //maxFrameSize = 1275 was too limiting at 128kbps,2ch,60ms
             _next = next;
-            _ticksPerFrame = samplesPerFrame / 48;
+            _client = client;
+            _ticksPerFrame = OpusEncoder.FrameMillis;
             _logger = logger;
             _queueLength = (bufferMillis + (_ticksPerFrame - 1)) / _ticksPerFrame; //Round up
 
@@ -51,49 +56,67 @@ namespace Discord.Audio.Streams
             for (int i = 0; i < _queueLength; i++)
                 _bufferPool.Enqueue(new byte[maxFrameSize]); 
             _queueLock = new SemaphoreSlim(_queueLength, _queueLength);
+            _silenceFrames = MaxSilenceFrames;
 
             _task = Run();
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                _cancelTokenSource.Cancel();
+            base.Dispose(disposing);
         }
 
         private Task Run()
         {
             return Task.Run(async () =>
             {
-#if DEBUG
-                uint num = 0;
-#endif
                 try
                 {
                     while (!_isPreloaded && !_cancelToken.IsCancellationRequested)
                         await Task.Delay(1).ConfigureAwait(false);
 
                     long nextTick = Environment.TickCount;
+                    ushort seq = 0;
+                    uint timestamp = 0;
                     while (!_cancelToken.IsCancellationRequested)
                     {
                         long tick = Environment.TickCount;
                         long dist = nextTick - tick;
                         if (dist <= 0)
                         {
-                            Frame frame;
-                            if (_queuedFrames.TryDequeue(out frame))
+                            if (_queuedFrames.TryDequeue(out Frame frame))
                             {
+                                await _client.SetSpeakingAsync(true).ConfigureAwait(false);
+                                _next.WriteHeader(seq, timestamp, false);
                                 await _next.WriteAsync(frame.Buffer, 0, frame.Bytes).ConfigureAwait(false);
                                 _bufferPool.Enqueue(frame.Buffer);
                                 _queueLock.Release();
                                 nextTick += _ticksPerFrame;
+                                seq++;
+                                timestamp += OpusEncoder.FrameSamplesPerChannel;
+                                _silenceFrames = 0;
 #if DEBUG
-                                var _ = _logger.DebugAsync($"{num++}: Sent {frame.Bytes} bytes ({_queuedFrames.Count} frames buffered)");
+                                var _ = _logger?.DebugAsync($"Sent {frame.Bytes} bytes ({_queuedFrames.Count} frames buffered)");
 #endif
                             }
-                            else 
+                            else
                             {
                                 while ((nextTick - tick) <= 0)
                                 {
-                                    await _next.WriteAsync(_silenceFrame, 0, _silenceFrame.Length).ConfigureAwait(false);
+                                    if (_silenceFrames++ < MaxSilenceFrames)
+                                    {
+                                        _next.WriteHeader(seq, timestamp, false);
+                                        await _next.WriteAsync(_silenceFrame, 0, _silenceFrame.Length).ConfigureAwait(false);
+                                    }
+                                    else
+                                        await _client.SetSpeakingAsync(false).ConfigureAwait(false);
                                     nextTick += _ticksPerFrame;
+                                    seq++;
+                                    timestamp += OpusEncoder.FrameSamplesPerChannel;
                                 }
 #if DEBUG
-                                var _ = _logger.DebugAsync($"{num++}: Buffer underrun");
+                                var _ = _logger?.DebugAsync($"Buffer underrun");
 #endif
                             }
                         }
@@ -105,6 +128,7 @@ namespace Discord.Audio.Streams
             });
         }
 
+        public override void WriteHeader(ushort seq, uint timestamp, bool missed) { } //Ignore, we use our own timing
         public override async Task WriteAsync(byte[] data, int offset, int count, CancellationToken cancelToken)
         {
             if (cancelToken.CanBeCanceled)
@@ -113,23 +137,19 @@ namespace Discord.Audio.Streams
                 cancelToken = _cancelToken;
 
             await _queueLock.WaitAsync(-1, cancelToken).ConfigureAwait(false);
-            byte[] buffer;
-            if (!_bufferPool.TryDequeue(out buffer))
+            if (!_bufferPool.TryDequeue(out byte[] buffer))
             {
 #if DEBUG
-                var _ = _logger.DebugAsync($"Buffer overflow"); //Should never happen because of the queueLock
+                var _ = _logger?.DebugAsync($"Buffer overflow"); //Should never happen because of the queueLock
 #endif
                 return;
             }
             Buffer.BlockCopy(data, offset, buffer, 0, count);
             _queuedFrames.Enqueue(new Frame(buffer, count));
-#if DEBUG
-            //var _ await _logger.DebugAsync($"Queued {count} bytes ({_queuedFrames.Count} frames buffered)");
-#endif
             if (!_isPreloaded && _queuedFrames.Count == _queueLength)
             {
 #if DEBUG
-                var _ = _logger.DebugAsync($"Preloaded");
+                var _ = _logger?.DebugAsync($"Preloaded");
 #endif
                 _isPreloaded = true;
             }
@@ -147,16 +167,10 @@ namespace Discord.Audio.Streams
         }
         public override Task ClearAsync(CancellationToken cancelToken)
         {
-            Frame ignored;
             do
                 cancelToken.ThrowIfCancellationRequested();
-            while (_queuedFrames.TryDequeue(out ignored));
+            while (_queuedFrames.TryDequeue(out Frame ignored));
             return Task.Delay(0);
-        }
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-                _cancelTokenSource.Cancel();
         }
     }
 }

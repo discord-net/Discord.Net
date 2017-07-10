@@ -42,10 +42,13 @@ namespace Discord.Audio
         private CancellationTokenSource _connectCancelToken;
         private IUdpSocket _udp;
         private bool _isDisposed;
+        private ulong _nextKeepalive;
 
         public ulong GuildId { get; }
         internal IWebSocketClient WebSocketClient { get; }
         public ConnectionState ConnectionState { get; private set; }
+
+        public ushort UdpPort => _udp.Port;
 
         internal DiscordVoiceAPIClient(ulong guildId, WebSocketProvider webSocketProvider, UdpSocketProvider udpSocketProvider, JsonSerializer serializer = null)
         {
@@ -54,7 +57,7 @@ namespace Discord.Audio
             _udp = udpSocketProvider();
             _udp.ReceivedDatagram += async (data, index, count) =>
             {
-                if (index != 0)
+                if (index != 0 || count != data.Length)
                 {
                     var newData = new byte[count];
                     Buffer.BlockCopy(data, index, newData, 0, count);
@@ -227,10 +230,25 @@ namespace Discord.Audio
             await SendAsync(packet, 0, 70).ConfigureAwait(false);
             await _sentDiscoveryEvent.InvokeAsync().ConfigureAwait(false);
         }
-
-        public void SetUdpEndpoint(string host, int port)
+        public async Task<ulong> SendKeepaliveAsync()
         {
-            _udp.SetDestination(host, port);
+            var value = _nextKeepalive++;
+            var packet = new byte[8];
+            packet[0] = (byte)(value >> 0);
+            packet[1] = (byte)(value >> 8);
+            packet[2] = (byte)(value >> 16);
+            packet[3] = (byte)(value >> 24);
+            packet[4] = (byte)(value >> 32);
+            packet[5] = (byte)(value >> 40);
+            packet[6] = (byte)(value >> 48);
+            packet[7] = (byte)(value >> 56);
+            await SendAsync(packet, 0, 8).ConfigureAwait(false);
+            return value;
+        }
+
+        public void SetUdpEndpoint(string ip, int port)
+        {
+            _udp.SetDestination(ip, port);
         }
 
         //Helpers

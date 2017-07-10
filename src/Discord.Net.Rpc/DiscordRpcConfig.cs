@@ -19,7 +19,7 @@ namespace Discord.Rpc
 
         public DiscordRpcConfig()
         {
-#if NETSTANDARD1_3
+#if FILESYSTEM
             WebSocketProvider = () => new DefaultWebSocketClient();
 #else
             WebSocketProvider = () =>

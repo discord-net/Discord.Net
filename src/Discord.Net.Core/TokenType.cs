@@ -5,5 +5,6 @@
         User,
         Bearer,
         Bot,
+        Webhook
     }
 }

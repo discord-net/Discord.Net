@@ -44,12 +44,11 @@ namespace Discord.Commands
             _enumsByValue = byValueBuilder.ToImmutable();
         }
 
-        public override Task<TypeReaderResult> Read(ICommandContext context, string input)
+        public override Task<TypeReaderResult> Read(ICommandContext context, string input, IServiceProvider services)
         {
-            T baseValue;
             object enumValue;
 
-            if (_tryParse(input, out baseValue))
+            if (_tryParse(input, out T baseValue))
             {
                 if (_enumsByValue.TryGetValue(baseValue, out enumValue))
                     return Task.FromResult(TypeReaderResult.FromSuccess(enumValue));

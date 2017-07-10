@@ -14,20 +14,26 @@ namespace Discord.Rpc
         public ushort DiscriminatorValue { get; private set; }
         public string AvatarId { get; private set; }
 
-        public string GetAvatarUrl(AvatarFormat format = AvatarFormat.Png, ushort size = 128) => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);
+        public virtual bool IsWebhook => false;
         public virtual Game? Game => null;
-        public virtual UserStatus Status => UserStatus.Unknown;
+        public virtual UserStatus Status => UserStatus.Offline;
 
         internal RpcUser(DiscordRpcClient discord, ulong id)
             : base(discord, id)
         {
         }
         internal static RpcUser Create(DiscordRpcClient discord, Model model)
+            => Create(discord, model, null);
+        internal static RpcUser Create(DiscordRpcClient discord, Model model, ulong? webhookId)
         {
-            var entity = new RpcUser(discord, model.Id);
+            RpcUser entity;
+            if (webhookId.HasValue)
+                entity = new RpcWebhookUser(discord, model.Id, webhookId.Value);
+            else
+                entity = new RpcUser(discord, model.Id);
             entity.Update(model);
             return entity;
         }
@@ -43,8 +49,11 @@ namespace Discord.Rpc
                 Username = model.Username.Value;
         }
 
-        public Task<RestDMChannel> CreateDMChannelAsync(RequestOptions options = null)
+        public Task<RestDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
             => UserHelper.CreateDMChannelAsync(this, Discord, options);
+
+        public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
 
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";

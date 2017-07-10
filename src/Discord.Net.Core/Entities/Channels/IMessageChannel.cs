@@ -9,7 +9,7 @@ namespace Discord
     {
         /// <summary> Sends a message to this message channel. </summary>
         Task<IUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null);
-#if NETSTANDARD1_3
+#if FILESYSTEM
         /// <summary> Sends a file to this text channel, with an optional caption. </summary>
         Task<IUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, RequestOptions options = null);
 #endif
@@ -30,7 +30,9 @@ namespace Discord
         /// <summary> Gets a collection of pinned messages in this channel. </summary>
         Task<IReadOnlyCollection<IMessage>> GetPinnedMessagesAsync(RequestOptions options = null);
         /// <summary> Bulk deletes multiple messages. </summary>
-        Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null);        
+        Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null);
+        /// <summary> Bulk deletes multiple messages. </summary>
+        Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null);
 
         /// <summary> Broadcasts the "user is typing" message to all users in this channel, lasting 10 seconds. </summary>
         Task TriggerTypingAsync(RequestOptions options = null);

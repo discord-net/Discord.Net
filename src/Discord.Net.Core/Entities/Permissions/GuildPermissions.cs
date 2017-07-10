@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord
@@ -9,9 +8,10 @@ namespace Discord
     {
         /// <summary> Gets a blank GuildPermissions that grants no permissions. </summary>
         public static readonly GuildPermissions None = new GuildPermissions();
-        /// <summary> Gets a GuildPermissions that grants all permissions. </summary>
-        //TODO: C#7 Candidate for binary literals
-        public static readonly GuildPermissions All = new GuildPermissions(Convert.ToUInt64("01111111111100111111110001111111", 2));
+        /// <summary> Gets a GuildPermissions that grants all guild permissions for webhook users. </summary>
+        public static readonly GuildPermissions Webhook = new GuildPermissions(0b00000_0000000_0001101100000_000000);
+        /// <summary> Gets a GuildPermissions that grants all guild permissions. </summary>
+        public static readonly GuildPermissions All = new GuildPermissions(0b11111_1111110_0111111110001_111111);
 
         /// <summary> Gets a packed value representing all the permissions in this GuildPermissions. </summary>
         public ulong RawValue { get; }

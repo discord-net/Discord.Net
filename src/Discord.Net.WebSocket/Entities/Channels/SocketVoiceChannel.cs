@@ -40,15 +40,9 @@ namespace Discord.WebSocket
         public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
-        public async Task<IAudioClient> ConnectAsync()
+        public async Task<IAudioClient> ConnectAsync(Action<IAudioClient> configAction = null)
         {
-            var audioMode = Discord.AudioMode;
-            if (audioMode == AudioMode.Disabled)
-                throw new InvalidOperationException($"Audio is not enabled on this client, {nameof(DiscordSocketConfig.AudioMode)} in {nameof(DiscordSocketConfig)} must be set.");
-
-            return await Guild.ConnectAudioAsync(Id,
-                (audioMode & AudioMode.Incoming) == 0,
-                (audioMode & AudioMode.Outgoing) == 0).ConfigureAwait(false);
+            return await Guild.ConnectAudioAsync(Id, false, false, configAction).ConfigureAwait(false);
         }
 
         public override SocketGuildUser GetUser(ulong id)

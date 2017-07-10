@@ -26,8 +26,6 @@ namespace Discord
         public ConnectionState State { get; private set; }
         public CancellationToken CancelToken { get; private set; }
 
-        public bool IsCompleted => _readyPromise.Task.IsCompleted;
-
         internal ConnectionManager(SemaphoreSlim stateLock, Logger logger, int connectionTimeout, 
             Func<Task> onConnecting, Func<Exception, Task> onDisconnecting, Action<Func<Exception, Task>> clientDisconnectHandler)
         {
@@ -192,6 +190,12 @@ namespace Discord
         {
             _reconnectCancelToken?.Cancel();
             Error(ex);
+        }
+        public void Reconnect()
+        {
+            _readyPromise.TrySetCanceled();
+            _connectionPromise.TrySetCanceled();
+            _connectionCancelToken?.Cancel();
         }
         private async Task AcquireConnectionLock()
         {

@@ -13,10 +13,11 @@ namespace Discord.Rest
 
         public IMessageChannel Channel { get; }
         public IUser Author { get; }
+        public MessageSource Source { get; }
 
         public string Content { get; private set; }
 
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public virtual bool IsTTS => false;
         public virtual bool IsPinned => false;
         public virtual DateTimeOffset? EditedTimestamp => null;
@@ -26,16 +27,15 @@ namespace Discord.Rest
         public virtual IReadOnlyCollection<ulong> MentionedRoleIds => ImmutableArray.Create<ulong>();
         public virtual IReadOnlyCollection<RestUser> MentionedUsers => ImmutableArray.Create<RestUser>();
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
-        public virtual ulong? WebhookId => null;
-        public bool IsWebhook => WebhookId != null;
 
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
-        internal RestMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author)
+        internal RestMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
             : base(discord, id)
         {
             Channel = channel;
             Author = author;
+            Source = source;
         }
         internal static RestMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author, Model model)
         {

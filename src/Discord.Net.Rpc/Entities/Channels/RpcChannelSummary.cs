@@ -7,8 +7,8 @@ namespace Discord.Rpc
     public class RpcChannelSummary
     {
         public ulong Id { get; }
-        public string Name { get; set; }
-        public ChannelType Type { get; set; }
+        public string Name { get; private set; }
+        public ChannelType Type { get; private set; }
 
         internal RpcChannelSummary(ulong id)
         {

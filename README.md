@@ -1,4 +1,5 @@
-# Discord.Net v1.0.0-rc
+# Discord.Net
+[![NuGet](https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic)](https://www.nuget.org/packages/Discord.Net)
 [![MyGet](https://img.shields.io/myget/discord-net/vpre/Discord.Net.svg)](https://www.myget.org/feed/Packages/discord-net) 
 [![Build status](https://ci.appveyor.com/api/projects/status/5sb7n8a09w9clute/branch/dev?svg=true)](https://ci.appveyor.com/project/RogueException/discord-net/branch/dev)
 [![Discord](https://discordapp.com/api/guilds/81384788765712384/widget.png)](https://discord.gg/0SBTUU1wZTVjAMPx)
@@ -13,13 +14,13 @@ Our stable builds available from NuGet through the Discord.Net metapackage:
 - [Discord.Net](https://www.nuget.org/packages/Discord.Net/)
 
 The individual components may also be installed from NuGet:
+- [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
 - [Discord.Net.Rest](https://www.nuget.org/packages/Discord.Net.Rest/)
 - [Discord.Net.Rpc](https://www.nuget.org/packages/Discord.Net.Rpc/)
 - [Discord.Net.WebSocket](https://www.nuget.org/packages/Discord.Net.WebSocket/)
-- [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
+- [Discord.Net.Webhook](https://www.nuget.org/packages/Discord.Net.Webhook/)
 
-The following providers are available for platforms not supporting .NET Standard 1.3:
-- [Discord.Net.Providers.UdpClient](https://www.nuget.org/packages/Discord.Net.Providers.UdpClient/)
+The following provider is available for platforms not supporting .NET Standard 1.3:
 - [Discord.Net.Providers.WS4Net](https://www.nuget.org/packages/Discord.Net.Providers.WS4Net/)
 
 ### Unstable (MyGet)
@@ -29,13 +30,13 @@ Nightly builds are available through our MyGet feed (`https://www.myget.org/F/di
 In order to compile Discord.Net, you require the following:
 
 ### Using Visual Studio
-- [Visual Studio 2017 RC](https://www.microsoft.com/net/core#windowsvs2017)
-- [.NET Core SDK 1.0 RC3](https://github.com/dotnet/core/blob/master/release-notes/rc3-download.md)
+- [Visual Studio 2017](https://www.microsoft.com/net/core#windowsvs2017)
+- [.NET Core SDK](https://www.microsoft.com/net/download/core)
 
-The .NET Core and Docker (Preview) workload is required during Visual Studio installation.
+The .NET Core workload must be selected during Visual Studio installation.
 
 ### Using Command Line
-- [.NET Core SDK 1.0 RC3](https://github.com/dotnet/core/blob/master/release-notes/rc3-download.md)
+- [.NET Core SDK](https://www.microsoft.com/net/download/core)
 
 ## Known Issues
 

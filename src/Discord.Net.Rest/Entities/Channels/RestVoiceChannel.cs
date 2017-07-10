@@ -40,8 +40,8 @@ namespace Discord.Rest
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
 
-        //IVoiceChannel
-        Task<IAudioClient> IVoiceChannel.ConnectAsync() { throw new NotSupportedException(); }
+        //IAudioChannel
+        Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) { throw new NotSupportedException(); }
 
         //IGuildChannel
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)

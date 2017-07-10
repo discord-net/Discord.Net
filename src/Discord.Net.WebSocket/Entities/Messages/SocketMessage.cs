@@ -14,10 +14,11 @@ namespace Discord.WebSocket
         
         public SocketUser Author { get; }
         public ISocketMessageChannel Channel { get; }
+        public MessageSource Source { get; }
 
         public string Content { get; private set; }
 
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public virtual bool IsTTS => false;
         public virtual bool IsPinned => false;
         public virtual DateTimeOffset? EditedTimestamp => null;
@@ -27,16 +28,15 @@ namespace Discord.WebSocket
         public virtual IReadOnlyCollection<SocketRole> MentionedRoles => ImmutableArray.Create<SocketRole>();
         public virtual IReadOnlyCollection<SocketUser> MentionedUsers => ImmutableArray.Create<SocketUser>();
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
-        public virtual ulong? WebhookId => null;
-        public bool IsWebhook => WebhookId != null;
 
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
-        internal SocketMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author)
+        internal SocketMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author, MessageSource source)
             : base(discord, id)
         {
             Channel = channel;
             Author = author;
+            Source = source;
         }
         internal static SocketMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
         {

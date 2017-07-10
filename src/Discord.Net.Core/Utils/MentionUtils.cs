@@ -19,8 +19,7 @@ namespace Discord
         /// <summary> Parses a provided user mention string. </summary>
         public static ulong ParseUser(string text)
         {
-            ulong id;
-            if (TryParseUser(text, out id))
+            if (TryParseUser(text, out ulong id))
                 return id;
             throw new ArgumentException("Invalid mention format", nameof(text));
         }
@@ -44,8 +43,7 @@ namespace Discord
         /// <summary> Parses a provided channel mention string. </summary>
         public static ulong ParseChannel(string text)
         {
-            ulong id;
-            if (TryParseChannel(text, out id))
+            if (TryParseChannel(text, out ulong id))
                 return id;
             throw new ArgumentException("Invalid mention format", nameof(text));
         }
@@ -66,8 +64,7 @@ namespace Discord
         /// <summary> Parses a provided role mention string. </summary>
         public static ulong ParseRole(string text)
         {
-            ulong id;
-            if (TryParseRole(text, out id))
+            if (TryParseRole(text, out ulong id))
                 return id;
             throw new ArgumentException("Invalid mention format", nameof(text));
         }
@@ -255,7 +252,16 @@ namespace Discord
         {
             if (mode != TagHandling.Remove)
             {
-                Emoji emoji = (Emoji)tag.Value;
+                Emote emoji = (Emote)tag.Value;
+
+                //Remove if its name contains any bad chars (prevents a few tag exploits)
+                for (int i = 0; i < emoji.Name.Length; i++)
+                {
+                    char c = emoji.Name[i];
+                    if (!char.IsLetterOrDigit(c) && c != '_' && c != '-')
+                        return "";
+                }
+
                 switch (mode)
                 {
                     case TagHandling.Name:

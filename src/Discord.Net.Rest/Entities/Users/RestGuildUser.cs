@@ -50,9 +50,12 @@ namespace Discord.Rest
                 _joinedAtTicks = model.JoinedAt.Value.UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
-            IsDeafened = model.Deaf;
-            IsMuted = model.Mute;
-            UpdateRoles(model.Roles);
+            if (model.Deaf.IsSpecified)
+                IsDeafened = model.Deaf.Value;
+            if (model.Mute.IsSpecified)
+                IsMuted = model.Mute.Value;
+            if (model.Roles.IsSpecified)
+                UpdateRoles(model.Roles.Value);
         }
         private void UpdateRoles(ulong[] roleIds)
         {
@@ -82,8 +85,20 @@ namespace Discord.Rest
             else if (args.RoleIds.IsSpecified)
                 UpdateRoles(args.RoleIds.Value.ToArray());
         }
-        public Task KickAsync(RequestOptions options = null)
-            => UserHelper.KickAsync(this, Discord, options);
+        public Task KickAsync(string reason = null, RequestOptions options = null)
+            => UserHelper.KickAsync(this, Discord, reason, options);
+        /// <inheritdoc />
+        public Task AddRoleAsync(IRole role, RequestOptions options = null)
+            => AddRolesAsync(new[] { role }, options);
+        /// <inheritdoc />
+        public Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
+            => UserHelper.AddRolesAsync(this, Discord, roles, options);
+        /// <inheritdoc />
+        public Task RemoveRoleAsync(IRole role, RequestOptions options = null)
+            => RemoveRolesAsync(new[] { role }, options);
+        /// <inheritdoc />
+        public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
+            => UserHelper.RemoveRolesAsync(this, Discord, roles, options);
 
         public ChannelPermissions GetPermissions(IGuildChannel channel)
         {

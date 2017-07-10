@@ -19,8 +19,7 @@ namespace Discord.Net.Converters
             if (property.Ignored)
                 return property;
 
-            var propInfo = member as PropertyInfo;
-            if (propInfo != null)
+            if (member is PropertyInfo propInfo)
             {
                 var converter = GetConverter(property, propInfo, propInfo.PropertyType, 0);
                 if (converter != null)

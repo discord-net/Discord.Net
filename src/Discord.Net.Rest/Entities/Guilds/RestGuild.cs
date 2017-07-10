@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using Model = Discord.API.Guild;
-using EmbedModel = Discord.API.GuildEmbed;
 using System.Linq;
+using System.Threading.Tasks;
+using EmbedModel = Discord.API.GuildEmbed;
+using Model = Discord.API.Guild;
 
 namespace Discord.Rest
 {
@@ -14,7 +14,7 @@ namespace Discord.Rest
     public class RestGuild : RestEntity<ulong>, IGuild, IUpdateable
     {
         private ImmutableDictionary<ulong, RestRole> _roles;
-        private ImmutableArray<GuildEmoji> _emojis;
+        private ImmutableArray<GuildEmote> _emotes;
         private ImmutableArray<string> _features;
 
         public string Name { get; private set; }
@@ -32,14 +32,14 @@ namespace Discord.Rest
         public string SplashId { get; private set; }
         internal bool Available { get; private set; }
 
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public ulong DefaultChannelId => Id;
         public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
 
         public RestRole EveryoneRole => GetRole(Id);
         public IReadOnlyCollection<RestRole> Roles => _roles.ToReadOnlyCollection();
-        public IReadOnlyCollection<GuildEmoji> Emojis => _emojis;
+        public IReadOnlyCollection<GuildEmote> Emotes => _emotes;
         public IReadOnlyCollection<string> Features => _features;
 
         internal RestGuild(BaseDiscordClient client, ulong id)
@@ -69,13 +69,13 @@ namespace Discord.Rest
 
             if (model.Emojis != null)
             {
-                var emojis = ImmutableArray.CreateBuilder<GuildEmoji>(model.Emojis.Length);
+                var emotes = ImmutableArray.CreateBuilder<GuildEmote>(model.Emojis.Length);
                 for (int i = 0; i < model.Emojis.Length; i++)
-                    emojis.Add(model.Emojis[i].ToEntity());
-                _emojis = emojis.ToImmutableArray();
+                    emotes.Add(model.Emojis[i].ToEntity());
+                _emotes = emotes.ToImmutableArray();
             }
             else
-                _emojis = ImmutableArray.Create<GuildEmoji>();
+                _emotes = ImmutableArray.Create<GuildEmote>();
 
             if (model.Features != null)
                 _features = model.Features.ToImmutableArray();
@@ -114,14 +114,14 @@ namespace Discord.Rest
             var model = await GuildHelper.ModifyEmbedAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
-        public async Task ModifyChannelsAsync(IEnumerable<BulkGuildChannelProperties> args, RequestOptions options = null)
+        public async Task ReorderChannelsAsync(IEnumerable<ReorderChannelProperties> args, RequestOptions options = null)
         {
             var arr = args.ToArray();
-            await GuildHelper.ModifyChannelsAsync(this, Discord, arr, options);
+            await GuildHelper.ReorderChannelsAsync(this, Discord, arr, options);
         }
-        public async Task ModifyRolesAsync(IEnumerable<BulkRoleProperties> args, RequestOptions options = null)
+        public async Task ReorderRolesAsync(IEnumerable<ReorderRoleProperties> args, RequestOptions options = null)
         {
-            var models = await GuildHelper.ModifyRolesAsync(this, Discord, args, options).ConfigureAwait(false);
+            var models = await GuildHelper.ReorderRolesAsync(this, Discord, args, options).ConfigureAwait(false);
             foreach (var model in models)
             {
                 var role = GetRole(model.Id);
@@ -137,10 +137,10 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestBan>> GetBansAsync(RequestOptions options = null)
             => GuildHelper.GetBansAsync(this, Discord, options);
 
-        public Task AddBanAsync(IUser user, int pruneDays = 0, RequestOptions options = null)
-            => GuildHelper.AddBanAsync(this, Discord, user.Id, pruneDays, options);
-        public Task AddBanAsync(ulong userId, int pruneDays = 0, RequestOptions options = null)
-            => GuildHelper.AddBanAsync(this, Discord, userId, pruneDays, options);
+        public Task AddBanAsync(IUser user, int pruneDays = 0, string reason = null, RequestOptions options = null)
+            => GuildHelper.AddBanAsync(this, Discord, user.Id, pruneDays, reason, options);
+        public Task AddBanAsync(ulong userId, int pruneDays = 0, string reason = null, RequestOptions options = null)
+            => GuildHelper.AddBanAsync(this, Discord, userId, pruneDays, reason, options);
 
         public Task RemoveBanAsync(IUser user, RequestOptions options = null)
             => GuildHelper.RemoveBanAsync(this, Discord, user.Id, options);
@@ -188,14 +188,11 @@ namespace Discord.Rest
             var channel = await GuildHelper.GetChannelAsync(this, Discord, DefaultChannelId, options).ConfigureAwait(false);
             return channel as RestTextChannel;
         }
-        public async Task<RestVoiceChannel> GetEmbedChannelAsync(RequestOptions options = null)
+        public async Task<RestGuildChannel> GetEmbedChannelAsync(RequestOptions options = null)
         {
             var embedId = EmbedChannelId;
             if (embedId.HasValue) 
-            {
-                var channel = await GuildHelper.GetChannelAsync(this, Discord, embedId.Value, options).ConfigureAwait(false);
-                return channel as RestVoiceChannel;
-            }
+                return await GuildHelper.GetChannelAsync(this, Discord, embedId.Value, options).ConfigureAwait(false);
             return null;
         }
         public Task<RestTextChannel> CreateTextChannelAsync(string name, RequestOptions options = null)
@@ -216,8 +213,7 @@ namespace Discord.Rest
         //Roles
         public RestRole GetRole(ulong id)
         {
-            RestRole value;
-            if (_roles.TryGetValue(id, out value))
+            if (_roles.TryGetValue(id, out RestRole value))
                 return value;
             return null;
         }
@@ -311,7 +307,7 @@ namespace Discord.Rest
             else
                 return null;
         }
-        async Task<IVoiceChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
+        async Task<IGuildChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
                 return await GetEmbedChannelAsync(options).ConfigureAwait(false);

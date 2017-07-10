@@ -7,3 +7,5 @@ apiRules:
     uidRegex: ^Discord\.Net\.Converters$
 - exclude:
     uidRegex: ^Discord\.Net.*$
+- exclude:
+    uidRegex: ^RegexAnalyzer$

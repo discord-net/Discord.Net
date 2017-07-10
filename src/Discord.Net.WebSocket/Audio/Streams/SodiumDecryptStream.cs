@@ -7,18 +7,18 @@ namespace Discord.Audio.Streams
     ///<summary> Decrypts an RTP frame using libsodium </summary>
     public class SodiumDecryptStream : AudioOutStream
     {
-        private readonly AudioOutStream _next;
-        private readonly byte[] _buffer, _nonce, _secretKey;
+        private readonly AudioClient _client;
+        private readonly AudioStream _next;
+        private readonly byte[] _nonce;
 
         public override bool CanRead => true;
         public override bool CanSeek => false;
         public override bool CanWrite => true;
 
-        public SodiumDecryptStream(AudioOutStream next, byte[] secretKey, int bufferSize = 4000)
+        public SodiumDecryptStream(AudioStream next, IAudioClient client)
         {
             _next = next;
-            _secretKey = secretKey;
-            _buffer = new byte[bufferSize];
+            _client = (AudioClient)client;
             _nonce = new byte[24];
         }
 
@@ -26,11 +26,11 @@ namespace Discord.Audio.Streams
         {
             cancelToken.ThrowIfCancellationRequested();
 
-            Buffer.BlockCopy(buffer, 0, _nonce, 0, 12); //Copy RTP header to nonce
-            count = SecretBox.Decrypt(buffer, offset, count, _buffer, 0, _nonce, _secretKey);
+            if (_client.SecretKey == null)
+                return;
 
-            var newBuffer = new byte[count];
-            Buffer.BlockCopy(_buffer, 0, newBuffer, 0, count);
+            Buffer.BlockCopy(buffer, 0, _nonce, 0, 12); //Copy RTP header to nonce
+            count = SecretBox.Decrypt(buffer, offset + 12, count - 12, buffer, offset + 12, _nonce, _client.SecretKey);
             await _next.WriteAsync(buffer, 0, count + 12, cancelToken).ConfigureAwait(false);
         }
 

@@ -16,6 +16,7 @@ using MemberModel = Discord.API.GuildMember;
 using Model = Discord.API.Guild;
 using PresenceModel = Discord.API.Presence;
 using RoleModel = Discord.API.Role;
+using UserModel = Discord.API.User;
 using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord.WebSocket
@@ -29,10 +30,9 @@ namespace Discord.WebSocket
         private ConcurrentDictionary<ulong, SocketGuildUser> _members;
         private ConcurrentDictionary<ulong, SocketRole> _roles;
         private ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
-        private ImmutableArray<GuildEmoji> _emojis;
+        private ImmutableArray<GuildEmote> _emotes;
         private ImmutableArray<string> _features;
         private AudioClient _audioClient;
-        internal bool _available;
 
         public string Name { get; private set; }
         public int AFKTimeout { get; private set; }
@@ -40,8 +40,10 @@ namespace Discord.WebSocket
         public VerificationLevel VerificationLevel { get; private set; }
         public MfaLevel MfaLevel { get; private set; }
         public DefaultMessageNotifications DefaultMessageNotifications { get; private set; }
-        public int MemberCount { get; set; }
+        public int MemberCount { get; internal set; }
         public int DownloadedMemberCount { get; private set; }
+        internal bool IsAvailable { get; private set; }
+        public bool IsConnected { get; internal set; }
 
         internal ulong? AFKChannelId { get; private set; }
         internal ulong? EmbedChannelId { get; private set; }
@@ -51,7 +53,7 @@ namespace Discord.WebSocket
         public string IconId { get; private set; }
         public string SplashId { get; private set; }
 
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public SocketTextChannel DefaultChannel => GetTextChannel(Id);
         public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
@@ -68,28 +70,19 @@ namespace Discord.WebSocket
                 return id.HasValue ? GetVoiceChannel(id.Value) : null;
             }
         }
-        public SocketVoiceChannel EmbedChannel 
+        public SocketGuildChannel EmbedChannel 
         {
             get
             {
                 var id = EmbedChannelId;
-                return id.HasValue ? GetVoiceChannel(id.Value) : null;
+                return id.HasValue ? GetChannel(id.Value) : null;
             }
         }
         public IReadOnlyCollection<SocketTextChannel> TextChannels
             => Channels.Select(x => x as SocketTextChannel).Where(x => x != null).ToImmutableArray();
         public IReadOnlyCollection<SocketVoiceChannel> VoiceChannels
             => Channels.Select(x => x as SocketVoiceChannel).Where(x => x != null).ToImmutableArray();
-        public SocketGuildUser CurrentUser
-        {
-            get
-            {
-                SocketGuildUser member;
-                if (_members.TryGetValue(Discord.CurrentUser.Id, out member))
-                    return member;
-                return null;
-            }
-        }
+        public SocketGuildUser CurrentUser => _members.TryGetValue(Discord.CurrentUser.Id, out SocketGuildUser member) ? member : null;
         public SocketRole EveryoneRole => GetRole(Id);
         public IReadOnlyCollection<SocketGuildChannel> Channels
         {
@@ -100,7 +93,7 @@ namespace Discord.WebSocket
                 return channels.Select(x => state.GetChannel(x) as SocketGuildChannel).Where(x => x != null).ToReadOnlyCollection(channels);
             }
         }
-        public IReadOnlyCollection<GuildEmoji> Emojis => _emojis;
+        public IReadOnlyCollection<GuildEmote> Emotes => _emotes;
         public IReadOnlyCollection<string> Features => _features;
         public IReadOnlyCollection<SocketGuildUser> Users => _members.ToReadOnlyCollection();
         public IReadOnlyCollection<SocketRole> Roles => _roles.ToReadOnlyCollection();
@@ -109,7 +102,7 @@ namespace Discord.WebSocket
             : base(client, id)
         {
             _audioLock = new SemaphoreSlim(1, 1);
-            _emojis = ImmutableArray.Create<GuildEmoji>();
+            _emotes = ImmutableArray.Create<GuildEmote>();
             _features = ImmutableArray.Create<string>();
         }
         internal static SocketGuild Create(DiscordSocketClient discord, ClientState state, ExtendedModel model)
@@ -120,8 +113,8 @@ namespace Discord.WebSocket
         }
         internal void Update(ClientState state, ExtendedModel model)
         {
-            _available = !(model.Unavailable ?? false);
-            if (!_available)
+            IsAvailable = !(model.Unavailable ?? false);
+            if (!IsAvailable)
             {
                 if (_channels == null)
                     _channels = new ConcurrentHashSet<ulong>();
@@ -133,6 +126,8 @@ namespace Discord.WebSocket
                     _emojis = ImmutableArray.Create<Emoji>();
                 if (Features == null)
                     _features = ImmutableArray.Create<string>();*/
+                _syncPromise = new TaskCompletionSource<bool>();
+                _downloaderPromise = new TaskCompletionSource<bool>();
                 return;
             }
 
@@ -160,9 +155,8 @@ namespace Discord.WebSocket
 
                 for (int i = 0; i < model.Presences.Length; i++)
                 {
-                    SocketGuildUser member;
-                    if (members.TryGetValue(model.Presences[i].User.Id, out member))
-                        member.Update(state, model.Presences[i]);
+                    if (members.TryGetValue(model.Presences[i].User.Id, out SocketGuildUser member))
+                        member.Update(state, model.Presences[i], true);
                     else
                         Debug.Assert(false);
                 }
@@ -188,8 +182,8 @@ namespace Discord.WebSocket
             if (Discord.ApiClient.AuthTokenType != TokenType.User)
             {
                 var _ = _syncPromise.TrySetResultAsync(true);
-                if (!model.Large)
-                    _ = _downloaderPromise.TrySetResultAsync(true);
+                /*if (!model.Large)
+                    _ = _downloaderPromise.TrySetResultAsync(true);*/
             }
         }
         internal void Update(ClientState state, Model model)
@@ -209,13 +203,13 @@ namespace Discord.WebSocket
 
             if (model.Emojis != null)
             {
-                var emojis = ImmutableArray.CreateBuilder<GuildEmoji>(model.Emojis.Length);
+                var emojis = ImmutableArray.CreateBuilder<GuildEmote>(model.Emojis.Length);
                 for (int i = 0; i < model.Emojis.Length; i++)
                     emojis.Add(model.Emojis[i].ToEntity());
-                _emojis = emojis.ToImmutable();
+                _emotes = emojis.ToImmutable();
             }
             else
-                _emojis = ImmutableArray.Create<GuildEmoji>();
+                _emotes = ImmutableArray.Create<GuildEmote>();
 
             if (model.Features != null)
                 _features = model.Features.ToImmutableArray();
@@ -246,9 +240,8 @@ namespace Discord.WebSocket
 
                 for (int i = 0; i < model.Presences.Length; i++)
                 {
-                    SocketGuildUser member;
-                    if (members.TryGetValue(model.Presences[i].User.Id, out member))
-                        member.Update(state, model.Presences[i]);
+                    if (members.TryGetValue(model.Presences[i].User.Id, out SocketGuildUser member))
+                        member.Update(state, model.Presences[i], true);
                     else
                         Debug.Assert(false);
                 }
@@ -256,16 +249,16 @@ namespace Discord.WebSocket
             _members = members;
 
             var _ = _syncPromise.TrySetResultAsync(true);
-            if (!model.Large)
-                _ = _downloaderPromise.TrySetResultAsync(true);
+            /*if (!model.Large)
+                _ = _downloaderPromise.TrySetResultAsync(true);*/
         }
 
         internal void Update(ClientState state, EmojiUpdateModel model)
         {
-            var emojis = ImmutableArray.CreateBuilder<GuildEmoji>(model.Emojis.Length);
+            var emotes = ImmutableArray.CreateBuilder<GuildEmote>(model.Emojis.Length);
             for (int i = 0; i < model.Emojis.Length; i++)
-                emojis.Add(model.Emojis[i].ToEntity());
-            _emojis = emojis.ToImmutable();
+                emotes.Add(model.Emojis[i].ToEntity());
+            _emotes = emotes.ToImmutable();
         }
 
         //General
@@ -276,10 +269,10 @@ namespace Discord.WebSocket
             => GuildHelper.ModifyAsync(this, Discord, func, options);
         public Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyEmbedAsync(this, Discord, func, options);
-        public Task ModifyChannelsAsync(IEnumerable<BulkGuildChannelProperties> args, RequestOptions options = null)
-            => GuildHelper.ModifyChannelsAsync(this, Discord, args, options);
-        public Task ModifyRolesAsync(IEnumerable<BulkRoleProperties> args, RequestOptions options = null)
-            => GuildHelper.ModifyRolesAsync(this, Discord, args, options);
+        public Task ReorderChannelsAsync(IEnumerable<ReorderChannelProperties> args, RequestOptions options = null)
+            => GuildHelper.ReorderChannelsAsync(this, Discord, args, options);
+        public Task ReorderRolesAsync(IEnumerable<ReorderRoleProperties> args, RequestOptions options = null)
+            => GuildHelper.ReorderRolesAsync(this, Discord, args, options);
 
         public Task LeaveAsync(RequestOptions options = null)
             => GuildHelper.LeaveAsync(this, Discord, options);
@@ -288,10 +281,10 @@ namespace Discord.WebSocket
         public Task<IReadOnlyCollection<RestBan>> GetBansAsync(RequestOptions options = null)
             => GuildHelper.GetBansAsync(this, Discord, options);
 
-        public Task AddBanAsync(IUser user, int pruneDays = 0, RequestOptions options = null)
-            => GuildHelper.AddBanAsync(this, Discord, user.Id, pruneDays, options);
-        public Task AddBanAsync(ulong userId, int pruneDays = 0, RequestOptions options = null)
-            => GuildHelper.AddBanAsync(this, Discord, userId, pruneDays, options);
+        public Task AddBanAsync(IUser user, int pruneDays = 0, string reason = null, RequestOptions options = null)
+            => GuildHelper.AddBanAsync(this, Discord, user.Id, pruneDays, reason, options);
+        public Task AddBanAsync(ulong userId, int pruneDays = 0, string reason = null, RequestOptions options = null)
+            => GuildHelper.AddBanAsync(this, Discord, userId, pruneDays, reason, options);
 
         public Task RemoveBanAsync(IUser user, RequestOptions options = null)
             => GuildHelper.RemoveBanAsync(this, Discord, user.Id, options);
@@ -341,8 +334,7 @@ namespace Discord.WebSocket
         //Roles
         public SocketRole GetRole(ulong id)
         {
-            SocketRole value;
-            if (_roles.TryGetValue(id, out value))
+            if (_roles.TryGetValue(id, out SocketRole value))
                 return value;
             return null;
         }
@@ -357,8 +349,7 @@ namespace Discord.WebSocket
         }
         internal SocketRole RemoveRole(ulong id)
         {
-            SocketRole role;
-            if (_roles.TryRemove(id, out role))
+            if (_roles.TryRemove(id, out SocketRole role))
                 return role;
             return null;
         }
@@ -366,22 +357,34 @@ namespace Discord.WebSocket
         //Users
         public SocketGuildUser GetUser(ulong id)
         {
-            SocketGuildUser member;
-            if (_members.TryGetValue(id, out member))
+            if (_members.TryGetValue(id, out SocketGuildUser member))
                 return member;
             return null;
         }
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null)
             => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options);
 
+        internal SocketGuildUser AddOrUpdateUser(UserModel model)
+        {
+            if (_members.TryGetValue(model.Id, out SocketGuildUser member))
+                member.GlobalUser?.Update(Discord.State, model);
+            else
+            {
+                member = SocketGuildUser.Create(this, Discord.State, model);
+                member.GlobalUser.AddRef();
+                _members[member.Id] = member;
+                DownloadedMemberCount++;
+            }
+            return member;
+        }
         internal SocketGuildUser AddOrUpdateUser(MemberModel model)
         {
-            SocketGuildUser member;
-            if (_members.TryGetValue(model.User.Id, out member))
+            if (_members.TryGetValue(model.User.Id, out SocketGuildUser member))
                 member.Update(Discord.State, model);
             else
             {
                 member = SocketGuildUser.Create(this, Discord.State, model);
+                member.GlobalUser.AddRef();
                 _members[member.Id] = member;
                 DownloadedMemberCount++;
             }
@@ -389,12 +392,12 @@ namespace Discord.WebSocket
         }
         internal SocketGuildUser AddOrUpdateUser(PresenceModel model)
         {
-            SocketGuildUser member;
-            if (_members.TryGetValue(model.User.Id, out member))
-                member.Update(Discord.State, model);
+            if (_members.TryGetValue(model.User.Id, out SocketGuildUser member))
+                member.Update(Discord.State, model, false);
             else
             {
                 member = SocketGuildUser.Create(this, Discord.State, model);
+                member.GlobalUser.AddRef();
                 _members[member.Id] = member;
                 DownloadedMemberCount++;
             }
@@ -402,8 +405,7 @@ namespace Discord.WebSocket
         }
         internal SocketGuildUser RemoveUser(ulong id)
         {
-            SocketGuildUser member;
-            if (_members.TryRemove(id, out member))
+            if (_members.TryRemove(id, out SocketGuildUser member))
             {
                 DownloadedMemberCount--;
                 member.GlobalUser.RemoveRef(Discord);
@@ -422,30 +424,56 @@ namespace Discord.WebSocket
         }
 
         //Voice States
-        internal SocketVoiceState AddOrUpdateVoiceState(ClientState state, VoiceStateModel model)
+        internal async Task<SocketVoiceState> AddOrUpdateVoiceStateAsync(ClientState state, VoiceStateModel model)
         {
             var voiceChannel = state.GetChannel(model.ChannelId.Value) as SocketVoiceChannel;
-            var voiceState = SocketVoiceState.Create(voiceChannel, model);
-            _voiceStates[model.UserId] = voiceState;
-            return voiceState;
+            var before = GetVoiceState(model.UserId) ?? SocketVoiceState.Default;
+            var after = SocketVoiceState.Create(voiceChannel, model);
+            _voiceStates[model.UserId] = after;
+
+            if (_audioClient != null && before.VoiceChannel?.Id != after.VoiceChannel?.Id)
+            {
+                if (model.UserId == CurrentUser.Id)
+                {
+                    if (after.VoiceChannel != null && _audioClient.ChannelId != after.VoiceChannel?.Id)
+                    {
+                        _audioClient.ChannelId = after.VoiceChannel.Id;
+                        await RepopulateAudioStreamsAsync().ConfigureAwait(false);
+                    }
+                }
+                else
+                {
+                    await _audioClient.RemoveInputStreamAsync(model.UserId).ConfigureAwait(false); //User changed channels, end their stream
+                    if (CurrentUser.VoiceChannel != null && after.VoiceChannel?.Id == CurrentUser.VoiceChannel?.Id)
+                        await _audioClient.CreateInputStreamAsync(model.UserId).ConfigureAwait(false);
+                }
+            }
+
+            return after;
         }
         internal SocketVoiceState? GetVoiceState(ulong id)
         {
-            SocketVoiceState voiceState;
-            if (_voiceStates.TryGetValue(id, out voiceState))
+            if (_voiceStates.TryGetValue(id, out SocketVoiceState voiceState))
                 return voiceState;
             return null;
         }
-        internal SocketVoiceState? RemoveVoiceState(ulong id)
+        internal async Task<SocketVoiceState?> RemoveVoiceStateAsync(ulong id)
         {
-            SocketVoiceState voiceState;
-            if (_voiceStates.TryRemove(id, out voiceState))
+            if (_voiceStates.TryRemove(id, out SocketVoiceState voiceState))
+            {
+                if (_audioClient != null)
+                    await _audioClient.RemoveInputStreamAsync(id).ConfigureAwait(false); //User changed channels, end their stream
                 return voiceState;
+            }
             return null;
         }
 
         //Audio
-        internal async Task<IAudioClient> ConnectAudioAsync(ulong channelId, bool selfDeaf, bool selfMute)
+        internal AudioInStream GetAudioStream(ulong userId)
+        {
+            return _audioClient?.GetInputStream(userId);
+        }
+        internal async Task<IAudioClient> ConnectAudioAsync(ulong channelId, bool selfDeaf, bool selfMute, Action<IAudioClient> configAction)
         {
             selfDeaf = false;
             selfMute = false;
@@ -458,6 +486,32 @@ namespace Discord.WebSocket
                 await DisconnectAudioInternalAsync().ConfigureAwait(false);
                 promise = new TaskCompletionSource<AudioClient>();
                 _audioConnectPromise = promise;
+
+                if (_audioClient == null)
+                {
+                    var audioClient = new AudioClient(this, Discord.GetAudioId(), channelId);
+                    audioClient.Disconnected += async ex =>
+                    {
+                        if (!promise.Task.IsCompleted)
+                        {
+                            try { audioClient.Dispose(); } catch { }
+                            _audioClient = null;
+                            if (ex != null)
+                                await promise.TrySetExceptionAsync(ex);
+                            else
+                                await promise.TrySetCanceledAsync();
+                            return;
+                        }
+                    };
+                    audioClient.Connected += () =>
+                    {
+                        var _ = promise.TrySetResultAsync(_audioClient);
+                        return Task.Delay(0);
+                    };
+                    configAction?.Invoke(audioClient);
+                    _audioClient = audioClient;
+                }
+
                 await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, channelId, selfDeaf, selfMute).ConfigureAwait(false);
             }
             catch (Exception)
@@ -502,9 +556,10 @@ namespace Discord.WebSocket
             _audioConnectPromise = null;
             if (_audioClient != null)
                 await _audioClient.StopAsync().ConfigureAwait(false);
+            await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, null, false, false).ConfigureAwait(false);
             _audioClient = null;
         }
-        internal async Task FinishConnectAudio(int id, string url, string token)
+        internal async Task FinishConnectAudio(string url, string token)
         {
             //TODO: Mem Leak: Disconnected/Connected handlers arent cleaned up
             var voiceState = GetVoiceState(Discord.CurrentUser.Id).Value;
@@ -512,30 +567,7 @@ namespace Discord.WebSocket
             await _audioLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                var promise = _audioConnectPromise;
-                if (_audioClient == null)
-                {
-                    var audioClient = new AudioClient(this, id);
-                    audioClient.Disconnected += async ex =>
-                    {
-                        if (!promise.Task.IsCompleted)
-                        {
-                            try { audioClient.Dispose(); } catch { }
-                            _audioClient = null;
-                            if (ex != null)
-                                await promise.TrySetExceptionAsync(ex);
-                            else
-                                await promise.TrySetCanceledAsync();
-                            return;
-                        }
-                    };
-                    _audioClient = audioClient;
-                }
-                _audioClient.Connected += () => 
-                { 
-                    var _ = promise.TrySetResultAsync(_audioClient); 
-                    return Task.Delay(0);
-                };
+                await RepopulateAudioStreamsAsync().ConfigureAwait(false);
                 await _audioClient.StartAsync(url, Discord.CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);                
             }
             catch (OperationCanceledException)
@@ -550,6 +582,19 @@ namespace Discord.WebSocket
             finally
             {
                 _audioLock.Release();
+            }
+        }
+
+        internal async Task RepopulateAudioStreamsAsync()
+        {
+            await _audioClient.ClearInputStreamsAsync().ConfigureAwait(false); //We changed channels, end all current streams
+            if (CurrentUser.VoiceChannel != null)
+            {
+                foreach (var pair in _voiceStates)
+                {
+                    if (pair.Value.VoiceChannel?.Id == CurrentUser.VoiceChannel?.Id && pair.Key != CurrentUser.Id)
+                        await _audioClient.CreateInputStreamAsync(pair.Key).ConfigureAwait(false);
+                }
             }
         }
 
@@ -585,8 +630,8 @@ namespace Discord.WebSocket
             => Task.FromResult<IVoiceChannel>(AFKChannel);
         Task<ITextChannel> IGuild.GetDefaultChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<ITextChannel>(DefaultChannel);
-        Task<IVoiceChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
-            => Task.FromResult<IVoiceChannel>(EmbedChannel);
+        Task<IGuildChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult<IGuildChannel>(EmbedChannel);
         async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, RequestOptions options)
             => await CreateTextChannelAsync(name, options).ConfigureAwait(false);
         async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, RequestOptions options)

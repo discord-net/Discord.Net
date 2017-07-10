@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands.Builders
 {
@@ -9,19 +10,22 @@ namespace Discord.Commands.Builders
     {
         private readonly List<PreconditionAttribute> _preconditions;
         private readonly List<ParameterBuilder> _parameters;
+        private readonly List<Attribute> _attributes;
         private readonly List<string> _aliases;
 
         public ModuleBuilder Module { get; }
-        internal Func<ICommandContext, object[], IDependencyMap, Task> Callback { get; set; }
+        internal Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> Callback { get; set; }
 
         public string Name { get; set; }
         public string Summary { get; set; }
         public string Remarks { get; set; }
+        public string PrimaryAlias { get; set; }
         public RunMode RunMode { get; set; }
         public int Priority { get; set; }
 
         public IReadOnlyList<PreconditionAttribute> Preconditions => _preconditions;
         public IReadOnlyList<ParameterBuilder> Parameters => _parameters;
+        public IReadOnlyList<Attribute> Attributes => _attributes;
         public IReadOnlyList<string> Aliases => _aliases;
 
         //Automatic
@@ -31,16 +35,18 @@ namespace Discord.Commands.Builders
 
             _preconditions = new List<PreconditionAttribute>();
             _parameters = new List<ParameterBuilder>();
+            _attributes = new List<Attribute>();
             _aliases = new List<string>();
         }
         //User-defined
-        internal CommandBuilder(ModuleBuilder module, string primaryAlias, Func<ICommandContext, object[], IDependencyMap, Task> callback)
+        internal CommandBuilder(ModuleBuilder module, string primaryAlias, Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> callback)
             : this(module)
         {
             Discord.Preconditions.NotNull(primaryAlias, nameof(primaryAlias));
             Discord.Preconditions.NotNull(callback, nameof(callback));
 
             Callback = callback;
+            PrimaryAlias = primaryAlias;
             _aliases.Add(primaryAlias);
         }
 
@@ -74,10 +80,15 @@ namespace Discord.Commands.Builders
         {
             for (int i = 0; i < aliases.Length; i++)
             {
-                var alias = aliases[i] ?? "";
+                string alias = aliases[i] ?? "";
                 if (!_aliases.Contains(alias))
                     _aliases.Add(alias);
             }
+            return this;
+        }
+        public CommandBuilder AddAttributes(params Attribute[] attributes)
+        {
+            _attributes.AddRange(attributes);
             return this;
         }
         public CommandBuilder AddPrecondition(PreconditionAttribute precondition)
@@ -109,9 +120,9 @@ namespace Discord.Commands.Builders
 
         internal CommandInfo Build(ModuleInfo info, CommandService service)
         {
-            //Default name to first alias
+            //Default name to primary alias
             if (Name == null)
-                Name = _aliases[0];
+                Name = PrimaryAlias;
 
             if (_parameters.Count > 0)
             {
@@ -119,11 +130,11 @@ namespace Discord.Commands.Builders
 
                 var firstMultipleParam = _parameters.FirstOrDefault(x => x.IsMultiple);
                 if ((firstMultipleParam != null) && (firstMultipleParam != lastParam))
-                    throw new InvalidOperationException("Only the last parameter in a command may have the Multiple flag.");
+                    throw new InvalidOperationException($"Only the last parameter in a command may have the Multiple flag. Parameter: {firstMultipleParam.Name} in {PrimaryAlias}");
                 
                 var firstRemainderParam = _parameters.FirstOrDefault(x => x.IsRemainder);
                 if ((firstRemainderParam != null) && (firstRemainderParam != lastParam))
-                    throw new InvalidOperationException("Only the last parameter in a command may have the Remainder flag.");
+                    throw new InvalidOperationException($"Only the last parameter in a command may have the Remainder flag. Parameter: {firstRemainderParam.Name} in {PrimaryAlias}");
             }
 
             return new CommandInfo(this, info, service);
