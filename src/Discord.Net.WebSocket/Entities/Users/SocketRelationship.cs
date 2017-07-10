@@ -8,16 +8,18 @@ namespace Discord.WebSocket
 
         public IUser User { get; internal set; }
 
-        public SocketRelationship(RelationshipType type, IUser user)
+        internal SocketRelationship()
         {
-            Type = type;
-            User = user;
         }
 
         internal static SocketRelationship Create(DiscordSocketClient discord, ClientState state, Model model)
         {
-            SocketSimpleUser user = SocketSimpleUser.Create(discord, state, model.User);
-            return new SocketRelationship(model.Type, user);
+            SocketGlobalUser user = SocketGlobalUser.Create(discord, state, model.User);
+            return new SocketRelationship
+            {
+                Type = model.Type,
+                User = user
+            };
         }
     }
 }

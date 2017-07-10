@@ -58,17 +58,14 @@ namespace Discord.Rpc
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
 
-        //IUser
-        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options)
-            => Task.FromResult<IDMChannel>(null);
-        async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
-            => await CreateDMChannelAsync(options).ConfigureAwait(false);
-
         Task IUser.AddFriendAsync(RequestOptions options)
             => throw new NotSupportedException();
         Task IUser.BlockUserAsync(RequestOptions options)
             => throw new NotSupportedException();
         Task IUser.RemoveRelationshipAsync(RequestOptions options)
             => throw new NotSupportedException();
+
+        async Task<IDMChannel> IUser.GetOrCreateDMChannelAsync(RequestOptions options)
+            => await GetOrCreateDMChannelAsync(options);
     }
 }

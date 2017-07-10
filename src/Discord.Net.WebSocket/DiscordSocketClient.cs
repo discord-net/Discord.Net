@@ -257,8 +257,8 @@ namespace Discord.WebSocket
             => ClientHelper.GetConnectionsAsync(this, new RequestOptions());
 
         /// <inheritdoc />
-        public Task<RestInvite> GetInviteAsync(string inviteId)
-            => ClientHelper.GetInviteAsync(this, inviteId);
+        public Task<RestInvite> GetInviteAsync(string inviteId, RequestOptions options = null)
+            => ClientHelper.GetInviteAsync(this, inviteId, options);
         
         public Task<IReadOnlyCollection<SocketRelationship>> GetRelationshipsAsync()
             => Task.FromResult(State.Relationships);
@@ -1842,6 +1842,8 @@ namespace Discord.WebSocket
             return State.RemoveRelationship(id);
         }
 
+        internal int GetAudioId() => _nextAudioId++;
+
         //IDiscordClient
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
             => await GetApplicationInfoAsync().ConfigureAwait(false);
@@ -1883,7 +1885,7 @@ namespace Discord.WebSocket
         async Task IDiscordClient.StopAsync()
             => await StopAsync().ConfigureAwait(false);
 
-        async Task<IReadOnlyCollection<IRelationship>> IDiscordClient.GetRelationshipsAsync()
+        async Task<IReadOnlyCollection<IRelationship>> IDiscordClient.GetRelationshipsAsync(RequestOptions options)
             => await GetRelationshipsAsync();
     }
 }

@@ -65,12 +65,6 @@ namespace Discord.WebSocket
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
-
-        //IUser
-        Task<IDMChannel> IUser.GetDMChannelAsync(CacheMode mode, RequestOptions options)
-            => Task.FromResult<IDMChannel>(GlobalUser.DMChannel);
-        async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
-            => await CreateDMChannelAsync(options).ConfigureAwait(false);
         
         public async Task AddFriendAsync(RequestOptions options = null)
             => await Discord.ApiClient.AddFriendAsync(Id, options);

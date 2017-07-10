@@ -18,11 +18,6 @@ namespace Discord
         bool IsWebhook { get; }
         /// <summary> Gets the username for this user. </summary>
         string Username { get; }
-
-        /// <summary> Returns a private message channel to this user, creating one if it does not already exist. </summary>
-        Task<IDMChannel> GetDMChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
-        /// <summary> Returns a private message channel to this user, creating one if it does not already exist. </summary>
-        Task<IDMChannel> CreateDMChannelAsync(RequestOptions options = null);
         
         /// <summary> Adds this user as a friend, this will remove a block </summary>
         Task AddFriendAsync(RequestOptions options = null);
@@ -30,6 +25,7 @@ namespace Discord
         Task BlockUserAsync(RequestOptions options = null);
         /// <summary> Removes the relationship of this user </summary>
         Task RemoveRelationshipAsync(RequestOptions options = null);
+        /// <summary> Returns a private message channel to this user, creating one if it does not already exist. </summary>
         Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null);
     }
 }

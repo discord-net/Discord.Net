@@ -127,10 +127,10 @@ namespace Discord.Rest
         ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;
         ISelfUser IDiscordClient.CurrentUser => CurrentUser;
         
-        Task<IReadOnlyCollection<IRelationship>> IDiscordClient.GetRelationshipsAsync()
+        Task<IReadOnlyCollection<IRelationship>> IDiscordClient.GetRelationshipsAsync(RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IRelationship>>(null);
         
-        Task<IApplication> IDiscordClient.GetApplicationInfoAsync() { throw new NotSupportedException(); }
+        Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options) { throw new NotSupportedException(); }
 
         Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IChannel>(null);
