@@ -46,6 +46,7 @@ namespace Discord.Rest
         }
         internal void Update(Model model)
         {
+            base.Update(model.User);
             if (model.JoinedAt.IsSpecified)
                 _joinedAtTicks = model.JoinedAt.Value.UtcTicks;
             if (model.Nick.IsSpecified)
