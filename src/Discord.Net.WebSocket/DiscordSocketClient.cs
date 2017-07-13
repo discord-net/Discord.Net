@@ -1631,8 +1631,7 @@ namespace Discord.WebSocket
 
         internal ISocketPrivateChannel AddPrivateChannel(API.Channel model, ClientState state)
         {
-            ISocketPrivateChannel channel;
-            if ((channel = state.GetChannel(model.Id) as ISocketPrivateChannel) != null)
+            if (state.GetChannel(model.Id) is ISocketPrivateChannel channel)
                 return channel;
             channel = SocketChannel.CreatePrivate(this, state, model);
             state.AddChannel(channel as SocketChannel);
