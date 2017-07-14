@@ -85,7 +85,8 @@ namespace Discord.Rest
 
             await _loggedInEvent.InvokeAsync().ConfigureAwait(false);
         }
-        internal virtual Task OnLoginAsync(TokenType tokenType, string token) { return Task.Delay(0); }
+        internal virtual Task OnLoginAsync(TokenType tokenType, string token) 
+            => Task.Delay(0);
 
         /// <inheritdoc />
         public async Task LogoutAsync()
@@ -110,7 +111,8 @@ namespace Discord.Rest
 
             await _loggedOutEvent.InvokeAsync().ConfigureAwait(false);
         }
-        internal virtual Task OnLogoutAsync() { return Task.Delay(0); }
+        internal virtual Task OnLogoutAsync() 
+            => Task.Delay(0);
 
         internal virtual void Dispose(bool disposing)
         {
@@ -127,7 +129,8 @@ namespace Discord.Rest
         ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;
         ISelfUser IDiscordClient.CurrentUser => CurrentUser;
 
-        Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options) { throw new NotSupportedException(); }
+        Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options) 
+            => throw new NotSupportedException();
 
         Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IChannel>(null);
@@ -148,7 +151,8 @@ namespace Discord.Rest
             => Task.FromResult<IGuild>(null);
         Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IGuild>>(ImmutableArray.Create<IGuild>());
-        Task<IGuild> IDiscordClient.CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon, RequestOptions options) { throw new NotSupportedException(); }
+        Task<IGuild> IDiscordClient.CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon, RequestOptions options)
+            => throw new NotSupportedException();
 
         Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null);

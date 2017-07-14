@@ -67,6 +67,7 @@ namespace Discord.Rpc
 
         public Task StartAsync() => _connection.StartAsync();
         public Task StopAsync() => _connection.StopAsync();
+                        
 
         private async Task OnConnectingAsync()
         {

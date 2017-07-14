@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Discord.WebSocket
 {
-    public partial class DiscordShardedClient : BaseDiscordClient, IDiscordClient
+    public partial class DiscordShardedClient : BaseSocketClient, IDiscordClient
     {
         private readonly DiscordSocketConfig _baseConfig;
         private readonly SemaphoreSlim _connectionGroupLock;
@@ -20,16 +20,15 @@ namespace Discord.WebSocket
         private bool _automaticShards;
         
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
-        public int Latency => GetLatency();
-        public UserStatus Status => _shards[0].Status;
-        public Game? Game => _shards[0].Game;
+        public override int Latency { get => GetLatency(); protected set { } }
+        public override UserStatus Status { get => _shards[0].Status; protected set { } }
+        public override Game? Game { get => _shards[0].Game; protected set { } }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
-        public new SocketSelfUser CurrentUser { get { return base.CurrentUser as SocketSelfUser; } private set { base.CurrentUser = value; } }
-        public IReadOnlyCollection<SocketGuild> Guilds => GetGuilds().ToReadOnlyCollection(() => GetGuildCount());
-        public IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => GetPrivateChannels().ToReadOnlyCollection(() => GetPrivateChannelCount());
+        public override IReadOnlyCollection<SocketGuild> Guilds => GetGuilds().ToReadOnlyCollection(() => GetGuildCount());
+        public override IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => GetPrivateChannels().ToReadOnlyCollection(() => GetPrivateChannelCount());
         public IReadOnlyCollection<DiscordSocketClient> Shards => _shards;
-        public IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _shards[0].VoiceRegions;
+        public override IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _shards[0].VoiceRegions;
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
         public DiscordShardedClient() : this(null, new DiscordSocketConfig()) { }
@@ -115,15 +114,11 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public async Task StartAsync()
-        {
-            await Task.WhenAll(_shards.Select(x => x.StartAsync())).ConfigureAwait(false);
-        }
+        public override async Task StartAsync() 
+            => await Task.WhenAll(_shards.Select(x => x.StartAsync())).ConfigureAwait(false);
         /// <inheritdoc />
-        public async Task StopAsync()
-        {
+        public override async Task StopAsync() => 
             await Task.WhenAll(_shards.Select(x => x.StopAsync())).ConfigureAwait(false);
-        }
 
         public DiscordSocketClient GetShard(int id)
         {
@@ -141,17 +136,15 @@ namespace Discord.WebSocket
             => GetShardFor(guild.Id);
 
         /// <inheritdoc />
-        public async Task<RestApplication> GetApplicationInfoAsync()
-            => await _shards[0].GetApplicationInfoAsync().ConfigureAwait(false);
+        public override async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
+            => await _shards[0].GetApplicationInfoAsync(options).ConfigureAwait(false);
 
         /// <inheritdoc />
-        public SocketGuild GetGuild(ulong id) => GetShardFor(id).GetGuild(id);
-        /// <inheritdoc />
-        public Task<RestGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null)
-            => ClientHelper.CreateGuildAsync(this, name, region, jpegIcon, new RequestOptions());
+        public override SocketGuild GetGuild(ulong id) 
+            => GetShardFor(id).GetGuild(id);
 
         /// <inheritdoc />
-        public SocketChannel GetChannel(ulong id)
+        public override SocketChannel GetChannel(ulong id)
         {
             for (int i = 0; i < _shards.Length; i++)
             {
@@ -202,7 +195,7 @@ namespace Discord.WebSocket
             => ClientHelper.GetInviteAsync(this, inviteId, new RequestOptions());
 
         /// <inheritdoc />
-        public SocketUser GetUser(ulong id)
+        public override SocketUser GetUser(ulong id)
         {
             for (int i = 0; i < _shards.Length; i++)
             {
@@ -213,7 +206,7 @@ namespace Discord.WebSocket
             return null;
         }
         /// <inheritdoc />
-        public SocketUser GetUser(string username, string discriminator)
+        public override SocketUser GetUser(string username, string discriminator)
         {
             for (int i = 0; i < _shards.Length; i++)
             {
@@ -225,7 +218,7 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public RestVoiceRegion GetVoiceRegion(string id)
+        public override RestVoiceRegion GetVoiceRegion(string id)
             => _shards[0].GetVoiceRegion(id);
 
         /// <summary> Downloads the users list for the provided guilds, if they don't have a complete list. </summary>
@@ -248,12 +241,12 @@ namespace Discord.WebSocket
             return (int)Math.Round(total / (double)_shards.Length);
         }
 
-        public async Task SetStatusAsync(UserStatus status)
+        public override async Task SetStatusAsync(UserStatus status)
         {
             for (int i = 0; i < _shards.Length; i++)
                 await _shards[i].SetStatusAsync(status).ConfigureAwait(false);
         }
-        public async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
+        public override async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
         {
             for (int i = 0; i < _shards.Length; i++)
                 await _shards[i].SetGameAsync(name, streamUrl, streamType).ConfigureAwait(false);
@@ -280,6 +273,9 @@ namespace Discord.WebSocket
                     return Task.Delay(0);
                 };
             }
+
+            client.Connected += () => _shardConnectedEvent.InvokeAsync(client);
+            client.Disconnected += (exception) => _shardDisconnectedEvent.InvokeAsync(client, exception);
 
             client.ChannelCreated += (channel) => _channelCreatedEvent.InvokeAsync(channel);
             client.ChannelDestroyed += (channel) => _channelDestroyedEvent.InvokeAsync(channel);
