@@ -1,15 +1,16 @@
 // Program.cs
 using Discord.WebSocket;
 // ...
+private DiscordSocketClient _client;
 public async Task MainAsync()
 {
-	var client = new DiscordSocketClient();
+	_client = new DiscordSocketClient();
 
-	client.Log += Log;
+	_client.Log += Log;
 
 	string token = "abcdefg..."; // Remember to keep this private!
-	await client.LoginAsync(TokenType.Bot, token);
-	await client.StartAsync();
+	await _client.LoginAsync(TokenType.Bot, token);
+	await _client.StartAsync();
 
 	// Block this task until the program is closed.
 	await Task.Delay(-1);
