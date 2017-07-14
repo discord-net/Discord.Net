@@ -4,12 +4,12 @@ using Discord.Commands;
 
 public class BooleanTypeReader : TypeReader
 {
-    public override Task<TypeReaderResult> Read(CommandContext context, string input)
+    public override Task<TypeReaderResult> Read(ICommandContext context, string input, IServiceProvider services)
     {
         bool result;
         if (bool.TryParse(input, out result))
             return Task.FromResult(TypeReaderResult.FromSuccess(result));
-        
-        return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Input could not be parsed as a boolean."))
+
+        return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Input could not be parsed as a boolean."));
     }
 }
