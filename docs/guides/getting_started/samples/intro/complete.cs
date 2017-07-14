@@ -7,12 +7,14 @@ namespace MyBot
 {
 	public class Program
 	{
+		private DiscordSocketClient client;
+		
 		public static void Main(string[] args)
 			=> new Program().MainAsync().GetAwaiter().GetResult();
 
 		public async Task MainAsync()
 		{
-			var client = new DiscordSocketClient();
+			client = new DiscordSocketClient();
 
 			client.Log += Log;
 			client.MessageReceived += MessageReceived;
