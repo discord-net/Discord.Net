@@ -4,7 +4,7 @@
     <id>Discord.Net</id>
     <version>1.0.2$suffix$</version>
     <title>Discord.Net</title>
-    <authors>RogueException</authors>
+    <authors>Discord.Net Contributors</authors>
     <owners>RogueException</owners>
     <description>An asynchronous API wrapper for Discord. This metapackage includes all of the optional Discord.Net components.</description>
     <tags>discord;discordapp</tags>
