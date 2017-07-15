@@ -19,7 +19,7 @@ namespace Discord.Rest
 
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public bool IsEveryone => Id == Guild.Id;
-        public string Mention => IsEveryone ? : "@everyone" : MentionUtils.MentionRole(Id);
+        public string Mention => IsEveryone ? "@everyone" : MentionUtils.MentionRole(Id);
 
         internal RestRole(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, id)

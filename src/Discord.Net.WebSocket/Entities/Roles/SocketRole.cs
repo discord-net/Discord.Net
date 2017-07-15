@@ -23,7 +23,7 @@ namespace Discord.WebSocket
 
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public bool IsEveryone => Id == Guild.Id;
-        public string Mention => IsEveryone ? : "@everyone" : MentionUtils.MentionRole(Id);
+        public string Mention => IsEveryone ? "@everyone" : MentionUtils.MentionRole(Id);
         public IEnumerable<SocketGuildUser> Members 
             => Guild.Users.Where(x => x.Roles.Any(r => r.Id == Id));
 
