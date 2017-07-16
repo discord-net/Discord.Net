@@ -577,7 +577,8 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            var id = new Random().Next(0, int.MaxValue);
+            var ids = new BucketIds(channelId: (ulong)id);
 
             await SendAsync("PUT", () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}/@me", ids, options: options).ConfigureAwait(false);
         }
@@ -589,7 +590,8 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(channelId: channelId);
+            var id = new Random().Next(0, int.MaxValue);
+            var ids = new BucketIds(channelId: (ulong)id);
 
             await SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}/{userId}", ids, options: options).ConfigureAwait(false);
         }
