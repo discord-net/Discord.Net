@@ -7,19 +7,21 @@ namespace MyBot
 {
 	public class Program
 	{
+		private DiscordSocketClient _client;
+		
 		public static void Main(string[] args)
 			=> new Program().MainAsync().GetAwaiter().GetResult();
 
 		public async Task MainAsync()
 		{
-			var client = new DiscordSocketClient();
+			_client = new DiscordSocketClient();
 
-			client.Log += Log;
-			client.MessageReceived += MessageReceived;
+			_client.Log += Log;
+			_client.MessageReceived += MessageReceived;
 
 			string token = "abcdefg..."; // Remember to keep this private!
-			await client.LoginAsync(TokenType.Bot, token);
-			await client.StartAsync();
+			await _client.LoginAsync(TokenType.Bot, token);
+			await _client.StartAsync();
 
 			// Block this task until the program is closed.
 			await Task.Delay(-1);
