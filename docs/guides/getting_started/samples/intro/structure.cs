@@ -39,6 +39,9 @@ class Program
             // add the `using` at the top, and uncomment this line:
             //WebSocketProvider = WS4NetProvider.Instance
         });
+        // Subscribe the logging handler to both the client and the CommandService.
+        _client.Log += Logger;
+        _commands.Log += Logger;
     }
 
     // Example of a logging handler. This can be re-used by addons
@@ -77,9 +80,6 @@ class Program
 
     private async Task MainAsync()
     {
-        // Subscribe the logging handler.
-        _client.Log += Logger;
-
         // Centralize the logic for commands into a seperate method.
         await InitCommands();
 
