@@ -15,6 +15,11 @@ namespace Discord
         public RetryMode? RetryMode { get; set; }
         public bool HeaderOnly { get; internal set; }
         /// <summary>
+        /// Should this request bypass the ratelimit buckets? This option should be used sparingly, and when used, should be coupled with your own
+        /// delays between requests, to avoid encountering 429 errors.
+        /// </summary>
+        public bool BypassBuckets { get; set; }
+        /// <summary>
         /// The reason for this action in the guild's audit log
         /// </summary>
         public string AuditLogReason { get; set; }

@@ -48,8 +48,11 @@ namespace Discord.Net.Queue
             LastAttemptAt = DateTimeOffset.UtcNow;
             while (true)
             {
-                await _queue.EnterGlobalAsync(id, request).ConfigureAwait(false);
-                await EnterAsync(id, request).ConfigureAwait(false);
+                if (!request.Options.BypassBuckets)
+                {
+                    await _queue.EnterGlobalAsync(id, request).ConfigureAwait(false);
+                    await EnterAsync(id, request).ConfigureAwait(false);
+                }
 
 #if DEBUG_LIMITS
                 Debug.WriteLine($"[{id}] Sending...");
