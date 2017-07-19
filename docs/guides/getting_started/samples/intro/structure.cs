@@ -8,12 +8,6 @@ using Discord.WebSocket;
 
 class Program
 {
-    private readonly DiscordSocketClient _client;
-    
-    // Keep the CommandService and IServiceCollection around for use with commands.
-    private readonly IServiceCollection _map = new ServiceCollection();
-    private readonly CommandService _commands = new CommandService();
-
     // Program entry point
     static void Main(string[] args)
     {
@@ -21,6 +15,12 @@ class Program
         // MainAsync method and wait until it finishes (which should be never).
         new Program().MainAsync().GetAwaiter().GetResult();
     }
+
+    private readonly DiscordSocketClient _client;
+    
+    // Keep the CommandService and IServiceCollection around for use with commands.
+    private readonly IServiceCollection _map = new ServiceCollection();
+    private readonly CommandService _commands = new CommandService();
 
     private Program()
     {
@@ -48,7 +48,6 @@ class Program
     // that ask for a Func<LogMessage, Task>.
     private static Task Logger(LogMessage message)
     {
-        var cc = Console.ForegroundColor;
         switch (message.Severity)
         {
             case LogSeverity.Critical:
@@ -67,7 +66,7 @@ class Program
                 break;
         }
         Console.WriteLine($"{DateTime.Now,-19} [{message.Severity,8}] {message.Source}: {message.Message}");
-        Console.ForegroundColor = cc;
+        Console.ResetColor();
         
         // If you get an error saying 'CompletedTask' doesn't exist,
         // your project is targeting .NET 4.5.2 or lower. You'll need
