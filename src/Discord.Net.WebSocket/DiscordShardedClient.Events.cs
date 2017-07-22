@@ -22,5 +22,13 @@ namespace Discord.WebSocket
             remove { _shardDisconnectedEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<DiscordSocketClient, Exception, Task>> _shardDisconnectedEvent = new AsyncEvent<Func<DiscordSocketClient, Exception, Task>>();
+        /// <summary>
+        /// Fired when a guild data for a shard has finished downloading.
+        /// </summary>
+        public event Func<DiscordSocketClient, Task> ShardReady {
+            add { _shardReadyEvent.Add(value); }
+            remove { _shardReadyEvent.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<DiscordSocketClient, Task>> _shardReadyEvent = new AsyncEvent<Func<DiscordSocketClient, Task>>();
     }
 }

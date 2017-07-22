@@ -276,6 +276,7 @@ namespace Discord.WebSocket
 
             client.Connected += () => _shardConnectedEvent.InvokeAsync(client);
             client.Disconnected += (exception) => _shardDisconnectedEvent.InvokeAsync(client, exception);
+            client.Ready += () => _shardReadyEvent.InvokeAsync(client);
 
             client.ChannelCreated += (channel) => _channelCreatedEvent.InvokeAsync(channel);
             client.ChannelDestroyed += (channel) => _channelDestroyedEvent.InvokeAsync(channel);
