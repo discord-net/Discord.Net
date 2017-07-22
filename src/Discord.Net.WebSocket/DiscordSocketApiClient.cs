@@ -27,7 +27,7 @@ namespace Discord.API
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
 
         private readonly MemoryStream _decompressionStream;
-        private readonly JsonTextReader _decompressionJsonReader;
+        private readonly StreamReader _decompressionReader;
         private CancellationTokenSource _connectCancelToken;
         private string _gatewayUrl;
         private bool _isExplicitUrl;
@@ -43,8 +43,8 @@ namespace Discord.API
             _gatewayUrl = url;
             if (url != null)
                 _isExplicitUrl = true;
-            _decompressionStream = new MemoryStream(10 * 1024); //10 KB            
-            _decompressionJsonReader = new JsonTextReader(new StreamReader(_decompressionStream));
+            _decompressionStream = new MemoryStream(10 * 1024); //10 KB 
+            _decompressionReader = new StreamReader(_decompressionStream);
 
             WebSocketClient = webSocketProvider();
             //WebSocketClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .NET Framework 4.6+)
@@ -55,11 +55,15 @@ namespace Discord.API
                     _decompressionStream.Position = 0;
                     using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
                         zlib.CopyTo(_decompressionStream);
-                        
+
                     _decompressionStream.Position = 0;
-                    var msg = _serializer.Deserialize<SocketFrame>(_decompressionJsonReader);
-                    if (msg != null)
-                        await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                    using (var jsonReader = new JsonTextReader(_decompressionReader) { CloseInput = false })
+                    {
+                        var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
+                        if (msg != null)
+                            await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                    }
+                    _decompressionStream.SetLength(0);
                 }
             };
             WebSocketClient.TextMessage += async text =>

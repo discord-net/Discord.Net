@@ -40,7 +40,7 @@ namespace Discord.Audio
         private readonly JsonSerializer _serializer;
         private readonly SemaphoreSlim _connectionLock;
         private readonly MemoryStream _decompressionStream;
-        private readonly JsonTextReader _decompressionJsonReader;
+        private readonly StreamReader _decompressionReader;
         private CancellationTokenSource _connectCancelToken;
         private IUdpSocket _udp;
         private bool _isDisposed;
@@ -59,7 +59,7 @@ namespace Discord.Audio
             _udp = udpSocketProvider();
             _udp.ReceivedDatagram += (data, index, count) => _receivedPacketEvent.InvokeAsync(data, index, count);
             _decompressionStream = new MemoryStream(10 * 1024); //10 KB
-            _decompressionJsonReader = new JsonTextReader(new StreamReader(_decompressionStream));
+            _decompressionReader = new StreamReader(_decompressionStream);
 
             WebSocketClient = webSocketProvider();
             //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); //(Causes issues in .Net 4.6+)
@@ -72,9 +72,13 @@ namespace Discord.Audio
                         zlib.CopyTo(_decompressionStream);
 
                     _decompressionStream.Position = 0;
-                    var msg = _serializer.Deserialize<SocketFrame>(_decompressionJsonReader);
-                    if (msg != null)
-                        await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
+                    using (var jsonReader = new JsonTextReader(_decompressionReader) { CloseInput = false })
+                    {
+                        var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
+                        if (msg != null)
+                            await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
+                    }
+                    _decompressionStream.SetLength(0);
                 }
             };
             WebSocketClient.TextMessage += async text =>
@@ -231,7 +235,7 @@ namespace Discord.Audio
         }
         public async Task<ulong> SendKeepaliveAsync()
         {
-            var value = _nextKeepalive++;
+            ulong value = _nextKeepalive++;
             var packet = new byte[8];
             packet[0] = (byte)(value >> 0);
             packet[1] = (byte)(value >> 8);
