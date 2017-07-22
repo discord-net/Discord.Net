@@ -7,7 +7,7 @@ namespace Discord.Audio.Streams
     public class RTPReadStream : AudioOutStream
     {
         private readonly AudioStream _next;
-        private readonly byte[] _buffer, _nonce;
+        private readonly byte[] _nonce;
 
         public override bool CanRead => true;
         public override bool CanSeek => false;
@@ -16,7 +16,6 @@ namespace Discord.Audio.Streams
         public RTPReadStream(AudioStream next, int bufferSize = 4000)
         {
             _next = next;
-            _buffer = new byte[bufferSize];
             _nonce = new byte[24];
         }
 

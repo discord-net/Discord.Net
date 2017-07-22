@@ -212,7 +212,7 @@ namespace Discord.Net.WebSockets
                             else
                                 result = stream.ToArray();
 #else
-                                result = stream.GetBuffer();
+                            result = stream.GetBuffer();
 #endif
                         }
                     }

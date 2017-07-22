@@ -31,5 +31,8 @@ namespace Discord.Audio
         AudioOutStream CreatePCMStream(AudioApplication application, int? bitrate = null, int bufferMillis = 1000, int packetLoss = 30);
         /// <summary>Creates a new direct outgoing stream accepting PCM (raw) data. This is a direct stream with no internal timer.</summary>
         AudioOutStream CreateDirectPCMStream(AudioApplication application, int? bitrate = null, int packetLoss = 30);
+        
+        /// <summary>Recycles an RTPFrame's payload buffer. Do not call more than once for a given frame.</summary>
+        void RecycleFrame(RTPFrame frame);
     }
 }

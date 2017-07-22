@@ -26,6 +26,8 @@ namespace Discord.API
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
 
+        private readonly MemoryStream _decompressionStream;
+        private readonly JsonTextReader _decompressionJsonReader;
         private CancellationTokenSource _connectCancelToken;
         private string _gatewayUrl;
         private bool _isExplicitUrl;
@@ -41,23 +43,23 @@ namespace Discord.API
             _gatewayUrl = url;
             if (url != null)
                 _isExplicitUrl = true;
+            _decompressionStream = new MemoryStream(10 * 1024); //10 KB            
+            _decompressionJsonReader = new JsonTextReader(new StreamReader(_decompressionStream));
+
             WebSocketClient = webSocketProvider();
             //WebSocketClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .NET Framework 4.6+)
             WebSocketClient.BinaryMessage += async (data, index, count) =>
             {
                 using (var compressed = new MemoryStream(data, index + 2, count - 2))
-                using (var decompressed = new MemoryStream())
                 {
+                    _decompressionStream.Position = 0;
                     using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
-                        zlib.CopyTo(decompressed);
-                    decompressed.Position = 0;
-                    using (var reader = new StreamReader(decompressed))
-                    using (var jsonReader = new JsonTextReader(reader))
-                    {
-                        var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
-                        if (msg != null)
-                            await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
-                    }
+                        zlib.CopyTo(_decompressionStream);
+                        
+                    _decompressionStream.Position = 0;
+                    var msg = _serializer.Deserialize<SocketFrame>(_decompressionJsonReader);
+                    if (msg != null)
+                        await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                 }
             };
             WebSocketClient.TextMessage += async text =>

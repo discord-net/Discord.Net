@@ -32,13 +32,15 @@ namespace Discord.Audio
 
         public event Func<VoiceOpCode, object, Task> ReceivedEvent { add { _receivedEvent.Add(value); } remove { _receivedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<VoiceOpCode, object, Task>> _receivedEvent = new AsyncEvent<Func<VoiceOpCode, object, Task>>();
-        public event Func<byte[], Task> ReceivedPacket { add { _receivedPacketEvent.Add(value); } remove { _receivedPacketEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<byte[], Task>> _receivedPacketEvent = new AsyncEvent<Func<byte[], Task>>();
+        public event Func<byte[], int, int, Task> ReceivedPacket { add { _receivedPacketEvent.Add(value); } remove { _receivedPacketEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<byte[], int, int, Task>> _receivedPacketEvent = new AsyncEvent<Func<byte[], int, int, Task>>();
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
         
         private readonly JsonSerializer _serializer;
         private readonly SemaphoreSlim _connectionLock;
+        private readonly MemoryStream _decompressionStream;
+        private readonly JsonTextReader _decompressionJsonReader;
         private CancellationTokenSource _connectCancelToken;
         private IUdpSocket _udp;
         private bool _isDisposed;
@@ -55,38 +57,35 @@ namespace Discord.Audio
             GuildId = guildId;
             _connectionLock = new SemaphoreSlim(1, 1);
             _udp = udpSocketProvider();
-            _udp.ReceivedDatagram += async (data, index, count) =>
-            {
-                if (index != 0 || count != data.Length)
-                {
-                    var newData = new byte[count];
-                    Buffer.BlockCopy(data, index, newData, 0, count);
-                    data = newData;
-                }
-                await _receivedPacketEvent.InvokeAsync(data).ConfigureAwait(false);
-            };
+            _udp.ReceivedDatagram += (data, index, count) => _receivedPacketEvent.InvokeAsync(data, index, count);
+            _decompressionStream = new MemoryStream(10 * 1024); //10 KB
+            _decompressionJsonReader = new JsonTextReader(new StreamReader(_decompressionStream));
 
             WebSocketClient = webSocketProvider();
             //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); //(Causes issues in .Net 4.6+)
             WebSocketClient.BinaryMessage += async (data, index, count) =>
             {
                 using (var compressed = new MemoryStream(data, index + 2, count - 2))
-                using (var decompressed = new MemoryStream())
                 {
+                    _decompressionStream.Position = 0;
                     using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
-                        zlib.CopyTo(decompressed);
-                    decompressed.Position = 0;
-                    using (var reader = new StreamReader(decompressed))
-                    {
-                        var msg = JsonConvert.DeserializeObject<SocketFrame>(reader.ReadToEnd());
+                        zlib.CopyTo(_decompressionStream);
+
+                    _decompressionStream.Position = 0;
+                    var msg = _serializer.Deserialize<SocketFrame>(_decompressionJsonReader);
+                    if (msg != null)
                         await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
-                    }
                 }
             };
             WebSocketClient.TextMessage += async text =>
             {
-                var msg = JsonConvert.DeserializeObject<SocketFrame>(text);
-                await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
+                using (var reader = new StringReader(text))
+                using (var jsonReader = new JsonTextReader(reader))
+                {
+                    var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
+                    if (msg != null)
+                        await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
+                }
             };
             WebSocketClient.Closed += async ex =>
             {

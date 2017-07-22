@@ -10,6 +10,7 @@ namespace Discord.Audio.Streams
     {
         private const int MaxFrames = 100; //1-2 Seconds
 
+        private readonly AudioClient _client;
         private ConcurrentQueue<RTPFrame> _frames;
         private SemaphoreSlim _signal;
         private ushort _nextSeq;
@@ -23,8 +24,9 @@ namespace Discord.Audio.Streams
         public override bool CanWrite => false;
         public override int AvailableFrames => _signal.CurrentCount;
 
-        public InputStream()
+        public InputStream(IAudioClient client)
         {
+            _client = (AudioClient)client;
             _frames = new ConcurrentQueue<RTPFrame>();
             _signal = new SemaphoreSlim(0, MaxFrames);
         }
@@ -70,28 +72,33 @@ namespace Discord.Audio.Streams
             _nextMissed = missed;
         }
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
+            => WriteAsync(buffer, offset, count, cancelToken, false);
+        internal Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken, bool claimBuffer)
         {
             cancelToken.ThrowIfCancellationRequested();
 
-            if (_signal.CurrentCount >= MaxFrames) //1-2 seconds
-            {
-                _hasHeader = false;
-                return Task.Delay(0); //Buffer overloaded
-            }
             if (!_hasHeader)
                 throw new InvalidOperationException("Received payload without an RTP header");
             _hasHeader = false;
-            byte[] payload = new byte[count];
-            Buffer.BlockCopy(buffer, offset, payload, 0, count);
+
+            if (_signal.CurrentCount >= MaxFrames) //1-2 seconds
+                return Task.Delay(0); //Buffer overloaded
 
             _frames.Enqueue(new RTPFrame(
                 sequence: _nextSeq,
                 timestamp: _nextTimestamp,
                 missed: _nextMissed,
-                payload: payload
+                payload: CopyBuffer(buffer, offset, count)
             ));
             _signal.Release();
             return Task.Delay(0);
+        }
+
+        protected byte[] CopyBuffer(byte[] buffer, int offset, int count)
+        {
+            byte[] payload = _client.GetFrameBuffer();
+            Buffer.BlockCopy(buffer, offset, payload, 0, count);
+            return payload;
         }
 
         protected override void Dispose(bool isDisposing)

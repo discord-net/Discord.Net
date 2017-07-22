@@ -38,6 +38,7 @@ namespace Discord.Audio
         private readonly ConcurrentQueue<KeyValuePair<ulong, int>> _keepaliveTimes;
         private readonly ConcurrentDictionary<uint, ulong> _ssrcMap;
         private readonly ConcurrentDictionary<ulong, StreamPair> _streams;
+        private readonly ConcurrentQueue<byte[]> _frameBuffers;
 
         private Task _heartbeatTask, _keepaliveTask;
         private long _lastMessageTime;
@@ -79,6 +80,7 @@ namespace Discord.Audio
             _keepaliveTimes = new ConcurrentQueue<KeyValuePair<ulong, int>>();
             _ssrcMap = new ConcurrentDictionary<uint, ulong>();
             _streams = new ConcurrentDictionary<ulong, StreamPair>();
+            _frameBuffers = new ConcurrentQueue<byte[]>();
             
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             _serializer.Error += (s, e) =>
@@ -174,7 +176,7 @@ namespace Discord.Audio
             //Assume Thread-safe
             if (!_streams.ContainsKey(userId))
             {
-                var readerStream = new InputStream(); //Consumes header
+                var readerStream = new InputStream(this); //Consumes header
                 var opusDecoder = new OpusDecodeStream(readerStream); //Passes header
                 //var jitterBuffer = new JitterBuffer(opusDecoder, _audioLogger);
                 var rtpReader = new RTPReadStream(opusDecoder); //Generates header
@@ -283,13 +285,13 @@ namespace Discord.Audio
                 return;
             }
         }
-        private async Task ProcessPacketAsync(byte[] packet)
+        private async Task ProcessPacketAsync(byte[] packet, int offset, int count)
         {
             try
             {
                 if (_connection.State == ConnectionState.Connecting)
                 {
-                    if (packet.Length != 70)
+                    if (count != 70)
                     {
                         await _audioLogger.DebugAsync($"Malformed Packet").ConfigureAwait(false);
                         return;
@@ -298,8 +300,8 @@ namespace Discord.Audio
                     int port;
                     try
                     {
-                        ip = Encoding.UTF8.GetString(packet, 4, 70 - 6).TrimEnd('\0');
-                        port = (packet[69] << 8) | packet[68];
+                        ip = Encoding.UTF8.GetString(packet, offset + 4, 70 - 6).TrimEnd('\0');
+                        port = (packet[offset + 69] << 8) | packet[offset + 68];
                     }
                     catch (Exception ex)
                     {
@@ -312,19 +314,19 @@ namespace Discord.Audio
                 }
                 else if (_connection.State == ConnectionState.Connected)
                 {
-                    if (packet.Length == 8)
+                    if (count == 8)
                     {
                         await _audioLogger.DebugAsync("Received Keepalive").ConfigureAwait(false);
 
                         ulong value = 
-                            ((ulong)packet[0] >> 0) |
-                            ((ulong)packet[1] >> 8) |
-                            ((ulong)packet[2] >> 16) |
-                            ((ulong)packet[3] >> 24) |
-                            ((ulong)packet[4] >> 32) |
-                            ((ulong)packet[5] >> 40) |
-                            ((ulong)packet[6] >> 48) |
-                            ((ulong)packet[7] >> 56);
+                            ((ulong)packet[offset + 0] >> 0) |
+                            ((ulong)packet[offset + 1] >> 8) |
+                            ((ulong)packet[offset + 2] >> 16) |
+                            ((ulong)packet[offset + 3] >> 24) |
+                            ((ulong)packet[offset + 4] >> 32) |
+                            ((ulong)packet[offset + 5] >> 40) |
+                            ((ulong)packet[offset + 6] >> 48) |
+                            ((ulong)packet[offset + 7] >> 56);
 
                         while (_keepaliveTimes.TryDequeue(out var pair))
                         {
@@ -341,7 +343,7 @@ namespace Discord.Audio
                     }
                     else
                     {                        
-                        if (!RTPReadStream.TryReadSsrc(packet, 0, out var ssrc))
+                        if (!RTPReadStream.TryReadSsrc(packet, offset, out var ssrc))
                         {
                             await _audioLogger.DebugAsync($"Malformed Frame").ConfigureAwait(false);
                             return;
@@ -358,14 +360,14 @@ namespace Discord.Audio
                         }
                         try
                         {
-                            await pair.Writer.WriteAsync(packet, 0, packet.Length).ConfigureAwait(false);
+                            await pair.Writer.WriteAsync(packet, offset, count).ConfigureAwait(false);
                         }
                         catch (Exception ex)
                         {
                             await _audioLogger.DebugAsync($"Malformed Frame", ex).ConfigureAwait(false);
                             return;
                         }
-                        //await _audioLogger.DebugAsync($"Received {packet.Length} bytes from user {userId}").ConfigureAwait(false);
+                        //await _audioLogger.DebugAsync($"Received {count} bytes from user {userId}").ConfigureAwait(false);
                     }
                 }
             }
@@ -459,6 +461,18 @@ namespace Discord.Audio
                 _isSpeaking = value;
                 await ApiClient.SendSetSpeaking(value).ConfigureAwait(false);
             }
+        }
+
+        public void RecycleFrame(RTPFrame frame)
+        {
+            if (_frameBuffers.Count < 100) //2s of audio
+                _frameBuffers.Enqueue(frame.Payload);
+        }
+        internal byte[] GetFrameBuffer()
+        {
+            if (_frameBuffers.TryDequeue(out var buffer))
+                return buffer;
+            return new byte[OpusConverter.FrameBytes];
         }
 
         internal void Dispose(bool disposing)
