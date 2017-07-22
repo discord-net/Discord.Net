@@ -51,6 +51,7 @@ namespace Discord.Audio.Streams
             if (count < frame.Payload.Length)
                 throw new InvalidOperationException("Buffer is too small.");
             Buffer.BlockCopy(frame.Payload, 0, buffer, offset, frame.Payload.Length);
+            _client.RecycleFrame(frame);
             return frame.Payload.Length;
         }
         public override async Task<RTPFrame> ReadFrameAsync(CancellationToken cancelToken)
