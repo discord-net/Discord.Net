@@ -240,15 +240,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override SocketChannel GetChannel(ulong id) 
             => State.GetChannel(id);
-
-        /// <inheritdoc />
-        public Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync()
-            => ClientHelper.GetConnectionsAsync(this, new RequestOptions());
-
-        /// <inheritdoc />
-        public Task<RestInvite> GetInviteAsync(string inviteId)
-            => ClientHelper.GetInviteAsync(this, inviteId, new RequestOptions());
-
+                                                                                
         /// <inheritdoc />
         public override SocketUser GetUser(ulong id) 
             => State.GetUser(id);

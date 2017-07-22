@@ -117,8 +117,8 @@ namespace Discord.WebSocket
         public override async Task StartAsync() 
             => await Task.WhenAll(_shards.Select(x => x.StartAsync())).ConfigureAwait(false);
         /// <inheritdoc />
-        public override async Task StopAsync() => 
-            await Task.WhenAll(_shards.Select(x => x.StopAsync())).ConfigureAwait(false);
+        public override async Task StopAsync() 
+            => await Task.WhenAll(_shards.Select(x => x.StopAsync())).ConfigureAwait(false);
 
         public DiscordSocketClient GetShard(int id)
         {
@@ -168,11 +168,7 @@ namespace Discord.WebSocket
             for (int i = 0; i < _shards.Length; i++)
                 result += _shards[i].PrivateChannels.Count;
             return result;
-        }
-
-        /// <inheritdoc />
-        public Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync()
-            => ClientHelper.GetConnectionsAsync(this, new RequestOptions());
+        }                                                                    
 
         private IEnumerable<SocketGuild> GetGuilds()
         {
@@ -188,11 +184,7 @@ namespace Discord.WebSocket
             for (int i = 0; i < _shards.Length; i++)
                 result += _shards[i].Guilds.Count;
             return result;
-        }
-
-        /// <inheritdoc />
-        public Task<RestInvite> GetInviteAsync(string inviteId)
-            => ClientHelper.GetInviteAsync(this, inviteId, new RequestOptions());
+        }                    
 
         /// <inheritdoc />
         public override SocketUser GetUser(ulong id)
