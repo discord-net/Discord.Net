@@ -1,5 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.IO;
+using Newtonsoft.Json;
 using Model = Discord.API.Image;
 
 namespace Discord.Net.Converters
@@ -23,8 +24,12 @@ namespace Discord.Net.Converters
 
             if (image.Stream != null)
             {
-                byte[] bytes = new byte[image.Stream.Length - image.Stream.Position];
-                image.Stream.Read(bytes, 0, bytes.Length);
+                Stream cloneStream = new MemoryStream();
+                image.Stream.CopyTo(cloneStream);
+
+                byte[] bytes = new byte[cloneStream.Length];
+                cloneStream.Seek(0, SeekOrigin.Begin);
+                cloneStream.Read(bytes, 0, bytes.Length);
 
                 string base64 = Convert.ToBase64String(bytes);
                 writer.WriteValue($"data:image/jpeg;base64,{base64}");
