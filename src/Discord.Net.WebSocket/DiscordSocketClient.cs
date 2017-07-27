@@ -231,7 +231,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public override async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null) 
-            => _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this, options ?? RequestOptions.Default));
+            => _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this, options ?? RequestOptions.Default).ConfigureAwait(false));
 
         /// <inheritdoc />
         public override SocketGuild GetGuild(ulong id) 
@@ -278,7 +278,7 @@ namespace Discord.WebSocket
         }
 
         /// <summary> Downloads the users list for the provided guilds, if they don't have a complete list. </summary>
-        public async Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
+        public override async Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
         {
             if (ConnectionState == ConnectionState.Connected)
             {

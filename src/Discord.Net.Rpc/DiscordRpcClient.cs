@@ -67,8 +67,7 @@ namespace Discord.Rpc
 
         public Task StartAsync() => _connection.StartAsync();
         public Task StopAsync() => _connection.StopAsync();
-                        
-
+                                                                                                                                                                                       
         private async Task OnConnectingAsync()
         {
             await _rpcLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
@@ -450,7 +449,7 @@ namespace Discord.Rpc
                             //Others
                             default:
                                 await _rpcLogger.WarningAsync($"Unknown Dispatch ({evnt})").ConfigureAwait(false);
-                                return;
+                                return;                                                                                                                                                 
                         }
                         break;
 

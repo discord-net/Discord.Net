@@ -2,8 +2,7 @@
 using System.Threading.Tasks;
 
 namespace Discord.WebSocket
-{
-    //TODO: Add event docstrings
+{                                
     public partial class DiscordShardedClient
     {
         /// <summary>

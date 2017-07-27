@@ -214,7 +214,7 @@ namespace Discord.WebSocket
             => _shards[0].GetVoiceRegion(id);
 
         /// <summary> Downloads the users list for the provided guilds, if they don't have a complete list. </summary>
-        public async Task DownloadUsersAsync(IEnumerable<SocketGuild> guilds)
+        public override async Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
         {
             for (int i = 0; i < _shards.Length; i++)
             {

@@ -45,7 +45,7 @@ namespace Discord.WebSocket
         public abstract Task StopAsync();
         public abstract Task SetStatusAsync(UserStatus status);
         public abstract Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming);
-        // TODO: DownloadUsersAsync? 
+        public abstract Task DownloadUsersAsync(IEnumerable<IGuild> guilds);  
 
         /// <inheritdoc />
         public Task<RestGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null, RequestOptions options = null)
