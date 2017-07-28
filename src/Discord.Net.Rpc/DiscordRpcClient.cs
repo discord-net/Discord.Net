@@ -22,7 +22,7 @@ namespace Discord.Rpc
 
         public ConnectionState ConnectionState { get; private set; }
         public IReadOnlyCollection<string> Scopes { get; private set; }
-        public DateTimeOffset TokenExpiresAt { get; private set; }
+        public DateTimeOffset TokenExpiresAt { get; private set; }                                                                                  
 
         internal new API.DiscordRpcApiClient ApiClient => base.ApiClient as API.DiscordRpcApiClient;
         public new RestSelfUser CurrentUser { get { return base.CurrentUser as RestSelfUser; } private set { base.CurrentUser = value; } }
@@ -66,8 +66,8 @@ namespace Discord.Rpc
         }
 
         public Task StartAsync() => _connection.StartAsync();
-        public Task StopAsync() => _connection.StopAsync();
-                                                                                                                                                                                       
+        public Task StopAsync() => _connection.StopAsync();                                                                                                                             
+
         private async Task OnConnectingAsync()
         {
             await _rpcLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
@@ -449,7 +449,7 @@ namespace Discord.Rpc
                             //Others
                             default:
                                 await _rpcLogger.WarningAsync($"Unknown Dispatch ({evnt})").ConfigureAwait(false);
-                                return;                                                                                                                                                 
+                                return;
                         }
                         break;
 
