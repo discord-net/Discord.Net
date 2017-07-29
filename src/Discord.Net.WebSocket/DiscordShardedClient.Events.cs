@@ -35,6 +35,7 @@ namespace Discord.WebSocket
         }
         private readonly AsyncEvent<Func<int, int, DiscordSocketClient, Task>> _shardLatencyUpdatedEvent = new AsyncEvent<Func<int, int, DiscordSocketClient, Task>>();
 
+        [Obsolete("This event is non-functioning and will be removed in the next major release. Functionality has been merged into the GuildMemberUpdated event.")]
         public event Func<Optional<SocketGuild>, SocketUser, SocketPresence, SocketPresence, Task> UserPresenceUpdated
         {
             add { _userPresenceUpdatedEvent.Add(value); }
