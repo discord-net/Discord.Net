@@ -55,6 +55,7 @@ namespace Discord.API
                     _decompressionStream.Position = 0;
                     using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
                         zlib.CopyTo(_decompressionStream);
+                    _decompressionStream.SetLength(_decompressionStream.Position);
 
                     _decompressionStream.Position = 0;
                     using (var jsonReader = new JsonTextReader(_decompressionReader) { CloseInput = false })
@@ -63,7 +64,6 @@ namespace Discord.API
                         if (msg != null)
                             await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                     }
-                    _decompressionStream.SetLength(0);
                 }
             };
             WebSocketClient.TextMessage += async text =>
