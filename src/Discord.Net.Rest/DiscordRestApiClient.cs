@@ -392,6 +392,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
             Preconditions.NotEqual(roleId, 0, nameof(roleId));
+            Preconditions.NotEqual(roleId, guildId, nameof(roleId), "The Everyone role cannot be added to a user.");
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
@@ -402,6 +403,7 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(userId, 0, nameof(userId));
             Preconditions.NotEqual(roleId, 0, nameof(roleId));
+            Preconditions.NotEqual(roleId, guildId, nameof(roleId), "The Everyone role cannot be removed from a user.");
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
@@ -1000,6 +1002,10 @@ namespace Discord.API
 
             bool isCurrentUser = userId == CurrentUserId;
 
+            if (args.RoleIds.IsSpecified)
+            {
+                Preconditions.NotEveryoneRole(args.RoleIds.Value, guildId, nameof(args.RoleIds));
+            }
             if (isCurrentUser && args.Nickname.IsSpecified)
             {
                 var nickArgs = new Rest.ModifyCurrentUserNickParams(args.Nickname.Value ?? "");
