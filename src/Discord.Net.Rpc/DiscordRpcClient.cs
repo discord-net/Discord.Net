@@ -1,8 +1,6 @@
 ﻿using Discord.API.Rpc;
 using Discord.Logging;
-using Discord.Net.Converters;
 using Discord.Rest;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -10,22 +8,23 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
+using Discord.Serialization;
 
 namespace Discord.Rpc
 {
     public partial class DiscordRpcClient : BaseDiscordClient, IDiscordClient
     {
-        private readonly JsonSerializer _serializer;
         private readonly ConnectionManager _connection;
         private readonly Logger _rpcLogger;
         private readonly SemaphoreSlim _stateLock, _authorizeLock;
+        private readonly ScopedSerializer _serializer;
 
         public ConnectionState ConnectionState { get; private set; }
         public IReadOnlyCollection<string> Scopes { get; private set; }
         public DateTimeOffset TokenExpiresAt { get; private set; }
 
         internal new API.DiscordRpcApiClient ApiClient => base.ApiClient as API.DiscordRpcApiClient;
-        public new RestSelfUser CurrentUser { get { return base.CurrentUser as RestSelfUser; } private set { base.CurrentUser = value; } }
+        public new RestSelfUser CurrentUser { get => base.CurrentUser as RestSelfUser; private set => base.CurrentUser = value; }
         public RestApplication ApplicationInfo { get; private set; }
 
         /// <summary> Creates a new RPC discord client. </summary>
@@ -38,18 +37,18 @@ namespace Discord.Rpc
             _stateLock = new SemaphoreSlim(1, 1);
             _authorizeLock = new SemaphoreSlim(1, 1);
             _rpcLogger = LogManager.CreateLogger("RPC");
+
+            _serializer = Serializer.CreateScope();
+            _serializer.Error += async ex =>
+            {
+                await _rpcLogger.WarningAsync("Serializer Error", ex);
+            };
+
             _connection = new ConnectionManager(_stateLock, _rpcLogger, config.ConnectionTimeout, 
                 OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
             _connection.Connected += () => _connectedEvent.InvokeAsync();
             _connection.Disconnected += (ex, recon) => _disconnectedEvent.InvokeAsync(ex);
 
-            _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
-            _serializer.Error += (s, e) =>
-            {
-                _rpcLogger.WarningAsync(e.ErrorContext.Error).GetAwaiter().GetResult();
-                e.ErrorContext.Handled = true;
-            };
-            
             ApiClient.SentRpcMessage += async opCode => await _rpcLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
             ApiClient.ReceivedRpcEvent += ProcessMessageAsync;
         }
@@ -185,10 +184,12 @@ namespace Discord.Rpc
         {
             if (func == null) throw new NullReferenceException(nameof(func));
 
-            var settings = new VoiceProperties();
-            settings.Input = new VoiceDeviceProperties();
-            settings.Output = new VoiceDeviceProperties();
-            settings.Mode = new VoiceModeProperties();
+            var settings = new VoiceProperties
+            {
+                Input = new VoiceDeviceProperties(),
+                Output = new VoiceDeviceProperties(),
+                Mode = new VoiceModeProperties()
+            };
             func(settings);
 
             var model = new API.Rpc.VoiceSettings
@@ -294,9 +295,9 @@ namespace Discord.Rpc
                             case "READY":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<ReadyEvent>(_serializer);
+                                    var data = _serializer.FromJson<ReadyEvent>(payload.Value as JToken);
 
-                                    RequestOptions options = new RequestOptions
+                                    var options = new RequestOptions
                                     {
                                         //CancellationToken = _cancelToken //TODO: Implement
                                     };
@@ -336,7 +337,7 @@ namespace Discord.Rpc
                             case "CHANNEL_CREATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (CHANNEL_CREATE)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<ChannelSummary>(_serializer);
+                                    var data = _serializer.FromJson<ChannelSummary>(payload.Value as JToken);
                                     var channel = RpcChannelSummary.Create(data);
 
                                     await _channelCreatedEvent.InvokeAsync(channel).ConfigureAwait(false);
@@ -347,7 +348,7 @@ namespace Discord.Rpc
                             case "GUILD_CREATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (GUILD_CREATE)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<GuildSummary>(_serializer);
+                                    var data = _serializer.FromJson<GuildSummary>(payload.Value as JToken);
                                     var guild = RpcGuildSummary.Create(data);
 
                                     await _guildCreatedEvent.InvokeAsync(guild).ConfigureAwait(false);
@@ -356,7 +357,7 @@ namespace Discord.Rpc
                             case "GUILD_STATUS":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (GUILD_STATUS)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<GuildStatusEvent>(_serializer);
+                                    var data = _serializer.FromJson<GuildStatusEvent>(payload.Value as JToken);
                                     var guildStatus = RpcGuildStatus.Create(data);
 
                                     await _guildStatusUpdatedEvent.InvokeAsync(guildStatus).ConfigureAwait(false);
@@ -367,7 +368,7 @@ namespace Discord.Rpc
                             case "VOICE_STATE_CREATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (VOICE_STATE_CREATE)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<ExtendedVoiceState>(_serializer);
+                                    var data = _serializer.FromJson<ExtendedVoiceState>(payload.Value as JToken);
                                     var voiceState = RpcVoiceState.Create(this, data);
 
                                     await _voiceStateCreatedEvent.InvokeAsync(voiceState).ConfigureAwait(false);
@@ -376,7 +377,7 @@ namespace Discord.Rpc
                             case "VOICE_STATE_UPDATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (VOICE_STATE_UPDATE)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<ExtendedVoiceState>(_serializer);
+                                    var data = _serializer.FromJson<ExtendedVoiceState>(payload.Value as JToken);
                                     var voiceState = RpcVoiceState.Create(this, data);
 
                                     await _voiceStateUpdatedEvent.InvokeAsync(voiceState).ConfigureAwait(false);
@@ -385,7 +386,7 @@ namespace Discord.Rpc
                             case "VOICE_STATE_DELETE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (VOICE_STATE_DELETE)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<ExtendedVoiceState>(_serializer);
+                                    var data = _serializer.FromJson<ExtendedVoiceState>(payload.Value as JToken);
                                     var voiceState = RpcVoiceState.Create(this, data);
 
                                     await _voiceStateDeletedEvent.InvokeAsync(voiceState).ConfigureAwait(false);
@@ -395,7 +396,7 @@ namespace Discord.Rpc
                             case "SPEAKING_START":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (SPEAKING_START)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<SpeakingEvent>(_serializer);
+                                    var data = _serializer.FromJson<SpeakingEvent>(payload.Value as JToken);
 
                                     await _speakingStartedEvent.InvokeAsync(data.UserId).ConfigureAwait(false);
                                 }
@@ -403,7 +404,7 @@ namespace Discord.Rpc
                             case "SPEAKING_STOP":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (SPEAKING_STOP)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<SpeakingEvent>(_serializer);
+                                    var data = _serializer.FromJson<SpeakingEvent>(payload.Value as JToken);
 
                                     await _speakingStoppedEvent.InvokeAsync(data.UserId).ConfigureAwait(false);
                                 }
@@ -411,7 +412,7 @@ namespace Discord.Rpc
                             case "VOICE_SETTINGS_UPDATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (VOICE_SETTINGS_UPDATE)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<API.Rpc.VoiceSettings>(_serializer);
+                                    var data = _serializer.FromJson<API.Rpc.VoiceSettings>(payload.Value as JToken);
                                     var settings = VoiceSettings.Create(data);
 
                                     await _voiceSettingsUpdated.InvokeAsync(settings).ConfigureAwait(false);
@@ -422,7 +423,7 @@ namespace Discord.Rpc
                             case "MESSAGE_CREATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_CREATE)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<MessageEvent>(_serializer);
+                                    var data = _serializer.FromJson<MessageEvent>(payload.Value as JToken);
                                     var msg = RpcMessage.Create(this, data.ChannelId, data.Message);
 
                                     await _messageReceivedEvent.InvokeAsync(msg).ConfigureAwait(false);
@@ -431,7 +432,7 @@ namespace Discord.Rpc
                             case "MESSAGE_UPDATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_UPDATE)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<MessageEvent>(_serializer);
+                                    var data = _serializer.FromJson<MessageEvent>(payload.Value as JToken);
                                     var msg = RpcMessage.Create(this, data.ChannelId, data.Message);
 
                                     await _messageUpdatedEvent.InvokeAsync(msg).ConfigureAwait(false);
@@ -440,7 +441,7 @@ namespace Discord.Rpc
                             case "MESSAGE_DELETE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE)").ConfigureAwait(false);
-                                    var data = (payload.Value as JToken).ToObject<MessageEvent>(_serializer);
+                                    var data = _serializer.FromJson<MessageEvent>(payload.Value as JToken);
 
                                     await _messageDeletedEvent.InvokeAsync(data.ChannelId, data.Message.Id).ConfigureAwait(false);
                                 }

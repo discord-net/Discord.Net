@@ -2,7 +2,7 @@
 using System;
 using System.Globalization;
 
-namespace Discord.Net.Converters
+namespace Discord.Serialization.JsonConverters
 {
     internal class UInt64Converter : JsonConverter
     {

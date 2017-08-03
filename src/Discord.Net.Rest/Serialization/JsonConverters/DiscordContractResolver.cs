@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Discord.Net.Converters
+namespace Discord.Serialization.JsonConverters
 {
     internal class DiscordContractResolver : DefaultContractResolver
     {

@@ -2,7 +2,7 @@
 using System;
 using Model = Discord.API.Image;
 
-namespace Discord.Net.Converters
+namespace Discord.Serialization.JsonConverters
 {
     internal class ImageConverter : JsonConverter
     {

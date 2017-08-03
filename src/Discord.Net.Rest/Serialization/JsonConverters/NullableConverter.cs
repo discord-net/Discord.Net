@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace Discord.Net.Converters
+namespace Discord.Serialization.JsonConverters
 {
     internal class NullableConverter<T> : JsonConverter
         where T : struct

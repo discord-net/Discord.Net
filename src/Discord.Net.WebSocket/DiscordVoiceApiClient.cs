@@ -1,9 +1,9 @@
 ﻿#pragma warning disable CS1591
 using Discord.API;
 using Discord.API.Voice;
-using Discord.Net.Converters;
 using Discord.Net.Udp;
 using Discord.Net.WebSockets;
+using Discord.Serialization;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
@@ -37,7 +37,7 @@ namespace Discord.Audio
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
         
-        private readonly JsonSerializer _serializer;
+        private readonly ScopedSerializer _serializer;
         private readonly SemaphoreSlim _connectionLock;
         private readonly MemoryStream _decompressionStream;
         private readonly StreamReader _decompressionReader;
@@ -52,12 +52,14 @@ namespace Discord.Audio
 
         public ushort UdpPort => _udp.Port;
 
-        internal DiscordVoiceAPIClient(ulong guildId, WebSocketProvider webSocketProvider, UdpSocketProvider udpSocketProvider, JsonSerializer serializer = null)
+        internal DiscordVoiceAPIClient(ulong guildId, WebSocketProvider webSocketProvider, UdpSocketProvider udpSocketProvider, ScopedSerializer serializer)
         {
             GuildId = guildId;
             _connectionLock = new SemaphoreSlim(1, 1);
             _udp = udpSocketProvider();
             _udp.ReceivedDatagram += (data, index, count) => _receivedPacketEvent.InvokeAsync(data, index, count);
+            _serializer = serializer;
+
             _decompressionStream = new MemoryStream(10 * 1024); //10 KB
             _decompressionReader = new StreamReader(_decompressionStream);
 
@@ -70,23 +72,19 @@ namespace Discord.Audio
                     _decompressionStream.Position = 0;
                     using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
                         zlib.CopyTo(_decompressionStream);
+                    _decompressionStream.SetLength(_decompressionStream.Position);
 
                     _decompressionStream.Position = 0;
-                    using (var jsonReader = new JsonTextReader(_decompressionReader) { CloseInput = false })
-                    {
-                        var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
-                        if (msg != null)
-                            await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
-                    }
-                    _decompressionStream.SetLength(0);
+                    var msg = _serializer.FromJson<SocketFrame>(_decompressionReader);
+                    if (msg != null)
+                        await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
                 }
             };
             WebSocketClient.TextMessage += async text =>
             {
                 using (var reader = new StringReader(text))
-                using (var jsonReader = new JsonTextReader(reader))
                 {
-                    var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
+                    var msg = _serializer.FromJson<SocketFrame>(reader);
                     if (msg != null)
                         await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
                 }
@@ -96,8 +94,6 @@ namespace Discord.Audio
                 await DisconnectAsync().ConfigureAwait(false);
                 await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
             };
-
-            _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
         }
         private void Dispose(bool disposing)
         {
@@ -259,16 +255,14 @@ namespace Discord.Audio
         private string SerializeJson(object value)
         {
             var sb = new StringBuilder(256);
-            using (TextWriter text = new StringWriter(sb, CultureInfo.InvariantCulture))
-            using (JsonWriter writer = new JsonTextWriter(text))
-                _serializer.Serialize(writer, value);
+            using (TextWriter writer = new StringWriter(sb, CultureInfo.InvariantCulture))
+                _serializer.ToJson(writer, value);
             return sb.ToString();
         }
         private T DeserializeJson<T>(Stream jsonStream)
         {
-            using (TextReader text = new StreamReader(jsonStream))
-            using (JsonReader reader = new JsonTextReader(text))
-                return _serializer.Deserialize<T>(reader);
+            using (TextReader reader = new StreamReader(jsonStream))
+                return _serializer.FromJson<T>(reader);
         }
     }
 }

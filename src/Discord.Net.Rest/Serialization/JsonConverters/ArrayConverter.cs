@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Discord.Net.Converters
+namespace Discord.Serialization.JsonConverters
 {
     internal class ArrayConverter<T> : JsonConverter
     {

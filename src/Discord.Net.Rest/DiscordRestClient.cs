@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Discord.Serialization;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
@@ -7,15 +8,23 @@ namespace Discord.Rest
 {
     public class DiscordRestClient : BaseDiscordClient, IDiscordClient
     {
+        private readonly ScopedSerializer _serializer;
         private RestApplication _applicationInfo;
 
         public new RestSelfUser CurrentUser => base.CurrentUser as RestSelfUser;
 
         public DiscordRestClient() : this(new DiscordRestConfig()) { }
-        public DiscordRestClient(DiscordRestConfig config) : base(config, CreateApiClient(config)) { }
+        public DiscordRestClient(DiscordRestConfig config) : base(config)
+        {
+            _serializer = Serializer.CreateScope();
+            _serializer.Error += async ex =>
+            {
+                await _restLogger.WarningAsync("Serializer Error", ex);
+            };
 
-        private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
-            => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent);
+            SetApiClient(new API.DiscordRestApiClient(config.RestClientProvider, DiscordConfig.UserAgent, _serializer, config.DefaultRetryMode));
+        }
+
         internal override void Dispose(bool disposing)
         {
             if (disposing)

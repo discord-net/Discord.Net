@@ -22,23 +22,25 @@ namespace Discord.Rest
         private readonly SemaphoreSlim _stateLock;
         private bool _isFirstLogin, _isDisposed;
 
-        internal API.DiscordRestApiClient ApiClient { get; }
         internal LogManager LogManager { get; }
+        internal API.DiscordRestApiClient ApiClient { get; private set; }
         public LoginState LoginState { get; private set; }
         public ISelfUser CurrentUser { get; protected set; }
         public TokenType TokenType => ApiClient.AuthTokenType;
         
         /// <summary> Creates a new REST-only discord client. </summary>
-        internal BaseDiscordClient(DiscordRestConfig config, API.DiscordRestApiClient client)
+        internal BaseDiscordClient(DiscordRestConfig config)
         {
-            ApiClient = client;
             LogManager = new LogManager(config.LogLevel);
             LogManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
 
             _stateLock = new SemaphoreSlim(1, 1);
             _restLogger = LogManager.CreateLogger("Rest");
             _isFirstLogin = config.DisplayInitialLog;
-
+        }
+        internal void SetApiClient(API.DiscordRestApiClient client)
+        {
+            ApiClient = client;
             ApiClient.RequestQueue.RateLimitTriggered += async (id, info) =>
             {
                 if (info == null)

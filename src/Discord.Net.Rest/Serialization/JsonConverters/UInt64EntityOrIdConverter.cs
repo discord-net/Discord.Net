@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System;
 
-namespace Discord.Net.Converters
+namespace Discord.Serialization.JsonConverters
 {
     internal class UInt64EntityOrIdConverter<T> : JsonConverter
     {

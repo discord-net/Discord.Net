@@ -4,8 +4,8 @@ using Discord.API.Rest;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
 using Discord.Net.WebSockets;
+using Discord.Serialization;
 using Discord.WebSocket;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,13 +36,14 @@ namespace Discord.API
 
         public ConnectionState ConnectionState { get; private set; }
 
-        public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent,
-            string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null)
-            : base(restClientProvider, userAgent, defaultRetryMode, serializer)
+        public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent, ScopedSerializer serializer,
+            string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry)
+            : base(restClientProvider, userAgent, serializer, defaultRetryMode)
         {
             _gatewayUrl = url;
             if (url != null)
                 _isExplicitUrl = true;
+
             _decompressionStream = new MemoryStream(10 * 1024); //10 KB 
             _decompressionReader = new StreamReader(_decompressionStream);
 
@@ -58,20 +59,16 @@ namespace Discord.API
                     _decompressionStream.SetLength(_decompressionStream.Position);
 
                     _decompressionStream.Position = 0;
-                    using (var jsonReader = new JsonTextReader(_decompressionReader) { CloseInput = false })
-                    {
-                        var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
-                        if (msg != null)
-                            await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
-                    }
+                    var msg = _serializer.FromJson<SocketFrame>(_decompressionReader);
+                    if (msg != null)
+                        await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                 }
             };
             WebSocketClient.TextMessage += async text =>
             {
                 using (var reader = new StringReader(text))
-                using (var jsonReader = new JsonTextReader(reader))
                 {
-                    var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
+                    var msg = _serializer.FromJson<SocketFrame>(reader);
                     if (msg != null)
                         await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                 }

@@ -1,10 +1,9 @@
 ﻿#pragma warning disable CS1591
 using Discord.API.Rest;
 using Discord.Net;
-using Discord.Net.Converters;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
-using Newtonsoft.Json;
+using Discord.Serialization;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -27,9 +26,9 @@ namespace Discord.API
 
         public event Func<string, string, double, Task> SentRequest { add { _sentRequestEvent.Add(value); } remove { _sentRequestEvent.Remove(value); } }
         private readonly AsyncEvent<Func<string, string, double, Task>> _sentRequestEvent = new AsyncEvent<Func<string, string, double, Task>>();
-
-        protected readonly JsonSerializer _serializer;
+        
         protected readonly SemaphoreSlim _stateLock;
+        protected readonly ScopedSerializer _serializer;
         private readonly RestClientProvider _restClientProvider;
 
         protected bool _isDisposed;
@@ -45,13 +44,12 @@ namespace Discord.API
         internal IRestClient RestClient { get; private set; }
         internal ulong? CurrentUserId { get; set;}
 
-        public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, 
-            JsonSerializer serializer = null)
+        public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, ScopedSerializer serializer, RetryMode defaultRetryMode = RetryMode.AlwaysRetry)
         {
             _restClientProvider = restClientProvider;
             UserAgent = userAgent;
+            _serializer = serializer;
             DefaultRetryMode = defaultRetryMode;
-            _serializer = serializer ?? new JsonSerializer { DateFormatString = "yyyy-MM-ddTHH:mm:ssZ", ContractResolver = new DiscordContractResolver() };
 
             RequestQueue = new RequestQueue();
             _stateLock = new SemaphoreSlim(1, 1);
@@ -1159,16 +1157,14 @@ namespace Discord.API
         protected string SerializeJson(object value)
         {
             var sb = new StringBuilder(256);
-            using (TextWriter text = new StringWriter(sb, CultureInfo.InvariantCulture))
-            using (JsonWriter writer = new JsonTextWriter(text))
-                _serializer.Serialize(writer, value);
+            using (var writer = new StringWriter(sb, CultureInfo.InvariantCulture))
+                _serializer.ToJson(writer, value);
             return sb.ToString();
         }
         protected T DeserializeJson<T>(Stream jsonStream)
         {
-            using (TextReader text = new StreamReader(jsonStream))
-            using (JsonReader reader = new JsonTextReader(text))
-                return _serializer.Deserialize<T>(reader);
+            using (var reader = new StreamReader(jsonStream))
+                return _serializer.FromJson<T>(reader);
         }
 
         internal class BucketIds

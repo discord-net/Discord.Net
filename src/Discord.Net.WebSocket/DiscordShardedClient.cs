@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
+using Discord.Serialization;
 
 namespace Discord.WebSocket
 {
@@ -13,6 +14,8 @@ namespace Discord.WebSocket
     {
         private readonly DiscordSocketConfig _baseConfig;
         private readonly SemaphoreSlim _connectionGroupLock;
+        private readonly ScopedSerializer _serializer;
+
         private int[] _shardIds;
         private Dictionary<int, int> _shardIdsToIndex;
         private DiscordSocketClient[] _shards;
@@ -25,7 +28,7 @@ namespace Discord.WebSocket
         public Game? Game => _shards[0].Game;
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
-        public new SocketSelfUser CurrentUser { get { return base.CurrentUser as SocketSelfUser; } private set { base.CurrentUser = value; } }
+        public new SocketSelfUser CurrentUser { get => base.CurrentUser as SocketSelfUser; private set => base.CurrentUser = value; }
         public IReadOnlyCollection<SocketGuild> Guilds => GetGuilds().ToReadOnlyCollection(() => GetGuildCount());
         public IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => GetPrivateChannels().ToReadOnlyCollection(() => GetPrivateChannelCount());
         public IReadOnlyCollection<DiscordSocketClient> Shards => _shards;
@@ -34,13 +37,12 @@ namespace Discord.WebSocket
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
         public DiscordShardedClient() : this(null, new DiscordSocketConfig()) { }
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
-        public DiscordShardedClient(DiscordSocketConfig config) : this(null, config, CreateApiClient(config)) { }
+        public DiscordShardedClient(DiscordSocketConfig config) : this(null, config) { }
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
         public DiscordShardedClient(int[] ids) : this(ids, new DiscordSocketConfig()) { }
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
-        public DiscordShardedClient(int[] ids, DiscordSocketConfig config) : this(ids, config, CreateApiClient(config)) { }
-        private DiscordShardedClient(int[] ids, DiscordSocketConfig config, API.DiscordSocketApiClient client)
-            : base(config, client)
+        public DiscordShardedClient(int[] ids, DiscordSocketConfig config)
+            : base(config)
         {
             if (config.ShardId != null)
                 throw new ArgumentException($"{nameof(config.ShardId)} must not be set.");
@@ -51,6 +53,14 @@ namespace Discord.WebSocket
             config.DisplayInitialLog = false;
             _baseConfig = config;
             _connectionGroupLock = new SemaphoreSlim(1, 1);
+
+            _serializer = Serializer.CreateScope();
+            _serializer.Error += async ex =>
+            {
+                await _restLogger.WarningAsync("Serializer Error", ex);
+            };
+
+            SetApiClient(new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordConfig.UserAgent, _serializer));
 
             if (config.TotalShards == null)
                 _automaticShards = true;
@@ -69,8 +79,6 @@ namespace Discord.WebSocket
                 }
             }
         }
-        private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
-            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent);
 
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
