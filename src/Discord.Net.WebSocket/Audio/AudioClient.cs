@@ -103,7 +103,7 @@ namespace Discord.Audio
             {
                 StopAsync().GetAwaiter().GetResult();
                 ApiClient.Dispose();
-                if (_secretKeyHandle.Target != null)
+                if (_secretKeyHandle.IsAllocated)
                     _secretKeyHandle.Free();
                 _isDisposed = true;
             }
@@ -260,10 +260,10 @@ namespace Discord.Audio
                             if (data.Mode != DiscordVoiceAPIClient.Mode)
                                 throw new InvalidOperationException($"Discord selected an unexpected mode: {data.Mode}");
 
-                            if (_secretKeyHandle.Target != null)
-                                _secretKeyHandle.Free();
                             _secretKey = data.SecretKey;
-                            _secretKeyHandle = GCHandle.Alloc(data.SecretKey, GCHandleType.Pinned);
+                            if (_secretKeyHandle.IsAllocated)
+                                _secretKeyHandle.Free();
+                            _secretKeyHandle = GCHandle.Alloc(_secretKey, GCHandleType.Pinned);
                             SecretKeyPtr = _secretKeyHandle.AddrOfPinnedObject();
 
                             _isSpeaking = false;
