@@ -104,7 +104,7 @@ class Program
         _services = _map.BuildServiceProvider();
 
         // Either search the program and add all Module classes that can be found.
-        // Module classes *must* be marked 'public' or they will be ignored.
+        // Module classes MUST be marked 'public' or they will be ignored.
         await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
         // Or add Modules manually if you prefer to be a little more explicit:
         await _commands.AddModuleAsync<SomeModule>();
@@ -119,6 +119,11 @@ class Program
         var msg = arg as SocketUserMessage;
         if (msg == null) return;
 
+        // We don't want the bot to respond to itself or other bots.
+        // NOTE: Selfbots should invert this first check and remove the second
+        // as they should ONLY be allowed to respond to messages from the same account.
+        if (msg.Author.Id == _client.CurrentUser.Id || msg.Author.IsBot) return;
+        
         // Create a number to track where the prefix ends and the command begins
         int pos = 0;
         // Replace the '!' with whatever character
