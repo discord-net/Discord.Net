@@ -108,6 +108,7 @@ class Program
         await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
         // Or add Modules manually if you prefer to be a little more explicit:
         await _commands.AddModuleAsync<SomeModule>();
+        // Note that the first one is 'Modules' (plural) and the second is 'Module' (singular).
 
         // Subscribe a handler to see if a message invokes a command.
         _client.MessageReceived += HandleCommandAsync;
