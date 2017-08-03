@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Discord.Audio
 {
@@ -45,14 +46,17 @@ namespace Discord.Audio
         private string _url, _sessionId, _token;
         private ulong _userId;
         private uint _ssrc;
+        private byte[] _secretKey;
+        private GCHandle _secretKeyHandle;
         private bool _isSpeaking;
+        private bool _isDisposed;
 
         public SocketGuild Guild { get; }
         public DiscordVoiceAPIClient ApiClient { get; private set; }
         public int Latency { get; private set; }
         public int UdpLatency { get; private set; }
         public ulong ChannelId { get; internal set; }
-        internal byte[] SecretKey { get; private set; }
+        internal IntPtr SecretKeyPtr { get; private set; }
 
         private DiscordSocketClient Discord => Guild.Discord;
         public ConnectionState ConnectionState => _connection.State;
@@ -92,6 +96,20 @@ namespace Discord.Audio
             LatencyUpdated += async (old, val) => await _audioLogger.DebugAsync($"Latency = {val} ms").ConfigureAwait(false);
             UdpLatencyUpdated += async (old, val) => await _audioLogger.DebugAsync($"UDP Latency = {val} ms").ConfigureAwait(false);
         }
+
+        internal void Dispose(bool disposing)
+        {
+            if (disposing && !_isDisposed)
+            {
+                StopAsync().GetAwaiter().GetResult();
+                ApiClient.Dispose();
+                if (_secretKeyHandle.IsAllocated)
+                    _secretKeyHandle.Free();
+                _isDisposed = true;
+            }
+        }
+        /// <inheritdoc />
+        public void Dispose() => Dispose(true);
 
         internal async Task StartAsync(string url, ulong userId, string sessionId, string token) 
         {
@@ -242,7 +260,12 @@ namespace Discord.Audio
                             if (data.Mode != DiscordVoiceAPIClient.Mode)
                                 throw new InvalidOperationException($"Discord selected an unexpected mode: {data.Mode}");
 
-                            SecretKey = data.SecretKey;
+                            _secretKey = data.SecretKey;
+                            if (_secretKeyHandle != null)
+                                _secretKeyHandle.Free();
+                            _secretKeyHandle = GCHandle.Alloc(data.SecretKey, GCHandleType.Pinned);
+                            SecretKeyPtr = _secretKeyHandle.AddrOfPinnedObject();
+
                             _isSpeaking = false;
                             await ApiClient.SendSetSpeaking(false).ConfigureAwait(false);
                             _keepaliveTask = RunKeepaliveAsync(5000, _connection.CancelToken);
@@ -386,7 +409,7 @@ namespace Discord.Audio
                 await _audioLogger.DebugAsync("Heartbeat Started").ConfigureAwait(false);
                 while (!cancelToken.IsCancellationRequested)
                 {
-                    var now = Environment.TickCount;
+                    int now = Environment.TickCount;
 
                     //Did server respond to our last heartbeat?
                     if (_heartbeatTimes.Count != 0 && (now - _lastMessageTime) > intervalMillis && 
@@ -427,7 +450,7 @@ namespace Discord.Audio
                 await _audioLogger.DebugAsync("Keepalive Started").ConfigureAwait(false);
                 while (!cancelToken.IsCancellationRequested)
                 {
-                    var now = Environment.TickCount;
+                    int now = Environment.TickCount;
 
                     try
                     {
@@ -474,16 +497,5 @@ namespace Discord.Audio
                 return buffer;
             return new byte[OpusConverter.FrameBytes];
         }
-
-        internal void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                StopAsync().GetAwaiter().GetResult();
-                ApiClient.Dispose();
-            }
-        }
-        /// <inheritdoc />
-        public void Dispose() => Dispose(true);
     }
 }

@@ -53,12 +53,9 @@ namespace Discord.Audio
             CheckError(EncoderCtl(_ptr, OpusCtl.SetBitrate, bitrate));
         }
 
-        public unsafe int EncodeFrame(byte[] input, int inputOffset, byte[] output, int outputOffset)
+        public unsafe int EncodeFrame(byte* inPtr, int inputOffset, byte* outPtr, int outputOffset, int count)
         {
-            int result = 0;
-            fixed (byte* inPtr = input)
-            fixed (byte* outPtr = output)
-                result = Encode(_ptr, inPtr + inputOffset, FrameSamplesPerChannel, outPtr + outputOffset, output.Length - outputOffset);
+            int result = Encode(_ptr, inPtr + inputOffset, FrameSamplesPerChannel, outPtr + outputOffset, count);
             CheckError(result);
             return result;
         }

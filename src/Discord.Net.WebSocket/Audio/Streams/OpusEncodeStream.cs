@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,26 +13,48 @@ namespace Discord.Audio.Streams
         private readonly AudioStream _next;
         private readonly OpusEncoder _encoder;
         private readonly byte[] _buffer;
+        private readonly GCHandle _bufferHandle;
+        private readonly IntPtr _bufferPtr;
         private int _partialFramePos;
         private ushort _seq;
         private uint _timestamp;
-        
+        private bool _isDisposed;
+
         public OpusEncodeStream(AudioStream next, int bitrate, AudioApplication application, int packetLoss)
         {
             _next = next;
             _encoder = new OpusEncoder(bitrate, application, packetLoss);
             _buffer = new byte[OpusConverter.FrameBytes];
+            _bufferHandle = GCHandle.Alloc(_buffer, GCHandleType.Pinned);
+            _bufferPtr = _bufferHandle.AddrOfPinnedObject();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            
+            if (disposing && !_isDisposed)
+            {
+                _encoder.Dispose();
+                _bufferHandle.Free();
+                _isDisposed = true;
+            }
         }
 
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
             //Assume threadsafe
+            int encFrameSize = 0;
             while (count > 0)
             {
                 if (_partialFramePos == 0 && count >= OpusConverter.FrameBytes)
                 {
                     //We have enough data and no partial frames. Pass the buffer directly to the encoder
-                    int encFrameSize = _encoder.EncodeFrame(buffer, offset, _buffer, 0);
+                    unsafe
+                    {
+                        fixed (byte* inPtr = buffer)
+                            encFrameSize = _encoder.EncodeFrame(inPtr, offset, (byte*)_bufferPtr, 0, OpusConverter.FrameBytes);
+                    }
                     _next.WriteHeader(_seq, _timestamp, false);
                     await _next.WriteAsync(_buffer, 0, encFrameSize, cancelToken).ConfigureAwait(false);
 
@@ -45,7 +68,10 @@ namespace Discord.Audio.Streams
                     //We have enough data to complete a previous partial frame.
                     int partialSize = OpusConverter.FrameBytes - _partialFramePos;
                     Buffer.BlockCopy(buffer, offset, _buffer, _partialFramePos, partialSize);
-                    int encFrameSize = _encoder.EncodeFrame(_buffer, 0, _buffer, 0);
+                    unsafe
+                    {
+                        encFrameSize = _encoder.EncodeFrame((byte*)_bufferPtr, 0, (byte*)_bufferPtr, 0, OpusConverter.FrameBytes);
+                    }
                     _next.WriteHeader(_seq, _timestamp, false);
                     await _next.WriteAsync(_buffer, 0, encFrameSize, cancelToken).ConfigureAwait(false);
 
@@ -85,14 +111,6 @@ namespace Discord.Audio.Streams
         public override async Task ClearAsync(CancellationToken cancelToken)
         {
             await _next.ClearAsync(cancelToken).ConfigureAwait(false);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            if (disposing)
-                _encoder.Dispose();
         }
     }
 }
