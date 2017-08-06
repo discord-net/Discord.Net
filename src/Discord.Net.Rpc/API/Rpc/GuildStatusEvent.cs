@@ -1,13 +1,13 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class GuildStatusEvent
     {
-        [JsonProperty("guild")]
+        [ModelProperty("guild")]
         public Guild Guild { get; set; }
-        [JsonProperty("online")]
+        [ModelProperty("online")]
         public int Online { get; set; }
     }
 }

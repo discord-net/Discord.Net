@@ -6,10 +6,10 @@ namespace Discord.Audio.Streams
     ///<summary> Wraps an IAudioClient, sending voice data on write. </summary>
     public class OutputStream : AudioOutStream
     {
-        private readonly DiscordVoiceAPIClient _client;
+        private readonly DiscordVoiceApiClient _client;
         public OutputStream(IAudioClient client)
             : this((client as AudioClient).ApiClient) { }
-        internal OutputStream(DiscordVoiceAPIClient client)
+        internal OutputStream(DiscordVoiceApiClient client)
         {
             _client = client;
         }

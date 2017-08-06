@@ -1,12 +1,11 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rest
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class DeleteMessagesParams
     {
-        [JsonProperty("messages")]
+        [ModelProperty("messages")]
         public ulong[] MessageIds { get; }
 
         public DeleteMessagesParams(ulong[] messageIds)

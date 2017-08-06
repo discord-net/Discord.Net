@@ -1,15 +1,15 @@
 ﻿using Discord.Rpc;
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class VoiceShortcut
     {
-        [JsonProperty("type")]
+        [ModelProperty("type")]
         public Optional<VoiceShortcutType> Type { get; set; }
-        [JsonProperty("code")]
+        [ModelProperty("code")]
         public Optional<int> Code { get; set; }
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public Optional<string> Name { get; set; }
     }
 }

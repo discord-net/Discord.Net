@@ -1,15 +1,15 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Gateway
 {
     internal class VoiceServerUpdateEvent
 	{
-		[JsonProperty("guild_id")]
+		[ModelProperty("guild_id")]
 		public ulong GuildId { get; set; }
-        [JsonProperty("endpoint")]
+        [ModelProperty("endpoint")]
 		public string Endpoint { get; set; }
-        [JsonProperty("token")]
+        [ModelProperty("token")]
 		public string Token { get; set; }
     }
 }

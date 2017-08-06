@@ -1,13 +1,13 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Voice
 {
     internal class SessionDescriptionEvent
     {
-        [JsonProperty("secret_key")]
+        [ModelProperty("secret_key")]
         public byte[] SecretKey { get; set; }
-        [JsonProperty("mode")]
+        [ModelProperty("mode")]
         public string Mode { get; set; }
     }
 }

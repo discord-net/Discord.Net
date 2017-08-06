@@ -1,34 +1,34 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class Channel
     {
         //Shared
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public ulong Id { get; set; }
-        [JsonProperty("type")]
+        [ModelProperty("type")]
         public ChannelType Type { get; set; }
 
         //GuildChannel
-        [JsonProperty("guild_id")]
+        [ModelProperty("guild_id")]
         public Optional<ulong> GuildId { get; set; }
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public Optional<string> Name { get; set; }
-        [JsonProperty("position")]
+        [ModelProperty("position")]
         public Optional<int> Position { get; set; }
 
         //IMessageChannel
-        [JsonProperty("messages")]
+        [ModelProperty("messages")]
         public Message[] Messages { get; set; }
 
         //VoiceChannel
-        [JsonProperty("bitrate")]
+        [ModelProperty("bitrate")]
         public Optional<int> Bitrate { get; set; }
-        [JsonProperty("user_limit")]
+        [ModelProperty("user_limit")]
         public Optional<int> UserLimit { get; set; }
-        [JsonProperty("voice_states")]
+        [ModelProperty("voice_states")]
         public ExtendedVoiceState[] VoiceStates { get; set; }
     }
 }

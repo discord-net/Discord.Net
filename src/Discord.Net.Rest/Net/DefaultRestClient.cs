@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -68,13 +69,15 @@ namespace Discord.Net.Rest
                 return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
             }
         }
-        public async Task<RestResponse> SendAsync(string method, string endpoint, string json, CancellationToken cancelToken, bool headerOnly, string reason = null)
+        public async Task<RestResponse> SendAsync(string method, string endpoint, ReadOnlyBuffer<byte> json, CancellationToken cancelToken, bool headerOnly, string reason = null)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
             using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
             {
                 if (reason != null) restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
-                restRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                var content = new ByteArrayContent(json.ToArray());
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                restRequest.Content = content;
                 return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
             }
         }
@@ -122,9 +125,9 @@ namespace Discord.Net.Rest
             HttpResponseMessage response = await _client.SendAsync(request, cancelToken).ConfigureAwait(false);
             
             var headers = response.Headers.ToDictionary(x => x.Key, x => x.Value.FirstOrDefault(), StringComparer.OrdinalIgnoreCase);
-            var stream = !headerOnly ? await response.Content.ReadAsStreamAsync().ConfigureAwait(false) : null;
+            var data = !headerOnly ? await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false) : null;
 
-            return new RestResponse(response.StatusCode, headers, stream);
+            return new RestResponse(response.StatusCode, headers, new ReadOnlyBuffer<byte>(data));
         }
 
         private static readonly HttpMethod _patch = new HttpMethod("PATCH");

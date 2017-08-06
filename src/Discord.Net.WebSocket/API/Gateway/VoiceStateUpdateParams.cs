@@ -1,19 +1,18 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Gateway
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class VoiceStateUpdateParams
     {
-        [JsonProperty("self_mute")]
+        [ModelProperty("self_mute")]
         public bool SelfMute { get; set; }
-        [JsonProperty("self_deaf")]
+        [ModelProperty("self_deaf")]
         public bool SelfDeaf { get; set; }
 
-        [JsonProperty("guild_id")]
+        [ModelProperty("guild_id")]
         public ulong? GuildId { get; set; }
-        [JsonProperty("channel_id")]
+        [ModelProperty("channel_id")]
         public ulong? ChannelId { get; set; }
     }
 }

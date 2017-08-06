@@ -1,17 +1,17 @@
 ﻿using System;
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class EmbedAuthor
     {
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public string Name { get; set; }
-        [JsonProperty("url")]
+        [ModelProperty("url")]
         public string Url { get; set; }
-        [JsonProperty("icon_url")]
+        [ModelProperty("icon_url")]
         public string IconUrl { get; set; }
-        [JsonProperty("proxy_icon_url")]
+        [ModelProperty("proxy_icon_url")]
         public string ProxyIconUrl { get; set; }
     }
 }

@@ -1,42 +1,42 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 using System;
 
 namespace Discord.API
 {
     internal class Message
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public ulong Id { get; set; }
-        [JsonProperty("type")]
+        [ModelProperty("type")]
         public MessageType Type { get; set; }
-        [JsonProperty("channel_id")]
+        [ModelProperty("channel_id")]
         public ulong ChannelId { get; set; }
-        [JsonProperty("webhook_id")]
+        [ModelProperty("webhook_id")]
         public Optional<ulong> WebhookId { get; set; }
-        [JsonProperty("author")]
+        [ModelProperty("author")]
         public Optional<User> Author { get; set; }
-        [JsonProperty("content")]
+        [ModelProperty("content")]
         public Optional<string> Content { get; set; }
-        [JsonProperty("timestamp")]
+        [ModelProperty("timestamp")]
         public Optional<DateTimeOffset> Timestamp { get; set; }
-        [JsonProperty("edited_timestamp")]
+        [ModelProperty("edited_timestamp")]
         public Optional<DateTimeOffset?> EditedTimestamp { get; set; }
-        [JsonProperty("tts")]
+        [ModelProperty("tts")]
         public Optional<bool> IsTextToSpeech { get; set; }
-        [JsonProperty("mention_everyone")]
+        [ModelProperty("mention_everyone")]
         public Optional<bool> MentionEveryone { get; set; }
-        [JsonProperty("mentions")]
+        [ModelProperty("mentions")]
         public Optional<EntityOrId<User>[]> UserMentions { get; set; }
-        [JsonProperty("mention_roles")]
+        [ModelProperty("mention_roles")]
         public Optional<ulong[]> RoleMentions { get; set; }
-        [JsonProperty("attachments")]
+        [ModelProperty("attachments")]
         public Optional<Attachment[]> Attachments { get; set; }
-        [JsonProperty("embeds")]
+        [ModelProperty("embeds")]
         public Optional<Embed[]> Embeds { get; set; }
-        [JsonProperty("pinned")]
+        [ModelProperty("pinned")]
         public Optional<bool> Pinned { get; set; }
-        [JsonProperty("reactions")]
+        [ModelProperty("reactions")]
         public Optional<Reaction[]> Reactions { get; set; }
     }
 }

@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class VoiceDevice
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public string Id { get; set; }
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public string Name { get; set; }
     }
 }

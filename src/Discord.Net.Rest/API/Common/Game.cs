@@ -1,23 +1,15 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System.Runtime.Serialization;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class Game
     {
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public string Name { get; set; }
-        [JsonProperty("url")]
+        [ModelProperty("url")]
         public Optional<string> StreamUrl { get; set; }
-        [JsonProperty("type")]
+        [ModelProperty("type")]
         public Optional<StreamType?> StreamType { get; set; }
-
-        [OnError]
-        internal void OnError(StreamingContext context, ErrorContext errorContext)
-        {
-            errorContext.Handled = true;
-        }
     }
 }

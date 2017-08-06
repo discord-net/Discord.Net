@@ -1,32 +1,32 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 using System;
 
 namespace Discord.API
 {
     internal class Integration
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public ulong Id { get; set; }
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public string Name { get; set; }
-        [JsonProperty("type")]
+        [ModelProperty("type")]
         public string Type { get; set; }
-        [JsonProperty("enabled")]
+        [ModelProperty("enabled")]
         public bool Enabled { get; set; }
-        [JsonProperty("syncing")]
+        [ModelProperty("syncing")]
         public bool Syncing { get; set; }
-        [JsonProperty("role_id")]
+        [ModelProperty("role_id")]
         public ulong RoleId { get; set; }
-        [JsonProperty("expire_behavior")]
+        [ModelProperty("expire_behavior")]
         public ulong ExpireBehavior { get; set; }
-        [JsonProperty("expire_grace_period")]
+        [ModelProperty("expire_grace_period")]
         public ulong ExpireGracePeriod { get; set; }
-        [JsonProperty("user")]
+        [ModelProperty("user")]
         public User User { get; set; }
-        [JsonProperty("account")]
+        [ModelProperty("account")]
         public IntegrationAccount Account { get; set; }
-        [JsonProperty("synced_at")]
+        [ModelProperty("synced_at")]
         public DateTimeOffset SyncedAt { get; set; }
     }
 }

@@ -1,15 +1,15 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Voice
 {
     internal class UdpProtocolInfo
     {
-        [JsonProperty("address")]
+        [ModelProperty("address")]
         public string Address { get; set; }
-        [JsonProperty("port")]
+        [ModelProperty("port")]
         public int Port { get; set; }
-        [JsonProperty("mode")]
+        [ModelProperty("mode")]
         public string Mode { get; set; }
     }
 }

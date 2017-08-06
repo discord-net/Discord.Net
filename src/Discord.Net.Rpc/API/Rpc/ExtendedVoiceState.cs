@@ -1,21 +1,21 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class ExtendedVoiceState
     {
-        [JsonProperty("user")]
+        [ModelProperty("user")]
         public User User { get; set; }
-        [JsonProperty("voice_state")]
+        [ModelProperty("voice_state")]
         public Optional<VoiceState> VoiceState { get; set; }
-        [JsonProperty("nick")]
+        [ModelProperty("nick")]
         public Optional<string> Nickname { get; set; }
-        [JsonProperty("volume")]
+        [ModelProperty("volume")]
         public Optional<int> Volume { get; set; }
-        [JsonProperty("mute")]
+        [ModelProperty("mute")]
         public Optional<bool> Mute { get; set; }
-        [JsonProperty("pan")]
+        [ModelProperty("pan")]
         public Optional<Pan> Pan { get; set; }
     }
 }

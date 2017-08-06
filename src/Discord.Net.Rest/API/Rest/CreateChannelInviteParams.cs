@@ -1,18 +1,17 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rest
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class CreateChannelInviteParams
     {
-        [JsonProperty("max_age")]
+        [ModelProperty("max_age")]
         public Optional<int> MaxAge { get; set; }
-        [JsonProperty("max_uses")]
+        [ModelProperty("max_uses")]
         public Optional<int> MaxUses { get; set; }
-        [JsonProperty("temporary")]
+        [ModelProperty("temporary")]
         public Optional<bool> IsTemporary { get; set; }
-        [JsonProperty("unique")]
+        [ModelProperty("unique")]
         public Optional<bool> IsUnique { get; set; }
     }
 }

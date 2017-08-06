@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class GuildSummary
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public ulong Id { get; set; }
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public string Name { get; set; }
     }
 }

@@ -1,15 +1,15 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class InviteGuild
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public ulong Id { get; set; }
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public string Name { get; set; }
-        [JsonProperty("splash_hash")]
+        [ModelProperty("splash_hash")]
         public string SplashHash { get; set; }
     }
 }

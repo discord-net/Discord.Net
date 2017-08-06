@@ -1,13 +1,13 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Gateway
 {
     internal class GuildRoleUpdateEvent
     {
-		[JsonProperty("guild_id")]
+		[ModelProperty("guild_id")]
         public ulong GuildId { get; set; }
-        [JsonProperty("role")]
+        [ModelProperty("role")]
         public Role Role { get; set; }
     }
 }

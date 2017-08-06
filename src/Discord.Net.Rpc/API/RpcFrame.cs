@@ -1,20 +1,20 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 using System;
 
 namespace Discord.API.Rpc
 {
     internal class RpcFrame
     {
-        [JsonProperty("cmd")]
+        [ModelProperty("cmd")]
         public string Cmd { get; set; }
-        [JsonProperty("nonce")]
+        [ModelProperty("nonce")]
         public Optional<Guid?> Nonce { get; set; }
-        [JsonProperty("evt")]
+        [ModelProperty("evt")]
         public Optional<string> Event { get; set; }
-        [JsonProperty("data")]
-        public Optional<object> Data { get; set; }
-        [JsonProperty("args")]
+        [ModelProperty("data")]
+        public Optional<ReadOnlyBuffer<byte>> Data { get; set; }
+        [ModelProperty("args")]
         public object Args { get; set; }
     }
 }

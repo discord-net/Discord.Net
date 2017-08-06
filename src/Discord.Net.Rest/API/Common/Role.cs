@@ -1,25 +1,25 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class Role
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public ulong Id { get; set; }
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public string Name { get; set; }
-        [JsonProperty("color")]
+        [ModelProperty("color")]
         public uint Color { get; set; }
-        [JsonProperty("hoist")]
+        [ModelProperty("hoist")]
         public bool Hoist { get; set; }
-        [JsonProperty("mentionable")]
+        [ModelProperty("mentionable")]
         public bool Mentionable { get; set; }
-        [JsonProperty("position")]
+        [ModelProperty("position")]
         public int Position { get; set; }
-        [JsonProperty("permissions"), Int53]
+        [ModelProperty("permissions"), Int53]
         public ulong Permissions { get; set; }
-        [JsonProperty("managed")]
+        [ModelProperty("managed")]
         public bool Managed { get; set; }
     }
 }

@@ -1,18 +1,18 @@
 ﻿#pragma warning disable CS1591
 
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.Rpc
 {
     public class UserVoiceProperties
     {
-        [JsonProperty("userId")]
+        [ModelProperty("userId")]
         internal ulong UserId { get; set; }
-        [JsonProperty("pan")]
+        [ModelProperty("pan")]
         public Optional<Pan> Pan { get; set; }
-        [JsonProperty("volume")]
+        [ModelProperty("volume")]
         public Optional<int> Volume { get; set; }
-        [JsonProperty("mute")]
+        [ModelProperty("mute")]
         public Optional<bool> Mute { get; set; }
     }
 }

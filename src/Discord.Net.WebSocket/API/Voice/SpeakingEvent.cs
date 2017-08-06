@@ -1,15 +1,15 @@
 #pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Voice
 {
     internal class SpeakingEvent
     {
-        [JsonProperty("user_id")]
+        [ModelProperty("user_id")]
         public ulong UserId { get; set; }
-        [JsonProperty("ssrc")]
+        [ModelProperty("ssrc")]
         public uint Ssrc { get; set; }
-        [JsonProperty("speaking")]
+        [ModelProperty("speaking")]
         public bool Speaking { get; set; }
     }
 }

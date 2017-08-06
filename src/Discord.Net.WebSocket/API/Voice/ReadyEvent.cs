@@ -1,19 +1,19 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Voice
 {
     internal class ReadyEvent
     {
-        [JsonProperty("ssrc")]
+        [ModelProperty("ssrc")]
         public uint SSRC { get; set; }
-        [JsonProperty("ip")]
+        [ModelProperty("ip")]
         public string Ip { get; set; }
-        [JsonProperty("port")]
+        [ModelProperty("port")]
         public ushort Port { get; set; }
-        [JsonProperty("modes")]
+        [ModelProperty("modes")]
         public string[] Modes { get; set; }
-        [JsonProperty("heartbeat_interval")]
+        [ModelProperty("heartbeat_interval")]
         public int HeartbeatInterval { get; set; }
     }
 }

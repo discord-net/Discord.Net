@@ -1,14 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class VoiceDeviceSettings
     {
-        [JsonProperty("device_id")]
+        [ModelProperty("device_id")]
         public Optional<string> DeviceId { get; set; }
-        [JsonProperty("volume")]
+        [ModelProperty("volume")]
         public Optional<float> Volume { get; set; }
-        [JsonProperty("available_devices")]
+        [ModelProperty("available_devices")]
         public Optional<VoiceDevice[]> AvailableDevices { get; set; }
     }
 }

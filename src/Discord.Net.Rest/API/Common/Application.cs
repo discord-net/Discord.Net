@@ -1,24 +1,24 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class Application
     {
-        [JsonProperty("description")]
+        [ModelProperty("description")]
         public string Description { get; set; }
-        [JsonProperty("rpc_origins")]
+        [ModelProperty("rpc_origins")]
         public string[] RPCOrigins { get; set; }
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public string Name { get; set; }
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public ulong Id { get; set; }
-        [JsonProperty("icon")]
+        [ModelProperty("icon")]
         public string Icon { get; set; }
 
-        [JsonProperty("flags"), Int53]
+        [ModelProperty("flags"), Int53]
         public Optional<ulong> Flags { get; set; }
-        [JsonProperty("owner")]
+        [ModelProperty("owner")]
         public Optional<User> Owner { get; set; }
     }
 }

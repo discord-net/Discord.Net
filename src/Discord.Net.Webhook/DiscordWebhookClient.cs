@@ -5,6 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
 using Discord.Logging;
+using Discord.Serialization;
 
 namespace Discord.Webhook
 {
@@ -13,8 +14,9 @@ namespace Discord.Webhook
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
 
-        private readonly ulong _webhookId;
         internal readonly Logger _restLogger;
+        private readonly ulong _webhookId;
+        private readonly ScopedSerializer _serializer;
         
         internal API.DiscordRestApiClient ApiClient { get; }
         internal LogManager LogManager { get; }
@@ -27,7 +29,13 @@ namespace Discord.Webhook
         {
             _webhookId = webhookId;
 
-            ApiClient = CreateApiClient(config);
+            _serializer = Serializer.CreateScope();
+            _serializer.Error += async ex =>
+            {
+                await _restLogger.WarningAsync("Serializer Error", ex);
+            };
+
+            ApiClient = new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, _serializer);
             LogManager = new LogManager(config.LogLevel);
             LogManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
 
@@ -43,8 +51,6 @@ namespace Discord.Webhook
             ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
             ApiClient.LoginAsync(TokenType.Webhook, webhookToken).GetAwaiter().GetResult();
         }
-        private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
-            => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent);
 
         public async Task SendMessageAsync(string text, bool isTTS = false, Embed[] embeds = null, 
             string username = null, string avatarUrl = null, RequestOptions options = null)

@@ -2,6 +2,7 @@
     <PropertyGroup>
         <VersionPrefix>1.1.0-alpha</VersionPrefix>
         <VersionSuffix></VersionSuffix>
+        <LangVersion>latest</LangVersion>
         <Authors>RogueException</Authors>
         <PackageTags>discord;discordapp</PackageTags>
         <PackageProjectUrl>https://github.com/RogueException/Discord.Net</PackageProjectUrl>
@@ -18,7 +19,7 @@
         <VersionSuffix Condition=" '$(VersionSuffix)' == '' ">build-$(BuildNumber)</VersionSuffix>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' Or '$(TargetFramework)' == 'net45' ">
-        <DefineConstants>$(DefineConstants);FILESYSTEM;DEFAULTUDPCLIENT;DEFAULTWEBSOCKET</DefineConstants>
+        <DefineConstants>$(DefineConstants);FILESYSTEM;DEFAULTUDPCLIENT;DEFAULTWEBSOCKET;MSBUFFER</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
         <DefineConstants>$(DefineConstants);FORMATSTR;UNIXTIME;MSTRYBUFFER;UDPDISPOSE</DefineConstants>

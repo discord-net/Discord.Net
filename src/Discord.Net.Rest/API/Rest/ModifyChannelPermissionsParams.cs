@@ -1,16 +1,15 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rest
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyChannelPermissionsParams
     {
-        [JsonProperty("type")]
+        [ModelProperty("type")]
         public string Type { get; }
-        [JsonProperty("allow")]
+        [ModelProperty("allow")]
         public ulong Allow { get; }
-        [JsonProperty("deny")]
+        [ModelProperty("deny")]
         public ulong Deny { get; }
 
         public ModifyChannelPermissionsParams(string type, ulong allow, ulong deny)

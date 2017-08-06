@@ -1,27 +1,27 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class User
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public ulong Id { get; set; }
-        [JsonProperty("username")]
+        [ModelProperty("username")]
         public Optional<string> Username { get; set; }
-        [JsonProperty("discriminator")]
+        [ModelProperty("discriminator")]
         public Optional<string> Discriminator { get; set; }
-        [JsonProperty("bot")]
+        [ModelProperty("bot")]
         public Optional<bool> Bot { get; set; }
-        [JsonProperty("avatar")]
+        [ModelProperty("avatar")]
         public Optional<string> Avatar { get; set; }
 
         //CurrentUser
-        [JsonProperty("verified")]
+        [ModelProperty("verified")]
         public Optional<bool> Verified { get; set; }
-        [JsonProperty("email")]
+        [ModelProperty("email")]
         public Optional<string> Email { get; set; }
-        [JsonProperty("mfa_enabled")]
+        [ModelProperty("mfa_enabled")]
         public Optional<bool> MfaEnabled { get; set; }
     }
 }

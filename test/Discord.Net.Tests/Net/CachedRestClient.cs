@@ -73,9 +73,9 @@ namespace Discord.Net
                 
             string uri = Path.Combine(_baseUrl, endpoint);
             var bytes = await _blobCache.DownloadUrl(uri, _headers);
-            return new RestResponse(HttpStatusCode.OK, _headers, new MemoryStream(bytes));
+            return new RestResponse(HttpStatusCode.OK, _headers, new ReadOnlyBuffer<byte>(bytes));
         }
-        public Task<RestResponse> SendAsync(string method, string endpoint, string json, CancellationToken cancelToken, bool headerOnly, string reason = null)
+        public Task<RestResponse> SendAsync(string method, string endpoint, ReadOnlyBuffer<byte> json, CancellationToken cancelToken, bool headerOnly, string reason = null)
         {
             throw new InvalidOperationException("This RestClient does not support payloads.");
         }

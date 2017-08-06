@@ -1,22 +1,22 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 using System;
 
 namespace Discord.API
 {
     internal class GuildMember
     {
-        [JsonProperty("user")]
+        [ModelProperty("user")]
         public User User { get; set; }
-        [JsonProperty("nick")]
+        [ModelProperty("nick")]
         public Optional<string> Nick { get; set; }
-        [JsonProperty("roles")]
+        [ModelProperty("roles")]
         public Optional<ulong[]> Roles { get; set; }
-        [JsonProperty("joined_at")]
+        [ModelProperty("joined_at")]
         public Optional<DateTimeOffset> JoinedAt { get; set; }
-        [JsonProperty("deaf")]
+        [ModelProperty("deaf")]
         public Optional<bool> Deaf { get; set; }
-        [JsonProperty("mute")]
+        [ModelProperty("mute")]
         public Optional<bool> Mute { get; set; }
     }
 }

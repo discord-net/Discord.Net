@@ -1,13 +1,13 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class ReadyEvent
     {
-        [JsonProperty("v")]
+        [ModelProperty("v")]
         public int Version { get; set; }
-        [JsonProperty("config")]
+        [ModelProperty("config")]
         public RpcConfig Config { get; set; }
     }
 }

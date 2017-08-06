@@ -1,21 +1,21 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class VoiceRegion
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public string Id { get; set; }
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public string Name { get; set; }
-        [JsonProperty("vip")]
+        [ModelProperty("vip")]
         public bool IsVip { get; set; }
-        [JsonProperty("optimal")]
+        [ModelProperty("optimal")]
         public bool IsOptimal { get; set; }
-        [JsonProperty("sample_hostname")]
+        [ModelProperty("sample_hostname")]
         public string SampleHostname { get; set; }
-        [JsonProperty("sample_port")]
+        [ModelProperty("sample_port")]
         public int SamplePort { get; set; }
     }
 }

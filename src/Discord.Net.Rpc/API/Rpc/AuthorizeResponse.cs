@@ -1,11 +1,11 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class AuthorizeResponse
     {
-        [JsonProperty("code")]
+        [ModelProperty("code")]
         public string Code { get; set; }
     }
 }

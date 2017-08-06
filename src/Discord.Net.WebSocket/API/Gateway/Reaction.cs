@@ -1,16 +1,16 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.Serialization;
 
 namespace Discord.API.Gateway
 {
     internal class Reaction
     {
-        [JsonProperty("user_id")]
+        [ModelProperty("user_id")]
         public ulong UserId { get; set; }
-        [JsonProperty("message_id")]
+        [ModelProperty("message_id")]
         public ulong MessageId { get; set; }
-        [JsonProperty("channel_id")]
+        [ModelProperty("channel_id")]
         public ulong ChannelId { get; set; }
-        [JsonProperty("emoji")]
+        [ModelProperty("emoji")]
         public Emoji Emoji { get; set; }
     }
 }

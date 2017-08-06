@@ -1,12 +1,11 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rest
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyTextChannelParams : ModifyGuildChannelParams
     {
-        [JsonProperty("topic")]
+        [ModelProperty("topic")]
         public Optional<string> Topic { get; set; }
     }
 }

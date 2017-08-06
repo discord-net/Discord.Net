@@ -1,13 +1,13 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class Ban
     {
-        [JsonProperty("user")]
+        [ModelProperty("user")]
         public User User { get; set; }
-        [JsonProperty("reason")]
+        [ModelProperty("reason")]
         public string Reason { get; set; }
     }
 }

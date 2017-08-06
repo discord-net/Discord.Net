@@ -1,21 +1,21 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 using System.Collections.Generic;
 
 namespace Discord.API
 {
     internal class Connection
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public string Id { get; set; }
-        [JsonProperty("type")]
+        [ModelProperty("type")]
         public string Type { get; set; }
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public string Name { get; set; }
-        [JsonProperty("revoked")]
+        [ModelProperty("revoked")]
         public bool Revoked { get; set; }
 
-        [JsonProperty("integrations")]
+        [ModelProperty("integrations")]
         public IReadOnlyCollection<ulong> Integrations { get; set; }
     }
 }

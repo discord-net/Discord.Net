@@ -1,14 +1,13 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rest
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyGuildEmbedParams
     {        
-        [JsonProperty("enabled")]
+        [ModelProperty("enabled")]
         public Optional<bool> Enabled { get; set; }
-        [JsonProperty("channel")]
+        [ModelProperty("channel")]
         public Optional<ulong?> ChannelId { get; set; }
     }
 }

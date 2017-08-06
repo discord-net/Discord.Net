@@ -1,15 +1,15 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class Relationship
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public ulong Id { get; set; }
-        [JsonProperty("user")]
+        [ModelProperty("user")]
         public User User { get; set; }
-        [JsonProperty("type")]
+        [ModelProperty("type")]
         public RelationshipType Type { get; set; }
     }
 }

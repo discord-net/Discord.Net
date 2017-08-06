@@ -1,14 +1,13 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rest
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyCurrentUserParams
     {
-        [JsonProperty("username")]
+        [ModelProperty("username")]
         public Optional<string> Username { get; set; }
-        [JsonProperty("avatar")]
+        [ModelProperty("avatar")]
         public Optional<Image?> Avatar { get; set; }
     }
 }

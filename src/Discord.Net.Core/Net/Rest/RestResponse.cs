@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 
 namespace Discord.Net.Rest
@@ -8,13 +8,13 @@ namespace Discord.Net.Rest
     {
         public HttpStatusCode StatusCode { get; }
         public Dictionary<string, string> Headers { get; }
-        public Stream Stream { get; }
+        public ReadOnlyBuffer<byte> Data { get; }
 
-        public RestResponse(HttpStatusCode statusCode, Dictionary<string, string> headers, Stream stream)
+        public RestResponse(HttpStatusCode statusCode, Dictionary<string, string> headers, ReadOnlyBuffer<byte> data)
         {
             StatusCode = statusCode;
             Headers = headers;
-            Stream = stream;
+            Data = data;
         }
     }
 }

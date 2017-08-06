@@ -1,25 +1,25 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 using System;
 
 namespace Discord.API.Gateway
 {
     internal class ExtendedGuild : Guild
     {
-        [JsonProperty("unavailable")]
+        [ModelProperty("unavailable")]
         public bool? Unavailable { get; set; }
-        [JsonProperty("member_count")]
+        [ModelProperty("member_count")]
         public int MemberCount { get; set; }
-        [JsonProperty("large")]
+        [ModelProperty("large")]
         public bool Large { get; set; }
 
-        [JsonProperty("presences")]
+        [ModelProperty("presences")]
         public Presence[] Presences { get; set; }
-        [JsonProperty("members")]
+        [ModelProperty("members")]
         public GuildMember[] Members { get; set; }
-        [JsonProperty("channels")]
+        [ModelProperty("channels")]
         public Channel[] Channels { get; set; }
-        [JsonProperty("joined_at")]
+        [ModelProperty("joined_at")]
         public DateTimeOffset JoinedAt { get; set; }
     }
 }

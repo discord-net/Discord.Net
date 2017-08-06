@@ -1,18 +1,17 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Gateway
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class StatusUpdateParams
     {
-        [JsonProperty("status")]
+        [ModelProperty("status")]
         public UserStatus Status { get; set; }
-        [JsonProperty("since"), Int53]
+        [ModelProperty("since"), Int53]
         public long? IdleSince { get; set; }
-        [JsonProperty("afk")]
+        [ModelProperty("afk")]
         public bool IsAFK { get; set; }
-        [JsonProperty("game")]
+        [ModelProperty("game")]
         public Game Game { get; set; }
     }
 }

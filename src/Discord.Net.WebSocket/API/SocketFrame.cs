@@ -1,17 +1,18 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
+using System;
 
 namespace Discord.API
 {
     internal class SocketFrame
     {
-        [JsonProperty("op")]
+        [ModelProperty("op")]
         public int Operation { get; set; }
-        [JsonProperty("t", NullValueHandling = NullValueHandling.Ignore)]
+        [ModelProperty("t", IgnoreNull = true)]
         public string Type { get; set; }
-        [JsonProperty("s", NullValueHandling = NullValueHandling.Ignore)]
+        [ModelProperty("s", IgnoreNull = true)]
         public int? Sequence { get; set; }
-        [JsonProperty("d")]
-        public object Payload { get; set; }
+        [ModelProperty("d")]
+        public ReadOnlyBuffer<byte> Payload { get; set; }
     }
 }

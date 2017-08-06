@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Net.WebSockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,8 +15,7 @@ namespace Discord.Net.WebSockets
         public const int SendChunkSize = 4 * 1024; //4KB
         private const int HR_TIMEOUT = -2147012894;
 
-        public event Func<byte[], int, int, Task> BinaryMessage;
-        public event Func<string, Task> TextMessage;
+        public event Func<ReadOnlyBuffer<byte>, bool, Task> Message;
         public event Func<Exception, Task> Closed;
 
         private readonly SemaphoreSlim _lock;
@@ -146,27 +144,34 @@ namespace Discord.Net.WebSockets
             _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
         }
 
-        public async Task SendAsync(byte[] data, int index, int count, bool isText)
+        public async Task SendAsync(ReadOnlyBuffer<byte> data, bool isText)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
             try
             {
                 if (_client == null) return;
 
-                int frameCount = (int)Math.Ceiling((double)count / SendChunkSize);
+                int frameCount = (int)Math.Ceiling((double)data.Length / SendChunkSize);
 
+                byte[] arr;
+                if (data.DangerousTryGetArray(out var segment))
+                    arr = segment.Array;
+                else
+                    arr = data.ToArray();
+
+                int index = 0;
                 for (int i = 0; i < frameCount; i++, index += SendChunkSize)
                 {
                     bool isLast = i == (frameCount - 1);
 
                     int frameSize;
                     if (isLast)
-                        frameSize = count - (i * SendChunkSize);
+                        frameSize = data.Length - (i * SendChunkSize);
                     else
                         frameSize = SendChunkSize;
                     
                     var type = isText ? WebSocketMessageType.Text : WebSocketMessageType.Binary;
-                    await _client.SendAsync(new ArraySegment<byte>(data, index, count), type, isLast, _cancelToken).ConfigureAwait(false);
+                    await _client.SendAsync(new ArraySegment<byte>(arr, index, frameSize), type, isLast, _cancelToken).ConfigureAwait(false);
                 }
             }
             finally
@@ -206,14 +211,7 @@ namespace Discord.Net.WebSockets
 
                             //Use the internal buffer if we can get it
                             resultCount = (int)stream.Length;
-#if MSTRYBUFFER
-                            if (stream.TryGetBuffer(out var streamBuffer))
-                                result = streamBuffer.Array;
-                            else
-                                result = stream.ToArray();
-#else
                             result = stream.GetBuffer();
-#endif
                         }
                     }
                     else
@@ -222,14 +220,9 @@ namespace Discord.Net.WebSockets
                         resultCount = socketResult.Count;
                         result = buffer.Array;
                     }
-                    
-                    if (socketResult.MessageType == WebSocketMessageType.Text)
-                    {
-                        string text = Encoding.UTF8.GetString(result, 0, resultCount);
-                        await TextMessage(text).ConfigureAwait(false);
-                    }
-                    else
-                        await BinaryMessage(result, 0, resultCount).ConfigureAwait(false);
+
+                    bool isText = socketResult.MessageType == WebSocketMessageType.Text;
+                    await Message(new ReadOnlyBuffer<byte>(result, 0, resultCount), isText).ConfigureAwait(false);
                 }
             }
             catch (Win32Exception ex) when (ex.HResult == HR_TIMEOUT)

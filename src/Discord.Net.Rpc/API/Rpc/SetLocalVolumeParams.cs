@@ -1,11 +1,11 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class SetLocalVolumeParams
     {
-        [JsonProperty("volume")]
+        [ModelProperty("volume")]
         public int Volume { get; set; }
     }
 }

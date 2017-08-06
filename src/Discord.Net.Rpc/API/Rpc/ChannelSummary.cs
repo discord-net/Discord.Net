@@ -1,14 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class ChannelSummary
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public ulong Id { get; set; }
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public string Name { get; set; }
-        [JsonProperty("type")]
+        [ModelProperty("type")]
         public ChannelType Type { get; set; }
     }
 }

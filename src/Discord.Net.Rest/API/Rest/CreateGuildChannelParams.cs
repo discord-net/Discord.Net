@@ -1,17 +1,16 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rest
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class CreateGuildChannelParams
     {
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public string Name { get; }
-        [JsonProperty("type")]
+        [ModelProperty("type")]
         public ChannelType Type { get; }
 
-        [JsonProperty("bitrate")]
+        [ModelProperty("bitrate")]
         public Optional<int> Bitrate { get; set; }
 
         public CreateGuildChannelParams(string name, ChannelType type)

@@ -1,27 +1,27 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class VoiceState
     {
-        [JsonProperty("guild_id")]
+        [ModelProperty("guild_id")]
         public ulong? GuildId { get; set; }
-        [JsonProperty("channel_id")]
+        [ModelProperty("channel_id")]
         public ulong? ChannelId { get; set; }
-        [JsonProperty("user_id")]
+        [ModelProperty("user_id")]
         public ulong UserId { get; set; }
-        [JsonProperty("session_id")]
+        [ModelProperty("session_id")]
         public string SessionId { get; set; }
-        [JsonProperty("deaf")]
+        [ModelProperty("deaf")]
         public bool Deaf { get; set; }
-        [JsonProperty("mute")]
+        [ModelProperty("mute")]
         public bool Mute { get; set; }
-        [JsonProperty("self_deaf")]
+        [ModelProperty("self_deaf")]
         public bool SelfDeaf { get; set; }
-        [JsonProperty("self_mute")]
+        [ModelProperty("self_mute")]
         public bool SelfMute { get; set; }
-        [JsonProperty("suppress")]
+        [ModelProperty("suppress")]
         public bool Suppress { get; set; }
     }
 }

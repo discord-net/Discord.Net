@@ -1,22 +1,22 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class Presence
     {
-        [JsonProperty("user")]
+        [ModelProperty("user")]
         public User User { get; set; }
-        [JsonProperty("guild_id")]
+        [ModelProperty("guild_id")]
         public Optional<ulong> GuildId { get; set; }
-        [JsonProperty("status")]
+        [ModelProperty("status")]
         public UserStatus Status { get; set; }
-        [JsonProperty("game")]
+        [ModelProperty("game")]
         public Game Game { get; set; }
 
-        [JsonProperty("roles")]
+        [ModelProperty("roles")]
         public Optional<ulong[]> Roles { get; set; }
-        [JsonProperty("nick")]
+        [ModelProperty("nick")]
         public Optional<string> Nick { get; set; }
     }
 }

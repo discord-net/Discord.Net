@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Discord.Serialization;
 using System;
 #if DEBUG_LIMITS
 using System.Diagnostics;
@@ -13,6 +12,16 @@ namespace Discord.Net.Queue
 {
     internal class RequestBucket
     {
+        private class Error
+        {
+            [ModelProperty("code")]
+            public int Code { get; set; }
+            [ModelProperty("message")]
+            public string Message { get; set; }
+        }
+
+        private static int _nextId = 0;
+
         private readonly object _lock;
         private readonly RequestQueue _queue;
         private int _semaphore;
@@ -38,10 +47,9 @@ namespace Discord.Net.Queue
             LastAttemptAt = DateTimeOffset.UtcNow;
         }
         
-        static int nextId = 0;
-        public async Task<Stream> SendAsync(RestRequest request)
+        public async Task<ReadOnlyBuffer<byte>> SendAsync(RestRequest request)
         {
-            int id = Interlocked.Increment(ref nextId);
+            int id = Interlocked.Increment(ref _nextId);
 #if DEBUG_LIMITS
             Debug.WriteLine($"[{id}] Start");
 #endif
@@ -54,7 +62,7 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                 Debug.WriteLine($"[{id}] Sending...");
 #endif
-                RateLimitInfo info = default(RateLimitInfo);
+                var info = default(RateLimitInfo);
                 try
                 {
                     var response = await request.SendAsync().ConfigureAwait(false);
@@ -92,17 +100,13 @@ namespace Discord.Net.Queue
                             default:
                                 int? code = null;
                                 string reason = null;
-                                if (response.Stream != null)
+                                if (response.Data.Length > 0)
                                 {
                                     try
                                     {
-                                        using (var reader = new StreamReader(response.Stream))
-                                        using (var jsonReader = new JsonTextReader(reader))
-                                        {
-                                            var json = JToken.Load(jsonReader);
-                                            try { code = json.Value<int>("code"); } catch { };
-                                            try { reason = json.Value<string>("message"); } catch { };
-                                        }
+                                        var error = Serializer.ReadJson<Error>(response.Data);
+                                        code = error.Code;
+                                        reason = error.Message;
                                     }
                                     catch { }
                                 }
@@ -114,7 +118,7 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                         Debug.WriteLine($"[{id}] Success");
 #endif
-                        return response.Stream;
+                        return response.Data;
                     }
                 }
                 //catch (HttpException) { throw; } //Pass through
@@ -231,7 +235,7 @@ namespace Discord.Net.Queue
 #endif
                 }
 
-                var now = DateTimeUtils.ToUnixSeconds(DateTimeOffset.UtcNow);
+                long now = DateTimeUtils.ToUnixSeconds(DateTimeOffset.UtcNow);
                 DateTimeOffset? resetTick = null;
 
                 //Using X-RateLimit-Remaining causes a race condition

@@ -1,11 +1,11 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rest
 {
     internal class GetGuildPruneCountResponse
     {
-        [JsonProperty("pruned")]
+        [ModelProperty("pruned")]
         public int Pruned { get; set; }
     }
 }

@@ -10,14 +10,14 @@ namespace Discord.Net.Queue
     {
         public IWebSocketClient Client { get; }
         public string BucketId { get; }
-        public byte[] Data { get; }
+        public ReadOnlyBuffer<byte> Data { get; }
         public bool IsText { get; }
         public DateTimeOffset? TimeoutAt { get; }
         public TaskCompletionSource<Stream> Promise { get; }
         public RequestOptions Options { get; }
         public CancellationToken CancelToken { get; internal set; }
 
-        public WebSocketRequest(IWebSocketClient client, string bucketId, byte[] data, bool isText, RequestOptions options)
+        public WebSocketRequest(IWebSocketClient client, string bucketId, ReadOnlyBuffer<byte> data, bool isText, RequestOptions options)
         {
             Preconditions.NotNull(options, nameof(options));
 
@@ -32,7 +32,7 @@ namespace Discord.Net.Queue
 
         public async Task SendAsync()
         {
-            await Client.SendAsync(Data, 0, Data.Length, IsText).ConfigureAwait(false);
+            await Client.SendAsync(Data, IsText).ConfigureAwait(false);
         }
     }
 }

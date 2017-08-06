@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Utf8;
 using System.Threading;
 using System.Threading.Tasks;
 using WebSocket4Net;
@@ -12,8 +13,7 @@ namespace Discord.Net.Providers.WS4Net
 {
     internal class WS4NetClient : IWebSocketClient, IDisposable
     {
-        public event Func<byte[], int, int, Task> BinaryMessage;
-        public event Func<string, Task> TextMessage;
+        public event Func<ReadOnlyBuffer<byte>, bool, Task> Message;
         public event Func<Exception, Task> Closed;
 
         private readonly SemaphoreSlim _lock;
@@ -129,15 +129,20 @@ namespace Discord.Net.Providers.WS4Net
             _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
         }
 
-        public async Task SendAsync(byte[] data, int index, int count, bool isText)
+        public async Task SendAsync(ReadOnlyBuffer<byte> data, bool isText)
         {
             await _lock.WaitAsync(_cancelToken).ConfigureAwait(false);
             try
             {
                 if (isText)
-                    _client.Send(Encoding.UTF8.GetString(data, index, count));
+                    _client.Send(new Utf8String(data.Span).ToString());
                 else
-                    _client.Send(data, index, count);
+                {
+                    if (data.DangerousTryGetArray(out var array))
+                        _client.Send(array.Array, 0, data.Length);
+                    else
+                        _client.Send(data.ToArray(), 0, data.Length);
+                }
             }
             finally
             {
@@ -147,11 +152,12 @@ namespace Discord.Net.Providers.WS4Net
 
         private void OnTextMessage(object sender, MessageReceivedEventArgs e)
         {
-            TextMessage(e.Message).GetAwaiter().GetResult();
+            //TODO: Inefficient, but were dropping this plugin ASAP
+            Message(new ReadOnlyBuffer<byte>(Encoding.UTF8.GetBytes(e.Message)), true).GetAwaiter().GetResult();
         }
         private void OnBinaryMessage(object sender, DataReceivedEventArgs e)
         {
-            BinaryMessage(e.Data, 0, e.Data.Count()).GetAwaiter().GetResult();
+            Message(new ReadOnlyBuffer<byte>(e.Data, 0, e.Data.Count()), false).GetAwaiter().GetResult();
         }
         private void OnConnected(object sender, object e)
         {

@@ -1,13 +1,13 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class SelectChannelParams
     {
-        [JsonProperty("channel_id")]
+        [ModelProperty("channel_id")]
         public ulong? ChannelId { get; set; }
-        [JsonProperty("force")]
+        [ModelProperty("force")]
         public Optional<bool> Force { get; set; }
     }
 }

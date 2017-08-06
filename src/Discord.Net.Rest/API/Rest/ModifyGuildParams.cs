@@ -1,30 +1,29 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rest
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyGuildParams
     {
-        [JsonProperty("username")]
+        [ModelProperty("username")]
         public Optional<string> Username { get; set; }
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public Optional<string> Name { get; set; }
-        [JsonProperty("region")]
+        [ModelProperty("region")]
         public Optional<string> RegionId { get; set; }
-        [JsonProperty("verification_level")]
+        [ModelProperty("verification_level")]
         public Optional<VerificationLevel> VerificationLevel { get; set; }
-        [JsonProperty("default_message_notifications")]
+        [ModelProperty("default_message_notifications")]
         public Optional<DefaultMessageNotifications> DefaultMessageNotifications { get; set; }
-        [JsonProperty("afk_timeout")]
+        [ModelProperty("afk_timeout")]
         public Optional<int> AfkTimeout { get; set; }
-        [JsonProperty("icon")]
+        [ModelProperty("icon")]
         public Optional<Image?> Icon { get; set; }
-        [JsonProperty("splash")]
+        [ModelProperty("splash")]
         public Optional<Image?> Splash { get; set; }
-        [JsonProperty("afk_channel_id")]
+        [ModelProperty("afk_channel_id")]
         public Optional<ulong?> AfkChannelId { get; set; }
-        [JsonProperty("owner_id")]
+        [ModelProperty("owner_id")]
         public Optional<ulong> OwnerId { get; set; }
     }
 }

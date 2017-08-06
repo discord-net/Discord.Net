@@ -1,15 +1,15 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class ReadState
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public ulong Id { get; set; }
-        [JsonProperty("mention_count")]
+        [ModelProperty("mention_count")]
         public int MentionCount { get; set; }
-        [JsonProperty("last_message_id")]
+        [ModelProperty("last_message_id")]
         public Optional<ulong> LastMessageId { get; set; }
     }
 }

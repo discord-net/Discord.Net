@@ -1,17 +1,17 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class Message : Discord.API.Message
     {
-        [JsonProperty("blocked")]
+        [ModelProperty("blocked")]
         public Optional<bool> IsBlocked { get; }
-        [JsonProperty("content_parsed")]
+        [ModelProperty("content_parsed")]
         public Optional<object[]> ContentParsed { get; }
-        [JsonProperty("author_color")]
+        [ModelProperty("author_color")]
         public Optional<string> AuthorColor { get; } //#Hex
 
-        [JsonProperty("mentions")]
+        [ModelProperty("mentions")]
         public new Optional<ulong[]> UserMentions { get; set; }
     }
 }

@@ -1,13 +1,13 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Gateway
 {
     internal class GuildBanEvent
     {
-        [JsonProperty("guild_id")]
+        [ModelProperty("guild_id")]
         public ulong GuildId { get; set; }
-        [JsonProperty("user")]
+        [ModelProperty("user")]
         public User User { get; set; }
     }
 }

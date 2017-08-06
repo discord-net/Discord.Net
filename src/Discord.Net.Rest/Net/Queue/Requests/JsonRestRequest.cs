@@ -1,21 +1,22 @@
 ﻿using Discord.Net.Rest;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord.Net.Queue
 {
     public class JsonRestRequest : RestRequest
     {
-        public string Json { get; }
+        public ReadOnlyBuffer<byte> Payload { get; }
 
-        public JsonRestRequest(IRestClient client, string method, string endpoint, string json, RequestOptions options)
+        public JsonRestRequest(IRestClient client, string method, string endpoint, ReadOnlyBuffer<byte> payload, RequestOptions options)
             : base(client, method, endpoint, options)
         {
-            Json = json;
+            Payload = payload;
         }
 
         public override async Task<RestResponse> SendAsync()
         {
-            return await Client.SendAsync(Method, Endpoint, Json, Options.CancelToken, Options.HeaderOnly, Options.AuditLogReason).ConfigureAwait(false);
+            return await Client.SendAsync(Method, Endpoint, Payload, Options.CancelToken, Options.HeaderOnly, Options.AuditLogReason).ConfigureAwait(false);
         }
     }
 }

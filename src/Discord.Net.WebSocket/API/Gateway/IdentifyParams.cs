@@ -1,21 +1,20 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 using System.Collections.Generic;
 
 namespace Discord.API.Gateway
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class IdentifyParams
     {
-        [JsonProperty("token")]
+        [ModelProperty("token")]
         public string Token { get; set; }
-        [JsonProperty("properties")]
+        [ModelProperty("properties")]
         public IDictionary<string, string> Properties { get; set; }
-        [JsonProperty("large_threshold")]
+        [ModelProperty("large_threshold")]
         public int LargeThreshold { get; set; }
-        [JsonProperty("compress")]
+        [ModelProperty("compress")]
         public bool UseCompression { get; set; }
-        [JsonProperty("shard")]
+        [ModelProperty("shard")]
         public Optional<int[]> ShardingParams { get; set; }
     }
 }

@@ -1,13 +1,13 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class SetLocalVolumeResponse
     {
-        [JsonProperty("user_id")]
+        [ModelProperty("user_id")]
         public ulong UserId { get; set; }
-        [JsonProperty("volume")]
+        [ModelProperty("volume")]
         public int Volume { get; set; }
     }
 }

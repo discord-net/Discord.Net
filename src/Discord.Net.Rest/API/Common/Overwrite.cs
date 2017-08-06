@@ -1,17 +1,17 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class Overwrite
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public ulong TargetId { get; set; }
-        [JsonProperty("type")]
+        [ModelProperty("type")]
         public PermissionTarget TargetType { get; set; }
-        [JsonProperty("deny"), Int53]
+        [ModelProperty("deny"), Int53]
         public ulong Deny { get; set; }
-        [JsonProperty("allow"), Int53]
+        [ModelProperty("allow"), Int53]
         public ulong Allow { get; set; }
     }
 }

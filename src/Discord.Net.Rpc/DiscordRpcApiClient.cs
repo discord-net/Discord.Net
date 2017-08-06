@@ -5,14 +5,13 @@ using Discord.Net.Rest;
 using Discord.Net.WebSockets;
 using Discord.Rpc;
 using Discord.Serialization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Text.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,11 +21,12 @@ namespace Discord.API
     {
         private interface IRpcRequest
         {
-            Task SetResultAsync(JToken data);
-            Task SetExceptionAsync(JToken data);
+            Task SetResultAsync(ReadOnlyBuffer<byte> data);
+            Task SetExceptionAsync(ReadOnlyBuffer<byte> data);
         }
 
         private class RpcRequest<T> : IRpcRequest
+            where T : class, new()
         {
             public TaskCompletionSource<T> Promise { get; set; }
 
@@ -39,13 +39,13 @@ namespace Discord.API
                     Promise.TrySetCanceled(); //Doesn't need to be async, we're already in a separate task
                 });
             }
-            public Task SetResultAsync(JToken data)
+            public Task SetResultAsync(ReadOnlyBuffer<byte> data)
             {
-                return Promise.TrySetResultAsync(Serializer.FromJson<T>(data));
+                return Promise.TrySetResultAsync(Serializer.ReadJson<T>(data));
             }
-            public Task SetExceptionAsync(JToken data)
+            public Task SetExceptionAsync(ReadOnlyBuffer<byte> data)
             {
-                var error = Serializer.FromJson<ErrorEvent>(data);
+                var error = Serializer.ReadJson<ErrorEvent>(data);
                 return Promise.TrySetExceptionAsync(new RpcException(error.Code, error.Message));
             }
         }
@@ -55,8 +55,8 @@ namespace Discord.API
         public event Func<string, Task> SentRpcMessage { add { _sentRpcMessageEvent.Add(value); } remove { _sentRpcMessageEvent.Remove(value); } }
         private readonly AsyncEvent<Func<string, Task>> _sentRpcMessageEvent = new AsyncEvent<Func<string, Task>>();
 
-        public event Func<string, Optional<string>, Optional<object>, Task> ReceivedRpcEvent { add { _receivedRpcEvent.Add(value); } remove { _receivedRpcEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<string, Optional<string>, Optional<object>, Task>> _receivedRpcEvent = new AsyncEvent<Func<string, Optional<string>, Optional<object>, Task>>();
+        public event Func<string, Optional<string>, Optional<ReadOnlyBuffer<byte>>, Task> ReceivedRpcEvent { add { _receivedRpcEvent.Add(value); } remove { _receivedRpcEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<string, Optional<string>, Optional<ReadOnlyBuffer<byte>>, Task>> _receivedRpcEvent = new AsyncEvent<Func<string, Optional<string>, Optional<ReadOnlyBuffer<byte>>, Task>>();
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
 
@@ -71,9 +71,9 @@ namespace Discord.API
 
         public ConnectionState ConnectionState { get; private set; }
 
-        public DiscordRpcApiClient(string clientId, string userAgent, string origin, RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, 
-                RetryMode defaultRetryMode = RetryMode.AlwaysRetry)
-            : base(restClientProvider, userAgent, defaultRetryMode)
+        public DiscordRpcApiClient(string clientId, string userAgent, string origin, RestClientProvider restClientProvider, WebSocketProvider webSocketProvider,
+                ScopedSerializer serializer, RetryMode defaultRetryMode = RetryMode.AlwaysRetry)
+            : base(restClientProvider, userAgent, serializer, defaultRetryMode)
         {
             _connectionLock = new SemaphoreSlim(1, 1);
             _clientId = clientId;
@@ -87,30 +87,30 @@ namespace Discord.API
             _webSocketClient = webSocketProvider();
             //_webSocketClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .Net 4.6+)
             _webSocketClient.SetHeader("origin", _origin);
-            _webSocketClient.BinaryMessage += async (data, index, count) =>
+            _webSocketClient.Message += async (data, isText) =>
             {
-                using (var compressed = new MemoryStream(data, index + 2, count - 2))
+                if (!isText)
                 {
-                    _decompressionStream.Position = 0;
-                    using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
-                        zlib.CopyTo(_decompressionStream);
-                    _decompressionStream.SetLength(_decompressionStream.Position);
-
-                    _decompressionStream.Position = 0;
-                    var msg = _serializer.FromJson<API.Rpc.RpcFrame>(_decompressionReader);
-                    if (msg != null)
+                    using (var compressed = new MemoryStream(data.ToArray(), 2, data.Length - 2))
                     {
-                        await _receivedRpcEvent.InvokeAsync(msg.Cmd, msg.Event, msg.Data).ConfigureAwait(false);
-                        if (msg.Nonce.IsSpecified && msg.Nonce.Value.HasValue)
-                            ProcessMessage(msg);
+                        _decompressionStream.Position = 0;
+                        using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
+                            zlib.CopyTo(_decompressionStream);
+                        _decompressionStream.SetLength(_decompressionStream.Position);
+
+                        _decompressionStream.Position = 0;
+                        var msg = _serializer.ReadJson<RpcFrame>(_decompressionStream.ToReadOnlyBuffer());
+                        if (msg != null)
+                        {
+                            await _receivedRpcEvent.InvokeAsync(msg.Cmd, msg.Event, msg.Data).ConfigureAwait(false);
+                            if (msg.Nonce.IsSpecified && msg.Nonce.Value.HasValue)
+                                ProcessMessage(msg);
+                        }
                     }
                 }
-            };
-            _webSocketClient.TextMessage += async text =>
-            {
-                using (var reader = new StringReader(text))
+                else
                 {
-                    var msg = _serializer.FromJson<API.Rpc.RpcFrame>(reader);
+                    var msg = _serializer.ReadJson<RpcFrame>(data);
                     if (msg != null)
                     {
                         await _receivedRpcEvent.InvokeAsync(msg.Cmd, msg.Event, msg.Data).ConfigureAwait(false);
@@ -216,29 +216,35 @@ namespace Discord.API
         }
 
         //Core
-        public async Task<TResponse> SendRpcAsync<TResponse>(string cmd, object payload, Optional<string> evt = default(Optional<string>), RequestOptions options = null)
-            where TResponse : class
+        public async Task<TResponse> SendRpcAsync<TResponse>(string cmd, object payload, Optional<string> evt = default, RequestOptions options = null)
+            where TResponse : class, new()
         {
             return await SendRpcAsyncInternal<TResponse>(cmd, payload, evt, options).ConfigureAwait(false);
         }
         private async Task<TResponse> SendRpcAsyncInternal<TResponse>(string cmd, object payload, Optional<string> evt, RequestOptions options)
-            where TResponse : class
+            where TResponse : class, new()
         {
-            byte[] bytes = null;
-            var guid = Guid.NewGuid();
-            payload = new API.Rpc.RpcFrame { Cmd = cmd, Event = evt, Args = payload, Nonce = guid };
-            if (payload != null)
+            if (_formatters.TryDequeue(out var data1))
+                data1 = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            if (_formatters.TryDequeue(out var data2))
+                data2 = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            try
             {
-                string json = SerializeJson(payload);
-                bytes = Encoding.UTF8.GetBytes(json);
+                var guid = Guid.NewGuid();
+                payload = new API.Rpc.RpcFrame { Cmd = cmd, Event = evt, Args = SerializeJson(data1, payload), Nonce = guid };
+
+                var requestTracker = new RpcRequest<TResponse>(options);
+                _requests[guid] = requestTracker;
+
+                await RequestQueue.SendAsync(new WebSocketRequest(_webSocketClient, null, SerializeJson(data2, payload), true, options)).ConfigureAwait(false);
+                await _sentRpcMessageEvent.InvokeAsync(cmd).ConfigureAwait(false);
+                return await requestTracker.Promise.Task.ConfigureAwait(false);
             }
-
-            var requestTracker = new RpcRequest<TResponse>(options);
-            _requests[guid] = requestTracker;
-
-            await RequestQueue.SendAsync(new WebSocketRequest(_webSocketClient, null, bytes, true, options)).ConfigureAwait(false);
-            await _sentRpcMessageEvent.InvokeAsync(cmd).ConfigureAwait(false);
-            return await requestTracker.Promise.Task.ConfigureAwait(false);
+            finally
+            {
+                _formatters.Enqueue(data1);
+                _formatters.Enqueue(data2);
+            }
         }
 
         //Rpc
@@ -392,11 +398,11 @@ namespace Discord.API
             {
                 if (msg.Event.GetValueOrDefault("") == "ERROR")
                 {
-                    var _ = requestTracker.SetExceptionAsync(msg.Data.GetValueOrDefault() as JToken);
+                    var _ = requestTracker.SetExceptionAsync(msg.Data.GetValueOrDefault());
                 }
                 else
                 {
-                    var _ = requestTracker.SetResultAsync(msg.Data.GetValueOrDefault() as JToken);
+                    var _ = requestTracker.SetResultAsync(msg.Data.GetValueOrDefault());
                 }
                 return true;
             }

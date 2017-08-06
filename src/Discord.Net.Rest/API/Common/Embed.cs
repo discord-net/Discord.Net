@@ -1,37 +1,36 @@
 ﻿#pragma warning disable CS1591
 using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class Embed
     {
-        [JsonProperty("title")]
+        [ModelProperty("title")]
         public string Title { get; set; }
-        [JsonProperty("description")]
+        [ModelProperty("description")]
         public string Description { get; set; }
-        [JsonProperty("url")]
+        [ModelProperty("url")]
         public string Url { get; set; }
-        [JsonProperty("color")]
+        [ModelProperty("color")]
         public uint? Color { get; set; }
-        [JsonProperty("type"), JsonConverter(typeof(StringEnumConverter))]
+        [ModelProperty("type")]
         public EmbedType Type { get; set; }
-        [JsonProperty("timestamp")]
+        [ModelProperty("timestamp")]
         public DateTimeOffset? Timestamp { get; set; }
-        [JsonProperty("author")]
+        [ModelProperty("author")]
         public Optional<EmbedAuthor> Author { get; set; }
-        [JsonProperty("footer")]
+        [ModelProperty("footer")]
         public Optional<EmbedFooter> Footer { get; set; }
-        [JsonProperty("video")]
+        [ModelProperty("video")]
         public Optional<EmbedVideo> Video { get; set; }
-        [JsonProperty("thumbnail")]
+        [ModelProperty("thumbnail")]
         public Optional<EmbedThumbnail> Thumbnail { get; set; }
-        [JsonProperty("image")]
+        [ModelProperty("image")]
         public Optional<EmbedImage> Image { get; set; }
-        [JsonProperty("provider")]
+        [ModelProperty("provider")]
         public Optional<EmbedProvider> Provider { get; set; }
-        [JsonProperty("fields")]
+        [ModelProperty("fields")]
         public Optional<EmbedField[]> Fields { get; set; }
     }
 }

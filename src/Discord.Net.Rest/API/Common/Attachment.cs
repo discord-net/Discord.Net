@@ -1,23 +1,23 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class Attachment
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public ulong Id { get; set; }
-        [JsonProperty("filename")]
+        [ModelProperty("filename")]
         public string Filename { get; set; }
-        [JsonProperty("size")]
+        [ModelProperty("size")]
         public int Size { get; set; }
-        [JsonProperty("url")]
+        [ModelProperty("url")]
         public string Url { get; set; }
-        [JsonProperty("proxy_url")]
+        [ModelProperty("proxy_url")]
         public string ProxyUrl { get; set; }
-        [JsonProperty("height")]
+        [ModelProperty("height")]
         public Optional<int> Height { get; set; }
-        [JsonProperty("width")]
+        [ModelProperty("width")]
         public Optional<int> Width { get; set; }
     }
 }

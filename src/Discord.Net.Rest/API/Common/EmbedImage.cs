@@ -1,18 +1,18 @@
 ﻿#pragma warning disable CS1591
 using System;
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class EmbedImage
     {
-        [JsonProperty("url")]
+        [ModelProperty("url")]
         public string Url { get; set; }
-        [JsonProperty("proxy_url")]
+        [ModelProperty("proxy_url")]
         public string ProxyUrl { get; set; }
-        [JsonProperty("height")]
+        [ModelProperty("height")]
         public Optional<int> Height { get; set; }
-        [JsonProperty("width")]
+        [ModelProperty("width")]
         public Optional<int> Width { get; set; }
     }
 }

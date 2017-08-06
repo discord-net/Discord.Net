@@ -1,15 +1,15 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class RpcConfig
     {
-        [JsonProperty("cdn_host")]
+        [ModelProperty("cdn_host")]
         public string CdnHost { get; set; }
-        [JsonProperty("api_endpoint")]
+        [ModelProperty("api_endpoint")]
         public string ApiEndpoint { get; set; }
-        [JsonProperty("environment")]
+        [ModelProperty("environment")]
         public string Environment { get; set; }
     }
 }

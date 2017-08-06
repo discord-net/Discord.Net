@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Text.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,14 +21,14 @@ namespace Discord.API
     {
         public event Func<GatewayOpCode, Task> SentGatewayMessage { add { _sentGatewayMessageEvent.Add(value); } remove { _sentGatewayMessageEvent.Remove(value); } }
         private readonly AsyncEvent<Func<GatewayOpCode, Task>> _sentGatewayMessageEvent = new AsyncEvent<Func<GatewayOpCode, Task>>();
-        public event Func<GatewayOpCode, int?, string, object, Task> ReceivedGatewayEvent { add { _receivedGatewayEvent.Add(value); } remove { _receivedGatewayEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<GatewayOpCode, int?, string, object, Task>> _receivedGatewayEvent = new AsyncEvent<Func<GatewayOpCode, int?, string, object, Task>>();
+        public event Func<GatewayOpCode, int?, string, ReadOnlyBuffer<byte>, Task> ReceivedGatewayEvent { add { _receivedGatewayEvent.Add(value); } remove { _receivedGatewayEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<GatewayOpCode, int?, string, ReadOnlyBuffer<byte>, Task>> _receivedGatewayEvent = new AsyncEvent<Func<GatewayOpCode, int?, string, ReadOnlyBuffer<byte>, Task>>();
 
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
 
+        private readonly Span<byte> _textBuffer;
         private readonly MemoryStream _decompressionStream;
-        private readonly StreamReader _decompressionReader;
         private CancellationTokenSource _connectCancelToken;
         private string _gatewayUrl;
         private bool _isExplicitUrl;
@@ -45,30 +46,30 @@ namespace Discord.API
                 _isExplicitUrl = true;
 
             _decompressionStream = new MemoryStream(10 * 1024); //10 KB 
-            _decompressionReader = new StreamReader(_decompressionStream);
+            _textBuffer = new Span<byte>(new byte[10 * 1024]);
 
             WebSocketClient = webSocketProvider();
             //WebSocketClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .NET Framework 4.6+)
-            WebSocketClient.BinaryMessage += async (data, index, count) =>
+            WebSocketClient.Message += async (data, isText) =>
             {
-                using (var compressed = new MemoryStream(data, index + 2, count - 2))
+                if (!isText)
                 {
-                    _decompressionStream.Position = 0;
-                    using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
-                        zlib.CopyTo(_decompressionStream);
-                    _decompressionStream.SetLength(_decompressionStream.Position);
+                    using (var compressed = new MemoryStream(data.ToArray(), 2, data.Length - 2))
+                    {
+                        _decompressionStream.Position = 0;
+                        using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
+                            zlib.CopyTo(_decompressionStream);
+                        _decompressionStream.SetLength(_decompressionStream.Position);
 
-                    _decompressionStream.Position = 0;
-                    var msg = _serializer.FromJson<SocketFrame>(_decompressionReader);
-                    if (msg != null)
-                        await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                        _decompressionStream.Position = 0;
+                        var msg = _serializer.ReadJson<SocketFrame>(_decompressionStream.ToReadOnlyBuffer());
+                        if (msg != null)
+                            await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                    }
                 }
-            };
-            WebSocketClient.TextMessage += async text =>
-            {
-                using (var reader = new StringReader(text))
+                else
                 {
-                    var msg = _serializer.FromJson<SocketFrame>(reader);
+                    var msg = _serializer.ReadJson<SocketFrame>(data);
                     if (msg != null)
                         await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                 }
@@ -174,13 +175,21 @@ namespace Discord.API
         {
             CheckState();
 
-            //TODO: Add ETF
-            byte[] bytes = null;
-            payload = new SocketFrame { Operation = (int)opCode, Payload = payload };
-            if (payload != null)
-                bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
-            await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, null, bytes, true, options)).ConfigureAwait(false);
-            await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
+            if (_formatters.TryDequeue(out var data1))
+                data1 = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            if (_formatters.TryDequeue(out var data2))
+                data2 = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            try
+            {
+                payload = new SocketFrame { Operation = (int)opCode, Payload = SerializeJson(data1, payload) };
+                await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, null, SerializeJson(data2, payload), true, options)).ConfigureAwait(false);
+                await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
+            }
+            finally
+            {
+                _formatters.Enqueue(data1);
+                _formatters.Enqueue(data2);
+            }            
         }
 
         //Gateway

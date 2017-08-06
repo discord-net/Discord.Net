@@ -1,19 +1,19 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API
 {
     internal class Emoji
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public ulong? Id { get; set; }
-        [JsonProperty("name")]
+        [ModelProperty("name")]
         public string Name { get; set; }
-        [JsonProperty("roles")]
+        [ModelProperty("roles")]
         public ulong[] Roles { get; set; }
-        [JsonProperty("require_colons")]
+        [ModelProperty("require_colons")]
         public bool RequireColons { get; set; }
-        [JsonProperty("managed")]
+        [ModelProperty("managed")]
         public bool Managed { get; set; }
     }
 }

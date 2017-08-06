@@ -8,13 +8,12 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,6 +28,7 @@ namespace Discord.API
         
         protected readonly SemaphoreSlim _stateLock;
         protected readonly ScopedSerializer _serializer;
+        protected readonly ConcurrentQueue<ArrayFormatter> _formatters;
         private readonly RestClientProvider _restClientProvider;
 
         protected bool _isDisposed;
@@ -53,6 +53,7 @@ namespace Discord.API
 
             RequestQueue = new RequestQueue();
             _stateLock = new SemaphoreSlim(1, 1);
+            _formatters = new ConcurrentQueue<ArrayFormatter>();
 
             SetBaseUrl(DiscordConfig.APIUrl);
         }
@@ -187,9 +188,14 @@ namespace Discord.API
             options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
             options.IsClientBucket = AuthTokenType == TokenType.User;
 
-            string json = payload != null ? SerializeJson(payload) : null;
-            var request = new JsonRestRequest(RestClient, method, endpoint, json, options);
-            await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
+            if (_formatters.TryDequeue(out var data))
+                data = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            try
+            {
+                var request = new JsonRestRequest(RestClient, method, endpoint, SerializeJson(data, payload), options);
+                await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
+            }
+            finally { _formatters.Enqueue(data); }
         }
 
         internal Task SendMultipartAsync(string method, Expression<Func<string>> endpointExpr, IReadOnlyDictionary<string, object> multipartArgs, BucketIds ids,
@@ -208,10 +214,10 @@ namespace Discord.API
         }
 
         internal Task<TResponse> SendAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, BucketIds ids,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class
+             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class, new()
             => SendAsync<TResponse>(method, GetEndpoint(endpointExpr), GetBucketId(ids, endpointExpr, AuthTokenType, funcName), clientBucket, options);
         public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint,
-            string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
+            string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class, new()
         {
             options = options ?? new RequestOptions();
             options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
@@ -222,25 +228,30 @@ namespace Discord.API
         }
 
         internal Task<TResponse> SendJsonAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, object payload, BucketIds ids,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class
+             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class, new()
             => SendJsonAsync<TResponse>(method, GetEndpoint(endpointExpr), payload, GetBucketId(ids, endpointExpr, AuthTokenType, funcName), clientBucket, options);
         public async Task<TResponse> SendJsonAsync<TResponse>(string method, string endpoint, object payload,
-            string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
+            string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class, new()
         {
             options = options ?? new RequestOptions();
             options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
             options.IsClientBucket = AuthTokenType == TokenType.User;
 
-            string json = payload != null ? SerializeJson(payload) : null;
-            var request = new JsonRestRequest(RestClient, method, endpoint, json, options);
-            return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
+            if (_formatters.TryDequeue(out var data))
+                data = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            try
+            {
+                var request = new JsonRestRequest(RestClient, method, endpoint, SerializeJson(data, payload), options);
+                return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
+            }
+            finally { _formatters.Enqueue(data); }
         }
 
         internal Task<TResponse> SendMultipartAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, IReadOnlyDictionary<string, object> multipartArgs, BucketIds ids,
-             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
+             ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class, new()
             => SendMultipartAsync<TResponse>(method, GetEndpoint(endpointExpr), multipartArgs, GetBucketId(ids, endpointExpr, AuthTokenType, funcName), clientBucket, options);
         public async Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, 
-            string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
+            string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class, new()
         {
             options = options ?? new RequestOptions();
             options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
@@ -250,7 +261,7 @@ namespace Discord.API
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
         }
 
-        private async Task<Stream> SendInternalAsync(string method, string endpoint, RestRequest request)
+        private async Task<ReadOnlyBuffer<byte>> SendInternalAsync(string method, string endpoint, RestRequest request)
         {
             if (!request.Options.IgnoreState)
                 CheckState();
@@ -258,13 +269,13 @@ namespace Discord.API
                 request.Options.RetryMode = DefaultRetryMode;
 
             var stopwatch = Stopwatch.StartNew();
-            var responseStream = await RequestQueue.SendAsync(request).ConfigureAwait(false);
+            var response = await RequestQueue.SendAsync(request).ConfigureAwait(false);
             stopwatch.Stop();
 
             double milliseconds = ToMilliseconds(stopwatch);
             await _sentRequestEvent.InvokeAsync(method, endpoint, milliseconds).ConfigureAwait(false);
 
-            return responseStream;
+            return response;
         }
 
         //Auth
@@ -309,7 +320,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<Channel>>("GET", () => $"guilds/{guildId}/channels", ids, options: options).ConfigureAwait(false);
+            return await SendAsync<List<Channel>>("GET", () => $"guilds/{guildId}/channels", ids, options: options).ConfigureAwait(false);
         }
         public async Task<Channel> CreateGuildChannelAsync(ulong guildId, CreateGuildChannelParams args, RequestOptions options = null)
         {
@@ -452,7 +463,7 @@ namespace Discord.API
                 endpoint = () => $"channels/{channelId}/messages?limit={limit}&{relativeDir}={relativeId}";
             else
                 endpoint = () => $"channels/{channelId}/messages?limit={limit}";
-            return await SendAsync<IReadOnlyCollection<Message>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
+            return await SendAsync<List<Message>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
         public async Task<Message> CreateMessageAsync(ulong channelId, CreateMessageParams args, RequestOptions options = null)
         {
@@ -618,7 +629,7 @@ namespace Discord.API
 
             var ids = new BucketIds(channelId: channelId);
             Expression<Func<string>> endpoint = () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}";
-            return await SendAsync<IReadOnlyCollection<User>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
+            return await SendAsync<List<User>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
         public async Task AckMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)
         {
@@ -685,7 +696,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendAsync<IReadOnlyCollection<Message>>("GET", () => $"channels/{channelId}/pins", ids, options: options).ConfigureAwait(false);
+            return await SendAsync<List<Message>>("GET", () => $"channels/{channelId}/pins", ids, options: options).ConfigureAwait(false);
         }
 
         //Channel Recipients
@@ -789,7 +800,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<Ban>>("GET", () => $"guilds/{guildId}/bans", ids, options: options).ConfigureAwait(false);
+            return await SendAsync<List<Ban>>("GET", () => $"guilds/{guildId}/bans", ids, options: options).ConfigureAwait(false);
         }
         public async Task CreateGuildBanAsync(ulong guildId, ulong userId, CreateGuildBanParams args, RequestOptions options = null)
         {
@@ -844,7 +855,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<Integration>>("GET", () => $"guilds/{guildId}/integrations", ids, options: options).ConfigureAwait(false);
+            return await SendAsync<List<Integration>>("GET", () => $"guilds/{guildId}/integrations", ids, options: options).ConfigureAwait(false);
         }
         public async Task<Integration> CreateGuildIntegrationAsync(ulong guildId, CreateGuildIntegrationParams args, RequestOptions options = null)
         {
@@ -913,7 +924,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<InviteMetadata>>("GET", () => $"guilds/{guildId}/invites", ids, options: options).ConfigureAwait(false);
+            return await SendAsync< List<InviteMetadata>>("GET", () => $"guilds/{guildId}/invites", ids, options: options).ConfigureAwait(false);
         }
         public async Task<IReadOnlyCollection<InviteMetadata>> GetChannelInvitesAsync(ulong channelId, RequestOptions options = null)
         {
@@ -921,7 +932,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
-            return await SendAsync<IReadOnlyCollection<InviteMetadata>>("GET", () => $"channels/{channelId}/invites", ids, options: options).ConfigureAwait(false);
+            return await SendAsync<List<InviteMetadata>>("GET", () => $"channels/{channelId}/invites", ids, options: options).ConfigureAwait(false);
         }
         public async Task<InviteMetadata> CreateChannelInviteAsync(ulong channelId, CreateChannelInviteParams args, RequestOptions options = null)
         {
@@ -977,7 +988,7 @@ namespace Discord.API
 
             var ids = new BucketIds(guildId: guildId);
             Expression<Func<string>> endpoint = () => $"guilds/{guildId}/members?limit={limit}&after={afterUserId}";
-            return await SendAsync<IReadOnlyCollection<GuildMember>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
+            return await SendAsync< List<GuildMember>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
         public async Task RemoveGuildMemberAsync(ulong guildId, ulong userId, string reason, RequestOptions options = null)
         {
@@ -1018,7 +1029,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<Role>>("GET", () => $"guilds/{guildId}/roles", ids, options: options).ConfigureAwait(false);
+            return await SendAsync<List<Role>>("GET", () => $"guilds/{guildId}/roles", ids, options: options).ConfigureAwait(false);
         }
         public async Task<Role> CreateGuildRoleAsync(ulong guildId, RequestOptions options = null)
         {
@@ -1056,7 +1067,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<IReadOnlyCollection<Role>>("PATCH", () => $"guilds/{guildId}/roles", args, ids, options: options).ConfigureAwait(false);
+            return await SendJsonAsync<List<Role>>("PATCH", () => $"guilds/{guildId}/roles", args, ids, options: options).ConfigureAwait(false);
         }
 
         //Users
@@ -1081,12 +1092,12 @@ namespace Discord.API
         public async Task<IReadOnlyCollection<Connection>> GetMyConnectionsAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<IReadOnlyCollection<Connection>>("GET", () => "users/@me/connections", new BucketIds(), options: options).ConfigureAwait(false);
+            return await SendAsync<List<Connection>>("GET", () => "users/@me/connections", new BucketIds(), options: options).ConfigureAwait(false);
         }
         public async Task<IReadOnlyCollection<Channel>> GetMyPrivateChannelsAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<IReadOnlyCollection<Channel>>("GET", () => "users/@me/channels", new BucketIds(), options: options).ConfigureAwait(false);
+            return await SendAsync<List<Channel>>("GET", () => "users/@me/channels", new BucketIds(), options: options).ConfigureAwait(false);
         }
         public async Task<IReadOnlyCollection<UserGuild>> GetMyGuildsAsync(GetGuildSummariesParams args, RequestOptions options = null)
         {
@@ -1099,7 +1110,7 @@ namespace Discord.API
             int limit = args.Limit.GetValueOrDefault(int.MaxValue);
             ulong afterGuildId = args.AfterGuildId.GetValueOrDefault(0);
             
-            return await SendAsync<IReadOnlyCollection<UserGuild>>("GET", () => $"users/@me/guilds?limit={limit}&after={afterGuildId}", new BucketIds(), options: options).ConfigureAwait(false);
+            return await SendAsync<List<UserGuild>>("GET", () => $"users/@me/guilds?limit={limit}&after={afterGuildId}", new BucketIds(), options: options).ConfigureAwait(false);
         }
         public async Task<Application> GetMyApplicationAsync(RequestOptions options = null)
         {
@@ -1136,7 +1147,7 @@ namespace Discord.API
         public async Task<IReadOnlyCollection<VoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<IReadOnlyCollection<VoiceRegion>>("GET", () => "voice/regions", new BucketIds(), options: options).ConfigureAwait(false);
+            return await SendAsync<List<VoiceRegion>>("GET", () => "voice/regions", new BucketIds(), options: options).ConfigureAwait(false);
         }
         public async Task<IReadOnlyCollection<VoiceRegion>> GetGuildVoiceRegionsAsync(ulong guildId, RequestOptions options = null)
         {
@@ -1144,7 +1155,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<VoiceRegion>>("GET", () => $"guilds/{guildId}/regions", ids, options: options).ConfigureAwait(false);
+            return await SendAsync<List<VoiceRegion>>("GET", () => $"guilds/{guildId}/regions", ids, options: options).ConfigureAwait(false);
         }
 
         //Helpers
@@ -1154,17 +1165,15 @@ namespace Discord.API
                 throw new InvalidOperationException("Client is not logged in.");
         }
         protected static double ToMilliseconds(Stopwatch stopwatch) => Math.Round((double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
-        protected string SerializeJson(object value)
+        protected ReadOnlyBuffer<byte> SerializeJson(ArrayFormatter data, object value)
         {
-            var sb = new StringBuilder(256);
-            using (var writer = new StringWriter(sb, CultureInfo.InvariantCulture))
-                _serializer.ToJson(writer, value);
-            return sb.ToString();
+            _serializer.WriteJson(data, value);
+            return new ReadOnlyBuffer<byte>(data.Formatted.Array, 0, data.Formatted.Count);
         }
-        protected T DeserializeJson<T>(Stream jsonStream)
+        protected T DeserializeJson<T>(ReadOnlyBuffer<byte> data)
+            where T : class, new()
         {
-            using (var reader = new StreamReader(jsonStream))
-                return _serializer.FromJson<T>(reader);
+            return _serializer.ReadJson<T>(data);
         }
 
         internal class BucketIds

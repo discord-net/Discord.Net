@@ -1,15 +1,15 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class GuildMember
     {
-        [JsonProperty("user")]
+        [ModelProperty("user")]
         public User User { get; set; }
-        [JsonProperty("status")]
+        [ModelProperty("status")]
         public UserStatus Status { get; set; }
-        /*[JsonProperty("activity")]
+        /*[ModelProperty("activity")]
         public object Activity { get; set; }*/
     }
 }

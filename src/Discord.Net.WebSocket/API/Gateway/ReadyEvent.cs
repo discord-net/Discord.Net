@@ -1,5 +1,5 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Gateway
 {
@@ -7,32 +7,32 @@ namespace Discord.API.Gateway
     {
         public class ReadState
         {
-            [JsonProperty("id")]
+            [ModelProperty("id")]
             public string ChannelId { get; set; }
-            [JsonProperty("mention_count")]
+            [ModelProperty("mention_count")]
             public int MentionCount { get; set; }
-            [JsonProperty("last_message_id")]
+            [ModelProperty("last_message_id")]
             public string LastMessageId { get; set; }
         }
 
-        [JsonProperty("v")]
+        [ModelProperty("v")]
         public int Version { get; set; }
-        [JsonProperty("user")]
+        [ModelProperty("user")]
         public User User { get; set; }
-        [JsonProperty("session_id")]
+        [ModelProperty("session_id")]
         public string SessionId { get; set; }
-        [JsonProperty("read_state")]
+        [ModelProperty("read_state")]
         public ReadState[] ReadStates { get; set; }
-        [JsonProperty("guilds")]
+        [ModelProperty("guilds")]
         public ExtendedGuild[] Guilds { get; set; }
-        [JsonProperty("private_channels")]
+        [ModelProperty("private_channels")]
         public Channel[] PrivateChannels { get; set; }
-        [JsonProperty("relationships")]
+        [ModelProperty("relationships")]
         public Relationship[] Relationships { get; set; }
 
         //Ignored
-        /*[JsonProperty("user_settings")]
-        [JsonProperty("user_guild_settings")]
-        [JsonProperty("tutorial")]*/
+        /*[ModelProperty("user_settings")]
+        [ModelProperty("user_guild_settings")]
+        [ModelProperty("tutorial")]*/
     }
 }

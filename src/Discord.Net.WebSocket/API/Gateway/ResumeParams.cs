@@ -1,16 +1,15 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Gateway
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ResumeParams
     {
-        [JsonProperty("token")]
+        [ModelProperty("token")]
         public string Token { get; set; }
-        [JsonProperty("session_id")]
+        [ModelProperty("session_id")]
         public string SessionId { get; set; }
-        [JsonProperty("seq")]
+        [ModelProperty("seq")]
         public int Sequence { get; set; }
     }
 }

@@ -1,26 +1,26 @@
 ﻿#pragma warning disable CS1591
 
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class VoiceSettings
     {
-        [JsonProperty("input")]
+        [ModelProperty("input")]
         public VoiceDeviceSettings Input { get; set; }
-        [JsonProperty("output")]
+        [ModelProperty("output")]
         public VoiceDeviceSettings Output { get; set; }
-        [JsonProperty("mode")]
+        [ModelProperty("mode")]
         public VoiceMode Mode { get; set; }
-        [JsonProperty("automatic_gain_control")]
+        [ModelProperty("automatic_gain_control")]
         public Optional<bool> AutomaticGainControl { get; set; }
-        [JsonProperty("echo_cancellation")]
+        [ModelProperty("echo_cancellation")]
         public Optional<bool> EchoCancellation { get; set; }
-        [JsonProperty("noise_suppression")]
+        [ModelProperty("noise_suppression")]
         public Optional<bool> NoiseSuppression { get; set; }
-        [JsonProperty("qos")]
+        [ModelProperty("qos")]
         public Optional<bool> QualityOfService { get; set; }
-        [JsonProperty("silence_warning")]
+        [ModelProperty("silence_warning")]
         public Optional<bool> SilenceWarning { get; set; }
     }
 }

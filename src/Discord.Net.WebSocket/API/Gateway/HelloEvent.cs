@@ -1,11 +1,11 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Gateway
 {
     internal class HelloEvent
     {
-        [JsonProperty("heartbeat_interval")]
+        [ModelProperty("heartbeat_interval")]
         public int HeartbeatInterval { get; set; }
     }
 }

@@ -1,20 +1,19 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rest
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyGuildMemberParams
     {
-        [JsonProperty("mute")]
+        [ModelProperty("mute")]
         public Optional<bool> Mute { get; set; }
-        [JsonProperty("deaf")]
+        [ModelProperty("deaf")]
         public Optional<bool> Deaf { get; set; }
-        [JsonProperty("nick")]
+        [ModelProperty("nick")]
         public Optional<string> Nickname { get; set; }
-        [JsonProperty("roles")]
+        [ModelProperty("roles")]
         public Optional<ulong[]> RoleIds { get; set; }
-        [JsonProperty("channel_id")]
+        [ModelProperty("channel_id")]
         public Optional<ulong> ChannelId { get; set; }
     }
 }

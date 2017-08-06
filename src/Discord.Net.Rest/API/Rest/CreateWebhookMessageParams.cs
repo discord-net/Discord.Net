@@ -1,23 +1,22 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rest
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class CreateWebhookMessageParams
     {
-        [JsonProperty("content")]
+        [ModelProperty("content")]
         public string Content { get; }
 
-        [JsonProperty("nonce")]
+        [ModelProperty("nonce")]
         public Optional<string> Nonce { get; set; }
-        [JsonProperty("tts")]
+        [ModelProperty("tts")]
         public Optional<bool> IsTTS { get; set; }
-        [JsonProperty("embeds")]
+        [ModelProperty("embeds")]
         public Optional<Embed[]> Embeds { get; set; }
-        [JsonProperty("username")]
+        [ModelProperty("username")]
         public Optional<string> Username { get; set; }
-        [JsonProperty("avatar_url")]
+        [ModelProperty("avatar_url")]
         public Optional<string> AvatarUrl { get; set; }
 
         public CreateWebhookMessageParams(string content)

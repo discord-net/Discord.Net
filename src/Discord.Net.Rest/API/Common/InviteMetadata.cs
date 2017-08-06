@@ -1,24 +1,24 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 using System;
 
 namespace Discord.API
 {
     internal class InviteMetadata : Invite
     {
-        [JsonProperty("inviter")]
+        [ModelProperty("inviter")]
         public User Inviter { get; set; }
-        [JsonProperty("uses")]
+        [ModelProperty("uses")]
         public int Uses { get; set; }
-        [JsonProperty("max_uses")]
+        [ModelProperty("max_uses")]
         public int MaxUses { get; set; }
-        [JsonProperty("max_age")]
+        [ModelProperty("max_age")]
         public int MaxAge { get; set; }
-        [JsonProperty("temporary")]
+        [ModelProperty("temporary")]
         public bool Temporary { get; set; }
-        [JsonProperty("created_at")]
+        [ModelProperty("created_at")]
         public DateTimeOffset CreatedAt { get; set; }
-        [JsonProperty("revoked")]
+        [ModelProperty("revoked")]
         public bool Revoked { get; set; }
     }
 }

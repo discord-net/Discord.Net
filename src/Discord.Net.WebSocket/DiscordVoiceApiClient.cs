@@ -4,19 +4,20 @@ using Discord.API.Voice;
 using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Serialization;
-using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Text.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord.Audio
 {
-    internal class DiscordVoiceAPIClient
+    internal class DiscordVoiceApiClient
     {
         public const int MaxBitrate = 128 * 1024;
         public const string Mode = "xsalsa20_poly1305";
@@ -30,8 +31,8 @@ namespace Discord.Audio
         public event Func<int, Task> SentData { add { _sentDataEvent.Add(value); } remove { _sentDataEvent.Remove(value); } }
         private readonly AsyncEvent<Func<int, Task>> _sentDataEvent = new AsyncEvent<Func<int, Task>>();
 
-        public event Func<VoiceOpCode, object, Task> ReceivedEvent { add { _receivedEvent.Add(value); } remove { _receivedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<VoiceOpCode, object, Task>> _receivedEvent = new AsyncEvent<Func<VoiceOpCode, object, Task>>();
+        public event Func<VoiceOpCode, ReadOnlyBuffer<byte>, Task> ReceivedEvent { add { _receivedEvent.Add(value); } remove { _receivedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<VoiceOpCode, ReadOnlyBuffer<byte>, Task>> _receivedEvent = new AsyncEvent<Func<VoiceOpCode, ReadOnlyBuffer<byte>, Task>>();
         public event Func<byte[], int, int, Task> ReceivedPacket { add { _receivedPacketEvent.Add(value); } remove { _receivedPacketEvent.Remove(value); } }
         private readonly AsyncEvent<Func<byte[], int, int, Task>> _receivedPacketEvent = new AsyncEvent<Func<byte[], int, int, Task>>();
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
@@ -40,7 +41,9 @@ namespace Discord.Audio
         private readonly ScopedSerializer _serializer;
         private readonly SemaphoreSlim _connectionLock;
         private readonly MemoryStream _decompressionStream;
-        private readonly StreamReader _decompressionReader;
+        private readonly Span<byte> _textBuffer;
+        protected readonly ConcurrentQueue<ArrayFormatter> _formatters;
+
         private CancellationTokenSource _connectCancelToken;
         private IUdpSocket _udp;
         private bool _isDisposed;
@@ -52,39 +55,40 @@ namespace Discord.Audio
 
         public ushort UdpPort => _udp.Port;
 
-        internal DiscordVoiceAPIClient(ulong guildId, WebSocketProvider webSocketProvider, UdpSocketProvider udpSocketProvider, ScopedSerializer serializer)
+        internal DiscordVoiceApiClient(ulong guildId, WebSocketProvider webSocketProvider, UdpSocketProvider udpSocketProvider, ScopedSerializer serializer)
         {
             GuildId = guildId;
             _connectionLock = new SemaphoreSlim(1, 1);
             _udp = udpSocketProvider();
             _udp.ReceivedDatagram += (data, index, count) => _receivedPacketEvent.InvokeAsync(data, index, count);
             _serializer = serializer;
+            _formatters = new ConcurrentQueue<ArrayFormatter>();
 
             _decompressionStream = new MemoryStream(10 * 1024); //10 KB
-            _decompressionReader = new StreamReader(_decompressionStream);
+            _textBuffer = new Span<byte>(new byte[10 * 1024]);
 
             WebSocketClient = webSocketProvider();
             //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); //(Causes issues in .Net 4.6+)
-            WebSocketClient.BinaryMessage += async (data, index, count) =>
+            WebSocketClient.Message += async (data, isText) =>
             {
-                using (var compressed = new MemoryStream(data, index + 2, count - 2))
+                if (!isText)
                 {
-                    _decompressionStream.Position = 0;
-                    using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
-                        zlib.CopyTo(_decompressionStream);
-                    _decompressionStream.SetLength(_decompressionStream.Position);
+                    using (var compressed = new MemoryStream(data.ToArray(), 2, data.Length - 2))
+                    {
+                        _decompressionStream.Position = 0;
+                        using (var zlib = new DeflateStream(compressed, CompressionMode.Decompress))
+                            zlib.CopyTo(_decompressionStream);
+                        _decompressionStream.SetLength(_decompressionStream.Position);
 
-                    _decompressionStream.Position = 0;
-                    var msg = _serializer.FromJson<SocketFrame>(_decompressionReader);
-                    if (msg != null)
-                        await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
+                        _decompressionStream.Position = 0;
+                        var msg = _serializer.ReadJson<SocketFrame>(_decompressionStream.ToReadOnlyBuffer());
+                        if (msg != null)
+                            await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
+                    }
                 }
-            };
-            WebSocketClient.TextMessage += async text =>
-            {
-                using (var reader = new StringReader(text))
+                else
                 {
-                    var msg = _serializer.FromJson<SocketFrame>(reader);
+                    var msg = _serializer.ReadJson<SocketFrame>(data);
                     if (msg != null)
                         await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
                 }
@@ -112,12 +116,21 @@ namespace Discord.Audio
 
         public async Task SendAsync(VoiceOpCode opCode, object payload, RequestOptions options = null)
         {
-            byte[] bytes = null;
-            payload = new SocketFrame { Operation = (int)opCode, Payload = payload };
-            if (payload != null)
-                bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
-            await WebSocketClient.SendAsync(bytes, 0, bytes.Length, true).ConfigureAwait(false);
-            await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
+            if (_formatters.TryDequeue(out var data1))
+                data1 = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            if (_formatters.TryDequeue(out var data2))
+                data2 = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            try
+            {
+                payload = new SocketFrame { Operation = (int)opCode, Payload = SerializeJson(data1, payload) };
+                await WebSocketClient.SendAsync(SerializeJson(data2, payload), true).ConfigureAwait(false);
+                await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
+            }
+            finally
+            {
+                _formatters.Enqueue(data1);
+                _formatters.Enqueue(data2);
+            }
         }
         public async Task SendAsync(byte[] data, int offset, int bytes)
         {
@@ -252,17 +265,15 @@ namespace Discord.Audio
 
         //Helpers
         private static double ToMilliseconds(Stopwatch stopwatch) => Math.Round((double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
-        private string SerializeJson(object value)
+        protected ReadOnlyBuffer<byte> SerializeJson(ArrayFormatter data, object value)
         {
-            var sb = new StringBuilder(256);
-            using (TextWriter writer = new StringWriter(sb, CultureInfo.InvariantCulture))
-                _serializer.ToJson(writer, value);
-            return sb.ToString();
+            _serializer.WriteJson(data, value);
+            return new ReadOnlyBuffer<byte>(data.Formatted.Array, 0, data.Formatted.Count);
         }
-        private T DeserializeJson<T>(Stream jsonStream)
+        protected T DeserializeJson<T>(ReadOnlyBuffer<byte> data)
+            where T : class, new()
         {
-            using (TextReader reader = new StreamReader(jsonStream))
-                return _serializer.FromJson<T>(reader);
+            return _serializer.ReadJson<T>(data);
         }
     }
 }

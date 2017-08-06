@@ -63,7 +63,7 @@ namespace Discord.Net.Queue
             finally { _tokenLock.Release(); }
         }
 
-        public async Task<Stream> SendAsync(RestRequest request)
+        public async Task<ReadOnlyBuffer<byte>> SendAsync(RestRequest request)
         {
             if (request.Options.CancelToken.CanBeCanceled)
                 request.Options.CancelToken = CancellationTokenSource.CreateLinkedTokenSource(_requestCancelToken, request.Options.CancelToken).Token;

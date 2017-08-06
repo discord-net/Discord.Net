@@ -1,18 +1,18 @@
-﻿using Newtonsoft.Json;
+﻿using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class VoiceMode
     {
-        [JsonProperty("type")]
+        [ModelProperty("type")]
         public Optional<string> Type { get; set; }
-        [JsonProperty("auto_threshold")]
+        [ModelProperty("auto_threshold")]
         public Optional<bool> AutoThreshold { get; set; }
-        [JsonProperty("threshold")]
+        [ModelProperty("threshold")]
         public Optional<float> Threshold { get; set; }
-        [JsonProperty("shortcut")]
+        [ModelProperty("shortcut")]
         public Optional<VoiceShortcut[]> Shortcut { get; set; }
-        [JsonProperty("delay")]
+        [ModelProperty("delay")]
         public Optional<float> Delay { get; set; }
     }
 }

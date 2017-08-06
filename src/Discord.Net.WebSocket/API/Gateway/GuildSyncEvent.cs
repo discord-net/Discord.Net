@@ -1,18 +1,18 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Gateway
 {
     internal class GuildSyncEvent
     {
-        [JsonProperty("id")]
+        [ModelProperty("id")]
         public ulong Id { get; set; }
-        [JsonProperty("large")]
+        [ModelProperty("large")]
         public bool Large { get; set; }
 
-        [JsonProperty("presences")]
+        [ModelProperty("presences")]
         public Presence[] Presences { get; set; }
-        [JsonProperty("members")]
+        [ModelProperty("members")]
         public GuildMember[] Members { get; set; }
     }
 }

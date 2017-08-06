@@ -1,13 +1,13 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rpc
 {
     internal class ErrorEvent
     {
-        [JsonProperty("code")]
+        [ModelProperty("code")]
         public int Code { get; set; }
-        [JsonProperty("message")]
+        [ModelProperty("message")]
         public string Message { get; set; }
     }
 }

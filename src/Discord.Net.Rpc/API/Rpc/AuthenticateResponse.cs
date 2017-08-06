@@ -1,18 +1,18 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 using System;
 
 namespace Discord.API.Rpc
 {
     internal class AuthenticateResponse
     {
-        [JsonProperty("application")]
+        [ModelProperty("application")]
         public Application Application { get; set; }
-        [JsonProperty("expires")]
+        [ModelProperty("expires")]
         public DateTimeOffset Expires { get; set; }
-        [JsonProperty("user")]
+        [ModelProperty("user")]
         public User User { get; set; }
-        [JsonProperty("scopes")]
+        [ModelProperty("scopes")]
         public string[] Scopes { get; set; }
     }
 }

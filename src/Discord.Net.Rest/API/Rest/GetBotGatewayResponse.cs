@@ -1,13 +1,13 @@
 ﻿#pragma warning disable CS1591
-using Newtonsoft.Json;
+using Discord.Serialization;
 
 namespace Discord.API.Rest
 {
     internal class GetBotGatewayResponse
     {
-        [JsonProperty("url")]
+        [ModelProperty("url")]
         public string Url { get; set; }
-        [JsonProperty("shards")]
+        [ModelProperty("shards")]
         public int Shards { get; set; }
     }
 }
