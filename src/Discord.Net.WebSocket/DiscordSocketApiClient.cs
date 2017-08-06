@@ -26,8 +26,7 @@ namespace Discord.API
 
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
-
-        private readonly Span<byte> _textBuffer;
+        
         private readonly MemoryStream _decompressionStream;
         private CancellationTokenSource _connectCancelToken;
         private string _gatewayUrl;
@@ -45,8 +44,7 @@ namespace Discord.API
             if (url != null)
                 _isExplicitUrl = true;
 
-            _decompressionStream = new MemoryStream(10 * 1024); //10 KB 
-            _textBuffer = new Span<byte>(new byte[10 * 1024]);
+            _decompressionStream = new MemoryStream(10 * 1024); //10 KB
 
             WebSocketClient = webSocketProvider();
             //WebSocketClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .NET Framework 4.6+)

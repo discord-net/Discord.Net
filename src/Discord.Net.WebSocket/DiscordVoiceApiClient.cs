@@ -41,7 +41,6 @@ namespace Discord.Audio
         private readonly ScopedSerializer _serializer;
         private readonly SemaphoreSlim _connectionLock;
         private readonly MemoryStream _decompressionStream;
-        private readonly Span<byte> _textBuffer;
         protected readonly ConcurrentQueue<ArrayFormatter> _formatters;
 
         private CancellationTokenSource _connectCancelToken;
@@ -65,7 +64,6 @@ namespace Discord.Audio
             _formatters = new ConcurrentQueue<ArrayFormatter>();
 
             _decompressionStream = new MemoryStream(10 * 1024); //10 KB
-            _textBuffer = new Span<byte>(new byte[10 * 1024]);
 
             WebSocketClient = webSocketProvider();
             //_gatewayClient.SetHeader("user-agent", DiscordConfig.UserAgent); //(Causes issues in .Net 4.6+)
