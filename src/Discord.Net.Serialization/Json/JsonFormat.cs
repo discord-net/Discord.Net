@@ -11,8 +11,6 @@ namespace Discord.Serialization.Json
     {
         public JsonFormat()
         {
-            AddConverter<bool, Converters.BooleanPropertyConverter>();
-
             AddConverter<sbyte, Converters.Int8PropertyConverter>();
             AddConverter<short, Converters.Int16PropertyConverter>();
             AddConverter<int, Converters.Int32PropertyConverter>();
@@ -32,6 +30,9 @@ namespace Discord.Serialization.Json
 
             AddConverter<DateTime, Converters.DateTimePropertyConverter>();
             AddConverter<DateTimeOffset, Converters.DateTimeOffsetPropertyConverter>();
+
+            AddConverter<bool, Converters.BooleanPropertyConverter>();
+            AddConverter<Guid, Converters.GuidPropertyConverter>();
 
             AddGenericConverter(typeof(List<>), typeof(Converters.ListPropertyConverter<>));
             AddGenericConverter(typeof(Nullable<>), typeof(Converters.NullablePropertyConverter<>));

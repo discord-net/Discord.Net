@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 
 namespace Discord.Serialization.Json.Converters
 {
@@ -16,6 +17,20 @@ namespace Discord.Serialization.Json.Converters
             }
         }
         public void Write(JsonWriter writer, bool value)
+            => writer.WriteValue(value);
+    }
+
+    internal class GuidPropertyConverter : IJsonPropertyConverter<Guid>
+    {
+        public Guid Read(JsonReader reader, bool read = true)
+        {
+            if (read)
+                reader.Read();
+            if (reader.ValueType != JsonValueType.String)
+                throw new SerializationException("Bad input, expected String");
+            return Guid.Parse(reader.ParseString());
+        }
+        public void Write(JsonWriter writer, Guid value)
             => writer.WriteValue(value);
     }
 }
