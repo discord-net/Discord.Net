@@ -9,8 +9,6 @@ namespace Discord.Commands
     {
         public static TypeReader Create(Type type, TypeReader reader)
         {
-            if (reader == null)
-                return null;
             var constructor = typeof(NullableTypeReader<>).MakeGenericType(type).GetTypeInfo().DeclaredConstructors.First();
             return (TypeReader)constructor.Invoke(new object[] { reader });
         }
