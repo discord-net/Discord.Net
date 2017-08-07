@@ -41,11 +41,11 @@ namespace Discord.API
             }
             public Task SetResultAsync(ReadOnlyBuffer<byte> data)
             {
-                return Promise.TrySetResultAsync(Serializer.ReadJson<T>(data));
+                return Promise.TrySetResultAsync(Serializer.Json.Read<T>(data));
             }
             public Task SetExceptionAsync(ReadOnlyBuffer<byte> data)
             {
-                var error = Serializer.ReadJson<ErrorEvent>(data);
+                var error = Serializer.Json.Read<ErrorEvent>(data);
                 return Promise.TrySetExceptionAsync(new RpcException(error.Code, error.Message));
             }
         }
@@ -72,7 +72,7 @@ namespace Discord.API
         public ConnectionState ConnectionState { get; private set; }
 
         public DiscordRpcApiClient(string clientId, string userAgent, string origin, RestClientProvider restClientProvider, WebSocketProvider webSocketProvider,
-                ScopedSerializer serializer, RetryMode defaultRetryMode = RetryMode.AlwaysRetry)
+                Serializer serializer, RetryMode defaultRetryMode = RetryMode.AlwaysRetry)
             : base(restClientProvider, userAgent, serializer, defaultRetryMode)
         {
             _connectionLock = new SemaphoreSlim(1, 1);
@@ -99,7 +99,7 @@ namespace Discord.API
                         _decompressionStream.SetLength(_decompressionStream.Position);
 
                         _decompressionStream.Position = 0;
-                        var msg = _serializer.ReadJson<RpcFrame>(_decompressionStream.ToReadOnlyBuffer());
+                        var msg = _serializer.Read<RpcFrame>(_decompressionStream.ToReadOnlyBuffer());
                         if (msg != null)
                         {
                             await _receivedRpcEvent.InvokeAsync(msg.Cmd, msg.Event, msg.Data).ConfigureAwait(false);
@@ -110,7 +110,7 @@ namespace Discord.API
                 }
                 else
                 {
-                    var msg = _serializer.ReadJson<RpcFrame>(data);
+                    var msg = _serializer.Read<RpcFrame>(data);
                     if (msg != null)
                     {
                         await _receivedRpcEvent.InvokeAsync(msg.Cmd, msg.Event, msg.Data).ConfigureAwait(false);

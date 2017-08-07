@@ -4,6 +4,8 @@ using Discord.Net;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
 using Discord.Serialization;
+using Discord.Serialization.Json;
+using Discord.Serialization.Json.Converters;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,6 +13,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Formatting;
@@ -21,13 +24,22 @@ namespace Discord.API
 {
     internal class DiscordRestApiClient : IDisposable
     {
+        static DiscordRestApiClient()
+        {
+            SerializationFormat.Json.AddConverter<Image, ImagePropertyConverter>();
+            SerializationFormat.Json.AddConverter<long, Int53PropertyConverter>(info => info.GetCustomAttribute<Int53Attribute>() != null);
+            SerializationFormat.Json.AddConverter<ulong, UInt53PropertyConverter>(info => info.GetCustomAttribute<Int53Attribute>() != null);
+            SerializationFormat.Json.AddGenericConverter(typeof(EntityOrId<>), typeof(EntityOrIdPropertyConverter<>));
+            SerializationFormat.Json.AddGenericConverter(typeof(Optional<>), typeof(OptionalPropertyConverter<>));
+        }
+
         private static readonly ConcurrentDictionary<string, Func<BucketIds, string>> _bucketIdGenerators = new ConcurrentDictionary<string, Func<BucketIds, string>>();
 
         public event Func<string, string, double, Task> SentRequest { add { _sentRequestEvent.Add(value); } remove { _sentRequestEvent.Remove(value); } }
         private readonly AsyncEvent<Func<string, string, double, Task>> _sentRequestEvent = new AsyncEvent<Func<string, string, double, Task>>();
         
         protected readonly SemaphoreSlim _stateLock;
-        protected readonly ScopedSerializer _serializer;
+        protected readonly Serializer _serializer;
         protected readonly ConcurrentQueue<ArrayFormatter> _formatters;
         private readonly RestClientProvider _restClientProvider;
 
@@ -44,7 +56,7 @@ namespace Discord.API
         internal IRestClient RestClient { get; private set; }
         internal ulong? CurrentUserId { get; set;}
 
-        public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, ScopedSerializer serializer, RetryMode defaultRetryMode = RetryMode.AlwaysRetry)
+        public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, Serializer serializer, RetryMode defaultRetryMode = RetryMode.AlwaysRetry)
         {
             _restClientProvider = restClientProvider;
             UserAgent = userAgent;
@@ -1167,13 +1179,13 @@ namespace Discord.API
         protected static double ToMilliseconds(Stopwatch stopwatch) => Math.Round((double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
         protected ReadOnlyBuffer<byte> SerializeJson(ArrayFormatter data, object value)
         {
-            _serializer.WriteJson(data, value);
+            _serializer.Write(data, value);
             return new ReadOnlyBuffer<byte>(data.Formatted.Array, 0, data.Formatted.Count);
         }
         protected T DeserializeJson<T>(ReadOnlyBuffer<byte> data)
             where T : class, new()
         {
-            return _serializer.ReadJson<T>(data);
+            return _serializer.Read<T>(data);
         }
 
         internal class BucketIds

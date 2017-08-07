@@ -38,7 +38,7 @@ namespace Discord.Audio
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
         
-        private readonly ScopedSerializer _serializer;
+        private readonly Serializer _serializer;
         private readonly SemaphoreSlim _connectionLock;
         private readonly MemoryStream _decompressionStream;
         protected readonly ConcurrentQueue<ArrayFormatter> _formatters;
@@ -54,7 +54,7 @@ namespace Discord.Audio
 
         public ushort UdpPort => _udp.Port;
 
-        internal DiscordVoiceApiClient(ulong guildId, WebSocketProvider webSocketProvider, UdpSocketProvider udpSocketProvider, ScopedSerializer serializer)
+        internal DiscordVoiceApiClient(ulong guildId, WebSocketProvider webSocketProvider, UdpSocketProvider udpSocketProvider, Serializer serializer)
         {
             GuildId = guildId;
             _connectionLock = new SemaphoreSlim(1, 1);
@@ -79,14 +79,14 @@ namespace Discord.Audio
                         _decompressionStream.SetLength(_decompressionStream.Position);
 
                         _decompressionStream.Position = 0;
-                        var msg = _serializer.ReadJson<SocketFrame>(_decompressionStream.ToReadOnlyBuffer());
+                        var msg = _serializer.Read<SocketFrame>(_decompressionStream.ToReadOnlyBuffer());
                         if (msg != null)
                             await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
                     }
                 }
                 else
                 {
-                    var msg = _serializer.ReadJson<SocketFrame>(data);
+                    var msg = _serializer.Read<SocketFrame>(data);
                     if (msg != null)
                         await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
                 }
@@ -265,13 +265,13 @@ namespace Discord.Audio
         private static double ToMilliseconds(Stopwatch stopwatch) => Math.Round((double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
         protected ReadOnlyBuffer<byte> SerializeJson(ArrayFormatter data, object value)
         {
-            _serializer.WriteJson(data, value);
+            _serializer.Write(data, value);
             return new ReadOnlyBuffer<byte>(data.Formatted.Array, 0, data.Formatted.Count);
         }
         protected T DeserializeJson<T>(ReadOnlyBuffer<byte> data)
             where T : class, new()
         {
-            return _serializer.ReadJson<T>(data);
+            return _serializer.Read<T>(data);
         }
     }
 }

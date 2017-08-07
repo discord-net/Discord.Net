@@ -30,7 +30,7 @@ namespace Discord.Audio
         }
 
         private readonly Logger _audioLogger;
-        private readonly ScopedSerializer _serializer;
+        private readonly Serializer _serializer;
         private readonly ConnectionManager _connection;
         private readonly SemaphoreSlim _stateLock;
         private readonly ConcurrentQueue<long> _heartbeatTimes;
@@ -66,10 +66,10 @@ namespace Discord.Audio
             ChannelId = channelId;
             _audioLogger = Discord.LogManager.CreateLogger($"Audio #{clientId}");
 
-            _serializer = Serializer.CreateScope();
-            _serializer.Error += async ex =>
+            _serializer = new Serializer(SerializationFormat.Json);
+            _serializer.Error += ex =>
             {
-                await _audioLogger.WarningAsync("Serializer Error", ex);
+                _audioLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();
             };
 
             ApiClient = new DiscordVoiceApiClient(guild.Id, Discord.WebSocketProvider, Discord.UdpSocketProvider, _serializer);
@@ -236,7 +236,7 @@ namespace Discord.Audio
                     case VoiceOpCode.Ready:
                         {
                             await _audioLogger.DebugAsync("Received Ready").ConfigureAwait(false);
-                            var data = _serializer.ReadJson<ReadyEvent>(payload);
+                            var data = _serializer.Read<ReadyEvent>(payload);
 
                             _ssrc = data.SSRC;
 
@@ -252,7 +252,7 @@ namespace Discord.Audio
                     case VoiceOpCode.SessionDescription:
                         {
                             await _audioLogger.DebugAsync("Received SessionDescription").ConfigureAwait(false);
-                            var data = _serializer.ReadJson<SessionDescriptionEvent>(payload);
+                            var data = _serializer.Read<SessionDescriptionEvent>(payload);
 
                             if (data.Mode != DiscordVoiceApiClient.Mode)
                                 throw new InvalidOperationException($"Discord selected an unexpected mode: {data.Mode}");
@@ -288,7 +288,7 @@ namespace Discord.Audio
                         {
                             await _audioLogger.DebugAsync("Received Speaking").ConfigureAwait(false);
 
-                            var data = _serializer.ReadJson<SpeakingEvent>(payload);
+                            var data = _serializer.Read<SpeakingEvent>(payload);
                             _ssrcMap[data.Ssrc] = data.UserId; //TODO: Memory Leak: SSRCs are never cleaned up
 
                             await _speakingUpdatedEvent.InvokeAsync(data.UserId, data.Speaking);

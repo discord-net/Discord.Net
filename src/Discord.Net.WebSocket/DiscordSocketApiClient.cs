@@ -36,7 +36,7 @@ namespace Discord.API
 
         public ConnectionState ConnectionState { get; private set; }
 
-        public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent, ScopedSerializer serializer,
+        public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent, Serializer serializer,
             string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry)
             : base(restClientProvider, userAgent, serializer, defaultRetryMode)
         {
@@ -60,14 +60,14 @@ namespace Discord.API
                         _decompressionStream.SetLength(_decompressionStream.Position);
 
                         _decompressionStream.Position = 0;
-                        var msg = _serializer.ReadJson<SocketFrame>(_decompressionStream.ToReadOnlyBuffer());
+                        var msg = _serializer.Read<SocketFrame>(_decompressionStream.ToReadOnlyBuffer());
                         if (msg != null)
                             await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                     }
                 }
                 else
                 {
-                    var msg = _serializer.ReadJson<SocketFrame>(data);
+                    var msg = _serializer.Read<SocketFrame>(data);
                     if (msg != null)
                         await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                 }

@@ -22,7 +22,7 @@ namespace Discord.WebSocket
     {
         private readonly ConcurrentQueue<ulong> _largeGuilds;
         private readonly SemaphoreSlim _connectionGroupLock, _stateLock;
-        private readonly ScopedSerializer _serializer;
+        private readonly Serializer _serializer;
         private readonly DiscordSocketClient _parentClient;
         private readonly ConcurrentQueue<long> _heartbeatTimes;
         private readonly ConnectionManager _connection;
@@ -87,10 +87,10 @@ namespace Discord.WebSocket
             _stateLock = new SemaphoreSlim(1, 1);
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : $"Shard #{ShardId}");
 
-            _serializer = Serializer.CreateScope();
-            _serializer.Error += async ex =>
+            _serializer = new Serializer(SerializationFormat.Json);
+            _serializer.Error += ex =>
             {
-                await _restLogger.WarningAsync("Serializer Error", ex);
+                _restLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();
             };
 
             SetApiClient(new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordConfig.UserAgent, _serializer, config.GatewayHost, config.DefaultRetryMode));
@@ -395,7 +395,7 @@ namespace Discord.WebSocket
                     case GatewayOpCode.Hello:
                         {
                             await _gatewayLogger.DebugAsync("Received Hello").ConfigureAwait(false);
-                            var data = _serializer.ReadJson<HelloEvent>(payload);
+                            var data = _serializer.Read<HelloEvent>(payload);
 
                             _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _connection.CancelToken);
                         }
@@ -451,7 +451,7 @@ namespace Discord.WebSocket
                                     {
                                         await _gatewayLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
 
-                                        var data = _serializer.ReadJson<ReadyEvent>(payload);
+                                        var data = _serializer.Read<ReadyEvent>(payload);
                                         var state = new ClientState(data.Guilds.Length, data.PrivateChannels.Length);
 
                                         var currentUser = SocketSelfUser.Create(this, state, data.User);
@@ -521,7 +521,7 @@ namespace Discord.WebSocket
                             //Guilds
                             case "GUILD_CREATE":
                                 {
-                                    var data = _serializer.ReadJson<ExtendedGuild>(payload);
+                                    var data = _serializer.Read<ExtendedGuild>(payload);
 
                                     if (data.Unavailable == false)
                                     {
@@ -573,7 +573,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_UPDATE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<API.Guild>(payload);
+                                    var data = _serializer.Read<API.Guild>(payload);
                                     var guild = State.GetGuild(data.Id);
                                     if (guild != null)
                                     {
@@ -592,7 +592,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_EMOJIS_UPDATE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<API.Gateway.GuildEmojiUpdateEvent>(payload);
+                                    var data = _serializer.Read<API.Gateway.GuildEmojiUpdateEvent>(payload);
                                     var guild = State.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
@@ -610,7 +610,7 @@ namespace Discord.WebSocket
                             case "GUILD_SYNC":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_SYNC)").ConfigureAwait(false);
-                                    var data = _serializer.ReadJson<GuildSyncEvent>(payload);
+                                    var data = _serializer.Read<GuildSyncEvent>(payload);
                                     var guild = State.GetGuild(data.Id);
                                     if (guild != null)
                                     {
@@ -631,7 +631,7 @@ namespace Discord.WebSocket
                                 break;
                             case "GUILD_DELETE":
                                 {
-                                    var data = _serializer.ReadJson<ExtendedGuild>(payload);
+                                    var data = _serializer.Read<ExtendedGuild>(payload);
                                     if (data.Unavailable == true)
                                     {
                                         type = "GUILD_UNAVAILABLE";
@@ -673,7 +673,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_CREATE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<API.Channel>(payload);
+                                    var data = _serializer.Read<API.Channel>(payload);
                                     SocketChannel channel = null;
                                     if (data.GuildId.IsSpecified)
                                     {
@@ -705,7 +705,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_UPDATE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<API.Channel>(payload);
+                                    var data = _serializer.Read<API.Channel>(payload);
                                     var channel = State.GetChannel(data.Id);
                                     if (channel != null)
                                     {
@@ -733,7 +733,7 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_DELETE)").ConfigureAwait(false);
 
                                     SocketChannel channel = null;
-                                    var data = _serializer.ReadJson<API.Channel>(payload);
+                                    var data = _serializer.Read<API.Channel>(payload);
                                     if (data.GuildId.IsSpecified)
                                     {
                                         var guild = State.GetGuild(data.GuildId.Value);
@@ -771,7 +771,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_MEMBER_ADD)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<GuildMemberAddEvent>(payload);
+                                    var data = _serializer.Read<GuildMemberAddEvent>(payload);
                                     var guild = State.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
@@ -797,7 +797,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_MEMBER_UPDATE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<GuildMemberUpdateEvent>(payload);
+                                    var data = _serializer.Read<GuildMemberUpdateEvent>(payload);
                                     var guild = State.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
@@ -835,7 +835,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_MEMBER_REMOVE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<GuildMemberRemoveEvent>(payload);
+                                    var data = _serializer.Read<GuildMemberRemoveEvent>(payload);
                                     var guild = State.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
@@ -870,7 +870,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_MEMBERS_CHUNK)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<GuildMembersChunkEvent>(payload);
+                                    var data = _serializer.Read<GuildMembersChunkEvent>(payload);
                                     var guild = State.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
@@ -894,7 +894,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_RECIPIENT_ADD)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<RecipientEvent>(payload);
+                                    var data = _serializer.Read<RecipientEvent>(payload);
                                     if (State.GetChannel(data.ChannelId) is SocketGroupChannel channel)
                                     {
                                         var user = channel.GetOrAddUser(data.User);
@@ -911,7 +911,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (CHANNEL_RECIPIENT_REMOVE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<RecipientEvent>(payload);
+                                    var data = _serializer.Read<RecipientEvent>(payload);
                                     if (State.GetChannel(data.ChannelId) is SocketGroupChannel channel)
                                     {
                                         var user = channel.RemoveUser(data.User.Id);
@@ -936,7 +936,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_ROLE_CREATE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<GuildRoleCreateEvent>(payload);
+                                    var data = _serializer.Read<GuildRoleCreateEvent>(payload);
                                     var guild = State.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
@@ -960,7 +960,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_ROLE_UPDATE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<GuildRoleUpdateEvent>(payload);
+                                    var data = _serializer.Read<GuildRoleUpdateEvent>(payload);
                                     var guild = State.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
@@ -995,7 +995,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_ROLE_DELETE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<GuildRoleDeleteEvent>(payload);
+                                    var data = _serializer.Read<GuildRoleDeleteEvent>(payload);
                                     var guild = State.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
@@ -1029,7 +1029,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_BAN_ADD)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<GuildBanEvent>(payload);
+                                    var data = _serializer.Read<GuildBanEvent>(payload);
                                     var guild = State.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
@@ -1055,7 +1055,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_BAN_REMOVE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<GuildBanEvent>(payload);
+                                    var data = _serializer.Read<GuildBanEvent>(payload);
                                     var guild = State.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
@@ -1083,7 +1083,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_CREATE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<API.Message>(payload);
+                                    var data = _serializer.Read<API.Message>(payload);
                                     if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
                                     {
                                         var guild = (channel as SocketGuildChannel)?.Guild;
@@ -1130,7 +1130,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_UPDATE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<API.Message>(payload);
+                                    var data = _serializer.Read<API.Message>(payload);
                                     if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
                                     {
                                         var guild = (channel as SocketGuildChannel)?.Guild;
@@ -1177,7 +1177,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<API.Message>(payload);
+                                    var data = _serializer.Read<API.Message>(payload);
                                     if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
                                     {
                                         var guild = (channel as SocketGuildChannel)?.Guild;
@@ -1204,7 +1204,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_ADD)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<API.Gateway.Reaction>(payload);
+                                    var data = _serializer.Read<API.Gateway.Reaction>(payload);
                                     if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
                                     {
                                         var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
@@ -1228,7 +1228,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_REMOVE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<API.Gateway.Reaction>(payload);
+                                    var data = _serializer.Read<API.Gateway.Reaction>(payload);
                                     if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
                                     {
                                         var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
@@ -1252,7 +1252,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_REMOVE_ALL)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<RemoveAllReactionsEvent>(payload);
+                                    var data = _serializer.Read<RemoveAllReactionsEvent>(payload);
                                     if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
                                     {
                                         var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
@@ -1274,7 +1274,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE_BULK)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<MessageDeleteBulkEvent>(payload);
+                                    var data = _serializer.Read<MessageDeleteBulkEvent>(payload);
                                     if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
                                     {
                                         var guild = (channel as SocketGuildChannel)?.Guild;
@@ -1305,7 +1305,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (PRESENCE_UPDATE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<API.Presence>(payload);
+                                    var data = _serializer.Read<API.Presence>(payload);
 
                                     if (data.GuildId.IsSpecified)
                                     {
@@ -1364,7 +1364,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (TYPING_START)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<TypingStartEvent>(payload);
+                                    var data = _serializer.Read<TypingStartEvent>(payload);
                                     if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
                                     {
                                         var guild = (channel as SocketGuildChannel)?.Guild;
@@ -1386,7 +1386,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (USER_UPDATE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<API.User>(payload);
+                                    var data = _serializer.Read<API.User>(payload);
                                     if (data.Id == CurrentUser.Id)
                                     {
                                         var before = CurrentUser.Clone();
@@ -1406,7 +1406,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (VOICE_STATE_UPDATE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<API.VoiceState>(payload);
+                                    var data = _serializer.Read<API.VoiceState>(payload);
                                     SocketUser user;
                                     SocketVoiceState before, after;
                                     if (data.GuildId != null)
@@ -1478,7 +1478,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (VOICE_SERVER_UPDATE)").ConfigureAwait(false);
 
-                                    var data = _serializer.ReadJson<VoiceServerUpdateEvent>(payload);
+                                    var data = _serializer.Read<VoiceServerUpdateEvent>(payload);
                                     var guild = State.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {

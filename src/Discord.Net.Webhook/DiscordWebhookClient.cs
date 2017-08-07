@@ -16,7 +16,7 @@ namespace Discord.Webhook
 
         internal readonly Logger _restLogger;
         private readonly ulong _webhookId;
-        private readonly ScopedSerializer _serializer;
+        private readonly Serializer _serializer;
         
         internal API.DiscordRestApiClient ApiClient { get; }
         internal LogManager LogManager { get; }
@@ -29,10 +29,10 @@ namespace Discord.Webhook
         {
             _webhookId = webhookId;
 
-            _serializer = Serializer.CreateScope();
-            _serializer.Error += async ex =>
+            _serializer = new Serializer(SerializationFormat.Json);
+            _serializer.Error += ex =>
             {
-                await _restLogger.WarningAsync("Serializer Error", ex);
+                _restLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();
             };
 
             ApiClient = new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, _serializer);

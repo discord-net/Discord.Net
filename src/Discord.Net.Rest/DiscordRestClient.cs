@@ -8,7 +8,7 @@ namespace Discord.Rest
 {
     public class DiscordRestClient : BaseDiscordClient, IDiscordClient
     {
-        private readonly ScopedSerializer _serializer;
+        private readonly Serializer _serializer;
         private RestApplication _applicationInfo;
 
         public new RestSelfUser CurrentUser => base.CurrentUser as RestSelfUser;
@@ -16,10 +16,10 @@ namespace Discord.Rest
         public DiscordRestClient() : this(new DiscordRestConfig()) { }
         public DiscordRestClient(DiscordRestConfig config) : base(config)
         {
-            _serializer = Serializer.CreateScope();
-            _serializer.Error += async ex =>
+            _serializer = new Serializer(SerializationFormat.Json);
+            _serializer.Error += ex =>
             {
-                await _restLogger.WarningAsync("Serializer Error", ex);
+                _restLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();
             };
 
             SetApiClient(new API.DiscordRestApiClient(config.RestClientProvider, DiscordConfig.UserAgent, _serializer, config.DefaultRetryMode));

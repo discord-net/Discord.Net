@@ -14,7 +14,7 @@ namespace Discord.WebSocket
     {
         private readonly DiscordSocketConfig _baseConfig;
         private readonly SemaphoreSlim _connectionGroupLock;
-        private readonly ScopedSerializer _serializer;
+        private readonly Serializer _serializer;
 
         private int[] _shardIds;
         private Dictionary<int, int> _shardIdsToIndex;
@@ -54,10 +54,10 @@ namespace Discord.WebSocket
             _baseConfig = config;
             _connectionGroupLock = new SemaphoreSlim(1, 1);
 
-            _serializer = Serializer.CreateScope();
-            _serializer.Error += async ex =>
+            _serializer = new Serializer(SerializationFormat.Json);
+            _serializer.Error += ex =>
             {
-                await _restLogger.WarningAsync("Serializer Error", ex);
+                _restLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();
             };
 
             SetApiClient(new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordConfig.UserAgent, _serializer));

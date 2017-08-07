@@ -16,7 +16,7 @@ namespace Discord.Rpc
         private readonly ConnectionManager _connection;
         private readonly Logger _rpcLogger;
         private readonly SemaphoreSlim _stateLock, _authorizeLock;
-        private readonly ScopedSerializer _serializer;
+        private readonly Serializer _serializer;
 
         public ConnectionState ConnectionState { get; private set; }
         public IReadOnlyCollection<string> Scopes { get; private set; }
@@ -37,10 +37,10 @@ namespace Discord.Rpc
             _authorizeLock = new SemaphoreSlim(1, 1);
             _rpcLogger = LogManager.CreateLogger("RPC");
 
-            _serializer = Serializer.CreateScope();
-            _serializer.Error += async ex =>
+            _serializer = new Serializer(SerializationFormat.Json);
+            _serializer.Error += ex =>
             {
-                await _rpcLogger.WarningAsync("Serializer Error", ex);
+                _rpcLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();
             };
 
             SetApiClient(new API.DiscordRpcApiClient(clientId, DiscordRestConfig.UserAgent, origin, config.RestClientProvider, config.WebSocketProvider, _serializer));
@@ -293,7 +293,7 @@ namespace Discord.Rpc
                             case "READY":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (READY)").ConfigureAwait(false);
-                                    var data = _serializer.ReadJson<ReadyEvent>(payload.Value);
+                                    var data = _serializer.Read<ReadyEvent>(payload.Value);
 
                                     var options = new RequestOptions
                                     {
@@ -335,7 +335,7 @@ namespace Discord.Rpc
                             case "CHANNEL_CREATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (CHANNEL_CREATE)").ConfigureAwait(false);
-                                    var data = _serializer.ReadJson<ChannelSummary>(payload.Value);
+                                    var data = _serializer.Read<ChannelSummary>(payload.Value);
                                     var channel = RpcChannelSummary.Create(data);
 
                                     await _channelCreatedEvent.InvokeAsync(channel).ConfigureAwait(false);
@@ -346,7 +346,7 @@ namespace Discord.Rpc
                             case "GUILD_CREATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (GUILD_CREATE)").ConfigureAwait(false);
-                                    var data = _serializer.ReadJson<GuildSummary>(payload.Value);
+                                    var data = _serializer.Read<GuildSummary>(payload.Value);
                                     var guild = RpcGuildSummary.Create(data);
 
                                     await _guildCreatedEvent.InvokeAsync(guild).ConfigureAwait(false);
@@ -355,7 +355,7 @@ namespace Discord.Rpc
                             case "GUILD_STATUS":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (GUILD_STATUS)").ConfigureAwait(false);
-                                    var data = _serializer.ReadJson<GuildStatusEvent>(payload.Value);
+                                    var data = _serializer.Read<GuildStatusEvent>(payload.Value);
                                     var guildStatus = RpcGuildStatus.Create(data);
 
                                     await _guildStatusUpdatedEvent.InvokeAsync(guildStatus).ConfigureAwait(false);
@@ -366,7 +366,7 @@ namespace Discord.Rpc
                             case "VOICE_STATE_CREATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (VOICE_STATE_CREATE)").ConfigureAwait(false);
-                                    var data = _serializer.ReadJson<ExtendedVoiceState>(payload.Value);
+                                    var data = _serializer.Read<ExtendedVoiceState>(payload.Value);
                                     var voiceState = RpcVoiceState.Create(this, data);
 
                                     await _voiceStateCreatedEvent.InvokeAsync(voiceState).ConfigureAwait(false);
@@ -375,7 +375,7 @@ namespace Discord.Rpc
                             case "VOICE_STATE_UPDATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (VOICE_STATE_UPDATE)").ConfigureAwait(false);
-                                    var data = _serializer.ReadJson<ExtendedVoiceState>(payload.Value);
+                                    var data = _serializer.Read<ExtendedVoiceState>(payload.Value);
                                     var voiceState = RpcVoiceState.Create(this, data);
 
                                     await _voiceStateUpdatedEvent.InvokeAsync(voiceState).ConfigureAwait(false);
@@ -384,7 +384,7 @@ namespace Discord.Rpc
                             case "VOICE_STATE_DELETE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (VOICE_STATE_DELETE)").ConfigureAwait(false);
-                                    var data = _serializer.ReadJson<ExtendedVoiceState>(payload.Value);
+                                    var data = _serializer.Read<ExtendedVoiceState>(payload.Value);
                                     var voiceState = RpcVoiceState.Create(this, data);
 
                                     await _voiceStateDeletedEvent.InvokeAsync(voiceState).ConfigureAwait(false);
@@ -394,7 +394,7 @@ namespace Discord.Rpc
                             case "SPEAKING_START":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (SPEAKING_START)").ConfigureAwait(false);
-                                    var data = _serializer.ReadJson<SpeakingEvent>(payload.Value);
+                                    var data = _serializer.Read<SpeakingEvent>(payload.Value);
 
                                     await _speakingStartedEvent.InvokeAsync(data.UserId).ConfigureAwait(false);
                                 }
@@ -402,7 +402,7 @@ namespace Discord.Rpc
                             case "SPEAKING_STOP":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (SPEAKING_STOP)").ConfigureAwait(false);
-                                    var data = _serializer.ReadJson<SpeakingEvent>(payload.Value);
+                                    var data = _serializer.Read<SpeakingEvent>(payload.Value);
 
                                     await _speakingStoppedEvent.InvokeAsync(data.UserId).ConfigureAwait(false);
                                 }
@@ -410,7 +410,7 @@ namespace Discord.Rpc
                             case "VOICE_SETTINGS_UPDATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (VOICE_SETTINGS_UPDATE)").ConfigureAwait(false);
-                                    var data = _serializer.ReadJson<API.Rpc.VoiceSettings>(payload.Value);
+                                    var data = _serializer.Read<API.Rpc.VoiceSettings>(payload.Value);
                                     var settings = VoiceSettings.Create(data);
 
                                     await _voiceSettingsUpdated.InvokeAsync(settings).ConfigureAwait(false);
@@ -421,7 +421,7 @@ namespace Discord.Rpc
                             case "MESSAGE_CREATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_CREATE)").ConfigureAwait(false);
-                                    var data = _serializer.ReadJson<MessageEvent>(payload.Value);
+                                    var data = _serializer.Read<MessageEvent>(payload.Value);
                                     var msg = RpcMessage.Create(this, data.ChannelId, data.Message);
 
                                     await _messageReceivedEvent.InvokeAsync(msg).ConfigureAwait(false);
@@ -430,7 +430,7 @@ namespace Discord.Rpc
                             case "MESSAGE_UPDATE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_UPDATE)").ConfigureAwait(false);
-                                    var data = _serializer.ReadJson<MessageEvent>(payload.Value);
+                                    var data = _serializer.Read<MessageEvent>(payload.Value);
                                     var msg = RpcMessage.Create(this, data.ChannelId, data.Message);
 
                                     await _messageUpdatedEvent.InvokeAsync(msg).ConfigureAwait(false);
@@ -439,7 +439,7 @@ namespace Discord.Rpc
                             case "MESSAGE_DELETE":
                                 {
                                     await _rpcLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE)").ConfigureAwait(false);
-                                    var data = _serializer.ReadJson<MessageEvent>(payload.Value);
+                                    var data = _serializer.Read<MessageEvent>(payload.Value);
 
                                     await _messageDeletedEvent.InvokeAsync(data.ChannelId, data.Message.Id).ConfigureAwait(false);
                                 }
