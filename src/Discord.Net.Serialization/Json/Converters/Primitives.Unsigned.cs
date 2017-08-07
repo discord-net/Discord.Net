@@ -4,57 +4,77 @@ namespace Discord.Serialization.Json.Converters
 {
     internal class UInt8PropertyConverter : IJsonPropertyConverter<byte>
     {
-        public byte Read(JsonReader reader, bool read = true)
+        public byte Read(PropertyMap map, JsonReader reader, bool isTopLevel)
         {
-            if (read)
+            if (isTopLevel)
                 reader.Read();
             if (reader.ValueType != JsonValueType.Number)
                 throw new SerializationException("Bad input, expected Number");
             return reader.ParseUInt8();
         }
-        public void Write(JsonWriter writer, byte value)
-            => writer.WriteValue(value);
+        public void Write(PropertyMap map, JsonWriter writer, byte value, bool isTopLevel)
+        {
+            if (isTopLevel)
+                writer.WriteAttribute(map.Key, value);
+            else
+                writer.WriteValue(value);
+        }
     }
 
     internal class UInt16PropertyConverter : IJsonPropertyConverter<ushort>
     {
-        public ushort Read(JsonReader reader, bool read = true)
+        public ushort Read(PropertyMap map, JsonReader reader, bool isTopLevel)
         {
-            if (read)
+            if (isTopLevel)
                 reader.Read();
             if (reader.ValueType != JsonValueType.Number)
                 throw new SerializationException("Bad input, expected Number");
             return reader.ParseUInt16();
         }
-        public void Write(JsonWriter writer, ushort value)
-            => writer.WriteValue(value);
+        public void Write(PropertyMap map, JsonWriter writer, ushort value, bool isTopLevel)
+        {
+            if (isTopLevel)
+                writer.WriteAttribute(map.Key, value);
+            else
+                writer.WriteValue(value);
+        }
     }
 
     internal class UInt32PropertyConverter : IJsonPropertyConverter<uint>
     {
-        public uint Read(JsonReader reader, bool read = true)
+        public uint Read(PropertyMap map, JsonReader reader, bool isTopLevel)
         {
-            if (read)
+            if (isTopLevel)
                 reader.Read();
             if (reader.ValueType != JsonValueType.Number)
                 throw new SerializationException("Bad input, expected Number");
             return reader.ParseUInt32();
         }
-        public void Write(JsonWriter writer, uint value)
-            => writer.WriteValue(value);
+        public void Write(PropertyMap map, JsonWriter writer, uint value, bool isTopLevel)
+        {
+            if (isTopLevel)
+                writer.WriteAttribute(map.Key, value);
+            else
+                writer.WriteValue(value);
+        }
     }
 
     internal class UInt64PropertyConverter : IJsonPropertyConverter<ulong>
     {
-        public ulong Read(JsonReader reader, bool read = true)
+        public ulong Read(PropertyMap map, JsonReader reader, bool isTopLevel)
         {
-            if (read)
+            if (isTopLevel)
                 reader.Read();
             if (reader.ValueType != JsonValueType.String)
                 throw new SerializationException("Bad input, expected String");
             return reader.ParseUInt64();
         }
-        public void Write(JsonWriter writer, ulong value)
-            => writer.WriteValue(value.ToString());
+        public void Write(PropertyMap map, JsonWriter writer, ulong value, bool isTopLevel)
+        {
+            if (isTopLevel)
+                writer.WriteAttribute(map.Key, value.ToString());
+            else
+                writer.WriteValue(value.ToString());
+        }
     }
 }

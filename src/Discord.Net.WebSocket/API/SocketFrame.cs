@@ -8,9 +8,9 @@ namespace Discord.API
     {
         [ModelProperty("op")]
         public int Operation { get; set; }
-        [ModelProperty("t", IgnoreNull = true)]
+        [ModelProperty("t", ExcludeNull = true)]
         public string Type { get; set; }
-        [ModelProperty("s", IgnoreNull = true)]
+        [ModelProperty("s", ExcludeNull = true)]
         public int? Sequence { get; set; }
         [ModelProperty("d")]
         public ReadOnlyBuffer<byte> Payload { get; set; }

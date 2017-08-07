@@ -92,11 +92,7 @@ namespace Discord.Serialization.Json
 
             writer.WriteObjectStart();
             for (int i = 0; i < map.Properties.Length; i++)
-            {
-                var property = map.Properties[i];
-                writer.WriteStartAttribute(property.Key);
-                (property as IJsonPropertyMap<TModel>).Write(model, writer);
-            }
+                (map.Properties[i] as IJsonPropertyMap<TModel>).Write(model, writer);
             writer.WriteObjectEnd();
         }
     }

@@ -12,21 +12,26 @@ namespace Discord.Serialization.Json.Converters
             _innerConverter = innerConverter;
         }
 
-        public T? Read(JsonReader reader, bool read = true)
+        public T? Read(PropertyMap map, JsonReader reader, bool isTopLevel)
         {
-            if (read)
+            if (isTopLevel)
                 reader.Read();
             if (reader.ValueType == JsonValueType.Null)
                 return null;
-            return _innerConverter.Read(reader, false);
+            return _innerConverter.Read(map, reader, false);
         }
 
-        public void Write(JsonWriter writer, T? value)
+        public void Write(PropertyMap map, JsonWriter writer, T? value, bool isTopLevel)
         {
             if (value.HasValue)
-                _innerConverter.Write(writer, value.Value);
+                _innerConverter.Write(map, writer, value.Value, isTopLevel);
             else
-                writer.WriteNull();
+            {
+                if (isTopLevel)
+                    writer.WriteAttributeNull(map.Key);
+                else
+                    writer.WriteNull();
+            }
         }
     }
 }

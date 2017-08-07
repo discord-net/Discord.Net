@@ -12,22 +12,25 @@ namespace Discord.Serialization.Json.Converters
             _innerConverter = innerConverter;
         }
 
-        public List<T> Read(JsonReader reader, bool read = true)
+        public List<T> Read(PropertyMap map, JsonReader reader, bool isTopLevel)
         {
-            if ((read && !reader.Read()) || reader.TokenType != JsonTokenType.StartArray)
+            if ((isTopLevel && !reader.Read()) || reader.TokenType != JsonTokenType.StartArray)
                 throw new SerializationException("Bad input, expected StartArray");
 
             var list = new List<T>();
             while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
-                list.Add(_innerConverter.Read(reader));
+                list.Add(_innerConverter.Read(map, reader, false));
             return list;
         }
 
-        public void Write(JsonWriter writer, List<T> value)
+        public void Write(PropertyMap map, JsonWriter writer, List<T> value, bool isTopLevel)
         {
-            writer.WriteArrayStart();
+            if (isTopLevel)
+                writer.WriteArrayStart(map.Key);
+            else
+                writer.WriteArrayStart();
             for (int i = 0; i < value.Count; i++)
-                _innerConverter.Write(writer, value[i]);
+                _innerConverter.Write(map, writer, value[i], false);
             writer.WriteArrayEnd();
         }
     }

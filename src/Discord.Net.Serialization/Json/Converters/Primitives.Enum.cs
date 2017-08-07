@@ -4,9 +4,9 @@ namespace Discord.Serialization.Json.Converters
 {
     internal class EnumPropertyConverter<T> : IJsonPropertyConverter<T>
     {
-        public T Read(JsonReader reader, bool read = true) 
+        public T Read(PropertyMap map, JsonReader reader, bool isTopLevel)
             => throw new System.NotImplementedException();
-        public void Write(JsonWriter writer, T value) 
+        public void Write(PropertyMap map, JsonWriter writer, T value, bool isTopLevel)
             => throw new System.NotImplementedException();
     }
 }

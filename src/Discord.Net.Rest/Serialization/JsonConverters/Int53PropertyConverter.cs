@@ -4,15 +4,20 @@ namespace Discord.Serialization.Json.Converters
 {
     internal class Int53PropertyConverter : IJsonPropertyConverter<long>
     {
-        public long Read(JsonReader reader, bool read = true)
+        public long Read(PropertyMap map, JsonReader reader, bool isTopLevel)
         {
-            if (read)
+            if (isTopLevel)
                 reader.Read();
             if (reader.ValueType != JsonValueType.Number)
                 throw new SerializationException("Bad input, expected Number");
             return reader.ParseInt64();
         }
-        public void Write(JsonWriter writer, long value)
-            => writer.WriteValue(value);
+        public void Write(PropertyMap map, JsonWriter writer, long value, bool isTopLevel)
+        {
+            if (isTopLevel)
+                writer.WriteAttribute(map.Key, value);
+            else
+                writer.WriteValue(value.ToString());
+        }
     }
 }

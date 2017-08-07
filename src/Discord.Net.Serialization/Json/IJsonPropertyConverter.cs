@@ -4,7 +4,7 @@ namespace Discord.Serialization.Json
 {
     public interface IJsonPropertyConverter<T>
     {
-        T Read(JsonReader reader, bool read = true);
-        void Write(JsonWriter writer, T value);
+        T Read(PropertyMap map, JsonReader reader, bool isTopLevel);
+        void Write(PropertyMap map, JsonWriter writer, T value, bool isTopLevel);
     }
 }

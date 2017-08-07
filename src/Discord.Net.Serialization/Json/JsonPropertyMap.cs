@@ -22,11 +22,13 @@ namespace Discord.Serialization.Json
         public void Write(TModel model, JsonWriter writer)
         {
             var value = _getFunc(model);
-            _converter.Write(writer, value);
+            if (value == null && ExcludeNull)
+                return;
+            _converter.Write(this, writer, value, true);
         }
         public void Read(TModel model, JsonReader reader)
         {
-            var value = _converter.Read(reader);
+            var value = _converter.Read(this, reader, true);
             _setFunc(model, value);
         }
     }
