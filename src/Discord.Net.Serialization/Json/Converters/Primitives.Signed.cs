@@ -4,7 +4,7 @@ namespace Discord.Serialization.Json.Converters
 {
     internal class Int8PropertyConverter : IJsonPropertyConverter<sbyte>
     {
-        public sbyte Read(PropertyMap map, JsonReader reader, bool isTopLevel)
+        public sbyte Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -12,7 +12,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseInt8();
         }
-        public void Write(PropertyMap map, JsonWriter writer, sbyte value, bool isTopLevel)
+        public void Write(PropertyMap map, ref JsonWriter writer, sbyte value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteAttribute(map.Key, value);
@@ -23,7 +23,7 @@ namespace Discord.Serialization.Json.Converters
 
     internal class Int16PropertyConverter : IJsonPropertyConverter<short>
     {
-        public short Read(PropertyMap map, JsonReader reader, bool isTopLevel)
+        public short Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -31,7 +31,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseInt16();
         }
-        public void Write(PropertyMap map, JsonWriter writer, short value, bool isTopLevel)
+        public void Write(PropertyMap map, ref JsonWriter writer, short value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteAttribute(map.Key, value);
@@ -42,7 +42,7 @@ namespace Discord.Serialization.Json.Converters
 
     internal class Int32PropertyConverter : IJsonPropertyConverter<int>
     {
-        public int Read(PropertyMap map, JsonReader reader, bool isTopLevel)
+        public int Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -50,7 +50,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseInt32();
         }
-        public void Write(PropertyMap map, JsonWriter writer, int value, bool isTopLevel)
+        public void Write(PropertyMap map, ref JsonWriter writer, int value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteAttribute(map.Key, value);
@@ -61,7 +61,7 @@ namespace Discord.Serialization.Json.Converters
 
     internal class Int64PropertyConverter : IJsonPropertyConverter<long>
     {
-        public long Read(PropertyMap map, JsonReader reader, bool isTopLevel)
+        public long Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -69,7 +69,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseInt64();
         }
-        public void Write(PropertyMap map, JsonWriter writer, long value, bool isTopLevel)
+        public void Write(PropertyMap map, ref JsonWriter writer, long value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteAttribute(map.Key, value.ToString());

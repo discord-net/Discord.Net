@@ -4,9 +4,9 @@ namespace Discord.Serialization.Json.Converters
 {
     internal class ImagePropertyConverter : IJsonPropertyConverter<API.Image>
     {
-        public API.Image Read(PropertyMap map, JsonReader reader, bool isTopLevel)
+        public API.Image Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
             => throw new System.NotImplementedException();
-        public void Write(PropertyMap map, JsonWriter writer, API.Image value, bool isTopLevel)
+        public void Write(PropertyMap map, ref JsonWriter writer, API.Image value, bool isTopLevel)
             => throw new System.NotImplementedException();
     }
 }

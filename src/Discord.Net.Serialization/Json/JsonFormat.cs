@@ -70,14 +70,14 @@ namespace Discord.Serialization.Json
             if (!reader.Read())
                 return null;
             var converter = _converters.Get<TModel>() as IJsonPropertyConverter<TModel>;
-            return converter.Read(null, reader, false);
+            return converter.Read(null, ref reader, false);
         }
 
         protected internal override void Write<TModel>(Serializer serializer, ArrayFormatter stream, TModel model)
         {
             var writer = new JsonWriter(stream);
             var converter = _converters.Get<TModel>() as IJsonPropertyConverter<TModel>;
-            converter.Write(null, writer, model, false);
+            converter.Write(null, ref writer, model, false);
         }
     }
 }

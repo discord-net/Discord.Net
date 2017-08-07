@@ -6,7 +6,7 @@ namespace Discord.Serialization
     {
         string Key { get; }
 
-        void Write(TModel model, JsonWriter writer);
-        void Read(TModel model, JsonReader reader);
+        void Write(TModel model, ref JsonWriter writer);
+        void Read(TModel model, ref JsonReader reader);
     }
 }

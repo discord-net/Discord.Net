@@ -19,16 +19,16 @@ namespace Discord.Serialization.Json
             _setFunc = propInfo.SetMethod.CreateDelegate(typeof(Action<TModel, TType>)) as Action<TModel, TType>;
         }
 
-        public void Write(TModel model, JsonWriter writer)
+        public void Write(TModel model, ref JsonWriter writer)
         {
             var value = _getFunc(model);
             if (value == null && ExcludeNull)
                 return;
-            _converter.Write(this, writer, value, true);
+            _converter.Write(this, ref writer, value, true);
         }
-        public void Read(TModel model, JsonReader reader)
+        public void Read(TModel model, ref JsonReader reader)
         {
-            var value = _converter.Read(this, reader, true);
+            var value = _converter.Read(this, ref reader, true);
             _setFunc(model, value);
         }
     }

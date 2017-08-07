@@ -23,7 +23,7 @@ namespace Discord.Serialization.Json.Converters
 
     internal class StringPropertyConverter : IJsonPropertyConverter<string>
     {
-        public string Read(PropertyMap map, JsonReader reader, bool isTopLevel)
+        public string Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -31,7 +31,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected String");
             return reader.ParseString();
         }
-        public void Write(PropertyMap map, JsonWriter writer, string value, bool isTopLevel)
+        public void Write(PropertyMap map, ref JsonWriter writer, string value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteAttribute(map.Key, value);

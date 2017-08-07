@@ -7,7 +7,7 @@ namespace Discord.Serialization.Json.Converters
     {
         private static readonly ModelMap<T> _map = SerializationFormat.Json.MapModel<T>();
         
-        public T Read(PropertyMap map, JsonReader reader, bool isTopLevel)
+        public T Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
         {
             var model = new T();
 
@@ -20,25 +20,22 @@ namespace Discord.Serialization.Json.Converters
                 if (reader.TokenType != JsonTokenType.PropertyName)
                     throw new SerializationException("Bad input, expected PropertyName");
 
-                string key = reader.ParseString();
+                string key = reader.ParseString();                
                 if (_map.PropertiesByKey.TryGetValue(key, out var property))
-                    (property as IJsonPropertyMap<T>).Read(model, reader);
+                    (property as IJsonPropertyMap<T>).Read(model, ref reader);
                 else
                     reader.Skip(); //Unknown property, skip
-
-                if (!reader.Read())
-                    throw new SerializationException("Bad input, expected Value");
             }
             throw new SerializationException("Bad input, expected EndObject");
         }
-        public void Write(PropertyMap map, JsonWriter writer, T value, bool isTopLevel)
+        public void Write(PropertyMap map, ref JsonWriter writer, T value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteObjectStart(map.Key);
             else
                 writer.WriteObjectStart();
             for (int i = 0; i < _map.Properties.Length; i++)
-                (_map.Properties[i] as IJsonPropertyMap<T>).Write(value, writer);
+                (_map.Properties[i] as IJsonPropertyMap<T>).Write(value, ref writer);
             writer.WriteObjectEnd();
         }
     }
