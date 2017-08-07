@@ -27,8 +27,8 @@ namespace Discord.API
         static DiscordRestApiClient()
         {
             SerializationFormat.Json.AddConverter<Image, ImagePropertyConverter>();
-            SerializationFormat.Json.AddConverter<long, Int53PropertyConverter>(info => info.GetCustomAttribute<Int53Attribute>() != null);
-            SerializationFormat.Json.AddConverter<ulong, UInt53PropertyConverter>(info => info.GetCustomAttribute<Int53Attribute>() != null);
+            SerializationFormat.Json.AddConverter<long, Int53PropertyConverter>((type, prop) => prop?.GetCustomAttribute<Int53Attribute>() != null);
+            SerializationFormat.Json.AddConverter<ulong, UInt53PropertyConverter>((type, prop) => prop?.GetCustomAttribute<Int53Attribute>() != null);
             SerializationFormat.Json.AddGenericConverter(typeof(EntityOrId<>), typeof(EntityOrIdPropertyConverter<>));
             SerializationFormat.Json.AddGenericConverter(typeof(Optional<>), typeof(OptionalPropertyConverter<>));
         }

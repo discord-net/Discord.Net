@@ -19,7 +19,7 @@ namespace Discord.Serialization
         protected readonly ConcurrentDictionary<Type, object> _maps = new ConcurrentDictionary<Type, object>();
         protected readonly ConverterCollection _converters = new ConverterCollection();
 
-        protected ModelMap<TModel> MapModel<TModel>()
+        protected internal ModelMap<TModel> MapModel<TModel>()
             where TModel : class, new()
         {
             return _maps.GetOrAdd(typeof(TModel), _ =>

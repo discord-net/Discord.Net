@@ -10,85 +10,116 @@ namespace Discord.Serialization
         private class ConverterTypeCollection
         {
             public Type DefaultConverterType;
-            public List<(Func<PropertyInfo, bool> Condition, Type ConverterType)> Conditionals = new List<(Func<PropertyInfo, bool>, Type)>();
+            public List<(Func<TypeInfo, PropertyInfo, bool> Condition, Type ConverterType)> Conditionals = new List<(Func<TypeInfo, PropertyInfo, bool>, Type)>();
         }
 
         private static readonly MethodInfo _getConverterMethod
             = typeof(ConverterCollection).GetTypeInfo().GetDeclaredMethod(nameof(Get));
 
-        private readonly ConcurrentDictionary<Type, object> _maps = new ConcurrentDictionary<Type, object>();
-        private readonly ConcurrentDictionary<Type, ConverterTypeCollection> _types = new ConcurrentDictionary<Type, ConverterTypeCollection>();
-        private readonly ConcurrentDictionary<Type, ConverterTypeCollection> _genericTypes = new ConcurrentDictionary<Type, ConverterTypeCollection>();
+        private readonly ConcurrentDictionary<Type, object> _cache = new ConcurrentDictionary<Type, object>();
+        private readonly Dictionary<Type, ConverterTypeCollection> _types = new Dictionary<Type, ConverterTypeCollection>();
+        private readonly Dictionary<Type, ConverterTypeCollection> _mappedGenericTypes = new Dictionary<Type, ConverterTypeCollection>();
+        private readonly ConverterTypeCollection _genericTypes = new ConverterTypeCollection();
 
         internal ConverterCollection() { }
 
         public void Add<TType, TConverter>()
         {
-            var converters = _types.GetOrAdd(typeof(TType), _ => new ConverterTypeCollection());
+            if (!_types.TryGetValue(typeof(TType), out var converters))
+                _types.Add(typeof(TType), converters = new ConverterTypeCollection());
             converters.DefaultConverterType = typeof(TConverter);
         }
-        public void Add<TType, TConverter>(Func<PropertyInfo, bool> condition)
+        public void Add<TType, TConverter>(Func<TypeInfo, PropertyInfo, bool> condition)
         {
-            var converters = _types.GetOrAdd(typeof(TType), _ => new ConverterTypeCollection());
+            if (!_types.TryGetValue(typeof(TType), out var converters))
+                _types.Add(typeof(TType), converters = new ConverterTypeCollection());
             converters.Conditionals.Add((condition, typeof(TConverter)));
         }
 
+        public void AddGeneric(Type openConverterType)
+        {
+            if (openConverterType.IsConstructedGenericType) throw new InvalidOperationException($"{nameof(openConverterType)} must be an open generic");
+            _genericTypes.DefaultConverterType = openConverterType;
+        }
+        public void AddGeneric(Type openConverterType, Func<TypeInfo, PropertyInfo, bool> condition)
+        {
+            if (openConverterType.IsConstructedGenericType) throw new InvalidOperationException($"{nameof(openConverterType)} must be an open generic");
+            _genericTypes.Conditionals.Add((condition, openConverterType));
+        }
         public void AddGeneric(Type openType, Type openConverterType)
         {
             if (openType.IsConstructedGenericType) throw new InvalidOperationException($"{nameof(openType)} must be an open generic");
             if (openConverterType.IsConstructedGenericType) throw new InvalidOperationException($"{nameof(openConverterType)} must be an open generic");
-            var converters = _genericTypes.GetOrAdd(openType, _ => new ConverterTypeCollection());
+            if (!_mappedGenericTypes.TryGetValue(openType, out var converters))
+                _mappedGenericTypes.Add(openType, converters = new ConverterTypeCollection());
             converters.DefaultConverterType = openConverterType;
         }
-        public void AddGeneric(Type openType, Type openConverterType, Func<PropertyInfo, bool> condition)
+        public void AddGeneric(Type openType, Type openConverterType, Func<TypeInfo, PropertyInfo, bool> condition)
         {
             if (openType.IsConstructedGenericType) throw new InvalidOperationException($"{nameof(openType)} must be an open generic");
             if (openConverterType.IsConstructedGenericType) throw new InvalidOperationException($"{nameof(openConverterType)} must be an open generic");
-            var converters = _genericTypes.GetOrAdd(openType, _ => new ConverterTypeCollection());
+            if (!_mappedGenericTypes.TryGetValue(openType, out var converters))
+                _mappedGenericTypes.Add(openType, converters = new ConverterTypeCollection());
             converters.Conditionals.Add((condition, openConverterType));
         }
         
-        public object Get<TType>(PropertyInfo propInfo)
+        public object Get<TType>(PropertyInfo propInfo = null)
         {
-            var typeInfo = typeof(TType).GetTypeInfo();
-
-            //Generic converters
-            if (typeInfo.IsGenericType)
+            return _cache.GetOrAdd(typeof(TType), _ =>
             {
-                var converterType = FindConverterType(typeInfo.GetGenericTypeDefinition(), _genericTypes, propInfo);
-                if (converterType != null)
+                TypeInfo typeInfo = typeof(TType).GetTypeInfo();
+
+                //Mapped generic converters (List<T> -> CollectionPropertyConverter<T>)
+                if (typeInfo.IsGenericType)
                 {
-                    var innerType = typeInfo.GenericTypeArguments[0];
-                    converterType = converterType.MakeGenericType(innerType);
-                    object innerConverter = GetInnerConverter(innerType, propInfo);
-                    return Activator.CreateInstance(converterType, innerConverter);
+                    var converterType = FindConverterType(typeInfo.GetGenericTypeDefinition(), _mappedGenericTypes, typeInfo, propInfo);
+                    if (converterType != null)
+                    {
+                        var innerType = typeInfo.GenericTypeArguments[0];
+                        converterType = converterType.MakeGenericType(innerType);
+                        object innerConverter = GetInnerConverter(innerType, propInfo);
+                        return Activator.CreateInstance(converterType, innerConverter);
+                    }
                 }
-            }
 
-            //Normal converters
-            {
-                var converterType = FindConverterType(typeof(TType), _types, propInfo);
-                if (converterType != null)
-                    return Activator.CreateInstance(converterType);
-            }
+                //Normal converters (bool -> BooleanPropertyConverter)
+                {
+                    var converterType = FindConverterType(typeof(TType), _types, typeInfo, propInfo);
+                    if (converterType != null)
+                        return Activator.CreateInstance(converterType);
+                }
 
-            throw new InvalidOperationException($"Unsupported model type: {typeof(TType).Name}");
+                //Generic converters (Model -> ObjectPropertyConverter<Model>)
+                {
+                    var converterType = FindConverterType(_genericTypes, typeInfo, propInfo);
+                    if (converterType != null)
+                    {
+                        converterType = converterType.MakeGenericType(typeof(TType));
+                        return Activator.CreateInstance(converterType);
+                    }
+                }
+
+                throw new InvalidOperationException($"Unsupported model type: {typeof(TType).Name}");
+            });
         }
         private object GetInnerConverter(Type type, PropertyInfo propInfo)
             => _getConverterMethod.MakeGenericMethod(type).Invoke(this, new object[] { propInfo });
 
-        private Type FindConverterType(Type type, ConcurrentDictionary<Type, ConverterTypeCollection> collection, PropertyInfo propInfo)
+        private Type FindConverterType(Type type, Dictionary<Type, ConverterTypeCollection> collection, TypeInfo typeInfo, PropertyInfo propInfo)
         {
             if (collection.TryGetValue(type, out var converters))
+                return FindConverterType(converters, typeInfo, propInfo);
+            return null;
+        }
+        private Type FindConverterType(ConverterTypeCollection converters, TypeInfo typeInfo, PropertyInfo propInfo)
+        {
+            for (int i = 0; i < converters.Conditionals.Count; i++)
             {
-                for (int i = 0; i < converters.Conditionals.Count; i++)
-                {
-                    if (converters.Conditionals[i].Condition(propInfo))
-                        return converters.Conditionals[i].ConverterType;
-                }
-                if (converters.DefaultConverterType != null)
-                    return converters.DefaultConverterType;
+                if (converters.Conditionals[i].Condition(typeInfo, propInfo))
+                    return converters.Conditionals[i].ConverterType;
             }
+            if (converters.DefaultConverterType != null)
+                return converters.DefaultConverterType;
             return null;
         }
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord.Serialization.Json.Converters;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -37,20 +38,26 @@ namespace Discord.Serialization.Json
             AddGenericConverter(typeof(List<>), typeof(Converters.ListPropertyConverter<>));
             AddGenericConverter(typeof(Nullable<>), typeof(Converters.NullablePropertyConverter<>));
 
+            AddGenericConverter(typeof(Converters.ObjectPropertyConverter<>), (type, prop) => type.IsClass);
+
             //AddEnumConverter<Converters.EnumPropertyConverter>();
         }
 
         public void AddConverter<TValue, TConverter>()
             where TConverter : class, IJsonPropertyConverter<TValue>
             => _converters.Add<TValue, TConverter>();
-        public void AddConverter<TValue, TConverter>(Func<PropertyInfo, bool> condition)
+        public void AddConverter<TValue, TConverter>(Func<TypeInfo, PropertyInfo, bool> condition)
             where TConverter : class, IJsonPropertyConverter<TValue>
             => _converters.Add<TValue, TConverter>(condition);
 
+        public void AddGenericConverter(Type converter)
+            => _converters.AddGeneric(converter);
+        public void AddGenericConverter(Type converter, Func<TypeInfo, PropertyInfo, bool> condition)
+            => _converters.AddGeneric(converter, condition);
         public void AddGenericConverter(Type value, Type converter)
             => _converters.AddGeneric(value, converter);
-        public void AddGenericConverter(Type value, Type converter, Func<PropertyInfo, bool> condition)
-            => _converters.AddGeneric(value, converter);
+        public void AddGenericConverter(Type value, Type converter, Func<TypeInfo, PropertyInfo, bool> condition)
+            => _converters.AddGeneric(value, converter, condition);
 
         protected override PropertyMap CreatePropertyMap<TModel, TValue>(PropertyInfo propInfo)
         {
@@ -61,39 +68,17 @@ namespace Discord.Serialization.Json
         protected internal override TModel Read<TModel>(Serializer serializer, ReadOnlyBuffer<byte> data)
         {
             var reader = new JsonReader(data.Span, SymbolTable.InvariantUtf8);
-            var map = MapModel<TModel>();
-            var model = new TModel();
-
-            if (!reader.Read() || reader.TokenType != JsonTokenType.StartObject)
-                throw new InvalidOperationException("Bad input, expected StartObject");
-            while (reader.Read())
-            {
-                if (reader.TokenType == JsonTokenType.EndObject)
-                    return model;
-                if (reader.TokenType != JsonTokenType.PropertyName)
-                    throw new InvalidOperationException("Bad input, expected PropertyName");
-
-                string key = reader.ParseString();
-                if (map.PropertiesByKey.TryGetValue(key, out var property))
-                    (property as IJsonPropertyMap<TModel>).Read(model, reader);
-                else
-                    reader.Skip(); //Unknown property, skip
-
-                if (!reader.Read())
-                    throw new InvalidOperationException("Bad input, expected Value");
-            }
-            throw new InvalidOperationException("Bad input, expected EndObject");
+            if (!reader.Read())
+                return null;
+            var converter = _converters.Get<TModel>() as IJsonPropertyConverter<TModel>;
+            return converter.Read(null, reader, false);
         }
 
         protected internal override void Write<TModel>(Serializer serializer, ArrayFormatter stream, TModel model)
         {
             var writer = new JsonWriter(stream);
-            var map = MapModel<TModel>();
-
-            writer.WriteObjectStart();
-            for (int i = 0; i < map.Properties.Length; i++)
-                (map.Properties[i] as IJsonPropertyMap<TModel>).Write(model, writer);
-            writer.WriteObjectEnd();
+            var converter = _converters.Get<TModel>() as IJsonPropertyConverter<TModel>;
+            converter.Write(null, writer, model, false);
         }
     }
 }
