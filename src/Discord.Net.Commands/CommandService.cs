@@ -193,8 +193,20 @@ namespace Discord.Commands
         }
 
         //Type Readers 
+        /// <summary>
+        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
+        /// If <typeparamref name="T"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> will also be added.
+        /// </summary>
+        /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
+        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
         public void AddTypeReader<T>(TypeReader reader)
             => AddTypeReader(typeof(T), reader);
+        /// <summary>
+        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
+        /// If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added. 
+        /// </summary>
+        /// <param name="type">A <see cref="Type"/> instance for the type to be read.</param>
+        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
         public void AddTypeReader(Type type, TypeReader reader)
         {
             var readers = _typeReaders.GetOrAdd(type, x => new ConcurrentDictionary<Type, TypeReader>());
@@ -241,6 +253,7 @@ namespace Discord.Commands
             }
             return null;
         }
+
         //Execution
         public SearchResult Search(ICommandContext context, int argPos)
             => Search(context, context.Message.Content.Substring(argPos));
