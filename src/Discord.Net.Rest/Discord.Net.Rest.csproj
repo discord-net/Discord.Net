@@ -5,7 +5,6 @@
     <RootNamespace>Discord.Rest</RootNamespace>
     <Description>A core Discord.Net library containing the REST client and models.</Description>
     <TargetFrameworks>net45;netstandard1.1;netstandard1.3</TargetFrameworks>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Serialization\System.Buffers\**" />
