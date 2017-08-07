@@ -8,8 +8,8 @@ namespace Discord.Serialization.Json.Converters
         {
             if (isTopLevel)
                 reader.Read();
-            if (reader.ValueType != JsonValueType.Number)
-                throw new SerializationException("Bad input, expected Number");
+            if (reader.ValueType != JsonValueType.Number && reader.ValueType != JsonValueType.String)
+                throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseSingle();
         }
         public void Write(PropertyMap map, JsonWriter writer, float value, bool isTopLevel)
@@ -27,8 +27,8 @@ namespace Discord.Serialization.Json.Converters
         {
             if (isTopLevel)
                 reader.Read();
-            if (reader.ValueType != JsonValueType.Number)
-                throw new SerializationException("Bad input, expected Number");
+            if (reader.ValueType != JsonValueType.Number && reader.ValueType != JsonValueType.String)
+                throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseDouble();
         }
         public void Write(PropertyMap map, JsonWriter writer, double value, bool isTopLevel)
@@ -46,8 +46,8 @@ namespace Discord.Serialization.Json.Converters
         {
             if (isTopLevel)
                 reader.Read();
-            if (reader.ValueType != JsonValueType.Number)
-                throw new SerializationException("Bad input, expected Number");
+            if (reader.ValueType != JsonValueType.Number && reader.ValueType != JsonValueType.String)
+                throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseDecimal();
         }
         public void Write(PropertyMap map, JsonWriter writer, decimal value, bool isTopLevel)
