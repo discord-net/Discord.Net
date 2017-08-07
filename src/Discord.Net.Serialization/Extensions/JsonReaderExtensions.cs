@@ -17,7 +17,7 @@ namespace Discord.Serialization
         public static uint ParseUInt32(this JsonReader reader) => reader.Value.ParseUInt32();
         public static ulong ParseUInt64(this JsonReader reader) => reader.Value.ParseUInt64();
 
-        public static char ParseChar(this JsonReader reader) => reader.Value.ParseChar();
+        //public static char ParseChar(this JsonReader reader) => reader.Value.ParseChar();
         public static string ParseString(this JsonReader reader) => reader.Value.ParseString();
 
         public static float ParseSingle(this JsonReader reader) => reader.Value.ParseSingle();

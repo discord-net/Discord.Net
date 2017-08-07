@@ -25,8 +25,8 @@ namespace Discord.Serialization.Json
             AddConverter<float, Converters.SinglePropertyConverter>();
             AddConverter<double, Converters.DoublePropertyConverter>();
             AddConverter<decimal, Converters.DecimalPropertyConverter>();
-
-            AddConverter<char, Converters.CharPropertyConverter>();
+            
+            //AddConverter<char, Converters.CharPropertyConverter>(); //char.Parse does not support Json.Net's serialization
             AddConverter<string, Converters.StringPropertyConverter>();
 
             AddConverter<DateTime, Converters.DateTimePropertyConverter>();
@@ -38,9 +38,8 @@ namespace Discord.Serialization.Json
             AddGenericConverter(typeof(List<>), typeof(Converters.ListPropertyConverter<>));
             AddGenericConverter(typeof(Nullable<>), typeof(Converters.NullablePropertyConverter<>));
 
+            //AddGenericConverter(typeof(Converters.EnumPropertyConverter<>), (type, prop) => type.IsEnum); //TODO: Impl Enums
             AddGenericConverter(typeof(Converters.ObjectPropertyConverter<>), (type, prop) => type.IsClass);
-
-            //AddEnumConverter<Converters.EnumPropertyConverter>();
         }
 
         public void AddConverter<TValue, TConverter>()

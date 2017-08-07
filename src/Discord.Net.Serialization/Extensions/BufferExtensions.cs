@@ -65,13 +65,13 @@ namespace Discord.Serialization
             throw new SerializationException("Failed to parse UInt64");
         }
 
-        public static char ParseChar(this ReadOnlySpan<byte> text)
+        /*public static char ParseChar(this ReadOnlySpan<byte> text)
         {
             string str = ParseString(text);
-            if (str.Length == 1)
-                return str[0];
+            if (char.TryParse(str, out char c))
+                return c;
             throw new SerializationException("Failed to parse Char");
-        }
+        }*/
         public static string ParseString(this ReadOnlySpan<byte> text) => new Utf8String(text).ToString();
 
         public static float ParseSingle(this ReadOnlySpan<byte> text)

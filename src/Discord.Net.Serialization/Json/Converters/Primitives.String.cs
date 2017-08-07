@@ -2,7 +2,7 @@
 
 namespace Discord.Serialization.Json.Converters
 {
-    internal class CharPropertyConverter : IJsonPropertyConverter<char>
+    /*internal class CharPropertyConverter : IJsonPropertyConverter<char>
     {
         public char Read(PropertyMap map, JsonReader reader, bool isTopLevel)
         {
@@ -19,7 +19,7 @@ namespace Discord.Serialization.Json.Converters
             else
                 writer.WriteValue(value.ToString());
         }
-    }
+    }*/
 
     internal class StringPropertyConverter : IJsonPropertyConverter<string>
     {
