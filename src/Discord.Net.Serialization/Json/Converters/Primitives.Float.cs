@@ -15,7 +15,7 @@ namespace Discord.Serialization.Json.Converters
         public void Write(PropertyMap map, ref JsonWriter writer, float value, bool isTopLevel)
         {
             if (isTopLevel)
-                writer.WriteAttribute(map.Utf16Key, value.ToString());
+                writer.WriteAttribute(map.Key, value.ToString());
             else
                 writer.WriteValue(value.ToString());
         }
@@ -34,7 +34,7 @@ namespace Discord.Serialization.Json.Converters
         public void Write(PropertyMap map, ref JsonWriter writer, double value, bool isTopLevel)
         {
             if (isTopLevel)
-                writer.WriteAttribute(map.Utf16Key, value.ToString());
+                writer.WriteAttribute(map.Key, value.ToString());
             else
                 writer.WriteValue(value.ToString());
         }
@@ -53,7 +53,7 @@ namespace Discord.Serialization.Json.Converters
         public void Write(PropertyMap map, ref JsonWriter writer, decimal value, bool isTopLevel)
         {
             if (isTopLevel)
-                writer.WriteAttribute(map.Utf16Key, value.ToString());
+                writer.WriteAttribute(map.Key, value.ToString());
             else
                 writer.WriteValue(value.ToString());
         }

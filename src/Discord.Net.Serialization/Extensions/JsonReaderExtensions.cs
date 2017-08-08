@@ -27,8 +27,11 @@ namespace Discord.Serialization
 
         public static bool ParseBool(this JsonReader reader) => reader.Value.ParseBool();
         public static Guid ParseGuid(this JsonReader reader) => reader.Value.ParseGuid();
+    }
 
-        public static void Skip(this JsonReader reader)
+    public static class JsonUtils
+    {
+        public static void Skip(ref JsonReader reader)
         {
             int initialDepth = reader._depth;
             while (reader.Read() && reader._depth > initialDepth) { }

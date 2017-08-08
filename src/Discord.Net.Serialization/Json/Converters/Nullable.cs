@@ -28,7 +28,7 @@ namespace Discord.Serialization.Json.Converters
             else
             {
                 if (isTopLevel)
-                    writer.WriteAttributeNull(map.Utf16Key);
+                    writer.WriteAttributeNull(map.Key);
                 else
                     writer.WriteNull();
             }

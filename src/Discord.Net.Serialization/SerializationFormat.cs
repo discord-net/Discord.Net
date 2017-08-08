@@ -29,11 +29,11 @@ namespace Discord.Serialization
                     .Where(x => x.CanRead && x.CanWrite)
                     .ToArray();
 
-                var properties = new Dictionary<ReadOnlySpan<byte>, PropertyMap>(propInfos.Length, Utf8SpanComparer.Instance);
+                var properties = new List<PropertyMap>();
                 for (int i = 0; i < propInfos.Length; i++)
                 {
                     var propMap = MapProperty<TModel>(propInfos[i]);
-                    properties.Add(propMap.Utf8Key, propMap);
+                    properties.Add(propMap);
                 }
                 return new ModelMap<TModel>(properties);
             }) as ModelMap<TModel>;
