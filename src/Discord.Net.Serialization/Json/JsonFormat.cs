@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Formatting;
 using System.Text.Json;
+using System.Text.Utf8;
 
 namespace Discord.Serialization.Json
 {
@@ -28,6 +29,7 @@ namespace Discord.Serialization.Json
             
             //AddConverter<char, Converters.CharPropertyConverter>(); //char.Parse does not support Json.Net's serialization
             AddConverter<string, Converters.StringPropertyConverter>();
+            AddConverter<Utf8String, Converters.Utf8StringPropertyConverter>();
 
             AddConverter<DateTime, Converters.DateTimePropertyConverter>();
             AddConverter<DateTimeOffset, Converters.DateTimeOffsetPropertyConverter>();
