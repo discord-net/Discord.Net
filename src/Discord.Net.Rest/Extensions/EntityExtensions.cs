@@ -114,7 +114,7 @@ namespace Discord.Rest
 
         public static API.Image ToModel(this Image entity)
         {
-            return new API.Image(entity.Stream);
+            return new API.Image(entity.Stream, entity.Format);
         }
 
         public static Overwrite ToEntity(this API.Overwrite model)
