@@ -65,42 +65,48 @@ namespace Discord.Serialization
         
         public object Get<TType>(PropertyInfo propInfo = null)
         {
-            return _cache.GetOrAdd(typeof(TType), _ =>
+            if (!_cache.TryGetValue(typeof(TType), out var result))
             {
-                TypeInfo typeInfo = typeof(TType).GetTypeInfo();
+                object converter = Create(typeof(TType), propInfo);
+                result = _cache.GetOrAdd(typeof(TType), converter);
+            }
+            return result;
+        }
+        private object Create(Type type, PropertyInfo propInfo)
+        {
+            TypeInfo typeInfo = type.GetTypeInfo();
 
-                //Mapped generic converters (List<T> -> CollectionPropertyConverter<T>)
-                if (typeInfo.IsGenericType)
+            //Mapped generic converters (List<T> -> CollectionPropertyConverter<T>)
+            if (typeInfo.IsGenericType)
+            {
+                var converterType = FindConverterType(typeInfo.GetGenericTypeDefinition(), _mappedGenericTypes, typeInfo, propInfo);
+                if (converterType != null)
                 {
-                    var converterType = FindConverterType(typeInfo.GetGenericTypeDefinition(), _mappedGenericTypes, typeInfo, propInfo);
-                    if (converterType != null)
-                    {
-                        var innerType = typeInfo.GenericTypeArguments[0];
-                        converterType = converterType.MakeGenericType(innerType);
-                        object innerConverter = GetInnerConverter(innerType, propInfo);
-                        return Activator.CreateInstance(converterType, innerConverter);
-                    }
+                    var innerType = typeInfo.GenericTypeArguments[0];
+                    converterType = converterType.MakeGenericType(innerType);
+                    object innerConverter = GetInnerConverter(innerType, propInfo);
+                    return Activator.CreateInstance(converterType, innerConverter);
                 }
+            }
 
-                //Normal converters (bool -> BooleanPropertyConverter)
+            //Normal converters (bool -> BooleanPropertyConverter)
+            {
+                var converterType = FindConverterType(type, _types, typeInfo, propInfo);
+                if (converterType != null)
+                    return Activator.CreateInstance(converterType);
+            }
+
+            //Generic converters (Model -> ObjectPropertyConverter<Model>)
+            {
+                var converterType = FindConverterType(_genericTypes, typeInfo, propInfo);
+                if (converterType != null)
                 {
-                    var converterType = FindConverterType(typeof(TType), _types, typeInfo, propInfo);
-                    if (converterType != null)
-                        return Activator.CreateInstance(converterType);
+                    converterType = converterType.MakeGenericType(type);
+                    return Activator.CreateInstance(converterType);
                 }
+            }
 
-                //Generic converters (Model -> ObjectPropertyConverter<Model>)
-                {
-                    var converterType = FindConverterType(_genericTypes, typeInfo, propInfo);
-                    if (converterType != null)
-                    {
-                        converterType = converterType.MakeGenericType(typeof(TType));
-                        return Activator.CreateInstance(converterType);
-                    }
-                }
-
-                throw new InvalidOperationException($"Unsupported model type: {typeof(TType).Name}");
-            });
+            throw new InvalidOperationException($"Unsupported model type: {type.Name}");
         }
         private object GetInnerConverter(Type type, PropertyInfo propInfo)
             => _getConverterMethod.MakeGenericMethod(type).Invoke(this, new object[] { propInfo });

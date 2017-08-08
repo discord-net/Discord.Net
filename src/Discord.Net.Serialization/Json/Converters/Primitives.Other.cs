@@ -19,7 +19,7 @@ namespace Discord.Serialization.Json.Converters
         public void Write(PropertyMap map, ref JsonWriter writer, bool value, bool isTopLevel)
         {
             if (isTopLevel)
-                writer.WriteAttribute(map.Key, value);
+                writer.WriteAttribute(map.Utf16Key, value);
             else
                 writer.WriteValue(value);
         }
@@ -33,12 +33,12 @@ namespace Discord.Serialization.Json.Converters
                 reader.Read();
             if (reader.ValueType != JsonValueType.String)
                 throw new SerializationException("Bad input, expected String");
-            return Guid.Parse(reader.ParseString());
+            return Guid.Parse(reader.ParseString()); //TODO: Causes allocs
         }
         public void Write(PropertyMap map, ref JsonWriter writer, Guid value, bool isTopLevel)
         {
             if (isTopLevel)
-                writer.WriteAttribute(map.Key, value.ToString());
+                writer.WriteAttribute(map.Utf16Key, value.ToString());
             else
                 writer.WriteValue(value.ToString());
         }

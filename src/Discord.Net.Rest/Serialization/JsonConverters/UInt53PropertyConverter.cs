@@ -15,7 +15,7 @@ namespace Discord.Serialization.Json.Converters
         public void Write(PropertyMap map, ref JsonWriter writer, ulong value, bool isTopLevel)
         {
             if (isTopLevel)
-                writer.WriteAttribute(map.Key, value);
+                writer.WriteAttribute(map.Utf16Key, value);
             else
                 writer.WriteValue(value.ToString());
         }

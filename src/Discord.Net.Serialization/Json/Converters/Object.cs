@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Utf8;
 
 namespace Discord.Serialization.Json.Converters
 {
@@ -19,9 +20,8 @@ namespace Discord.Serialization.Json.Converters
                     return model;
                 if (reader.TokenType != JsonTokenType.PropertyName)
                     throw new SerializationException("Bad input, expected PropertyName");
-
-                string key = reader.ParseString();                
-                if (_map.PropertiesByKey.TryGetValue(key, out var property))
+                
+                if (_map.PropertiesByKey.TryGetValue(reader.Value, out var property))
                     (property as IJsonPropertyMap<T>).Read(model, ref reader);
                 else
                     reader.Skip(); //Unknown property, skip
@@ -31,7 +31,7 @@ namespace Discord.Serialization.Json.Converters
         public void Write(PropertyMap map, ref JsonWriter writer, T value, bool isTopLevel)
         {
             if (isTopLevel)
-                writer.WriteObjectStart(map.Key);
+                writer.WriteObjectStart(map.Utf16Key);
             else
                 writer.WriteObjectStart();
             for (int i = 0; i < _map.Properties.Length; i++)

@@ -25,17 +25,15 @@ namespace Discord.Serialization
             return _maps.GetOrAdd(typeof(TModel), _ =>
             {
                 var type = typeof(TModel).GetTypeInfo();
-                var properties = new Dictionary<string, PropertyMap>();
+                var propInfos = type.DeclaredProperties
+                    .Where(x => x.CanRead && x.CanWrite)
+                    .ToArray();
 
-                var propInfos = type.DeclaredProperties.ToArray();
+                var properties = new Dictionary<ReadOnlySpan<byte>, PropertyMap>(propInfos.Length, Utf8SpanComparer.Instance);
                 for (int i = 0; i < propInfos.Length; i++)
                 {
-                    var propInfo = propInfos[i];
-                    if (!propInfo.CanRead || !propInfo.CanWrite)
-                        continue;
-
-                    var propMap = MapProperty<TModel>(propInfo);
-                    properties.Add(propMap.Key, propMap);
+                    var propMap = MapProperty<TModel>(propInfos[i]);
+                    properties.Add(propMap.Utf8Key, propMap);
                 }
                 return new ModelMap<TModel>(properties);
             }) as ModelMap<TModel>;
