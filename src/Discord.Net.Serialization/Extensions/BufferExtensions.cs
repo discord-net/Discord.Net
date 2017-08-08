@@ -9,13 +9,6 @@ namespace Discord.Serialization
     {
         private static readonly ParsedFormat _numberFormat = new ParsedFormat('D');
 
-        public static bool ParseBool(this ReadOnlySpan<byte> text)
-        {
-            if (PrimitiveParser.TryParseBoolean(text, out bool result, out int ignored, SymbolTable.InvariantUtf8))
-                return result;
-            throw new SerializationException("Failed to parse Boolean");
-        }
-
         public static sbyte ParseInt8(this ReadOnlySpan<byte> text)
         {
             if (PrimitiveParser.TryParseSByte(text, out sbyte result, out int ignored, _numberFormat, SymbolTable.InvariantUtf8))
@@ -77,19 +70,22 @@ namespace Discord.Serialization
 
         public static float ParseSingle(this ReadOnlySpan<byte> text)
         {
-            if (PrimitiveParser.TryParseDecimal(text, out decimal result, out int ignored, SymbolTable.InvariantUtf8))
-                return (float)result;
+            //TODO: Allocs a string
+            if (float.TryParse(ParseString(text), out float result))
+                return result;
             throw new SerializationException("Failed to parse Single");
         }
         public static double ParseDouble(this ReadOnlySpan<byte> text)
         {
-            if (PrimitiveParser.TryParseDecimal(text, out decimal result, out int ignored, SymbolTable.InvariantUtf8))
-                return (double)result;
+            //TODO: Allocs a string
+            if (double.TryParse(ParseString(text), out double result))
+                return result;
             throw new SerializationException("Failed to parse Double");
         }
         public static decimal ParseDecimal(this ReadOnlySpan<byte> text)
         {
-            if (PrimitiveParser.TryParseDecimal(text, out decimal result, out int ignored, SymbolTable.InvariantUtf8))
+            //TODO: Allocs a string
+            if (decimal.TryParse(ParseString(text), out decimal result))
                 return result;
             throw new SerializationException("Failed to parse Decimal");
         }
@@ -270,6 +266,20 @@ namespace Discord.Serialization
             bytesConsumed = text.Length;
             value = (int)(parsedValue);
             return true;
+        }
+
+        public static bool ParseBool(this ReadOnlySpan<byte> text)
+        {
+            if (PrimitiveParser.TryParseBoolean(text, out bool result, out int ignored, SymbolTable.InvariantUtf8))
+                return result;
+            throw new SerializationException("Failed to parse Boolean");
+        }
+        public static Guid ParseGuid(this ReadOnlySpan<byte> text)
+        {
+            //TODO: Allocs a string
+            if (Guid.TryParse(text.ParseString(), out var result))
+                return result;
+            throw new SerializationException("Failed to parse Guid");
         }
     }
 }

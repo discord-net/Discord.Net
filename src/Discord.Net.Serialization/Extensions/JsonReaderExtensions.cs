@@ -5,8 +5,6 @@ namespace Discord.Serialization
 {
     public static class JsonReaderExtensions
     {
-        public static bool ParseBool(this JsonReader reader) => reader.Value.ParseBool();
-
         public static sbyte ParseInt8(this JsonReader reader) => reader.Value.ParseInt8();
         public static short ParseInt16(this JsonReader reader) => reader.Value.ParseInt16();
         public static int ParseInt32(this JsonReader reader) => reader.Value.ParseInt32();
@@ -26,6 +24,9 @@ namespace Discord.Serialization
 
         public static DateTime ParseDateTime(this JsonReader reader) => reader.Value.ParseDateTime();
         public static DateTimeOffset ParseDateTimeOffset(this JsonReader reader) => reader.Value.ParseDateTimeOffset();
+
+        public static bool ParseBool(this JsonReader reader) => reader.Value.ParseBool();
+        public static Guid ParseGuid(this JsonReader reader) => reader.Value.ParseGuid();
 
         public static void Skip(this JsonReader reader)
         {

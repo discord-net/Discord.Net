@@ -33,7 +33,7 @@ namespace Discord.Serialization.Json.Converters
                 reader.Read();
             if (reader.ValueType != JsonValueType.String)
                 throw new SerializationException("Bad input, expected String");
-            return Guid.Parse(reader.ParseString()); //TODO: Causes allocs
+            return reader.ParseGuid();
         }
         public void Write(PropertyMap map, ref JsonWriter writer, Guid value, bool isTopLevel)
         {
