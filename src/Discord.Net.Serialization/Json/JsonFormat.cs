@@ -38,7 +38,7 @@ namespace Discord.Serialization.Json
             AddGenericConverter(typeof(List<>), typeof(Converters.ListPropertyConverter<>));
             AddGenericConverter(typeof(Nullable<>), typeof(Converters.NullablePropertyConverter<>));
 
-            //AddGenericConverter(typeof(Converters.EnumPropertyConverter<>), (type, prop) => type.IsEnum); //TODO: Impl Enums
+            AddGenericConverter(typeof(Converters.EnumPropertyConverter<>), (type, prop) => type.IsEnum);
             AddGenericConverter(typeof(Converters.ObjectPropertyConverter<>), (type, prop) => type.IsClass);
         }
 
