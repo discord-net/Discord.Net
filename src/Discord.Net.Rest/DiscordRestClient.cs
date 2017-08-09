@@ -1,4 +1,5 @@
 ﻿using Discord.Serialization;
+using Discord.Serialization.Json;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -16,7 +17,7 @@ namespace Discord.Rest
         public DiscordRestClient() : this(new DiscordRestConfig()) { }
         public DiscordRestClient(DiscordRestConfig config) : base(config)
         {
-            _serializer = new Serializer(SerializationFormat.Json);
+            _serializer = DiscordJsonSerializer.Global.CreateScope();
             _serializer.Error += ex =>
             {
                 _restLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();

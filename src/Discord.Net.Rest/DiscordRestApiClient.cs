@@ -24,15 +24,6 @@ namespace Discord.API
 {
     internal class DiscordRestApiClient : IDisposable
     {
-        static DiscordRestApiClient()
-        {
-            SerializationFormat.Json.AddConverter<Image, ImagePropertyConverter>();
-            SerializationFormat.Json.AddConverter<long, Int53PropertyConverter>((type, prop) => prop?.GetCustomAttribute<Int53Attribute>() != null);
-            SerializationFormat.Json.AddConverter<ulong, UInt53PropertyConverter>((type, prop) => prop?.GetCustomAttribute<Int53Attribute>() != null);
-            SerializationFormat.Json.AddGenericConverter(typeof(EntityOrId<>), typeof(EntityOrIdPropertyConverter<>));
-            SerializationFormat.Json.AddGenericConverter(typeof(Optional<>), typeof(OptionalPropertyConverter<>));
-        }
-
         private static readonly ConcurrentDictionary<string, Func<BucketIds, string>> _bucketIdGenerators = new ConcurrentDictionary<string, Func<BucketIds, string>>();
 
         public event Func<string, string, double, Task> SentRequest { add { _sentRequestEvent.Add(value); } remove { _sentRequestEvent.Remove(value); } }

@@ -1,5 +1,4 @@
-﻿using Discord.Serialization.Json.Converters;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -8,9 +7,12 @@ using System.Text.Json;
 
 namespace Discord.Serialization.Json
 {
-    public class JsonFormat : SerializationFormat
+    public class JsonSerializer : Serializer
     {
-        public JsonFormat()
+        private static readonly Lazy<JsonSerializer> _singleton = new Lazy<JsonSerializer>();
+        public static JsonSerializer Global => _singleton.Value;
+
+        public JsonSerializer()
         {
             AddConverter<sbyte, Converters.Int8PropertyConverter>();
             AddConverter<short, Converters.Int16PropertyConverter>();
@@ -41,42 +43,34 @@ namespace Discord.Serialization.Json
             AddGenericConverter(typeof(Converters.EnumPropertyConverter<>), (type, prop) => type.IsEnum);
             AddGenericConverter(typeof(Converters.ObjectPropertyConverter<>), (type, prop) => type.IsClass);
         }
+        protected JsonSerializer(JsonSerializer parent) : base(parent) { }
+        public JsonSerializer CreateScope() => new JsonSerializer(this);
 
         public void AddConverter<TValue, TConverter>()
             where TConverter : class, IJsonPropertyConverter<TValue>
-            => _converters.Add<TValue, TConverter>();
+            => AddConverter(typeof(TValue), typeof(TConverter));
         public void AddConverter<TValue, TConverter>(Func<TypeInfo, PropertyInfo, bool> condition)
             where TConverter : class, IJsonPropertyConverter<TValue>
-            => _converters.Add<TValue, TConverter>(condition);
-
-        public void AddGenericConverter(Type converter)
-            => _converters.AddGeneric(converter);
-        public void AddGenericConverter(Type converter, Func<TypeInfo, PropertyInfo, bool> condition)
-            => _converters.AddGeneric(converter, condition);
-        public void AddGenericConverter(Type value, Type converter)
-            => _converters.AddGeneric(value, converter);
-        public void AddGenericConverter(Type value, Type converter, Func<TypeInfo, PropertyInfo, bool> condition)
-            => _converters.AddGeneric(value, converter, condition);
+            => AddConverter(typeof(TValue), typeof(TConverter), condition);
 
         protected override PropertyMap CreatePropertyMap<TModel, TValue>(PropertyInfo propInfo)
         {
-            var converter = (IJsonPropertyConverter<TValue>)_converters.Get<TValue>(propInfo);
+            var converter = (IJsonPropertyConverter<TValue>)GetConverter(typeof(TValue), propInfo);
             return new JsonPropertyMap<TModel, TValue>(propInfo, converter);
         }
 
-        protected internal override TModel Read<TModel>(Serializer serializer, ReadOnlyBuffer<byte> data)
+        public override TModel Read<TModel>(ReadOnlyBuffer<byte> data)
         {
             var reader = new JsonReader(data.Span, SymbolTable.InvariantUtf8);
             if (!reader.Read())
                 return null;
-            var converter = _converters.Get<TModel>() as IJsonPropertyConverter<TModel>;
+            var converter = GetConverter(typeof(TModel)) as IJsonPropertyConverter<TModel>;
             return converter.Read(null, ref reader, false);
         }
-
-        protected internal override void Write<TModel>(Serializer serializer, ArrayFormatter stream, TModel model)
+        public override void Write<TModel>(ArrayFormatter stream, TModel model)
         {
             var writer = new JsonWriter(stream);
-            var converter = _converters.Get<TModel>() as IJsonPropertyConverter<TModel>;
+            var converter = GetConverter(typeof(TModel)) as IJsonPropertyConverter<TModel>;
             converter.Write(null, ref writer, model, false);
         }
     }

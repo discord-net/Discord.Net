@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Discord.Serialization
 {
-    public class ConverterCollection
+    internal class ConverterCollection
     {
         private class ConverterTypeCollection
         {
@@ -13,27 +14,30 @@ namespace Discord.Serialization
             public List<(Func<TypeInfo, PropertyInfo, bool> Condition, Type ConverterType)> Conditionals = new List<(Func<TypeInfo, PropertyInfo, bool>, Type)>();
         }
 
-        private static readonly MethodInfo _getConverterMethod
-            = typeof(ConverterCollection).GetTypeInfo().GetDeclaredMethod(nameof(Get));
+        private static readonly TypeInfo _serializerType = typeof(Serializer).GetTypeInfo();
 
+        private readonly Serializer _serializer;
         private readonly ConcurrentDictionary<Type, object> _cache = new ConcurrentDictionary<Type, object>();
         private readonly Dictionary<Type, ConverterTypeCollection> _types = new Dictionary<Type, ConverterTypeCollection>();
         private readonly Dictionary<Type, ConverterTypeCollection> _mappedGenericTypes = new Dictionary<Type, ConverterTypeCollection>();
         private readonly ConverterTypeCollection _genericTypes = new ConverterTypeCollection();
 
-        internal ConverterCollection() { }
-
-        public void Add<TType, TConverter>()
+        internal ConverterCollection(Serializer serializer)
         {
-            if (!_types.TryGetValue(typeof(TType), out var converters))
-                _types.Add(typeof(TType), converters = new ConverterTypeCollection());
-            converters.DefaultConverterType = typeof(TConverter);
+            _serializer = serializer;
         }
-        public void Add<TType, TConverter>(Func<TypeInfo, PropertyInfo, bool> condition)
+
+        public void Add(Type type, Type converterType)
         {
-            if (!_types.TryGetValue(typeof(TType), out var converters))
-                _types.Add(typeof(TType), converters = new ConverterTypeCollection());
-            converters.Conditionals.Add((condition, typeof(TConverter)));
+            if (!_types.TryGetValue(type, out var converters))
+                _types.Add(type, converters = new ConverterTypeCollection());
+            converters.DefaultConverterType = converterType;
+        }
+        public void Add(Type type, Type converterType, Func<TypeInfo, PropertyInfo, bool> condition)
+        {
+            if (!_types.TryGetValue(type, out var converters))
+                _types.Add(type, converters = new ConverterTypeCollection());
+            converters.Conditionals.Add((condition, converterType));
         }
 
         public void AddGeneric(Type openConverterType)
@@ -63,12 +67,12 @@ namespace Discord.Serialization
             converters.Conditionals.Add((condition, openConverterType));
         }
         
-        public object Get<TType>(PropertyInfo propInfo = null)
+        public object Get(Type type, PropertyInfo propInfo = null)
         {
-            if (!_cache.TryGetValue(typeof(TType), out var result))
+            if (!_cache.TryGetValue(type, out var result))
             {
-                object converter = Create(typeof(TType), propInfo);
-                result = _cache.GetOrAdd(typeof(TType), converter);
+                object converter = Create(type, propInfo);
+                result = _cache.GetOrAdd(type, converter);
             }
             return result;
         }
@@ -84,7 +88,7 @@ namespace Discord.Serialization
                 {
                     var innerType = typeInfo.GenericTypeArguments[0];
                     converterType = converterType.MakeGenericType(innerType);
-                    object innerConverter = GetInnerConverter(innerType, propInfo);
+                    object innerConverter = Get(innerType, propInfo);
                     return Activator.CreateInstance(converterType, innerConverter);
                 }
             }
@@ -102,14 +106,30 @@ namespace Discord.Serialization
                 if (converterType != null)
                 {
                     converterType = converterType.MakeGenericType(type);
-                    return Activator.CreateInstance(converterType);
+                    var converterTypeInfo = converterType.GetTypeInfo();
+
+                    var constructors = converterTypeInfo.DeclaredConstructors.ToArray();
+                    if (constructors.Length == 0)
+                        throw new SerializationException($"{converterType.Name} is missing a constructor");
+                    if (constructors.Length != 1)
+                        throw new SerializationException($"{converterType.Name} has multiple constructors");
+                    var constructor = constructors[0];
+                    var parameters = constructor.GetParameters();
+
+                    if (parameters.Length == 0)
+                        return constructor.Invoke(null);
+                    else if (parameters.Length == 1)
+                    {
+                        var parameterType = parameters[0].ParameterType.GetTypeInfo();
+                        if (_serializerType.IsAssignableFrom(parameterType))
+                            return constructor.Invoke(new object[] { _serializer });
+                    }
+                    throw new SerializationException($"{converterType.Name} has an unsupported constructor");
                 }
             }
 
             throw new InvalidOperationException($"Unsupported model type: {type.Name}");
         }
-        private object GetInnerConverter(Type type, PropertyInfo propInfo)
-            => _getConverterMethod.MakeGenericMethod(type).Invoke(this, new object[] { propInfo });
 
         private Type FindConverterType(Type type, Dictionary<Type, ConverterTypeCollection> collection, TypeInfo typeInfo, PropertyInfo propInfo)
         {

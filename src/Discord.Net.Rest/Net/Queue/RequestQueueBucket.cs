@@ -1,4 +1,6 @@
-﻿using Discord.Serialization;
+﻿using Discord.Rest;
+using Discord.Serialization;
+using Discord.Serialization.Json;
 using System;
 #if DEBUG_LIMITS
 using System.Diagnostics;
@@ -104,7 +106,7 @@ namespace Discord.Net.Queue
                                 {
                                     try
                                     {
-                                        var error = Serializer.Json.Read<Error>(response.Data);
+                                        var error = DiscordJsonSerializer.Global.Read<Error>(response.Data);
                                         code = error.Code;
                                         reason = error.Message;
                                     }

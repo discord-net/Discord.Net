@@ -5,8 +5,13 @@ namespace Discord.Serialization.Json.Converters
     internal class ObjectPropertyConverter<T> : IJsonPropertyConverter<T>
         where T : class, new()
     {
-        private static readonly ModelMap<T> _map = SerializationFormat.Json.MapModel<T>();
-        
+        private readonly ModelMap<T> _map;
+
+        public ObjectPropertyConverter(Serializer serializer)
+        {
+            _map = serializer.MapModel<T>();
+        }
+
         public T Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
         {
             var model = new T();
