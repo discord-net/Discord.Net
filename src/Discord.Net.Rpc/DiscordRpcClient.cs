@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using Discord.Serialization;
+using Discord.Serialization.Json;
 
 namespace Discord.Rpc
 {
@@ -37,7 +38,7 @@ namespace Discord.Rpc
             _authorizeLock = new SemaphoreSlim(1, 1);
             _rpcLogger = LogManager.CreateLogger("RPC");
 
-            _serializer = new Serializer(SerializationFormat.Json);
+            _serializer = DiscordJsonSerializer.Global.CreateScope();
             _serializer.Error += ex =>
             {
                 _rpcLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();

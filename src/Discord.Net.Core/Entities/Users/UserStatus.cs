@@ -5,13 +5,13 @@ namespace Discord
     public enum UserStatus
     {
         Offline,
-        [ModelEnum("online")]
+        [ModelEnumValue("online")]
         Online,
-        [ModelEnum("idle")]
+        [ModelEnumValue("idle")]
         Idle,
-        [ModelEnum("idle", EnumValueType.WriteOnly)]
+        [ModelEnumValue("idle", EnumValueType.WriteOnly)]
         AFK,
-        [ModelEnum("dnd")]
+        [ModelEnumValue("dnd")]
         DoNotDisturb,
         Invisible,
     }

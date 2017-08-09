@@ -14,7 +14,9 @@ namespace Discord.API.Rpc
         public Optional<string> Event { get; set; }
         [ModelProperty("data")]
         public Optional<ReadOnlyBuffer<byte>> Data { get; set; }
+
         [ModelProperty("args")]
+        [ModelSelector(ModelSelectorGroups.RpcFrame, nameof(Event))]
         public object Args { get; set; }
     }
 }

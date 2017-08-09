@@ -2,9 +2,9 @@
 
 namespace Discord.Serialization.Json.Converters
 {
-    internal class SinglePropertyConverter : IJsonPropertyConverter<float>
+    public class SinglePropertyConverter : IJsonPropertyConverter<float>
     {
-        public float Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
+        public float Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -12,7 +12,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseSingle();
         }
-        public void Write(PropertyMap map, ref JsonWriter writer, float value, bool isTopLevel)
+        public void Write(PropertyMap map, object model, ref JsonWriter writer, float value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteAttribute(map.Key, value.ToString());
@@ -21,9 +21,9 @@ namespace Discord.Serialization.Json.Converters
         }
     }
 
-    internal class DoublePropertyConverter : IJsonPropertyConverter<double>
+    public class DoublePropertyConverter : IJsonPropertyConverter<double>
     {
-        public double Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
+        public double Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -31,7 +31,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseDouble();
         }
-        public void Write(PropertyMap map, ref JsonWriter writer, double value, bool isTopLevel)
+        public void Write(PropertyMap map, object model, ref JsonWriter writer, double value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteAttribute(map.Key, value.ToString());
@@ -42,7 +42,7 @@ namespace Discord.Serialization.Json.Converters
 
     internal class DecimalPropertyConverter : IJsonPropertyConverter<decimal>
     {
-        public decimal Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
+        public decimal Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -50,7 +50,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseDecimal();
         }
-        public void Write(PropertyMap map, ref JsonWriter writer, decimal value, bool isTopLevel)
+        public void Write(PropertyMap map, object model, ref JsonWriter writer, decimal value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteAttribute(map.Key, value.ToString());

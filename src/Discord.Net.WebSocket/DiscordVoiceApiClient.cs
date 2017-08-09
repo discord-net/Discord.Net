@@ -31,8 +31,8 @@ namespace Discord.Audio
         public event Func<int, Task> SentData { add { _sentDataEvent.Add(value); } remove { _sentDataEvent.Remove(value); } }
         private readonly AsyncEvent<Func<int, Task>> _sentDataEvent = new AsyncEvent<Func<int, Task>>();
 
-        public event Func<VoiceOpCode, ReadOnlyBuffer<byte>, Task> ReceivedEvent { add { _receivedEvent.Add(value); } remove { _receivedEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<VoiceOpCode, ReadOnlyBuffer<byte>, Task>> _receivedEvent = new AsyncEvent<Func<VoiceOpCode, ReadOnlyBuffer<byte>, Task>>();
+        public event Func<VoiceOpCode, object, Task> ReceivedEvent { add { _receivedEvent.Add(value); } remove { _receivedEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<VoiceOpCode, object, Task>> _receivedEvent = new AsyncEvent<Func<VoiceOpCode, object, Task>>();
         public event Func<byte[], int, int, Task> ReceivedPacket { add { _receivedPacketEvent.Add(value); } remove { _receivedPacketEvent.Remove(value); } }
         private readonly AsyncEvent<Func<byte[], int, int, Task>> _receivedPacketEvent = new AsyncEvent<Func<byte[], int, int, Task>>();
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
@@ -79,16 +79,16 @@ namespace Discord.Audio
                         _decompressionStream.SetLength(_decompressionStream.Position);
 
                         _decompressionStream.Position = 0;
-                        var msg = _serializer.Read<SocketFrame>(_decompressionStream.ToReadOnlyBuffer());
+                        var msg = _serializer.Read<VoiceSocketFrame>(_decompressionStream.ToReadOnlyBuffer());
                         if (msg != null)
-                            await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
+                            await _receivedEvent.InvokeAsync(msg.Operation, msg.Payload).ConfigureAwait(false);
                     }
                 }
                 else
                 {
-                    var msg = _serializer.Read<SocketFrame>(data);
+                    var msg = _serializer.Read<VoiceSocketFrame>(data);
                     if (msg != null)
-                        await _receivedEvent.InvokeAsync((VoiceOpCode)msg.Operation, msg.Payload).ConfigureAwait(false);
+                        await _receivedEvent.InvokeAsync(msg.Operation, msg.Payload).ConfigureAwait(false);
                 }
             };
             WebSocketClient.Closed += async ex =>
@@ -114,20 +114,17 @@ namespace Discord.Audio
 
         public async Task SendAsync(VoiceOpCode opCode, object payload, RequestOptions options = null)
         {
-            if (_formatters.TryDequeue(out var data1))
-                data1 = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
-            if (_formatters.TryDequeue(out var data2))
-                data2 = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            if (!_formatters.TryDequeue(out var data))
+                data = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
             try
             {
-                payload = new SocketFrame { Operation = (int)opCode, Payload = SerializeJson(data1, payload) };
-                await WebSocketClient.SendAsync(SerializeJson(data2, payload), true).ConfigureAwait(false);
+                var frame = new VoiceSocketFrame { Operation = opCode, Payload = payload };
+                await WebSocketClient.SendAsync(SerializeJson(data, frame), true).ConfigureAwait(false);
                 await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
             }
             finally
             {
-                _formatters.Enqueue(data1);
-                _formatters.Enqueue(data2);
+                _formatters.Enqueue(data);
             }
         }
         public async Task SendAsync(byte[] data, int offset, int bytes)

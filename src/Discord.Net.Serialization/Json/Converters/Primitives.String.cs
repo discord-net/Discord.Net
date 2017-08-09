@@ -1,11 +1,10 @@
 ﻿using System.Text.Json;
-using System.Text.Utf8;
 
 namespace Discord.Serialization.Json.Converters
 {
-    /*internal class CharPropertyConverter : IJsonPropertyConverter<char>
+    /*public class CharPropertyConverter : IJsonPropertyConverter<char>
     {
-        public char Read(PropertyMap map, JsonReader reader, bool isTopLevel)
+        public char Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -13,7 +12,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected String");
             return reader.ParseChar();
         }
-        public void Write(PropertyMap map, JsonWriter writer, char value, bool isTopLevel)
+        public void Write(PropertyMap map, object model, ref JsonWriter writer, char value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteAttribute(map.Key, value);
@@ -22,17 +21,19 @@ namespace Discord.Serialization.Json.Converters
         }
     }*/
 
-    internal class StringPropertyConverter : IJsonPropertyConverter<string>
+    public class StringPropertyConverter : IJsonPropertyConverter<string>
     {
-        public string Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
+        public string Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
-            if (reader.ValueType != JsonValueType.String)
+            if (reader.ValueType == JsonValueType.Null)
+                return null;
+            else if (reader.ValueType != JsonValueType.String)
                 throw new SerializationException("Bad input, expected String");
             return reader.ParseString();
         }
-        public void Write(PropertyMap map, ref JsonWriter writer, string value, bool isTopLevel)
+        public void Write(PropertyMap map, object model, ref JsonWriter writer, string value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteAttribute(map.Key, value);

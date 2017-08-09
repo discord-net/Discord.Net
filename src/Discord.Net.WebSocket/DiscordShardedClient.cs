@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using Discord.Serialization;
+using Discord.Serialization.Json;
 
 namespace Discord.WebSocket
 {
@@ -54,7 +55,7 @@ namespace Discord.WebSocket
             _baseConfig = config;
             _connectionGroupLock = new SemaphoreSlim(1, 1);
 
-            _serializer = new Serializer(SerializationFormat.Json);
+            _serializer = DiscordJsonSerializer.Global.CreateScope();
             _serializer.Error += ex =>
             {
                 _restLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();

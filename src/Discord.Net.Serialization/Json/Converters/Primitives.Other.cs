@@ -3,9 +3,9 @@ using System.Text.Json;
 
 namespace Discord.Serialization.Json.Converters
 {
-    internal class BooleanPropertyConverter : IJsonPropertyConverter<bool>
+    public class BooleanPropertyConverter : IJsonPropertyConverter<bool>
     {
-        public bool Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
+        public bool Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -16,7 +16,7 @@ namespace Discord.Serialization.Json.Converters
                 default: throw new SerializationException("Bad input, expected False or True");
             }
         }
-        public void Write(PropertyMap map, ref JsonWriter writer, bool value, bool isTopLevel)
+        public void Write(PropertyMap map, object model, ref JsonWriter writer, bool value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteAttribute(map.Key, value);
@@ -25,9 +25,9 @@ namespace Discord.Serialization.Json.Converters
         }
     }
 
-    internal class GuidPropertyConverter : IJsonPropertyConverter<Guid>
+    public class GuidPropertyConverter : IJsonPropertyConverter<Guid>
     {
-        public Guid Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
+        public Guid Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -35,7 +35,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected String");
             return reader.ParseGuid();
         }
-        public void Write(PropertyMap map, ref JsonWriter writer, Guid value, bool isTopLevel)
+        public void Write(PropertyMap map, object model, ref JsonWriter writer, Guid value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteAttribute(map.Key, value.ToString());

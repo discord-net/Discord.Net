@@ -29,7 +29,7 @@ namespace Discord.Serialization
         public static Guid ParseGuid(this JsonReader reader) => reader.Value.ParseGuid();
     }
 
-    public static class JsonUtils
+    public static class JsonReaderUtils
     {
         public static void Skip(ref JsonReader reader)
         {

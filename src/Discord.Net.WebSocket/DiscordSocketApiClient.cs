@@ -21,8 +21,8 @@ namespace Discord.API
     {
         public event Func<GatewayOpCode, Task> SentGatewayMessage { add { _sentGatewayMessageEvent.Add(value); } remove { _sentGatewayMessageEvent.Remove(value); } }
         private readonly AsyncEvent<Func<GatewayOpCode, Task>> _sentGatewayMessageEvent = new AsyncEvent<Func<GatewayOpCode, Task>>();
-        public event Func<GatewayOpCode, int?, string, ReadOnlyBuffer<byte>, Task> ReceivedGatewayEvent { add { _receivedGatewayEvent.Add(value); } remove { _receivedGatewayEvent.Remove(value); } }
-        private readonly AsyncEvent<Func<GatewayOpCode, int?, string, ReadOnlyBuffer<byte>, Task>> _receivedGatewayEvent = new AsyncEvent<Func<GatewayOpCode, int?, string, ReadOnlyBuffer<byte>, Task>>();
+        public event Func<GatewayOpCode, int?, string, object, Task> ReceivedGatewayEvent { add { _receivedGatewayEvent.Add(value); } remove { _receivedGatewayEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<GatewayOpCode, int?, string, object, Task>> _receivedGatewayEvent = new AsyncEvent<Func<GatewayOpCode, int?, string, object, Task>>();
 
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
@@ -60,16 +60,16 @@ namespace Discord.API
                         _decompressionStream.SetLength(_decompressionStream.Position);
 
                         _decompressionStream.Position = 0;
-                        var msg = _serializer.Read<SocketFrame>(_decompressionStream.ToReadOnlyBuffer());
+                        var msg = _serializer.Read<GatewaySocketFrame>(_decompressionStream.ToReadOnlyBuffer());
                         if (msg != null)
-                            await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                            await _receivedGatewayEvent.InvokeAsync(msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                     }
                 }
                 else
                 {
-                    var msg = _serializer.Read<SocketFrame>(data);
+                    var msg = _serializer.Read<GatewaySocketFrame>(data);
                     if (msg != null)
-                        await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                        await _receivedGatewayEvent.InvokeAsync(msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
                 }
             };
             WebSocketClient.Closed += async ex =>
@@ -173,20 +173,17 @@ namespace Discord.API
         {
             CheckState();
 
-            if (_formatters.TryDequeue(out var data1))
-                data1 = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
-            if (_formatters.TryDequeue(out var data2))
-                data2 = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            if (!_formatters.TryDequeue(out var data))
+                data = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
             try
             {
-                payload = new SocketFrame { Operation = (int)opCode, Payload = SerializeJson(data1, payload) };
-                await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, null, SerializeJson(data2, payload), true, options)).ConfigureAwait(false);
+                var frame = new GatewaySocketFrame { Operation = opCode, Payload = payload };
+                await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, null, SerializeJson(data, frame), true, options)).ConfigureAwait(false);
                 await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
             }
             finally
             {
-                _formatters.Enqueue(data1);
-                _formatters.Enqueue(data2);
+                _formatters.Enqueue(data);
             }            
         }
 

@@ -2,7 +2,7 @@
 
 namespace Discord.Serialization.Json.Converters
 {
-    internal class ObjectPropertyConverter<T> : IJsonPropertyConverter<T>
+    public class ObjectPropertyConverter<T> : IJsonPropertyConverter<T>
         where T : class, new()
     {
         private readonly ModelMap<T> _map;
@@ -12,27 +12,27 @@ namespace Discord.Serialization.Json.Converters
             _map = serializer.MapModel<T>();
         }
 
-        public T Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
+        public T Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
-            var model = new T();
+            var subModel = new T();
 
             if ((isTopLevel && !reader.Read()) || reader.TokenType != JsonTokenType.StartObject)
                 throw new SerializationException("Bad input, expected StartObject");
             while (reader.Read())
             {
                 if (reader.TokenType == JsonTokenType.EndObject)
-                    return model;
+                    return subModel;
                 if (reader.TokenType != JsonTokenType.PropertyName)
                     throw new SerializationException("Bad input, expected PropertyName");
                 
                 if (_map.TryGetProperty(reader.Value, out var property))
-                    (property as IJsonPropertyMap<T>).Read(model, ref reader);
+                    (property as IJsonPropertyMap<T>).Read(subModel, ref reader);
                 else
-                    JsonUtils.Skip(ref reader); //Unknown property, skip
+                    JsonReaderUtils.Skip(ref reader); //Unknown property, skip
             }
             throw new SerializationException("Bad input, expected EndObject");
         }
-        public void Write(PropertyMap map, ref JsonWriter writer, T value, bool isTopLevel)
+        public void Write(PropertyMap map, object model, ref JsonWriter writer, T value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteObjectStart(map.Key);

@@ -17,14 +17,20 @@ namespace Discord.Serialization
         private static readonly TypeInfo _serializerType = typeof(Serializer).GetTypeInfo();
 
         private readonly Serializer _serializer;
-        private readonly ConcurrentDictionary<Type, object> _cache = new ConcurrentDictionary<Type, object>();
-        private readonly Dictionary<Type, ConverterTypeCollection> _types = new Dictionary<Type, ConverterTypeCollection>();
-        private readonly Dictionary<Type, ConverterTypeCollection> _mappedGenericTypes = new Dictionary<Type, ConverterTypeCollection>();
-        private readonly ConverterTypeCollection _genericTypes = new ConverterTypeCollection();
+        private readonly ConcurrentDictionary<Type, object> _cache;
+        private readonly Dictionary<Type, ConverterTypeCollection> _types;
+        private readonly Dictionary<Type, ConverterTypeCollection> _mappedGenericTypes;
+        private readonly ConverterTypeCollection _genericTypes;
+        private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, ISelectorGroup>> _selectorGroups;
 
         internal ConverterCollection(Serializer serializer)
         {
             _serializer = serializer;
+            _cache = new ConcurrentDictionary<Type, object>();
+            _types = new Dictionary<Type, ConverterTypeCollection>();
+            _mappedGenericTypes = new Dictionary<Type, ConverterTypeCollection>();
+            _genericTypes = new ConverterTypeCollection();
+            _selectorGroups = new ConcurrentDictionary<Type, ConcurrentDictionary<string, ISelectorGroup>>();
         }
 
         public void Add(Type type, Type converterType)
@@ -66,15 +72,22 @@ namespace Discord.Serialization
                 _mappedGenericTypes.Add(openType, converters = new ConverterTypeCollection());
             converters.Conditionals.Add((condition, openConverterType));
         }
-        
+
+        public void AddSelector(string groupKey, Type keyType, object keyValue, Type converterType)
+        {
+            var group = GetSelectorGroup(keyType, groupKey);
+            group.AddDynamicConverter(keyValue, converterType);
+        }
+
         public object Get(Type type, PropertyInfo propInfo = null)
         {
-            if (!_cache.TryGetValue(type, out var result))
+            if (propInfo == null) //Can only cache top-level due to attribute influences
             {
-                object converter = Create(type, propInfo);
-                result = _cache.GetOrAdd(type, converter);
+                if (_cache.TryGetValue(type, out var result))
+                    return result;
+                return _cache.GetOrAdd(type, Create(type, propInfo));
             }
-            return result;
+            return Create(type, propInfo);
         }
         private object Create(Type type, PropertyInfo propInfo)
         {
@@ -108,7 +121,7 @@ namespace Discord.Serialization
                     converterType = converterType.MakeGenericType(type);
                     var converterTypeInfo = converterType.GetTypeInfo();
 
-                    var constructors = converterTypeInfo.DeclaredConstructors.ToArray();
+                    var constructors = converterTypeInfo.DeclaredConstructors.Where(x => !x.IsStatic).ToArray();
                     if (constructors.Length == 0)
                         throw new SerializationException($"{converterType.Name} is missing a constructor");
                     if (constructors.Length != 1)
@@ -148,5 +161,17 @@ namespace Discord.Serialization
                 return converters.DefaultConverterType;
             return null;
         }
+
+        public ISelectorGroup GetSelectorGroup(Type keyType, string groupKey)
+        {
+            var keyGroup = GetSelectorKeyGroup(keyType);
+            if (keyGroup.TryGetValue(groupKey, out var selectorGroup))
+                return selectorGroup;
+            return CreateSelectorGroup(keyType, keyGroup, groupKey);
+        }
+        private ISelectorGroup CreateSelectorGroup(Type keyType, ConcurrentDictionary<string, ISelectorGroup> keyGroup, string groupKey)
+            => keyGroup.GetOrAdd(groupKey, Activator.CreateInstance(typeof(SelectorGroup<>).MakeGenericType(keyType)) as ISelectorGroup);
+        private ConcurrentDictionary<string, ISelectorGroup> GetSelectorKeyGroup(Type keyType)
+            => _selectorGroups.GetOrAdd(keyType, _ => new ConcurrentDictionary<string, ISelectorGroup>());
     }
 }

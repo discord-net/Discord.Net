@@ -191,7 +191,7 @@ namespace Discord.API
             options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
             options.IsClientBucket = AuthTokenType == TokenType.User;
 
-            if (_formatters.TryDequeue(out var data))
+            if (!_formatters.TryDequeue(out var data))
                 data = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
             try
             {
@@ -240,7 +240,7 @@ namespace Discord.API
             options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
             options.IsClientBucket = AuthTokenType == TokenType.User;
 
-            if (_formatters.TryDequeue(out var data))
+            if (!_formatters.TryDequeue(out var data))
                 data = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
             try
             {
@@ -1168,13 +1168,12 @@ namespace Discord.API
                 throw new InvalidOperationException("Client is not logged in.");
         }
         protected static double ToMilliseconds(Stopwatch stopwatch) => Math.Round((double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
-        protected ReadOnlyBuffer<byte> SerializeJson(ArrayFormatter data, object value)
+        protected ReadOnlyBuffer<byte> SerializeJson<T>(ArrayFormatter data, T value)
         {
             _serializer.Write(data, value);
             return new ReadOnlyBuffer<byte>(data.Formatted.Array, 0, data.Formatted.Count);
         }
         protected T DeserializeJson<T>(ReadOnlyBuffer<byte> data)
-            where T : class, new()
         {
             return _serializer.Read<T>(data);
         }

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Discord.Serialization;
+using Discord.Serialization.Json;
 
 namespace Discord.Audio
 {
@@ -66,7 +67,7 @@ namespace Discord.Audio
             ChannelId = channelId;
             _audioLogger = Discord.LogManager.CreateLogger($"Audio #{clientId}");
 
-            _serializer = new Serializer(SerializationFormat.Json);
+            _serializer = DiscordJsonSerializer.Global.CreateScope();
             _serializer.Error += ex =>
             {
                 _audioLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();
@@ -225,7 +226,7 @@ namespace Discord.Audio
             _streams.Clear();
         }
 
-        private async Task ProcessMessageAsync(VoiceOpCode opCode, ReadOnlyBuffer<byte> payload)
+        private async Task ProcessMessageAsync(VoiceOpCode opCode, object payload)
         {
             _lastMessageTime = Environment.TickCount;
 
@@ -236,7 +237,7 @@ namespace Discord.Audio
                     case VoiceOpCode.Ready:
                         {
                             await _audioLogger.DebugAsync("Received Ready").ConfigureAwait(false);
-                            var data = _serializer.Read<ReadyEvent>(payload);
+                            var data = payload as ReadyEvent;
 
                             _ssrc = data.SSRC;
 
@@ -252,7 +253,7 @@ namespace Discord.Audio
                     case VoiceOpCode.SessionDescription:
                         {
                             await _audioLogger.DebugAsync("Received SessionDescription").ConfigureAwait(false);
-                            var data = _serializer.Read<SessionDescriptionEvent>(payload);
+                            var data = payload as SessionDescriptionEvent;
 
                             if (data.Mode != DiscordVoiceApiClient.Mode)
                                 throw new InvalidOperationException($"Discord selected an unexpected mode: {data.Mode}");
@@ -288,7 +289,7 @@ namespace Discord.Audio
                         {
                             await _audioLogger.DebugAsync("Received Speaking").ConfigureAwait(false);
 
-                            var data = _serializer.Read<SpeakingEvent>(payload);
+                            var data = payload as SpeakingEvent;
                             _ssrcMap[data.Ssrc] = data.UserId; //TODO: Memory Leak: SSRCs are never cleaned up
 
                             await _speakingUpdatedEvent.InvokeAsync(data.UserId, data.Speaking);

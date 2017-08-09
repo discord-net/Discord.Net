@@ -8,7 +8,9 @@ namespace Discord.Serialization
         public string Key { get; }
         public bool ExcludeNull { get; set; }
 
-        public ModelPropertyAttribute(string key = null)
+        public ModelPropertyAttribute()
+            : this(null) { }
+        public ModelPropertyAttribute(string key)
         {
             Key = key;
         }

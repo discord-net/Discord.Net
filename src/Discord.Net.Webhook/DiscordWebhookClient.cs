@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Discord.Logging;
 using Discord.Serialization;
+using Discord.Serialization.Json;
 
 namespace Discord.Webhook
 {
@@ -29,7 +30,7 @@ namespace Discord.Webhook
         {
             _webhookId = webhookId;
 
-            _serializer = new Serializer(SerializationFormat.Json);
+            _serializer = DiscordJsonSerializer.Global.CreateScope();
             _serializer.Error += ex =>
             {
                 _restLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();

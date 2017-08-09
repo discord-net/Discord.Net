@@ -3,9 +3,9 @@ using System.Text.Json;
 
 namespace Discord.Serialization.Json.Converters
 {
-    internal class DateTimePropertyConverter : IJsonPropertyConverter<DateTime>
+    public class DateTimePropertyConverter : IJsonPropertyConverter<DateTime>
     {
-        public DateTime Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
+        public DateTime Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -13,7 +13,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected String");
             return reader.ParseDateTime();
         }
-        public void Write(PropertyMap map, ref JsonWriter writer, DateTime value, bool isTopLevel)
+        public void Write(PropertyMap map, object model, ref JsonWriter writer, DateTime value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteAttribute(map.Key, value);
@@ -22,9 +22,9 @@ namespace Discord.Serialization.Json.Converters
         }
     }
 
-    internal class DateTimeOffsetPropertyConverter : IJsonPropertyConverter<DateTimeOffset>
+    public class DateTimeOffsetPropertyConverter : IJsonPropertyConverter<DateTimeOffset>
     {
-        public DateTimeOffset Read(PropertyMap map, ref JsonReader reader, bool isTopLevel)
+        public DateTimeOffset Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -32,7 +32,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected String");
             return reader.ParseDateTimeOffset();
         }
-        public void Write(PropertyMap map, ref JsonWriter writer, DateTimeOffset value, bool isTopLevel)
+        public void Write(PropertyMap map, object model, ref JsonWriter writer, DateTimeOffset value, bool isTopLevel)
         {
             if (isTopLevel)
                 writer.WriteAttribute(map.Key, value);

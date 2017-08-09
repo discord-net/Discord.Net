@@ -5,6 +5,7 @@ using Discord.Net.Rest;
 using Discord.Net.WebSockets;
 using Discord.Rpc;
 using Discord.Serialization;
+using Discord.Serialization.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -41,11 +42,11 @@ namespace Discord.API
             }
             public Task SetResultAsync(ReadOnlyBuffer<byte> data)
             {
-                return Promise.TrySetResultAsync(Serializer.Json.Read<T>(data));
+                return Promise.TrySetResultAsync(DiscordJsonSerializer.Global.Read<T>(data));
             }
             public Task SetExceptionAsync(ReadOnlyBuffer<byte> data)
             {
-                var error = Serializer.Json.Read<ErrorEvent>(data);
+                var error = DiscordJsonSerializer.Global.Read<ErrorEvent>(data);
                 return Promise.TrySetExceptionAsync(new RpcException(error.Code, error.Message));
             }
         }
@@ -231,12 +232,12 @@ namespace Discord.API
             try
             {
                 var guid = Guid.NewGuid();
-                payload = new API.Rpc.RpcFrame { Cmd = cmd, Event = evt, Args = SerializeJson(data1, payload), Nonce = guid };
+                var frame = new API.Rpc.RpcFrame { Cmd = cmd, Event = evt, Args = SerializeJson(data1, payload), Nonce = guid };
 
                 var requestTracker = new RpcRequest<TResponse>(options);
                 _requests[guid] = requestTracker;
 
-                await RequestQueue.SendAsync(new WebSocketRequest(_webSocketClient, null, SerializeJson(data2, payload), true, options)).ConfigureAwait(false);
+                await RequestQueue.SendAsync(new WebSocketRequest(_webSocketClient, null, SerializeJson(data2, frame), true, options)).ConfigureAwait(false);
                 await _sentRpcMessageEvent.InvokeAsync(cmd).ConfigureAwait(false);
                 return await requestTracker.Promise.Task.ConfigureAwait(false);
             }
