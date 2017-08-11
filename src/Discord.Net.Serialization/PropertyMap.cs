@@ -51,7 +51,7 @@ namespace Discord.Serialization
             private TKey GetSelectorKey<TKey>(object model)
                 => (_getSelectorFunc as Func<TModel, TKey>)((TModel)model);
             public object GetDynamicConverter(object model)
-                => _group.GetDynamicConverter(_getWrappedSelectorFunc, model);
+                => _group?.GetDynamicConverter(_getWrappedSelectorFunc, model);
         }
         
         private readonly Delegate _getSelectorFunc, _getWrappedSelectorFunc;
@@ -73,7 +73,7 @@ namespace Discord.Serialization
 
                     return new Selector(prop, selectorGroup, selectorFunc);
                 })
-                .ToList();            
+                .ToList();
         }
 
         public override object GetDynamicConverter(object model, bool throwOnMissing)

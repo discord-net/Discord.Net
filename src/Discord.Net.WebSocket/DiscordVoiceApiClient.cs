@@ -124,6 +124,7 @@ namespace Discord.Audio
             }
             finally
             {
+                data.Clear();
                 _formatters.Enqueue(data);
             }
         }
@@ -138,7 +139,7 @@ namespace Discord.Audio
         {
             await SendAsync(VoiceOpCode.Heartbeat, DateTimeUtils.ToUnixMilliseconds(DateTimeOffset.UtcNow), options: options).ConfigureAwait(false);
         }
-        public async Task SendIdentityAsync(ulong userId, string sessionId, string token)
+        public async Task SendIdentifyAsync(ulong userId, string sessionId, string token)
         {
             await SendAsync(VoiceOpCode.Identify, new IdentifyParams
             {

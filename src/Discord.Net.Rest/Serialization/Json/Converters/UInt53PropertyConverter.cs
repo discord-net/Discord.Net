@@ -2,9 +2,9 @@
 
 namespace Discord.Serialization.Json.Converters
 {
-    internal class UInt53PropertyConverter : IJsonPropertyConverter<ulong>
+    internal class UInt53PropertyConverter : JsonPropertyConverter<ulong>
     {
-        public ulong Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override ulong Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -12,12 +12,12 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number");
             return reader.ParseUInt64();
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, ulong value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, ulong value, string key)
         {
-            if (isTopLevel)
-                writer.WriteAttribute(map.Key, value);
+            if (key != null)
+                writer.WriteAttribute(key, value);
             else
-                writer.WriteValue(value.ToString());
+                writer.WriteValue(value);
         }
     }
 }

@@ -13,65 +13,40 @@ namespace Discord.Serialization
 
         private static readonly MethodInfo _createPropertyMapMethod
             = typeof(Serializer).GetTypeInfo().GetDeclaredMethod(nameof(CreatePropertyMap));
-
+        
         private readonly ConcurrentDictionary<Type, object> _maps;
         private readonly ConverterCollection _converters;
 
-        public bool IsScoped { get; }
-
         protected Serializer()
-        {
-            _maps = new ConcurrentDictionary<Type, object>();
-            _converters = new ConverterCollection(this);
-            IsScoped = false;
-        }
+            : this(null) { }
         protected Serializer(Serializer parent)
         {
-            _maps = parent._maps;
-            _converters = parent._converters;
-            IsScoped = true;
+            _maps = new ConcurrentDictionary<Type, object>();
+            _converters = new ConverterCollection(parent?._converters);
         }
 
-        protected object GetConverter(Type valueType, PropertyInfo propInfo = null)
-            => _converters.Get(valueType, propInfo);
+        protected internal object GetConverter(Type valueType, PropertyInfo propInfo = null)
+            => _converters.Get(this, valueType, propInfo);
 
         public void AddConverter(Type valueType, Type converterType)
-        {
-            CheckScoped();
-            _converters.Add(valueType, converterType);
-        }
+            => _converters.Add(valueType, converterType);
         public void AddConverter(Type valueType, Type converterType, Func<TypeInfo, PropertyInfo, bool> condition)
-        {
-            CheckScoped();
-            _converters.Add(valueType, converterType, condition);
-        }
+            => _converters.Add(valueType, converterType, condition);
 
-        public void AddGenericConverter(Type converterType)
-        {
-            CheckScoped();
-            _converters.AddGeneric(converterType);
-        }
-        public void AddGenericConverter(Type converterType, Func<TypeInfo, PropertyInfo, bool> condition)
-        {
-            CheckScoped();
-            _converters.AddGeneric(converterType, condition);
-        }
-        public void AddGenericConverter(Type valueType, Type converterType)
-        {
-            CheckScoped();
-            _converters.AddGeneric(valueType, converterType);
-        }
-        public void AddGenericConverter(Type valueType, Type converterType, Func<TypeInfo, PropertyInfo, bool> condition)
-        {
-            CheckScoped();
-            _converters.AddGeneric(valueType, converterType, condition);
-        }
+        public void AddGenericConverter(Type converterType, Func<Type, Type> typeSelector = null)
+            => _converters.AddGeneric(converterType, typeSelector);
+        public void AddGenericConverter(Type converterType, Func<TypeInfo, PropertyInfo, bool> condition, Func<Type, Type> typeSelector = null)
+            => _converters.AddGeneric(converterType, condition, typeSelector);
+        public void AddGenericConverter(Type valueType, Type converterType, Func<Type, Type> typeSelector = null)
+            => _converters.AddGeneric(valueType, converterType, typeSelector);
+        public void AddGenericConverter(Type valueType, Type converterType, Func<TypeInfo, PropertyInfo, bool> condition, Func<Type, Type> typeSelector = null)
+            => _converters.AddGeneric(valueType, converterType, condition, typeSelector);
 
         public void AddSelectorConverter(string groupKey, Type keyType, object keyValue, Type converterType)
-        {
-            CheckScoped();
-            _converters.AddSelector(groupKey, keyType, keyValue, converterType);
-        }
+            => _converters.AddSelector(this, groupKey, keyType, keyValue, converterType);
+        public void AddSelectorConverter<TKey, TConverter>(string groupKey, TKey keyValue)
+            => _converters.AddSelector(this, groupKey, typeof(TKey), keyValue, typeof(TConverter));
+        
         public ISelectorGroup GetSelectorGroup(Type keyType, string groupKey)
             => _converters.GetSelectorGroup(keyType, groupKey);
 
@@ -104,11 +79,5 @@ namespace Discord.Serialization
 
         public abstract TModel Read<TModel>(ReadOnlyBuffer<byte> data);
         public abstract void Write<TModel>(ArrayFormatter stream, TModel model);
-        
-        private void CheckScoped()
-        {
-            if (IsScoped)
-                throw new InvalidOperationException("Scoped serializers are read-only");
-        }
     }
 }

@@ -55,7 +55,7 @@ namespace Discord.WebSocket
             _baseConfig = config;
             _connectionGroupLock = new SemaphoreSlim(1, 1);
 
-            _serializer = DiscordJsonSerializer.Global.CreateScope();
+            _serializer = DiscordSocketJsonSerializer.Global.CreateScope();
             _serializer.Error += ex =>
             {
                 _restLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();

@@ -9,7 +9,7 @@ namespace Discord.API.Gateway
         [ModelProperty("token")]
         public string Token { get; set; }
         [ModelProperty("properties")]
-        public IDictionary<string, string> Properties { get; set; }
+        public Dictionary<string, string> Properties { get; set; }
         [ModelProperty("large_threshold")]
         public int LargeThreshold { get; set; }
         [ModelProperty("compress")]

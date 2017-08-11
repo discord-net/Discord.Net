@@ -3,9 +3,9 @@ using System.Text.Json;
 
 namespace Discord.Serialization.Json.Converters
 {
-    public class DateTimePropertyConverter : IJsonPropertyConverter<DateTime>
+    public class DateTimePropertyConverter : JsonPropertyConverter<DateTime>
     {
-        public DateTime Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override DateTime Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -13,18 +13,18 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected String");
             return reader.ParseDateTime();
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, DateTime value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, DateTime value, string key)
         {
-            if (isTopLevel)
-                writer.WriteAttribute(map.Key, value);
+            if (key != null)
+                writer.WriteAttribute(key, value);
             else
                 writer.WriteValue(value);
         }
     }
 
-    public class DateTimeOffsetPropertyConverter : IJsonPropertyConverter<DateTimeOffset>
+    public class DateTimeOffsetPropertyConverter : JsonPropertyConverter<DateTimeOffset>
     {
-        public DateTimeOffset Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override DateTimeOffset Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -32,10 +32,10 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected String");
             return reader.ParseDateTimeOffset();
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, DateTimeOffset value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, DateTimeOffset value, string key)
         {
-            if (isTopLevel)
-                writer.WriteAttribute(map.Key, value);
+            if (key != null)
+                writer.WriteAttribute(key, value);
             else
                 writer.WriteValue(value);
         }

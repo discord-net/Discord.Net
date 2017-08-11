@@ -42,11 +42,11 @@ namespace Discord.API
             }
             public Task SetResultAsync(ReadOnlyBuffer<byte> data)
             {
-                return Promise.TrySetResultAsync(DiscordJsonSerializer.Global.Read<T>(data));
+                return Promise.TrySetResultAsync(DiscordRestJsonSerializer.Global.Read<T>(data));
             }
             public Task SetExceptionAsync(ReadOnlyBuffer<byte> data)
             {
-                var error = DiscordJsonSerializer.Global.Read<ErrorEvent>(data);
+                var error = DiscordRestJsonSerializer.Global.Read<ErrorEvent>(data);
                 return Promise.TrySetExceptionAsync(new RpcException(error.Code, error.Message));
             }
         }
@@ -225,26 +225,23 @@ namespace Discord.API
         private async Task<TResponse> SendRpcAsyncInternal<TResponse>(string cmd, object payload, Optional<string> evt, RequestOptions options)
             where TResponse : class, new()
         {
-            if (_formatters.TryDequeue(out var data1))
-                data1 = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
-            if (_formatters.TryDequeue(out var data2))
-                data2 = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            if (_formatters.TryDequeue(out var data))
+                data = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
             try
             {
                 var guid = Guid.NewGuid();
-                var frame = new API.Rpc.RpcFrame { Cmd = cmd, Event = evt, Args = SerializeJson(data1, payload), Nonce = guid };
+                var frame = new API.Rpc.RpcFrame { Cmd = cmd, Event = evt, Args = payload, Nonce = guid };
 
                 var requestTracker = new RpcRequest<TResponse>(options);
                 _requests[guid] = requestTracker;
 
-                await RequestQueue.SendAsync(new WebSocketRequest(_webSocketClient, null, SerializeJson(data2, frame), true, options)).ConfigureAwait(false);
+                await RequestQueue.SendAsync(new WebSocketRequest(_webSocketClient, null, SerializeJson(data, frame), true, options)).ConfigureAwait(false);
                 await _sentRpcMessageEvent.InvokeAsync(cmd).ConfigureAwait(false);
                 return await requestTracker.Promise.Task.ConfigureAwait(false);
             }
             finally
             {
-                _formatters.Enqueue(data1);
-                _formatters.Enqueue(data2);
+                _formatters.Enqueue(data);
             }
         }
 

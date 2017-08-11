@@ -12,6 +12,6 @@ namespace Discord.API.Gateway
         public int Limit { get; set; }
 
         [ModelProperty("guild_id")]
-        public IEnumerable<ulong> GuildIds { get; set; }
+        public ulong[] GuildIds { get; set; }
     }
 }

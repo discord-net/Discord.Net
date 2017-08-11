@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using GameModel = Discord.API.Game;
@@ -88,7 +87,7 @@ namespace Discord.WebSocket
             _stateLock = new SemaphoreSlim(1, 1);
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : $"Shard #{ShardId}");
 
-            _serializer = DiscordJsonSerializer.Global.CreateScope();
+            _serializer = DiscordSocketJsonSerializer.Global.CreateScope();
             _serializer.Error += ex =>
             {
                 _restLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();
@@ -593,7 +592,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_EMOJIS_UPDATE)").ConfigureAwait(false);
 
-                                    var data = payload as API.Gateway.GuildEmojiUpdateEvent;
+                                    var data = payload as GuildEmojiUpdateEvent;
                                     var guild = State.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
@@ -1201,6 +1200,35 @@ namespace Discord.WebSocket
                                     }
                                 }
                                 break;
+                            case "MESSAGE_DELETE_BULK":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE_BULK)").ConfigureAwait(false);
+
+                                    var data = payload as MessageDeleteBulkEvent;
+                                    if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
+                                    {
+                                        var guild = (channel as SocketGuildChannel)?.Guild;
+                                        if (!(guild?.IsSynced ?? true))
+                                        {
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                            return;
+                                        }
+
+                                        foreach (ulong id in data.Ids)
+                                        {
+                                            var msg = SocketChannelHelper.RemoveMessage(channel, this, id);
+                                            bool isCached = msg != null;
+                                            var cacheable = new Cacheable<IMessage, ulong>(msg, id, isCached, async () => await channel.GetMessageAsync(id));
+                                            await TimedInvokeAsync(_messageDeletedEvent, nameof(MessageDeleted), cacheable, channel).ConfigureAwait(false);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
                             case "MESSAGE_REACTION_ADD":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_ADD)").ConfigureAwait(false);
@@ -1263,35 +1291,6 @@ namespace Discord.WebSocket
                                         cachedMsg?.ClearReactions();
 
                                         await TimedInvokeAsync(_reactionsClearedEvent, nameof(ReactionsCleared), cacheable, channel).ConfigureAwait(false);
-                                    }
-                                    else
-                                    {
-                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
-                                        return;
-                                    }
-                                }
-                                break;
-                            case "MESSAGE_DELETE_BULK":
-                                {
-                                    await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE_BULK)").ConfigureAwait(false);
-
-                                    var data = payload as MessageDeleteBulkEvent;
-                                    if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
-                                    {
-                                        var guild = (channel as SocketGuildChannel)?.Guild;
-                                        if (!(guild?.IsSynced ?? true))
-                                        {
-                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
-                                            return;
-                                        }
-
-                                        foreach (ulong id in data.Ids)
-                                        {
-                                            var msg = SocketChannelHelper.RemoveMessage(channel, this, id);
-                                            bool isCached = msg != null;
-                                            var cacheable = new Cacheable<IMessage, ulong>(msg, id, isCached, async () => await channel.GetMessageAsync(id));
-                                            await TimedInvokeAsync(_messageDeletedEvent, nameof(MessageDeleted), cacheable, channel).ConfigureAwait(false);
-                                        }
                                     }
                                     else
                                     {

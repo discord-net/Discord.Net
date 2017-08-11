@@ -3,16 +3,16 @@ using System.Text.Json;
 
 namespace Discord.Serialization.Json.Converters
 {
-    internal class EntityOrIdPropertyConverter<T> : IJsonPropertyConverter<EntityOrId<T>>
+    internal class EntityOrIdPropertyConverter<T> : JsonPropertyConverter<EntityOrId<T>>
     {
-        private readonly IJsonPropertyConverter<T> _innerConverter;
+        private readonly JsonPropertyConverter<T> _innerConverter;
 
-        public EntityOrIdPropertyConverter(IJsonPropertyConverter<T> innerConverter)
+        public EntityOrIdPropertyConverter(JsonPropertyConverter<T> innerConverter)
         {
             _innerConverter = innerConverter;
         }
 
-        public EntityOrId<T> Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override EntityOrId<T> Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -21,14 +21,14 @@ namespace Discord.Serialization.Json.Converters
             return new EntityOrId<T>(_innerConverter.Read(map, model, ref reader, false));
         }
 
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, EntityOrId<T> value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, EntityOrId<T> value, string key)
         {
             if (value.Object != null)
-                _innerConverter.Write(map, model, ref writer, value.Object, isTopLevel);
+                _innerConverter.Write(map, model, ref writer, value.Object, key);
             else
             {
-                if (isTopLevel)
-                    writer.WriteAttribute(map.Key, value.Id);
+                if (key != null)
+                    writer.WriteAttribute(key, value.Id);
                 else
                     writer.WriteValue(value.Id);
             }

@@ -3,9 +3,9 @@ using System.Text.Json;
 
 namespace Discord.Serialization.Json.Converters
 {
-    public class BooleanPropertyConverter : IJsonPropertyConverter<bool>
+    public class BooleanPropertyConverter : JsonPropertyConverter<bool>
     {
-        public bool Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override bool Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -16,18 +16,18 @@ namespace Discord.Serialization.Json.Converters
                 default: throw new SerializationException("Bad input, expected False or True");
             }
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, bool value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, bool value, string key)
         {
-            if (isTopLevel)
-                writer.WriteAttribute(map.Key, value);
+            if (key != null)
+                writer.WriteAttribute(key, value);
             else
                 writer.WriteValue(value);
         }
     }
 
-    public class GuidPropertyConverter : IJsonPropertyConverter<Guid>
+    public class GuidPropertyConverter : JsonPropertyConverter<Guid>
     {
-        public Guid Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override Guid Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -35,10 +35,10 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected String");
             return reader.ParseGuid();
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, Guid value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, Guid value, string key)
         {
-            if (isTopLevel)
-                writer.WriteAttribute(map.Key, value.ToString());
+            if (key != null)
+                writer.WriteAttribute(key, value.ToString());
             else
                 writer.WriteValue(value.ToString());
         }

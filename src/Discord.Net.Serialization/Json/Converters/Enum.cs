@@ -2,12 +2,12 @@
 
 namespace Discord.Serialization.Json.Converters
 {
-    public class Int64EnumPropertyConverter<T> : IJsonPropertyConverter<T>
+    public class Int64EnumPropertyConverter<T> : JsonPropertyConverter<T>
         where T : struct
     {
         private static readonly EnumMap<T> _map = EnumMap.For<T>();
 
-        public T Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override T Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -15,22 +15,22 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return _map.FromInt64(reader.Value);
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, T value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, T value, string key)
         {
-            long key = _map.ToInt64(value);
-            if (isTopLevel)
-                writer.WriteAttribute(map.Key, key);
+            long intVal = _map.ToInt64(value);
+            if (key != null)
+                writer.WriteAttribute(key, intVal);
             else
-                writer.WriteValue(key);
+                writer.WriteValue(intVal);
         }
     }
 
-    public class UInt64EnumPropertyConverter<T> : IJsonPropertyConverter<T>
+    public class UInt64EnumPropertyConverter<T> : JsonPropertyConverter<T>
         where T : struct
     {
         private static readonly EnumMap<T> _map = EnumMap.For<T>();
 
-        public T Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override T Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -38,22 +38,22 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return _map.FromUInt64(reader.Value);
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, T value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, T value, string key)
         {
-            ulong key = _map.ToUInt64(value);
-            if (isTopLevel)
-                writer.WriteAttribute(map.Key, key);
+            ulong uintVal = _map.ToUInt64(value);
+            if (key != null)
+                writer.WriteAttribute(key, uintVal);
             else
-                writer.WriteValue(key);
+                writer.WriteValue(uintVal);
         }
     }
 
-    public class StringEnumPropertyConverter<T> : IJsonPropertyConverter<T>
+    public class StringEnumPropertyConverter<T> : JsonPropertyConverter<T>
         where T : struct
     {
         private static readonly EnumMap<T> _map = EnumMap.For<T>();
 
-        public T Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override T Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -61,13 +61,13 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected String");
             return _map.FromKey(reader.Value);
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, T value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, T value, string key)
         {
-            string key = _map.ToUtf16Key(value);
-            if (isTopLevel)
-                writer.WriteAttribute(map.Key, key);
+            string strVal = _map.ToUtf16Key(value);
+            if (key != null)
+                writer.WriteAttribute(key, strVal);
             else
-                writer.WriteValue(key);
+                writer.WriteValue(strVal);
         }
     }
 }

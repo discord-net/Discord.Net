@@ -30,7 +30,7 @@ namespace Discord.Webhook
         {
             _webhookId = webhookId;
 
-            _serializer = DiscordJsonSerializer.Global.CreateScope();
+            _serializer = DiscordRestJsonSerializer.Global.CreateScope();
             _serializer.Error += ex =>
             {
                 _restLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();

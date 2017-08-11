@@ -9,6 +9,6 @@ namespace Discord.API.Gateway
         [ModelProperty("channel_id")]
         public ulong ChannelId { get; set; }
         [ModelProperty("ids")]
-        public IEnumerable<ulong> Ids { get; set; }
+        public ulong[] Ids { get; set; }
     }
 }

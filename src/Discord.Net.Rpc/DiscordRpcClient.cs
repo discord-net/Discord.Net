@@ -38,7 +38,7 @@ namespace Discord.Rpc
             _authorizeLock = new SemaphoreSlim(1, 1);
             _rpcLogger = LogManager.CreateLogger("RPC");
 
-            _serializer = DiscordJsonSerializer.Global.CreateScope();
+            _serializer = DiscordRpcJsonSerializer.Global.CreateScope();
             _serializer.Error += ex =>
             {
                 _rpcLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();

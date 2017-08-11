@@ -2,9 +2,9 @@
 
 namespace Discord.Serialization.Json.Converters
 {
-    internal class Int53PropertyConverter : IJsonPropertyConverter<long>
+    internal class Int53PropertyConverter : JsonPropertyConverter<long>
     {
-        public long Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override long Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -12,10 +12,10 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number");
             return reader.ParseInt64();
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, long value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, long value, string key)
         {
-            if (isTopLevel)
-                writer.WriteAttribute(map.Key, value);
+            if (key != null)
+                writer.WriteAttribute(key, value);
             else
                 writer.WriteValue(value.ToString());
         }

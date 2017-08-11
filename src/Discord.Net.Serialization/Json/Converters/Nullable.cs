@@ -2,17 +2,17 @@
 
 namespace Discord.Serialization.Json.Converters
 {
-    public class NullablePropertyConverter<T> : IJsonPropertyConverter<T?>
+    public class NullablePropertyConverter<T> : JsonPropertyConverter<T?>
         where T : struct
     {
-        private readonly IJsonPropertyConverter<T> _innerConverter;
+        private readonly JsonPropertyConverter<T> _innerConverter;
 
-        public NullablePropertyConverter(IJsonPropertyConverter<T> innerConverter)
+        public NullablePropertyConverter(JsonPropertyConverter<T> innerConverter)
         {
             _innerConverter = innerConverter;
         }
 
-        public T? Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override T? Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -21,14 +21,14 @@ namespace Discord.Serialization.Json.Converters
             return _innerConverter.Read(map, model, ref reader, false);
         }
 
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, T? value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, T? value, string key)
         {
             if (value.HasValue)
-                _innerConverter.Write(map, model, ref writer, value.Value, isTopLevel);
+                _innerConverter.Write(map, model, ref writer, value.Value, key);
             else
             {
-                if (isTopLevel)
-                    writer.WriteAttributeNull(map.Key);
+                if (key != null)
+                    writer.WriteAttributeNull(key);
                 else
                     writer.WriteNull();
             }

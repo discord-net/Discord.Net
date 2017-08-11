@@ -15,11 +15,11 @@ namespace Discord.Serialization.Json
 
     internal class JsonPropertyMap<TModel, TValue> : PropertyMap<TModel, TValue>, IJsonPropertyMap<TModel>
     {
-        private readonly IJsonPropertyConverter<TValue> _converter;
+        private readonly JsonPropertyConverter<TValue> _converter;
         private readonly Func<TModel, TValue> _getFunc;
         private readonly Action<TModel, TValue> _setFunc;
 
-        public JsonPropertyMap(Serializer serializer, PropertyInfo propInfo, IJsonPropertyConverter<TValue> converter)
+        public JsonPropertyMap(Serializer serializer, PropertyInfo propInfo, JsonPropertyConverter<TValue> converter)
             : base(serializer, propInfo)
         {
             _converter = converter;
@@ -28,17 +28,17 @@ namespace Discord.Serialization.Json
             _setFunc = propInfo.SetMethod.CreateDelegate(typeof(Action<TModel, TValue>)) as Action<TModel, TValue>;
         }
 
+        public void Read(TModel model, ref JsonReader reader)
+        {
+            var value = _converter.Read(this, model, ref reader, true);
+            _setFunc(model, value);
+        }
         public void Write(TModel model, ref JsonWriter writer)
         {
             var value = _getFunc(model);
             if (value == null && ExcludeNull)
                 return;
-            _converter.Write(this, model, ref writer, value, true);
-        }
-        public void Read(TModel model, ref JsonReader reader)
-        {
-            var value = _converter.Read(this, model, ref reader, true);
-            _setFunc(model, value);
+            _converter.Write(this, model, ref writer, value, Key);
         }
     }
 }

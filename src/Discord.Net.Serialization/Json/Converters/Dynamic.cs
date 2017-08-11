@@ -3,9 +3,9 @@
 namespace Discord.Serialization.Json.Converters
 {
     //TODO: Only supports cases where the key arrives first
-    public class DynamicPropertyConverter : IJsonPropertyConverter<object>
+    public class DynamicPropertyConverter : JsonPropertyConverter<object>
     {
-        public object Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override object Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (map.GetDynamicConverter(model, false) is IJsonPropertyReader<object> converter)
                 return converter.Read(map, model, ref reader, isTopLevel);
@@ -16,19 +16,19 @@ namespace Discord.Serialization.Json.Converters
             }
         }
 
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, object value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, object value, string key)
         {
             if (value == null)
             {
-                if (isTopLevel)
-                    writer.WriteAttributeNull(map.Key);
+                if (key != null)
+                    writer.WriteAttributeNull(key);
                 else
                     writer.WriteNull();
             }
             else
             {
-                var converter = map.GetDynamicConverter(model, true) as IJsonPropertyWriter<object>;
-                converter.Write(map, model, ref writer, value, isTopLevel);
+                var converter = (IJsonPropertyWriter)map.GetDynamicConverter(model, true);
+                converter.Write(map, model, ref writer, value, key);
             }
         }
     }

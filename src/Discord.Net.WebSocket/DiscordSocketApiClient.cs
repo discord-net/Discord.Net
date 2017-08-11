@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using System.Text.Formatting;
 using System.Threading;
@@ -183,8 +184,9 @@ namespace Discord.API
             }
             finally
             {
+                data.Clear();
                 _formatters.Enqueue(data);
-            }            
+            }
         }
 
         //Gateway
@@ -236,31 +238,37 @@ namespace Discord.API
         public async Task SendStatusUpdateAsync(UserStatus status, bool isAFK, long? since, Game game, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            var args = new StatusUpdateParams
+            var msg = new StatusUpdateParams
             {
                 Status = status,
                 IdleSince = since,
                 IsAFK = isAFK,
                 Game = game
             };
-            await SendGatewayAsync(GatewayOpCode.StatusUpdate, args, options: options).ConfigureAwait(false);
+            await SendGatewayAsync(GatewayOpCode.StatusUpdate, msg, options: options).ConfigureAwait(false);
         }
         public async Task SendRequestMembersAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            await SendGatewayAsync(GatewayOpCode.RequestGuildMembers, new RequestMembersParams { GuildIds = guildIds, Query = "", Limit = 0 }, options: options).ConfigureAwait(false);
+            var msg = new RequestMembersParams
+            {
+                GuildIds = guildIds.ToArray(),
+                Query = "",
+                Limit = 0
+            };
+            await SendGatewayAsync(GatewayOpCode.RequestGuildMembers, msg, options: options).ConfigureAwait(false);
         }
         public async Task SendVoiceStateUpdateAsync(ulong guildId, ulong? channelId, bool selfDeaf, bool selfMute, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            var payload = new VoiceStateUpdateParams
+            var msg = new VoiceStateUpdateParams
             {
                 GuildId = guildId,
                 ChannelId = channelId,
                 SelfDeaf = selfDeaf,
                 SelfMute = selfMute
             };
-            await SendGatewayAsync(GatewayOpCode.VoiceStateUpdate, payload, options: options).ConfigureAwait(false);
+            await SendGatewayAsync(GatewayOpCode.VoiceStateUpdate, msg, options: options).ConfigureAwait(false);
         }
         public async Task SendGuildSyncAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)
         {

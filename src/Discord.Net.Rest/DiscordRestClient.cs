@@ -17,7 +17,7 @@ namespace Discord.Rest
         public DiscordRestClient() : this(new DiscordRestConfig()) { }
         public DiscordRestClient(DiscordRestConfig config) : base(config)
         {
-            _serializer = DiscordJsonSerializer.Global.CreateScope();
+            _serializer = DiscordRestJsonSerializer.Global.CreateScope();
             _serializer.Error += ex =>
             {
                 _restLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();

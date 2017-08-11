@@ -198,7 +198,11 @@ namespace Discord.API
                 var request = new JsonRestRequest(RestClient, method, endpoint, SerializeJson(data, payload), options);
                 await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
             }
-            finally { _formatters.Enqueue(data); }
+            finally
+            {
+                data.Clear();
+                _formatters.Enqueue(data);
+            }
         }
 
         internal Task SendMultipartAsync(string method, Expression<Func<string>> endpointExpr, IReadOnlyDictionary<string, object> multipartArgs, BucketIds ids,
@@ -247,7 +251,11 @@ namespace Discord.API
                 var request = new JsonRestRequest(RestClient, method, endpoint, SerializeJson(data, payload), options);
                 return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
             }
-            finally { _formatters.Enqueue(data); }
+            finally
+            {
+                data.Clear();
+                _formatters.Enqueue(data);
+            }
         }
 
         internal Task<TResponse> SendMultipartAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, IReadOnlyDictionary<string, object> multipartArgs, BucketIds ids,

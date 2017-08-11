@@ -106,7 +106,7 @@ namespace Discord.Net.Queue
                                 {
                                     try
                                     {
-                                        var error = DiscordJsonSerializer.Global.Read<Error>(response.Data);
+                                        var error = DiscordRestJsonSerializer.Global.Read<Error>(response.Data);
                                         code = error.Code;
                                         reason = error.Message;
                                     }

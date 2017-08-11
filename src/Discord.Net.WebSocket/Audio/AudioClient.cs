@@ -67,7 +67,7 @@ namespace Discord.Audio
             ChannelId = channelId;
             _audioLogger = Discord.LogManager.CreateLogger($"Audio #{clientId}");
 
-            _serializer = DiscordJsonSerializer.Global.CreateScope();
+            _serializer = DiscordVoiceJsonSerializer.Global.CreateScope();
             _serializer.Error += ex =>
             {
                 _audioLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();
@@ -128,7 +128,7 @@ namespace Discord.Audio
             await ApiClient.ConnectAsync("wss://" + _url).ConfigureAwait(false);
             await _audioLogger.DebugAsync("Listening on port " + ApiClient.UdpPort).ConfigureAwait(false);
             await _audioLogger.DebugAsync("Sending Identity").ConfigureAwait(false);
-            await ApiClient.SendIdentityAsync(_userId, _sessionId, _token).ConfigureAwait(false);
+            await ApiClient.SendIdentifyAsync(_userId, _sessionId, _token).ConfigureAwait(false);
 
             //Wait for READY
             await _connection.WaitAsync().ConfigureAwait(false);

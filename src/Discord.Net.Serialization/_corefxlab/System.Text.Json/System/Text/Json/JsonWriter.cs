@@ -314,7 +314,7 @@ namespace System.Text.Json
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void WriteStartAttribute(string name)
+        private void WriteStartAttribute(string name)
         {
             WriteItemSeperator();
             _firstItem = false;

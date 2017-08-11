@@ -2,9 +2,9 @@
 
 namespace Discord.Serialization.Json.Converters
 {
-    public class UInt8PropertyConverter : IJsonPropertyConverter<byte>
+    public class UInt8PropertyConverter : JsonPropertyConverter<byte>
     {
-        public byte Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override byte Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -12,18 +12,18 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseUInt8();
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, byte value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, byte value, string key)
         {
-            if (isTopLevel)
-                writer.WriteAttribute(map.Key, value);
+            if (key != null)
+                writer.WriteAttribute(key, value);
             else
                 writer.WriteValue(value);
         }
     }
 
-    public class UInt16PropertyConverter : IJsonPropertyConverter<ushort>
+    public class UInt16PropertyConverter : JsonPropertyConverter<ushort>
     {
-        public ushort Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override ushort Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -31,18 +31,18 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseUInt16();
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, ushort value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, ushort value, string key)
         {
-            if (isTopLevel)
-                writer.WriteAttribute(map.Key, value);
+            if (key != null)
+                writer.WriteAttribute(key, value);
             else
                 writer.WriteValue(value);
         }
     }
 
-    public class UInt32PropertyConverter : IJsonPropertyConverter<uint>
+    public class UInt32PropertyConverter : JsonPropertyConverter<uint>
     {
-        public uint Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override uint Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -50,18 +50,18 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseUInt32();
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, uint value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, uint value, string key)
         {
-            if (isTopLevel)
-                writer.WriteAttribute(map.Key, value);
+            if (key != null)
+                writer.WriteAttribute(key, value);
             else
                 writer.WriteValue(value);
         }
     }
 
-    public class UInt64PropertyConverter : IJsonPropertyConverter<ulong>
+    public class UInt64PropertyConverter : JsonPropertyConverter<ulong>
     {
-        public ulong Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override ulong Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -69,10 +69,10 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseUInt64();
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, ulong value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, ulong value, string key)
         {
-            if (isTopLevel)
-                writer.WriteAttribute(map.Key, value.ToString());
+            if (key != null)
+                writer.WriteAttribute(key, value.ToString());
             else
                 writer.WriteValue(value.ToString());
         }

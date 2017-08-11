@@ -2,9 +2,9 @@
 
 namespace Discord.Serialization.Json.Converters
 {
-    /*public class CharPropertyConverter : IJsonPropertyConverter<char>
+    /*public class CharPropertyConverter : JsonPropertyConverter<char>
     {
-        public char Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override char Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -12,18 +12,18 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected String");
             return reader.ParseChar();
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, char value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, char value, string key)
         {
-            if (isTopLevel)
-                writer.WriteAttribute(map.Key, value);
+            if (key != null)
+                writer.WriteAttribute(key, value);
             else
-                writer.WriteValue(value.ToString());
+                writer.WriteValue(value);
         }
     }*/
 
-    public class StringPropertyConverter : IJsonPropertyConverter<string>
+    public class StringPropertyConverter : JsonPropertyConverter<string>
     {
-        public string Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override string Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -33,10 +33,10 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected String");
             return reader.ParseString();
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, string value, bool isTopLevel)
+        public override void Write(PropertyMap map, object model, ref JsonWriter writer, string value, string key)
         {
-            if (isTopLevel)
-                writer.WriteAttribute(map.Key, value);
+            if (key != null)
+                writer.WriteAttribute(key, value);
             else
                 writer.WriteValue(value);
         }
