@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Buffers;
+using System.Collections.Sequences;
 using System.Runtime.CompilerServices;
 using System.Text.Formatting;
 
@@ -14,6 +16,7 @@ namespace System.Text.Json
 
         int _indent;
         bool _firstItem;
+        ResizableArray<byte> _working;
 
         // These next 2 properties are used to check for whether we can take the fast path
         // for invariant UTF-8 or UTF-16 processing. Otherwise, we need to go through the
@@ -33,6 +36,7 @@ namespace System.Text.Json
 
             _indent = -1;
             _firstItem = true;
+            _working = default;
 
             var symbolTable = output.SymbolTable;
             if (symbolTable == SymbolTable.InvariantUtf8)
@@ -356,7 +360,6 @@ namespace System.Text.Json
         private void WriteQuotedString(string value)
         {
             WriteControl(JsonConstants.Quote);
-            // TODO: We need to handle escaping.
             Write(value.AsSpan());
             WriteControl(JsonConstants.Quote);
         }
@@ -423,25 +426,110 @@ namespace System.Text.Json
 
             if (UseFastUtf8)
             {
-                Span<byte> destination = _output.Buffer;
-
-                while (true)
+                bool hasBackslashes = false;
+                for (int i = 0; i < value.Length; i++)
                 {
-                    var status = Encoders.Utf16.ToUtf8(source, destination, out int consumed, out int written);
-                    if (status == Buffers.TransformationStatus.Done)
+                    char c = value[i];
+                    if (c == '\\' || c == '"')
                     {
-                        _output.Advance(written);
-                        return;
+                        hasBackslashes = true;
+                        break;
+                    }
+                }
+
+                if (!hasBackslashes) //Fast path
+                {
+                    Span<byte> destination = _output.Buffer;
+
+                    while (true)
+                    {
+                        var status = Encoders.Utf16.ToUtf8(source, destination, out int consumed, out int written);
+                        if (status == Buffers.TransformationStatus.Done)
+                        {
+                            _output.Advance(written);
+                            return;
+                        }
+                        if (status == Buffers.TransformationStatus.DestinationTooSmall)
+                        {
+                            destination = EnsureBuffer();
+                            continue;
+                        }
+
+                        // This is a failure due to bad input. This shouldn't happen under normal circumstances.
+                        throw new FormatException();
+                    }
+                }
+                else //Slow path
+                {
+                    if (_working.Items == null)
+                        _working = new ResizableArray<byte>(ArrayPool<byte>.Shared.Rent(128));
+                    else
+                        _working.Clear();
+
+                    while (true)
+                    {
+                        int outputWritten = 0;
+                        var workingBuffer = _working.Free.AsSpan();
+                        var status = Encoders.Utf16.ToUtf8(source, _working.Free, out int consumed, out int workingWritten);
+                        _working.Count += workingWritten;
+                        if (status == Buffers.TransformationStatus.Done)
+                        {
+                            int start = 0;
+                            int workingLength = _output.Buffer.Length;
+                            for (int i = 0; i <= workingWritten; i++)
+                            {
+                                byte c = i != workingWritten ? _working[i] : (byte)0;
+
+                                //Search for next backslash/quote or end of string
+                                bool isEscapable = c == JsonConstants.Backslash || c == JsonConstants.Quote;
+                                if (isEscapable || i == workingWritten)
+                                {
+                                    int segmentLength = i - start;
+
+                                    //Ensure buffer length
+                                    var destination = _output.Buffer;
+                                    if (destination.Length <= segmentLength)
+                                    {
+                                        workingLength += segmentLength;
+                                        _output.Enlarge(workingLength);
+                                        destination = _output.Buffer;
+                                    }
+
+                                    //Write data before escapable char
+                                    if (segmentLength != 0)
+                                    {
+                                        workingBuffer.Slice(start, segmentLength).CopyTo(destination); //TODO: Optimize w/ ref ptrs
+                                        start = i;
+                                        outputWritten += segmentLength;
+                                        _output.Advance(segmentLength);
+                                    }
+
+                                    //Write backslash
+                                    if (isEscapable)
+                                    {
+                                        destination[segmentLength] = JsonConstants.Backslash;
+                                        outputWritten++;
+                                        _output.Advance(1);
+                                    }
+                                }
+                            }
+                            return;
+                        }
+                        if (status == Buffers.TransformationStatus.DestinationTooSmall)
+                        {
+                            int newSize = _working.Free.Count * 2;
+                            var newArray = ArrayPool<byte>.Shared.Rent(newSize);
+                            var oldArray = _working.Resize(newArray);
+                            ArrayPool<byte>.Shared.Return(oldArray);
+
+                            workingBuffer = _working.Free.AsSpan();
+                            continue;
+                        }
+
+                        // This is a failure due to bad input. This shouldn't happen under normal circumstances.
+                        throw new FormatException();
                     }
 
-                    if (status == Buffers.TransformationStatus.DestinationTooSmall)
-                    {
-                        destination = EnsureBuffer();
-                        continue;
-                    }
-
-                    // This is a failure due to bad input. This shouldn't happen under normal circumstances.
-                    throw new FormatException();
                 }
             }
             else if (UseFastUtf16)

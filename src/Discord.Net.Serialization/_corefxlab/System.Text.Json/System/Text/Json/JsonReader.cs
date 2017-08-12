@@ -720,7 +720,7 @@ namespace System.Text.Json
                                 int doubleSize = _working.Free.Count * 2;
                                 int minNewSize = _working.Capacity + segmentLength;
                                 int newSize = minNewSize > doubleSize ? minNewSize : doubleSize;
-                                var newArray = ArrayPool<byte>.Shared.Rent(minNewSize + _working.Count);
+                                var newArray = ArrayPool<byte>.Shared.Rent(newSize);
                                 var oldArray = _working.Resize(newArray);
                                 ArrayPool<byte>.Shared.Return(oldArray);
                             }
