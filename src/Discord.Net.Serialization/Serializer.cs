@@ -77,7 +77,9 @@ namespace Discord.Serialization
             => _createPropertyMapMethod.MakeGenericMethod(typeof(TModel), propInfo.PropertyType).Invoke(this, new object[] { propInfo }) as PropertyMap;
         protected abstract PropertyMap CreatePropertyMap<TModel, TValue>(PropertyInfo propInfo);
 
-        public abstract TModel Read<TModel>(ReadOnlyBuffer<byte> data);
+        public TModel Read<TModel>(ReadOnlyBuffer<byte> data)
+            => Read<TModel>(data.Span);
+        public abstract TModel Read<TModel>(ReadOnlySpan<byte> data);
         public abstract void Write<TModel>(ArrayFormatter stream, TModel model);
     }
 }

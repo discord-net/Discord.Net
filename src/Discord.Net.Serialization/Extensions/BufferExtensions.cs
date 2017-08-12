@@ -107,13 +107,16 @@ namespace Discord.Serialization
         {
             int index = 0;
             bytesConsumed = 0;
-            if (!TryParseDateParts(text, ref index, ref bytesConsumed, out int year, out int month, out int day) ||
-                !TryParseTimeParts(text, ref index, ref bytesConsumed, out int hour, out int min, out int sec, out int milli) ||
-                !TryParseTimezoneParts(text, ref index, ref bytesConsumed, out var offset))
+            if (!TryParseDateParts(text, ref index, out int year, out int month, out int day) ||
+                !TryParseTimeParts(text, ref index, out int hour, out int min, out int sec, out int milli, out int milliLength) ||
+                !TryParseTimezoneParts(text, ref index, out var offset))
             {
                 value = default;
                 return false;
             }
+
+            if (milliLength == 6)
+                milli /= 1000;
 
             value = new DateTime(year, month, day, hour, min, sec, milli, DateTimeKind.Utc);
             if (offset != TimeSpan.Zero)
@@ -124,19 +127,23 @@ namespace Discord.Serialization
         {
             int index = 0;
             bytesConsumed = 0;
-            if (!TryParseDateParts(text, ref index, ref bytesConsumed, out int year, out int month, out int day) ||
-                !TryParseTimeParts(text, ref index, ref bytesConsumed, out int hour, out int min, out int sec, out int milli) ||
-                !TryParseTimezoneParts(text, ref index, ref bytesConsumed, out var offset))
+            if (!TryParseDateParts(text, ref index, out int year, out int month, out int day) ||
+                !TryParseTimeParts(text, ref index, out int hour, out int min, out int sec, out int milli, out int milliLength) ||
+                !TryParseTimezoneParts(text, ref index, out var offset))
             {
                 value = default;
                 return false;
             }
+
+            if (milliLength == 6)
+                milli /= 1000;
+
             value = new DateTimeOffset(year, month, day, hour, min, sec, milli, offset);
             return true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool TryParseDateParts(ReadOnlySpan<byte> text, ref int index, ref int bytesConsumed,
+        private static bool TryParseDateParts(ReadOnlySpan<byte> text, ref int index, 
             out int year, out int month, out int day)
         {
             year = 0;
@@ -145,65 +152,54 @@ namespace Discord.Serialization
 
             //Format: YYYY-MM-DD
             if (text.Length < 10 ||
-                !TryParseNumericPart(text, ref index, out year, ref bytesConsumed, 4) ||
+                !TryParseNumericPart(text, ref index, out year, out var ignored, 4) ||
                 text[index++] != (byte)'-' ||
-                !TryParseNumericPart(text, ref index, out month, ref bytesConsumed, 2) ||
+                !TryParseNumericPart(text, ref index, out month, out ignored, 2) ||
                 text[index++] != (byte)'-' ||
-                !TryParseNumericPart(text, ref index, out day, ref bytesConsumed, 2))
-            {
-                bytesConsumed = 0;
+                !TryParseNumericPart(text, ref index, out day, out ignored, 2))
                 return false;
-            }
             return true;
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool TryParseTimeParts(ReadOnlySpan<byte> text, ref int index, ref int bytesConsumed,
-            out int hour, out int minute, out int second, out int millisecond)
+        private static bool TryParseTimeParts(ReadOnlySpan<byte> text, ref int index,
+            out int hour, out int minute, out int second, out int millisecond, out int milliLength)
         {
             hour = 0;
             minute = 0;
             second = 0;
             millisecond = 0;
+            milliLength = 0;
 
             //Time (hh:mm)
             if (text.Length < 16 || text[index] != (byte)'T')  //0001-01-01T01:01
                 return true;
             index++;
 
-            if (!TryParseNumericPart(text, ref index, out hour, ref bytesConsumed, 2) ||
+            if (!TryParseNumericPart(text, ref index, out hour, out var ignored, 2) ||
                 text[index++] != (byte)':' ||
-                !TryParseNumericPart(text, ref index, out minute, ref bytesConsumed, 2))
-            {
-                bytesConsumed = 0;
+                !TryParseNumericPart(text, ref index, out minute, out ignored, 2))
                 return false;
-            }
 
             //Time (hh:mm:ss)
             if (text.Length < 19 || text[index] != (byte)':')  //0001-01-01T01:01:01
                 return true;
             index++;
 
-            if (!TryParseNumericPart(text, ref index, out second, ref bytesConsumed, 2))
-            {
-                bytesConsumed = 0;
+            if (!TryParseNumericPart(text, ref index, out second, out ignored, 2))
                 return false;
-            }
 
             //Time (hh:mm:ss.sss)
             if (text.Length < 21 || text[index] != (byte)'.')  //0001-01-01T01:01:01.1
                 return true;
             index++;
-
-            if (!TryParseNumericPart(text, ref index, out millisecond, ref bytesConsumed, 3))
-            {
-                bytesConsumed = 0;
+            
+            if (!TryParseNumericPart(text, ref index, out millisecond, out milliLength, 6))
                 return false;
-            }
 
             return true;
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool TryParseTimezoneParts(ReadOnlySpan<byte> text, ref int index, ref int bytesConsumed,
+        private static bool TryParseTimezoneParts(ReadOnlySpan<byte> text, ref int index,
             out TimeSpan offset)
         {
             offset = default;
@@ -222,13 +218,10 @@ namespace Discord.Serialization
                     return false;
                 index++;
                 
-                if (!TryParseNumericPart(text, ref index, out int hours, ref bytesConsumed, 2) ||
+                if (!TryParseNumericPart(text, ref index, out int hours, out var ignored, 2) ||
                     text[index++] != (byte)':' ||
-                    !TryParseNumericPart(text, ref index, out int minutes, ref bytesConsumed, 2))
-                {
-                    bytesConsumed = 0;
+                    !TryParseNumericPart(text, ref index, out int minutes, out ignored, 2))
                     return false;
-                }
                 offset = new TimeSpan(hours, minutes, 0);
                 if (isNegative) offset = -offset;
                 return true;
@@ -239,16 +232,17 @@ namespace Discord.Serialization
 
         //From https://github.com/dotnet/corefxlab/blob/master/src/System.Text.Primitives/System/Text/Parsing/Unsigned.cs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool TryParseNumericPart(ReadOnlySpan<byte> text, ref int index, out int value, ref int bytesConsumed, int maxLength)
+        private static bool TryParseNumericPart(ReadOnlySpan<byte> text, ref int index, out int value, out int valueLength, int maxLength)
         {
             // Parse the first digit separately. If invalid here, we need to return false.
             uint firstDigit = text[index++] - 48u; // '0'
             if (firstDigit > 9)
             {
-                bytesConsumed = 0;
+                valueLength = 0;
                 value = default;
                 return false;
             }
+            valueLength = 1;
             uint parsedValue = firstDigit;
             
             for (int i = 1; i < maxLength && index < text.Length; i++, index++)
@@ -256,14 +250,13 @@ namespace Discord.Serialization
                 uint nextDigit = text[index] - 48u; // '0'
                 if (nextDigit > 9)
                 {
-                    bytesConsumed = index;
                     value = (int)(parsedValue);
                     return true;
                 }
+                valueLength++;
                 parsedValue = parsedValue * 10 + nextDigit;
             }
-
-            bytesConsumed = text.Length;
+            
             value = (int)(parsedValue);
             return true;
         }

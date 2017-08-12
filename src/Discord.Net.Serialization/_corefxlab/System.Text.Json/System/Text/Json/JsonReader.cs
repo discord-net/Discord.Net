@@ -1,7 +1,10 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Buffers;
+using System.Collections.Sequences;
 using System.Runtime.CompilerServices;
+using System.Text.Formatting;
 
 namespace System.Text.Json
 {
@@ -14,6 +17,7 @@ namespace System.Text.Json
         private readonly SymbolTable _symbolTable;
 
         private ReadOnlySpan<byte> _buffer;
+        private ResizableArray<byte> _working;
 
         // Depth tracks the recursive depth of the nested objects / arrays within the JSON data.
         internal int _depth;
@@ -71,6 +75,7 @@ namespace System.Text.Json
             _symbolTable = symbolTable;
             _depth = 0;
             _containerMask = 0;
+            _working = default;
 
             if (_symbolTable == SymbolTable.InvariantUtf8)
                 _encoderState = JsonEncoderState.UseFastUtf8;
@@ -660,17 +665,89 @@ namespace System.Text.Json
             // If we are in this method, the first char is already known to be a JSON quote character.
             // Skip through the bytes until we find the closing JSON quote character.
             int idx = 1;
-            while (idx < length && Unsafe.Add(ref src, idx++) != JsonConstants.Quote) ;
+            int start = idx;
+            bool hasEscapes = false;
 
-            // If we hit the end of the source and never saw an ending quote, then fail.
-            if (idx == length && Unsafe.Add(ref src, idx - 1) != JsonConstants.Quote)
-                throw new JsonReaderException();
+            while (idx < length)
+            {
+                byte c = Unsafe.Add(ref src, idx++);
+                if (c == JsonConstants.Quote)
+                    break;
+                else if (c == JsonConstants.Backslash)
+                {
+                    hasEscapes = true;
+                    break;
+                }
+            }
 
-            // Calculate the real start of the property name based on our current buffer location.
-            // Also, skip the opening JSON quote character.
-            int startIndex = (int)Unsafe.ByteOffset(ref _buffer.DangerousGetPinnableReference(), ref src) + 1;
+            if (!hasEscapes) //Fast route
+            {
+                // If we hit the end of the source and never saw an ending quote, then fail.
+                if (idx == length && Unsafe.Add(ref src, idx - 1) != JsonConstants.Quote)
+                    throw new JsonReaderException();
 
-            Value = _buffer.Slice(startIndex, idx - 2); // -2 to exclude the quote characters.
+                // Calculate the real start of the property name based on our current buffer location.
+                // Also, skip the opening JSON quote character.
+                int startIndex = (int)Unsafe.ByteOffset(ref _buffer.DangerousGetPinnableReference(), ref src) + 1;
+
+                Value = _buffer.Slice(startIndex, idx - 2); // -2 to exclude the quote characters.
+            }
+            else //Slow route
+            {
+                if (_working.Items == null)
+                    _working = new ResizableArray<byte>(ArrayPool<byte>.Shared.Rent(128));
+                _working.Clear();
+
+                int arrLength = idx - start;
+                idx = start;
+                
+                bool isEscaping = false;
+                bool success = false;
+                while (idx < length)
+                {
+                    byte c = Unsafe.Add(ref src, idx);
+                    if (isEscaping)
+                        isEscaping = false;
+                    else if (c == JsonConstants.Backslash || c == JsonConstants.Quote)
+                    {
+                        int segmentLength = idx - start;
+                        if (segmentLength != 0)
+                        {
+                            //Ensure we have enough space in the buffer
+                            int remaining = _working.Capacity - _working.Count;
+                            if (segmentLength > remaining)
+                            {
+                                int doubleSize = _working.Free.Count * 2;
+                                int minNewSize = _working.Capacity + segmentLength;
+                                int newSize = minNewSize > doubleSize ? minNewSize : doubleSize;
+                                var newArray = ArrayPool<byte>.Shared.Rent(minNewSize + _working.Count);
+                                var oldArray = _working.Resize(newArray);
+                                ArrayPool<byte>.Shared.Return(oldArray);
+                            }
+
+                            //Copy all data before the backslash
+                            var span = _working.Free.AsSpan();
+                            Unsafe.CopyBlock(ref span.DangerousGetPinnableReference(), ref Unsafe.Add(ref src, start), (uint)segmentLength);
+                            _working.Count += segmentLength;
+                        }
+                        start = idx + 1;
+                        isEscaping = true;
+
+                        if (c == JsonConstants.Quote)
+                        {
+                            idx++;
+                            success = true;
+                            break;
+                        }
+                    }
+                    idx++;
+                }
+
+                if (!success)
+                    throw new JsonReaderException();
+
+                Value = _working.Full;
+            }
             ValueType = JsonValueType.String;
             return idx;
         }
