@@ -225,8 +225,7 @@ namespace Discord.API
         private async Task<TResponse> SendRpcAsyncInternal<TResponse>(string cmd, object payload, Optional<string> evt, RequestOptions options)
             where TResponse : class, new()
         {
-            if (_formatters.TryDequeue(out var data))
-                data = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            var data = _formatters.Rent();
             try
             {
                 var guid = Guid.NewGuid();
@@ -241,7 +240,8 @@ namespace Discord.API
             }
             finally
             {
-                _formatters.Enqueue(data);
+                data.Clear();
+                _formatters.Return(data);
             }
         }
 

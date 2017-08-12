@@ -4,8 +4,6 @@ using Discord.Net;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
 using Discord.Serialization;
-using Discord.Serialization.Json;
-using Discord.Serialization.Json.Converters;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,7 +11,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Formatting;
@@ -31,7 +28,7 @@ namespace Discord.API
         
         protected readonly SemaphoreSlim _stateLock;
         protected readonly Serializer _serializer;
-        protected readonly ConcurrentQueue<ArrayFormatter> _formatters;
+        protected readonly Pool<ArrayFormatter> _formatters;
         private readonly RestClientProvider _restClientProvider;
 
         protected bool _isDisposed;
@@ -56,7 +53,7 @@ namespace Discord.API
 
             RequestQueue = new RequestQueue();
             _stateLock = new SemaphoreSlim(1, 1);
-            _formatters = new ConcurrentQueue<ArrayFormatter>();
+            _formatters = new Pool<ArrayFormatter>(() => new ArrayFormatter(128, SymbolTable.InvariantUtf8));
 
             SetBaseUrl(DiscordConfig.APIUrl);
         }
@@ -190,9 +187,8 @@ namespace Discord.API
             options.HeaderOnly = true;
             options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
             options.IsClientBucket = AuthTokenType == TokenType.User;
-
-            if (!_formatters.TryDequeue(out var data))
-                data = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            
+            var data = _formatters.Rent();
             try
             {
                 var request = new JsonRestRequest(RestClient, method, endpoint, SerializeJson(data, payload), options);
@@ -201,7 +197,7 @@ namespace Discord.API
             finally
             {
                 data.Clear();
-                _formatters.Enqueue(data);
+                _formatters.Return(data);
             }
         }
 
@@ -244,8 +240,7 @@ namespace Discord.API
             options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
             options.IsClientBucket = AuthTokenType == TokenType.User;
 
-            if (!_formatters.TryDequeue(out var data))
-                data = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            var data = _formatters.Rent();
             try
             {
                 var request = new JsonRestRequest(RestClient, method, endpoint, SerializeJson(data, payload), options);
@@ -254,7 +249,7 @@ namespace Discord.API
             finally
             {
                 data.Clear();
-                _formatters.Enqueue(data);
+                _formatters.Return(data);
             }
         }
 

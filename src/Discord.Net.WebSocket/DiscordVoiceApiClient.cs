@@ -41,7 +41,7 @@ namespace Discord.Audio
         private readonly Serializer _serializer;
         private readonly SemaphoreSlim _connectionLock;
         private readonly MemoryStream _decompressionStream;
-        protected readonly ConcurrentQueue<ArrayFormatter> _formatters;
+        protected readonly Pool<ArrayFormatter> _formatters;
 
         private CancellationTokenSource _connectCancelToken;
         private IUdpSocket _udp;
@@ -61,7 +61,7 @@ namespace Discord.Audio
             _udp = udpSocketProvider();
             _udp.ReceivedDatagram += (data, index, count) => _receivedPacketEvent.InvokeAsync(data, index, count);
             _serializer = serializer;
-            _formatters = new ConcurrentQueue<ArrayFormatter>();
+            _formatters = new Pool<ArrayFormatter>(() => new ArrayFormatter(128, SymbolTable.InvariantUtf8));
 
             _decompressionStream = new MemoryStream(10 * 1024); //10 KB
 
@@ -114,8 +114,7 @@ namespace Discord.Audio
 
         public async Task SendAsync(VoiceOpCode opCode, object payload, RequestOptions options = null)
         {
-            if (!_formatters.TryDequeue(out var data))
-                data = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            var data = _formatters.Rent();
             try
             {
                 var frame = new VoiceSocketFrame { Operation = opCode, Payload = payload };
@@ -125,7 +124,7 @@ namespace Discord.Audio
             finally
             {
                 data.Clear();
-                _formatters.Enqueue(data);
+                _formatters.Return(data);
             }
         }
         public async Task SendAsync(byte[] data, int offset, int bytes)

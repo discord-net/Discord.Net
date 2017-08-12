@@ -174,8 +174,7 @@ namespace Discord.API
         {
             CheckState();
 
-            if (!_formatters.TryDequeue(out var data))
-                data = new ArrayFormatter(128, SymbolTable.InvariantUtf8);
+            var data = _formatters.Rent();
             try
             {
                 var frame = new GatewaySocketFrame { Operation = opCode, Payload = payload };
@@ -185,7 +184,7 @@ namespace Discord.API
             finally
             {
                 data.Clear();
-                _formatters.Enqueue(data);
+                _formatters.Return(data);
             }
         }
 
