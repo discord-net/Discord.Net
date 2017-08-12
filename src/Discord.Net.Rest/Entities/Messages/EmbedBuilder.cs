@@ -180,15 +180,7 @@ namespace Discord
             AddField(field);
             return this;
         }
-        public EmbedBuilder AddInlineField(string name, object value)
-        {
-            var field = new EmbedFieldBuilder()
-                .WithIsInline(true)
-                .WithName(name)
-                .WithValue(value);
-            AddField(field);
-            return this;
-        }
+
         public EmbedBuilder AddField(EmbedFieldBuilder field)
         {
             if (Fields.Count >= MaxFieldCount)
