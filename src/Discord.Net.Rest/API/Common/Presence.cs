@@ -10,7 +10,6 @@ namespace Discord.API
         [ModelProperty("guild_id")]
         public Optional<ulong> GuildId { get; set; }
         [ModelProperty("status")]
-        [ModelStringEnum]
         public UserStatus Status { get; set; }
         [ModelProperty("game")]
         public Game Game { get; set; }

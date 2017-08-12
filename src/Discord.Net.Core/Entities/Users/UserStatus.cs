@@ -2,6 +2,7 @@
 
 namespace Discord
 {
+    [ModelStringEnum]
     public enum UserStatus
     {
         Offline,

@@ -2,11 +2,12 @@
 
 namespace Discord
 {
+    [ModelStringEnum]
     public enum PermissionTarget
     {
         [ModelEnumValue("role")]
         Role,
-        [ModelEnumValue("user")]
+        [ModelEnumValue("member")]
         User
     }
 }

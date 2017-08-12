@@ -52,7 +52,7 @@ namespace Discord.Serialization.Json
             AddGenericConverter(typeof(Converters.ArrayPropertyConverter<>), //Arrays
                 (type, prop) => type.IsArray, innerType => innerType.GetElementType());
             AddGenericConverter(typeof(Converters.StringEnumPropertyConverter<>), //Enums : string
-                (type, prop) => type.IsEnum && prop.GetCustomAttribute<ModelStringEnumAttribute>() != null);
+                (type, prop) => type.IsEnum && type.GetCustomAttribute<ModelStringEnumAttribute>() != null);
             AddGenericConverter(typeof(Converters.Int64EnumPropertyConverter<>), //Enums : sbyte/short/int/long
                 (type, prop) => type.IsEnum && IsSignedEnum(Enum.GetUnderlyingType(type.AsType())));
             AddGenericConverter(typeof(Converters.UInt64EnumPropertyConverter<>), //Enums: byte/ushort/uint/ulong

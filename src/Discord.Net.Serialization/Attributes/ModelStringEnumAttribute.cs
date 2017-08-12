@@ -2,7 +2,7 @@
 
 namespace Discord.Serialization
 {
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Enum, AllowMultiple = false)]
     public class ModelStringEnumAttribute : Attribute
     {
     }
