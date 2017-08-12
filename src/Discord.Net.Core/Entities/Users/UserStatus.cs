@@ -5,6 +5,7 @@ namespace Discord
     [ModelStringEnum]
     public enum UserStatus
     {
+        [ModelEnumValue("offline", EnumValueType.ReadOnly)]
         Offline,
         [ModelEnumValue("online")]
         Online,
@@ -14,6 +15,7 @@ namespace Discord
         AFK,
         [ModelEnumValue("dnd")]
         DoNotDisturb,
+        [ModelEnumValue("invisible", EnumValueType.WriteOnly)]
         Invisible,
     }
 }
