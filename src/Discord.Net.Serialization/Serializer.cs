@@ -56,18 +56,23 @@ namespace Discord.Serialization
             return _maps.GetOrAdd(typeof(TModel), _ =>
             {
                 var type = typeof(TModel).GetTypeInfo();
-                var propInfos = type.DeclaredProperties
-                    .Where(x => x.CanRead && x.CanWrite)
-                    .ToArray();
-
                 var properties = new List<PropertyMap>();
-                for (int i = 0; i < propInfos.Length; i++)
+                while (type != null)
                 {
-                    if (propInfos[i].GetCustomAttribute<ModelPropertyAttribute>() != null)
+                    var propInfos = type.DeclaredProperties
+                        .Where(x => x.CanRead && x.CanWrite)
+                        .ToArray();
+
+                    for (int i = 0; i < propInfos.Length; i++)
                     {
-                        var propMap = MapProperty<TModel>(propInfos[i]);
-                        properties.Add(propMap);
+                        if (propInfos[i].GetCustomAttribute<ModelPropertyAttribute>() != null)
+                        {
+                            var propMap = MapProperty<TModel>(propInfos[i]);
+                            properties.Add(propMap);
+                        }
                     }
+
+                    type = type.BaseType?.GetTypeInfo();
                 }
                 return new ModelMap<TModel>(this, type, properties);
             }) as ModelMap<TModel>;
