@@ -11,6 +11,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Tests.Emotes.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="../../src/Discord.Net.Commands/Discord.Net.Commands.csproj" />
     <ProjectReference Include="../../src/Discord.Net.Core/Discord.Net.Core.csproj" />
     <ProjectReference Include="../../src/Discord.Net.Rest/Discord.Net.Rest.csproj" />

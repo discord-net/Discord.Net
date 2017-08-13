@@ -1,0 +1,59 @@
+﻿<#@ output extension=".cs" #>
+<#@ template language="C#" #>
+<#@ assembly name="System.Net.Http.dll" #>
+<#@ import namespace="System.Net.Http" #>
+<#@ assembly name="System.Core.dll" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#
+	const string DataUrl = "http://www.unicode.org/Public/emoji/6.0/emoji-data.txt";
+
+	List<int> codepoints = new List<int>();
+
+	void FetchData()
+	{
+		var client = new HttpClient();
+		try
+		{
+			var response = client.GetAsync(DataUrl).GetAwaiter().GetResult();
+			response.EnsureSuccessStatusCode();
+			string body = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+
+			foreach (var line in body.Split('\n'))
+			{
+				if (line.StartsWith("#")) continue;
+				var split = line.Split(';');
+				if (split.Length < 1) continue;
+				var code = split[0].Trim();
+				if (string.IsNullOrEmpty(code)) continue;
+				var ranges = code.Split("..".ToCharArray());
+				if (ranges.Length == 3)
+				{
+					var lower = Convert.ToInt32(ranges[0], 16);
+					var upper = Convert.ToInt32(ranges[2], 16);
+					codepoints.AddRange(Enumerable.Range(lower, (upper-lower)+1));
+				}
+				else
+				{
+					var point = Convert.ToInt32(code, 16);
+					codepoints.Add(point);
+				}
+			}
+		}
+		catch
+		{
+		}
+	}
+
+	FetchData();
+#>
+namespace Discord
+{
+    public partial class Emoji
+    {
+		internal readonly int[] Codepoints = new int[]
+		{
+<# foreach (var codepoint in codepoints) { #><#= codepoint #>, <# } #>
+		};
+    }
+}

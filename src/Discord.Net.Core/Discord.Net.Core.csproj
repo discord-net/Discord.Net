@@ -11,4 +11,20 @@
     <PackageReference Include="System.Collections.Immutable" Version="1.3.1" />
     <PackageReference Include="System.Interactive.Async" Version="3.1.1" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Entities\Emotes\Emoji.Codepoints.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Emoji.Codepoints.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Entities\Emotes\Emoji.Codepoints.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Emoji.Codepoints.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>
