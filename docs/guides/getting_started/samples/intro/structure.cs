@@ -19,6 +19,7 @@ class Program
     private readonly DiscordSocketClient _client;
     
     // Keep the CommandService and IServiceCollection around for use with commands.
+    // These two types require you install the Discord.Net.Commands package.
     private readonly IServiceCollection _map = new ServiceCollection();
     private readonly CommandService _commands = new CommandService();
 
