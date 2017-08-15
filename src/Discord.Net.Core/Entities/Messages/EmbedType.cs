@@ -1,13 +1,16 @@
-﻿namespace Discord
+﻿using Discord.Serialization;
+
+namespace Discord
 {
+    [ModelStringEnum]
     public enum EmbedType
     {
-        Rich,
-        Link,
-        Video,
-        Image,
-        Gifv,
-        Article,
-        Tweet
+        [ModelEnumValue("rich")] Rich,
+        [ModelEnumValue("link")] Link,
+        [ModelEnumValue("video")] Video,
+        [ModelEnumValue("image")] Image,
+        [ModelEnumValue("gifv")] Gifv,
+        [ModelEnumValue("article")] Article,
+        [ModelEnumValue("tweet")] Tweet
     }
 }
