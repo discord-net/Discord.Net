@@ -5,11 +5,32 @@ namespace Discord
 {
     public class EmoteTests
     {
-		[Fact]
-		public void Emoji()
+        const string Smiley = "\U0001F603";
+        const string Man = "\U0001F468";
+        const string Woman = "\U0001F469";
+        const string Girl = "\U0001F467";
+        const string Boy = "\U0001F466";
+        const string Join = "\u200D";
+
+        [Fact]
+		public void Single_Emoji()
         {
-			// Future: Validate emoji parsing
-            Assert.Equal("🦅", new Emoji("🦅").Name);
+            Assert.Equal(Smiley, new Emoji(Smiley).Name);
+            Assert.Equal(Man, new Emoji(Man).Name);
+            Assert.Equal(Woman, new Emoji(Woman).Name);
+            Assert.Equal(Girl, new Emoji(Girl).Name);
+            Assert.Equal(Boy, new Emoji(Boy).Name);
+        }
+        [Fact]
+        public void Multipart_Emoji()
+        {
+            string family = string.Concat(Man, Join, Woman, Join, Girl, Join, Boy);
+            Assert.Equal(family, new Emoji(family).Name);
+        }
+        [Fact]
+        public void Emoji_Fail()
+        {
+            Assert.Throws<ArgumentException>(() => new Emoji("foxDab"));
         }
 
 		[Fact]

@@ -23,13 +23,14 @@ namespace Discord
         /// <param name="unicode">The pure UTF-8 encoding of an emoji</param>
         public Emoji(string unicode)
         {
-            byte[] utf32 = Encoding.Unicode.GetBytes(unicode);
-            bool safe = false, any = false;
-            int codepoint = 0;
+            // NETStandard1.1 doesn't support UTF32
+#if !NETSTANDARD1_1
+            byte[] utf32 = Encoding.UTF32.GetBytes(unicode);
             for (var i = 0; i < utf32.Length; i += 4)
             {
-                codepoint = BitConverter.ToInt32(utf32, i);
-                any = false;
+                int codepoint = BitConverter.ToInt32(utf32, i);
+                bool any = false;
+
                 for (var j = 0; j < Codepoints.Length; j++)
                 {
                     if (Codepoints[j] == codepoint)
@@ -38,16 +39,13 @@ namespace Discord
                         break;
                     }
                 }
-                if (any)
-                    safe = true;
+
+                if (any) continue;
                 else
-                {
-                    safe = false;
-                    break;
-                }
+                    throw new ArgumentException("One or more characters was not a valid Emoji", nameof(unicode));
             }
-            if (!safe)
-                throw new ArgumentException("One or more characters was not a valid Emoji", nameof(unicode));
+#endif
+
             Name = unicode;
         }
 
