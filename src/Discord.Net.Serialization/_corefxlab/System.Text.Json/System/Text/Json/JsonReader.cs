@@ -703,41 +703,87 @@ namespace System.Text.Json
                 
                 bool isEscaping = false;
                 bool success = false;
-                while (idx < length)
+                while (!success && idx < length)
                 {
                     byte c = Unsafe.Add(ref src, idx);
                     if (isEscaping)
-                        isEscaping = false;
-                    else if (c == JsonConstants.Backslash || c == JsonConstants.Quote)
                     {
-                        int segmentLength = idx - start;
-                        if (segmentLength != 0)
+                        switch (c)
                         {
-                            //Ensure we have enough space in the buffer
-                            int remaining = _working.Capacity - _working.Count;
-                            if (segmentLength > remaining)
-                            {
-                                int doubleSize = _working.Free.Count * 2;
-                                int minNewSize = _working.Capacity + segmentLength;
-                                int newSize = minNewSize > doubleSize ? minNewSize : doubleSize;
-                                var newArray = ArrayPool<byte>.Shared.Rent(newSize);
-                                var oldArray = _working.Resize(newArray);
-                                ArrayPool<byte>.Shared.Return(oldArray);
-                            }
+                            case (byte)'/':
+                            case (byte)'b':
+                            case (byte)'f':
+                            case (byte)'n':
+                            case (byte)'r':
+                            case (byte)'t':
+                                {
+                                    int remaining = _working.Capacity - _working.Count;
+                                    if (remaining == 0)
+                                    {
+                                        int newSize = _working.Free.Count * 2;
+                                        var newArray = ArrayPool<byte>.Shared.Rent(newSize);
+                                        var oldArray = _working.Resize(newArray);
+                                        ArrayPool<byte>.Shared.Return(oldArray);
+                                    }
 
-                            //Copy all data before the backslash
-                            var span = _working.Free.AsSpan();
-                            Unsafe.CopyBlock(ref span.DangerousGetPinnableReference(), ref Unsafe.Add(ref src, start), (uint)segmentLength);
-                            _working.Count += segmentLength;
+                                    var span = _working.Free.AsSpan();
+                                    switch (c)
+                                    {
+                                        case (byte)'/': span[0] = (byte)'/'; break;
+                                        case (byte)'b': span[0] = (byte)'\b'; break;
+                                        case (byte)'f': span[0] = (byte)'\f'; break;
+                                        case (byte)'n': span[0] = (byte)'\n'; break;
+                                        case (byte)'r': span[0] = (byte)'\r'; break;
+                                        case (byte)'t': span[0] = (byte)'\t'; break;
+                                    }
+                                    _working.Count++;
+                                    start++; //Skip this char
+                                }
+                                break;
+                            //case (byte)'u': //Not Supported
                         }
-                        start = idx + 1;
-                        isEscaping = true;
-
-                        if (c == JsonConstants.Quote)
+                        isEscaping = false;
+                    }
+                    else
+                    {
+                        switch (c)
                         {
-                            idx++;
-                            success = true;
-                            break;
+                            case JsonConstants.Backslash:
+                            case JsonConstants.Quote:
+                                {
+                                    int segmentLength = idx - start;
+                                    if (segmentLength != 0)
+                                    {
+                                        //Ensure we have enough space in the buffer
+                                        int remaining = _working.Capacity - _working.Count;
+                                        if (segmentLength > remaining)
+                                        {
+                                            int doubleSize = _working.Free.Count * 2;
+                                            int minNewSize = _working.Capacity + segmentLength;
+                                            int newSize = minNewSize > doubleSize ? minNewSize : doubleSize;
+                                            var newArray = ArrayPool<byte>.Shared.Rent(newSize);
+                                            var oldArray = _working.Resize(newArray);
+                                            ArrayPool<byte>.Shared.Return(oldArray);
+                                        }
+
+                                        //Copy all data before the backslash
+                                        var span = _working.Free.AsSpan();
+                                        Unsafe.CopyBlock(ref span.DangerousGetPinnableReference(), ref Unsafe.Add(ref src, start), (uint)segmentLength);
+                                        _working.Count += segmentLength;
+                                    }
+
+                                    if (c == JsonConstants.Quote)
+                                    {
+                                        success = true;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        start = idx + 1;
+                                        isEscaping = true;
+                                    }
+                                }
+                                break;
                         }
                     }
                     idx++;

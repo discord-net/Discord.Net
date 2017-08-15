@@ -481,14 +481,18 @@ namespace System.Text.Json
                                 byte c = i != workingWritten ? _working[i] : (byte)0;
 
                                 //Search for next backslash/quote or end of string
-                                bool isEscapable = c == JsonConstants.Backslash || c == JsonConstants.Quote;
+                                bool isEscapable =
+                                    c == (byte)'"' ||
+                                    c == (byte)'\\' ||
+                                    c == (byte)'/' ||
+                                    c < 32;
                                 if (isEscapable || i == workingWritten)
                                 {
                                     int segmentLength = i - start;
 
                                     //Ensure buffer length
                                     var destination = _output.Buffer;
-                                    if (destination.Length <= segmentLength)
+                                    if (destination.Length < segmentLength + 2)
                                     {
                                         workingLength += segmentLength;
                                         _output.Enlarge(workingLength);
@@ -504,12 +508,62 @@ namespace System.Text.Json
                                         _output.Advance(segmentLength);
                                     }
 
-                                    //Write backslash
                                     if (isEscapable)
                                     {
-                                        destination[segmentLength] = JsonConstants.Backslash;
-                                        outputWritten++;
-                                        _output.Advance(1);
+                                        switch (c)
+                                        {
+                                            case (byte)'"':
+                                            case (byte)'\\':
+                                            case (byte)'/':
+                                                //Just write backslash
+                                                destination[segmentLength] = JsonConstants.Backslash;
+                                                outputWritten++;
+                                                _output.Advance(1);
+                                                break;
+                                            case (byte)'\b':
+                                                destination[segmentLength] = JsonConstants.Backslash;
+                                                destination[segmentLength + 1] = (byte)'b';
+                                                outputWritten += 2;
+                                                _output.Advance(2);
+                                                i++;
+                                                start++;
+                                                break;
+                                            case (byte)'\f':
+                                                destination[segmentLength] = JsonConstants.Backslash;
+                                                destination[segmentLength + 1] = (byte)'f';
+                                                outputWritten += 2;
+                                                _output.Advance(2);
+                                                i++;
+                                                start++;
+                                                break;
+                                            case (byte)'\n':
+                                                destination[segmentLength] = JsonConstants.Backslash;
+                                                destination[segmentLength + 1] = (byte)'n';
+                                                outputWritten += 2;
+                                                _output.Advance(2);
+                                                i++;
+                                                start++;
+                                                break;
+                                            case (byte)'\r':
+                                                destination[segmentLength] = JsonConstants.Backslash;
+                                                destination[segmentLength + 1] = (byte)'r';
+                                                outputWritten += 2;
+                                                _output.Advance(2);
+                                                i++;
+                                                start++;
+                                                break;
+                                            case (byte)'\t':
+                                                destination[segmentLength] = JsonConstants.Backslash;
+                                                destination[segmentLength + 1] = (byte)'t';
+                                                outputWritten += 2;
+                                                _output.Advance(2);
+                                                i++;
+                                                start++;
+                                                break;
+                                            default: //Unsupported control char, ignore
+                                                i++;
+                                                break;
+                                        }
                                     }
                                 }
                             }
