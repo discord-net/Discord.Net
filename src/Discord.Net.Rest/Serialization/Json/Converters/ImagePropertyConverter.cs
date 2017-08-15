@@ -5,7 +5,7 @@ namespace Discord.Serialization.Json.Converters
 {
     internal class ImagePropertyConverter : JsonPropertyConverter<API.Image>
     {
-        public override API.Image Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override API.Image Read(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -13,7 +13,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected String");
             return new API.Image(reader.ParseString());
         }
-        public override void Write(PropertyMap map, object model, ref JsonWriter writer, API.Image value, string key)
+        public override void Write(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonWriter writer, API.Image value, string key)
         {
             string str;
             if (value.Stream != null)

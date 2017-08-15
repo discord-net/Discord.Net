@@ -42,13 +42,24 @@ namespace Discord.Serialization
 
         public void Add(ReadOnlyBuffer<byte> key, TValue value)
         {
+            if (!TryAdd(key, value))
+                throw new ArgumentException("Duplicate key");
+        }
+        public void Add(ReadOnlySpan<byte> key, TValue value)
+        {
+            if (!TryAdd(key, value))
+                throw new ArgumentException("Duplicate key");
+        }
+
+        public bool TryAdd(ReadOnlyBuffer<byte> key, TValue value)
+        {
             int hashCode = GetKeyHashCode(key) & 0x7FFFFFFF;
             int targetBucket = hashCode % _buckets.Length;
 
             for (int i = _buckets[targetBucket]; i >= 0; i = _entries[i].next)
             {
                 if (_entries[i].hashCode == hashCode && KeyEquals(_entries[i].key, key))
-                    throw new ArgumentException("Duplicate key", nameof(key));
+                    return false;
             }
             int index;
             if (_freeCount > 0)
@@ -73,6 +84,43 @@ namespace Discord.Serialization
             _entries[index].key = key;
             _entries[index].value = value;
             _buckets[targetBucket] = index;
+            return true;
+        }
+        //Duplicate code for perf reasons
+        public bool TryAdd(ReadOnlySpan<byte> key, TValue value)
+        {
+            int hashCode = GetKeyHashCode(key) & 0x7FFFFFFF;
+            int targetBucket = hashCode % _buckets.Length;
+
+            for (int i = _buckets[targetBucket]; i >= 0; i = _entries[i].next)
+            {
+                if (_entries[i].hashCode == hashCode && KeyEquals(_entries[i].key, key))
+                    return false;
+            }
+            int index;
+            if (_freeCount > 0)
+            {
+                index = _freeList;
+                _freeList = _entries[index].next;
+                _freeCount--;
+            }
+            else
+            {
+                if (_count == _entries.Length)
+                {
+                    Resize();
+                    targetBucket = hashCode % _buckets.Length;
+                }
+                index = _count;
+                _count++;
+            }
+
+            _entries[index].hashCode = hashCode;
+            _entries[index].next = _buckets[targetBucket];
+            _entries[index].key = new ReadOnlyBuffer<byte>(key.ToArray());
+            _entries[index].value = value;
+            _buckets[targetBucket] = index;
+            return true;
         }
         private void Resize()
         {

@@ -68,10 +68,16 @@ namespace Discord.Audio
             _audioLogger = Discord.LogManager.CreateLogger($"Audio #{clientId}");
 
             _serializer = DiscordVoiceJsonSerializer.Global.CreateScope();
-            _serializer.Error += ex =>
+            if (Discord.LogManager.Level >= LogSeverity.Warning)
             {
-                _audioLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();
-            };
+                _serializer.ModelError += (path, ex)
+                    => _audioLogger.WarningAsync($"Failed to deserialize {path}", ex).GetAwaiter().GetResult();
+            }
+            if (Discord.LogManager.Level >= LogSeverity.Debug)
+            {
+                _serializer.UnmappedProperty += path
+                    => _audioLogger.DebugAsync($"Unmapped property: {path}");
+            }
 
             ApiClient = new DiscordVoiceApiClient(guild.Id, Discord.WebSocketProvider, Discord.UdpSocketProvider, _serializer);
             ApiClient.SentGatewayMessage += async opCode => await _audioLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);

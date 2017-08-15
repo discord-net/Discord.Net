@@ -4,7 +4,7 @@ namespace Discord.Serialization.Json.Converters
 {
     /*public class CharPropertyConverter : JsonPropertyConverter<char>
     {
-        public override char Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override char Read(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -12,7 +12,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected String");
             return reader.ParseChar();
         }
-        public override void Write(PropertyMap map, object model, ref JsonWriter writer, char value, string key)
+        public override void Write(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonWriter writer, char value, string key)
         {
             if (key != null)
                 writer.WriteAttribute(key, value);
@@ -23,7 +23,7 @@ namespace Discord.Serialization.Json.Converters
 
     public class StringPropertyConverter : JsonPropertyConverter<string>
     {
-        public override string Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override string Read(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -33,7 +33,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected String");
             return reader.ParseString();
         }
-        public override void Write(PropertyMap map, object model, ref JsonWriter writer, string value, string key)
+        public override void Write(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonWriter writer, string value, string key)
         {
             if (key != null)
                 writer.WriteAttribute(key, value);

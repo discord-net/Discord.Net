@@ -56,10 +56,16 @@ namespace Discord.WebSocket
             _connectionGroupLock = new SemaphoreSlim(1, 1);
 
             _serializer = DiscordSocketJsonSerializer.Global.CreateScope();
-            _serializer.Error += ex =>
+            if (config.LogLevel >= LogSeverity.Warning)
             {
-                _restLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();
-            };
+                _serializer.ModelError += (path, ex)
+                    => _restLogger.WarningAsync($"Failed to deserialize {path}", ex).GetAwaiter().GetResult();
+            }
+            if (config.LogLevel >= LogSeverity.Debug)
+            {
+                _serializer.UnmappedProperty += path
+                    => _restLogger.DebugAsync($"Unmapped property: {path}");
+            }
 
             SetApiClient(new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordConfig.UserAgent, _serializer));
 

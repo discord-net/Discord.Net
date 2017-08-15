@@ -11,18 +11,19 @@ namespace Discord.Serialization
         public string Key { get; }
         public ReadOnlyBuffer<byte> Utf8Key { get; }
         public string Name { get; }
+        public string Path { get; }
 
         public bool ExcludeNull { get; }
 
-        public PropertyMap(Serializer serializer, PropertyInfo propInfo)
+        internal PropertyMap(Serializer serializer, PropertyInfo propInfo, ModelMap modelMap)
         {
             Name = propInfo.Name;
+            Path = $"{modelMap.Path}.{propInfo.Name}";
 
             var attr = propInfo.GetCustomAttribute<ModelPropertyAttribute>();
             Key = attr.Key ?? propInfo.Name;
             Utf8Key = new ReadOnlyBuffer<byte>(new Utf8String(Key).Bytes.ToArray());
             ExcludeNull = attr.ExcludeNull;
-
         }
         
         public abstract object GetDynamicConverter(object model, bool throwOnMissing);
@@ -54,11 +55,10 @@ namespace Discord.Serialization
                 => _group?.GetDynamicConverter(_getWrappedSelectorFunc, model);
         }
         
-        private readonly Delegate _getSelectorFunc, _getWrappedSelectorFunc;
         private readonly IReadOnlyList<Selector> _selectors;
 
-        public PropertyMap(Serializer serializer, PropertyInfo propInfo)
-            : base(serializer, propInfo)
+        internal PropertyMap(Serializer serializer, ModelMap modelMap, PropertyInfo propInfo)
+            : base(serializer, propInfo, modelMap)
         {
             _selectors = propInfo.GetCustomAttributes<ModelSelectorAttribute>()
                 .Select(x =>

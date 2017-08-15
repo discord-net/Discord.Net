@@ -12,7 +12,7 @@ namespace Discord.Serialization.Json.Converters
             _map = serializer.MapModel<T>();
         }
 
-        public T Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public T Read(ModelMap modelMap, PropertyMap propMap, object model, ref JsonReader reader, bool isTopLevel)
         {
             var subModel = new T();
 
@@ -32,7 +32,7 @@ namespace Discord.Serialization.Json.Converters
             }
             throw new SerializationException("Bad input, expected EndObject");
         }
-        public void Write(PropertyMap map, object model, ref JsonWriter writer, T value, string key)
+        public void Write(ModelMap modelMap, PropertyMap propMap, object model, ref JsonWriter writer, T value, string key)
         {
             if (key != null)
                 writer.WriteObjectStart(key);

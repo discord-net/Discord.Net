@@ -5,7 +5,7 @@ namespace Discord.Serialization.Json.Converters
 {
     public class BooleanPropertyConverter : JsonPropertyConverter<bool>
     {
-        public override bool Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override bool Read(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -16,7 +16,7 @@ namespace Discord.Serialization.Json.Converters
                 default: throw new SerializationException("Bad input, expected False or True");
             }
         }
-        public override void Write(PropertyMap map, object model, ref JsonWriter writer, bool value, string key)
+        public override void Write(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonWriter writer, bool value, string key)
         {
             if (key != null)
                 writer.WriteAttribute(key, value);
@@ -27,7 +27,7 @@ namespace Discord.Serialization.Json.Converters
 
     public class GuidPropertyConverter : JsonPropertyConverter<Guid>
     {
-        public override Guid Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override Guid Read(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -35,7 +35,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected String");
             return reader.ParseGuid();
         }
-        public override void Write(PropertyMap map, object model, ref JsonWriter writer, Guid value, string key)
+        public override void Write(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonWriter writer, Guid value, string key)
         {
             if (key != null)
                 writer.WriteAttribute(key, value.ToString());

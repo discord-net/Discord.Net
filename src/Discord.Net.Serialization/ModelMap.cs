@@ -1,22 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace Discord.Serialization
 {
-    public class ModelMap<TModel>
-        where TModel : class, new()
+    public class ModelMap
     {
-        private BufferDictionary<PropertyMap> _propDict;
+        private readonly List<PropertyMap> _propList;
+        private readonly BufferDictionary<PropertyMap> _propDict;
 
+        public string Path { get; }
         public bool HasDynamics { get; }
-        public PropertyMap[] Properties { get; }
+        public IReadOnlyList<PropertyMap> Properties => _propList;
 
-        public ModelMap(Serializer serializer, TypeInfo type, List<PropertyMap> properties)
+        internal ModelMap(string path)
         {
-            Properties = properties.ToArray();
-            _propDict = new BufferDictionary<PropertyMap>(properties.ToDictionary(x => x.Utf8Key));
+            Path = path;
+            _propList = new List<PropertyMap>();
+            _propDict = new BufferDictionary<PropertyMap>();
+        }
+
+        internal void AddProperty(PropertyMap propMap)
+        {
+            _propList.Add(propMap);
+            _propDict.Add(propMap.Utf8Key, propMap);
         }
 
         public bool TryGetProperty(ReadOnlyBuffer<byte> key, out PropertyMap value)

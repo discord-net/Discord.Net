@@ -94,13 +94,13 @@ namespace Discord.Serialization
         public void AddSelector(Serializer serializer, string groupKey, Type keyType, object keyValue, Type converterType)
         {
             var group = CreateSelectorGroup(keyType, groupKey);
-            group.AddDynamicConverter(keyValue, BuildConverter(converterType, serializer));
+            group.AddDynamicConverter(keyValue, BuildConverter(converterType, serializer ));
         }
 
         public object Get(Serializer serializer, Type type, PropertyInfo propInfo = null, bool throwOnNotFound = true)
         {
             //Check parent
-            object converter = _parent?.Get(serializer, type, propInfo, false);
+            var converter = _parent?.Get(serializer, type, propInfo, false);
             if (converter != null)
                 return converter;
 
@@ -190,6 +190,7 @@ namespace Discord.Serialization
                 else
                     throw new SerializationException($"{converterType.Name} has an unsupported constructor");
             }
+
             return constructor.Invoke(args);
         }
 

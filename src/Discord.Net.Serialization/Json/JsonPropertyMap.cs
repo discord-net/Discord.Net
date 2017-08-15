@@ -9,36 +9,38 @@ namespace Discord.Serialization.Json
         string Key { get; }
         ReadOnlyBuffer<byte> Utf8Key { get; }
 
-        void Write(TModel model, ref JsonWriter writer);
-        void Read(TModel model, ref JsonReader reader);
+        void Write(Serializer serializer, TModel model, ref JsonWriter writer);
+        void Read(Serializer serializer, TModel model, ref JsonReader reader);
     }
 
     internal class JsonPropertyMap<TModel, TValue> : PropertyMap<TModel, TValue>, IJsonPropertyMap<TModel>
     {
+        private readonly ModelMap _modelMap;
         private readonly JsonPropertyConverter<TValue> _converter;
         private readonly Func<TModel, TValue> _getFunc;
         private readonly Action<TModel, TValue> _setFunc;
 
-        public JsonPropertyMap(Serializer serializer, PropertyInfo propInfo, JsonPropertyConverter<TValue> converter)
-            : base(serializer, propInfo)
+        public JsonPropertyMap(Serializer serializer, ModelMap modelMap, PropertyInfo propInfo, JsonPropertyConverter<TValue> converter)
+            : base(serializer, modelMap, propInfo)
         {
+            _modelMap = modelMap;
             _converter = converter;
 
             _getFunc = propInfo.GetMethod.CreateDelegate(typeof(Func<TModel, TValue>)) as Func<TModel, TValue>;
             _setFunc = propInfo.SetMethod.CreateDelegate(typeof(Action<TModel, TValue>)) as Action<TModel, TValue>;
         }
 
-        public void Read(TModel model, ref JsonReader reader)
+        public void Read(Serializer serializer, TModel model, ref JsonReader reader)
         {
-            var value = _converter.Read(this, model, ref reader, true);
+            var value = _converter.Read(serializer, _modelMap, this, model, ref reader, true);
             _setFunc(model, value);
         }
-        public void Write(TModel model, ref JsonWriter writer)
+        public void Write(Serializer serializer, TModel model, ref JsonWriter writer)
         {
             var value = _getFunc(model);
             if (value == null && ExcludeNull)
                 return;
-            _converter.Write(this, model, ref writer, value, Key);
+            _converter.Write(serializer, _modelMap, this, model, ref writer, value, Key);
         }
     }
 }

@@ -4,7 +4,7 @@ namespace Discord.Serialization.Json.Converters
 {
     public class UInt8PropertyConverter : JsonPropertyConverter<byte>
     {
-        public override byte Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override byte Read(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -12,7 +12,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseUInt8();
         }
-        public override void Write(PropertyMap map, object model, ref JsonWriter writer, byte value, string key)
+        public override void Write(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonWriter writer, byte value, string key)
         {
             if (key != null)
                 writer.WriteAttribute(key, value);
@@ -23,7 +23,7 @@ namespace Discord.Serialization.Json.Converters
 
     public class UInt16PropertyConverter : JsonPropertyConverter<ushort>
     {
-        public override ushort Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override ushort Read(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -31,7 +31,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseUInt16();
         }
-        public override void Write(PropertyMap map, object model, ref JsonWriter writer, ushort value, string key)
+        public override void Write(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonWriter writer, ushort value, string key)
         {
             if (key != null)
                 writer.WriteAttribute(key, value);
@@ -42,7 +42,7 @@ namespace Discord.Serialization.Json.Converters
 
     public class UInt32PropertyConverter : JsonPropertyConverter<uint>
     {
-        public override uint Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override uint Read(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -50,7 +50,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseUInt32();
         }
-        public override void Write(PropertyMap map, object model, ref JsonWriter writer, uint value, string key)
+        public override void Write(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonWriter writer, uint value, string key)
         {
             if (key != null)
                 writer.WriteAttribute(key, value);
@@ -61,7 +61,7 @@ namespace Discord.Serialization.Json.Converters
 
     public class UInt64PropertyConverter : JsonPropertyConverter<ulong>
     {
-        public override ulong Read(PropertyMap map, object model, ref JsonReader reader, bool isTopLevel)
+        public override ulong Read(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonReader reader, bool isTopLevel)
         {
             if (isTopLevel)
                 reader.Read();
@@ -69,7 +69,7 @@ namespace Discord.Serialization.Json.Converters
                 throw new SerializationException("Bad input, expected Number or String");
             return reader.ParseUInt64();
         }
-        public override void Write(PropertyMap map, object model, ref JsonWriter writer, ulong value, string key)
+        public override void Write(Serializer serializer, ModelMap modelMap, PropertyMap propMap, object model, ref JsonWriter writer, ulong value, string key)
         {
             if (key != null)
                 writer.WriteAttribute(key, value.ToString());

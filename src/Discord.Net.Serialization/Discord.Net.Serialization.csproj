@@ -8,6 +8,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\Discord.Net.Core\Utils\ConcurrentHashSet.cs" Link="Utils\ConcurrentHashSet.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="System.Buffers" Version="4.4.0" />
     <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
     <PackageReference Include="System.Interactive.Async" Version="3.1.1" />

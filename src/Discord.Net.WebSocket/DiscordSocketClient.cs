@@ -88,10 +88,16 @@ namespace Discord.WebSocket
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : $"Shard #{ShardId}");
 
             _serializer = DiscordSocketJsonSerializer.Global.CreateScope();
-            _serializer.Error += ex =>
+            if (config.LogLevel >= LogSeverity.Warning)
             {
-                _restLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();
-            };
+                _serializer.ModelError += (path, ex) 
+                    => _gatewayLogger.WarningAsync($"Failed to deserialize {path}", ex).GetAwaiter().GetResult();
+            }
+            if (config.LogLevel >= LogSeverity.Debug)
+            {
+                _serializer.UnmappedProperty += path
+                    => _gatewayLogger.DebugAsync($"Unmapped property: {path}");
+            }
 
             SetApiClient(new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordConfig.UserAgent, _serializer, config.GatewayHost, config.DefaultRetryMode));
 

@@ -18,10 +18,16 @@ namespace Discord.Rest
         public DiscordRestClient(DiscordRestConfig config) : base(config)
         {
             _serializer = DiscordRestJsonSerializer.Global.CreateScope();
-            _serializer.Error += ex =>
+            if (config.LogLevel >= LogSeverity.Warning)
             {
-                _restLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();
-            };
+                _serializer.ModelError += (path, ex)
+                    => _restLogger.WarningAsync($"Failed to deserialize {path}", ex).GetAwaiter().GetResult();
+            }
+            if (config.LogLevel >= LogSeverity.Debug)
+            {
+                _serializer.UnmappedProperty += path
+                    => _restLogger.DebugAsync($"Unmapped property: {path}");
+            }
 
             SetApiClient(new API.DiscordRestApiClient(config.RestClientProvider, DiscordConfig.UserAgent, _serializer, config.DefaultRetryMode));
         }
