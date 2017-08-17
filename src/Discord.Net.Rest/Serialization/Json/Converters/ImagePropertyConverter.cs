@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text.Json;
 
 namespace Discord.Serialization.Json.Converters
@@ -18,24 +19,28 @@ namespace Discord.Serialization.Json.Converters
             string str;
             if (value.Stream != null)
             {
-                byte[] bytes = new byte[value.Stream.Length - value.Stream.Position];
-                value.Stream.Read(bytes, 0, bytes.Length);
+                byte[] bytes;
+                int length;
+                if (value.Stream.CanSeek)
+                {
+                    bytes = new byte[value.Stream.Length - value.Stream.Position];
+                    length = value.Stream.Read(bytes, 0, bytes.Length);
+                }
+                else
+                {
+                    var tempStream = new MemoryStream();
+                    value.Stream.CopyTo(tempStream);
+                    bytes = tempStream.GetBuffer();
+                    length = (int)tempStream.Length;
+                }
 
-                string base64 = Convert.ToBase64String(bytes);
+                string base64 = Convert.ToBase64String(bytes, 0, length);
                 switch (value.StreamFormat)
                 {
-                    case ImageFormat.Jpeg:
-                        str = $"data:image/jpeg;base64,{base64}";
-                        break;
-                    case ImageFormat.Png:
-                        str = $"data:image/png;base64,{base64}";
-                        break;
-                    case ImageFormat.Gif:
-                        str = $"data:image/gif;base64,{base64}";
-                        break;
-                    case ImageFormat.WebP:
-                        str = $"data:image/webp;base64,{base64}";
-                        break;
+                    case ImageFormat.Jpeg: str = $"data:image/jpeg;base64,{base64}"; break;
+                    case ImageFormat.Png: str = $"data:image/png;base64,{base64}"; break;
+                    case ImageFormat.Gif: str = $"data:image/gif;base64,{base64}"; break;
+                    case ImageFormat.WebP: str = $"data:image/webp;base64,{base64}"; break;
                     default:
                         throw new SerializationException($"Unable to serialize an {nameof(Image)} with a format of {value.StreamFormat}");
                 }
