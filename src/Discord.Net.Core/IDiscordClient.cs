@@ -26,6 +26,8 @@ namespace Discord
         Task<IGuild> GetGuildAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<IReadOnlyCollection<IGuild>> GetGuildsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<IGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null, RequestOptions options = null);
+
+        Task<IReadOnlyCollection<IRelationship>> GetRelationshipsAsync(RequestOptions options = null);
         
         Task<IInvite> GetInviteAsync(string inviteId, RequestOptions options = null);
 

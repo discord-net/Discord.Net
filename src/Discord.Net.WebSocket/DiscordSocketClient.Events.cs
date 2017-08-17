@@ -215,5 +215,19 @@ namespace Discord.WebSocket
             remove { _recipientRemovedEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<SocketGroupUser, Task>> _recipientRemovedEvent = new AsyncEvent<Func<SocketGroupUser, Task>>();
+        
+        // relationships
+        public event Func<SocketRelationship, SocketRelationship, Task> RelationshipAdded
+        {
+            add { _relationshipAddedEvent.Add(value); }
+            remove { _relationshipAddedEvent.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<SocketRelationship, SocketRelationship, Task>> _relationshipAddedEvent = new AsyncEvent<Func<SocketRelationship, SocketRelationship, Task>>();
+        public event Func<SocketRelationship, Task> RelationshipRemoved
+        {
+            add { _relationshipRemovedEvent.Add(value); }
+            remove { _relationshipRemovedEvent.Remove(value); }
+        }
+        private readonly AsyncEvent<Func<SocketRelationship, Task>> _relationshipRemovedEvent = new AsyncEvent<Func<SocketRelationship, Task>>();
     }
 }

@@ -192,5 +192,7 @@ namespace Discord
                     throw new ArgumentOutOfRangeException(name, "Messages must be younger than two weeks old.");
             }
         }
+
+        public static void LoggedInAs(TokenType token, TokenType existing) { if (token != existing) throw new NotSupportedException($"Must be logged in as a {token} to use this endpoint"); }
     }
 }
