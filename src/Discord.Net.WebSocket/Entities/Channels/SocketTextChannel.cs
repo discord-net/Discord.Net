@@ -110,6 +110,9 @@ namespace Discord.WebSocket
         }
         
         private string DebuggerDisplay => $"{Name} ({Id}, Text)";
+
+        bool ITextChannel.IsNsfw => ChannelHelper.IsNsfw(this);
+
         internal new SocketTextChannel Clone() => MemberwiseClone() as SocketTextChannel;
 
         //IGuildChannel

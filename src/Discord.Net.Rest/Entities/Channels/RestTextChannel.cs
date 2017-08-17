@@ -75,6 +75,8 @@ namespace Discord.Rest
 
         private string DebuggerDisplay => $"{Name} ({Id}, Text)";
 
+        bool ITextChannel.IsNsfw => ChannelHelper.IsNsfw(this);
+
         //IMessageChannel
         async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id, CacheMode mode, RequestOptions options)
         {
