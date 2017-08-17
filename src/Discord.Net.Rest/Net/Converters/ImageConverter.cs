@@ -24,14 +24,24 @@ namespace Discord.Net.Converters
 
             if (image.Stream != null)
             {
-                Stream cloneStream = new MemoryStream();
-                image.Stream.CopyTo(cloneStream);
+                byte[] bytes;
+                int length;
+                if (image.Stream.CanSeek)
+                {
+                    bytes = new byte[image.Stream.Length - image.Stream.Position];
+                    length = image.Stream.Read(bytes, 0, bytes.Length);
+                }
+                else
+                {
+                    var cloneStream = new MemoryStream();
+                    image.Stream.CopyTo(cloneStream);
+                    byte[] bytes = new byte[cloneStream.Length];
+                    cloneStream.Position = 0;
+                    cloneStream.Read(bytes, 0, bytes.Length);
+                    length = (int)cloneStream.Length;
+                }
 
-                byte[] bytes = new byte[cloneStream.Length];
-                cloneStream.Seek(0, SeekOrigin.Begin);
-                cloneStream.Read(bytes, 0, bytes.Length);
-
-                string base64 = Convert.ToBase64String(bytes);
+                string base64 = Convert.ToBase64String(bytes, 0, length);
                 writer.WriteValue($"data:image/jpeg;base64,{base64}");
             }
             else if (image.Hash != null)
