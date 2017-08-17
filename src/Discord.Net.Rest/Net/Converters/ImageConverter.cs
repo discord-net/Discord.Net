@@ -35,7 +35,7 @@ namespace Discord.Net.Converters
                 {
                     var cloneStream = new MemoryStream();
                     image.Stream.CopyTo(cloneStream);
-                    byte[] bytes = new byte[cloneStream.Length];
+                    bytes = new byte[cloneStream.Length];
                     cloneStream.Position = 0;
                     cloneStream.Read(bytes, 0, bytes.Length);
                     length = (int)cloneStream.Length;
