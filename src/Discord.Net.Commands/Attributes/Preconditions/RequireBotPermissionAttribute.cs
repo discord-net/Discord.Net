@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands
 {
     /// <summary>
     /// This attribute requires that the bot has a specified permission in the channel a command is invoked in.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RequireBotPermissionAttribute : PreconditionAttribute
     {
         public GuildPermission? GuildPermission { get; }
