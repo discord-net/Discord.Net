@@ -39,10 +39,16 @@ namespace Discord.Rpc
             _rpcLogger = LogManager.CreateLogger("RPC");
 
             _serializer = DiscordRpcJsonSerializer.Global.CreateScope();
-            _serializer.Error += ex =>
+            if (config.LogLevel >= LogSeverity.Warning)
             {
-                _rpcLogger.WarningAsync("Serializer Error", ex).GetAwaiter().GetResult();
-            };
+                _serializer.ModelError += (path, ex)
+                    => _rpcLogger.WarningAsync($"Failed to deserialize {path}", ex).GetAwaiter().GetResult();
+            }
+            if (config.LogLevel >= LogSeverity.Debug)
+            {
+                _serializer.UnmappedProperty += path
+                    => _rpcLogger.DebugAsync($"Unmapped property: {path}");
+            }
 
             SetApiClient(new API.DiscordRpcApiClient(clientId, DiscordRestConfig.UserAgent, origin, config.RestClientProvider, config.WebSocketProvider, _serializer));
             ApiClient.SentRpcMessage += async opCode => await _rpcLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
