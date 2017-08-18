@@ -66,7 +66,7 @@ class Program
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 break;
         }
-        Console.WriteLine($"{DateTime.Now,-19} [{message.Severity,8}] {message.Source}: {message.Message}");
+        Console.WriteLine($"{DateTime.Now,-19} [{message.Severity,8}] {message.Source}: {message.Message} {message.Exception}");
         Console.ResetColor();
         
         // If you get an error saying 'CompletedTask' doesn't exist,
