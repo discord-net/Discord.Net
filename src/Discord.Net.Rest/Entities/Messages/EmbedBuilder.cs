@@ -249,7 +249,7 @@ namespace Discord
             get => _field.Name;
             set
             {
-                if (string.IsNullOrEmpty(value)) throw new ArgumentException($"Field name must not be null or empty.", nameof(Name));
+                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException($"Field name must not be null, empty or entirely whitespace.", nameof(Name));
                 if (value.Length > MaxFieldNameLength) throw new ArgumentException($"Field name length must be less than or equal to {MaxFieldNameLength}.", nameof(Name));
                 _field.Name = value;
             }
