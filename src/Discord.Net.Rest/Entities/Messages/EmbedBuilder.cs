@@ -234,7 +234,6 @@ namespace Discord
 
             return _embed;
         }
-        public static implicit operator Embed(EmbedBuilder builder) => builder?.Build();
     }
 
     public class EmbedFieldBuilder
