@@ -334,6 +334,12 @@ namespace Discord.WebSocket
                 Game = null;
             await SendStatusAsync().ConfigureAwait(false);
         }
+
+        public async Task SetGameAsync(Game game)
+        {
+            Game = game;
+            await SendStatusAsync().ConfigureAwait(false);
+        }
         private async Task SendStatusAsync()
         {
             if (CurrentUser == null)
@@ -346,11 +352,49 @@ namespace Discord.WebSocket
             GameModel gameModel;
             if (game != null)
             {
+                var assets = game.Value.Assets.HasValue
+                    ? new API.GameAssets()
+                    {
+                        SmallText = game.Value.Assets.Value.SmallText,
+                        SmallImage = game.Value.Assets.Value.SmallImage,
+                        LargeText = game.Value.Assets.Value.LargeText,
+                        LargeImage = game.Value.Assets.Value.LargeImage,
+                    }
+                    : Optional.Create<API.GameAssets>();
+                var party = game.Value.Party.HasValue
+                    ? new API.GameParty
+                    {
+                        Id = game.Value.Party.Value.Id,
+                        Size = game.Value.Party.Value.Size
+                    }
+                    : Optional.Create<API.GameParty>();
+                var secrets = game.Value.Secrets.HasValue
+                    ? new API.GameSecrets()
+                    {
+                        Join = game.Value.Secrets.Value.Join,
+                        Match = game.Value.Secrets.Value.Match,
+                        Spectate = game.Value.Secrets.Value.Spectate
+                    }
+                    : Optional.Create<API.GameSecrets>();
+                var timestamps = game.Value.Timestamps.HasValue
+                    ? new API.GameTimestamps
+                    {
+                        Start = game.Value.Timestamps.Value.Start,
+                        End = game.Value.Timestamps.Value.End
+                    }
+                    : Optional.Create<API.GameTimestamps>();
                 gameModel = new API.Game
                 {
                     Name = game.Value.Name,
                     StreamType = game.Value.StreamType,
-                    StreamUrl = game.Value.StreamUrl
+                    StreamUrl = game.Value.StreamUrl,
+                    Details = game.Value.Details,
+                    State = game.Value.State,
+                    ApplicationId = game.Value.ApplicationId ?? Optional.Create<ulong>(),
+                    Assets = assets,
+                    Party = party,
+                    Secrets = secrets,
+                    Timestamps = timestamps,
                 };
             }
             else
