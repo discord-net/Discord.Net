@@ -33,6 +33,8 @@ namespace Discord.Rest
         internal bool Available { get; private set; }
 
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
+
+        [Obsolete("DefaultChannelId is deprecated, use GetDefaultChannelAsync")]
         public ulong DefaultChannelId => Id;
         public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
@@ -185,8 +187,12 @@ namespace Discord.Rest
         }
         public async Task<RestTextChannel> GetDefaultChannelAsync(RequestOptions options = null)
         {
-            var channel = await GuildHelper.GetChannelAsync(this, Discord, DefaultChannelId, options).ConfigureAwait(false);
-            return channel as RestTextChannel;
+            var channels = await GetTextChannelsAsync(options).ConfigureAwait(false);
+            var user = await GetCurrentUserAsync(options).ConfigureAwait(false);
+            return channels
+                .Where(c => user.GetPermissions(c).ReadMessages)
+                .OrderBy(c => c.Position)
+                .FirstOrDefault();
         }
         public async Task<RestGuildChannel> GetEmbedChannelAsync(RequestOptions options = null)
         {

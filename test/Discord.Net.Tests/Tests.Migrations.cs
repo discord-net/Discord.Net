@@ -57,7 +57,7 @@ namespace Discord
             
             foreach (var channel in textChannels)
             {
-                if (channel.Id != guild.DefaultChannelId)
+                //if (channel.Id != guild.DefaultChannelId)
                     await channel.DeleteAsync();
             }
             foreach (var channel in voiceChannels)
