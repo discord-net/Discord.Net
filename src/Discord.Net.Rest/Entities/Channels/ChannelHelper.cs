@@ -290,8 +290,8 @@ namespace Discord.Rest
             return author;
         }
 
-        public static bool IsNsfw(IChannel channel) =>
-            IsNsfw(channel.Name);
+        public static bool IsNsfw(IChannel channel)
+            => IsNsfw(channel.Name);
         public static bool IsNsfw(string channelName) =>
             channelName == "nsfw" || channelName.StartsWith("nsfw-");
     }

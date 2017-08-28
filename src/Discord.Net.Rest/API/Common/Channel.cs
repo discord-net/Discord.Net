@@ -29,6 +29,8 @@ namespace Discord.API
         public Optional<string> Topic { get; set; }
         [JsonProperty("last_pin_timestamp")]
         public Optional<DateTimeOffset?> LastPinTimestamp { get; set; }
+        [JsonProperty("nsfw")]
+        public Optional<bool> Nsfw { get; set; }
 
         //VoiceChannel
         [JsonProperty("bitrate")]
