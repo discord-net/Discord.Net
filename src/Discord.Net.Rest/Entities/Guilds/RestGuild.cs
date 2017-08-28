@@ -33,9 +33,9 @@ namespace Discord.Rest
         internal bool Available { get; private set; }
 
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
+
         [Obsolete("DefaultChannelId is deprecated, use GetDefaultChannelAsync")]
-        public ulong DefaultChannelId =>
-            throw new NotSupportedException("DefaultChannelId can not be accessed synchronously, see GetDefaultChannelAsync");  
+        public ulong DefaultChannelId => Id;
         public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
 
