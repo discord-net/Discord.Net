@@ -1,6 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <VersionPrefix>1.1.0-alpha</VersionPrefix>
+        <VersionPrefix>2.0.0-alpha</VersionPrefix>
         <VersionSuffix></VersionSuffix>
         <Authors>RogueException</Authors>
         <PackageTags>discord;discordapp</PackageTags>
