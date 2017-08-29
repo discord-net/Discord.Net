@@ -8,7 +8,6 @@ namespace Discord.Rpc
     public class RpcChannel : RpcEntity<ulong>
     {
         public string Name { get; private set; }
-        public bool IsNsfw => ChannelHelper.IsNsfw(Name);
 
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
