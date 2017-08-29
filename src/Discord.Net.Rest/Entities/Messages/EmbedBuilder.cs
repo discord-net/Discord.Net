@@ -171,24 +171,16 @@ namespace Discord
             return this;
         }
 
-        public EmbedBuilder AddField(string name, object value)
+        public EmbedBuilder AddField(string name, object value, bool inline = false)
         {
             var field = new EmbedFieldBuilder()
-                .WithIsInline(false)
+                .WithIsInline(inline)
                 .WithName(name)
                 .WithValue(value);
             AddField(field);
             return this;
         }
-        public EmbedBuilder AddInlineField(string name, object value)
-        {
-            var field = new EmbedFieldBuilder()
-                .WithIsInline(true)
-                .WithName(name)
-                .WithValue(value);
-            AddField(field);
-            return this;
-        }
+
         public EmbedBuilder AddField(EmbedFieldBuilder field)
         {
             if (Fields.Count >= MaxFieldCount)
@@ -204,17 +196,6 @@ namespace Discord
             var field = new EmbedFieldBuilder();
             action(field);
             this.AddField(field);
-            return this;
-        }
-        public EmbedBuilder AddField(string title, string text, bool inline = false)
-        {
-            var field = new EmbedFieldBuilder
-            {
-                Name = title,
-                Value = text,
-                IsInline = inline
-            };
-            _fields.Add(field);
             return this;
         }
 
