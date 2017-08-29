@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -8,6 +9,7 @@ namespace Discord
         /// <summary> Gets the name of this channel. </summary>
         string Name { get; }
 
+        [Obsolete("Deprecated, please use ITextChannel#IsNsfw instead")]
         /// <summary> Checks if the channel is NSFW. </summary>
         bool IsNsfw { get; }
 
