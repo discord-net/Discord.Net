@@ -188,17 +188,22 @@ namespace Discord.Commands
                 if (task is Task<IResult> resultTask)
                 {
                     var result = await resultTask.ConfigureAwait(false);
+                    await Module.Service._commandExecutedEvent.InvokeAsync(this, context, result).ConfigureAwait(false);
                     if (result is RuntimeResult execResult)
                         return execResult;
                 }
                 else if (task is Task<ExecuteResult> execTask)
                 {
-                    return await execTask.ConfigureAwait(false);
+                    var result = await execTask.ConfigureAwait(false);
+                    await Module.Service._commandExecutedEvent.InvokeAsync(this, context, result).ConfigureAwait(false);
+                    return result;
                 }
                 else
                     await task.ConfigureAwait(false);
 
-                return ExecuteResult.FromSuccess();
+                var executeResult = ExecuteResult.FromSuccess();
+                await Module.Service._commandExecutedEvent.InvokeAsync(this, context, executeResult).ConfigureAwait(false);
+                return executeResult;
             }
             catch (Exception ex)
             {
