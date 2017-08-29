@@ -41,7 +41,8 @@ namespace Discord.Rest
             {
                 Name = args.Name,
                 Position = args.Position,
-                Topic = args.Topic
+                Topic = args.Topic,
+                IsNsfw = args.IsNsfw
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
