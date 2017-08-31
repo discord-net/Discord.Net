@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 using UserModel = Discord.API.User;
+using WebhookModel = Discord.API.Webhook;
 
 namespace Discord.Rest
 {
@@ -278,6 +279,30 @@ namespace Discord.Rest
         public static IDisposable EnterTypingState(IMessageChannel channel, BaseDiscordClient client, 
             RequestOptions options)
             => new TypingNotifier(client, channel, options);
+
+        //Webhooks
+        public static async Task<RestWebhook> CreateWebhookAsync(ITextChannel channel, BaseDiscordClient client, string name, Stream avatar, RequestOptions options)
+        {
+            var args = new CreateWebhookParams { Name = name };
+            if (avatar != null)
+                args.Avatar = new API.Image(avatar);
+
+            var model = await client.ApiClient.CreateWebhookAsync(channel.Id, args, options).ConfigureAwait(false);
+            return RestWebhook.Create(client, channel, model);
+        }
+        public static async Task<RestWebhook> GetWebhookAsync(ITextChannel channel, BaseDiscordClient client, ulong id, RequestOptions options)
+        {
+            var model = await client.ApiClient.GetWebhookAsync(id, options: options).ConfigureAwait(false);
+            if (model == null)
+                return null;
+            return RestWebhook.Create(client, channel, model);
+        }
+        public static async Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(ITextChannel channel, BaseDiscordClient client, RequestOptions options)
+        {
+            var models = await client.ApiClient.GetChannelWebhooksAsync(channel.Id, options).ConfigureAwait(false);
+            return models.Select(x => RestWebhook.Create(client, channel, x))
+                .ToImmutableArray();
+        }
 
         //Helpers
         private static IUser GetAuthor(BaseDiscordClient client, IGuild guild, UserModel model, ulong? webhookId)

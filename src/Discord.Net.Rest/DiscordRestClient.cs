@@ -91,6 +91,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task<RestVoiceRegion> GetVoiceRegionAsync(string id, RequestOptions options = null)
             => ClientHelper.GetVoiceRegionAsync(this, id, options);
+        /// <inheritdoc />
+        public Task<RestWebhook> GetWebhookAsync(ulong id, string webhookToken = null, RequestOptions options = null)
+            => ClientHelper.GetWebhookAsync(this, id, webhookToken, options);
 
         //IDiscordClient
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
@@ -160,5 +163,8 @@ namespace Discord.Rest
             => await GetVoiceRegionsAsync(options).ConfigureAwait(false);
         async Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
             => await GetVoiceRegionAsync(id, options).ConfigureAwait(false);
+
+        async Task<IWebhook> IDiscordClient.GetWebhookAsync(ulong id, string webhookToken, RequestOptions options)
+            => await GetWebhookAsync(id, webhookToken, options);
     }
 }

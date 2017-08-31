@@ -108,9 +108,25 @@ namespace Discord.WebSocket
             }
             return null;
         }
-        
+
+        //Webhooks
+        public Task<RestWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null)
+            => ChannelHelper.CreateWebhookAsync(this, Discord, name, avatar, options);
+        public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
+            => ChannelHelper.GetWebhookAsync(this, Discord, id, options);
+        public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
+            => ChannelHelper.GetWebhooksAsync(this, Discord, options);
+
         private string DebuggerDisplay => $"{Name} ({Id}, Text)";
         internal new SocketTextChannel Clone() => MemberwiseClone() as SocketTextChannel;
+
+        //ITextChannel
+        async Task<IWebhook> ITextChannel.CreateWebhookAsync(string name, Stream avatar, RequestOptions options)
+            => await CreateWebhookAsync(name, avatar, options);
+        async Task<IWebhook> ITextChannel.GetWebhookAsync(ulong id, RequestOptions options)
+            => await GetWebhookAsync(id, options);
+        async Task<IReadOnlyCollection<IWebhook>> ITextChannel.GetWebhooksAsync(RequestOptions options)
+            => await GetWebhooksAsync(options);
 
         //IGuildChannel
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
