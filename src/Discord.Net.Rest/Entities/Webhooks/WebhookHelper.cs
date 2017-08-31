@@ -9,7 +9,7 @@ namespace Discord.Rest
     internal static class WebhookHelper
     {
         public static async Task<Model> ModifyAsync(IWebhook webhook, BaseDiscordClient client,
-            Action<WebhookProperties> func, string webhookToken, RequestOptions options)
+            Action<WebhookProperties> func, RequestOptions options)
         {
             var args = new WebhookProperties();
             func(args);
@@ -22,12 +22,11 @@ namespace Discord.Rest
             if (!apiArgs.Avatar.IsSpecified && webhook.AvatarId != null)
                 apiArgs.Avatar = new ImageModel(webhook.AvatarId);
 
-            return await client.ApiClient.ModifyWebhookAsync(webhook.Id, apiArgs, webhookToken, options).ConfigureAwait(false);
+            return await client.ApiClient.ModifyWebhookAsync(webhook.Id, apiArgs, options).ConfigureAwait(false);
         }
-        public static async Task DeleteAsync(IWebhook webhook, BaseDiscordClient client, string webhookToken,
-            RequestOptions options)
+        public static async Task DeleteAsync(IWebhook webhook, BaseDiscordClient client, RequestOptions options)
         {
-            await client.ApiClient.DeleteWebhookAsync(webhook.Id, webhookToken, options).ConfigureAwait(false);
+            await client.ApiClient.DeleteWebhookAsync(webhook.Id, options).ConfigureAwait(false);
         }
 
     }

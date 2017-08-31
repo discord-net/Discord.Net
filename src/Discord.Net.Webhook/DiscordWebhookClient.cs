@@ -20,6 +20,9 @@ namespace Discord.Webhook
         internal LogManager LogManager { get; }
 
         /// <summary> Creates a new Webhook discord client. </summary>
+        public DiscordWebhookClient(IWebhook webhook)
+            : this(webhook.Id, webhook.Token) {  }
+        /// <summary> Creates a new Webhook discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken)
             : this(webhookId, webhookToken, new DiscordRestConfig()) { }
         /// <summary> Creates a new Webhook discord client. </summary>
