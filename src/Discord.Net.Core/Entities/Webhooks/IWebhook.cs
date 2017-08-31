@@ -29,6 +29,6 @@ namespace Discord
         IUser Creator { get; }
 
         /// <summary> Modifies this webhook. </summary>
-        Task ModifyAsync(Action<WebhookProperties> func, string webhookToken = null, RequestOptions options = null);
+        Task ModifyAsync(Action<WebhookProperties> func, RequestOptions options = null);
     }
 }

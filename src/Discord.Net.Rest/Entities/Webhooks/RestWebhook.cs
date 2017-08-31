@@ -8,8 +8,8 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestWebhook : RestEntity<ulong>, IWebhook, IUpdateable
     {
-        internal IGuild Guild { get; }
-        internal ITextChannel Channel { get; }
+        internal IGuild Guild { get; private set; }
+        internal ITextChannel Channel { get; private set; }
         public string Token { get; private set; }
         public string Name { get; private set; }
         public string AvatarId { get; private set; }
@@ -57,21 +57,29 @@ namespace Discord.Rest
 
         public async Task UpdateAsync(RequestOptions options = null)
         {
-            var model = await Discord.ApiClient.GetWebhookAsync(Id, Token, options).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetWebhookAsync(Id, options).ConfigureAwait(false);
             Update(model);
         }
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
            => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
 
-        public async Task ModifyAsync(Action<WebhookProperties> func, string webhookToken = null, RequestOptions options = null)
+        public async Task ModifyAsync(Action<WebhookProperties> func, RequestOptions options = null)
         {
-            var model = await WebhookHelper.ModifyAsync(this, Discord, func, webhookToken, options).ConfigureAwait(false);
+            var model = await WebhookHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
 
-        public Task DeleteAsync(string webhookToken = null, RequestOptions options = null)
-            => WebhookHelper.DeleteAsync(this, Discord, webhookToken, options);
+        public Task DeleteAsync(RequestOptions options = null)
+            => WebhookHelper.DeleteAsync(this, Discord, options);
+
+        public async Task<RestTextChannel> GetChannelAsync(RequestOptions options = null)
+        {
+            Channel = await ClientHelper.GetChannelAsync(Discord, ChannelId, options) as RestTextChannel;
+            Guild = Channel.Guild;
+
+            return Channel as RestTextChannel;
+        }
 
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
@@ -81,9 +89,7 @@ namespace Discord.Rest
             => Guild ?? throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
         ITextChannel IWebhook.Channel 
             => Channel ?? throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
-        Task IWebhook.ModifyAsync(Action<WebhookProperties> func, string webhookToken, RequestOptions options)
-            => ModifyAsync(func, webhookToken, options);
-        Task IDeletable.DeleteAsync(RequestOptions options)
-            => DeleteAsync(Token, options);
+        Task IWebhook.ModifyAsync(Action<WebhookProperties> func, RequestOptions options)
+            => ModifyAsync(func, options);
     }
 }

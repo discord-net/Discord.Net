@@ -9,7 +9,7 @@ namespace Discord.API.Rest
         [JsonProperty("content")]
         public string Content { get; }
         [JsonProperty("wait")]
-        public bool ReturnCreatedMessage { get; set; }
+        public bool ReturnCreatedMessage { get; set; } = true;
 
         [JsonProperty("nonce")]
         public Optional<string> Nonce { get; set; }
