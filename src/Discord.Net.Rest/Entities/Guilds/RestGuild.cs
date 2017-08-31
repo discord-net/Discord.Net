@@ -257,6 +257,12 @@ namespace Discord.Rest
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null)
             => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options);
 
+        //Webhooks
+        public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
+            => GuildHelper.GetWebhookAsync(this, Discord, id, options);
+        public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
+            => GuildHelper.GetWebhooksAsync(this, Discord, options);
+
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
 
@@ -386,5 +392,10 @@ namespace Discord.Rest
                 return ImmutableArray.Create<IGuildUser>();
         }
         Task IGuild.DownloadUsersAsync() { throw new NotSupportedException(); }
+
+        async Task<IWebhook> IGuild.GetWebhookAsync(ulong id, RequestOptions options)
+            => await GetWebhookAsync(id, options);
+        async Task<IReadOnlyCollection<IWebhook>> IGuild.GetWebhooksAsync(RequestOptions options)
+            => await GetWebhooksAsync(options);
     }
 }

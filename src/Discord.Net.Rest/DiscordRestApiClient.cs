@@ -473,10 +473,12 @@ namespace Discord.API
             var ids = new BucketIds(channelId: channelId);
             return await SendJsonAsync<Message>("POST", () => $"channels/{channelId}/messages", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
-        public async Task CreateWebhookMessageAsync(ulong webhookId, CreateWebhookMessageParams args, RequestOptions options = null)
+        public async Task<Message> CreateWebhookMessageAsync(ulong webhookId, CreateWebhookMessageParams args, string webhookToken = null, RequestOptions options = null)
         {
-            if (AuthTokenType != TokenType.Webhook)
+            if (AuthTokenType != TokenType.Webhook && string.IsNullOrWhiteSpace(webhookToken))
                 throw new InvalidOperationException($"This operation may only be called with a {nameof(TokenType.Webhook)} token.");
+
+            webhookToken = webhookToken ?? AuthToken;
 
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
@@ -487,7 +489,11 @@ namespace Discord.API
                 throw new ArgumentException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             options = RequestOptions.CreateOrClone(options);
 
-            await SendJsonAsync("POST", () => $"webhooks/{webhookId}/{AuthToken}", args, new BucketIds(), clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            if (args.ReturnCreatedMessage)
+                return await SendJsonAsync<Message>("POST", () => $"webhooks/{webhookId}/{webhookToken}", args, new BucketIds(), clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+
+            await SendJsonAsync("POST", () => $"webhooks/{webhookId}/{webhookToken}", args, new BucketIds(), clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+            return null;
         }
         public async Task<Message> UploadFileAsync(ulong channelId, UploadFileParams args, RequestOptions options = null)
         {
@@ -1152,6 +1158,79 @@ namespace Discord.API
 
             var ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<VoiceRegion>>("GET", () => $"guilds/{guildId}/regions", ids, options: options).ConfigureAwait(false);
+        }
+
+        //Webhooks
+        public async Task<Webhook> CreateWebhookAsync(ulong channelId, CreateWebhookParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotNull(args.Name, nameof(args.Name));
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendJsonAsync<Webhook>("POST", () => $"channels/{channelId}/webhooks", args, new BucketIds(), options: options);
+        }
+        public async Task<Webhook> GetWebhookAsync(ulong webhookId, string webhookToken = null, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
+            options = RequestOptions.CreateOrClone(options);
+
+            if (!string.IsNullOrWhiteSpace(webhookToken))
+            {
+                webhookToken = "/" + webhookToken;
+                options.IgnoreState = true;
+            }
+
+            try
+            {
+                return await SendAsync<Webhook>("GET", () => $"webhooks/{webhookId}{webhookToken}", new BucketIds(), options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
+        }
+        public async Task<Webhook> ModifyWebhookAsync(ulong webhookId, ModifyWebhookParams args, string webhookToken = null, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
+            options = RequestOptions.CreateOrClone(options);
+
+            if (!string.IsNullOrWhiteSpace(webhookToken))
+            {
+                webhookToken = "/" + webhookToken;
+                options.IgnoreState = true;
+            }
+
+            return await SendJsonAsync<Webhook>("PATCH", () => $"webhooks/{webhookId}{webhookToken}", args, new BucketIds(), options: options).ConfigureAwait(false);
+        }
+        public async Task DeleteWebhookAsync(ulong webhookId, string webhookToken = null, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
+            options = RequestOptions.CreateOrClone(options);
+            options.IgnoreState = true;
+
+            if (!string.IsNullOrWhiteSpace(webhookToken))
+            {
+                webhookToken = "/" + webhookToken;
+                options.IgnoreState = true;
+            }
+
+            await SendAsync("DELETE", () => $"webhooks/{webhookId}{webhookToken}", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+        public async Task<IReadOnlyCollection<Webhook>> GetGuildWebhooksAsync(ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(guildId: guildId);
+            return await SendAsync<IReadOnlyCollection<Webhook>>("GET", () => $"guilds/{guildId}/webhooks", ids, options: options).ConfigureAwait(false);
+        }
+        public async Task<IReadOnlyCollection<Webhook>> GetChannelWebhooksAsync(ulong channelId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(channelId: channelId);
+            return await SendAsync<IReadOnlyCollection<Webhook>>("GET", () => $"channels/{channelId}/webhooks", ids, options: options).ConfigureAwait(false);
         }
 
         //Helpers

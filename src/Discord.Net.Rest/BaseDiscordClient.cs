@@ -164,6 +164,9 @@ namespace Discord.Rest
         Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
             => Task.FromResult<IVoiceRegion>(null);
 
+        Task<IWebhook> IDiscordClient.GetWebhookAsync(ulong id, string webhookToken, RequestOptions options)
+            => Task.FromResult<IWebhook>(null);
+
         Task IDiscordClient.StartAsync()
             => Task.Delay(0);
         Task IDiscordClient.StopAsync()

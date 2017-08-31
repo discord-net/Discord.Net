@@ -56,7 +56,7 @@ namespace Discord.Webhook
                 args.Username = username;
             if (avatarUrl != null)
                 args.AvatarUrl = avatarUrl;
-            await ApiClient.CreateWebhookMessageAsync(_webhookId, args, options).ConfigureAwait(false);
+            await ApiClient.CreateWebhookMessageAsync(_webhookId, args, options: options).ConfigureAwait(false);
         }
 
 #if FILESYSTEM

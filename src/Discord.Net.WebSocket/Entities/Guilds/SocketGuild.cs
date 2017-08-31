@@ -433,6 +433,12 @@ namespace Discord.WebSocket
             _downloaderPromise.TrySetResultAsync(true);
         }
 
+        //Webhooks
+        public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
+            => GuildHelper.GetWebhookAsync(this, Discord, id, options);
+        public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
+            => GuildHelper.GetWebhooksAsync(this, Discord, options);
+
         //Voice States
         internal async Task<SocketVoiceState> AddOrUpdateVoiceStateAsync(ClientState state, VoiceStateModel model)
         {
@@ -672,5 +678,10 @@ namespace Discord.WebSocket
         Task<IGuildUser> IGuild.GetOwnerAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(Owner);
         Task IGuild.DownloadUsersAsync() { throw new NotSupportedException(); }
+
+        async Task<IWebhook> IGuild.GetWebhookAsync(ulong id, RequestOptions options)
+            => await GetWebhookAsync(id, options);
+        async Task<IReadOnlyCollection<IWebhook>> IGuild.GetWebhooksAsync(RequestOptions options)
+            => await GetWebhooksAsync(options);
     }
 }
