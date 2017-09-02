@@ -42,7 +42,7 @@ namespace Discord.Commands
             GuildPermission = null;
         }
         
-        public override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider services)
+        public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
             var guildUser = context.User as IGuildUser;
 

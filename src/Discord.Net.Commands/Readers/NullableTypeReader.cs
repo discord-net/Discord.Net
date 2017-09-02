@@ -24,11 +24,11 @@ namespace Discord.Commands
             _baseTypeReader = baseTypeReader;
         }
 
-        public override async Task<TypeReaderResult> Read(ICommandContext context, string input, IServiceProvider services)
+        public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
             if (string.Equals(input, "null", StringComparison.OrdinalIgnoreCase) || string.Equals(input, "nothing", StringComparison.OrdinalIgnoreCase))
                 return TypeReaderResult.FromSuccess(new T?());
-            return await _baseTypeReader.Read(context, input, services); ;
+            return await _baseTypeReader.ReadAsync(context, input, services); ;
         }
     }
 }

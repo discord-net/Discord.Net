@@ -59,7 +59,7 @@ namespace Discord.Commands
         public async Task<TypeReaderResult> Parse(ICommandContext context, string input, IServiceProvider services = null)
         {
             services = services ?? EmptyServiceProvider.Instance;
-            return await _reader.Read(context, input, services).ConfigureAwait(false);
+            return await _reader.ReadAsync(context, input, services).ConfigureAwait(false);
         }
 
         public override string ToString() => Name;

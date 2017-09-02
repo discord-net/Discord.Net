@@ -78,7 +78,7 @@ namespace Discord.Commands
                     {
                         foreach (PreconditionAttribute precondition in preconditionGroup)
                         {
-                            var result = await precondition.CheckPermissions(context, this, services).ConfigureAwait(false);
+                            var result = await precondition.CheckPermissionsAsync(context, this, services).ConfigureAwait(false);
                             if (!result.IsSuccess)
                                 return result;
                         }
@@ -87,7 +87,7 @@ namespace Discord.Commands
                     {
                         var results = new List<PreconditionResult>();
                         foreach (PreconditionAttribute precondition in preconditionGroup)
-                            results.Add(await precondition.CheckPermissions(context, this, services).ConfigureAwait(false));
+                            results.Add(await precondition.CheckPermissionsAsync(context, this, services).ConfigureAwait(false));
 
                         if (!results.Any(p => p.IsSuccess))
                             return PreconditionGroupResult.FromError($"{type} precondition group {preconditionGroup.Key} failed.", results);

@@ -13,6 +13,6 @@ namespace Discord.Commands
         /// </summary>
         public string Group { get; set; } = null;
 
-        public abstract Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider services);
+        public abstract Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services);
     }
 }
