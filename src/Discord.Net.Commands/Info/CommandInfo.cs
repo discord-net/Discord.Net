@@ -117,7 +117,7 @@ namespace Discord.Commands
                 return ParseResult.FromError(preconditionResult);
 
             string input = searchResult.Text.Substring(startIndex);
-            return await CommandParser.ParseArgs(this, context, services, input, 0).ConfigureAwait(false);
+            return await CommandParser.ParseArgsAsync(this, context, services, input, 0).ConfigureAwait(false);
         }
 
         public Task<IResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)
@@ -163,11 +163,11 @@ namespace Discord.Commands
                 switch (RunMode)
                 {
                     case RunMode.Sync: //Always sync
-                        return await ExecuteAsyncInternal(context, args, services).ConfigureAwait(false);
+                        return await ExecuteAsyncInternalAsync(context, args, services).ConfigureAwait(false);
                     case RunMode.Async: //Always async
                         var t2 = Task.Run(async () =>
                         {
-                            await ExecuteAsyncInternal(context, args, services).ConfigureAwait(false);
+                            await ExecuteAsyncInternalAsync(context, args, services).ConfigureAwait(false);
                         });
                         break;
                 }
@@ -179,7 +179,7 @@ namespace Discord.Commands
             }
         }
 
-        private async Task<IResult> ExecuteAsyncInternal(ICommandContext context, object[] args, IServiceProvider services)
+        private async Task<IResult> ExecuteAsyncInternalAsync(ICommandContext context, object[] args, IServiceProvider services)
         {
             await Module.Service._cmdLogger.DebugAsync($"Executing {GetLogText(context)}").ConfigureAwait(false);
             try

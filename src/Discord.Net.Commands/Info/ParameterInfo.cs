@@ -56,7 +56,7 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
 
-        public async Task<TypeReaderResult> Parse(ICommandContext context, string input, IServiceProvider services = null)
+        public async Task<TypeReaderResult> ParseAsync(ICommandContext context, string input, IServiceProvider services = null)
         {
             services = services ?? EmptyServiceProvider.Instance;
             return await _reader.ReadAsync(context, input, services).ConfigureAwait(false);
