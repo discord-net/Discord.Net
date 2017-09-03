@@ -29,7 +29,7 @@ namespace Discord.Rpc
         public RestApplication ApplicationInfo { get; private set; }
 
         /// <summary> Creates a new RPC discord client. </summary>
-        public DiscordRpcClient(string clientId, string origin) 
+        public DiscordRpcClient(string clientId, string origin)
             : this(clientId, origin, new DiscordRpcConfig()) { }
         /// <summary> Creates a new RPC discord client. </summary>
         public DiscordRpcClient(string clientId, string origin, DiscordRpcConfig config)
@@ -38,8 +38,8 @@ namespace Discord.Rpc
             _stateLock = new SemaphoreSlim(1, 1);
             _authorizeLock = new SemaphoreSlim(1, 1);
             _rpcLogger = LogManager.CreateLogger("RPC");
-            _connection = new ConnectionManager(_stateLock, _rpcLogger, config.ConnectionTimeout, 
-                OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
+            _connection = new ConnectionManager(_stateLock, _rpcLogger, config.ConnectionTimeout,
+                ConnectAsync, DisconnectAsync, x => ApiClient.Disconnected += x);
             _connection.Connected += () => _connectedEvent.InvokeAsync();
             _connection.Disconnected += (ex, recon) => _disconnectedEvent.InvokeAsync(ex);
 
@@ -49,7 +49,7 @@ namespace Discord.Rpc
                 _rpcLogger.WarningAsync(e.ErrorContext.Error).GetAwaiter().GetResult();
                 e.ErrorContext.Handled = true;
             };
-            
+
             ApiClient.SentRpcMessage += async opCode => await _rpcLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
             ApiClient.ReceivedRpcEvent += ProcessMessageAsync;
         }
@@ -68,14 +68,14 @@ namespace Discord.Rpc
         public Task StartAsync() => _connection.StartAsync();
         public Task StopAsync() => _connection.StopAsync();
 
-        private async Task OnConnectingAsync()
+        private async Task ConnectAsync()
         {
             await _rpcLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
             await ApiClient.ConnectAsync().ConfigureAwait(false);
 
             await _connection.WaitAsync().ConfigureAwait(false);
         }
-        private async Task OnDisconnectingAsync(Exception ex)
+        private async Task DisconnectAsync(Exception ex)
         {
             await _rpcLogger.DebugAsync("Disconnecting ApiClient").ConfigureAwait(false);
             await ApiClient.DisconnectAsync().ConfigureAwait(false);
@@ -313,7 +313,7 @@ namespace Discord.Rpc
                                                 ApplicationInfo = RestApplication.Create(this, response.Application);
                                                 Scopes = response.Scopes;
                                                 TokenExpiresAt = response.Expires;
-                                                
+
                                                 var __ = _connection.CompleteAsync();
                                                 await _rpcLogger.InfoAsync("Ready").ConfigureAwait(false);
                                             }
