@@ -8,6 +8,8 @@ namespace Discord
 {
     internal class ConnectionManager
     {
+        public event Func<Task> Connecting { add { _connectingEvent.Add(value); } remove { _connectingEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<Task>> _connectingEvent = new AsyncEvent<Func<Task>>();
         public event Func<Task> Connected { add { _connectedEvent.Add(value); } remove { _connectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Task>> _connectedEvent = new AsyncEvent<Func<Task>>();
         public event Func<Exception, bool, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
@@ -123,6 +125,8 @@ namespace Discord
 
             try
             {
+                await _connectingEvent.InvokeAsync().ConfigureAwait(false);
+
                 var readyPromise = new TaskCompletionSource<bool>();
                 _readyPromise = readyPromise;
 

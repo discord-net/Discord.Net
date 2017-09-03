@@ -92,6 +92,7 @@ namespace Discord.WebSocket
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : $"Shard #{ShardId}");
             _connection = new ConnectionManager(_stateLock, _gatewayLogger, config.ConnectionTimeout,
                 ConnectAsync, DisconnectAsync, x => ApiClient.Disconnected += x);
+            _connection.Connecting += () => TimedInvokeAsync(_connectingEvent, nameof(Connecting));
             _connection.Connected += () => TimedInvokeAsync(_connectedEvent, nameof(Connected));
             _connection.Disconnected += (ex, recon) => TimedInvokeAsync(_disconnectedEvent, nameof(Disconnected), ex);
 

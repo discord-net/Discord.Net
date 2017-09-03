@@ -40,6 +40,7 @@ namespace Discord.Rpc
             _rpcLogger = LogManager.CreateLogger("RPC");
             _connection = new ConnectionManager(_stateLock, _rpcLogger, config.ConnectionTimeout,
                 ConnectAsync, DisconnectAsync, x => ApiClient.Disconnected += x);
+            _connection.Connecting += () => _connectingEvent.InvokeAsync();
             _connection.Connected += () => _connectedEvent.InvokeAsync();
             _connection.Disconnected += (ex, recon) => _disconnectedEvent.InvokeAsync(ex);
 
