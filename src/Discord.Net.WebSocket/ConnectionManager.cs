@@ -8,6 +8,8 @@ namespace Discord
 {
     internal class ConnectionManager
     {
+        public event Func<Task> Connecting { add { _connectingEvent.Add(value); } remove { _connectingEvent.Remove(value); } }
+        private readonly AsyncEvent<Func<Task>> _connectingEvent = new AsyncEvent<Func<Task>>();
         public event Func<Task> Connected { add { _connectedEvent.Add(value); } remove { _connectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Task>> _connectedEvent = new AsyncEvent<Func<Task>>();
         public event Func<Exception, bool, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
@@ -16,8 +18,8 @@ namespace Discord
         private readonly SemaphoreSlim _stateLock;
         private readonly Logger _logger;
         private readonly int _connectionTimeout;
-        private readonly Func<Task> _onConnecting;
-        private readonly Func<Exception, Task> _onDisconnecting;
+        private readonly Func<Task> _connect;
+        private readonly Func<Exception, Task> _disconnect;
 
         private TaskCompletionSource<bool> _connectionPromise, _readyPromise;
         private CancellationTokenSource _combinedCancelToken, _reconnectCancelToken, _connectionCancelToken;
@@ -26,14 +28,14 @@ namespace Discord
         public ConnectionState State { get; private set; }
         public CancellationToken CancelToken { get; private set; }
 
-        internal ConnectionManager(SemaphoreSlim stateLock, Logger logger, int connectionTimeout, 
-            Func<Task> onConnecting, Func<Exception, Task> onDisconnecting, Action<Func<Exception, Task>> clientDisconnectHandler)
+        internal ConnectionManager(SemaphoreSlim stateLock, Logger logger, int connectionTimeout,
+            Func<Task> connect, Func<Exception, Task> disconnect, Action<Func<Exception, Task>> clientDisconnectHandler)
         {
             _stateLock = stateLock;
             _logger = logger;
             _connectionTimeout = connectionTimeout;
-            _onConnecting = onConnecting;
-            _onDisconnecting = onDisconnecting;
+            _connect = connect;
+            _disconnect = disconnect;
 
             clientDisconnectHandler(ex =>
             {
@@ -67,16 +69,16 @@ namespace Discord
                         try
                         {
                             await ConnectAsync(reconnectCancelToken).ConfigureAwait(false);
-                            nextReconnectDelay = 1000; //Reset delay                          
+                            nextReconnectDelay = 1000; //Reset delay
                             await _connectionPromise.Task.ConfigureAwait(false);
                         }
-                        catch (OperationCanceledException ex) 
-                        { 
+                        catch (OperationCanceledException ex)
+                        {
                             Cancel(); //In case this exception didn't come from another Error call
                             await DisconnectAsync(ex, !reconnectCancelToken.IsCancellationRequested).ConfigureAwait(false);
                         }
-                        catch (Exception ex) 
-                        { 
+                        catch (Exception ex)
+                        {
                             Error(ex); //In case this exception didn't come from another Error call
                             if (!reconnectCancelToken.IsCancellationRequested)
                             {
@@ -120,9 +122,11 @@ namespace Discord
             _connectionPromise = new TaskCompletionSource<bool>();
             State = ConnectionState.Connecting;
             await _logger.InfoAsync("Connecting").ConfigureAwait(false);
-            
+
             try
             {
+                await _connectingEvent.InvokeAsync().ConfigureAwait(false);
+
                 var readyPromise = new TaskCompletionSource<bool>();
                 _readyPromise = readyPromise;
 
@@ -138,7 +142,7 @@ namespace Discord
                     catch (OperationCanceledException) { }
                 });
 
-                await _onConnecting().ConfigureAwait(false);
+                await _connect().ConfigureAwait(false);
 
                 await _logger.InfoAsync("Connected").ConfigureAwait(false);
                 State = ConnectionState.Connected;
@@ -157,7 +161,7 @@ namespace Discord
             State = ConnectionState.Disconnecting;
             await _logger.InfoAsync("Disconnecting").ConfigureAwait(false);
 
-            await _onDisconnecting(ex).ConfigureAwait(false);
+            await _disconnect(ex).ConfigureAwait(false);
 
             await _logger.InfoAsync("Disconnected").ConfigureAwait(false);
             State = ConnectionState.Disconnected;
