@@ -10,7 +10,7 @@ using Model = Discord.API.Channel;
 namespace Discord.WebSocket
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public abstract class SocketGuildChannel : SocketChannel, IGuildChannel
+    public class SocketGuildChannel : SocketChannel, IGuildChannel
     {
         private ImmutableArray<Overwrite> _overwrites;
 
@@ -19,7 +19,7 @@ namespace Discord.WebSocket
         public int Position { get; private set; }
 
         public IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
-        public new abstract IReadOnlyCollection<SocketGuildUser> Users { get; }
+        public new virtual IReadOnlyCollection<SocketGuildUser> Users => ImmutableArray.Create<SocketGuildUser>();
 
         internal SocketGuildChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
             : base(discord, id)
@@ -35,7 +35,8 @@ namespace Discord.WebSocket
                 case ChannelType.Voice:
                     return SocketVoiceChannel.Create(guild, state, model);
                 default:
-                    throw new InvalidOperationException("Unknown guild channel type");
+                    // TODO: Proper implementation for channel categories
+                    return new SocketGuildChannel(guild.Discord, model.Id, guild);
             }
         }
         internal override void Update(ClientState state, Model model)
@@ -49,7 +50,7 @@ namespace Discord.WebSocket
                 newOverwrites.Add(overwrites[i].ToEntity());
             _overwrites = newOverwrites.ToImmutable();
         }
-        
+
         public Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
         public Task DeleteAsync(RequestOptions options = null)
@@ -115,7 +116,7 @@ namespace Discord.WebSocket
         public async Task<RestInviteMetadata> CreateInviteAsync(int? maxAge = 3600, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
             => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
 
-        public new abstract SocketGuildUser GetUser(ulong id);
+        public new virtual SocketGuildUser GetUser(ulong id) => null;
 
         public override string ToString() => Name;
         internal new SocketGuildChannel Clone() => MemberwiseClone() as SocketGuildChannel;
@@ -145,7 +146,7 @@ namespace Discord.WebSocket
             => await RemovePermissionOverwriteAsync(role, options).ConfigureAwait(false);
         async Task IGuildChannel.RemovePermissionOverwriteAsync(IUser user, RequestOptions options)
             => await RemovePermissionOverwriteAsync(user, options).ConfigureAwait(false);
-        
+
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
