@@ -7,7 +7,7 @@ using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
-    public abstract class RestGuildChannel : RestChannel, IGuildChannel, IUpdateable
+    public class RestGuildChannel : RestChannel, IGuildChannel, IUpdateable
     {
         private ImmutableArray<Overwrite> _overwrites;
 
@@ -33,7 +33,8 @@ namespace Discord.Rest
                 case ChannelType.Voice:
                     return RestVoiceChannel.Create(discord, guild, model);
                 default:
-                    throw new InvalidOperationException("Unknown guild channel type");
+                    // TODO: Channel categories
+                    return new RestGuildChannel(discord, guild, model.Id);
             }
         }
         internal override void Update(Model model)
