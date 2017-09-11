@@ -1,0 +1,9 @@
+
+1
+2
+3
+4
+static void Main(string[] args)
+        {
+            MyBot bot = new Bot Pata();
+        }
