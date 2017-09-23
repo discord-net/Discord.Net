@@ -18,6 +18,8 @@ namespace Discord.API.Rest
         public Optional<DefaultMessageNotifications> DefaultMessageNotifications { get; set; }
         [JsonProperty("afk_timeout")]
         public Optional<int> AfkTimeout { get; set; }
+        [JsonProperty("system_channel_id")]
+        public Optional<ulong?> SystemChannelId { get; set; }
         [JsonProperty("icon")]
         public Optional<Image?> Icon { get; set; }
         [JsonProperty("splash")]
