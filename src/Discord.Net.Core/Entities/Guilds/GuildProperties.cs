@@ -60,6 +60,14 @@
         /// </summary>
         public Optional<ulong?> AfkChannelId { get; set; }
         /// <summary>
+        /// The ITextChannel where System messages should be sent.
+        /// </summary>
+        public Optional<ITextChannel> SystemChannel { get; set; }
+        /// <summary>
+        /// The ID of the ITextChannel where System messages should be sent.
+        /// </summary>
+        public Optional<ulong?> SystemChannelId { get; set; }
+        /// <summary>
         /// The owner of this guild.
         /// </summary>
         public Optional<IUser> Owner { get; set; }

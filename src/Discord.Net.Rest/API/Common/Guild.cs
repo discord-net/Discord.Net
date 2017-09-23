@@ -25,6 +25,8 @@ namespace Discord.API
         public bool EmbedEnabled { get; set; }
         [JsonProperty("embed_channel_id")]
         public ulong? EmbedChannelId { get; set; }
+        [JsonProperty("system_channel_id")]
+        public ulong? SystemChannelId { get; set; }
         [JsonProperty("verification_level")]
         public VerificationLevel VerificationLevel { get; set; }
         [JsonProperty("voice_states")]

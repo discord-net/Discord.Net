@@ -47,6 +47,7 @@ namespace Discord.WebSocket
 
         internal ulong? AFKChannelId { get; private set; }
         internal ulong? EmbedChannelId { get; private set; }
+        internal ulong? SystemChannelId { get; private set; }
         public ulong OwnerId { get; private set; }
         public SocketGuildUser Owner => GetUser(OwnerId);
         public string VoiceRegionId { get; private set; }
@@ -79,6 +80,14 @@ namespace Discord.WebSocket
             {
                 var id = EmbedChannelId;
                 return id.HasValue ? GetChannel(id.Value) : null;
+            }
+        }
+        public SocketTextChannel SystemChannel
+        {
+            get
+            {
+                var id = SystemChannelId;
+                return id.HasValue ? GetTextChannel(id.Value) : null;
             }
         }
         public IReadOnlyCollection<SocketTextChannel> TextChannels
@@ -191,6 +200,7 @@ namespace Discord.WebSocket
         {
             AFKChannelId = model.AFKChannelId;
             EmbedChannelId = model.EmbedChannelId;
+            SystemChannelId = model.SystemChannelId;
             AFKTimeout = model.AFKTimeout;
             IsEmbeddable = model.EmbedEnabled;
             IconId = model.Icon;
@@ -607,6 +617,7 @@ namespace Discord.WebSocket
         bool IGuild.Available => true;
         ulong IGuild.DefaultChannelId => DefaultChannel?.Id ?? 0;
         ulong? IGuild.EmbedChannelId => EmbedChannelId;
+        ulong? IGuild.SystemChannelId => SystemChannelId;
         IRole IGuild.EveryoneRole => EveryoneRole;
         IReadOnlyCollection<IRole> IGuild.Roles => Roles;
 
@@ -631,6 +642,8 @@ namespace Discord.WebSocket
             => Task.FromResult<ITextChannel>(DefaultChannel);
         Task<IGuildChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildChannel>(EmbedChannel);
+        Task<ITextChannel> IGuild.GetSystemChannelAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult<ITextChannel>(SystemChannel);
         async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, RequestOptions options)
             => await CreateTextChannelAsync(name, options).ConfigureAwait(false);
         async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, RequestOptions options)

@@ -36,6 +36,8 @@ namespace Discord
         ulong DefaultChannelId { get; }
         /// <summary> Gets the id of the embed channel for this guild if set, or null if not. </summary>
         ulong? EmbedChannelId { get; }
+        /// <summary> Gets the id of the channel where randomized welcome messages are sent, or null if not. </summary>
+        ulong? SystemChannelId { get; }
         /// <summary> Gets the id of the user that created this guild. </summary>
         ulong OwnerId { get; }
         /// <summary> Gets the id of the region hosting this guild's voice channels. </summary>
@@ -84,6 +86,7 @@ namespace Discord
         Task<IReadOnlyCollection<IVoiceChannel>> GetVoiceChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<IVoiceChannel> GetVoiceChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<IVoiceChannel> GetAFKChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<ITextChannel> GetSystemChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<ITextChannel> GetDefaultChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<IGuildChannel> GetEmbedChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Creates a new text channel. </summary>
