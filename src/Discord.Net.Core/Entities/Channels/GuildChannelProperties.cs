@@ -29,6 +29,6 @@
         /// <summary>
         /// Sets the category for this channel
         /// </summary>
-        public Optional<ulong?> ParentId { get; set; }
+        public Optional<ulong?> CategoryId { get; set; }
     }
 }

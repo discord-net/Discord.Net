@@ -16,8 +16,8 @@ namespace Discord.Rest
         internal IGuild Guild { get; }
         public string Name { get; private set; }
         public int Position { get; private set; }
-        public ulong? ParentId { get; private set; }
-        public Task<IGuildChannel> GetParentChannelAsync() => ParentId == null ? null : Guild.GetChannelAsync(ParentId.Value);
+        public ulong? CategoryId { get; private set; }
+        public async Task<IChannelCategory> GetCategory() => CategoryId == null ? null : await Guild.GetChannelAsync(CategoryId.Value) as IChannelCategory;
 
         public ulong GuildId => Guild.Id;
 
@@ -34,6 +34,8 @@ namespace Discord.Rest
                     return RestTextChannel.Create(discord, guild, model);
                 case ChannelType.Voice:
                     return RestVoiceChannel.Create(discord, guild, model);
+                case ChannelType.Category:
+                    return RestChannelCategory.Create(discord, guild, model);
                 default:
                     // TODO: Channel categories
                     return new RestGuildChannel(discord, guild, model.Id);

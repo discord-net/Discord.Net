@@ -17,9 +17,9 @@ namespace Discord.WebSocket
         public SocketGuild Guild { get; }
         public string Name { get; private set; }
         public int Position { get; private set; }
-        public ulong? ParentId { get; private set; }
-        public IGuildChannel ParentChannel => ParentId == null ? null : Guild.GetChannel(ParentId.Value);
-        public Task<IGuildChannel> GetParentChannelAsync() => Task.FromResult(ParentChannel);
+        public ulong? CategoryId { get; private set; }
+        public IChannelCategory Category => CategoryId == null ? null : Guild.GetChannel(CategoryId.Value) as IChannelCategory;
+        Task<IChannelCategory> IGuildChannel.GetCategory() => Task.FromResult(Category);
 
         public IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
         public new virtual IReadOnlyCollection<SocketGuildUser> Users => ImmutableArray.Create<SocketGuildUser>();
@@ -38,7 +38,7 @@ namespace Discord.WebSocket
                 case ChannelType.Voice:
                     return SocketVoiceChannel.Create(guild, state, model);
                 case ChannelType.Category:
-                    return SocketGuildChannelCategory.Create(guild, state, model);
+                    return SocketChannelCategory.Create(guild, state, model);
                 default:
                     // TODO: Proper implementation for channel categories
                     return new SocketGuildChannel(guild.Discord, model.Id, guild);
@@ -48,7 +48,7 @@ namespace Discord.WebSocket
         {
             Name = model.Name.Value;
             Position = model.Position.Value;
-            ParentId = model.ParentId;
+            CategoryId = model.CategoryId;
 
             var overwrites = model.PermissionOverwrites.Value;
             var newOverwrites = ImmutableArray.CreateBuilder<Overwrite>(overwrites.Length);

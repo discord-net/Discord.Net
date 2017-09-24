@@ -24,7 +24,7 @@ namespace Discord.API
         [JsonProperty("permission_overwrites")]
         public Optional<Overwrite[]> PermissionOverwrites { get; set; }
         [JsonProperty("parent_id")]
-        public ulong? ParentId { get; set; }
+        public ulong? CategoryId { get; set; }
 
         //TextChannel
         [JsonProperty("topic")]

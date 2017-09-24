@@ -11,6 +11,6 @@ namespace Discord.API.Rest
         [JsonProperty("position")]
         public Optional<int> Position { get; set; }
         [JsonProperty("parent_id")]
-        public Optional<ulong?> ParentId { get; set; }
+        public Optional<ulong?> CategoryId { get; set; }
     }
 }

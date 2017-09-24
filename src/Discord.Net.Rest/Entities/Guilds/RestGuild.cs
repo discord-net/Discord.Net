@@ -176,10 +176,10 @@ namespace Discord.Rest
             var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
             return channels.Select(x => x as RestVoiceChannel).Where(x => x != null).ToImmutableArray();
         }
-        public async Task<IReadOnlyCollection<RestGuildChannelCategory>> GetChannelCategoriesAsync(RequestOptions options = null)
+        public async Task<IReadOnlyCollection<RestChannelCategory>> GetChannelCategoriesAsync(RequestOptions options = null)
         {
             var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
-            return channels.Select(x => x as RestGuildChannelCategory).Where(x => x != null).ToImmutableArray();
+            return channels.Select(x => x as RestChannelCategory).Where(x => x != null).ToImmutableArray();
         }
 
         public async Task<RestVoiceChannel> GetAFKChannelAsync(RequestOptions options = null)
@@ -222,6 +222,8 @@ namespace Discord.Rest
             => GuildHelper.CreateTextChannelAsync(this, Discord, name, options);
         public Task<RestVoiceChannel> CreateVoiceChannelAsync(string name, RequestOptions options = null)
             => GuildHelper.CreateVoiceChannelAsync(this, Discord, name, options);
+        public Task<RestChannelCategory> CreateChannelCategoryAsync(string name, RequestOptions options = null)
+            => GuildHelper.CreateChannelCategoryAsync(this, Discord, name, options);
 
         //Integrations
         public Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(RequestOptions options = null)
@@ -309,7 +311,7 @@ namespace Discord.Rest
             else
                 return ImmutableArray.Create<IVoiceChannel>();
         }
-        async Task<IReadOnlyCollection<IGuildChannelCategory>> IGuild.GetChannelCategoriesAsync(CacheMode mode , RequestOptions options)
+        async Task<IReadOnlyCollection<IChannelCategory>> IGuild.GetChannelCategoriesAsync(CacheMode mode , RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
                 return await GetChannelCategoriesAsync(options).ConfigureAwait(false);
@@ -355,6 +357,8 @@ namespace Discord.Rest
             => await CreateTextChannelAsync(name, options).ConfigureAwait(false);
         async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, RequestOptions options)
             => await CreateVoiceChannelAsync(name, options).ConfigureAwait(false);
+        async Task<IChannelCategory> IGuild.CreateChannelCategoryAsync(string name, RequestOptions options)
+            => await CreateChannelCategoryAsync(name, options).ConfigureAwait(false);
 
         async Task<IReadOnlyCollection<IGuildIntegration>> IGuild.GetIntegrationsAsync(RequestOptions options)
             => await GetIntegrationsAsync(options).ConfigureAwait(false);

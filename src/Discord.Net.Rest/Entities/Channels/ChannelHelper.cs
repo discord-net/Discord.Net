@@ -28,7 +28,7 @@ namespace Discord.Rest
             {
                 Name = args.Name,
                 Position = args.Position,
-                ParentId = args.ParentId
+                CategoryId = args.CategoryId
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
@@ -42,7 +42,7 @@ namespace Discord.Rest
             {
                 Name = args.Name,
                 Position = args.Position,
-                ParentId = args.ParentId,
+                CategoryId = args.CategoryId,
                 Topic = args.Topic,
                 IsNsfw = args.IsNsfw
             };
@@ -59,7 +59,7 @@ namespace Discord.Rest
                 Bitrate = args.Bitrate,
                 Name = args.Name,
                 Position = args.Position,
-                ParentId = args.ParentId,
+                CategoryId = args.CategoryId,
                 UserLimit = args.UserLimit.IsSpecified ? (args.UserLimit.Value ?? 0) : Optional.Create<int>()
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
