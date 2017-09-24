@@ -23,7 +23,7 @@ namespace Discord.Rest
         public VerificationLevel VerificationLevel { get; private set; }
         public MfaLevel MfaLevel { get; private set; }
         public DefaultMessageNotifications DefaultMessageNotifications { get; private set; }
-        
+
         public ulong? AFKChannelId { get; private set; }
         public ulong? EmbedChannelId { get; private set; }
         public ulong? SystemChannelId { get; private set; }
@@ -114,7 +114,7 @@ namespace Discord.Rest
             Update(model);
         }
         public async Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
-        { 
+        {
             var model = await GuildHelper.ModifyEmbedAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
@@ -155,7 +155,7 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestGuildChannel>> GetChannelsAsync(RequestOptions options = null)
             => GuildHelper.GetChannelsAsync(this, Discord, options);
         public Task<RestGuildChannel> GetChannelAsync(ulong id, RequestOptions options = null)
-            => GuildHelper.GetChannelAsync(this, Discord, id, options);            
+            => GuildHelper.GetChannelAsync(this, Discord, id, options);
         public async Task<RestTextChannel> GetTextChannelAsync(ulong id, RequestOptions options = null)
         {
             var channel = await GuildHelper.GetChannelAsync(this, Discord, id, options).ConfigureAwait(false);
@@ -175,6 +175,11 @@ namespace Discord.Rest
         {
             var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
             return channels.Select(x => x as RestVoiceChannel).Where(x => x != null).ToImmutableArray();
+        }
+        public async Task<IReadOnlyCollection<RestGuildChannelCategory>> GetChannelCategoriesAsync(RequestOptions options = null)
+        {
+            var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
+            return channels.Select(x => x as RestGuildChannelCategory).Where(x => x != null).ToImmutableArray();
         }
 
         public async Task<RestVoiceChannel> GetAFKChannelAsync(RequestOptions options = null)
@@ -199,7 +204,7 @@ namespace Discord.Rest
         public async Task<RestGuildChannel> GetEmbedChannelAsync(RequestOptions options = null)
         {
             var embedId = EmbedChannelId;
-            if (embedId.HasValue) 
+            if (embedId.HasValue)
                 return await GuildHelper.GetChannelAsync(this, Discord, embedId.Value, options).ConfigureAwait(false);
             return null;
         }
@@ -236,7 +241,7 @@ namespace Discord.Rest
             return null;
         }
 
-        public async Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?), 
+        public async Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?),
             bool isHoisted = false, RequestOptions options = null)
         {
             var role = await GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, options).ConfigureAwait(false);
@@ -304,6 +309,13 @@ namespace Discord.Rest
             else
                 return ImmutableArray.Create<IVoiceChannel>();
         }
+        async Task<IReadOnlyCollection<IGuildChannelCategory>> IGuild.GetChannelCategoriesAsync(CacheMode mode , RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetChannelCategoriesAsync(options).ConfigureAwait(false);
+            else
+                return null;
+        }
         async Task<IVoiceChannel> IGuild.GetVoiceChannelAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -352,7 +364,7 @@ namespace Discord.Rest
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuild.GetInvitesAsync(RequestOptions options)
             => await GetInvitesAsync(options).ConfigureAwait(false);
 
-        IRole IGuild.GetRole(ulong id) 
+        IRole IGuild.GetRole(ulong id)
             => GetRole(id);
         async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options)
             => await CreateRoleAsync(name, permissions, color, isHoisted, options).ConfigureAwait(false);

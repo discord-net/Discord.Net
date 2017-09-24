@@ -74,7 +74,7 @@ namespace Discord.WebSocket
                 return id.HasValue ? GetVoiceChannel(id.Value) : null;
             }
         }
-        public SocketGuildChannel EmbedChannel 
+        public SocketGuildChannel EmbedChannel
         {
             get
             {
@@ -94,6 +94,8 @@ namespace Discord.WebSocket
             => Channels.Select(x => x as SocketTextChannel).Where(x => x != null).ToImmutableArray();
         public IReadOnlyCollection<SocketVoiceChannel> VoiceChannels
             => Channels.Select(x => x as SocketVoiceChannel).Where(x => x != null).ToImmutableArray();
+        public IReadOnlyCollection<SocketGuildChannelCategory> ChannelCategories
+            => Channels.Select(x => x as SocketGuildChannelCategory).Where(x => x != null).ToImmutableArray();
         public SocketGuildUser CurrentUser => _members.TryGetValue(Discord.CurrentUser.Id, out SocketGuildUser member) ? member : null;
         public SocketRole EveryoneRole => GetRole(Id);
         public IReadOnlyCollection<SocketGuildChannel> Channels
@@ -347,7 +349,7 @@ namespace Discord.WebSocket
                 return value;
             return null;
         }
-        public Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?), 
+        public Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?),
             bool isHoisted = false, RequestOptions options = null)
             => GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, options);
         internal SocketRole AddRole(RoleModel model)
@@ -577,7 +579,7 @@ namespace Discord.WebSocket
             try
             {
                 await RepopulateAudioStreamsAsync().ConfigureAwait(false);
-                await _audioClient.StartAsync(url, Discord.CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);                
+                await _audioClient.StartAsync(url, Discord.CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
@@ -634,6 +636,8 @@ namespace Discord.WebSocket
             => Task.FromResult<ITextChannel>(GetTextChannel(id));
         Task<IReadOnlyCollection<IVoiceChannel>> IGuild.GetVoiceChannelsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IVoiceChannel>>(VoiceChannels);
+        Task<IReadOnlyCollection<IGuildChannelCategory>> IGuild.GetChannelCategoriesAsync(CacheMode mode , RequestOptions options)
+            => Task.FromResult<IReadOnlyCollection<IGuildChannelCategory>>(ChannelCategories);
         Task<IVoiceChannel> IGuild.GetVoiceChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IVoiceChannel>(GetVoiceChannel(id));
         Task<IVoiceChannel> IGuild.GetAFKChannelAsync(CacheMode mode, RequestOptions options)
