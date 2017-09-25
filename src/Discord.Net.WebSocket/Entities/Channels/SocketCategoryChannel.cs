@@ -1,30 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Discord.Audio;
+using Discord.Rest;
 using Model = Discord.API.Channel;
 
-namespace Discord.Rest
+namespace Discord.WebSocket
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestChannelCategory : RestGuildChannel, IChannelCategory
+    public class SocketCategoryChannel : SocketGuildChannel, ICategoryChannel
     {
-        public string Mention => MentionUtils.MentionChannel(Id);
+        public override IReadOnlyCollection<SocketGuildUser> Users
+            => Guild.Users.Where(x => x.VoiceChannel?.Id == Id).ToImmutableArray();
 
-        internal RestChannelCategory(BaseDiscordClient discord, IGuild guild, ulong id)
-            : base(discord, guild, id)
+        internal SocketCategoryChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
+            : base(discord, id, guild)
         {
         }
-        internal new static RestChannelCategory Create(BaseDiscordClient discord, IGuild guild, Model model)
+        internal new static SocketCategoryChannel Create(SocketGuild guild, ClientState state, Model model)
         {
-            var entity = new RestChannelCategory(discord, guild, model.Id);
-            entity.Update(model);
+            var entity = new SocketCategoryChannel(guild.Discord, model.Id, guild);
+            entity.Update(state, model);
             return entity;
         }
 
         private string DebuggerDisplay => $"{Name} ({Id}, Category)";
+        internal new SocketCategoryChannel Clone() => MemberwiseClone() as SocketCategoryChannel;
 
         // IGuildChannel
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)

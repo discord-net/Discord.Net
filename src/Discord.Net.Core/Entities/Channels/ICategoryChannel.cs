@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface IChannelCategory : IGuildChannel
+    public interface ICategoryChannel : IGuildChannel
     {
     }
 }

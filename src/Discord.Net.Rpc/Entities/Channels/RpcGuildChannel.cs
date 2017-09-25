@@ -58,7 +58,7 @@ namespace Discord.Rpc
         public override string ToString() => Name;
 
         //IGuildChannel
-        public Task<IChannelCategory> GetCategory()
+        public Task<ICategoryChannel> GetCategory()
         {
             //Always fails
             throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");

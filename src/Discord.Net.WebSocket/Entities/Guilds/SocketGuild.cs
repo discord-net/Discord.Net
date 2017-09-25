@@ -94,8 +94,8 @@ namespace Discord.WebSocket
             => Channels.Select(x => x as SocketTextChannel).Where(x => x != null).ToImmutableArray();
         public IReadOnlyCollection<SocketVoiceChannel> VoiceChannels
             => Channels.Select(x => x as SocketVoiceChannel).Where(x => x != null).ToImmutableArray();
-        public IReadOnlyCollection<SocketChannelCategory> ChannelCategories
-            => Channels.Select(x => x as SocketChannelCategory).Where(x => x != null).ToImmutableArray();
+        public IReadOnlyCollection<SocketCategoryChannel> CategoryChannels
+            => Channels.Select(x => x as SocketCategoryChannel).Where(x => x != null).ToImmutableArray();
         public SocketGuildUser CurrentUser => _members.TryGetValue(Discord.CurrentUser.Id, out SocketGuildUser member) ? member : null;
         public SocketRole EveryoneRole => GetRole(Id);
         public IReadOnlyCollection<SocketGuildChannel> Channels
@@ -318,8 +318,8 @@ namespace Discord.WebSocket
             => GuildHelper.CreateTextChannelAsync(this, Discord, name, options);
         public Task<RestVoiceChannel> CreateVoiceChannelAsync(string name, RequestOptions options = null)
             => GuildHelper.CreateVoiceChannelAsync(this, Discord, name, options);
-        public Task<RestChannelCategory> CreateChannelCategoryAsync(string name, RequestOptions options = null)
-            => GuildHelper.CreateChannelCategoryAsync(this, Discord, name, options);
+        public Task<RestCategoryChannel> CreateCategoryChannelAsync(string name, RequestOptions options = null)
+            => GuildHelper.CreateCategoryChannelAsync(this, Discord, name, options);
 
         internal SocketGuildChannel AddChannel(ClientState state, ChannelModel model)
         {
@@ -639,8 +639,8 @@ namespace Discord.WebSocket
             => Task.FromResult<ITextChannel>(GetTextChannel(id));
         Task<IReadOnlyCollection<IVoiceChannel>> IGuild.GetVoiceChannelsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IVoiceChannel>>(VoiceChannels);
-        Task<IReadOnlyCollection<IChannelCategory>> IGuild.GetChannelCategoriesAsync(CacheMode mode , RequestOptions options)
-            => Task.FromResult<IReadOnlyCollection<IChannelCategory>>(ChannelCategories);
+        Task<IReadOnlyCollection<ICategoryChannel>> IGuild.GetCategoryChannelsAsync(CacheMode mode , RequestOptions options)
+            => Task.FromResult<IReadOnlyCollection<ICategoryChannel>>(CategoryChannels);
         Task<IVoiceChannel> IGuild.GetVoiceChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IVoiceChannel>(GetVoiceChannel(id));
         Task<IVoiceChannel> IGuild.GetAFKChannelAsync(CacheMode mode, RequestOptions options)
@@ -655,8 +655,8 @@ namespace Discord.WebSocket
             => await CreateTextChannelAsync(name, options).ConfigureAwait(false);
         async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, RequestOptions options)
             => await CreateVoiceChannelAsync(name, options).ConfigureAwait(false);
-        async Task<IChannelCategory> IGuild.CreateChannelCategoryAsync(string name, RequestOptions options)
-            => await CreateChannelCategoryAsync(name, options).ConfigureAwait(false);
+        async Task<ICategoryChannel> IGuild.CreateCategoryChannelAsync(string name, RequestOptions options)
+            => await CreateCategoryChannelAsync(name, options).ConfigureAwait(false);
 
         async Task<IReadOnlyCollection<IGuildIntegration>> IGuild.GetIntegrationsAsync(RequestOptions options)
             => await GetIntegrationsAsync(options).ConfigureAwait(false);

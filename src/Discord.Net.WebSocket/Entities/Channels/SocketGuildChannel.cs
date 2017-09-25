@@ -18,8 +18,8 @@ namespace Discord.WebSocket
         public string Name { get; private set; }
         public int Position { get; private set; }
         public ulong? CategoryId { get; private set; }
-        public IChannelCategory Category => CategoryId == null ? null : Guild.GetChannel(CategoryId.Value) as IChannelCategory;
-        Task<IChannelCategory> IGuildChannel.GetCategory() => Task.FromResult(Category);
+        public ICategoryChannel Category => CategoryId == null ? null : Guild.GetChannel(CategoryId.Value) as ICategoryChannel;
+        Task<ICategoryChannel> IGuildChannel.GetCategory() => Task.FromResult(Category);
 
         public IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
         public new virtual IReadOnlyCollection<SocketGuildUser> Users => ImmutableArray.Create<SocketGuildUser>();
@@ -38,7 +38,7 @@ namespace Discord.WebSocket
                 case ChannelType.Voice:
                     return SocketVoiceChannel.Create(guild, state, model);
                 case ChannelType.Category:
-                    return SocketChannelCategory.Create(guild, state, model);
+                    return SocketCategoryChannel.Create(guild, state, model);
                 default:
                     // TODO: Proper implementation for channel categories
                     return new SocketGuildChannel(guild.Discord, model.Id, guild);
