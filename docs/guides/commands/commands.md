@@ -132,12 +132,13 @@ will not need to cast them.
 To reply to messages, you may also invoke [ReplyAsync], instead of
 accessing the channel through the [Context] and sending a message.
 
-[Context]: xref:Discord.Commands.ModuleBase`1#Discord_Commands_ModuleBase_1_Context
-[SocketCommandContext]: xref:Discord.Commands.SocketCommandContext
-
->![WARNING]
+> [!WARNING]
 >Contexts should **NOT** be mixed! You cannot have one module that
 >uses CommandContext and another that uses SocketCommandContext.
+
+[Context]: xref:Discord.Commands.ModuleBase`1#Discord_Commands_ModuleBase_1_Context
+[SocketCommandContext]: xref:Discord.Commands.SocketCommandContext
+[ReplyAsync]: xref:Discord.Commands.ModuleBase`1#Discord_Commands_ModuleBase_1_ReplyAsync_System_String_System_Boolean_Discord_Embed_Discord_RequestOptions_
 
 ### Example Module
 
