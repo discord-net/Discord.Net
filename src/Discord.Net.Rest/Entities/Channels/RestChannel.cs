@@ -6,7 +6,7 @@ using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
-    public abstract class RestChannel : RestEntity<ulong>, IChannel, IUpdateable
+    public class RestChannel : RestEntity<ulong>, IChannel, IUpdateable
     {
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
@@ -25,7 +25,7 @@ namespace Discord.Rest
                 case ChannelType.Group:
                     return CreatePrivate(discord, model) as RestChannel;
                 default:
-                    throw new InvalidOperationException($"Unexpected channel type: {model.Type}");
+                    return new RestChannel(discord, model.Id);
             }
         }
         internal static IRestPrivateChannel CreatePrivate(BaseDiscordClient discord, Model model)
@@ -40,13 +40,12 @@ namespace Discord.Rest
                     throw new InvalidOperationException($"Unexpected channel type: {model.Type}");
             }
         }
-        internal abstract void Update(Model model);
+        internal virtual void Update(Model model) { }
 
-        public abstract Task UpdateAsync(RequestOptions options = null);
+        public virtual Task UpdateAsync(RequestOptions options = null) => Task.Delay(0);
 
         //IChannel
         string IChannel.Name => null;
-        bool IChannel.IsNsfw => ChannelHelper.IsNsfw(this);
 
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null); //Overriden

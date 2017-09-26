@@ -171,24 +171,16 @@ namespace Discord
             return this;
         }
 
-        public EmbedBuilder AddField(string name, object value)
+        public EmbedBuilder AddField(string name, object value, bool inline = false)
         {
             var field = new EmbedFieldBuilder()
-                .WithIsInline(false)
+                .WithIsInline(inline)
                 .WithName(name)
                 .WithValue(value);
             AddField(field);
             return this;
         }
-        public EmbedBuilder AddInlineField(string name, object value)
-        {
-            var field = new EmbedFieldBuilder()
-                .WithIsInline(true)
-                .WithName(name)
-                .WithValue(value);
-            AddField(field);
-            return this;
-        }
+
         public EmbedBuilder AddField(EmbedFieldBuilder field)
         {
             if (Fields.Count >= MaxFieldCount)
@@ -204,17 +196,6 @@ namespace Discord
             var field = new EmbedFieldBuilder();
             action(field);
             this.AddField(field);
-            return this;
-        }
-        public EmbedBuilder AddField(string title, string text, bool inline = false)
-        {
-            var field = new EmbedFieldBuilder
-            {
-                Name = title,
-                Value = text,
-                IsInline = inline
-            };
-            _fields.Add(field);
             return this;
         }
 
@@ -234,7 +215,6 @@ namespace Discord
 
             return _embed;
         }
-        public static implicit operator Embed(EmbedBuilder builder) => builder?.Build();
     }
 
     public class EmbedFieldBuilder
@@ -249,7 +229,7 @@ namespace Discord
             get => _field.Name;
             set
             {
-                if (string.IsNullOrEmpty(value)) throw new ArgumentException($"Field name must not be null or empty.", nameof(Name));
+                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException($"Field name must not be null, empty or entirely whitespace.", nameof(Name));
                 if (value.Length > MaxFieldNameLength) throw new ArgumentException($"Field name length must be less than or equal to {MaxFieldNameLength}.", nameof(Name));
                 _field.Name = value;
             }

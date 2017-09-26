@@ -254,6 +254,9 @@ namespace Discord.Commands
                     case ParameterPreconditionAttribute precon:
                         builder.AddPrecondition(precon);
                         break;
+                    case NameAttribute name:
+                        builder.Name = name.Text;
+                        break;
                     case RemainderAttribute _:
                         if (position != count - 1)
                             throw new InvalidOperationException($"Remainder parameters must be the last parameter in a command. Parameter: {paramInfo.Name} in {paramInfo.Member.DeclaringType.Name}.{paramInfo.Member.Name}");

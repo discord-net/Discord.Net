@@ -26,6 +26,7 @@ namespace Discord.Rest
         
         public ulong? AFKChannelId { get; private set; }
         public ulong? EmbedChannelId { get; private set; }
+        public ulong? SystemChannelId { get; private set; }
         public ulong OwnerId { get; private set; }
         public string VoiceRegionId { get; private set; }
         public string IconId { get; private set; }
@@ -33,6 +34,8 @@ namespace Discord.Rest
         internal bool Available { get; private set; }
 
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
+
+        [Obsolete("DefaultChannelId is deprecated, use GetDefaultChannelAsync")]
         public ulong DefaultChannelId => Id;
         public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
@@ -56,6 +59,7 @@ namespace Discord.Rest
         {
             AFKChannelId = model.AFKChannelId;
             EmbedChannelId = model.EmbedChannelId;
+            SystemChannelId = model.SystemChannelId;
             AFKTimeout = model.AFKTimeout;
             IsEmbeddable = model.EmbedEnabled;
             IconId = model.Icon;
@@ -185,14 +189,28 @@ namespace Discord.Rest
         }
         public async Task<RestTextChannel> GetDefaultChannelAsync(RequestOptions options = null)
         {
-            var channel = await GuildHelper.GetChannelAsync(this, Discord, DefaultChannelId, options).ConfigureAwait(false);
-            return channel as RestTextChannel;
+            var channels = await GetTextChannelsAsync(options).ConfigureAwait(false);
+            var user = await GetCurrentUserAsync(options).ConfigureAwait(false);
+            return channels
+                .Where(c => user.GetPermissions(c).ReadMessages)
+                .OrderBy(c => c.Position)
+                .FirstOrDefault();
         }
         public async Task<RestGuildChannel> GetEmbedChannelAsync(RequestOptions options = null)
         {
             var embedId = EmbedChannelId;
             if (embedId.HasValue) 
                 return await GuildHelper.GetChannelAsync(this, Discord, embedId.Value, options).ConfigureAwait(false);
+            return null;
+        }
+        public async Task<RestTextChannel> GetSystemChannelAsync(RequestOptions options = null)
+        {
+            var systemId = SystemChannelId;
+            if (systemId.HasValue)
+            {
+                var channel = await GuildHelper.GetChannelAsync(this, Discord, systemId.Value, options).ConfigureAwait(false);
+                return channel as RestTextChannel;
+            }
             return null;
         }
         public Task<RestTextChannel> CreateTextChannelAsync(string name, RequestOptions options = null)
@@ -311,6 +329,13 @@ namespace Discord.Rest
         {
             if (mode == CacheMode.AllowDownload)
                 return await GetEmbedChannelAsync(options).ConfigureAwait(false);
+            else
+                return null;
+        }
+        async Task<ITextChannel> IGuild.GetSystemChannelAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetSystemChannelAsync(options).ConfigureAwait(false);
             else
                 return null;
         }

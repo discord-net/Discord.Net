@@ -26,6 +26,7 @@ namespace Discord.Rest
             {
                 AfkChannelId = args.AfkChannelId,
                 AfkTimeout = args.AfkTimeout,
+                SystemChannelId = args.SystemChannelId,
                 DefaultMessageNotifications = args.DefaultMessageNotifications,
                 Icon = args.Icon.IsSpecified ? args.Icon.Value?.ToModel() : Optional.Create<ImageModel?>(),
                 Name = args.Name,
@@ -38,6 +39,11 @@ namespace Discord.Rest
                 apiArgs.AfkChannelId = args.AfkChannel.Value.Id;
             else if (args.AfkChannelId.IsSpecified)
                 apiArgs.AfkChannelId = args.AfkChannelId.Value;
+
+            if (args.SystemChannel.IsSpecified)
+                apiArgs.SystemChannelId = args.SystemChannel.Value.Id;
+            else if (args.SystemChannelId.IsSpecified)
+                apiArgs.SystemChannelId = args.SystemChannelId.Value;
 
             if (args.Owner.IsSpecified)
                 apiArgs.OwnerId = args.Owner.Value.Id;

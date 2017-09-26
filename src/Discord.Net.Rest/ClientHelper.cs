@@ -120,6 +120,9 @@ namespace Discord.Rest
             string name, IVoiceRegion region, Stream jpegIcon, RequestOptions options)
         {
             var args = new CreateGuildParams(name, region.Id);
+            if (jpegIcon != null)
+                args.Icon = new API.Image(jpegIcon);
+
             var model = await client.ApiClient.CreateGuildAsync(args, options).ConfigureAwait(false);
             return RestGuild.Create(client, model);
         }

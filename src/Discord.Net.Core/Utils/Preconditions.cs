@@ -192,5 +192,13 @@ namespace Discord
                     throw new ArgumentOutOfRangeException(name, "Messages must be younger than two weeks old.");
             }
         }
+        public static void NotEveryoneRole(ulong[] roles, ulong guildId, string name)
+        {
+            for (var i = 0; i < roles.Length; i++)
+            {
+                if (roles[i] == guildId)
+                    throw new ArgumentException($"The everyone role cannot be assigned to a user", name);
+            }
+        }
     }
 }

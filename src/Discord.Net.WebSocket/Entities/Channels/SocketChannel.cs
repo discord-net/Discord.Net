@@ -41,7 +41,6 @@ namespace Discord.WebSocket
 
         //IChannel
         string IChannel.Name => null;
-        bool IChannel.IsNsfw => ChannelHelper.IsNsfw(this);
 
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null); //Overridden

@@ -8,5 +8,7 @@ namespace Discord.API.Rest
     {
         [JsonProperty("topic")]
         public Optional<string> Topic { get; set; }
+        [JsonProperty("nsfw")]
+        public Optional<bool> IsNsfw { get; set; }
     }
 }

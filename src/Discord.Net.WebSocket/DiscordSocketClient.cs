@@ -675,7 +675,12 @@ namespace Discord.WebSocket
                                         }
                                     }
                                     else
+                                    {
+                                        channel = State.GetChannel(data.Id);
+                                        if (channel != null)
+                                            return; //Discord may send duplicate CHANNEL_CREATEs for DMs
                                         channel = AddPrivateChannel(data, State) as SocketChannel;
+                                    }
 
                                     if (channel != null)
                                         await TimedInvokeAsync(_channelCreatedEvent, nameof(ChannelCreated), channel).ConfigureAwait(false);

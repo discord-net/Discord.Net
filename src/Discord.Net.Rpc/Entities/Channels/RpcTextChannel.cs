@@ -16,6 +16,8 @@ namespace Discord.Rpc
         public IReadOnlyCollection<RpcMessage> CachedMessages { get; private set; }
 
         public string Mention => MentionUtils.MentionChannel(Id);
+        // TODO: Check if RPC includes the 'nsfw' field on Channel models
+        public bool IsNsfw => ChannelHelper.IsNsfw(this);
 
         internal RpcTextChannel(DiscordRpcClient discord, ulong id, ulong guildId)
             : base(discord, id, guildId)

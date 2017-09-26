@@ -64,7 +64,7 @@ namespace Discord
             var text5 = textChannels.Where(x => x.Name == "text5").FirstOrDefault();
 
             Assert.NotNull(text1);
-            Assert.True(text1.Id == guild.DefaultChannelId);
+            //Assert.True(text1.Id == guild.DefaultChannelId);
             Assert.Equal(text1.Position, 1);
             Assert.Equal(text1.Topic, "Topic1");
 

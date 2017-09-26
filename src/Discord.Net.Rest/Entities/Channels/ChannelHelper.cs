@@ -41,7 +41,8 @@ namespace Discord.Rest
             {
                 Name = args.Name,
                 Position = args.Position,
-                Topic = args.Topic
+                Topic = args.Topic,
+                IsNsfw = args.IsNsfw
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
@@ -290,8 +291,8 @@ namespace Discord.Rest
             return author;
         }
 
-        public static bool IsNsfw(IChannel channel) =>
-            IsNsfw(channel.Name);
+        public static bool IsNsfw(IChannel channel)
+            => IsNsfw(channel.Name);
         public static bool IsNsfw(string channelName) =>
             channelName == "nsfw" || channelName.StartsWith("nsfw-");
     }

@@ -8,7 +8,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands
 {
@@ -16,6 +15,9 @@ namespace Discord.Commands
     {
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
+
+        public event Func<CommandInfo, ICommandContext, IResult, Task> CommandExecuted { add { _commandExecutedEvent.Add(value); } remove { _commandExecutedEvent.Remove(value); } }
+        internal readonly AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>> _commandExecutedEvent = new AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>>();
 
         private readonly SemaphoreSlim _moduleLock;
         private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
@@ -57,7 +59,10 @@ namespace Discord.Commands
 
             _defaultTypeReaders = new ConcurrentDictionary<Type, TypeReader>();
             foreach (var type in PrimitiveParsers.SupportedTypes)
+            {
                 _defaultTypeReaders[type] = PrimitiveTypeReader.Create(type);
+                _defaultTypeReaders[typeof(Nullable<>).MakeGenericType(type)] = NullableTypeReader.Create(type, _defaultTypeReaders[type]);
+            }
 
             _defaultTypeReaders[typeof(string)] =
                 new PrimitiveTypeReader<string>((string x, out string y) => { y = x; return true; }, 0);
@@ -190,17 +195,35 @@ namespace Discord.Commands
             return true;
         }
 
-        //Type Readers
+        //Type Readers 
+        /// <summary>
+        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
+        /// If <typeparamref name="T"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> will also be added.
+        /// </summary>
+        /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
+        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
         public void AddTypeReader<T>(TypeReader reader)
-        {
-            var readers = _typeReaders.GetOrAdd(typeof(T), x => new ConcurrentDictionary<Type, TypeReader>());
-            readers[reader.GetType()] = reader;
-        }
+            => AddTypeReader(typeof(T), reader);
+        /// <summary>
+        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
+        /// If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added. 
+        /// </summary>
+        /// <param name="type">A <see cref="Type"/> instance for the type to be read.</param>
+        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
         public void AddTypeReader(Type type, TypeReader reader)
         {
             var readers = _typeReaders.GetOrAdd(type, x => new ConcurrentDictionary<Type, TypeReader>());
             readers[reader.GetType()] = reader;
+
+            if (type.GetTypeInfo().IsValueType)
+                AddNullableTypeReader(type, reader);
         }
+        internal void AddNullableTypeReader(Type valueType, TypeReader valueTypeReader)
+        {
+            var readers = _typeReaders.GetOrAdd(typeof(Nullable<>).MakeGenericType(valueType), x => new ConcurrentDictionary<Type, TypeReader>());
+            var nullableReader = NullableTypeReader.Create(valueType, valueTypeReader);
+            readers[nullableReader.GetType()] = nullableReader;
+        }  
         internal IDictionary<Type, TypeReader> GetTypeReaders(Type type)
         {
             if (_typeReaders.TryGetValue(type, out var definedTypeReaders))

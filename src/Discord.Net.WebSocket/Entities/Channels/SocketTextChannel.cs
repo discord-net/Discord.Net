@@ -16,6 +16,9 @@ namespace Discord.WebSocket
         private readonly MessageCache _messages;
 
         public string Topic { get; private set; }
+        
+        private bool _nsfw;
+        public bool IsNsfw => _nsfw || ChannelHelper.IsNsfw(this);
 
         public string Mention => MentionUtils.MentionChannel(Id);
         public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();
@@ -41,6 +44,7 @@ namespace Discord.WebSocket
             base.Update(state, model);
 
             Topic = model.Topic.Value;
+            _nsfw = model.Nsfw.GetValueOrDefault();
         }
 
         public Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)

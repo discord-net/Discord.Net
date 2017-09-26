@@ -15,6 +15,9 @@ namespace Discord.Rest
 
         public string Mention => MentionUtils.MentionChannel(Id);
 
+        private bool _nsfw;
+        public bool IsNsfw => _nsfw || ChannelHelper.IsNsfw(this);
+
         internal RestTextChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
         {
@@ -30,6 +33,7 @@ namespace Discord.Rest
             base.Update(model);
 
             Topic = model.Topic.Value;
+            _nsfw = model.Nsfw.GetValueOrDefault();
         }
 
         public async Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
