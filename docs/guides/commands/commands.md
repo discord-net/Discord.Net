@@ -334,4 +334,6 @@ necessary.
 TypeReaders are not automatically discovered by the Command Service
 and must be explicitly added.
 
-To install a TypeReader, invoke [CommandService.AddTypeReader](xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddTypeReader__1_Discord_Commands_TypeReader_).
+To install a TypeReader, invoke [CommandService.AddTypeReader].
+
+[CommandService.AddTypeReader]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddTypeReader__1_Discord_Commands_TypeReader_
