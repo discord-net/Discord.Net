@@ -46,8 +46,8 @@ ASP.NET Core's Controller pattern. This means that the lifetime of a
 module instance is only as long as the Command is being invoked. 
 
 **Avoid using long-running code** in your modules wherever possible. 
-You should **not** be implementing very much logic into your modules; 
-you should outsource to a service for that. 
+You should **not** be implementing very much logic into your modules, 
+instead, outsource to a service for that.
 
 If you are unfamiliar with Inversion of Control, it is recommended to 
 read the MSDN article on [IoC] and [Dependency Injection]. 
