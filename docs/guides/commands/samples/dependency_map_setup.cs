@@ -9,9 +9,9 @@ public class Commands
     {
         // Here, we will inject the ServiceProvider with 
         // all of the services our client will use.
-        _serviceCollection.AddSingleton(client)
-        _serviceCollection.AddSingleton(new NotificationService())
-        _serviceCollection.AddSingleton(new DatabaseService())
+        _serviceCollection.AddSingleton(client);
+        _serviceCollection.AddSingleton(new NotificationService());
+        _serviceCollection.AddSingleton(new DatabaseService());
         // ...
         await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
     }
