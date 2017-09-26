@@ -268,9 +268,10 @@ the [CheckPermissions] method.
 
 Your IDE should provide an option to fill this in for you.
 
-Return [PreconditionResult.FromSuccess] if the context meets the
-required parameters, otherwise return [PreconditionResult.FromError]
-and optionally include an error message.
+If the context meets the required parameters, return 
+[PreconditionResult.FromSuccess], otherwise return 
+[PreconditionResult.FromError] and include an error message if 
+necessary.
 
 [!code-csharp[Custom Precondition](samples/require_owner.cs)]
 
@@ -314,11 +315,14 @@ Next, satisfy the `TypeReader` class by overriding the [Read] method.
 Inside this task, add whatever logic you need to parse the input
 string.
 
-Finally, return a `TypeReaderResult`. If you were able to successfully
-parse the input, return `TypeReaderResult.FromSuccess(parsedInput)`,
-otherwise, return `TypeReaderResult.FromError` and optionally include
-an error message.
+If you are able to successfully parse the input, return 
+[TypeReaderResult.FromSuccess] with the parsed input, otherwise return
+[TypeReaderResult.FromError] and include an error message if 
+necessary.
 
+[TypeReaderResult]: xref:Discord.Commands.TypeReaderResult
+[TypeReaderResult.FromSuccess]: xref:Discord.Commands.TypeReaderResult#Discord_Commands_TypeReaderResult_FromSuccess_Discord_Commands_TypeReaderValue_
+[TypeReaderResult.FromError]: xref:Discord.Commands.TypeReaderResult#Discord_Commands_TypeReaderResult_FromError_Discord_Commands_CommandError_System_String_
 [Read]: xref:Discord.Commands.TypeReader#Discord_Commands_TypeReader_Read_Discord_Commands_ICommandContext_System_String_IServiceProvider_
 
 #### Sample
