@@ -157,7 +157,7 @@ Invoke [CommandService.AddModulesAsync] to discover modules and
 install them.
 
 [DontAutoLoadAttribute]: xref:Discord.Commands.DontAutoLoadAttribute
-[CommandService.AddModulesAsync]: xref:Discord_Commands_CommandService#Discord_Commands_CommandService_AddModulesAsync_Assembly_
+[CommandService.AddModulesAsync]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddModulesAsync_Assembly_
 
 #### Loading Modules Manually
 
@@ -274,7 +274,7 @@ and optionally include an error message.
 
 [!code-csharp[Custom Precondition](samples/require_owner.cs)]
 
-[CheckPermissions]: xref:Discord.Commands.PreconditionAttribute#Discord_Commands_PreconditionAttribute_CheckPermissions_Discord_Commands_CommandContext_Discord_Commands_CommandInfo_Discord_Commands_IDependencyMap_
+[CheckPermissions]: xref:Discord.Commands.PreconditionAttribute#Discord_Commands_PreconditionAttribute_CheckPermissions_Discord_Commands_ICommandContext_Discord_Commands_CommandInfo_IServiceProvider_
 [PreconditionResult.FromSuccess]: xref:Discord.Commands.PreconditionResult#Discord_Commands_PreconditionResult_FromSuccess
 [PreconditionResult.FromError]: xref:Discord.Commands.PreconditionResult#Discord_Commands_PreconditionResult_FromError_System_String_
 
@@ -319,7 +319,7 @@ parse the input, return `TypeReaderResult.FromSuccess(parsedInput)`,
 otherwise, return `TypeReaderResult.FromError` and optionally include
 an error message.
 
-[Read]: xref:Discord.Commands.TypeReader#Discord_Commands_TypeReader_Read_Discord_Commands_CommandContext_System_String_
+[Read]: xref:Discord.Commands.TypeReader#Discord_Commands_TypeReader_Read_Discord_Commands_ICommandContext_System_String_IServiceProvider_
 
 #### Sample
 
