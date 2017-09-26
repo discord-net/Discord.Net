@@ -61,6 +61,7 @@ class from [ModuleBase]. This class **must** be `public`.
 >extension of ModuleBase.
 
 By now, your module should look like this:
+
 [!code-csharp[Empty Module](samples/empty-module.cs)]
 
 [IoC]: https://msdn.microsoft.com/en-us/library/ff921087.aspx
@@ -146,7 +147,7 @@ At this point, your module should look comparable to this example:
 #### Loading Modules Automatically
 
 The Command Service can automatically discover all classes in an
-Assembly that inherits [ModuleBase] and load them.
+Assembly that inherit [ModuleBase] and load them.
 
 To opt a module out of auto-loading, flag it with
 [DontAutoLoadAttribute].
