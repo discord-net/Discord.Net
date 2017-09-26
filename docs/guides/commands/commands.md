@@ -9,7 +9,7 @@ command parser.
 
 ## Setup
 
-To use Commands, you must create a [Commands Service] and a Command
+To use Commands, you must create a [Command Service] and a Command
 Handler.
 
 Included below is a very barebone Command Handler. You can extend your
