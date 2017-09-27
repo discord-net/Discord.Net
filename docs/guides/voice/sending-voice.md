@@ -17,7 +17,7 @@ when developing on .NET Core, this is where you execute `dotnet run`
 from; typically the same directory as your csproj).
 
 For Windows Users, precompiled binaries are available for your 
-convienence [here](https://discord.foxbot.me/binaries/)
+convienence [here](https://discord.foxbot.me/binaries/).
 
 For Linux Users, you will need to compile [Sodium] and [Opus] from 
 source, or install them from your package manager.
@@ -31,7 +31,7 @@ Joining a channel is the first step to sending audio, and will return
 an [IAudioClient] to send data with.
 
 To join a channel, simply await [ConnectAsync] on any instance of an
-@Discord.IVoiceChannel.
+@Discord.IAudioChannel.
 
 [!code-csharp[Joining a Channel](samples/joining_audio.cs)]
 
@@ -44,7 +44,7 @@ guild. To switch channels within a guild, invoke [ConnectAsync] on
 another voice channel in the guild.
 
 [IAudioClient]: xref:Discord.Audio.IAudioClient
-[ConnectAsync]: xref:Discord.IVoiceChannel#Discord_IVoiceChannel_ConnectAsync
+[ConnectAsync]: xref:Discord.IAudioChannel#Discord_IAudioChannel_ConnectAsync_Action_IAudioClient__
 
 ## Transmitting Audio
 
@@ -84,7 +84,7 @@ Channels should be left at `2`, unless you specified a different value
 for `-ac 2` when creating FFmpeg.
 
 [AudioOutStream]: xref:Discord.Audio.AudioOutStream
-[IAudioClient.CreatePCMStream]: xref:Discord.Audio.IAudioClient#Discord_Audio_IAudioClient_CreatePCMStream_System_Int32_System_Int32_System_Nullable_System_Int32__System_Int32_
+[IAudioClient.CreatePCMStream]: xref:Discord.Audio.IAudioClient#Discord_Audio_IAudioClient_CreateDirectPCMStream_Discord_Audio_AudioApplication_System_Nullable_System_Int32__System_Int32_
 
 Finally, audio will need to be piped from FFmpeg's stdout into your 
 AudioOutStream. This step can be as complex as you'd like it to be, but 
