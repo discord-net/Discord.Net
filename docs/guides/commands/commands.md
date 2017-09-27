@@ -228,13 +228,13 @@ Any publicly settable properties will also be filled in the same
 manner.
 
 >[!NOTE]
-> Annotating a property with the [DontInject] attribute will
-prevent it from being injected.
+> Annotating a property with a `[DontInject]` attribute will prevent the
+property from being injected.
 
 >[!NOTE]
 >If you accept `CommandService` or `IServiceProvider` as a parameter
-in your constructor, or as an injectable property, these entries will
-be filled by the `CommandService` that the Module is loaded from, and
+in your constructor or as an injectable property, these entries will
+be filled by the `CommandService` that the Module is loaded from and
 the `ServiceProvider` that is passed into it respectively.
 
 [!code-csharp[ServiceProvider in Modules](samples/dependency_module.cs)]
