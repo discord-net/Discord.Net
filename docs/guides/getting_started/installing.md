@@ -27,7 +27,7 @@ required. When using .NET Framework, it is suggested to target
 Release builds of Discord.Net 1.0 will be published to the
 [official NuGet feed].
 
-Development builds of Discord.Net 1.0, as well as add-ons *(TODO)* are
+Development builds of Discord.Net 1.0, as well as addons *(TODO)* are
 published to our development [MyGet feed].
 
 Direct feed link: `https://www.myget.org/F/discord-net/api/v3/index.json`

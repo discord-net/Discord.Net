@@ -23,8 +23,8 @@ but you should be aware of the differences between them.
 `Discord.Net.Core` provides a set of interfaces that models Discord's 
 API. These interfaces are consistent throughout all implementations of 
 Discord.Net, and if you are writing an implementation-agnostic library 
-or add-on, you can rely on the core interfaces to ensure that your 
-add-on will run on all platforms.
+or addon, you can rely on the core interfaces to ensure that your 
+addon will run on all platforms.
 
 `Discord.Net.Rest` provides a set of concrete classes to be used 
 **strictly** with the REST portion of Discord's API. Entities in this 
