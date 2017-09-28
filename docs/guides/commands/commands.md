@@ -41,7 +41,7 @@ The first step to creating Commands is to create a _module_.
 A Module is an organizational pattern that allows you to write your
 Commands in different classes and have them automatically loaded.
 
-Discord.NET's implementation of Modules is influenced heavily from
+Discord.Net's implementation of Modules is influenced heavily from
 ASP.NET Core's Controller pattern. This means that the lifetime of a
 module instance is only as long as the Command is being invoked.
 

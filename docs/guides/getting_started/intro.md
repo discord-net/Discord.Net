@@ -56,12 +56,12 @@ through the OAuth2 flow.
 
 ## Connecting to Discord
 
-If you have not already created a project and installed Discord.NET,
+If you have not already created a project and installed Discord.Net,
 do that now. (see the [Installing](installing.md) section)
 
 ### Async
 
-Discord.NET uses .NET's [Task-based Asynchronous Pattern (TAP)]
+Discord.Net uses .NET's [Task-based Asynchronous Pattern (TAP)]
 extensively - nearly every operation is asynchronous.
 
 It is highly recommended that these operations are awaited in a
@@ -84,7 +84,7 @@ If your application throws any exceptions within an async context,
 they will be thrown all the way back up to the first non-async method;
 since our first non-async method is the program's `Main` method, this
 means that **all** unhandled exceptions will be thrown up there, which
-will crash your application. Discord.NET will prevent exceptions in
+will crash your application. Discord.Net will prevent exceptions in
 event handlers from crashing your program, but any exceptions in your
 async main **will** cause the application to crash.
 
@@ -93,7 +93,7 @@ async main **will** cause the application to crash.
 ### Creating a logging method
 
 Before we create and configure a Discord client, we will add a method
-to handle Discord.NET's log events.
+to handle Discord.Net's log events.
 
 To allow agnostic support of as many log providers as possible, we
 log information through a `Log` event with a proprietary `LogMessage`
@@ -119,7 +119,7 @@ main, passing in a configuration object only if necessary. For most
 users, the default will work fine.
 
 Before connecting, we should hook the client's `Log` event to the
-log handler that was just created. Events in Discord.NET work
+log handler that was just created. Events in Discord.Net work
 similarly to other events in C#, so hook this event the way that
 you typically would.
 
