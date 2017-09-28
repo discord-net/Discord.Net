@@ -20,7 +20,7 @@ or a named function.
 
 ### Safety
 
-All events are designed to be thread-safe in that events are executed
+All events are designed to be thread-safe; events are executed
 synchronously off the gateway task in the same context as the gateway
 task.
 
@@ -33,7 +33,7 @@ offloaded to another task.
 This also means that you should not await a task that requests data
 from Discord's gateway in the same context of an event. Since the
 gateway will wait on all invoked event handlers to finish before
-processing any additional data from the gateway; this will create
+processing any additional data from the gateway, this will create
 a deadlock that will be impossible to recover from.
 
 Exceptions in commands will be swallowed by the gateway and logged out
@@ -76,8 +76,8 @@ object.
 
 ### Tips
 
-Many events relating to a Message entity (e.g. `MessageUpdated`)
-and `ReactionAdded` rely on the client's message cache, which is
+Many events relating to a Message entity (i.e. `MessageUpdated` and 
+`ReactionAdded`) rely on the client's message cache, which is
 **not** enabled by default. Set the `MessageCacheSize` flag in
 [DiscordSocketConfig] to enable it.
 
