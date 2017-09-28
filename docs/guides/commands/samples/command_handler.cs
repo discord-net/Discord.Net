@@ -12,9 +12,11 @@ public class Program
     private DiscordSocketClient _client;
     private IServiceProvider _services;
 
-    static void Main(string[] args) => new Program().Start().GetAwaiter().GetResult();
+    // Async Main is a C#7.1 feature.
+    // Use "static void Main(string[] args) => new Program().StartAsync().GetAwaiter().GetResult();" for C#7 and prior.
+    static Task Main(string[] args) => new Program().StartAsync();
 
-    public async Task Start()
+    public async Task StartAsync()
     {
         _client = new DiscordSocketClient();
         _commands = new CommandService();
@@ -22,9 +24,11 @@ public class Program
         string token = "bot token here";
 
         _services = new ServiceCollection()
+            .AddSingleton(_client)
+            .AddSingleton(_commands)
             .BuildServiceProvider();
 
-        await InstallCommands();
+        await InstallCommandsAsync();
 
         await _client.LoginAsync(TokenType.Bot, token);
         await _client.StartAsync();
@@ -32,15 +36,15 @@ public class Program
         await Task.Delay(-1);
     }
 
-    public async Task InstallCommands()
+    public async Task InstallCommandsAsync()
     {
         // Hook the MessageReceived Event into our Command Handler
-        _client.MessageReceived += HandleCommand;
+        _client.MessageReceived += HandleCommandAsync;
         // Discover all of the commands in this assembly and load them.
         await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
     }
 
-    public async Task HandleCommand(SocketMessage messageParam)
+    public async Task HandleCommandAsync(SocketMessage messageParam)
     {
         // Don't process the command if it was a System Message
         var message = messageParam as SocketUserMessage;
