@@ -31,8 +31,8 @@ Data logged through this event is typically coupled with a
 [CommandException], where information about the command's context
 and error can be found and handled.
 
-[CommandService]: Discord.Commands.CommandService
-[CommandException]: Discord.Commands.CommandException
+[CommandService]: xref:Discord.Commands.CommandService
+[CommandException]: xref:Discord.Commands.CommandException
 
 #### Samples
 
