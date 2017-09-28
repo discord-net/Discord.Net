@@ -8,7 +8,7 @@ convention, with the exception that every event must be of the type
 event's parameters are passed directly into the handler.
 
 This allows for events to be handled in an async context directly
-instead of relying on async void`.
+instead of relying on `async void`.
 
 ### Usage
 
