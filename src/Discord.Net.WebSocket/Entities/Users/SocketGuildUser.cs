@@ -43,7 +43,7 @@ namespace Discord.WebSocket
         public SocketVoiceState? VoiceState => Guild.GetVoiceState(Id);
         public AudioInStream AudioStream => Guild.GetAudioStream(Id);
 
-        /// <summary> The position of the user within the role hirearchy. </summary>
+        /// <summary> The position of the user within the role hierarchy. </summary>
         /// <remarks> The returned value equal to the position of the highest role the user has, 
         /// or int.MaxValue if user is the server owner. </remarks>
         public int Hierarchy
