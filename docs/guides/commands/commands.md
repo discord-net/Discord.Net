@@ -246,11 +246,16 @@ mind, however, that they are not limited to _just_ permissions and can
 be as complex as you want them to be.
 
 >[!NOTE]
->Preconditions can be applied to Modules, Groups, or Commands.
+>There are two types of Preconditions.
+[PreconditionAttribute] can be applied to Modules, Groups, or Commands;
+[ParameterPreconditionAttribute] can be applied to Parameters.
+
+[PreconditionAttribute]: xref:Discord.Commands.PreconditionAttribute
+[ParameterPreconditionAttribute]: xref:Discord.Commands.ParameterPreconditionAttribute
 
 ## Bundled Preconditions
 
-Commands ship with four bundled preconditions; you may view their
+Commands ship with four bundled Preconditions; you may view their
 usages on their respective API pages.
 
 - @Discord.Commands.RequireContextAttribute
@@ -260,10 +265,11 @@ usages on their respective API pages.
 
 ## Custom Preconditions
 
-To write your own precondition, create a new class that inherits from
-@Discord.Commands.PreconditionAttribute.
+To write your own Precondition, create a new class that inherits from
+either [PreconditionAttribute] or [ParameterPreconditionAttribute]
+depending on your use.
 
-In order for your precondition to function, you will need to override
+In order for your Precondition to function, you will need to override
 the [CheckPermissions] method.
 
 Your IDE should provide an option to fill this in for you.
