@@ -150,7 +150,7 @@ soon be added to indicate when the client's state is ready for use
 (rewrite this section when possible).
 
 Finally, we will want to block the async main method from returning
-until after the application has exited. To do this, we can await an
+until after the application is exited. To do this, we can await an
 infinite delay or any other blocking method, such as reading from
 the console.
 
@@ -158,7 +158,7 @@ The following lines can now be added:
 
 [!code-csharp[Create client](samples/intro/client.cs)]
 
-At this point, feel free to start your program and see your bot comes
+At this point, feel free to start your program and see your bot come
 online in Discord.
 
 >[!TIP]
