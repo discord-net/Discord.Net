@@ -1,4 +1,5 @@
-﻿using Discord.Audio;
+﻿#pragma warning disable CS0618
+using Discord.Audio;
 using Discord.Rest;
 using System;
 using System.Collections.Concurrent;

@@ -1,4 +1,5 @@
 ﻿#pragma warning disable CS1591
+#pragma warning disable CS0618
 using Discord.API.Rest;
 using Discord.Net;
 using Discord.Net.Converters;

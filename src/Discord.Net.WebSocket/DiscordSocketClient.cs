@@ -1,4 +1,5 @@
-﻿using Discord.API;
+﻿#pragma warning disable CS0618
+using Discord.API;
 using Discord.API.Gateway;
 using Discord.Logging;
 using Discord.Net.Converters;
