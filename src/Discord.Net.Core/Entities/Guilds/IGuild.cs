@@ -117,5 +117,16 @@ namespace Discord
         Task DownloadUsersAsync();
         /// <summary> Removes all users from this guild if they have not logged on in a provided number of days or, if simulate is true, returns the number of users that would be removed. </summary>
         Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null);
+
+        /// <summary> Gets a collection of all emotes in this guild. </summary>
+        Task<IReadOnlyCollection<GuildEmote>> ListEmotesAsync(RequestOptions options = null);
+        /// <summary> Gets a specific emote from this guild. </summary>
+        Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null);
+        /// <summary> Creates a new emote in this guild. </summary>
+        Task<GuildEmote> CreateEmoteAsync(string name, Image image, Optional<IEnumerable<IRole>> roles = default(Optional<IEnumerable<IRole>>), RequestOptions options = null);
+        /// <summary> Modifies an existing emote in this guild. </summary>
+        Task<GuildEmote> ModifyEmoteAsync(GuildEmote emote, Action<EmoteProperties> func, RequestOptions options = null);
+        /// <summary> Deletes an existing emote from this guild. </summary>
+        Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null);
     }
 }
