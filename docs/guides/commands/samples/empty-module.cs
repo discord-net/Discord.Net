@@ -1,6 +1,6 @@
 using Discord.Commands;
 
-public class InfoModule : ModuleBase
+public class InfoModule : ModuleBase<SocketCommandContext>
 {
     
 }
