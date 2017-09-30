@@ -167,6 +167,11 @@ for how to fix this.
 
 ### Handling a 'ping'
 
+>[!WARNING]
+Please note that this is *not* a proper way to create a command.
+Use the `CommandService` provided by the library instead, as explained
+in the [Command Guide] section.
+
 Now that we have learned how to open a connection to Discord, we can
 begin handling messages that users are sending.
 
@@ -211,6 +216,7 @@ For your reference, you may view the [completed program].
 [SocketMessage]: xref:Discord.WebSocket.SocketMessage
 [SocketMessageChannel]: xref:Discord.WebSocket.ISocketMessageChannel
 [completed program]: samples/intro/complete.cs
+[Command Guide]: ../commands/commands.md
 
 # Building a bot with commands
 
