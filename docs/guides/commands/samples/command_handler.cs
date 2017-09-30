@@ -12,14 +12,14 @@ public class Program
     private DiscordSocketClient _client;
     private IServiceProvider _services;
 
-    static void Main(string[] args) => new Program().Start().GetAwaiter().GetResult();
+    private static void Main(string[] args) => new Program().StartAsync().GetAwaiter().GetResult();
 
     public async Task StartAsync()
     {
         _client = new DiscordSocketClient();
         _commands = new CommandService();
 
-		// Avoid hard coding your token. Use an external source instead in your code.
+        // Avoid hard coding your token. Use an external source instead in your code.
         string token = "bot token here";
 
         _services = new ServiceCollection()
