@@ -43,7 +43,7 @@ public class Program
         await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
     }
 
-    public async Task HandleCommandAsync(SocketMessage messageParam)
+    private async Task HandleCommandAsync(SocketMessage messageParam)
     {
         // Don't process the command if it was a System Message
         var message = messageParam as SocketUserMessage;
