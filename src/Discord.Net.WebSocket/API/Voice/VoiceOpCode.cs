@@ -11,11 +11,19 @@ namespace Discord.API.Voice
         Ready = 2,
         /// <summary> C→S - Used to keep the connection alive and measure latency. </summary>
         Heartbeat = 3,
-        /// <summary> C←S - Used to reply to a client's heartbeat. </summary>
-        HeartbeatAck = 3,
         /// <summary> C←S - Used to provide an encryption key to the client. </summary>
         SessionDescription = 4,
         /// <summary> C↔S - Used to inform that a certain user is speaking. </summary>
-        Speaking = 5
+        Speaking = 5,
+        /// <summary> C←S - Used to reply to a client's heartbeat. </summary>
+        HeartbeatAck = 6,
+        /// <summary> C→S - Used to resume a connection. </summary>
+        Resume = 7,
+        /// <summary> C←S - The continuous interval in milliseconds after which the client should send a heartbeat. </summary>
+        Hello = 8,
+        /// <summary> C←S - Used to acknowledge Resume. </summary>
+        Resumed = 9,
+        /// <summary> C←S - Used to acknowledge that a client has disconnected from the voice channel. </summary>
+        ClientDisconnect = 13,
     }
 }
