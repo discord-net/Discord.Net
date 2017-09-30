@@ -144,11 +144,6 @@ start connection/reconnection logic. It is important to note that
 Any methods that rely on the client's state should go in an event
 handler.
 
->[!NOTE]
-Connection logic is incomplete as of the current build. Events will
-soon be added to indicate when the client's state is ready for use
-(rewrite this section when possible).
-
 Finally, we will want to block the async main method from returning
 until after the application is exited. To do this, we can await an
 infinite delay or any other blocking method, such as reading from
