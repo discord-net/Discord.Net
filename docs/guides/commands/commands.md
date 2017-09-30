@@ -157,7 +157,7 @@ install them.
 
 #### Loading Modules Manually
 
-To manually load a module, invoke [CommandService.AddModuleAsync], by
+To manually load a module, invoke [CommandService.AddModuleAsync] by
 passing in the generic type of your module and optionally, a
 dependency map.
 
