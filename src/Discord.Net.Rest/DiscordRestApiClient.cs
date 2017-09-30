@@ -1067,26 +1067,26 @@ namespace Discord.API
         }
 
         //Guild emoji
-        public async Task<IReadOnlyCollection<GuildEmote>> ListGuildEmotesAsync(ulong guildId, RequestOptions options = null)
+        public async Task<IReadOnlyCollection<Emoji>> ListGuildEmotesAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<GuildEmote>>("GET", () => $"guilds/{guildId}/emojis", ids, options: options);
+            return await SendAsync<IReadOnlyCollection<Emoji>>("GET", () => $"guilds/{guildId}/emojis", ids, options: options);
         }
 
-        public async Task<GuildEmote> GetGuildEmoteAsync(ulong guildId, ulong emoteId, RequestOptions options = null)
+        public async Task<Emoji> GetGuildEmoteAsync(ulong guildId, ulong emoteId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(emoteId, 0, nameof(emoteId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<GuildEmote>("GET", () => $"guilds/{guildId}/emojis/{emoteId}", ids, options: options);
+            return await SendAsync<Emoji>("GET", () => $"guilds/{guildId}/emojis/{emoteId}", ids, options: options);
         }
 
-        public async Task<GuildEmote> CreateGuildEmoteAsync(ulong guildId, Rest.CreateGuildEmoteParams args, RequestOptions options = null)
+        public async Task<Emoji> CreateGuildEmoteAsync(ulong guildId, Rest.CreateGuildEmoteParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
@@ -1095,10 +1095,10 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<GuildEmote>("POST", () => $"guilds/{guildId}/emojis", args, ids, options: options);
+            return await SendJsonAsync<Emoji>("POST", () => $"guilds/{guildId}/emojis", args, ids, options: options);
         }
 
-        public async Task<GuildEmote> ModifyGuildEmoteAsync(ulong guildId, ulong emoteId, ModifyGuildEmoteParams args, RequestOptions options = null)
+        public async Task<Emoji> ModifyGuildEmoteAsync(ulong guildId, ulong emoteId, ModifyGuildEmoteParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(emoteId, 0, nameof(emoteId));
@@ -1106,7 +1106,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<GuildEmote>("PATCH", () => $"guilds/{guildId}/emojis/{emoteId}", args, ids, options: options);
+            return await SendJsonAsync<Emoji>("PATCH", () => $"guilds/{guildId}/emojis/{emoteId}", args, ids, options: options);
         }
 
         public async Task DeleteGuildEmoteAsync(ulong guildId, ulong emoteId, RequestOptions options = null)

@@ -255,11 +255,20 @@ namespace Discord.Rest
         }
 
         //Emotes
-        public static Task<IReadOnlyCollection<GuildEmote>> ListEmotesAsync(IGuild guild, BaseDiscordClient client, RequestOptions options) 
-            => client.ApiClient.ListGuildEmotesAsync(guild.Id, options);
-        public static Task<GuildEmote> GetEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options) 
-            => client.ApiClient.GetGuildEmoteAsync(guild.Id, id, options);
-        public static Task<GuildEmote> CreateEmoteAsync(IGuild guild, BaseDiscordClient client, string name, Image image, Optional<IEnumerable<IRole>> roles, 
+        public static async Task<IReadOnlyCollection<GuildEmote>> ListEmotesAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
+        {
+            var model = await client.ApiClient.ListGuildEmotesAsync(guild.Id, options);
+            var emotes = ImmutableArray.CreateBuilder<GuildEmote>(model.Count);
+            foreach (var xm in model)
+                emotes.Add(xm.ToEntity());
+            return emotes;
+        }
+        public static async Task<GuildEmote> GetEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
+        {
+            var emote = await client.ApiClient.GetGuildEmoteAsync(guild.Id, id, options);
+            return emote.ToEntity();
+        }
+        public static async Task<GuildEmote> CreateEmoteAsync(IGuild guild, BaseDiscordClient client, string name, Image image, Optional<IEnumerable<IRole>> roles, 
             RequestOptions options)
         {
             var apiargs = new CreateGuildEmoteParams
@@ -270,9 +279,10 @@ namespace Discord.Rest
             if (roles.IsSpecified)
                 apiargs.RoleIds = roles.Value?.Select(xr => xr.Id)?.ToArray();
 
-            return client.ApiClient.CreateGuildEmoteAsync(guild.Id, apiargs, options);
+            var emote = await client.ApiClient.CreateGuildEmoteAsync(guild.Id, apiargs, options);
+            return emote.ToEntity();
         }
-        public static Task<GuildEmote> ModifyEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, Action<EmoteProperties> func, 
+        public static async Task<GuildEmote> ModifyEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, Action<EmoteProperties> func, 
             RequestOptions options)
         {
             if (func == null) throw new ArgumentNullException(nameof(func));
@@ -287,7 +297,8 @@ namespace Discord.Rest
             if (props.Roles.IsSpecified)
                 apiargs.RoleIds = props.Roles.Value?.Select(xr => xr.Id)?.ToArray();
 
-            return client.ApiClient.ModifyGuildEmoteAsync(guild.Id, id, apiargs, options);
+            var emote = await client.ApiClient.ModifyGuildEmoteAsync(guild.Id, id, apiargs, options);
+            return emote.ToEntity();
         }
         public static Task DeleteEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options) 
             => client.ApiClient.DeleteGuildEmoteAsync(guild.Id, id, options);
