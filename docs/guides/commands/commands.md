@@ -224,7 +224,7 @@ Any publicly settable properties will also be filled in the same
 manner.
 
 >[!NOTE]
-> Annotating a property with a `[DontInject]` attribute will prevent the
+> Annotating a property with a [DontInjectAttribute] attribute will prevent the
 property from being injected.
 
 >[!NOTE]
@@ -234,6 +234,8 @@ be filled by the `CommandService` that the Module is loaded from and
 the `ServiceProvider` that is passed into it respectively.
 
 [!code-csharp[ServiceProvider in Modules](samples/dependency_module.cs)]
+
+[DontInjectAttribute]: xref:Discord.Commands.DontInjectAttribute
 
 # Preconditions
 
