@@ -19,6 +19,7 @@ public class Program
         _client = new DiscordSocketClient();
         _commands = new CommandService();
 
+		// Avoid hard coding your token. Use an external source instead in your code.
         string token = "bot token here";
 
         _services = new ServiceCollection()
