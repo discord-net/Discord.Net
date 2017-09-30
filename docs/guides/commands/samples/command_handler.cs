@@ -12,9 +12,7 @@ public class Program
     private DiscordSocketClient _client;
     private IServiceProvider _services;
 
-    // Async Main is a C#7.1 feature.
-    // Use "static void Main(string[] args) => new Program().StartAsync().GetAwaiter().GetResult();" for C#7 and prior.
-    static Task Main(string[] args) => new Program().StartAsync();
+    static void Main(string[] args) => new Program().Start().GetAwaiter().GetResult();
 
     public async Task StartAsync()
     {
