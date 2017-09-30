@@ -130,7 +130,7 @@ accessing the channel through the [Context] and sending a message.
 
 > [!WARNING]
 >Contexts should **NOT** be mixed! You cannot have one module that
->uses CommandContext and another that uses SocketCommandContext.
+>uses `CommandContext` and another that uses `SocketCommandContext`.
 
 [Context]: xref:Discord.Commands.ModuleBase`1#Discord_Commands_ModuleBase_1_Context
 [SocketCommandContext]: xref:Discord.Commands.SocketCommandContext
