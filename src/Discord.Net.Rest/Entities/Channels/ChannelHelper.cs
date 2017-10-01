@@ -181,7 +181,7 @@ namespace Discord.Rest
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }     
 
-        public static async Task DeleteMessagesAsync(IMessageChannel channel, BaseDiscordClient client,
+        public static async Task DeleteMessagesAsync(ITextChannel channel, BaseDiscordClient client,
             IEnumerable<ulong> messageIds, RequestOptions options)
         {
             var msgs = messageIds.ToArray();
