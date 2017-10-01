@@ -118,8 +118,6 @@ namespace Discord
         /// <summary> Removes all users from this guild if they have not logged on in a provided number of days or, if simulate is true, returns the number of users that would be removed. </summary>
         Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null);
 
-        /// <summary> Gets a collection of all emotes in this guild. </summary>
-        Task<IReadOnlyCollection<GuildEmote>> ListEmotesAsync(RequestOptions options = null);
         /// <summary> Gets a specific emote from this guild. </summary>
         Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null);
         /// <summary> Creates a new emote in this guild. </summary>

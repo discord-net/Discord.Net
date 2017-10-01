@@ -255,14 +255,6 @@ namespace Discord.Rest
         }
 
         //Emotes
-        public static async Task<IReadOnlyCollection<GuildEmote>> ListEmotesAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
-        {
-            var model = await client.ApiClient.ListGuildEmotesAsync(guild.Id, options);
-            var emotes = ImmutableArray.CreateBuilder<GuildEmote>(model.Count);
-            foreach (var xm in model)
-                emotes.Add(xm.ToEntity());
-            return emotes;
-        }
         public static async Task<GuildEmote> GetEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
         {
             var emote = await client.ApiClient.GetGuildEmoteAsync(guild.Id, id, options);

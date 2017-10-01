@@ -434,8 +434,6 @@ namespace Discord.WebSocket
         }
 
         //Emotes
-        public Task<IReadOnlyCollection<GuildEmote>> ListEmotesAsync(RequestOptions options = null)
-            => GuildHelper.ListEmotesAsync(this, Discord, options);
         public Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null)
             => GuildHelper.GetEmoteAsync(this, Discord, id, options);
         public Task<GuildEmote> CreateEmoteAsync(string name, Image image, Optional<IEnumerable<IRole>> roles = default(Optional<IEnumerable<IRole>>), RequestOptions options = null)

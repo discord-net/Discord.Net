@@ -1067,15 +1067,6 @@ namespace Discord.API
         }
 
         //Guild emoji
-        public async Task<IReadOnlyCollection<Emoji>> ListGuildEmotesAsync(ulong guildId, RequestOptions options = null)
-        {
-            Preconditions.NotEqual(guildId, 0, nameof(guildId));
-            options = RequestOptions.CreateOrClone(options);
-
-            var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<IReadOnlyCollection<Emoji>>("GET", () => $"guilds/{guildId}/emojis", ids, options: options);
-        }
-
         public async Task<Emoji> GetGuildEmoteAsync(ulong guildId, ulong emoteId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
