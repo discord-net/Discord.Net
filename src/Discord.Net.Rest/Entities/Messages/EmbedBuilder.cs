@@ -66,6 +66,15 @@ namespace Discord
                 _embed.Image = new EmbedImage(value, null, null, null);
             }
         }
+        public string VideoUrl
+        {
+            get => _embed.Video?.Url;
+            set
+            {
+                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(VideoUrl));
+                _embed.Video = new EmbedVideo(value, null, null);
+            }
+        }
         public DateTimeOffset? Timestamp { get => _embed.Timestamp; set { _embed.Timestamp = value; } }
         public Color? Color { get => _embed.Color; set { _embed.Color = value; } }
 
@@ -107,6 +116,11 @@ namespace Discord
         public EmbedBuilder WithImageUrl(string imageUrl)
         {
             ImageUrl = imageUrl;
+            return this;
+        }
+        public EmbedBuilder WithVideoUrl(string videoUrl)
+        {
+            VideoUrl = videoUrl;
             return this;
         }
         public EmbedBuilder WithCurrentTimestamp()
