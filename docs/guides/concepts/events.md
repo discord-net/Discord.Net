@@ -4,27 +4,27 @@ title: Working with Events
 
 Events in Discord.Net are consumed in a similar manner to the standard
 convention, with the exception that every event must be of the type
-`System.Threading.Tasks.Task`, and instead of using EventArgs, the
+`System.Threading.Tasks.Task` and instead of using `EventArgs`, the
 event's parameters are passed directly into the handler.
 
-This allows for events to be handled in an async context directly,
-instead of relying on async void.
+This allows for events to be handled in an async context directly
+instead of relying on `async void`.
 
 ### Usage
 
 To receive data from an event, hook into it using C#'s delegate
 event pattern.
 
-You may opt either to hook an event to an anonymous function (lambda)
+You may either opt to hook an event to an anonymous function (lambda)
 or a named function.
 
 ### Safety
 
-All events are designed to be thread-safe, in that events are executed
-synchronously off the gateway task, in the same context as the gateway
+All events are designed to be thread-safe; events are executed
+synchronously off the gateway task in the same context as the gateway
 task.
 
-As a side effect, this makes it possible to deadlock the gateway task,
+As a side effect, this makes it possible to deadlock the gateway task
 and kill a connection. As a general rule of thumb, any task that takes
 longer than three seconds should **not** be awaited directly in the
 context of an event, but should be wrapped in a `Task.Run` or
@@ -62,7 +62,7 @@ This pattern is typically only found on `EntityUpdated` events.
 
 An event handler with a signature of `Func<Cacheable, Entity, Task>`
 means that the `before`	state of the entity was not provided by the
-API, so it can either be pulled from the client's cache, or
+API, so it can either be pulled from the client's cache or
 downloaded from the API.
 
 See the documentation for [Cacheable] for more information on this
@@ -76,8 +76,8 @@ object.
 
 ### Tips
 
-Many events relating to a Message entity, e.g. `MessageUpdated`
-and `ReactionAdded` rely on the client's message cache, which is
+Many events relating to a Message entity (i.e. `MessageUpdated` and 
+`ReactionAdded`) rely on the client's message cache, which is
 **not** enabled by default. Set the `MessageCacheSize` flag in
 [DiscordSocketConfig] to enable it.
 

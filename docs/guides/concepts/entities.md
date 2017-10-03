@@ -12,7 +12,7 @@ Discord API.
 ### Inheritance
 
 Due to the nature of the Discord API, some entities are designed with
-multiple variants, for example, `SocketUser` and `SocketGuildUser`.
+multiple variants; for example, `SocketUser` and `SocketGuildUser`.
 
 All models will contain the most detailed version of an entity
 possible, even if the type is less detailed. 
@@ -61,8 +61,11 @@ a variant of the type that you need.
 ### Tips
 
 Avoid using boxing-casts to coerce entities into a variant, use the
-`as` keyword, and a null-conditional operator.
+[`as`] keyword, and a null-conditional operator instead.
 
-This allows you to write safer code, and avoid InvalidCastExceptions.
+This allows you to write safer code and avoid [InvalidCastExceptions].
 
 For example, `(message.Author as SocketGuildUser)?.Nickname`.
+
+[`as`]: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/as
+[InvalidCastExceptions]: https://msdn.microsoft.com/en-us/library/system.invalidcastexception(v=vs.110).aspx
