@@ -63,7 +63,7 @@ class Program
                 break;
             case LogSeverity.Verbose:
             case LogSeverity.Debug:
-                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
                 break;
         }
         Console.WriteLine($"{DateTime.Now,-19} [{message.Severity,8}] {message.Source}: {message.Message}");
