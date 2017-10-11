@@ -10,41 +10,45 @@ namespace Discord.Rest
     {
         internal IGuild Guild { get; private set; }
         internal ITextChannel Channel { get; private set; }
-        public string Token { get; private set; }
+
+        public ulong ChannelId { get; }
+        public string Token { get; }
+
         public string Name { get; private set; }
         public string AvatarId { get; private set; }
-        public ulong ChannelId { get; private set; }
-        public ulong GuildId { get; private set; }
+        public ulong? GuildId { get; private set; }
         public IUser Creator { get; private set; }
 
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
-        internal RestWebhook(BaseDiscordClient discord, IGuild guild, ulong id)
+        internal RestWebhook(BaseDiscordClient discord, IGuild guild, ulong id, string token, ulong channelId)
             : base(discord, id)
         {
             Guild = guild;
+            Token = token;
+            ChannelId = channelId;
         }
-        internal RestWebhook(BaseDiscordClient discord, ITextChannel channel, ulong id)
-            : this(discord, channel.Guild, id)
+        internal RestWebhook(BaseDiscordClient discord, ITextChannel channel, ulong id, string token, ulong channelId)
+            : this(discord, channel.Guild, id, token, channelId)
         {
             Channel = channel;
         }
+
         internal static RestWebhook Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            var entity = new RestWebhook(discord, guild, model.Id);
+            var entity = new RestWebhook(discord, guild, model.Id, model.Token, model.ChannelId);
             entity.Update(model);
             return entity;
         }
         internal static RestWebhook Create(BaseDiscordClient discord, ITextChannel channel, Model model)
         {
-            var entity = new RestWebhook(discord, channel, model.Id);
+            var entity = new RestWebhook(discord, channel, model.Id, model.Token, model.ChannelId);
             entity.Update(model);
             return entity;
         }
+
         internal void Update(Model model)
         {
-            Token = model.Token;
-            ChannelId = model.ChannelId;
             if (model.Avatar.IsSpecified)
                 AvatarId = model.Avatar.Value;
             if (model.Creator.IsSpecified)
@@ -73,16 +77,8 @@ namespace Discord.Rest
         public Task DeleteAsync(RequestOptions options = null)
             => WebhookHelper.DeleteAsync(this, Discord, options);
 
-        public async Task<RestTextChannel> GetChannelAsync(RequestOptions options = null)
-        {
-            Channel = await ClientHelper.GetChannelAsync(Discord, ChannelId, options) as RestTextChannel;
-            Guild = Channel.Guild;
-
-            return Channel as RestTextChannel;
-        }
-
-        public override string ToString() => Name;
-        private string DebuggerDisplay => $"{Name} ({Id})";
+        public override string ToString() => $"Webhook: {Name}:{Id}";
+        private string DebuggerDisplay => $"Webhook: {Name} ({Id})";
 
         //IWebhook
         IGuild IWebhook.Guild 

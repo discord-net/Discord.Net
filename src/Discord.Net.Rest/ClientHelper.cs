@@ -144,9 +144,9 @@ namespace Discord.Rest
             return null;
         }
 
-        public static async Task<RestWebhook> GetWebhookAsync(BaseDiscordClient client, ulong id, string webhookToken, RequestOptions options)
+        public static async Task<RestWebhook> GetWebhookAsync(BaseDiscordClient client, ulong id, RequestOptions options)
         {
-            var model = await client.ApiClient.GetWebhookAsync(id, webhookToken);
+            var model = await client.ApiClient.GetWebhookAsync(id);
             if (model != null)
                 return RestWebhook.Create(client, (IGuild)null, model);
             return null;

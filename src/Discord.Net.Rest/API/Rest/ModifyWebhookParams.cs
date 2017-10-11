@@ -10,5 +10,7 @@ namespace Discord.API.Rest
         public Optional<string> Name { get; set; }
         [JsonProperty("avatar")]
         public Optional<Image?> Avatar { get; set; }
+        [JsonProperty("channel_id")]
+        public Optional<ulong> ChannelId { get; set; }
     }
 }

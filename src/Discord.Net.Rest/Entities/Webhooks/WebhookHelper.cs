@@ -1,6 +1,6 @@
-﻿using Discord.API.Rest;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Discord.API.Rest;
 using ImageModel = Discord.API.Image;
 using Model = Discord.API.Webhook;
 
@@ -21,6 +21,11 @@ namespace Discord.Rest
 
             if (!apiArgs.Avatar.IsSpecified && webhook.AvatarId != null)
                 apiArgs.Avatar = new ImageModel(webhook.AvatarId);
+
+            if (args.Channel.IsSpecified)
+                apiArgs.ChannelId = args.Channel.Value.Id;
+            else if (args.ChannelId.IsSpecified)
+                apiArgs.ChannelId = args.ChannelId.Value;
 
             return await client.ApiClient.ModifyWebhookAsync(webhook.Id, apiArgs, options).ConfigureAwait(false);
         }
