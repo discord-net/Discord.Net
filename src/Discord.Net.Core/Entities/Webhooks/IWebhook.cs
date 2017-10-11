@@ -23,7 +23,7 @@ namespace Discord
         /// <summary> Gets the guild owning this webhook. </summary>
         IGuild Guild { get; }
         /// <summary> Gets the id of the guild owning this webhook. </summary>
-        ulong GuildId { get; }
+        ulong? GuildId { get; }
 
         /// <summary> Gets the user that created this webhook. </summary>
         IUser Creator { get; }

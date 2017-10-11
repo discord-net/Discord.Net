@@ -23,5 +23,19 @@
         /// The default avatar of the webhook.
         /// </summary>
         public Optional<Image?> Image { get; set; }
+        /// <summary>
+        /// The channel for this webhook.
+        /// </summary>
+        /// <remarks>
+        /// This field is not used when authenticated with <see cref="TokenType.Webhook"/>.
+        /// </remarks>
+        public Optional<ITextChannel> Channel { get; set; }
+        /// <summary>
+        /// The channel id for this webhook.
+        /// </summary>
+        /// <remarks>
+        /// This field is not used when authenticated with <see cref="TokenType.Webhook"/>.
+        /// </remarks>
+        public Optional<ulong> ChannelId { get; set; }
     }
 }
