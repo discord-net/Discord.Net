@@ -1,19 +1,19 @@
-using Discord.API.Rest;
-using Discord.Rest;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using System.Linq;
 using Discord.Logging;
+using Discord.Rest;
 
 namespace Discord.Webhook
 {
-    public partial class DiscordWebhookClient
+    public class DiscordWebhookClient : IDisposable
     {
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
 
         private readonly ulong _webhookId;
+        internal IWebhook Webhook;
         internal readonly Logger _restLogger;
         
         internal API.DiscordRestApiClient ApiClient { get; }
@@ -21,15 +21,29 @@ namespace Discord.Webhook
 
         /// <summary> Creates a new Webhook discord client. </summary>
         public DiscordWebhookClient(IWebhook webhook)
-            : this(webhook.Id, webhook.Token) {  }
+            : this(webhook.Id, webhook.Token, new DiscordRestConfig()) {  }
         /// <summary> Creates a new Webhook discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken)
             : this(webhookId, webhookToken, new DiscordRestConfig()) { }
+
         /// <summary> Creates a new Webhook discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken, DiscordRestConfig config)
+            : this(config)
         {
             _webhookId = webhookId;
+            ApiClient.LoginAsync(TokenType.Webhook, webhookToken).GetAwaiter().GetResult();
+            Webhook = WebhookClientHelper.GetWebhookAsync(this, webhookId).GetAwaiter().GetResult();
+        }
+        /// <summary> Creates a new Webhook discord client. </summary>
+        public DiscordWebhookClient(IWebhook webhook, DiscordRestConfig config)
+            : this(config)
+        {
+            Webhook = webhook;
+            _webhookId = Webhook.Id;
+        }
 
+        private DiscordWebhookClient(DiscordRestConfig config)
+        {
             ApiClient = CreateApiClient(config);
             LogManager = new LogManager(config.LogLevel);
             LogManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
@@ -44,42 +58,40 @@ namespace Discord.Webhook
                     await _restLogger.WarningAsync($"Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
             };
             ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
-            ApiClient.LoginAsync(TokenType.Webhook, webhookToken).GetAwaiter().GetResult();
         }
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
             => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent);
-
-        public async Task SendMessageAsync(string text, bool isTTS = false, Embed[] embeds = null, 
+        
+        /// <summary> Sends a message using to the channel for this webhook. Returns the ID of the created message. </summary>
+        public Task<ulong> SendMessageAsync(string text, bool isTTS = false, IEnumerable<Embed> embeds = null,
             string username = null, string avatarUrl = null, RequestOptions options = null)
-        {
-            var args = new CreateWebhookMessageParams(text) { IsTTS = isTTS };
-            if (embeds != null)
-                args.Embeds = embeds.Select(x => x.ToModel()).ToArray();
-            if (username != null)
-                args.Username = username;
-            if (avatarUrl != null)
-                args.AvatarUrl = avatarUrl;
-            await ApiClient.CreateWebhookMessageAsync(_webhookId, args, options: options).ConfigureAwait(false);
-        }
+            => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, options);
 
 #if FILESYSTEM
-        public async Task SendFileAsync(string filePath, string text, bool isTTS = false, 
-            string username = null, string avatarUrl = null, RequestOptions options = null)
-        {
-            string filename = Path.GetFileName(filePath);
-            using (var file = File.OpenRead(filePath))
-                await SendFileAsync(file, filename, text, isTTS, username, avatarUrl, options).ConfigureAwait(false);
-        }
+        /// <summary> Send a message to the channel for this webhook with an attachment. Returns the ID of the created message. </summary>
+        public Task<ulong> SendFileAsync(string filePath, string text, bool isTTS = false,
+            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null)
+            => WebhookClientHelper.SendFileAsync(this, filePath, text, isTTS, embeds, username, avatarUrl, options);
 #endif
-        public async Task SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, 
-            string username = null, string avatarUrl = null, RequestOptions options = null)
+        /// <summary> Send a message to the channel for this webhook with an attachment. Returns the ID of the created message. </summary>
+        public Task<ulong> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false,
+            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null)
+            => WebhookClientHelper.SendFileAsync(this, stream, filename, text, isTTS, embeds, username, avatarUrl, options);
+
+        /// <summary> Modifies the properties of this webhook. </summary>
+        public Task ModifyWebhookAsync(Action<WebhookProperties> func, RequestOptions options = null)
+            => Webhook.ModifyAsync(func, options);
+
+        /// <summary> Deletes this webhook from Discord and disposes the client. </summary>
+        public async Task DeleteWebhookAsync(RequestOptions options = null)
         {
-            var args = new UploadWebhookFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS };
-            if (username != null)
-                args.Username = username;
-            if (avatarUrl != null)
-                args.AvatarUrl = username;
-            await ApiClient.UploadWebhookFileAsync(_webhookId, args, options).ConfigureAwait(false);
+            await Webhook.DeleteAsync(options).ConfigureAwait(false);
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            ApiClient?.Dispose();
         }
     }
 }
