@@ -6,6 +6,6 @@
 
         void BeforeExecute(CommandInfo command);
         
-        void AfterExecute(CommandInfo command);
+        void AfterExecute(CommandInfo command, Exception exception);
     }
 }
