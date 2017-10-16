@@ -1,4 +1,6 @@
-﻿namespace Discord.Commands
+using System;
+
+namespace Discord.Commands
 {
     internal interface IModuleBase
     {
