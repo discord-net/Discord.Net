@@ -154,14 +154,14 @@ namespace Discord.Rest
             => await RemovePermissionOverwriteAsync(user, options).ConfigureAwait(false);
         
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
-            => AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>(); //Overriden //Overriden in Text/Voice
+            => AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>(); //Overridden //Overridden in Text/Voice
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
-            => Task.FromResult<IGuildUser>(null); //Overriden in Text/Voice
+            => Task.FromResult<IGuildUser>(null); //Overridden in Text/Voice
 
         //IChannel
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
-            => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overriden in Text/Voice
+            => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overridden in Text/Voice
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
-            => Task.FromResult<IUser>(null); //Overriden in Text/Voice
+            => Task.FromResult<IUser>(null); //Overridden in Text/Voice
     }
 }
