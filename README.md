@@ -6,7 +6,7 @@
 
 An unofficial .NET API Wrapper for the Discord client (http://discordapp.com).
 
-Check out the [documentation](https://discord.foxbot.me/docs/) or join the [Discord API Chat](https://discord.gg/0SBTUU1wZTVjAMPx).
+Check out the [documentation](https://discord.foxbot.me/docs/) or join the [Discord API Chat].(https://discord.gg/0SBTUU1wZTVjAMPx).
 
 ## Installation 
 ### Stable (NuGet)
