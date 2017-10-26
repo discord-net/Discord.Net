@@ -1161,8 +1161,9 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotNull(args.Name, nameof(args.Name));
             options = RequestOptions.CreateOrClone(options);
+            var ids = new BucketIds(channelId: channelId);
 
-            return await SendJsonAsync<Webhook>("POST", () => $"channels/{channelId}/webhooks", args, new BucketIds(), options: options);
+            return await SendJsonAsync<Webhook>("POST", () => $"channels/{channelId}/webhooks", args, ids, options: options);
         }
         public async Task<Webhook> GetWebhookAsync(ulong webhookId, RequestOptions options = null)
         {
