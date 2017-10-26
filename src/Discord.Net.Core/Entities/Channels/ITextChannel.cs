@@ -13,6 +13,11 @@ namespace Discord
         /// <summary> Gets the current topic for this text channel. </summary>
         string Topic { get; }
 
+        /// <summary> Bulk deletes multiple messages. </summary>
+        Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null);
+        /// <summary> Bulk deletes multiple messages. </summary>
+        Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null);
+
         /// <summary> Modifies this text channel. </summary>
         Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null);
 

@@ -8,12 +8,6 @@ using Discord.WebSocket;
 
 class Program
 {
-    private readonly DiscordSocketClient _client;
-    
-    // Keep the CommandService and IServiceCollection around for use with commands.
-    private readonly IServiceCollection _map = new ServiceCollection();
-    private readonly CommandService _commands = new CommandService();
-
     // Program entry point
     static void Main(string[] args)
     {
@@ -21,6 +15,13 @@ class Program
         // MainAsync method and wait until it finishes (which should be never).
         new Program().MainAsync().GetAwaiter().GetResult();
     }
+
+    private readonly DiscordSocketClient _client;
+    
+    // Keep the CommandService and IServiceCollection around for use with commands.
+    // These two types require you install the Discord.Net.Commands package.
+    private readonly IServiceCollection _map = new ServiceCollection();
+    private readonly CommandService _commands = new CommandService();
 
     private Program()
     {
@@ -48,7 +49,6 @@ class Program
     // that ask for a Func<LogMessage, Task>.
     private static Task Logger(LogMessage message)
     {
-        var cc = Console.ForegroundColor;
         switch (message.Severity)
         {
             case LogSeverity.Critical:
@@ -66,8 +66,8 @@ class Program
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 break;
         }
-        Console.WriteLine($"{DateTime.Now,-19} [{message.Severity,8}] {message.Source}: {message.Message}");
-        Console.ForegroundColor = cc;
+        Console.WriteLine($"{DateTime.Now,-19} [{message.Severity,8}] {message.Source}: {message.Message} {message.Exception}");
+        Console.ResetColor();
         
         // If you get an error saying 'CompletedTask' doesn't exist,
         // your project is targeting .NET 4.5.2 or lower. You'll need
@@ -105,10 +105,11 @@ class Program
         _services = _map.BuildServiceProvider();
 
         // Either search the program and add all Module classes that can be found.
-        // Module classes *must* be marked 'public' or they will be ignored.
+        // Module classes MUST be marked 'public' or they will be ignored.
         await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
         // Or add Modules manually if you prefer to be a little more explicit:
         await _commands.AddModuleAsync<SomeModule>();
+        // Note that the first one is 'Modules' (plural) and the second is 'Module' (singular).
 
         // Subscribe a handler to see if a message invokes a command.
         _client.MessageReceived += HandleCommandAsync;
@@ -120,6 +121,11 @@ class Program
         var msg = arg as SocketUserMessage;
         if (msg == null) return;
 
+        // We don't want the bot to respond to itself or other bots.
+        // NOTE: Selfbots should invert this first check and remove the second
+        // as they should ONLY be allowed to respond to messages from the same account.
+        if (msg.Author.Id == _client.CurrentUser.Id || msg.Author.IsBot) return;
+        
         // Create a number to track where the prefix ends and the command begins
         int pos = 0;
         // Replace the '!' with whatever character
