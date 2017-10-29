@@ -27,25 +27,23 @@ namespace Discord
             if (embed.Type != EmbedType.Rich)
                 throw new InvalidOperationException($"Only {nameof(EmbedType.Rich)} embeds may be built.");
 
-            var eb = new EmbedBuilder
+            var builder = new EmbedBuilder
             {
                 Title = embed.Title,
                 Description = embed.Description,
                 Url = embed.Url,
                 ImageUrl = embed.Image?.Url,
                 ThumbnailUrl = embed.Thumbnail?.Url,
-                Timestamp = embed.Timestamp
+                Timestamp = embed.Timestamp,
+                Color = embed.Color ?? Color.Default
             }
             .WithAuthor(embed.Author?.Name, embed.Author?.IconUrl, embed.Author?.Url)
             .WithFooter(embed.Footer?.Text, embed.Footer?.IconUrl);
 
-            if (embed.Color.HasValue)
-                eb.WithColor(embed.Color.Value);
-
             foreach (var field in embed.Fields)
-                eb.AddField(field.Name, field.Value, field.Inline);
+                builder.AddField(field.Name, field.Value, field.Inline);
 
-            return eb;
+            return builder;
         }
     }
 }
