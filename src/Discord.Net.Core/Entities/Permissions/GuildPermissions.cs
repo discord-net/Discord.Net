@@ -150,7 +150,7 @@ namespace Discord
             bool? useExternalEmojis = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
             bool? moveMembers = null, bool? useVoiceActivation = null, bool? changeNickname = null, bool? manageNicknames = null,
             bool? manageRoles = null, bool? manageWebhooks = null, bool? manageEmojis = null)
-            => new GuildPermissions(RawValue, kickMembers, banMembers, administrator, manageChannels, manageGuild, addReactions,
+            => new GuildPermissions(RawValue, createInstantInvite, kickMembers, banMembers, administrator, manageChannels, manageGuild, addReactions,
                 viewAuditLog, readMessages, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
                 useVoiceActivation, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojis);
