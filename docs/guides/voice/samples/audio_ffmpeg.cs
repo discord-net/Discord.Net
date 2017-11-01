@@ -1,9 +1,11 @@
 private async Task SendAsync(IAudioClient client, string path)
 {
     // Create FFmpeg using the previous example
-    var ffmpeg = CreateStream(path);
-    var output = ffmpeg.StandardOutput.BaseStream;
-    var discord = client.CreatePCMStream(AudioApplication.Mixed);
-    await output.CopyToAsync(discord);
-    await discord.FlushAsync();
+    using (var ffmpeg = CreateStream(path))
+    using (var output = ffmpeg.StandardOutput.BaseStream)
+    using (var discord = client.CreatePCMStream(AudioApplication.Mixed))
+    {
+        try { await output.CopyToAsync(discord); }
+        finally { await discord.FlushAsync(); }
+    }
 }
