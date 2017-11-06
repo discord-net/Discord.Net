@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Discord;
@@ -88,7 +89,7 @@ class Program
         await _client.StartAsync();
 
         // Wait infinitely so your bot actually stays connected.
-        await Task.Delay(-1);
+        await Task.Delay(Timeout.Infinite);
     }
 
     private IServiceProvider _services;
