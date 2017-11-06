@@ -19,7 +19,7 @@ namespace Discord.Commands
         {
         }
 
-        protected virtual void AfterExecute(CommandInfo command)
+        protected virtual void AfterExecute(CommandInfo command, Exception exception)
         {
         }
 
@@ -32,6 +32,6 @@ namespace Discord.Commands
 
         void IModuleBase.BeforeExecute(CommandInfo command) => BeforeExecute(command);
 
-        void IModuleBase.AfterExecute(CommandInfo command) => AfterExecute(command);
+        void IModuleBase.AfterExecute(CommandInfo command, Exception exception) => AfterExecute(command, exception);
     }
 }

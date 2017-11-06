@@ -201,7 +201,9 @@ namespace Discord.Commands
             {
                 var instance = createInstance(services);
                 instance.SetContext(context);
-
+                
+                Exception exc = null;
+                
                 try
                 {
                     instance.BeforeExecute(cmd);
@@ -217,9 +219,14 @@ namespace Discord.Commands
                         return ExecuteResult.FromSuccess();
                     }
                 }
+                catch (Exception exception)
+                {
+                    exc = exception;
+                    throw;
+                }
                 finally
                 {
-                    instance.AfterExecute(cmd);
+                    instance.AfterExecute(cmd, exc);
                     (instance as IDisposable)?.Dispose();
                 }
             }
