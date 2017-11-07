@@ -41,7 +41,11 @@ namespace Discord
         /// <summary> If true, a user may add reactions. </summary>
         public bool AddReactions => Permissions.GetValue(RawValue, ChannelPermission.AddReactions);
         /// <summary> If True, a user may join channels. </summary>
-        public bool ReadMessages => Permissions.GetValue(RawValue, ChannelPermission.ReadMessages);
+        [Obsolete("Use ViewChannel instead.")]
+        public bool ReadMessages => ViewChannel;
+        /// <summary> If True, a user may view channels. </summary>
+        public bool ViewChannel => Permissions.GetValue(RawValue, ChannelPermission.ReadMessages);
+
         /// <summary> If True, a user may send messages. </summary>
         public bool SendMessages => Permissions.GetValue(RawValue, ChannelPermission.SendMessages);
         /// <summary> If True, a user may send text-to-speech messages. </summary>
