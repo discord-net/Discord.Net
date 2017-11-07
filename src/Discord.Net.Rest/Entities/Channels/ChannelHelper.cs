@@ -184,21 +184,26 @@ namespace Discord.Rest
         public static async Task DeleteMessagesAsync(ITextChannel channel, BaseDiscordClient client,
             IEnumerable<ulong> messageIds, RequestOptions options)
         {
+            const int BATCH_SIZE = 100;
+
             var msgs = messageIds.ToArray();
-            if (msgs.Length < 100)
+            int batches = msgs.Length / BATCH_SIZE;
+            for (int i = 0; i <= batches; i++)
             {
-                var args = new DeleteMessagesParams(msgs);
-                await client.ApiClient.DeleteMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
-            }
-            else
-            {
-                var batch = new ulong[100];
-                for (int i = 0; i < (msgs.Length + 99) / 100; i++)
+                ArraySegment<ulong> batch;
+                if (i < batches)
                 {
-                    Array.Copy(msgs, i * 100, batch, 0, Math.Min(msgs.Length - (100 * i), 100));
-                    var args = new DeleteMessagesParams(batch);
-                    await client.ApiClient.DeleteMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
+                    batch = new ArraySegment<ulong>(msgs, i * BATCH_SIZE, BATCH_SIZE);
+                } else
+                {
+                    batch = new ArraySegment<ulong>(msgs, i * BATCH_SIZE, msgs.Length - batches * BATCH_SIZE);
+                    if (batch.Count == 0)
+                    {
+                        break;
+                    }
                 }
+                var args = new DeleteMessagesParams(batch.ToArray());
+                await client.ApiClient.DeleteMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
             }
         }
 
