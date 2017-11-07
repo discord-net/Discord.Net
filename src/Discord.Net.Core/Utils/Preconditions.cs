@@ -188,7 +188,8 @@ namespace Discord
             var minimum = SnowflakeUtils.ToSnowflake(DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(14)));
             for (var i = 0; i < collection.Length; i++)
             {
-                if (collection[i] <= minimum) 
+                if (collection[i] == 0) continue;
+                if (collection[i] <= minimum)
                     throw new ArgumentOutOfRangeException(name, "Messages must be younger than two weeks old.");
             }
         }
