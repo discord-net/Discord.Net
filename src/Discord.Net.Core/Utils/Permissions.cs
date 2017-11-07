@@ -152,7 +152,7 @@ namespace Discord
 
                 if (channel is ITextChannel textChannel)
                 {
-                    if (!GetValue(resolvedPermissions, ChannelPermission.ReadMessages))
+                    if (!GetValue(resolvedPermissions, ChannelPermission.ViewChannel))
                     {
                         //No read permission on a text channel removes all other permissions
                         resolvedPermissions = 0;

@@ -41,7 +41,11 @@ namespace Discord
         /// <summary> If true, a user may add reactions. </summary>
         public bool AddReactions => Permissions.GetValue(RawValue, ChannelPermission.AddReactions);
         /// <summary> If True, a user may join channels. </summary>
-        public bool ReadMessages => Permissions.GetValue(RawValue, ChannelPermission.ReadMessages);
+        [Obsolete("Use ViewChannel instead.")]
+        public bool ReadMessages => ViewChannel;
+        /// <summary> If True, a user may view channels. </summary>
+        public bool ViewChannel => Permissions.GetValue(RawValue, ChannelPermission.ViewChannel);
+
         /// <summary> If True, a user may send messages. </summary>
         public bool SendMessages => Permissions.GetValue(RawValue, ChannelPermission.SendMessages);
         /// <summary> If True, a user may send text-to-speech messages. </summary>
@@ -82,7 +86,7 @@ namespace Discord
 
         private ChannelPermissions(ulong initialValue, bool? createInstantInvite = null, bool? manageChannel = null,
             bool? addReactions = null,
-            bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
+            bool? viewChannel = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
             bool? useExternalEmojis = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
             bool? moveMembers = null, bool? useVoiceActivation = null, bool? manageRoles = null, bool? manageWebhooks = null)
@@ -92,7 +96,7 @@ namespace Discord
             Permissions.SetValue(ref value, createInstantInvite, ChannelPermission.CreateInstantInvite);
             Permissions.SetValue(ref value, manageChannel, ChannelPermission.ManageChannels);
             Permissions.SetValue(ref value, addReactions, ChannelPermission.AddReactions);
-            Permissions.SetValue(ref value, readMessages, ChannelPermission.ReadMessages);
+            Permissions.SetValue(ref value, viewChannel, ChannelPermission.ViewChannel);
             Permissions.SetValue(ref value, sendMessages, ChannelPermission.SendMessages);
             Permissions.SetValue(ref value, sendTTSMessages, ChannelPermission.SendTTSMessages);
             Permissions.SetValue(ref value, manageMessages, ChannelPermission.ManageMessages);

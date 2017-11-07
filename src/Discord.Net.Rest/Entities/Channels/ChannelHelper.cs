@@ -234,7 +234,7 @@ namespace Discord.Rest
             if (model == null)
                 return null;
             var user = RestGuildUser.Create(client, guild, model);
-            if (!user.GetPermissions(channel).ReadMessages)
+            if (!user.GetPermissions(channel).ViewChannel)
                 return null;
 
             return user;
@@ -255,7 +255,7 @@ namespace Discord.Rest
                     var models = await client.ApiClient.GetGuildMembersAsync(guild.Id, args, options).ConfigureAwait(false);
                     return models
                         .Select(x => RestGuildUser.Create(client, guild, x))
-                        .Where(x => x.GetPermissions(channel).ReadMessages)
+                        .Where(x => x.GetPermissions(channel).ViewChannel)
                         .ToImmutableArray();
                 },
                 nextPage: (info, lastPage) =>
