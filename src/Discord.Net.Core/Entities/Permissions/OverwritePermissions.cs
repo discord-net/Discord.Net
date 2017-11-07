@@ -23,7 +23,7 @@ namespace Discord
         /// <summary> If Allowed, a user may create invites. </summary>
         public PermValue CreateInstantInvite => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.CreateInstantInvite);
         /// <summary> If Allowed, a user may create, delete and modify this channel. </summary>
-        public PermValue ManageChannel => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManageChannel);
+        public PermValue ManageChannel => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManageChannels);
         /// <summary> If Allowed, a user may add reactions. </summary>
         public PermValue AddReactions => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.AddReactions);
         /// <summary> If Allowed, a user may join channels. </summary>
@@ -58,8 +58,8 @@ namespace Discord
         /// <summary> If Allowed, a user may use voice-activity-detection rather than push-to-talk. </summary>
         public PermValue UseVAD => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.UseVAD);
 
-        /// <summary> If Allowed, a user may adjust permissions. This also implictly grants all other permissions. </summary>
-        public PermValue ManagePermissions => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManagePermissions);
+        /// <summary> If Allowed, a user may adjust role permissions. This also implictly grants all other permissions. </summary>
+        public PermValue ManageRoles => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManageRoles);
         /// <summary> If True, a user may edit the webhooks for this channel. </summary>
         public PermValue ManageWebhooks => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManageWebhooks);
 
@@ -75,11 +75,11 @@ namespace Discord
             PermValue? readMessages = null, PermValue? sendMessages = null, PermValue? sendTTSMessages = null, PermValue? manageMessages = null, 
             PermValue? embedLinks = null, PermValue? attachFiles = null, PermValue? readMessageHistory = null, PermValue? mentionEveryone = null, 
             PermValue? useExternalEmojis = null, PermValue? connect = null, PermValue? speak = null, PermValue? muteMembers = null, 
-            PermValue? deafenMembers = null, PermValue? moveMembers = null, PermValue? useVoiceActivation = null, PermValue? managePermissions = null, 
+            PermValue? deafenMembers = null, PermValue? moveMembers = null, PermValue? useVoiceActivation = null, PermValue? manageRoles = null, 
             PermValue? manageWebhooks = null)
         {
             Permissions.SetValue(ref allowValue, ref denyValue, createInstantInvite, ChannelPermission.CreateInstantInvite);
-            Permissions.SetValue(ref allowValue, ref denyValue, manageChannel, ChannelPermission.ManageChannel);
+            Permissions.SetValue(ref allowValue, ref denyValue, manageChannel, ChannelPermission.ManageChannels);
             Permissions.SetValue(ref allowValue, ref denyValue, addReactions, ChannelPermission.AddReactions);
             Permissions.SetValue(ref allowValue, ref denyValue, readMessages, ChannelPermission.ReadMessages);
             Permissions.SetValue(ref allowValue, ref denyValue, sendMessages, ChannelPermission.SendMessages);
@@ -96,7 +96,7 @@ namespace Discord
             Permissions.SetValue(ref allowValue, ref denyValue, deafenMembers, ChannelPermission.DeafenMembers);
             Permissions.SetValue(ref allowValue, ref denyValue, moveMembers, ChannelPermission.MoveMembers);
             Permissions.SetValue(ref allowValue, ref denyValue, useVoiceActivation, ChannelPermission.UseVAD);
-            Permissions.SetValue(ref allowValue, ref denyValue, managePermissions, ChannelPermission.ManagePermissions);
+            Permissions.SetValue(ref allowValue, ref denyValue, manageRoles, ChannelPermission.ManageRoles);
             Permissions.SetValue(ref allowValue, ref denyValue, manageWebhooks, ChannelPermission.ManageWebhooks);
 
             AllowValue = allowValue;
@@ -109,10 +109,10 @@ namespace Discord
             PermValue readMessages = PermValue.Inherit, PermValue sendMessages = PermValue.Inherit, PermValue sendTTSMessages = PermValue.Inherit, PermValue manageMessages = PermValue.Inherit, 
             PermValue embedLinks = PermValue.Inherit, PermValue attachFiles = PermValue.Inherit, PermValue readMessageHistory = PermValue.Inherit, PermValue mentionEveryone = PermValue.Inherit,
             PermValue useExternalEmojis = PermValue.Inherit, PermValue connect = PermValue.Inherit, PermValue speak = PermValue.Inherit, PermValue muteMembers = PermValue.Inherit, PermValue deafenMembers = PermValue.Inherit,
-            PermValue moveMembers = PermValue.Inherit, PermValue useVoiceActivation = PermValue.Inherit, PermValue managePermissions = PermValue.Inherit, PermValue manageWebhooks = PermValue.Inherit)
+            PermValue moveMembers = PermValue.Inherit, PermValue useVoiceActivation = PermValue.Inherit, PermValue manageRoles = PermValue.Inherit, PermValue manageWebhooks = PermValue.Inherit)
             : this(0, 0, createInstantInvite, manageChannel, addReactions, readMessages, sendMessages, sendTTSMessages, manageMessages, 
                   embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, 
-                  moveMembers, useVoiceActivation, managePermissions, manageWebhooks) { }
+                  moveMembers, useVoiceActivation, manageRoles, manageWebhooks) { }
 
         /// <summary> Creates a new OverwritePermissions from this one, changing the provided non-null permissions. </summary>
         public OverwritePermissions Modify(PermValue? createInstantInvite = null, PermValue? manageChannel = null,
@@ -120,30 +120,31 @@ namespace Discord
             PermValue? readMessages = null, PermValue? sendMessages = null, PermValue? sendTTSMessages = null, PermValue? manageMessages = null, 
             PermValue? embedLinks = null, PermValue? attachFiles = null, PermValue? readMessageHistory = null, PermValue? mentionEveryone = null, 
             PermValue? useExternalEmojis = null, PermValue? connect = null, PermValue? speak = null, PermValue? muteMembers = null, PermValue? deafenMembers = null,
-            PermValue? moveMembers = null, PermValue? useVoiceActivation = null, PermValue? managePermissions = null, PermValue? manageWebhooks = null)
+            PermValue? moveMembers = null, PermValue? useVoiceActivation = null, PermValue? manageRoles = null, PermValue? manageWebhooks = null)
             => new OverwritePermissions(AllowValue, DenyValue, createInstantInvite, manageChannel, addReactions, readMessages, sendMessages, sendTTSMessages, manageMessages, 
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, 
-                moveMembers, useVoiceActivation, managePermissions, manageWebhooks);
+                moveMembers, useVoiceActivation, manageRoles, manageWebhooks);
 
         public List<ChannelPermission> ToAllowList()
         {
             var perms = new List<ChannelPermission>();
-            ulong x = 1;
-            for (byte i = 0; i < Permissions.MaxBits; i++, x <<= 1)
+            for (byte i = 0; i < Permissions.MaxBits; i++)
             {
-                if ((AllowValue & x) != 0)
-                    perms.Add((ChannelPermission)i);
+                // first operand must be long or ulong to shift >31 bits
+                ulong flag = ((ulong)1 << i);
+                if ((AllowValue & flag) != 0)
+                    perms.Add((ChannelPermission)flag);
             }
             return perms;
         }
         public List<ChannelPermission> ToDenyList()
         {
             var perms = new List<ChannelPermission>();
-            ulong x = 1;
-            for (byte i = 0; i < Permissions.MaxBits; i++, x <<= 1)
+            for (byte i = 0; i < Permissions.MaxBits; i++)
             {
-                if ((DenyValue & x) != 0)
-                    perms.Add((ChannelPermission)i);
+                ulong flag = ((ulong)1 << i);
+                if ((DenyValue & flag) != 0)
+                    perms.Add((ChannelPermission)flag);
             }
             return perms;
         }
