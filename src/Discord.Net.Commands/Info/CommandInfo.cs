@@ -199,10 +199,13 @@ namespace Discord.Commands
                     return result;
                 }
                 else
+                {
                     await task.ConfigureAwait(false);
+                    var result = ExecuteResult.FromSuccess();
+                    await Module.Service._commandExecutedEvent.InvokeAsync(this, context, result).ConfigureAwait(false);
+                }
 
                 var executeResult = ExecuteResult.FromSuccess();
-                await Module.Service._commandExecutedEvent.InvokeAsync(this, context, executeResult).ConfigureAwait(false);
                 return executeResult;
             }
             catch (Exception ex)
