@@ -73,3 +73,41 @@ csharp_space_between_method_call_parameter_list_parentheses = false
 
 csharp_preserve_single_line_statements = false
 csharp_preserve_single_line_blocks = true
+
+dotnet_naming_rule.all_of_const_fields_are_pascal_case.symbols = const_fields
+dotnet_naming_rule.all_of_const_fields_are_pascal_case.style = pascal_case
+dotnet_naming_rule.all_of_const_fields_are_pascal_case.severity = suggestion
+
+dotnet_naming_rule.all_of_local_fields_without_const_are_camel_case.symbols = local_fields
+dotnet_naming_rule.all_of_local_fields_without_const_are_camel_case.style = starts_with_low_line_camel_case
+dotnet_naming_rule.all_of_local_fields_without_const_are_camel_case.severity = suggestion
+
+dotnet_naming_rule.all_of_interfaces_starts_with_low_line_camel_case.symbols = interfaces
+dotnet_naming_rule.all_of_interfaces_starts_with_low_line_camel_case.style = starts_with_i_pascal_case
+dotnet_naming_rule.all_of_interfaces_starts_with_low_line_camel_case.severity = suggestion
+
+dotnet_naming_rule.default_is_pascal_case.symbols = without_interfaces_and_fields
+dotnet_naming_rule.default_is_pascal_case.style = pascal_case
+dotnet_naming_rule.default_is_pascal_case.severity = suggestion
+
+dotnet_naming_symbols.const_fields.applicable_kinds = field
+dotnet_naming_symbols.const_fields.applicable_accessibilities = *
+dotnet_naming_symbols.const_fields.required_modifiers = const
+
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_symbols.interfaces.applicable_accessibilities = *
+
+dotnet_naming_symbols.local_fields.applicable_kinds = field
+dotnet_naming_symbols.local_fields.applicable_accessibilities = private, protected, protected_internal
+dotnet_naming_symbols.local_fields.required_modifiers = abstract, must_inherit, readonly, static, shared
+
+dotnet_naming_symbols.without_interfaces_and_fields.applicable_kinds = class, struct, enum, property, method, event, namespace, delegate, type_parameter
+dotnet_naming_symbols.without_interfaces_and_fields.applicable_accessibilities = *
+
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+dotnet_naming_style.starts_with_i_pascal_case.required_prefix = I
+dotnet_naming_style.starts_with_i_pascal_case.capitalization = pascal_case
+
+dotnet_naming_style.starts_with_low_line_camel_case.required_prefix = _
+dotnet_naming_style.starts_with_low_line_camel_case.capitalization = camel_case
