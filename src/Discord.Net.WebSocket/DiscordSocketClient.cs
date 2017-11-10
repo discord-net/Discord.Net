@@ -328,7 +328,7 @@ namespace Discord.WebSocket
         }
         public override async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
         {
-            if (name != null && streamUrl != null)
+            if (streamUrl != null)
                 Activity = new StreamingGame(name, streamUrl, streamType);
             else if (name != null)
                 Activity = new Game(name);
@@ -336,7 +336,7 @@ namespace Discord.WebSocket
                 Activity = null;
             await SendStatusAsync().ConfigureAwait(false);
         }
-        public async Task SetActivityAsync(IActivity activity)
+        public override async Task SetActivityAsync(IActivity activity)
         {
             Activity = activity;
             await SendStatusAsync().ConfigureAwait(false);

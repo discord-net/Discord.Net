@@ -240,8 +240,17 @@ namespace Discord.WebSocket
         }
         public override async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
         {
+            IActivity activity = null;
+            if (streamUrl != null)
+                activity = new StreamingGame(name, streamUrl, streamType);
+            else if (name != null)
+                activity = new Game(name);
+            await SetActivityAsync(activity).ConfigureAwait(false);
+        }
+        public override async Task SetActivityAsync(IActivity activity)
+        {
             for (int i = 0; i < _shards.Length; i++)
-                await _shards[i].SetGameAsync(name, streamUrl, streamType).ConfigureAwait(false);
+                await _shards[i].SetActivityAsync(activity).ConfigureAwait(false);
         }
 
         private void RegisterEvents(DiscordSocketClient client, bool isPrimary)
