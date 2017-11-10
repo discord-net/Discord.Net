@@ -48,7 +48,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override int Latency { get; protected set; }
         public override UserStatus Status { get; protected set; } = UserStatus.Online;
-        public override Game? Game { get; protected set; }
+        internal IActivity Activity { get; protected set; }
 
         //From DiscordSocketConfig
         internal int TotalShards { get; private set; }
@@ -328,77 +328,39 @@ namespace Discord.WebSocket
         }
         public override async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
         {
-            if (name != null)
-                Game = new Game(name, streamUrl, streamType);
+            if (name != null && streamUrl != null)
+                Activity = new StreamingGame(name, streamUrl, streamType);
+            else if (name != null)
+                Activity = new Game(name);
             else
-                Game = null;
+                Activity = null;
             await SendStatusAsync().ConfigureAwait(false);
         }
-
-        public async Task SetGameAsync(Game game)
+        public async Task SetActivityAsync(IActivity activity)
         {
-            Game = game;
+            Activity = activity;
             await SendStatusAsync().ConfigureAwait(false);
         }
+        
         private async Task SendStatusAsync()
         {
             if (CurrentUser == null)
                 return;
-            var game = Game;
+            var activity = Activity;
             var status = Status;
             var statusSince = _statusSince;
-            CurrentUser.Presence = new SocketPresence(status, game);
+            CurrentUser.Presence = new SocketPresence(status, activity);
 
-            GameModel gameModel;
-            if (game != null)
+            var gameModel = new GameModel();
+            // Discord only accepts rich presence over RPC, don't even bother building a payload
+            if (activity is RichGame game) throw new NotSupportedException("Outgoing Rich Presences are not supported");
+            if (activity is StreamingGame stream)
             {
-                var assets = game.Value.Assets.HasValue
-                    ? new API.GameAssets()
-                    {
-                        SmallText = game.Value.Assets.Value.SmallText,
-                        SmallImage = game.Value.Assets.Value.SmallImage,
-                        LargeText = game.Value.Assets.Value.LargeText,
-                        LargeImage = game.Value.Assets.Value.LargeImage,
-                    }
-                    : Optional.Create<API.GameAssets>();
-                var party = game.Value.Party.HasValue
-                    ? new API.GameParty
-                    {
-                        Id = game.Value.Party.Value.Id,
-                        Size = game.Value.Party.Value.Size
-                    }
-                    : Optional.Create<API.GameParty>();
-                var secrets = game.Value.Secrets.HasValue
-                    ? new API.GameSecrets()
-                    {
-                        Join = game.Value.Secrets.Value.Join,
-                        Match = game.Value.Secrets.Value.Match,
-                        Spectate = game.Value.Secrets.Value.Spectate
-                    }
-                    : Optional.Create<API.GameSecrets>();
-                var timestamps = game.Value.Timestamps.HasValue
-                    ? new API.GameTimestamps
-                    {
-                        Start = game.Value.Timestamps.Value.Start,
-                        End = game.Value.Timestamps.Value.End
-                    }
-                    : Optional.Create<API.GameTimestamps>();
-                gameModel = new API.Game
-                {
-                    Name = game.Value.Name,
-                    StreamType = game.Value.StreamType,
-                    StreamUrl = game.Value.StreamUrl,
-                    Details = game.Value.Details,
-                    State = game.Value.State,
-                    ApplicationId = game.Value.ApplicationId ?? Optional.Create<ulong>(),
-                    Assets = assets,
-                    Party = party,
-                    Secrets = secrets,
-                    Timestamps = timestamps,
-                };
+                gameModel.StreamUrl = stream.Url;
+                gameModel.StreamType = stream.StreamType;
             }
-            else
-                gameModel = null;
+            else if (activity != null)
+                gameModel.Name = activity.Name;
 
             await ApiClient.SendStatusUpdateAsync(
                 status,

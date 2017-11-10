@@ -1,6 +1,6 @@
 ﻿namespace Discord
 {
-    public struct GameSecrets
+    public class GameSecrets
     {
         public string Match { get; }
         public string Join { get; }

@@ -2,32 +2,64 @@
 {
     internal static class EntityExtensions
     {
-        public static Game ToEntity(this API.Game model)
+        public static IActivity ToEntity(this API.Game model)
         {
-            return new Game(model.Name,
-                model.StreamUrl.GetValueOrDefault(null),
-                model.StreamType.GetValueOrDefault(null) ?? StreamType.NotStreaming,
-                model.Details.GetValueOrDefault(),
-                model.State.GetValueOrDefault(),
-                model.ApplicationId.ToNullable(),
-                model.Assets.GetValueOrDefault(null)?.ToEntity(),
-                model.Party.GetValueOrDefault(null)?.ToEntity(),
-                model.Secrets.GetValueOrDefault(null)?.ToEntity(),
-                model.Timestamps.GetValueOrDefault(null)?.ToEntity()
-                );
+            // Rich Game
+            if (model.Details.IsSpecified)
+            {
+                var appId = model.ApplicationId.ToNullable();
+                return new RichGame
+                {
+                    ApplicationId = appId,
+                    Name = model.Name,
+                    Details = model.Details.GetValueOrDefault(),
+                    State = model.State.GetValueOrDefault(),
+                    
+                    Assets = model.Assets.GetValueOrDefault()?.ToEntity(appId ?? 0),
+                    Party = model.Party.GetValueOrDefault()?.ToEntity(),
+                    Secrets = model.Secrets.GetValueOrDefault()?.ToEntity(),
+                    Timestamps = model.Timestamps.GetValueOrDefault()?.ToEntity()
+                    
+                };
+            }
+            // Stream Game
+            if (model.StreamUrl.IsSpecified)
+            {
+                return new StreamingGame(
+                    model.Name, 
+                    model.StreamUrl.Value, 
+                    model.StreamType.Value.GetValueOrDefault());
+            }
+            // Normal Game
+            return new Game(model.Name);
         }
 
-        public static GameAssets ToEntity(this API.GameAssets model)
+        public static GameAssets ToEntity(this API.GameAssets model, ulong appId)
         {
-            return new GameAssets(model.SmallText.GetValueOrDefault(),
-                model.SmallImage.GetValueOrDefault(),
-                model.LargeText.GetValueOrDefault(),
-                model.LargeImage.GetValueOrDefault());
+            return new GameAssets
+            {
+                Large = new GameAsset
+                {
+                    ApplicationId = appId,
+                    ImageId = model.LargeImage.GetValueOrDefault(),
+                    Text = model.LargeText.GetValueOrDefault()
+                },
+                Small = new GameAsset
+                {
+                    ApplicationId = appId,
+                    ImageId = model.LargeImage.GetValueOrDefault(),
+                    Text = model.LargeText.GetValueOrDefault()
+                },
+            };
         }
 
         public static GameParty ToEntity(this API.GameParty model)
         {
-            return new GameParty(model.Size, model.Id);
+            return new GameParty
+            {
+                Id = model.Id,
+                Size = model.Size
+            };
         }
 
         public static GameSecrets ToEntity(this API.GameSecrets model)

@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-    public struct GameTimestamps
+    public class GameTimestamps
     {
         public DateTimeOffset Start { get; }
         public DateTimeOffset End { get; }
