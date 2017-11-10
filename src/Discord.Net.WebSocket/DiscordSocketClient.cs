@@ -48,7 +48,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override int Latency { get; protected set; }
         public override UserStatus Status { get; protected set; } = UserStatus.Online;
-        internal IActivity Activity { get; protected set; }
+        public override IActivity Activity { get; protected set; }
 
         //From DiscordSocketConfig
         internal int TotalShards { get; private set; }

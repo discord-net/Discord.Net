@@ -13,7 +13,7 @@ namespace Discord.WebSocket
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         public abstract int Latency { get; protected set; }
         public abstract UserStatus Status { get; protected set; } 
-        public abstract Game? Game { get; protected set; }
+        public abstract IActivity Activity { get; protected set; }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
 
