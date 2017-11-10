@@ -1,0 +1,18 @@
+# EditorConfig is awesome: http://EditorConfig.org
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_size = 4
+indent_style = space
+trim_trailing_whitespace = true
+
+[*.{csproj,json,md,yml}]
+indent_size = 2
+indent_style = space
+
+[*.sln]
+indent_style = tab
