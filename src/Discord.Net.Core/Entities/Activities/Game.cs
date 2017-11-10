@@ -7,7 +7,7 @@ namespace Discord
     {
         public string Name { get; internal set; }
 
-        public Game() { }
+        internal Game() { }
         public Game(string name)
         {
             Name = name;
