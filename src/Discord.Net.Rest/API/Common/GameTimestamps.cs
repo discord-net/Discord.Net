@@ -6,8 +6,10 @@ namespace Discord.API
     internal class GameTimestamps
     {
         [JsonProperty("start")]
-        public DateTimeOffset Start { get; set; }
+        [UnixTimestamp]
+        public Optional<DateTimeOffset> Start { get; set; }
         [JsonProperty("end")]
-        public DateTimeOffset End { get; set; }
+        [UnixTimestamp]
+        public Optional<DateTimeOffset> End { get; set; }
     }
 }

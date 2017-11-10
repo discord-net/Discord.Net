@@ -66,6 +66,12 @@ namespace Discord.Net.Converters
                 if (type == typeof(ulong))
                     return UInt64Converter.Instance;
             }
+            bool hasUnixStamp = propInfo.GetCustomAttribute<UnixTimestampAttribute>() != null;
+            if (hasUnixStamp)
+            {
+                if (type == typeof(DateTimeOffset))
+                    return UnixTimestampConverter.Instance;
+            }
 
             //Enums
             if (type == typeof(PermissionTarget))

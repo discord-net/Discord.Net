@@ -69,7 +69,7 @@
 
         public static GameTimestamps ToEntity(this API.GameTimestamps model)
         {
-            return new GameTimestamps(model.Start, model.End);
+            return new GameTimestamps(model.Start.ToNullable(), model.End.ToNullable());
         }
     }
 }

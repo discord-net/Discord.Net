@@ -5,8 +5,8 @@ namespace Discord.API
     internal class GameParty
     {
         [JsonProperty("id")]
-        public ulong Id { get; set; }
+        public string Id { get; set; }
         [JsonProperty("size")]
-        public ulong[] Size { get; set; }
+        public int[] Size { get; set; }
     }
 }

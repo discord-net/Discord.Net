@@ -2,7 +2,7 @@
 {
     public class GameParty
     {
-        public ulong[] Size { get; internal set; }
-        public ulong Id { get; internal set; }
+        public string Id { get; internal set; }
+        public int[] Size { get; internal set; }
     }
 }
