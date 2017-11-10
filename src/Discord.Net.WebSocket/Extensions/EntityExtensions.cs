@@ -5,9 +5,9 @@
         public static IActivity ToEntity(this API.Game model)
         {
             // Rich Game
-            if (model.Details.IsSpecified)
+            if (model.ApplicationId.IsSpecified)
             {
-                var appId = model.ApplicationId.ToNullable();
+                ulong appId = model.ApplicationId.Value;
                 return new RichGame
                 {
                     ApplicationId = appId,
@@ -15,7 +15,7 @@
                     Details = model.Details.GetValueOrDefault(),
                     State = model.State.GetValueOrDefault(),
                     
-                    Assets = model.Assets.GetValueOrDefault()?.ToEntity(appId ?? 0),
+                    Assets = model.Assets.GetValueOrDefault()?.ToEntity(appId),
                     Party = model.Party.GetValueOrDefault()?.ToEntity(),
                     Secrets = model.Secrets.GetValueOrDefault()?.ToEntity(),
                     Timestamps = model.Timestamps.GetValueOrDefault()?.ToEntity()
