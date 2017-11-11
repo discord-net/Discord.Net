@@ -10,11 +10,11 @@ indent_size = 4
 indent_style = space
 trim_trailing_whitespace = true
 
-[*.{csproj,json,md,yml}]
+[*.{csproj,json,md,nuspec,yml}]
 indent_size = 2
 indent_style = space
 
-[*.sln]
+[*.{sln,xml}]
 indent_style = tab
 
 [*.cs]
