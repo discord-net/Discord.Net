@@ -8,20 +8,20 @@ namespace Discord.WebSocket
     public struct SocketPresence : IPresence
     {
         public UserStatus Status { get; }
-        public Game? Game { get; }
+        public Activity? Activity { get; }
 
-        internal SocketPresence(UserStatus status, Game? game)
+        internal SocketPresence(UserStatus status, Activity? game)
         {
             Status = status;
-            Game = game;
+            Activity = game;
         }
         internal static SocketPresence Create(Model model)
         {
-            return new SocketPresence(model.Status, model.Game != null ? model.Game.ToEntity() : (Game?)null);
+            return new SocketPresence(model.Status, model.Activity != null ? model.Activity.ToEntity() : (Activity?)null);
         }
 
         public override string ToString() => Status.ToString();
-        private string DebuggerDisplay => $"{Status}{(Game != null ? $", {Game.Value.Name} ({Game.Value.StreamType})" : "")}";
+        private string DebuggerDisplay => $"{Status}{(Activity != null ? $", {Activity.Value.Name} ({Activity.Value.Type})" : "")}";
 
         internal SocketPresence Clone() => this;
     }

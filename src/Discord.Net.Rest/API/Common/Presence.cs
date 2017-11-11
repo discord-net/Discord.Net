@@ -12,7 +12,7 @@ namespace Discord.API
         [JsonProperty("status")]
         public UserStatus Status { get; set; }
         [JsonProperty("game")]
-        public Game Game { get; set; }
+        public Activity Activity { get; set; }
 
         [JsonProperty("roles")]
         public Optional<ulong[]> Roles { get; set; }

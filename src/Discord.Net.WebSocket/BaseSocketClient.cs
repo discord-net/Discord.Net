@@ -13,7 +13,7 @@ namespace Discord.WebSocket
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         public abstract int Latency { get; protected set; }
         public abstract UserStatus Status { get; protected set; } 
-        public abstract Game? Game { get; protected set; }
+        public abstract Activity? Game { get; protected set; }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
 
@@ -44,7 +44,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public abstract Task StopAsync();
         public abstract Task SetStatusAsync(UserStatus status);
-        public abstract Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming);
+        public abstract Task SetActivityAsync(string name, string streamUrl = null, ActivityType streamType = ActivityType.Playing);
         public abstract Task DownloadUsersAsync(IEnumerable<IGuild> guilds);  
 
         /// <inheritdoc />

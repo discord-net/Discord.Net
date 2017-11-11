@@ -22,7 +22,7 @@ namespace Discord.WebSocket
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         public override int Latency { get => GetLatency(); protected set { } }
         public override UserStatus Status { get => _shards[0].Status; protected set { } }
-        public override Game? Game { get => _shards[0].Game; protected set { } }
+        public override Activity? Game { get => _shards[0].Game; protected set { } }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         public override IReadOnlyCollection<SocketGuild> Guilds => GetGuilds().ToReadOnlyCollection(() => GetGuildCount());
@@ -238,10 +238,10 @@ namespace Discord.WebSocket
             for (int i = 0; i < _shards.Length; i++)
                 await _shards[i].SetStatusAsync(status).ConfigureAwait(false);
         }
-        public override async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
+        public override async Task SetActivityAsync(string name, string streamUrl = null, ActivityType streamType = ActivityType.Playing)
         {
             for (int i = 0; i < _shards.Length; i++)
-                await _shards[i].SetGameAsync(name, streamUrl, streamType).ConfigureAwait(false);
+                await _shards[i].SetActivityAsync(name, streamUrl, streamType).ConfigureAwait(false);
         }
 
         private void RegisterEvents(DiscordSocketClient client, bool isPrimary)

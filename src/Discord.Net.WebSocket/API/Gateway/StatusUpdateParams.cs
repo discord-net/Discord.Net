@@ -13,6 +13,6 @@ namespace Discord.API.Gateway
         [JsonProperty("afk")]
         public bool IsAFK { get; set; }
         [JsonProperty("game")]
-        public Game Game { get; set; }
+        public Activity Activity { get; set; }
     }
 }

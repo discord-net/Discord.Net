@@ -16,7 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GameModel = Discord.API.Game;
+using GameModel = Discord.API.Activity;
 
 namespace Discord.WebSocket
 {
@@ -48,7 +48,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override int Latency { get; protected set; }
         public override UserStatus Status { get; protected set; } = UserStatus.Online;
-        public override Game? Game { get; protected set; }
+        public override Activity? Game { get; protected set; }
 
         //From DiscordSocketConfig
         internal int TotalShards { get; private set; }
@@ -326,10 +326,10 @@ namespace Discord.WebSocket
                 _statusSince = null;
             await SendStatusAsync().ConfigureAwait(false);
         }
-        public override async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
+        public override async Task SetActivityAsync(string name, string streamUrl = null, ActivityType streamType = ActivityType.Playing)
         {
             if (name != null)
-                Game = new Game(name, streamUrl, streamType);
+                Game = new Activity(name, streamUrl, streamType);
             else
                 Game = null;
             await SendStatusAsync().ConfigureAwait(false);
@@ -346,10 +346,10 @@ namespace Discord.WebSocket
             GameModel gameModel;
             if (game != null)
             {
-                gameModel = new API.Game
+                gameModel = new API.Activity
                 {
                     Name = game.Value.Name,
-                    StreamType = game.Value.StreamType,
+                    Type = game.Value.Type,
                     StreamUrl = game.Value.StreamUrl
                 };
             }

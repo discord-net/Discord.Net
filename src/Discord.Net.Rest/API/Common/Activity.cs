@@ -5,14 +5,14 @@ using System.Runtime.Serialization;
 
 namespace Discord.API
 {
-    internal class Game
+    internal class Activity
     {
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("url")]
         public Optional<string> StreamUrl { get; set; }
         [JsonProperty("type")]
-        public Optional<StreamType?> StreamType { get; set; }
+        public Optional<ActivityType?> Type { get; set; }
 
         [OnError]
         internal void OnError(StreamingContext context, ErrorContext errorContext)
