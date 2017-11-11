@@ -253,7 +253,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             await SendGatewayAsync(GatewayOpCode.Heartbeat, lastSeq, options: options).ConfigureAwait(false);
         }
-        public async Task SendStatusUpdateAsync(UserStatus status, bool isAFK, long? since, Game game, RequestOptions options = null)
+        public async Task SendStatusUpdateAsync(UserStatus status, bool isAFK, long? since, Activity game, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
             var args = new StatusUpdateParams
@@ -261,7 +261,7 @@ namespace Discord.API
                 Status = status,
                 IdleSince = since,
                 IsAFK = isAFK,
-                Game = game
+                Activity = game
             };
             await SendGatewayAsync(GatewayOpCode.StatusUpdate, args, options: options).ConfigureAwait(false);
         }

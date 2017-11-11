@@ -18,7 +18,7 @@ namespace Discord.WebSocket
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);
-        public Game? Game => Presence.Game;
+        public Activity? Activity => Presence.Activity;
         public UserStatus Status => Presence.Status;
 
         internal SocketUser(DiscordSocketClient discord, ulong id)

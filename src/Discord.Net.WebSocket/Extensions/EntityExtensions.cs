@@ -2,11 +2,11 @@
 {
     internal static class EntityExtensions
     {
-        public static Game ToEntity(this API.Game model)
+        public static Activity ToEntity(this API.Activity model)
         {
-            return new Game(model.Name,
+            return new Activity(model.Name,
                 model.StreamUrl.GetValueOrDefault(null),
-                model.StreamType.GetValueOrDefault(null) ?? StreamType.NotStreaming);
+                model.Type.GetValueOrDefault(null) ?? ActivityType.Playing);
         }
     }
 }
