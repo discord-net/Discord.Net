@@ -98,7 +98,7 @@ dotnet_naming_symbols.interfaces.applicable_kinds = interface
 dotnet_naming_symbols.interfaces.applicable_accessibilities = *
 
 dotnet_naming_symbols.local_fields.applicable_kinds = field
-dotnet_naming_symbols.local_fields.applicable_accessibilities = private, protected, protected_internal
+dotnet_naming_symbols.local_fields.applicable_accessibilities = internal, private, protected, protected_internal
 dotnet_naming_symbols.local_fields.required_modifiers = abstract, must_inherit, readonly, static, shared
 
 dotnet_naming_symbols.without_interfaces_and_fields.applicable_kinds = class, struct, enum, property, method, event, namespace, delegate, type_parameter
