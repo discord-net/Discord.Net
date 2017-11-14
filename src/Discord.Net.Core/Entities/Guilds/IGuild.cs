@@ -117,5 +117,8 @@ namespace Discord
         Task DownloadUsersAsync();
         /// <summary> Removes all users from this guild if they have not logged on in a provided number of days or, if simulate is true, returns the number of users that would be removed. </summary>
         Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null);
+
+        Task<IReadOnlyCollection<IAuditLogEntry>> GetAuditLogAsync(int limit = DiscordConfig.MaxAuditLogEntriesPerBatch,
+            CacheMode cacheMode = CacheMode.AllowDownload, RequestOptions options = null);
     }
 }

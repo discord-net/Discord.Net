@@ -257,6 +257,10 @@ namespace Discord.Rest
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null)
             => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options);
 
+        //Audit logs
+        public IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(int limit, RequestOptions options = null)
+            => GuildHelper.GetAuditLogsAsync(this, Discord, null, limit, options);
+
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
 
@@ -386,5 +390,13 @@ namespace Discord.Rest
                 return ImmutableArray.Create<IGuildUser>();
         }
         Task IGuild.DownloadUsersAsync() { throw new NotSupportedException(); }
+
+        async Task<IReadOnlyCollection<IAuditLogEntry>> IGuild.GetAuditLogAsync(int limit, CacheMode cacheMode, RequestOptions options)
+        {
+            if (cacheMode == CacheMode.AllowDownload)
+                return (await GetAuditLogsAsync(limit, options).Flatten().ConfigureAwait(false)).ToImmutableArray();
+            else
+                return ImmutableArray.Create<IAuditLogEntry>();
+        }
     }
 }
