@@ -194,7 +194,8 @@ namespace Discord.Rest
                 if (i < batches)
                 {
                     batch = new ArraySegment<ulong>(msgs, i * BATCH_SIZE, BATCH_SIZE);
-                } else
+                }
+                else
                 {
                     batch = new ArraySegment<ulong>(msgs, i * BATCH_SIZE, msgs.Length - batches * BATCH_SIZE);
                     if (batch.Count == 0)
