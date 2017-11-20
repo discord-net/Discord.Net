@@ -260,6 +260,16 @@ namespace Discord.Rest
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
 
+        //Emotes
+        public Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null)
+            => GuildHelper.GetEmoteAsync(this, Discord, id, options);
+        public Task<GuildEmote> CreateEmoteAsync(string name, Image image, Optional<IEnumerable<IRole>> roles = default(Optional<IEnumerable<IRole>>), RequestOptions options = null)
+            => GuildHelper.CreateEmoteAsync(this, Discord, name, image, roles, options);
+        public Task<GuildEmote> ModifyEmoteAsync(GuildEmote emote, Action<EmoteProperties> func, RequestOptions options = null)
+            => GuildHelper.ModifyEmoteAsync(this, Discord, emote.Id, func, options);
+        public Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null)
+            => GuildHelper.DeleteEmoteAsync(this, Discord, emote.Id, options);
+
         //IGuild
         bool IGuild.Available => Available;
         IAudioClient IGuild.AudioClient => null;
