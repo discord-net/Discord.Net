@@ -63,7 +63,7 @@ namespace Discord.Commands
                 if (guildChannel != null)
                     perms = guildUser.GetPermissions(guildChannel);
                 else
-                    perms = ChannelPermissions.All(guildChannel);
+                    perms = ChannelPermissions.All(context.Channel);
 
                 if (!perms.Has(ChannelPermission.Value))
                     return PreconditionResult.FromError($"Bot requires channel permission {ChannelPermission.Value}");
