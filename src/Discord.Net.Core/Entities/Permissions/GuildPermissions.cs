@@ -11,7 +11,7 @@ namespace Discord
         /// <summary> Gets a GuildPermissions that grants all guild permissions for webhook users. </summary>
         public static readonly GuildPermissions Webhook = new GuildPermissions(0b00000_0000000_0001101100000_000000);
         /// <summary> Gets a GuildPermissions that grants all guild permissions. </summary>
-        public static readonly GuildPermissions All = new GuildPermissions(0b11111_1111110_11111111110011_111111);
+        public static readonly GuildPermissions All = new GuildPermissions(0b11111_1111110_1111111110011_111111);
 
         /// <summary> Gets a packed value representing all the permissions in this GuildPermissions. </summary>
         public ulong RawValue { get; }
