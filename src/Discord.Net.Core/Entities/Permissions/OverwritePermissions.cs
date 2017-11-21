@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord
@@ -27,7 +28,10 @@ namespace Discord
         /// <summary> If Allowed, a user may add reactions. </summary>
         public PermValue AddReactions => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.AddReactions);
         /// <summary> If Allowed, a user may join channels. </summary>
-        public PermValue ReadMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ViewChannel);
+        [Obsolete("Use ViewChannel instead.")]
+        public PermValue ReadMessages => ViewChannel;
+        /// <summary> If Allowed, a user may join channels. </summary>
+        public PermValue ViewChannel => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ViewChannel);
         /// <summary> If Allowed, a user may send messages. </summary>
         public PermValue SendMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SendMessages);
         /// <summary> If Allowed, a user may send text-to-speech messages. </summary>
