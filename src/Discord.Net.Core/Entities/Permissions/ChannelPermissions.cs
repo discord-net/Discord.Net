@@ -44,7 +44,7 @@ namespace Discord
         [Obsolete("Use ViewChannel instead.")]
         public bool ReadMessages => ViewChannel;
         /// <summary> If True, a user may view channels. </summary>
-        public bool ViewChannel => Permissions.GetValue(RawValue, ChannelPermission.ReadMessages);
+        public bool ViewChannel => Permissions.GetValue(RawValue, ChannelPermission.ViewChannel);
 
         /// <summary> If True, a user may send messages. </summary>
         public bool SendMessages => Permissions.GetValue(RawValue, ChannelPermission.SendMessages);
@@ -96,7 +96,7 @@ namespace Discord
             Permissions.SetValue(ref value, createInstantInvite, ChannelPermission.CreateInstantInvite);
             Permissions.SetValue(ref value, manageChannel, ChannelPermission.ManageChannels);
             Permissions.SetValue(ref value, addReactions, ChannelPermission.AddReactions);
-            Permissions.SetValue(ref value, readMessages, ChannelPermission.ReadMessages);
+            Permissions.SetValue(ref value, readMessages, ChannelPermission.ViewChannel);
             Permissions.SetValue(ref value, sendMessages, ChannelPermission.SendMessages);
             Permissions.SetValue(ref value, sendTTSMessages, ChannelPermission.SendTTSMessages);
             Permissions.SetValue(ref value, manageMessages, ChannelPermission.ManageMessages);
