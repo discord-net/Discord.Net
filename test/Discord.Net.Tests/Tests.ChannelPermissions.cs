@@ -7,7 +7,7 @@ namespace Discord
     public partial class Tests
     {
         [Fact]
-        public async Task TestChannelPermission()
+        public Task TestChannelPermission()
         {
             var perm = new ChannelPermissions();
 
@@ -82,9 +82,10 @@ namespace Discord
                 | ChannelPermission.UseVAD
                 );
             Assert.Equal(groupChannel, ChannelPermissions.Group.RawValue);
+            return Task.CompletedTask;
         }
 
-        public async Task TestChannelPermissionModify()
+        public Task TestChannelPermissionModify()
         {
             // test channel permission modify
 
@@ -311,14 +312,16 @@ namespace Discord
             perm = perm.Modify(manageWebhooks: false);
             Assert.False(perm.ManageWebhooks);
             Assert.Equal(ChannelPermissions.None.RawValue, perm.RawValue);
+            return Task.CompletedTask;
         }
 
         [Fact]
-        public async Task TestChannelTypeResolution()
+        public Task TestChannelTypeResolution()
         {
             ITextChannel someChannel = null;
             // null channels will throw exception
             Assert.Throws<ArgumentException>(() => ChannelPermissions.All(someChannel));
+            return Task.CompletedTask;
         }
     }
 }
