@@ -1,11 +1,5 @@
 ﻿namespace Discord
 {
-    public class GameAssets
-    {
-        public GameAsset Small { get; internal set; }
-        public GameAsset Large { get; internal set; }
-    }
-
     public class GameAsset
     {
         internal GameAsset() { }

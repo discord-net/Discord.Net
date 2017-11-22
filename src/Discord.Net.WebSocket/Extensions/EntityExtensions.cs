@@ -8,18 +8,18 @@
             if (model.ApplicationId.IsSpecified)
             {
                 ulong appId = model.ApplicationId.Value;
+                var assets = model.Assets.GetValueOrDefault()?.ToEntity(appId);
                 return new RichGame
                 {
                     ApplicationId = appId,
                     Name = model.Name,
                     Details = model.Details.GetValueOrDefault(),
                     State = model.State.GetValueOrDefault(),
-                    
-                    Assets = model.Assets.GetValueOrDefault()?.ToEntity(appId),
+                    SmallAsset = assets?[0],
+                    LargeAsset = assets?[1],
                     Party = model.Party.GetValueOrDefault()?.ToEntity(),
                     Secrets = model.Secrets.GetValueOrDefault()?.ToEntity(),
                     Timestamps = model.Timestamps.GetValueOrDefault()?.ToEntity()
-                    
                 };
             }
             // Stream Game
@@ -34,22 +34,23 @@
             return new Game(model.Name);
         }
 
-        public static GameAssets ToEntity(this API.GameAssets model, ulong appId)
+        // (Small, Large)
+        public static GameAsset[] ToEntity(this API.GameAssets model, ulong appId)
         {
-            return new GameAssets
+            return new GameAsset[]
             {
-                Large = new GameAsset
+                model.SmallImage.IsSpecified ? new GameAsset
+                {
+                    ApplicationId = appId,
+                    ImageId = model.SmallImage.GetValueOrDefault(),
+                    Text = model.SmallText.GetValueOrDefault()
+                } : null,
+                model.LargeImage.IsSpecified ? new GameAsset
                 {
                     ApplicationId = appId,
                     ImageId = model.LargeImage.GetValueOrDefault(),
                     Text = model.LargeText.GetValueOrDefault()
-                },
-                Small = new GameAsset
-                {
-                    ApplicationId = appId,
-                    ImageId = model.LargeImage.GetValueOrDefault(),
-                    Text = model.LargeText.GetValueOrDefault()
-                },
+                } : null,
             };
         }
 
