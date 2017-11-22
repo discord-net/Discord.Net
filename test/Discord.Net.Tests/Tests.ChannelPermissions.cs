@@ -29,7 +29,7 @@ namespace Discord
             ulong textChannel = (ulong)( ChannelPermission.CreateInstantInvite
                 | ChannelPermission.ManageChannels
                 | ChannelPermission.AddReactions
-                | ChannelPermission.ReadMessages
+                | ChannelPermission.ViewChannel
                 | ChannelPermission.SendMessages
                 | ChannelPermission.SendTTSMessages
                 | ChannelPermission.ManageMessages
@@ -59,7 +59,7 @@ namespace Discord
 
             // DM Channels
             ulong dmChannel = (ulong)(
-                ChannelPermission.ReadMessages
+                ChannelPermission.ViewChannel
                 | ChannelPermission.SendMessages
                 | ChannelPermission.EmbedLinks 
                 | ChannelPermission.AttachFiles
@@ -126,14 +126,14 @@ namespace Discord
             Assert.Equal(ChannelPermissions.None.RawValue, perm.RawValue);
 
             // individual permission test
-            Assert.False(perm.ReadMessages);
+            Assert.False(perm.ViewChannel);
 
-            perm = perm.Modify(readMessages: true);
-            Assert.True(perm.ReadMessages);
-            Assert.Equal(perm.RawValue, (ulong)ChannelPermission.ReadMessages);
+            perm = perm.Modify(viewChannel: true);
+            Assert.True(perm.ViewChannel);
+            Assert.Equal(perm.RawValue, (ulong)ChannelPermission.ViewChannel);
 
-            perm = perm.Modify(readMessages: false);
-            Assert.False(perm.ReadMessages);
+            perm = perm.Modify(viewChannel: false);
+            Assert.False(perm.ViewChannel);
             Assert.Equal(ChannelPermissions.None.RawValue, perm.RawValue);
 
             // individual permission test
