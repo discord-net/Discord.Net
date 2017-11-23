@@ -42,3 +42,7 @@ where possible.
 
 As a general rule, follow the coding style already set in the file you
 are editing, or look at a similar file if you are adding a new one.
+
+We also provide an `.editorconfig` to define standard rules and
+practices across our codebase. Please be sure to use the appropriate
+plugin for your editor, if one exists.
