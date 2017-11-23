@@ -41,7 +41,7 @@ namespace Discord.Commands
             GuildPermission = null;
         }
 
-        public override async Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider services)
+        public override async Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
             IGuildUser guildUser = null;
             if (context.Guild != null)
@@ -57,13 +57,11 @@ namespace Discord.Commands
 
             if (ChannelPermission.HasValue)
             {
-                var guildChannel = context.Channel as IGuildChannel;
-
                 ChannelPermissions perms;
-                if (guildChannel != null)
+                if (context.Channel is IGuildChannel guildChannel)
                     perms = guildUser.GetPermissions(guildChannel);
                 else
-                    perms = ChannelPermissions.All(guildChannel);
+                    perms = ChannelPermissions.All(context.Channel);
 
                 if (!perms.Has(ChannelPermission.Value))
                     return PreconditionResult.FromError($"Bot requires channel permission {ChannelPermission.Value}");

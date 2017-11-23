@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Discord;
@@ -80,7 +81,7 @@ class Program
 
     private async Task MainAsync()
     {
-        // Centralize the logic for commands into a seperate method.
+        // Centralize the logic for commands into a separate method.
         await InitCommands();
 
         // Login and connect.
@@ -88,7 +89,7 @@ class Program
         await _client.StartAsync();
 
         // Wait infinitely so your bot actually stays connected.
-        await Task.Delay(-1);
+        await Task.Delay(Timeout.Infinite);
     }
 
     private IServiceProvider _services;
@@ -138,7 +139,7 @@ class Program
             var context = new SocketCommandContext(_client, msg);
             
             // Execute the command. (result does not indicate a return value, 
-            // rather an object stating if the command executed succesfully).
+            // rather an object stating if the command executed successfully).
             var result = await _commands.ExecuteAsync(context, pos, _services);
 
             // Uncomment the following lines if you want the bot

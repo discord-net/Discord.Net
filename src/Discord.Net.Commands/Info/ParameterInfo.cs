@@ -48,7 +48,7 @@ namespace Discord.Commands
 
             foreach (var precondition in Preconditions)
             {
-                var result = await precondition.CheckPermissions(context, this, arg, services).ConfigureAwait(false);
+                var result = await precondition.CheckPermissionsAsync(context, this, arg, services).ConfigureAwait(false);
                 if (!result.IsSuccess)
                     return result;
             }
@@ -56,10 +56,10 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
 
-        public async Task<TypeReaderResult> Parse(ICommandContext context, string input, IServiceProvider services = null)
+        public async Task<TypeReaderResult> ParseAsync(ICommandContext context, string input, IServiceProvider services = null)
         {
             services = services ?? EmptyServiceProvider.Instance;
-            return await _reader.Read(context, input, services).ConfigureAwait(false);
+            return await _reader.ReadAsync(context, input, services).ConfigureAwait(false);
         }
 
         public override string ToString() => Name;

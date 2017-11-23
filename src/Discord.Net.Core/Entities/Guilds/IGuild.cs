@@ -122,5 +122,14 @@ namespace Discord
         Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
         /// <summary> Gets a collection of all webhooks for this guild. </summary>
         Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions options = null);
+        
+        /// <summary> Gets a specific emote from this guild. </summary>
+        Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null);
+        /// <summary> Creates a new emote in this guild. </summary>
+        Task<GuildEmote> CreateEmoteAsync(string name, Image image, Optional<IEnumerable<IRole>> roles = default(Optional<IEnumerable<IRole>>), RequestOptions options = null);
+        /// <summary> Modifies an existing emote in this guild. </summary>
+        Task<GuildEmote> ModifyEmoteAsync(GuildEmote emote, Action<EmoteProperties> func, RequestOptions options = null);
+        /// <summary> Deletes an existing emote from this guild. </summary>
+        Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null);
     }
 }
