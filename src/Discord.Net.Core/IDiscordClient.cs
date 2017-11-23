@@ -7,6 +7,8 @@ namespace Discord
 {
     public interface IDiscordClient : IDisposable
     {
+        event Func<LogMessage, Task> Log;
+
         ConnectionState ConnectionState { get; }
         ISelfUser CurrentUser { get; }
         TokenType TokenType { get; }
