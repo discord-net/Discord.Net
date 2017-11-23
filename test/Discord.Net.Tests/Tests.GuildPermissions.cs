@@ -7,7 +7,7 @@ namespace Discord
     public partial class Tests
     {
         [Fact]
-        public async Task TestGuildPermission()
+        public void TestGuildPermission()
         {
             // Test Guild Permission Constructors
             var perm = new GuildPermissions();
@@ -49,7 +49,7 @@ namespace Discord
         }
 
         [Fact]
-        public async Task TestGuildPermissionModify()
+        public void TestGuildPermissionModify()
         {
             var perm = new GuildPermissions();
 

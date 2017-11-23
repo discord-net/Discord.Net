@@ -7,7 +7,7 @@ namespace Discord
     public partial class Tests
     {
         [Fact]
-        public async Task TestChannelPermission()
+        public void TestChannelPermission()
         {
             var perm = new ChannelPermissions();
 
@@ -84,7 +84,7 @@ namespace Discord
             Assert.Equal(groupChannel, ChannelPermissions.Group.RawValue);
         }
 
-        public async Task TestChannelPermissionModify()
+        public void TestChannelPermissionModify()
         {
             // test channel permission modify
 
@@ -314,7 +314,7 @@ namespace Discord
         }
 
         [Fact]
-        public async Task TestChannelTypeResolution()
+        public void TestChannelTypeResolution()
         {
             ITextChannel someChannel = null;
             // null channels will throw exception
