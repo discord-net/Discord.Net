@@ -5,6 +5,8 @@ namespace Discord
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RichGame : Game
     {
+        internal RichGame() { }
+
         public string Details { get; internal set;}
         public string State { get; internal set;}
         public ulong ApplicationId { get; internal set; }

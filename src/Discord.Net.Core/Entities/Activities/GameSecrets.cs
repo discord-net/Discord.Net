@@ -6,7 +6,7 @@
         public string Join { get; }
         public string Spectate { get; }
 
-        public GameSecrets(string match, string join, string spectate)
+        internal GameSecrets(string match, string join, string spectate)
         {
             Match = match;
             Join = join;

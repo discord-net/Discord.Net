@@ -7,7 +7,7 @@ namespace Discord
         public DateTimeOffset? Start { get; }
         public DateTimeOffset? End { get; }
 
-        public GameTimestamps(DateTimeOffset? start, DateTimeOffset? end)
+        internal GameTimestamps(DateTimeOffset? start, DateTimeOffset? end)
         {
             Start = start;
             End = end;

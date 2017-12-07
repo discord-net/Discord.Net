@@ -1,6 +1,7 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Core", "src\Discord.Net.Core\Discord.Net.Core.csproj", "{91E9E7BD-75C9-4E98-84AA-2C271922E5C2}"
 EndProject
@@ -18,11 +19,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Providers", "Providers", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Providers.WS4Net", "src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj", "{6BDEEC08-417B-459F-9CA3-FF8BAB18CAC7}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Providers.UdpClient", "src\Discord.Net.Providers.UdpClient\Discord.Net.Providers.UdpClient.csproj", "{ABC9F4B9-2452-4725-B522-754E0A02E282}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{CC3D4B1C-9DE0-448B-8AE7-F3F1F3EC5C3A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Tests", "test\Discord.Net.Tests\Discord.Net.Tests.csproj", "{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Webhook", "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj", "{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -106,6 +107,18 @@ Global
 		{6BDEEC08-417B-459F-9CA3-FF8BAB18CAC7}.Release|x64.Build.0 = Release|Any CPU
 		{6BDEEC08-417B-459F-9CA3-FF8BAB18CAC7}.Release|x86.ActiveCfg = Release|Any CPU
 		{6BDEEC08-417B-459F-9CA3-FF8BAB18CAC7}.Release|x86.Build.0 = Release|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Debug|x64.Build.0 = Debug|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Debug|x86.Build.0 = Debug|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Release|x64.ActiveCfg = Release|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Release|x64.Build.0 = Release|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Release|x86.ActiveCfg = Release|Any CPU
+		{ABC9F4B9-2452-4725-B522-754E0A02E282}.Release|x86.Build.0 = Release|Any CPU
 		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -118,18 +131,6 @@ Global
 		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Release|x64.Build.0 = Release|Any CPU
 		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Release|x86.ActiveCfg = Release|Any CPU
 		{C38E5BC1-11CB-4101-8A38-5B40A1BC6433}.Release|x86.Build.0 = Release|Any CPU
-		{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30}.Debug|x64.Build.0 = Debug|Any CPU
-		{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30}.Debug|x86.Build.0 = Debug|Any CPU
-		{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30}.Release|x64.ActiveCfg = Release|Any CPU
-		{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30}.Release|x64.Build.0 = Release|Any CPU
-		{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30}.Release|x86.ActiveCfg = Release|Any CPU
-		{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -140,12 +141,9 @@ Global
 		{078DD7E6-943D-4D09-AFC2-D2BA58B76C9C} = {CC3D4B1C-9DE0-448B-8AE7-F3F1F3EC5C3A}
 		{688FD1D8-7F01-4539-B2E9-F473C5D699C7} = {288C363D-A636-4EAE-9AC1-4698B641B26E}
 		{6BDEEC08-417B-459F-9CA3-FF8BAB18CAC7} = {B0657AAE-DCC5-4FBF-8E5D-1FB578CF3012}
-		{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30} = {CC3D4B1C-9DE0-448B-8AE7-F3F1F3EC5C3A}
+		{ABC9F4B9-2452-4725-B522-754E0A02E282} = {B0657AAE-DCC5-4FBF-8E5D-1FB578CF3012}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {D2404771-EEC8-45F2-9D71-F3373F6C1495}
-	EndGlobalSection
-	GlobalSection(CodealikeProperties) = postSolution
-		SolutionGuid = a45217b4-a401-4dbf-8654-34d2ec034cd9
+		SolutionGuid = {0DC0B0D7-4E1F-4EDB-BC1E-E473772068C8}
 	EndGlobalSection
 EndGlobal
