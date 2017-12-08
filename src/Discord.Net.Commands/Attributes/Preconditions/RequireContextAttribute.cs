@@ -19,6 +19,7 @@ namespace Discord.Commands
     public class RequireContextAttribute : PreconditionAttribute
     {
         public ContextType Contexts { get; }
+        public override string ErrorMessage { get; set; }
 
         /// <summary>
         /// Require that the command be invoked in a specified context.
@@ -52,7 +53,7 @@ namespace Discord.Commands
             if (isValid)
                 return Task.FromResult(PreconditionResult.FromSuccess());
             else
-                return Task.FromResult(PreconditionResult.FromError($"Invalid context for command; accepted contexts: {Contexts}"));
+                return Task.FromResult(PreconditionResult.FromError(ErrorMessage ?? $"Invalid context for command; accepted contexts: {Contexts}"));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord.Commands
@@ -11,6 +11,7 @@ namespace Discord.Commands
     {
         public GuildPermission? GuildPermission { get; }
         public ChannelPermission? ChannelPermission { get; }
+        public override string ErrorMessage { get; set; }
 
         /// <summary>
         /// Require that the user invoking the command has a specified GuildPermission
@@ -51,7 +52,7 @@ namespace Discord.Commands
                 if (guildUser == null)
                     return Task.FromResult(PreconditionResult.FromError("Command must be used in a guild channel"));                
                 if (!guildUser.GuildPermissions.Has(GuildPermission.Value))
-                    return Task.FromResult(PreconditionResult.FromError($"User requires guild permission {GuildPermission.Value}"));
+                    return Task.FromResult(PreconditionResult.FromError(ErrorMessage ?? $"User requires guild permission {GuildPermission.Value}"));
             }
 
             if (ChannelPermission.HasValue)
@@ -63,7 +64,7 @@ namespace Discord.Commands
                     perms = ChannelPermissions.All(context.Channel);
 
                 if (!perms.Has(ChannelPermission.Value))
-                    return Task.FromResult(PreconditionResult.FromError($"User requires channel permission {ChannelPermission.Value}"));
+                    return Task.FromResult(PreconditionResult.FromError(ErrorMessage ?? $"User requires channel permission {ChannelPermission.Value}"));
             }
 
             return Task.FromResult(PreconditionResult.FromSuccess());

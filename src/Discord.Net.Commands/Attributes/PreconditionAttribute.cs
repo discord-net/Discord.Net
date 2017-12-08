@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord.Commands
@@ -12,6 +12,14 @@ namespace Discord.Commands
         /// or not at all will require *all* preconditions to pass, just like normal (A &amp;&amp; B).
         /// </summary>
         public string Group { get; set; } = null;
+
+        /// <summary>
+        /// When overridden in a derived class, uses the supplied string
+        /// as the error message if the precondition doesn't pass.
+        /// Setting this for a class that doesn't override
+        /// this property is a no-op.
+        /// </summary>
+        public virtual string ErrorMessage { get { return null; } set { } }
 
         public abstract Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services);
     }
