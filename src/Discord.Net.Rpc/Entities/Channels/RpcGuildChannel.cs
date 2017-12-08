@@ -10,6 +10,7 @@ namespace Discord.Rpc
     {
         public ulong GuildId { get; }
         public int Position { get; private set; }
+        public ulong? CategoryId { get; private set; }
 
         internal RpcGuildChannel(DiscordRpcClient discord, ulong id, ulong guildId)
             : base(discord, id)
@@ -57,6 +58,12 @@ namespace Discord.Rpc
         public override string ToString() => Name;
 
         //IGuildChannel
+        public Task<ICategoryChannel> GetCategory()
+        {
+            //Always fails
+            throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
+        }
+
         IGuild IGuildChannel.Guild
         {
             get

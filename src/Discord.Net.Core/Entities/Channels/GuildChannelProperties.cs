@@ -26,5 +26,9 @@
         /// Move the channel to the following position. This is 0-based!
         /// </summary>
         public Optional<int> Position { get; set; }
+        /// <summary>
+        /// Sets the category for this channel
+        /// </summary>
+        public Optional<ulong?> CategoryId { get; set; }
     }
 }

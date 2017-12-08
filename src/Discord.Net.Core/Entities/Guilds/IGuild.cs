@@ -84,6 +84,7 @@ namespace Discord
         Task<IReadOnlyCollection<ITextChannel>> GetTextChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<ITextChannel> GetTextChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<IReadOnlyCollection<IVoiceChannel>> GetVoiceChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IReadOnlyCollection<ICategoryChannel>> GetCategoryChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<IVoiceChannel> GetVoiceChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<IVoiceChannel> GetAFKChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<ITextChannel> GetSystemChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
@@ -93,6 +94,8 @@ namespace Discord
         Task<ITextChannel> CreateTextChannelAsync(string name, RequestOptions options = null);
         /// <summary> Creates a new voice channel. </summary>
         Task<IVoiceChannel> CreateVoiceChannelAsync(string name, RequestOptions options = null);
+        /// <summary> Creates a new channel category. </summary>
+        Task<ICategoryChannel> CreateCategoryChannelAsync(string name, RequestOptions options = null);
 
         Task<IReadOnlyCollection<IGuildIntegration>> GetIntegrationsAsync(RequestOptions options = null);
         Task<IGuildIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null);
