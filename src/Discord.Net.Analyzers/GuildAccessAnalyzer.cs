@@ -29,36 +29,43 @@ namespace Discord.Analyzers
 
         private static void AnalyzeMemberAccess(SyntaxNodeAnalysisContext context)
         {
+            // Bail out if the accessed member isn't named 'Guild'
+            var memberAccessSymbol = context.SemanticModel.GetSymbolInfo(context.Node).Symbol;
+            if (memberAccessSymbol.Name != "Guild")
+                return;
+
+            // Bail out if it happens to be 'ContextType.Guild' in the '[RequireContext]' argument
+            if (context.Node.Parent is AttributeArgumentSyntax)
+                return;
+
             // Bail out if the containing class doesn't derive from 'ModuleBase<T>'
             var classNode = context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>();
-            var classSymbol = context.SemanticModel.GetSymbolInfo(classNode).Symbol as INamedTypeSymbol;
+            var classSymbol = context.SemanticModel.GetDeclaredSymbol(classNode);
             if (!DerivesFromModuleBase(classSymbol))
                 return;
 
             // Bail out if the containing method isn't marked with '[Command]'
             var methodNode = context.Node.FirstAncestorOrSelf<MethodDeclarationSyntax>();
-            var methodSymbol = context.SemanticModel.GetSymbolInfo(methodNode).Symbol;
+            var methodSymbol = context.SemanticModel.GetDeclaredSymbol(methodNode);
             var methodAttributes = methodSymbol.GetAttributes();
             if (!methodAttributes.Any(a => a.AttributeClass.Name == nameof(CommandAttribute)))
                 return;
 
-            // Are you geting a property named 'Guild'?
-            var memberAccessSymbol = context.SemanticModel.GetSymbolInfo(context.Node).Symbol as IMethodSymbol;
-            if (memberAccessSymbol.AssociatedSymbol.Name == "Guild") //I guess?
+            // Is the '[RequireContext]' attribute not applied to either the
+            // method or the class, or its argument isn't 'ContextType.Guild'?
+            var ctxAttribute = methodAttributes.SingleOrDefault(_attributeDataPredicate)
+                ?? classSymbol.GetAttributes().SingleOrDefault(_attributeDataPredicate);
+
+            if (ctxAttribute == null || ctxAttribute.ConstructorArguments.Any(arg => !arg.Value.Equals((int)ContextType.Guild)))
             {
-                // Is the '[RequireContext]' attribute not applied to either the method or the class, or doesn't contain 'ContextType.Guild'?
-                var ctxAttribute = methodAttributes.SingleOrDefault(_attributeDataPredicate)
-                    ?? classSymbol.GetAttributes().SingleOrDefault(_attributeDataPredicate);
-                if (ctxAttribute == null || ctxAttribute.ConstructorArguments.Any(arg => !arg.Value.Equals(ContextType.Guild)))
-                {
-                    // Report the diagnostic
-                    var diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation(), methodSymbol.Name);
-                    context.ReportDiagnostic(diagnostic);
-                }
+                // Report the diagnostic
+                var diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation(), methodSymbol.Name);
+                context.ReportDiagnostic(diagnostic);
             }
         }
 
-        private static readonly Func<AttributeData, bool> _attributeDataPredicate = a => a.AttributeClass.Name == nameof(RequireContextAttribute);
+        private static readonly Func<AttributeData, bool> _attributeDataPredicate =
+            (a => a.AttributeClass.Name == nameof(RequireContextAttribute));
 
         private static readonly string _moduleBaseName = typeof(ModuleBase<>).Name;
 
