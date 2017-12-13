@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Core", "src\Discord.Net.Core\Discord.Net.Core.csproj", "{91E9E7BD-75C9-4E98-84AA-2C271922E5C2}"
 EndProject
@@ -141,5 +141,11 @@ Global
 		{688FD1D8-7F01-4539-B2E9-F473C5D699C7} = {288C363D-A636-4EAE-9AC1-4698B641B26E}
 		{6BDEEC08-417B-459F-9CA3-FF8BAB18CAC7} = {B0657AAE-DCC5-4FBF-8E5D-1FB578CF3012}
 		{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30} = {CC3D4B1C-9DE0-448B-8AE7-F3F1F3EC5C3A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D2404771-EEC8-45F2-9D71-F3373F6C1495}
+	EndGlobalSection
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = a45217b4-a401-4dbf-8654-34d2ec034cd9
 	EndGlobalSection
 EndGlobal

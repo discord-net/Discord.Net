@@ -29,10 +29,6 @@ namespace Discord
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Gets a collection of pinned messages in this channel. </summary>
         Task<IReadOnlyCollection<IMessage>> GetPinnedMessagesAsync(RequestOptions options = null);
-        /// <summary> Bulk deletes multiple messages. </summary>
-        Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null);
-        /// <summary> Bulk deletes multiple messages. </summary>
-        Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null);
 
         /// <summary> Broadcasts the "user is typing" message to all users in this channel, lasting 10 seconds. </summary>
         Task TriggerTypingAsync(RequestOptions options = null);

@@ -262,5 +262,46 @@ namespace Discord.Rest
                 model = await client.ApiClient.BeginGuildPruneAsync(guild.Id, args, options).ConfigureAwait(false);
             return model.Pruned;
         }
+
+        //Emotes
+        public static async Task<GuildEmote> GetEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
+        {
+            var emote = await client.ApiClient.GetGuildEmoteAsync(guild.Id, id, options);
+            return emote.ToEntity();
+        }
+        public static async Task<GuildEmote> CreateEmoteAsync(IGuild guild, BaseDiscordClient client, string name, Image image, Optional<IEnumerable<IRole>> roles, 
+            RequestOptions options)
+        {
+            var apiargs = new CreateGuildEmoteParams
+            {
+                Name = name,
+                Image = image.ToModel()
+            };
+            if (roles.IsSpecified)
+                apiargs.RoleIds = roles.Value?.Select(xr => xr.Id)?.ToArray();
+
+            var emote = await client.ApiClient.CreateGuildEmoteAsync(guild.Id, apiargs, options);
+            return emote.ToEntity();
+        }
+        public static async Task<GuildEmote> ModifyEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, Action<EmoteProperties> func, 
+            RequestOptions options)
+        {
+            if (func == null) throw new ArgumentNullException(nameof(func));
+
+            var props = new EmoteProperties();
+            func(props);
+
+            var apiargs = new ModifyGuildEmoteParams
+            {
+                Name = props.Name
+            };
+            if (props.Roles.IsSpecified)
+                apiargs.RoleIds = props.Roles.Value?.Select(xr => xr.Id)?.ToArray();
+
+            var emote = await client.ApiClient.ModifyGuildEmoteAsync(guild.Id, id, apiargs, options);
+            return emote.ToEntity();
+        }
+        public static Task DeleteEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options) 
+            => client.ApiClient.DeleteGuildEmoteAsync(guild.Id, id, options);
     }
 }

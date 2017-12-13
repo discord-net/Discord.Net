@@ -1,4 +1,5 @@
-﻿using Discord.API;
+﻿#pragma warning disable CS0618
+using Discord.API;
 using Discord.API.Gateway;
 using Discord.Logging;
 using Discord.Net.Converters;
@@ -19,7 +20,7 @@ using GameModel = Discord.API.Game;
 
 namespace Discord.WebSocket
 {
-    public partial class DiscordSocketClient : BaseDiscordClient, IDiscordClient
+    public partial class DiscordSocketClient : BaseSocketClient, IDiscordClient
     {
         private readonly ConcurrentQueue<ulong> _largeGuilds;
         private readonly JsonSerializer _serializer;
@@ -44,10 +45,10 @@ namespace Discord.WebSocket
         public int ShardId { get; }
         /// <summary> Gets the current connection state of this client. </summary>
         public ConnectionState ConnectionState => _connection.State;
-        /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
-        public int Latency { get; private set; }
-        internal UserStatus Status { get; private set; } = UserStatus.Online;
-        internal Game? Game { get; private set; }
+        /// <inheritdoc />
+        public override int Latency { get; protected set; }
+        public override UserStatus Status { get; protected set; } = UserStatus.Online;
+        public override Game? Game { get; protected set; }
 
         //From DiscordSocketConfig
         internal int TotalShards { get; private set; }
@@ -60,14 +61,13 @@ namespace Discord.WebSocket
         internal int? HandlerTimeout { get; private set; }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
-        public new SocketSelfUser CurrentUser { get => base.CurrentUser as SocketSelfUser; private set => base.CurrentUser = value; }
-        public IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
-        public IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => State.PrivateChannels;
+        public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
+        public override IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => State.PrivateChannels;
         public IReadOnlyCollection<SocketDMChannel> DMChannels 
             => State.PrivateChannels.Select(x => x as SocketDMChannel).Where(x => x != null).ToImmutableArray();
         public IReadOnlyCollection<SocketGroupChannel> GroupChannels 
             => State.PrivateChannels.Select(x => x as SocketGroupChannel).Where(x => x != null).ToImmutableArray();
-        public IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
+        public override IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
         public DiscordSocketClient() : this(new DiscordSocketConfig()) { }
@@ -155,9 +155,9 @@ namespace Discord.WebSocket
             _voiceRegions = ImmutableDictionary.Create<string, RestVoiceRegion>();
         }
 
-        public async Task StartAsync() 
+        public override async Task StartAsync() 
             => await _connection.StartAsync().ConfigureAwait(false);
-        public async Task StopAsync() 
+        public override async Task StopAsync() 
             => await _connection.StopAsync().ConfigureAwait(false);
         
         private async Task OnConnectingAsync()
@@ -231,44 +231,23 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public async Task<RestApplication> GetApplicationInfoAsync()
-        { 
-            return _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this, new RequestOptions()));
-        }
+        public override async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null) 
+            => _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this, options ?? RequestOptions.Default).ConfigureAwait(false));
 
         /// <inheritdoc />
-        public SocketGuild GetGuild(ulong id)
-        {
-            return State.GetGuild(id);
-        }
-        /// <inheritdoc />
-        public Task<RestGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null)
-            => ClientHelper.CreateGuildAsync(this, name, region, jpegIcon, new RequestOptions());
+        public override SocketGuild GetGuild(ulong id) 
+            => State.GetGuild(id);                                                               
 
         /// <inheritdoc />
-        public SocketChannel GetChannel(ulong id)
-        {
-            return State.GetChannel(id);
-        }
-
+        public override SocketChannel GetChannel(ulong id) 
+            => State.GetChannel(id);
+                                                                                
         /// <inheritdoc />
-        public Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync()
-            => ClientHelper.GetConnectionsAsync(this, new RequestOptions());
-
+        public override SocketUser GetUser(ulong id) 
+            => State.GetUser(id);
         /// <inheritdoc />
-        public Task<RestInvite> GetInviteAsync(string inviteId)
-            => ClientHelper.GetInviteAsync(this, inviteId, new RequestOptions());
-
-        /// <inheritdoc />
-        public SocketUser GetUser(ulong id)
-        {
-            return State.GetUser(id);
-        }
-        /// <inheritdoc />
-        public SocketUser GetUser(string username, string discriminator)
-        {
-            return State.Users.FirstOrDefault(x => x.Discriminator == discriminator && x.Username == username);
-        }
+        public override SocketUser GetUser(string username, string discriminator) 
+            => State.Users.FirstOrDefault(x => x.Discriminator == discriminator && x.Username == username);
         internal SocketGlobalUser GetOrCreateUser(ClientState state, Discord.API.User model)
         {
             return state.GetOrAddUser(model.Id, x =>
@@ -288,13 +267,11 @@ namespace Discord.WebSocket
                 return user;
             });
         }
-        internal void RemoveUser(ulong id)
-        {
-            State.RemoveUser(id);
-        }
+        internal void RemoveUser(ulong id) 
+            => State.RemoveUser(id);
 
         /// <inheritdoc />
-        public RestVoiceRegion GetVoiceRegion(string id)
+        public override RestVoiceRegion GetVoiceRegion(string id)
         {
             if (_voiceRegions.TryGetValue(id, out RestVoiceRegion region))
                 return region;
@@ -302,7 +279,7 @@ namespace Discord.WebSocket
         }
 
         /// <summary> Downloads the users list for the provided guilds, if they don't have a complete list. </summary>
-        public async Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
+        public override async Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
         {
             if (ConnectionState == ConnectionState.Connected)
             {
@@ -340,7 +317,7 @@ namespace Discord.WebSocket
             }
         }
 
-        public async Task SetStatusAsync(UserStatus status)
+        public override async Task SetStatusAsync(UserStatus status)
         {
             Status = status;
             if (status == UserStatus.AFK)
@@ -349,7 +326,7 @@ namespace Discord.WebSocket
                 _statusSince = null;
             await SendStatusAsync().ConfigureAwait(false);
         }
-        public async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
+        public override async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
         {
             if (name != null)
                 Game = new Game(name, streamUrl, streamType);

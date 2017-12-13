@@ -1,4 +1,5 @@
-﻿using Discord.Audio;
+﻿#pragma warning disable CS0618
+using Discord.Audio;
 using Discord.Rest;
 using System;
 using System.Collections.Concurrent;
@@ -436,6 +437,16 @@ namespace Discord.WebSocket
         {
             _downloaderPromise.TrySetResultAsync(true);
         }
+
+        //Emotes
+        public Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null)
+            => GuildHelper.GetEmoteAsync(this, Discord, id, options);
+        public Task<GuildEmote> CreateEmoteAsync(string name, Image image, Optional<IEnumerable<IRole>> roles = default(Optional<IEnumerable<IRole>>), RequestOptions options = null)
+            => GuildHelper.CreateEmoteAsync(this, Discord, name, image, roles, options);
+        public Task<GuildEmote> ModifyEmoteAsync(GuildEmote emote, Action<EmoteProperties> func, RequestOptions options = null)
+            => GuildHelper.ModifyEmoteAsync(this, Discord, emote.Id, func, options);
+        public Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null)
+            => GuildHelper.DeleteEmoteAsync(this, Discord, emote.Id, options);
 
         //Voice States
         internal async Task<SocketVoiceState> AddOrUpdateVoiceStateAsync(ClientState state, VoiceStateModel model)

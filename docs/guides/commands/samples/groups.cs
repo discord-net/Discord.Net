@@ -1,8 +1,8 @@
 [Group("admin")]
-public class AdminModule : ModuleBase
+public class AdminModule : ModuleBase<SocketCommandContext>
 {
     [Group("clean")]
-    public class CleanModule : ModuleBase
+    public class CleanModule : ModuleBase<SocketCommandContext>
     {
         // ~admin clean 15
         [Command]

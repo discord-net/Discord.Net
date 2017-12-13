@@ -1,7 +1,7 @@
 public async Task MainAsync()
 {
 	// client.Log ...
-	client.MessageReceived += MessageReceived;
+	_client.MessageReceived += MessageReceived;
 	// ...
 }
 

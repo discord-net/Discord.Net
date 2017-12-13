@@ -10,7 +10,7 @@ namespace Discord
         public static Optional<T> Unspecified => default(Optional<T>);
         private readonly T _value;
 
-        /// <summary> Gets the value for this paramter. </summary>
+        /// <summary> Gets the value for this parameter. </summary>
         public T Value
         {
             get
