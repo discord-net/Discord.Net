@@ -12,7 +12,7 @@ namespace Discord
         /// <summary> Gets the parentid (category) of this channel in the guild's channel list. </summary>
         ulong? CategoryId { get; }
         /// <summary> Gets the parent channel (category) of this channel. </summary>
-        Task<ICategoryChannel> GetCategory();
+        Task<ICategoryChannel> GetCategoryAsync();
         /// <summary> Gets the guild this channel is a member of. </summary>
         IGuild Guild { get; }
         /// <summary> Gets the id of the guild this channel is a member of. </summary>

@@ -17,7 +17,7 @@ namespace Discord.Rest
         public string Name { get; private set; }
         public int Position { get; private set; }
         public ulong? CategoryId { get; private set; }
-        public async Task<ICategoryChannel> GetCategory() => CategoryId == null ? null : await Guild.GetChannelAsync(CategoryId.Value) as ICategoryChannel;
+        public async Task<ICategoryChannel> GetCategoryAsync() => CategoryId == null ? null : await Guild.GetChannelAsync(CategoryId.Value).ConfigureAwait(false) as ICategoryChannel;
 
         public ulong GuildId => Guild.Id;
 

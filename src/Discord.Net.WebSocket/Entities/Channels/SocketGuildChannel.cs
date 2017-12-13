@@ -19,7 +19,7 @@ namespace Discord.WebSocket
         public int Position { get; private set; }
         public ulong? CategoryId { get; private set; }
         public ICategoryChannel Category => CategoryId == null ? null : Guild.GetChannel(CategoryId.Value) as ICategoryChannel;
-        Task<ICategoryChannel> IGuildChannel.GetCategory() => Task.FromResult(Category);
+        Task<ICategoryChannel> IGuildChannel.GetCategoryAsync() => Task.FromResult(Category);
 
         public IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
         public new virtual IReadOnlyCollection<SocketGuildUser> Users => ImmutableArray.Create<SocketGuildUser>();
