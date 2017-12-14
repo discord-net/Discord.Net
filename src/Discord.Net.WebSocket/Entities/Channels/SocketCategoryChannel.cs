@@ -17,6 +17,9 @@ namespace Discord.WebSocket
         public override IReadOnlyCollection<SocketGuildUser> Users
             => Guild.Users.Where(x => x.VoiceChannel?.Id == Id).ToImmutableArray();
 
+        public IReadOnlyCollection<SocketGuildChannel> Channels
+            => Guild.Channels.Where(x => x.CategoryId == CategoryId).ToImmutableArray();
+
         internal SocketCategoryChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
             : base(discord, id, guild)
         {

@@ -11,8 +11,6 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestCategoryChannel : RestGuildChannel, ICategoryChannel
     {
-        public string Mention => MentionUtils.MentionChannel(Id);
-
         internal RestCategoryChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
         {
