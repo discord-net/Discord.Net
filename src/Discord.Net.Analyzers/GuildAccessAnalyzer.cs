@@ -41,7 +41,7 @@ namespace Discord.Analyzers
             // Bail out if the containing class doesn't derive from 'ModuleBase<T>'
             var classNode = context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>();
             var classSymbol = context.SemanticModel.GetDeclaredSymbol(classNode);
-            if (!DerivesFromModuleBase(classSymbol))
+            if (!classSymbol.DerivesFromModuleBase())
                 return;
 
             // Bail out if the containing method isn't marked with '[Command]'
@@ -66,20 +66,5 @@ namespace Discord.Analyzers
 
         private static readonly Func<AttributeData, bool> _attributeDataPredicate =
             (a => a.AttributeClass.Name == nameof(RequireContextAttribute));
-
-        private static readonly string _moduleBaseName = typeof(ModuleBase<>).Name;
-
-        private static bool DerivesFromModuleBase(INamedTypeSymbol symbol)
-        {
-            var bType = symbol.BaseType;
-            while (bType != null)
-            {
-                if (bType.MetadataName == _moduleBaseName)
-                    return true;
-
-                bType = bType.BaseType;
-            }
-            return false;
-        }
     }
 }
