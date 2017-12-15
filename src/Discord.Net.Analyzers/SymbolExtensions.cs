@@ -8,15 +8,12 @@ namespace Discord.Analyzers
     {
         private static readonly string _moduleBaseName = typeof(ModuleBase<>).Name;
 
-        public static bool DerivesFromModuleBase(this INamedTypeSymbol symbol)
+        public static bool DerivesFromModuleBase(this ITypeSymbol symbol)
         {
-            var bType = symbol.BaseType;
-            while (bType != null)
+            for (var bType = symbol.BaseType; bType != null; bType = bType.BaseType)
             {
                 if (bType.MetadataName == _moduleBaseName)
                     return true;
-
-                bType = bType.BaseType;
             }
             return false;
         }

@@ -39,9 +39,9 @@ namespace Discord.Analyzers
                 return;
 
             // Bail out if the containing class doesn't derive from 'ModuleBase<T>'
-            var classNode = context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>();
-            var classSymbol = context.SemanticModel.GetDeclaredSymbol(classNode);
-            if (!classSymbol.DerivesFromModuleBase())
+            var typeNode = context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>();
+            var typeSymbol = context.SemanticModel.GetDeclaredSymbol(typeNode);
+            if (!typeSymbol.DerivesFromModuleBase())
                 return;
 
             // Bail out if the containing method isn't marked with '[Command]'
@@ -54,7 +54,7 @@ namespace Discord.Analyzers
             // Is the '[RequireContext]' attribute not applied to either the
             // method or the class, or its argument isn't 'ContextType.Guild'?
             var ctxAttribute = methodAttributes.SingleOrDefault(_attributeDataPredicate)
-                ?? classSymbol.GetAttributes().SingleOrDefault(_attributeDataPredicate);
+                ?? typeSymbol.GetAttributes().SingleOrDefault(_attributeDataPredicate);
 
             if (ctxAttribute == null || ctxAttribute.ConstructorArguments.Any(arg => !arg.Value.Equals((int)ContextType.Guild)))
             {
