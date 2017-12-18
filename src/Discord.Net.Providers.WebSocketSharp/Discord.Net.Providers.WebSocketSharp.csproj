@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../Discord.Net.targets" />
+  <PropertyGroup>
+    <AssemblyName>Discord.Net.Providers.WebSocketSharp</AssemblyName>
+    <RootNamespace>Discord.Providers.WebSocketSharp</RootNamespace>
+    <Description>An optional WebSocket client provider for Discord.Net using websocket-sharp</Description>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="websocket-sharp-customheaders" Version="1.0.2.31869" />
+  </ItemGroup>
+</Project>
