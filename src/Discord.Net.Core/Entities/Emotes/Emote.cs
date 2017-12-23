@@ -16,13 +16,18 @@ namespace Discord
         /// The ID of this emote
         /// </summary>
         public ulong Id { get; }
+        /// <summary>
+        /// Is this emote animated?
+        /// </summary>
+        public bool Animated { get; }
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
-        public string Url => CDN.GetEmojiUrl(Id);
+        public string Url => CDN.GetEmojiUrl(Id, Animated);
 
-        internal Emote(ulong id, string name)
+        internal Emote(ulong id, string name, bool animated)
         {
             Id = id;
             Name = name;
+            Animated = animated;
         }
 
         public override bool Equals(object other)
@@ -59,7 +64,7 @@ namespace Discord
         public static bool TryParse(string text, out Emote result)
         {
             result = null;
-            if (text.Length >= 4 && text[0] == '<' && text[1] == ':' && text[text.Length - 1] == '>')
+            if (text.Length >= 4 && text[0] == '<' && (text[1] == ':' || (text[1] == 'a' && text[2] == ':')) && text[text.Length - 1] == '>')
             {
                 int splitIndex = text.IndexOf(':', 2);
                 if (splitIndex == -1)
@@ -69,7 +74,8 @@ namespace Discord
                     return false;
 
                 string name = text.Substring(2, splitIndex - 2);
-                result = new Emote(id, name);
+                bool animated = text[1] == 'a';
+                result = new Emote(id, name, animated);
                 return true;
             }
             return false;
@@ -77,6 +83,6 @@ namespace Discord
         }
 
         private string DebuggerDisplay => $"{Name} ({Id})";
-        public override string ToString() => $"<:{Name}:{Id}>";
+        public override string ToString() => $"<{(Animated ? "a" : "")}:{Name}:{Id}>";
     }
 }
