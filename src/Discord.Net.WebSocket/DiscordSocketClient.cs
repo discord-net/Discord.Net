@@ -48,7 +48,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override int Latency { get; protected set; }
         public override UserStatus Status { get; protected set; } = UserStatus.Online;
-        public override Game? Game { get; protected set; }
+        public override IActivity Activity { get; protected set; }
 
         //From DiscordSocketConfig
         internal int TotalShards { get; private set; }
@@ -328,33 +328,39 @@ namespace Discord.WebSocket
         }
         public override async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
         {
-            if (name != null)
-                Game = new Game(name, streamUrl, streamType);
+            if (streamUrl != null)
+                Activity = new StreamingGame(name, streamUrl, streamType);
+            else if (name != null)
+                Activity = new Game(name);
             else
-                Game = null;
+                Activity = null;
             await SendStatusAsync().ConfigureAwait(false);
         }
+        public override async Task SetActivityAsync(IActivity activity)
+        {
+            Activity = activity;
+            await SendStatusAsync().ConfigureAwait(false);
+        }
+        
         private async Task SendStatusAsync()
         {
             if (CurrentUser == null)
                 return;
-            var game = Game;
+            var activity = Activity;
             var status = Status;
             var statusSince = _statusSince;
-            CurrentUser.Presence = new SocketPresence(status, game);
+            CurrentUser.Presence = new SocketPresence(status, activity);
 
-            GameModel gameModel;
-            if (game != null)
+            var gameModel = new GameModel();
+            // Discord only accepts rich presence over RPC, don't even bother building a payload
+            if (activity is RichGame game) throw new NotSupportedException("Outgoing Rich Presences are not supported");
+            if (activity is StreamingGame stream)
             {
-                gameModel = new API.Game
-                {
-                    Name = game.Value.Name,
-                    StreamType = game.Value.StreamType,
-                    StreamUrl = game.Value.StreamUrl
-                };
+                gameModel.StreamUrl = stream.Url;
+                gameModel.StreamType = stream.StreamType;
             }
-            else
-                gameModel = null;
+            else if (activity != null)
+                gameModel.Name = activity.Name;
 
             await ApiClient.SendStatusUpdateAsync(
                 status,

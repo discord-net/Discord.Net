@@ -22,6 +22,12 @@ namespace Discord
         public static string GetEmojiUrl(ulong emojiId)
             => $"{DiscordConfig.CDNUrl}emojis/{emojiId}.png";
 
+        public static string GetRichAssetUrl(ulong appId, string assetId, ushort size, ImageFormat format)
+        {
+            string extension = FormatToExtension(format, "");
+            return $"{DiscordConfig.CDNUrl}app-assets/{appId}/{assetId}.{extension}?size={size}";
+        }
+
         private static string FormatToExtension(ImageFormat format, string imageId)
         {
             if (format == ImageFormat.Auto)
