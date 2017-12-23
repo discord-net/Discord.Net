@@ -254,6 +254,20 @@ namespace Discord.Rest
             return model.Pruned;
         }
 
+        //Webhooks
+        public static async Task<RestWebhook> GetWebhookAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
+        {
+            var model = await client.ApiClient.GetWebhookAsync(id, options: options).ConfigureAwait(false);
+            if (model == null)
+                return null;
+            return RestWebhook.Create(client, guild, model);
+        }
+        public static async Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
+        {
+            var models = await client.ApiClient.GetGuildWebhooksAsync(guild.Id, options).ConfigureAwait(false);
+            return models.Select(x => RestWebhook.Create(client, guild, x)).ToImmutableArray();
+        }
+
         //Emotes
         public static async Task<GuildEmote> GetEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
         {

@@ -144,6 +144,14 @@ namespace Discord.Rest
             return null;
         }
 
+        public static async Task<RestWebhook> GetWebhookAsync(BaseDiscordClient client, ulong id, RequestOptions options)
+        {
+            var model = await client.ApiClient.GetWebhookAsync(id);
+            if (model != null)
+                return RestWebhook.Create(client, (IGuild)null, model);
+            return null;
+        }
+
         public static async Task<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(BaseDiscordClient client, RequestOptions options)
         {
             var models = await client.ApiClient.GetVoiceRegionsAsync(options).ConfigureAwait(false);
