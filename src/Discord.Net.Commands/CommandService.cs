@@ -27,7 +27,7 @@ namespace Discord.Commands
         private readonly HashSet<ModuleInfo> _moduleDefs;
         private readonly CommandMap _map;
 
-        internal readonly bool _caseSensitive, _throwOnError;
+        internal readonly bool _caseSensitive, _throwOnError, _failOnTooManyArgs;
         internal readonly char _separatorChar;
         internal readonly RunMode _defaultRunMode;
         internal readonly Logger _cmdLogger;
@@ -42,6 +42,7 @@ namespace Discord.Commands
         {
             _caseSensitive = config.CaseSensitiveCommands;
             _throwOnError = config.ThrowOnError;
+            _failOnTooManyArgs = config.FailOnTooManyArgs;
             _separatorChar = config.SeparatorChar;
             _defaultRunMode = config.DefaultRunMode;
             if (_defaultRunMode == RunMode.Default)
