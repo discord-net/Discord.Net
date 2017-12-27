@@ -56,6 +56,8 @@
 
         public static GameParty ToEntity(this API.GameParty model)
         {
+            // todo: proper fix for this
+            if (model == null) return null;
             // Discord will probably send bad data since they don't validate anything
             int current = 0, cap = 0;
             if (model.Size.Length == 2)
