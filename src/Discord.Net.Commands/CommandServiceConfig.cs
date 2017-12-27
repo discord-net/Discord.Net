@@ -16,7 +16,7 @@
         /// <summary> Determines whether RunMode.Sync commands should push exceptions up to the caller. </summary>
         public bool ThrowOnError { get; set; } = true;
 
-        /// <summary> Determines whether the command execution should fail if too many parameters are provided. </summary>
-        public bool FailOnTooManyArgs { get; set; } = true;
+        /// <summary> Determines whether extra parameters should be ignored. </summary>
+        public bool IgnoreExtraArgs { get; set; } = false;
     }
 }

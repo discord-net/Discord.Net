@@ -20,7 +20,7 @@ namespace Discord.Commands
 
         private readonly CommandService _commandService;
         private readonly Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> _action;
-        
+
         public ModuleInfo Module { get; }
         public string Name { get; }
         public string Summary { get; }
@@ -119,7 +119,7 @@ namespace Discord.Commands
                 return ParseResult.FromError(preconditionResult);
 
             string input = searchResult.Text.Substring(startIndex);
-            return await CommandParser.ParseArgsAsync(this, context, _commandService, services, input, 0).ConfigureAwait(false);
+            return await CommandParser.ParseArgsAsync(this, context, _commandService._ignoreExtraArgs, services, input, 0).ConfigureAwait(false);
         }
 
         public Task<IResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)

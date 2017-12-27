@@ -14,7 +14,7 @@ namespace Discord.Commands
             QuotedParameter
         }
         
-        public static async Task<ParseResult> ParseArgsAsync(CommandInfo command, ICommandContext context, CommandService commandService, IServiceProvider services, string input, int startPos)
+        public static async Task<ParseResult> ParseArgsAsync(CommandInfo command, ICommandContext context, bool ignoreExtraArgs, IServiceProvider services, string input, int startPos)
         {
             ParameterInfo curParam = null;
             StringBuilder argBuilder = new StringBuilder(input.Length);
@@ -110,10 +110,10 @@ namespace Discord.Commands
                 {
                     if (curParam == null)
                     {
-                        if (commandService._failOnTooManyArgs)
-                            return ParseResult.FromError(CommandError.BadArgCount, "The input text has too many parameters.");
-                        else
+                        if (ignoreExtraArgs)
                             break;
+                        else
+                            return ParseResult.FromError(CommandError.BadArgCount, "The input text has too many parameters.");
                     }
 
                     var typeReaderResult = await curParam.ParseAsync(context, argString, services).ConfigureAwait(false);
