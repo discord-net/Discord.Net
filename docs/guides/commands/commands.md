@@ -93,9 +93,9 @@ If you would like a parameter to parse until the end of a Command,
 flag the parameter with the [RemainderAttribute]. This will allow a
 user to invoke a Command without wrapping a parameter in quotes.
 
-Finally, flag your Command with the [CommandAttribute] (you must
+Finally, flag your Command with the [CommandAttribute]. (you must
 specify a name for this Command, except for when it is part of a
-Module Group - see below).
+Module Group - see below)
 
 [RemainderAttribute]: xref:Discord.Commands.RemainderAttribute
 [CommandAttribute]: xref:Discord.Commands.CommandAttribute
