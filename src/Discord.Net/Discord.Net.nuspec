@@ -16,7 +16,6 @@
             <dependency id="Discord.Net.Core" version="2.0.0-beta$suffix$" />
             <dependency id="Discord.Net.Rest" version="2.0.0-beta$suffix$" />
             <dependency id="Discord.Net.WebSocket" version="2.0.0-beta$suffix$" />
-            <dependency id="Discord.Net.Rpc" version="2.0.0-beta$suffix$" />
             <dependency id="Discord.Net.Commands" version="2.0.0-beta$suffix$" />
             <dependency id="Discord.Net.Webhook" version="2.0.0-beta$suffix$" />
         </group>
@@ -24,7 +23,6 @@
             <dependency id="Discord.Net.Core" version="2.0.0-beta$suffix$" />
             <dependency id="Discord.Net.Rest" version="2.0.0-beta$suffix$" />
             <dependency id="Discord.Net.WebSocket" version="2.0.0-beta$suffix$" />
-            <dependency id="Discord.Net.Rpc" version="2.0.0-beta$suffix$" />
             <dependency id="Discord.Net.Commands" version="2.0.0-beta$suffix$" />
             <dependency id="Discord.Net.Webhook" version="2.0.0-beta$suffix$" />
         </group>
@@ -32,7 +30,6 @@
             <dependency id="Discord.Net.Core" version="2.0.0-beta$suffix$" />
             <dependency id="Discord.Net.Rest" version="2.0.0-beta$suffix$" />
             <dependency id="Discord.Net.WebSocket" version="2.0.0-beta$suffix$" />
-            <dependency id="Discord.Net.Rpc" version="2.0.0-beta$suffix$" />
             <dependency id="Discord.Net.Commands" version="2.0.0-beta$suffix$" />
             <dependency id="Discord.Net.Webhook" version="2.0.0-beta$suffix$" />
         </group>
