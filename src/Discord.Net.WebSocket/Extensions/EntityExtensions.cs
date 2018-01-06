@@ -17,9 +17,9 @@
                     State = model.State.GetValueOrDefault(),
                     SmallAsset = assets?[0],
                     LargeAsset = assets?[1],
-                    Party = model.Party.GetValueOrDefault()?.ToEntity(),
-                    Secrets = model.Secrets.GetValueOrDefault()?.ToEntity(),
-                    Timestamps = model.Timestamps.GetValueOrDefault()?.ToEntity()
+                    Party = model.Party.IsSpecified ? model.Party.Value.ToEntity() : null,
+                    Secrets = model.Secrets.IsSpecified ? model.Secrets.Value.ToEntity() : null,
+                    Timestamps = model.Timestamps.IsSpecified ? model.Timestamps.Value.ToEntity() : null
                 };
             }
             // Stream Game
@@ -56,11 +56,9 @@
 
         public static GameParty ToEntity(this API.GameParty model)
         {
-            // todo: proper fix for this
-            if (model == null) return null;
             // Discord will probably send bad data since they don't validate anything
             int current = 0, cap = 0;
-            if (model.Size.Length == 2)
+            if (model.Size?.Length == 2)
             {
                 current = model.Size[0];
                 cap = model.Size[1];
