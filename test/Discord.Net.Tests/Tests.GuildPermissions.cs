@@ -7,7 +7,7 @@ namespace Discord
     public partial class Tests
     {
         [Fact]
-        public void TestGuildPermission()
+        public Task TestGuildPermission()
         {
             // Test Guild Permission Constructors
             var perm = new GuildPermissions();
@@ -46,10 +46,12 @@ namespace Discord
                 GuildPermission.SendMessages | GuildPermission.SendTTSMessages | GuildPermission.EmbedLinks |
                 GuildPermission.AttachFiles);
             Assert.Equal(webHookPermissions, GuildPermissions.Webhook.RawValue);
+
+            return Task.CompletedTask;
         }
 
         [Fact]
-        public void TestGuildPermissionModify()
+        public Task TestGuildPermissionModify()
         {
             var perm = new GuildPermissions();
 
@@ -298,6 +300,7 @@ namespace Discord
             Assert.False(perm.ManageEmojis);
             Assert.Equal(GuildPermissions.None.RawValue, perm.RawValue);
 
+            return Task.CompletedTask;
         }
 
     }

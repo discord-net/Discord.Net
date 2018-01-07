@@ -197,7 +197,7 @@ namespace Discord.Rest
             var channels = await GetTextChannelsAsync(options).ConfigureAwait(false);
             var user = await GetCurrentUserAsync(options).ConfigureAwait(false);
             return channels
-                .Where(c => user.GetPermissions(c).ReadMessages)
+                .Where(c => user.GetPermissions(c).ViewChannel)
                 .OrderBy(c => c.Position)
                 .FirstOrDefault();
         }
