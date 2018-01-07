@@ -79,7 +79,7 @@ namespace Discord.Rest
             ulong? fromGuildId, int? limit, RequestOptions options)
         {
             return new PagedAsyncEnumerable<RestUserGuild>(
-                DiscordConfig.MaxUsersPerBatch,
+                DiscordConfig.MaxGuildsPerBatch,
                 async (info, ct) =>
                 {
                     var args = new GetGuildSummariesParams
@@ -106,7 +106,7 @@ namespace Discord.Rest
         }
         public static async Task<IReadOnlyCollection<RestGuild>> GetGuildsAsync(BaseDiscordClient client, RequestOptions options)
         {
-            var summaryModels = await GetGuildSummariesAsync(client, null, null, options).Flatten();
+            var summaryModels = await GetGuildSummariesAsync(client, null, null, options).FlattenAsync().ConfigureAwait(false);
             var guilds = ImmutableArray.CreateBuilder<RestGuild>();
             foreach (var summaryModel in summaryModels)
             {

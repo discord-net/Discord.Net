@@ -413,7 +413,7 @@ namespace Discord.Rest
         async Task<IReadOnlyCollection<IGuildUser>> IGuild.GetUsersAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
-                return (await GetUsersAsync(options).Flatten().ConfigureAwait(false)).ToImmutableArray();
+                return (await GetUsersAsync(options).FlattenAsync().ConfigureAwait(false)).ToImmutableArray();
             else
                 return ImmutableArray.Create<IGuildUser>();
         }
