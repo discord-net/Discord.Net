@@ -51,7 +51,8 @@ namespace Discord
                 ThumbnailUrl = embed.Thumbnail?.Url,
                 Timestamp = embed.Timestamp,
                 Title = embed.Title,
-                Url = embed.Url
+                Url = embed.Url,
+                VideoUrl = embed.Video?.Url
             };
 
             foreach (var field in embed.Fields)
