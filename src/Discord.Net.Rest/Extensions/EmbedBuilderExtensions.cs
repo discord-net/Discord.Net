@@ -43,6 +43,11 @@ namespace Discord
                     IconUrl = embed.Footer?.IconUrl
                 },
                 ImageUrl = embed.Image?.Url,
+                Provider = new EmbedProviderBuilder
+                {
+                    Name = embed.Provider?.Name,
+                    Url = embed.Provider?.Url
+                },
                 ThumbnailUrl = embed.Thumbnail?.Url,
                 Timestamp = embed.Timestamp,
                 Title = embed.Title,
