@@ -157,6 +157,15 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestVoiceChannel.Create(client, guild, model);
         }
+        public static async Task<RestCategoryChannel> CreateCategoryChannelAsync(IGuild guild, BaseDiscordClient client,
+            string name, RequestOptions options)
+        {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+
+            var args = new CreateGuildChannelParams(name, ChannelType.Category);
+            var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
+            return RestCategoryChannel.Create(client, guild, model);
+        }
 
         //Integrations
         public static async Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(IGuild guild, BaseDiscordClient client,
