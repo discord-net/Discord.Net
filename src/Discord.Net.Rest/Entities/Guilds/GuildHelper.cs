@@ -157,6 +157,15 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestVoiceChannel.Create(client, guild, model);
         }
+        public static async Task<RestCategoryChannel> CreateCategoryChannelAsync(IGuild guild, BaseDiscordClient client,
+            string name, RequestOptions options)
+        {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+
+            var args = new CreateGuildChannelParams(name, ChannelType.Category);
+            var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
+            return RestCategoryChannel.Create(client, guild, model);
+        }
 
         //Integrations
         public static async Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(IGuild guild, BaseDiscordClient client,
@@ -253,5 +262,60 @@ namespace Discord.Rest
                 model = await client.ApiClient.BeginGuildPruneAsync(guild.Id, args, options).ConfigureAwait(false);
             return model.Pruned;
         }
+
+        //Webhooks
+        public static async Task<RestWebhook> GetWebhookAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
+        {
+            var model = await client.ApiClient.GetWebhookAsync(id, options: options).ConfigureAwait(false);
+            if (model == null)
+                return null;
+            return RestWebhook.Create(client, guild, model);
+        }
+        public static async Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
+        {
+            var models = await client.ApiClient.GetGuildWebhooksAsync(guild.Id, options).ConfigureAwait(false);
+            return models.Select(x => RestWebhook.Create(client, guild, x)).ToImmutableArray();
+        }
+
+        //Emotes
+        public static async Task<GuildEmote> GetEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
+        {
+            var emote = await client.ApiClient.GetGuildEmoteAsync(guild.Id, id, options);
+            return emote.ToEntity();
+        }
+        public static async Task<GuildEmote> CreateEmoteAsync(IGuild guild, BaseDiscordClient client, string name, Image image, Optional<IEnumerable<IRole>> roles, 
+            RequestOptions options)
+        {
+            var apiargs = new CreateGuildEmoteParams
+            {
+                Name = name,
+                Image = image.ToModel()
+            };
+            if (roles.IsSpecified)
+                apiargs.RoleIds = roles.Value?.Select(xr => xr.Id)?.ToArray();
+
+            var emote = await client.ApiClient.CreateGuildEmoteAsync(guild.Id, apiargs, options);
+            return emote.ToEntity();
+        }
+        public static async Task<GuildEmote> ModifyEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, Action<EmoteProperties> func, 
+            RequestOptions options)
+        {
+            if (func == null) throw new ArgumentNullException(nameof(func));
+
+            var props = new EmoteProperties();
+            func(props);
+
+            var apiargs = new ModifyGuildEmoteParams
+            {
+                Name = props.Name
+            };
+            if (props.Roles.IsSpecified)
+                apiargs.RoleIds = props.Roles.Value?.Select(xr => xr.Id)?.ToArray();
+
+            var emote = await client.ApiClient.ModifyGuildEmoteAsync(guild.Id, id, apiargs, options);
+            return emote.ToEntity();
+        }
+        public static Task DeleteEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options) 
+            => client.ApiClient.DeleteGuildEmoteAsync(guild.Id, id, options);
     }
 }

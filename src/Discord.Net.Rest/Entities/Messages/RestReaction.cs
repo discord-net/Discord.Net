@@ -18,7 +18,7 @@ namespace Discord.Rest
         {
             IEmote emote;
             if (model.Emoji.Id.HasValue)
-                emote = new Emote(model.Emoji.Id.Value, model.Emoji.Name);
+                emote = new Emote(model.Emoji.Id.Value, model.Emoji.Name, model.Emoji.Animated.GetValueOrDefault());
             else
                 emote = new Emoji(model.Emoji.Name);
             return new RestReaction(emote, model.Count, model.Me);

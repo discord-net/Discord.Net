@@ -84,6 +84,7 @@ namespace Discord
         Task<IReadOnlyCollection<ITextChannel>> GetTextChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<ITextChannel> GetTextChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<IReadOnlyCollection<IVoiceChannel>> GetVoiceChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IReadOnlyCollection<ICategoryChannel>> GetCategoriesAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<IVoiceChannel> GetVoiceChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<IVoiceChannel> GetAFKChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<ITextChannel> GetSystemChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
@@ -93,6 +94,8 @@ namespace Discord
         Task<ITextChannel> CreateTextChannelAsync(string name, RequestOptions options = null);
         /// <summary> Creates a new voice channel. </summary>
         Task<IVoiceChannel> CreateVoiceChannelAsync(string name, RequestOptions options = null);
+        /// <summary> Creates a new channel category. </summary>
+        Task<ICategoryChannel> CreateCategoryAsync(string name, RequestOptions options = null);
 
         Task<IReadOnlyCollection<IGuildIntegration>> GetIntegrationsAsync(RequestOptions options = null);
         Task<IGuildIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null);
@@ -117,5 +120,19 @@ namespace Discord
         Task DownloadUsersAsync();
         /// <summary> Removes all users from this guild if they have not logged on in a provided number of days or, if simulate is true, returns the number of users that would be removed. </summary>
         Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null);
+
+        /// <summary> Gets the webhook in this guild with the provided id, or null if not found. </summary>
+        Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
+        /// <summary> Gets a collection of all webhooks for this guild. </summary>
+        Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions options = null);
+        
+        /// <summary> Gets a specific emote from this guild. </summary>
+        Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null);
+        /// <summary> Creates a new emote in this guild. </summary>
+        Task<GuildEmote> CreateEmoteAsync(string name, Image image, Optional<IEnumerable<IRole>> roles = default(Optional<IEnumerable<IRole>>), RequestOptions options = null);
+        /// <summary> Modifies an existing emote in this guild. </summary>
+        Task<GuildEmote> ModifyEmoteAsync(GuildEmote emote, Action<EmoteProperties> func, RequestOptions options = null);
+        /// <summary> Deletes an existing emote from this guild. </summary>
+        Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null);
     }
 }

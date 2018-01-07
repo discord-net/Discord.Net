@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord
@@ -27,7 +28,10 @@ namespace Discord
         /// <summary> If Allowed, a user may add reactions. </summary>
         public PermValue AddReactions => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.AddReactions);
         /// <summary> If Allowed, a user may join channels. </summary>
-        public PermValue ReadMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ReadMessages);
+        [Obsolete("Use ViewChannel instead.")]
+        public PermValue ReadMessages => ViewChannel;
+        /// <summary> If Allowed, a user may join channels. </summary>
+        public PermValue ViewChannel => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ViewChannel);
         /// <summary> If Allowed, a user may send messages. </summary>
         public PermValue SendMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SendMessages);
         /// <summary> If Allowed, a user may send text-to-speech messages. </summary>
@@ -72,7 +76,7 @@ namespace Discord
 
         private OverwritePermissions(ulong allowValue, ulong denyValue, PermValue? createInstantInvite = null, PermValue? manageChannel = null, 
             PermValue? addReactions = null,
-            PermValue? readMessages = null, PermValue? sendMessages = null, PermValue? sendTTSMessages = null, PermValue? manageMessages = null, 
+            PermValue? viewChannel = null, PermValue? sendMessages = null, PermValue? sendTTSMessages = null, PermValue? manageMessages = null, 
             PermValue? embedLinks = null, PermValue? attachFiles = null, PermValue? readMessageHistory = null, PermValue? mentionEveryone = null, 
             PermValue? useExternalEmojis = null, PermValue? connect = null, PermValue? speak = null, PermValue? muteMembers = null, 
             PermValue? deafenMembers = null, PermValue? moveMembers = null, PermValue? useVoiceActivation = null, PermValue? manageRoles = null, 
@@ -81,7 +85,7 @@ namespace Discord
             Permissions.SetValue(ref allowValue, ref denyValue, createInstantInvite, ChannelPermission.CreateInstantInvite);
             Permissions.SetValue(ref allowValue, ref denyValue, manageChannel, ChannelPermission.ManageChannels);
             Permissions.SetValue(ref allowValue, ref denyValue, addReactions, ChannelPermission.AddReactions);
-            Permissions.SetValue(ref allowValue, ref denyValue, readMessages, ChannelPermission.ReadMessages);
+            Permissions.SetValue(ref allowValue, ref denyValue, viewChannel, ChannelPermission.ViewChannel);
             Permissions.SetValue(ref allowValue, ref denyValue, sendMessages, ChannelPermission.SendMessages);
             Permissions.SetValue(ref allowValue, ref denyValue, sendTTSMessages, ChannelPermission.SendTTSMessages);
             Permissions.SetValue(ref allowValue, ref denyValue, manageMessages, ChannelPermission.ManageMessages);

@@ -10,6 +10,7 @@ namespace Discord.Rpc
     {
         public ulong GuildId { get; }
         public int Position { get; private set; }
+        public ulong? CategoryId { get; private set; }
 
         internal RpcGuildChannel(DiscordRpcClient discord, ulong id, ulong guildId)
             : base(discord, id)
@@ -51,12 +52,18 @@ namespace Discord.Rpc
 
         public async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
             => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
-        public async Task<RestInviteMetadata> CreateInviteAsync(int? maxAge = 3600, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+        public async Task<RestInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
             => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
 
         public override string ToString() => Name;
 
         //IGuildChannel
+        public Task<ICategoryChannel> GetCategoryAsync()
+        {
+            //Always fails
+            throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
+        }
+
         IGuild IGuildChannel.Guild
         {
             get

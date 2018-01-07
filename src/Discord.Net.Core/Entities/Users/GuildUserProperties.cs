@@ -34,7 +34,7 @@ namespace Discord
         /// Should the user have a nickname set? 
         /// </summary>
         /// <remarks>
-        /// To clear the user's nickname, this value can be set to null.
+        /// To clear the user's nickname, this value can be set to <see langword="null" /> or <see cref="string.Empty" />.
         /// </remarks>
         public Optional<string> Nickname { get; set; }
         /// <summary>

@@ -16,7 +16,7 @@ namespace Discord.Rest
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public string Discriminator => DiscriminatorValue.ToString("D4");
         public string Mention => MentionUtils.MentionUser(Id);
-        public virtual Game? Game => null;
+        public virtual IActivity Activity => null;
         public virtual UserStatus Status => UserStatus.Offline;
         public virtual bool IsWebhook => false;
 

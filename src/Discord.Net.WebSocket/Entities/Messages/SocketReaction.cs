@@ -24,7 +24,7 @@ namespace Discord.WebSocket
         {
             IEmote emote;
             if (model.Emoji.Id.HasValue)
-                emote = new Emote(model.Emoji.Id.Value, model.Emoji.Name);
+                emote = new Emote(model.Emoji.Id.Value, model.Emoji.Name, model.Emoji.Animated.GetValueOrDefault());
             else
                 emote = new Emoji(model.Emoji.Name);
             return new SocketReaction(channel, model.MessageId, message, model.UserId, user, emote);
