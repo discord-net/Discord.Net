@@ -6,8 +6,8 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct EmbedProvider
     {
-        public string Name { get; }
-        public string Url { get; }
+        public string Name { get; internal set; }
+        public string Url { get; internal set; }
 
         internal EmbedProvider(string name, string url)
         {

@@ -57,7 +57,7 @@ namespace Discord
             Fields = fields;
         }
 
-        public int Length => Title?.Length + Author?.Name?.Length + Description?.Length + Footer?.Text?.Length + Fields.Sum(f => f.Name.Length + f.Value.ToString().Length) ?? 0;
+        public int Length => Title?.Length + Author?.Name?.Length + Description?.Length + Footer?.Text?.Length + Provider?.Name?.Length + Fields.Sum(f => f.Name.Length + f.Value.ToString().Length) ?? 0;
 
         public override string ToString() => Title;
         private string DebuggerDisplay => $"{Title} ({Type})";

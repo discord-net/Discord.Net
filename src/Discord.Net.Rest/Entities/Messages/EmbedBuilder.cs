@@ -66,11 +66,21 @@ namespace Discord
                 _embed.Image = new EmbedImage(value, null, null, null);
             }
         }
+        public string VideoUrl
+        {
+            get => _embed.Video?.Url;
+            set
+            {
+                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(VideoUrl));
+                _embed.Video = new EmbedVideo(value, null, null);
+            }
+        }
         public DateTimeOffset? Timestamp { get => _embed.Timestamp; set { _embed.Timestamp = value; } }
         public Color? Color { get => _embed.Color; set { _embed.Color = value; } }
 
         public EmbedAuthorBuilder Author { get; set; }
         public EmbedFooterBuilder Footer { get; set; }
+        public EmbedProviderBuilder Provider { get; set; }
         private List<EmbedFieldBuilder> _fields;
         public List<EmbedFieldBuilder> Fields
         {
@@ -107,6 +117,11 @@ namespace Discord
         public EmbedBuilder WithImageUrl(string imageUrl)
         {
             ImageUrl = imageUrl;
+            return this;
+        }
+        public EmbedBuilder WithVideoUrl(string videoUrl)
+        {
+            VideoUrl = videoUrl;
             return this;
         }
         public EmbedBuilder WithCurrentTimestamp()
@@ -171,6 +186,31 @@ namespace Discord
             return this;
         }
 
+        public EmbedBuilder WithProvider(EmbedProviderBuilder provider)
+        {
+            Provider = provider;
+            return this;
+        }
+
+        public EmbedBuilder WithProvider(Action<EmbedProviderBuilder> action)
+        {
+            var provider = new EmbedProviderBuilder();
+            action(provider);
+            Provider = provider;
+            return this;
+        }
+
+        public EmbedBuilder WithProvider(string name, string url = null)
+        {
+            var provider = new EmbedProviderBuilder
+            {
+                Name = name,
+                Url = url
+            };
+            Provider = provider;
+            return this;
+        }
+
         public EmbedBuilder AddField(string name, object value, bool inline = false)
         {
             var field = new EmbedFieldBuilder()
@@ -203,6 +243,7 @@ namespace Discord
         {
             _embed.Footer = Footer?.Build();
             _embed.Author = Author?.Build();
+            _embed.Provider = Provider?.Build();
             var fields = ImmutableArray.CreateBuilder<EmbedField>(Fields.Count);
             for (int i = 0; i < Fields.Count; i++)
                 fields.Add(Fields[i].Build());
@@ -375,5 +416,40 @@ namespace Discord
 
         public EmbedFooter Build()
             => _footer;
+    }
+
+    public class EmbedProviderBuilder
+    {
+        private EmbedProvider _provider;
+
+        public string Name
+        {
+            get => _provider.Name;
+            set => _provider.Name = value;
+        }
+
+        public string Url
+        {
+            get => _provider.Url;
+            set
+            {
+                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(Url));
+            }
+        }
+
+        public EmbedProviderBuilder WithName(string name)
+        {
+            Name = name;
+            return this;
+        }
+
+        public EmbedProviderBuilder WithUrl(string url)
+        {
+            Url = url;
+            return this;
+        }
+
+        public EmbedProvider Build()
+            => _provider;
     }
 }
