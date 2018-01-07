@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS0618
+#pragma warning disable CS0618
 using Discord.API;
 using Discord.API.Gateway;
 using Discord.Logging;
@@ -328,9 +328,9 @@ namespace Discord.WebSocket
         }
         public override async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
         {
-            if (streamUrl != null)
+            if (!string.IsNullOrEmpty(streamUrl))
                 Activity = new StreamingGame(name, streamUrl, streamType);
-            else if (name != null)
+            else if (!string.IsNullOrEmpty(name))
                 Activity = new Game(name);
             else
                 Activity = null;
@@ -346,21 +346,24 @@ namespace Discord.WebSocket
         {
             if (CurrentUser == null)
                 return;
-            var activity = Activity;
             var status = Status;
             var statusSince = _statusSince;
-            CurrentUser.Presence = new SocketPresence(status, activity);
+            CurrentUser.Presence = new SocketPresence(status, Activity);
 
             var gameModel = new GameModel();
             // Discord only accepts rich presence over RPC, don't even bother building a payload
-            if (activity is RichGame game) throw new NotSupportedException("Outgoing Rich Presences are not supported");
-            if (activity is StreamingGame stream)
+            if (Activity is RichGame game)
+                throw new NotSupportedException("Outgoing Rich Presences are not supported");
+            else if (Activity is StreamingGame stream)
             {
                 gameModel.StreamUrl = stream.Url;
                 gameModel.StreamType = stream.StreamType;
             }
-            else if (activity != null)
-                gameModel.Name = activity.Name;
+            else if (Activity != null)
+            {
+                gameModel.Name = Activity.Name;
+                gameModel.StreamType = StreamType.NotStreaming;
+            }
 
             await ApiClient.SendStatusUpdateAsync(
                 status,
