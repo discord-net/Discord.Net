@@ -1,4 +1,4 @@
-﻿using Discord.API;
+using Discord.API;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
@@ -133,7 +133,7 @@ namespace Discord.WebSocket
         private DiscordSocketClient GetShardFor(ulong guildId)
             => GetShard(GetShardIdFor(guildId));
         public DiscordSocketClient GetShardFor(IGuild guild)
-            => GetShardFor(guild.Id);
+            => GetShardFor(guild?.Id ?? 0);
 
         /// <inheritdoc />
         public override async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
