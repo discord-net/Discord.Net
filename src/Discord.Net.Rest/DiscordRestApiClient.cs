@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 #pragma warning disable CS0618
 using Discord.API.Rest;
 using Discord.Net;
@@ -52,7 +52,7 @@ namespace Discord.API
             _restClientProvider = restClientProvider;
             UserAgent = userAgent;
             DefaultRetryMode = defaultRetryMode;
-            _serializer = serializer ?? new JsonSerializer { DateFormatString = "yyyy-MM-ddTHH:mm:ssZ", ContractResolver = new DiscordContractResolver() };
+            _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
 
             RequestQueue = new RequestQueue();
             _stateLock = new SemaphoreSlim(1, 1);
