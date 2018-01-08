@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Discord.Addons.Core
+namespace Discord
 {
     public static class DiscordComparers
     {
