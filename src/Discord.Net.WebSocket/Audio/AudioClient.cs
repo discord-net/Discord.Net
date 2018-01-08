@@ -1,4 +1,4 @@
-﻿using Discord.API.Voice;
+using Discord.API.Voice;
 using Discord.Audio.Streams;
 using Discord.Logging;
 using Discord.Net.Converters;
@@ -71,7 +71,7 @@ namespace Discord.Audio
             ApiClient.ReceivedPacket += ProcessPacketAsync;
 
             _stateLock = new SemaphoreSlim(1, 1);
-            _connection = new ConnectionManager(_stateLock, _audioLogger, 30000, 
+            _connection = new ConnectionManager(_stateLock, _audioLogger, 30000, false,
                 OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
             _connection.Connected += () => _connectedEvent.InvokeAsync();
             _connection.Disconnected += (ex, recon) => _disconnectedEvent.InvokeAsync(ex);

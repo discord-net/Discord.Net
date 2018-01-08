@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+
 namespace Discord.Net
 {
     public class WebSocketClosedException : Exception
@@ -6,7 +7,7 @@ namespace Discord.Net
         public int CloseCode { get; }
         public string Reason { get; }
 
-        public WebSocketClosedException(int closeCode, string reason = null)
+        public WebSocketClosedException(int closeCode, string reason = null, bool fatal = false)
             : base($"The server sent close {closeCode}{(reason != null ? $": \"{reason}\"" : "")}")
         {
             CloseCode = closeCode;

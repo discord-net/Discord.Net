@@ -90,7 +90,7 @@ namespace Discord.WebSocket
 
             _stateLock = new SemaphoreSlim(1, 1);
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : $"Shard #{ShardId}");
-            _connection = new ConnectionManager(_stateLock, _gatewayLogger, config.ConnectionTimeout, 
+            _connection = new ConnectionManager(_stateLock, _gatewayLogger, config.ConnectionTimeout, config.InvalidStateFatal,
                 OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
             _connection.Connected += () => TimedInvokeAsync(_connectedEvent, nameof(Connected));
             _connection.Disconnected += (ex, recon) => TimedInvokeAsync(_disconnectedEvent, nameof(Disconnected), ex);
@@ -466,7 +466,7 @@ namespace Discord.WebSocket
                                     }
                                     catch (Exception ex)
                                     {
-                                        _connection.CriticalError(new Exception("Processing READY failed", ex));
+                                        _connection.FatalError(new Exception("Processing READY failed", ex));
                                         return;
                                     }
 
