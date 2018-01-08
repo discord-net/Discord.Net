@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 
 namespace Discord.Commands
 {
     // Extension of the Cosmetic Summary, for Groups, Commands, and Parameters
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class RemarksAttribute : Attribute
     {
         public string Text { get; }

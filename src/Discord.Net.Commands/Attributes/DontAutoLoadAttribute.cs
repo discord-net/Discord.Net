@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 namespace Discord.Commands
 {
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class DontAutoLoadAttribute : Attribute
     {
     }

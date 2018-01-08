@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 namespace Discord.Commands
 {
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class CommandAttribute : Attribute
     {
         public string Text { get; }
