@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+
 namespace Discord.Net
 {
     public class WebSocketClosedException : Exception

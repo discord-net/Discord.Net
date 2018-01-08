@@ -1,4 +1,4 @@
-﻿using Discord.Net.Udp;
+using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
 
@@ -25,6 +25,10 @@ namespace Discord.WebSocket
         /// Gets or sets the max number of users a guild may have for offline users to be included in the READY packet. Max is 250.
         /// </summary>
         public int LargeThreshold { get; set; } = 250;
+        /// <summary>
+        /// Gets or sets whether a State Invalidation from Discord should be fatal. Setting this to false could lead to unexpected behavior when Discord is unstable.
+        /// </summary>
+        public bool InvalidStateFatal { get; set; } = true;
 
         /// <summary> Gets or sets the provider used to generate new websocket connections. </summary>
         public WebSocketProvider WebSocketProvider { get; set; }

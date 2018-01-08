@@ -1,13 +1,17 @@
 using Discord.Logging;
+using Discord.Net;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Discord.Net;
+using System.Linq;
 
 namespace Discord
 {
     internal class ConnectionManager
     {
+        // close codes that cannot be recovered from
+        private static readonly int[] _fatalErrorCodes = { 4004, 4010, 4011 };
+
         public event Func<Task> Connected { add { _connectedEvent.Add(value); } remove { _connectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Task>> _connectedEvent = new AsyncEvent<Func<Task>>();
         public event Func<Exception, bool, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
@@ -26,7 +30,7 @@ namespace Discord
         public ConnectionState State { get; private set; }
         public CancellationToken CancelToken { get; private set; }
 
-        internal ConnectionManager(SemaphoreSlim stateLock, Logger logger, int connectionTimeout, 
+        internal ConnectionManager(SemaphoreSlim stateLock, Logger logger, int connectionTimeout, bool invalidStateFatal,
             Func<Task> onConnecting, Func<Exception, Task> onDisconnecting, Action<Func<Exception, Task>> clientDisconnectHandler)
         {
             _stateLock = stateLock;
@@ -40,8 +44,8 @@ namespace Discord
                 if (ex != null)
                 {
                     var ex2 = ex as WebSocketClosedException;
-                    if (ex2?.CloseCode == 4006)
-                        CriticalError(new Exception("WebSocket session expired", ex));
+                    if ((invalidStateFatal && ex2?.CloseCode == 4006) || _fatalErrorCodes.Contains(ex2?.CloseCode ?? 0))
+                        FatalError(new FatalException("WebSocket connection was closed with an unrecoverable error", ex));
                     else
                         Error(new Exception("WebSocket connection was closed", ex));
                 }
@@ -186,7 +190,7 @@ namespace Discord
             _connectionPromise.TrySetException(ex);
             _connectionCancelToken?.Cancel();
         }
-        public void CriticalError(Exception ex)
+        public void FatalError(Exception ex)
         {
             _reconnectCancelToken?.Cancel();
             Error(ex);
