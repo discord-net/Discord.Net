@@ -42,6 +42,8 @@ namespace Discord
             }
         }
 
+        // Message IDs are allegedly not guaranteed to be globally unique forever,
+        // so they require a specialized implementation.
         private sealed class MessageEqualityComparer : EqualityComparer<IMessage>
         {
             public override bool Equals(IMessage x, IMessage y)
