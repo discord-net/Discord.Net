@@ -10,7 +10,7 @@ namespace Discord
         public static IEqualityComparer<IGuild> GuildComparer => _guildComparer ?? (_guildComparer = new EntityEqualityComparer<IGuild, ulong>());
         public static IEqualityComparer<IChannel> ChannelComparer => _channelComparer ?? (_channelComparer = new EntityEqualityComparer<IChannel, ulong>());
         public static IEqualityComparer<IRole> RoleComparer => _roleComparer ?? (_roleComparer = new EntityEqualityComparer<IRole, ulong>());
-        public static IEqualityComparer<IMessage> MessageComparer => _messageComparer ?? (_messageComparer = new MessageEqualityComparer());
+        public static IEqualityComparer<IMessage> MessageComparer => _messageComparer ?? (_messageComparer = new EntityEqualityComparer<IMessage, ulong>());
 
         private static IEqualityComparer<IUser> _userComparer;
         private static IEqualityComparer<IGuild> _guildComparer;
@@ -37,30 +37,6 @@ namespace Discord
             }
 
             public override int GetHashCode(TEntity obj)
-            {
-                return obj?.Id.GetHashCode() ?? 0;
-            }
-        }
-
-        // Message IDs are allegedly not guaranteed to be globally unique forever,
-        // so they require a specialized implementation.
-        private sealed class MessageEqualityComparer : EqualityComparer<IMessage>
-        {
-            public override bool Equals(IMessage x, IMessage y)
-            {
-                bool xNull = x == null;
-                bool yNull = y == null;
-
-                if (xNull && yNull)
-                    return true;
-
-                if (xNull ^ yNull)
-                    return false;
-
-                return x.Channel.Id.Equals(y.Channel.Id) && x.Id.Equals(y.Id);
-            }
-
-            public override int GetHashCode(IMessage obj)
             {
                 return obj?.Id.GetHashCode() ?? 0;
             }
