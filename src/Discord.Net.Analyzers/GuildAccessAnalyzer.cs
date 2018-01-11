@@ -16,7 +16,7 @@ namespace Discord.Analyzers
         private const string Title = "Limit command to Guild contexts.";
         private const string MessageFormat = "Command method '{0}' is accessing 'Context.Guild' but is not restricted to Guild contexts.";
         private const string Description = "Accessing 'Context.Guild' in a command without limiting the command to run only in guilds.";
-        private const string Category = "Design";
+        private const string Category = "API Usage";
 
         private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
