@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -20,45 +19,7 @@ namespace Discord
 
         public static IAsyncEnumerable<T> Flatten<T>(this IAsyncEnumerable<IEnumerable<T>> source)
         {
-            return new PagedCollectionEnumerator<T>(source);
-        }
-        
-        internal class PagedCollectionEnumerator<T> : IAsyncEnumerator<T>, IAsyncEnumerable<T>
-        {
-            readonly IAsyncEnumerator<IEnumerable<T>> _source;
-            IEnumerator<T> _enumerator;
-
-            public IAsyncEnumerator<T> GetEnumerator() => this;
-
-            internal PagedCollectionEnumerator(IAsyncEnumerable<IEnumerable<T>> source)
-            {
-                _source = source.GetEnumerator();
-            }
-
-            public T Current => _enumerator.Current;
-
-            public void Dispose()
-            {
-                _enumerator?.Dispose();
-                _source.Dispose();
-            }
-
-            public async Task<bool> MoveNext(CancellationToken cancellationToken)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                if(!_enumerator?.MoveNext() ?? true)
-                {
-                    if (!await _source.MoveNext(cancellationToken).ConfigureAwait(false))
-                        return false;
-
-                    _enumerator?.Dispose();
-                    _enumerator = _source.Current.GetEnumerator();
-                    return _enumerator.MoveNext();
-                }
-
-                return true;
-            }
+            return source.SelectMany(enumerable => enumerable.ToAsyncEnumerable());
         }
     }
 }
