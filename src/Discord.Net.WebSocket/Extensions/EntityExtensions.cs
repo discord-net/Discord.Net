@@ -27,11 +27,10 @@
             {
                 return new StreamingGame(
                     model.Name, 
-                    model.StreamUrl.Value, 
-                    model.StreamType.Value.GetValueOrDefault());
+                    model.StreamUrl.Value);
             }
             // Normal Game
-            return new Game(model.Name);
+            return new Game(model.Name, model.Type.GetValueOrDefault() ?? ActivityType.Playing);
         }
 
         // (Small, Large)

@@ -12,7 +12,7 @@ namespace Discord.API
         [JsonProperty("url")]
         public Optional<string> StreamUrl { get; set; }
         [JsonProperty("type")]
-        public Optional<StreamType?> StreamType { get; set; }
+        public Optional<ActivityType?> Type { get; set; }
         [JsonProperty("details")]
         public Optional<string> Details { get; set; }
         [JsonProperty("state")]

@@ -1,4 +1,4 @@
-using Discord.API;
+﻿using Discord.API;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
@@ -238,13 +238,13 @@ namespace Discord.WebSocket
             for (int i = 0; i < _shards.Length; i++)
                 await _shards[i].SetStatusAsync(status).ConfigureAwait(false);
         }
-        public override async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
+        public override async Task SetGameAsync(string name, string streamUrl = null, ActivityType type = ActivityType.Playing)
         {
             IActivity activity = null;
-            if (streamUrl != null)
-                activity = new StreamingGame(name, streamUrl, streamType);
-            else if (name != null)
-                activity = new Game(name);
+            if (!string.IsNullOrEmpty(streamUrl))
+                activity = new StreamingGame(name, streamUrl);
+            else if (!string.IsNullOrEmpty(name))
+                activity = new Game(name, type);
             await SetActivityAsync(activity).ConfigureAwait(false);
         }
         public override async Task SetActivityAsync(IActivity activity)
