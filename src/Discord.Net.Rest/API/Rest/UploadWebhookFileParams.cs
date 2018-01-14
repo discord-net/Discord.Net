@@ -1,7 +1,7 @@
 ﻿#pragma warning disable CS1591
-using Discord.Net.Rest;
 using System.Collections.Generic;
 using System.IO;
+using Discord.Net.Rest;
 
 namespace Discord.API.Rest
 {
@@ -15,6 +15,7 @@ namespace Discord.API.Rest
         public Optional<bool> IsTTS { get; set; }
         public Optional<string> Username { get; set; }
         public Optional<string> AvatarUrl { get; set; }
+        public Optional<Embed[]> Embeds { get; set; }
 
         public UploadWebhookFileParams(Stream file)
         {
@@ -25,6 +26,7 @@ namespace Discord.API.Rest
         {
             var d = new Dictionary<string, object>();
             d["file"] = new MultipartFile(File, Filename.GetValueOrDefault("unknown.dat"));
+
             if (Content.IsSpecified)
                 d["content"] = Content.Value;
             if (IsTTS.IsSpecified)
@@ -35,6 +37,8 @@ namespace Discord.API.Rest
                 d["username"] = Username.Value;
             if (AvatarUrl.IsSpecified)
                 d["avatar_url"] = AvatarUrl.Value;
+            if (Embeds.IsSpecified)
+                d["embeds"] = Embeds.Value;
             return d;
         }
     }

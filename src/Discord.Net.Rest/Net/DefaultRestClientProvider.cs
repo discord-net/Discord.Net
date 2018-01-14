@@ -4,16 +4,21 @@ namespace Discord.Net.Rest
 {
     public static class DefaultRestClientProvider
     {
-        public static readonly RestClientProvider Instance = url => 
+        public static readonly RestClientProvider Instance = Create();
+
+        public static RestClientProvider Create(bool useProxy = false)
         {
-            try
+            return url =>
             {
-                return new DefaultRestClient(url);                    
-            }
-            catch (PlatformNotSupportedException ex)
-            {
-                throw new PlatformNotSupportedException("The default RestClientProvider is not supported on this platform.", ex);
-            }
-        };
+                try
+                {
+                    return new DefaultRestClient(url, useProxy);
+                }
+                catch (PlatformNotSupportedException ex)
+                {
+                    throw new PlatformNotSupportedException("The default RestClientProvider is not supported on this platform.", ex);
+                }
+            };
+        }
     }
 }

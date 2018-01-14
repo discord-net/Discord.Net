@@ -19,8 +19,14 @@ namespace Discord
             => splashId != null ? $"{DiscordConfig.CDNUrl}splashes/{guildId}/{splashId}.jpg" : null;
         public static string GetChannelIconUrl(ulong channelId, string iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}channel-icons/{channelId}/{iconId}.jpg" : null;
-        public static string GetEmojiUrl(ulong emojiId)
-            => $"{DiscordConfig.CDNUrl}emojis/{emojiId}.png";
+        public static string GetEmojiUrl(ulong emojiId, bool animated)
+            => $"{DiscordConfig.CDNUrl}emojis/{emojiId}.{(animated ? "gif" : "png")}";
+
+        public static string GetRichAssetUrl(ulong appId, string assetId, ushort size, ImageFormat format)
+        {
+            string extension = FormatToExtension(format, "");
+            return $"{DiscordConfig.CDNUrl}app-assets/{appId}/{assetId}.{extension}?size={size}";
+        }
 
         private static string FormatToExtension(ImageFormat format, string imageId)
         {

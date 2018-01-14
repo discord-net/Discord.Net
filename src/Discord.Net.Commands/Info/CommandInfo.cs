@@ -18,6 +18,7 @@ namespace Discord.Commands
         private static readonly System.Reflection.MethodInfo _convertParamsMethod = typeof(CommandInfo).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<object>, object>> _arrayConverters = new ConcurrentDictionary<Type, Func<IEnumerable<object>, object>>();
 
+        private readonly CommandService _commandService;
         private readonly Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> _action;
 
         public ModuleInfo Module { get; }
@@ -64,6 +65,7 @@ namespace Discord.Commands
             HasVarArgs = builder.Parameters.Count > 0 ? builder.Parameters[builder.Parameters.Count - 1].IsMultiple : false;
 
             _action = builder.Callback;
+            _commandService = service;
         }
 
         public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, IServiceProvider services = null)
@@ -117,7 +119,7 @@ namespace Discord.Commands
                 return ParseResult.FromError(preconditionResult);
 
             string input = searchResult.Text.Substring(startIndex);
-            return await CommandParser.ParseArgsAsync(this, context, services, input, 0).ConfigureAwait(false);
+            return await CommandParser.ParseArgsAsync(this, context, _commandService._ignoreExtraArgs, services, input, 0).ConfigureAwait(false);
         }
 
         public Task<IResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)
