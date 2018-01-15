@@ -150,7 +150,7 @@ namespace Discord.Commands
                 try
                 {
                     var moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(module.TypeInfo.Value, this, services);
-                    moduleInstance.OnModuleAdded(this);
+                    moduleInstance.OnModuleBuilding(this);
                 }
                 catch(Exception)
                 {
