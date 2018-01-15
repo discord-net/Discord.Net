@@ -19,10 +19,10 @@ class Program
 
     private readonly DiscordSocketClient _client;
     
-    // Keep the CommandService and IServiceCollection around for use with commands.
+    // Keep the CommandService and IServiceProvider around for use with commands.
     // These two types require you install the Discord.Net.Commands package.
-    private readonly IServiceCollection _map = new ServiceCollection();
-    private readonly CommandService _commands = new CommandService();
+    private readonly IServiceProvider _services;
+    private readonly CommandService _commands;
 
     private Program()
     {
@@ -41,9 +41,39 @@ class Program
             // add the `using` at the top, and uncomment this line:
             //WebSocketProvider = WS4NetProvider.Instance
         });
+        
+        _commands = new CommandService(new CommandServiceConfig
+        {
+            // Again, log level:
+            LogLevel = LogSeverity.Info,
+            
+            // There's a few more properties you can set,
+            // for example, case-insensitive commands.
+            CaseSensitiveCommands = false,
+        });
+        
         // Subscribe the logging handler to both the client and the CommandService.
         _client.Log += Logger;
         _commands.Log += Logger;
+        
+        // Setup your DI container.
+        _services = ConfigureServices();
+    }
+    
+    // If any services require the client, or the CommandService, or something else you keep on hand,
+    // pass them as parameters into this method as needed.
+    // If this method is getting pretty long, you can seperate it out into another file using partials.
+    private static IServiceProvider ConfigureServices()
+    {
+        map = new ServiceCollection()        
+            // Repeat this for all the service classes
+            // and other dependencies that your commands might need.
+            .AddSingleton(new SomeServiceClass());
+            
+        // When all your required services are in the collection, build the container.
+        // Tip: There's an overload taking in a 'validateScopes' bool to make sure
+        // you haven't made any mistakes in your dependency graph.
+        return map.BuildServiceProvider();
     }
 
     // Example of a logging handler. This can be re-used by addons
@@ -92,24 +122,15 @@ class Program
         await Task.Delay(Timeout.Infinite);
     }
 
-    private IServiceProvider _services;
-    
     private async Task InitCommands()
     {
-        // Repeat this for all the service classes
-        // and other dependencies that your commands might need.
-        _map.AddSingleton(new SomeServiceClass());
-
-        // When all your required services are in the collection, build the container.
-        // Tip: There's an overload taking in a 'validateScopes' bool to make sure
-        // you haven't made any mistakes in your dependency graph.
-        _services = _map.BuildServiceProvider();
-
         // Either search the program and add all Module classes that can be found.
         // Module classes MUST be marked 'public' or they will be ignored.
-        await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
+        // You also need to pass your 'IServiceProvider' instance now,
+        // so make sure that's done before you get here.
+        await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         // Or add Modules manually if you prefer to be a little more explicit:
-        await _commands.AddModuleAsync<SomeModule>();
+        await _commands.AddModuleAsync<SomeModule>(_services);
         // Note that the first one is 'Modules' (plural) and the second is 'Module' (singular).
 
         // Subscribe a handler to see if a message invokes a command.

@@ -87,15 +87,17 @@ namespace Discord.Commands
                 buildFunc(builder);
 
                 var module = builder.Build(this);
-                return LoadModuleInternal(module);
+
+                //should be fine to pass null here since it'll never get checked from this path anyway
+                return LoadModuleInternal(module, null);
             }
             finally
             {
                 _moduleLock.Release();
             }
         }
-        public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services = null) => AddModuleAsync(typeof(T), services);
-        public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services = null)
+        public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services) => AddModuleAsync(typeof(T), services);
+        public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -119,7 +121,7 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly, IServiceProvider services = null)
+        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly, IServiceProvider services)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -140,12 +142,13 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        private ModuleInfo LoadModuleInternal(ModuleInfo module, IServiceProvider services = null)
+        private ModuleInfo LoadModuleInternal(ModuleInfo module, IServiceProvider services)
         {
             _moduleDefs.Add(module);
 
             if (module.TypeInfo.IsSpecified)
             {
+                //keep this for safety?
                 services = services ?? EmptyServiceProvider.Instance;
                 try
                 {
@@ -163,7 +166,7 @@ namespace Discord.Commands
                 _map.AddCommand(command);
 
             foreach (var submodule in module.Submodules)
-                LoadModuleInternal(submodule);
+                LoadModuleInternal(submodule, services);
 
             return module;
         }
