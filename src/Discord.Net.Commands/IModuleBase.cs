@@ -8,6 +8,6 @@ namespace Discord.Commands
         
         void AfterExecute(CommandInfo command);
 
-        void OnModuleAdded(CommandService commandService);
+        void OnModuleBuilding(CommandService commandService);
     }
 }

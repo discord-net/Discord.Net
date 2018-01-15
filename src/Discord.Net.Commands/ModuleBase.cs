@@ -23,7 +23,7 @@ namespace Discord.Commands
         {
         }
 
-        protected virtual void OnModuleAdded(CommandService commandService)
+        protected virtual void OnModuleBuilding(CommandService commandService)
         {
         }
 
@@ -38,6 +38,6 @@ namespace Discord.Commands
 
         void IModuleBase.AfterExecute(CommandInfo command) => AfterExecute(command);
 
-        void IModuleBase.OnModuleAdded(CommandService commandService) => OnModuleAdded(commandService);
+        void IModuleBase.OnModuleBuilding(CommandService commandService) => OnModuleBuilding(commandService);
     }
 }
