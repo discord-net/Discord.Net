@@ -98,6 +98,7 @@ namespace Discord.Commands
         private static void BuildModule(ModuleBuilder builder, TypeInfo typeInfo, CommandService service)
         {
             var attributes = typeInfo.GetCustomAttributes();
+            builder.TypeInfo = typeInfo;
 
             foreach (var attribute in attributes)
             {

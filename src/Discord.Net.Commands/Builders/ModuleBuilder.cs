@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,6 +25,8 @@ namespace Discord.Commands.Builders
         public IReadOnlyList<PreconditionAttribute> Preconditions => _preconditions;
         public IReadOnlyList<Attribute> Attributes => _attributes;
         public IReadOnlyList<string> Aliases => _aliases;
+
+        internal Optional<TypeInfo> TypeInfo { get; set; }
 
         //Automatic
         internal ModuleBuilder(CommandService service, ModuleBuilder parent)

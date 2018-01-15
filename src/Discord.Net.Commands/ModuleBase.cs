@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord.Commands
@@ -23,6 +23,10 @@ namespace Discord.Commands
         {
         }
 
+        protected virtual void OnModuleAdded(CommandService commandService)
+        {
+        }
+
         //IModuleBase
         void IModuleBase.SetContext(ICommandContext context)
         {
@@ -33,5 +37,7 @@ namespace Discord.Commands
         void IModuleBase.BeforeExecute(CommandInfo command) => BeforeExecute(command);
 
         void IModuleBase.AfterExecute(CommandInfo command) => AfterExecute(command);
+
+        void IModuleBase.OnModuleAdded(CommandService commandService) => OnModuleAdded(commandService);
     }
 }

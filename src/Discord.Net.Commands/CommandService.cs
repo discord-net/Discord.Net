@@ -1,5 +1,3 @@
-﻿using Discord.Commands.Builders;
-using Discord.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,6 +6,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Discord.Commands.Builders;
+using Discord.Logging;
 
 namespace Discord.Commands
 {
@@ -93,8 +94,8 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public Task<ModuleInfo> AddModuleAsync<T>() => AddModuleAsync(typeof(T));
-        public async Task<ModuleInfo> AddModuleAsync(Type type)
+        public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services = null) => AddModuleAsync(typeof(T), services);
+        public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services = null)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -111,14 +112,14 @@ namespace Discord.Commands
 
                 _typedModuleDefs[module.Key] = module.Value;
 
-                return LoadModuleInternal(module.Value);
+                return LoadModuleInternal(module.Value, services);
             }
             finally
             {
                 _moduleLock.Release();
             }
         }
-        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly)
+        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly, IServiceProvider services = null)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -129,7 +130,7 @@ namespace Discord.Commands
                 foreach (var info in moduleDefs)
                 {
                     _typedModuleDefs[info.Key] = info.Value;
-                    LoadModuleInternal(info.Value);
+                    LoadModuleInternal(info.Value, services);
                 }
 
                 return moduleDefs.Select(x => x.Value).ToImmutableArray();
@@ -139,9 +140,24 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        private ModuleInfo LoadModuleInternal(ModuleInfo module)
+        private ModuleInfo LoadModuleInternal(ModuleInfo module, IServiceProvider services = null)
         {
             _moduleDefs.Add(module);
+
+            if (module.TypeInfo.IsSpecified)
+            {
+                services = services ?? EmptyServiceProvider.Instance;
+                try
+                {
+                    var moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(module.TypeInfo.Value, this, services);
+                    moduleInstance.OnModuleAdded(this);
+                }
+                catch(Exception)
+                {
+                    //unsure of what to do here
+                    throw;
+                }
+            }
 
             foreach (var command in module.Commands)
                 _map.AddCommand(command);
