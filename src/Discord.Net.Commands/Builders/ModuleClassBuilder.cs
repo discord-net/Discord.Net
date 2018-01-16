@@ -274,7 +274,7 @@ namespace Discord.Commands
 
             if (builder.TypeReaders == null || builder.TypeReaders.Count == 0)
             {
-                builder.TypeReaders = service.GetTypeReaders(paramType).Values.ToImmutableList();
+                builder.TypeReaders = service.GetTypeReaders(paramType).Values.ToImmutableArray();
             }
         }
 
