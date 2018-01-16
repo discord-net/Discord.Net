@@ -1,15 +1,15 @@
-using Discord.Commands.Builders;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Discord.Commands.Builders;
 
 namespace Discord.Commands
 {
     public class ParameterInfo
     {
-        private readonly TypeReader _reader;
+        private readonly IReadOnlyCollection<TypeReader> _readers;
 
         public CommandInfo Command { get; }
         public string Name { get; }
@@ -39,7 +39,7 @@ namespace Discord.Commands
             Preconditions = builder.Preconditions.ToImmutableArray();
             Attributes = builder.Attributes.ToImmutableArray();
 
-            _reader = builder.TypeReader;
+            _readers = builder.TypeReaders;
         }
 
         public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, object arg, IServiceProvider services = null)
@@ -59,7 +59,20 @@ namespace Discord.Commands
         public async Task<TypeReaderResult> ParseAsync(ICommandContext context, string input, IServiceProvider services = null)
         {
             services = services ?? EmptyServiceProvider.Instance;
-            return await _reader.ReadAsync(context, input, services).ConfigureAwait(false);
+            var failedResults = new List<TypeReaderResult>();
+            foreach (var reader in _readers)
+            {
+                var result = await reader.ReadAsync(context, input, services).ConfigureAwait(false);
+                if (result.IsSuccess)
+                    return result;
+
+                failedResults.Add(result);
+            }
+
+            if (failedResults.Count == 1)
+                return failedResults[0];
+
+            return TypeReaderResult.FromError(CommandError.Unsuccessful, "None of the registered TypeReaders could parse the input.");
         }
 
         public override string ToString() => Name;

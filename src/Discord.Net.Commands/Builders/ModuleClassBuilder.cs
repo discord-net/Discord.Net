@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -245,7 +246,7 @@ namespace Discord.Commands
                         builder.Summary = summary.Text;
                         break;
                     case OverrideTypeReaderAttribute typeReader:
-                        builder.TypeReader = GetTypeReader(service, paramType, typeReader.TypeReader);
+                        builder.TypeReaders = ImmutableList.Create(GetTypeReader(service, paramType, typeReader.TypeReader));
                         break;
                     case ParamArrayAttribute _:
                         builder.IsMultiple = true;
@@ -271,17 +272,9 @@ namespace Discord.Commands
 
             builder.ParameterType = paramType;
 
-            if (builder.TypeReader == null)
+            if (builder.TypeReaders == null || builder.TypeReaders.Count == 0)
             {
-                var readers = service.GetTypeReaders(paramType);
-                TypeReader reader = null;
-
-                if (readers != null)
-                    reader = readers.FirstOrDefault().Value;
-                else
-                    reader = service.GetDefaultTypeReader(paramType);
-
-                builder.TypeReader = reader;
+                builder.TypeReaders = service.GetTypeReaders(paramType).Values.ToImmutableList();
             }
         }
 

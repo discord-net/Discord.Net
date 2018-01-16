@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
-using System.Collections.Generic;
 
 namespace Discord.Commands.Builders
 {
@@ -15,7 +16,7 @@ namespace Discord.Commands.Builders
         public string Name { get; internal set; }
         public Type ParameterType { get; internal set; }
 
-        public TypeReader TypeReader { get; set; }
+        public IReadOnlyCollection<TypeReader> TypeReaders { get; set; }
         public bool IsOptional { get; set; }
         public bool IsRemainder { get; set; }
         public bool IsMultiple { get; set; }
@@ -45,13 +46,13 @@ namespace Discord.Commands.Builders
 
         internal void SetType(Type type)
         {
-            var readers = Command.Module.Service.GetTypeReaders(type);
-            if (readers != null)
-                TypeReader = readers.FirstOrDefault().Value;
+            var readers = Command.Module.Service.GetTypeReaders(type).Values.ToImmutableList();
+            if (readers.Count > 1)
+                TypeReaders = readers;
             else
-                TypeReader = Command.Module.Service.GetDefaultTypeReader(type);
+                TypeReaders = ImmutableList.Create(Command.Module.Service.GetDefaultTypeReader(type));
 
-            if (TypeReader == null)
+            if (TypeReaders.Count == 0)
                 throw new InvalidOperationException($"{type} does not have a TypeReader registered for it. Parameter: {Name} in {Command.PrimaryAlias}");            
 
             if (type.GetTypeInfo().IsValueType)
@@ -100,7 +101,7 @@ namespace Discord.Commands.Builders
 
         internal ParameterInfo Build(CommandInfo info)
         {
-            if (TypeReader == null)
+            if (TypeReaders == null || TypeReaders.Count == 0)
                 throw new InvalidOperationException($"No type reader found for type {ParameterType.Name}, one must be specified");
 
             return new ParameterInfo(this, info, Command.Module.Service);
