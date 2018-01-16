@@ -1,4 +1,6 @@
-﻿namespace Discord.Commands
+using System;
+
+namespace Discord.Commands
 {
     public class CommandServiceConfig
     {
@@ -18,5 +20,7 @@
 
         /// <summary> Determines whether extra parameters should be ignored. </summary>
         public bool IgnoreExtraArgs { get; set; } = false;
+
+        public IServiceProvider ServiceProvider { get; set; } = EmptyServiceProvider.Instance;
     }
 }

@@ -22,7 +22,7 @@ namespace Discord.Commands
         public ModuleInfo Parent { get; }
         public bool IsSubmodule => Parent != null;
 
-        internal Optional<TypeInfo> TypeInfo { get; }
+        //public TypeInfo TypeInfo { get; }
 
         internal ModuleInfo(ModuleBuilder builder, CommandService service, ModuleInfo parent = null)
         {
@@ -33,7 +33,7 @@ namespace Discord.Commands
             Remarks = builder.Remarks;
             Parent = parent;
 
-            TypeInfo = builder.TypeInfo;
+            //TypeInfo = builder.TypeInfo;
 
             Aliases = BuildAliases(builder, service).ToImmutableArray();
             Commands = builder.Commands.Select(x => x.Build(this, service)).ToImmutableArray();

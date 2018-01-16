@@ -26,7 +26,7 @@ namespace Discord.Commands.Builders
         public IReadOnlyList<Attribute> Attributes => _attributes;
         public IReadOnlyList<string> Aliases => _aliases;
 
-        internal Optional<TypeInfo> TypeInfo { get; set; }
+        internal TypeInfo TypeInfo { get; set; }
 
         //Automatic
         internal ModuleBuilder(CommandService service, ModuleBuilder parent)
@@ -119,6 +119,22 @@ namespace Discord.Commands.Builders
             //Default name to first alias
             if (Name == null)
                 Name = _aliases[0];
+
+            if (TypeInfo != null)
+            {
+                //keep this for safety?
+                //services = services ?? EmptyServiceProvider.Instance;
+                try
+                {
+                    var moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(TypeInfo, service, service._serviceProvider);
+                    moduleInstance.OnModuleBuilding(service);
+                }
+                catch (Exception)
+                {
+                    //unsure of what to do here
+                    throw;
+                }
+            }
 
             return new ModuleInfo(this, service, parent);
         }

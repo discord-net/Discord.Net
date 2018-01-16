@@ -19,9 +19,8 @@ class Program
 
     private readonly DiscordSocketClient _client;
     
-    // Keep the CommandService and IServiceProvider around for use with commands.
-    // These two types require you install the Discord.Net.Commands package.
-    private readonly IServiceProvider _services;
+    // Keep the CommandService around for use with commands.
+    // This type requires you install the Discord.Net.Commands package.
     private readonly CommandService _commands;
 
     private Program()
@@ -47,6 +46,9 @@ class Program
             // Again, log level:
             LogLevel = LogSeverity.Info,
             
+            // Setup your DI container.
+            ServiceProvider = ConfigureServices(),
+            
             // There's a few more properties you can set,
             // for example, case-insensitive commands.
             CaseSensitiveCommands = false,
@@ -56,8 +58,6 @@ class Program
         _client.Log += Logger;
         _commands.Log += Logger;
         
-        // Setup your DI container.
-        _services = ConfigureServices();
     }
     
     // If any services require the client, or the CommandService, or something else you keep on hand,
@@ -161,7 +161,7 @@ class Program
             
             // Execute the command. (result does not indicate a return value, 
             // rather an object stating if the command executed successfully).
-            var result = await _commands.ExecuteAsync(context, pos, _services);
+            var result = await _commands.ExecuteAsync(context, pos);
 
             // Uncomment the following lines if you want the bot
             // to send a message if it failed (not advised for most situations).
