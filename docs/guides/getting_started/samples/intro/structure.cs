@@ -131,9 +131,9 @@ class Program
         // Module classes MUST be marked 'public' or they will be ignored.
         // You also need to pass your 'IServiceProvider' instance now,
         // so make sure that's done before you get here.
-        await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+        await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
         // Or add Modules manually if you prefer to be a little more explicit:
-        await _commands.AddModuleAsync<SomeModule>(_services);
+        await _commands.AddModuleAsync<SomeModule>();
         // Note that the first one is 'Modules' (plural) and the second is 'Module' (singular).
 
         // Subscribe a handler to see if a message invokes a command.
