@@ -21,6 +21,8 @@ namespace Discord.Commands
         /// <summary> Determines whether extra parameters should be ignored. </summary>
         public bool IgnoreExtraArgs { get; set; } = false;
 
-        public IServiceProvider ServiceProvider { get; set; } = EmptyServiceProvider.Instance;
+        public IServiceProvider ServiceProvider { get; set; }
+
+        public Func<CommandService, IServiceProvider> ServiceProviderFactory { get; set; }
     }
 }

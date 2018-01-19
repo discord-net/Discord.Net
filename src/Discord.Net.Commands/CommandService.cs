@@ -43,7 +43,10 @@ namespace Discord.Commands
         public CommandService() : this(new CommandServiceConfig()) { }
         public CommandService(CommandServiceConfig config)
         {
-            _serviceProvider = config.ServiceProvider ?? EmptyServiceProvider.Instance;
+            _serviceProvider = config.ServiceProvider
+                ?? config.ServiceProviderFactory?.Invoke(this)
+                ?? EmptyServiceProvider.Instance;
+
             _caseSensitive = config.CaseSensitiveCommands;
             _throwOnError = config.ThrowOnError;
             _ignoreExtraArgs = config.IgnoreExtraArgs;
@@ -91,7 +94,6 @@ namespace Discord.Commands
 
                 var module = builder.Build(this, null);
 
-                //should be fine to pass null here since it'll never get checked from this path anyway
                 return LoadModuleInternal(module);
             }
             finally
@@ -148,22 +150,6 @@ namespace Discord.Commands
         private ModuleInfo LoadModuleInternal(ModuleInfo module)
         {
             _moduleDefs.Add(module);
-
-            //if (module.TypeInfo.IsSpecified)
-            //{
-            //    //keep this for safety?
-            //    services = services ?? EmptyServiceProvider.Instance;
-            //    try
-            //    {
-            //        var moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(module.TypeInfo.Value, this, services);
-            //        moduleInstance.OnModuleBuilding(this);
-            //    }
-            //    catch(Exception)
-            //    {
-            //        //unsure of what to do here
-            //        throw;
-            //    }
-            //}
 
             foreach (var command in module.Commands)
                 _map.AddCommand(command);

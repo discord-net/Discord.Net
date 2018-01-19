@@ -122,8 +122,6 @@ namespace Discord.Commands.Builders
 
             if (TypeInfo != null)
             {
-                //keep this for safety?
-                //services = services ?? EmptyServiceProvider.Instance;
                 try
                 {
                     var moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(TypeInfo, service, service._serviceProvider);

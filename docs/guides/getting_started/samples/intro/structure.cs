@@ -164,7 +164,9 @@ class Program
             var result = await _commands.ExecuteAsync(context, pos);
 
             // Uncomment the following lines if you want the bot
-            // to send a message if it failed (not advised for most situations).
+            // to send a message if it failed.
+            // This does not catch errors from commands with 'RunMode.Async',
+            // subscribe a handler for '_commands.CommandExecuted' to see those.
             //if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
             //    await msg.Channel.SendMessageAsync(result.ErrorReason);
         }
