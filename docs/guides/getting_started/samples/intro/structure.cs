@@ -48,6 +48,9 @@ class Program
             
             // Setup your DI container.
             ServiceProvider = ConfigureServices(),
+            // If you have a service that's dependant on the CommandService instance,
+            // use ServiceProviderFactory instead.
+            //ServiceProviderFactory = (cs => ConfigureServices(cs)),
             
             // There's a few more properties you can set,
             // for example, case-insensitive commands.
