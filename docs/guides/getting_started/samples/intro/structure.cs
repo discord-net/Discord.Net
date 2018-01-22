@@ -19,9 +19,10 @@ class Program
 
     private readonly DiscordSocketClient _client;
     
-    // Keep the CommandService around for use with commands.
-    // This type requires you install the Discord.Net.Commands package.
+    // Keep the CommandService and DI container around for use with commands.
+    // These two types require you install the Discord.Net.Commands package.
     private readonly CommandService _commands;
+    private readonly IServiceProvider _services;
 
     private Program()
     {
@@ -46,12 +47,6 @@ class Program
             // Again, log level:
             LogLevel = LogSeverity.Info,
             
-            // Setup your DI container.
-            ServiceProvider = ConfigureServices(),
-            // If you have a service that's dependant on the CommandService instance,
-            // use ServiceProviderFactory instead.
-            //ServiceProviderFactory = (cs => ConfigureServices(cs)),
-            
             // There's a few more properties you can set,
             // for example, case-insensitive commands.
             CaseSensitiveCommands = false,
@@ -60,6 +55,9 @@ class Program
         // Subscribe the logging handler to both the client and the CommandService.
         _client.Log += Logger;
         _commands.Log += Logger;
+        
+        // Setup your DI container.
+        _services = ConfigureServices(),
         
     }
     
@@ -131,9 +129,9 @@ class Program
         // Module classes MUST be marked 'public' or they will be ignored.
         // You also need to pass your 'IServiceProvider' instance now,
         // so make sure that's done before you get here.
-        await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
+        await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
         // Or add Modules manually if you prefer to be a little more explicit:
-        await _commands.AddModuleAsync<SomeModule>();
+        await _commands.AddModuleAsync<SomeModule>(_services);
         // Note that the first one is 'Modules' (plural) and the second is 'Module' (singular).
 
         // Subscribe a handler to see if a message invokes a command.
