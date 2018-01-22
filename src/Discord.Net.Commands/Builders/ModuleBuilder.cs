@@ -114,7 +114,7 @@ namespace Discord.Commands.Builders
             return this;
         }
 
-        private ModuleInfo BuildImpl(CommandService service, ModuleInfo parent = null)
+        private ModuleInfo BuildImpl(CommandService service, IServiceProvider services, ModuleInfo parent = null)
         {
             //Default name to first alias
             if (Name == null)
@@ -124,7 +124,7 @@ namespace Discord.Commands.Builders
             {
                 try
                 {
-                    var moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(TypeInfo, service, service._serviceProvider);
+                    var moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(TypeInfo, service, services);
                     moduleInstance.OnModuleBuilding(service);
                 }
                 catch (Exception)
@@ -134,11 +134,11 @@ namespace Discord.Commands.Builders
                 }
             }
 
-            return new ModuleInfo(this, service, parent);
+            return new ModuleInfo(this, service, services, parent);
         }
 
-        public ModuleInfo Build(CommandService service) => BuildImpl(service);
+        public ModuleInfo Build(CommandService service, IServiceProvider services) => BuildImpl(service, services);
 
-        internal ModuleInfo Build(CommandService service, ModuleInfo parent) => BuildImpl(service, parent);
+        internal ModuleInfo Build(CommandService service, IServiceProvider services, ModuleInfo parent) => BuildImpl(service, services, parent);
     }
 }

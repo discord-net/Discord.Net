@@ -24,7 +24,7 @@ namespace Discord.Commands
 
         //public TypeInfo TypeInfo { get; }
 
-        internal ModuleInfo(ModuleBuilder builder, CommandService service, ModuleInfo parent = null)
+        internal ModuleInfo(ModuleBuilder builder, CommandService service, IServiceProvider services, ModuleInfo parent = null)
         {
             Service = service;
 
@@ -40,7 +40,7 @@ namespace Discord.Commands
             Preconditions = BuildPreconditions(builder).ToImmutableArray();
             Attributes = BuildAttributes(builder).ToImmutableArray();
 
-            Submodules = BuildSubmodules(builder, service).ToImmutableArray();
+            Submodules = BuildSubmodules(builder, service, services).ToImmutableArray();
         }
 
         private static IEnumerable<string> BuildAliases(ModuleBuilder builder, CommandService service)
@@ -70,12 +70,12 @@ namespace Discord.Commands
             return result;
         }
 
-        private List<ModuleInfo> BuildSubmodules(ModuleBuilder parent, CommandService service)
+        private List<ModuleInfo> BuildSubmodules(ModuleBuilder parent, CommandService service, IServiceProvider services)
         {
             var result = new List<ModuleInfo>();
 
             foreach (var submodule in parent.Modules)
-                result.Add(submodule.Build(service, this));
+                result.Add(submodule.Build(service, services, this));
 
             return result;
         }
