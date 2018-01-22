@@ -13,7 +13,7 @@ namespace Discord.Commands
         public string Name { get; }
         public string Summary { get; }
         public string Remarks { get; }
-        public string Group { get; set; }
+        public string Group { get; }
 
         public IReadOnlyList<string> Aliases { get; }
         public IReadOnlyList<CommandInfo> Commands { get; }
