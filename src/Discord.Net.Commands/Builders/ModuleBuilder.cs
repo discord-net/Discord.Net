@@ -19,6 +19,7 @@ namespace Discord.Commands.Builders
         public string Name { get; set; }
         public string Summary { get; set; }
         public string Remarks { get; set; }
+        public string Group { get; set; }
 
         public IReadOnlyList<CommandBuilder> Commands => _commands;
         public IReadOnlyList<ModuleBuilder> Modules => _submodules;

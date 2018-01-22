@@ -13,6 +13,7 @@ namespace Discord.Commands
         public string Name { get; }
         public string Summary { get; }
         public string Remarks { get; }
+        public string Group { get; set; }
 
         public IReadOnlyList<string> Aliases { get; }
         public IReadOnlyList<CommandInfo> Commands { get; }
@@ -31,6 +32,7 @@ namespace Discord.Commands
             Name = builder.Name;
             Summary = builder.Summary;
             Remarks = builder.Remarks;
+            Group = builder.Group;
             Parent = parent;
 
             //TypeInfo = builder.TypeInfo;
