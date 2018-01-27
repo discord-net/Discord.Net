@@ -28,8 +28,6 @@ namespace Discord.Commands
         private readonly HashSet<ModuleInfo> _moduleDefs;
         private readonly CommandMap _map;
 
-        //internal readonly IServiceProvider _serviceProvider;
-
         internal readonly bool _caseSensitive, _throwOnError, _ignoreExtraArgs;
         internal readonly char _separatorChar;
         internal readonly RunMode _defaultRunMode;
@@ -77,10 +75,6 @@ namespace Discord.Commands
             entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IRole), typeof(RoleTypeReader<>)));
             entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IUser), typeof(UserTypeReader<>)));
             _entityTypeReaders = entityTypeReaders.ToImmutable();
-
-            //_serviceProvider = config.ServiceProvider
-            //    ?? config.ServiceProviderFactory?.Invoke(this)
-            //    ?? EmptyServiceProvider.Instance;
         }
 
         //Modules
@@ -285,7 +279,6 @@ namespace Discord.Commands
         public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;
-            //using (var scope = _serviceProvider.CreateScope())
             using (var scope = services.CreateScope())
             {
                 var searchResult = Search(context, input);
