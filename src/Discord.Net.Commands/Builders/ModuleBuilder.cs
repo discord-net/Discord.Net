@@ -123,16 +123,8 @@ namespace Discord.Commands.Builders
 
             if (TypeInfo != null)
             {
-                try
-                {
-                    var moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(TypeInfo, service, services);
-                    moduleInstance.OnModuleBuilding(service, this);
-                }
-                catch (Exception)
-                {
-                    //unsure of what to do here
-                    throw;
-                }
+                var moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(TypeInfo, service, services);
+                moduleInstance.OnModuleBuilding(service, this);
             }
 
             return new ModuleInfo(this, service, services, parent);
