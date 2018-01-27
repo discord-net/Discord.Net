@@ -1,4 +1,4 @@
-﻿namespace Discord.Commands
+namespace Discord.Commands
 {
     internal interface IModuleBase
     {
@@ -7,5 +7,7 @@
         void BeforeExecute(CommandInfo command);
         
         void AfterExecute(CommandInfo command);
+
+        void OnModuleBuilding(CommandService commandService);
     }
 }
