@@ -1,3 +1,5 @@
+using Discord.Commands.Builders;
+
 namespace Discord.Commands
 {
     internal interface IModuleBase
@@ -8,6 +10,6 @@ namespace Discord.Commands
         
         void AfterExecute(CommandInfo command);
 
-        void OnModuleBuilding(CommandService commandService);
+        void OnModuleBuilding(CommandService commandService, ModuleBuilder builder);
     }
 }

@@ -126,7 +126,7 @@ namespace Discord.Commands.Builders
                 try
                 {
                     var moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(TypeInfo, service, services);
-                    moduleInstance.OnModuleBuilding(service);
+                    moduleInstance.OnModuleBuilding(service, this);
                 }
                 catch (Exception)
                 {
