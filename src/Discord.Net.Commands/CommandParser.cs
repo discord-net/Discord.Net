@@ -13,6 +13,19 @@ namespace Discord.Commands
             Parameter,
             QuotedParameter
         }
+
+        /// <summary>
+        /// Checks to see if the supplied character is a quotation mark
+        /// from either the default " character, or the list of aliases
+        /// if they are provided.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="aliases"></param>
+        private static bool isQuotationChar(char c, char[] aliases)
+        {
+            if (aliases == null) return c == '\"';
+            return Array.Exists(aliases, x => x == c);
+        }
         
         public static async Task<ParseResult> ParseArgsAsync(CommandInfo command, ICommandContext context, IServiceProvider services, string input, int startPos)
         {
@@ -74,7 +87,7 @@ namespace Discord.Commands
                             argBuilder.Append(c);
                             continue;
                         }
-                        if (c == '\"')
+                        if (isQuotationChar(c, command._quotationAliases))
                         {
                             curPart = ParserPart.QuotedParameter;
                             continue;
@@ -97,7 +110,7 @@ namespace Discord.Commands
                 }
                 else if (curPart == ParserPart.QuotedParameter)
                 {
-                    if (c == '\"')
+                    if (isQuotationChar(c, command._quotationAliases))
                     {
                         argString = argBuilder.ToString(); //Remove quotes
                         lastArgEndPos = curPos + 1;

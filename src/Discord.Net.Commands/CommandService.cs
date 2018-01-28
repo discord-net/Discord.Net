@@ -32,6 +32,7 @@ namespace Discord.Commands
         internal readonly RunMode _defaultRunMode;
         internal readonly Logger _cmdLogger;
         internal readonly LogManager _logManager;
+        internal readonly char[] _quotationMarkAliases;
 
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
         public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
@@ -44,6 +45,7 @@ namespace Discord.Commands
             _throwOnError = config.ThrowOnError;
             _separatorChar = config.SeparatorChar;
             _defaultRunMode = config.DefaultRunMode;
+            _quotationMarkAliases = config.QuotationMarkAliases;
             if (_defaultRunMode == RunMode.Default)
                 throw new InvalidOperationException("The default run mode cannot be set to Default.");
 
@@ -276,7 +278,7 @@ namespace Discord.Commands
         public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;
-
+            
             var searchResult = Search(context, input);
             if (!searchResult.IsSuccess)
                 return searchResult;

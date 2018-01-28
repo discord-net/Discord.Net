@@ -19,6 +19,7 @@ namespace Discord.Commands
         private static readonly ConcurrentDictionary<Type, Func<IEnumerable<object>, object>> _arrayConverters = new ConcurrentDictionary<Type, Func<IEnumerable<object>, object>>();
 
         private readonly Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> _action;
+        internal readonly char[] _quotationAliases;
 
         public ModuleInfo Module { get; }
         public string Name { get; }
@@ -64,6 +65,7 @@ namespace Discord.Commands
             HasVarArgs = builder.Parameters.Count > 0 ? builder.Parameters[builder.Parameters.Count - 1].IsMultiple : false;
 
             _action = builder.Callback;
+            _quotationAliases = service._quotationMarkAliases;
         }
 
         public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, IServiceProvider services = null)
@@ -107,7 +109,7 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
 
-        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult preconditionResult = null, IServiceProvider services = null)
+        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult preconditionResult = null, IServiceProvider services = null, char[] quotationAliases = null)
         {
             services = services ?? EmptyServiceProvider.Instance;
 

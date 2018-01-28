@@ -15,5 +15,8 @@
 
         /// <summary> Determines whether RunMode.Sync commands should push exceptions up to the caller. </summary>
         public bool ThrowOnError { get; set; } = true;
+
+        /// <summary> List of aliases for string parsing </summary>
+        public char[] QuotationMarkAliases { get; set; } = new char[] { '“', '”', '\'', '«', '»', '‹', '›' };
     }
 }
