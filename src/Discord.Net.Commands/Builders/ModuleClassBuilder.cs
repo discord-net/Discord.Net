@@ -273,7 +273,8 @@ namespace Discord.Commands
 
             if (builder.TypeReader == null)
             {
-                builder.TypeReader = service.GetDefaultTypeReader(paramType);
+                builder.TypeReader = service.GetDefaultTypeReader(paramType)
+                    ?? service.GetTypeReaders(paramType)?.FirstOrDefault().Value;
             }
         }
 
