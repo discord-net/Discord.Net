@@ -1,4 +1,4 @@
-using Discord.Commands.Builders;
+﻿using Discord.Commands.Builders;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -66,8 +66,8 @@ namespace Discord.Commands
             HasVarArgs = builder.Parameters.Count > 0 ? builder.Parameters[builder.Parameters.Count - 1].IsMultiple : false;
 
             _action = builder.Callback;
-            _commandService = service;
             _quotationAliases = service._quotationMarkAliases;
+            _commandService = service;
         }
 
         public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, IServiceProvider services = null)
@@ -111,7 +111,7 @@ namespace Discord.Commands
             return PreconditionResult.FromSuccess();
         }
 
-        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult preconditionResult = null, IServiceProvider services = null, char[] quotationAliases = null)
+        public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult preconditionResult = null, IServiceProvider services = null)
         {
             services = services ?? EmptyServiceProvider.Instance;
 

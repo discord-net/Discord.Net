@@ -279,7 +279,6 @@ namespace Discord.Commands
         public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;
-            
             var searchResult = Search(context, input);
             if (!searchResult.IsSuccess)
                 return searchResult;
