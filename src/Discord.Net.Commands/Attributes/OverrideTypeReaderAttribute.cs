@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Discord.Commands
 {
-    [AttributeUsage(AttributeTargets.Parameter)]
+    [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
     public class OverrideTypeReaderAttribute : Attribute
     {
         private static readonly TypeInfo _typeReaderTypeInfo = typeof(TypeReader).GetTypeInfo();

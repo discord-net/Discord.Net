@@ -13,7 +13,7 @@ namespace Discord
         public bool RequireColons { get; }
         public IReadOnlyList<ulong> RoleIds { get; }
 
-        internal GuildEmote(ulong id, string name, bool isManaged, bool requireColons, IReadOnlyList<ulong> roleIds) : base(id, name)
+        internal GuildEmote(ulong id, string name, bool animated, bool isManaged, bool requireColons, IReadOnlyList<ulong> roleIds) : base(id, name, animated)
         {
             IsManaged = isManaged;
             RequireColons = requireColons;
@@ -21,6 +21,6 @@ namespace Discord
         }
 
         private string DebuggerDisplay => $"{Name} ({Id})";
-        public override string ToString() => $"<:{Name}:{Id}>";
+        public override string ToString() => $"<{(Animated ? "a" : "")}:{Name}:{Id}>";
     }
 }

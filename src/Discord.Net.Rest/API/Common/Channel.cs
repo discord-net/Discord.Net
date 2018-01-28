@@ -23,6 +23,8 @@ namespace Discord.API
         public Optional<int> Position { get; set; }
         [JsonProperty("permission_overwrites")]
         public Optional<Overwrite[]> PermissionOverwrites { get; set; }
+        [JsonProperty("parent_id")]
+        public ulong? CategoryId { get; set; }
 
         //TextChannel
         [JsonProperty("topic")]

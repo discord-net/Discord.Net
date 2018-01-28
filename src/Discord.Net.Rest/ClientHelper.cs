@@ -79,7 +79,7 @@ namespace Discord.Rest
             ulong? fromGuildId, int? limit, RequestOptions options)
         {
             return new PagedAsyncEnumerable<RestUserGuild>(
-                DiscordConfig.MaxUsersPerBatch,
+                DiscordConfig.MaxGuildsPerBatch,
                 async (info, ct) =>
                 {
                     var args = new GetGuildSummariesParams
@@ -106,7 +106,7 @@ namespace Discord.Rest
         }
         public static async Task<IReadOnlyCollection<RestGuild>> GetGuildsAsync(BaseDiscordClient client, RequestOptions options)
         {
-            var summaryModels = await GetGuildSummariesAsync(client, null, null, options).Flatten();
+            var summaryModels = await GetGuildSummariesAsync(client, null, null, options).FlattenAsync().ConfigureAwait(false);
             var guilds = ImmutableArray.CreateBuilder<RestGuild>();
             foreach (var summaryModel in summaryModels)
             {
@@ -141,6 +141,14 @@ namespace Discord.Rest
             var model = await client.ApiClient.GetGuildMemberAsync(guildId, id, options).ConfigureAwait(false);
             if (model != null)
                 return RestGuildUser.Create(client, new RestGuild(client, guildId), model);
+            return null;
+        }
+
+        public static async Task<RestWebhook> GetWebhookAsync(BaseDiscordClient client, ulong id, RequestOptions options)
+        {
+            var model = await client.ApiClient.GetWebhookAsync(id);
+            if (model != null)
+                return RestWebhook.Create(client, (IGuild)null, model);
             return null;
         }
 

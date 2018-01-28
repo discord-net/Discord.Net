@@ -9,6 +9,8 @@ namespace Discord.API
         public ulong? Id { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
+        [JsonProperty("animated")]
+        public bool? Animated { get; set; }
         [JsonProperty("roles")]
         public ulong[] Roles { get; set; }
         [JsonProperty("require_colons")]

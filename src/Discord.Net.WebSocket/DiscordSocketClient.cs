@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS0618
+#pragma warning disable CS0618
 using Discord.API;
 using Discord.API.Gateway;
 using Discord.Logging;
@@ -48,7 +48,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override int Latency { get; protected set; }
         public override UserStatus Status { get; protected set; } = UserStatus.Online;
-        public override Game? Game { get; protected set; }
+        public override IActivity Activity { get; protected set; }
 
         //From DiscordSocketConfig
         internal int TotalShards { get; private set; }
@@ -326,35 +326,42 @@ namespace Discord.WebSocket
                 _statusSince = null;
             await SendStatusAsync().ConfigureAwait(false);
         }
-        public override async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
+        public override async Task SetGameAsync(string name, string streamUrl = null, ActivityType type = ActivityType.Playing)
         {
-            if (name != null)
-                Game = new Game(name, streamUrl, streamType);
+            if (!string.IsNullOrEmpty(streamUrl))
+                Activity = new StreamingGame(name, streamUrl);
+            else if (!string.IsNullOrEmpty(name))
+                Activity = new Game(name, type);
             else
-                Game = null;
+                Activity = null;
             await SendStatusAsync().ConfigureAwait(false);
         }
+        public override async Task SetActivityAsync(IActivity activity)
+        {
+            Activity = activity;
+            await SendStatusAsync().ConfigureAwait(false);
+        }
+        
         private async Task SendStatusAsync()
         {
             if (CurrentUser == null)
                 return;
-            var game = Game;
             var status = Status;
             var statusSince = _statusSince;
-            CurrentUser.Presence = new SocketPresence(status, game);
+            CurrentUser.Presence = new SocketPresence(status, Activity);
 
-            GameModel gameModel;
-            if (game != null)
+            var gameModel = new GameModel();
+            // Discord only accepts rich presence over RPC, don't even bother building a payload
+            if (Activity is RichGame game)
+                throw new NotSupportedException("Outgoing Rich Presences are not supported");
+
+            if (Activity != null)
             {
-                gameModel = new API.Game
-                {
-                    Name = game.Value.Name,
-                    StreamType = game.Value.StreamType,
-                    StreamUrl = game.Value.StreamUrl
-                };
+                gameModel.Name = Activity.Name;
+                gameModel.Type = Activity.Type;
+                if (Activity is StreamingGame streamGame)
+                    gameModel.StreamUrl = streamGame.Url;
             }
-            else
-                gameModel = null;
 
             await ApiClient.SendStatusUpdateAsync(
                 status,
@@ -409,11 +416,8 @@ namespace Discord.WebSocket
 
                             _sessionId = null;
                             _lastSeq = 0;
-                            bool retry = (bool)payload;
-                            if (retry)
-                                _connection.Reconnect(); //TODO: Untested
-                            else
-                                await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
+                            
+                            await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
                         }
                         break;
                     case GatewayOpCode.Reconnect:

@@ -133,9 +133,10 @@ namespace Discord
                 ulong deniedPermissions = 0UL, allowedPermissions = 0UL;
                 foreach (var roleId in user.RoleIds)
                 {
-                    if (roleId != guild.EveryoneRole.Id)
+                    IRole role = null;
+                    if (roleId != guild.EveryoneRole.Id && (role = guild.GetRole(roleId)) != null)
                     {
-                        perms = channel.GetPermissionOverwrite(guild.GetRole(roleId));
+                        perms = channel.GetPermissionOverwrite(role);
                         if (perms != null)
                         {
                             allowedPermissions |= perms.Value.AllowValue;
@@ -152,7 +153,7 @@ namespace Discord
 
                 if (channel is ITextChannel textChannel)
                 {
-                    if (!GetValue(resolvedPermissions, ChannelPermission.ReadMessages))
+                    if (!GetValue(resolvedPermissions, ChannelPermission.ViewChannel))
                     {
                         //No read permission on a text channel removes all other permissions
                         resolvedPermissions = 0;

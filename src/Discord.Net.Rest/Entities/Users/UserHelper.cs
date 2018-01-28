@@ -48,6 +48,14 @@ namespace Discord.Rest
             else if (args.RoleIds.IsSpecified)
                 apiArgs.RoleIds = args.RoleIds.Value.ToArray();
 
+            /*
+             * Ensure that the nick passed in the params of the request is not null.
+             * string.Empty ("") is the only way to reset the user nick in the API,
+             * a value of null does not. This is a workaround.
+             */
+            if (apiArgs.Nickname.IsSpecified && apiArgs.Nickname.Value == null)
+                apiArgs.Nickname = new Optional<string>(string.Empty);
+
             await client.ApiClient.ModifyGuildMemberAsync(user.GuildId, user.Id, apiArgs, options).ConfigureAwait(false);
             return args;
         }

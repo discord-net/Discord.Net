@@ -18,5 +18,8 @@
 
         /// <summary> List of aliases for string parsing </summary>
         public char[] QuotationMarkAliases { get; set; } = new char[] { '“', '”', '\'', '«', '»', '‹', '›' };
+
+        /// <summary> Determines whether extra parameters should be ignored. </summary>
+        public bool IgnoreExtraArgs { get; set; } = false;
     }
 }
