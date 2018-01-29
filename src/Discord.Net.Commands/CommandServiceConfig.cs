@@ -20,8 +20,7 @@ namespace Discord.Commands
         /// <summary> Collection of aliases that can wrap strings for command parsing. 
         /// represents the opening quotation mark and the value is the corresponding closing mark.</summary>
         public Dictionary<char, char> QuotationMarkAliasMap { get; set; }
-        = new Dictionary<char, char>()
-        {
+        = new Dictionary<char, char> {
             {'\"', '\"' },
             {'«', '»' },
             {'‘', '’' },
