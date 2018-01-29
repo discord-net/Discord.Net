@@ -46,7 +46,7 @@ namespace Discord.Commands
             _ignoreExtraArgs = config.IgnoreExtraArgs;
             _separatorChar = config.SeparatorChar;
             _defaultRunMode = config.DefaultRunMode;
-            _quotationMarkAliasMap = config.QuotationMarkAliasMap;
+            _quotationMarkAliasMap = config.QuotationMarkAliasMap.ToImmutableDictionary();
             if (_defaultRunMode == RunMode.Default)
                 throw new InvalidOperationException("The default run mode cannot be set to Default.");
 
