@@ -20,7 +20,6 @@ namespace Discord.Commands
 
         private readonly CommandService _commandService;
         private readonly Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> _action;
-        internal readonly IReadOnlyDictionary<char,char> _quotationAliases;
 
         public ModuleInfo Module { get; }
         public string Name { get; }
@@ -66,7 +65,6 @@ namespace Discord.Commands
             HasVarArgs = builder.Parameters.Count > 0 ? builder.Parameters[builder.Parameters.Count - 1].IsMultiple : false;
 
             _action = builder.Callback;
-            _quotationAliases = service._quotationMarkAliasMap;
             _commandService = service;
         }
 
@@ -121,7 +119,7 @@ namespace Discord.Commands
                 return ParseResult.FromError(preconditionResult);
 
             string input = searchResult.Text.Substring(startIndex);
-            return await CommandParser.ParseArgsAsync(this, context, _commandService._ignoreExtraArgs, services, input, 0).ConfigureAwait(false);
+            return await CommandParser.ParseArgsAsync(this, context, _commandService._ignoreExtraArgs, services, input, 0, _commandService._quotationMarkAliasMap).ConfigureAwait(false);
         }
 
         public Task<IResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)

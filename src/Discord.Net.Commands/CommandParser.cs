@@ -14,7 +14,7 @@ namespace Discord.Commands
             Parameter,
             QuotedParameter
         }    
-        public static async Task<ParseResult> ParseArgsAsync(CommandInfo command, ICommandContext context, bool ignoreExtraArgs, IServiceProvider services, string input, int startPos)
+        public static async Task<ParseResult> ParseArgsAsync(CommandInfo command, ICommandContext context, bool ignoreExtraArgs, IServiceProvider services, string input, int startPos, IReadOnlyDictionary<char, char> aliasMap)
         {
             ParameterInfo curParam = null;
             StringBuilder argBuilder = new StringBuilder(input.Length);
@@ -99,10 +99,10 @@ namespace Discord.Commands
                             continue;
                         }
                         
-                        if (IsOpenQuote(command._quotationAliases, c))
+                        if (IsOpenQuote(aliasMap, c))
                         {
                             curPart = ParserPart.QuotedParameter;
-                            matchQuote = GetMatch(command._quotationAliases, c);
+                            matchQuote = GetMatch(aliasMap, c);
                             continue;
                         }
                         curPart = ParserPart.Parameter;
