@@ -20,7 +20,7 @@ namespace Discord.Commands
 
         private readonly CommandService _commandService;
         private readonly Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> _action;
-        internal readonly char[] _quotationAliases;
+        internal readonly Dictionary<char,char> _quotationAliases;
 
         public ModuleInfo Module { get; }
         public string Name { get; }
@@ -66,7 +66,7 @@ namespace Discord.Commands
             HasVarArgs = builder.Parameters.Count > 0 ? builder.Parameters[builder.Parameters.Count - 1].IsMultiple : false;
 
             _action = builder.Callback;
-            _quotationAliases = service._quotationMarkAliases;
+            _quotationAliases = service._quotationMarkAliasMap;
             _commandService = service;
         }
 

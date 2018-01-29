@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,19 +15,32 @@ namespace Discord.Commands
             QuotedParameter
         }
 
-        /// <summary>
-        /// Checks to see if the supplied character is a quotation mark
-        /// from either the default " character, or the list of aliases
-        /// if they are provided.
-        /// </summary>
-        /// <param name="c"></param>
-        /// <param name="aliases"></param>
-        private static bool isQuotationChar(char c, char[] aliases)
+        private static bool isOpenQuote(Dictionary<char,char> map, char c)
         {
-            if (aliases == null) return c == '\"';
-            return Array.Exists(aliases, x => x == c);
+            // determine if the map contains the key for this value
+            if(map != null)
+            {
+                return map.ContainsKey(c);
+            }
+            // or if the value is a normal quote "
+            return c == '\"';
         }
-        
+
+        // get the corresponding matching quote for the key
+        private static char getMatch(Dictionary<char,char> map, char c)
+        {
+            if (map != null)
+            {
+                char value;
+                if( map.TryGetValue(c, out value))
+                {
+                    return value;
+                }
+            }
+
+            return '\"';
+        }
+                
         public static async Task<ParseResult> ParseArgsAsync(CommandInfo command, ICommandContext context, bool ignoreExtraArgs, IServiceProvider services, string input, int startPos)
         {
             ParameterInfo curParam = null;
@@ -37,7 +51,7 @@ namespace Discord.Commands
             var argList = ImmutableArray.CreateBuilder<TypeReaderResult>();
             var paramList = ImmutableArray.CreateBuilder<TypeReaderResult>();
             bool isEscaping = false;
-            char c;
+            char c, matchQuote = '\0';
 
             for (int curPos = startPos; curPos <= endPos; curPos++)
             {
@@ -87,9 +101,11 @@ namespace Discord.Commands
                             argBuilder.Append(c);
                             continue;
                         }
-                        if (isQuotationChar(c, command._quotationAliases))
+                        
+                        if(isOpenQuote(command._quotationAliases, c))
                         {
                             curPart = ParserPart.QuotedParameter;
+                            matchQuote = getMatch(command._quotationAliases, c);
                             continue;
                         }
                         curPart = ParserPart.Parameter;
@@ -110,7 +126,9 @@ namespace Discord.Commands
                 }
                 else if (curPart == ParserPart.QuotedParameter)
                 {
-                    if (isQuotationChar(c, command._quotationAliases))
+                    //if (findQuotationChar(c, false, out matchingQuotation))
+                    //if( matchingQuotation != null && matchingQuotation.Right == c)
+                    if(c == matchQuote)
                     {
                         argString = argBuilder.ToString(); //Remove quotes
                         lastArgEndPos = curPos + 1;
