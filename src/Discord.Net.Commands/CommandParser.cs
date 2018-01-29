@@ -126,8 +126,6 @@ namespace Discord.Commands
                 }
                 else if (curPart == ParserPart.QuotedParameter)
                 {
-                    //if (findQuotationChar(c, false, out matchingQuotation))
-                    //if( matchingQuotation != null && matchingQuotation.Right == c)
                     if(c == matchQuote)
                     {
                         argString = argBuilder.ToString(); //Remove quotes
