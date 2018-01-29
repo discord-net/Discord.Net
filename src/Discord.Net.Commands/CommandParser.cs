@@ -14,33 +14,7 @@ namespace Discord.Commands
             Parameter,
             QuotedParameter
         }
-
-        private static bool isOpenQuote(Dictionary<char,char> map, char c)
-        {
-            // determine if the map contains the key for this value
-            if(map != null)
-            {
-                return map.ContainsKey(c);
-            }
-            // or if the value is a normal quote "
-            return c == '\"';
-        }
-
-        // get the corresponding matching quote for the key
-        private static char getMatch(Dictionary<char,char> map, char c)
-        {
-            if (map != null)
-            {
-                char value;
-                if( map.TryGetValue(c, out value))
-                {
-                    return value;
-                }
-            }
-
-            return '\"';
-        }
-                
+                        
         public static async Task<ParseResult> ParseArgsAsync(CommandInfo command, ICommandContext context, bool ignoreExtraArgs, IServiceProvider services, string input, int startPos)
         {
             ParameterInfo curParam = null;
@@ -52,6 +26,31 @@ namespace Discord.Commands
             var paramList = ImmutableArray.CreateBuilder<TypeReaderResult>();
             bool isEscaping = false;
             char c, matchQuote = '\0';
+
+            // local helper functions
+            bool IsOpenQuote(IReadOnlyDictionary<char, char> dict, char ch)
+            {
+                // return if the key is contained in the dictionary if it exists
+                if (dict != null)
+                    return dict.ContainsKey(ch);
+                // or otherwise if it is the default double quote
+                return c == '\"';
+            }
+
+            char GetMatch(IReadOnlyDictionary<char, char> dict, char ch)
+            {
+                // get the corresponding value for the key, if it exists
+                if (dict != null)
+                {
+                    char value;
+                    if (dict.TryGetValue(c, out value))
+                    {
+                        return value;
+                    }
+                }
+                // or get the default pair of the default double quote
+                return '\"';
+            }
 
             for (int curPos = startPos; curPos <= endPos; curPos++)
             {
@@ -102,10 +101,10 @@ namespace Discord.Commands
                             continue;
                         }
                         
-                        if(isOpenQuote(command._quotationAliases, c))
+                        if(IsOpenQuote(command._quotationAliases, c))
                         {
                             curPart = ParserPart.QuotedParameter;
-                            matchQuote = getMatch(command._quotationAliases, c);
+                            matchQuote = GetMatch(command._quotationAliases, c);
                             continue;
                         }
                         curPart = ParserPart.Parameter;
