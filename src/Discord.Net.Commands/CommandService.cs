@@ -32,7 +32,7 @@ namespace Discord.Commands
         internal readonly RunMode _defaultRunMode;
         internal readonly Logger _cmdLogger;
         internal readonly LogManager _logManager;
-        internal readonly Dictionary<char, char> _quotationMarkAliasMap;
+        internal readonly IReadOnlyDictionary<char, char> _quotationMarkAliasMap;
 
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
         public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);

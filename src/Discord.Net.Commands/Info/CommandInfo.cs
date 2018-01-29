@@ -20,7 +20,7 @@ namespace Discord.Commands
 
         private readonly CommandService _commandService;
         private readonly Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> _action;
-        internal readonly Dictionary<char,char> _quotationAliases;
+        internal readonly IReadOnlyDictionary<char,char> _quotationAliases;
 
         public ModuleInfo Module { get; }
         public string Name { get; }
