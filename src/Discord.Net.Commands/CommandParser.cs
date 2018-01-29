@@ -42,8 +42,7 @@ namespace Discord.Commands
                 // get the corresponding value for the key, if it exists
                 if (dict != null)
                 {
-                    char value;
-                    if (dict.TryGetValue(c, out value))
+                    if (dict.TryGetValue(c, out var value))
                     {
                         return value;
                     }
@@ -101,7 +100,7 @@ namespace Discord.Commands
                             continue;
                         }
                         
-                        if(IsOpenQuote(command._quotationAliases, c))
+                        if (IsOpenQuote(command._quotationAliases, c))
                         {
                             curPart = ParserPart.QuotedParameter;
                             matchQuote = GetMatch(command._quotationAliases, c);
@@ -125,7 +124,7 @@ namespace Discord.Commands
                 }
                 else if (curPart == ParserPart.QuotedParameter)
                 {
-                    if(c == matchQuote)
+                    if (c == matchQuote)
                     {
                         argString = argBuilder.ToString(); //Remove quotes
                         lastArgEndPos = curPos + 1;
