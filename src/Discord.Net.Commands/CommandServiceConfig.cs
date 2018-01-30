@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+
 namespace Discord.Commands
 {
     public class CommandServiceConfig
