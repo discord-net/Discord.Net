@@ -18,7 +18,7 @@ namespace Discord.WebSocket
             => throw new NotSupportedException();
 
         public IReadOnlyCollection<SocketGuildChannel> Channels
-            => Guild.Channels.Where(x => x.CategoryId == CategoryId).ToImmutableArray();
+            => Guild.Channels.Where(x => x.CategoryId == Id).ToImmutableArray();
 
         internal SocketCategoryChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
             : base(discord, id, guild)
