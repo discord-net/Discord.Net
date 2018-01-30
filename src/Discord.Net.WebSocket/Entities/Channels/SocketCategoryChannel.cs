@@ -15,7 +15,7 @@ namespace Discord.WebSocket
     public class SocketCategoryChannel : SocketGuildChannel, ICategoryChannel
     {
         public override IReadOnlyCollection<SocketGuildUser> Users
-            => Guild.Users.Where(x => x.VoiceChannel?.Id == Id).ToImmutableArray();
+            => throw new NotSupportedException();
 
         public IReadOnlyCollection<SocketGuildChannel> Channels
             => Guild.Channels.Where(x => x.CategoryId == CategoryId).ToImmutableArray();
