@@ -53,8 +53,8 @@ class Program
         });
         
         // Subscribe the logging handler to both the client and the CommandService.
-        _client.Log += Logger;
-        _commands.Log += Logger;
+        _client.Log += Log;
+        _commands.Log += Log;
         
         // Setup your DI container.
         _services = ConfigureServices(),
@@ -79,7 +79,7 @@ class Program
 
     // Example of a logging handler. This can be re-used by addons
     // that ask for a Func<LogMessage, Task>.
-    private static Task Logger(LogMessage message)
+    private static Task Log(LogMessage message)
     {
         switch (message.Severity)
         {
@@ -145,8 +145,6 @@ class Program
         if (msg == null) return;
 
         // We don't want the bot to respond to itself or other bots.
-        // NOTE: Selfbots should invert this first check and remove the second
-        // as they should ONLY be allowed to respond to messages from the same account.
         if (msg.Author.Id == _client.CurrentUser.Id || msg.Author.IsBot) return;
         
         // Create a number to track where the prefix ends and the command begins
