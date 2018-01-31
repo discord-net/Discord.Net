@@ -66,7 +66,7 @@ class Program
     // If this method is getting pretty long, you can seperate it out into another file using partials.
     private static IServiceProvider ConfigureServices()
     {
-        map = new ServiceCollection()        
+        var map = new ServiceCollection()        
             // Repeat this for all the service classes
             // and other dependencies that your commands might need.
             .AddSingleton(new SomeServiceClass());
