@@ -696,7 +696,6 @@ namespace Discord.WebSocket
             => Task.FromResult<IGuildUser>(CurrentUser);
         Task<IGuildUser> IGuild.GetOwnerAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(Owner);
-        Task IGuild.DownloadUsersAsync() { throw new NotSupportedException(); }
 
         async Task<IWebhook> IGuild.GetWebhookAsync(ulong id, RequestOptions options)
             => await GetWebhookAsync(id, options);
