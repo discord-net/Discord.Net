@@ -1,4 +1,4 @@
-﻿using Discord.Commands.Builders;
+using Discord.Commands.Builders;
 using Discord.Logging;
 using System;
 using System.Collections.Concurrent;
@@ -287,7 +287,17 @@ namespace Discord.Commands
 
             foreach (var match in commands)
             {
-                preconditionResults[match] = await match.Command.CheckPreconditionsAsync(context, services).ConfigureAwait(false);
+                try
+                {
+                    preconditionResults[match] = await match.Command.CheckPreconditionsAsync(context, services).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    if (_throwOnError)
+                        throw;
+
+                    return PreconditionResult.FromError(ex);
+                }
             }
 
             var successfulPreconditions = preconditionResults

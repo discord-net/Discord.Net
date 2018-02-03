@@ -1,17 +1,21 @@
-﻿using System.Diagnostics;
+using System;
+using System.Diagnostics;
 
 namespace Discord.Commands
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class PreconditionResult : IResult
     {
+        public Exception Exception { get; }
+
         public CommandError? Error { get; }
         public string ErrorReason { get; }
 
         public bool IsSuccess => !Error.HasValue;
 
-        protected PreconditionResult(CommandError? error, string errorReason)
+        protected PreconditionResult(CommandError? error, string errorReason, Exception exception = null)
         {
+            Exception = exception;
             Error = error;
             ErrorReason = errorReason;
         }
@@ -20,6 +24,8 @@ namespace Discord.Commands
             => new PreconditionResult(null, null);
         public static PreconditionResult FromError(string reason)
             => new PreconditionResult(CommandError.UnmetPrecondition, reason);
+        public static PreconditionResult FromError(Exception ex)
+            => new PreconditionResult(CommandError.Exception, ex.Message, ex);
         public static PreconditionResult FromError(IResult result)
             => new PreconditionResult(result.Error, result.ErrorReason);
 
