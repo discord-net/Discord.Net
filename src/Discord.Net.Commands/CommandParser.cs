@@ -40,13 +40,8 @@ namespace Discord.Commands
             char GetMatch(IReadOnlyDictionary<char, char> dict, char ch)
             {
                 // get the corresponding value for the key, if it exists
-                if (dict != null)
-                {
-                    if (dict.TryGetValue(c, out var value))
-                    {
-                        return value;
-                    }
-                }
+                if (dict != null && dict.TryGetValue(c, out var value))
+                    return value;
                 // or get the default pair of the default double quote
                 return '\"';
             }
