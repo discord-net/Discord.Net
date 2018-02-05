@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Discord.Commands
 {
@@ -20,75 +20,7 @@ namespace Discord.Commands
 
         /// <summary> Collection of aliases that can wrap strings for command parsing. 
         /// represents the opening quotation mark and the value is the corresponding closing mark.</summary>
-        public Dictionary<char, char> QuotationMarkAliasMap { get; set; }
-        = new Dictionary<char, char> {
-            {'\"', '\"' },
-            {'«', '»' },
-            {'‘', '’' },
-            {'“', '”' },
-            {'„', '‟' },
-            {'‹', '›' },
-            {'‚', '‛' },
-            {'《', '》' },
-            {'〈', '〉' },
-            {'「', '」' },
-            {'『', '』' },
-            {'〝', '〞' },
-            {'﹁', '﹂' },
-            {'﹃', '﹄' },
-            {'＂', '＂' },
-            {'＇', '＇' },
-            {'｢', '｣' },
-            {'(', ')' },
-            {'༺', '༻' },
-            {'༼', '༽' },
-            {'᚛', '᚜' },
-            {'⁅', '⁆' },
-            {'⌈', '⌉' },
-            {'⌊', '⌋' },
-            {'❨', '❩' },
-            {'❪', '❫' },
-            {'❬', '❭' },
-            {'❮', '❯' },
-            {'❰', '❱' },
-            {'❲', '❳' },
-            {'❴', '❵' },
-            {'⟅', '⟆' },
-            {'⟦', '⟧' },
-            {'⟨', '⟩' },
-            {'⟪', '⟫' },
-            {'⟬', '⟭' },
-            {'⟮', '⟯' },
-            {'⦃', '⦄' },
-            {'⦅', '⦆' },
-            {'⦇', '⦈' },
-            {'⦉', '⦊' },
-            {'⦋', '⦌' },
-            {'⦍', '⦎' },
-            {'⦏', '⦐' },
-            {'⦑', '⦒' },
-            {'⦓', '⦔' },
-            {'⦕', '⦖' },
-            {'⦗', '⦘' },
-            {'⧘', '⧙' },
-            {'⧚', '⧛' },
-            {'⧼', '⧽' },
-            {'⸂', '⸃' },
-            {'⸄', '⸅' },
-            {'⸉', '⸊' },
-            {'⸌', '⸍' },
-            {'⸜', '⸝' },
-            {'⸠', '⸡' },
-            {'⸢', '⸣' },
-            {'⸤', '⸥' },
-            {'⸦', '⸧' },
-            {'⸨', '⸩' },
-            {'【', '】'},
-            {'〔', '〕' },
-            {'〖', '〗' },
-            {'〘', '〙' },
-            {'〚', '〛' }
-        };
+        public Dictionary<char, char> QuotationMarkAliasMap { get; set; } = QuotationAliasUtils.GetDefaultAliasMap;
 
         /// <summary> Determines whether extra parameters should be ignored. </summary>
         public bool IgnoreExtraArgs { get; set; } = false;
