@@ -1,4 +1,4 @@
-﻿using Discord.Commands.Builders;
+using Discord.Commands.Builders;
 using Discord.Logging;
 using System;
 using System.Collections.Concurrent;
@@ -362,7 +362,11 @@ namespace Discord.Commands
 
             //If we get this far, at least one parse was successful. Execute the most likely overload.
             var chosenOverload = successfulParses[0];
-            return await chosenOverload.Key.ExecuteAsync(context, chosenOverload.Value, services).ConfigureAwait(false);
+            var result = await chosenOverload.Key.ExecuteAsync(context, chosenOverload.Value, services).ConfigureAwait(false);
+
+            await chosenOverload.Key.ExecutePostActionsAsync(context, result, services).ConfigureAwait(false);
+
+            return result;
         }
     }
 }

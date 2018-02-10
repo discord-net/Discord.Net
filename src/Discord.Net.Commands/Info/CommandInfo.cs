@@ -32,6 +32,7 @@ namespace Discord.Commands
         public IReadOnlyList<string> Aliases { get; }
         public IReadOnlyList<ParameterInfo> Parameters { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
+        public IReadOnlyList<PostActionAttribute> PostActions { get; }
         public IReadOnlyList<Attribute> Attributes { get; }
 
         internal CommandInfo(CommandBuilder builder, ModuleInfo module, CommandService service)
@@ -59,6 +60,7 @@ namespace Discord.Commands
                 .ToImmutableArray();
 
             Preconditions = builder.Preconditions.ToImmutableArray();
+            PostActions = builder.PostActions.ToImmutableArray();
             Attributes = builder.Attributes.ToImmutableArray();
 
             Parameters = builder.Parameters.Select(x => x.Build(this)).ToImmutableArray();
@@ -107,6 +109,16 @@ namespace Discord.Commands
                 return commandResult;
 
             return PreconditionResult.FromSuccess();
+        }
+
+        public async Task ExecutePostActionsAsync(ICommandContext context, IResult result, IServiceProvider services = null)
+        {
+            services = services ?? EmptyServiceProvider.Instance;
+
+            foreach (var postAction in Enumerable.Concat(PostActions, Module.PostActions))
+            {
+                await postAction.ExecuteAsync(context, this, result, services).ConfigureAwait(false);
+            }
         }
 
         public async Task<ParseResult> ParseAsync(ICommandContext context, int startIndex, SearchResult searchResult, PreconditionResult preconditionResult = null, IServiceProvider services = null)

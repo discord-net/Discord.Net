@@ -17,6 +17,7 @@ namespace Discord.Commands
         public IReadOnlyList<string> Aliases { get; }
         public IReadOnlyList<CommandInfo> Commands { get; }
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
+        public IReadOnlyList<PostActionAttribute> PostActions { get; }
         public IReadOnlyList<Attribute> Attributes { get; }
         public IReadOnlyList<ModuleInfo> Submodules { get; }
         public ModuleInfo Parent { get; }
@@ -34,6 +35,7 @@ namespace Discord.Commands
             Aliases = BuildAliases(builder, service).ToImmutableArray();
             Commands = builder.Commands.Select(x => x.Build(this, service)).ToImmutableArray();
             Preconditions = BuildPreconditions(builder).ToImmutableArray();
+            PostActions = BuildPostActions(builder).ToImmutableArray();
             Attributes = BuildAttributes(builder).ToImmutableArray();
 
             Submodules = BuildSubmodules(builder, service).ToImmutableArray();
@@ -84,6 +86,20 @@ namespace Discord.Commands
             while (parent != null)
             {
                 result.AddRange(parent.Preconditions);
+                parent = parent.Parent;
+            }
+
+            return result;
+        }
+
+        private static List<PostActionAttribute> BuildPostActions(ModuleBuilder builder)
+        {
+            var result = new List<PostActionAttribute>();
+
+            ModuleBuilder parent = builder;
+            while (parent != null)
+            {
+                result.AddRange(parent.PostActions);
                 parent = parent.Parent;
             }
 

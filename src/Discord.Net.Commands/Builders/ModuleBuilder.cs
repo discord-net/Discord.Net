@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +10,7 @@ namespace Discord.Commands.Builders
         private readonly List<CommandBuilder> _commands;
         private readonly List<ModuleBuilder> _submodules;
         private readonly List<PreconditionAttribute> _preconditions;
+        private readonly List<PostActionAttribute> _postActions;
         private readonly List<Attribute> _attributes;
         private readonly List<string> _aliases;
 
@@ -22,6 +23,7 @@ namespace Discord.Commands.Builders
         public IReadOnlyList<CommandBuilder> Commands => _commands;
         public IReadOnlyList<ModuleBuilder> Modules => _submodules;
         public IReadOnlyList<PreconditionAttribute> Preconditions => _preconditions;
+        public IReadOnlyList<PostActionAttribute> PostActions => _postActions;
         public IReadOnlyList<Attribute> Attributes => _attributes;
         public IReadOnlyList<string> Aliases => _aliases;
 
@@ -34,6 +36,7 @@ namespace Discord.Commands.Builders
             _commands = new List<CommandBuilder>();
             _submodules = new List<ModuleBuilder>();
             _preconditions = new List<PreconditionAttribute>();
+            _postActions = new List<PostActionAttribute>();
             _attributes = new List<Attribute>();
             _aliases = new List<string>();
         }
@@ -80,6 +83,11 @@ namespace Discord.Commands.Builders
         public ModuleBuilder AddPrecondition(PreconditionAttribute precondition)
         {
             _preconditions.Add(precondition);
+            return this;
+        }
+        public ModuleBuilder AddPostAction(PostActionAttribute postAction)
+        {
+            _postActions.Add(postAction);
             return this;
         }
         public ModuleBuilder AddCommand(string primaryAlias, Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> callback, Action<CommandBuilder> createFunc)

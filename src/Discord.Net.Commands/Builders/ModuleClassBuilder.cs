@@ -122,6 +122,9 @@ namespace Discord.Commands
                     case PreconditionAttribute precondition:
                         builder.AddPrecondition(precondition);
                         break;
+                    case PostActionAttribute postAction:
+                        builder.AddPostAction(postAction);
+                        break;
                     default:
                         builder.AddAttributes(attribute);
                         break;
@@ -175,6 +178,9 @@ namespace Discord.Commands
                         break;
                     case PreconditionAttribute precondition:
                         builder.AddPrecondition(precondition);
+                        break;
+                    case PostActionAttribute postAction:
+                        builder.AddPostAction(postAction);
                         break;
                     default:
                         builder.AddAttributes(attribute);

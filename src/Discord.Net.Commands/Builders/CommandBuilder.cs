@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -9,6 +9,7 @@ namespace Discord.Commands.Builders
     public class CommandBuilder
     {
         private readonly List<PreconditionAttribute> _preconditions;
+        private readonly List<PostActionAttribute> _postActions;
         private readonly List<ParameterBuilder> _parameters;
         private readonly List<Attribute> _attributes;
         private readonly List<string> _aliases;
@@ -24,6 +25,7 @@ namespace Discord.Commands.Builders
         public int Priority { get; set; }
 
         public IReadOnlyList<PreconditionAttribute> Preconditions => _preconditions;
+        public IReadOnlyList<PostActionAttribute> PostActions => _postActions;
         public IReadOnlyList<ParameterBuilder> Parameters => _parameters;
         public IReadOnlyList<Attribute> Attributes => _attributes;
         public IReadOnlyList<string> Aliases => _aliases;
@@ -34,6 +36,7 @@ namespace Discord.Commands.Builders
             Module = module;
 
             _preconditions = new List<PreconditionAttribute>();
+            _postActions = new List<PostActionAttribute>();
             _parameters = new List<ParameterBuilder>();
             _attributes = new List<Attribute>();
             _aliases = new List<string>();
@@ -94,6 +97,11 @@ namespace Discord.Commands.Builders
         public CommandBuilder AddPrecondition(PreconditionAttribute precondition)
         {
             _preconditions.Add(precondition);
+            return this;
+        }
+        public CommandBuilder AddPostAction(PostActionAttribute postAction)
+        {
+            _postActions.Add(postAction);
             return this;
         }
         public CommandBuilder AddParameter<T>(string name, Action<ParameterBuilder> createFunc)
