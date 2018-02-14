@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace Discord.API
 {
@@ -7,6 +7,6 @@ namespace Discord.API
         [JsonProperty("id")]
         public string Id { get; set; }
         [JsonProperty("size")]
-        public int[] Size { get; set; }
+        public long[] Size { get; set; }
     }
 }
