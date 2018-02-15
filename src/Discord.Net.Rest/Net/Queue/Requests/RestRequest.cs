@@ -1,11 +1,11 @@
-﻿using Discord.Net.Rest;
+using Discord.Net.Rest;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord.Net.Queue
 {
-    public class RestRequest
+    public class RestRequest : IRequest
     {
         public IRestClient Client { get; }
         public string Method { get; }
