@@ -86,7 +86,7 @@ namespace Discord.Net.Queue
                                 Debug.WriteLine($"[{id}] (!) 502");
 #endif
                                 if ((request.Options.RetryMode & RetryMode.Retry502) == 0)
-                                    throw new HttpException(HttpStatusCode.BadGateway, null);
+                                    throw new HttpException(HttpStatusCode.BadGateway, request, null);
 
                                 continue; //Retry
                             default:
@@ -106,7 +106,7 @@ namespace Discord.Net.Queue
                                     }
                                     catch { }
                                 }
-                                throw new HttpException(response.StatusCode, code, reason);
+                                throw new HttpException(response.StatusCode, request, code, reason);
                         }
                     }
                     else
