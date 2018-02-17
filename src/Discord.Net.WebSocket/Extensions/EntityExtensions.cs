@@ -1,4 +1,4 @@
-﻿namespace Discord.WebSocket
+namespace Discord.WebSocket
 {
     internal static class EntityExtensions
     {
@@ -56,7 +56,7 @@
         public static GameParty ToEntity(this API.GameParty model)
         {
             // Discord will probably send bad data since they don't validate anything
-            int current = 0, cap = 0;
+            long current = 0, cap = 0;
             if (model.Size?.Length == 2)
             {
                 current = model.Size[0];
