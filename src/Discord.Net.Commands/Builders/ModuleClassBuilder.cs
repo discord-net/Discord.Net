@@ -42,8 +42,8 @@ namespace Discord.Commands
         }
 
 
-        public static Task<Dictionary<Type, ModuleInfo>> BuildAsync(CommandService service, params TypeInfo[] validTypes) => BuildAsync(validTypes, service);
-        public static async Task<Dictionary<Type, ModuleInfo>> BuildAsync(IEnumerable<TypeInfo> validTypes, CommandService service)
+        public static Task<Dictionary<Type, ModuleInfo>> BuildAsync(CommandService service, IServiceProvider services, params TypeInfo[] validTypes) => BuildAsync(validTypes, service, services);
+        public static async Task<Dictionary<Type, ModuleInfo>> BuildAsync(IEnumerable<TypeInfo> validTypes, CommandService service, IServiceProvider services)
         {
             /*if (!validTypes.Any())
                 throw new InvalidOperationException("Could not find any valid modules from the given selection");*/
@@ -63,11 +63,11 @@ namespace Discord.Commands
 
                 var module = new ModuleBuilder(service, null);
 
-                BuildModule(module, typeInfo, service);
-                BuildSubTypes(module, typeInfo.DeclaredNestedTypes, builtTypes, service);
+                BuildModule(module, typeInfo, service, services);
+                BuildSubTypes(module, typeInfo.DeclaredNestedTypes, builtTypes, service, services);
                 builtTypes.Add(typeInfo);
 
-                result[typeInfo.AsType()] = module.Build(service);
+                result[typeInfo.AsType()] = module.Build(service, services);
             }
 
             await service._cmdLogger.DebugAsync($"Successfully built {builtTypes.Count} modules.").ConfigureAwait(false);
@@ -75,7 +75,7 @@ namespace Discord.Commands
             return result;
         }
 
-        private static void BuildSubTypes(ModuleBuilder builder, IEnumerable<TypeInfo> subTypes, List<TypeInfo> builtTypes, CommandService service)
+        private static void BuildSubTypes(ModuleBuilder builder, IEnumerable<TypeInfo> subTypes, List<TypeInfo> builtTypes, CommandService service, IServiceProvider services)
         {
             foreach (var typeInfo in subTypes)
             {
@@ -87,17 +87,18 @@ namespace Discord.Commands
                 
                 builder.AddModule((module) => 
                 {
-                    BuildModule(module, typeInfo, service);
-                    BuildSubTypes(module, typeInfo.DeclaredNestedTypes, builtTypes, service);
+                    BuildModule(module, typeInfo, service, services);
+                    BuildSubTypes(module, typeInfo.DeclaredNestedTypes, builtTypes, service, services);
                 });
 
                 builtTypes.Add(typeInfo);
             }
         }
 
-        private static void BuildModule(ModuleBuilder builder, TypeInfo typeInfo, CommandService service)
+        private static void BuildModule(ModuleBuilder builder, TypeInfo typeInfo, CommandService service, IServiceProvider services)
         {
             var attributes = typeInfo.GetCustomAttributes();
+            builder.TypeInfo = typeInfo;
 
             foreach (var attribute in attributes)
             {
@@ -117,6 +118,7 @@ namespace Discord.Commands
                         break;
                     case GroupAttribute group:
                         builder.Name = builder.Name ?? group.Prefix;
+                        builder.Group = group.Prefix;
                         builder.AddAliases(group.Prefix);
                         break;
                     case PreconditionAttribute precondition:
@@ -140,12 +142,12 @@ namespace Discord.Commands
             {
                 builder.AddCommand((command) => 
                 {
-                    BuildCommand(command, typeInfo, method, service);
+                    BuildCommand(command, typeInfo, method, service, services);
                 });
             }
         }
 
-        private static void BuildCommand(CommandBuilder builder, TypeInfo typeInfo, MethodInfo method, CommandService service)
+        private static void BuildCommand(CommandBuilder builder, TypeInfo typeInfo, MethodInfo method, CommandService service, IServiceProvider serviceprovider)
         {
             var attributes = method.GetCustomAttributes();
             
@@ -191,7 +193,7 @@ namespace Discord.Commands
             {
                 builder.AddParameter((parameter) => 
                 {
-                    BuildParameter(parameter, paramInfo, pos++, count, service);
+                    BuildParameter(parameter, paramInfo, pos++, count, service, serviceprovider);
                 });
             }
 
@@ -227,7 +229,7 @@ namespace Discord.Commands
             builder.Callback = ExecuteCallback;
         }
 
-        private static void BuildParameter(ParameterBuilder builder, System.Reflection.ParameterInfo paramInfo, int position, int count, CommandService service)
+        private static void BuildParameter(ParameterBuilder builder, System.Reflection.ParameterInfo paramInfo, int position, int count, CommandService service, IServiceProvider services)
         {
             var attributes = paramInfo.GetCustomAttributes();
             var paramType = paramInfo.ParameterType;
@@ -245,7 +247,7 @@ namespace Discord.Commands
                         builder.Summary = summary.Text;
                         break;
                     case OverrideTypeReaderAttribute typeReader:
-                        builder.TypeReader = GetTypeReader(service, paramType, typeReader.TypeReader);
+                        builder.TypeReader = GetTypeReader(service, paramType, typeReader.TypeReader, services);
                         break;
                     case ParamArrayAttribute _:
                         builder.IsMultiple = true;
@@ -285,7 +287,7 @@ namespace Discord.Commands
             }
         }
 
-        private static TypeReader GetTypeReader(CommandService service, Type paramType, Type typeReaderType)
+        private static TypeReader GetTypeReader(CommandService service, Type paramType, Type typeReaderType, IServiceProvider services)
         {
             var readers = service.GetTypeReaders(paramType);
             TypeReader reader = null;
@@ -296,7 +298,7 @@ namespace Discord.Commands
             }
 
             //We dont have a cached type reader, create one
-            reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, EmptyServiceProvider.Instance);
+            reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, services);
             service.AddTypeReader(paramType, reader);
 
             return reader;

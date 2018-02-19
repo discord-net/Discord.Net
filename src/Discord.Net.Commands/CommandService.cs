@@ -1,5 +1,3 @@
-﻿using Discord.Commands.Builders;
-using Discord.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,6 +6,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Discord.Commands.Builders;
+using Discord.Logging;
 
 namespace Discord.Commands
 {
@@ -85,7 +86,8 @@ namespace Discord.Commands
                 var builder = new ModuleBuilder(this, null, primaryAlias);
                 buildFunc(builder);
 
-                var module = builder.Build(this);
+                var module = builder.Build(this, null);
+
                 return LoadModuleInternal(module);
             }
             finally
@@ -93,8 +95,8 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public Task<ModuleInfo> AddModuleAsync<T>() => AddModuleAsync(typeof(T));
-        public async Task<ModuleInfo> AddModuleAsync(Type type)
+        public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services) => AddModuleAsync(typeof(T), services);
+        public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -104,7 +106,7 @@ namespace Discord.Commands
                 if (_typedModuleDefs.ContainsKey(type))
                     throw new ArgumentException($"This module has already been added.");
 
-                var module = (await ModuleClassBuilder.BuildAsync(this, typeInfo).ConfigureAwait(false)).FirstOrDefault();
+                var module = (await ModuleClassBuilder.BuildAsync(this, services, typeInfo).ConfigureAwait(false)).FirstOrDefault();
 
                 if (module.Value == default(ModuleInfo))
                     throw new InvalidOperationException($"Could not build the module {type.FullName}, did you pass an invalid type?");
@@ -118,13 +120,13 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly)
+        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly, IServiceProvider services)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 var types = await ModuleClassBuilder.SearchAsync(assembly, this).ConfigureAwait(false);
-                var moduleDefs = await ModuleClassBuilder.BuildAsync(types, this).ConfigureAwait(false);
+                var moduleDefs = await ModuleClassBuilder.BuildAsync(types, this, services).ConfigureAwait(false);
 
                 foreach (var info in moduleDefs)
                 {
@@ -224,7 +226,7 @@ namespace Discord.Commands
             var readers = _typeReaders.GetOrAdd(typeof(Nullable<>).MakeGenericType(valueType), x => new ConcurrentDictionary<Type, TypeReader>());
             var nullableReader = NullableTypeReader.Create(valueType, valueTypeReader);
             readers[nullableReader.GetType()] = nullableReader;
-        }  
+        }
         internal IDictionary<Type, TypeReader> GetTypeReaders(Type type)
         {
             if (_typeReaders.TryGetValue(type, out var definedTypeReaders))
@@ -277,92 +279,94 @@ namespace Discord.Commands
         public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;
-
-            var searchResult = Search(context, input);
-            if (!searchResult.IsSuccess)
-                return searchResult;
-
-            var commands = searchResult.Commands;
-            var preconditionResults = new Dictionary<CommandMatch, PreconditionResult>();
-
-            foreach (var match in commands)
+            using (var scope = services.CreateScope())
             {
-                preconditionResults[match] = await match.Command.CheckPreconditionsAsync(context, services).ConfigureAwait(false);
-            }
+                var searchResult = Search(context, input);
+                if (!searchResult.IsSuccess)
+                    return searchResult;
 
-            var successfulPreconditions = preconditionResults
-                .Where(x => x.Value.IsSuccess)
-                .ToArray();
+                var commands = searchResult.Commands;
+                var preconditionResults = new Dictionary<CommandMatch, PreconditionResult>();
 
-            if (successfulPreconditions.Length == 0)
-            {
-                //All preconditions failed, return the one from the highest priority command
-                var bestCandidate = preconditionResults
-                    .OrderByDescending(x => x.Key.Command.Priority)
-                    .FirstOrDefault(x => !x.Value.IsSuccess);
-                return bestCandidate.Value;
-            }
-
-            //If we get this far, at least one precondition was successful.
-
-            var parseResultsDict = new Dictionary<CommandMatch, ParseResult>();
-            foreach (var pair in successfulPreconditions)
-            {
-                var parseResult = await pair.Key.ParseAsync(context, searchResult, pair.Value, services).ConfigureAwait(false);
-
-                if (parseResult.Error == CommandError.MultipleMatches)
+                foreach (var match in commands)
                 {
-                    IReadOnlyList<TypeReaderValue> argList, paramList;
-                    switch (multiMatchHandling)
+                    preconditionResults[match] = await match.Command.CheckPreconditionsAsync(context, scope.ServiceProvider).ConfigureAwait(false);
+                }
+
+                var successfulPreconditions = preconditionResults
+                    .Where(x => x.Value.IsSuccess)
+                    .ToArray();
+
+                if (successfulPreconditions.Length == 0)
+                {
+                    //All preconditions failed, return the one from the highest priority command
+                    var bestCandidate = preconditionResults
+                        .OrderByDescending(x => x.Key.Command.Priority)
+                        .FirstOrDefault(x => !x.Value.IsSuccess);
+                    return bestCandidate.Value;
+                }
+
+                //If we get this far, at least one precondition was successful.
+
+                var parseResultsDict = new Dictionary<CommandMatch, ParseResult>();
+                foreach (var pair in successfulPreconditions)
+                {
+                    var parseResult = await pair.Key.ParseAsync(context, searchResult, pair.Value, scope.ServiceProvider).ConfigureAwait(false);
+
+                    if (parseResult.Error == CommandError.MultipleMatches)
                     {
-                        case MultiMatchHandling.Best:
-                            argList = parseResult.ArgValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
-                            paramList = parseResult.ParamValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
-                            parseResult = ParseResult.FromSuccess(argList, paramList);
-                            break;
+                        IReadOnlyList<TypeReaderValue> argList, paramList;
+                        switch (multiMatchHandling)
+                        {
+                            case MultiMatchHandling.Best:
+                                argList = parseResult.ArgValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
+                                paramList = parseResult.ParamValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
+                                parseResult = ParseResult.FromSuccess(argList, paramList);
+                                break;
+                        }
                     }
+
+                    parseResultsDict[pair.Key] = parseResult;
                 }
 
-                parseResultsDict[pair.Key] = parseResult;
-            }
-
-            // Calculates the 'score' of a command given a parse result
-            float CalculateScore(CommandMatch match, ParseResult parseResult)
-            {
-                float argValuesScore = 0, paramValuesScore = 0;
-                
-                if (match.Command.Parameters.Count > 0)
+                // Calculates the 'score' of a command given a parse result
+                float CalculateScore(CommandMatch match, ParseResult parseResult)
                 {
-                    var argValuesSum = parseResult.ArgValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
-                    var paramValuesSum = parseResult.ParamValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
+                    float argValuesScore = 0, paramValuesScore = 0;
 
-                    argValuesScore = argValuesSum / match.Command.Parameters.Count;
-                    paramValuesScore = paramValuesSum / match.Command.Parameters.Count;
+                    if (match.Command.Parameters.Count > 0)
+                    {
+                        var argValuesSum = parseResult.ArgValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
+                        var paramValuesSum = parseResult.ParamValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
+
+                        argValuesScore = argValuesSum / match.Command.Parameters.Count;
+                        paramValuesScore = paramValuesSum / match.Command.Parameters.Count;
+                    }
+
+                    var totalArgsScore = (argValuesScore + paramValuesScore) / 2;
+                    return match.Command.Priority + totalArgsScore * 0.99f;
                 }
 
-                var totalArgsScore = (argValuesScore + paramValuesScore) / 2;
-                return match.Command.Priority + totalArgsScore * 0.99f;
+                //Order the parse results by their score so that we choose the most likely result to execute
+                var parseResults = parseResultsDict
+                    .OrderByDescending(x => CalculateScore(x.Key, x.Value));
+
+                var successfulParses = parseResults
+                    .Where(x => x.Value.IsSuccess)
+                    .ToArray();
+
+                if (successfulParses.Length == 0)
+                {
+                    //All parses failed, return the one from the highest priority command, using score as a tie breaker
+                    var bestMatch = parseResults
+                        .FirstOrDefault(x => !x.Value.IsSuccess);
+                    return bestMatch.Value;
+                }
+
+                //If we get this far, at least one parse was successful. Execute the most likely overload.
+                var chosenOverload = successfulParses[0];
+                return await chosenOverload.Key.ExecuteAsync(context, chosenOverload.Value, scope.ServiceProvider).ConfigureAwait(false);
             }
-
-            //Order the parse results by their score so that we choose the most likely result to execute
-            var parseResults = parseResultsDict
-                .OrderByDescending(x => CalculateScore(x.Key, x.Value));
-
-            var successfulParses = parseResults
-                .Where(x => x.Value.IsSuccess)
-                .ToArray();
-
-            if (successfulParses.Length == 0)
-            {
-                //All parses failed, return the one from the highest priority command, using score as a tie breaker
-                var bestMatch = parseResults
-                    .FirstOrDefault(x => !x.Value.IsSuccess);
-                return bestMatch.Value;
-            }
-
-            //If we get this far, at least one parse was successful. Execute the most likely overload.
-            var chosenOverload = successfulParses[0];
-            return await chosenOverload.Key.ExecuteAsync(context, chosenOverload.Value, services).ConfigureAwait(false);
         }
     }
 }
