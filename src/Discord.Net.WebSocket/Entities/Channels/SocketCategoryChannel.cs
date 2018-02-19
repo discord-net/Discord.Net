@@ -48,7 +48,7 @@ namespace Discord.WebSocket
         }
 
         private string DebuggerDisplay => $"{Name} ({Id}, Category)";
-        internal new SocketCategoryChannel Clone() => MemberwiseClone() as SocketCategoryChannel;       
+        internal new SocketCategoryChannel Clone() => MemberwiseClone() as SocketCategoryChannel;
 
         // IGuildChannel
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
