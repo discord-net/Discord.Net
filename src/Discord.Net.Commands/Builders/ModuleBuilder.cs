@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,12 +19,15 @@ namespace Discord.Commands.Builders
         public string Name { get; set; }
         public string Summary { get; set; }
         public string Remarks { get; set; }
+        public string Group { get; set; }
 
         public IReadOnlyList<CommandBuilder> Commands => _commands;
         public IReadOnlyList<ModuleBuilder> Modules => _submodules;
         public IReadOnlyList<PreconditionAttribute> Preconditions => _preconditions;
         public IReadOnlyList<Attribute> Attributes => _attributes;
         public IReadOnlyList<string> Aliases => _aliases;
+
+        internal TypeInfo TypeInfo { get; set; }
 
         //Automatic
         internal ModuleBuilder(CommandService service, ModuleBuilder parent)
@@ -111,17 +115,23 @@ namespace Discord.Commands.Builders
             return this;
         }
 
-        private ModuleInfo BuildImpl(CommandService service, ModuleInfo parent = null)
+        private ModuleInfo BuildImpl(CommandService service, IServiceProvider services, ModuleInfo parent = null)
         {
             //Default name to first alias
             if (Name == null)
                 Name = _aliases[0];
 
-            return new ModuleInfo(this, service, parent);
+            if (TypeInfo != null)
+            {
+                var moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(TypeInfo, service, services);
+                moduleInstance.OnModuleBuilding(service, this);
+            }
+
+            return new ModuleInfo(this, service, services, parent);
         }
 
-        public ModuleInfo Build(CommandService service) => BuildImpl(service);
+        public ModuleInfo Build(CommandService service, IServiceProvider services) => BuildImpl(service, services);
 
-        internal ModuleInfo Build(CommandService service, ModuleInfo parent) => BuildImpl(service, parent);
+        internal ModuleInfo Build(CommandService service, IServiceProvider services, ModuleInfo parent) => BuildImpl(service, services, parent);
     }
 }

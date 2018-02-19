@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
+using Discord.Commands.Builders;
 
 namespace Discord.Commands
 {
@@ -23,15 +24,18 @@ namespace Discord.Commands
         {
         }
 
+        protected virtual void OnModuleBuilding(CommandService commandService, ModuleBuilder builder)
+        {
+        }
+
         //IModuleBase
         void IModuleBase.SetContext(ICommandContext context)
         {
             var newValue = context as T;
             Context = newValue ?? throw new InvalidOperationException($"Invalid context type. Expected {typeof(T).Name}, got {context.GetType().Name}");
         }
-
         void IModuleBase.BeforeExecute(CommandInfo command) => BeforeExecute(command);
-
         void IModuleBase.AfterExecute(CommandInfo command) => AfterExecute(command);
+        void IModuleBase.OnModuleBuilding(CommandService commandService, ModuleBuilder builder) => OnModuleBuilding(commandService, builder);
     }
 }
