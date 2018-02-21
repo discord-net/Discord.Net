@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS0618
+#pragma warning disable CS0618
 using Discord.Audio;
 using Discord.Rest;
 using System;
@@ -192,12 +192,12 @@ namespace Discord.WebSocket
 
             _syncPromise = new TaskCompletionSource<bool>();
             _downloaderPromise = new TaskCompletionSource<bool>();
-            if (Discord.ApiClient.AuthTokenType != TokenType.User)
-            {
+            //if (Discord.ApiClient.AuthTokenType != TokenType.User)
+            //{
                 var _ = _syncPromise.TrySetResultAsync(true);
                 /*if (!model.Large)
                     _ = _downloaderPromise.TrySetResultAsync(true);*/
-            }
+            //}
         }
         internal void Update(ClientState state, Model model)
         {
