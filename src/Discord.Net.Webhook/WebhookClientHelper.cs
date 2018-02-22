@@ -49,7 +49,7 @@ namespace Discord.Webhook
             if (username != null)
                 args.Username = username;
             if (avatarUrl != null)
-                args.AvatarUrl = username;
+                args.AvatarUrl = avatarUrl;
             if (embeds != null)
                 args.Embeds = embeds.Select(x => x.ToModel()).ToArray();
             var msg = await client.ApiClient.UploadWebhookFileAsync(client.Webhook.Id, args, options).ConfigureAwait(false);
