@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
@@ -88,6 +88,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
             => ClientHelper.GetVoiceRegionsAsync(this, options);
+
+        /// <inheritdoc />
+        public Task<int> GetRecommendedShardCount(RequestOptions options = null)
+            => ClientHelper.GetRecommendShardCount(this, options);
         /// <inheritdoc />
         public Task<RestVoiceRegion> GetVoiceRegionAsync(string id, RequestOptions options = null)
             => ClientHelper.GetVoiceRegionAsync(this, id, options);
