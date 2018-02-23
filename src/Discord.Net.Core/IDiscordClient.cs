@@ -36,5 +36,7 @@ namespace Discord
         Task<IVoiceRegion> GetVoiceRegionAsync(string id, RequestOptions options = null);
 
         Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
+
+        Task<int> GetRecommendedShardCount(RequestOptions options = null);
     }
 }
