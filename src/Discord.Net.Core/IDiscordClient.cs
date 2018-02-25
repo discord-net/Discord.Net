@@ -37,6 +37,6 @@ namespace Discord
 
         Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
 
-        Task<int> GetRecommendedShardCount(RequestOptions options = null);
+        Task<int> GetRecommendedShardCountAsync(RequestOptions options = null);
     }
 }

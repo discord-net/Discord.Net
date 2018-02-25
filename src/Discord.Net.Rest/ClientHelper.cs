@@ -164,7 +164,7 @@ namespace Discord.Rest
             return models.Select(x => RestVoiceRegion.Create(client, x)).FirstOrDefault(x => x.Id == id);
         }
 
-        public static async Task<int> GetRecommendShardCount(BaseDiscordClient client, RequestOptions options)
+        public static async Task<int> GetRecommendShardCountAsync(BaseDiscordClient client, RequestOptions options)
         {
             var response = await client.ApiClient.GetBotGatewayAsync(options);
             return response.Shards;

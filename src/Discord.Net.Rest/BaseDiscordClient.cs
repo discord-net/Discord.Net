@@ -126,8 +126,8 @@ namespace Discord.Rest
         public void Dispose() => Dispose(true);
 
         /// <inheritdoc />
-        public Task<int> GetRecommendedShardCount(RequestOptions options = null)
-            => ClientHelper.GetRecommendShardCount(this, options);
+        public Task<int> GetRecommendedShardCountAsync(RequestOptions options = null)
+            => ClientHelper.GetRecommendShardCountAsync(this, options);
 
         //IDiscordClient
         ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;

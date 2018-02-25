@@ -75,7 +75,7 @@ namespace Discord.WebSocket
         {
             if (_automaticShards)
             {
-                var shardCount = await GetRecommendedShardCount().ConfigureAwait(false);
+                var shardCount = await GetRecommendedShardCountAsync().ConfigureAwait(false);
                 _shardIds = Enumerable.Range(0, shardCount).ToArray();
                 _totalShards = _shardIds.Length;
                 _shards = new DiscordSocketClient[_shardIds.Length];
