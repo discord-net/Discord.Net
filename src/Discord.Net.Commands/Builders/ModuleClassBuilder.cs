@@ -307,7 +307,8 @@ namespace Discord.Commands
         private static bool IsValidModuleDefinition(TypeInfo typeInfo)
         {
             return _moduleTypeInfo.IsAssignableFrom(typeInfo) &&
-                   !typeInfo.IsAbstract;
+                   !typeInfo.IsAbstract &&
+                   !typeInfo.ContainsGenericParameters;
         }
 
         private static bool IsValidCommandDefinition(MethodInfo methodInfo)
