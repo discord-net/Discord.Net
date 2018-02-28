@@ -188,5 +188,50 @@ namespace Discord
 
             return Task.CompletedTask;
         }
+
+        /// <summary>
+        /// Tests for the <see cref="Discord.Permissions"/> class.
+        /// 
+        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/> 
+        /// returns the correct value when no permissions are set.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public Task TestPermissionsHasGuildPermissionNone()
+        {
+            var value = GuildPermissions.None;
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Tests for the <see cref="Discord.Permissions"/> class.
+        /// 
+        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/> 
+        /// returns the correct value when all permissions are set.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public Task TestPermissionsHasGuildPermissionAll()
+        {
+            var value = GuildPermissions.All;
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Tests for the <see cref="Discord.Permissions"/> class.
+        /// 
+        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/> 
+        /// returns the correct value when webhook permissions are set.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public Task TestPermissionsHasGuildPermissionWebhook()
+        {
+            var value = GuildPermissions.All;
+
+            return Task.CompletedTask;
+        }
     }
 }
