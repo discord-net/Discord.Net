@@ -472,7 +472,6 @@ namespace Discord.API
             return await SendAsync<IReadOnlyCollection<Message>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
 
-
         public async Task<Message> CreateMessageAsync(ulong channelId, CreateMessageParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
