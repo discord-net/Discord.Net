@@ -166,7 +166,7 @@ namespace Discord.Rest
 
         public static async Task<int> GetRecommendShardCountAsync(BaseDiscordClient client, RequestOptions options)
         {
-            var response = await client.ApiClient.GetBotGatewayAsync(options);
+            var response = await client.ApiClient.GetBotGatewayAsync(options).ConfigureAwait(false);
             return response.Shards;
         }
     }
