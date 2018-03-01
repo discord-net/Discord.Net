@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace Discord
 {
-    public partial class Tests
+    public class PermissionsTests
     {
         private void TestHelper(ChannelPermissions value, ChannelPermission permission, bool expected = false)
             => TestHelper(value.RawValue, (ulong)permission, expected);
@@ -119,6 +119,7 @@ namespace Discord
         /// from the Has method.
         /// </summary>
         /// <returns></returns>
+        [Fact]
         public Task TestPermissionsHasChannelPermissionNone()
         {
             // check that none will fail all
@@ -155,6 +156,7 @@ namespace Discord
         /// from the Has method.
         /// </summary>
         /// <returns></returns>
+        [Fact]
         public Task TestPermissionsHasChannelPermissionDM()
         {
             // check that none will fail all
@@ -191,6 +193,7 @@ namespace Discord
         /// from the Has method.
         /// </summary>
         /// <returns></returns>
+        [Fact]
         public Task TestPermissionsHasChannelPermissionGroup()
         {
             var value = ChannelPermissions.Group;
