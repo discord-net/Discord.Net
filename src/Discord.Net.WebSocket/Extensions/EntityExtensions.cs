@@ -7,8 +7,15 @@ namespace Discord.WebSocket
             // Spotify Game
             if (model.SyncId.IsSpecified)
             {
-                return new SpotifyGame()
+                var assets = model.Assets.GetValueOrDefault()?.ToEntity();
+                return new SpotifyGame
                 {
+                    Name = model.Name,
+                    SessionId = model.SessionId.GetValueOrDefault(),
+                    SyncId = model.SyncId.Value,
+                    TrackAlbum = assets?[1]?.Text,
+                    TrackTitle = model.Details.GetValueOrDefault(),
+                    Artists = model.State.GetValueOrDefault()?.Split(';')
                 };
             }
 
