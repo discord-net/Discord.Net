@@ -48,11 +48,13 @@ namespace Discord.Commands
             /*if (!validTypes.Any())
                 throw new InvalidOperationException("Could not find any valid modules from the given selection");*/
 
+            var topLevelGroups = validTypes.Where(x => x.DeclaringType == null || !IsValidModuleDefinition(x.DeclaringType.GetTypeInfo()));
+
             var builtTypes = new List<TypeInfo>();
 
             var result = new Dictionary<Type, ModuleInfo>();
 
-            foreach (var typeInfo in validTypes)
+            foreach (var typeInfo in topLevelGroups)
             {
                 // TODO: This shouldn't be the case; may be safe to remove?
                 if (result.ContainsKey(typeInfo.AsType()))
