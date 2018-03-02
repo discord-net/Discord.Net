@@ -55,7 +55,7 @@ namespace Discord.WebSocket
         }
 
         // (Small, Large)
-        public static GameAsset[] ToEntity(this API.GameAssets model, ulong appId = 0)
+        public static GameAsset[] ToEntity(this API.GameAssets model, ulong? appId = null)
         {
             return new GameAsset[]
             {
