@@ -16,7 +16,7 @@ namespace Discord.WebSocket
             if (model.ApplicationId.IsSpecified)
             {
                 ulong appId = model.ApplicationId.Value;
-                var assets = model.Assets.GetValueOrDefault()?.ToEntity(appId);
+                var assets = model.Assets.GetValueOrDefault()?.ToEntity();
                 return new RichGame
                 {
                     ApplicationId = appId,
@@ -42,19 +42,17 @@ namespace Discord.WebSocket
         }
 
         // (Small, Large)
-        public static GameAsset[] ToEntity(this API.GameAssets model, ulong appId)
+        public static GameAsset[] ToEntity(this API.GameAssets model)
         {
             return new GameAsset[]
             {
                 model.SmallImage.IsSpecified ? new GameAsset
                 {
-                    ApplicationId = appId,
                     ImageId = model.SmallImage.GetValueOrDefault(),
                     Text = model.SmallText.GetValueOrDefault()
                 } : null,
                 model.LargeImage.IsSpecified ? new GameAsset
                 {
-                    ApplicationId = appId,
                     ImageId = model.LargeImage.GetValueOrDefault(),
                     Text = model.LargeText.GetValueOrDefault()
                 } : null,
