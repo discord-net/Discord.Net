@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -13,6 +14,7 @@ namespace Discord
         public string SyncId { get; internal set; }
         public string SessionId { get; internal set; }
         public string[] Artists { get; internal set; }
+        public TimeSpan? Duration { get; internal set; }
 
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} (Spotify)";

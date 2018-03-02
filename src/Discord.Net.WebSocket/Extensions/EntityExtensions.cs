@@ -8,6 +8,7 @@ namespace Discord.WebSocket
             if (model.SyncId.IsSpecified)
             {
                 var assets = model.Assets.GetValueOrDefault()?.ToEntity();
+                var timestamps = model.Timestamps.IsSpecified ? model.Timestamps.Value.ToEntity() : null;
                 return new SpotifyGame
                 {
                     Name = model.Name,
@@ -15,7 +16,8 @@ namespace Discord.WebSocket
                     SyncId = model.SyncId.Value,
                     TrackAlbum = assets?[1]?.Text,
                     TrackTitle = model.Details.GetValueOrDefault(),
-                    Artists = model.State.GetValueOrDefault()?.Split(';')
+                    Artists = model.State.GetValueOrDefault()?.Split(';'),
+                    Duration = timestamps?.End - timestamps?.Start
                 };
             }
 
