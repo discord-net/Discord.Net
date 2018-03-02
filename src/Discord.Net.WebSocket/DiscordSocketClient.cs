@@ -1294,7 +1294,7 @@ namespace Discord.WebSocket
                             case "PRESENCE_UPDATE":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (PRESENCE_UPDATE)").ConfigureAwait(false);
-
+                                    await _gatewayLogger.DebugAsync(payload.ToString());
                                     var data = (payload as JToken).ToObject<API.Presence>(_serializer);
 
                                     if (data.GuildId.IsSpecified)

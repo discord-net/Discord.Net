@@ -4,6 +4,14 @@ namespace Discord.WebSocket
     {
         public static IActivity ToEntity(this API.Game model)
         {
+            // Spotify Game
+            if (model.SyncId.IsSpecified)
+            {
+                return new SpotifyGame()
+                {
+                };
+            }
+
             // Rich Game
             if (model.ApplicationId.IsSpecified)
             {
