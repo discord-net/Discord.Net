@@ -9,11 +9,12 @@ namespace Discord
     {
         internal SpotifyGame() { }
 
+        public string[] Artists { get; internal set; }
+        public string AlbumArt { get; internal set; }
+        public string AlbumTitle { get; internal set; }
         public string TrackTitle { get; internal set; }
-        public string TrackAlbum { get; internal set; }
         public string SyncId { get; internal set; }
         public string SessionId { get; internal set; }
-        public string[] Artists { get; internal set; }
         public TimeSpan? Duration { get; internal set; }
 
         public override string ToString() => Name;

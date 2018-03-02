@@ -8,16 +8,19 @@ namespace Discord.WebSocket
             if (model.SyncId.IsSpecified)
             {
                 var assets = model.Assets.GetValueOrDefault()?.ToEntity();
+                string albumText = assets?[1]?.Text;
+                string albumArtId = assets?[1]?.ImageId?.Replace("spotify:","");
                 var timestamps = model.Timestamps.IsSpecified ? model.Timestamps.Value.ToEntity() : null;
                 return new SpotifyGame
                 {
                     Name = model.Name,
                     SessionId = model.SessionId.GetValueOrDefault(),
                     SyncId = model.SyncId.Value,
-                    TrackAlbum = assets?[1]?.Text,
+                    AlbumTitle = albumText,
                     TrackTitle = model.Details.GetValueOrDefault(),
                     Artists = model.State.GetValueOrDefault()?.Split(';'),
-                    Duration = timestamps?.End - timestamps?.Start
+                    Duration = timestamps?.End - timestamps?.Start,
+                    AlbumArt = albumArtId != null ? $"https://i.scdn.co/image/{albumArtId}" : null ,
                 };
             }
 
@@ -25,7 +28,7 @@ namespace Discord.WebSocket
             if (model.ApplicationId.IsSpecified)
             {
                 ulong appId = model.ApplicationId.Value;
-                var assets = model.Assets.GetValueOrDefault()?.ToEntity();
+                var assets = model.Assets.GetValueOrDefault()?.ToEntity(appId);
                 return new RichGame
                 {
                     ApplicationId = appId,
@@ -51,17 +54,19 @@ namespace Discord.WebSocket
         }
 
         // (Small, Large)
-        public static GameAsset[] ToEntity(this API.GameAssets model)
+        public static GameAsset[] ToEntity(this API.GameAssets model, ulong appId = 0)
         {
             return new GameAsset[]
             {
                 model.SmallImage.IsSpecified ? new GameAsset
                 {
+                    ApplicationId = appId,
                     ImageId = model.SmallImage.GetValueOrDefault(),
                     Text = model.SmallText.GetValueOrDefault()
                 } : null,
                 model.LargeImage.IsSpecified ? new GameAsset
                 {
+                    ApplicationId = appId,
                     ImageId = model.LargeImage.GetValueOrDefault(),
                     Text = model.LargeText.GetValueOrDefault()
                 } : null,
