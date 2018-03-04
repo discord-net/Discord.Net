@@ -95,9 +95,11 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services) => AddModuleAsync(typeof(T), services);
-        public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services)
+        public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services = null) => AddModuleAsync(typeof(T), services);
+        public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services = null)
         {
+            services = services ?? EmptyServiceProvider.Instance;
+
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
@@ -120,8 +122,10 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly, IServiceProvider services)
+        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly, IServiceProvider services = null)
         {
+            services = services ?? EmptyServiceProvider.Instance;
+
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
