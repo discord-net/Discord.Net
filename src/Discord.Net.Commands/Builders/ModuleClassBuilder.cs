@@ -48,8 +48,7 @@ namespace Discord.Commands
             /*if (!validTypes.Any())
                 throw new InvalidOperationException("Could not find any valid modules from the given selection");*/
 
-            var topLevelGroups = validTypes.Where(x => x.DeclaringType == null);
-            var subGroups = validTypes.Intersect(topLevelGroups);
+            var topLevelGroups = validTypes.Where(x => x.DeclaringType == null || !IsValidModuleDefinition(x.DeclaringType.GetTypeInfo()));
 
             var builtTypes = new List<TypeInfo>();
 
