@@ -13,14 +13,9 @@ namespace Discord
             string extension = FormatToExtension(format, avatarId);
             return $"{DiscordConfig.CDNUrl}avatars/{userId}/{avatarId}.{extension}?size={size}";
         }
-        public static string GetDefaultUserAvatarUrl(string discriminator)
+        public static string GetDefaultUserAvatarUrl(ushort discriminator)
         {
-            if (string.IsNullOrEmpty(discriminator))
-                throw new ArgumentNullException(nameof(discriminator));
-
-            int discriminator_mod = Convert.ToInt32(discriminator) % 5;
-
-            return $"{DiscordConfig.CDNUrl}embed/avatars/{discriminator_mod}";
+            return $"{DiscordConfig.CDNUrl}embed/avatars/{discriminator % 5}.png";
         }
         public static string GetGuildIconUrl(ulong guildId, string iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}icons/{guildId}/{iconId}.jpg" : null;
