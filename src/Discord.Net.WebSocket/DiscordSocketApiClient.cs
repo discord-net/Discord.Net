@@ -207,7 +207,6 @@ namespace Discord.API
             await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, null, bytes, true, options)).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
-
         
         public async Task SendIdentifyAsync(int largeThreshold = 100, int shardID = 0, int totalShards = 1, RequestOptions options = null)
         {
