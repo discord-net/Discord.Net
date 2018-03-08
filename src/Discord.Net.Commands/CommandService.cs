@@ -264,11 +264,12 @@ namespace Discord.Commands
             return null;
         }
         public void ReplaceDefaultTypereader<T>(TypeReader reader)
+            => ReplaceDefaultTypereader(typeof(T), reader);
+        public void ReplaceDefaultTypereader(Type type, TypeReader reader)
         {
-            var key = typeof(T);
-            if (_defaultTypeReaders.ContainsKey(key))
+            if (_defaultTypeReaders.ContainsKey(type))
             {
-                _defaultTypeReaders.AddOrUpdate(key, k => throw new Exception("This shouldn't happen?"), (k, v) => reader);
+                _defaultTypeReaders.AddOrUpdate(type, k => throw new Exception("This shouldn't happen?"), (k, v) => reader);
             }
         }
 
