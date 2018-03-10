@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -37,7 +37,7 @@ namespace Discord.Rest
         public override async Task UpdateAsync(RequestOptions options = null)
         {
             var model = await Discord.ApiClient.GetChannelAsync(Id, options).ConfigureAwait(false);
-            Update(model); 
+            Update(model);
         }
         public Task CloseAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
@@ -66,11 +66,11 @@ namespace Discord.Rest
         public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
 #if FILESYSTEM
-        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, RequestOptions options = null)
-            => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, options);
+        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+            => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, options);
 #endif
-        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, RequestOptions options = null)
-            => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, options);
+        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+            => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options);
 
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);
@@ -122,11 +122,11 @@ namespace Discord.Rest
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
 
 #if FILESYSTEM
-        async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, RequestOptions options)
-            => await SendFileAsync(filePath, text, isTTS, options).ConfigureAwait(false);
+        async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed, RequestOptions options)
+            => await SendFileAsync(filePath, text, isTTS, embed, options).ConfigureAwait(false);
 #endif
-        async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, RequestOptions options)
-            => await SendFileAsync(stream, filename, text, isTTS, options).ConfigureAwait(false);
+        async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options)
+            => await SendFileAsync(stream, filename, text, isTTS, embed, options).ConfigureAwait(false);
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
         IDisposable IMessageChannel.EnterTypingState(RequestOptions options)

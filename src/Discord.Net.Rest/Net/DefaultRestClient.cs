@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+using Discord.Net.Converters;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -35,7 +36,7 @@ namespace Discord.Net.Rest
             SetHeader("accept-encoding", "gzip, deflate");
 
             _cancelToken = CancellationToken.None;
-            _errorDeserializer = new JsonSerializer();
+            _errorDeserializer = new JsonSerializer() { ContractResolver = new DiscordContractResolver() };
         }
         private void Dispose(bool disposing)
         {

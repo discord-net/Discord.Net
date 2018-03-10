@@ -1,18 +1,26 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
+using Discord.Net.Converters;
 using Discord.Net.Rest;
+using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Text;
 
 namespace Discord.API.Rest
 {
     internal class UploadFileParams
     {
+        // Fuckin Discord man.
+        private static JsonSerializer _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
+
         public Stream File { get; }
 
         public Optional<string> Filename { get; set; }
         public Optional<string> Content { get; set; }
         public Optional<string> Nonce { get; set; }
         public Optional<bool> IsTTS { get; set; }
+        public Optional<Embed> Embed { get; set; }
 
         public UploadFileParams(Stream file)
         {
@@ -29,6 +37,17 @@ namespace Discord.API.Rest
                 d["tts"] = IsTTS.Value.ToString();
             if (Nonce.IsSpecified)
                 d["nonce"] = Nonce.Value;
+            if (Embed.IsSpecified)
+            {
+                var sb = new StringBuilder(256);
+                using (TextWriter text = new StringWriter(sb, CultureInfo.InvariantCulture))
+                using (JsonWriter writer = new JsonTextWriter(text))
+                {
+                    // I apologise for the mess I've created here, god damn is this annoying.
+                    _serializer.Serialize(writer, new Dictionary<string, object>() { { "embed", Embed.Value } });
+                }
+                d["payload_json"] = sb.ToString();
+            }
             return d;
         }
     }
