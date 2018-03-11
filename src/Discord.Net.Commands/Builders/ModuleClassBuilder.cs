@@ -246,7 +246,7 @@ namespace Discord.Commands
                         builder.Summary = summary.Text;
                         break;
                     case OverrideTypeReaderAttribute typeReader:
-                        builder.TypeReader = ReflectionUtils.CreateObject<TypeReader>(typeReader.TypeReader.GetTypeInfo(), service, EmptyServiceProvider.Instance);
+                        builder.TypeReader = ReflectionUtils.CreateObject<TypeReader>(typeReader.TypeReader.GetTypeInfo(), service, services);
                         break;
                     case ParamArrayAttribute _:
                         builder.IsMultiple = true;
