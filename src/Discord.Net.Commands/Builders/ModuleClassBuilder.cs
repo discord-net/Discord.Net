@@ -246,7 +246,7 @@ namespace Discord.Commands
                         builder.Summary = summary.Text;
                         break;
                     case OverrideTypeReaderAttribute typeReader:
-                        builder.TypeReader = GetTypeReader(service, paramType, typeReader.TypeReader, services);
+                        builder.TypeReader = ReflectionUtils.CreateObject<TypeReader>(typeReader.TypeReader.GetTypeInfo(), service, services);
                         break;
                     case ParamArrayAttribute _:
                         builder.IsMultiple = true;
@@ -274,26 +274,9 @@ namespace Discord.Commands
 
             if (builder.TypeReader == null)
             {
-                builder.TypeReader = service.GetDefaultTypeReader(paramType)
-                    ?? service.GetTypeReaders(paramType)?.FirstOrDefault().Value;
+                builder.TypeReader = service.GetTypeReaders(paramType)?.FirstOrDefault().Value
+                    ?? service.GetDefaultTypeReader(paramType);
             }
-        }
-
-        private static TypeReader GetTypeReader(CommandService service, Type paramType, Type typeReaderType, IServiceProvider services)
-        {
-            var readers = service.GetTypeReaders(paramType);
-            TypeReader reader = null;
-            if (readers != null)
-            {
-                if (readers.TryGetValue(typeReaderType, out reader))
-                    return reader;
-            }
-
-            //We dont have a cached type reader, create one
-            reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, services);
-            service.AddTypeReader(paramType, reader);
-
-            return reader;
         }
 
         private static bool IsValidModuleDefinition(TypeInfo typeInfo)
