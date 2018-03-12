@@ -36,7 +36,7 @@ namespace Discord.Net.Rest
             SetHeader("accept-encoding", "gzip, deflate");
 
             _cancelToken = CancellationToken.None;
-            _errorDeserializer = new JsonSerializer() { ContractResolver = new DiscordContractResolver() };
+            _errorDeserializer = new JsonSerializer();
         }
         private void Dispose(bool disposing)
         {
