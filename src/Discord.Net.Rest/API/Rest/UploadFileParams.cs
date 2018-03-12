@@ -11,7 +11,6 @@ namespace Discord.API.Rest
 {
     internal class UploadFileParams
     {
-        // Fuckin Discord man.
         private static JsonSerializer _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
 
         public Stream File { get; }
@@ -43,8 +42,10 @@ namespace Discord.API.Rest
                 using (TextWriter text = new StringWriter(sb, CultureInfo.InvariantCulture))
                 using (JsonWriter writer = new JsonTextWriter(text))
                 {
-                    // I apologise for the mess I've created here, god damn is this annoying.
-                    _serializer.Serialize(writer, new Dictionary<string, object>() { { "embed", Embed.Value } });
+                    Dictionary<string, object> dictionary = new Dictionary<string, object>();
+                    dictionary["embed"] = Embed.Value;
+
+                    _serializer.Serialize(writer, dictionary);
                 }
                 d["payload_json"] = sb.ToString();
             }
