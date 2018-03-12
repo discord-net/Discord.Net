@@ -36,6 +36,19 @@ namespace _02_commands_framework.Modules
             await ReplyAsync(user.ToString());
         }
 
+        // Ban a user
+        [Command("ban")]
+        [RequireContext(ContextType.Guild)]
+        // make sure the user invoking the command can ban
+        [RequireUserPermission(GuildPermission.BanMembers)]
+        // make sure the bot itself can ban
+        [RequireBotPermission(GuildPermission.BanMembers)]
+        public async Task BanUserAsync(IGuildUser user, [Remainder] string reason = null)
+        {
+            await user.Guild.AddBanAsync(user, reason: reason);
+            await ReplyAsync("ok!");
+        }
+
         // [Remainder] takes the rest of the command's arguments as one argument, rather than splitting every space
         [Command("echo")]
         public Task EchoAsync([Remainder] string text)
@@ -43,6 +56,7 @@ namespace _02_commands_framework.Modules
             => ReplyAsync('\u200B' + text);
 
         // 'params' will parse space-separated elements into a list
+        [Command("list")]
         public Task ListAsync(params string[] objects)
             => ReplyAsync("You listed: " + string.Join("; ", objects));
     }

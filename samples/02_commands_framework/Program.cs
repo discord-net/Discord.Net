@@ -1,11 +1,11 @@
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
 using _02_commands_framework.Services;
-using System.Net.Http;
 
 namespace _02_commands_framework
 {
