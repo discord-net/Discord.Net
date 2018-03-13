@@ -38,16 +38,19 @@ namespace Discord.API.Rest
                 d["nonce"] = Nonce.Value;
             if (Embed.IsSpecified)
             {
-                var sb = new StringBuilder(256);
-                using (TextWriter text = new StringWriter(sb, CultureInfo.InvariantCulture))
-                using (JsonWriter writer = new JsonTextWriter(text))
+                var payload = new StringBuilder();
+                using (var text = new StringWriter(payload))
+                using (var writer = new JsonTextWriter(text))
                 {
-                    Dictionary<string, object> dictionary = new Dictionary<string, object>();
-                    dictionary["embed"] = Embed.Value;
+                    var map = new Dictionary<string, object>()
+                    {
+                        ["embed"] = Embed.Value,
+                    };
 
-                    _serializer.Serialize(writer, dictionary);
+                    _serializer.Serialize(writer, map);
                 }
-                d["payload_json"] = sb.ToString();
+                d["payload_json"] = payload.ToString();
+
             }
             return d;
         }
