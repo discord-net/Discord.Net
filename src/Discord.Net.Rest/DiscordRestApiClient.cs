@@ -69,6 +69,8 @@ namespace Discord.API
         {
             switch (tokenType)
             {
+                case default(TokenType):
+                    return token;
                 case TokenType.Bot:
                     return $"Bot {token}";
                 case TokenType.Bearer:
