@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 
 namespace Discord.Net.Converters
@@ -18,12 +18,15 @@ namespace Discord.Net.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            T obj;
+            object obj;
             if (_innerConverter != null)
-                obj = (T)_innerConverter.ReadJson(reader, typeof(T), null, serializer);
+                obj = _innerConverter.ReadJson(reader, typeof(T), null, serializer);
             else
                 obj = serializer.Deserialize<T>(reader);
-            return new Optional<T>(obj);
+
+            if (obj is Optional<T>)
+                return obj;
+            return new Optional<T>((T)obj);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
