@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Discord.API.Gateway;
 using Discord.API.Rest;
 using Discord.Net.Queue;
@@ -207,18 +207,7 @@ namespace Discord.API
             await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, null, bytes, true, options)).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
-
-        //Gateway
-        public async Task<GetGatewayResponse> GetGatewayAsync(RequestOptions options = null)
-        {
-            options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<GetGatewayResponse>("GET", () => "gateway", new BucketIds(), options: options).ConfigureAwait(false);
-        }
-        public async Task<GetBotGatewayResponse> GetBotGatewayAsync(RequestOptions options = null)
-        {
-            options = RequestOptions.CreateOrClone(options);
-            return await SendAsync<GetBotGatewayResponse>("GET", () => "gateway/bot", new BucketIds(), options: options).ConfigureAwait(false);
-        }
+        
         public async Task SendIdentifyAsync(int largeThreshold = 100, int shardID = 0, int totalShards = 1, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);

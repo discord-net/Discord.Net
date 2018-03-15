@@ -269,6 +269,18 @@ namespace Discord.API
             await SendAsync("GET", () => "auth/login", new BucketIds(), options: options).ConfigureAwait(false);
         }
 
+        //Gateway
+        public async Task<GetGatewayResponse> GetGatewayAsync(RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendAsync<GetGatewayResponse>("GET", () => "gateway", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+        public async Task<GetBotGatewayResponse> GetBotGatewayAsync(RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendAsync<GetBotGatewayResponse>("GET", () => "gateway/bot", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
         //Channels
         public async Task<Channel> GetChannelAsync(ulong channelId, RequestOptions options = null)
         {
