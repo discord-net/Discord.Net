@@ -18,15 +18,20 @@ namespace Discord.Net.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            object obj;
+            T obj;
+            // custom converters need to be able to safely fail; move this check in here to prevent wasteful casting when parsing primitives
             if (_innerConverter != null)
-                obj = _innerConverter.ReadJson(reader, typeof(T), null, serializer);
+            {
+                object o = _innerConverter.ReadJson(reader, typeof(T), null, serializer);
+                if (o is Optional<T>)
+                    return o;
+
+                obj = (T)o;
+            }
             else
                 obj = serializer.Deserialize<T>(reader);
 
-            if (obj is Optional<T>)
-                return obj;
-            return new Optional<T>((T)obj);
+            return new Optional<T>(obj);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
