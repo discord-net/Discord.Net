@@ -5,6 +5,7 @@ using Discord.Net.Converters;
 using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
+using Discord.WebSocket.Entities.Guilds;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -1474,6 +1475,9 @@ namespace Discord.WebSocket
                                         await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
                                         return;
                                     }
+
+                                    SocketVoiceServer VoiceServer = new SocketVoiceServer(data.GuildId, data.Endpoint, data.Token);
+                                    await TimedInvokeAsync(_voiceServerUpdatedEvent, nameof(UserVoiceStateUpdated), VoiceServer).ConfigureAwait(false);
                                 }
                                 break;
 

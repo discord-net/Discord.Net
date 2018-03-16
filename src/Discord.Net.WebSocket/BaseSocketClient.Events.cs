@@ -1,4 +1,5 @@
-﻿using System;
+using Discord.WebSocket.Entities.Guilds;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord.WebSocket
@@ -165,6 +166,13 @@ namespace Discord.WebSocket
             remove { _userVoiceStateUpdatedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketUser, SocketVoiceState, SocketVoiceState, Task>> _userVoiceStateUpdatedEvent = new AsyncEvent<Func<SocketUser, SocketVoiceState, SocketVoiceState, Task>>();
+        /// <summary> Fired when the bot connects/disconnects to a Discord voice server. </summary>
+        public event Func<SocketVoiceServer, Task> VoiceServerUpdated
+        {
+            add { _voiceServerUpdatedEvent.Add(value);  }
+            remove { _voiceServerUpdatedEvent.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<SocketVoiceServer, Task>> _voiceServerUpdatedEvent = new AsyncEvent<Func<SocketVoiceServer, Task>>();
         /// <summary> Fired when the connected account is updated. </summary>
         public event Func<SocketSelfUser, SocketSelfUser, Task> CurrentUserUpdated {
             add { _selfUpdatedEvent.Add(value); }
