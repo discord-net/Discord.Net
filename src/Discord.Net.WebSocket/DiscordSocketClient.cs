@@ -1466,7 +1466,7 @@ namespace Discord.WebSocket
                                     var data = (payload as JToken).ToObject<VoiceServerUpdateEvent>(_serializer);
                                     var guild = State.GetGuild(data.GuildId);
 
-                                    var voiceServer = new Entities.Guilds.SocketVoiceServer(data.GuildId, data.Endpoint, data.Token);
+                                    var voiceServer = new SocketVoiceServer(data.GuildId, data.Endpoint, data.Token);
                                     await TimedInvokeAsync(_voiceServerUpdatedEvent, nameof(UserVoiceStateUpdated), voiceServer).ConfigureAwait(false);
 
                                     if (guild != null)

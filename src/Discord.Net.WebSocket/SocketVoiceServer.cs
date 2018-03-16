@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Discord.WebSocket.Entities.Guilds
+namespace Discord.WebSocket
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketVoiceServer
