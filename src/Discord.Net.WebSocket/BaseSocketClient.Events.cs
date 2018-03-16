@@ -1,4 +1,3 @@
-using Discord.WebSocket.Entities.Guilds;
 using System;
 using System.Threading.Tasks;
 
