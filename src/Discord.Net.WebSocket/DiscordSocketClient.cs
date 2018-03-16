@@ -5,7 +5,7 @@ using Discord.Net.Converters;
 using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
-using Discord.WebSocket.Entities.Guilds;
+using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -1465,6 +1465,10 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<VoiceServerUpdateEvent>(_serializer);
                                     var guild = State.GetGuild(data.GuildId);
+
+                                    var voiceServer = new Entities.Guilds.SocketVoiceServer(data.GuildId, data.Endpoint, data.Token);
+                                    await TimedInvokeAsync(_voiceServerUpdatedEvent, nameof(UserVoiceStateUpdated), voiceServer).ConfigureAwait(false);
+
                                     if (guild != null)
                                     {
                                         string endpoint = data.Endpoint.Substring(0, data.Endpoint.LastIndexOf(':'));
@@ -1476,8 +1480,6 @@ namespace Discord.WebSocket
                                         return;
                                     }
 
-                                    SocketVoiceServer VoiceServer = new SocketVoiceServer(data.GuildId, data.Endpoint, data.Token);
-                                    await TimedInvokeAsync(_voiceServerUpdatedEvent, nameof(UserVoiceStateUpdated), VoiceServer).ConfigureAwait(false);
                                 }
                                 break;
 
