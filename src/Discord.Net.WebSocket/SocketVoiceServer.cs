@@ -9,11 +9,13 @@ namespace Discord.WebSocket
         public string Endpoint { get; private set; }
         public string Token { get; private set; }
 
-        internal SocketVoiceServer(ulong GuildId, string Endpoint, string Token)
+        internal SocketVoiceServer(ulong guildId, string endpoint, string token)
         {
-            this.GuildId = GuildId;
-            this.Endpoint = Endpoint;
-            this.Token = Token;
+            GuildId = guildId;
+            Endpoint = endpoint;
+            Token = token;
         }
+
+        private string DebuggerDisplay => $"SocketVoiceServer ({GuildId})";
     }
 }

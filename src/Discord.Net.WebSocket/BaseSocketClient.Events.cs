@@ -165,7 +165,7 @@ namespace Discord.WebSocket
             remove { _userVoiceStateUpdatedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketUser, SocketVoiceState, SocketVoiceState, Task>> _userVoiceStateUpdatedEvent = new AsyncEvent<Func<SocketUser, SocketVoiceState, SocketVoiceState, Task>>();
-        /// <summary> Fired when the bot connects/disconnects to a Discord voice server. </summary>
+        /// <summary> Fired when the bot connects to a Discord voice server. </summary>
         public event Func<SocketVoiceServer, Task> VoiceServerUpdated
         {
             add { _voiceServerUpdatedEvent.Add(value);  }

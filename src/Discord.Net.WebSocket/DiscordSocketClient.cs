@@ -5,7 +5,6 @@ using Discord.Net.Converters;
 using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
-using Discord.WebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
