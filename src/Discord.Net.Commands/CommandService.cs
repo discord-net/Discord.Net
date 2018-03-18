@@ -95,8 +95,15 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services = null) => AddModuleAsync(typeof(T), services);
-        public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services = null)
+
+        /// <summary>
+        /// Add a command module from a type
+        /// </summary>
+        /// <typeparam name="T">The type of module</typeparam>
+        /// <param name="services">An IServiceProvider for your dependency injection solution, if using one - otherwise, pass null</param>
+        /// <returns>A built module</returns>
+        public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services) => AddModuleAsync(typeof(T), services);
+        public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services)
         {
             services = services ?? EmptyServiceProvider.Instance;
 
@@ -122,7 +129,13 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly, IServiceProvider services = null)
+        /// <summary>
+        /// Add command modules from an assembly
+        /// </summary>
+        /// <param name="assembly">The assembly containing command modules</param>
+        /// <param name="services">An IServiceProvider for your dependency injection solution, if using one - otherwise, pass null</param>
+        /// <returns>A collection of built modules</returns>
+        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly, IServiceProvider services)
         {
             services = services ?? EmptyServiceProvider.Instance;
 
@@ -278,9 +291,9 @@ namespace Discord.Commands
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
 
-        public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IServiceProvider services = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
             => ExecuteAsync(context, context.Message.Content.Substring(argPos), services, multiMatchHandling);
-        public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;
 
