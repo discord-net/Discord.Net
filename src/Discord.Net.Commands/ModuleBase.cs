@@ -11,7 +11,13 @@ namespace Discord.Commands
     {
         public T Context { get; private set; }
 
-        protected virtual async Task<IUserMessage> ReplyAsync(string message, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        /// <summary>
+        /// Sends a message to the source channel
+        /// </summary>
+        /// <param name="message">Contents of the message; optional only if <paramref name="embed"/> is specified</param>
+        /// <param name="isTTS">Specifies if Discord should read this message aloud using TTS</param>
+        /// <param name="embed">An embed to be displayed alongside the message</param>
+        protected virtual async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
             return await Context.Channel.SendMessageAsync(message, isTTS, embed, options).ConfigureAwait(false);
         }
