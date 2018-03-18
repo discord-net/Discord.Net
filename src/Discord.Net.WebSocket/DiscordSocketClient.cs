@@ -1464,8 +1464,10 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<VoiceServerUpdateEvent>(_serializer);
                                     var guild = State.GetGuild(data.GuildId);
+                                    var cacheable = new Cacheable<IGuild, ulong>(guild, data.GuildId, guild != null,
+                                        async () => (IGuild) await ApiClient.GetGuildAsync(data.GuildId));
 
-                                    var voiceServer = new SocketVoiceServer(data.GuildId, data.Endpoint, data.Token);
+                                    var voiceServer = new SocketVoiceServer(cacheable, data.GuildId, data.Endpoint, data.Token);
                                     await TimedInvokeAsync(_voiceServerUpdatedEvent, nameof(UserVoiceStateUpdated), voiceServer).ConfigureAwait(false);
 
                                     if (guild != null)

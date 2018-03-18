@@ -5,17 +5,17 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketVoiceServer
     {
-        public ulong GuildId { get; private set; }
+        public Cacheable<IGuild, ulong> Guild { get; private set; }
         public string Endpoint { get; private set; }
         public string Token { get; private set; }
 
-        internal SocketVoiceServer(ulong guildId, string endpoint, string token)
+        internal SocketVoiceServer(Cacheable<IGuild, ulong> guild, ulong guildId, string endpoint, string token)
         {
-            GuildId = guildId;
+            Guild = guild;
             Endpoint = endpoint;
             Token = token;
         }
 
-        private string DebuggerDisplay => $"SocketVoiceServer ({GuildId})";
+        private string DebuggerDisplay => $"SocketVoiceServer ({Guild.Id})";
     }
 }
