@@ -7,7 +7,7 @@ namespace Discord
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SpotifyGame : Game
     {
-        public string[] Artists { get; internal set; }
+        public IEnumerable<string> Artists { get; internal set; }
         public string AlbumArt { get; internal set; }
         public string AlbumTitle { get; internal set; }
         public string TrackTitle { get; internal set; }

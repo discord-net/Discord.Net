@@ -20,7 +20,7 @@ namespace Discord.WebSocket
                     TrackTitle = model.Details.GetValueOrDefault(),
                     Artists = model.State.GetValueOrDefault()?.Split(';'),
                     Duration = timestamps?.End - timestamps?.Start,
-                    AlbumArt = albumArtId != null ? $"https://i.scdn.co/image/{albumArtId}" : null,
+                    AlbumArt = albumArtId != null ? CDN.GetSpotifyAlbumArtUrl(albumArtId) : null,
                     Type = ActivityType.Listening
                 };
             }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Discord
 {
@@ -27,6 +27,9 @@ namespace Discord
             string extension = FormatToExtension(format, "");
             return $"{DiscordConfig.CDNUrl}app-assets/{appId}/{assetId}.{extension}?size={size}";
         }
+
+        public static string GetSpotifyAlbumArtUrl(string albumArtId)
+            => $"https://i.scdn.co/image/{albumArtId}";
 
         private static string FormatToExtension(ImageFormat format, string imageId)
         {
