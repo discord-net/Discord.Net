@@ -11,9 +11,6 @@ stopped.
 To start a connection, invoke the `StartAsync` method on a client that
 supports a WebSocket connection.
 
-These clients include the [DiscordSocketClient] and 
-[DiscordRpcClient], as well as Audio clients.
-
 To end a connection, invoke the `StopAsync` method. This will
 gracefully close any open WebSocket or UdpSocket connections.
 

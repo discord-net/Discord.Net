@@ -153,7 +153,7 @@ Invoke [CommandService.AddModulesAsync] to discover modules and
 install them.
 
 [DontAutoLoadAttribute]: xref:Discord.Commands.DontAutoLoadAttribute
-[CommandService.AddModulesAsync]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddModulesAsync_Assembly_
+[CommandService.AddModulesAsync]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddModulesAsync_Assembly_System_IServiceProvider_
 
 #### Loading Modules Manually
 
@@ -161,7 +161,7 @@ To manually load a module, invoke [CommandService.AddModuleAsync] by
 passing in the generic type of your module and optionally, a
 dependency map.
 
-[CommandService.AddModuleAsync]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddModuleAsync__1
+[CommandService.AddModuleAsync]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddModuleAsync__1_System_IServiceProvider_
 
 ### Module Constructors
 
@@ -268,7 +268,7 @@ either [PreconditionAttribute] or [ParameterPreconditionAttribute]
 depending on your use.
 
 In order for your Precondition to function, you will need to override
-the [CheckPermissions] method.
+the [CheckPermissionsAsync] method.
 
 Your IDE should provide an option to fill this in for you.
 
@@ -279,7 +279,7 @@ necessary.
 
 [!code-csharp[Custom Precondition](samples/require_owner.cs)]
 
-[CheckPermissions]: xref:Discord.Commands.PreconditionAttribute#Discord_Commands_PreconditionAttribute_CheckPermissions_Discord_Commands_ICommandContext_Discord_Commands_CommandInfo_IServiceProvider_
+[CheckPermissionsAsync]: xref:Discord.Commands.PreconditionAttribute#Discord_Commands_PreconditionAttribute_CheckPermissionsAsync_Discord_Commands_ICommandContext_Discord_Commands_CommandInfo_System_IServiceProvider_
 [PreconditionResult.FromSuccess]: xref:Discord.Commands.PreconditionResult#Discord_Commands_PreconditionResult_FromSuccess
 [PreconditionResult.FromError]: xref:Discord.Commands.PreconditionResult#Discord_Commands_PreconditionResult_FromError_System_String_
 
@@ -310,7 +310,7 @@ To create a `TypeReader`, create a new class that imports @Discord and
 @Discord.Commands and ensure the class inherits from
 @Discord.Commands.TypeReader.
 
-Next, satisfy the `TypeReader` class by overriding the [Read] method.
+Next, satisfy the `TypeReader` class by overriding the [ReadAsync] method.
 
 >[!NOTE]
 >In many cases, Visual Studio can fill this in for you, using the
@@ -327,7 +327,7 @@ necessary.
 [TypeReaderResult]: xref:Discord.Commands.TypeReaderResult
 [TypeReaderResult.FromSuccess]: xref:Discord.Commands.TypeReaderResult#Discord_Commands_TypeReaderResult_FromSuccess_Discord_Commands_TypeReaderValue_
 [TypeReaderResult.FromError]: xref:Discord.Commands.TypeReaderResult#Discord_Commands_TypeReaderResult_FromError_Discord_Commands_CommandError_System_String_
-[Read]: xref:Discord.Commands.TypeReader#Discord_Commands_TypeReader_Read_Discord_Commands_ICommandContext_System_String_IServiceProvider_
+[ReadAsync]: xref:Discord.Commands.TypeReader#Discord_Commands_TypeReader_ReadAsync_Discord_Commands_ICommandContext_System_String_System_IServiceProvider_
 
 #### Sample
 
