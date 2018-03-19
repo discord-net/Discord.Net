@@ -1,7 +1,7 @@
-- name: FAQ
-  href: faq/
 - name: Guides
   href: guides/
+- name: FAQ
+  href: faq/
 - name: API Documentation
   href: api/
   homepage: api/index.md
