@@ -7,7 +7,7 @@ namespace Discord.Commands
         /// </summary>
         Default,
         /// <summary>
-        /// Executes the command on the same thread as gateway.
+        /// Executes the command on the same thread as gateway one.
         /// </summary>
         Sync,
         /// <summary>
