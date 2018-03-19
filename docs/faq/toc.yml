@@ -1,10 +1,12 @@
 - name: Getting Started
-  href: 0-GettingStarted.md
-- name: Basics
-  href: 1-Basics.md
+  href: GettingStarted.md
+- name: Client Basics
+  href: ClientBasics.md
 - name: Basic Operations
-  href: 2-BasicOperations.md
+  href: BasicOperations.md
 - name: Commands
-  href: 4-Commands.md
+  href: Commands.md
+- name: Glossary
+  href: Glossary.md
 - name: Legacy or Upgrade
-  href: 5-Legacy.md
+  href: Legacy.md
