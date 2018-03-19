@@ -33,7 +33,7 @@ able to message.
 You may check the message channel type. Visit [Glossary] to see the 
 various types of channels.
 
-[Glossary]: Glossary.md
+[Glossary]: Glossary.md#message-channels
 
 ## How do I add hyperlink text to an embed?
 
