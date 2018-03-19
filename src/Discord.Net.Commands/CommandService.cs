@@ -17,6 +17,9 @@ namespace Discord.Commands
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
 
+        /// <summary>
+        /// Fired when a command is successfully executed.
+        /// </summary>
         public event Func<CommandInfo, ICommandContext, IResult, Task> CommandExecuted { add { _commandExecutedEvent.Add(value); } remove { _commandExecutedEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>> _commandExecutedEvent = new AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>>();
 
@@ -34,8 +37,19 @@ namespace Discord.Commands
         internal readonly Logger _cmdLogger;
         internal readonly LogManager _logManager;
 
+        /// <summary>
+        /// Represents all modules loaded within <see cref="CommandService"/>.
+        /// </summary>
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
+
+        /// <summary>
+        /// Represents all commands loaded within <see cref="CommandService"/>.
+        /// </summary>
         public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
+
+        /// <summary>
+        /// Represents all <see cref="TypeReader"/> loaded within <see cref="CommandService"/>.
+        /// </summary>
         public ILookup<Type, TypeReader> TypeReaders => _typeReaders.SelectMany(x => x.Value.Select(y => new { y.Key, y.Value })).ToLookup(x => x.Key, x => x.Value);
 
         public CommandService() : this(new CommandServiceConfig()) { }
