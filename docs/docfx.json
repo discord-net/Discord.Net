@@ -30,6 +30,8 @@
         "files": [
           "guides/**.md",
           "guides/**/toc.yml",
+          "faq/**.md",
+          "faq/**/toc.yml",
           "toc.yml",
           "*.md"
         ],
@@ -67,7 +69,7 @@
       "default"
     ],
     "globalMetadata": {
-      "_appFooter": "Discord.Net (c) 2015-2017"
+      "_appFooter": "Discord.Net (c) 2015-2018"
     },
     "noLangKeyword": false
   }

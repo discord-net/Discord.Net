@@ -1,0 +1,10 @@
+- name: Getting Started
+  href: 0-GettingStarted.md
+- name: Basics
+  href: 1-Basics.md
+- name: Basic Operations
+  href: 2-BasicOperations.md
+- name: Commands
+  href: 4-Commands.md
+- name: Legacy or Upgrade
+  href: 5-Legacy.md

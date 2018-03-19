@@ -1,4 +1,5 @@
-
+- name: FAQ
+  href: faq/
 - name: Guides
   href: guides/
 - name: API Documentation
