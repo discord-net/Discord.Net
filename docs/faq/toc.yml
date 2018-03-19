@@ -1,9 +1,9 @@
 - name: Getting Started
   href: getting-started.md
-- name: Client Basics
-  href: client-basics.md
 - name: Basic Operations
   href: basic-operations.md
+- name: Client Basics
+  href: client-basics.md
 - name: Commands
   href: commands.md
 - name: Glossary
