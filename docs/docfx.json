@@ -53,17 +53,6 @@
         ]
       }
     ],
-    "overwrite": [
-      {
-        "files": [
-          "apidoc/**.md"
-        ],
-        "exclude": [
-          "obj/**",
-          "_site/**"
-        ]
-      }
-    ],
     "dest": "_site",
     "template": [
       "default"
