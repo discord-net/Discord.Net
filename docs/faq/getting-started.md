@@ -12,7 +12,9 @@ understand these topics to some extent before proceeding.
   1. [Official quick start guide](https://github.com/RogueException/Discord.Net/blob/dev/docs/guides/getting_started/samples/intro/structure.cs)
   2. [Official template](https://github.com/foxbot/DiscordBotBase/tree/csharp/src/DiscordBot)
   
-Please note that you should *not* try to blindly copy paste the code. It is meant to be a template or a guide. It is not meant to be something that will work out of the box.
+Please note that you should *not* try to blindly copy paste the code. 
+It is meant to be a template or a guide. It is not meant to be 
+something that will work out of the box.
   
 [Task-based Asynchronous Pattern]: https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap
 [polymorphism]: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/polymorphism

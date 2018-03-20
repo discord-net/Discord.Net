@@ -2,6 +2,13 @@
 
 ## My client keeps returning 401 upon logging in!
 
+> [!WARNING]
+> Userbot/selfbot (logging in with a user token) is not 
+> officially supported with this library.
+>
+> Logging in under a user account may result in account 
+> termination!
+
 There are few possible reasons why this may occur.
 	1. You are not using the appropriate [TokenType]. 
 	If you are using a bot account created from the Discord Developer 
@@ -16,11 +23,11 @@ There are few possible reasons why this may occur.
 
 ## How do I do X, Y, Z when my bot connects/logs on? Why do I get a `NullReferenceException` upon calling any client methods after connect?
 
-Your bot should not attempt to interact in any way with guilds/servers 
-until the [Ready] event fires. When the bot connects, it first has to 
-download guild information from Discord in order for you to get 
-access to any server information; the client is not ready at this 
-point. 
+Your bot should **not** attempt to interact in any way with 
+guilds/servers until the [Ready] event fires. When the bot 
+connects, it first has to download guild information from 
+Discord in order for you to get access to any server 
+information; the client is not ready at this point. 
  
 Technically, the [GuildAvailable] event fires once the data for a 
 particular guild has downloaded; however, it's best to wait for all 
