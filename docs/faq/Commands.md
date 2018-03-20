@@ -18,7 +18,7 @@ custom preconditions.
 [RequireUserPermission]: xref:Discord.Commands.RequireUserPermissionAttribute
 [Preconditions Addons]: https://github.com/Joe4evr/Discord.Addons/tree/master/src/Discord.Addons.Preconditions
 
-## I'm getting an error about `Assembly#GetEntryAssembly`. What now?
+## I'm getting an error about `Assembly#GetEntryAssembly`.
 
 You may be confusing [CommandService#AddModulesAsync] with 
 [CommandService#AddModuleAsync]. The former is used to add modules 
@@ -64,37 +64,64 @@ A brief example of service and dependency injection can be seen below.
 
 By default, all commands are executed on the same thread as the 
 gateway task, which is responsible for keeping the connection from 
-your client to Discord alive. When you execute a long-running task, 
+your client to Discord alive. By default, when you execute a command, 
 this blocks the gateway from communicating for as long as the command 
 task is being executed. The library will warn you about any long 
 running event handler (in this case, the command handler) that 
-persists for more than 3 seconds. 
+persists for **more than 3 seconds**. 
 
 To resolve this, the library has designed a flag called [RunMode]. 
-There are 2 main `RunMode`s. One being `RunMode.Sync`, which is the 
-default; another being `RunMode.Async`. `RunMode.Async` essentially 
-calls an unawaited Task and continues with the execution without 
-waiting for the command task to finish. You should use 
-`RunMode.Async` in either the [CommandAttribute] or the 
-[DefaultRunMode] flag in `CommandServiceConfig`. 
-Further details regarding `RunMode.Async` can be found below.
+
+There are 2 main `RunMode`s.
+	1. `RunMode.Sync` (default) 
+	2. `RunMode.Async`
+
+You can set the `RunMode` either by specifying it individually via
+the `CommandAttribute`, or by setting the global default with 
+the [DefaultRunMode] flag under `CommandServiceConfig`.
+
+# [CommandAttribute](#tab/cmdattrib)
+
+[!code-csharp[Command Attribute](samples/commands/runmode-cmdattrib.cs)]
+
+# [CommandServiceConfig](#tab/cmdconfig)
+
+[!code-csharp[Command Service Config](samples/commands/runmode-cmdconfig.cs)]
+
+***
+
+***
+
+> [!IMPORTANT]
+> While specifying `RunMode.Async` allows the command to be spun off 
+> to a different thread instead of the gateway thread,
+> keep in mind that there will be **potential consequences** 
+> by doing so. Before applying this flag, please 
+> consider whether it is necessary to do so.
+>
+> Further details regarding `RunMode.Async` can be found below.
 
 [RunMode]: xref:Discord.Commands.RunMode
 [CommandAttribute]: xref:Discord.Commands.CommandAttribute
 [DefaultRunMode]: xref:Discord.Commands.CommandServiceConfig#Discord_Commands_CommandServiceConfig_DefaultRunMode
 
-## Okay, that's great and all, but how does `RunMode.Async` work, and if it's so great, why is the lib *not* using it by default?
+## How does `RunMode.Async` work, and why is Discord.NET *not* using it by default?
 
-As with any async operation, `RunMode.Async` also comes at a cost. 
-The following are the caveats with RunMode.Async,
-1) You introduce race condition.
-2) Unnecessary overhead caused by [async state machine].
-3) [ExecuteAsync] will immediately return [ExecuteResult] instead of 
-other result types (this is particularly important for those who wish 
-to utilize [RuntimeResult] in 2.0).
-4) Exceptions are swallowed.
+`RunMode.Async` works by spawning a new `Task` with an unawaited 
+[Task.Run], essentially making `ExecuteAsyncInternalAsync`, the task 
+that is used to invoke the command task, to be finished on a 
+different thread. This means that [ExecuteAsync] will be forced to
+return a successful [ExecuteResult] regardless of the execution.
 
-However, there are ways to remedy #3 and #4.
+The following are the known caveats with `RunMode.Async`,
+	1. You introduce race condition.
+	2. Unnecessary overhead caused by [async state machine].
+	3. [ExecuteAsync] will immediately return [ExecuteResult] instead of 
+	other result types (this is particularly important for those who wish 
+	to utilize [RuntimeResult] in 2.0).
+	4. Exceptions are swallowed.
+
+However, there are ways to remedy some of these.
 
 For #3, in Discord.NET 2.0, the library introduces a new event called 
 [CommandExecuted], which is raised whenever the command is 
@@ -104,7 +131,8 @@ the `RunMode` type and will return the appropriate execution result.
 For #4, exceptions are caught in [CommandService#Log] event under 
 [LogMessage.Exception] as [CommandException].
 
-[async state machine]: https://www.red-gate.com/simple-talk/dotnet/net-tools/c-async-what-is-it-and-how-does-it-work/))
+[Task.Run]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task.run
+[async state machine]: https://www.red-gate.com/simple-talk/dotnet/net-tools/c-async-what-is-it-and-how-does-it-work/
 [ExecuteAsync]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_ExecuteAsync_Discord_Commands_ICommandContext_System_Int32_System_IServiceProvider_Discord_Commands_MultiMatchHandling_
 [ExecuteResult]: xref:Discord.Commands.ExecuteResult
 [RuntimeResult]: xref:Discord.Commands.RuntimeResult
