@@ -7,13 +7,13 @@ title: Terminology
 
 ## Preface
 
-Most terms for objects remain the same between 0.9 and 1.0. The major 
-difference is that the ``Server`` is now called ``Guild`` to stay in 
-line with Discord internally.
+Most terms for objects remain the same between 0.9 and 1.0 and above.
+The major difference is that the ``Server`` is now called ``Guild`` 
+to stay in line with Discord internally.
 
 ## Implementation Specific Entities
 
-Discord.Net 1.0 is split into a core library and three different 
+Discord.Net is split into a core library and three different 
 implementations - `Discord.Net.Core`, `Discord.Net.Rest`, 
 `Discord.Net.Rpc`, and `Discord.Net.WebSockets`.
 

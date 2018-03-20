@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  // The following may differ depending on the latest version of 
-  // .NET Core Framework or Discord.NET.
-  
+  <!--
+  The following may differ depending on the latest version of 
+  .NET Core Framework or Discord.NET.
+  -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp1.1</TargetFramework>

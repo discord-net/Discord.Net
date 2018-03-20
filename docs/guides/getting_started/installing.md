@@ -80,7 +80,7 @@ you're installing from the developer feed.
 1. Create a new project for your bot.
 2. Add `Discord.Net` to your .csproj.
 
-[!code-xml[Sample .csproj](samples/project.csproj)]
+[!code[Sample .csproj](samples/project.csproj)]
 
 [NuGet.Config file]: #configuring-nuget-without-visual-studio
 
@@ -145,4 +145,4 @@ your application, where the project solution is located.
 Paste the following snippets into this configuration file, adding any
 additional feeds as necessary.
 
-[!code-xml[NuGet Configuration](samples/nuget.config)]
+[!code[NuGet Configuration](samples/nuget.config)]
