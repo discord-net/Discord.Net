@@ -24,10 +24,10 @@ required. When using .NET Framework, it is suggested to target
 
 # Installing with NuGet
 
-Release builds of Discord.Net 1.0 will be published to the
+Release builds of Discord.Net will be published to the
 [official NuGet feed].
 
-Development builds of Discord.Net 1.0, as well as addons *(TODO)* are
+Development builds of Discord.Net, as well as addons *(TODO)* are
 published to our development [MyGet feed].
 
 Direct feed link: `https://www.myget.org/F/discord-net/api/v3/index.json`
@@ -91,14 +91,16 @@ In order to compile Discord.Net, you require the following:
 ### Using Visual Studio
 
 - [Visual Studio 2017](https://www.visualstudio.com/)
-- [.NET Core SDK 1.0](https://www.microsoft.com/net/download/core#/sdk)
+- [.NET Core SDK]
 
 The .NET Core and Docker (Preview) workload is required during Visual
 Studio installation.
 
 ### Using Command Line
 
-- [.NET Core SDK 1.0](https://www.microsoft.com/net/download/core#/sdk)
+- [.NET Core SDK]
+
+[.NET Core SDK]: https://www.microsoft.com/net/download/
 
 # Additional Information
 
