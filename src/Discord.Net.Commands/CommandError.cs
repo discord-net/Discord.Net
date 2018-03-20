@@ -14,7 +14,7 @@ namespace Discord.Commands
         /// </summary>
         ParseFailed,
         /// <summary>
-        /// Thrown when the input text has too few parameters.
+        /// Thrown when the input text has too few or too many arguments.
         /// </summary>
         BadArgCount,
 

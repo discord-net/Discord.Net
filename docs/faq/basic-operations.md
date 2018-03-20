@@ -20,6 +20,12 @@ A good and safe casting example:
 
 ## How do I send a message?
 
+> [!TIP]
+> The [GetChannel] method by default returns an [IChannel].
+> This means channels such as [IVoiceChannel], [ICategoryChannel]
+> can be returned. This is why that you cannot send message 
+> to channels like those.
+
 Any implementation of [IMessageChannel] has a [SendMessageAsync]
 method. You can get the channel via [GetChannel] under the client.
 Remember, when using Discord.NET, polymorphism is a common recurring 
@@ -42,7 +48,7 @@ various types of channels.
 
 There are 2 ways to do this. You can do either of the following,
 	1. Cast the user as an [IGuildUser] and use its [IGuild] property.
-	2. Cast the channel as an [ITextChannel]/[IVoiceChannel] and use 
+	2. Cast the channel as an [IGuildChannel] and use 
 	its [IGuild] property.
 
 ## How do I add hyperlink text to an embed?
@@ -67,7 +73,7 @@ implement [IEmote] and are valid options.
   
 ## Why am I getting so many preemptive rate limits when I try to add more than one reactions?
 
-This is due to how .NET parses the HTML header, mistreating 
+This is due to how HTML header works, mistreating 
 0.25sec/action to 1sec. This casues the lib to throw preemptive rate 
 limit more frequently than it should for methods such as adding 
 reactions.
@@ -77,6 +83,7 @@ reactions.
 Unfortunately, not at the moment. See [#401](https://github.com/RogueException/Discord.Net/issues/401).
    
 
+[IGuildChannel]: xref:Discord.IGuildChannel
 [ITextChannel]: xref:Discord.ITextChannel
 [IGuild]: xref:Discord.IGuild
 [IVoiceChannel]: xref:Discord.IVoiceChannel

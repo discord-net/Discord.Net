@@ -24,10 +24,13 @@ Group.
 * A **Message channel** ([IMessageChannel]) can be any of the above.
 
 ### Misc Channels
+* A **Guild channel** ([IGuildChannel]) is a guild channel in a guild.
+	- This can be any channels that may exist in a guild.
 * A **Voice channel** ([IVoiceChannel]) is a voice channel in a guild.
 * A **Category channel** ([ICategoryChannel]) (2.0+) is a category that 
 holds one or more sub-channels.
 
+[IGuildChannel]: xref:Discord.IGuildChannel
 [IMessageChannel]: xref:Discord.IMessageChannel
 [ITextChannel]: xref:Discord.ITextChannel
 [IGroupChannel]: xref:Discord.IGroupChannel

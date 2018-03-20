@@ -5,8 +5,8 @@ First of all, welcome! You may visit us on our Discord should you
 have any questions. Before you delve into using the library, 
 however, you should have some decent understanding of the language 
 you are about to use. This library touches on 
-[Task-based Asynchronous Pattern], [polymorphism], [interface] and 
-many more advanced topics extensively. Please make sure that you 
+[Task-based Asynchronous Pattern] (TAP), [polymorphism], [interface] 
+and many more advanced topics extensively. Please make sure that you 
 understand these topics to some extent before proceeding.
   
   Here are some examples:
@@ -47,7 +47,8 @@ library require an ID to retrieve the said object.
 There are 2 ways to obtain the said ID. 
   1. Enable Discord's developer mode. With developer mode enabled, 
   you can - as an example - right click on a guild and copy the guild 
-  id (please note that this does not apply to Role IDs, see below).
+  id (please note that this does not apply to all objects, such as 
+  Role IDs \[see below], or DM channel IDs).
   ![Developer Mode](images/dev-mode.png)
   2. Escape the object using `\` in front the object. For example, 
   when you do `\@Example#1234` in chat, it will return the user ID of 

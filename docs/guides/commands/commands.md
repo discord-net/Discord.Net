@@ -159,7 +159,7 @@ install them.
 
 To manually load a module, invoke [CommandService.AddModuleAsync] by
 passing in the generic type of your module and optionally, a
-dependency map.
+service provider.
 
 [CommandService.AddModuleAsync]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddModuleAsync__1_System_IServiceProvider_
 
@@ -167,8 +167,12 @@ dependency map.
 
 Modules are constructed using Dependency Injection. Any parameters
 that are placed in the Module's constructor must be injected into an
-@System.IServiceProvider first. Alternatively, you may accept an
-`IServiceProvider` as an argument and extract services yourself.
+@System.IServiceProvider first. 
+
+> [!TIP]
+> Alternatively, you may accept an
+> `IServiceProvider` as an argument and extract services yourself,
+> although this is discouraged.
 
 ### Module Properties
 

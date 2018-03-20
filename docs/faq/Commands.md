@@ -114,7 +114,7 @@ different thread. This means that [ExecuteAsync] will be forced to
 return a successful [ExecuteResult] regardless of the execution.
 
 The following are the known caveats with `RunMode.Async`,
-	1. You introduce race condition.
+	1. You can potentially introduce race condition.
 	2. Unnecessary overhead caused by [async state machine].
 	3. [ExecuteAsync] will immediately return [ExecuteResult] instead of 
 	other result types (this is particularly important for those who wish 
