@@ -24,7 +24,7 @@ understand these topics to some extent before proceeding.
   
 ## How do I add my bot to my server/guild?
 
-You can do so by using the [permissions calculator] provided 
+You can do so by using the [permission calculator] provided 
 by FiniteReality.
 This tool allows you to set the permissions that the bot will be 
 added with, and invite the bot into your guild. With this method, 
