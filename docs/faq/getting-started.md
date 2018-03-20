@@ -1,7 +1,8 @@
 # Basic Concepts / Getting Started
 
 ## How do I get started?
-First of all, welcome! Before you delve into using the library; 
+First of all, welcome! You may visit us on our Discord should you 
+have any questions. Before you delve into using the library, 
 however, you should have some decent understanding of the language 
 you are about to use. This library touches on 
 [Task-based Asynchronous Pattern], [polymorphism], [interface] and 
@@ -11,10 +12,11 @@ understand these topics to some extent before proceeding.
   Here are some examples:
   1. [Official quick start guide](https://github.com/RogueException/Discord.Net/blob/dev/docs/guides/getting_started/samples/intro/structure.cs)
   2. [Official template](https://github.com/foxbot/DiscordBotBase/tree/csharp/src/DiscordBot)
-  
-Please note that you should *not* try to blindly copy paste the code. 
-It is meant to be a template or a guide. It is not meant to be 
-something that will work out of the box.
+
+> [!TIP]  
+> Please note that you should *not* try to blindly copy paste 
+> the code. It is meant to be a template or a guide. It is not 
+> meant to be something that will work out of the box.
   
 [Task-based Asynchronous Pattern]: https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap
 [polymorphism]: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/polymorphism
@@ -22,11 +24,16 @@ something that will work out of the box.
   
 ## How do I add my bot to my server/guild?
 
-The [OAuth2 URL](https://discordapp.com/developers/tools/oauth2-url-generator) 
-can be generated via the Discord developer page. This allows you to 
-set the permissions that the bot will be added with. With this method,
- bots will also be assigned their own special roles that normal users 
- cannot use, which is what we call a `Managed` role.
+You can do so by using the [permissions calculator] provided 
+by FiniteReality.
+This tool allows you to set the permissions that the bot will be 
+added with, and invite the bot into your guild. With this method, 
+bots will also be assigned their own special roles that normal users 
+cannot use; this is what we call a `Managed` role, and this is a much
+safer method of permission management than to create a role that any 
+users can be assigned to.
+
+[permission calculator]: https://finitereality.github.io/permissions-calculator
 
 ## What is a Client/User/Object ID? Is it the token?
 
