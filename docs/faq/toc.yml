@@ -1,12 +1,18 @@
-- name: Getting Started
-  href: getting-started.md
-- name: Basic Operations
-  href: basic-operations.md
-- name: Client Basics
-  href: client-basics.md
-- name: Commands
-  href: commands.md
-- name: Glossary
-  href: glossary.md
-- name: Legacy or Upgrade
-  href: legacy.md
+- name: Basic Concepts
+  items:
+    - name: Getting Started
+      href: getting-started.md
+    - name: Basic Operations
+      href: basic-operations.md
+    - name: Client Basics
+      href: client-basics.md
+- name: Command
+  items:
+    - name: Commands
+      href: commands.md
+- name: Misc
+  items:
+    - name: Glossary
+      href: glossary.md
+    - name: Legacy or Upgrade
+      href: legacy.md
