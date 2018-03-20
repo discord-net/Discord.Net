@@ -28,12 +28,19 @@ able to message.
 [SendMessageAsync]: xref:Discord.IMessageChannel#Discord_IMessageChannel_SendMessageAsync_System_String_System_Boolean_Discord_Embed_Discord_RequestOptions_
 [GetChannel]: xref:Discord.WebSocket.DiscordSocketClient#Discord_WebSocket_DiscordSocketClient_GetChannel_System_UInt64_
 
-## How can I tell if a message is from X, Y, Z?
+## How can I tell if a message is from X, Y, Z channel?
 
 You may check the message channel type. Visit [Glossary] to see the 
 various types of channels.
 
 [Glossary]: Glossary.md#message-channels
+
+## How can I get the guild from a message?
+
+There are 2 ways to do this. You can do either of the following,
+	1. Cast the user as an [IGuildUser] and use its [IGuild] property.
+	2. Cast the channel as an [ITextChannel]/[IVoiceChannel] and use 
+	its [IGuild] property.
 
 ## How do I add hyperlink text to an embed?
 
@@ -67,6 +74,10 @@ reactions.
 Unfortunately, not at the moment. See [#401](https://github.com/RogueException/Discord.Net/issues/401).
    
 
+[ITextChannel]: xref:Discord.ITextChannel
+[IGuild]: xref:Discord.IGuild
+[IVoiceChannel]: xref:Discord.IVoiceChannel
+[IGuildUser]: xref:Discord.IGuildUser
 [IMessageChannel]: xref:Discord.IMessageChannel
 [IUserMessage]: xref:Discord.IUserMessage
 [IEmote]: xref:Discord.IEmote
