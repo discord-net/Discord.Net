@@ -3,9 +3,12 @@
 ## How should I safely check a type?
 In Discord.NET, the idea of polymorphism is used throughout. You may 
 need to cast the object as a certain type before you can perform any 
-action. There are several ways to cast, with direct casting 
-`(Type)type` being the the least recommended, as it *can* throw an 
+action. 
+
+There are several ways to cast, with direct casting 
+`(Type)type` being **the least recommended**, as it *can* throw an 
 [InvalidCastException] when the object isn't the desired type. 
+
 Please refer to [this post] for more details.
 
 A good and safe casting example:
