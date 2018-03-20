@@ -21,11 +21,16 @@ namespace Discord.Commands
         {
             return await Context.Channel.SendMessageAsync(message, isTTS, embed, options).ConfigureAwait(false);
         }
-
+        /// <summary>
+        /// The method to execute before executing the command.
+        /// </summary>
         protected virtual void BeforeExecute(CommandInfo command)
         {
         }
-
+        /// <summary>
+        /// The method to execute after executing the command.
+        /// </summary>
+        /// <param name="command"></param>
         protected virtual void AfterExecute(CommandInfo command)
         {
         }
