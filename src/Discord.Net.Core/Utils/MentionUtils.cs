@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Text;
 
@@ -10,10 +10,13 @@ namespace Discord
 
         //If the system can't be positive a user doesn't have a nickname, assume useNickname = true (source: Jake)
         internal static string MentionUser(string id, bool useNickname = true) => useNickname ? $"<@!{id}>" : $"<@{id}>";
+        /// <summary> Returns a mention string based on the user ID. </summary>
         public static string MentionUser(ulong id) => MentionUser(id.ToString(), true);
         internal static string MentionChannel(string id) => $"<#{id}>";
+        /// <summary> Returns a mention string based on the channel ID. </summary>
         public static string MentionChannel(ulong id) => MentionChannel(id.ToString());
-        internal static string MentionRole(string id) => $"<@&{id}>";        
+        internal static string MentionRole(string id) => $"<@&{id}>";
+        /// <summary> Returns a mention string based on the role ID. </summary>
         public static string MentionRole(ulong id) => MentionRole(id.ToString());
 
         /// <summary> Parses a provided user mention string. </summary>

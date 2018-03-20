@@ -1,13 +1,18 @@
-﻿using System;
+using System;
 using System.Text;
 
 namespace Discord
 {
+    /// <summary> The message object for logging purposes. </summary>
     public struct LogMessage
     {
+        /// <summary> The severity of the log message. </summary>
         public LogSeverity Severity { get; }
+        /// <summary> The source of the log message. </summary>
         public string Source { get; }
+        /// <summary> The message of the log message. </summary>
         public string Message { get; }
+        /// <summary> The exception of the log message. </summary>
         public Exception Exception { get; }
 
         public LogMessage(LogSeverity severity, string source, string message, Exception exception = null)
