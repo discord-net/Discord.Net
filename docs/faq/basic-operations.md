@@ -44,9 +44,9 @@ There are 2 ways to do this. You can do either of the following,
 
 ## How do I add hyperlink text to an embed?
 
-Embeds can use standard [markdown] in the description field as well as
- in field values. With that in mind, links can be added using the 
- following format \[text](link).
+Embeds can use standard [markdown] in the description field as well 
+as in field values. With that in mind, links can be added with 
+`[text](link)`.
 
 [markdown]: https://support.discordapp.com/hc/en-us/articles/210298617-Markdown-Text-101-Chat-Formatting-Bold-Italic-Underline-
 
