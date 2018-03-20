@@ -134,7 +134,7 @@ accessing the channel through the [Context] and sending a message.
 
 [Context]: xref:Discord.Commands.ModuleBase`1#Discord_Commands_ModuleBase_1_Context
 [SocketCommandContext]: xref:Discord.Commands.SocketCommandContext
-[ReplyAsync]: xref:Discord.Commands.ModuleBase`1#Discord_Commands_ModuleBase_1_ReplyAsync_System_String_System_Boolean_Discord_Embed_Discord_RequestOptions_
+[ReplyAsync]: xref:Discord.Commands.ModuleBase`1.ReplyAsync*
 
 ### Example Module
 
@@ -153,7 +153,7 @@ Invoke [CommandService.AddModulesAsync] to discover modules and
 install them.
 
 [DontAutoLoadAttribute]: xref:Discord.Commands.DontAutoLoadAttribute
-[CommandService.AddModulesAsync]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddModulesAsync_Assembly_System_IServiceProvider_
+[CommandService.AddModulesAsync]: xref:Discord.Commands.CommandService.AddModulesAsync*
 
 #### Loading Modules Manually
 
@@ -161,7 +161,7 @@ To manually load a module, invoke [CommandService.AddModuleAsync] by
 passing in the generic type of your module and optionally, a
 service provider.
 
-[CommandService.AddModuleAsync]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddModuleAsync__1_System_IServiceProvider_
+[CommandService.AddModuleAsync]: xref:Discord.Commands.CommandService.AddModuleAsync*
 
 ### Module Constructors
 
@@ -228,8 +228,8 @@ Any publicly settable properties will also be filled in the same
 manner.
 
 >[!NOTE]
-> Annotating a property with a [DontInjectAttribute] attribute will prevent the
-property from being injected.
+> Annotating a property with a [DontInjectAttribute] attribute will 
+> prevent the property from being injected.
 
 >[!NOTE]
 >If you accept `CommandService` or `IServiceProvider` as a parameter
@@ -283,9 +283,9 @@ necessary.
 
 [!code-csharp[Custom Precondition](samples/require_owner.cs)]
 
-[CheckPermissionsAsync]: xref:Discord.Commands.PreconditionAttribute#Discord_Commands_PreconditionAttribute_CheckPermissionsAsync_Discord_Commands_ICommandContext_Discord_Commands_CommandInfo_System_IServiceProvider_
-[PreconditionResult.FromSuccess]: xref:Discord.Commands.PreconditionResult#Discord_Commands_PreconditionResult_FromSuccess
-[PreconditionResult.FromError]: xref:Discord.Commands.PreconditionResult#Discord_Commands_PreconditionResult_FromError_System_String_
+[CheckPermissionsAsync]: xref:Discord.Commands.PreconditionAttribute.CheckPermissionsAsync*
+[PreconditionResult.FromSuccess]: xref:Discord.Commands.PreconditionResult.FromSuccess*
+[PreconditionResult.FromError]: xref:Discord.Commands.PreconditionResult.FromError*
 
 # Type Readers
 
@@ -329,9 +329,9 @@ If you are able to successfully parse the input, return
 necessary.
 
 [TypeReaderResult]: xref:Discord.Commands.TypeReaderResult
-[TypeReaderResult.FromSuccess]: xref:Discord.Commands.TypeReaderResult#Discord_Commands_TypeReaderResult_FromSuccess_Discord_Commands_TypeReaderValue_
-[TypeReaderResult.FromError]: xref:Discord.Commands.TypeReaderResult#Discord_Commands_TypeReaderResult_FromError_Discord_Commands_CommandError_System_String_
-[ReadAsync]: xref:Discord.Commands.TypeReader#Discord_Commands_TypeReader_ReadAsync_Discord_Commands_ICommandContext_System_String_System_IServiceProvider_
+[TypeReaderResult.FromSuccess]: xref:Discord.Commands.TypeReaderResult.FromSuccess*
+[TypeReaderResult.FromError]: xref:Discord.Commands.TypeReaderResult.FromError*
+[ReadAsync]: xref:Discord.Commands.TypeReader.ReadAsync*
 
 #### Sample
 
@@ -344,4 +344,4 @@ and must be explicitly added.
 
 To install a TypeReader, invoke [CommandService.AddTypeReader].
 
-[CommandService.AddTypeReader]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddTypeReader__1_Discord_Commands_TypeReader_
+[CommandService.AddTypeReader]: xref:Discord.Commands.CommandService.AddTypeReader*

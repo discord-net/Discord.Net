@@ -105,7 +105,7 @@ the Console.
 
 [!code-csharp[Async Context](samples/intro/logging.cs)]
 
-[API Documentation]: xref:Discord.Rest.BaseDiscordClient#Discord_Rest_BaseDiscordClient_Log
+[API Documentation]: xref:Discord.Rest.BaseDiscordClient.Log
 
 ### Creating a Discord Client
 
@@ -212,7 +212,7 @@ shown below.
 
 For your reference, you may view the [completed program].
 
-[MessageReceived]: xref:Discord.WebSocket.BaseSocketClient#Discord_WebSocket_BaseSocketClient_MessageReceived
+[MessageReceived]: xref:Discord.WebSocket.BaseSocketClient.MessageReceived
 [SocketMessage]: xref:Discord.WebSocket.SocketMessage
 [SocketMessageChannel]: xref:Discord.WebSocket.ISocketMessageChannel
 [completed program]: samples/intro/complete.cs

@@ -34,8 +34,8 @@ particular guild has downloaded; however, it's best to wait for all
 guilds to be downloaded. Once all downloads are complete, the [Ready] 
 event is triggered, then you can proceed to do whatever you like.
 
-[Ready]: xref:Discord.WebSocket.DiscordSocketClient#Discord_WebSocket_DiscordSocketClient_Ready
-[GuildAvailable]: xref:Discord.WebSocket.BaseSocketClient#Discord_WebSocket_BaseSocketClient_GuildAvailable
+[Ready]: xref:Discord.WebSocket.DiscordSocketClient.Ready
+[GuildAvailable]: xref:Discord.WebSocket.BaseSocketClient.GuildAvailable
 
 ## How do I get a message's previous content when that message is edited?
 
@@ -49,6 +49,6 @@ use the cached message entity. Read more about it [here](../guides/concepts/even
 3. Only messages received *after* the bot comes online will be 
 available in the cache.
 
-[MessageCacheSize]: xref:Discord.WebSocket.DiscordSocketConfig#Discord_WebSocket_DiscordSocketConfig_MessageCacheSize
+[MessageCacheSize]: xref:Discord.WebSocket.DiscordSocketConfig.MessageCacheSize
 [DiscordSocketConfig]: xref:Discord.WebSocket.DiscordSocketConfig
-[MessageUpdated]: xref:Discord.WebSocket.BaseSocketClient#Discord_WebSocket_BaseSocketClient_MessageUpdated
+[MessageUpdated]: xref:Discord.WebSocket.BaseSocketClient.MessageUpdated

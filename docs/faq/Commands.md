@@ -24,8 +24,8 @@ You may be confusing [CommandService#AddModulesAsync] with
 [CommandService#AddModuleAsync]. The former is used to add modules 
 via the assembly, while the latter is used to add a single module.
 
-[CommandService#AddModulesAsync]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddModulesAsync_Assembly_System_IServiceProvider_
-[CommandService#AddModuleAsync]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_AddModuleAsync__1_System_IServiceProvider_
+[CommandService#AddModulesAsync]: xref:Discord.Commands.CommandService.AddModulesAsync*
+[CommandService#AddModuleAsync]: xref:Discord.Commands.CommandService.AddModuleAsync*
 
 ## What does [Remainder] do in the command signature?
 
@@ -104,7 +104,7 @@ the [DefaultRunMode] flag under `CommandServiceConfig`.
 
 [RunMode]: xref:Discord.Commands.RunMode
 [CommandAttribute]: xref:Discord.Commands.CommandAttribute
-[DefaultRunMode]: xref:Discord.Commands.CommandServiceConfig#Discord_Commands_CommandServiceConfig_DefaultRunMode
+[DefaultRunMode]: xref:Discord.Commands.CommandServiceConfig.DefaultRunMode
 
 ## How does `RunMode.Async` work, and why is Discord.NET *not* using it by default?
 
@@ -134,10 +134,10 @@ For #4, exceptions are caught in [CommandService#Log] event under
 
 [Task.Run]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task.run
 [async state machine]: https://www.red-gate.com/simple-talk/dotnet/net-tools/c-async-what-is-it-and-how-does-it-work/
-[ExecuteAsync]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_ExecuteAsync_Discord_Commands_ICommandContext_System_Int32_System_IServiceProvider_Discord_Commands_MultiMatchHandling_
+[ExecuteAsync]: xref:Discord.Commands.CommandService.ExecuteAsync*
 [ExecuteResult]: xref:Discord.Commands.ExecuteResult
 [RuntimeResult]: xref:Discord.Commands.RuntimeResult
-[CommandExecuted]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_CommandExecuted
-[CommandService#Log]: xref:Discord.Commands.CommandService#Discord_Commands_CommandService_Log
-[LogMessage.Exception]: xref:Discord.LogMessage#Discord_LogMessage_Exception
+[CommandExecuted]: xref:Discord.Commands.CommandService.CommandExecuted
+[CommandService#Log]: xref:Discord.Commands.CommandService.Log
+[LogMessage.Exception]: xref:Discord.LogMessage.Exception*
 [CommandException]: xref:Discord.Commands.CommandException

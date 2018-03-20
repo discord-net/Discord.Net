@@ -44,7 +44,7 @@ guild. To switch channels within a guild, invoke [ConnectAsync] on
 another voice channel in the guild.
 
 [IAudioClient]: xref:Discord.Audio.IAudioClient
-[ConnectAsync]: xref:Discord.IAudioChannel#Discord_IAudioChannel_ConnectAsync_System_Action_IAudioClient__
+[ConnectAsync]: xref:Discord.IAudioChannel.ConnectAsync*
 
 ## Transmitting Audio
 

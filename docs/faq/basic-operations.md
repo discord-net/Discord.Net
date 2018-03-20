@@ -36,8 +36,8 @@ means casting is your friend. You should attempt to cast the channel
 as an [IMessageChannel] or any other entity that implements it to be 
 able to message.
 
-[SendMessageAsync]: xref:Discord.IMessageChannel#Discord_IMessageChannel_SendMessageAsync_System_String_System_Boolean_Discord_Embed_Discord_RequestOptions_
-[GetChannel]: xref:Discord.WebSocket.DiscordSocketClient#Discord_WebSocket_DiscordSocketClient_GetChannel_System_UInt64_
+[SendMessageAsync]: xref:Discord.IMessageChannel.SendMessageAsync*
+[GetChannel]: xref:Discord.WebSocket.DiscordSocketClient.GetChannel*
 
 ## How can I tell if a message is from X, Y, Z channel?
 
@@ -71,7 +71,7 @@ implement [IEmote] and are valid options.
 
 [!code-csharp[Emoji](samples/basics/emoji.cs)]
 
-[AddReactionAsync]: xref:Discord.IUserMessage#Discord_IUserMessage_AddReactionAsync_Discord_IEmote_Discord_RequestOptions_
+[AddReactionAsync]: xref:Discord.IUserMessage.AddReactionAsync*
   
 ## Why am I getting so many preemptive rate limits when I try to add more than one reactions?
 

@@ -3,12 +3,12 @@ title: Logging
 ---
 
 Discord.Net's clients provide a [Log] event that all messages will be
-disbatched over.
+dispatched over.
 
 For more information about events in Discord.Net, see the [Events]
 section.
 
-[Log]: xref:Discord.Rest.BaseDiscordClient#Discord_Rest_BaseDiscordClient_Log
+[Log]: xref:Discord.Rest.BaseDiscordClient.Log
 [Events]: events.md
 
 ### Usage
