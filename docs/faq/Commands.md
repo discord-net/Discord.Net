@@ -51,7 +51,7 @@ Service is often used to hold data externally, so that they will
 persist throughout execution. Think of it like a chest that holds 
 whatever you throw at it that won't be affected by anything unless 
 you want it to. Note that you should also learn Microsoft's 
-implementation of [Dependency Injection] ([video]) before proceeding, as well 
+implementation of [Dependency Injection] \([video]) before proceeding, as well 
 as how it works in [Discord.NET](../guides/commands/commands.md#usage-in-modules).
 
 A brief example of service and dependency injection can be seen below.

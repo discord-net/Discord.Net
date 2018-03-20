@@ -5,7 +5,7 @@ First of all, welcome! You may visit us on our Discord should you
 have any questions. Before you delve into using the library, 
 however, you should have some decent understanding of the language 
 you are about to use. This library touches on 
-[Task-based Asynchronous Pattern] (TAP), [polymorphism], [interface] 
+[Task-based Asynchronous Pattern] \(TAP), [polymorphism], [interface] 
 and many more advanced topics extensively. Please make sure that you 
 understand these topics to some extent before proceeding.
   
@@ -15,8 +15,8 @@ understand these topics to some extent before proceeding.
 
 > [!TIP]  
 > Please note that you should *not* try to blindly copy paste 
-> the code. It is meant to be a template or a guide. It is not 
-> meant to be something that will work out of the box.
+> the code. The examples are meant to be a template or a guide. 
+> It is not meant to be something that will work out of the box.
   
 [Task-based Asynchronous Pattern]: https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap
 [polymorphism]: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/polymorphism
