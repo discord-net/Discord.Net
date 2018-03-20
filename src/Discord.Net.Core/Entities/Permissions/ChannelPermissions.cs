@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -7,17 +7,17 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct ChannelPermissions
     {
-        /// <summary> Gets a blank ChannelPermissions that grants no permissions. </summary>
+        /// <summary> Gets a blank <see cref="ChannelPermissions"/> that grants no permissions. </summary>
         public static readonly ChannelPermissions None = new ChannelPermissions();
-        /// <summary> Gets a ChannelPermissions that grants all permissions for text channels. </summary>
+        /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for text channels. </summary>
         public static readonly ChannelPermissions Text = new ChannelPermissions(0b01100_0000000_1111111110001_010001);
-        /// <summary> Gets a ChannelPermissions that grants all permissions for voice channels. </summary>
+        /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for voice channels. </summary>
         public static readonly ChannelPermissions Voice = new ChannelPermissions(0b00100_1111110_0000000000000_010001);
-        /// <summary> Gets a ChannelPermissions that grants all permissions for direct message channels. </summary>
+        /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for direct message channels. </summary>
         public static readonly ChannelPermissions DM = new ChannelPermissions(0b00000_1000110_1011100110000_000000);
-        /// <summary> Gets a ChannelPermissions that grants all permissions for group channels. </summary>
+        /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for group channels. </summary>
         public static readonly ChannelPermissions Group = new ChannelPermissions(0b00000_1000110_0001101100000_000000);
-        /// <summary> Gets a ChannelPermissions that grants all permissions for a given channelType. </summary>
+        /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for a given channelType. </summary>
         public static ChannelPermissions All(IChannel channel)
         {
             switch (channel)
@@ -30,7 +30,7 @@ namespace Discord
             }
         }
 
-        /// <summary> Gets a packed value representing all the permissions in this ChannelPermissions. </summary>
+        /// <summary> Gets a packed value representing all the permissions in this <see cref="ChannelPermissions"/>. </summary>
         public ulong RawValue { get; }
 
         /// <summary> If True, a user may create invites. </summary>
@@ -117,7 +117,7 @@ namespace Discord
             RawValue = value;
         }
 
-        /// <summary> Creates a new ChannelPermissions with the provided permissions. </summary>
+        /// <summary> Creates a new <see cref="ChannelPermissions"/> with the provided permissions. </summary>
         public ChannelPermissions(bool createInstantInvite = false, bool manageChannel = false,
             bool addReactions = false,
             bool viewChannel = false, bool sendMessages = false, bool sendTTSMessages = false, bool manageMessages = false,
@@ -129,7 +129,7 @@ namespace Discord
                 speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, manageRoles, manageWebhooks)
         { }
 
-        /// <summary> Creates a new ChannelPermissions from this one, changing the provided non-null permissions. </summary>
+        /// <summary> Creates a new <see cref="ChannelPermissions"/> from this one, changing the provided non-null permissions. </summary>
         public ChannelPermissions Modify(bool? createInstantInvite = null, bool? manageChannel = null,
             bool? addReactions = null,
             bool? viewChannel = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,

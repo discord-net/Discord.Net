@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Model = Discord.API.Attachment;
 
 namespace Discord
@@ -6,12 +6,19 @@ namespace Discord
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Attachment : IAttachment
     {
+        /// <inheritdoc/>
         public ulong Id { get; }
+        /// <inheritdoc/>
         public string Filename { get; }
+        /// <inheritdoc/>
         public string Url { get; }
+        /// <inheritdoc/>
         public string ProxyUrl { get; }
+        /// <inheritdoc/>
         public int Size { get; }
+        /// <inheritdoc/>
         public int? Height { get; }
+        /// <inheritdoc/>
         public int? Width { get; }
 
         internal Attachment(ulong id, string filename, string url, string proxyUrl, int size, int? height, int? width)
