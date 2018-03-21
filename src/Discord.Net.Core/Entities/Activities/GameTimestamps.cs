@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 
 namespace Discord
 {
+    /// <summary> The timestamps for a <see cref="RichGame"/> object. </summary>
     public class GameTimestamps
     {
         public DateTimeOffset? Start { get; }
