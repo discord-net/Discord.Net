@@ -1,7 +1,7 @@
-﻿namespace Discord
+namespace Discord
 {
     /// <summary>
-    /// A unicode emoji
+    /// A unicode emoji.
     /// </summary>
     public class Emoji : IEmote
     {

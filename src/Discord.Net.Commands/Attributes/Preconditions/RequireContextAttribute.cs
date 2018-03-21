@@ -13,7 +13,7 @@ namespace Discord.Commands
     }
 
     /// <summary>
-    /// Require that the command be invoked in a specified context.
+    /// This attribute requires that the command be invoked in a specified context. (e.g. in guild, DM)
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RequireContextAttribute : PreconditionAttribute
@@ -21,7 +21,7 @@ namespace Discord.Commands
         public ContextType Contexts { get; }
 
         /// <summary>
-        /// Require that the command be invoked in a specified context.
+        /// Requires that the command be invoked in the specified context.
         /// </summary>
         /// <param name="contexts">The type of context the command can be invoked in. Multiple contexts can be specified by ORing the contexts together.</param>
         /// <example>

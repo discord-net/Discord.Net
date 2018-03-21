@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Discord
 {
+    /// <summary> A helper class for mention-related parsing. </summary>
     public static class MentionUtils
     {
         private const char SanitizeChar = '\x200b';

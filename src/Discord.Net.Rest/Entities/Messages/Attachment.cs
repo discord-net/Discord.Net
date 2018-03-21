@@ -3,6 +3,7 @@ using Model = Discord.API.Attachment;
 
 namespace Discord
 {
+    /// <summary> A Discord attachment. </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Attachment : IAttachment
     {
@@ -38,6 +39,7 @@ namespace Discord
                 model.Width.IsSpecified ? model.Width.Value : (int?)null);
         }
 
+        /// <summary> Returns the filename of the attachment. </summary>
         public override string ToString() => Filename;
         private string DebuggerDisplay => $"{Filename} ({Size} bytes)";
     }

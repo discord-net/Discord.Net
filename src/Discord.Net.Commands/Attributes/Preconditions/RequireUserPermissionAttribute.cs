@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord.Commands
@@ -13,7 +13,7 @@ namespace Discord.Commands
         public ChannelPermission? ChannelPermission { get; }
 
         /// <summary>
-        /// Require that the user invoking the command has a specified GuildPermission
+        /// Requires that the user invoking the command to have a specific <see cref="GuildPermission"/>.
         /// </summary>
         /// <remarks>This precondition will always fail if the command is being invoked in a private channel.</remarks>
         /// <param name="permission">The GuildPermission that the user must have. Multiple permissions can be specified by ORing the permissions together.</param>
@@ -23,7 +23,7 @@ namespace Discord.Commands
             ChannelPermission = null;
         }
         /// <summary>
-        /// Require that the user invoking the command has a specified ChannelPermission.
+        /// Requires that the user invoking the command to have a specific <see cref="ChannelPermission"/>.
         /// </summary>
         /// <param name="permission">The ChannelPermission that the user must have. Multiple permissions can be specified by ORing the permissions together.</param>
         /// <example>

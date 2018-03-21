@@ -1,7 +1,7 @@
-﻿namespace Discord
+namespace Discord
 {
     /// <summary>
-    /// Modify the widget of an IGuild with the specified parameters
+    /// Properties that are used to modify the widget of an <see cref="IGuild"/> with the specified parameters.
     /// </summary>
     public class GuildEmbedProperties
     {

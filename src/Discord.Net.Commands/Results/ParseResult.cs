@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord.Commands
@@ -9,9 +9,12 @@ namespace Discord.Commands
         public IReadOnlyList<TypeReaderResult> ArgValues { get; }
         public IReadOnlyList<TypeReaderResult> ParamValues { get; }
 
+        /// <inheritdoc/>
         public CommandError? Error { get; }
+        /// <inheritdoc/>
         public string ErrorReason { get; }
 
+        /// <inheritdoc/>
         public bool IsSuccess => !Error.HasValue;
 
         private ParseResult(IReadOnlyList<TypeReaderResult> argValues, IReadOnlyList<TypeReaderResult> paramValues, CommandError? error, string errorReason)

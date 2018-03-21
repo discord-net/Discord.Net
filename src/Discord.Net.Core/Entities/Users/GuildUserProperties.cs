@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Discord
 {
     /// <summary>
-    /// Modify an IGuildUser with the following parameters.
+    /// Properties that are used to modify an <see cref="IGuildUser"/> with the following parameters.
     /// </summary>
     /// <example>
     /// <code language="c#">
@@ -54,14 +54,14 @@ namespace Discord
         /// </remarks>
         public Optional<IEnumerable<ulong>> RoleIds { get; set; }
         /// <summary>
-        /// Move a user to a voice channel.
+        /// Moves a user to a voice channel.
         /// </summary>
         /// <remarks>
         /// This user MUST already be in a Voice Channel for this to work.
         /// </remarks>
         public Optional<IVoiceChannel> Channel { get; set; }
         /// <summary>
-        /// Move a user to a voice channel.
+        /// Moves a user to a voice channel.
         /// </summary>
         /// <remarks>
         /// This user MUST already be in a Voice Channel for this to work.

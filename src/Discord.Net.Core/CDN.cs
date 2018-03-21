@@ -2,6 +2,7 @@ using System;
 
 namespace Discord
 {
+    /// <summary> Contains the strings related to various Content Delievery Networks (CDNs). </summary>
     public static class CDN
     {
         /// <summary> Returns the Discord developer application icon. </summary>

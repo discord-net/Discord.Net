@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -26,9 +26,12 @@ namespace Discord.Commands
     {
         public IReadOnlyCollection<TypeReaderValue> Values { get; }
 
+        /// <inheritdoc/>
         public CommandError? Error { get; }
+        /// <inheritdoc/>
         public string ErrorReason { get; }
 
+        /// <inheritdoc/>
         public bool IsSuccess => !Error.HasValue;
 
         private TypeReaderResult(IReadOnlyCollection<TypeReaderValue> values, CommandError? error, string errorReason)

@@ -1,19 +1,19 @@
-﻿using System;
+using System;
 using System.Globalization;
 
 namespace Discord
 {
     /// <summary>
-    /// A custom image-based emote
+    /// A custom image-based emote.
     /// </summary>
     public class Emote : IEmote, ISnowflakeEntity
     {
         /// <summary>
-        /// The display name (tooltip) of this emote
+        /// The display name (tooltip) of this emote.
         /// </summary>
         public string Name { get; }
         /// <summary>
-        /// The ID of this emote
+        /// The ID of this emote.
         /// </summary>
         public ulong Id { get; }
         /// <summary>
@@ -50,7 +50,7 @@ namespace Discord
         }
 
         /// <summary>
-        /// Parse an Emote from its raw format
+        /// Parses an Emote from its raw format.
         /// </summary>
         /// <param name="text">The raw encoding of an emote; for example, &lt;:dab:277855270321782784&gt;</param>
         /// <returns>An emote</returns>

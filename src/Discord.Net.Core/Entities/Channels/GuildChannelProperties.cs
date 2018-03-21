@@ -1,7 +1,7 @@
-﻿namespace Discord
+namespace Discord
 {
     /// <summary>
-    /// Modify an IGuildChannel with the specified changes.
+    /// Properties that are used to modify an <see cref="IGuildChannel"/> with the specified changes.
     /// </summary>
     /// <example>
     /// <code language="c#">
@@ -14,7 +14,7 @@
     public class GuildChannelProperties
     {
         /// <summary>
-        /// Set the channel to this name
+        /// Sets the channel to this name.
         /// </summary>
         /// <remarks>
         /// When modifying an ITextChannel, the Name MUST be alphanumeric with dashes.
@@ -23,11 +23,11 @@
         /// <exception cref="Net.HttpException">A BadRequest will be thrown if the name does not match the above RegEx.</exception>
         public Optional<string> Name { get; set; }
         /// <summary>
-        /// Move the channel to the following position. This is 0-based!
+        /// Moves the channel to the following position. This is 0-based!
         /// </summary>
         public Optional<int> Position { get; set; }
         /// <summary>
-        /// Sets the category for this channel
+        /// Sets the category for this channel.
         /// </summary>
         public Optional<ulong?> CategoryId { get; set; }
     }

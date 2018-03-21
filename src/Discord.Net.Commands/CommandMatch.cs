@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +7,9 @@ namespace Discord.Commands
 {
     public struct CommandMatch
     {
+        /// <summary> The command that matches the search result. </summary>
         public CommandInfo Command { get; }
+        /// <summary> The alias of the command. </summary>
         public string Alias { get; }
 
         public CommandMatch(CommandInfo command, string alias)

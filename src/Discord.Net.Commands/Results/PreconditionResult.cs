@@ -1,13 +1,16 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Discord.Commands
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class PreconditionResult : IResult
     {
+        /// <inheritdoc/>
         public CommandError? Error { get; }
+        /// <inheritdoc/>
         public string ErrorReason { get; }
 
+        /// <inheritdoc/>
         public bool IsSuccess => !Error.HasValue;
 
         protected PreconditionResult(CommandError? error, string errorReason)
