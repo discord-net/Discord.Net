@@ -23,7 +23,7 @@ public class ModuleB
 {
 
     // Public settable properties will be injected
-    public AnnounceService { get; set; }
+    public AnnounceService Announce { get; set; }
 
     // Public properties without setters will not
     public CommandService Commands { get; }
