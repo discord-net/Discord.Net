@@ -61,6 +61,7 @@
       "_appFooter": "Discord.Net (c) 2015-2018",
       "_enableSearch": true
     },
-    "noLangKeyword": false
+    "noLangKeyword": false,
+    "xrefService": [ "https://xref.docs.microsoft.com/query?uid={uid}" ]
   }
 }
