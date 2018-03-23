@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -126,6 +126,8 @@ namespace Discord.Rest
 
         public async Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
         {
+            if (Author.Id != Discord.CurrentUser.Id)
+                throw new InvalidOperationException("Discord allows only the author of a message to change it.");
             var model = await MessageHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }

@@ -1,4 +1,4 @@
-﻿using Discord.Rest;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -122,7 +122,11 @@ namespace Discord.WebSocket
         }
 
         public Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
-            => MessageHelper.ModifyAsync(this, Discord, func, options);
+        {
+            if (Author.Id != Discord.CurrentUser.Id)
+                throw new InvalidOperationException("Discord allows only the author of a message to change it.");
+            return MessageHelper.ModifyAsync(this, Discord, func, options);
+        }
 
         public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
             => MessageHelper.AddReactionAsync(this, emote, Discord, options);
