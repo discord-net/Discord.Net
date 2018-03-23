@@ -1,4 +1,4 @@
-﻿using Discord.API.Rest;
+using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -13,6 +13,9 @@ namespace Discord.Rest
         public static async Task<Model> ModifyAsync(IMessage msg, BaseDiscordClient client, Action<MessageProperties> func,
             RequestOptions options)
         {
+            if (msg.Author.Id != client.CurrentUser.Id)
+                throw new InvalidOperationException("Discord allows only the author of a message to change it.");
+
             var args = new MessageProperties();
             func(args);
             var apiArgs = new API.Rest.ModifyMessageParams
