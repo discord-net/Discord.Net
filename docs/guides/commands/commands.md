@@ -24,8 +24,8 @@ values.
 
 ## With Attributes
 
-In 1.0, Commands can be defined ahead of time with attributes, or at
-runtime with builders.
+Starting from 1.0, Commands can be defined ahead of time with 
+attributes, or at runtime with builders.
 
 For most bots, ahead-of-time Commands should be all you need, and this
 is the recommended method of defining Commands.
@@ -41,20 +41,21 @@ Discord.Net's implementation of Modules is influenced heavily from
 ASP.NET Core's Controller pattern. This means that the lifetime of a
 module instance is only as long as the Command is being invoked.
 
-**Avoid using long-running code** in your modules wherever possible.
-You should **not** be implementing very much logic into your modules,
-instead, outsource to a service for that.
-
-If you are unfamiliar with Inversion of Control, it is recommended to
-read the MSDN article on [IoC] and [Dependency Injection].
-
-To begin, create a new class somewhere in your project and inherit the
-class from [ModuleBase]. This class **must** be `public`.
+> [!WARNING]
+> **Avoid using long-running code** in your modules wherever possible.
+> You should **not** be implementing very much logic into your 
+> modules, instead, outsource to a service for that.
+>
+> If you are unfamiliar with Inversion of Control, it is recommended 
+> to read the MSDN article on [IoC] and [Dependency Injection].
 
 >[!NOTE]
 >[ModuleBase] is an _abstract_ class, meaning that you may extend it
 >or override it as you see fit. Your module may inherit from any
 >extension of ModuleBase.
+
+To begin, create a new class somewhere in your project and inherit the
+class from [ModuleBase]. This class **must** be `public`.
 
 By now, your module should look like this:
 
