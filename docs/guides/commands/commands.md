@@ -79,9 +79,9 @@ parent Task.
 
 For example, to take an integer as an argument from the user, add `int
 arg`; to take a user as an argument from the user, add `IUser user`.
-In 1.0, a Command can accept nearly any type of argument; a full list
-of types that are parsed by default can be found in the below section
-on _Type Readers_.
+Starting from 1.0, a Command can accept nearly any type of argument; 
+a full list of types that are parsed by default can be found in 
+the below section on [Type Readers](#type-readers).
 
 Parameters, by default, are always required. To make a parameter
 optional, give it a default value. To accept a comma-separated list,
