@@ -132,7 +132,7 @@ accessing the channel through the [Context] and sending a message.
 >Contexts should **NOT** be mixed! You cannot have one module that
 >uses `CommandContext` and another that uses `SocketCommandContext`.
 
-[Context]: xref:Discord.Commands.ModuleBase`1#Discord_Commands_ModuleBase_1_Context
+[Context]: xref:Discord.Commands.ModuleBase`1.Context
 [SocketCommandContext]: xref:Discord.Commands.SocketCommandContext
 [ReplyAsync]: xref:Discord.Commands.ModuleBase`1.ReplyAsync*
 
@@ -264,6 +264,7 @@ usages on their respective API pages.
 - @Discord.Commands.RequireOwnerAttribute
 - @Discord.Commands.RequireBotPermissionAttribute
 - @Discord.Commands.RequireUserPermissionAttribute
+- @Discord.Commands.RequireNsfwAttribute
 
 ## Custom Preconditions
 
