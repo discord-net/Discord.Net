@@ -69,7 +69,8 @@ By now, your module should look like this:
 
 The next step to creating Commands is actually creating the Commands.
 
-To create a Command, add a method to your module of type `Task`.
+To create a Command, add a method to your module of type `Task` or 
+`Task<RuntimeResult>` depending on your use.
 Typically, you will want to mark this method as `async`, although it
 is not required.
 
