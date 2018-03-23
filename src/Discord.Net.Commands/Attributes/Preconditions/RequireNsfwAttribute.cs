@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Discord.Commands
 {
     /// <summary>
-    /// This attribute requires that the command to be invoked in a channel marked NSFW.
+    /// Requires the command to be invoked in a channel marked NSFW.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RequireNsfwAttribute : PreconditionAttribute

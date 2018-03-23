@@ -1,12 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Discord
 {
-    /// <summary>
-    /// Builder for creating an <see cref="Embed"/> to be sent.
-    /// </summary>
+    /// <summary> A builder for creating an <see cref="Embed"/> to be sent. </summary>
     public class EmbedBuilder
     {
         private readonly Embed _embed;

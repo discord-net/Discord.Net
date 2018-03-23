@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord
 {
-    /// <summary> A Guild-User pairing. </summary>
+    /// <summary> Represents a Discord user that is in a guild. </summary>
     public interface IGuildUser : IUser, IVoiceState
     {
         /// <summary> Gets when this user joined this guild. </summary>

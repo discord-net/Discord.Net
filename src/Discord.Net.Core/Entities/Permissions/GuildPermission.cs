@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 
 namespace Discord
 {
+    /// <summary> Defines the available permissions for a channel. </summary>
     [FlagsAttribute]
     public enum GuildPermission : ulong
     {

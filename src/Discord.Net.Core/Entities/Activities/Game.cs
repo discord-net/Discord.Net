@@ -2,10 +2,13 @@ using System.Diagnostics;
 
 namespace Discord
 {
+    /// <summary> A user's game activity. </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Game : IActivity
     {
+        /// <inheritdoc/>
         public string Name { get; internal set; }
+        /// <inheritdoc/>
         public ActivityType Type { get; internal set; }
 
         internal Game() { }

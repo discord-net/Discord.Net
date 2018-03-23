@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Discord.Commands
 {
     /// <summary>
-    /// This attribute requires that the user invoking the command has a specified permission.
+    /// Requires the user invoking the command to have a specified permission.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RequireUserPermissionAttribute : PreconditionAttribute

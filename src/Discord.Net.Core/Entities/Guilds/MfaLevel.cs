@@ -1,5 +1,6 @@
-﻿namespace Discord
+namespace Discord
 {
+    /// <summary> Specifies the guild's Multi-Factor Authentication (MFA) level requirement. </summary>
     public enum MfaLevel
     {
         /// <summary> Users have no additional MFA restriction on this guild. </summary>

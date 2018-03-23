@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Discord
 {
+    /// <summary> Represents a Discord message object. </summary>
     public interface IMessage : ISnowflakeEntity, IDeletable
     {
         /// <summary> Gets the type of this system message. </summary>

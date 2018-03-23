@@ -1,5 +1,6 @@
 namespace Discord
 {
+    /// <summary> Specifies the severity of the log message. </summary>
     public enum LogSeverity
     {
         /// <summary> 
