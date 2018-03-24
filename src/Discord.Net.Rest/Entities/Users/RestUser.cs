@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
@@ -57,8 +57,12 @@ namespace Discord.Rest
         public Task<RestDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
             => UserHelper.CreateDMChannelAsync(this, Discord, options);
 
+        public string GetDefaultAvatarUrl()
+            => CDN.GetUserDefaultAvatarUrl(DiscriminatorValue);
+        public string GetCustomAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetUserCustomAvatarUrl(Id, AvatarId, size, format);
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-            => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
+            => GetCustomAvatarUrl(format, size) ?? GetDefaultAvatarUrl();
 
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";

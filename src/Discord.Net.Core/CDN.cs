@@ -6,7 +6,9 @@ namespace Discord
     {
         public static string GetApplicationIconUrl(ulong appId, string iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}app-icons/{appId}/{iconId}.jpg" : null;
-        public static string GetUserAvatarUrl(ulong userId, string avatarId, ushort size, ImageFormat format)
+        public static string GetUserDefaultAvatarUrl(ushort discriminator)
+            => $"{DiscordConfig.CDNUrl}embed/avatars/{discriminator % 5}.png";
+        public static string GetUserCustomAvatarUrl(ulong userId, string avatarId, ushort size, ImageFormat format)
         {
             if (avatarId == null)
                 return null;

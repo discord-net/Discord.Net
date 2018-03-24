@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Webhook;
@@ -66,7 +66,7 @@ namespace Discord.Rest
         }
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-           => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
+           => CDN.GetUserCustomAvatarUrl(Id, AvatarId, size, format);
 
         public async Task ModifyAsync(Action<WebhookProperties> func, RequestOptions options = null)
         {
