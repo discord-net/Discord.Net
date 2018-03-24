@@ -33,30 +33,6 @@ namespace Discord.Commands
                 else
                     c = '\0';
 
-                //If this character is escaped, skip it
-                if (isEscaping)
-                {
-                    if (curPos != endPos)
-                    {
-                        argBuilder.Append(c);
-                        isEscaping = false;
-                        continue;
-                    }
-                }
-                //Are we escaping the next character?
-                if (c == '\\' && (curParam == null || !curParam.IsRemainder))
-                {
-                    isEscaping = true;
-                    continue;
-                }
-
-                //If we're processing an remainder parameter, ignore all other logic
-                if (curParam != null && curParam.IsRemainder && curPos != endPos)
-                {
-                    argBuilder.Append(c);
-                    continue;
-                }
-
                 //If we're not currently processing one, are we starting the next argument yet?
                 if (curPart == ParserPart.None)
                 {
@@ -81,6 +57,30 @@ namespace Discord.Commands
                         }
                         curPart = ParserPart.Parameter;
                     }
+                }
+
+                //If this character is escaped, skip it
+                if (isEscaping)
+                {
+                    if (curPos != endPos)
+                    {
+                        argBuilder.Append(c);
+                        isEscaping = false;
+                        continue;
+                    }
+                }
+                //Are we escaping the next character?
+                if (c == '\\' && (curParam == null || !curParam.IsRemainder))
+                {
+                    isEscaping = true;
+                    continue;
+                }
+
+                //If we're processing a remainder parameter, ignore all other logic
+                if (curParam != null && curParam.IsRemainder && curPos != endPos)
+                {
+                    argBuilder.Append(c);
+                    continue;
                 }
 
                 //Has this parameter ended yet?
