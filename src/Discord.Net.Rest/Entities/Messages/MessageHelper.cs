@@ -14,7 +14,7 @@ namespace Discord.Rest
             RequestOptions options)
         {
             if (msg.Author.Id != client.CurrentUser.Id)
-                throw new InvalidOperationException("Discord allows only the author of a message to change it.");
+                throw new InvalidOperationException("Only the author of a message may change it.");
 
             var args = new MessageProperties();
             func(args);
