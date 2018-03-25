@@ -20,7 +20,6 @@ namespace Discord.Commands.Builders
         public string Remarks { get; set; }
         public string Group { get; set; }
         public bool IgnoreExtraArgs { get; set; }
-        public RunMode RunMode { get; set; }
 
         public IReadOnlyList<CommandBuilder> Commands => _commands;
         public IReadOnlyList<ModuleBuilder> Modules => _submodules;
@@ -36,7 +35,6 @@ namespace Discord.Commands.Builders
             Service = service;
             Parent = parent;
             IgnoreExtraArgs = service._ignoreExtraArgs;
-            RunMode = service._defaultRunMode;
 
             _commands = new List<CommandBuilder>();
             _submodules = new List<ModuleBuilder>();
