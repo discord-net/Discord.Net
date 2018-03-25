@@ -121,7 +121,7 @@ namespace Discord.Commands
                 return ParseResult.FromError(preconditionResult);
 
             string input = searchResult.Text.Substring(startIndex);
-            return await CommandParser.ParseArgsAsync(this, context, IgnoreExtraArgs, services, input, 0).ConfigureAwait(false);
+            return await CommandParser.ParseArgsAsync(this, context, services, input, 0).ConfigureAwait(false);
         }
 
         public Task<IResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)
