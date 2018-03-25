@@ -126,6 +126,9 @@ namespace Discord.Commands
                     case IgnoreExtraArgsAttribute ignoreExtra:
                         builder.IgnoreExtraArgs = ignoreExtra.IgnoreValue;
                         break;
+                    case SetRunModeAttribute runmode:
+                        builder.RunMode = runmode.RunMode;
+                        break;
                     default:
                         builder.AddAttributes(attribute);
                         break;
@@ -159,7 +162,6 @@ namespace Discord.Commands
                 {
                     case CommandAttribute command:
                         builder.AddAliases(command.Text);
-                        builder.RunMode = command.RunMode;
                         builder.Name = builder.Name ?? command.Text;
                         break;
                     case NameAttribute name:
@@ -182,6 +184,9 @@ namespace Discord.Commands
                         break;
                     case IgnoreExtraArgsAttribute ignoreExtra:
                         builder.IgnoreExtraArgs = ignoreExtra.IgnoreValue;
+                        break;
+                    case SetRunModeAttribute runmode:
+                        builder.RunMode = runmode.RunMode;
                         break;
                     default:
                         builder.AddAttributes(attribute);

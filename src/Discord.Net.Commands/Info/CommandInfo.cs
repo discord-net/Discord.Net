@@ -43,7 +43,7 @@ namespace Discord.Commands
             Summary = builder.Summary;
             Remarks = builder.Remarks;
 
-            RunMode = (builder.RunMode == RunMode.Default ? service._defaultRunMode : builder.RunMode);
+            RunMode = builder.RunMode;
             Priority = builder.Priority;
 
             Aliases = module.Aliases

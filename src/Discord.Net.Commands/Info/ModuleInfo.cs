@@ -14,6 +14,7 @@ namespace Discord.Commands
         public string Remarks { get; }
         public string Group { get; }
         public bool IgnoreExtraArgs { get; }
+        public RunMode RunMode { get; }
 
         public IReadOnlyList<string> Aliases { get; }
         public IReadOnlyList<CommandInfo> Commands { get; }
@@ -32,6 +33,7 @@ namespace Discord.Commands
             Remarks = builder.Remarks;
             Group = builder.Group;
             IgnoreExtraArgs = builder.IgnoreExtraArgs;
+            RunMode = builder.RunMode;
             Parent = parent;
 
             Aliases = BuildAliases(builder, service).ToImmutableArray();
