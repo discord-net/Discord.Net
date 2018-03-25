@@ -32,7 +32,6 @@ namespace Discord.Commands.Builders
         internal CommandBuilder(ModuleBuilder module)
         {
             Module = module;
-            IgnoreExtraArgs = module.IgnoreExtraArgs;
 
             _preconditions = new List<PreconditionAttribute>();
             _parameters = new List<ParameterBuilder>();

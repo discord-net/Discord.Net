@@ -13,7 +13,6 @@ namespace Discord.Commands
         public string Summary { get; }
         public string Remarks { get; }
         public string Group { get; }
-        public bool IgnoreExtraArgs { get; }
 
         public IReadOnlyList<string> Aliases { get; }
         public IReadOnlyList<CommandInfo> Commands { get; }
@@ -31,7 +30,6 @@ namespace Discord.Commands
             Summary = builder.Summary;
             Remarks = builder.Remarks;
             Group = builder.Group;
-            IgnoreExtraArgs = builder.IgnoreExtraArgs;
             Parent = parent;
 
             Aliases = BuildAliases(builder, service).ToImmutableArray();
