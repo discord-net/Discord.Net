@@ -123,6 +123,9 @@ namespace Discord.Commands
                     case PreconditionAttribute precondition:
                         builder.AddPrecondition(precondition);
                         break;
+                    case IgnoreExtraArgsAttribute ignoreExtra:
+                        builder.IgnoreExtraArgs = ignoreExtra.IgnoreValue;
+                        break;
                     default:
                         builder.AddAttributes(attribute);
                         break;
@@ -176,6 +179,9 @@ namespace Discord.Commands
                         break;
                     case PreconditionAttribute precondition:
                         builder.AddPrecondition(precondition);
+                        break;
+                    case IgnoreExtraArgsAttribute ignoreExtra:
+                        builder.IgnoreExtraArgs = ignoreExtra.IgnoreValue;
                         break;
                     default:
                         builder.AddAttributes(attribute);

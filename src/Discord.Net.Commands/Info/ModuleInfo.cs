@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Reflection;
 using Discord.Commands.Builders;
 
 namespace Discord.Commands
@@ -14,6 +13,7 @@ namespace Discord.Commands
         public string Summary { get; }
         public string Remarks { get; }
         public string Group { get; }
+        public bool IgnoreExtraArgs { get; }
 
         public IReadOnlyList<string> Aliases { get; }
         public IReadOnlyList<CommandInfo> Commands { get; }
@@ -23,8 +23,6 @@ namespace Discord.Commands
         public ModuleInfo Parent { get; }
         public bool IsSubmodule => Parent != null;
 
-        //public TypeInfo TypeInfo { get; }
-
         internal ModuleInfo(ModuleBuilder builder, CommandService service, IServiceProvider services, ModuleInfo parent = null)
         {
             Service = service;
@@ -33,9 +31,8 @@ namespace Discord.Commands
             Summary = builder.Summary;
             Remarks = builder.Remarks;
             Group = builder.Group;
+            IgnoreExtraArgs = builder.IgnoreExtraArgs;
             Parent = parent;
-
-            //TypeInfo = builder.TypeInfo;
 
             Aliases = BuildAliases(builder, service).ToImmutableArray();
             Commands = builder.Commands.Select(x => x.Build(this, service)).ToImmutableArray();

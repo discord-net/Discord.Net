@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands.Builders
 {
@@ -22,6 +21,7 @@ namespace Discord.Commands.Builders
         public string PrimaryAlias { get; set; }
         public RunMode RunMode { get; set; }
         public int Priority { get; set; }
+        public bool IgnoreExtraArgs { get; set; }
 
         public IReadOnlyList<PreconditionAttribute> Preconditions => _preconditions;
         public IReadOnlyList<ParameterBuilder> Parameters => _parameters;
@@ -32,6 +32,7 @@ namespace Discord.Commands.Builders
         internal CommandBuilder(ModuleBuilder module)
         {
             Module = module;
+            IgnoreExtraArgs = module.IgnoreExtraArgs;
 
             _preconditions = new List<PreconditionAttribute>();
             _parameters = new List<ParameterBuilder>();

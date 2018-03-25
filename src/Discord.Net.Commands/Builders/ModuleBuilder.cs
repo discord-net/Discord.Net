@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands.Builders
 {
@@ -20,6 +19,7 @@ namespace Discord.Commands.Builders
         public string Summary { get; set; }
         public string Remarks { get; set; }
         public string Group { get; set; }
+        public bool IgnoreExtraArgs { get; set; }
 
         public IReadOnlyList<CommandBuilder> Commands => _commands;
         public IReadOnlyList<ModuleBuilder> Modules => _submodules;
@@ -34,6 +34,7 @@ namespace Discord.Commands.Builders
         {
             Service = service;
             Parent = parent;
+            IgnoreExtraArgs = service._ignoreExtraArgs;
 
             _commands = new List<CommandBuilder>();
             _submodules = new List<ModuleBuilder>();
