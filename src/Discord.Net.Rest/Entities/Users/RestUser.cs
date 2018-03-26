@@ -9,7 +9,6 @@ namespace Discord.Rest
     public class RestUser : RestEntity<ulong>, IUser, IUpdateable
     {
         public bool IsBot { get; private set; }
-        public bool HasCustomeAvatar { get; private set; }
         public string Username { get; private set; }
         public ushort DiscriminatorValue { get; private set; }
         public string AvatarId { get; private set; }
@@ -60,10 +59,10 @@ namespace Discord.Rest
             => UserHelper.CreateDMChannelAsync(this, Discord, options);
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-            => GetCustomAvatarUrl(format, size) ?? GetDefaultAvatarUrl();
-
-        public string GetCustomAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
+
+        public string GetEffectiveAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GetAvatarUrl(format, size) ?? GetDefaultAvatarUrl();
 
         public string GetDefaultAvatarUrl()
             => CDN.GetUserDefaultAvatarUrl(DiscriminatorValue);

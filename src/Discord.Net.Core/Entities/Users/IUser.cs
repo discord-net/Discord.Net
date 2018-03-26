@@ -6,10 +6,10 @@ namespace Discord
     {
         /// <summary> Gets the id of this user's avatar. </summary>
         string AvatarId { get; }
-        /// <summary> Gets the url to this user's avatar. </summary>
+        /// <summary> Gets the url to this user's custom avatar. </summary>
         string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
-        /// <summary> Get the url to this user's custom avatar. </summary>
-        string GetCustomAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
+        /// <summary> Get the url to this user's custom avatar, if set, else this user's default avatar. </summary>
+        string GetEffectiveAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
         /// <summary> Get the url to this user's default avatar. </summary>
         string GetDefaultAvatarUrl();
         /// <summary> Gets the per-username unique id for this user. </summary>

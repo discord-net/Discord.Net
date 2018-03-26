@@ -60,10 +60,10 @@ namespace Discord.WebSocket
             => GlobalUser.DMChannel ?? await UserHelper.CreateDMChannelAsync(this, Discord, options) as IDMChannel;
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-            => GetCustomAvatarUrl(format, size) ?? GetDefaultAvatarUrl();
-
-        public string GetCustomAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
+
+        public string GetEffectiveAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GetAvatarUrl(format, size) ?? GetDefaultAvatarUrl();
 
         public string GetDefaultAvatarUrl()
             => CDN.GetUserDefaultAvatarUrl(DiscriminatorValue);
