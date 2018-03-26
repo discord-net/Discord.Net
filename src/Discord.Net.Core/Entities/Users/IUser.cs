@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary> Represents a Discord user. </summary>
     public interface IUser : ISnowflakeEntity, IMentionable, IPresence
     {
         /// <summary> Gets the id of this user's avatar. </summary>

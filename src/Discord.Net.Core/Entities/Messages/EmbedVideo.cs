@@ -1,13 +1,17 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 
 namespace Discord
 {
+    /// <summary> A video featured in an <see cref="Embed"/>. </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct EmbedVideo
     {
+        /// <summary> Gets the URL of the video. </summary>
         public string Url { get; }
+        /// <summary> Gets the height of the video if there is any. </summary>
         public int? Height { get; }
+        /// <summary> Gets the weight of the video if there is any. </summary>
         public int? Width { get; }
 
         internal EmbedVideo(string url, int? height, int? width)

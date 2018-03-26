@@ -2,7 +2,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
-public class ModuleA : ModuleBase
+public class ModuleA : ModuleBase<SocketCommandContext>
 {
     private readonly DatabaseService _database;
 
@@ -19,11 +19,11 @@ public class ModuleA : ModuleBase
     }
 }
 
-public class ModuleB
+public class ModuleB : ModuleBase<SocketCommandContext>
 {
 
     // Public settable properties will be injected
-    public AnnounceService { get; set; }
+    public AnnounceService Announce { get; set; }
 
     // Public properties without setters will not
     public CommandService Commands { get; }

@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary> A Discord message object. </summary>
     public interface IUserMessage : IMessage
     {
         /// <summary> Modifies this message. </summary>

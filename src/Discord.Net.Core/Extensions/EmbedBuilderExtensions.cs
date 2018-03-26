@@ -2,6 +2,7 @@ using System;
 
 namespace Discord
 {
+    /// <summary> Extensions for building an embed. </summary>
     public static class EmbedBuilderExtensions
     {
         /// <summary> Adds embed color based on the provided raw value. </summary>

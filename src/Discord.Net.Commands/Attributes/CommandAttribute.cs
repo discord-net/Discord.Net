@@ -7,7 +7,7 @@ namespace Discord.Commands
     public class CommandAttribute : Attribute
     {
         /// <summary>
-        /// Specifies the text required to be recognized as a command.
+        /// Gets the text that has been set to be recognized as a command.
         /// </summary>
         public string Text { get; }
         /// <summary>

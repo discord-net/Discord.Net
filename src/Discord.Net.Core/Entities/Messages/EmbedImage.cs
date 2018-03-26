@@ -1,14 +1,19 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 
 namespace Discord
 {
+    /// <summary> An image for an <see cref="Embed"/>. </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct EmbedImage
     {
+        /// <summary> Gets the URL of the image.</summary>
         public string Url { get; }
+        /// <summary> Gets the proxified URL of the image.</summary>
         public string ProxyUrl { get; }
+        /// <summary> Gets the height of the image if any is set. </summary>
         public int? Height { get; }
+        /// <summary> Gets the width of the image if any is set. </summary>
         public int? Width { get; }
 
         internal EmbedImage(string url, string proxyUrl, int? height, int? width)

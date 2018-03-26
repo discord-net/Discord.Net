@@ -1,5 +1,6 @@
 namespace Discord
 {
+    /// <summary> Specifies the cache mode that should be used. </summary>
     public enum CacheMode
     {
         /// <summary> Allows the object to be downloaded if it does not exist in the current cache. </summary>

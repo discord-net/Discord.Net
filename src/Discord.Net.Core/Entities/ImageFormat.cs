@@ -1,6 +1,6 @@
 namespace Discord
 {
-    /// <summary> The type of format for the image to return. </summary>
+    /// <summary> Specifies the type of format the image should return in. </summary>
     public enum ImageFormat
     {
         Auto,

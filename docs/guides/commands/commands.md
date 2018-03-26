@@ -1,15 +1,15 @@
 # The Command Service
 
-[Discord.Commands](xref:Discord.Commands) provides an Attribute-based
+[Discord.Commands](xref:Discord.Commands) provides an attribute-based
 command parser.
 
 ## Setup
 
-To use Commands, you must create a [Command Service] and a Command
+To use Commands, you must create a [Command Service] and a command
 Handler.
 
-Included below is a very barebone Command Handler. You can extend your
-Command Handler as much as you like; however, the below is the bare
+Included below is a very barebone command handler. You can extend your
+command Handler as much as you like; however, the below is the bare
 minimum.
 
 The `CommandService` will optionally accept a [CommandServiceConfig],
@@ -24,8 +24,8 @@ values.
 
 ## With Attributes
 
-In 1.0, Commands can be defined ahead of time with attributes, or at
-runtime with builders.
+Starting from 1.0, Commands can be defined ahead of time with 
+attributes, or at runtime with builders.
 
 For most bots, ahead-of-time Commands should be all you need, and this
 is the recommended method of defining Commands.
@@ -39,22 +39,23 @@ Commands in different classes and have them automatically loaded.
 
 Discord.Net's implementation of Modules is influenced heavily from
 ASP.NET Core's Controller pattern. This means that the lifetime of a
-module instance is only as long as the Command is being invoked.
+module instance is only as long as the command is being invoked.
 
-**Avoid using long-running code** in your modules wherever possible.
-You should **not** be implementing very much logic into your modules,
-instead, outsource to a service for that.
-
-If you are unfamiliar with Inversion of Control, it is recommended to
-read the MSDN article on [IoC] and [Dependency Injection].
-
-To begin, create a new class somewhere in your project and inherit the
-class from [ModuleBase]. This class **must** be `public`.
+> [!WARNING]
+> **Avoid using long-running code** in your modules wherever possible.
+> You should **not** be implementing very much logic into your 
+> modules, instead, outsource to a service for that.
+>
+> If you are unfamiliar with Inversion of Control, it is recommended 
+> to read the MSDN article on [IoC] and [Dependency Injection].
 
 >[!NOTE]
 >[ModuleBase] is an _abstract_ class, meaning that you may extend it
 >or override it as you see fit. Your module may inherit from any
 >extension of ModuleBase.
+
+To begin, create a new class somewhere in your project and inherit the
+class from [ModuleBase]. This class **must** be `public`.
 
 By now, your module should look like this:
 
@@ -66,36 +67,36 @@ By now, your module should look like this:
 
 ### Adding Commands
 
-The next step to creating Commands is actually creating the Commands.
+The next step to creating commands is actually creating the commands.
 
-To create a Command, add a method to your module of type `Task`.
+To create a command, add a method to your module of type `Task` or 
+`Task<RuntimeResult>` depending on your use.
 Typically, you will want to mark this method as `async`, although it
 is not required.
 
-Adding parameters to a Command is done by adding parameters to the
-parent Task.
-
-For example, to take an integer as an argument from the user, add `int
-arg`; to take a user as an argument from the user, add `IUser user`.
-In 1.0, a Command can accept nearly any type of argument; a full list
-of types that are parsed by default can be found in the below section
-on _Type Readers_.
+Adding parameters to a command is done by adding parameters to the
+parent Task. For example, to take an integer as an argument from 
+the user, add `int arg`; to take a user as an argument from the 
+user, add `IUser user`. Starting from 1.0, a command can accept 
+nearly any type of argument;  a full list of types that are parsed 
+by default can be found in the below 
+section on [Type Readers](#type-readers).
 
 Parameters, by default, are always required. To make a parameter
 optional, give it a default value. To accept a comma-separated list,
 set the parameter to `params Type[]`.
 
-Should a parameter include spaces, it **must** be wrapped in quotes.
-For example, for a Command with a parameter `string food`, you would
-execute it with `!favoritefood "Key Lime Pie"`.
+Should a parameter include spaces, the parameter **must** be 
+wrapped in quotes. For example, for a command with a parameter 
+`string food`, you would execute it with 
+`!favoritefood "Key Lime Pie"`. If you would like a parameter to 
+parse until the end of a command, flag the parameter with the 
+[RemainderAttribute]. This will allow a user to invoke a command 
+without wrapping a parameter in quotes.
 
-If you would like a parameter to parse until the end of a Command,
-flag the parameter with the [RemainderAttribute]. This will allow a
-user to invoke a Command without wrapping a parameter in quotes.
-
-Finally, flag your Command with the [CommandAttribute]. (you must
-specify a name for this Command, except for when it is part of a
-Module Group - see below)
+Finally, flag your command with the [CommandAttribute] (you must
+specify a name for this command, except for when it is part of a
+[Module Group](#module-groups).
 
 [RemainderAttribute]: xref:Discord.Commands.RemainderAttribute
 [CommandAttribute]: xref:Discord.Commands.CommandAttribute
@@ -114,11 +115,10 @@ priority will be called first.
 
 ### Command Context
 
-Every Command can access the execution context through the [Context]
+Every command can access the execution context through the [Context]
 property on [ModuleBase]. `ICommandContext` allows you to access the
-message, channel, guild, and user that the Command was invoked from,
-as well as the underlying Discord client that the Command was invoked
-from.
+message, channel, guild, user, and the underlying Discord client 
+that the command was invoked from.
 
 Different types of Contexts may be specified using the generic variant
 of [ModuleBase]. When using a [SocketCommandContext], for example, the
@@ -132,7 +132,7 @@ accessing the channel through the [Context] and sending a message.
 >Contexts should **NOT** be mixed! You cannot have one module that
 >uses `CommandContext` and another that uses `SocketCommandContext`.
 
-[Context]: xref:Discord.Commands.ModuleBase`1#Discord_Commands_ModuleBase_1_Context
+[Context]: xref:Discord.Commands.ModuleBase`1.Context
 [SocketCommandContext]: xref:Discord.Commands.SocketCommandContext
 [ReplyAsync]: xref:Discord.Commands.ModuleBase`1.ReplyAsync*
 
@@ -144,13 +144,12 @@ At this point, your module should look comparable to this example:
 #### Loading Modules Automatically
 
 The Command Service can automatically discover all classes in an
-Assembly that inherit [ModuleBase] and load them.
+Assembly that inherit [ModuleBase] and load them. Invoke 
+[CommandService.AddModulesAsync] to discover modules and
+install them.
 
 To opt a module out of auto-loading, flag it with
 [DontAutoLoadAttribute].
-
-Invoke [CommandService.AddModulesAsync] to discover modules and
-install them.
 
 [DontAutoLoadAttribute]: xref:Discord.Commands.DontAutoLoadAttribute
 [CommandService.AddModulesAsync]: xref:Discord.Commands.CommandService.AddModulesAsync*
@@ -187,7 +186,7 @@ prefixed. To create a group, flag a module with the
 
 Module groups also allow you to create **nameless Commands**, where
 the [CommandAttribute] is configured with no name. In this case, the
-Command will inherit the name of the group it belongs to.
+command will inherit the name of the group it belongs to.
 
 ### Submodules
 
@@ -209,20 +208,19 @@ DI when writing your modules.
 
 ### Setup
 
-First, you need to create an @System.IServiceProvider; you may create
-your own one if you wish.
+First, you need to create an @System.IServiceProvider.
 
-Next, add the dependencies that your modules will use to the map.
+Next, add the dependencies to the service collection that you wish 
+to use in the Modules.
 
-Finally, pass the map into the `LoadAssembly` method. Your modules
-will be automatically loaded with this dependency map.
+Finally, pass the service collection into `AddModulesAsync`.
 
 [!code-csharp[IServiceProvider Setup](samples/dependency_map_setup.cs)]
 
 ### Usage in Modules
 
 In the constructor of your Module, any parameters will be filled in by
-the @System.IServiceProvider that you've passed into `LoadAssembly`.
+the @System.IServiceProvider that you've passed.
 
 Any publicly settable properties will also be filled in the same
 manner.
@@ -264,6 +262,7 @@ usages on their respective API pages.
 - @Discord.Commands.RequireOwnerAttribute
 - @Discord.Commands.RequireBotPermissionAttribute
 - @Discord.Commands.RequireUserPermissionAttribute
+- @Discord.Commands.RequireNsfwAttribute
 
 ## Custom Preconditions
 

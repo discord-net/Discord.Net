@@ -14,5 +14,5 @@ public async Task InstallAsync(DiscordSocketClient client)
 		.AddSingleton<DatabaseService>()
 		.BuildServiceProvider();
 	// ...
-	await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
+	await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
 }

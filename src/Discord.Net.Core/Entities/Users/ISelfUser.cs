@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary> Represents a logged-in Discord user. </summary>
     public interface ISelfUser : IUser
     {
         /// <summary> Gets the email associated with this user. </summary>

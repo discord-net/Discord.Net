@@ -1,7 +1,7 @@
-﻿namespace Discord
+namespace Discord
 {
     /// <summary>
-    /// Modify an IRole with the specified parameters
+    /// Properties that are used to modify an <see cref="IRole"/> with the specified changes.
     /// </summary>
     /// <example>
     /// <code language="c#">
@@ -16,39 +16,39 @@
     public class RoleProperties
     {
         /// <summary>
-        /// The name of the role
+        /// Gets or sets the name of the role.
         /// </summary>
         /// <remarks>
         /// If this role is the EveryoneRole, this value may not be set.
         /// </remarks>
         public Optional<string> Name { get; set; }
         /// <summary>
-        /// The role's GuildPermissions
+        /// Gets or sets the role's <see cref="GuildPermission"/>.
         /// </summary>
         public Optional<GuildPermissions> Permissions { get; set; }
         /// <summary>
-        /// The position of the role. This is 0-based!
+        /// Gets or sets the position of the role. This is 0-based!
         /// </summary>
         /// <remarks>
         /// If this role is the EveryoneRole, this value may not be set.
         /// </remarks>
         public Optional<int> Position { get; set; }
         /// <summary>
-        /// The color of the Role.
+        /// Gets or sets the color of the Role.
         /// </summary>
         /// <remarks>
         /// If this role is the EveryoneRole, this value may not be set.
         /// </remarks>
         public Optional<Color> Color { get; set; }
         /// <summary>
-        /// Whether or not this role should be displayed independently in the userlist.
+        /// Gets or sets whether or not this role should be displayed independently in the userlist.
         /// </summary>
         /// <remarks>
         /// If this role is the EveryoneRole, this value may not be set.
         /// </remarks>
         public Optional<bool> Hoist { get; set; }
         /// <summary>
-        /// Whether or not this role can be mentioned.
+        /// Gets or sets whether or not this role can be mentioned.
         /// </summary>
         /// <remarks>
         /// If this role is the EveryoneRole, this value may not be set.

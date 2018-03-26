@@ -1,5 +1,6 @@
-﻿namespace Discord
+namespace Discord
 {
+    /// <summary> Specifies the verification level the guild uses. </summary>
     public enum VerificationLevel
     {
         /// <summary> Users have no additional restrictions on sending messages to this guild. </summary>

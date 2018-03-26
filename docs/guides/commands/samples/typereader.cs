@@ -4,7 +4,7 @@ using Discord.Commands;
 
 public class BooleanTypeReader : TypeReader
 {
-    public override Task<TypeReaderResult> Read(ICommandContext context, string input, IServiceProvider services)
+    public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
     {
         bool result;
         if (bool.TryParse(input, out result))

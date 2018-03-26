@@ -1,7 +1,7 @@
-﻿namespace Discord
+namespace Discord
 {
     /// <summary>
-    /// Modify the current user with the specified arguments
+    /// Properties that are used to modify the <see cref="ISelfUser"/> with the specified changes.
     /// </summary>
     /// <example>
     /// <code language="c#">

@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    /// Properties that are used to modify a message with the specified parameters.
+    /// Properties that are used to modify an <see cref="IUserMessage"/> with the specified changes.
     /// </summary>
     /// <remarks>
     /// The content of a message can be cleared with String.Empty; if and only if an Embed is present.
