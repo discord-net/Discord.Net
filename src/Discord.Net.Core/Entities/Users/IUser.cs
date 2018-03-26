@@ -8,6 +8,10 @@ namespace Discord
         string AvatarId { get; }
         /// <summary> Gets the url to this user's avatar. </summary>
         string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
+        /// <summary> Get the url to this user's custom avatar. </summary>
+        string GetCustomAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
+        /// <summary> Get the url to this user's default avatar. </summary>
+        string GetDefaultAvatarUrl();
         /// <summary> Gets the per-username unique id for this user. </summary>
         string Discriminator { get; }
         /// <summary> Gets the per-username unique id for this user. </summary>
@@ -16,6 +20,8 @@ namespace Discord
         bool IsBot { get; }
         /// <summary> Returns true if this user is a webhook user. </summary>
         bool IsWebhook { get; }
+        /// <summary> Returns true if this user has set a custom avatar. </summary>
+        bool HasCustomAvatar { get; }
         /// <summary> Gets the username for this user. </summary>
         string Username { get; }
 

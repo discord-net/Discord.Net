@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
@@ -9,6 +9,7 @@ namespace Discord.Rest
     public class RestUser : RestEntity<ulong>, IUser, IUpdateable
     {
         public bool IsBot { get; private set; }
+        public bool HasCustomeAvatar { get; private set; }
         public string Username { get; private set; }
         public ushort DiscriminatorValue { get; private set; }
         public string AvatarId { get; private set; }
@@ -19,6 +20,7 @@ namespace Discord.Rest
         public virtual IActivity Activity => null;
         public virtual UserStatus Status => UserStatus.Offline;
         public virtual bool IsWebhook => false;
+        public bool HasCustomAvatar => AvatarId != null;
 
         internal RestUser(BaseDiscordClient discord, ulong id)
             : base(discord, id)
@@ -58,7 +60,13 @@ namespace Discord.Rest
             => UserHelper.CreateDMChannelAsync(this, Discord, options);
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GetCustomAvatarUrl(format, size) ?? GetDefaultAvatarUrl();
+
+        public string GetCustomAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
+
+        public string GetDefaultAvatarUrl()
+            => CDN.GetUserDefaultAvatarUrl(DiscriminatorValue);
 
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
@@ -66,5 +74,6 @@ namespace Discord.Rest
         //IUser
         async Task<IDMChannel> IUser.GetOrCreateDMChannelAsync(RequestOptions options)
             => await GetOrCreateDMChannelAsync(options);
+
     }
 }

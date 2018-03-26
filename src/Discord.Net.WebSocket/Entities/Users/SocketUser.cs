@@ -1,4 +1,4 @@
-﻿using Discord.Rest;
+using Discord.Rest;
 using System;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
@@ -20,6 +20,7 @@ namespace Discord.WebSocket
         public string Mention => MentionUtils.MentionUser(Id);
         public IActivity Activity => Presence.Activity;
         public UserStatus Status => Presence.Status;
+        public bool HasCustomAvatar => AvatarId != null;
 
         internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
@@ -59,10 +60,17 @@ namespace Discord.WebSocket
             => GlobalUser.DMChannel ?? await UserHelper.CreateDMChannelAsync(this, Discord, options) as IDMChannel;
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => GetCustomAvatarUrl(format, size) ?? GetDefaultAvatarUrl();
+
+        public string GetCustomAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
+
+        public string GetDefaultAvatarUrl()
+            => CDN.GetUserDefaultAvatarUrl(DiscriminatorValue);
 
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
+
     }
 }
