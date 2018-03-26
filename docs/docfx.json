@@ -69,8 +69,8 @@
             "temp/api/netstandard1.1/*.yml":[
                "netstandard1.1"
             ],
-            "temp/api/net46/*.yml":[
-               "net46"
+            "temp/api/net45/*.yml":[
+               "net45"
             ]
          }
       },
