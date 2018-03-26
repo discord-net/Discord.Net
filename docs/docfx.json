@@ -1,69 +1,127 @@
 {
-  "metadata": [
-    {
-      "src": [
-        {
-          "src": "../src",
-          "files": [
-            "**.csproj"
-          ],
-          "exclude": [
-            "**/bin/**",
-            "**/obj/**"
-          ]
-        }
-      ],
-      "dest": "api",
-      "filter": "filterConfig.yml",
-	  "properties":{
-			"TargetFramework": "netstandard1.1"
-	  }
-    }
-  ],
-  "build": {
-    "content": [
+   "metadata":[
       {
-        "files": [
-          "api/**.yml",
-          "api/index.md"
-        ]
+         "src":[
+            {
+               "src":"../src",
+               "files":[
+                  "**.csproj"
+               ]
+            }
+         ],
+         "dest":"temp/api/netstandard1.1",
+         "filter":"filterConfig.yml",
+         "properties":{
+            "TargetFramework":"netstandard1.1"
+         }
       },
       {
-        "files": [
-          "guides/**.md",
-          "guides/**/toc.yml",
-          "faq/**.md",
-          "faq/**/toc.yml",
-          "toc.yml",
-          "*.md"
-        ],
-        "exclude": [
-          "obj/**",
-          "_site/**"
-        ]
-      }
-    ],
-    "resource": [
+         "src":[
+            {
+               "src":"../src",
+               "files":[
+                  "**.csproj"
+               ]
+            }
+         ],
+         "dest":"temp/api/netstandard1.3",
+         "filter":"filterConfig.yml",
+         "properties":{
+            "TargetFramework":"netstandard1.3"
+         }
+      },
       {
-        "files": [
-          "**/images/**",
-          "**/samples/**"
-        ],
-        "exclude": [
-          "obj/**",
-          "_site/**"
-        ]
+         "src":[
+            {
+               "src":"../src",
+               "files":[
+                  "**.csproj"
+               ]
+            }
+         ],
+         "dest":"temp/api/net45",
+         "filter":"filterConfig.yml",
+         "properties":{
+            "TargetFramework":"net45"
+         }
       }
-    ],
-    "dest": "_site",
-    "template": [
-      "default"
-    ],
-    "globalMetadata": {
-      "_appFooter": "Discord.Net (c) 2015-2018",
-      "_enableSearch": true
-    },
-    "noLangKeyword": false,
-    "xrefService": [ "https://xref.docs.microsoft.com/query?uid={uid}" ]
-  }
+   ],
+   "merge":{
+      "content":[
+         {
+            "files":"*.yml",
+            "src":"temp/api/netstandard1.1"
+         },
+         {
+            "files":"*.yml",
+            "src":"temp/api/netstandard1.3"
+         },
+         {
+            "files":"*.yml",
+            "src":"temp/api/net45"
+         }
+      ],
+      "fileMetadata":{
+         "platform":{
+            "temp/api/netstandard1.3/*.yml":[
+               "netstandard1.3"
+            ],
+            "temp/api/netstandard1.1/*.yml":[
+               "netstandard1.1"
+            ],
+            "temp/api/net46/*.yml":[
+               "net46"
+            ]
+         }
+      },
+      "dest":"api"
+   },
+   "build":{
+      "content":[
+         {
+            "files":[
+               "api/**.yml",
+               "api/index.md"
+            ]
+         },
+         {
+            "files":[
+               "guides/**.md",
+               "guides/**/toc.yml",
+               "faq/**.md",
+               "faq/**/toc.yml",
+               "toc.yml",
+               "*.md"
+            ],
+            "exclude":[
+               "obj/**",
+               "_site/**"
+            ]
+         }
+      ],
+      "resource":[
+         {
+            "files":[
+               "**/images/**",
+               "**/samples/**"
+            ],
+            "exclude":[
+               "obj/**",
+               "_site/**"
+            ]
+         }
+      ],
+      "dest":"_site",
+      "template":[
+         "default"
+      ],
+      "globalMetadata":{
+         "_appFooter":"Discord.Net (c) 2015-2018",
+         "_enableSearch":true
+      },
+      "noLangKeyword":false,
+      "xrefService":[
+         "https://xref.docs.microsoft.com/query?uid={uid}"
+      ]
+   }
 }
