@@ -3,13 +3,13 @@
     {
       "src": [
         {
-          "src": "..",
+          "src": "../src",
           "files": [
-            "*.sln"
+            "**.csproj"
           ],
           "exclude": [
-            "**/obj/**",
-            "**/bin/**"
+            "**/bin/**",
+            "**/obj/**"
           ]
         }
       ],
