@@ -5,17 +5,19 @@
         {
           "src": "..",
           "files": [
-            "src/**/*.cs"
+            "*.sln"
           ],
           "exclude": [
             "**/obj/**",
-            "**/bin/**",
-            "_site/**"
+            "**/bin/**"
           ]
         }
       ],
       "dest": "api",
-      "filter": "filterConfig.yml"
+      "filter": "filterConfig.yml",
+	  "properties":{
+			"TargetFramework": "netstandard1.1"
+	  }
     }
   ],
   "build": {
