@@ -9,73 +9,13 @@
                ]
             }
          ],
-         "dest":"temp/api/netstandard1.1",
+         "dest":"api",
          "filter":"filterConfig.yml",
          "properties":{
             "TargetFramework":"netstandard1.1"
          }
-      },
-      {
-         "src":[
-            {
-               "src":"../src",
-               "files":[
-                  "**.csproj"
-               ]
-            }
-         ],
-         "dest":"temp/api/netstandard1.3",
-         "filter":"filterConfig.yml",
-         "properties":{
-            "TargetFramework":"netstandard1.3"
-         }
-      },
-      {
-         "src":[
-            {
-               "src":"../src",
-               "files":[
-                  "**.csproj"
-               ]
-            }
-         ],
-         "dest":"temp/api/net45",
-         "filter":"filterConfig.yml",
-         "properties":{
-            "TargetFramework":"net45"
-         }
       }
    ],
-   "merge":{
-      "content":[
-         {
-            "files":"*.yml",
-            "src":"temp/api/netstandard1.1"
-         },
-         {
-            "files":"*.yml",
-            "src":"temp/api/netstandard1.3"
-         },
-         {
-            "files":"*.yml",
-            "src":"temp/api/net45"
-         }
-      ],
-      "fileMetadata":{
-         "platform":{
-            "temp/api/netstandard1.3/*.yml":[
-               "netstandard1.3"
-            ],
-            "temp/api/netstandard1.1/*.yml":[
-               "netstandard1.1"
-            ],
-            "temp/api/net45/*.yml":[
-               "net45"
-            ]
-         }
-      },
-      "dest":"api"
-   },
    "build":{
       "content":[
          {
