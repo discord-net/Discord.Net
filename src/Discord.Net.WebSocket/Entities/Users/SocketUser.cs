@@ -20,7 +20,6 @@ namespace Discord.WebSocket
         public string Mention => MentionUtils.MentionUser(Id);
         public IActivity Activity => Presence.Activity;
         public UserStatus Status => Presence.Status;
-        public bool HasCustomAvatar => AvatarId != null;
 
         internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
@@ -61,12 +60,6 @@ namespace Discord.WebSocket
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
-
-        public string GetEffectiveAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-            => GetAvatarUrl(format, size) ?? GetDefaultAvatarUrl();
-
-        public string GetDefaultAvatarUrl()
-            => CDN.GetUserDefaultAvatarUrl(DiscriminatorValue);
 
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";

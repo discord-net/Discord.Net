@@ -19,7 +19,6 @@ namespace Discord.Rest
         public virtual IActivity Activity => null;
         public virtual UserStatus Status => UserStatus.Offline;
         public virtual bool IsWebhook => false;
-        public bool HasCustomAvatar => AvatarId != null;
 
         internal RestUser(BaseDiscordClient discord, ulong id)
             : base(discord, id)
@@ -60,12 +59,6 @@ namespace Discord.Rest
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
-
-        public string GetEffectiveAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-            => GetAvatarUrl(format, size) ?? GetDefaultAvatarUrl();
-
-        public string GetDefaultAvatarUrl()
-            => CDN.GetUserDefaultAvatarUrl(DiscriminatorValue);
 
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
