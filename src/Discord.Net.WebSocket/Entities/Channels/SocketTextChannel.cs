@@ -15,13 +15,18 @@ namespace Discord.WebSocket
     {
         private readonly MessageCache _messages;
 
+        /// <inheritdoc />
         public string Topic { get; private set; }
 
         private bool _nsfw;
+        /// <inheritdoc />
         public bool IsNsfw => _nsfw || ChannelHelper.IsNsfw(this);
 
+        /// <inheritdoc />
         public string Mention => MentionUtils.MentionChannel(Id);
+        /// <inheritdoc />
         public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();
+        /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuildUser> Users
             => Guild.Users.Where(x => Permissions.GetValue(
                 Permissions.ResolveChannel(Guild, x, this, Permissions.ResolveGuild(Guild, x)),
@@ -47,10 +52,12 @@ namespace Discord.WebSocket
             _nsfw = model.Nsfw.GetValueOrDefault();
         }
 
+        /// <inheritdoc />
         public Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
         //Messages
+        /// <inheritdoc />
         public SocketMessage GetCachedMessage(ulong id)
             => _messages?.Get(id);
         public async Task<IMessage> GetMessageAsync(ulong id, RequestOptions options = null)
@@ -100,6 +107,7 @@ namespace Discord.WebSocket
             => _messages?.Remove(id);
 
         //Users
+        /// <inheritdoc />
         public override SocketGuildUser GetUser(ulong id)
         {
             var user = Guild.GetUser(id);

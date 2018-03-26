@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary> Represents a guild channel. This includes a text channel, voice channel, and category channel. </summary>
     public interface IGuildChannel : IChannel, IDeletable
     {
         /// <summary> Gets the position of this channel in the guild's channel list, relative to others of the same type. </summary>

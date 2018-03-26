@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary> Represents a generic Discord channel. </summary>
     public interface IChannel : ISnowflakeEntity
     {
         /// <summary> Gets the name of this channel. </summary>
