@@ -64,6 +64,5 @@ namespace Discord.WebSocket
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
-
     }
 }
