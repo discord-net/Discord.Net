@@ -12,7 +12,7 @@
          "dest":"api",
          "filter":"filterConfig.yml",
          "properties":{
-            "TargetFramework":"netstandard1.1"
+            "TargetFramework":"netstandard1.3"
          }
       }
    ],
