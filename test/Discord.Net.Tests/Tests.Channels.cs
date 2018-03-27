@@ -143,9 +143,11 @@ namespace Discord
         }
 
         [Fact]
-        public async Task TestChannelCategories()
+        public Task TestChannelCategories()
         {
             CheckChannelCategories(_client, _guild);
+
+            return Task.CompletedTask;
         }
 
         private async static void CheckChannelCategories(DiscordRestClient client, RestGuild guild)
@@ -166,8 +168,7 @@ namespace Discord
                 var x = cat2.GetCategoryAsync();
             });
 
-
-            // incomplete test, could use more coverage
+            // incomplete test, could use more coverage, incluing behavior of nested Text and Voice channels
         }
     }
 }
