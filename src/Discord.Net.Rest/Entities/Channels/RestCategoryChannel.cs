@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -25,6 +25,8 @@ namespace Discord.Rest
         private string DebuggerDisplay => $"{Name} ({Id}, Category)";
 
         // IGuildChannel
+        ulong? IGuildChannel.CategoryId
+            => throw new NotSupportedException();
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => throw new NotSupportedException();
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
