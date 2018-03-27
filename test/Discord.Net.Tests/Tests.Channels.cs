@@ -1,4 +1,5 @@
 using Discord.Rest;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -139,6 +140,34 @@ namespace Discord
             Assert.Equal(voice3.Bitrate, 8000);
             Assert.Equal(voice3.Position, 1);
             Assert.Equal(voice3.UserLimit, 16);
+        }
+
+        [Fact]
+        public async Task TestChannelCategories()
+        {
+            CheckChannelCategories(_client, _guild);
+        }
+
+        private async static void CheckChannelCategories(DiscordRestClient client, RestGuild guild)
+        {
+            // create some channel categories
+            var cat1 = await guild.CreateCategoryChannelAsync("Cat1");
+            var cat2 = await guild.CreateCategoryChannelAsync("Cat2");
+
+            // check that both CategoryID and GetCategoryID throw NotSupportedException
+            // because Categories cannot be nested
+            Assert.Throws<NotSupportedException>(() =>
+            {
+                var x = cat1.CategoryId;
+            });
+
+            Assert.Throws<NotSupportedException>(() =>
+            {
+                var x = cat2.GetCategoryAsync();
+            });
+
+
+            // incomplete test, could use more coverage
         }
     }
 }
