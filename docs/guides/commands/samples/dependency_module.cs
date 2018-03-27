@@ -21,16 +21,16 @@ public class ModuleA : ModuleBase<SocketCommandContext>
 
 public class ModuleB : ModuleBase<SocketCommandContext>
 {
-
-    // Public settable properties will be injected
+    // Public settable properties will be injected.
     public AnnounceService Announce { get; set; }
 
-    // Public properties without setters will not
+    // Public properties without setters will not be injected.
     public CommandService Commands { get; }
 
     // Public properties annotated with [DontInject] will not
+    // be injected.
     [DontInject]
-    public NotificationService { get; set; }
+    public NotificationService NotificationService { get; set; }
 
     public ModuleB(CommandService commands)
     {
