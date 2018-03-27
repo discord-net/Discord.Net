@@ -137,7 +137,7 @@ namespace Discord
             bool? addReactions = null,
             bool? viewChannel = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
             bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
-            bool useExternalEmojis = false, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
+            bool? useExternalEmojis = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
             bool? moveMembers = null, bool? useVoiceActivation = null, bool? manageRoles = null, bool? manageWebhooks = null)
             => new ChannelPermissions(RawValue, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages,
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect,
