@@ -7,19 +7,19 @@ namespace Discord
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Attachment : IAttachment
     {
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public ulong Id { get; }
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string Filename { get; }
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string Url { get; }
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string ProxyUrl { get; }
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public int Size { get; }
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public int? Height { get; }
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public int? Width { get; }
 
         internal Attachment(ulong id, string filename, string url, string proxyUrl, int size, int? height, int? width)

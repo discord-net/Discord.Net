@@ -1,5 +1,6 @@
 namespace Discord.Commands
 {
+    /// <summary> Represents the information of command execution result. </summary>
     public interface IResult
     {
         /// <summary> Describes the error type that may have occurred during the operation. </summary>

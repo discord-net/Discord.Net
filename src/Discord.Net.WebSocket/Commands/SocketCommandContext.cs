@@ -3,7 +3,6 @@ using Discord.WebSocket;
 namespace Discord.Commands
 {
     /// <summary> The WebSocket variant of <see cref="ICommandContext"/>, which may contain the client, user, guild, channel, and message. </summary>
-    /// <seealso cref="ICommandContext"/>
     public class SocketCommandContext : ICommandContext
     {
         /// <summary> Gets the <see cref="DiscordSocketClient"/> that the command is executed with. </summary>

@@ -1,6 +1,6 @@
 namespace Discord
 {
-    /// <summary> Represents a Discord attachment object. </summary>
+    /// <summary> Represents a Discord attachment. </summary>
     public interface IAttachment
     {
         /// <summary> Gets the snowflake ID of the attachment. </summary>
