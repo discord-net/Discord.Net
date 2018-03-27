@@ -53,6 +53,8 @@ namespace Discord.WebSocket
         // IGuildChannel
         ulong? IGuildChannel.CategoryId
             => throw new NotSupportedException();
+        Task<ICategoryChannel> IGuildChannel.GetCategoryAsync()
+            => throw new NotSupportedException();
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)

@@ -27,6 +27,8 @@ namespace Discord.Rest
         // IGuildChannel
         ulong? IGuildChannel.CategoryId
             => throw new NotSupportedException();
+        Task<ICategoryChannel> IGuildChannel.GetCategoryAsync()
+            => throw new NotSupportedException();
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => throw new NotSupportedException();
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
