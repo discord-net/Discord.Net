@@ -26,6 +26,18 @@ namespace Discord
             // ensure that the raw values match
             Assert.Equal((ulong)0, copy.RawValue);
 
+            // test modify with no parameters
+            copy = GuildPermissions.None.Modify();
+            Assert.Equal(GuildPermissions.None.RawValue, copy.RawValue);
+
+            // test modify with no paramters on all permissions
+            copy = GuildPermissions.All.Modify();
+            Assert.Equal(GuildPermissions.All.RawValue, copy.RawValue);
+
+            // test modify with no paramters on webhook permissions
+            copy = GuildPermissions.Webhook.Modify();
+            Assert.Equal(GuildPermissions.Webhook.RawValue, copy.RawValue);
+
             // test GuildPermissions.All
             ulong sumOfAllGuildPermissions = 0;
             foreach(var v in Enum.GetValues(typeof(GuildPermission)))
