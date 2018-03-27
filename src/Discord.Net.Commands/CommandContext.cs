@@ -1,5 +1,6 @@
 namespace Discord.Commands
 {
+    /// <summary> The context of a command which may contain the client, user, guild, channel, and message. </summary>
     public class CommandContext : ICommandContext
     {
         /// <inheritdoc/>

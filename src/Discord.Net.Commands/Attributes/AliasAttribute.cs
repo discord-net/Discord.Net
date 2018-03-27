@@ -2,7 +2,7 @@ using System;
 
 namespace Discord.Commands
 {
-    /// <summary> Provides aliases for a command. </summary>
+    /// <summary> Marks the aliases for a command. </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class AliasAttribute : Attribute
     {

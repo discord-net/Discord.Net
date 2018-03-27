@@ -2,7 +2,7 @@ using System;
 
 namespace Discord.Commands
 {
-    /// <summary> Provides the execution information for a command. </summary>
+    /// <summary> Marks the execution information for a command. </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class CommandAttribute : Attribute
     {

@@ -2,6 +2,7 @@ using System;
 
 namespace Discord.Commands
 {
+    /// <summary> An exception thrown when a command fails to execute. </summary>
     public class CommandException : Exception
     {
         /// <summary> The command that caused the exception. </summary>
