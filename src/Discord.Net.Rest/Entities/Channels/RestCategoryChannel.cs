@@ -25,8 +25,17 @@ namespace Discord.Rest
         private string DebuggerDisplay => $"{Name} ({Id}, Category)";
 
         // IGuildChannel
+
+        /// <summary>
+        /// Throws a NotSupportedException because Channel Categories cannot be the child of another Channel Category.
+        /// </summary>
+        /// <exception cref="NotSupportedException">A NotSupportedException is always thrown because Channel Categories do not support being nested.</exception>
         ulong? IGuildChannel.CategoryId
             => throw new NotSupportedException();
+        /// <summary>
+        /// Throws a NotSupportedException because Channel Categories cannot be the child of another Channel Category.
+        /// </summary>
+        /// <exception cref="NotSupportedException">A NotSupportedException is always thrown because Channel Categories do not support being nested.</exception>
         Task<ICategoryChannel> IGuildChannel.GetCategoryAsync()
             => throw new NotSupportedException();
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
