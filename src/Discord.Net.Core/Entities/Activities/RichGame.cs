@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Discord
 {
@@ -7,8 +7,8 @@ namespace Discord
     {
         internal RichGame() { }
 
-        public string Details { get; internal set;}
-        public string State { get; internal set;}
+        public string Details { get; internal set; }
+        public string State { get; internal set; }
         public ulong ApplicationId { get; internal set; }
         public GameAsset SmallAsset { get; internal set; }
         public GameAsset LargeAsset { get; internal set; }

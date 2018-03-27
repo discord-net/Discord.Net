@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace Discord
 {
-    public partial class Tests
+    public class GuidPermissionsTests
     {
         [Fact]
         public Task TestGuildPermission()

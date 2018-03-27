@@ -1,4 +1,4 @@
-﻿using Discord.API;
+using Discord.API;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
@@ -75,8 +75,8 @@ namespace Discord.WebSocket
         {
             if (_automaticShards)
             {
-                var response = await ApiClient.GetBotGatewayAsync().ConfigureAwait(false);
-                _shardIds = Enumerable.Range(0, response.Shards).ToArray();
+                var shardCount = await GetRecommendedShardCountAsync().ConfigureAwait(false);
+                _shardIds = Enumerable.Range(0, shardCount).ToArray();
                 _totalShards = _shardIds.Length;
                 _shards = new DiscordSocketClient[_shardIds.Length];
                 for (int i = 0; i < _shardIds.Length; i++)

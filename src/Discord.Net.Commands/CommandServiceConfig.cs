@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Discord.Commands
@@ -24,5 +25,11 @@ namespace Discord.Commands
 
         /// <summary> Determines whether extra parameters should be ignored. </summary>
         public bool IgnoreExtraArgs { get; set; } = false;
+
+        ///// <summary> Gets or sets the <see cref="IServiceProvider"/> to use. </summary>
+        //public IServiceProvider ServiceProvider { get; set; } = null;
+
+        ///// <summary> Gets or sets a factory function for the <see cref="IServiceProvider"/> to use. </summary>
+        //public Func<CommandService, IServiceProvider> ServiceProviderFactory { get; set; } = null;
     }
 }

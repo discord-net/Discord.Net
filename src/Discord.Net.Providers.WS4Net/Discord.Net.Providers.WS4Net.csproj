@@ -10,6 +10,6 @@
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WebSocket4Net" Version="0.15.0" />
+    <PackageReference Include="WebSocket4Net" Version="0.15.2" />
   </ItemGroup>
 </Project>

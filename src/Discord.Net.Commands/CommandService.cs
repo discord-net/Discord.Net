@@ -1,5 +1,3 @@
-﻿using Discord.Commands.Builders;
-using Discord.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,6 +6,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Discord.Commands.Builders;
+using Discord.Logging;
 
 namespace Discord.Commands
 {
@@ -87,7 +88,8 @@ namespace Discord.Commands
                 var builder = new ModuleBuilder(this, null, primaryAlias);
                 buildFunc(builder);
 
-                var module = builder.Build(this);
+                var module = builder.Build(this, null);
+
                 return LoadModuleInternal(module);
             }
             finally
@@ -95,9 +97,18 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public Task<ModuleInfo> AddModuleAsync<T>() => AddModuleAsync(typeof(T));
-        public async Task<ModuleInfo> AddModuleAsync(Type type)
+
+        /// <summary>
+        /// Add a command module from a type
+        /// </summary>
+        /// <typeparam name="T">The type of module</typeparam>
+        /// <param name="services">An IServiceProvider for your dependency injection solution, if using one - otherwise, pass null</param>
+        /// <returns>A built module</returns>
+        public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services) => AddModuleAsync(typeof(T), services);
+        public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services)
         {
+            services = services ?? EmptyServiceProvider.Instance;
+
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
@@ -106,7 +117,7 @@ namespace Discord.Commands
                 if (_typedModuleDefs.ContainsKey(type))
                     throw new ArgumentException($"This module has already been added.");
 
-                var module = (await ModuleClassBuilder.BuildAsync(this, typeInfo).ConfigureAwait(false)).FirstOrDefault();
+                var module = (await ModuleClassBuilder.BuildAsync(this, services, typeInfo).ConfigureAwait(false)).FirstOrDefault();
 
                 if (module.Value == default(ModuleInfo))
                     throw new InvalidOperationException($"Could not build the module {type.FullName}, did you pass an invalid type?");
@@ -120,13 +131,21 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly)
+        /// <summary>
+        /// Add command modules from an assembly
+        /// </summary>
+        /// <param name="assembly">The assembly containing command modules</param>
+        /// <param name="services">An IServiceProvider for your dependency injection solution, if using one - otherwise, pass null</param>
+        /// <returns>A collection of built modules</returns>
+        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly, IServiceProvider services)
         {
+            services = services ?? EmptyServiceProvider.Instance;
+
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 var types = await ModuleClassBuilder.SearchAsync(assembly, this).ConfigureAwait(false);
-                var moduleDefs = await ModuleClassBuilder.BuildAsync(types, this).ConfigureAwait(false);
+                var moduleDefs = await ModuleClassBuilder.BuildAsync(types, this, services).ConfigureAwait(false);
 
                 foreach (var info in moduleDefs)
                 {
@@ -226,7 +245,7 @@ namespace Discord.Commands
             var readers = _typeReaders.GetOrAdd(typeof(Nullable<>).MakeGenericType(valueType), x => new ConcurrentDictionary<Type, TypeReader>());
             var nullableReader = NullableTypeReader.Create(valueType, valueTypeReader);
             readers[nullableReader.GetType()] = nullableReader;
-        }  
+        }
         internal IDictionary<Type, TypeReader> GetTypeReaders(Type type)
         {
             if (_typeReaders.TryGetValue(type, out var definedTypeReaders))
@@ -274,9 +293,9 @@ namespace Discord.Commands
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
 
-        public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IServiceProvider services = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
             => ExecuteAsync(context, context.Message.Content.Substring(argPos), services, multiMatchHandling);
-        public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;
             var searchResult = Search(context, input);
@@ -331,7 +350,7 @@ namespace Discord.Commands
             float CalculateScore(CommandMatch match, ParseResult parseResult)
             {
                 float argValuesScore = 0, paramValuesScore = 0;
-                
+
                 if (match.Command.Parameters.Count > 0)
                 {
                     var argValuesSum = parseResult.ArgValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;

@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using System.IO;
 
 namespace Discord
@@ -8,10 +8,10 @@ namespace Discord
         /// <summary>
         /// Sends a message to the user via DM.
         /// </summary>
-        public static async Task<IUserMessage> SendMessageAsync(this IUser user, 
-            string text, 
+        public static async Task<IUserMessage> SendMessageAsync(this IUser user,
+            string text,
             bool isTTS = false,
-            Embed embed = null, 
+            Embed embed = null,
             RequestOptions options = null)
         {
             return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
@@ -25,24 +25,29 @@ namespace Discord
             string filename,
             string text = null,
             bool isTTS = false,
+            Embed embed = null,
             RequestOptions options = null
             )
         {
-            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(stream, filename, text, isTTS, options).ConfigureAwait(false);
+            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(stream, filename, text, isTTS, embed, options).ConfigureAwait(false);
         }
 
 #if FILESYSTEM
         /// <summary>
         /// Sends a file to the user via DM.
         /// </summary>
-        public static async Task<IUserMessage> SendFileAsync(this IUser user, 
-            string filePath, 
-            string text = null, 
-            bool isTTS = false, 
+        public static async Task<IUserMessage> SendFileAsync(this IUser user,
+            string filePath,
+            string text = null,
+            bool isTTS = false,
+            Embed embed = null,
             RequestOptions options = null)
         {
-            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(filePath, text, isTTS, options).ConfigureAwait(false);
+            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(filePath, text, isTTS, embed, options).ConfigureAwait(false);
         }
 #endif
+
+        public static Task BanAsync(this IGuildUser user, int pruneDays = 0, string reason = null, RequestOptions options = null)
+            => user.Guild.AddBanAsync(user, pruneDays, reason, options);
     }
 }

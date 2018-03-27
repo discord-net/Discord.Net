@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 #if DEBUG_LIMITS
@@ -86,7 +86,7 @@ namespace Discord.Net.Queue
                                 Debug.WriteLine($"[{id}] (!) 502");
 #endif
                                 if ((request.Options.RetryMode & RetryMode.Retry502) == 0)
-                                    throw new HttpException(HttpStatusCode.BadGateway, null);
+                                    throw new HttpException(HttpStatusCode.BadGateway, request, null);
 
                                 continue; //Retry
                             default:
@@ -106,7 +106,7 @@ namespace Discord.Net.Queue
                                     }
                                     catch { }
                                 }
-                                throw new HttpException(response.StatusCode, code, reason);
+                                throw new HttpException(response.StatusCode, request, code, reason);
                         }
                     }
                     else
@@ -163,7 +163,7 @@ namespace Discord.Net.Queue
                     if (!isRateLimited)
                         throw new TimeoutException();
                     else
-                        throw new RateLimitedException();
+                        throw new RateLimitedException(request);
                 }
 
                 lock (_lock)
@@ -182,12 +182,12 @@ namespace Discord.Net.Queue
                     }
 
                     if ((request.Options.RetryMode & RetryMode.RetryRatelimit) == 0)
-                        throw new RateLimitedException();
+                        throw new RateLimitedException(request);
 
                     if (resetAt.HasValue)
                     {
                         if (resetAt > timeoutAt)
-                            throw new RateLimitedException();
+                            throw new RateLimitedException(request);
                         int millis = (int)Math.Ceiling((resetAt.Value - DateTimeOffset.UtcNow).TotalMilliseconds);
 #if DEBUG_LIMITS
                         Debug.WriteLine($"[{id}] Sleeping {millis} ms (Pre-emptive)");
@@ -198,7 +198,7 @@ namespace Discord.Net.Queue
                     else
                     {
                         if ((timeoutAt.Value - DateTimeOffset.UtcNow).TotalMilliseconds < 500.0)
-                            throw new RateLimitedException();
+                            throw new RateLimitedException(request);
 #if DEBUG_LIMITS
                         Debug.WriteLine($"[{id}] Sleeping 500* ms (Pre-emptive)");
 #endif

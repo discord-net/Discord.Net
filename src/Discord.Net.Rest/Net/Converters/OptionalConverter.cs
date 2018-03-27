@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 
 namespace Discord.Net.Converters
@@ -19,10 +19,18 @@ namespace Discord.Net.Converters
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             T obj;
+            // custom converters need to be able to safely fail; move this check in here to prevent wasteful casting when parsing primitives
             if (_innerConverter != null)
-                obj = (T)_innerConverter.ReadJson(reader, typeof(T), null, serializer);
+            {
+                object o = _innerConverter.ReadJson(reader, typeof(T), null, serializer);
+                if (o is Optional<T>)
+                    return o;
+
+                obj = (T)o;
+            }
             else
                 obj = serializer.Deserialize<T>(reader);
+
             return new Optional<T>(obj);
         }
 

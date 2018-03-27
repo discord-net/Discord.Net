@@ -66,7 +66,7 @@ namespace Discord.Net.Providers.WS4Net
             _cancelTokenSource = new CancellationTokenSource();
             _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
 
-            _client = new WS4NetSocket(host, customHeaderItems: _headers.ToList())
+            _client = new WS4NetSocket(host, "", customHeaderItems: _headers.ToList())
             {
                 EnableAutoSendPing = false,
                 NoDelay = true,
