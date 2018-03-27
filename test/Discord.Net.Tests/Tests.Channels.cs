@@ -168,7 +168,29 @@ namespace Discord
                 var x = cat2.GetCategoryAsync();
             });
 
-            // incomplete test, could use more coverage, incluing behavior of nested Text and Voice channels
+            var text1 = await guild.CreateTextChannelAsync("nestedText1");
+            var voice1 = await guild.CreateVoiceChannelAsync("nestedVoice1");
+            // set the text channel parent to Cat 1
+            await text1.ModifyAsync(x =>
+            {
+                x.CategoryId = cat1.Id;
+            });
+
+            await voice1.ModifyAsync(x =>
+            {
+                x.CategoryId = cat2.Id;
+            });
+
+            // these shouldn't throw because they are not channel categories
+
+            // assert that CategoryId works for text channels
+            Assert.Equal(text1.CategoryId, cat1.Id);
+            Assert.Equal((await text1.GetCategoryAsync()).Id, cat1.Id);
+            // and for voice channels
+            Assert.Equal(voice1.CategoryId, cat2.Id);
+            Assert.Equal((await voice1.GetCategoryAsync()).Id, cat2.Id);
+
+            // incomplete test, could use more coverage of other methods
         }
     }
 }
