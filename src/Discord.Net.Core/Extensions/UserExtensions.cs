@@ -46,5 +46,8 @@ namespace Discord
             return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(filePath, text, isTTS, embed, options).ConfigureAwait(false);
         }
 #endif
+
+        public static Task BanAsync(this IGuildUser user, int pruneDays = 0, string reason = null, RequestOptions options = null)
+            => user.Guild.AddBanAsync(user, pruneDays, reason, options);
     }
 }

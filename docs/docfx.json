@@ -56,7 +56,7 @@
          "default"
       ],
       "globalMetadata":{
-         "_appFooter":"Discord.Net (c) 2015-2018",
+         "_appFooter":"Discord.Net (c) 2015-2018 2.0.0-beta",
          "_enableSearch":true
       },
       "noLangKeyword":false,
