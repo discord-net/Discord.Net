@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    /// <summary> Represents a guild channel. This includes a text channel, voice channel, and category channel. </summary>
+    /// <summary> Represents a guild channel (text, voice, category). </summary>
     public interface IGuildChannel : IChannel, IDeletable
     {
         /// <summary> Gets the position of this channel in the guild's channel list, relative to others of the same type. </summary>
         int Position { get; }
 
-        /// <summary> Gets the parentid (category) of this channel in the guild's channel list. </summary>
+        /// <summary> Gets the parent ID (category) of this channel in the guild's channel list. </summary>
         ulong? CategoryId { get; }
         /// <summary> Gets the parent channel (category) of this channel. </summary>
         Task<ICategoryChannel> GetCategoryAsync();

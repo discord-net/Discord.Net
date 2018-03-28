@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -14,12 +14,17 @@ namespace Discord.Rest
         private long? _joinedAtTicks;
         private ImmutableArray<ulong> _roleIds;
 
+        /// <inheritdoc />
         public string Nickname { get; private set; }
         internal IGuild Guild { get; private set; }
+        /// <inheritdoc />
         public bool IsDeafened { get; private set; }
+        /// <inheritdoc />
         public bool IsMuted { get; private set; }
 
+        /// <inheritdoc />
         public ulong GuildId => Guild.Id;
+        /// <inheritdoc />
         public GuildPermissions GuildPermissions
         {
             get
@@ -29,8 +34,10 @@ namespace Discord.Rest
                 return new GuildPermissions(Permissions.ResolveGuild(Guild, this));
             }
         }
+        /// <inheritdoc />
         public IReadOnlyCollection<ulong> RoleIds => _roleIds;
 
+        /// <inheritdoc />
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
 
         internal RestGuildUser(BaseDiscordClient discord, IGuild guild, ulong id)
@@ -67,11 +74,13 @@ namespace Discord.Rest
             _roleIds = roles.ToImmutable();
         }
 
+        /// <inheritdoc />
         public override async Task UpdateAsync(RequestOptions options = null)
         {
             var model = await Discord.ApiClient.GetGuildMemberAsync(GuildId, Id, options).ConfigureAwait(false);
             Update(model);
         }
+        /// <inheritdoc />
         public async Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null)
         {
             var args = await UserHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
@@ -86,6 +95,7 @@ namespace Discord.Rest
             else if (args.RoleIds.IsSpecified)
                 UpdateRoles(args.RoleIds.Value.ToArray());
         }
+        /// <inheritdoc />
         public Task KickAsync(string reason = null, RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, reason, options);
         /// <inheritdoc />
@@ -101,6 +111,7 @@ namespace Discord.Rest
         public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
             => UserHelper.RemoveRolesAsync(this, Discord, roles, options);
 
+        /// <inheritdoc />
         public ChannelPermissions GetPermissions(IGuildChannel channel)
         {
             var guildPerms = GuildPermissions;

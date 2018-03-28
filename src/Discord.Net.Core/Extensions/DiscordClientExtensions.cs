@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    /// <summary> Extensions for <see cref="IDiscordClient"/>. </summary>
+    /// <summary> An extension class for the Discord client. </summary>
     public static class DiscordClientExtensions
     {
         /// <summary> Gets the private channel with the provided ID. </summary>
