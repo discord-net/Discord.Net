@@ -14,7 +14,7 @@ namespace Discord.Commands
             Prefix = null;
         }
         /// <summary> Creates a <see cref="GroupAttribute"/> with the provided prefix. </summary>
-        /// <param name="prefix"> The prefix of the module group.</param>
+        /// <param name="prefix"> The prefix of the module group. </param>
         public GroupAttribute(string prefix)
         {
             Prefix = prefix;

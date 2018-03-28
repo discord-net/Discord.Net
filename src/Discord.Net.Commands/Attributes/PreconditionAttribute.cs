@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
+    /// <summary> Requires the module or class to pass the specified precondition before execution can begin. </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
     public abstract class PreconditionAttribute : Attribute
     {
