@@ -45,7 +45,7 @@ namespace Discord.WebSocket
         internal override void Update(ClientState state, Model model)
         {
             base.Update(state, model);
-
+            CategoryId = model.CategoryId;
             Topic = model.Topic.Value;
             _nsfw = model.Nsfw.GetValueOrDefault();
         }
@@ -123,6 +123,10 @@ namespace Discord.WebSocket
             => ChannelHelper.GetWebhookAsync(this, Discord, id, options);
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => ChannelHelper.GetWebhooksAsync(this, Discord, options);
+
+        // Categories
+        public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
+            => ChannelHelper.GetCategoryAsync(this, Discord, options);
 
         private string DebuggerDisplay => $"{Name} ({Id}, Text)";
         internal new SocketTextChannel Clone() => MemberwiseClone() as SocketTextChannel;

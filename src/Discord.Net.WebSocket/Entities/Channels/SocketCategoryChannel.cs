@@ -20,7 +20,7 @@ namespace Discord.WebSocket
                ChannelPermission.ViewChannel)).ToImmutableArray();
 
         public IReadOnlyCollection<SocketGuildChannel> Channels
-            => Guild.Channels.Where(x => x.CategoryId == Id).ToImmutableArray();
+            => Guild.Channels.Where(x => x is INestedChannel && (x as INestedChannel).CategoryId == Id).ToImmutableArray();
 
         internal SocketCategoryChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
             : base(discord, id, guild)
@@ -51,19 +51,6 @@ namespace Discord.WebSocket
         internal new SocketCategoryChannel Clone() => MemberwiseClone() as SocketCategoryChannel;
 
         // IGuildChannel
-
-        /// <summary>
-        /// Throws a NotSupportedException because Channel Categories cannot be the child of another Channel Category.
-        /// </summary>
-        /// <exception cref="NotSupportedException">A NotSupportedException is always thrown because Channel Categories do not support being nested.</exception>
-        ulong? IGuildChannel.CategoryId
-            => throw new NotSupportedException();
-        /// <summary>
-        /// Throws a NotSupportedException because Channel Categories cannot be the child of another Channel Category.
-        /// </summary>
-        /// <exception cref="NotSupportedException">A NotSupportedException is always thrown because Channel Categories do not support being nested.</exception>
-        Task<ICategoryChannel> IGuildChannel.GetCategoryAsync()
-            => throw new NotSupportedException();
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)

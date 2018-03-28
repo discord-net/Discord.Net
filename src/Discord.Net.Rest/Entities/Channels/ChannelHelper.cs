@@ -313,6 +313,16 @@ namespace Discord.Rest
             return models.Select(x => RestWebhook.Create(client, channel, x))
                 .ToImmutableArray();
         }
+        // Categories
+        public static async Task<ICategoryChannel> GetCategoryAsync(INestedChannel channel, BaseDiscordClient client, RequestOptions options)
+        {
+            // if no category id specified, return null
+            if (!channel.CategoryId.HasValue)
+                return null;
+            // CategoryId will contain a value here
+            var model = await client.ApiClient.GetChannelAsync(channel.CategoryId.Value, options).ConfigureAwait(false);
+            return RestCategoryChannel.Create(client, model) as ICategoryChannel;
+        }
 
         //Helpers
         private static IUser GetAuthor(BaseDiscordClient client, IGuild guild, UserModel model, ulong? webhookId)

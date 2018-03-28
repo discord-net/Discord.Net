@@ -35,7 +35,7 @@ namespace Discord.WebSocket
         internal override void Update(ClientState state, Model model)
         {
             base.Update(state, model);
-
+            CategoryId = model.CategoryId;
             Bitrate = model.Bitrate.Value;
             UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
         }
@@ -55,7 +55,10 @@ namespace Discord.WebSocket
                 return user;
             return null;
         }
-        
+
+        public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
+            => ChannelHelper.GetCategoryAsync(this, Discord, options);
+
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
         internal new SocketVoiceChannel Clone() => MemberwiseClone() as SocketVoiceChannel;
 

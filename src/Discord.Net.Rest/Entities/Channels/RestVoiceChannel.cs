@@ -39,6 +39,9 @@ namespace Discord.Rest
             Update(model);
         }
 
+        public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
+            => ChannelHelper.GetCategoryAsync(this, Discord, options);
+
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
 
         //IAudioChannel

@@ -156,18 +156,6 @@ namespace Discord
             var cat1 = await guild.CreateCategoryChannelAsync("Cat1");
             var cat2 = await guild.CreateCategoryChannelAsync("Cat2");
 
-            // check that both CategoryID and GetCategoryID throw NotSupportedException
-            // because Categories cannot be nested
-            Assert.Throws<NotSupportedException>(() =>
-            {
-                var x = cat1.CategoryId;
-            });
-
-            Assert.Throws<NotSupportedException>(() =>
-            {
-                var x = cat2.GetCategoryAsync();
-            });
-
             var text1 = await guild.CreateTextChannelAsync("nestedText1");
             var voice1 = await guild.CreateVoiceChannelAsync("nestedVoice1");
             // set the text channel parent to Cat 1
@@ -185,10 +173,17 @@ namespace Discord
 
             // assert that CategoryId works for text channels
             Assert.Equal(text1.CategoryId, cat1.Id);
+            Assert.True(text1 is INestedChannel);
+            Assert.Equal((await (text1 as INestedChannel).GetCategoryAsync()).Id, cat1.Id);
             Assert.Equal((await text1.GetCategoryAsync()).Id, cat1.Id);
+            Assert.Equal(text1.CategoryId, cat1.Id);
+
             // and for voice channels
             Assert.Equal(voice1.CategoryId, cat2.Id);
+            Assert.True(voice1 is INestedChannel);
+            Assert.Equal((await (voice1 as INestedChannel).GetCategoryAsync()).Id, cat2.Id);
             Assert.Equal((await voice1.GetCategoryAsync()).Id, cat2.Id);
+            Assert.Equal(voice1.CategoryId, cat1.Id);
 
             // incomplete test, could use more coverage of other methods
         }
