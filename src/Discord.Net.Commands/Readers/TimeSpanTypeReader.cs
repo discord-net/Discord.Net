@@ -27,7 +27,7 @@ namespace Discord.Commands
 
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
-            return (TimeSpan.TryParseExact(input, _formats, CultureInfo.InvariantCulture, out var timeSpan))
+            return (TimeSpan.TryParseExact(input.ToLowerInvariant(), _formats, CultureInfo.InvariantCulture, out var timeSpan))
                 ? Task.FromResult(TypeReaderResult.FromSuccess(timeSpan))
                 : Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse TimeSpan"));
         }
