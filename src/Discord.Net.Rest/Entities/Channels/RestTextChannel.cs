@@ -9,9 +9,10 @@ using Model = Discord.API.Channel;
 namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestTextChannel : RestGuildChannel, IRestMessageChannel, ITextChannel
+    public class RestTextChannel : RestGuildChannel, IRestMessageChannel, ITextChannel, INestedChannel
     {
         public string Topic { get; private set; }
+        public ulong? CategoryId { get; private set; }
 
         public string Mention => MentionUtils.MentionChannel(Id);
 
@@ -167,6 +168,14 @@ namespace Discord.Rest
                 return GetUsersAsync(options);
             else
                 return AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
+        }
+
+        // INestedChannel
+        async Task<ICategoryChannel> INestedChannel.GetCategoryAsync()
+        {
+            if (CategoryId.HasValue)
+                return (await Guild.GetChannelAsync(CategoryId.Value).ConfigureAwait(false)) as ICategoryChannel;
+            return null;
         }
     }
 }

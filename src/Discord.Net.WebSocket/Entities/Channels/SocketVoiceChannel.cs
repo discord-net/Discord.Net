@@ -1,4 +1,4 @@
-﻿using Discord.Audio;
+using Discord.Audio;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
@@ -11,10 +11,13 @@ using Model = Discord.API.Channel;
 namespace Discord.WebSocket
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class SocketVoiceChannel : SocketGuildChannel, IVoiceChannel, ISocketAudioChannel
+    public class SocketVoiceChannel : SocketGuildChannel, IVoiceChannel, ISocketAudioChannel, INestedChannel
     {
         public int Bitrate { get; private set; }
         public int? UserLimit { get; private set; }
+        public ulong? CategoryId { get; private set; }
+        public ICategoryChannel Category
+            => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
 
         public override IReadOnlyCollection<SocketGuildUser> Users
             => Guild.Users.Where(x => x.VoiceChannel?.Id == Id).ToImmutableArray();
@@ -61,5 +64,9 @@ namespace Discord.WebSocket
             => Task.FromResult<IGuildUser>(GetUser(id));
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
+
+        // INestedChannel
+        Task<ICategoryChannel> INestedChannel.GetCategoryAsync()
+            => Task.FromResult(Category);
     }
 }

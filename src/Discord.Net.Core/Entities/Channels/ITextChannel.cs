@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface ITextChannel : IMessageChannel, IMentionable, IGuildChannel
+    public interface ITextChannel : IMessageChannel, IMentionable, IGuildChannel, INestedChannel
     {
         /// <summary> Checks if the channel is NSFW. </summary>
         bool IsNsfw { get; }

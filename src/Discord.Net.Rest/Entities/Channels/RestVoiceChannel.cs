@@ -1,4 +1,4 @@
-﻿using Discord.Audio;
+using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,10 +9,11 @@ using Model = Discord.API.Channel;
 namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestVoiceChannel : RestGuildChannel, IVoiceChannel, IRestAudioChannel
+    public class RestVoiceChannel : RestGuildChannel, IVoiceChannel, IRestAudioChannel, INestedChannel
     {
         public int Bitrate { get; private set; }
         public int? UserLimit { get; private set; }
+        public ulong? CategoryId { get; private set; }
 
         internal RestVoiceChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
@@ -48,5 +49,13 @@ namespace Discord.Rest
             => Task.FromResult<IGuildUser>(null);
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
+
+        // INestedChannel
+        async Task<ICategoryChannel> INestedChannel.GetCategoryAsync()
+        {
+            if (CategoryId.HasValue)
+                return (await Guild.GetChannelAsync(CategoryId.Value).ConfigureAwait(false)) as ICategoryChannel;
+            return null;
+        }
     }
 }
