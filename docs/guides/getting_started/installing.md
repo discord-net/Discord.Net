@@ -40,13 +40,13 @@ Not sure how to add a direct feed? See how [with Visual Studio] or
 [with Visual Studio]: https://docs.microsoft.com/en-us/nuget/tools/package-manager-ui#package-sources
 [without Visual Studio]: #configuring-nuget-without-visual-studio
 
-## Using Visual Studio
+## [Using Visual Studio](#tab/vs-install)
 
 > [!TIP]
->Don't forget to change your package source if you're installing from
-the developer feed.
->Also make sure to check "Enable Prereleases" if installing a dev
-build!
+> Don't forget to change your package source if you're installing from
+> the developer feed.
+> Also make sure to check "Enable Prereleases" if installing a dev
+> build!
 
 1. Create a solution for your bot.
 2. In Solution Explorer, find the "Dependencies" element under your
@@ -57,10 +57,10 @@ bot's project.
 5. Install the `Discord.Net` package.
 ![Step 5](images/install-vs-nuget.png)
 
-## Using JetBrains Rider
+## [Using JetBrains Rider](#tab/rider-install)
 
 > [!TIP]
-Make sure to check the "Prerelease" box if installing a dev build!
+> Make sure to check the "Prerelease" box if installing a dev build!
 
 1. Create a new solution for your bot.
 2. Open the NuGet window (Tools > NuGet > Manage NuGet packages for
@@ -71,11 +71,11 @@ Solution).
 4. Install by adding the package to your project.
 ![Step 4](images/install-rider-add.png)
 
-## Using Visual Studio Code
+## [Using Visual Studio Code](#tab/vs-code)
 
 > [!TIP]
-Don't forget to add the package source to a [NuGet.Config file] if
-you're installing from the developer feed.
+> Don't forget to add the package source to a [NuGet.Config file] if
+> you're installing from the developer feed.
 
 1. Create a new project for your bot.
 2. Add `Discord.Net` to your .csproj.
@@ -83,6 +83,19 @@ you're installing from the developer feed.
 [!code[Sample .csproj](samples/project.csproj)]
 
 [NuGet.Config file]: #configuring-nuget-without-visual-studio
+
+## [Using dotnet CLI](#tab/dotnet-cli)
+
+> [!TIP]
+> Don't forget to add the package source to a [NuGet.Config file] if
+> you're installing from the developer feed.
+
+1. Open command-line and navigate to where your .csproj is located.
+2. Enter `dotnet add package Discord.Net`.
+
+[NuGet.Config file]: #configuring-nuget-without-visual-studio
+
+***
 
 # Compiling from Source
 
