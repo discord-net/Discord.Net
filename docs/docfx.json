@@ -54,7 +54,8 @@
       "dest":"_site",
       "template":[
          "default",
-		 "_template"
+		 "_template/dark",
+		 "_template/lightbox-featherlight"
       ],
 	  "overwrite": "_overwrites/**/**.md",
       "globalMetadata":{
