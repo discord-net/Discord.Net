@@ -53,7 +53,8 @@
       ],
       "dest":"_site",
       "template":[
-         "default"
+         "default",
+		 "_template"
       ],
 	  "overwrite": "_overwrites/**/**.md",
       "globalMetadata":{
