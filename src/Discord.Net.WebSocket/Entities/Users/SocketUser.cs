@@ -1,5 +1,7 @@
-﻿using Discord.Rest;
+using Discord.Rest;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 
@@ -20,6 +22,8 @@ namespace Discord.WebSocket
         public string Mention => MentionUtils.MentionUser(Id);
         public IActivity Activity => Presence.Activity;
         public UserStatus Status => Presence.Status;
+        public IEnumerable<SocketGuild> MutualGuilds
+            => Discord.Guilds.Where(g => g.Users.Any(u => u.Id == Id));
 
         internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
