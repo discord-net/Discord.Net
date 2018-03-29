@@ -1,8 +1,9 @@
 /* Copyright (c) Microsoft Corporation. All Rights Reserved. Licensed under the MIT License. See License.txt in the project root for license information. */
-@import url('https://fonts.googleapis.com/css?family=PT+Sans');
+@import url('https://fonts.googleapis.com/css?family=Titillium+Web');
+@import url("dracula.css");
 html,
 body {
-  font-family: 'PT Sans', 'Segoe UI', Tahoma, Helvetica, sans-serif;
+  font-family: 'Titillium Web', 'Segoe UI', Tahoma, Helvetica, sans-serif;
   height: 100%;
   background: #212121;
   color: #C0C0C0
@@ -413,10 +414,6 @@ article section {
   margin-left: 0;
 }
 
-.sidenav, .fixed_header, .toc  {
-  background-color: #212121;
-}
-
 .sidetoc {
   position: fixed;
   width: 260px;
@@ -436,7 +433,6 @@ article section {
 
 body .toc{
   background-color: inherit;
-  overflow-x: hidden;
 }
 
 .sidetoggle.ng-hide {
@@ -591,7 +587,6 @@ body .toc{
   margin-top: 50px;
   font-size: 12px;
   max-height: 100%;
-  overflow: hidden;
   top: 100px;
   bottom: 10px;
   position: fixed;
@@ -867,6 +862,12 @@ pre > code .line-highlight {
     content:"\e086"
 }
 
+.alert-warning {
+  color: #fffaf2;
+  background: #80551a;
+  border-color: #99661f
+}
+
 .alert-warning h5:before {
     content:"\e127"
 }
@@ -968,4 +969,20 @@ code {
   color:white;
   background-color:#4a4c52;
   border-radius:4px
+}
+pre {
+  background-color: #282a36;
+}
+
+/* table */
+.table-striped>tbody>tr:nth-of-type(odd) {
+  background-color:#333333;
+  color: #d3d3d3
+}
+tbody>tr {
+  background-color:#424242;
+  color: #c0c0c0
+}
+.table>tbody+tbody {
+  border-top:2px solid rgb(173, 173, 173)
 }
