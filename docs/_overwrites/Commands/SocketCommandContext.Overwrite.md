@@ -1,5 +1,6 @@
 ---
 uid: Discord.Commands.SocketCommandContext
+example: [*content]
 ---
 
 An example of how this class is used the command system can be seen 

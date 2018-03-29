@@ -1,14 +1,16 @@
 ---
 uid: Discord.EmbedBuilder
+remarks: *content
 ---
 
-### Remarks
-
 This builder class is used to build an @Discord.Embed (rich embed)
-object that will be ready to be sent via @Discord.IMessageChannel.SendMessageAsync* 
+object that will be ready to be sent via @Discord.IMessageChannel.SendMessageAsync*
 after @Discord.EmbedBuilder.Build* is called.
 
-### Example
+---
+uid: Discord.EmbedBuilder
+example: [*content]
+---
 
 The example below builds an embed and sends it to the chat.
 

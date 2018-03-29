@@ -1,8 +1,7 @@
 ---
 uid: Discord.Commands.CommandException
+remarks: *content
 ---
-
-### Remarks
 
 This @System.Exception class is typically used when diagnosing
 an error thrown during the execution of a command. You will find the
@@ -10,6 +9,11 @@ thrown exception passed into
 [LogMessage.Exception](xref:Discord.LogMessage.Exception), which is
 sent to your [CommandService.Log](xref:Discord.Commands.CommandService.Log)
 event handler.
+
+---
+uid: Discord.Commands.CommandException
+example: [*content]
+---
 
 You may use this information to handle runtime exceptions after
 execution. Below is an example of how you may use this:

@@ -1,15 +1,17 @@
 ---
 uid: Discord.Commands.DontAutoLoadAttribute
+remarks: *content
 ---
-
-### Remarks
 
 The attribute can be applied to a public class that inherits
 @Discord.Commands.ModuleBase. By applying this attribute,
 @Discord.Commands.CommandService.AddModulesAsync* will not discover and
 add the marked module to the CommandService.
 
-### Example
+---
+uid: Discord.Commands.DontAutoLoadAttribute
+example: [*content]
+---
 
 ```cs
 [DontAutoLoad]
