@@ -16,17 +16,28 @@ namespace Discord
             var text4 = await guild.CreateTextChannelAsync("text4");
             var text5 = await guild.CreateTextChannelAsync("text5");
 
+            // create a channel category
+            var cat1 = await guild.CreateCategoryChannelAsync("cat1");
+
+            if (text1 == null)
+            {
+                // the guild did not have a default channel, so make a new one
+                text1 = await guild.CreateTextChannelAsync("default");
+            }
+
             //Modify #general
             await text1.ModifyAsync(x =>
             {
                 x.Name = "text1";
                 x.Position = 1;
                 x.Topic = "Topic1";
+                x.CategoryId = cat1.Id;
             });
 
             await text2.ModifyAsync(x =>
             {
                 x.Position = 2;
+                x.CategoryId = cat1.Id;
             });
             await text3.ModifyAsync(x =>
             {
@@ -90,10 +101,13 @@ namespace Discord
             var voice2 = await guild.CreateVoiceChannelAsync("voice2");
             var voice3 = await guild.CreateVoiceChannelAsync("voice3");
 
+            var cat2 = await guild.CreateCategoryChannelAsync("cat2");
+
             await voice1.ModifyAsync(x =>
             {
                 x.Bitrate = 96000;
                 x.Position = 1;
+                x.CategoryId = cat2.Id;
             });
             await voice2.ModifyAsync(x =>
             {
@@ -104,6 +118,7 @@ namespace Discord
                 x.Bitrate = 8000;
                 x.Position = 1;
                 x.UserLimit = 16;
+                x.CategoryId = cat2.Id;
             });
 
             CheckVoiceChannels(voice1, voice2, voice3);
@@ -143,49 +158,61 @@ namespace Discord
         }
 
         [Fact]
-        public Task TestChannelCategories()
+        public async Task TestChannelCategories()
         {
-            CheckChannelCategories(_client, _guild);
+            // (await _guild.GetVoiceChannelsAsync()).ToArray()
+            var channels = await _guild.GetCategoryChannelsAsync();
 
-            return Task.CompletedTask;
+            await CheckChannelCategories(channels.ToArray(), (await _guild.GetChannelsAsync()).ToArray());
         }
 
-        private async static void CheckChannelCategories(DiscordRestClient client, RestGuild guild)
+        private async Task CheckChannelCategories(RestCategoryChannel[] categories, RestGuildChannel[] allChannels)
         {
-            // create some channel categories
-            var cat1 = await guild.CreateCategoryChannelAsync("Cat1");
-            var cat2 = await guild.CreateCategoryChannelAsync("Cat2");
+            // 2 categories
+            Assert.Equal(categories.Length, 2);
 
-            var text1 = await guild.CreateTextChannelAsync("nestedText1");
-            var voice1 = await guild.CreateVoiceChannelAsync("nestedVoice1");
-            // set the text channel parent to Cat 1
-            await text1.ModifyAsync(x =>
-            {
-                x.CategoryId = cat1.Id;
-            });
+            var cat1 = categories.Where(x => x.Name == "cat1").FirstOrDefault();
+            var cat2 = categories.Where(x => x.Name == "cat2").FirstOrDefault();
 
-            await voice1.ModifyAsync(x =>
-            {
-                x.CategoryId = cat2.Id;
-            });
+            Assert.NotNull(cat1);
+            Assert.NotNull(cat2);
 
-            // these shouldn't throw because they are not channel categories
+            // get text1, text2, ensure they have category id == cat1
+            var text1 = allChannels.Where(x => x.Name == "text1").FirstOrDefault() as RestTextChannel;
+            var text2 = allChannels.Where(x => x.Name == "text2").FirstOrDefault() as RestTextChannel;
 
-            // assert that CategoryId works for text channels
+            Assert.NotNull(text1);
+            Assert.NotNull(text2);
+
+            // check that CategoryID and .GetCategoryAsync work correctly
+            // for both of the text channels
             Assert.Equal(text1.CategoryId, cat1.Id);
-            Assert.True(text1 is INestedChannel);
-            Assert.Equal((await (text1 as INestedChannel).GetCategoryAsync()).Id, cat1.Id);
-            Assert.Equal((await text1.GetCategoryAsync()).Id, cat1.Id);
-            Assert.Equal(text1.CategoryId, cat1.Id);
+            var text1Cat = await text1.GetCategoryAsync();
+            Assert.Equal(text1Cat.Id, cat1.Id);
+            Assert.Equal(text1Cat.Name, cat1.Name);
 
-            // and for voice channels
+            Assert.Equal(text2.CategoryId, cat1.Id);
+            var text2Cat = await text2.GetCategoryAsync();
+            Assert.Equal(text2Cat.Id, cat1.Id);
+            Assert.Equal(text2Cat.Name, cat1.Name);
+
+            // do the same for the voice channels
+            var voice1 = allChannels.Where(x => x.Name == "voice1").FirstOrDefault() as RestVoiceChannel;
+            var voice3 = allChannels.Where(x => x.Name == "voice3").FirstOrDefault() as RestVoiceChannel;
+
+            Assert.NotNull(voice1);
+            Assert.NotNull(voice3);
+            
             Assert.Equal(voice1.CategoryId, cat2.Id);
-            Assert.True(voice1 is INestedChannel);
-            Assert.Equal((await (voice1 as INestedChannel).GetCategoryAsync()).Id, cat2.Id);
-            Assert.Equal((await voice1.GetCategoryAsync()).Id, cat2.Id);
-            Assert.Equal(voice1.CategoryId, cat1.Id);
+            var voice1Cat = await voice1.GetCategoryAsync();
+            Assert.Equal(voice1Cat.Id, cat2.Id);
+            Assert.Equal(voice1Cat.Name, cat2.Name);
 
-            // incomplete test, could use more coverage of other methods
+            Assert.Equal(voice3.CategoryId, cat2.Id);
+            var voice3Cat = await voice3.GetCategoryAsync();
+            Assert.Equal(voice3Cat.Id, cat2.Id);
+            Assert.Equal(voice3Cat.Name, cat2.Name);
+
         }
     }
 }
