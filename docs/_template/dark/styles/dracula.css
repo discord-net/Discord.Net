@@ -22,7 +22,7 @@
 .hljs-section,
 .hljs-link,
 .hljs-keyword {
-  color: rgb(86, 156, 214);
+  color: rgb(86, 156, 214) !important;
 }
 
 /*
@@ -41,26 +41,25 @@
 .hljs-string,
 .hljs-meta,
 .hljs-name,
-.hljs-type,
 .hljs-attr,
 .hljs-symbol,
 .hljs-bullet,
 .hljs-addition,
 .hljs-variable,
 .hljs-template-tag,
-.hljs-template-variable,
-.hljs-title {
-  color: rgb(214, 157, 133);
+.hljs-template-variable {
+  color: rgb(214, 157, 133) !important;
 }
 
-.hljs-title {
-  color: rgb(78, 201, 176);
+.hljs-title,
+.hljs-type {
+  color: rgb(78, 201, 176) !important;
 }
 
 .hljs-comment,
 .hljs-quote,
 .hljs-deletion {
-  color: rgb(87, 166, 74);
+  color: rgb(87, 166, 74) !important;
 }
 
 .hljs-keyword,
@@ -77,7 +76,7 @@
 
 .hljs-literal,
 .hljs-number {
-  color: rgb(181, 206, 168);
+  color: rgb(181, 206, 168) !important;
 }
 
 .hljs-emphasis {
