@@ -34,7 +34,6 @@ namespace Discord.Rest
                 case ChannelType.Category:
                     return RestCategoryChannel.Create(discord, guild, model);
                 default:
-                    // TODO: Channel categories
                     return new RestGuildChannel(discord, guild, model.Id);
             }
         }
