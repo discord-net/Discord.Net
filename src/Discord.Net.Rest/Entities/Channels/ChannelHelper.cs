@@ -184,12 +184,10 @@ namespace Discord.Rest
             var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }
-        
-        public static async Task DeleteMessageAsync(IMessageChannel channel, BaseDiscordClient client,
-            ulong messageId, RequestOptions options)
-        {
-            await client.ApiClient.DeleteMessageAsync(channel.Id, messageId, options).ConfigureAwait(false);
-        }
+
+        public static Task DeleteMessageAsync(IMessageChannel channel, ulong messageId, BaseDiscordClient client,
+            RequestOptions options)
+            => MessageHelper.DeleteAsync(channel.Id, messageId, client, options);
 
         public static async Task DeleteMessagesAsync(ITextChannel channel, BaseDiscordClient client,
             IEnumerable<ulong> messageIds, RequestOptions options)

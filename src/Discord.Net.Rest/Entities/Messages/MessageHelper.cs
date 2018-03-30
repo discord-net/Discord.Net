@@ -1,4 +1,4 @@
-﻿using Discord.API.Rest;
+using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -22,10 +22,12 @@ namespace Discord.Rest
             };
             return await client.ApiClient.ModifyMessageAsync(msg.Channel.Id, msg.Id, apiArgs, options).ConfigureAwait(false);
         }
-        public static async Task DeleteAsync(IMessage msg, BaseDiscordClient client,
+        public static Task DeleteAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
+            => DeleteAsync(msg.Channel.Id, msg.Id, client, options);
+        public static async Task DeleteAsync(ulong channelId, ulong msgId, BaseDiscordClient client,
             RequestOptions options)
         {
-            await client.ApiClient.DeleteMessageAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
+            await client.ApiClient.DeleteMessageAsync(channelId, msgId, options).ConfigureAwait(false);
         }
 
         public static async Task AddReactionAsync(IMessage msg, IEmote emote, BaseDiscordClient client, RequestOptions options)
