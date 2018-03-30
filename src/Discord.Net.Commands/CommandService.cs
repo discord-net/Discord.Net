@@ -235,7 +235,8 @@ namespace Discord.Commands
         public void AddTypeReader(Type type, TypeReader reader)
         {
             if (_defaultTypeReaders.ContainsKey(type))
-                _cmdLogger.WarningAsync($"The default TypeReader for {type.FullName} was replaced by {reader.GetType().FullName}. To suppress this message, use the overload that has a Boolean to replace the default one and pass true.").GetAwaiter().GetResult();
+                _ = _cmdLogger.WarningAsync($"The default TypeReader for {type.FullName} was replaced by {reader.GetType().FullName}." +
+                    $"To suppress this message, use AddTypeReader<T>(reader, true).");
             AddTypeReader(type, reader, true);
         }
         /// <summary>
@@ -244,19 +245,19 @@ namespace Discord.Commands
         /// </summary>
         /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
         /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
-        /// <param name="replaceDefaultTypeReader">If <paramref name="reader"/> should replace the default <see cref="TypeReader"/> for <typeparamref name="T"/> if one exists.</param>
-        public void AddTypeReader<T>(TypeReader reader, bool replaceDefaultTypeReader)
-            => AddTypeReader(typeof(T), reader, replaceDefaultTypeReader);
+        /// <param name="replaceDefault">If <paramref name="reader"/> should replace the default <see cref="TypeReader"/> for <typeparamref name="T"/> if one exists.</param>
+        public void AddTypeReader<T>(TypeReader reader, bool replaceDefault)
+            => AddTypeReader(typeof(T), reader, replaceDefault);
         /// <summary>
         /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
         /// If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added. 
         /// </summary>
         /// <param name="type">A <see cref="Type"/> instance for the type to be read.</param>
         /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
-        /// <param name="replaceDefaultTypeReader">If <paramref name="reader"/> should replace the default <see cref="TypeReader"/> for <paramref name="type"/> if one exists.</param>
-        public void AddTypeReader(Type type, TypeReader reader, bool replaceDefaultTypeReader)
+        /// <param name="replaceDefault">If <paramref name="reader"/> should replace the default <see cref="TypeReader"/> for <paramref name="type"/> if one exists.</param>
+        public void AddTypeReader(Type type, TypeReader reader, bool replaceDefault)
         {
-            if (replaceDefaultTypeReader && _defaultTypeReaders.ContainsKey(type))
+            if (replaceDefault && _defaultTypeReaders.ContainsKey(type))
             {
                 _defaultTypeReaders.AddOrUpdate(type, reader, (k, v) => reader);
                 if (type.GetTypeInfo().IsValueType)
