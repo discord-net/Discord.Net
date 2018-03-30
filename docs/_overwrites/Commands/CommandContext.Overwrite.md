@@ -3,8 +3,18 @@ uid: Discord.Commands.CommandContext
 example: [*content]
 ---
 
-An example of how this class is used the command system can be seen 
-below:
+[!include[Example Section](CommandContext.Inclusion.md)]
 
-[!code[Sample module](../../guides/commands/samples/empty-module.cs)]
-[!code[Command handler](../../guides/commands/samples/command_handler.cs)]
+---
+uid: Discord.Commands.SocketCommandContext
+example: [*content]
+---
+
+[!include[Example Section](CommandContext.Inclusion.md)]
+
+---
+uid: Discord.Commands.ShardCommandContext
+example: [*content]
+---
+
+[!include[Example Section](CommandContext.Inclusion.md)]

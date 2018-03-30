@@ -1,5 +1,9 @@
 ---
 uid: Discord.EmbedBuilder
+seealso:
+    - linkId: Discord.EmbedFooterBuilder
+    - linkId: Discord.EmbedAuthorBuilder
+    - linkId: Discord.EmbedFieldBuilder
 remarks: *content
 ---
 
@@ -12,7 +16,8 @@ uid: Discord.EmbedBuilder
 example: [*content]
 ---
 
-The example below builds an embed and sends it to the chat.
+The example below builds an embed and sends it to the chat using the
+command system.
 
 ```cs
 [Command("embed")]
