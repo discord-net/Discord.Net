@@ -90,9 +90,9 @@ namespace Discord.WebSocket
             => ChannelHelper.DeleteMessagesAsync(this, Discord, messageIds, options);
 
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
-            => ChannelHelper.DeleteMessageAsync(this, Discord, messageId, options);
+            => ChannelHelper.DeleteMessageAsync(this, messageId, Discord, options);
         public Task DeleteMessageAsync(IMessage message, RequestOptions options = null)
-            => ChannelHelper.DeleteMessageAsync(this, Discord, message.Id, options);
+            => ChannelHelper.DeleteMessageAsync(this, message.Id, Discord, options);
 
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);

@@ -77,9 +77,9 @@ namespace Discord.Rest
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
 
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
-            => ChannelHelper.DeleteMessageAsync(this, Discord, messageId, options);
+            => ChannelHelper.DeleteMessageAsync(this, messageId, Discord, options);
         public Task DeleteMessageAsync(IMessage message, RequestOptions options = null)
-            => ChannelHelper.DeleteMessageAsync(this, Discord, message.Id, options);
+            => ChannelHelper.DeleteMessageAsync(this, message.Id, Discord, options);
 
         public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
