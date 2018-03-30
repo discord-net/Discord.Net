@@ -28,7 +28,7 @@ namespace Discord.Rest
         internal override void Update(Model model)
         {
             base.Update(model);
-
+            CategoryId = model.CategoryId;
             Bitrate = model.Bitrate.Value;
             UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
         }
