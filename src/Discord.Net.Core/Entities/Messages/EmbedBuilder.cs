@@ -86,7 +86,19 @@ namespace Discord
         public EmbedAuthorBuilder Author { get; set; }
         public EmbedFooterBuilder Footer { get; set; }
 
-        public int Length => Title?.Length + Author?.Name?.Length + Description?.Length + Footer?.Text?.Length + Fields.Sum(f => f.Name.Length + f.Value.ToString().Length) ?? 0;
+        public int Length
+        {
+            get
+            {
+                int titleLength = Title?.Length ?? 0;
+                int authorLength = Author?.Name?.Length ?? 0;
+                int descriptionLength = Description?.Length ?? 0;
+                int footerLength = Footer?.Text?.Length ?? 0;
+                int fieldSum = Fields.Sum(f => f.Name.Length + f.Value.ToString().Length);
+
+                return titleLength + authorLength + descriptionLength + footerLength + fieldSum;
+            }
+        }
 
         public EmbedBuilder WithTitle(string title)
         {
