@@ -27,12 +27,12 @@ required. When using .NET Framework, it is suggested to target
 Release builds of Discord.Net will be published to the
 [official NuGet feed].
 
-Development builds of Discord.Net, as well as addons *(TODO)* are
-published to our development [MyGet feed].
+Development builds of Discord.Net, as well as add-ons are published to
+our development [MyGet feed].
 
 Direct feed link: `https://www.myget.org/F/discord-net/api/v3/index.json`
 
-Not sure how to add a direct feed? See how [with Visual Studio] or 
+Not sure how to add a direct feed? See how [with Visual Studio] or
 [without Visual Studio].
 
 [official NuGet feed]: https://nuget.org

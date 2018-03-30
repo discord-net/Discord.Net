@@ -15,16 +15,15 @@ account on Discord.
 
 1. Visit the [Discord Applications Portal].
 2. Create a New Application.
-3. Give the application a name (this will be the bot's initial
-username).
+3. Give the application a name (this will be the bot's initial username).
 4. Create the Application.
-	
-	![Step 4](images/intro-create-app.png)
-	
+
+    ![Step 4](images/intro-create-app.png)
+
 5. In the application review page, click **Create a Bot User**.
-	
-	![Step 5](images/intro-create-bot.png)
-	
+
+    ![Step 5](images/intro-create-bot.png)
+
 6. Confirm the popup.
 7. If this bot will be public, check "Public Bot." **Do not tick any 
 other options!**
@@ -33,26 +32,25 @@ other options!**
 
 ## Adding your bot to a server
 
-Bots **cannot** use invite links, they must be explicitly invited
+Bots **cannot** use invite links; they must be explicitly invited
 through the OAuth2 flow.
 
 1. Open your bot's application on the [Discord Applications Portal].
 2. Retrieve the app's **Client ID**.
-	
-	![Step 2](images/intro-client-id.png)
-	
+
+    ![Step 2](images/intro-client-id.png)
+
 3. Create an OAuth2 authorization URL
 `https://discordapp.com/oauth2/authorize?client_id=<CLIENT ID>&scope=bot`
 4. Open the authorization URL in your browser.
 5. Select a server.
 6. Click on authorize.
-	
-	>[!NOTE]
-	Only servers where you have the `MANAGE_SERVER` permission will be
-	present in this list.
-	
-	![Step 6](images/intro-add-bot.png)
 
+    > [!NOTE]
+    > Only servers where you have the `MANAGE_SERVER` permission will be
+    > present in this list.
+
+    ![Step 6](images/intro-add-bot.png)
 
 ## Connecting to Discord
 
@@ -75,7 +73,7 @@ async main.
 [!code-csharp[Async Context](samples/intro/async-context.cs)]
 
 As a result of this, your program will now start and immediately
-jump into an async context. This will allow us to create a connection 
+jump into an async context. This will allow us to create a connection
 to Discord later on without needing to worry about setting up the
 correct async implementation.
 
@@ -123,7 +121,7 @@ log handler that was just created. Events in Discord.Net work
 similarly to other events in C#, so hook this event the way that
 you typically would.
 
-Next, you will need to "login to Discord" with the `LoginAsync` 
+Next, you will need to "login to Discord" with the `LoginAsync`
 method.
 
 You may create a variable to hold your bot's token (this can be found
@@ -131,11 +129,11 @@ on your bot's application page on the [Discord Applications Portal]).
 
 ![Token](images/intro-token.png)
 
->[!IMPORTANT]
-Your bot's token can be used to gain total access to your bot, so
-**do __NOT__ share this token with anyone else!** It may behoove you 
-to store this token in an external file if you plan on distributing 
-the source code for your bot.
+> [!IMPORTANT]
+> Your bot's token can be used to gain total access to your bot, so
+> **do __NOT__ share this token with anyone else!** It may behoove you
+> to store this token in an external file if you plan on distributing
+> the source code for your bot.
 
 We may now invoke the client's `StartAsync` method, which will
 start connection/reconnection logic. It is important to note that
@@ -156,27 +154,26 @@ The following lines can now be added:
 At this point, feel free to start your program and see your bot come
 online in Discord.
 
->[!TIP]
-Encountering a `PlatformNotSupportedException` when starting your bot?
-This means that you are targeting a platform where .NET's default
-WebSocket client is not supported. Refer to the [installation guide]
-for how to fix this.
+> [!TIP]
+> Encountering a `PlatformNotSupportedException` when starting your bot?
+> This means that you are targeting a platform where .NET's default
+> WebSocket client is not supported. Refer to the [installation guide]
+> for how to fix this.
 
 [DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
 [installation guide]: installing.md#installing-on-net-standard-11
 
 ### Handling a 'ping'
 
->[!WARNING]
-Please note that this is *not* a proper way to create a command.
-Use the `CommandService` provided by the library instead, as explained
-in the [Command Guide] section.
+> [!WARNING]
+> Please note that this is *not* a proper way to create a command.
+> Use the `CommandService` provided by the library instead, as explained
+> in the [Command Guide] section.
 
 Now that we have learned how to open a connection to Discord, we can
-begin handling messages that users are sending.
-
-To start out, our bot will listen for any message where the content
-is equal to `!ping` and respond back with "Pong!".
+begin handling messages that users are sending. To start out, our bot
+will listen for any message where the content is equal to `!ping` and
+respond back with "Pong!".
 
 Since we want to listen for new messages, the event to hook into
 is [MessageReceived].
@@ -201,7 +198,7 @@ channel object is of type [SocketMessageChannel], we can invoke the
 `SendMessageAsync` instance method. For the message content, send back
 a string containing "Pong!".
 
-You should have now added the following lines:
+You should have now added the following lines,
 
 [!code-csharp[Message](samples/intro/message.cs)]
 

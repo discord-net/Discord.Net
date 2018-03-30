@@ -2,6 +2,8 @@
 title: Working with Events
 ---
 
+# Events in Discord.NET
+
 Events in Discord.Net are consumed in a similar manner to the standard
 convention, with the exception that every event must be of the type
 `System.Threading.Tasks.Task` and instead of using `EventArgs`, the
@@ -61,7 +63,7 @@ This pattern is typically only found on `EntityUpdated` events.
 #### Cacheable
 
 An event handler with a signature of `Func<Cacheable, Entity, Task>`
-means that the `before`	state of the entity was not provided by the
+means that the `before` state of the entity was not provided by the
 API, so it can either be pulled from the client's cache or
 downloaded from the API.
 
@@ -70,15 +72,12 @@ object.
 
 [Cacheable]: xref:Discord.Cacheable`2
 
-### Samples
+> [!NOTE]
+> Many events relating to a Message entity (i.e. `MessageUpdated` and
+> `ReactionAdded`) rely on the client's message cache, which is
+> **not** enabled by default. Set the `MessageCacheSize` flag in
+> @Discord.WebSocket.DiscordSocketConfig to enable it.
+
+### Sample
 
 [!code-csharp[Event Sample](samples/events.cs)]
-
-### Tips
-
-Many events relating to a Message entity (i.e. `MessageUpdated` and 
-`ReactionAdded`) rely on the client's message cache, which is
-**not** enabled by default. Set the `MessageCacheSize` flag in
-[DiscordSocketConfig] to enable it.
-
-[DiscordSocketConfig]: xref:Discord.WebSocket.DiscordSocketConfig

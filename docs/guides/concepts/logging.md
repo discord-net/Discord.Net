@@ -2,18 +2,26 @@
 title: Logging
 ---
 
-Discord.Net's clients provide a [Log] event that all messages will be
+# Logging in Discord.NET
+
+Discord.Net's clients provide a log event that all messages will be
 dispatched over.
 
 For more information about events in Discord.Net, see the [Events]
 section.
 
-[Log]: xref:Discord.Rest.BaseDiscordClient.Log
 [Events]: events.md
 
-### Usage
+> [!WARNING]
+> Due to the nature of Discord.Net's event system, all log event
+> handlers will be executed synchronously on the gateway thread. If your
+> log output will be dumped to a Web API (e.g. Sentry), you are advised
+> to wrap your output in a `Task.Run` so the gateway thread does not
+> become blocked while waiting for logging data to be written.
 
-To receive log events, simply hook the discord client's log method
+### Usage in Client(s)
+
+To receive log events, simply hook the Discord client's @Discord.Rest.BaseDiscordClient.Log
 to a `Task` with a single parameter of type [LogMessage].
 
 It is recommended that you use an established function instead of a
@@ -24,8 +32,8 @@ to a logging function to write their own messages.
 
 ### Usage in Commands
 
-Discord.Net's [CommandService] also provides a log event, identical
-in signature to other log events.
+Discord.Net's [CommandService] also provides a @Discord.Commands.CommandService.Log 
+event, identical in signature to other log events.
 
 Data logged through this event is typically coupled with a
 [CommandException], where information about the command's context
@@ -34,14 +42,6 @@ and error can be found and handled.
 [CommandService]: xref:Discord.Commands.CommandService
 [CommandException]: xref:Discord.Commands.CommandException
 
-#### Samples
+### Sample
 
 [!code-csharp[Logging Sample](samples/logging.cs)]
-
-#### Tips
-
-Due to the nature of Discord.Net's event system, all log event
-handlers will be executed synchronously on the gateway thread. If your
-log output will be dumped to a Web API (e.g. Sentry), you are advised
-to wrap your output in a `Task.Run` so the gateway thread does not
-become blocked while waiting for logging data to be written.
