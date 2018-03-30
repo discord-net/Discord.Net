@@ -26,7 +26,7 @@ namespace Discord
         SendTTSMessages = 0x00_00_10_00,
         /// <summary> Allows for deletion of other users messages. </summary>
         ManageMessages = 0x00_00_20_00,
-        /// <summary> Links sent by users with this permission will be auto-embedded. </summary>
+        /// <summary> Allows links sent by users with this permission will be auto-embedded. </summary>
         EmbedLinks = 0x00_00_40_00,
         /// <summary> Allows for uploading images and files. </summary>
         AttachFiles = 0x00_00_80_00,

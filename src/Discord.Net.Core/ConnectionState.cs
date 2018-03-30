@@ -3,13 +3,13 @@ namespace Discord
     /// <summary> Specifies the connection state of a client. </summary>
     public enum ConnectionState : byte
     {
-        /// <summary> Represents that the client has disconnected from the WebSocket. </summary>
+        /// <summary> The client has disconnected from Discord. </summary>
         Disconnected,
-        /// <summary> Represents that the client is connecting to the WebSocket. </summary>
+        /// <summary> The client is connecting to Discord. </summary>
         Connecting,
-        /// <summary> Represents that the client has established a connection to the WebSocket. </summary>
+        /// <summary> The client has established a connection to Discord. </summary>
         Connected,
-        /// <summary> Represents that the client is disconnecting from the WebSocket. </summary>
+        /// <summary> The client is disconnecting from Discord. </summary>
         Disconnecting
     }
 }
