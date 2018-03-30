@@ -13,6 +13,8 @@ namespace Discord
             string extension = FormatToExtension(format, avatarId);
             return $"{DiscordConfig.CDNUrl}avatars/{userId}/{avatarId}.{extension}?size={size}";
         }
+        public static string GetUserDefaultAvatarUrl(ushort discriminator)
+            => $"{DiscordConfig.CDNUrl}embed/avatars/{discriminator % 5}.png";
         public static string GetGuildIconUrl(ulong guildId, string iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}icons/{guildId}/{iconId}.jpg" : null;
         public static string GetGuildSplashUrl(ulong guildId, string splashId)
