@@ -24,6 +24,26 @@ namespace Discord
             Fields = new List<EmbedFieldBuilder>();
         }
 
+        public EmbedBuilder(params EmbedFieldBuilder[] EmbedFields)
+        {
+            Fields = new List<EmbedFieldBuilder>();
+            foreach (var Field in EmbedFields)
+            {
+                Fields.Add(Field);
+            }
+        }
+
+        public EmbedBuilder(EmbedAuthorBuilder Author, EmbedFooterBuilder Footer, params EmbedFieldBuilder[] EmbedFields)
+        {
+            this.Author = Author;
+            this.Footer = Footer;
+            Fields = new List<EmbedFieldBuilder>();
+            foreach (var Field in EmbedFields)
+            {
+                Fields.Add(Field);
+            }
+        }
+
         public string Title
         {
             get => _title;
