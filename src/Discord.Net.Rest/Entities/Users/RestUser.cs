@@ -57,8 +57,12 @@ namespace Discord.Rest
         public Task<RestDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
             => UserHelper.CreateDMChannelAsync(this, Discord, options);
 
+        public string GetDefaultAvatarUrl()
+            => CDN.GetUserDefaultAvatarUrl(DiscriminatorValue);
+        public string GetCustomAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetUserCustomAvatarUrl(Id, AvatarId, size, format);
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-            => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
+            => GetCustomAvatarUrl(format, size) ?? GetDefaultAvatarUrl();
 
         public string GetDefaultAvatarUrl()
             => CDN.GetDefaultUserAvatarUrl(DiscriminatorValue);
