@@ -8,6 +8,8 @@ namespace Discord
         string AvatarId { get; }
         /// <summary> Gets the url to this user's avatar. </summary>
         string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
+        /// <summary> Gets the url to this user's default avatar. </summary>
+        string GetDefaultAvatarUrl();
         /// <summary> Gets the per-username unique id for this user. </summary>
         string Discriminator { get; }
         /// <summary> Gets the per-username unique id for this user. </summary>

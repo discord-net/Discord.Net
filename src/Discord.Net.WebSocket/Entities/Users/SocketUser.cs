@@ -1,4 +1,4 @@
-﻿using Discord.Rest;
+using Discord.Rest;
 using System;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
@@ -37,29 +37,32 @@ namespace Discord.WebSocket
             {
                 var newVal = ushort.Parse(model.Discriminator.Value);
                 if (newVal != DiscriminatorValue)
-                { 
+                {
                     DiscriminatorValue = ushort.Parse(model.Discriminator.Value);
                     hasChanges = true;
                 }
             }
             if (model.Bot.IsSpecified && model.Bot.Value != IsBot)
-            { 
+            {
                 IsBot = model.Bot.Value;
                 hasChanges = true;
             }
             if (model.Username.IsSpecified && model.Username.Value != Username)
-            { 
+            {
                 Username = model.Username.Value;
                 hasChanges = true;
             }
             return hasChanges;
-        } 
+        }
 
         public async Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
             => GlobalUser.DMChannel ?? await UserHelper.CreateDMChannelAsync(this, Discord, options) as IDMChannel;
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
+
+        public string GetDefaultAvatarUrl()
+            => CDN.GetDefaultUserAvatarUrl(DiscriminatorValue);
 
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
