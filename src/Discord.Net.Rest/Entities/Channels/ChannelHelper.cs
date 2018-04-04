@@ -26,13 +26,13 @@ namespace Discord.Rest
         {
             var args = new GuildChannelProperties();
             func(args);
-            var apiArgs = new ModifyGuildChannelParams
+            var apiArgs = new API.Rest.ModifyGuildChannelParams
             {
                 Name = args.Name,
                 Position = args.Position,
                 CategoryId = args.CategoryId
             };
-            if (args.SyncWithParent.IsSpecified && args.SyncWithParent.Value)
+            if (args.SyncWithCategory.IsSpecified && args.SyncWithCategory.Value)
             {
                 var categoryChannel = await channel.GetCategoryAsync().ConfigureAwait(false);
                 if (categoryChannel != null)

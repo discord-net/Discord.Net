@@ -33,6 +33,6 @@ namespace Discord
         /// <summary>
         /// Syncs the permission with the channel's parent (category).
         /// </summary>
-        public Optional<bool> SyncWithParent { get; set; }
+        public Optional<bool> SyncWithCategory { get; set; }
     }
 }
