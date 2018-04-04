@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -13,5 +13,13 @@ namespace Discord.API
         public ulong Deny { get; set; }
         [JsonProperty("allow"), Int53]
         public ulong Allow { get; set; }
+
+        public Overwrite(ulong targetId, PermissionTarget targetType, ulong allowValue, ulong denyValue)
+        {
+            TargetId = targetId;
+            TargetType = targetType;
+            Allow = allowValue;
+            Deny = denyValue;
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -58,7 +58,8 @@ namespace Discord.Rest
         }
         public async Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null)
         {
-            var model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
+            var categoryChannel = await GetCategoryAsync().ConfigureAwait(false);
+            var model = await ChannelHelper.ModifyAsync(this, Discord, func, categoryChannel.PermissionOverwrites, options).ConfigureAwait(false);
             Update(model);
         }
         public Task DeleteAsync(RequestOptions options = null)

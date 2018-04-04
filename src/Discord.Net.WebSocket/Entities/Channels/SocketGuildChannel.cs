@@ -1,4 +1,4 @@
-﻿using Discord.Rest;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -58,7 +58,7 @@ namespace Discord.WebSocket
         }
 
         public Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null)
-            => ChannelHelper.ModifyAsync(this, Discord, func, options);
+            => ChannelHelper.ModifyAsync(this, Discord, func, Category.PermissionOverwrites, options);
         public Task DeleteAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
 

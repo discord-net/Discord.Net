@@ -19,17 +19,25 @@ namespace Discord.Rest
         {
             await client.ApiClient.DeleteChannelAsync(channel.Id, options).ConfigureAwait(false);
         }
+
         public static async Task<Model> ModifyAsync(IGuildChannel channel, BaseDiscordClient client,
             Action<GuildChannelProperties> func,
+            IEnumerable<Overwrite> overwrites,
             RequestOptions options)
         {
             var args = new GuildChannelProperties();
             func(args);
-            var apiArgs = new API.Rest.ModifyGuildChannelParams
+            var apiArgs = new ModifyGuildChannelParams
             {
                 Name = args.Name,
                 Position = args.Position,
-                CategoryId = args.CategoryId
+                CategoryId = args.CategoryId,
+                Overwrites = args.SyncWithParent.Value
+                    ? overwrites
+                        .Select(overwrite => new API.Overwrite(overwrite.TargetId, overwrite.TargetType,
+                            overwrite.Permissions.AllowValue, overwrite.Permissions.DenyValue))
+                        .ToArray()
+                    : null
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
