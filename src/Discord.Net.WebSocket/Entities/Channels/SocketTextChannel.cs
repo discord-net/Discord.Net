@@ -124,10 +124,6 @@ namespace Discord.WebSocket
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => ChannelHelper.GetWebhooksAsync(this, Discord, options);
 
-        // Categories
-        public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
-            => ChannelHelper.GetCategoryAsync(this, Discord, options);
-
         private string DebuggerDisplay => $"{Name} ({Id}, Text)";
         internal new SocketTextChannel Clone() => MemberwiseClone() as SocketTextChannel;
 

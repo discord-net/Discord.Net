@@ -56,9 +56,6 @@ namespace Discord.WebSocket
             return null;
         }
 
-        public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
-            => ChannelHelper.GetCategoryAsync(this, Discord, options);
-
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
         internal new SocketVoiceChannel Clone() => MemberwiseClone() as SocketVoiceChannel;
 
