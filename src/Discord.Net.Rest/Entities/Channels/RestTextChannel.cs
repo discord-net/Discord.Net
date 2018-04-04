@@ -175,10 +175,10 @@ namespace Discord.Rest
         }
 
         // INestedChannel
-        async Task<ICategoryChannel> INestedChannel.GetCategoryAsync()
+        async Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
         {
             if (CategoryId.HasValue)
-                return (await Guild.GetChannelAsync(CategoryId.Value).ConfigureAwait(false)) as ICategoryChannel;
+                return (await Guild.GetChannelAsync(CategoryId.Value, mode, options).ConfigureAwait(false)) as ICategoryChannel;
             return null;
         }
     }

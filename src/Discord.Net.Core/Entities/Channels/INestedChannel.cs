@@ -11,6 +11,6 @@ namespace Discord
         /// <summary> Gets the parentid (category) of this channel in the guild's channel list. </summary>
         ulong? CategoryId { get; }
         /// <summary> Gets the parent channel (category) of this channel, if it is set. If unset, returns null.</summary>
-        Task<ICategoryChannel> GetCategoryAsync();
+        Task<ICategoryChannel> GetCategoryAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
     }
 }

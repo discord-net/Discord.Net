@@ -66,7 +66,7 @@ namespace Discord.WebSocket
             => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
 
         // INestedChannel
-        Task<ICategoryChannel> INestedChannel.GetCategoryAsync()
+        Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult(Category);
     }
 }
