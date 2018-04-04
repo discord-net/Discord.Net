@@ -22,7 +22,6 @@ namespace Discord.Rest
 
         public static async Task<Model> ModifyAsync(IGuildChannel channel, BaseDiscordClient client,
             Action<GuildChannelProperties> func,
-            IEnumerable<Overwrite> overwrites,
             RequestOptions options)
         {
             var args = new GuildChannelProperties();
@@ -31,14 +30,16 @@ namespace Discord.Rest
             {
                 Name = args.Name,
                 Position = args.Position,
-                CategoryId = args.CategoryId,
-                Overwrites = args.SyncWithParent.Value
-                    ? overwrites
-                        .Select(overwrite => new API.Overwrite(overwrite.TargetId, overwrite.TargetType,
-                            overwrite.Permissions.AllowValue, overwrite.Permissions.DenyValue))
-                        .ToArray()
-                    : null
+                CategoryId = args.CategoryId
             };
+            if (args.SyncWithParent.IsSpecified && args.SyncWithParent.Value)
+            {
+                var categoryChannel = await channel.GetCategoryAsync().ConfigureAwait(false);
+                apiArgs.Overwrites = categoryChannel.PermissionOverwrites
+                    .Select(overwrite => new API.Overwrite(overwrite.TargetId, overwrite.TargetType,
+                        overwrite.Permissions.AllowValue, overwrite.Permissions.DenyValue))
+                    .ToArray();
+            }
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task<Model> ModifyAsync(ITextChannel channel, BaseDiscordClient client,

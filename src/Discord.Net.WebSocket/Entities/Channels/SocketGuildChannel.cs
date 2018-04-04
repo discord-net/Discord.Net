@@ -58,7 +58,7 @@ namespace Discord.WebSocket
         }
 
         public Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null)
-            => ChannelHelper.ModifyAsync(this, Discord, func, Category.PermissionOverwrites, options);
+            => ChannelHelper.ModifyAsync(this, Discord, func, options);
         public Task DeleteAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
 

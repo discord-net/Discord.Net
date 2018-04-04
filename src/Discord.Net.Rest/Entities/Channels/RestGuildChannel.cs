@@ -58,8 +58,7 @@ namespace Discord.Rest
         }
         public async Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null)
         {
-            var categoryChannel = await GetCategoryAsync().ConfigureAwait(false);
-            var model = await ChannelHelper.ModifyAsync(this, Discord, func, categoryChannel.PermissionOverwrites, options).ConfigureAwait(false);
+            var model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
         public Task DeleteAsync(RequestOptions options = null)
