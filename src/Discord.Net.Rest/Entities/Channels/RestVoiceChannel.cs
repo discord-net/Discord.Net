@@ -9,7 +9,7 @@ using Model = Discord.API.Channel;
 namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestVoiceChannel : RestGuildChannel, IVoiceChannel, IRestAudioChannel, INestedChannel
+    public class RestVoiceChannel : RestGuildChannel, IVoiceChannel, IRestAudioChannel
     {
         public int Bitrate { get; private set; }
         public int? UserLimit { get; private set; }

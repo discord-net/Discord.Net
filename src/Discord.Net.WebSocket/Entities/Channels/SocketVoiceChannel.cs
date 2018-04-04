@@ -11,7 +11,7 @@ using Model = Discord.API.Channel;
 namespace Discord.WebSocket
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class SocketVoiceChannel : SocketGuildChannel, IVoiceChannel, ISocketAudioChannel, INestedChannel
+    public class SocketVoiceChannel : SocketGuildChannel, IVoiceChannel, ISocketAudioChannel
     {
         public int Bitrate { get; private set; }
         public int? UserLimit { get; private set; }

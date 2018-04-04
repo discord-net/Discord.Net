@@ -9,7 +9,7 @@ using Model = Discord.API.Channel;
 namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestTextChannel : RestGuildChannel, IRestMessageChannel, ITextChannel, INestedChannel
+    public class RestTextChannel : RestGuildChannel, IRestMessageChannel, ITextChannel
     {
         public string Topic { get; private set; }
         public ulong? CategoryId { get; private set; }
