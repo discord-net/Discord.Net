@@ -56,7 +56,7 @@ namespace Discord.Rest
         // INestedChannel
         async Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
         {
-            if (CategoryId.HasValue)
+            if (CategoryId.HasValue && mode == CacheMode.AllowDownload)
                 return (await Guild.GetChannelAsync(CategoryId.Value, mode, options).ConfigureAwait(false)) as ICategoryChannel;
             return null;
         }
