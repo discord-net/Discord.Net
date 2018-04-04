@@ -35,11 +35,13 @@ namespace Discord.Rest
             if (args.SyncWithParent.IsSpecified && args.SyncWithParent.Value)
             {
                 var categoryChannel = await channel.GetCategoryAsync().ConfigureAwait(false);
-                apiArgs.Overwrites = categoryChannel.PermissionOverwrites
-                    .Select(overwrite => new API.Overwrite(overwrite.TargetId, overwrite.TargetType,
-                        overwrite.Permissions.AllowValue, overwrite.Permissions.DenyValue))
-                    .ToArray();
+                if (categoryChannel != null)
+                    apiArgs.Overwrites = categoryChannel.PermissionOverwrites
+                        .Select(overwrite => new API.Overwrite(overwrite.TargetId, overwrite.TargetType,
+                            overwrite.Permissions.AllowValue, overwrite.Permissions.DenyValue))
+                        .ToArray();
             }
+
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task<Model> ModifyAsync(ITextChannel channel, BaseDiscordClient client,
