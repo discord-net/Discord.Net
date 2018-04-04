@@ -92,11 +92,11 @@ namespace Discord.Rest
 
         //ITextChannel
         async Task<IWebhook> ITextChannel.CreateWebhookAsync(string name, Stream avatar, RequestOptions options)
-            => await CreateWebhookAsync(name, avatar, options);
+            => await CreateWebhookAsync(name, avatar, options).ConfigureAwait(false);
         async Task<IWebhook> ITextChannel.GetWebhookAsync(ulong id, RequestOptions options)
-            => await GetWebhookAsync(id, options);
+            => await GetWebhookAsync(id, options).ConfigureAwait(false);
         async Task<IReadOnlyCollection<IWebhook>> ITextChannel.GetWebhooksAsync(RequestOptions options)
-            => await GetWebhooksAsync(options);
+            => await GetWebhooksAsync(options).ConfigureAwait(false);
 
         //IMessageChannel
         async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id, CacheMode mode, RequestOptions options)
