@@ -1,5 +1,5 @@
 ---
-uid: Terminology
+uid: Guides.GettingStarted.Terminology
 title: Terminology
 ---
 

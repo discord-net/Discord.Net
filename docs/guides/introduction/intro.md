@@ -1,3 +1,8 @@
+---
+uid: Guides.Introduction
+title: Introduction to Discord.NET
+---
+
 # Introduction
 
 ## Looking to get started?

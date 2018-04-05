@@ -1,3 +1,8 @@
+---
+uid: FAQ.Commands
+title: Questions about Commands
+---
+
 # Command-related Questions
 
 ## How can I restrict some of my commands so only certain users can execute them?
@@ -35,7 +40,7 @@ recognized as a single object. Please note that if your method has
 multiple parameters, the remainder attribute can only be applied to
 the last parameter.
 
-[!code-csharp[Remainder](samples/commands/Remainder.cs)]
+[!code-csharp[Remainder](samples/Remainder.cs)]
 
 [RemainderAttribute]: xref:Discord.Commands.RemainderAttribute
 
@@ -52,11 +57,11 @@ persist throughout execution. Think of it like a chest that holds
 whatever you throw at it that won't be affected by anything unless
 you want it to. Note that you should also learn Microsoft's
 implementation of [Dependency Injection] \([video]) before proceeding, as well
-as how it works in [Discord.NET](../guides/commands/commands.md#usage-in-modules).
+as how it works in [Discord.NET](xref:Guides.Commands.Intro#usage-in-modules).
 
 A brief example of service and dependency injection can be seen below.
 
-[!code-csharp[DI](samples/commands/DI.cs)]
+[!code-csharp[DI](samples/DI.cs)]
 
 [Dependency Injection]: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection
 [video]: https://www.youtube.com/watch?v=QtDTfn8YxXg
@@ -83,11 +88,11 @@ the [DefaultRunMode] flag under `CommandServiceConfig`.
 
 # [CommandAttribute](#tab/cmdattrib)
 
-[!code-csharp[Command Attribute](samples/commands/runmode-cmdattrib.cs)]
+[!code-csharp[Command Attribute](samples/runmode-cmdattrib.cs)]
 
 # [CommandServiceConfig](#tab/cmdconfig)
 
-[!code-csharp[Command Service Config](samples/commands/runmode-cmdconfig.cs)]
+[!code-csharp[Command Service Config](samples/runmode-cmdconfig.cs)]
 
 ***
 

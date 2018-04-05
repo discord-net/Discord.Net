@@ -1,3 +1,8 @@
+---
+uid: Guides.Commands.PostExecution
+title: Post-command Execution Handling
+---
+
 # Preface
 
 When developing a command system or modules, you may want to consider
@@ -25,7 +30,7 @@ issue, working with `RunMode.Async`.
 If your command is marked with `RunMode.Async`, [ExecuteAsync] will 
 return a successful [ExecuteResult] instead of whatever results 
 the actual command may return. Because of the way `RunMode.Async` 
-[works](../../faq/commands.md), handling within the command handler 
+[works](xref:FAQ.Commands), handling within the command handler 
 may not always achieve the desired effect.
 
 ## CommandExecuted Event
@@ -38,4 +43,4 @@ sucessfully executed** and is not prone to `RunMode.Async`'s
 [CommandExecuted]: xref:Discord.Commands.CommandService.CommandExecuted
 [ExecuteAsync]: xref:Discord.Commands.CommandService.ExecuteAsync*
 [ExecuteResult]: xref:Discord.Commands.ExecuteResult
-[Command Guide]: Commands.md
+[Command Guide]: xref:Guides.Commands.Intro

@@ -1,3 +1,8 @@
+---
+uid: FAQ.Misc.Glossary
+title: Common Terminologies / Glossary
+---
+
 # Glossary
 
 ## Common Types

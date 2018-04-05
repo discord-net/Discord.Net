@@ -1,3 +1,8 @@
+---
+uid: FAQ.Basics.GetStarted
+title: Beginner Questions / How to Get Started
+---
+
 # Basic Concepts / Getting Started
 
 ## How do I add my bot to my server/guild?

@@ -1,3 +1,8 @@
+---
+uid: Root.Landing
+title: Home
+---
+
 # Discord.Net Documentation
 
 ## What is Discord.NET?
@@ -8,9 +13,10 @@ interface with the [Discord API](https://discordapp.com/).
 ## Where to begin?
 
 If this is your first time using Discord.Net, you should refer to the
-[Intro](guides/introduction/intro.md) for tutorials.
-More experienced users might refer to the
-[API Documentation](api/index.md) for a breakdown of the individuals
+[Intro](xref:Guides.Introduction) for tutorials.
+
+More experienced users might want to refer to the
+[API Documentation](xref:API.Docs) for a breakdown of the individual
 objects in the library.
 
 ## Additional Resources

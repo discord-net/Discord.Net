@@ -1,4 +1,5 @@
 ---
+uid: Guides.Concepts.Events
 title: Working with Events
 ---
 
@@ -12,7 +13,7 @@ event's parameters are passed directly into the handler.
 This allows for events to be handled in an async context directly
 instead of relying on `async void`.
 
-### Usage
+## Usage
 
 To receive data from an event, hook into it using C#'s delegate
 event pattern.
@@ -20,7 +21,7 @@ event pattern.
 You may either opt to hook an event to an anonymous function (lambda)
 or a named function.
 
-### Safety
+## Safety
 
 All events are designed to be thread-safe; events are executed
 synchronously off the gateway task in the same context as the gateway
@@ -41,7 +42,7 @@ a deadlock that will be impossible to recover from.
 Exceptions in commands will be swallowed by the gateway and logged out
 through the client's log method.
 
-### Common Patterns
+## Common Patterns
 
 As you may know, events in Discord.Net are only given a signature of
 `Func<T1, ..., Task>`. There is no room for predefined argument names,
@@ -51,7 +52,7 @@ directly.
 That being said, there are a variety of common patterns that allow you
 to infer what the parameters in an event mean.
 
-#### Entity, Entity
+### Entity, Entity
 
 An event handler with a signature of `Func<Entity, Entity, Task>`
 typically means that the first object will be a clone of the entity
@@ -60,7 +61,7 @@ model of the entity _after_ the change was made.
 
 This pattern is typically only found on `EntityUpdated` events.
 
-#### Cacheable
+### Cacheable
 
 An event handler with a signature of `Func<Cacheable, Entity, Task>`
 means that the `before` state of the entity was not provided by the
@@ -78,6 +79,6 @@ object.
 > **not** enabled by default. Set the `MessageCacheSize` flag in
 > @Discord.WebSocket.DiscordSocketConfig to enable it.
 
-### Sample
+## Sample
 
 [!code-csharp[Event Sample](samples/events.cs)]

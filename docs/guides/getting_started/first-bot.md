@@ -1,5 +1,6 @@
 ---
-title: Getting Started
+uid: Guides.GettingStarted.FirstBot
+title: Start making a bot
 ---
 
 # Making a Ping-Pong bot
@@ -25,8 +26,8 @@ account on Discord.
     ![Step 5](images/intro-create-bot.png)
 
 6. Confirm the popup.
-7. If this bot will be public, check "Public Bot." **Do not tick any 
-other options!**
+7. If this bot will be public, check "Public Bot." **Do not tick any
+    other options!**
 
 [Discord Applications Portal]: https://discordapp.com/developers/applications/me
 
@@ -55,7 +56,7 @@ through the OAuth2 flow.
 ## Connecting to Discord
 
 If you have not already created a project and installed Discord.Net,
-do that now. (see the [Installing](installing.md) section)
+do that now. (see the [Installing](xref:Guides.GettingStarted.Installation) section)
 
 ### Async
 
@@ -109,7 +110,7 @@ the Console.
 
 Finally, we can create a connection to Discord. Since we are writing
 a bot, we will be using a [DiscordSocketClient] along with socket
-entities. See the [terminology](terminology.md) if you're unsure of
+entities. See the [terminology](xref:Guides.GettingStarted.Terminology) if you're unsure of
 the differences.
 
 To do so, create an instance of [DiscordSocketClient] in your async
@@ -161,7 +162,7 @@ online in Discord.
 > for how to fix this.
 
 [DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
-[installation guide]: installing.md#installing-on-net-standard-11
+[installation guide]: xref:Guides.GettingStarted.Installation#installing-on-net-standard-11
 
 ### Handling a 'ping'
 
@@ -213,12 +214,12 @@ For your reference, you may view the [completed program].
 [SocketMessage]: xref:Discord.WebSocket.SocketMessage
 [SocketMessageChannel]: xref:Discord.WebSocket.ISocketMessageChannel
 [completed program]: samples/intro/complete.cs
-[Command Guide]: ../commands/commands.md
+[Command Guide]: xref:Guides.Commands.Intro
 
 # Building a bot with commands
 
 This section will show you how to write a program that is ready for
-[Commands](../commands/commands.md). Note that we will not be 
+[Commands](xref:Guides.Commands.Intro). Note that we will not be 
 explaining _how_ to write Commands or Services, it will only be 
 covering the general structure.
 

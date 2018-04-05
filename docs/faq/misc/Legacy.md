@@ -1,3 +1,8 @@
+---
+uid: FAQ.Misc.Legacy
+title: Questions about Legacy Versions
+---
+
 # Legacy Questions
 
 ## X, Y, Z does not work! It doesn't return a valid value anymore.

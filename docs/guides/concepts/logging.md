@@ -1,4 +1,5 @@
 ---
+uid: Guides.Concepts.Logging
 title: Logging
 ---
 
@@ -10,7 +11,7 @@ dispatched over.
 For more information about events in Discord.Net, see the [Events]
 section.
 
-[Events]: events.md
+[Events]: xref:Guides.Concepts.Events
 
 > [!WARNING]
 > Due to the nature of Discord.Net's event system, all log event
@@ -19,7 +20,7 @@ section.
 > to wrap your output in a `Task.Run` so the gateway thread does not
 > become blocked while waiting for logging data to be written.
 
-### Usage in Client(s)
+## Usage in Client(s)
 
 To receive log events, simply hook the Discord client's @Discord.Rest.BaseDiscordClient.Log
 to a `Task` with a single parameter of type [LogMessage].
@@ -30,7 +31,7 @@ to a logging function to write their own messages.
 
 [LogMessage]: xref:Discord.LogMessage
 
-### Usage in Commands
+## Usage in Commands
 
 Discord.Net's [CommandService] also provides a @Discord.Commands.CommandService.Log 
 event, identical in signature to other log events.
@@ -42,6 +43,6 @@ and error can be found and handled.
 [CommandService]: xref:Discord.Commands.CommandService
 [CommandException]: xref:Discord.Commands.CommandException
 
-### Sample
+## Sample
 
 [!code-csharp[Logging Sample](samples/logging.cs)]

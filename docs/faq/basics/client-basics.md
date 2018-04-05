@@ -1,3 +1,8 @@
+---
+uid: FAQ.Basics.ClientBasics
+title: Basic Questions about Client
+---
+
 # Client Basics Questions
 
 ## My client keeps returning 401 upon logging in!
@@ -42,7 +47,7 @@ event is triggered, then you can proceed to do whatever you like.
 If you need to do anything with messages (e.g. checking Reactions,
 checking the content of edited/deleted messages), you must set the
 [MessageCacheSize] in your [DiscordSocketConfig] settings in order to
-use the cached message entity. Read more about it [here](../guides/concepts/events.md#cacheable).
+use the cached message entity. Read more about it [here](xref:Guides.Concepts.Events#cacheable).
 
 1. Message Cache must be enabled.
 2. Hook the MessageUpdated event. This event provides a *before* and

@@ -1,4 +1,5 @@
 ---
+uid: Guides.Concepts.Entities
 title: Entities
 ---
 
@@ -11,7 +12,7 @@ title: Entities
 Discord.Net provides a versatile entity system for navigating the
 Discord API.
 
-### Inheritance
+## Inheritance
 
 Due to the nature of the Discord API, some entities are designed with
 multiple variants; for example, `SocketUser` and `SocketGuildUser`.
@@ -30,14 +31,14 @@ But that doesn't mean a message _can't_ come from a
 retrieve information about a guild from a message entity, you will
 need to cast its channel object to a `SocketTextChannel`.
 
-### Navigation
+## Navigation
 
 All socket entities have navigation properties on them, which allow
 you to easily navigate to an entity's parent or children. As explained
 above, you will sometimes need to cast to a more detailed version of
 an entity to navigate to its parent.
 
-### Accessing Entities
+## Accessing Entities
 
 The most basic forms of entities, `SocketGuild`, `SocketUser`, and
 `SocketChannel` can be pulled from the DiscordSocketClient's global
@@ -56,6 +57,6 @@ entities, e.g. `SocketGuild.GetUser`, which returns a
 `SocketGuildChannel`. Again, you may need to cast these objects to get
 a variant of the type that you need.
 
-### Sample
+## Sample
 
 [!code-csharp[Entity Sample](samples/entities.cs)]

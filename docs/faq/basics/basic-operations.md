@@ -1,3 +1,8 @@
+---
+uid: FAQ.Basics.BasicOp
+title: Questions about Basic Operations
+---
+
 # Basic Operations Questions
 
 ## How should I safely check a type?
@@ -15,7 +20,7 @@ action.
 
 A good and safe casting example:
 
-[!code-csharp[Casting](samples/basics/cast.cs)]
+[!code-csharp[Casting](samples/cast.cs)]
 
 [InvalidCastException]: https://docs.microsoft.com/en-us/dotnet/api/system.invalidcastexception
 [this post]: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/types/how-to-safely-cast-by-using-as-and-is-operators
@@ -44,7 +49,7 @@ able to message.
 You may check the message channel type. Visit [Glossary] to see the
 various types of channels.
 
-[Glossary]: Glossary.md#message-channels
+[Glossary]: xref:FAQ.Misc.Glossary#message-channels
 
 ## How can I get the guild from a message?
 
@@ -69,7 +74,7 @@ In Discord.Net, an Emote represents a server custom emote, while an
 Emoji is a Unicode emoji (standard emoji). Both [Emoji] and [Emote]
 implement [IEmote] and are valid options.
 
-[!code-csharp[Emoji](samples/basics/emoji.cs)]
+[!code-csharp[Emoji](samples/emoji.cs)]
 
 [AddReactionAsync]: xref:Discord.IUserMessage.AddReactionAsync*
 

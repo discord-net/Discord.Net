@@ -1,3 +1,8 @@
+---
+uid: Guides.Commands.Intro
+title: Introduction to the Command Service
+---
+
 # The Command Service
 
 [Discord.Commands](xref:Discord.Commands) provides an attribute-based

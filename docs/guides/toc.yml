@@ -1,28 +1,28 @@
 - name: Introduction
-  href: introduction/intro.md
+  topicUid: Guides.Introduction
 - name: Getting Started
   items:
     - name: Installation
-      href: getting_started/installing.md
+      topicUid: Guides.GettingStarted.Installation
     - name: Your First Bot
-      href: getting_started/first-bot.md
+      topicUid: Guides.GettingStarted.FirstBot
     - name: Terminology
-      href: getting_started/terminology.md
+      topicUid: Guides.GettingStarted.Terminology
 - name: Basic Concepts
   items:
     - name: Logging Data
-      href: concepts/logging.md
+      topicUid: Guides.Concepts.Logging
     - name: Working with Events
-      href: concepts/events.md
+      topicUid: Guides.Concepts.Events
     - name: Managing Connections
-      href: concepts/connections.md
+      topicUid: Guides.Concepts.ManageConnections
     - name: Entities
-      href: concepts/entities.md
+      topicUid: Guides.Concepts.Entities
 - name: The Command Service
   items:
     - name: Command Guide
-      href: commands/commands.md
+      topicUid: Guides.Commands.Intro
     - name: Post-execution Handling
-      href: commands/post-execution.md
+      topicUid: Guides.Commands.PostExecution
 - name: Voice
-  href: voice/sending-voice.md
+  topicUid: Guides.Voice.SendingVoice
