@@ -1,28 +1,5 @@
 # Basic Concepts / Getting Started
 
-## How do I get started?
-
-First of all, welcome! You may visit us on our Discord should you
-have any questions. Before you delve into using the library,
-however, you should have some decent understanding of the language
-you are about to use. This library touches on
-[Task-based Asynchronous Pattern] \(TAP), [polymorphism], [interface]
-and many more advanced topics extensively. Please make sure that you
-understand these topics to some extent before proceeding.
-
-  Here are some examples:
-  1. [Official quick start guide](https://github.com/RogueException/Discord.Net/blob/dev/docs/guides/getting_started/samples/intro/structure.cs)
-  2. [Official template](https://github.com/foxbot/DiscordBotBase/tree/csharp/src/DiscordBot)
-
-> [!TIP]
-> Please note that you should *not* try to blindly copy paste
-> the code. The examples are meant to be a template or a guide.
-> It is not meant to be something that will work out of the box.
-
-[Task-based Asynchronous Pattern]: https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap
-[polymorphism]: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/polymorphism
-[interface]: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/interfaces/
-
 ## How do I add my bot to my server/guild?
 
 You can do so by using the [permission calculator] provided
@@ -74,11 +51,3 @@ Several common ways to do this:
 
 Please note that right-clicking on the role and copying the ID will
 **not** work. It will only copy the message ID.
-
-## I have more questions!
-
-Please visit us at #dotnet_discord-net at [Discord API].
-Describe the problem in details to us, and preferably with the
-problematic code uploaded onto [Hastebin](https://hastebin.com).
-
-[Discord API]: https://discord.gg/jkrBmQR

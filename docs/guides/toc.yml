@@ -1,9 +1,11 @@
+- name: Introduction
+  href: introduction/intro.md
 - name: Getting Started
   items:
     - name: Installation
       href: getting_started/installing.md
     - name: Your First Bot
-      href: getting_started/intro.md
+      href: getting_started/first-bot.md
     - name: Terminology
       href: getting_started/terminology.md
 - name: Basic Concepts
@@ -23,6 +25,4 @@
     - name: Post-execution Handling
       href: commands/post-execution.md
 - name: Voice
-  items:
-    - name: Voice Guide
-      href: voice/sending-voice.md
+  href: voice/sending-voice.md
