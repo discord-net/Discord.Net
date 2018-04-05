@@ -1,6 +1,6 @@
 # Introduction
 
-## How do I get started?
+## Looking to get started?
 
 First of all, welcome! You may visit us on our Discord should you
 have any questions. Before you delve into using the library,
