@@ -49,9 +49,9 @@ various types of channels.
 ## How can I get the guild from a message?
 
 There are 2 ways to do this. You can do either of the following,
-	1. Cast the user as an [IGuildUser] and use its [IGuild] property.
-	2. Cast the channel as an [IGuildChannel] and use
-	its [IGuild] property.
+
+1. Cast the user as an [IGuildUser] and use its [IGuild] property.
+2. Cast the channel as an [IGuildChannel] and use its [IGuild] property.
 
 ## How do I add hyperlink text to an embed?
 
@@ -73,6 +73,14 @@ implement [IEmote] and are valid options.
 
 [AddReactionAsync]: xref:Discord.IUserMessage.AddReactionAsync*
 
+## What is a "preemptive rate limit?"
+
+A preemptive rate limit is Discord.NET's way of telling you to slow
+down before you get hit by the real rate limit. Hitting a real rate
+limit might prevent your entire client from sending any requests for
+a period of time. This is calculated based on the HTTP header
+returned by a Discord response.
+
 ## Why am I getting so many preemptive rate limits when I try to add more than one reactions?
 
 This is due to how HTML header works, mistreating
@@ -83,7 +91,6 @@ reactions.
 ## Can I opt-out of preemptive rate limits?
 
 Unfortunately, not at the moment. See [#401](https://github.com/RogueException/Discord.Net/issues/401).
-
 
 [IChannel]: xref:Discord.IChannel
 [ICategoryChannel]: xref:Discord.ICategoryChannel
