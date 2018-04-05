@@ -16,7 +16,11 @@ namespace Discord
             string extension = FormatToExtension(format, avatarId);
             return $"{DiscordConfig.CDNUrl}avatars/{userId}/{avatarId}.{extension}?size={size}";
         }
-        /// <summary> Returns the guild icon URL based on the guild and icon ID. </summary>
+        /// <summary> Returns the default user avatar URL. </summary>
+        public static string GetDefaultUserAvatarUrl(ushort discriminator)
+        {
+            return $"{DiscordConfig.CDNUrl}embed/avatars/{discriminator % 5}.png";
+        }
         public static string GetGuildIconUrl(ulong guildId, string iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}icons/{guildId}/{iconId}.jpg" : null;
         /// <summary> Returns the guild splash URL based on the guild and icon ID. </summary>
@@ -46,11 +50,16 @@ namespace Discord
                 format = imageId.StartsWith("a_") ? ImageFormat.Gif : ImageFormat.Png;
             switch (format)
             {
-                case ImageFormat.Gif: return "gif";
-                case ImageFormat.Jpeg: return "jpeg";
-                case ImageFormat.Png: return "png";
-                case ImageFormat.WebP: return "webp";
-                default: throw new ArgumentException(nameof(format));
+                case ImageFormat.Gif:
+                    return "gif";
+                case ImageFormat.Jpeg:
+                    return "jpeg";
+                case ImageFormat.Png:
+                    return "png";
+                case ImageFormat.WebP:
+                    return "webp";
+                default:
+                    throw new ArgumentException(nameof(format));
             }
         }
     }

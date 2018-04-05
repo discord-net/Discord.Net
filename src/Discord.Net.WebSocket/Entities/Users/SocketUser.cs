@@ -48,18 +48,18 @@ namespace Discord.WebSocket
             {
                 var newVal = ushort.Parse(model.Discriminator.Value);
                 if (newVal != DiscriminatorValue)
-                { 
+                {
                     DiscriminatorValue = ushort.Parse(model.Discriminator.Value);
                     hasChanges = true;
                 }
             }
             if (model.Bot.IsSpecified && model.Bot.Value != IsBot)
-            { 
+            {
                 IsBot = model.Bot.Value;
                 hasChanges = true;
             }
             if (model.Username.IsSpecified && model.Username.Value != Username)
-            { 
+            {
                 Username = model.Username.Value;
                 hasChanges = true;
             }
@@ -74,7 +74,10 @@ namespace Discord.WebSocket
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
 
-        /// <summary> Gets the username and the discriminator. </summary>
+        /// <inheritdoc />
+        public string GetDefaultAvatarUrl()
+            => CDN.GetDefaultUserAvatarUrl(DiscriminatorValue);
+
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
