@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface ITextChannel : IMessageChannel, IMentionable, IGuildChannel, INestedChannel
+    public interface ITextChannel : IMessageChannel, IMentionable, INestedChannel
     {
         /// <summary> Checks if the channel is NSFW. </summary>
         bool IsNsfw { get; }
