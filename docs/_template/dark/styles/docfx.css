@@ -6,7 +6,8 @@ body {
   font-family: 'Titillium Web', 'Segoe UI', Tahoma, Helvetica, sans-serif;
   height: 100%;
   background: #212121;
-  color: #C0C0C0
+  color: #C0C0C0;
+  font-size: 15px;  
 }
 button,
 a {
