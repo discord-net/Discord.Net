@@ -65,7 +65,7 @@ Not sure how to add a direct feed? See how [with Visual Studio] or
 
 1. Create a new solution for your bot.
 2. Open the NuGet window (Tools > NuGet > Manage NuGet packages for
-Solution).
+ Solution).
 ![Step 2](images/install-rider-nuget-manager.png)
 3. In the "Packages" tab, search for `Discord.Net`.
 ![Step 3](images/install-rider-search.png)
@@ -102,7 +102,7 @@ Solution).
 
 In order to compile Discord.Net, you require the following:
 
-### Using Visual Studio
+## Using Visual Studio
 
 - [Visual Studio 2017](https://www.visualstudio.com/)
 - [.NET Core SDK]
@@ -110,7 +110,7 @@ In order to compile Discord.Net, you require the following:
 The .NET Core and Docker (Preview) workload is required during Visual
 Studio installation.
 
-### Using Command Line
+## Using Command Line
 
 - [.NET Core SDK]
 

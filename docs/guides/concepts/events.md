@@ -7,8 +7,8 @@ title: Working with Events
 
 Events in Discord.Net are consumed in a similar manner to the standard
 convention, with the exception that every event must be of the type
-`System.Threading.Tasks.Task` and instead of using `EventArgs`, the
-event's parameters are passed directly into the handler.
+@System.Threading.Tasks.Task and instead of using @System.EventArgs,
+the event's parameters are passed directly into the handler.
 
 This allows for events to be handled in an async context directly
 instead of relying on `async void`.

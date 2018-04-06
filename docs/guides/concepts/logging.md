@@ -33,7 +33,7 @@ to a logging function to write their own messages.
 
 ## Usage in Commands
 
-Discord.Net's [CommandService] also provides a @Discord.Commands.CommandService.Log 
+Discord.Net's [CommandService] also provides a @Discord.Commands.CommandService.Log
 event, identical in signature to other log events.
 
 Data logged through this event is typically coupled with a
