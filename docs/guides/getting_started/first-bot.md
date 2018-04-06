@@ -78,14 +78,14 @@ jump into an async context. This will allow us to create a connection
 to Discord later on without needing to worry about setting up the
 correct async implementation.
 
->[!TIP]
-If your application throws any exceptions within an async context,
-they will be thrown all the way back up to the first non-async method;
-since our first non-async method is the program's `Main` method, this
-means that **all** unhandled exceptions will be thrown up there, which
-will crash your application. Discord.Net will prevent exceptions in
-event handlers from crashing your program, but any exceptions in your
-async main **will** cause the application to crash.
+> [!TIP]
+> If your application throws any exceptions within an async context,
+> they will be thrown all the way back up to the first non-async method;
+> since our first non-async method is the program's `Main` method, this
+> means that **all** unhandled exceptions will be thrown up there, which
+> will crash your application. Discord.Net will prevent exceptions in
+> event handlers from crashing your program, but any exceptions in your
+> async main **will** cause the application to crash.
 
 [Task-based Asynchronous Pattern (TAP)]: https://docs.microsoft.com/en-us/dotnet/articles/csharp/async
 
