@@ -42,7 +42,7 @@ through the OAuth2 flow.
     ![Step 2](images/intro-client-id.png)
 
 3. Create an OAuth2 authorization URL
-`https://discordapp.com/oauth2/authorize?client_id=<CLIENT ID>&scope=bot`
+ `https://discordapp.com/oauth2/authorize?client_id=<CLIENT ID>&scope=bot`
 4. Open the authorization URL in your browser.
 5. Select a server.
 6. Click on authorize.
@@ -231,5 +231,3 @@ It is important to know that the recommended design pattern of bots
 should be to separate the program (initialization and command handler),
 the modules (handle commands), and the services (persistent storage,
 pure functions, data manipulation).
-
-**todo:** diagram of bot structure

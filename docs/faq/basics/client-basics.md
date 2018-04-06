@@ -15,14 +15,12 @@ title: Basic Questions about Client
 > termination!
 
 There are few possible reasons why this may occur.
-	1. You are not using the appropriate [TokenType].
-	If you are using a bot account created from the Discord Developer
-	portal, you should be using `TokenType.Bot`.
-	2. You are not using the correct login credentials.
-	Please keep in mind that tokens start with `Mj*`.
-	If it starts with any other characters, chances are, you might be
-	using the *client secret*, which has nothing to do with the login
-	token.
+
+1. You are not using the appropriate [TokenType]. If you are using a
+ bot account created from the Discord Developer portal, you should
+ be using `TokenType.Bot`.
+2. You are not using the correct login credentials. Please keep in
+ mind that tokens is different from a *client secret*.
 
 [TokenType]: xref:Discord.TokenType
 
@@ -51,9 +49,9 @@ use the cached message entity. Read more about it [here](xref:Guides.Concepts.Ev
 
 1. Message Cache must be enabled.
 2. Hook the MessageUpdated event. This event provides a *before* and
-*after* object.
+ *after* object.
 3. Only messages received *after* the bot comes online will be
-available in the cache.
+ available in the cache.
 
 [MessageCacheSize]: xref:Discord.WebSocket.DiscordSocketConfig.MessageCacheSize
 [DiscordSocketConfig]: xref:Discord.WebSocket.DiscordSocketConfig

@@ -51,12 +51,12 @@ Not sure how to add a direct feed? See how [with Visual Studio] or
 
 1. Create a solution for your bot.
 2. In Solution Explorer, find the "Dependencies" element under your
-bot's project.
+ bot's project.
 3. Right click on "Dependencies", and select "Manage NuGet packages."
-![Step 3](images/install-vs-deps.png)
+ ![Step 3](images/install-vs-deps.png)
 4. In the "Browse" tab, search for `Discord.Net`.
 5. Install the `Discord.Net` package.
-![Step 5](images/install-vs-nuget.png)
+ ![Step 5](images/install-vs-nuget.png)
 
 ## [Using JetBrains Rider](#tab/rider-install)
 

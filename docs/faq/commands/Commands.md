@@ -79,8 +79,9 @@ persists for **more than 3 seconds**.
 To resolve this, the library has designed a flag called [RunMode].
 
 There are 2 main `RunMode`s.
-	1. `RunMode.Sync` (default)
-	2. `RunMode.Async`
+
+1. `RunMode.Sync` (default)
+2. `RunMode.Async`
 
 You can set the `RunMode` either by specifying it individually via
 the `CommandAttribute`, or by setting the global default with
@@ -120,12 +121,13 @@ different thread. This means that [ExecuteAsync] will be forced to
 return a successful [ExecuteResult] regardless of the execution.
 
 The following are the known caveats with `RunMode.Async`,
-	1. You can potentially introduce race condition.
-	2. Unnecessary overhead caused by [async state machine].
-	3. [ExecuteAsync] will immediately return [ExecuteResult] instead of
-	other result types (this is particularly important for those who wish
-	to utilize [RuntimeResult] in 2.0).
-	4. Exceptions are swallowed.
+
+1. You can potentially introduce race condition.
+2. Unnecessary overhead caused by [async state machine].
+3. [ExecuteAsync] will immediately return [ExecuteResult] instead of
+ other result types (this is particularly important for those who wish
+ to utilize [RuntimeResult] in 2.0).
+4. Exceptions are swallowed.
 
 However, there are ways to remedy some of these.
 
