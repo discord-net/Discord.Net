@@ -60,6 +60,9 @@ namespace Discord.Rest
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
 
+        public string GetDefaultAvatarUrl()
+            => CDN.GetDefaultUserAvatarUrl(DiscriminatorValue);
+
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
 
