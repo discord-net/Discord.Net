@@ -1,6 +1,6 @@
 function getSelectionChange(e){
   var selectValue = e.options[e.selectedIndex].value;
-  setActiveStyleSheet(selectValue);
+  if (selectValue != null) setActiveStyleSheet(selectValue);
 }
 
 function setActiveStyleSheet(title) {
@@ -57,13 +57,10 @@ window.onload = function(e) {
   var cookie = readCookie("style");
   var title = cookie ? cookie : getPreferredStyleSheet();
   setActiveStyleSheet(title);
+  document.getElementById("theme-switcher").value = title;
 }
 
 window.onunload = function(e) {
   var title = getActiveStyleSheet();
   createCookie("style", title, 365);
 }
-
-var cookie = readCookie("style");
-var title = cookie ? cookie : getPreferredStyleSheet();
-setActiveStyleSheet(title);
