@@ -8,7 +8,7 @@ title: Introduction to the Command Service
 [Discord.Commands](xref:Discord.Commands) provides an attribute-based
 command parser.
 
-## Setup
+## Get Started
 
 To use Commands, you must create a [Command Service] and a command
 Handler.
@@ -29,7 +29,7 @@ values.
 
 ## With Attributes
 
-Starting from 1.0, Commands can be defined ahead of time with 
+Starting from 1.0, Commands can be defined ahead of time with
 attributes, or at runtime with builders.
 
 For most bots, ahead-of-time Commands should be all you need, and this
@@ -48,16 +48,16 @@ module instance is only as long as the command is being invoked.
 
 > [!WARNING]
 > **Avoid using long-running code** in your modules wherever possible.
-> You should **not** be implementing very much logic into your 
+> You should **not** be implementing very much logic into your
 > modules, instead, outsource to a service for that.
 >
-> If you are unfamiliar with Inversion of Control, it is recommended 
+> If you are unfamiliar with Inversion of Control, it is recommended
 > to read the MSDN article on [IoC] and [Dependency Injection].
 
->[!NOTE]
->[ModuleBase] is an _abstract_ class, meaning that you may extend it
->or override it as you see fit. Your module may inherit from any
->extension of ModuleBase.
+> [!NOTE]
+> [ModuleBase] is an _abstract_ class, meaning that you may extend it
+> or override it as you see fit. Your module may inherit from any
+> extension of ModuleBase.
 
 To begin, create a new class somewhere in your project and inherit the
 class from [ModuleBase]. This class **must** be `public`.
@@ -201,17 +201,13 @@ create nested groups).
 
 [!code-csharp[Groups and Submodules](samples/groups.cs)]
 
-## With Builders
-
-**TODO**
-
-## Dependency Injection
+# Dependency Injection
 
 The Command Service is bundled with a very barebone Dependency
 Injection service for your convenience. It is recommended that you use
 DI when writing your modules.
 
-### Setup
+## Setup
 
 First, you need to create an @System.IServiceProvider.
 
@@ -222,7 +218,7 @@ Finally, pass the service collection into `AddModulesAsync`.
 
 [!code-csharp[IServiceProvider Setup](samples/dependency_map_setup.cs)]
 
-### Usage in Modules
+## Usage in Modules
 
 In the constructor of your Module, any parameters will be filled in by
 the @System.IServiceProvider that you've passed.
@@ -298,21 +294,22 @@ your commands.
 
 By default, the following Types are supported arguments:
 
-- bool
-- char
-- sbyte/byte
-- ushort/short
-- uint/int
-- ulong/long
-- float, double, decimal
-- string
-- DateTime/DateTimeOffset/TimeSpan
-- IMessage/IUserMessage
-- IChannel/IGuildChannel/ITextChannel/IVoiceChannel/IGroupChannel
-- IUser/IGuildUser/IGroupUser
-- IRole
+- `bool`
+- `char`
+- `sbyte`/`byte`
+- `ushort`/`short`
+- `uint`/`int`
+- `ulong`/`long`
+- `float`, `double`, `decimal`
+- `string`
+- `DateTime`/`DateTimeOffset`/`TimeSpan`
+- `IMessage`/`IUserMessage`
+- `IChannel`/`IGuildChannel`/`ITextChannel`/`IVoiceChannel`/`ICategoryChannel`/`IMessageChannel`/`IGroupChannel`
+- `IUser`/`IGuildUser`/`IGroupUser`
+- `IRole`
+- `Nullable<T>` where applicible
 
-### Creating a Type Readers
+## Creating a Type Readers
 
 To create a `TypeReader`, create a new class that imports @Discord and
 @Discord.Commands and ensure the class inherits from
@@ -337,11 +334,11 @@ necessary.
 [TypeReaderResult.FromError]: xref:Discord.Commands.TypeReaderResult.FromError*
 [ReadAsync]: xref:Discord.Commands.TypeReader.ReadAsync*
 
-#### Sample
+### Sample
 
 [!code-csharp[TypeReaders](samples/typereader.cs)]
 
-### Installing TypeReaders
+## Installing TypeReaders
 
 TypeReaders are not automatically discovered by the Command Service
 and must be explicitly added.
