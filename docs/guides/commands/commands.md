@@ -345,4 +345,8 @@ and must be explicitly added.
 
 To install a TypeReader, invoke [CommandService.AddTypeReader].
 
+> [!WARNING]
+> TypeReaders must be added prior to module discovery, otherwise your
+> TypeReaders may not work!
+
 [CommandService.AddTypeReader]: xref:Discord.Commands.CommandService.AddTypeReader*
