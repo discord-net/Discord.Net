@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord
@@ -130,7 +130,7 @@ namespace Discord
             bool readMessages = false, bool sendMessages = false, bool sendTTSMessages = false, bool manageMessages = false,
             bool embedLinks = false, bool attachFiles = false, bool readMessageHistory = false, bool mentionEveryone = false,
             bool useExternalEmojis = false, bool connect = false, bool speak = false, bool muteMembers = false, bool deafenMembers = false,
-            bool moveMembers = false, bool useVoiceActivation = false, bool? changeNickname = false, bool? manageNicknames = false,
+            bool moveMembers = false, bool useVoiceActivation = false, bool changeNickname = false, bool manageNicknames = false,
             bool manageRoles = false, bool manageWebhooks = false, bool manageEmojis = false)
             : this(0, createInstantInvite: createInstantInvite, manageRoles: manageRoles, kickMembers: kickMembers, banMembers: banMembers,
                   administrator: administrator, manageChannels: manageChannels, manageGuild: manageGuild, addReactions: addReactions,
