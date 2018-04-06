@@ -1,5 +1,6 @@
 /* Copyright (c) Microsoft Corporation. All Rights Reserved. Licensed under the MIT License. See License.txt in the project root for license information. */
 @import url('https://fonts.googleapis.com/css?family=Titillium+Web');
+@import url('dracula.css');
 html,
 body {
   font-family: 'Titillium Web', 'Segoe UI', Tahoma, Helvetica, sans-serif;
@@ -177,7 +178,8 @@ body .toc{
 code {
   color:white;
   background-color:#4a4c52;
-  border-radius:4px
+  border-radius:4px;
+  padding: 3px 7px;
 }
 pre {
   background-color: #282a36;

@@ -11,8 +11,8 @@
   <link rel="shortcut icon" href="{{_rel}}{{{_appFaviconPath}}}{{^_appFaviconPath}}favicon.ico{{/_appFaviconPath}}">
   <link rel="stylesheet" href="{{_rel}}styles/docfx.vendor.css">
   <link rel="stylesheet" href="{{_rel}}styles/docfx.css">
-  <link rel="stylesheet" href="{{_rel}}styles/dark.css">
-  <link rel="stylesheet" href="{{_rel}}styles/dracula.css">
+  <link rel="stylesheet" href="{{_rel}}styles/dark.css" title="theme_dark" >
+  <link rel="alternate stylesheet" href="{{_rel}}styles/light.css" title="theme_light">
   <link rel="stylesheet" href="{{_rel}}styles/main.css">
   <link href="//cdn.rawgit.com/noelboss/featherlight/1.7.6/release/featherlight.min.css" type="text/css" rel="stylesheet" />
   <meta property="docfx:navrel" content="{{_navRel}}">
