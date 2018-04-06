@@ -61,7 +61,9 @@ article h4{
 .sideaffix{
   overflow: visible;
 }
-
+.sideaffix > div.contribution > ul > li > a.contribution-link:hover {
+  background-color: #333333;
+}
 body .toc{
   background-color: inherit;
   overflow: visible;
@@ -79,6 +81,7 @@ body .toc{
 }
 .toc .nav > li.active > a:hover,
 .toc .nav > li.active > a:focus {
+  background-color: #37474F;
   color: #4FC3F7;
 }
 
