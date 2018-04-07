@@ -143,7 +143,7 @@ public async Task LogAsync(LogMessage logMessage)
 ```
 
 [CommandException]: xref:Discord.Commands.CommandException
-[LogMessage.Exception]: xref:Discord.Commands.LogMessage.Exception
+[LogMessage.Exception]: xref:Discord.LogMessage.Exception
 [CommandService.Log]: xref:Discord.Commands.CommandService.Log
 [RuntimeResult]: xref:Discord.Commands.RuntimeResult
 [CommandExecuted]: xref:Discord.Commands.CommandService.CommandExecuted
