@@ -70,7 +70,7 @@ A brief example of service and dependency injection can be seen below.
 
 By default, all commands are executed on the same thread as the
 gateway task, which is responsible for keeping the connection from
-your client to Discord alive. By default, when you execute a command,
+your client to Discord alive. When you execute a command,
 this blocks the gateway from communicating for as long as the command
 task is being executed. The library will warn you about any long
 running event handler (in this case, the command handler) that
