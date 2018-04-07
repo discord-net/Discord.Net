@@ -46,13 +46,39 @@ namespace Discord.Rest
             await client.ApiClient.RemoveAllReactionsAsync(msg.Channel.Id, msg.Id, options);
         }
 
-        public static async Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, IEmote emote,
+        public static IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, IEmote emote,
             Action<GetReactionUsersParams> func, BaseDiscordClient client, RequestOptions options)
         {
             var args = new GetReactionUsersParams();
             func(args);
-            string emoji = (emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name);
-            return (await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false)).Select(u => RestUser.Create(client, u)).ToImmutableArray();
+
+            var emoji = (emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name);
+            return new PagedAsyncEnumerable<IUser>(
+                DiscordConfig.MaxUsersPerBatch,
+                async (info, ct) =>
+                {
+                    if (info.Position != null)
+                        args.AfterUserId = info.Position.Value;
+
+                    var models = await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false);
+                    var builder = ImmutableArray.CreateBuilder<IUser>();
+
+                    foreach (var model in models)
+                        builder.Add(RestUser.Create(client, model));
+
+                    return builder.ToImmutable();
+                },
+                nextPage: (info, lastPage) =>
+                {
+                    if (lastPage.Count != DiscordConfig.MaxUsersPerBatch)
+                        return false;
+
+                    info.Position = lastPage.OrderBy(u => u.Id).First().Id;
+                    return true;
+                },
+                count: args.Limit.Value
+            );
+
         }
 
         public static async Task PinAsync(IMessage msg, BaseDiscordClient client,
