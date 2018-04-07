@@ -31,6 +31,9 @@ But that doesn't mean a message _can't_ come from a
 retrieve information about a guild from a message entity, you will
 need to cast its channel object to a `SocketTextChannel`.
 
+You can find out various types of entities in the @FAQ.Misc.Glossary
+page.
+
 ## Navigation
 
 All socket entities have navigation properties on them, which allow
@@ -47,13 +50,14 @@ DiscordSocketClient.
 
 > [!TIP]
 > It is **vital** that you use the proper IDs for an entity when using
-> a GetXXX method. It is recommended that you enable Discord's
+> a `GetXXX` method. It is recommended that you enable Discord's
 > _developer mode_ to allow easy access to entity IDs, found in
-> Settings > Appearance > Advanced.
+> Settings > Appearance > Advanced. Read more about it in the
+> [FAQ](xref:FAQ.Basics.GetStarted) page.
 
 More detailed versions of entities can be pulled from the basic
-entities, e.g. `SocketGuild.GetUser`, which returns a 
-`SocketGuildUser`, or `SocketGuild.GetChannel`, which returns a 
+entities, e.g. `SocketGuild.GetUser`, which returns a
+`SocketGuildUser`, or `SocketGuild.GetChannel`, which returns a
 `SocketGuildChannel`. Again, you may need to cast these objects to get
 a variant of the type that you need.
 
