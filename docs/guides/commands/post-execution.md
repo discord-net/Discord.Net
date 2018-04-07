@@ -28,10 +28,10 @@ handler. This could lead to messy code and has another potential
 issue, working with `RunMode.Async`.
 
 If your command is marked with `RunMode.Async`, [ExecuteAsync] will
-return a successful [ExecuteResult] instead of whatever results
-the actual command may return. Because of the way `RunMode.Async`
-[works](xref:FAQ.Commands), handling within the command handler
-may not always achieve the desired effect.
+**always** return a successful [ExecuteResult] instead of whatever
+results the actual command may return. Because of the way
+`RunMode.Async` [works](xref:FAQ.Commands), handling within the
+command handler may not always achieve the desired effect.
 
 ## CommandExecuted Event
 
@@ -43,7 +43,7 @@ used to streamline your post-execution design, and the best thing
 about this event is that it is not prone to `RunMode.Async`'s
 [ExecuteAsync] drawbacks.
 
-With that in mind, we can begin working on code such as:
+Thus, we can begin working on code such as:
 
 [!code[CommandExecuted demo](samples/command_executed_demo.cs)]
 
@@ -84,7 +84,7 @@ After you're done creating your own [RuntimeResult], you can
 implement it in your command by marking its return type to
 `Task<RuntimeResult>`.
 
-> ![NOTE]
+> [!NOTE]
 > You must mark the return type as `Task<RuntimeResult>` instead of
 > `Task<MyCustomResult>`. Only the former will be picked up when
 > building the module.

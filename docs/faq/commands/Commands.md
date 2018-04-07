@@ -118,7 +118,8 @@ the [DefaultRunMode] flag under `CommandServiceConfig`.
 [Task.Run], essentially making `ExecuteAsyncInternalAsync`, the task
 that is used to invoke the command task, to be finished on a
 different thread. This means that [ExecuteAsync] will be forced to
-return a successful [ExecuteResult] regardless of the execution.
+return a successful [ExecuteResult] regardless of the actual
+execution result.
 
 The following are the known caveats with `RunMode.Async`,
 
