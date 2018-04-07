@@ -3,9 +3,6 @@ uid: Guides.Commands.PostExecution
 title: Post-command Execution Handling
 ---
 
-> [!WARNING]
-> This page is still under construction!
-
 # Preface
 
 When developing a command system or modules, you may want to consider
@@ -40,49 +37,15 @@ may not always achieve the desired effect.
 
 Enter [CommandExecuted], an event that was introduced in
 Discord.Net 2.0. This event is raised when the command is
-sucessfully executed **without any runtime exceptions** (more on this
-later). This means this event can be used to streamline your
-post-execution design, and the best thing about this event is that it
-is not prone to `RunMode.Async`'s [ExecuteAsync] drawbacks.
+sucessfully executed **without any runtime exceptions** or **without
+any parsing or precondition failure**. This means this event can be
+used to streamline your post-execution design, and the best thing
+about this event is that it is not prone to `RunMode.Async`'s
+[ExecuteAsync] drawbacks.
 
 With that in mind, we can begin working on code such as:
 
-```cs
-public async Task SetupAsync()
-{
-    await _command.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
-    // Hook the execution event
-    _command.CommandExecuted += OnCommandExecutedAsync;
-    // Hook the command handler
-    _client.MessageReceived += HandleCommandAsync;
-}
-public async Task OnCommandExecutedAsync(CommandInfo command, ICommandContext context, IResult result)
-{
-    // We have access to the information of the command executed,
-    // the context of the command, and the result returned from the
-    // execution in this event.
-
-    // We can tell the user what went wrong
-    if (!string.IsNullOrEmpty(result?.ErrorReason))
-    {
-        await context.Channel.SendMessageAsync(result.ErrorReason);
-    }
-
-    // ...or even log the result (the method used should fit into
-    // your existing log handler)
-    await _log.LogAsync(new LogMessage(LogSeverity.Info, "CommandExecution", $"{command.Name} was executed at {DateTime.UtcNow}."));
-}
-public async Task HandleCommandAsync(SocketMessage msg)
-{
-    // Notice how clean our new command handler has become.
-    var message = messageParam as SocketUserMessage;
-    if (message == null) return;
-    int argPos = 0;
-    if (!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))) return;
-    var context = new SocketCommandContext(_client, message);
-    await _commands.ExecuteAsync(context, argPos, _services);
-}
-```
+[!code[CommandExecuted demo](samples/command_executed_demo.cs)]
 
 So now we have a streamlined post-execution pipeline, great! What's
 next? We can take this further by using [RuntimeResult].
@@ -104,15 +67,31 @@ be returned when the command has finished its logic.
 
 The best way to make use of it is to create your own version of
 `RuntimeResult`. You can achieve this by inheriting the `RuntimeResult`
-class.
+class. The following creates a bare-minimum for a sub-class
+of `RuntimeResult`,
 
-```cs
-public class MyCustomResult : RuntimeResult
-{
-}
-```
+[!code[Base Use](samples/customresult_base.cs)]
 
-// todo: finish this section
+The sky's the limit from here. You can add any additional information
+you'd like regarding the execution result. For example, you may
+want to add your own result type or other helpful information
+regarding the execution, or something simple like static methods to
+help you create return types easily.
+
+[!code[Extended Use](samples/customresult_extended.cs)]
+
+After you're done creating your own [RuntimeResult], you can
+implement it in your command by marking its return type to
+`Task<RuntimeResult>`.
+
+> ![NOTE]
+> You must mark the return type as `Task<RuntimeResult>` instead of
+> `Task<MyCustomResult>`. Only the former will be picked up when
+> building the module.
+
+Here's an example of a command that utilizes such logic:
+
+[!code[Usage](samples/customresult_usage.cs)]
 
 ## CommandService.Log Event
 
@@ -126,21 +105,7 @@ sent to the Log event under the [LogMessage.Exception] property as a
 [CommandException] type. The [CommandException] class allows us to
 access the exception thrown, as well as the context of the command.
 
-```cs
-public async Task LogAsync(LogMessage logMessage)
-{
-    // This casting type requries C#7
-    if (logMessage.Exception is CommandException cmdException)
-    {
-        // We can tell the user that something unexpected has happened
-        await cmdException.Context.Channel.SendMessageAsync("Something went catastrophically wrong!");
-
-        // We can also log this incident
-        Console.WriteLine($"{cmdException.Context.User} failed to execute '{cmdException.Command.Name}' in {cmdException.Context.Channel}.");
-        Console.WriteLine(cmdException.ToString());
-    }
-}
-```
+[!code[Logger Sample](samples/command_exception_log.cs)]
 
 [CommandException]: xref:Discord.Commands.CommandException
 [LogMessage.Exception]: xref:Discord.LogMessage.Exception
