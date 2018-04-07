@@ -5,10 +5,10 @@ title: Post-command Execution Handling
 
 # Preface
 
-When developing a command system or modules, you may want to consider
-building a post-execution handling system so you can have a finer
-control over commands. Discord.Net offers several different
-post-execution workflow for you to work with.
+When developing commands, you may want to consider building a
+post-execution handling system so you can have a finer control
+over commands. Discord.Net offers several post-execution workflows
+for you to work with.
 
 If you recall, in the [Command Guide], we've shown the following
 example for executing and handling commands,
@@ -17,27 +17,27 @@ example for executing and handling commands,
 
 You may notice that after we perform [ExecuteAsync], we store the
 result and print it to the chat. This is essentially the most
-basic post-execution handling. With this in mind, we could start doing
-things like the following,
+basic post-execution handling.
+
+With this in mind, we could start doing things like the following,
 
 [!code[Basic Command Handler](samples/post-execution_basic.cs)]
 
-**But!** This may not always be preferred, because you are
+However, this may not always be preferred, because you are
 creating your post-execution logic *with* the essential command
-handler. This could lead to messy code and has another potential
-issue, working with `RunMode.Async`.
+handler. This could lead to messy code and could potentially be a
+violation of the SRP (Single Responsibility Principle).
 
-If your command is marked with `RunMode.Async`, [ExecuteAsync] will
-**always** return a successful [ExecuteResult] instead of whatever
-results the actual command may return. Because of the way
-`RunMode.Async` [works](xref:FAQ.Commands), handling within the
-command handler may not always achieve the desired effect.
+Another major issue is if your command is marked with
+`RunMode.Async`, [ExecuteAsync] will **always** return a successful
+[ExecuteResult] instead of the actual result. You can learn more
+about the impact in the [FAQ](xref:FAQ.Commands).
 
 ## CommandExecuted Event
 
 Enter [CommandExecuted], an event that was introduced in
-Discord.Net 2.0. This event is raised when the command is
-sucessfully executed **without any runtime exceptions** or **without
+Discord.Net 2.0. This event is raised whenever a command is
+successfully executed **without any run-time exceptions** or **without
 any parsing or precondition failure**. This means this event can be
 used to streamline your post-execution design, and the best thing
 about this event is that it is not prone to `RunMode.Async`'s
@@ -53,35 +53,39 @@ next? We can take this further by using [RuntimeResult].
 ### RuntimeResult
 
 This class was introduced in 1.0, but it wasn't widely adopted due to
-the previously mentioned [ExecuteAsync] drawback. Since we now have
-access to proper result handling via the [CommandExecuted] event,
+the aforementioned [ExecuteAsync] drawback. Since we now have
+access to a proper result-handler via the [CommandExecuted] event,
 we can start making use of this class.
 
 #### What is it?
 
 `RuntimeResult` was introduced to allow developers to centralize
-their command result logic. It is a result type that is designed to
-be returned when the command has finished its logic.
+their command result logic. In other words, it is a result type
+that is designed to be returned when the command has finished its
+execution.
 
 #### How to make use of it?
 
 The best way to make use of it is to create your own version of
 `RuntimeResult`. You can achieve this by inheriting the `RuntimeResult`
-class. The following creates a bare-minimum for a sub-class
+class.
+
+The following creates a bare-minimum required for a sub-class
 of `RuntimeResult`,
 
 [!code[Base Use](samples/customresult_base.cs)]
 
 The sky's the limit from here. You can add any additional information
-you'd like regarding the execution result. For example, you may
-want to add your own result type or other helpful information
-regarding the execution, or something simple like static methods to
-help you create return types easily.
+you'd like regarding the execution result.
+
+For example, you may want to add your own result type or other
+helpful information regarding the execution, or something
+simple like static methods to help you create return types easily.
 
 [!code[Extended Use](samples/customresult_extended.cs)]
 
 After you're done creating your own [RuntimeResult], you can
-implement it in your command by marking its return type to
+implement it in your command by marking the command return type to
 `Task<RuntimeResult>`.
 
 > [!NOTE]
@@ -105,9 +109,10 @@ failure (i.e. exceptions). To resolve this, we can make use of the
 [CommandService.Log] event.
 
 All exceptions thrown during a command execution will be caught and
-sent to the Log event under the [LogMessage.Exception] property as a
-[CommandException] type. The [CommandException] class allows us to
-access the exception thrown, as well as the context of the command.
+be sent to the Log event under the [LogMessage.Exception] property
+as a [CommandException] type. The [CommandException] class allows
+us to access the exception thrown, as well as the context
+of the command.
 
 [!code[Logger Sample](samples/command_exception_log.cs)]
 
