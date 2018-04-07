@@ -14,7 +14,7 @@ title: Questions about Basic Operations
 >
 > Please refer to [this post] for more details.
 
-In Discord.NET, the idea of polymorphism is used throughout. You may
+In Discord.Net, the idea of polymorphism is used throughout. You may
 need to cast the object as a certain type before you can perform any
 action.
 
@@ -35,7 +35,7 @@ A good and safe casting example:
 
 Any implementation of [IMessageChannel] has a [SendMessageAsync]
 method. You can get the channel via [GetChannel] under the client.
-Remember, when using Discord.NET, polymorphism is a common recurring
+Remember, when using Discord.Net, polymorphism is a common recurring
 theme. This means an object may take in many shapes or form, which
 means casting is your friend. You should attempt to cast the channel
 as an [IMessageChannel] or any other entity that implements it to be
@@ -68,7 +68,7 @@ as in field values. With that in mind, links can be added with
 
 ## How do I add reactions to a message?
 
-Any entities that implement [IUserMessage] has an [AddReactionAsync]
+Any entity that implements [IUserMessage] has an [AddReactionAsync]
 method. This method expects an [IEmote] as a parameter.
 In Discord.Net, an Emote represents a server custom emote, while an
 Emoji is a Unicode emoji (standard emoji). Both [Emoji] and [Emote]
@@ -80,7 +80,7 @@ implement [IEmote] and are valid options.
 
 ## What is a "preemptive rate limit?"
 
-A preemptive rate limit is Discord.NET's way of telling you to slow
+A preemptive rate limit is Discord.Net's way of telling you to slow
 down before you get hit by the real rate limit. Hitting a real rate
 limit might prevent your entire client from sending any requests for
 a period of time. This is calculated based on the HTTP header

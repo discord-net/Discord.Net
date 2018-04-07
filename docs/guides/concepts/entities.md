@@ -3,7 +3,7 @@ uid: Guides.Concepts.Entities
 title: Entities
 ---
 
-# Entities in Discord.NET
+# Entities in Discord.Net
 
 > [!NOTE]
 > This article is written with the Socket variants of entities in mind,

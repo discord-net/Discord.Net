@@ -1,6 +1,6 @@
 ---
 uid: Guides.Introduction
-title: Introduction to Discord.NET
+title: Introduction to Discord.Net
 ---
 
 # Introduction

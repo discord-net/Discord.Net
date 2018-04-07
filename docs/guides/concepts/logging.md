@@ -3,7 +3,7 @@ uid: Guides.Concepts.Logging
 title: Logging
 ---
 
-# Logging in Discord.NET
+# Logging in Discord.Net
 
 Discord.Net's clients provide a log event that all messages will be
 dispatched over.

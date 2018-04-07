@@ -3,7 +3,7 @@ uid: Guides.Concepts.Events
 title: Working with Events
 ---
 
-# Events in Discord.NET
+# Events in Discord.Net
 
 Events in Discord.Net are consumed in a similar manner to the standard
 convention, with the exception that every event must be of the type

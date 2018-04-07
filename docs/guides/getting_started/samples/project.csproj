@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!--
   The following may differ depending on the latest version of 
-  .NET Core Framework or Discord.NET.
+  .NET Core Framework or Discord.Net.
   -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>

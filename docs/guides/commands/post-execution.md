@@ -10,7 +10,7 @@ title: Post-command Execution Handling
 
 When developing a command system or modules, you may want to consider
 building a post-execution handling system so you can have a finer
-control over commands. Discord.NET offers several different
+control over commands. Discord.Net offers several different
 post-execution workflow for you to work with.
 
 If you recall, in the [Command Guide], we've shown the following
@@ -39,7 +39,7 @@ may not always achieve the desired effect.
 ## CommandExecuted Event
 
 Enter [CommandExecuted], an event that was introduced in
-Discord.NET 2.0. This event is raised when the command is
+Discord.Net 2.0. This event is raised when the command is
 sucessfully executed **without any runtime exceptions** (more on this
 later). This means this event can be used to streamline your
 post-execution design, and the best thing about this event is that it

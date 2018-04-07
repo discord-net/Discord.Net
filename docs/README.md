@@ -1,6 +1,6 @@
 # Instructions for Building Documentation
 
-The documentation for the Discord.NET library uses [DocFX][docfx-main]. [Instructions for installing this tool can be found here.][docfx-installing]
+The documentation for the Discord.Net library uses [DocFX][docfx-main]. [Instructions for installing this tool can be found here.][docfx-installing]
 
 1. Navigate to the root of the repository.
 2. (Optional) If you intend to target a specific version, ensure that you

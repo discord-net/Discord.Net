@@ -46,7 +46,7 @@ the last parameter.
 
 ## What is a service? Why does my module not hold any data after execution?
 
-In Discord.NET, modules are created similarly to ASP.NET, meaning
+In Discord.Net, modules are created similarly to ASP.NET, meaning
 that they have a transient nature. This means that they are spawned
 every time when a request is received, and are killed from memory
 when the execution finishes. This is why you cannot store persistent
@@ -57,7 +57,7 @@ persist throughout execution. Think of it like a chest that holds
 whatever you throw at it that won't be affected by anything unless
 you want it to. Note that you should also learn Microsoft's
 implementation of [Dependency Injection] \([video]) before proceeding, as well
-as how it works in [Discord.NET](xref:Guides.Commands.Intro#usage-in-modules).
+as how it works in [Discord.Net](xref:Guides.Commands.Intro#usage-in-modules).
 
 A brief example of service and dependency injection can be seen below.
 
@@ -66,7 +66,7 @@ A brief example of service and dependency injection can be seen below.
 [Dependency Injection]: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection
 [video]: https://www.youtube.com/watch?v=QtDTfn8YxXg
 
-## I have a long-running Task in my command, and Discord.NET keeps saying that a `MessageReceived` handler is blocking the gateway. What gives?
+## I have a long-running Task in my command, and Discord.Net keeps saying that a `MessageReceived` handler is blocking the gateway. What gives?
 
 By default, all commands are executed on the same thread as the
 gateway task, which is responsible for keeping the connection from
@@ -112,7 +112,7 @@ the [DefaultRunMode] flag under `CommandServiceConfig`.
 [CommandAttribute]: xref:Discord.Commands.CommandAttribute
 [DefaultRunMode]: xref:Discord.Commands.CommandServiceConfig.DefaultRunMode
 
-## How does `RunMode.Async` work, and why is Discord.NET *not* using it by default?
+## How does `RunMode.Async` work, and why is Discord.Net *not* using it by default?
 
 `RunMode.Async` works by spawning a new `Task` with an unawaited
 [Task.Run], essentially making `ExecuteAsyncInternalAsync`, the task
@@ -131,7 +131,7 @@ The following are the known caveats with `RunMode.Async`,
 
 However, there are ways to remedy some of these.
 
-For #3, in Discord.NET 2.0, the library introduces a new event called
+For #3, in Discord.Net 2.0, the library introduces a new event called
 [CommandExecuted], which is raised whenever the command is
 **successfully executed**. This event will be raised regardless of
 the `RunMode` type and will return the appropriate execution result.

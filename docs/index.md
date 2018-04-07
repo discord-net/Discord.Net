@@ -5,9 +5,9 @@ title: Home
 
 # Discord.Net Documentation
 
-## What is Discord.NET?
+## What is Discord.Net?
 
-Discord.NET is an asynchronous, multi-platform .NET Library used to
+Discord.Net is an asynchronous, multi-platform .NET Library used to
 interface with the [Discord API](https://discordapp.com/).
 
 ## Where to begin?

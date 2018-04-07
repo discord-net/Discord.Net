@@ -17,7 +17,7 @@ Visit the repo's [release tag] to see the latest public pre-release.
 
 [release tag]: https://github.com/RogueException/Discord.Net/releases
 
-## I came from an earlier version of Discord.NET 1.0, and DependencyMap doesn't seem to exist anymore in the later revision? What happened to it?
+## I came from an earlier version of Discord.Net 1.0, and DependencyMap doesn't seem to exist anymore in the later revision? What happened to it?
 
 The `DependencyMap` has been replaced with Microsoft's
 [DependencyInjection] Abstractions. An example usage can be seen
