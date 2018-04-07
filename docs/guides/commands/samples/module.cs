@@ -1,5 +1,5 @@
 // Create a module with no prefix
-public class Info : ModuleBase<SocketCommandContext>
+public class InfoModule : ModuleBase<SocketCommandContext>
 {
 	// ~say hello world -> hello world
 	[Command("say")]
@@ -12,14 +12,14 @@ public class Info : ModuleBase<SocketCommandContext>
 
 // Create a module with the 'sample' prefix
 [Group("sample")]
-public class Sample : ModuleBase<SocketCommandContext>
+public class SampleModule : ModuleBase<SocketCommandContext>
 {
 	// ~sample square 20 -> 400
 	[Command("square")]
 	[Summary("Squares a number.")]
 	public async Task SquareAsync(
-	[Summary("The number to square.")] 
-	int num)
+		[Summary("The number to square.")] 
+		int num)
 	{
 		// We can also access the channel from the Command Context.
 		await Context.Channel.SendMessageAsync($"{num}^2 = {Math.Pow(num, 2)}");
@@ -36,8 +36,8 @@ public class Sample : ModuleBase<SocketCommandContext>
 	("Returns info about the current user, or the user parameter, if one passed.")]
 	[Alias("user", "whois")]
 	public async Task UserInfoAsync(
-	[Summary("The (optional) user to get info for")] 
-	SocketUser user = null)
+		[Summary("The (optional) user to get info from")]
+		SocketUser user = null)
 	{
 		var userInfo = user ?? Context.Client.CurrentUser;
 		await ReplyAsync($"{userInfo.Username}#{userInfo.Discriminator}");

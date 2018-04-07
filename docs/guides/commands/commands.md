@@ -10,17 +10,18 @@ command parser.
 
 ## Get Started
 
-To use Commands, you must create a [Command Service] and a command
-Handler.
+To use commands, you must create a [Command Service] and a command
+handler.
 
-Included below is a very barebone command handler. You can extend your
+Included below is a barebone command handler. You can extend your
 command Handler as much as you like; however, the below is the bare
 minimum.
 
-The `CommandService` will optionally accept a [CommandServiceConfig],
-which _does_ set a few default values for you. It is recommended to
-look over the properties in [CommandServiceConfig] and their default
-values.
+> [!NOTE]
+> The `CommandService` will optionally accept a [CommandServiceConfig],
+> which *does* set a few default values for you. It is recommended to
+> look over the properties in [CommandServiceConfig] and their default
+> values.
 
 [!code-csharp[Command Handler](samples/command_handler.cs)]
 
@@ -29,20 +30,20 @@ values.
 
 ## With Attributes
 
-Starting from 1.0, Commands can be defined ahead of time with
+Starting from 1.0, commands can be defined ahead of time with
 attributes, or at runtime with builders.
 
-For most bots, ahead-of-time Commands should be all you need, and this
-is the recommended method of defining Commands.
+For most bots, ahead-of-time commands should be all you need, and this
+is the recommended method of defining commands.
 
 ### Modules
 
-The first step to creating Commands is to create a _module_.
+The first step to creating commands is to create a _module_.
 
-A Module is an organizational pattern that allows you to write your
-Commands in different classes and have them automatically loaded.
+A module is an organizational pattern that allows you to write your
+commands in different classes and have them automatically loaded.
 
-Discord.Net's implementation of Modules is influenced heavily from
+Discord.Net's implementation of "modules" is influenced heavily from
 ASP.NET Core's Controller pattern. This means that the lifetime of a
 module instance is only as long as the command is being invoked.
 
@@ -74,32 +75,32 @@ By now, your module should look like this:
 
 The next step to creating commands is actually creating the commands.
 
-To create a command, add a method to your module of type `Task` or 
-`Task<RuntimeResult>` depending on your use.
+To create a command, add a method to your module of type `Task` or
+`Task<RuntimeResult>` depending on your use (see: [Post-execution](xref:Guides.Commands.PostExecution)).
 Typically, you will want to mark this method as `async`, although it
 is not required.
 
 Adding parameters to a command is done by adding parameters to the
-parent Task. For example, to take an integer as an argument from 
-the user, add `int arg`; to take a user as an argument from the 
-user, add `IUser user`. Starting from 1.0, a command can accept 
-nearly any type of argument;  a full list of types that are parsed 
-by default can be found in the below 
+parent Task. For example, to take an integer as an argument from
+the user, add `int arg`; to take a user as an argument from the
+user, add `IUser user`. Starting from 1.0, a command can accept
+nearly any type of argument;  a full list of types that are parsed
+by default can be found in the below
 section on [Type Readers](#type-readers).
 
 Parameters, by default, are always required. To make a parameter
-optional, give it a default value. To accept a comma-separated list,
+optional, give it a default value (i.e. `int num = 0`). To accept a comma-separated list,
 set the parameter to `params Type[]`.
 
-Should a parameter include spaces, the parameter **must** be 
-wrapped in quotes. For example, for a command with a parameter 
-`string food`, you would execute it with 
-`!favoritefood "Key Lime Pie"`. If you would like a parameter to 
-parse until the end of a command, flag the parameter with the 
-[RemainderAttribute]. This will allow a user to invoke a command 
+Should a parameter include spaces, the parameter **must** be
+wrapped in quotes. For example, for a command with a parameter
+`string food`, you would execute it with
+`!favoritefood "Key Lime Pie"`. If you would like a parameter to
+parse until the end of a command, flag the parameter with the
+[RemainderAttribute]. This will allow a user to invoke a command
 without wrapping a parameter in quotes.
 
-Finally, flag your command with the [CommandAttribute] (you must
+Finally, flag your command with the [CommandAttribute]. Note that you must
 specify a name for this command, except for when it is part of a
 [Module Group](#module-groups).
 
@@ -108,10 +109,10 @@ specify a name for this command, except for when it is part of a
 
 ### Command Overloads
 
-You may add overloads to your Commands, and the Command parser will
+You may add overloads to your commands, and the command parser will
 automatically pick up on it.
 
-If for whatever reason, you have two Commands which are ambiguous to
+If, for whatever reason, you have two commands which are ambiguous to
 each other, you may use the @Discord.Commands.PriorityAttribute to
 specify which should be tested before the other.
 
@@ -122,10 +123,10 @@ priority will be called first.
 
 Every command can access the execution context through the [Context]
 property on [ModuleBase]. `ICommandContext` allows you to access the
-message, channel, guild, user, and the underlying Discord client 
+message, channel, guild, user, and the underlying Discord client
 that the command was invoked from.
 
-Different types of Contexts may be specified using the generic variant
+Different types of `Context` may be specified using the generic variant
 of [ModuleBase]. When using a [SocketCommandContext], for example, the
 properties on this context will already be Socket entities, so you
 will not need to cast them.
@@ -134,8 +135,8 @@ To reply to messages, you may also invoke [ReplyAsync], instead of
 accessing the channel through the [Context] and sending a message.
 
 > [!WARNING]
->Contexts should **NOT** be mixed! You cannot have one module that
->uses `CommandContext` and another that uses `SocketCommandContext`.
+> Contexts should **NOT** be mixed! You cannot have one module that
+> uses `CommandContext` and another that uses `SocketCommandContext`.
 
 [Context]: xref:Discord.Commands.ModuleBase`1.Context
 [SocketCommandContext]: xref:Discord.Commands.SocketCommandContext
@@ -144,12 +145,13 @@ accessing the channel through the [Context] and sending a message.
 ### Example Module
 
 At this point, your module should look comparable to this example:
+
 [!code-csharp[Example Module](samples/module.cs)]
 
 #### Loading Modules Automatically
 
 The Command Service can automatically discover all classes in an
-Assembly that inherit [ModuleBase] and load them. Invoke 
+`Assembly` that inherit [ModuleBase] and load them. Invoke
 [CommandService.AddModulesAsync] to discover modules and
 install them.
 
@@ -171,7 +173,7 @@ service provider.
 
 Modules are constructed using Dependency Injection. Any parameters
 that are placed in the Module's constructor must be injected into an
-@System.IServiceProvider first. 
+@System.IServiceProvider first.
 
 > [!TIP]
 > Alternatively, you may accept an
@@ -185,17 +187,17 @@ injected after the construction of the Module.
 
 ### Module Groups
 
-Module Groups allow you to create a module where Commands are
+Module Groups allow you to create a module where commands are
 prefixed. To create a group, flag a module with the
 @Discord.Commands.GroupAttribute.
 
-Module groups also allow you to create **nameless Commands**, where
+Module Groups also allow you to create **nameless Commands**, where
 the [CommandAttribute] is configured with no name. In this case, the
 command will inherit the name of the group it belongs to.
 
 ### Submodules
 
-Submodules are Modules that reside within another one. Typically,
+Submodules are "modules" that reside within another one. Typically,
 submodules are used to create nested groups (although not required to
 create nested groups).
 
@@ -209,32 +211,30 @@ DI when writing your modules.
 
 ## Setup
 
-First, you need to create an @System.IServiceProvider.
-
-Next, add the dependencies to the service collection that you wish 
-to use in the Modules.
-
-Finally, pass the service collection into `AddModulesAsync`.
+1. Create an @System.IServiceProvider.
+2. Add the dependencies to the service collection that you wish
+ to use in the modules.
+3. Pass the service collection into `AddModulesAsync`.
 
 [!code-csharp[IServiceProvider Setup](samples/dependency_map_setup.cs)]
 
 ## Usage in Modules
 
-In the constructor of your Module, any parameters will be filled in by
+In the constructor of your module, any parameters will be filled in by
 the @System.IServiceProvider that you've passed.
 
 Any publicly settable properties will also be filled in the same
 manner.
 
->[!NOTE]
-> Annotating a property with a [DontInjectAttribute] attribute will 
+> [!NOTE]
+> Annotating a property with a [DontInjectAttribute] attribute will
 > prevent the property from being injected.
 
->[!NOTE]
->If you accept `CommandService` or `IServiceProvider` as a parameter
-in your constructor or as an injectable property, these entries will
-be filled by the `CommandService` that the Module is loaded from and
-the `ServiceProvider` that is passed into it respectively.
+> [!NOTE]
+> If you accept `CommandService` or `IServiceProvider` as a parameter
+> in your constructor or as an injectable property, these entries will
+> be filled by the `CommandService` that the module is loaded from and
+> the `ServiceProvider` that is passed into it respectively.
 
 [!code-csharp[ServiceProvider in Modules](samples/dependency_module.cs)]
 
@@ -246,17 +246,17 @@ Precondition serve as a permissions system for your Commands. Keep in
 mind, however, that they are not limited to _just_ permissions and can
 be as complex as you want them to be.
 
->[!NOTE]
->There are two types of Preconditions.
-[PreconditionAttribute] can be applied to Modules, Groups, or Commands;
-[ParameterPreconditionAttribute] can be applied to Parameters.
+> [!NOTE]
+> There are two types of Preconditions.
+> [PreconditionAttribute] can be applied to Modules, Groups, or Commands;
+> [ParameterPreconditionAttribute] can be applied to Parameters.
 
 [PreconditionAttribute]: xref:Discord.Commands.PreconditionAttribute
 [ParameterPreconditionAttribute]: xref:Discord.Commands.ParameterPreconditionAttribute
 
 ## Bundled Preconditions
 
-Commands ship with four bundled Preconditions; you may view their
+commands ship with four bundled Preconditions; you may view their
 usages on their respective API pages.
 
 - @Discord.Commands.RequireContextAttribute
@@ -276,9 +276,9 @@ the [CheckPermissionsAsync] method.
 
 Your IDE should provide an option to fill this in for you.
 
-If the context meets the required parameters, return 
-[PreconditionResult.FromSuccess], otherwise return 
-[PreconditionResult.FromError] and include an error message if 
+If the context meets the required parameters, return
+[PreconditionResult.FromSuccess], otherwise return
+[PreconditionResult.FromError] and include an error message if
 necessary.
 
 [!code-csharp[Custom Precondition](samples/require_owner.cs)]
@@ -303,11 +303,8 @@ By default, the following Types are supported arguments:
 - `float`, `double`, `decimal`
 - `string`
 - `DateTime`/`DateTimeOffset`/`TimeSpan`
-- `IMessage`/`IUserMessage`
-- `IChannel`/`IGuildChannel`/`ITextChannel`/`IVoiceChannel`/`ICategoryChannel`/`IMessageChannel`/`IGroupChannel`
-- `IUser`/`IGuildUser`/`IGroupUser`
-- `IRole`
 - `Nullable<T>` where applicible
+- Any implementation of `IChannel`/`IMessage`/`IUser`/`IRole`
 
 ## Creating a Type Readers
 
@@ -317,16 +314,16 @@ To create a `TypeReader`, create a new class that imports @Discord and
 
 Next, satisfy the `TypeReader` class by overriding the [ReadAsync] method.
 
->[!NOTE]
->In many cases, Visual Studio can fill this in for you, using the
->"Implement Abstract Class" IntelliSense hint.
+> [!NOTE]
+> In many cases, Visual Studio can fill this in for you, using the
+> "Implement Abstract Class" IntelliSense hint.
 
-Inside this task, add whatever logic you need to parse the input
+Inside this Task, add whatever logic you need to parse the input
 string.
 
-If you are able to successfully parse the input, return 
+If you are able to successfully parse the input, return
 [TypeReaderResult.FromSuccess] with the parsed input, otherwise return
-[TypeReaderResult.FromError] and include an error message if 
+[TypeReaderResult.FromError] and include an error message if
 necessary.
 
 [TypeReaderResult]: xref:Discord.Commands.TypeReaderResult
