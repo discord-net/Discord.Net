@@ -93,6 +93,10 @@ Here's an example of a command that utilizes such logic:
 
 [!code[Usage](samples/customresult_usage.cs)]
 
+And now we can check for it in our [CommandExecuted] handler:
+
+[!code[Usage](samples/command_executed_adv_demo.cs)]
+
 ## CommandService.Log Event
 
 We have so far covered the handling of various result types, but we
