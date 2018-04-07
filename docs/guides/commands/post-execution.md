@@ -52,19 +52,15 @@ next? We can take this further by using [RuntimeResult].
 
 ### RuntimeResult
 
-This class was introduced in 1.0, but it wasn't widely adopted due to
-the aforementioned [ExecuteAsync] drawback. Since we now have
-access to a proper result-handler via the [CommandExecuted] event,
-we can start making use of this class.
+`RuntimeResult` was originally introduced in 1.0 to allow
+developers to centralize their command result logic.
+In other words, it is a result type that is designed to be
+returned when the command has finished its execution.
 
-#### What is it?
-
-`RuntimeResult` was introduced to allow developers to centralize
-their command result logic. In other words, it is a result type
-that is designed to be returned when the command has finished its
-execution.
-
-#### How to make use of it?
+However, it wasn't widely adopted due to the aforementioned
+[ExecuteAsync] drawback. Since we now have access to a proper
+result-handler via the [CommandExecuted] event, we can start
+making use of this class.
 
 The best way to make use of it is to create your own version of
 `RuntimeResult`. You can achieve this by inheriting the `RuntimeResult`
