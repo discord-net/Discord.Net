@@ -1,69 +1,50 @@
 {
-   "metadata":[
-      {
-         "src":[
-            {
-               "src":"../src",
-               "files":[
-                  "**.csproj"
-               ]
-            }
-         ],
-         "dest":"api",
-         "filter":"filterConfig.yml",
-         "properties":{
-            "TargetFramework":"netstandard1.3"
-         }
-      }
-   ],
-   "build":{
-      "content":[
-         {
-            "files":[
-               "api/**.yml",
-               "api/index.md"
-            ]
-         },
-         {
-            "files":[
-               "guides/**.md",
-               "guides/**/toc.yml",
-               "faq/**.md",
-               "faq/**/toc.yml",
-               "toc.yml",
-               "*.md"
-            ],
-            "exclude":[
-               "obj/**",
-               "_site/**"
-            ]
-         }
-      ],
-      "resource":[
-         {
-            "files":[
-               "**/images/**",
-               "**/samples/**"
-            ],
-            "exclude":[
-               "obj/**",
-               "_site/**"
-            ]
-         }
-      ],
-      "dest":"_site",
-      "template":[
-         "default",
-		 "_template/light-dark-theme"
-      ],
-	  "overwrite": "_overwrites/**/**.md",
-      "globalMetadata":{
-         "_appFooter":"Discord.Net (c) 2015-2018 2.0.0-beta",
-         "_enableSearch":true
-      },
-      "noLangKeyword":false,
-      "xrefService":[
-         "https://xref.docs.microsoft.com/query?uid={uid}"
+  "metadata": [{
+    "src": [{
+      "src": "../src",
+      "files": [
+        "**.csproj"
       ]
-   }
+    }],
+    "dest": "api",
+    "filter": "filterConfig.yml",
+    "properties": {
+      "TargetFramework": "netstandard1.3"
+    }
+  }],
+  "build": {
+    "content": [{
+        "files": ["api/**.yml", "api/index.md"]
+      },
+      {
+        "files": ["toc.yml", "index.md"]
+      },
+      {
+        "files": ["faq/**.md", "faq/**/toc.yml"]
+      },
+      {
+        "files": ["guides/**.md", "guides/**/toc.yml"]
+      }
+    ],
+    "resource": [{
+      "files": [
+        "**/images/**",
+        "**/samples/**"
+      ]
+    }],
+    "dest": "_site",
+    "template": [
+      "default",
+      "_template/light-dark-theme"
+    ],
+    "overwrite": "_overwrites/**/**.md",
+    "globalMetadata": {
+      "_appFooter": "Discord.Net (c) 2015-2018 2.0.0-beta",
+      "_enableSearch": true
+    },
+    "noLangKeyword": false,
+    "xrefService": [
+      "https://xref.docs.microsoft.com/query?uid={uid}"
+    ]
+  }
 }
