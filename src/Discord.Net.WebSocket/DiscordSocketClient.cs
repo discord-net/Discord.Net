@@ -68,9 +68,9 @@ namespace Discord.WebSocket
             => State.PrivateChannels.Select(x => x as SocketGroupChannel).Where(x => x != null).ToImmutableArray();
         public override IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
 
-        /// <summary> Creates a new REST/WebSocket discord client. </summary>
+        /// <summary> Creates a new REST/WebSocket Discord client. </summary>
         public DiscordSocketClient() : this(new DiscordSocketConfig()) { }
-        /// <summary> Creates a new REST/WebSocket discord client. </summary>
+        /// <summary> Creates a new REST/WebSocket Discord client. </summary>
         public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null, null) { }
         internal DiscordSocketClient(DiscordSocketConfig config, SemaphoreSlim groupLock, DiscordSocketClient parentClient) : this(config, CreateApiClient(config), groupLock, parentClient) { }
         private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, SemaphoreSlim groupLock, DiscordSocketClient parentClient)
