@@ -618,15 +618,15 @@ namespace Discord.API
             Preconditions.NotNullOrWhitespace(emoji, nameof(emoji));
             Preconditions.NotNull(args, nameof(args));
             Preconditions.GreaterThan(args.Limit, 0, nameof(args.Limit));
-            Preconditions.AtMost(args.Limit, DiscordConfig.MaxUsersPerBatch, nameof(args.Limit));
+            Preconditions.AtMost(args.Limit, DiscordConfig.MaxUserReactionsPerBatch, nameof(args.Limit));
             Preconditions.GreaterThan(args.AfterUserId, 0, nameof(args.AfterUserId));
             options = RequestOptions.CreateOrClone(options);
 
-            int limit = args.Limit.GetValueOrDefault(int.MaxValue);
-            ulong afterUserId = args.AfterUserId.GetValueOrDefault(0);
+            var limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxUserReactionsPerBatch);
+            var afterUserId = args.AfterUserId.GetValueOrDefault(0);
 
             var ids = new BucketIds(channelId: channelId);
-            Expression<Func<string>> endpoint = () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}";
+            Expression<Func<string>> endpoint = () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}?limit={limit}&after={afterUserId}";
             return await SendAsync<IReadOnlyCollection<User>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
         public async Task AckMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)

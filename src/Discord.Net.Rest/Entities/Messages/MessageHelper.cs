@@ -49,14 +49,19 @@ namespace Discord.Rest
         public static IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, IEmote emote,
             Action<GetReactionUsersParams> func, BaseDiscordClient client, RequestOptions options)
         {
-            var args = new GetReactionUsersParams();
-            func(args);
-
+            Preconditions.NotNull(emote, nameof(emote));
             var emoji = (emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name);
+
+            var arguments = new GetReactionUsersParams();
+            func(arguments);
+
             return new PagedAsyncEnumerable<IUser>(
-                DiscordConfig.MaxUsersPerBatch,
+                DiscordConfig.MaxUserReactionsPerBatch,
                 async (info, ct) =>
                 {
+                    var args = new GetReactionUsersParams();
+                    func(args);
+
                     if (info.Position != null)
                         args.AfterUserId = info.Position.Value;
 
@@ -73,10 +78,11 @@ namespace Discord.Rest
                     if (lastPage.Count != DiscordConfig.MaxUsersPerBatch)
                         return false;
 
-                    info.Position = lastPage.OrderBy(u => u.Id).First().Id;
+                    info.Position = lastPage.Max(x => x.Id);
                     return true;
                 },
-                count: args.Limit.Value
+                start: arguments.AfterUserId.Value,
+                count: arguments.Limit.Value
             );
 
         }

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace Discord
 {
@@ -20,6 +20,7 @@ namespace Discord
         public const int MaxMessagesPerBatch = 100;
         public const int MaxUsersPerBatch = 1000;
         public const int MaxGuildsPerBatch = 100;
+        public const int MaxUserReactionsPerBatch = 100;
 
         /// <summary> Gets or sets how a request should act in the case of an error, by default. </summary>
         public RetryMode DefaultRetryMode { get; set; } = RetryMode.AlwaysRetry;

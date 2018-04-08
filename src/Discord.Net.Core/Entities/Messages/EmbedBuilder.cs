@@ -231,6 +231,7 @@ namespace Discord
     {
         private string _name;
         private string _value;
+        private EmbedField _field;
         public const int MaxFieldNameLength = 256;
         public const int MaxFieldValueLength = 1024;
 
