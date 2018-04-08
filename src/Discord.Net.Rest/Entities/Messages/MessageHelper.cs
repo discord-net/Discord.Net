@@ -60,7 +60,7 @@ namespace Discord.Rest
                 async (info, ct) =>
                 {
                     var args = new GetReactionUsersParams();
-                    func(args);
+                    args.Limit = info.PageSize;
 
                     if (info.Position != null)
                         args.AfterUserId = info.Position.Value;
@@ -81,8 +81,8 @@ namespace Discord.Rest
                     info.Position = lastPage.Max(x => x.Id);
                     return true;
                 },
-                start: arguments.AfterUserId.Value,
-                count: arguments.Limit.Value
+                start: arguments.AfterUserId.IsSpecified ? arguments.AfterUserId.Value : (ulong?)null,
+                count: arguments.Limit.GetValueOrDefault(DiscordConfig.MaxUserReactionsPerBatch)
             );
 
         }

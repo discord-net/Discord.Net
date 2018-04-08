@@ -622,8 +622,8 @@ namespace Discord.API
             Preconditions.GreaterThan(args.AfterUserId, 0, nameof(args.AfterUserId));
             options = RequestOptions.CreateOrClone(options);
 
-            var limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxUserReactionsPerBatch);
-            var afterUserId = args.AfterUserId.GetValueOrDefault(0);
+            int limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxUserReactionsPerBatch);
+            ulong afterUserId = args.AfterUserId.GetValueOrDefault(0);
 
             var ids = new BucketIds(channelId: channelId);
             Expression<Func<string>> endpoint = () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}?limit={limit}&after={afterUserId}";
