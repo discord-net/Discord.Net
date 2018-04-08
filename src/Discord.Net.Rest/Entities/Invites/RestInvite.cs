@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Discord.API.Rest;
 using Model = Discord.API.Invite;
 
 namespace Discord.Rest
@@ -10,6 +11,8 @@ namespace Discord.Rest
     {
         public string ChannelName { get; private set; }
         public string GuildName { get; private set; }
+        public int? PresenceCount { get; private set; }
+        public int? MemberCount { get; private set; }
         public ulong ChannelId { get; private set; }
         public ulong GuildId { get; private set; }
         internal IChannel Channel { get; private set; }
@@ -36,11 +39,16 @@ namespace Discord.Rest
             ChannelId = model.Channel.Id;
             GuildName = model.Guild.Name;
             ChannelName = model.Channel.Name;
+            MemberCount = model.MemberCount.IsSpecified ? model.MemberCount.Value : null;
+            PresenceCount = model.PresenceCount.IsSpecified ? model.PresenceCount.Value : null;
         }
         
         public async Task UpdateAsync(RequestOptions options = null)
         {
-            var model = await Discord.ApiClient.GetInviteAsync(Code, options).ConfigureAwait(false);
+            var args = new GetInviteParams();
+            if (MemberCount != null || PresenceCount != null)
+                args.WithCounts = true;
+            var model = await Discord.ApiClient.GetInviteAsync(Code, args, options).ConfigureAwait(false);
             Update(model);
         }
         public Task DeleteAsync(RequestOptions options = null)

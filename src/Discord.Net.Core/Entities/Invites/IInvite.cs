@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -22,6 +22,10 @@ namespace Discord
         ulong GuildId { get; }
         /// <summary> Gets the name of the guild this invite is linked to. </summary>
         string GuildName { get; }
+        /// <summary> Gets the approximated count of online members in the guild. </summary>
+        int? PresenceCount { get; }
+        /// <summary> Gets the approximated count of total members in the guild. </summary>
+        int? MemberCount { get; }
 
         /// <summary> Accepts this invite and joins the target guild. This will fail on bot accounts. </summary>
         Task AcceptAsync(RequestOptions options = null);

@@ -897,7 +897,7 @@ namespace Discord.API
         }
 
         //Guild Invites
-        public async Task<Invite> GetInviteAsync(string inviteId, RequestOptions options = null)
+        public async Task<Invite> GetInviteAsync(string inviteId, GetInviteParams args, RequestOptions options = null)
         {
             Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
             options = RequestOptions.CreateOrClone(options);
@@ -912,7 +912,7 @@ namespace Discord.API
 
             try
             {
-                return await SendAsync<Invite>("GET", () => $"invites/{inviteId}", new BucketIds(), options: options).ConfigureAwait(false);
+                return await SendJsonAsync<Invite>("GET", () => $"invites/{inviteId}", args, new BucketIds(), options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
