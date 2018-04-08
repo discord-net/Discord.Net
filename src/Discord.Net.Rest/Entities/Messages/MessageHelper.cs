@@ -60,6 +60,7 @@ namespace Discord.Rest
                 async (info, ct) =>
                 {
                     var args = new GetReactionUsersParams();
+                    func(args);
                     args.Limit = info.PageSize;
 
                     if (info.Position != null)
