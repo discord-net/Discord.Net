@@ -56,7 +56,7 @@ namespace Discord.Rest
             => ClientHelper.GetConnectionsAsync(this, options);
 
         /// <inheritdoc />
-        public Task<RestInvite> GetInviteAsync(string inviteId, bool withCount = false, RequestOptions options = null)
+        public Task<RestInviteMetadata> GetInviteAsync(string inviteId, bool withCount = false, RequestOptions options = null)
             => ClientHelper.GetInviteAsync(this, inviteId, withCount, options);
 
         /// <inheritdoc />
