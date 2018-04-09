@@ -12,10 +12,16 @@ a {
     color: #64B5F6;
 }
 
+.sidenav{
+  background-color: rgb(30, 30, 30);
+}
+
 button:hover,
 button:focus,
 a:hover,
-a:focus {
+a:focus,
+.btn:focus,
+.btn:hover{
     color: #2196F3;
 }
 
