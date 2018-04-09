@@ -11,6 +11,7 @@
   <link rel="shortcut icon" href="{{_rel}}{{{_appFaviconPath}}}{{^_appFaviconPath}}favicon.ico{{/_appFaviconPath}}">
   <link rel="stylesheet" href="{{_rel}}styles/docfx.vendor.css">
   <link rel="stylesheet" href="{{_rel}}styles/docfx.css">
+  <link rel="stylesheet" href="{{_rel}}styles/master.css">
   <link rel="stylesheet" href="{{_rel}}styles/dark.css" title="theme_dark" >
   <link rel="alternate stylesheet" href="{{_rel}}styles/light.css" title="theme_light">
   <link rel="stylesheet" href="{{_rel}}styles/main.css">

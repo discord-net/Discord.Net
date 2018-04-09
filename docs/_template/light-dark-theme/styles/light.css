@@ -1,67 +1,43 @@
 /* Copyright (c) Microsoft Corporation. All Rights Reserved. Licensed under the MIT License. See License.txt in the project root for license information. */
-@import url('https://fonts.googleapis.com/css?family=Titillium+Web');
+
 html,
 body {
-  font-family: 'Titillium Web', 'Segoe UI', Tahoma, Helvetica, sans-serif;
-  height: 100%;
-  color: #000;
-  background: #fff;
-  font-size: 15px;  
+    background: #fff;
+    color: #000;
 }
-header .navbar {
-  border-width: 0 0 0px;
-  border-radius: 0;
-}
-.sideaffix{
-  overflow: visible;
-}
-body .toc{
-  background-color: inherit;
-  overflow: visible;
+
+.sideaffix {
+    overflow: visible;
 }
 
 /* code */
+
 code {
-  color:#222f3d;
-  background-color: #f9f9f9;
-  border-radius:4px;
-  padding: 3px 7px;
+    color: #222f3d;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    padding: 3px 7px;
 }
 
 /* table */
+
 .table-striped>tbody>tr:nth-of-type(odd) {
-  color:#333333;
-  background-color: #d3d3d3
+    color: #333333;
+    background-color: #d3d3d3
 }
+
 tbody>tr {
-  color:#424242;
-  background-color: #c0c0c0
+    color: #424242;
+    background-color: #c0c0c0
 }
+
 .table>tbody+tbody {
-  border-top:2px solid rgb(173, 173, 173)
+    border-top: 2px solid rgb(173, 173, 173)
 }
 
 /* select */
+
 select {
-  display: inline-block;
-  overflow: auto;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0 30px 0 6px;
-  vertical-align: middle;
-  height: 28px;
-  border: 1px solid #e3e3e3;
-  line-height: 16px;
-  outline: 0;
-  text-overflow: ellipsis;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  cursor: pointer;
-  background-image: linear-gradient(45deg,transparent 50%,#707070 0),linear-gradient(135deg,#707070 50%,transparent 0);
-  background-position: calc(100% - 13px) 11px,calc(100% - 8px) 11px;
-  background-size: 5px 5px,5px 6px;
-  background-repeat: no-repeat;
-  background-color: #fcfcfc;
-  border-color: #aeb1b5;
+    background-color: #fcfcfc;
+    border-color: #aeb1b5;
 }
