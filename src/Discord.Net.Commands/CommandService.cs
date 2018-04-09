@@ -317,8 +317,8 @@ namespace Discord.Commands
 
         //Execution
         public SearchResult Search(ICommandContext context, int argPos)
-            => Search(context, context.Message.Content.Substring(argPos));
-        public SearchResult Search(ICommandContext context, string input)
+            => Search(context.Message.Content.Substring(argPos));
+        public SearchResult Search(string input)
         {
             string searchInput = _caseSensitive ? input : input.ToLowerInvariant();
             var matches = _map.GetCommands(searchInput).OrderByDescending(x => x.Command.Priority).ToImmutableArray();
@@ -335,7 +335,7 @@ namespace Discord.Commands
         {
             services = services ?? EmptyServiceProvider.Instance;
 
-            var searchResult = Search(context, input);
+            var searchResult = Search(input);
             if (!searchResult.IsSuccess)
                 return searchResult;
 
