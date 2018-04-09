@@ -910,9 +910,11 @@ namespace Discord.API
             if (index >= 0)
                 inviteId = inviteId.Substring(index + 1);
 
+            var withCounts = args.WithCounts.GetValueOrDefault(false);
+
             try
             {
-                return await SendJsonAsync<InviteMetadata>("GET", () => $"invites/{inviteId}", args, new BucketIds(), options: options).ConfigureAwait(false);
+                return await SendAsync<InviteMetadata>("GET", () => $"invites/{inviteId}?with_counts={withCounts}", new BucketIds(), options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
