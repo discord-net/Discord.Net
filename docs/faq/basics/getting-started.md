@@ -56,6 +56,8 @@ You can escape an object by using `\` in front the object in the
 Discord client. For example, when you do `\@Example#1234` in chat,
 it will return the user ID of the aforementioned user.
 
+![Escaping mentions](images/mention-escape.png)
+
 ***
 
 ## How do I get the role ID?
