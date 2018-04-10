@@ -1,11 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../../Discord.Net.targets" />
-  <PropertyGroup>
-    <AssemblyName>Discord.Net.Core</AssemblyName>
-    <RootNamespace>Discord</RootNamespace>
-    <Description>The core components for the Discord.Net library.</Description>
-    <TargetFrameworks>net45;netstandard1.1;netstandard1.3</TargetFrameworks>
-  </PropertyGroup>
+  <Choose>
+    <When Condition=" '$(OS)' == 'Windows_NT' ">
+      <PropertyGroup>
+        <AssemblyName>Discord.Net.Core</AssemblyName>
+        <RootNamespace>Discord</RootNamespace>
+        <Description>The core components for the Discord.Net library.</Description>
+        <TargetFrameworks>net45;netstandard1.1;netstandard1.3</TargetFrameworks>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <AssemblyName>Discord.Net.Core</AssemblyName>
+        <RootNamespace>Discord</RootNamespace>
+        <Description>The core components for the Discord.Net library.</Description>
+        <TargetFrameworks>netstandard1.1;netstandard1.3</TargetFrameworks>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
     <PackageReference Include="System.Collections.Immutable" Version="1.3.1" />
