@@ -20,8 +20,10 @@
       topicUid: Guides.Concepts.Entities
 - name: The Command Service
   items:
-    - name: Command Guide
+    - name: Introduction to Command Service
       topicUid: Guides.Commands.Intro
+    - name: Dependency Injection
+      topicUid: Guides.Commands.DI
     - name: Post-execution Handling
       topicUid: Guides.Commands.PostExecution
 - name: Voice
