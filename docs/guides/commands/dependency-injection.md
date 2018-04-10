@@ -16,6 +16,8 @@ DI when writing your modules.
  to use in the modules.
 3. Pass the service collection into `AddModulesAsync`.
 
+### Example - Setting up Injection
+
 [!code-csharp[IServiceProvider Setup](samples/dependency_map_setup.cs)]
 
 ## Usage in Modules
@@ -34,8 +36,10 @@ manner.
 > If you accept `CommandService` or `IServiceProvider` as a parameter
 > in your constructor or as an injectable property, these entries will
 > be filled by the `CommandService` that the module is loaded from and
-> the `ServiceProvider` that is passed into it respectively.
+> the `IServiceProvider` that is passed into it respectively.
 
-[!code-csharp[ServiceProvider in Modules](samples/dependency_module.cs)]
+### Example - Injection in Modules
+
+[!code-csharp[IServiceProvider in Modules](samples/dependency_module.cs)]
 
 [DontInjectAttribute]: xref:Discord.Commands.DontInjectAttribute

@@ -6,8 +6,7 @@ remarks: *content
 The attribute can be applied to a public settable property inside a
 @Discord.Commands.ModuleBase based class. By applying this attribute,
 the marked property will not be automatically injected of the
-dependency. See [Dependency Injection](xref:Guides.Commands.Intro#dependency-injection)
-to learn more.
+dependency. See @Guides.Commands.DI to learn more.
 
 ---
 uid: Discord.Commands.DontInjectAttribute
