@@ -1,5 +1,4 @@
 #pragma warning disable CS1591
-#pragma warning disable CS0618
 using Discord.API.Rest;
 using Discord.Net;
 using Discord.Net.Converters;
@@ -70,12 +69,12 @@ namespace Discord.API
         {
             switch (tokenType)
             {
+                case default(TokenType):
+                    return token;
                 case TokenType.Bot:
                     return $"Bot {token}";
                 case TokenType.Bearer:
                     return $"Bearer {token}";
-                case TokenType.User:
-                    return token;
                 default:
                     throw new ArgumentException("Unknown OAuth token type", nameof(tokenType));
             }
@@ -113,7 +112,6 @@ namespace Discord.API
             {
                 _loginCancelToken = new CancellationTokenSource();
 
-                AuthTokenType = TokenType.User;
                 AuthToken = null;
                 await RequestQueue.SetCancelTokenAsync(_loginCancelToken.Token).ConfigureAwait(false);
                 RestClient.SetCancelToken(_loginCancelToken.Token);
@@ -172,8 +170,7 @@ namespace Discord.API
         {
             options = options ?? new RequestOptions();
             options.HeaderOnly = true;
-            options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
-            options.IsClientBucket = AuthTokenType == TokenType.User;
+            options.BucketId = bucketId;
 
             var request = new RestRequest(RestClient, method, endpoint, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
@@ -187,8 +184,7 @@ namespace Discord.API
         {
             options = options ?? new RequestOptions();
             options.HeaderOnly = true;
-            options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
-            options.IsClientBucket = AuthTokenType == TokenType.User;
+            options.BucketId = bucketId;
 
             string json = payload != null ? SerializeJson(payload) : null;
             var request = new JsonRestRequest(RestClient, method, endpoint, json, options);
@@ -203,8 +199,7 @@ namespace Discord.API
         {
             options = options ?? new RequestOptions();
             options.HeaderOnly = true;
-            options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
-            options.IsClientBucket = AuthTokenType == TokenType.User;
+            options.BucketId = bucketId;
 
             var request = new MultipartRestRequest(RestClient, method, endpoint, multipartArgs, options);
             await SendInternalAsync(method, endpoint, request).ConfigureAwait(false);
@@ -217,8 +212,7 @@ namespace Discord.API
             string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
         {
             options = options ?? new RequestOptions();
-            options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
-            options.IsClientBucket = AuthTokenType == TokenType.User;
+            options.BucketId = bucketId;
 
             var request = new RestRequest(RestClient, method, endpoint, options);
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
@@ -231,8 +225,7 @@ namespace Discord.API
             string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
         {
             options = options ?? new RequestOptions();
-            options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
-            options.IsClientBucket = AuthTokenType == TokenType.User;
+            options.BucketId = bucketId;
 
             string json = payload != null ? SerializeJson(payload) : null;
             var request = new JsonRestRequest(RestClient, method, endpoint, json, options);
@@ -246,8 +239,7 @@ namespace Discord.API
             string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
             options = options ?? new RequestOptions();
-            options.BucketId = AuthTokenType == TokenType.User ? ClientBucket.Get(clientBucket).Id : bucketId;
-            options.IsClientBucket = AuthTokenType == TokenType.User;
+            options.BucketId = bucketId;
 
             var request = new MultipartRestRequest(RestClient, method, endpoint, multipartArgs, options);
             return DeserializeJson<TResponse>(await SendInternalAsync(method, endpoint, request).ConfigureAwait(false));
@@ -275,6 +267,18 @@ namespace Discord.API
         {
             options = RequestOptions.CreateOrClone(options);
             await SendAsync("GET", () => "auth/login", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
+        //Gateway
+        public async Task<GetGatewayResponse> GetGatewayAsync(RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendAsync<GetGatewayResponse>("GET", () => "gateway", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+        public async Task<GetBotGatewayResponse> GetBotGatewayAsync(RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendAsync<GetBotGatewayResponse>("GET", () => "gateway/bot", new BucketIds(), options: options).ConfigureAwait(false);
         }
 
         //Channels
@@ -466,7 +470,7 @@ namespace Discord.API
             if (!args.Embed.IsSpecified || args.Embed.Value == null)
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
-            if (args.Content.Length > DiscordConfig.MaxMessageSize)
+            if (args.Content?.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             options = RequestOptions.CreateOrClone(options);
 
@@ -483,7 +487,7 @@ namespace Discord.API
             if (!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0)
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
-            if (args.Content.Length > DiscordConfig.MaxMessageSize)
+            if (args.Content?.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             options = RequestOptions.CreateOrClone(options);
             
@@ -564,7 +568,7 @@ namespace Discord.API
             {
                 if (!args.Embed.IsSpecified)
                     Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
-                if (args.Content.Value.Length > DiscordConfig.MaxMessageSize)
+                if (args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
                     throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             }
             options = RequestOptions.CreateOrClone(options);

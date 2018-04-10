@@ -1,4 +1,4 @@
-﻿using Discord.Rest;
+using Discord.Rest;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -14,10 +14,10 @@ namespace Discord.WebSocket
         new Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null);
 #if FILESYSTEM
         /// <summary> Sends a file to this text channel, with an optional caption. </summary>
-        new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, RequestOptions options = null);
+        new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
 #endif
         /// <summary> Sends a file to this text channel, with an optional caption. </summary>
-        new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, RequestOptions options = null);
+        new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
 
         SocketMessage GetCachedMessage(ulong id);
         /// <summary> Gets the last N messages from this message channel. </summary>

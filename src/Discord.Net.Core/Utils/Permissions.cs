@@ -80,7 +80,7 @@ namespace Discord
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool HasFlag(ulong value, ulong flag) => (value & flag) != 0;
+        private static bool HasFlag(ulong value, ulong flag) => (value & flag) == flag;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetFlag(ref ulong value, ulong flag) => value |= flag;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -133,9 +133,10 @@ namespace Discord
                 ulong deniedPermissions = 0UL, allowedPermissions = 0UL;
                 foreach (var roleId in user.RoleIds)
                 {
-                    if (roleId != guild.EveryoneRole.Id)
+                    IRole role = null;
+                    if (roleId != guild.EveryoneRole.Id && (role = guild.GetRole(roleId)) != null)
                     {
-                        perms = channel.GetPermissionOverwrite(guild.GetRole(roleId));
+                        perms = channel.GetPermissionOverwrite(role);
                         if (perms != null)
                         {
                             allowedPermissions |= perms.Value.AllowValue;
@@ -160,10 +161,10 @@ namespace Discord
                     else if (!GetValue(resolvedPermissions, ChannelPermission.SendMessages))
                     {
                         //No send permissions on a text channel removes all send-related permissions
-                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.SendTTSMessages);
-                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.MentionEveryone);
-                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.EmbedLinks);
-                        resolvedPermissions &= ~(1UL << (int)ChannelPermission.AttachFiles);
+                        resolvedPermissions &= ~(ulong)ChannelPermission.SendTTSMessages;
+                        resolvedPermissions &= ~(ulong)ChannelPermission.MentionEveryone;
+                        resolvedPermissions &= ~(ulong)ChannelPermission.EmbedLinks;
+                        resolvedPermissions &= ~(ulong)ChannelPermission.AttachFiles;
                     }
                 }
                 resolvedPermissions &= mask; //Ensure we didnt get any permissions this channel doesnt support (from guildPerms, for example)

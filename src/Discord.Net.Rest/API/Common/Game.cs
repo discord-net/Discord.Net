@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Runtime.Serialization;
@@ -12,7 +12,7 @@ namespace Discord.API
         [JsonProperty("url")]
         public Optional<string> StreamUrl { get; set; }
         [JsonProperty("type")]
-        public Optional<StreamType?> StreamType { get; set; }
+        public Optional<ActivityType?> Type { get; set; }
         [JsonProperty("details")]
         public Optional<string> Details { get; set; }
         [JsonProperty("state")]
@@ -29,6 +29,10 @@ namespace Discord.API
         public Optional<API.GameTimestamps> Timestamps { get; set; }
         [JsonProperty("instance")]
         public Optional<bool> Instance { get; set; }
+        [JsonProperty("sync_id")]
+        public Optional<string> SyncId { get; set; }
+        [JsonProperty("session_id")]
+        public Optional<string> SessionId { get; set; }
 
         [OnError]
         internal void OnError(StreamingContext context, ErrorContext errorContext)

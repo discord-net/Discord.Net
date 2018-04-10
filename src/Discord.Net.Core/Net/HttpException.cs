@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 
 namespace Discord.Net
@@ -8,11 +8,13 @@ namespace Discord.Net
         public HttpStatusCode HttpCode { get; }
         public int? DiscordCode { get; }
         public string Reason { get; }
+        public IRequest Request { get; }
 
-        public HttpException(HttpStatusCode httpCode, int? discordCode = null, string reason = null)
+        public HttpException(HttpStatusCode httpCode, IRequest request, int? discordCode = null, string reason = null)
             : base(CreateMessage(httpCode, discordCode, reason))
         {
             HttpCode = httpCode;
+            Request = request;
             DiscordCode = discordCode;
             Reason = reason;
         }

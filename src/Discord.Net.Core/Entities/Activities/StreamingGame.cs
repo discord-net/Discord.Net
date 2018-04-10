@@ -6,15 +6,14 @@ namespace Discord
     public class StreamingGame : Game
     {
         public string Url { get; internal set; }
-        public StreamType StreamType { get; internal set; }
 
-        public StreamingGame(string name, string url, StreamType streamType)
+        public StreamingGame(string name, string url)
         {
             Name = name;
             Url = url;
-            StreamType = streamType;
+            Type = ActivityType.Streaming;
         }
-        
+
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Url})";
     }

@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-
+using System.Reflection;
 using Discord.Commands.Builders;
 
 namespace Discord.Commands
@@ -13,6 +13,7 @@ namespace Discord.Commands
         public string Name { get; }
         public string Summary { get; }
         public string Remarks { get; }
+        public string Group { get; }
 
         public IReadOnlyList<string> Aliases { get; }
         public IReadOnlyList<CommandInfo> Commands { get; }
@@ -22,21 +23,26 @@ namespace Discord.Commands
         public ModuleInfo Parent { get; }
         public bool IsSubmodule => Parent != null;
 
-        internal ModuleInfo(ModuleBuilder builder, CommandService service, ModuleInfo parent = null)
+        //public TypeInfo TypeInfo { get; }
+
+        internal ModuleInfo(ModuleBuilder builder, CommandService service, IServiceProvider services, ModuleInfo parent = null)
         {
             Service = service;
 
             Name = builder.Name;
             Summary = builder.Summary;
             Remarks = builder.Remarks;
+            Group = builder.Group;
             Parent = parent;
+
+            //TypeInfo = builder.TypeInfo;
 
             Aliases = BuildAliases(builder, service).ToImmutableArray();
             Commands = builder.Commands.Select(x => x.Build(this, service)).ToImmutableArray();
             Preconditions = BuildPreconditions(builder).ToImmutableArray();
             Attributes = BuildAttributes(builder).ToImmutableArray();
 
-            Submodules = BuildSubmodules(builder, service).ToImmutableArray();
+            Submodules = BuildSubmodules(builder, service, services).ToImmutableArray();
         }
 
         private static IEnumerable<string> BuildAliases(ModuleBuilder builder, CommandService service)
@@ -66,12 +72,12 @@ namespace Discord.Commands
             return result;
         }
 
-        private List<ModuleInfo> BuildSubmodules(ModuleBuilder parent, CommandService service)
+        private List<ModuleInfo> BuildSubmodules(ModuleBuilder parent, CommandService service, IServiceProvider services)
         {
             var result = new List<ModuleInfo>();
 
             foreach (var submodule in parent.Modules)
-                result.Add(submodule.Build(service, this));
+                result.Add(submodule.Build(service, services, this));
 
             return result;
         }

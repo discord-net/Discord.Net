@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Discord.API;
@@ -44,7 +44,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public abstract Task StopAsync();
         public abstract Task SetStatusAsync(UserStatus status);
-        public abstract Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming);
+        public abstract Task SetGameAsync(string name, string streamUrl = null, ActivityType type = ActivityType.Playing);
         public abstract Task SetActivityAsync(IActivity activity);
         public abstract Task DownloadUsersAsync(IEnumerable<IGuild> guilds);  
 

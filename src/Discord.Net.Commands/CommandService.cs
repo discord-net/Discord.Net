@@ -1,5 +1,3 @@
-﻿using Discord.Commands.Builders;
-using Discord.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,6 +6,9 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Discord.Commands.Builders;
+using Discord.Logging;
 
 namespace Discord.Commands
 {
@@ -85,7 +86,8 @@ namespace Discord.Commands
                 var builder = new ModuleBuilder(this, null, primaryAlias);
                 buildFunc(builder);
 
-                var module = builder.Build(this);
+                var module = builder.Build(this, null);
+
                 return LoadModuleInternal(module);
             }
             finally
@@ -93,9 +95,18 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public Task<ModuleInfo> AddModuleAsync<T>() => AddModuleAsync(typeof(T));
-        public async Task<ModuleInfo> AddModuleAsync(Type type)
+
+        /// <summary>
+        /// Add a command module from a type
+        /// </summary>
+        /// <typeparam name="T">The type of module</typeparam>
+        /// <param name="services">An IServiceProvider for your dependency injection solution, if using one - otherwise, pass null</param>
+        /// <returns>A built module</returns>
+        public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services) => AddModuleAsync(typeof(T), services);
+        public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services)
         {
+            services = services ?? EmptyServiceProvider.Instance;
+
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
@@ -104,7 +115,7 @@ namespace Discord.Commands
                 if (_typedModuleDefs.ContainsKey(type))
                     throw new ArgumentException($"This module has already been added.");
 
-                var module = (await ModuleClassBuilder.BuildAsync(this, typeInfo).ConfigureAwait(false)).FirstOrDefault();
+                var module = (await ModuleClassBuilder.BuildAsync(this, services, typeInfo).ConfigureAwait(false)).FirstOrDefault();
 
                 if (module.Value == default(ModuleInfo))
                     throw new InvalidOperationException($"Could not build the module {type.FullName}, did you pass an invalid type?");
@@ -118,13 +129,21 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
-        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly)
+        /// <summary>
+        /// Add command modules from an assembly
+        /// </summary>
+        /// <param name="assembly">The assembly containing command modules</param>
+        /// <param name="services">An IServiceProvider for your dependency injection solution, if using one - otherwise, pass null</param>
+        /// <returns>A collection of built modules</returns>
+        public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly, IServiceProvider services)
         {
+            services = services ?? EmptyServiceProvider.Instance;
+
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 var types = await ModuleClassBuilder.SearchAsync(assembly, this).ConfigureAwait(false);
-                var moduleDefs = await ModuleClassBuilder.BuildAsync(types, this).ConfigureAwait(false);
+                var moduleDefs = await ModuleClassBuilder.BuildAsync(types, this, services).ConfigureAwait(false);
 
                 foreach (var info in moduleDefs)
                 {
@@ -196,10 +215,11 @@ namespace Discord.Commands
             return true;
         }
 
-        //Type Readers 
+        //Type Readers
         /// <summary>
         /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
         /// If <typeparamref name="T"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> will also be added.
+        /// If a default <see cref="TypeReader"/> exists for <typeparamref name="T"/>, a warning will be logged and the default <see cref="TypeReader"/> will be replaced. 
         /// </summary>
         /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
         /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
@@ -207,24 +227,61 @@ namespace Discord.Commands
             => AddTypeReader(typeof(T), reader);
         /// <summary>
         /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
-        /// If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added. 
+        /// If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added.
+        /// If a default <see cref="TypeReader"/> exists for <paramref name="type"/>, a warning will be logged and the default <see cref="TypeReader"/> will be replaced.
         /// </summary>
         /// <param name="type">A <see cref="Type"/> instance for the type to be read.</param>
         /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
         public void AddTypeReader(Type type, TypeReader reader)
         {
-            var readers = _typeReaders.GetOrAdd(type, x => new ConcurrentDictionary<Type, TypeReader>());
-            readers[reader.GetType()] = reader;
+            if (_defaultTypeReaders.ContainsKey(type))
+                _ = _cmdLogger.WarningAsync($"The default TypeReader for {type.FullName} was replaced by {reader.GetType().FullName}." +
+                    $"To suppress this message, use AddTypeReader<T>(reader, true).");
+            AddTypeReader(type, reader, true);
+        }
+        /// <summary>
+        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
+        /// If <typeparamref name="T"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> will also be added.
+        /// </summary>
+        /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
+        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
+        /// <param name="replaceDefault">If <paramref name="reader"/> should replace the default <see cref="TypeReader"/> for <typeparamref name="T"/> if one exists.</param>
+        public void AddTypeReader<T>(TypeReader reader, bool replaceDefault)
+            => AddTypeReader(typeof(T), reader, replaceDefault);
+        /// <summary>
+        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
+        /// If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added. 
+        /// </summary>
+        /// <param name="type">A <see cref="Type"/> instance for the type to be read.</param>
+        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
+        /// <param name="replaceDefault">If <paramref name="reader"/> should replace the default <see cref="TypeReader"/> for <paramref name="type"/> if one exists.</param>
+        public void AddTypeReader(Type type, TypeReader reader, bool replaceDefault)
+        {
+            if (replaceDefault && _defaultTypeReaders.ContainsKey(type))
+            {
+                _defaultTypeReaders.AddOrUpdate(type, reader, (k, v) => reader);
+                if (type.GetTypeInfo().IsValueType)
+                {
+                    var nullableType = typeof(Nullable<>).MakeGenericType(type);
+                    var nullableReader = NullableTypeReader.Create(type, reader);
+                    _defaultTypeReaders.AddOrUpdate(nullableType, nullableReader, (k, v) => nullableReader);
+                }
+            }
+            else
+            {
+                var readers = _typeReaders.GetOrAdd(type, x => new ConcurrentDictionary<Type, TypeReader>());
+                readers[reader.GetType()] = reader;
 
-            if (type.GetTypeInfo().IsValueType)
-                AddNullableTypeReader(type, reader);
+                if (type.GetTypeInfo().IsValueType)
+                    AddNullableTypeReader(type, reader);
+            }
         }
         internal void AddNullableTypeReader(Type valueType, TypeReader valueTypeReader)
         {
             var readers = _typeReaders.GetOrAdd(typeof(Nullable<>).MakeGenericType(valueType), x => new ConcurrentDictionary<Type, TypeReader>());
             var nullableReader = NullableTypeReader.Create(valueType, valueTypeReader);
             readers[nullableReader.GetType()] = nullableReader;
-        }  
+        }
         internal IDictionary<Type, TypeReader> GetTypeReaders(Type type)
         {
             if (_typeReaders.TryGetValue(type, out var definedTypeReaders))
@@ -272,9 +329,9 @@ namespace Discord.Commands
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
 
-        public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IServiceProvider services = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
             => ExecuteAsync(context, context.Message.Content.Substring(argPos), services, multiMatchHandling);
-        public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services = null, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;
 
@@ -330,7 +387,7 @@ namespace Discord.Commands
             float CalculateScore(CommandMatch match, ParseResult parseResult)
             {
                 float argValuesScore = 0, paramValuesScore = 0;
-                
+
                 if (match.Command.Parameters.Count > 0)
                 {
                     var argValuesSum = parseResult.ArgValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;

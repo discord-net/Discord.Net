@@ -3,7 +3,7 @@ public class Info : ModuleBase<SocketCommandContext>
 {
 	// ~say hello -> hello
 	[Command("say")]
-	[Summary("Echos a message.")]
+	[Summary("Echoes a message.")]
 	public async Task SayAsync([Remainder] [Summary("The text to echo")] string echo)
 	{
 		// ReplyAsync is a method on ModuleBase

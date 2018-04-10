@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Discord
 {
@@ -12,6 +12,10 @@ namespace Discord
                 return null;
             string extension = FormatToExtension(format, avatarId);
             return $"{DiscordConfig.CDNUrl}avatars/{userId}/{avatarId}.{extension}?size={size}";
+        }
+        public static string GetDefaultUserAvatarUrl(ushort discriminator)
+        {
+            return $"{DiscordConfig.CDNUrl}embed/avatars/{discriminator % 5}.png";
         }
         public static string GetGuildIconUrl(ulong guildId, string iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}icons/{guildId}/{iconId}.jpg" : null;
@@ -28,17 +32,25 @@ namespace Discord
             return $"{DiscordConfig.CDNUrl}app-assets/{appId}/{assetId}.{extension}?size={size}";
         }
 
+        public static string GetSpotifyAlbumArtUrl(string albumArtId)
+            => $"https://i.scdn.co/image/{albumArtId}";
+
         private static string FormatToExtension(ImageFormat format, string imageId)
         {
             if (format == ImageFormat.Auto)
                 format = imageId.StartsWith("a_") ? ImageFormat.Gif : ImageFormat.Png;
             switch (format)
             {
-                case ImageFormat.Gif: return "gif";
-                case ImageFormat.Jpeg: return "jpeg";
-                case ImageFormat.Png: return "png";
-                case ImageFormat.WebP: return "webp";
-                default: throw new ArgumentException(nameof(format));
+                case ImageFormat.Gif:
+                    return "gif";
+                case ImageFormat.Jpeg:
+                    return "jpeg";
+                case ImageFormat.Png:
+                    return "png";
+                case ImageFormat.WebP:
+                    return "webp";
+                default:
+                    throw new ArgumentException(nameof(format));
             }
         }
     }

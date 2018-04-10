@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace Discord.API
 {
@@ -8,9 +8,9 @@ namespace Discord.API
         public Optional<string> SmallText { get; set; }
         [JsonProperty("small_image")]
         public Optional<string> SmallImage { get; set; }
-        [JsonProperty("large_image")]
-        public Optional<string> LargeText { get; set; }
         [JsonProperty("large_text")]
+        public Optional<string> LargeText { get; set; }
+        [JsonProperty("large_image")]
         public Optional<string> LargeImage { get; set; }
     }
 }

@@ -1,9 +1,30 @@
-﻿namespace Discord.WebSocket
+namespace Discord.WebSocket
 {
     internal static class EntityExtensions
     {
         public static IActivity ToEntity(this API.Game model)
         {
+            // Spotify Game
+            if (model.SyncId.IsSpecified)
+            {
+                var assets = model.Assets.GetValueOrDefault()?.ToEntity();
+                string albumText = assets?[1]?.Text;
+                string albumArtId = assets?[1]?.ImageId?.Replace("spotify:","");
+                var timestamps = model.Timestamps.IsSpecified ? model.Timestamps.Value.ToEntity() : null;
+                return new SpotifyGame
+                {
+                    Name = model.Name,
+                    SessionId = model.SessionId.GetValueOrDefault(),
+                    SyncId = model.SyncId.Value,
+                    AlbumTitle = albumText,
+                    TrackTitle = model.Details.GetValueOrDefault(),
+                    Artists = model.State.GetValueOrDefault()?.Split(';'),
+                    Duration = timestamps?.End - timestamps?.Start,
+                    AlbumArt = albumArtId != null ? CDN.GetSpotifyAlbumArtUrl(albumArtId) : null,
+                    Type = ActivityType.Listening
+                };
+            }
+
             // Rich Game
             if (model.ApplicationId.IsSpecified)
             {
@@ -27,15 +48,14 @@
             {
                 return new StreamingGame(
                     model.Name, 
-                    model.StreamUrl.Value, 
-                    model.StreamType.Value.GetValueOrDefault());
+                    model.StreamUrl.Value);
             }
             // Normal Game
-            return new Game(model.Name);
+            return new Game(model.Name, model.Type.GetValueOrDefault() ?? ActivityType.Playing);
         }
 
         // (Small, Large)
-        public static GameAsset[] ToEntity(this API.GameAssets model, ulong appId)
+        public static GameAsset[] ToEntity(this API.GameAssets model, ulong? appId = null)
         {
             return new GameAsset[]
             {
@@ -57,7 +77,7 @@
         public static GameParty ToEntity(this API.GameParty model)
         {
             // Discord will probably send bad data since they don't validate anything
-            int current = 0, cap = 0;
+            long current = 0, cap = 0;
             if (model.Size?.Length == 2)
             {
                 current = model.Size[0];

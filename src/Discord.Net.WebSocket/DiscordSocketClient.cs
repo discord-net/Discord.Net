@@ -1,4 +1,3 @@
-#pragma warning disable CS0618
 using Discord.API;
 using Discord.API.Gateway;
 using Discord.Logging;
@@ -326,12 +325,12 @@ namespace Discord.WebSocket
                 _statusSince = null;
             await SendStatusAsync().ConfigureAwait(false);
         }
-        public override async Task SetGameAsync(string name, string streamUrl = null, StreamType streamType = StreamType.NotStreaming)
+        public override async Task SetGameAsync(string name, string streamUrl = null, ActivityType type = ActivityType.Playing)
         {
             if (!string.IsNullOrEmpty(streamUrl))
-                Activity = new StreamingGame(name, streamUrl, streamType);
+                Activity = new StreamingGame(name, streamUrl);
             else if (!string.IsNullOrEmpty(name))
-                Activity = new Game(name);
+                Activity = new Game(name, type);
             else
                 Activity = null;
             await SendStatusAsync().ConfigureAwait(false);
@@ -354,15 +353,13 @@ namespace Discord.WebSocket
             // Discord only accepts rich presence over RPC, don't even bother building a payload
             if (Activity is RichGame game)
                 throw new NotSupportedException("Outgoing Rich Presences are not supported");
-            else if (Activity is StreamingGame stream)
-            {
-                gameModel.StreamUrl = stream.Url;
-                gameModel.StreamType = stream.StreamType;
-            }
-            else if (Activity != null)
+
+            if (Activity != null)
             {
                 gameModel.Name = Activity.Name;
-                gameModel.StreamType = StreamType.NotStreaming;
+                gameModel.Type = Activity.Type;
+                if (Activity is StreamingGame streamGame)
+                    gameModel.StreamUrl = streamGame.Url;
             }
 
             await ApiClient.SendStatusUpdateAsync(
@@ -418,11 +415,8 @@ namespace Discord.WebSocket
 
                             _sessionId = null;
                             _lastSeq = 0;
-                            bool retry = (bool)payload;
-                            if (retry)
-                                _connection.Reconnect(); //TODO: Untested
-                            else
-                                await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
+                            
+                            await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
                         }
                         break;
                     case GatewayOpCode.Reconnect:
@@ -451,7 +445,7 @@ namespace Discord.WebSocket
                                         {
                                             var model = data.Guilds[i];
                                             var guild = AddGuild(model, state);
-                                            if (!guild.IsAvailable || ApiClient.AuthTokenType == TokenType.User)
+                                            if (!guild.IsAvailable)
                                                 unavailableGuilds++;
                                             else
                                                 await GuildAvailableAsync(guild).ConfigureAwait(false);
@@ -469,9 +463,6 @@ namespace Discord.WebSocket
                                         _connection.CriticalError(new Exception("Processing READY failed", ex));
                                         return;
                                     }
-
-                                    if (ApiClient.AuthTokenType == TokenType.User)
-                                        await SyncGuildsAsync().ConfigureAwait(false);
 
                                     _lastGuildAvailableTime = Environment.TickCount;
                                     _guildDownloadTask = WaitForGuildsAsync(_connection.CancelToken, _gatewayLogger)
@@ -547,8 +538,6 @@ namespace Discord.WebSocket
                                         var guild = AddGuild(data, State);
                                         if (guild != null)
                                         {
-                                            if (ApiClient.AuthTokenType == TokenType.User)
-                                                await SyncGuildsAsync().ConfigureAwait(false);
                                             await TimedInvokeAsync(_joinedGuildEvent, nameof(JoinedGuild), guild).ConfigureAwait(false);
                                         }
                                         else
