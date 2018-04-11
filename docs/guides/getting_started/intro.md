@@ -4,9 +4,9 @@ title: Getting Started
 
 # Making a Ping-Pong bot
 
-One of the first steps to getting started with the Discord API is to
-write a basic ping-pong bot. We will expand on this to create more
-diverse commands later, but for now, it is a good starting point.
+This topic introduces the Discord API by instructing you to 
+write a ping-pong bot who can respond message 'ping' with 
+'pong'. We would create more diverse commands for the bot later.
 
 ## Creating a Discord Bot
 
@@ -120,8 +120,7 @@ users, the default will work fine.
 
 Before connecting, we should hook the client's `Log` event to the
 log handler that you just created. Events in Discord.Net work
-similarly to other events in C#, so hook this event the way that
-you typically would.
+similarly to other events in C#. [An Overview of Events in C#]
 
 Next, you will need to "login to Discord" with the `LoginAsync` 
 method.
@@ -162,6 +161,7 @@ This means that you are targeting a platform where .NET's default
 WebSocket client is not supported. Refer to the [installation guide]
 for how to fix this.
 
+[An Overview of Events in C#]:https://docs.microsoft.com/en-us/dotnet/csharp/events-overview
 [DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
 [installation guide]: installing.md#installing-on-net-standard-11
 
@@ -207,7 +207,7 @@ You should have now added the following lines:
 
 Now your first bot is complete. You may continue to add on to this
 if you desire, but for any bots that will be carrying out multiple
-commands, it is strongly recommended to use the command framework as
+commands, we strongly recommend you using the command framework as
 shown below.
 
 For your reference, you may view the [completed program].
@@ -229,9 +229,8 @@ For reference, view an [annotated example] of this structure.
 
 [annotated example]: samples/intro/structure.cs
 
-It is important to know that the recommended design pattern of bots
-should be to separate the program (initialization and command handler),
+Separating the program (initialization and command handler),
 the modules (handle commands), and the services (persistent storage,
-pure functions, data manipulation).
+pure functions, data manipulation) is a nice design pattern for bot.
 
 **todo:** diagram of bot structure
