@@ -110,15 +110,16 @@ the Console.
 
 Finally, we can create a connection to Discord. Since we are writing
 a bot, we will be using a [DiscordSocketClient] along with socket
-entities. See the [terminology](terminology.md) if you're unsure of
-the differences.
+entities. See the [terminology](terminology.md) if you're unsure 
+the differences among `Discord.Net.Rest`, `Discord.Net.Rpc`, 
+and `Discord.Net.WebSocket`.
 
 To do so, create an instance of [DiscordSocketClient] in your async
 main, passing in a configuration object only if necessary. For most
 users, the default will work fine.
 
 Before connecting, we should hook the client's `Log` event to the
-log handler that was just created. Events in Discord.Net work
+log handler that you just created. Events in Discord.Net work
 similarly to other events in C#, so hook this event the way that
 you typically would.
 
@@ -143,10 +144,10 @@ start connection/reconnection logic. It is important to note that
 Any methods that rely on the client's state should go in an event
 handler.
 
-Finally, we will want to block the async main method from returning
-until after the application is exited. To do this, we can await an
-infinite delay or any other blocking method, such as reading from
-the console.
+Finally, we will want to block the async main method from returning 
+when running the application. To block from returning, we can await 
+an infinite delay or any other blocking method, such as reading 
+from the console.
 
 The following lines can now be added:
 
