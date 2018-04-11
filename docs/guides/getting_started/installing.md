@@ -114,6 +114,7 @@ packages yourself:
 - Discord.Net.Providers.WS4Net
 - Discord.Net.Providers.UDPClient
 
+>[!NOTE]
 `Discord.Net.Providers.UDPClient` is _only_ required if your bot will be 
 utilizing voice chat.
 
