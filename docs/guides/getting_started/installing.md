@@ -5,7 +5,7 @@ title: Installing Discord.Net
 Discord.Net is distributed through the NuGet package manager, and we 
 recommend installing Discord.Net with NuGet.
 
-Optionally, you may compile from source and install yourself.
+Alternatively, you may compile from source and install yourself.
 
 # Supported Platforms
 
@@ -105,25 +105,23 @@ Studio installation.
 
 For applications targeting a runtime environment corresponding with 
 .NET Standard 1.1 or 1.2, the built-in WebSocket and UDP provider will 
-not work. For applications utilizing a WebSocket connection to Discord 
-(WebSocket or RPC), third-party provider packages will need to be installed 
-and configured.
+not work. Install and configure third-party provider packages for applications 
+utilizing a WebSocket or an RPC connection to Discord.
 
-First, install the following packages through NuGet, or compile the 
-following packages yourself:
+1. Install the following packages through NuGet, or compile the following 
+packages yourself:
 
 - Discord.Net.Providers.WS4Net
 - Discord.Net.Providers.UDPClient
 
-Note that `Discord.Net.Providers.UDPClient` is _only_ required if your
-bot will be utilizing voice chat.
+`Discord.Net.Providers.UDPClient` is _only_ required if your bot will be 
+utilizing voice chat.
 
-Next, you will need to configure your [DiscordSocketClient] to use
-these third-party providers over the default ones.
+2. Configure your [DiscordSocketClient] to use these third-party providers 
+over the default ones.
 
-To do this, set the `WebSocketProvider` and the optional
-`UdpSocketProvider` properties on the [DiscordSocketConfig] that you
-are passing into your client.
+Set the `WebSocketProvider` and optionally the `UdpSocketProvider` properties 
+in the [DiscordSocketConfig] and pass the config into your client.
 
 [!code-csharp[NET Standard 1.1 Example](samples/netstd11.cs)]
 
