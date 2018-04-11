@@ -10,8 +10,7 @@ diverse commands later, but for now, it is a good starting point.
 
 ## Creating a Discord Bot
 
-Before you can begin writing your bot, it is necessary to create a bot
-account on Discord.
+Before writing your bot, create a bot account on Discord.
 
 1. Visit the [Discord Applications Portal].
 2. Create a New Application.
@@ -34,10 +33,11 @@ other options!**
 ## Adding your bot to a server
 
 Bots **cannot** use invite links, they must be explicitly invited
-through the OAuth2 flow.
+through the OAuth2 flow, the industry-standard protocol for 
+authorization. 
 
 1. Open your bot's application on the [Discord Applications Portal].
-2. Retrieve the app's **Client ID**.
+2. Retrieve the application's **Client ID**.
 	
 	![Step 2](images/intro-client-id.png)
 	
@@ -49,7 +49,7 @@ through the OAuth2 flow.
 	
 	>[!NOTE]
 	Only servers where you have the `MANAGE_SERVER` permission will be
-	present in this list.
+	present in the dropdown menu.
 	
 	![Step 6](images/intro-add-bot.png)
 
@@ -64,20 +64,18 @@ do that now. (see the [Installing](installing.md) section)
 Discord.Net uses .NET's [Task-based Asynchronous Pattern (TAP)]
 extensively - nearly every operation is asynchronous.
 
-It is highly recommended that these operations are awaited in a
-properly established async context whenever possible. Establishing an
-async context can be problematic, but not hard.
+We suggest that asynchronous operations should await in an established 
+async context whenever possible.
 
-To do so, we will be creating an async main in your console
-application, and rewriting the static main method to invoke the new
-async main.
+To establish an async context, create an async main method in your 
+console application, and rewrite the static main method to invoke the
+new async main.
 
 [!code-csharp[Async Context](samples/intro/async-context.cs)]
 
-As a result of this, your program will now start and immediately
-jump into an async context. This will allow us to create a connection 
-to Discord later on without needing to worry about setting up the
-correct async implementation.
+Your program will immediately jump into an async context when starts. 
+This will allow us to create a connection to Discord later on without 
+worrying about setting up the correct async implementation.
 
 >[!TIP]
 If your application throws any exceptions within an async context,
@@ -93,7 +91,7 @@ async main **will** cause the application to crash.
 ### Creating a logging method
 
 Before we create and configure a Discord client, we will add a method
-to handle Discord.Net's log events.
+to handle Discord.Net's log events. Check the concept of [logging data].
 
 To allow agnostic support of as many log providers as possible, we
 log information through a `Log` event with a proprietary `LogMessage`
@@ -105,6 +103,7 @@ the Console.
 
 [!code-csharp[Async Context](samples/intro/logging.cs)]
 
+[logging data]:../concepts/logging.md
 [API Documentation]: xref:Discord.Rest.BaseDiscordClient#Discord_Rest_BaseDiscordClient_Log
 
 ### Creating a Discord Client
@@ -139,7 +138,7 @@ the source code for your bot.
 
 We may now invoke the client's `StartAsync` method, which will
 start connection/reconnection logic. It is important to note that
-**this method returns as soon as connection logic has been started!**
+**`StartAsync` method returns as soon as connection logic has been started!**
 
 Any methods that rely on the client's state should go in an event
 handler.
