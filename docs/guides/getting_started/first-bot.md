@@ -81,7 +81,7 @@ jump into an async context. This will allow us to create a connection
 to Discord later on without having to worry about setting up the
 correct async implementation.
 
-> [!TIP]
+> [!WARNING]
 > If your application throws any exceptions within an async context,
 > they will be thrown all the way back up to the first non-async method;
 > since our first non-async method is the program's `Main` method, this
@@ -134,8 +134,8 @@ Next, you will need to "login to Discord" with the [LoginAsync]
 method with the application's "token."
 
 > [!NOTE]
-> Please note that this is not the same as the application's 
-> "client secret."
+> Pay attention to what you are copying from the developer portal!
+> A token is not the same as the application's "client secret."
 
 ![Token](images/intro-token.png)
 
