@@ -26,7 +26,7 @@ Here are some examples:
 > It is not meant to be something that will work out of the box.
 
 [Official template]: https://github.com/foxbot/DiscordBotBase/tree/csharp/src/DiscordBot
-[Official quick start guide]: https://github.com/RogueException/Discord.Net/blob/dev/docs/guides/getting_started/samples/intro/structure.cs
+[Official quick start guide]: https://github.com/RogueException/Discord.Net/blob/dev/docs/guides/getting_started/samples/first-bot/structure.cs
 [Task-based Asynchronous Pattern]: https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap
 [polymorphism]: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/polymorphism
 [interface]: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/interfaces/
