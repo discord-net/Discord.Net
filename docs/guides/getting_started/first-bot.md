@@ -224,7 +224,7 @@ shown below.
 
 [MessageReceived]: xref:Discord.WebSocket.BaseSocketClient.MessageReceived
 [SocketMessage]: xref:Discord.WebSocket.SocketMessage
-[SocketMessageChannel]: xref:Discord.WebSocket.ISocketMessageChannel
+[ISocketMessageChannel]: xref:Discord.WebSocket.ISocketMessageChannel
 [SendMessageAsync]: xref:Discord.WebSocket.ISocketMessageChannel.SendMessageAsync*
 [completed program]: samples/first-bot/complete.cs
 
