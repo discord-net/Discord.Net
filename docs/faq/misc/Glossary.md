@@ -10,8 +10,9 @@ title: Common Terminologies / Glossary
 * A **Guild** ([IGuild]) is an isolated collection of users and
 channels, and are often referred to as "servers".
 	- Example: [Discord API](https://discord.gg/jkrBmQR)
-* A **Channel** ([IChannel]) represents either a voice or text channel.
+* A **Channel** ([IChannel]) represents a generic channel.
 	- Example: #dotnet_discord-net
+	- See [Channel Types](#channel-types)
 	
 [IGuild]: xref:Discord.IGuild
 [IChannel]: xref:Discord.IChannel

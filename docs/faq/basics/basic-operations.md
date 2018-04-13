@@ -89,7 +89,7 @@ returned by a Discord response.
 ## Why am I getting so many preemptive rate limits when I try to add more than one reactions?
 
 This is due to how HTML header works, mistreating
-0.25sec/action to 1sec. This casues the lib to throw preemptive rate
+0.25sec/action to 1sec. This causes the lib to throw preemptive rate
 limit more frequently than it should for methods such as adding
 reactions.
 

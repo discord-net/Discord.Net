@@ -5,7 +5,7 @@ title: Preconditions
 
 # Preconditions
 
-Precondition serve as a permissions system for your Commands. Keep in
+Preconditions serve as a permissions system for your Commands. Keep in
 mind, however, that they are not limited to _just_ permissions and can
 be as complex as you want them to be.
 
@@ -21,8 +21,8 @@ You may visit their respective API documentation to find out more.
 
 ## Bundled Preconditions
 
-@Discord.Commands ship with several bundled Preconditions; you may
-view their usages on their respective API pages.
+@Discord.Commands ships with several bundled Preconditions for you
+to use.
 
 * @Discord.Commands.RequireContextAttribute
 * @Discord.Commands.RequireOwnerAttribute
@@ -39,12 +39,17 @@ depending on your use.
 In order for your Precondition to function, you will need to override
 the [CheckPermissionsAsync] method.
 
-Your IDE should provide an option to fill this in for you.
-
 If the context meets the required parameters, return
 [PreconditionResult.FromSuccess], otherwise return
 [PreconditionResult.FromError] and include an error message if
 necessary.
+
+> [!NOTE]
+> Visual Studio can help you implement missing members
+> from the abstract class by using the "Implement Abstract Class"
+> IntelliSense hint.
+
+### Example - Creating a Custom Precondition
 
 [!code-csharp[Custom Precondition](samples/require_owner.cs)]
 
