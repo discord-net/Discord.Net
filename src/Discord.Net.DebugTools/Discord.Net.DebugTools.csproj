@@ -1,23 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../../Discord.Net.targets" />
-  <Choose>
-    <When Condition=" '$(OS)' == 'Windows_NT' ">
-      <PropertyGroup>
-        <AssemblyName>Discord.Net.DebugTools</AssemblyName>
-        <RootNamespace>Discord</RootNamespace>
-        <Description>A Discord.Net extension adding some helper classes for diagnosing issues.</Description>
-        <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
-      </PropertyGroup>
-    </When>
-    <Otherwise>
-      <PropertyGroup>
-        <AssemblyName>Discord.Net.DebugTools</AssemblyName>
-        <RootNamespace>Discord</RootNamespace>
-        <Description>A Discord.Net extension adding some helper classes for diagnosing issues.</Description>
-        <TargetFrameworks>netstandard1.3</TargetFrameworks>
-      </PropertyGroup>
-    </Otherwise>
-  </Choose>
+  <PropertyGroup>
+    <AssemblyName>Discord.Net.DebugTools</AssemblyName>
+    <RootNamespace>Discord</RootNamespace>
+    <Description>A Discord.Net extension adding some helper classes for diagnosing issues.</Description>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net45;netstandard1.3</TargetFrameworks>
+    <TargetFramework Condition=" '$(OS)' != 'Windows_NT' ">netstandard1.3</TargetFramework>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
   </ItemGroup>

@@ -1,25 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../../Discord.Net.targets" />
-  <Choose>
-    <When Condition=" '$(OS)' == 'Windows_NT' ">
-      <PropertyGroup>
-        <AssemblyName>Discord.Net.WebSocket</AssemblyName>
-        <RootNamespace>Discord.WebSocket</RootNamespace>
-        <Description>A core Discord.Net library containing the WebSocket client and models.</Description>
-        <TargetFrameworks>net45;netstandard1.1;netstandard1.3</TargetFrameworks>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-      </PropertyGroup>
-    </When>
-    <Otherwise>
-      <PropertyGroup>
-        <AssemblyName>Discord.Net.WebSocket</AssemblyName>
-        <RootNamespace>Discord.WebSocket</RootNamespace>
-        <Description>A core Discord.Net library containing the WebSocket client and models.</Description>
-        <TargetFrameworks>netstandard1.1;netstandard1.3</TargetFrameworks>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-      </PropertyGroup>
-    </Otherwise>
-  </Choose>
+  <PropertyGroup>
+    <AssemblyName>Discord.Net.WebSocket</AssemblyName>
+    <RootNamespace>Discord.WebSocket</RootNamespace>
+    <Description>A core Discord.Net library containing the WebSocket client and models.</Description>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net45;netstandard1.1;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard1.1;netstandard1.3</TargetFrameworks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
     <ProjectReference Include="..\Discord.Net.Rest\Discord.Net.Rest.csproj" />
