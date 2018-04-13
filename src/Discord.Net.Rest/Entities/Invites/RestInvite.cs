@@ -54,9 +54,6 @@ namespace Discord.Rest
         public Task DeleteAsync(RequestOptions options = null)
             => InviteHelper.DeleteAsync(this, Discord, options);
 
-        public Task AcceptAsync(RequestOptions options = null)
-            => InviteHelper.AcceptAsync(this, Discord, options);
-
         public override string ToString() => Url;
         private string DebuggerDisplay => $"{Url} ({GuildName} / {ChannelName})";
         

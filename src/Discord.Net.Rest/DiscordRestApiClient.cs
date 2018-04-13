@@ -952,13 +952,6 @@ namespace Discord.API
             
             return await SendAsync<Invite>("DELETE", () => $"invites/{inviteId}", new BucketIds(), options: options).ConfigureAwait(false);
         }
-        public async Task AcceptInviteAsync(string inviteId, RequestOptions options = null)
-        {
-            Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
-            options = RequestOptions.CreateOrClone(options);
-            
-            await SendAsync("POST", () => $"invites/{inviteId}", new BucketIds(), options: options).ConfigureAwait(false);
-        }
 
         //Guild Members
         public async Task<GuildMember> GetGuildMemberAsync(ulong guildId, ulong userId, RequestOptions options = null)
