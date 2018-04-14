@@ -17,7 +17,7 @@ namespace Discord.Commands
                 case TokenType.Bot:
                     var application = await context.Client.GetApplicationInfoAsync();
                     if (context.User.Id != application.Owner.Id)
-                        return PreconditionResult.FromError("Command can only be run by the owner of the bot");
+                        return PreconditionResult.FromError("Command can only be run by the owner of the bot.");
                     return PreconditionResult.FromSuccess();
                 default:
                     return PreconditionResult.FromError($"{nameof(RequireOwnerAttribute)} is not supported by this {nameof(TokenType)}.");                    

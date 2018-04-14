@@ -57,7 +57,7 @@ namespace Discord
             get => _url;
             set
             {
-                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(Url));
+                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI.", nameof(Url));
                 _url = value;
             }
         }
@@ -67,7 +67,7 @@ namespace Discord
             get => _thumbnail?.Url;
             set
             {
-                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(ThumbnailUrl));
+                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI.", nameof(ThumbnailUrl));
                 _thumbnail = new EmbedThumbnail(value, null, null, null);
             }
         }
@@ -77,7 +77,7 @@ namespace Discord
             get => _image?.Url;
             set
             {
-                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(ImageUrl));
+                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI.", nameof(ImageUrl));
                 _image = new EmbedImage(value, null, null, null);
             }
         }
@@ -87,7 +87,7 @@ namespace Discord
             get => _fields;
             set
             {
-                if (value == null) throw new ArgumentNullException("Cannot set an embed builder's fields collection to null", nameof(Fields));
+                if (value == null) throw new ArgumentNullException(nameof(Fields), "Cannot set an embed builder's fields collection to null.");
                 if (value.Count > MaxFieldCount) throw new ArgumentException($"Field count must be less than or equal to {MaxFieldCount}.", nameof(Fields));
                 _fields = value;
             }
@@ -271,7 +271,7 @@ namespace Discord
         public Embed Build()
         {
             if (Length > MaxEmbedLength)
-                throw new InvalidOperationException($"Total embed length must be less than or equal to {MaxEmbedLength}");
+                throw new InvalidOperationException($"Total embed length must be less than or equal to {MaxEmbedLength}.");
 
             var fields = ImmutableArray.CreateBuilder<EmbedField>(Fields.Count);
             for (int i = 0; i < Fields.Count; i++)
@@ -294,7 +294,7 @@ namespace Discord
             get => _name;
             set
             {
-                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException($"Field name must not be null, empty or entirely whitespace.", nameof(Name));
+                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("Field name must not be null, empty or entirely whitespace.", nameof(Name));
                 if (value.Length > MaxFieldNameLength) throw new ArgumentException($"Field name length must be less than or equal to {MaxFieldNameLength}.", nameof(Name));
                 _name = value;
             }
@@ -354,7 +354,7 @@ namespace Discord
             get => _url;
             set
             {
-                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(Url));
+                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI.", nameof(Url));
                 _url = value;
             }
         }
@@ -363,7 +363,7 @@ namespace Discord
             get => _iconUrl;
             set
             {
-                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(IconUrl));
+                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI.", nameof(IconUrl));
                 _iconUrl = value;
             }
         }
@@ -409,7 +409,7 @@ namespace Discord
             get => _iconUrl;
             set
             {
-                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(IconUrl));
+                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI.", nameof(IconUrl));
                 _iconUrl = value;
             }
         }

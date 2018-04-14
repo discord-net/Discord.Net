@@ -2,11 +2,13 @@ using Discord.Commands.Builders;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class ParameterInfo
     {
         private readonly TypeReader _reader;
