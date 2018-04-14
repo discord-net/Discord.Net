@@ -1,6 +1,6 @@
 ---
 uid: Guides.Concepts.Logging
-title: Logging
+title: Logging Events/Data
 ---
 
 # Logging in Discord.Net

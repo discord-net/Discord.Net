@@ -99,18 +99,19 @@ For example:
 * ...etc.
 
 Starting from 1.0, a command can accept nearly any type of argument;
-a full list of types that are parsed by default can be found in the
-below section on [Type Readers](#type-readers).
+a full list of types that are parsed by default can
+be found in @Guides.Commands.TypeReaders.
 
 [CommandAttribute]: xref:Discord.Commands.CommandAttribute
 
 #### Optional Parameters
 
 Parameters, by default, are always required. To make a parameter
-optional, give it a default value (i.e. `int num = 0`). To accept a comma-separated list,
-set the parameter to `params Type[]`.
+optional, give it a default value (i.e. `int num = 0`).
 
 #### Parameters with Spaces
+
+To accept a comma-separated list, set the parameter to `params Type[]`.
 
 Should a parameter include spaces, the parameter **must** be
 wrapped in quotes. For example, for a command with a parameter
@@ -198,7 +199,8 @@ that are placed in the Module's constructor must be injected into an
 ### Module Properties
 
 Modules with `public` settable properties will have the dependencies
-injected after the construction of the Module.
+injected after the construction of the module. See @Guides.Commands.DI
+to learn more.
 
 ### Module Groups
 
@@ -217,111 +219,3 @@ submodules are used to create nested groups (although not required to
 create nested groups).
 
 [!code-csharp[Groups and Submodules](samples/groups.cs)]
-
-# Preconditions
-
-Precondition serve as a permissions system for your Commands. Keep in
-mind, however, that they are not limited to _just_ permissions and can
-be as complex as you want them to be.
-
-> [!NOTE]
-> There are two types of Preconditions.
-> [PreconditionAttribute] can be applied to Modules, Groups, or Commands;
-> [ParameterPreconditionAttribute] can be applied to Parameters.
-
-[PreconditionAttribute]: xref:Discord.Commands.PreconditionAttribute
-[ParameterPreconditionAttribute]: xref:Discord.Commands.ParameterPreconditionAttribute
-
-## Bundled Preconditions
-
-commands ship with four bundled Preconditions; you may view their
-usages on their respective API pages.
-
-* @Discord.Commands.RequireContextAttribute
-* @Discord.Commands.RequireOwnerAttribute
-* @Discord.Commands.RequireBotPermissionAttribute
-* @Discord.Commands.RequireUserPermissionAttribute
-* @Discord.Commands.RequireNsfwAttribute
-
-## Custom Preconditions
-
-To write your own Precondition, create a new class that inherits from
-either [PreconditionAttribute] or [ParameterPreconditionAttribute]
-depending on your use.
-
-In order for your Precondition to function, you will need to override
-the [CheckPermissionsAsync] method.
-
-Your IDE should provide an option to fill this in for you.
-
-If the context meets the required parameters, return
-[PreconditionResult.FromSuccess], otherwise return
-[PreconditionResult.FromError] and include an error message if
-necessary.
-
-[!code-csharp[Custom Precondition](samples/require_owner.cs)]
-
-[CheckPermissionsAsync]: xref:Discord.Commands.PreconditionAttribute.CheckPermissionsAsync*
-[PreconditionResult.FromSuccess]: xref:Discord.Commands.PreconditionResult.FromSuccess*
-[PreconditionResult.FromError]: xref:Discord.Commands.PreconditionResult.FromError*
-
-# Type Readers
-
-Type Readers allow you to parse different types of arguments in
-your commands.
-
-By default, the following Types are supported arguments:
-
-* `bool`
-* `char`
-* `sbyte`/`byte`
-* `ushort`/`short`
-* `uint`/`int`
-* `ulong`/`long`
-* `float`, `double`, `decimal`
-* `string`
-* `DateTime`/`DateTimeOffset`/`TimeSpan`
-* `Nullable<T>` where applicible
-* Any implementation of `IChannel`/`IMessage`/`IUser`/`IRole`
-
-## Creating a Type Readers
-
-To create a `TypeReader`, create a new class that imports @Discord and
-@Discord.Commands and ensure the class inherits from
-@Discord.Commands.TypeReader.
-
-Next, satisfy the `TypeReader` class by overriding the [ReadAsync] method.
-
-> [!NOTE]
-> In many cases, Visual Studio can fill this in for you, using the
-> "Implement Abstract Class" IntelliSense hint.
-
-Inside this Task, add whatever logic you need to parse the input
-string.
-
-If you are able to successfully parse the input, return
-[TypeReaderResult.FromSuccess] with the parsed input, otherwise return
-[TypeReaderResult.FromError] and include an error message if
-necessary.
-
-[TypeReaderResult]: xref:Discord.Commands.TypeReaderResult
-[TypeReaderResult.FromSuccess]: xref:Discord.Commands.TypeReaderResult.FromSuccess*
-[TypeReaderResult.FromError]: xref:Discord.Commands.TypeReaderResult.FromError*
-[ReadAsync]: xref:Discord.Commands.TypeReader.ReadAsync*
-
-## Registering TypeReaders
-
-TypeReaders are not automatically discovered by the Command Service
-and must be explicitly added.
-
-To register a TypeReader, invoke [CommandService.AddTypeReader].
-
-> [!WARNING]
-> TypeReaders must be added prior to module discovery, otherwise your
-> TypeReaders may not work!
-
-[CommandService.AddTypeReader]: xref:Discord.Commands.CommandService.AddTypeReader*
-
-### Sample
-
-[!code-csharp[TypeReaders](samples/typereader.cs)]
