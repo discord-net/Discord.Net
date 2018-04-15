@@ -39,7 +39,6 @@
     ],
     "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
-	  "_description": "Home to technical documentation, API references, and examples of the cross-platform .NET library, Discord.Net."
       "_appFooter": "Discord.Net (c) 2015-2018 2.0.0-beta",
       "_enableSearch": true,
     },
