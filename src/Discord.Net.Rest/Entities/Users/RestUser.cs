@@ -68,6 +68,6 @@ namespace Discord.Rest
 
         //IUser
         async Task<IDMChannel> IUser.GetOrCreateDMChannelAsync(RequestOptions options)
-            => await GetOrCreateDMChannelAsync(options);
+            => await GetOrCreateDMChannelAsync(options).ConfigureAwait(false);
     }
 }

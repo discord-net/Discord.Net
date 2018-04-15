@@ -121,7 +121,7 @@ namespace Discord.Rest
         public async Task ReorderChannelsAsync(IEnumerable<ReorderChannelProperties> args, RequestOptions options = null)
         {
             var arr = args.ToArray();
-            await GuildHelper.ReorderChannelsAsync(this, Discord, arr, options);
+            await GuildHelper.ReorderChannelsAsync(this, Discord, arr, options).ConfigureAwait(false);
         }
         public async Task ReorderRolesAsync(IEnumerable<ReorderRoleProperties> args, RequestOptions options = null)
         {
@@ -420,8 +420,8 @@ namespace Discord.Rest
         Task IGuild.DownloadUsersAsync() { throw new NotSupportedException(); }
 
         async Task<IWebhook> IGuild.GetWebhookAsync(ulong id, RequestOptions options)
-            => await GetWebhookAsync(id, options);
+            => await GetWebhookAsync(id, options).ConfigureAwait(false);
         async Task<IReadOnlyCollection<IWebhook>> IGuild.GetWebhooksAsync(RequestOptions options)
-            => await GetWebhooksAsync(options);
+            => await GetWebhooksAsync(options).ConfigureAwait(false);
     }
 }

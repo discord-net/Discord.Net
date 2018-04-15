@@ -37,7 +37,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
         {
-            return _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this, options));
+            return _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this, options).ConfigureAwait(false));
         }
         
         /// <inheritdoc />
@@ -165,6 +165,6 @@ namespace Discord.Rest
             => await GetVoiceRegionAsync(id, options).ConfigureAwait(false);
 
         async Task<IWebhook> IDiscordClient.GetWebhookAsync(ulong id, RequestOptions options)
-            => await GetWebhookAsync(id, options);
+            => await GetWebhookAsync(id, options).ConfigureAwait(false);
     }
 }

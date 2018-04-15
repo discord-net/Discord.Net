@@ -122,11 +122,11 @@ namespace Discord.Commands
                 return PreconditionGroupResult.FromSuccess();
             }
 
-            var moduleResult = await CheckGroups(Module.Preconditions, "Module");
+            var moduleResult = await CheckGroups(Module.Preconditions, "Module").ConfigureAwait(false);
             if (!moduleResult.IsSuccess)
                 return moduleResult;
 
-            var commandResult = await CheckGroups(Preconditions, "Command");
+            var commandResult = await CheckGroups(Preconditions, "Command").ConfigureAwait(false);
             if (!commandResult.IsSuccess)
                 return commandResult;
 
