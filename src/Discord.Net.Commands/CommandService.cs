@@ -111,11 +111,11 @@ namespace Discord.Commands
         }
 
         /// <summary>
-        /// Add a command module from a type
+        /// Add a command module from a <see cref="Type"/>.
         /// </summary>
-        /// <typeparam name="T">The type of module</typeparam>
-        /// <param name="services">An IServiceProvider for your dependency injection solution, if using one - otherwise, pass null</param>
-        /// <returns>A built module</returns>
+        /// <typeparam name="T">The type of module.</typeparam>
+        /// <param name="services">An <see cref="IServiceProvider"/> for your dependency injection solution, if using one - otherwise, pass <see langword="null"/>. </param>
+        /// <returns>A built module.</returns>
         public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services) => AddModuleAsync(typeof(T), services);
         public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services)
         {
@@ -127,7 +127,7 @@ namespace Discord.Commands
                 var typeInfo = type.GetTypeInfo();
 
                 if (_typedModuleDefs.ContainsKey(type))
-                    throw new ArgumentException($"This module has already been added.");
+                    throw new ArgumentException("This module has already been added.");
 
                 var module = (await ModuleClassBuilder.BuildAsync(this, services, typeInfo).ConfigureAwait(false)).FirstOrDefault();
 
@@ -144,11 +144,11 @@ namespace Discord.Commands
             }
         }
         /// <summary>
-        /// Add command modules from an assembly
+        /// Add command modules from an <see cref="Assembly"/>.
         /// </summary>
-        /// <param name="assembly">The assembly containing command modules</param>
-        /// <param name="services">An IServiceProvider for your dependency injection solution, if using one - otherwise, pass null</param>
-        /// <returns>A collection of built modules</returns>
+        /// <param name="assembly">The <see cref="Assembly"/> containing command modules.</param>
+        /// <param name="services">An <see cref="IServiceProvider"/> for your dependency injection solution, if using one - otherwise, pass <see langword="null"/>.</param>
+        /// <returns>A collection of built modules.</returns>
         public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly, IServiceProvider services)
         {
             services = services ?? EmptyServiceProvider.Instance;
@@ -231,18 +231,26 @@ namespace Discord.Commands
 
         //Type Readers
         /// <summary>
-        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
-        /// If <typeparamref name="T"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> will also be added.
-        /// If a default <see cref="TypeReader"/> exists for <typeparamref name="T"/>, a warning will be logged and the default <see cref="TypeReader"/> will be replaced. 
+        ///     Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
+        ///     <para>
+        ///         If <typeparamref name="T"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> will also be added.
+        ///     </para>
+        ///     <para>
+        ///         If a default <see cref="TypeReader"/> exists for <typeparamref name="T"/>, a warning will be logged and the default <see cref="TypeReader"/> will be replaced. 
+        ///     </para>
         /// </summary>
         /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
         /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
         public void AddTypeReader<T>(TypeReader reader)
             => AddTypeReader(typeof(T), reader);
         /// <summary>
-        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
-        /// If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added.
-        /// If a default <see cref="TypeReader"/> exists for <paramref name="type"/>, a warning will be logged and the default <see cref="TypeReader"/> will be replaced.
+        ///     Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
+        ///     <para>
+        ///         If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added.
+        ///     </para>
+        ///     <para>
+        ///         If a default <see cref="TypeReader"/> exists for <paramref name="type"/>, a warning will be logged and the default <see cref="TypeReader"/> will be replaced.
+        ///     </para>
         /// </summary>
         /// <param name="type">A <see cref="Type"/> instance for the type to be read.</param>
         /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
@@ -250,12 +258,14 @@ namespace Discord.Commands
         {
             if (_defaultTypeReaders.ContainsKey(type))
                 _ = _cmdLogger.WarningAsync($"The default TypeReader for {type.FullName} was replaced by {reader.GetType().FullName}." +
-                    $"To suppress this message, use AddTypeReader<T>(reader, true).");
+                    "To suppress this message, use AddTypeReader<T>(reader, true).");
             AddTypeReader(type, reader, true);
         }
         /// <summary>
         /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
-        /// If <typeparamref name="T"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> will also be added.
+        ///     <para>
+        ///         If <typeparamref name="T"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> will also be added.
+        ///     </para>
         /// </summary>
         /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
         /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
@@ -264,7 +274,9 @@ namespace Discord.Commands
             => AddTypeReader(typeof(T), reader, replaceDefault);
         /// <summary>
         /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
-        /// If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added. 
+        ///     <para>
+        ///         If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added. 
+        ///     </para>
         /// </summary>
         /// <param name="type">A <see cref="Type"/> instance for the type to be read.</param>
         /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>

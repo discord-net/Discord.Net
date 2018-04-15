@@ -50,9 +50,9 @@ namespace Discord.Commands
             if (GuildPermission.HasValue)
             {
                 if (guildUser == null)
-                    return PreconditionResult.FromError("Command must be used in a guild channel");
+                    return PreconditionResult.FromError("Command must be used in a guild channel.");
                 if (!guildUser.GuildPermissions.Has(GuildPermission.Value))
-                    return PreconditionResult.FromError($"Bot requires guild permission {GuildPermission.Value}");
+                    return PreconditionResult.FromError($"Bot requires guild permission {GuildPermission.Value}.");
             }
 
             if (ChannelPermission.HasValue)
@@ -64,7 +64,7 @@ namespace Discord.Commands
                     perms = ChannelPermissions.All(context.Channel);
 
                 if (!perms.Has(ChannelPermission.Value))
-                    return PreconditionResult.FromError($"Bot requires channel permission {ChannelPermission.Value}");
+                    return PreconditionResult.FromError($"Bot requires channel permission {ChannelPermission.Value}.");
             }
 
             return PreconditionResult.FromSuccess();

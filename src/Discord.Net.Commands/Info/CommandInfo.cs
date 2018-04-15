@@ -271,11 +271,11 @@ namespace Discord.Commands
             foreach (object arg in argList)
             {
                 if (i == argCount)
-                    throw new InvalidOperationException("Command was invoked with too many parameters");
+                    throw new InvalidOperationException("Command was invoked with too many parameters.");
                 array[i++] = arg;
             }
             if (i < argCount)
-                throw new InvalidOperationException("Command was invoked with too few parameters");
+                throw new InvalidOperationException("Command was invoked with too few parameters.");
 
             if (HasVarArgs)
             {

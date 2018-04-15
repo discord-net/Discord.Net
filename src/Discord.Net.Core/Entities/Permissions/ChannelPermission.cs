@@ -3,7 +3,7 @@ using System;
 namespace Discord
 {
     /// <summary> Defines the available permissions for a channel. </summary>
-    [FlagsAttribute]
+    [Flags]
     public enum ChannelPermission : ulong
     {
         // General

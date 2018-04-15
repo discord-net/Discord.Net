@@ -4,15 +4,15 @@ namespace Discord
 {
     public class DiscordConfig
     {
-        /// <summary> Returns the gateway version Discord.NET uses. </summary>
+        /// <summary> Returns the gateway version Discord.Net uses. </summary>
         public const int APIVersion = 6;
-        /// <summary> Returns the Discord.NET verion, including the build number. </summary>
+        /// <summary> Returns the Discord.Net version, including the build number. </summary>
         public static string Version { get; } =
             typeof(DiscordConfig).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ??
             typeof(DiscordConfig).GetTypeInfo().Assembly.GetName().Version.ToString(3) ?? 
             "Unknown";
         
-        /// <summary> Returns the user agent that Discord.NET uses in its clients. </summary>
+        /// <summary> Returns the user agent that Discord.Net uses in its clients. </summary>
         public static string UserAgent { get; } = $"DiscordBot (https://github.com/RogueException/Discord.Net, v{Version})";
         /// <summary> Returns the base Discord API URL. </summary>
         public static readonly string APIUrl = $"https://discordapp.com/api/v{APIVersion}/";
