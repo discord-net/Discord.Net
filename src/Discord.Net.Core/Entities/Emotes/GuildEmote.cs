@@ -3,9 +3,7 @@ using System.Diagnostics;
 
 namespace Discord
 {
-    /// <summary>
-    /// An image-based emote that is attached to a guild.
-    /// </summary>
+    /// <summary> An image-based emote that is attached to a guild. </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class GuildEmote : Emote
     {

@@ -70,7 +70,7 @@ as in field values. With that in mind, links can be added with
 
 Any entity that implements [IUserMessage] has an [AddReactionAsync]
 method. This method expects an [IEmote] as a parameter.
-In Discord.Net, an Emote represents a server custom emote, while an
+In Discord.Net, an Emote represents a custom-image emote, while an
 Emoji is a Unicode emoji (standard emoji). Both [Emoji] and [Emote]
 implement [IEmote] and are valid options.
 
