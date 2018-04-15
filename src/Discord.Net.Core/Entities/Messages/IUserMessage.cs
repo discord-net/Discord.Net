@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    /// <summary> A Discord message object. </summary>
+    /// <summary> Represents a Discord message object. </summary>
     public interface IUserMessage : IMessage
     {
         /// <summary> Modifies this message. </summary>
@@ -26,7 +26,7 @@ namespace Discord
         /// <summary>  Gets all users that reacted to a message with a given emote </summary>
         Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit = 100, ulong? afterUserId = null, RequestOptions options = null);
 
-        /// <summary> Transforms this message's text into a human readable form by resolving its tags. </summary>
+        /// <summary> Transforms this message's text into a human-readable form by resolving its tags. </summary>
         string Resolve(
             TagHandling userHandling = TagHandling.Name,
             TagHandling channelHandling = TagHandling.Name,
