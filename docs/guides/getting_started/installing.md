@@ -22,6 +22,12 @@ recommended to create applications using [.NET Core], although it is not
 required. When using .NET Framework, it is suggested to target
 `.NET Framework 4.6.1` or higher.
 
+> [!WARNING]
+> Using this library with [Mono] is not recommended until further
+> notice. It is known to have issues with the library's WebSockets
+> implementation and may crash the application upon startup.
+
+[Mono]: https://www.mono-project.com/
 [.NET Standard]: https://docs.microsoft.com/en-us/dotnet/articles/standard/library
 [.NET Core]: https://docs.microsoft.com/en-us/dotnet/articles/core/
 [additional steps]: #installing-on-net-standard-11
