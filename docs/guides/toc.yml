@@ -18,6 +18,8 @@
       topicUid: Guides.Concepts.ManageConnections
     - name: Entities
       topicUid: Guides.Concepts.Entities
+    - name: Deployment
+      topicUid: Guides.Concepts.Deployment
 - name: The Command Service
   items:
     - name: Introduction
