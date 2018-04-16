@@ -3,18 +3,30 @@ using System.Globalization;
 
 namespace Discord
 {
-    /// <summary> A custom image-based emote. </summary>
+    /// <summary>
+    ///     A custom image-based emote.
+    /// </summary>
     public class Emote : IEmote, ISnowflakeEntity
     {
-        /// <summary> Gets the display name (tooltip) of this emote. </summary>
+        /// <summary>
+        ///     Gets the display name (tooltip) of this emote.
+        /// </summary>
         public string Name { get; }
-        /// <summary> Gets the ID of this emote. </summary>
+        /// <summary>
+        ///     Gets the ID of this emote.
+        /// </summary>
         public ulong Id { get; }
-        /// <summary> Gets whether this emote animated? </summary>
+        /// <summary>
+        ///     Gets whether this emote is animated.
+        /// </summary>
         public bool Animated { get; }
-        /// <summary> Gets the date when this emote is created. </summary>
+        /// <summary>
+        ///     Gets the date when this emote is created.
+        /// </summary>
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
-        /// <summary> Gets the image URL of this emote. </summary>
+        /// <summary>
+        ///     Gets the image URL of this emote.
+        /// </summary>
         public string Url => CDN.GetEmojiUrl(Id, Animated);
 
         internal Emote(ulong id, string name, bool animated)

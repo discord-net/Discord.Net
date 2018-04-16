@@ -3,7 +3,9 @@ using System.Diagnostics;
 
 namespace Discord
 {
-    /// <summary> A color object that Discord uses. </summary>
+    /// <summary>
+    ///     A color object that Discord uses.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct Color
     {

@@ -4,50 +4,95 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
-    /// <summary> Represents a guild channel (text, voice, category). </summary>
+    /// <summary>
+    ///     Represents a guild channel (text, voice, category).
+    /// </summary>
     public interface IGuildChannel : IChannel, IDeletable
     {
-        /// <summary> Gets the position of this channel in the guild's channel list, relative to others of the same type. </summary>
+        /// <summary>
+        ///     Gets the position of this channel in the guild's channel list, relative to others of the same type.
+        /// </summary>
         int Position { get; }
 
-        /// <summary> Gets the parent ID (category) of this channel in the guild's channel list. </summary>
+        /// <summary>
+        ///     Gets the parent ID (category) of this channel in the guild's channel list.
+        /// </summary>
         ulong? CategoryId { get; }
-        /// <summary> Gets the parent channel (category) of this channel. </summary>
+        /// <summary>
+        ///     Gets the parent channel (category) of this channel.
+        /// </summary>
         Task<ICategoryChannel> GetCategoryAsync();
-        /// <summary> Gets the guild this channel is a member of. </summary>
+        /// <summary>
+        ///     Gets the guild this channel is a member of.
+        /// </summary>
         IGuild Guild { get; }
-        /// <summary> Gets the id of the guild this channel is a member of. </summary>
+        /// <summary>
+        ///     Gets the id of the guild this channel is a member of.
+        /// </summary>
         ulong GuildId { get; }
-        /// <summary> Gets a collection of permission overwrites for this channel. </summary>
+        /// <summary>
+        ///     Gets a collection of permission overwrites for this channel.
+        /// </summary>
         IReadOnlyCollection<Overwrite> PermissionOverwrites { get; }
 
-        /// <summary> Creates a new invite to this channel. </summary>
-        /// <param name="maxAge"> The time (in seconds) until the invite expires. Set to null to never expire. </param>
-        /// <param name="maxUses"> The max amount  of times this invite may be used. Set to null to have unlimited uses. </param>
-        /// <param name="isTemporary"> If true, a user accepting this invite will be kicked from the guild after closing their client. </param>
+        /// <summary>
+        ///     Creates a new invite to this channel.
+        /// </summary>
+        /// <param name="maxAge">
+        ///     The time (in seconds) until the invite expires. Set to <see langword="null"/> to never expire.
+        /// </param>
+        /// <param name="maxUses">
+        ///     The max amount of times this invite may be used. Set to <see langword="null"/> to have unlimited uses.
+        /// </param>
+        /// <param name="isTemporary">
+        ///     If <see langword="true"/>, a user accepting this invite will be kicked from the guild after closing their client.
+        /// </param>
+        /// <param name="isUnique">
+        ///     If <see langword="true"/>, don't try to reuse a similar invite (useful for creating many unique one time use invites).
+        /// </param>
         Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null);
-        /// <summary> Returns a collection of all invites to this channel. </summary>
+        /// <summary>
+        ///     Returns a collection of all invites to this channel.
+        /// </summary>
         Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null);
 
-        /// <summary> Modifies this guild channel. </summary>
+        /// <summary>
+        ///     Modifies this guild channel.
+        /// </summary>
         Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null);
 
-        /// <summary> Gets the permission overwrite for a specific role, or null if one does not exist. </summary>
+        /// <summary>
+        ///     Gets the permission overwrite for a specific role, or <see langword="null"/> if one does not exist.
+        /// </summary>
         OverwritePermissions? GetPermissionOverwrite(IRole role);
-        /// <summary> Gets the permission overwrite for a specific user, or null if one does not exist. </summary>
+        /// <summary>
+        ///     Gets the permission overwrite for a specific user, or <see langword="null"/> if one does not exist.
+        /// </summary>
         OverwritePermissions? GetPermissionOverwrite(IUser user);
-        /// <summary> Removes the permission overwrite for the given role, if one exists. </summary>
+        /// <summary>
+        ///     Removes the permission overwrite for the given role, if one exists.
+        /// </summary>
         Task RemovePermissionOverwriteAsync(IRole role, RequestOptions options = null);
-        /// <summary> Removes the permission overwrite for the given user, if one exists. </summary>
+        /// <summary>
+        ///     Removes the permission overwrite for the given user, if one exists.
+        /// </summary>
         Task RemovePermissionOverwriteAsync(IUser user, RequestOptions options = null);
-        /// <summary> Adds or updates the permission overwrite for the given role. </summary>
+        /// <summary>
+        ///     Adds or updates the permission overwrite for the given role.
+        /// </summary>
         Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null);
-        /// <summary> Adds or updates the permission overwrite for the given user. </summary>
+        /// <summary>
+        ///     Adds or updates the permission overwrite for the given user.
+        /// </summary>
         Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null);
 
-        /// <summary> Gets a collection of all users in this channel. </summary>
+        /// <summary>
+        ///     Gets a collection of all users in this channel.
+        /// </summary>
         new IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
-        /// <summary> Gets a user in this channel with the provided id.</summary>
+        /// <summary>
+        ///     Gets a user in this channel with the provided ID.
+        /// </summary>
         new Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
     }
 }

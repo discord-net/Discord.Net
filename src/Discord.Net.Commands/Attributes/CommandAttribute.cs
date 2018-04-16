@@ -7,11 +7,11 @@ namespace Discord.Commands
     public class CommandAttribute : Attribute
     {
         /// <summary>
-        /// Gets the text that has been set to be recognized as a command.
+        ///     Gets the text that has been set to be recognized as a command.
         /// </summary>
         public string Text { get; }
         /// <summary>
-        /// Specifies the <see cref="RunMode"/> of the command. This affects how the command is executed.
+        ///     Specifies the <see cref="RunMode" /> of the command. This affects how the command is executed.
         /// </summary>
         public RunMode RunMode { get; set; } = RunMode.Default;
 

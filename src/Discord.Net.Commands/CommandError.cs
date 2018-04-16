@@ -1,6 +1,6 @@
 namespace Discord.Commands
 {
-    /// <summary> The type of error the command throws. </summary>
+    /// <summary> Defines the type of error a command can throw. </summary>
     public enum CommandError
     {
         //Search

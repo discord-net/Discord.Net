@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -7,18 +7,28 @@ namespace Discord
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct OverwritePermissions
     {
-        /// <summary> Gets a blank OverwritePermissions that inherits all permissions. </summary>
+        /// <summary>
+        ///     Gets a blank <see cref="OverwritePermissions" /> that inherits all permissions.
+        /// </summary>
         public static OverwritePermissions InheritAll { get; } = new OverwritePermissions();
-        /// <summary> Gets a OverwritePermissions that grants all permissions for a given channelType. </summary>
+        /// <summary>
+        ///     Gets a <see cref="OverwritePermissions" /> that grants all permissions for the given channel.
+        /// </summary>
         public static OverwritePermissions AllowAll(IChannel channel) 
             => new OverwritePermissions(ChannelPermissions.All(channel).RawValue, 0);
-        /// <summary> Gets a OverwritePermissions that denies all permissions for a given channelType. </summary>
+        /// <summary>
+        ///     Gets a <see cref="OverwritePermissions" /> that denies all permissions for the given channel.
+        /// </summary>
         public static OverwritePermissions DenyAll(IChannel channel)
             => new OverwritePermissions(0, ChannelPermissions.All(channel).RawValue);
 
-        /// <summary> Gets a packed value representing all the allowed permissions in this OverwritePermissions. </summary>
+        /// <summary>
+        ///     Gets a packed value representing all the allowed permissions in this <see cref="OverwritePermissions" />.
+        /// </summary>
         public ulong AllowValue { get; }
-        /// <summary> Gets a packed value representing all the denied permissions in this OverwritePermissions. </summary>
+        /// <summary>
+        ///     Gets a packed value representing all the denied permissions in this <see cref="OverwritePermissions" />.
+        /// </summary>
         public ulong DenyValue { get; }
 
         /// <summary> If Allowed, a user may create invites. </summary>
@@ -62,7 +72,7 @@ namespace Discord
         /// <summary> If Allowed, a user may use voice-activity-detection rather than push-to-talk. </summary>
         public PermValue UseVAD => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.UseVAD);
 
-        /// <summary> If Allowed, a user may adjust role permissions. This also implictly grants all other permissions. </summary>
+        /// <summary> If Allowed, a user may adjust role permissions. This also implicitly grants all other permissions. </summary>
         public PermValue ManageRoles => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManageRoles);
         /// <summary> If True, a user may edit the webhooks for this channel. </summary>
         public PermValue ManageWebhooks => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManageWebhooks);
@@ -107,7 +117,9 @@ namespace Discord
             DenyValue = denyValue;
         }
 
-        /// <summary> Creates a new ChannelPermissions with the provided permissions. </summary>
+        /// <summary>
+        ///     Creates a new <see cref="ChannelPermissions" /> with the provided permissions.
+        /// </summary>
         public OverwritePermissions(PermValue createInstantInvite = PermValue.Inherit, PermValue manageChannel = PermValue.Inherit,
             PermValue addReactions = PermValue.Inherit,
             PermValue readMessages = PermValue.Inherit, PermValue sendMessages = PermValue.Inherit, PermValue sendTTSMessages = PermValue.Inherit, PermValue manageMessages = PermValue.Inherit, 
@@ -118,7 +130,10 @@ namespace Discord
                   embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, 
                   moveMembers, useVoiceActivation, manageRoles, manageWebhooks) { }
 
-        /// <summary> Creates a new OverwritePermissions from this one, changing the provided non-null permissions. </summary>
+        /// <summary>
+        ///     Creates a new <see cref="OverwritePermissions" /> from this one, changing the provided non-null
+        ///     permissions.
+        /// </summary>
         public OverwritePermissions Modify(PermValue? createInstantInvite = null, PermValue? manageChannel = null,
             PermValue? addReactions = null,
             PermValue? readMessages = null, PermValue? sendMessages = null, PermValue? sendTTSMessages = null, PermValue? manageMessages = null, 
