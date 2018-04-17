@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Represents a generic guild object.
+    /// </summary>
     public interface IGuild : IDeletable, ISnowflakeEntity
     {
         /// <summary>
@@ -17,7 +20,7 @@ namespace Discord
         /// </summary>
         int AFKTimeout { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if this guild is embeddable (e.g. widget)
+        ///     Returns <see langword="true"/> if this guild is embeddable (e.g. widget).
         /// </summary>
         bool IsEmbeddable { get; }
         /// <summary>
@@ -68,7 +71,7 @@ namespace Discord
         /// </summary>
         ulong? EmbedChannelId { get; }
         /// <summary>
-        ///     Gets the ID of the channel where randomized welcome messages are sent, or <see langword="null"/> if not.
+        ///     Gets the ID of the channel where randomized welcome messages are sent if set, or <see langword="null"/> if not.
         /// </summary>
         ulong? SystemChannelId { get; }
         /// <summary>

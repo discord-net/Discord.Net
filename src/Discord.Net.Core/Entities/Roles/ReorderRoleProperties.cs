@@ -14,6 +14,11 @@ namespace Discord
         /// </summary>
         public int Position { get; }
 
+        /// <summary>
+        ///     Initializes a <see cref="ReorderRoleProperties" /> with the given role ID and position.
+        /// </summary>
+        /// <param name="id">The ID of the role to be edited.</param>
+        /// <param name="pos">The new zero-based position of the role.</param>
         public ReorderRoleProperties(ulong id, int pos)
         {
             Id = id;

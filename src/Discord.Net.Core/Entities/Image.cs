@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 namespace Discord
 {
     /// <summary>
@@ -6,6 +6,9 @@ namespace Discord
     /// </summary>
     public struct Image
     {
+        /// <summary>
+        ///     Gets the stream to be uploaded to Discord.
+        /// </summary>
         public Stream Stream { get; }
         /// <summary>
         ///     Create the image with a <see cref="System.IO.Stream" /> .

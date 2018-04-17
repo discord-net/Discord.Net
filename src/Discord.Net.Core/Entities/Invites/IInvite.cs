@@ -2,6 +2,9 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Represents a generic invite object.
+    /// </summary>
     public interface IInvite : IEntity<string>, IDeletable
     {
         /// <summary>

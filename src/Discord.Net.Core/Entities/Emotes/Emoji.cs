@@ -25,6 +25,10 @@ namespace Discord
             Name = unicode;
         }
 
+        /// <summary>
+        ///     Determines whether the specified emoji is equal to the current emoji.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
         public override bool Equals(object other)
         {
             if (other == null) return false;
@@ -36,6 +40,7 @@ namespace Discord
             return string.Equals(Name, otherEmoji.Name);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode() => Name.GetHashCode();
     }
 }

@@ -5,7 +5,9 @@ using System.Linq;
 
 namespace Discord
 {
-    /// <summary> A builder for creating an <see cref="Embed"/> to be sent. </summary>
+    /// <summary>
+    ///     Represents a builder class for creating a <see cref="EmbedType.Rich"/> <see cref="Embed" />.
+    /// </summary>
     public class EmbedBuilder
     {
         private string _title;
@@ -15,16 +17,24 @@ namespace Discord
         private EmbedThumbnail? _thumbnail;
         private List<EmbedFieldBuilder> _fields;
 
-        /// <summary> The maximum number of fields allowed by Discord. </summary>
+        /// <summary> 
+        ///     Returns the maximum number of fields allowed by Discord. 
+        /// </summary>
         public const int MaxFieldCount = 25;
-        /// <summary> The maximum length of title allowed by Discord. </summary>
+        /// <summary> 
+        ///     Returns the maximum length of title allowed by Discord. 
+        /// </summary>
         public const int MaxTitleLength = 256;
-        /// <summary> The maximum length of description allowed by Discord. </summary>
+        /// <summary> 
+        ///     Returns the maximum length of description allowed by Discord. 
+        /// </summary>
         public const int MaxDescriptionLength = 2048;
-        /// <summary> The maximum length of total characters allowed by Discord. </summary>
+        /// <summary> 
+        ///     Returns the maximum length of total characters allowed by Discord. 
+        /// </summary>
         public const int MaxEmbedLength = 6000;
 
-        /// <summary> Creates a new <see cref="EmbedBuilder"/>. </summary>
+        /// <summary> Initializes a new <see cref="EmbedBuilder"/> class. </summary>
         public EmbedBuilder()
         {
             Fields = new List<EmbedFieldBuilder>();
@@ -102,6 +112,9 @@ namespace Discord
         /// <summary> Gets or sets the <see cref="EmbedFooterBuilder"/> of an <see cref="Embed"/>. </summary>
         public EmbedFooterBuilder Footer { get; set; }
 
+        /// <summary>
+        ///     Gets the total length of all embed properties.
+        /// </summary>
         public int Length
         {
             get
@@ -116,69 +129,91 @@ namespace Discord
             }
         }
 
+        /// <summary>
+        ///     Sets the title of an <see cref="Embed" />.
+        /// </summary>
+        /// <param name="title">The title to be set.</param>
         public EmbedBuilder WithTitle(string title)
         {
             Title = title;
             return this;
         }
-        /// <summary> Sets the description of an <see cref="Embed"/>. </summary>
+        /// <summary> 
+        ///     Sets the description of an <see cref="Embed"/>.
+        /// </summary>
         /// <param name="description"> The description to be set. </param>
         public EmbedBuilder WithDescription(string description)
         {
             Description = description;
             return this;
         }
-        /// <summary> Sets the URL of an <see cref="Embed"/>. </summary>
+        /// <summary> 
+        ///     Sets the URL of an <see cref="Embed"/>.
+        /// </summary>
         /// <param name="url"> The URL to be set. </param>
         public EmbedBuilder WithUrl(string url)
         {
             Url = url;
             return this;
         }
-        /// <summary> Sets the thumbnail URL of an <see cref="Embed"/>. </summary>
+        /// <summary> 
+        ///     Sets the thumbnail URL of an <see cref="Embed"/>.
+        /// </summary>
         /// <param name="thumbnailUrl"> The thumbnail URL to be set. </param>
         public EmbedBuilder WithThumbnailUrl(string thumbnailUrl)
         {
             ThumbnailUrl = thumbnailUrl;
             return this;
         }
-        /// <summary> Sets the image URL of an <see cref="Embed"/>. </summary>
-        /// <param name="imageUrl"> The image URL to be set. </param>
+        /// <summary>
+        ///     Sets the image URL of an <see cref="Embed" /> .
+        /// </summary>
+        /// <param name="imageUrl">The image URL to be set.</param>
         public EmbedBuilder WithImageUrl(string imageUrl)
         {
             ImageUrl = imageUrl;
             return this;
         }
-        /// <summary> Sets the timestamp of an <see cref="Embed"/> to the current time. </summary>
+        /// <summary>
+        ///     Sets the timestamp of an <see cref="Embed" /> to the current time.
+        /// </summary>
         public EmbedBuilder WithCurrentTimestamp()
         {
             Timestamp = DateTimeOffset.UtcNow;
             return this;
         }
-        /// <summary> Sets the timestamp of an <see cref="Embed"/>. </summary>
-        /// <param name="dateTimeOffset"> The timestamp to be set. </param>
+        /// <summary>
+        ///     Sets the timestamp of an <see cref="Embed" /> .
+        /// </summary>
+        /// <param name="dateTimeOffset">The timestamp to be set.</param>
         public EmbedBuilder WithTimestamp(DateTimeOffset dateTimeOffset)
         {
             Timestamp = dateTimeOffset;
             return this;
         }
-        /// <summary> Sets the sidebar color of an <see cref="Embed"/>. </summary>
-        /// <param name="color"> The color to be set. </param>
+        /// <summary>
+        ///     Sets the sidebar color of an <see cref="Embed" /> .
+        /// </summary>
+        /// <param name="color">The color to be set.</param>
         public EmbedBuilder WithColor(Color color)
         {
             Color = color;
             return this;
         }
 
-        /// <summary> Sets the <see cref="EmbedAuthorBuilder"/> of an <see cref="Embed"/>. </summary>
-        /// <param name="author"> The author builder class containing the author field properties. </param>
+        /// <summary>
+        ///     Sets the <see cref="EmbedAuthorBuilder" /> of an <see cref="Embed" /> .
+        /// </summary>
+        /// <param name="author">The author builder class containing the author field properties.</param>
         public EmbedBuilder WithAuthor(EmbedAuthorBuilder author)
         {
             Author = author;
             return this;
         }
-        /// <summary> Sets the author field of an <see cref="Embed"/> with the provided properties. </summary>
-        /// <param name="action"> The delegate containing the author field properties. </param>
+        /// <summary>
+        ///     Sets the author field of an <see cref="Embed" /> with the provided properties.
+        /// </summary>
+        /// <param name="action">The <see langword="delegate"/> containing the author field properties.</param>
         public EmbedBuilder WithAuthor(Action<EmbedAuthorBuilder> action)
         {
             var author = new EmbedAuthorBuilder();
@@ -186,10 +221,12 @@ namespace Discord
             Author = author;
             return this;
         }
-        /// <summary> Sets the author field of an <see cref="Embed"/> with the provided name, icon URL, and URL. </summary>
-        /// <param name="name"> The title of the author field. </param>
-        /// <param name="iconUrl"> The icon URL of the author field. </param>
-        /// <param name="url"> The URL of the author field. </param>
+        /// <summary>
+        ///     Sets the author field of an <see cref="Embed" /> with the provided name, icon URL, and URL.
+        /// </summary>
+        /// <param name="name">The title of the author field.</param>
+        /// <param name="iconUrl">The icon URL of the author field.</param>
+        /// <param name="url">The URL of the author field.</param>
         public EmbedBuilder WithAuthor(string name, string iconUrl = null, string url = null)
         {
             var author = new EmbedAuthorBuilder
@@ -201,15 +238,19 @@ namespace Discord
             Author = author;
             return this;
         }
-        /// <summary> Sets the <see cref="EmbedFooterBuilder"/> of an <see cref="Embed"/>. </summary>
-        /// <param name="footer"> The footer builder class containing the footer field properties. </param>
+        /// <summary>
+        ///     Sets the <see cref="EmbedFooterBuilder" /> of an <see cref="Embed" /> .
+        /// </summary>
+        /// <param name="footer">The footer builder class containing the footer field properties.</param>
         public EmbedBuilder WithFooter(EmbedFooterBuilder footer)
         {
             Footer = footer;
             return this;
         }
-        /// <summary> Sets the footer field of an <see cref="Embed"/> with the provided properties. </summary>
-        /// <param name="action"> The delegate containing the footer field properties. </param>
+        /// <summary>
+        ///     Sets the footer field of an <see cref="Embed" /> with the provided properties.
+        /// </summary>
+        /// <param name="action">The <see langword="delegate"/> containing the footer field properties.</param>
         public EmbedBuilder WithFooter(Action<EmbedFooterBuilder> action)
         {
             var footer = new EmbedFooterBuilder();
@@ -217,9 +258,11 @@ namespace Discord
             Footer = footer;
             return this;
         }
-        /// <summary> Sets the footer field of an <see cref="Embed"/> with the provided name, icon URL. </summary>
-        /// <param name="text"> The title of the footer field. </param>
-        /// <param name="iconUrl"> The icon URL of the footer field. </param>
+        /// <summary>
+        ///     Sets the footer field of an <see cref="Embed" /> with the provided name, icon URL.
+        /// </summary>
+        /// <param name="text">The title of the footer field.</param>
+        /// <param name="iconUrl">The icon URL of the footer field.</param>
         public EmbedBuilder WithFooter(string text, string iconUrl = null)
         {
             var footer = new EmbedFooterBuilder
@@ -231,10 +274,12 @@ namespace Discord
             return this;
         }
 
-        /// <summary> Adds an <see cref="Embed"/> field with the provided name and value. </summary>
-        /// <param name="name"> The title of the field. </param>
-        /// <param name="value"> The value of the field. </param>
-        /// <param name="inline"> Indicates whether the field is in-line or not. </param>
+        /// <summary>
+        ///     Adds an <see cref="Embed" /> field with the provided name and value.
+        /// </summary>
+        /// <param name="name">The title of the field.</param>
+        /// <param name="value">The value of the field.</param>
+        /// <param name="inline">Indicates whether the field is in-line or not.</param>
         public EmbedBuilder AddField(string name, object value, bool inline = false)
         {
             var field = new EmbedFieldBuilder()
@@ -244,8 +289,11 @@ namespace Discord
             AddField(field);
             return this;
         }
-        /// <summary> Adds a field with the provided <see cref="EmbedFieldBuilder"/> to an <see cref="Embed"/>. </summary>
-        /// <param name="field"> The field builder class containing the field properties. </param>
+        /// <summary>
+        ///     Adds a field with the provided <see cref="EmbedFieldBuilder" /> to an
+        ///     <see cref="Embed" />.
+        /// </summary>
+        /// <param name="field">The field builder class containing the field properties.</param>
         public EmbedBuilder AddField(EmbedFieldBuilder field)
         {
             if (Fields.Count >= MaxFieldCount)
@@ -256,8 +304,10 @@ namespace Discord
             Fields.Add(field);
             return this;
         }
-        /// <summary> Adds an <see cref="Embed"/> field with the provided properties. </summary>
-        /// <param name="action"> The delegate containing the field properties. </param>
+        /// <summary>
+        ///     Adds an <see cref="Embed" /> field with the provided properties.
+        /// </summary>
+        /// <param name="action">The <see langword="delegate"/> containing the field properties.</param>
         public EmbedBuilder AddField(Action<EmbedFieldBuilder> action)
         {
             var field = new EmbedFieldBuilder();
@@ -266,8 +316,12 @@ namespace Discord
             return this;
         }
 
-        /// <summary> Builds the <see cref="Embed"/> into a Rich Embed format. </summary>
-        /// <returns> The built embed object. </returns>
+        /// <summary>
+        ///     Builds the <see cref="Embed" /> into a Rich Embed format.
+        /// </summary>
+        /// <returns>
+        ///     The built embed object.
+        /// </returns>
         public Embed Build()
         {
             if (Length > MaxEmbedLength)
@@ -286,9 +340,18 @@ namespace Discord
         private string _name;
         private string _value;
         private EmbedField _field;
+        /// <summary>
+        ///     Gets the maximum field length for name allowed by Discord.
+        /// </summary>
         public const int MaxFieldNameLength = 256;
+        /// <summary>
+        ///     Gets the maximum field length for value allowed by Discord.
+        /// </summary>
         public const int MaxFieldValueLength = 1024;
 
+        /// <summary>
+        ///     Gets or sets the field name.
+        /// </summary>
         public string Name
         {
             get => _name;
@@ -300,6 +363,9 @@ namespace Discord
             }
         }
 
+        /// <summary>
+        ///     Gets or sets the field value.
+        /// </summary>
         public object Value
         {
             get => _value;
@@ -311,24 +377,41 @@ namespace Discord
                 _value = stringValue;
             }
         }
+        /// <summary>
+        ///     Gets or sets whether the field should be in-line with each other.
+        /// </summary>
         public bool IsInline { get; set; }
 
+        /// <summary>
+        ///     Sets the field name.
+        /// </summary>
+        /// <param name="name">The name to set the field name to.</param>
         public EmbedFieldBuilder WithName(string name)
         {
             Name = name;
             return this;
         }
+        /// <summary>
+        ///     Sets the field value.
+        /// </summary>
+        /// <param name="value">The value to set the field value to.</param>
         public EmbedFieldBuilder WithValue(object value)
         {
             Value = value;
             return this;
         }
+        /// <summary>
+        /// Sets whether the field should be in-line with each other.
+        /// </summary>
         public EmbedFieldBuilder WithIsInline(bool isInline)
         {
             IsInline = isInline;
             return this;
         }
 
+        /// <summary>
+        ///     Builds the field builder into a <see cref="EmbedField"/> class.
+        /// </summary>
         public EmbedField Build()
             => new EmbedField(Name, Value.ToString(), IsInline);
     }

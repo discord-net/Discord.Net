@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Discord
 {
     /// <summary>
-    ///     A color object that Discord uses.
+    ///     Represents a Discord color.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct Color
@@ -62,10 +62,20 @@ namespace Discord
         /// <summary> Gets the blue component for this color. </summary>
         public byte B => (byte)(RawValue);
 
+        /// <summary>
+        ///     Initializes a <see cref="Color" /> struct with the given raw value.
+        /// </summary>
+        /// <param name="rawValue">A raw value for the color (e.g. <c>0x607D8B</c>).</param>
         public Color(uint rawValue)
         {
             RawValue = rawValue;
         }
+        /// <summary>
+        ///     Initializes a <see cref="Color" /> struct with the given RGB bytes.
+        /// </summary>
+        /// <param name="r">The <see langword="byte"/> that represents the red color.</param>
+        /// <param name="g">The <see langword="byte"/> that represents the green color.</param>
+        /// <param name="b">The <see langword="byte"/> that represents the blue color.</param>
         public Color(byte r, byte g, byte b)
         {
             RawValue =
@@ -73,6 +83,12 @@ namespace Discord
                 ((uint)g << 8) |
                 (uint)b;
         }
+        /// <summary>
+        ///     Initializes a <see cref="Color"/> struct with the given RGB value.
+        /// </summary>
+        /// <param name="r">The value that represents the red color. Must be within 0~255.</param>
+        /// <param name="g">The value that represents the green color. Must be within 0~255.</param>
+        /// <param name="b">The value that represents the blue color. Must be within 0~255.</param>
         public Color(int r, int g, int b)
         {
             if (r < 0 || r > 255)
@@ -86,6 +102,12 @@ namespace Discord
                 ((uint)g << 8) |
                 (uint)b;
         }
+        /// <summary>
+        ///     Initializes a <see cref="Color"/> struct with the given RGB float value.
+        /// </summary>
+        /// <param name="r">The value that represents the red color. Must be within 0~1.</param>
+        /// <param name="g">The value that represents the green color. Must be within 0~1.</param>
+        /// <param name="b">The value that represents the blue color. Must be within 0~1.</param>
         public Color(float r, float g, float b)
         {
             if (r < 0.0f || r > 1.0f)
@@ -99,7 +121,10 @@ namespace Discord
                 ((uint)(g * 255.0f) << 8) |
                 (uint)(b * 255.0f);
         }
-        
+
+        /// <summary>
+        ///     Gets the hexadecimal representation of the color (e.g. #000ccc).
+        /// </summary>
         public override string ToString() =>
             $"#{Convert.ToString(RawValue, 16)}";
         private string DebuggerDisplay =>

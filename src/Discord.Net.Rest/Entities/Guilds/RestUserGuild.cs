@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.UserGuild;
@@ -6,7 +6,7 @@ using Model = Discord.API.UserGuild;
 namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestUserGuild : RestEntity<ulong>, ISnowflakeEntity, IUserGuild
+    public class RestUserGuild : RestEntity<ulong>, IUserGuild
     {
         private string _iconId;
                 

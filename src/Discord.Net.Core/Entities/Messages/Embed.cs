@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Represents an embed object seen in an <see cref="IUserMessage" />.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Embed : IEmbed
     {
@@ -70,8 +73,14 @@ namespace Discord
             Fields = fields;
         }
 
+        /// <summary>
+        ///     Gets the total length of all embed properties.
+        /// </summary>
         public int Length => Title?.Length + Author?.Name?.Length + Description?.Length + Footer?.Text?.Length + Fields.Sum(f => f.Name.Length + f.Value.ToString().Length) ?? 0;
 
+        /// <summary>
+        ///     Gets the title of the embed.
+        /// </summary>
         public override string ToString() => Title;
         private string DebuggerDisplay => $"{Title} ({Type})";
     }
