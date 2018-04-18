@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    ///     An asset for a <see cref="RichGame" /> object.
+    ///     An asset for a <see cref="RichGame" /> object containing the text and image.
     /// </summary>
     public class GameAsset
     {

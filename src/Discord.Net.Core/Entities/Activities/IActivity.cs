@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    ///     A Discord activity, typically a game.
+    ///     A user's activity status, typically a <see cref="Game"/>.
     /// </summary>
     public interface IActivity
     {

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a generic group channel.
+    ///     Represents a private generic group channel.
     /// </summary>
     public interface IGroupChannel : IMessageChannel, IPrivateChannel, IAudioChannel
     {

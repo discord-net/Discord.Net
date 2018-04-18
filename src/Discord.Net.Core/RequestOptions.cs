@@ -2,6 +2,9 @@ using System.Threading;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Represents options that should be used when sending a request.
+    /// </summary>
     public class RequestOptions
     {
         /// <summary>

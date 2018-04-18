@@ -1,5 +1,8 @@
 namespace Discord
 {
+    /// <summary>
+    ///     Party secret for a <see cref="RichGame" /> object.
+    /// </summary>
     public class GameSecrets
     {
         /// <summary>

@@ -1,11 +1,14 @@
 namespace Discord
 {
+    /// <summary>
+    ///     Party information for a <see cref="RichGame" /> object.
+    /// </summary>
     public class GameParty
     {
         internal GameParty() { }
 
         /// <summary>
-        ///     Gets the id of the party.
+        ///     Gets the ID of the party.
         /// </summary>
         public string Id { get; internal set; }
         public long Members { get; internal set; }
