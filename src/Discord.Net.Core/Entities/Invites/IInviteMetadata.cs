@@ -2,7 +2,7 @@ using System;
 
 namespace Discord
 {
-    /// <summary> Represents additional information regarding the invite object. </summary>
+    /// <summary> Represents additional information regarding the generic invite object. </summary>
     public interface IInviteMetadata : IInvite
     {
         /// <summary>

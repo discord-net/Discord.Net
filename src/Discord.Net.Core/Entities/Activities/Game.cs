@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace Discord
 {
     /// <summary>
-    ///     A user's game activity.
+    ///     A user's game status.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Game : IActivity

@@ -1,23 +1,32 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Application;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a REST entity that contains information about a Discord application created via the developer portal.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestApplication : RestEntity<ulong>, IApplication
     {
         protected string _iconId;
-        
+
+        /// <inheritdoc />
         public string Name { get; private set; }
+        /// <inheritdoc />
         public string Description { get; private set; }
+        /// <inheritdoc />
         public string[] RPCOrigins { get; private set; }
         public ulong Flags { get; private set; }
 
+        /// <inheritdoc />
         public IUser Owner { get; private set; }
 
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
+        /// <inheritdoc />
         public string IconUrl => CDN.GetApplicationIconUrl(Id, _iconId);
 
         internal RestApplication(BaseDiscordClient discord, ulong id)

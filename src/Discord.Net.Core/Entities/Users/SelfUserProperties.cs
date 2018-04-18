@@ -15,11 +15,11 @@ namespace Discord
     public class SelfUserProperties
     {
         /// <summary>
-        ///     Sets the username.
+        ///     Gets or sets the username.
         /// </summary>
         public Optional<string> Username { get; set; }
         /// <summary>
-        ///     Sets the avatar.
+        ///     Gets or sets the avatar.
         /// </summary>
         public Optional<Image?> Avatar { get; set; }
     }

@@ -16,12 +16,12 @@ namespace Discord
         Task<IUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null);
 #if FILESYSTEM
         /// <summary>
-        ///     Sends a file to this <paramref name="text"/> channel, with an optional caption.
+        ///     Sends a file to this message channel, with an optional caption.
         /// </summary>
         Task<IUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
 #endif
         /// <summary>
-        ///     Sends a file to this <paramref name="text"/> channel, with an optional caption.
+        ///     Sends a file to this message channel, with an optional caption.
         /// </summary>
         Task<IUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
 

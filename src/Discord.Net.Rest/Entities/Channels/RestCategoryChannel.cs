@@ -1,13 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a REST category channel.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestCategoryChannel : RestGuildChannel, ICategoryChannel
     {

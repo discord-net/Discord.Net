@@ -17,21 +17,21 @@ namespace Discord
     public class GuildUserProperties
     {
         /// <summary>
-        ///     Sets whether the user should be muted in a voice channel.
+        ///     Gets or sets whether the user should be muted in a voice channel.
         /// </summary>
         /// <remarks>
         ///     If this value is set to <see langword="true"/>, no user will be able to hear this user speak in the guild.
         /// </remarks>
         public Optional<bool> Mute { get; set; }
         /// <summary>
-        ///     Sets whether the user should be deafened in a voice channel.
+        ///     Gets or sets whether the user should be deafened in a voice channel.
         /// </summary>
         /// <remarks>
         ///     If this value is set to <see langword="true"/>, this user will not be able to hear anyone speak in the guild.
         /// </remarks>
         public Optional<bool> Deaf { get; set; }
         /// <summary>
-        ///     Sets the user's nickname.
+        ///     Gets or sets the user's nickname.
         /// </summary>
         /// <remarks>
         ///     To clear the user's nickname, this value can be set to <see langword="null" /> or
@@ -39,7 +39,7 @@ namespace Discord
         /// </remarks>
         public Optional<string> Nickname { get; set; }
         /// <summary>
-        ///     Sets the roles the user should have.
+        ///     Gets or sets the roles the user should have.
         /// </summary>
         /// <remarks>
         ///     <para>
@@ -53,7 +53,7 @@ namespace Discord
         /// </remarks>
         public Optional<IEnumerable<IRole>> Roles { get; set; }
         /// <summary>
-        ///     Sets the roles the user should have.
+        ///     Gets or sets the roles the user should have.
         /// </summary>
         /// <remarks>
         ///     <para>

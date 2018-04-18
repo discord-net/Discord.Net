@@ -2,6 +2,9 @@ using System.Diagnostics;
 
 namespace Discord
 {
+    /// <summary>
+    ///     A user's Rich Presence status.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RichGame : Game
     {

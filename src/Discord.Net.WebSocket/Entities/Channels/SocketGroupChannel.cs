@@ -14,6 +14,9 @@ using VoiceStateModel = Discord.API.VoiceState;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a private WebSocket group channel.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGroupChannel : SocketChannel, IGroupChannel, ISocketPrivateChannel, ISocketMessageChannel, ISocketAudioChannel
     {
