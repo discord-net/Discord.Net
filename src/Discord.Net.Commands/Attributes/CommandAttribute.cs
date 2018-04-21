@@ -15,10 +15,16 @@ namespace Discord.Commands
         /// </summary>
         public RunMode RunMode { get; set; } = RunMode.Default;
 
+        /// <inheritdoc />
         public CommandAttribute()
         {
             Text = null;
         }
+
+        /// <summary>
+        ///     Initializes a new <see cref="CommandAttribute" /> attribute with the specified name.
+        /// </summary>
+        /// <param name="text">The name of the command.</param>
         public CommandAttribute(string text)
         {
             Text = text;

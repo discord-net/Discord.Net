@@ -14,7 +14,7 @@ namespace Discord.Commands
         public int Priority { get; }
 
         /// <summary>
-        ///     Creates a new <see cref="PriorityAttribute" /> with the given priority.
+        ///     Initializes a new <see cref="PriorityAttribute" /> attribute with the given priority.
         /// </summary>
         public PriorityAttribute(int priority)
         {

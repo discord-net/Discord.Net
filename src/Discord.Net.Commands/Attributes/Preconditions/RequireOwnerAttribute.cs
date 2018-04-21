@@ -10,6 +10,7 @@ namespace Discord.Commands
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RequireOwnerAttribute : PreconditionAttribute
     {
+        /// <inheritdoc />
         public override async Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
             switch (context.Client.TokenType)

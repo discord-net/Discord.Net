@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Discord
 {
     /// <summary>
-    /// Represents a collection of <see cref="IEqualityComparer{T}"/> for various Discord objects.
+    ///     Represents a collection of <see cref="IEqualityComparer{T}"/> for various Discord objects.
     /// </summary>
     public static class DiscordComparers
     {

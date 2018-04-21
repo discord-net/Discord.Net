@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 namespace Discord.Commands
 {
     /// <summary>
-    /// Requires the command to be invoked in a channel marked NSFW.
+    ///     Requires the command to be invoked in a channel marked NSFW.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RequireNsfwAttribute : PreconditionAttribute
     {
+        /// <inheritdoc />
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
             if (context.Channel is ITextChannel text && text.IsNsfw)

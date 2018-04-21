@@ -5,6 +5,11 @@ namespace Discord.Commands
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class RuntimeResult : IResult
     {
+        /// <summary>
+        ///     Initializes a new <see cref="RuntimeResult" /> class with the type of error and reason.
+        /// </summary>
+        /// <param name="error">The type of failure, or <see langword="null" /> if none.</param>
+        /// <param name="reason">The reason of failure.</param>
         protected RuntimeResult(CommandError? error, string reason)
         {
             Error = error;

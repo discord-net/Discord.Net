@@ -24,7 +24,7 @@ namespace Discord.Commands
             Error = error;
             ErrorReason = errorReason;
         }
-
+        
         public static ParseResult FromSuccess(IReadOnlyList<TypeReaderResult> argValues, IReadOnlyList<TypeReaderResult> paramValues)
         {
             for (int i = 0; i < argValues.Count; i++)

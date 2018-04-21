@@ -9,39 +9,44 @@ namespace Discord.Commands
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RequireUserPermissionAttribute : PreconditionAttribute
     {
+        /// <summary>
+        ///     Gets the specified <see cref="Discord.GuildPermission" /> of the precondition.
+        /// </summary>
         public GuildPermission? GuildPermission { get; }
+        /// <summary>
+        ///     Gets the specified <see cref="Discord.ChannelPermission" /> of the precondition.
+        /// </summary>
         public ChannelPermission? ChannelPermission { get; }
 
         /// <summary>
-        /// Requires that the user invoking the command to have a specific <see cref="GuildPermission"/>.
+        ///     Requires that the user invoking the command to have a specific <see cref="Discord.GuildPermission" />.
         /// </summary>
-        /// <remarks>This precondition will always fail if the command is being invoked in a private channel.</remarks>
-        /// <param name="permission">The GuildPermission that the user must have. Multiple permissions can be specified by ORing the permissions together.</param>
+        /// <remarks>
+        ///     This precondition will always fail if the command is being invoked in a <see cref="IPrivateChannel"/>.
+        /// </remarks>
+        /// <param name="permission">
+        ///     The <see cref="Discord.GuildPermission" /> that the user must have. Multiple permissions can be
+        ///     specified by ORing the permissions together.
+        /// </param>
         public RequireUserPermissionAttribute(GuildPermission permission)
         {
             GuildPermission = permission;
             ChannelPermission = null;
         }
         /// <summary>
-        /// Requires that the user invoking the command to have a specific <see cref="ChannelPermission"/>.
+        ///     Requires that the user invoking the command to have a specific <see cref="Discord.ChannelPermission"/>.
         /// </summary>
-        /// <param name="permission">The ChannelPermission that the user must have. Multiple permissions can be specified by ORing the permissions together.</param>
-        /// <example>
-        /// <code language="c#">
-        ///     [Command("permission")]
-        ///     [RequireUserPermission(ChannelPermission.ReadMessageHistory | ChannelPermission.ReadMessages)]
-        ///     public async Task HasPermission()
-        ///     {
-        ///         await ReplyAsync("You can read messages and the message history!");
-        ///     }
-        /// </code>
-        /// </example>
+        /// <param name="permission">
+        ///     The <see cref="Discord.ChannelPermission"/> that the user must have. Multiple permissions can be
+        ///     specified by ORing the permissions together.
+        /// </param>
         public RequireUserPermissionAttribute(ChannelPermission permission)
         {
             ChannelPermission = permission;
             GuildPermission = null;
         }
-        
+
+        /// <inheritdoc />
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
             var guildUser = context.User as IGuildUser;

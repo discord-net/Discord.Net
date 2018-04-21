@@ -3,7 +3,7 @@ using System;
 namespace Discord
 {
     /// <summary>
-    ///     A class containing the strings related to various Content Delivery Networks (CDNs).
+    ///     Represents a class containing the strings related to various Content Delivery Networks (CDNs).
     /// </summary>
     public static class CDN
     {

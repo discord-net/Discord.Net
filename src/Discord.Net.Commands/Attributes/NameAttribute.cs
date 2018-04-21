@@ -14,8 +14,10 @@ namespace Discord.Commands
         /// </summary>
         public string Text { get; }
 
-        /// <summary> Marks the public name of a command, module, or parameter with the provided name. </summary>
-        /// <param name="text"> The public name of the object. </param>
+        /// <summary>
+        ///     Marks the public name of a command, module, or parameter with the provided name.
+        /// </summary>
+        /// <param name="text">The public name of the object.</param>
         public NameAttribute(string text)
         {
             Text = text;
