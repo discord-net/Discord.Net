@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -7,16 +7,24 @@ using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
-    public class RestGuildChannel : RestChannel, IGuildChannel, IUpdateable
+    /// <summary>
+    ///     Represents a private REST group channel.
+    /// </summary>
+    public class RestGuildChannel : RestChannel, IGuildChannel
     {
         private ImmutableArray<Overwrite> _overwrites;
 
+        /// <inheritdoc />
         public IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
 
         internal IGuild Guild { get; }
+        /// <inheritdoc />
         public string Name { get; private set; }
+        /// <inheritdoc />
         public int Position { get; private set; }
+        /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
+        /// <inheritdoc />
         public ulong GuildId => Guild.Id;
 
         internal RestGuildChannel(BaseDiscordClient discord, IGuild guild, ulong id)
@@ -51,19 +59,23 @@ namespace Discord.Rest
             _overwrites = newOverwrites.ToImmutable();
         }
 
+        /// <inheritdoc />
         public override async Task UpdateAsync(RequestOptions options = null)
         {
             var model = await Discord.ApiClient.GetChannelAsync(GuildId, Id, options).ConfigureAwait(false);
             Update(model);
         }
+        /// <inheritdoc />
         public async Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null)
         {
             var model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
+        /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
 
+        /// <inheritdoc />
         public async Task<ICategoryChannel> GetCategoryAsync()
         {
             if (CategoryId.HasValue)

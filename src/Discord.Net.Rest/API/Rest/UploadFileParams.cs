@@ -30,28 +30,24 @@ namespace Discord.API.Rest
         {
             var d = new Dictionary<string, object>();
             d["file"] = new MultipartFile(File, Filename.GetValueOrDefault("unknown.dat"));
+
+            var payload = new Dictionary<string, object>();
             if (Content.IsSpecified)
-                d["content"] = Content.Value;
+                payload["content"] = Content.Value;
             if (IsTTS.IsSpecified)
-                d["tts"] = IsTTS.Value.ToString();
+                payload["tts"] = IsTTS.Value.ToString();
             if (Nonce.IsSpecified)
-                d["nonce"] = Nonce.Value;
+                payload["nonce"] = Nonce.Value;
             if (Embed.IsSpecified)
-            {
-                var payload = new StringBuilder();
-                using (var text = new StringWriter(payload))
-                using (var writer = new JsonTextWriter(text))
-                {
-                    var map = new Dictionary<string, object>()
-                    {
-                        ["embed"] = Embed.Value,
-                    };
+                payload["embed"] = Embed.Value;
 
-                    _serializer.Serialize(writer, map);
-                }
-                d["payload_json"] = payload.ToString();
+            var json = new StringBuilder();
+            using (var text = new StringWriter(json))
+            using (var writer = new JsonTextWriter(text))
+                _serializer.Serialize(writer, payload);
 
-            }
+            d["payload_json"] = json.ToString();
+
             return d;
         }
     }

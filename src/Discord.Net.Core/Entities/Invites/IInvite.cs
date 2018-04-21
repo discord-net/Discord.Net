@@ -1,29 +1,50 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Represents a generic invite object.
+    /// </summary>
     public interface IInvite : IEntity<string>, IDeletable
     {
-        /// <summary> Gets the unique identifier for this invite. </summary>
+        /// <summary>
+        ///     Gets the unique identifier for this invite.
+        /// </summary>
         string Code { get; }
-        /// <summary> Gets the url used to accept this invite, using Code. </summary>
+        /// <summary>
+        ///     Gets the URL used to accept this invite, using Code.
+        /// </summary>
         string Url { get; }
 
-        /// <summary> Gets the channel this invite is linked to. </summary>
+        /// <summary>
+        ///     Gets the channel this invite is linked to.
+        /// </summary>
         IChannel Channel { get; }
-        /// <summary> Gets the id of the channel this invite is linked to. </summary>
+        /// <summary>
+        ///     Gets the ID of the channel this invite is linked to.
+        /// </summary>
         ulong ChannelId { get; }
-        /// <summary> Gets the name of the channel this invite is linked to. </summary>
+        /// <summary>
+        ///     Gets the name of the channel this invite is linked to.
+        /// </summary>
         string ChannelName { get; }
 
-        /// <summary> Gets the guild this invite is linked to. </summary>
+        /// <summary>
+        ///     Gets the guild this invite is linked to.
+        /// </summary>
         IGuild Guild { get; }
-        /// <summary> Gets the id of the guild this invite is linked to. </summary>
+        /// <summary>
+        ///     Gets the ID of the guild this invite is linked to.
+        /// </summary>
         ulong GuildId { get; }
-        /// <summary> Gets the name of the guild this invite is linked to. </summary>
+        /// <summary>
+        ///     Gets the name of the guild this invite is linked to.
+        /// </summary>
         string GuildName { get; }
 
-        /// <summary> Accepts this invite and joins the target guild. This will fail on bot accounts. </summary>
+        /// <summary>
+        ///     Accepts this invite and joins the target guild. This will fail on bot accounts.
+        /// </summary>
         Task AcceptAsync(RequestOptions options = null);
     }
 }

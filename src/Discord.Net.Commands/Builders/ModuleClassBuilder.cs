@@ -34,7 +34,7 @@ namespace Discord.Commands
                 }
                 else if (IsLoadableModule(typeInfo))
                 {
-                    await service._cmdLogger.WarningAsync($"Class {typeInfo.FullName} is not public and cannot be loaded. To suppress this message, mark the class with {nameof(DontAutoLoadAttribute)}.");
+                    await service._cmdLogger.WarningAsync($"Class {typeInfo.FullName} is not public and cannot be loaded. To suppress this message, mark the class with {nameof(DontAutoLoadAttribute)}.").ConfigureAwait(false);
                 }
             }
 
@@ -291,7 +291,7 @@ namespace Discord.Commands
 
             //We dont have a cached type reader, create one
             reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, services);
-            service.AddTypeReader(paramType, reader);
+            service.AddTypeReader(paramType, reader, false);
 
             return reader;
         }

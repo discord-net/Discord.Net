@@ -1,28 +1,40 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    ///     Defines the type of command context (i.e. where the command is being executed).
+    /// </summary>
     [Flags]
     public enum ContextType
     {
+        /// <summary>
+        ///     Specifies the command to be executed within a guild.
+        /// </summary>
         Guild = 0x01,
+        /// <summary>
+        ///     Specifies the command to be executed within a DM.
+        /// </summary>
         DM = 0x02,
+        /// <summary>
+        ///     Specifies the command to be executed within a group.
+        /// </summary>
         Group = 0x04
     }
 
     /// <summary>
-    /// Require that the command be invoked in a specified context.
+    ///     Requires the command to be invoked in a specified context (e.g. in guild, DM).
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RequireContextAttribute : PreconditionAttribute
     {
+        /// <summary>
+        ///     Gets the context required to execute the command.
+        /// </summary>
         public ContextType Contexts { get; }
 
-        /// <summary>
-        /// Require that the command be invoked in a specified context.
-        /// </summary>
+        /// <summary> Requires the command to be invoked in the specified context. </summary>
         /// <param name="contexts">The type of context the command can be invoked in. Multiple contexts can be specified by ORing the contexts together.</param>
         /// <example>
         /// <code language="c#">

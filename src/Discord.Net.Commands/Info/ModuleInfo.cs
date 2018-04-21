@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Reflection;
 using Discord.Commands.Builders;
 
 namespace Discord.Commands

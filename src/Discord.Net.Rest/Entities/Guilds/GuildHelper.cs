@@ -237,7 +237,7 @@ namespace Discord.Rest
                     };
                     if (info.Position != null)
                         args.AfterUserId = info.Position.Value;
-                    var models = await client.ApiClient.GetGuildMembersAsync(guild.Id, args, options);
+                    var models = await client.ApiClient.GetGuildMembersAsync(guild.Id, args, options).ConfigureAwait(false);
                     return models.Select(x => RestGuildUser.Create(client, guild, x)).ToImmutableArray();
                 },
                 nextPage: (info, lastPage) =>
@@ -280,7 +280,7 @@ namespace Discord.Rest
         //Emotes
         public static async Task<GuildEmote> GetEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
         {
-            var emote = await client.ApiClient.GetGuildEmoteAsync(guild.Id, id, options);
+            var emote = await client.ApiClient.GetGuildEmoteAsync(guild.Id, id, options).ConfigureAwait(false);
             return emote.ToEntity();
         }
         public static async Task<GuildEmote> CreateEmoteAsync(IGuild guild, BaseDiscordClient client, string name, Image image, Optional<IEnumerable<IRole>> roles, 
@@ -294,7 +294,7 @@ namespace Discord.Rest
             if (roles.IsSpecified)
                 apiargs.RoleIds = roles.Value?.Select(xr => xr.Id)?.ToArray();
 
-            var emote = await client.ApiClient.CreateGuildEmoteAsync(guild.Id, apiargs, options);
+            var emote = await client.ApiClient.CreateGuildEmoteAsync(guild.Id, apiargs, options).ConfigureAwait(false);
             return emote.ToEntity();
         }
         public static async Task<GuildEmote> ModifyEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, Action<EmoteProperties> func, 
@@ -312,7 +312,7 @@ namespace Discord.Rest
             if (props.Roles.IsSpecified)
                 apiargs.RoleIds = props.Roles.Value?.Select(xr => xr.Id)?.ToArray();
 
-            var emote = await client.ApiClient.ModifyGuildEmoteAsync(guild.Id, id, apiargs, options);
+            var emote = await client.ApiClient.ModifyGuildEmoteAsync(guild.Id, id, apiargs, options).ConfigureAwait(false);
             return emote.ToEntity();
         }
         public static Task DeleteEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options) 

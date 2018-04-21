@@ -1,29 +1,45 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Text;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Represents a helper class for mention-related parsing.
+    /// </summary>
     public static class MentionUtils
     {
         private const char SanitizeChar = '\x200b';
 
         //If the system can't be positive a user doesn't have a nickname, assume useNickname = true (source: Jake)
         internal static string MentionUser(string id, bool useNickname = true) => useNickname ? $"<@!{id}>" : $"<@{id}>";
+        /// <summary>
+        ///     Returns a mention string based on the user ID.
+        /// </summary>
         public static string MentionUser(ulong id) => MentionUser(id.ToString(), true);
         internal static string MentionChannel(string id) => $"<#{id}>";
+        /// <summary>
+        ///     Returns a mention string based on the channel ID.
+        /// </summary>
         public static string MentionChannel(ulong id) => MentionChannel(id.ToString());
-        internal static string MentionRole(string id) => $"<@&{id}>";        
+        internal static string MentionRole(string id) => $"<@&{id}>";
+        /// <summary>
+        ///     Returns a mention string based on the role ID.
+        /// </summary>
         public static string MentionRole(ulong id) => MentionRole(id.ToString());
 
-        /// <summary> Parses a provided user mention string. </summary>
+        /// <summary>
+        ///     Parses a provided user mention string.
+        /// </summary>
         public static ulong ParseUser(string text)
         {
             if (TryParseUser(text, out ulong id))
                 return id;
             throw new ArgumentException("Invalid mention format", nameof(text));
         }
-        /// <summary> Tries to parse a provided user mention string. </summary>
+        /// <summary>
+        ///     Tries to parse a provided user mention string.
+        /// </summary>
         public static bool TryParseUser(string text, out ulong userId)
         {
             if (text.Length >= 3 && text[0] == '<' && text[1] == '@' && text[text.Length - 1] == '>')
@@ -40,14 +56,18 @@ namespace Discord
             return false;
         }
 
-        /// <summary> Parses a provided channel mention string. </summary>
+        /// <summary>
+        ///     Parses a provided channel mention string.
+        /// </summary>
         public static ulong ParseChannel(string text)
         {
             if (TryParseChannel(text, out ulong id))
                 return id;
             throw new ArgumentException("Invalid mention format", nameof(text));
         }
-        /// <summary>Tries to parse a provided channel mention string. </summary>
+        /// <summary>
+        ///     Tries to parse a provided channel mention string.
+        /// </summary>
         public static bool TryParseChannel(string text, out ulong channelId)
         {
             if (text.Length >= 3 && text[0] == '<' && text[1] == '#' && text[text.Length - 1] == '>')
@@ -61,14 +81,18 @@ namespace Discord
             return false;
         }
 
-        /// <summary> Parses a provided role mention string. </summary>
+        /// <summary>
+        ///     Parses a provided role mention string.
+        /// </summary>
         public static ulong ParseRole(string text)
         {
             if (TryParseRole(text, out ulong id))
                 return id;
             throw new ArgumentException("Invalid mention format", nameof(text));
         }
-        /// <summary>Tries to parse a provided role mention string. </summary>
+        /// <summary>
+        ///     Tries to parse a provided role mention string.
+        /// </summary>
         public static bool TryParseRole(string text, out ulong roleId)
         {
             if (text.Length >= 4 && text[0] == '<' && text[1] == '@' && text[2] == '&' && text[text.Length - 1] == '>')

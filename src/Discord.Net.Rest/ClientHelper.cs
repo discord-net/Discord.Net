@@ -1,4 +1,4 @@
-﻿using Discord.API.Rest;
+using Discord.API.Rest;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -146,7 +146,7 @@ namespace Discord.Rest
 
         public static async Task<RestWebhook> GetWebhookAsync(BaseDiscordClient client, ulong id, RequestOptions options)
         {
-            var model = await client.ApiClient.GetWebhookAsync(id);
+            var model = await client.ApiClient.GetWebhookAsync(id).ConfigureAwait(false);
             if (model != null)
                 return RestWebhook.Create(client, (IGuild)null, model);
             return null;
@@ -162,6 +162,12 @@ namespace Discord.Rest
         {
             var models = await client.ApiClient.GetVoiceRegionsAsync(options).ConfigureAwait(false);
             return models.Select(x => RestVoiceRegion.Create(client, x)).FirstOrDefault(x => x.Id == id);
+        }
+
+        public static async Task<int> GetRecommendShardCountAsync(BaseDiscordClient client, RequestOptions options)
+        {
+            var response = await client.ApiClient.GetBotGatewayAsync(options).ConfigureAwait(false);
+            return response.Shards;
         }
     }
 }

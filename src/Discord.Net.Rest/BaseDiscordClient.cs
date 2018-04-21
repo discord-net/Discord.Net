@@ -1,4 +1,4 @@
-﻿using Discord.Logging;
+using Discord.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -124,6 +124,10 @@ namespace Discord.Rest
         }
         /// <inheritdoc />
         public void Dispose() => Dispose(true);
+
+        /// <inheritdoc />
+        public Task<int> GetRecommendedShardCountAsync(RequestOptions options = null)
+            => ClientHelper.GetRecommendShardCountAsync(this, options);
 
         //IDiscordClient
         ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;

@@ -269,6 +269,18 @@ namespace Discord.API
             await SendAsync("GET", () => "auth/login", new BucketIds(), options: options).ConfigureAwait(false);
         }
 
+        //Gateway
+        public async Task<GetGatewayResponse> GetGatewayAsync(RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendAsync<GetGatewayResponse>("GET", () => "gateway", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+        public async Task<GetBotGatewayResponse> GetBotGatewayAsync(RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+            return await SendAsync<GetBotGatewayResponse>("GET", () => "gateway/bot", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
         //Channels
         public async Task<Channel> GetChannelAsync(ulong channelId, RequestOptions options = null)
         {
@@ -389,7 +401,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            await SendAsync("PUT", () => $"guilds/{guildId}/members/{userId}/roles/{roleId}", ids, options: options);
+            await SendAsync("PUT", () => $"guilds/{guildId}/members/{userId}/roles/{roleId}", ids, options: options).ConfigureAwait(false);
         }
         public async Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
         {
@@ -400,7 +412,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            await SendAsync("DELETE", () => $"guilds/{guildId}/members/{userId}/roles/{roleId}", ids, options: options);
+            await SendAsync("DELETE", () => $"guilds/{guildId}/members/{userId}/roles/{roleId}", ids, options: options).ConfigureAwait(false);
         }
         
         //Channel Messages
@@ -458,7 +470,7 @@ namespace Discord.API
             if (!args.Embed.IsSpecified || args.Embed.Value == null)
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
-            if (args.Content.Length > DiscordConfig.MaxMessageSize)
+            if (args.Content?.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             options = RequestOptions.CreateOrClone(options);
 
@@ -475,7 +487,7 @@ namespace Discord.API
             if (!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0)
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
-            if (args.Content.Length > DiscordConfig.MaxMessageSize)
+            if (args.Content?.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             options = RequestOptions.CreateOrClone(options);
             
@@ -556,7 +568,7 @@ namespace Discord.API
             {
                 if (!args.Embed.IsSpecified)
                     Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
-                if (args.Content.Value.Length > DiscordConfig.MaxMessageSize)
+                if (args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
                     throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             }
             options = RequestOptions.CreateOrClone(options);
@@ -1066,7 +1078,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<Emoji>("GET", () => $"guilds/{guildId}/emojis/{emoteId}", ids, options: options);
+            return await SendAsync<Emoji>("GET", () => $"guilds/{guildId}/emojis/{emoteId}", ids, options: options).ConfigureAwait(false);
         }
 
         public async Task<Emoji> CreateGuildEmoteAsync(ulong guildId, Rest.CreateGuildEmoteParams args, RequestOptions options = null)
@@ -1078,7 +1090,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<Emoji>("POST", () => $"guilds/{guildId}/emojis", args, ids, options: options);
+            return await SendJsonAsync<Emoji>("POST", () => $"guilds/{guildId}/emojis", args, ids, options: options).ConfigureAwait(false);
         }
 
         public async Task<Emoji> ModifyGuildEmoteAsync(ulong guildId, ulong emoteId, ModifyGuildEmoteParams args, RequestOptions options = null)
@@ -1089,7 +1101,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<Emoji>("PATCH", () => $"guilds/{guildId}/emojis/{emoteId}", args, ids, options: options);
+            return await SendJsonAsync<Emoji>("PATCH", () => $"guilds/{guildId}/emojis/{emoteId}", args, ids, options: options).ConfigureAwait(false);
         }
 
         public async Task DeleteGuildEmoteAsync(ulong guildId, ulong emoteId, RequestOptions options = null)
@@ -1099,7 +1111,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            await SendAsync("DELETE", () => $"guilds/{guildId}/emojis/{emoteId}", ids, options: options);
+            await SendAsync("DELETE", () => $"guilds/{guildId}/emojis/{emoteId}", ids, options: options).ConfigureAwait(false);
         }
 
         //Users
@@ -1199,7 +1211,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             var ids = new BucketIds(channelId: channelId);
 
-            return await SendJsonAsync<Webhook>("POST", () => $"channels/{channelId}/webhooks", args, ids, options: options);
+            return await SendJsonAsync<Webhook>("POST", () => $"channels/{channelId}/webhooks", args, ids, options: options).ConfigureAwait(false);
         }
         public async Task<Webhook> GetWebhookAsync(ulong webhookId, RequestOptions options = null)
         {

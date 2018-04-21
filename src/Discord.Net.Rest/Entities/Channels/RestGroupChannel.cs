@@ -11,11 +11,12 @@ using Model = Discord.API.Channel;
 namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestGroupChannel : RestChannel, IGroupChannel, IRestPrivateChannel, IRestMessageChannel, IRestAudioChannel, IUpdateable
+    public class RestGroupChannel : RestChannel, IGroupChannel, IRestPrivateChannel, IRestMessageChannel, IRestAudioChannel
     {
         private string _iconId;
         private ImmutableDictionary<ulong, RestGroupUser> _users;
 
+        /// <inheritdoc />
         public string Name { get; private set; }
 
         public IReadOnlyCollection<RestGroupUser> Users => _users.ToReadOnlyCollection();
@@ -49,12 +50,13 @@ namespace Discord.Rest
                 users[models[i].Id] = RestGroupUser.Create(Discord, models[i]);
             _users = users.ToImmutable();
         }
-
+        /// <inheritdoc />
         public override async Task UpdateAsync(RequestOptions options = null)
         {
             var model = await Discord.ApiClient.GetChannelAsync(Id, options).ConfigureAwait(false);
             Update(model);
         }
+        /// <inheritdoc />
         public Task LeaveAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
 
@@ -65,26 +67,35 @@ namespace Discord.Rest
             return null;
         }
 
+        /// <inheritdoc />
         public Task<RestMessage> GetMessageAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetMessageAsync(this, Discord, id, options);
+        /// <inheritdoc />
         public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => ChannelHelper.GetMessagesAsync(this, Discord, null, Direction.Before, limit, options);
+        /// <inheritdoc />
         public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => ChannelHelper.GetMessagesAsync(this, Discord, fromMessageId, dir, limit, options);
+        /// <inheritdoc />
         public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => ChannelHelper.GetMessagesAsync(this, Discord, fromMessage.Id, dir, limit, options);
+        /// <inheritdoc />
         public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
 
+        /// <inheritdoc />
         public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
 #if FILESYSTEM
+        /// <inheritdoc />
         public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, options);
 #endif
+        /// <inheritdoc />
         public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options);
 
+        /// <inheritdoc />
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);
         public IDisposable EnterTypingState(RequestOptions options = null)

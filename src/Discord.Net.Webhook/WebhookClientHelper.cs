@@ -14,7 +14,7 @@ namespace Discord.Webhook
     {
         public static async Task<RestInternalWebhook> GetWebhookAsync(DiscordWebhookClient client, ulong webhookId)
         {
-            var model = await client.ApiClient.GetWebhookAsync(webhookId);
+            var model = await client.ApiClient.GetWebhookAsync(webhookId).ConfigureAwait(false);
             if (model == null)
                 throw new InvalidOperationException("Could not find a webhook for the supplied credentials.");
             return RestInternalWebhook.Create(client, model);

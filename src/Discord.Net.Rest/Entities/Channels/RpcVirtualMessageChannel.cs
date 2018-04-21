@@ -53,7 +53,7 @@ namespace Discord.Rest
         async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
-                return await GetMessageAsync(id, options);
+                return await GetMessageAsync(id, options).ConfigureAwait(false);
             else
                 return null;
         }
@@ -79,28 +79,27 @@ namespace Discord.Rest
                 return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
         }
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
-            => await GetPinnedMessagesAsync(options);
+            => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
 
 #if FILESYSTEM
         async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed, RequestOptions options)
-            => await SendFileAsync(filePath, text, isTTS, embed, options);
+            => await SendFileAsync(filePath, text, isTTS, embed, options).ConfigureAwait(false);
 #endif
         async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options)
-            => await SendFileAsync(stream, filename, text, isTTS, embed, options);
+            => await SendFileAsync(stream, filename, text, isTTS, embed, options).ConfigureAwait(false);
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options)
-            => await SendMessageAsync(text, isTTS, embed, options);
+            => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
         IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
             => EnterTypingState(options);
 
         //IChannel
-        string IChannel.Name { get { throw new NotSupportedException(); } }
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
-        {
+        string IChannel.Name => 
             throw new NotSupportedException();
-        }
-        Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
-        {
+
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options) => 
             throw new NotSupportedException();
-        }
+
+        Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options) => 
+            throw new NotSupportedException();
     }
 }

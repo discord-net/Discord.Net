@@ -1,26 +1,32 @@
-﻿using System;
+using System;
 using System.Globalization;
 
 namespace Discord
 {
     /// <summary>
-    /// A custom image-based emote
+    ///     A custom image-based emote.
     /// </summary>
     public class Emote : IEmote, ISnowflakeEntity
     {
         /// <summary>
-        /// The display name (tooltip) of this emote
+        ///     Gets the display name (tooltip) of this emote.
         /// </summary>
         public string Name { get; }
         /// <summary>
-        /// The ID of this emote
+        ///     Gets the ID of this emote.
         /// </summary>
         public ulong Id { get; }
         /// <summary>
-        /// Is this emote animated?
+        ///     Gets whether this emote is animated.
         /// </summary>
         public bool Animated { get; }
+        /// <summary>
+        ///     Gets the date when this emote is created.
+        /// </summary>
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
+        /// <summary>
+        ///     Gets the image URL of this emote.
+        /// </summary>
         public string Url => CDN.GetEmojiUrl(Id, Animated);
 
         internal Emote(ulong id, string name, bool animated)
@@ -49,16 +55,14 @@ namespace Discord
             }
         }
 
-        /// <summary>
-        /// Parse an Emote from its raw format
-        /// </summary>
-        /// <param name="text">The raw encoding of an emote; for example, &lt;:dab:277855270321782784&gt;</param>
+        /// <summary> Parses an <see cref="Emote"/> from its raw format. </summary>
+        /// <param name="text">The raw encoding of an emote; for example, &lt;:dab:277855270321782784&gt;.</param>
         /// <returns>An emote</returns>
         public static Emote Parse(string text)
         {
             if (TryParse(text, out Emote result))
                 return result;
-            throw new ArgumentException("Invalid emote format", nameof(text));
+            throw new ArgumentException("Invalid emote format.", nameof(text));
         }
 
         public static bool TryParse(string text, out Emote result)
