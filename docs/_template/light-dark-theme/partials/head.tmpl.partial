@@ -12,14 +12,14 @@
   <link rel="stylesheet" href="{{_rel}}styles/docfx.vendor.css">
   <link rel="stylesheet" href="{{_rel}}styles/docfx.css">
   <link rel="stylesheet" href="{{_rel}}styles/master.css">
-  <link rel="stylesheet" href="{{_rel}}styles/dark.css" title="theme_dark" >
-  <link rel="alternate stylesheet" href="{{_rel}}styles/light.css" title="theme_light">
   <link rel="stylesheet" href="{{_rel}}styles/main.css">
   <link rel="stylesheet" href="{{_rel}}styles/theme-switcher.css">
   <link href="//cdn.rawgit.com/noelboss/featherlight/1.7.6/release/featherlight.min.css" type="text/css" rel="stylesheet" />
   <meta property="docfx:navrel" content="{{_navRel}}">
   <meta property="docfx:tocrel" content="{{_tocRel}}">
+  <meta id="docfx-style:rel" content="{{_rel}}">
   {{#_noindex}}<meta name="searchOption" content="noindex">{{/_noindex}}
   {{#_enableSearch}}<meta property="docfx:rel" content="{{_rel}}">{{/_enableSearch}}
   {{#_enableNewTab}}<meta property="docfx:newtab" content="true">{{/_enableNewTab}}
+  <script type="text/javascript" src="{{_rel}}styles/styleswitcher.js"></script>
 </head>

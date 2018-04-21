@@ -1,66 +1,27 @@
-function getSelectionChange(e){
-  var selectValue = e.options[e.selectedIndex].value;
-  if (selectValue != null) setActiveStyleSheet(selectValue);
+const baseUrl = document.getElementById("docfx-style:rel").content;
+var themeElement;
+
+function onThemeSelect(event) {
+    const theme = event.target.value;
+    window.localStorage.setItem("theme", theme);
+    window.themeElement.href = getUrl(theme);
 }
 
-function setActiveStyleSheet(title) {
-  var i, a, main;
-  for(i=0; (a = document.getElementsByTagName("link")[i]); i++) {
-    if(a.getAttribute("rel").indexOf("style") != -1 && a.getAttribute("title")) {
-      a.disabled = true;
-      if(a.getAttribute("title") == title) a.disabled = false;
-    }
-  }
+function getUrl(slug) {
+    return baseUrl + "styles/" + slug + ".css";
 }
 
-function getActiveStyleSheet() {
-  var i, a;
-  for(i=0; (a = document.getElementsByTagName("link")[i]); i++) {
-    if(a.getAttribute("rel").indexOf("style") != -1 && a.getAttribute("title") && !a.disabled) return a.getAttribute("title");
-  }
-  return null;
-}
+const themeElement = document.createElement("link");
+themeElement.rel = "stylesheet";
 
-function getPreferredStyleSheet() {
-  var i, a;
-  for(i=0; (a = document.getElementsByTagName("link")[i]); i++) {
-    if(a.getAttribute("rel").indexOf("style") != -1
-       && a.getAttribute("rel").indexOf("alt") == -1
-       && a.getAttribute("title")
-       ) return a.getAttribute("title");
-  }
-  return null;
-}
+const theme = window.localStorage.getItem("theme") || "light";
+themeElement.href = getUrl(theme);
 
-function createCookie(name,value,days) {
-  if (days) {
-    var date = new Date();
-    date.setTime(date.getTime()+(days*24*60*60*1000));
-    var expires = "; expires="+date.toGMTString();
-  }
-  else expires = "";
-  document.cookie = name+"="+value+expires+"; path=/";
-}
+document.head.appendChild(themeElement);
+window.themeElement = themeElement;
 
-function readCookie(name) {
-  var nameEQ = name + "=";
-  var ca = document.cookie.split(';');
-  for(var i=0;i < ca.length;i++) {
-    var c = ca[i];
-    while (c.charAt(0)==' ') c = c.substring(1,c.length);
-    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-  }
-  return null;
-}
-
-window.onload = function(e) {
-  var cookie = readCookie("style");
-  var title = cookie ? cookie : getPreferredStyleSheet();
-  setActiveStyleSheet(title);
-  document.getElementById("theme-switcher").value = title;
-}
-
-window.onunload = function(e) {
-  var title = getActiveStyleSheet();
-  createCookie("style", title, 365);
-}
+document.addEventListener("DOMContentLoaded", function() {
+    const themeSwitcher = document.getElementById("theme-switcher");
+    themeSwitcher.onchange = onThemeSelect;
+    themeSwitcher.value = theme;
+}, false);
