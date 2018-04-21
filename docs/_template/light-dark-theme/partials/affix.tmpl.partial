@@ -4,10 +4,10 @@
   <div class="sideaffix">
     <div class="theme-switch-field">
       <p>Theme</p>
-      <select onchange="getSelectionChange(this);" id="theme-switcher">
-        <option value="theme_dark">Dark</option>
-        <option value="theme_light">Light</option>
-      </select> 
+      <select id="theme-switcher">
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+      </select>
     </div>
     {{^_disableContribution}}
     <div class="contribution">
