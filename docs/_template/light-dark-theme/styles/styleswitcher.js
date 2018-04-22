@@ -1,5 +1,4 @@
 const baseUrl = document.getElementById("docfx-style:rel").content;
-var themeElement;
 
 function onThemeSelect(event) {
     const theme = event.target.value;
