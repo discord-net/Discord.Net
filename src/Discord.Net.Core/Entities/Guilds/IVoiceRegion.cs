@@ -21,13 +21,13 @@ namespace Discord
         ///     Returns <see langword="true"/> if this voice region is the closest to your machine.
         /// </summary>
         bool IsOptimal { get; }
-        /// <summary>
-        ///     Gets an example hostname for this voice region.
+        /// <summary> 
+        ///     Returns <see langword="true"/> if this is a deprecated voice region (avoid switching to these).
         /// </summary>
-        string SampleHostname { get; }
-        /// <summary>
-        ///     Gets an example port for this voice region.
+        bool IsDeprecated { get; }
+        /// <summary> 
+        ///     Returns <see langword="true"/> if this is a custom voice region (used for events/etc).
         /// </summary>
-        int SamplePort { get; }
+        bool IsCustom { get; }
     }
 }
