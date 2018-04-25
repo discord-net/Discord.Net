@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Represents a generic Discord client.
+    /// </summary>
     public interface IDiscordClient : IDisposable
     {
         ConnectionState ConnectionState { get; }
@@ -14,11 +17,37 @@ namespace Discord
         Task StartAsync();
         Task StopAsync();
 
+        /// <summary>
+        ///     Gets the application information associated with this account.
+        /// </summary>
         Task<IApplication> GetApplicationInfoAsync(RequestOptions options = null);
 
+        /// <summary>
+        ///     Gets a generic channel with the provided ID.
+        /// </summary>
+        /// <param name="id">The ID of the channel.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
         Task<IChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a list of private channels.
+        /// </summary>
+        /// <param name="mode">
+        /// The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.
+        /// </param>
         Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a list of direct message channels.
+        /// </summary>
+        /// <param name="mode">
+        /// The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.
+        /// </param>
         Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a list of group channels.
+        /// </summary>
+        /// <param name="mode">
+        /// The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.
+        /// </param>
         Task<IReadOnlyCollection<IGroupChannel>> GetGroupChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 
         Task<IReadOnlyCollection<IConnection>> GetConnectionsAsync(RequestOptions options = null);

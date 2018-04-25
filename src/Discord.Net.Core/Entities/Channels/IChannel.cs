@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a generic Discord channel.
+    ///     Represents a generic channel.
     /// </summary>
     public interface IChannel : ISnowflakeEntity
     {

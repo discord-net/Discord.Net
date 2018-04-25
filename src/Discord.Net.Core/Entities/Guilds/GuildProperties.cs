@@ -8,9 +8,8 @@ namespace Discord
     ///         await Context.Guild.ModifyAsync(async x =&gt;
     ///         {
     ///             x.Name = "aaaaaah";
-    ///             x.RegionId = (await Context.Client.GetOptimalVoiceRegionAsync()).Id;
     ///         });
-    /// </code>
+    ///     </code>
     /// </example>
     /// <see cref="T:Discord.IGuild" />
     public class GuildProperties
@@ -61,11 +60,11 @@ namespace Discord
         /// </summary>
         public Optional<ulong?> AfkChannelId { get; set; }
         /// <summary>
-        ///     Gets or sets the <see cref="ITextChannel" /> where System messages should be sent.
+        ///     Gets or sets the <see cref="ITextChannel" /> where system messages should be sent.
         /// </summary>
         public Optional<ITextChannel> SystemChannel { get; set; }
         /// <summary>
-        ///     Gets or sets the ID of the <see cref="ITextChannel" /> where System messages should be sent.
+        ///     Gets or sets the ID of the <see cref="ITextChannel" /> where system messages should be sent.
         /// </summary>
         public Optional<ulong?> SystemChannelId { get; set; }
         /// <summary>

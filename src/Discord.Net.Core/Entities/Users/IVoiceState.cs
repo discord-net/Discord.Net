@@ -26,7 +26,7 @@ namespace Discord
         /// </summary>
         bool IsSuppressed { get; }
         /// <summary>
-        ///     Gets the voice channel this user is currently in, if any.
+        ///     Gets the voice channel this user is currently in, or <see langword="null"/> if none.
         /// </summary>
         IVoiceChannel VoiceChannel { get; }
         /// <summary>

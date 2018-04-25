@@ -16,7 +16,12 @@ namespace Discord.Commands
 
         /// <summary> Indicates whether the channel that the command is executed in is a private channel. </summary>
         public bool IsPrivate => Channel is IPrivateChannel;
-        
+
+        /// <summary>
+        ///     Initializes a new <see cref="CommandContext" /> class with the provided client and message.
+        /// </summary>
+        /// <param name="client">The underlying client.</param>
+        /// <param name="msg">The underlying message.</param>
         public CommandContext(IDiscordClient client, IUserMessage msg)
         {
             Client = client;

@@ -12,7 +12,9 @@ using PresenceModel = Discord.API.Presence;
 
 namespace Discord.WebSocket
 {
-    /// <summary> The WebSocket variant of <see cref="IGuildUser"/>. Represents a Discord user that is in a guild. </summary>
+    /// <summary>
+    ///     Represents a WebSocket guild user.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGuildUser : SocketUser, IGuildUser
     {
@@ -20,6 +22,9 @@ namespace Discord.WebSocket
         private ImmutableArray<ulong> _roleIds;
 
         internal override SocketGlobalUser GlobalUser { get; }
+        /// <summary>
+        ///     Gets the guild the user is in.
+        /// </summary>
         public SocketGuild Guild { get; }
         /// <inheritdoc />
         public string Nickname { get; private set; }
@@ -50,17 +55,27 @@ namespace Discord.WebSocket
         public bool IsMuted => VoiceState?.IsMuted ?? false;
         /// <inheritdoc />
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
+        /// <summary>
+        ///     Returns a collection of roles that the user possesses.
+        /// </summary>
         public IReadOnlyCollection<SocketRole> Roles 
             => _roleIds.Select(id => Guild.GetRole(id)).Where(x => x != null).ToReadOnlyCollection(() => _roleIds.Length);
+        /// <summary>
+        ///     Returns the voice channel the user is in, or <see langword="null" /> if none.
+        /// </summary>
         public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
         /// <inheritdoc />
         public string VoiceSessionId => VoiceState?.VoiceSessionId ?? "";
         public SocketVoiceState? VoiceState => Guild.GetVoiceState(Id);
         public AudioInStream AudioStream => Guild.GetAudioStream(Id);
 
-        /// <summary> The position of the user within the role hierarchy. </summary>
-        /// <remarks> The returned value equal to the position of the highest role the user has, 
-        /// or <see cref="int.MaxValue"/> if user is the server owner. </remarks>
+        /// <summary>
+        ///     Returns the position of the user within the role hierarchy.
+        /// </summary>
+        /// <remarks>
+        ///     The returned value equal to the position of the highest role the user has, or 
+        ///     <see cref="int.MaxValue"/> if user is the server owner.
+        /// </remarks>
         public int Hierarchy
         {
             get

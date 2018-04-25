@@ -508,7 +508,7 @@ namespace Discord.WebSocket
                                     {
                                         type = "GUILD_AVAILABLE";
                                         _lastGuildAvailableTime = Environment.TickCount;
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_AVAILABLE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_AVAILABLE)").ConfigureAwait(false);
 
                                         var guild = State.GetGuild(data.Id);
                                         if (guild != null)
@@ -533,7 +533,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_CREATE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_CREATE)").ConfigureAwait(false);
 
                                         var guild = AddGuild(data, State);
                                         if (guild != null)
@@ -614,7 +614,7 @@ namespace Discord.WebSocket
                                     if (data.Unavailable == true)
                                     {
                                         type = "GUILD_UNAVAILABLE";
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_UNAVAILABLE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_UNAVAILABLE)").ConfigureAwait(false);
 
                                         var guild = State.GetGuild(data.Id);
                                         if (guild != null)
@@ -630,7 +630,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        await _gatewayLogger.DebugAsync($"Received Dispatch (GUILD_DELETE)").ConfigureAwait(false);
+                                        await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_DELETE)").ConfigureAwait(false);
 
                                         var guild = RemoveGuild(data.Id);
                                         if (guild != null)

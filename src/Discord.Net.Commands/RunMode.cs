@@ -1,5 +1,10 @@
 namespace Discord.Commands
 {
+    /// <summary>
+    ///     Specifies the behavior of the command execution workflow.
+    /// </summary>
+    /// <seealso cref="CommandServiceConfig"/>
+    /// <seealso cref="CommandAttribute"/>
     public enum RunMode
     {
         /// <summary>

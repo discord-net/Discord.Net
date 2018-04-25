@@ -83,12 +83,14 @@ namespace Discord
                 ((uint)g << 8) |
                 (uint)b;
         }
+
         /// <summary>
         ///     Initializes a <see cref="Color"/> struct with the given RGB value.
         /// </summary>
         /// <param name="r">The value that represents the red color. Must be within 0~255.</param>
         /// <param name="g">The value that represents the green color. Must be within 0~255.</param>
         /// <param name="b">The value that represents the blue color. Must be within 0~255.</param>
+        /// <exception cref="ArgumentOutOfRangeException">The argument value is not between 0 to 255.</exception>
         public Color(int r, int g, int b)
         {
             if (r < 0 || r > 255)
@@ -108,6 +110,7 @@ namespace Discord
         /// <param name="r">The value that represents the red color. Must be within 0~1.</param>
         /// <param name="g">The value that represents the green color. Must be within 0~1.</param>
         /// <param name="b">The value that represents the blue color. Must be within 0~1.</param>
+        /// <exception cref="ArgumentOutOfRangeException">The argument value is not between 0 to 1.</exception>
         public Color(float r, float g, float b)
         {
             if (r < 0.0f || r > 1.0f)

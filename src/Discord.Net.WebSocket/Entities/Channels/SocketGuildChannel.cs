@@ -9,12 +9,20 @@ using Model = Discord.API.Channel;
 
 namespace Discord.WebSocket
 {
-    /// <summary> The WebSocket variant of <see cref="IGuildChannel"/>. Represents a guild channel (text, voice, category). </summary>
+    /// <summary>
+    ///     Represents a WebSocket-based guild channel.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGuildChannel : SocketChannel, IGuildChannel
     {
         private ImmutableArray<Overwrite> _overwrites;
 
+        /// <summary>
+        ///     Gets the guild associated with this channel.
+        /// </summary>
+        /// <returns>
+        ///     The guild that this channel belongs to.
+        /// </returns>
         public SocketGuild Guild { get; }
         /// <inheritdoc />
         public string Name { get; private set; }
@@ -22,11 +30,23 @@ namespace Discord.WebSocket
         public int Position { get; private set; }
         /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
+        /// <summary>
+        ///     Gets the parent category of this channel.
+        /// </summary>
+        /// <returns>
+        ///     The parent category ID associated with this channel, or <see langword="null"/> if none is set.
+        /// </returns>
         public ICategoryChannel Category 
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
 
         /// <inheritdoc />
         public IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
+        /// <summary>
+        ///     Returns a collection of users that are able to view the channel.
+        /// </summary>
+        /// <returns>
+        ///     A collection of users that can access the channel (i.e. the users seen in the user list).
+        /// </returns>
         public new virtual IReadOnlyCollection<SocketGuildUser> Users => ImmutableArray.Create<SocketGuildUser>();
 
         internal SocketGuildChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
@@ -131,7 +151,11 @@ namespace Discord.WebSocket
 
         public new virtual SocketGuildUser GetUser(ulong id) => null;
 
+        /// <summary>
+        ///     Gets the name of the channel.
+        /// </summary>
         public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id}, Guild)";
         internal new SocketGuildChannel Clone() => MemberwiseClone() as SocketGuildChannel;
 
         //SocketChannel

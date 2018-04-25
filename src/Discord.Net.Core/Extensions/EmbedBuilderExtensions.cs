@@ -30,6 +30,7 @@ namespace Discord
             builder.WithAuthor($"{user.Nickname ?? user.Username}#{user.Discriminator}", user.GetAvatarUrl());
 
         /// <summary> Converts a <see cref="EmbedType.Rich"/> <see cref="IEmbed"/> object to a <see cref="EmbedBuilder"/>. </summary>
+        /// <exception cref="InvalidOperationException">The embed type is not <see cref="EmbedType.Rich"/>.</exception>
         public static EmbedBuilder ToEmbedBuilder(this IEmbed embed)
         {
             if (embed.Type != EmbedType.Rich)

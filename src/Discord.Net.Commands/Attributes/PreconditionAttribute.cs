@@ -13,7 +13,7 @@ namespace Discord.Commands
         /// <remarks>
         ///     <see cref="Preconditions" /> of the same group require only one of the preconditions to pass in order to
         ///     be successful (A || B). Specifying <see cref="Group" /> = <see langword="null" /> or not at all will
-        ///     require *all* preconditions to pass, just like normal (A && B).
+        ///     require *all* preconditions to pass, just like normal (A &amp;&amp; B).
         /// </remarks>
         public string Group { get; set; } = null;
 

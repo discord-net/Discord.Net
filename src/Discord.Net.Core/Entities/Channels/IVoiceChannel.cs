@@ -21,6 +21,8 @@ namespace Discord
         /// <summary>
         ///     Modifies this voice channel.
         /// </summary>
+        /// <param name="func">The properties to modify the channel with.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
         Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null);
     }
 }

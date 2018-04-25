@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a Discord user.
+    ///     Represents a generic user.
     /// </summary>
     public interface IUser : ISnowflakeEntity, IMentionable, IPresence
     {
@@ -41,8 +41,7 @@ namespace Discord
         string Username { get; }
 
         /// <summary>
-        ///     Returns a private message channel to this user, creating one if it does not already
-        ///     exist.
+        ///     Returns a direct message channel to this user, or create one if it does not already exist.
         /// </summary>
         Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null);
     }

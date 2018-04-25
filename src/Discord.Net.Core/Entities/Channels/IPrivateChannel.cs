@@ -8,8 +8,11 @@ namespace Discord
     public interface IPrivateChannel : IChannel
     {
         /// <summary>
-        ///     Users that can access this channel.
+        ///     Gets the users that can access this channel.
         /// </summary>
+        /// <returns>
+        ///     A collection of users that can access this channel.
+        /// </returns>
         IReadOnlyCollection<IUser> Recipients { get; }
     }
 }

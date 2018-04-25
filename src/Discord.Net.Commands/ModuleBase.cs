@@ -9,32 +9,45 @@ namespace Discord.Commands
     public abstract class ModuleBase<T> : IModuleBase
         where T : class, ICommandContext
     {
+        /// <summary>
+        ///     The underlying context of the command.
+        /// </summary>
+        /// <seealso cref="T:Discord.Commands.ICommandContext" />
+        /// <seealso cref="T:Discord.Commands.CommandContext" />
         public T Context { get; private set; }
 
         /// <summary>
-        /// Sends a message to the source channel
+        ///     Sends a message to the source channel.
         /// </summary>
-        /// <param name="message">Contents of the message; optional only if <paramref name="embed"/> is specified</param>
-        /// <param name="isTTS">Specifies if Discord should read this message aloud using TTS</param>
-        /// <param name="embed">An embed to be displayed alongside the message</param>
+        /// <param name="message">
+        /// Contents of the message; optional only if <paramref name="embed" /> is specified.
+        /// </param>
+        /// <param name="isTTS">Specifies if Discord should read this <paramref name="message"/> aloud using text-to-speech.</param>
+        /// <param name="embed">An embed to be displayed alongside the <paramref name="message"/>.</param>
         protected virtual async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
         {
             return await Context.Channel.SendMessageAsync(message, isTTS, embed, options).ConfigureAwait(false);
         }
         /// <summary>
-        /// The method to execute before executing the command.
+        ///     The method to execute before executing the command.
         /// </summary>
+        /// <param name="command">The <see cref="CommandInfo"/> of the command to be executed.</param>
         protected virtual void BeforeExecute(CommandInfo command)
         {
         }
         /// <summary>
-        /// The method to execute after executing the command.
+        ///     The method to execute after executing the command.
         /// </summary>
-        /// <param name="command"></param>
+        /// <param name="command">The <see cref="CommandInfo"/> of the command to be executed.</param>
         protected virtual void AfterExecute(CommandInfo command)
         {
         }
 
+        /// <summary>
+        ///     The method to execute when building the module.
+        /// </summary>
+        /// <param name="commandService">The <see cref="CommandService"/> used to create the module.</param>
+        /// <param name="builder">The builder used to build the module.</param>
         protected virtual void OnModuleBuilding(CommandService commandService, ModuleBuilder builder)
         {
         }

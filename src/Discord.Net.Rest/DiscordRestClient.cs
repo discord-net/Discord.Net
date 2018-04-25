@@ -33,65 +33,49 @@ namespace Discord.Rest
             _applicationInfo = null;
             return Task.Delay(0);
         }
-
-        /// <inheritdoc />
+        
         public async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
         {
             return _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this, options).ConfigureAwait(false));
         }
         
-        /// <inheritdoc />
         public Task<RestChannel> GetChannelAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetChannelAsync(this, id, options);
-        /// <inheritdoc />
         public Task<IReadOnlyCollection<IRestPrivateChannel>> GetPrivateChannelsAsync(RequestOptions options = null)
             => ClientHelper.GetPrivateChannelsAsync(this, options);
         public Task<IReadOnlyCollection<RestDMChannel>> GetDMChannelsAsync(RequestOptions options = null)
             => ClientHelper.GetDMChannelsAsync(this, options);
         public Task<IReadOnlyCollection<RestGroupChannel>> GetGroupChannelsAsync(RequestOptions options = null)
             => ClientHelper.GetGroupChannelsAsync(this, options);
-
-        /// <inheritdoc />
+        
         public Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(RequestOptions options = null)
             => ClientHelper.GetConnectionsAsync(this, options);
-
-        /// <inheritdoc />
+        
         public Task<RestInvite> GetInviteAsync(string inviteId, RequestOptions options = null)
             => ClientHelper.GetInviteAsync(this, inviteId, options);
-
-        /// <inheritdoc />
+        
         public Task<RestGuild> GetGuildAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildAsync(this, id, options);
-        /// <inheritdoc />
         public Task<RestGuildEmbed?> GetGuildEmbedAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildEmbedAsync(this, id, options);
-        /// <inheritdoc />
         public IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(RequestOptions options = null)
             => ClientHelper.GetGuildSummariesAsync(this, null, null, options);
-        /// <inheritdoc />
         public IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(ulong fromGuildId, int limit, RequestOptions options = null)
             => ClientHelper.GetGuildSummariesAsync(this, fromGuildId, limit, options);
-        /// <inheritdoc />
         public Task<IReadOnlyCollection<RestGuild>> GetGuildsAsync(RequestOptions options = null)
             => ClientHelper.GetGuildsAsync(this, options);
-        /// <inheritdoc />
         public Task<RestGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null, RequestOptions options = null)
             => ClientHelper.CreateGuildAsync(this, name, region, jpegIcon, options);
-
-        /// <inheritdoc />
+        
         public Task<RestUser> GetUserAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetUserAsync(this, id, options);
-        /// <inheritdoc />
         public Task<RestGuildUser> GetGuildUserAsync(ulong guildId, ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildUserAsync(this, guildId, id, options);
-
-        /// <inheritdoc />
+        
         public Task<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
             => ClientHelper.GetVoiceRegionsAsync(this, options);
-        /// <inheritdoc />
         public Task<RestVoiceRegion> GetVoiceRegionAsync(string id, RequestOptions options = null)
             => ClientHelper.GetVoiceRegionAsync(this, id, options);
-        /// <inheritdoc />
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetWebhookAsync(this, id, options);
 

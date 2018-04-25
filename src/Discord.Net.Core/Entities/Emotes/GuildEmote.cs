@@ -31,7 +31,7 @@ namespace Discord
 
         private string DebuggerDisplay => $"{Name} ({Id})";
         /// <summary>
-        ///     Gets the raw representation of the emoji.
+        ///     Gets the raw representation of the emote.
         /// </summary>
         public override string ToString() => $"<{(Animated ? "a" : "")}:{Name}:{Id}>";
     }

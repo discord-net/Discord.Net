@@ -19,6 +19,7 @@ namespace Discord.Commands
 
         /// <inheritdoc/>
         /// <param name="overridenTypeReader">The <see cref="TypeReader"/> to be used with the parameter. </param>
+        /// <exception cref="ArgumentException">The given <paramref name="overridenTypeReader"/> does not inherit from <see cref="TypeReader"/>.</exception>
         public OverrideTypeReaderAttribute(Type overridenTypeReader)
         {
             if (!TypeReaderTypeInfo.IsAssignableFrom(overridenTypeReader.GetTypeInfo()))

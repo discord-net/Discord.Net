@@ -31,11 +31,12 @@ namespace Discord
         /// <summary>
         ///     Parses a provided user mention string.
         /// </summary>
+        /// <exception cref="ArgumentException">Invalid mention format.</exception>
         public static ulong ParseUser(string text)
         {
             if (TryParseUser(text, out ulong id))
                 return id;
-            throw new ArgumentException("Invalid mention format", nameof(text));
+            throw new ArgumentException("Invalid mention format.", nameof(text));
         }
         /// <summary>
         ///     Tries to parse a provided user mention string.
@@ -59,11 +60,12 @@ namespace Discord
         /// <summary>
         ///     Parses a provided channel mention string.
         /// </summary>
+        /// <exception cref="ArgumentException">Invalid mention format.</exception>
         public static ulong ParseChannel(string text)
         {
             if (TryParseChannel(text, out ulong id))
                 return id;
-            throw new ArgumentException("Invalid mention format", nameof(text));
+            throw new ArgumentException("Invalid mention format.", nameof(text));
         }
         /// <summary>
         ///     Tries to parse a provided channel mention string.
@@ -84,11 +86,12 @@ namespace Discord
         /// <summary>
         ///     Parses a provided role mention string.
         /// </summary>
+        /// <exception cref="ArgumentException">Invalid mention format.</exception>
         public static ulong ParseRole(string text)
         {
             if (TryParseRole(text, out ulong id))
                 return id;
-            throw new ArgumentException("Invalid mention format", nameof(text));
+            throw new ArgumentException("Invalid mention format.", nameof(text));
         }
         /// <summary>
         ///     Tries to parse a provided role mention string.
@@ -163,22 +166,22 @@ namespace Discord
                         if (user != null)
                             return $"@{guildUser?.Nickname ?? user?.Username}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.NameNoPrefix:
                         if (user != null)
                             return $"{guildUser?.Nickname ?? user?.Username}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.FullName:
                         if (user != null)
                             return $"@{user.Username}#{user.Discriminator}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.FullNameNoPrefix:
                         if (user != null)
                             return $"{user.Username}#{user.Discriminator}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.Sanitize:
                         if (guildUser != null && guildUser.Nickname == null)
                             return MentionUser($"{SanitizeChar}{tag.Key}", false);
@@ -200,13 +203,13 @@ namespace Discord
                         if (channel != null)
                             return $"#{channel.Name}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.NameNoPrefix:
                     case TagHandling.FullNameNoPrefix:
                         if (channel != null)
                             return $"{channel.Name}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.Sanitize:
                         return MentionChannel($"{SanitizeChar}{tag.Key}");
                 }
@@ -225,13 +228,13 @@ namespace Discord
                         if (role != null)
                             return $"@{role.Name}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.NameNoPrefix:
                     case TagHandling.FullNameNoPrefix:
                         if (role != null)
                             return $"{role.Name}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.Sanitize:
                         return MentionRole($"{SanitizeChar}{tag.Key}");
                 }

@@ -15,7 +15,7 @@ using VoiceStateModel = Discord.API.VoiceState;
 namespace Discord.WebSocket
 {
     /// <summary>
-    ///     Represents a private WebSocket group channel.
+    ///     Represents a WebSocket-based private group channel.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGroupChannel : SocketChannel, IGroupChannel, ISocketPrivateChannel, ISocketMessageChannel, ISocketAudioChannel
@@ -24,10 +24,12 @@ namespace Discord.WebSocket
 
         private string _iconId;
         private ConcurrentDictionary<ulong, SocketGroupUser> _users;
-        private ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
+        private readonly ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
 
+        /// <inheritdoc />
         public string Name { get; private set; }
 
+        /// <inheritdoc />
         public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();
         public new IReadOnlyCollection<SocketGroupUser> Users => _users.ToReadOnlyCollection();
         public IReadOnlyCollection<SocketGroupUser> Recipients
@@ -65,15 +67,18 @@ namespace Discord.WebSocket
             _users = users;
         }
 
+        /// <inheritdoc />
         public Task LeaveAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
 
+        /// <exception cref="NotSupportedException">Voice is not yet supported for group channels.</exception>
         public Task<IAudioClient> ConnectAsync()
         {
             throw new NotSupportedException("Voice is not yet supported for group channels.");
         }
 
         //Messages
+        /// <inheritdoc />
         public SocketMessage GetCachedMessage(ulong id)
             => _messages?.Get(id);
         public async Task<IMessage> GetMessageAsync(ulong id, RequestOptions options = null)
@@ -89,26 +94,35 @@ namespace Discord.WebSocket
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessageId, dir, limit, CacheMode.AllowDownload, options);
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessage.Id, dir, limit, CacheMode.AllowDownload, options);
+        /// <inheritdoc />
         public IReadOnlyCollection<SocketMessage> GetCachedMessages(int limit = DiscordConfig.MaxMessagesPerBatch)
             => SocketChannelHelper.GetCachedMessages(this, Discord, _messages, null, Direction.Before, limit);
+        /// <inheritdoc />
         public IReadOnlyCollection<SocketMessage> GetCachedMessages(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
             => SocketChannelHelper.GetCachedMessages(this, Discord, _messages, fromMessageId, dir, limit);
+        /// <inheritdoc />
         public IReadOnlyCollection<SocketMessage> GetCachedMessages(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
             => SocketChannelHelper.GetCachedMessages(this, Discord, _messages, fromMessage.Id, dir, limit);
+        /// <inheritdoc />
         public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
 
+        /// <inheritdoc />
         public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
 #if FILESYSTEM
+        /// <inheritdoc />
         public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, options);
 #endif
+        /// <inheritdoc />
         public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options);
 
+        /// <inheritdoc />
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);
+        /// <inheritdoc />
         public IDisposable EnterTypingState(RequestOptions options = null)
             => ChannelHelper.EnterTypingState(this, Discord, options);
 
@@ -118,6 +132,17 @@ namespace Discord.WebSocket
             => _messages?.Remove(id);
 
         //Users
+        /// <summary>
+        ///     Gets the group user from the WebSocket cache.
+        /// </summary>
+        /// <remarks>
+        ///     This method does NOT attempt to fetch the user if they don't exist in the cache. To guarantee a return
+        ///     from an existing user that doesn't exist in cache, use <see cref="DiscordRestClient.GetUserAsync" />.
+        /// </remarks>
+        /// <param name="id">The ID of the user.</param>
+        /// <returns>
+        ///     The user in the group.
+        /// </returns>
         public new SocketGroupUser GetUser(ulong id)
         {
             if (_users.TryGetValue(id, out SocketGroupUser user))
@@ -167,21 +192,29 @@ namespace Discord.WebSocket
             return null;
         }
 
+        /// <summary>
+        ///     Returns the name of the group.
+        /// </summary>
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id}, Group)";
         internal new SocketGroupChannel Clone() => MemberwiseClone() as SocketGroupChannel;
 
         //SocketChannel
+        /// <inheritdoc />
         internal override IReadOnlyCollection<SocketUser> GetUsersInternal() => Users;
+        /// <inheritdoc />
         internal override SocketUser GetUserInternal(ulong id) => GetUser(id);
 
         //ISocketPrivateChannel
+        /// <inheritdoc />
         IReadOnlyCollection<SocketUser> ISocketPrivateChannel.Recipients => Recipients;
 
         //IPrivateChannel
+        /// <inheritdoc />
         IReadOnlyCollection<IUser> IPrivateChannel.Recipients => Recipients;
 
         //IMessageChannel
+        /// <inheritdoc />
         async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -189,31 +222,42 @@ namespace Discord.WebSocket
             else
                 return GetCachedMessage(id);
         }
+        /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(int limit, CacheMode mode, RequestOptions options)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit, mode, options);
+        /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId, Direction dir, int limit, CacheMode mode, RequestOptions options)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessageId, dir, limit, mode, options);
+        /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(IMessage fromMessage, Direction dir, int limit, CacheMode mode, RequestOptions options)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessage.Id, dir, limit, mode, options);
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
 #if FILESYSTEM
+        /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendFileAsync(filePath, text, isTTS, embed, options).ConfigureAwait(false);
 #endif
+        /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendFileAsync(stream, filename, text, isTTS, embed, options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
+        /// <inheritdoc />
         IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
             => EnterTypingState(options);
 
         //IAudioChannel
+        /// <inheritdoc />
         Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) { throw new NotSupportedException(); }
 
         //IChannel        
+        /// <inheritdoc />
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(id));
+        /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable();
     }

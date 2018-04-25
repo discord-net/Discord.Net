@@ -11,40 +11,67 @@ namespace Discord
     public interface ITextChannel : IMessageChannel, IMentionable, IGuildChannel
     {
         /// <summary>
-        ///     Gets whether the channel is NSFW.
+        ///     Determines whether the channel is NSFW.
         /// </summary>
+        /// <returns>
+        ///     <see langword="true"/> if the channel has the NSFW flag enabled; otherwise, <see langword="false"/>.
+        /// </returns>
         bool IsNsfw { get; }
 
         /// <summary>
         ///     Gets the current topic for this text channel.
         /// </summary>
+        /// <returns>
+        ///     The topic set in the channel, or <see langword="null"/> if none is set.
+        /// </returns>
         string Topic { get; }
 
         /// <summary>
-        ///     Bulk deletes multiple messages.
+        ///     Bulk-deletes multiple messages.
         /// </summary>
+        /// <param name="messages">The messages to be bulk-deleted.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
         Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null);
         /// <summary>
-        ///     Bulk deletes multiple messages.
+        ///     Bulk-deletes multiple messages.
         /// </summary>
+        /// <param name="messageIds">The IDs of the messages to be bulk-deleted.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
         Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null);
 
         /// <summary>
         ///     Modifies this text channel.
         /// </summary>
+        /// <param name="func">The properties to modify the channel with.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
         Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null);
 
         /// <summary>
         ///     Creates a webhook in this text channel.
         /// </summary>
+        /// <param name="name">The name of the webhook.</param>
+        /// <param name="avatar">The avatar of the webhook.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     The created webhook.
+        /// </returns>
         Task<IWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null);
         /// <summary>
-        ///     Gets the webhook in this text channel with the provided ID, or <see langword="null"/> if not found.
+        ///     Gets the webhook in this text channel with the provided ID.
         /// </summary>
+        /// <param name="id">The ID of the webhook.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A webhook associated with the <paramref name="id"/>, or <see langword="null"/> if not found.
+        /// </returns>
         Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
         /// <summary>
         ///     Gets the webhooks for this text channel.
         /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A collection of webhooks.
+        /// </returns>
         Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions options = null);
     }
 }

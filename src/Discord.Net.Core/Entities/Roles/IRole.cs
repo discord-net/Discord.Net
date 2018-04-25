@@ -18,16 +18,28 @@ namespace Discord
         /// </summary>
         Color Color { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if users of this role are separated in the user list.
+        ///     Determines whether the role can be separated in the user list.
         /// </summary>
+        /// <returns>
+        ///     Returns <see langword="true"/> if users of this role are separated in the user list; otherwise, returns 
+        ///     <see langword="false"/>.
+        /// </returns>
         bool IsHoisted { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if this role is automatically managed by Discord.
+        ///     Determines whether the role is managed by Discord.
         /// </summary>
+        /// <returns>
+        ///     Returns <see langword="true"/> if this role is automatically managed by Discord; otherwise, returns 
+        ///     <see langword="false"/>.
+        /// </returns>
         bool IsManaged { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if this role may be mentioned in messages.
+        ///     Determines whether the role is mentionable.
         /// </summary>
+        /// <returns>
+        ///     Returns <see langword="true"/> if this role may be mentioned in messages; otherwise, returns 
+        ///     <see langword="false"/>.
+        /// </returns>
         bool IsMentionable { get; }
         /// <summary>
         ///     Gets the name of this role.
@@ -45,6 +57,8 @@ namespace Discord
         /// <summary>
         ///     Modifies this role.
         /// </summary>
+        /// <param name="func">The properties to modify the role with.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
         Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null);
     }
 }

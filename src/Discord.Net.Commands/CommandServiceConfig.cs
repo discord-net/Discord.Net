@@ -2,23 +2,40 @@ using System;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    ///     Represents a configuration class for <see cref="CommandService" />.
+    /// </summary>
     public class CommandServiceConfig
     {
-        /// <summary> Gets or sets the default RunMode commands should have, if one is not specified on the Command attribute or builder. </summary>
+        /// <summary>
+        ///     Gets or sets the default <see cref="RunMode" /> commands should have, if one is not specified on the
+        ///     Command attribute or builder.
+        /// </summary>
         public RunMode DefaultRunMode { get; set; } = RunMode.Sync;
 
+        /// <summary>
+        ///     Gets or sets the <see cref="char"/> that separates an argument with another.
+        /// </summary>
         public char SeparatorChar { get; set; } = ' ';
         
-        /// <summary> Determines whether commands should be case-sensitive. </summary>
+        /// <summary>
+        ///     Gets or sets whether commands should be case-sensitive.
+        /// </summary>
         public bool CaseSensitiveCommands { get; set; } = false;
 
-        /// <summary> Gets or sets the minimum log level severity that will be sent to the Log event. </summary>
+        /// <summary>
+        ///     Gets or sets the minimum log level severity that will be sent to the <see cref="CommandService.Log"/> event.
+        /// </summary>
         public LogSeverity LogLevel { get; set; } = LogSeverity.Info;
 
-        /// <summary> Determines whether RunMode.Sync commands should push exceptions up to the caller. </summary>
+        /// <summary>
+        ///     Gets or sets whether <see cref="RunMode.Sync"/> commands should push exceptions up to the caller.
+        /// </summary>
         public bool ThrowOnError { get; set; } = true;
 
-        /// <summary> Determines whether extra parameters should be ignored. </summary>
+        /// <summary>
+        ///     Gets or sets whether extra parameters should be ignored.
+        /// </summary>
         public bool IgnoreExtraArgs { get; set; } = false;
 
         ///// <summary> Gets or sets the <see cref="IServiceProvider"/> to use. </summary>

@@ -1,4 +1,4 @@
-﻿using Discord.Audio;
+using Discord.Audio;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
@@ -10,12 +10,18 @@ using Model = Discord.API.Channel;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a WebSocket-based voice channel in a guild.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketVoiceChannel : SocketGuildChannel, IVoiceChannel, ISocketAudioChannel
     {
+        /// <inheritdoc />
         public int Bitrate { get; private set; }
+        /// <inheritdoc />
         public int? UserLimit { get; private set; }
 
+        /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuildUser> Users
             => Guild.Users.Where(x => x.VoiceChannel?.Id == Id).ToImmutableArray();
 
@@ -37,14 +43,17 @@ namespace Discord.WebSocket
             UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
         }
 
+        /// <inheritdoc />
         public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
+        /// <inheritdoc />
         public async Task<IAudioClient> ConnectAsync(Action<IAudioClient> configAction = null)
         {
             return await Guild.ConnectAudioAsync(Id, false, false, configAction).ConfigureAwait(false);
         }
 
+        /// <inheritdoc />
         public override SocketGuildUser GetUser(ulong id)
         {
             var user = Guild.GetUser(id);
@@ -57,8 +66,10 @@ namespace Discord.WebSocket
         internal new SocketVoiceChannel Clone() => MemberwiseClone() as SocketVoiceChannel;
 
         //IGuildChannel
+        /// <inheritdoc />
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(GetUser(id));
+        /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
     }

@@ -288,7 +288,7 @@ namespace Discord.Rest
         }
         public static IDisposable EnterTypingState(IMessageChannel channel, BaseDiscordClient client,
             RequestOptions options)
-            => new TypingNotifier(client, channel, options);
+            => new TypingNotifier(channel, options);
 
         //Webhooks
         public static async Task<RestWebhook> CreateWebhookAsync(ITextChannel channel, BaseDiscordClient client, string name, Stream avatar, RequestOptions options)

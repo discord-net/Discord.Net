@@ -6,10 +6,8 @@ namespace Discord
     public class Emoji : IEmote
     {
         // TODO: need to constrain this to Unicode-only emojis somehow
-    
-        /// <summary>
-        ///     Gets the Unicode representation of this emote.
-        /// </summary>
+
+        /// <inheritdoc />
         public string Name { get; }
         /// <summary>
         ///     Gets the Unicode representation of this emote.
@@ -28,7 +26,7 @@ namespace Discord
         /// <summary>
         ///     Determines whether the specified emoji is equal to the current emoji.
         /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
+        /// <param name="other">The object to compare with the current object.</param>
         public override bool Equals(object other)
         {
             if (other == null) return false;

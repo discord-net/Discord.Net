@@ -37,6 +37,7 @@
       "default",
       "_template/light-dark-theme"
     ],
+    "postProcessors": [ "ExtractSearchIndex" ],
     "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
 	  "_appTitle": "Discord.Net Documentation",

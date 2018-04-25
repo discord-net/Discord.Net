@@ -13,11 +13,14 @@ namespace Discord.Commands
 {
     public class CommandService
     {
+        /// <summary>
+        ///     Occurs when a command-related information is received.
+        /// </summary>
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
 
         /// <summary>
-        ///     Fired when a command is successfully executed without any runtime error.
+        ///     Occurs when a command is successfully executed without any runtime error.
         /// </summary>
         public event Func<CommandInfo, ICommandContext, IResult, Task> CommandExecuted { add { _commandExecutedEvent.Add(value); } remove { _commandExecutedEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>> _commandExecutedEvent = new AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>>();
@@ -51,7 +54,16 @@ namespace Discord.Commands
         /// </summary>
         public ILookup<Type, TypeReader> TypeReaders => _typeReaders.SelectMany(x => x.Value.Select(y => new { y.Key, y.Value })).ToLookup(x => x.Key, x => x.Value);
 
+        /// <summary>
+        ///     Initializes a new <see cref="CommandService"/> class.
+        /// </summary>
         public CommandService() : this(new CommandServiceConfig()) { }
+
+        /// <summary>
+        ///     Initializes a new <see cref="CommandService" /> class with the provided configuration.
+        /// </summary>
+        /// <param name="config">The configuration class.</param>
+        /// <exception cref="InvalidOperationException">The <see cref="RunMode"/> is set to <see cref="RunMode.Default"/>.</exception>
         public CommandService(CommandServiceConfig config)
         {
             _caseSensitive = config.CaseSensitiveCommands;
@@ -121,6 +133,7 @@ namespace Discord.Commands
         ///     A built module.
         /// </returns>
         public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services) => AddModuleAsync(typeof(T), services);
+
         /// <summary>
         ///     Adds a command module from a <see cref="Type" /> .
         /// </summary>
@@ -132,6 +145,8 @@ namespace Discord.Commands
         /// <returns>
         ///     A built module.
         /// </returns>
+        /// <exception cref="ArgumentException">This module has already been added.</exception>
+        /// <exception cref="InvalidOperationException">The <see cref="ModuleInfo"/> fails to be built; an invalid type may have been provided.</exception>
         public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services)
         {
             services = services ?? EmptyServiceProvider.Instance;
@@ -209,7 +224,7 @@ namespace Discord.Commands
         /// </summary>
         /// <param name="module">The <see cref="ModuleInfo" /> to be removed from the service.</param>
         /// <returns>
-        ///     Returns whether the <paramref name="module"/> is successfully removed.
+        ///     Returns whether the module is successfully removed.
         /// </returns>
         public async Task<bool> RemoveModuleAsync(ModuleInfo module)
         {
@@ -223,7 +238,21 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
+        /// <summary>
+        ///     Removes the command module.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="Type"/> of the module.</typeparam>
+        /// <returns>
+        ///     Returns whether the module is successfully removed.
+        /// </returns>
         public Task<bool> RemoveModuleAsync<T>() => RemoveModuleAsync(typeof(T));
+        /// <summary>
+        ///     Removes the command module.
+        /// </summary>
+        /// <param name="type">The <see cref="Type"/> of the module.</param>
+        /// <returns>
+        ///     Returns whether the module is successfully removed.
+        /// </returns>
         public async Task<bool> RemoveModuleAsync(Type type)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);

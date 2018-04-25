@@ -3,7 +3,7 @@ using Model = Discord.API.InviteMetadata;
 
 namespace Discord.Rest
 {
-    /// <summary> Represents additional information regarding the REST invite object. </summary>
+    /// <summary> Represents additional information regarding the REST-based invite object. </summary>
     public class RestInviteMetadata : RestInvite, IInviteMetadata
     {
         private long _createdAtTicks;
@@ -48,6 +48,7 @@ namespace Discord.Rest
             _createdAtTicks = model.CreatedAt.UtcTicks;
         }
 
+        /// <inheritdoc />
         IUser IInviteMetadata.Inviter => Inviter;
     }
 }

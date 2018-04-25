@@ -17,7 +17,7 @@ namespace Discord
         /// </summary>
         public string Value { get; internal set; }
         /// <summary>
-        ///     Gets whether the field should be in-line with each other.
+        ///     Determines whether the field should be in-line with each other.
         /// </summary>
         public bool Inline { get; internal set; }
 
