@@ -16,6 +16,8 @@ uid: Discord.EmbedBuilder
 example: [*content]
 ---
 
+#### Basic Usage
+
 The example below builds an embed and sends it to the chat using the
 command system.
 
@@ -27,9 +29,10 @@ public async Task SendRichEmbedAsync()
         {
             // Embed property can be set within object initializer
             Title = "Hello world!"
-        }
+            Description = "I am a description set by initializer."
+        };
         // Or with methods
-        .AddField("Field title",
+    embed.AddField("Field title",
         "Field value. I also support [hyperlink markdown](https://example.com)!")
         .WithAuthor(Context.Client.CurrentUser)
         .WithFooter(footer => footer.Text = "I am a footer.")
@@ -43,6 +46,23 @@ public async Task SendRichEmbedAsync()
 }
 ```
 
-#### Result
-
 ![Embed Example](images/embed-example.png)
+
+#### Usage with Local Images
+
+The example below sends an image and has the image embedded in the rich
+embed. See @Discord.IMessageChannel.SendFileAsync* for more information
+about uploading a file or image.
+
+```cs
+[Command("embedimage")]
+public async Task SendEmbedWithImageAsync()
+{
+    var fileName = "image.png";
+    var embed = new EmbedBuilder()
+        {
+            ImageUrl = $"attachment://{fileName}"
+        }.Build();
+    await Context.Channel.SendFileAsync(fileName, embed: embed);
+}
+```
