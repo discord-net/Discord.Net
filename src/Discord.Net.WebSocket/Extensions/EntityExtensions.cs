@@ -24,7 +24,7 @@ namespace Discord.WebSocket
                     TrackTitle = model.Details.GetValueOrDefault(),
                     Artists = model.State.GetValueOrDefault()?.Split(';').Select(x=>x?.Trim()).ToImmutableArray(),
                     Duration = timestamps?.End - timestamps?.Start,
-                    AlbumArt = albumArtId != null ? CDN.GetSpotifyAlbumArtUrl(albumArtId) : null,
+                    AlbumArtUrl = albumArtId != null ? CDN.GetSpotifyAlbumArtUrl(albumArtId) : null,
                     Type = ActivityType.Listening
                 };
             }
