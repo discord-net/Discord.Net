@@ -12,6 +12,7 @@ namespace Discord
         public string AlbumTitle { get; internal set; }
         public string TrackTitle { get; internal set; }
         public string TrackId { get; internal set; }
+        public string TrackUrl { get; internal set; }
         public string SessionId { get; internal set; }
         public TimeSpan? Duration { get; internal set; }
 

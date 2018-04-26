@@ -19,6 +19,7 @@ namespace Discord.WebSocket
                     Name = model.Name,
                     SessionId = model.SessionId.GetValueOrDefault(),
                     TrackId = model.SyncId.Value,
+                    TrackUrl = CDN.GetSpotifyDirectUrl(model.SyncId.Value),
                     AlbumTitle = albumText,
                     TrackTitle = model.Details.GetValueOrDefault(),
                     Artists = model.State.GetValueOrDefault()?.Split(';').Select(x=>x?.Trim()).ToImmutableArray(),
