@@ -1,4 +1,4 @@
-﻿using Discord.Audio;
+using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -417,7 +417,10 @@ namespace Discord.Rest
             else
                 return ImmutableArray.Create<IGuildUser>();
         }
-        Task IGuild.DownloadUsersAsync() { throw new NotSupportedException(); }
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Downloading users is not supported with a REST-based guild.</exception>
+        Task IGuild.DownloadUsersAsync() =>
+            throw new NotSupportedException();
 
         async Task<IWebhook> IGuild.GetWebhookAsync(ulong id, RequestOptions options)
             => await GetWebhookAsync(id, options).ConfigureAwait(false);

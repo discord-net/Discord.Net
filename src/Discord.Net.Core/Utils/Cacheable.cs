@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a <see langword="struct"/> that contains an entity that may be cached.
+    ///     Represents a cached entity.
     /// </summary>
     /// <typeparam name="TEntity">The type of entity that is cached.</typeparam>
     /// <typeparam name="TId">The type of this entity's ID.</typeparam>
@@ -25,7 +25,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     This value is not guaranteed to be set; in cases where the entity cannot be pulled from cache, it is
-        ///     null.
+        ///     <see langword="null"/>.
         /// </remarks>
         public TEntity Value { get; }
         private Func<Task<TEntity>> DownloadFunc { get; }

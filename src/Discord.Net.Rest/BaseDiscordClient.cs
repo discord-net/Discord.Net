@@ -174,6 +174,7 @@ namespace Discord.Rest
         Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IGuild>>(ImmutableArray.Create<IGuild>());
         /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Creating a guild is not supported with the base client.</exception>
         Task<IGuild> IDiscordClient.CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon, RequestOptions options)
             => throw new NotSupportedException();
 

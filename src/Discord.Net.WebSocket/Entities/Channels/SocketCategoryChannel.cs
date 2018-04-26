@@ -55,8 +55,12 @@ namespace Discord.WebSocket
             => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(GetUser(id));
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">This method is not supported with category channels.</exception>
         Task<IInviteMetadata> IGuildChannel.CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
             => throw new NotSupportedException();
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">This method is not supported with category channels.</exception>
         Task<IReadOnlyCollection<IInviteMetadata>> IGuildChannel.GetInvitesAsync(RequestOptions options)
             => throw new NotSupportedException();
 

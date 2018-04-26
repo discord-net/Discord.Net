@@ -251,7 +251,9 @@ namespace Discord.WebSocket
 
         //IAudioChannel
         /// <inheritdoc />
-        Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) { throw new NotSupportedException(); }
+        /// <exception cref="NotSupportedException">Connecting to a group channel is not supported.</exception>
+        Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) =>
+            throw new NotSupportedException();
 
         //IChannel        
         /// <inheritdoc />

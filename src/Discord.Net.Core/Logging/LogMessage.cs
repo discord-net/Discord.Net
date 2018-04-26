@@ -26,8 +26,8 @@ namespace Discord
         public Exception Exception { get; }
 
         /// <summary>
-        ///     Initializes a new <see cref="LogMessage" /> <see langword="struct"/> with the severity, source,
-        ///     <paramref name="message"/> of the event, and optionally, an exception.
+        ///     Initializes a new <see cref="LogMessage" /> struct with the severity, source, message of the event, and
+        ///     optionally, an exception.
         /// </summary>
         /// <param name="severity">The severity of the event.</param>
         /// <param name="source">The source of the event.</param>

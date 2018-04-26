@@ -41,7 +41,7 @@ namespace Discord
         }
 
         /// <summary> Gets or sets the title of an <see cref="Embed"/>. </summary>
-        /// <exception cref="ArgumentException" accessor="set">Title length exceeds the maximum allowed by Discord.
+        /// <exception cref="ArgumentException" accessor="set">Title length exceeds <see cref="MaxTitleLength"/>.
         /// </exception>
         /// <returns> The title of the embed.</returns>
         public string Title
@@ -55,7 +55,7 @@ namespace Discord
         }
 
         /// <summary> Gets or sets the description of an <see cref="Embed"/>. </summary>
-        /// <exception cref="ArgumentException" accessor="set">Description length exceeds the maximum allowed by Discord.</exception>
+        /// <exception cref="ArgumentException" accessor="set">Description length exceeds <see cref="MaxDescriptionLength"/>.</exception>
         /// <returns> The description of the embed.</returns>
         public string Description
         {
@@ -107,8 +107,8 @@ namespace Discord
         /// <summary> Gets or sets the list of <see cref="EmbedFieldBuilder"/> of an <see cref="Embed"/>. </summary>
         /// <exception cref="ArgumentNullException" accessor="set">An embed builder's fields collection is set to 
         /// <see langword="null"/>.</exception>
-        /// <exception cref="ArgumentException" accessor="set">Description length exceeds the maximum allowed by
-        /// Discord.</exception>
+        /// <exception cref="ArgumentException" accessor="set">Description length exceeds <see cref="MaxFieldCount"/>.
+        /// </exception>
         /// <returns> The list of existing <see cref="EmbedFieldBuilder"/>.</returns>
         public List<EmbedFieldBuilder> Fields
         {
@@ -282,7 +282,7 @@ namespace Discord
         /// <summary>
         ///     Sets the author field of an <see cref="Embed" /> with the provided properties.
         /// </summary>
-        /// <param name="action">The <see langword="delegate"/> containing the author field properties.</param>
+        /// <param name="action">The delegate containing the author field properties.</param>
         /// <returns>
         ///     The current builder.
         /// </returns>
@@ -328,7 +328,7 @@ namespace Discord
         /// <summary>
         ///     Sets the footer field of an <see cref="Embed" /> with the provided properties.
         /// </summary>
-        /// <param name="action">The <see langword="delegate"/> containing the footer field properties.</param>
+        /// <param name="action">The delegate containing the footer field properties.</param>
         /// <returns>
         ///     The current builder.
         /// </returns>
@@ -382,7 +382,7 @@ namespace Discord
         ///     <see cref="Embed" />.
         /// </summary>
         /// <param name="field">The field builder class containing the field properties.</param>
-        /// <exception cref="ArgumentException">Field count exceeds the maximum allowed by Discord.</exception>
+        /// <exception cref="ArgumentException">Field count exceeds <see cref="MaxFieldCount"/>.</exception>
         /// <returns>
         ///     The current builder.
         /// </returns>
@@ -399,7 +399,7 @@ namespace Discord
         /// <summary>
         ///     Adds an <see cref="Embed" /> field with the provided properties.
         /// </summary>
-        /// <param name="action">The <see langword="delegate"/> containing the field properties.</param>
+        /// <param name="action">The delegate containing the field properties.</param>
         /// <returns>
         ///     The current builder.
         /// </returns>
@@ -417,7 +417,7 @@ namespace Discord
         /// <returns>
         ///     The built embed object.
         /// </returns>
-        /// <exception cref="InvalidOperationException">Total embed length exceeds the maximum allowed by Discord.</exception>
+        /// <exception cref="InvalidOperationException">Total embed length exceeds <see cref="MaxEmbedLength"/>.</exception>
         public Embed Build()
         {
             if (Length > MaxEmbedLength)
@@ -542,7 +542,7 @@ namespace Discord
         /// <exception cref="ArgumentException">
         /// <para><see cref="Name"/> or <see cref="Value"/> is <see langword="null" />, empty or entirely whitespace.</para>
         /// <para><c>- or -</c></para>
-        /// <para><see cref="Name"/> or <see cref="Value"/> length exceeds the maximum allowed by Discord.</para>
+        /// <para><see cref="Name"/> or <see cref="Value"/> exceeds the maximum length allowed by Discord.</para>
         /// </exception>
         public EmbedField Build()
             => new EmbedField(Name, Value.ToString(), IsInline);

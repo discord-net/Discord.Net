@@ -8,7 +8,7 @@ namespace Discord.WebSocket
 {
     public abstract partial class BaseSocketClient : BaseDiscordClient, IDiscordClient
     {
-        protected readonly DiscordSocketConfig _baseconfig;
+        protected readonly DiscordSocketConfig BaseConfig;
 
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         public abstract int Latency { get; protected set; }
@@ -23,7 +23,7 @@ namespace Discord.WebSocket
         public abstract IReadOnlyCollection<RestVoiceRegion> VoiceRegions { get; }
 
         internal BaseSocketClient(DiscordSocketConfig config, DiscordRestApiClient client)
-            : base(config, client) => _baseconfig = config;
+            : base(config, client) => BaseConfig = config;
         private static DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
             => new DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent);
         

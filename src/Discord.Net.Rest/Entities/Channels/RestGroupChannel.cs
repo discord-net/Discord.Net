@@ -154,7 +154,10 @@ namespace Discord.Rest
             => EnterTypingState(options);
 
         //IAudioChannel
-        Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) { throw new NotSupportedException(); }
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Connecting to a group channel is not supported.</exception>
+        Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) =>
+            throw new NotSupportedException();
 
         //IChannel        
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
