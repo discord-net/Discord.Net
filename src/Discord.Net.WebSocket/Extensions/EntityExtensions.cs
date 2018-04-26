@@ -1,3 +1,6 @@
+using System.Collections.Immutable;
+using System.Linq;
+
 namespace Discord.WebSocket
 {
     internal static class EntityExtensions
@@ -15,10 +18,10 @@ namespace Discord.WebSocket
                 {
                     Name = model.Name,
                     SessionId = model.SessionId.GetValueOrDefault(),
-                    SyncId = model.SyncId.Value,
+                    TrackId = model.SyncId.Value,
                     AlbumTitle = albumText,
                     TrackTitle = model.Details.GetValueOrDefault(),
-                    Artists = model.State.GetValueOrDefault()?.Split(';'),
+                    Artists = model.State.GetValueOrDefault()?.Split(';').Select(x=>x?.Trim()).ToImmutableArray(),
                     Duration = timestamps?.End - timestamps?.Start,
                     AlbumArt = albumArtId != null ? CDN.GetSpotifyAlbumArtUrl(albumArtId) : null,
                     Type = ActivityType.Listening
