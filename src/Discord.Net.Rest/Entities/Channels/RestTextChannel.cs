@@ -58,7 +58,7 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
 
-        public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        public Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
 #if FILESYSTEM
         public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
