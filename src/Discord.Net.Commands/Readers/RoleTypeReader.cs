@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
-    internal class RoleTypeReader<T> : TypeReader
+    public class RoleTypeReader<T> : TypeReader
         where T : class, IRole
     {
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
