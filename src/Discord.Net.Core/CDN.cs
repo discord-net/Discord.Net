@@ -65,6 +65,8 @@ namespace Discord
         /// </summary>
         public static string GetSpotifyAlbumArtUrl(string albumArtId)
             => $"https://i.scdn.co/image/{albumArtId}";
+        public static string GetSpotifyDirectUrl(string trackId)
+            => $"https://open.spotify.com/track/{trackId}";
 
         private static string FormatToExtension(ImageFormat format, string imageId)
         {

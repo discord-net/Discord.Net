@@ -41,10 +41,13 @@ namespace Discord
         ///     Gets the name of the guild this invite is linked to.
         /// </summary>
         string GuildName { get; }
-
         /// <summary>
-        ///     Accepts this invite and joins the target guild. This will fail on bot accounts.
+        ///     Gets the approximated count of online members in the guild.
         /// </summary>
-        Task AcceptAsync(RequestOptions options = null);
+        int? PresenceCount { get; }
+        /// <summary>
+        ///     Gets the approximated count of total members in the guild.
+        /// </summary>
+        int? MemberCount { get; }
     }
 }

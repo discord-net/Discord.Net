@@ -52,12 +52,16 @@ namespace Discord.Rest
             return models.Select(x => RestConnection.Create(x)).ToImmutableArray();
         }
         
-        public static async Task<RestInvite> GetInviteAsync(BaseDiscordClient client,
-            string inviteId, RequestOptions options)
+        public static async Task<RestInviteMetadata> GetInviteAsync(BaseDiscordClient client,
+            string inviteId, bool withCount, RequestOptions options)
         {
-            var model = await client.ApiClient.GetInviteAsync(inviteId, options).ConfigureAwait(false);
+            var args = new GetInviteParams
+            {
+                WithCounts = withCount
+            };
+            var model = await client.ApiClient.GetInviteAsync(inviteId, args, options).ConfigureAwait(false);
             if (model != null)
-                return RestInvite.Create(client, null, null, model);
+                return RestInviteMetadata.Create(client, null, null, model);
             return null;
         }
         

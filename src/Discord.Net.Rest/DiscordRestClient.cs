@@ -52,10 +52,10 @@ namespace Discord.Rest
         
         public Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(RequestOptions options = null)
             => ClientHelper.GetConnectionsAsync(this, options);
-        
-        public Task<RestInvite> GetInviteAsync(string inviteId, RequestOptions options = null)
-            => ClientHelper.GetInviteAsync(this, inviteId, options);
-        
+
+        public Task<RestInviteMetadata> GetInviteAsync(string inviteId, bool withCount = false, RequestOptions options = null)
+            => ClientHelper.GetInviteAsync(this, inviteId, withCount, options);
+
         public Task<RestGuild> GetGuildAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildAsync(this, id, options);
         public Task<RestGuildEmbed?> GetGuildEmbedAsync(ulong id, RequestOptions options = null)
@@ -123,9 +123,8 @@ namespace Discord.Rest
         async Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync(RequestOptions options)
             => await GetConnectionsAsync(options).ConfigureAwait(false);
 
-        /// <inheritdoc />
-        async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, RequestOptions options)
-            => await GetInviteAsync(inviteId, options).ConfigureAwait(false);
+        async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, bool withCount, RequestOptions options)
+            => await GetInviteAsync(inviteId, withCount, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode, RequestOptions options)

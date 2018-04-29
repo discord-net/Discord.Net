@@ -164,7 +164,7 @@ namespace Discord.Rest
             => Task.FromResult<IReadOnlyCollection<IConnection>>(ImmutableArray.Create<IConnection>());
 
         /// <inheritdoc />
-        Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, RequestOptions options)
+        Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, bool withCount, RequestOptions options)
             => Task.FromResult<IInvite>(null);
 
         /// <inheritdoc />

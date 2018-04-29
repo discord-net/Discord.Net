@@ -178,8 +178,8 @@ namespace Discord.WebSocket
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the invite information.
         /// </returns>
-        public Task<RestInvite> GetInviteAsync(string inviteId, RequestOptions options = null)
-            => ClientHelper.GetInviteAsync(this, inviteId, options ?? RequestOptions.Default);
+        public Task<RestInviteMetadata> GetInviteAsync(string inviteId, bool withCount = false, RequestOptions options = null)
+            => ClientHelper.GetInviteAsync(this, inviteId, withCount, options ?? RequestOptions.Default);
         
         // IDiscordClient
         /// <inheritdoc />
@@ -198,8 +198,8 @@ namespace Discord.WebSocket
             => await GetConnectionsAsync(options).ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, RequestOptions options)
-            => await GetInviteAsync(inviteId, options).ConfigureAwait(false);
+        async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, bool withCount, RequestOptions options)
+            => await GetInviteAsync(inviteId, withCount, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode, RequestOptions options)

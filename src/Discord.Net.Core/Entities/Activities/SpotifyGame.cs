@@ -13,11 +13,7 @@ namespace Discord
         /// <summary>
         ///     Gets the song's artist(s).
         /// </summary>
-        public IEnumerable<string> Artists { get; internal set; }
-        /// <summary>
-        ///     Gets the Spotify album art of the song.
-        /// </summary>
-        public string AlbumArt { get; internal set; }
+        public IReadOnlyCollection<string> Artists { get; internal set; }
         /// <summary>
         ///     Gets the Spotify album title of the song.
         /// </summary>
@@ -27,22 +23,34 @@ namespace Discord
         /// </summary>
         public string TrackTitle { get; internal set; }
         /// <summary>
-        ///     Gets the synchronization ID of the song.
-        /// </summary>
-        public string SyncId { get; internal set; }
-        /// <summary>
-        ///     Gets the session ID of the song.
-        /// </summary>
-        public string SessionId { get; internal set; }
-        /// <summary>
         ///     Gets the duration of the song.
         /// </summary>
         public TimeSpan? Duration { get; internal set; }
 
+        /// <summary>
+        ///     Gets the track ID of the song.
+        /// </summary>
+        public string TrackId { get; internal set; }
+        /// <summary>
+        ///     Gets the session ID of the song.
+        /// </summary>
+        public string SessionId { get; internal set; }
+
+        /// <summary>
+        ///     Gets the URL of the album art.
+        /// </summary>
+        public string AlbumArtUrl { get; internal set; }
+        /// <summary>
+        ///     Gets the direct Spotify URL of the track.
+        /// </summary>
+        public string TrackUrl { get; internal set; }
+
         internal SpotifyGame() { }
 
-        /// <summary> Gets the name of the song. </summary>
-        public override string ToString() => Name;
+        /// <summary>
+        ///     Gets the full information of the song.
+        /// </summary>
+        public override string ToString() => $"{string.Join(", ", Artists)} - {TrackTitle} ({Duration})";
         private string DebuggerDisplay => $"{Name} (Spotify)";
     }
 }

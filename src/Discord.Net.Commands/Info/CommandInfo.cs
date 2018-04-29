@@ -61,6 +61,10 @@ namespace Discord.Commands
         /// </summary>
         public bool HasVarArgs { get; }
         /// <summary>
+        ///     Indicates whether extra arguments should be ignored for this command.
+        /// </summary>
+        public bool IgnoreExtraArgs { get; }
+        /// <summary>
         ///     Gets the <see cref="RunMode" /> that is being used for the command.
         /// </summary>
         public RunMode RunMode { get; }
@@ -111,6 +115,7 @@ namespace Discord.Commands
 
             Parameters = builder.Parameters.Select(x => x.Build(this)).ToImmutableArray();
             HasVarArgs = builder.Parameters.Count > 0 ? builder.Parameters[builder.Parameters.Count - 1].IsMultiple : false;
+            IgnoreExtraArgs = builder.IgnoreExtraArgs;
 
             _action = builder.Callback;
             _commandService = service;
@@ -167,7 +172,7 @@ namespace Discord.Commands
                 return ParseResult.FromError(preconditionResult);
 
             string input = searchResult.Text.Substring(startIndex);
-            return await CommandParser.ParseArgsAsync(this, context, _commandService._ignoreExtraArgs, services, input, 0).ConfigureAwait(false);
+            return await CommandParser.ParseArgsAsync(this, context, services, input, 0).ConfigureAwait(false);
         }
         
         public Task<IResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)

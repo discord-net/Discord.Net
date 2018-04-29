@@ -499,7 +499,7 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (RESUMED)").ConfigureAwait(false);
 
-                                    var _ = _connection.CompleteAsync();
+                                    _ = _connection.CompleteAsync();
 
                                     //Notify the client that these guilds are available again
                                     foreach (var guild in State.Guilds)
@@ -1108,8 +1108,10 @@ namespace Discord.WebSocket
                                             else if (channel is SocketGroupChannel)
                                                 author = (channel as SocketGroupChannel).GetOrAddUser(data.Author.Value);
                                             else
+                                            {
                                                 await UnknownChannelUserAsync(type, data.Author.Value.Id, channel.Id).ConfigureAwait(false);
-                                            return;
+                                                return;
+                                            }
                                         }
 
                                         var msg = SocketMessage.Create(this, State, author, channel, data);
@@ -1817,8 +1819,8 @@ namespace Discord.WebSocket
             => await GetConnectionsAsync().ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, RequestOptions options)
-            => await GetInviteAsync(inviteId).ConfigureAwait(false);
+        async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, bool withCount, RequestOptions options)
+            => await GetInviteAsync(inviteId, withCount, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode, RequestOptions options)

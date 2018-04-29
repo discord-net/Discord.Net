@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Discord.API.Rest;
 using Model = Discord.API.Invite;
 
 namespace Discord.Rest
@@ -12,6 +13,10 @@ namespace Discord.Rest
         public string ChannelName { get; private set; }
         /// <inheritdoc />
         public string GuildName { get; private set; }
+        /// <inheritdoc />
+        public int? PresenceCount { get; private set; }
+        /// <inheritdoc />
+        public int? MemberCount { get; private set; }
         /// <inheritdoc />
         public ulong ChannelId { get; private set; }
         /// <inheritdoc />
@@ -42,20 +47,22 @@ namespace Discord.Rest
             ChannelId = model.Channel.Id;
             GuildName = model.Guild.Name;
             ChannelName = model.Channel.Name;
+            MemberCount = model.MemberCount.IsSpecified ? model.MemberCount.Value : null;
+            PresenceCount = model.PresenceCount.IsSpecified ? model.PresenceCount.Value : null;
         }
 
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
         {
-            var model = await Discord.ApiClient.GetInviteAsync(Code, options).ConfigureAwait(false);
+            var args = new GetInviteParams();
+            if (MemberCount != null || PresenceCount != null)
+                args.WithCounts = true;
+            var model = await Discord.ApiClient.GetInviteAsync(Code, args, options).ConfigureAwait(false);
             Update(model);
         }
         /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
             => InviteHelper.DeleteAsync(this, Discord, options);
-        /// <inheritdoc />
-        public Task AcceptAsync(RequestOptions options = null)
-            => InviteHelper.AcceptAsync(this, Discord, options);
 
         public override string ToString() => Url;
         private string DebuggerDisplay => $"{Url} ({GuildName} / {ChannelName})";
