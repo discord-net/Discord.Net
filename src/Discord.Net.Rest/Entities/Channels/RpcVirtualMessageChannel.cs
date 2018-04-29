@@ -33,13 +33,13 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
 
-        public Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS, Embed embed = null, RequestOptions options = null)
+        public Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
 #if FILESYSTEM
-        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS, Embed embed = null, RequestOptions options = null)
+        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, options);
 #endif
-        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed = null, RequestOptions options = null)
+        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options);
 
         public Task TriggerTypingAsync(RequestOptions options = null)
