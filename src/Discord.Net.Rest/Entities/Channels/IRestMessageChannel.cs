@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a REST channel that can send and receive messages.
+    ///     Represents a REST-based channel that can send and receive messages.
     /// </summary>
     public interface IRestMessageChannel : IMessageChannel
     {

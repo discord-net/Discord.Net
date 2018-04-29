@@ -13,7 +13,7 @@ using PresenceModel = Discord.API.Presence;
 namespace Discord.WebSocket
 {
     /// <summary>
-    ///     Represents a WebSocket guild user.
+    ///     Represents a WebSocket-based guild user.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGuildUser : SocketUser, IGuildUser

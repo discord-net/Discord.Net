@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Role;
@@ -9,16 +9,25 @@ namespace Discord.Rest
     public class RestRole : RestEntity<ulong>, IRole
     {
         internal IGuild Guild { get; }
+        /// <inheritdoc />
         public Color Color { get; private set; }
+        /// <inheritdoc />
         public bool IsHoisted { get; private set; }
+        /// <inheritdoc />
         public bool IsManaged { get; private set; }
+        /// <inheritdoc />
         public bool IsMentionable { get; private set; }
+        /// <inheritdoc />
         public string Name { get; private set; }
+        /// <inheritdoc />
         public GuildPermissions Permissions { get; private set; }
+        /// <inheritdoc />
         public int Position { get; private set; }
 
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public bool IsEveryone => Id == Guild.Id;
+        /// <inheritdoc />
         public string Mention => IsEveryone ? "@everyone" : MentionUtils.MentionRole(Id);
 
         internal RestRole(BaseDiscordClient discord, IGuild guild, ulong id)
@@ -43,20 +52,24 @@ namespace Discord.Rest
             Permissions = new GuildPermissions(model.Permissions);
         }
 
+        /// <inheritdoc />
         public async Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
         { 
             var model = await RoleHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
+        /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
             => RoleHelper.DeleteAsync(this, Discord, options);
 
+        /// <inheritdoc />
         public int CompareTo(IRole role) => RoleUtils.Compare(this, role);
 
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
 
         //IRole
+        /// <inheritdoc />
         IGuild IRole.Guild
         {
             get

@@ -23,7 +23,7 @@ namespace Discord
         /// </remarks>
         public Optional<string> Name { get; set; }
         /// <summary>
-        ///     Gets or sets the role's <see cref="GuildPermission" /> .
+        ///     Gets or sets the role's <see cref="GuildPermission" />.
         /// </summary>
         public Optional<GuildPermissions> Permissions { get; set; }
         /// <summary>

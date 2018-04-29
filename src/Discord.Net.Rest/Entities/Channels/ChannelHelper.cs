@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 using UserModel = Discord.API.User;
-using WebhookModel = Discord.API.Webhook;
 
 namespace Discord.Rest
 {
@@ -77,14 +76,8 @@ namespace Discord.Rest
             int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
         {
             var args = new CreateChannelInviteParams { IsTemporary = isTemporary, IsUnique = isUnique };
-            if (maxAge.HasValue)
-                args.MaxAge = maxAge.Value;
-            else
-                args.MaxAge = 0;
-            if (maxUses.HasValue)
-                args.MaxUses = maxUses.Value;
-            else
-                args.MaxUses = 0;
+            args.MaxAge = maxAge.GetValueOrDefault(0);
+            args.MaxUses = maxUses.GetValueOrDefault(0);
             var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestInviteMetadata.Create(client, null, channel, model);
         }
@@ -160,6 +153,7 @@ namespace Discord.Rest
             return builder.ToImmutable();
         }
 
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public static async Task<RestUserMessage> SendMessageAsync(IMessageChannel channel, BaseDiscordClient client,
             string text, bool isTTS, Embed embed, RequestOptions options)
         {
@@ -169,6 +163,30 @@ namespace Discord.Rest
         }
 
 #if FILESYSTEM
+        /// <exception cref="ArgumentException">
+        /// <paramref name="filePath" /> is a zero-length string, contains only white space, or contains one or more
+        /// invalid characters as defined by <see cref="System.IO.Path.InvalidPathChars" />.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="filePath" /> is <see langword="null" />.
+        /// </exception>
+        /// <exception cref="PathTooLongException">
+        /// The specified path, file name, or both exceed the system-defined maximum length. For example, on
+        /// Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260
+        /// characters.
+        /// </exception>
+        /// <exception cref="DirectoryNotFoundException">
+        /// The specified path is invalid, (for example, it is on an unmapped drive).
+        /// </exception>
+        /// <exception cref="UnauthorizedAccessException">
+        /// <paramref name="filePath" /> specified a directory.-or- The caller does not have the required permission.
+        /// </exception>
+        /// <exception cref="FileNotFoundException">
+        /// The file specified in <paramref name="filePath" /> was not found.
+        /// </exception>
+        /// <exception cref="NotSupportedException"><paramref name="filePath" /> is in an invalid format.</exception>
+        /// <exception cref="IOException">An I/O error occurred while opening the file.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             string filePath, string text, bool isTTS, Embed embed, RequestOptions options)
         {
@@ -177,6 +195,7 @@ namespace Discord.Rest
                 return await SendFileAsync(channel, client, file, filename, text, isTTS, embed, options).ConfigureAwait(false);
         }
 #endif
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options)
         {
@@ -249,6 +268,7 @@ namespace Discord.Rest
 
             return user;
         }
+        /// <exception cref="InvalidOperationException">Resolving permissions requires the parent guild to be downloaded.</exception>
         public static IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(IGuildChannel channel, IGuild guild, BaseDiscordClient client,
             ulong? fromUserId, int? limit, RequestOptions options)
         {

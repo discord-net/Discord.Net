@@ -40,17 +40,17 @@ namespace Discord.Commands
         internal readonly LogManager _logManager;
 
         /// <summary>
-        ///     Represents all modules loaded within <see cref="CommandService" /> .
+        ///     Represents all modules loaded within <see cref="CommandService" />.
         /// </summary>
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
 
         /// <summary>
-        ///     Represents all commands loaded within <see cref="CommandService" /> .
+        ///     Represents all commands loaded within <see cref="CommandService" />.
         /// </summary>
         public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
 
         /// <summary>
-        ///     Represents all <see cref="TypeReader" /> loaded within <see cref="CommandService" /> .
+        ///     Represents all <see cref="TypeReader" /> loaded within <see cref="CommandService" />.
         /// </summary>
         public ILookup<Type, TypeReader> TypeReaders => _typeReaders.SelectMany(x => x.Value.Select(y => new { y.Key, y.Value })).ToLookup(x => x.Key, x => x.Value);
 
@@ -122,12 +122,12 @@ namespace Discord.Commands
         }
 
         /// <summary>
-        ///     Add a command module from a <see cref="Type" /> .
+        ///     Add a command module from a <see cref="Type" />.
         /// </summary>
         /// <typeparam name="T">The type of module.</typeparam>
         /// <param name="services">
         ///     The <see cref="IServiceProvider" /> for your dependency injection solution, if using one - otherwise, pass
-        ///     <see langword="null" /> .
+        ///     <see langword="null" />.
         /// </param>
         /// <returns>
         ///     A built module.
@@ -135,12 +135,12 @@ namespace Discord.Commands
         public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services) => AddModuleAsync(typeof(T), services);
 
         /// <summary>
-        ///     Adds a command module from a <see cref="Type" /> .
+        ///     Adds a command module from a <see cref="Type" />.
         /// </summary>
         /// <param name="type">The type of module.</param>
         /// <param name="services">
         ///     The <see cref="IServiceProvider" /> for your dependency injection solution, if using one - otherwise, pass
-        ///     <see langword="null" /> .
+        ///     <see langword="null" />.
         /// </param>
         /// <returns>
         ///     A built module.
@@ -174,12 +174,12 @@ namespace Discord.Commands
             }
         }
         /// <summary>
-        ///     Add command modules from an <see cref="Assembly" /> .
+        ///     Add command modules from an <see cref="Assembly" />.
         /// </summary>
         /// <param name="assembly">The <see cref="Assembly" /> containing command modules.</param>
         /// <param name="services">
         ///     An <see cref="IServiceProvider" /> for your dependency injection solution, if using one - otherwise, pass
-        ///     <see langword="null" /> .
+        ///     <see langword="null" />.
         /// </param>
         /// <returns>
         ///     A collection of built modules.

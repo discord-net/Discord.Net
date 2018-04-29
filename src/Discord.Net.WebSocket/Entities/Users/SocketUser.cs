@@ -1,11 +1,15 @@
 using Discord.Rest;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 
 namespace Discord.WebSocket
 {
-    /// <summary> The WebSocket variant of <see cref="IUser"/>. Represents a Discord user. </summary>
+    /// <summary>
+    ///     Represents a WebSocket-based user.
+    /// </summary>
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class SocketUser : SocketEntity<ulong>, IUser
     {
         /// <inheritdoc />
@@ -68,7 +72,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public async Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
-            => GlobalUser.DMChannel ?? await UserHelper.CreateDMChannelAsync(this, Discord, options) as IDMChannel;
+            => GlobalUser.DMChannel ?? await UserHelper.CreateDMChannelAsync(this, Discord, options).ConfigureAwait(false) as IDMChannel;
 
         /// <inheritdoc />
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
@@ -78,6 +82,12 @@ namespace Discord.WebSocket
         public string GetDefaultAvatarUrl()
             => CDN.GetDefaultUserAvatarUrl(DiscriminatorValue);
 
+        /// <summary>
+        ///     Gets the full name of the user (e.g. Example#0001).
+        /// </summary>
+        /// <returns>
+        ///     The full name of the user.
+        /// </returns>
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;

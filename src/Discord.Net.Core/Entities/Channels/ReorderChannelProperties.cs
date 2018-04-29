@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    ///     Properties that are used to reorder an <see cref="IGuildChannel" /> .
+    ///     Properties that are used to reorder an <see cref="IGuildChannel" />.
     /// </summary>
     public class ReorderChannelProperties
     {

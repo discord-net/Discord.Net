@@ -16,7 +16,7 @@ namespace Discord.Commands
     /// </summary>
     /// <remarks>
     ///     This object contains the information of a command. This can include the module of the command, various
-    ///     descriptions regarding the command, and its <see cref="RunMode" /> .
+    ///     descriptions regarding the command, and its <see cref="RunMode" />.
     /// </remarks>
     [DebuggerDisplay("{Name,nq}")]
     public class CommandInfo

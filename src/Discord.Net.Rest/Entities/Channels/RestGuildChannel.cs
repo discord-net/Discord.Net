@@ -146,6 +146,7 @@ namespace Discord.Rest
         public override string ToString() => Name;
 
         //IGuildChannel
+        /// <inheritdoc />
         IGuild IGuildChannel.Guild
         {
             get
@@ -156,32 +157,44 @@ namespace Discord.Rest
             }
         }
 
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuildChannel.GetInvitesAsync(RequestOptions options)
             => await GetInvitesAsync(options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task<IInviteMetadata> IGuildChannel.CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
             => await CreateInviteAsync(maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
 
+        /// <inheritdoc />
         OverwritePermissions? IGuildChannel.GetPermissionOverwrite(IRole role)
             => GetPermissionOverwrite(role);
+        /// <inheritdoc />
         OverwritePermissions? IGuildChannel.GetPermissionOverwrite(IUser user)
             => GetPermissionOverwrite(user);
+        /// <inheritdoc />
         async Task IGuildChannel.AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options)
             => await AddPermissionOverwriteAsync(role, permissions, options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task IGuildChannel.AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options)
             => await AddPermissionOverwriteAsync(user, permissions, options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task IGuildChannel.RemovePermissionOverwriteAsync(IRole role, RequestOptions options)
             => await RemovePermissionOverwriteAsync(role, options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task IGuildChannel.RemovePermissionOverwriteAsync(IUser user, RequestOptions options)
             => await RemovePermissionOverwriteAsync(user, options).ConfigureAwait(false);
 
+        /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>(); //Overridden //Overridden in Text/Voice
+        /// <inheritdoc />
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(null); //Overridden in Text/Voice
 
         //IChannel
+        /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overridden in Text/Voice
+        /// <inheritdoc />
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null); //Overridden in Text/Voice
     }

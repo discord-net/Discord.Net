@@ -17,10 +17,12 @@ namespace Discord.Commands
         private readonly TryParseDelegate<T> _tryParse;
         private readonly float _score;
 
+        /// <exception cref="ArgumentOutOfRangeException"><typeparamref name="T"/> must be within the range [0, 1].</exception>
         public PrimitiveTypeReader()
             : this(PrimitiveParsers.Get<T>(), 1)
         { }
 
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="score"/> must be within the range [0, 1].</exception>
         public PrimitiveTypeReader(TryParseDelegate<T> tryParse, float score)
         {
             if (score < 0 || score > 1)

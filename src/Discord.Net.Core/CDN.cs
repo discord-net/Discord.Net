@@ -13,7 +13,7 @@ namespace Discord
         public static string GetApplicationIconUrl(ulong appId, string iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}app-icons/{appId}/{iconId}.jpg" : null;
         /// <summary>
-        ///     Returns the user avatar URL based on the <paramref name="size"/> and <see cref="ImageFormat" /> .
+        ///     Returns the user avatar URL based on the <paramref name="size"/> and <see cref="ImageFormat" />.
         /// </summary>
         public static string GetUserAvatarUrl(ulong userId, string avatarId, ushort size, ImageFormat format)
         {
@@ -52,7 +52,7 @@ namespace Discord
             => $"{DiscordConfig.CDNUrl}emojis/{emojiId}.{(animated ? "gif" : "png")}";
 
         /// <summary>
-        ///     Returns the rich presence asset URL based on the asset ID and <see cref="ImageFormat" /> .
+        ///     Returns the rich presence asset URL based on the asset ID and <see cref="ImageFormat" />.
         /// </summary>
         public static string GetRichAssetUrl(ulong appId, string assetId, ushort size, ImageFormat format)
         {

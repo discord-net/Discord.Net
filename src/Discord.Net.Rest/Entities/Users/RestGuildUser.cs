@@ -24,7 +24,9 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public ulong GuildId => Guild.Id;
+
         /// <inheritdoc />
+        /// <exception cref="InvalidOperationException" accessor="get">Resolving permissions requires the parent guild to be downloaded.</exception>
         public GuildPermissions GuildPermissions
         {
             get
@@ -112,6 +114,7 @@ namespace Discord.Rest
             => UserHelper.RemoveRolesAsync(this, Discord, roles, options);
 
         /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">Resolving permissions requires the parent guild to be downloaded.</exception>
         public ChannelPermissions GetPermissions(IGuildChannel channel)
         {
             var guildPerms = GuildPermissions;
@@ -119,6 +122,7 @@ namespace Discord.Rest
         }
 
         //IGuildUser
+        /// <inheritdoc />
         IGuild IGuildUser.Guild
         {
             get
@@ -130,10 +134,15 @@ namespace Discord.Rest
         }
 
         //IVoiceState
+        /// <inheritdoc />
         bool IVoiceState.IsSelfDeafened => false;
+        /// <inheritdoc />
         bool IVoiceState.IsSelfMuted => false;
+        /// <inheritdoc />
         bool IVoiceState.IsSuppressed => false;
+        /// <inheritdoc />
         IVoiceChannel IVoiceState.VoiceChannel => null;
+        /// <inheritdoc />
         string IVoiceState.VoiceSessionId => null;
     }
 }

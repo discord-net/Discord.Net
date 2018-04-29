@@ -58,6 +58,7 @@ namespace Discord.WebSocket
         internal abstract SocketUser GetUserInternal(ulong id);
         internal abstract IReadOnlyCollection<SocketUser> GetUsersInternal();
 
+        private string DebuggerDisplay => $"Unknown ({Id}, Channel)";
         internal SocketChannel Clone() => MemberwiseClone() as SocketChannel;
 
         //IChannel

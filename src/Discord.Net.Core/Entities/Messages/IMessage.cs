@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a Discord message object.
+    ///     Represents a message object.
     /// </summary>
     public interface IMessage : ISnowflakeEntity, IDeletable
     {

@@ -22,12 +22,14 @@ namespace Discord.Rest
                 ApiClient.Dispose();
         }
 
+        /// <inheritdoc />
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
             var user = await ApiClient.GetMyUserAsync(new RequestOptions { RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
             ApiClient.CurrentUserId = user.Id;
             base.CurrentUser = RestSelfUser.Create(this, user);
         }
+        /// <inheritdoc />
         internal override Task OnLogoutAsync()
         {
             _applicationInfo = null;
@@ -80,9 +82,11 @@ namespace Discord.Rest
             => ClientHelper.GetWebhookAsync(this, id, options);
 
         //IDiscordClient
+        /// <inheritdoc />
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
             => await GetApplicationInfoAsync(options).ConfigureAwait(false);
 
+        /// <inheritdoc />
         async Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -90,6 +94,7 @@ namespace Discord.Rest
             else
                 return null;
         }
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -97,6 +102,7 @@ namespace Discord.Rest
             else
                 return ImmutableArray.Create<IPrivateChannel>();
         }
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IDMChannel>> IDiscordClient.GetDMChannelsAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -104,6 +110,7 @@ namespace Discord.Rest
             else
                 return ImmutableArray.Create<IDMChannel>();
         }
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IGroupChannel>> IDiscordClient.GetGroupChannelsAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -112,12 +119,15 @@ namespace Discord.Rest
                 return ImmutableArray.Create<IGroupChannel>();
         }
 
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync(RequestOptions options)
             => await GetConnectionsAsync(options).ConfigureAwait(false);
 
+        /// <inheritdoc />
         async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, RequestOptions options)
             => await GetInviteAsync(inviteId, options).ConfigureAwait(false);
 
+        /// <inheritdoc />
         async Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -125,6 +135,7 @@ namespace Discord.Rest
             else
                 return null;
         }
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -132,9 +143,11 @@ namespace Discord.Rest
             else
                 return ImmutableArray.Create<IGuild>();
         }
+        /// <inheritdoc />
         async Task<IGuild> IDiscordClient.CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon, RequestOptions options)
             => await CreateGuildAsync(name, region, jpegIcon, options).ConfigureAwait(false);
 
+        /// <inheritdoc />
         async Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -143,11 +156,14 @@ namespace Discord.Rest
                 return null;
         }
 
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync(RequestOptions options)
             => await GetVoiceRegionsAsync(options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
             => await GetVoiceRegionAsync(id, options).ConfigureAwait(false);
 
+        /// <inheritdoc />
         async Task<IWebhook> IDiscordClient.GetWebhookAsync(ulong id, RequestOptions options)
             => await GetWebhookAsync(id, options).ConfigureAwait(false);
     }

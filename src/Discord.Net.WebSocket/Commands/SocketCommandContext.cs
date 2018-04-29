@@ -2,7 +2,9 @@ using Discord.WebSocket;
 
 namespace Discord.Commands
 {
-    /// <summary> The WebSocket variant of <see cref="ICommandContext"/>, which may contain the client, user, guild, channel, and message. </summary>
+    /// <summary>
+    ///     Represents a WebSocket-based context of a command. This may include the client, guild, channel, user, and message.
+    /// </summary>
     public class SocketCommandContext : ICommandContext
     {
         /// <summary>

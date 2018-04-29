@@ -183,7 +183,7 @@ namespace Discord
         }
 
         // Bulk Delete
-        /// <exception cref="ArgumentOutOfRangeException">Messages are younger than 2 weeks..</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Messages are younger than 2 weeks.</exception>
         public static void YoungerThanTwoWeeks(ulong[] collection, string name)
         {
             var minimum = SnowflakeUtils.ToSnowflake(DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(14)));
@@ -194,7 +194,7 @@ namespace Discord
                     throw new ArgumentOutOfRangeException(name, "Messages must be younger than two weeks old.");
             }
         }
-        /// <exception cref="ArgumentException">The everyone role cannot be assigned to a user</exception>
+        /// <exception cref="ArgumentException">The everyone role cannot be assigned to a user.</exception>
         public static void NotEveryoneRole(ulong[] roles, ulong guildId, string name)
         {
             for (var i = 0; i < roles.Length; i++)

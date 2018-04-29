@@ -357,9 +357,12 @@ namespace Discord.WebSocket
             => GuildHelper.DeleteAsync(this, Discord, options);
 
         /// <inheritdoc />
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         public Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyAsync(this, Discord, func, options);
+
         /// <inheritdoc />
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         public Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyEmbedAsync(this, Discord, func, options);
         /// <inheritdoc />
@@ -431,31 +434,37 @@ namespace Discord.WebSocket
         /// </returns>
         public SocketVoiceChannel GetVoiceChannel(ulong id)
             => GetChannel(id) as SocketVoiceChannel;
+
         /// <summary>
         ///     Creates a text channel with the provided name.
         /// </summary>
         /// <param name="name">The name of the new channel.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <see langword="null" />.</exception>
         /// <returns>
         ///     The created text channel.
         /// </returns>
         public Task<RestTextChannel> CreateTextChannelAsync(string name, RequestOptions options = null)
             => GuildHelper.CreateTextChannelAsync(this, Discord, name, options);
+
         /// <summary>
         ///     Creates a voice channel with the provided name.
         /// </summary>
         /// <param name="name">The name of the new channel.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <see langword="null" />.</exception>
         /// <returns>
         ///     The created voice channel.
         /// </returns>
         public Task<RestVoiceChannel> CreateVoiceChannelAsync(string name, RequestOptions options = null)
             => GuildHelper.CreateVoiceChannelAsync(this, Discord, name, options);
+
         /// <summary>
         ///     Creates a category channel with the provided name.
         /// </summary>
         /// <param name="name">The name of the new channel.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <see langword="null" />.</exception>
         /// <returns>
         ///     The created category channel.
         /// </returns>
@@ -507,6 +516,7 @@ namespace Discord.WebSocket
                 return value;
             return null;
         }
+
         /// <summary>
         ///     Creates a role.
         /// </summary>
@@ -517,6 +527,7 @@ namespace Discord.WebSocket
         /// <param name="color">The color of the role. Set to <see langword="null" /> to use the default color.</param>
         /// <param name="isHoisted">Used to determine if users of this role are separated in the user list.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <see langword="null" />.</exception>
         /// <returns>
         ///     The created role.
         /// </returns>
@@ -645,6 +656,7 @@ namespace Discord.WebSocket
         public Task<GuildEmote> CreateEmoteAsync(string name, Image image, Optional<IEnumerable<IRole>> roles = default(Optional<IEnumerable<IRole>>), RequestOptions options = null)
             => GuildHelper.CreateEmoteAsync(this, Discord, name, image, roles, options);
         /// <inheritdoc />
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         public Task<GuildEmote> ModifyEmoteAsync(GuildEmote emote, Action<EmoteProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyEmoteAsync(this, Discord, emote.Id, func, options);
         /// <inheritdoc />
@@ -931,9 +943,9 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         async Task<IWebhook> IGuild.GetWebhookAsync(ulong id, RequestOptions options)
-            => await GetWebhookAsync(id, options);
+            => await GetWebhookAsync(id, options).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IWebhook>> IGuild.GetWebhooksAsync(RequestOptions options)
-            => await GetWebhooksAsync(options);
+            => await GetWebhooksAsync(options).ConfigureAwait(false);
     }
 }

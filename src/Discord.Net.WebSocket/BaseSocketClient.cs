@@ -10,42 +10,174 @@ namespace Discord.WebSocket
     {
         protected readonly DiscordSocketConfig BaseConfig;
 
-        /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
+        /// <summary>
+        ///     Gets the estimated round-trip latency, in milliseconds, to the gateway server.
+        /// </summary>
         public abstract int Latency { get; protected set; }
-        public abstract UserStatus Status { get; protected set; } 
+        /// <summary>
+        ///     Gets the status for the logged-in user.
+        /// </summary>
+        public abstract UserStatus Status { get; protected set; }
+        /// <summary>
+        ///     Gets the activity for the logged-in user.
+        /// </summary>
         public abstract IActivity Activity { get; protected set; }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
 
+        /// <summary>
+        /// Gets the current logged-in user.
+        /// </summary>
         public new SocketSelfUser CurrentUser { get => base.CurrentUser as SocketSelfUser; protected set => base.CurrentUser = value; }
+        /// <summary>
+        ///     Gets a collection of guilds that the logged-in user is currently in.
+        /// </summary>
         public abstract IReadOnlyCollection<SocketGuild> Guilds { get; }
+        /// <summary>
+        ///     Gets a collection of private channels that are currently open for the logged-in user.
+        /// </summary>
         public abstract IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels { get; }
+        /// <summary>
+        ///     Gets a collection of available voice regions for the logged-in user.
+        /// </summary>
         public abstract IReadOnlyCollection<RestVoiceRegion> VoiceRegions { get; }
 
         internal BaseSocketClient(DiscordSocketConfig config, DiscordRestApiClient client)
             : base(config, client) => BaseConfig = config;
         private static DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
             => new DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent);
-        
+
+        /// <summary>
+        ///     Gets a Discord application information for the logged-in user.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     Application information. This reflects your application information you submitted when creating a
+        ///     Discord application via the Developer Portal.
+        /// </returns>
         public abstract Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null);
+        /// <summary>
+        ///     Gets a user who shares a mutual guild with logged-in user with the provided snowflake ID.
+        /// </summary>
+        /// <param name="id">The user snowflake ID.</param>
+        /// <returns>
+        ///     A user who shares a mutual guild with the logged-in user and who is also present in the WebSocket cache;
+        ///     or <see langword="null"/> when the user cannot be found.
+        /// </returns>
         public abstract SocketUser GetUser(ulong id);
+
+        /// <summary>
+        ///     Gets a user who shares a mutual guild with the logged-in user with the provided username and discriminator value combo.
+        /// </summary>
+        /// <param name="username">The name of the user.</param>
+        /// <param name="discriminator">The discriminator value of the user.</param>
+        /// <returns>
+        ///     A user who shares a mutual guild with the logged-in user and who is also present in the WebSocket cache;
+        ///     or <see langword="null"/> when the user cannot be found.
+        /// </returns>
         public abstract SocketUser GetUser(string username, string discriminator);
+        /// <summary>
+        ///     Gets a channel that the logged-in user is accessible to with the provided ID.
+        /// </summary>
+        /// <param name="id">The channel snowflake ID.</param>
+        /// <returns>
+        ///     A generic channel object (voice, text, category, etc.); or <see langword="null" /> when the channel
+        ///     cannot be found.
+        /// </returns>
         public abstract SocketChannel GetChannel(ulong id);
+        /// <summary>
+        ///     Gets a guild that the logged-in user is accessible to with the provided ID.
+        /// </summary>
+        /// <param name="id">The guild snowflake ID.</param>
+        /// <returns>
+        ///     A guild; or <see langword="null"/> when the guild cannot be found.
+        /// </returns>
         public abstract SocketGuild GetGuild(ulong id);
+        /// <summary>
+        ///     Gets a voice region with the provided ID.
+        /// </summary>
+        /// <param name="id">The unique identifier of the voice region.</param>
+        /// <returns>
+        ///     A voice region; or <see langword="null"/> if none can be found.
+        /// </returns>
         public abstract RestVoiceRegion GetVoiceRegion(string id);
         /// <inheritdoc />
         public abstract Task StartAsync();
         /// <inheritdoc />
         public abstract Task StopAsync();
+        /// <summary>
+        ///     Sets the current status of the logged-in user (e.g. Online, Do not Disturb).
+        /// </summary>
+        /// <param name="status">The new status to be set.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
         public abstract Task SetStatusAsync(UserStatus status);
+        /// <summary>
+        ///     Sets the game of the logged-in user.
+        /// </summary>
+        /// <param name="name">The name of the game.</param>
+        /// <param name="streamUrl">If streaming, the URL of the stream. Must be a valid Twitch URL.</param>
+        /// <param name="type">The type of the game.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
         public abstract Task SetGameAsync(string name, string streamUrl = null, ActivityType type = ActivityType.Playing);
+        /// <summary>
+        ///     Sets the <paramref name="activity"/> of the logged-in user.
+        /// </summary>
+        /// <remarks>
+        ///     This method sets the <paramref name="activity"/> of the user. Please note that Rich Presence cannot be
+        ///     set via this method or client. Rich Presence is strictly limited to RPC clients only. Furthermore,
+        ///     Discord will only accept setting of name and the type of activity.
+        /// </remarks>
+        /// <param name="activity">The activty to be set.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
         public abstract Task SetActivityAsync(IActivity activity);
-        public abstract Task DownloadUsersAsync(IEnumerable<IGuild> guilds);  
-        
+        /// <summary>
+        ///     Attempts to download users into the user cache for the selected guilds.
+        /// </summary>
+        /// <param name="guilds">The guilds to download the members from.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
+        public abstract Task DownloadUsersAsync(IEnumerable<IGuild> guilds);
+
+        /// <summary>
+        ///     Creates a guild for the logged-in user who is in less than 10 active guilds.
+        /// </summary>
+        /// <remarks>
+        ///     This method creates a new guild on behalf of the logged-in user. Note that due to Discord's limitation,
+        ///     this method will only work for users that are in less than 10 guilds.
+        /// </remarks>
+        /// <param name="name">The name of the new guild.</param>
+        /// <param name="region">The voice region to create the guild with.</param>
+        /// <param name="jpegIcon">The icon of the guild.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing the newly created guild.
+        /// </returns>
         public Task<RestGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null, RequestOptions options = null)
             => ClientHelper.CreateGuildAsync(this, name, region, jpegIcon, options ?? RequestOptions.Default);
+        /// <summary>
+        ///     Gets the connections that the logged-in user has set up.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing a collection of connections.
+        /// </returns>
         public Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(RequestOptions options = null)
             => ClientHelper.GetConnectionsAsync(this, options ?? RequestOptions.Default);
+        /// <summary>
+        ///     Gets an invite with the provided invite identifier.
+        /// </summary>
+        /// <param name="inviteId">The invitation identifier.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing the invite information.
+        /// </returns>
         public Task<RestInvite> GetInviteAsync(string inviteId, RequestOptions options = null)
             => ClientHelper.GetInviteAsync(this, inviteId, options ?? RequestOptions.Default);
         

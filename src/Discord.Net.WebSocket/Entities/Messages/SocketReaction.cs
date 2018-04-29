@@ -1,4 +1,4 @@
-﻿using Model = Discord.API.Gateway.Reaction;
+using Model = Discord.API.Gateway.Reaction;
 
 namespace Discord.WebSocket
 {
@@ -9,6 +9,7 @@ namespace Discord.WebSocket
         public ulong MessageId { get; }
         public Optional<SocketUserMessage> Message { get; }
         public ISocketMessageChannel Channel { get; }
+        /// <inheritdoc />
         public IEmote Emote { get; }
 
         internal SocketReaction(ISocketMessageChannel channel, ulong messageId, Optional<SocketUserMessage> message, ulong userId, Optional<IUser> user, IEmote emoji)
@@ -30,6 +31,7 @@ namespace Discord.WebSocket
             return new SocketReaction(channel, model.MessageId, message, model.UserId, user, emote);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object other)
         {
             if (other == null) return false;
@@ -41,6 +43,7 @@ namespace Discord.WebSocket
             return UserId == otherReaction.UserId && MessageId == otherReaction.MessageId && Emote.Equals(otherReaction.Emote);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             unchecked

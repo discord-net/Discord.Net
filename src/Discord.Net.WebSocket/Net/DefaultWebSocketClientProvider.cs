@@ -8,6 +8,7 @@ namespace Discord.Net.WebSockets
 #if DEFAULTWEBSOCKET
         public static readonly WebSocketProvider Instance = Create();
 
+        /// <exception cref="PlatformNotSupportedException">The default WebSocketProvider is not supported on this platform.</exception>
         public static WebSocketProvider Create(IWebProxy proxy = null)
         {
             return () =>

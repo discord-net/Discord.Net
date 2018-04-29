@@ -7,10 +7,10 @@ namespace Discord
     /// </summary>
     /// <example>
     ///     <code lang="c#">
-    /// await (Context.User as IGuildUser)?.ModifyAsync(x =&gt;
-    /// {
-    ///     x.Nickname = $"festive {Context.User.Username}";
-    /// });
+    ///         await guildUser.ModifyAsync(x =&gt;
+    ///         {
+    ///             x.Nickname = $"festive {guildUser.Username}";
+    ///         });
     /// </code>
     /// </example>
     /// <seealso cref="T:Discord.IGuildUser" />
@@ -35,7 +35,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     To clear the user's nickname, this value can be set to <see langword="null" /> or
-        ///     <see cref="string.Empty" /> .
+        ///     <see cref="string.Empty" />.
         /// </remarks>
         public Optional<string> Nickname { get; set; }
         /// <summary>

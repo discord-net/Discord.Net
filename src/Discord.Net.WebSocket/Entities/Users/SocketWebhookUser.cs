@@ -63,26 +63,32 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         ChannelPermissions IGuildUser.GetPermissions(IGuildChannel channel) => Permissions.ToChannelPerms(channel, GuildPermissions.Webhook.RawValue);
         /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Webhook users cannot be kicked.</exception>
         Task IGuildUser.KickAsync(string reason, RequestOptions options) => 
             throw new NotSupportedException("Webhook users cannot be kicked.");
 
         /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Webhook users cannot be modified.</exception>
         Task IGuildUser.ModifyAsync(Action<GuildUserProperties> func, RequestOptions options) => 
             throw new NotSupportedException("Webhook users cannot be modified.");
 
         /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Roles are not supported on webhook users.</exception>
         Task IGuildUser.AddRoleAsync(IRole role, RequestOptions options) => 
             throw new NotSupportedException("Roles are not supported on webhook users.");
 
         /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Roles are not supported on webhook users.</exception>
         Task IGuildUser.AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options) => 
             throw new NotSupportedException("Roles are not supported on webhook users.");
 
         /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Roles are not supported on webhook users.</exception>
         Task IGuildUser.RemoveRoleAsync(IRole role, RequestOptions options) => 
             throw new NotSupportedException("Roles are not supported on webhook users.");
 
         /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Roles are not supported on webhook users.</exception>
         Task IGuildUser.RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options) => 
             throw new NotSupportedException("Roles are not supported on webhook users.");
 

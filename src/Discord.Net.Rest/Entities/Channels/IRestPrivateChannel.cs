@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a REST channel that is private to select recipients.
+    ///     Represents a REST-based channel that is private to select recipients.
     /// </summary>
     public interface IRestPrivateChannel : IPrivateChannel
     {

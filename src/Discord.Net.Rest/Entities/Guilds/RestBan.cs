@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Model = Discord.API.Ban;
 
 namespace Discord.Rest
@@ -7,6 +7,7 @@ namespace Discord.Rest
     public class RestBan : IBan
     {
         public RestUser User { get; }
+        /// <inheritdoc />
         public string Reason { get; }
 
         internal RestBan(RestUser user, string reason)
@@ -23,6 +24,7 @@ namespace Discord.Rest
         private string DebuggerDisplay => $"{User}: {Reason}";
 
         //IBan
+        /// <inheritdoc />
         IUser IBan.User => User;
     }
 }

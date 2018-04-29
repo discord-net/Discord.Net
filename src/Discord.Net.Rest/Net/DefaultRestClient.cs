@@ -82,6 +82,8 @@ namespace Discord.Net.Rest
                 return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
             }
         }
+
+        /// <exception cref="InvalidOperationException">Unsupported param type.</exception>
         public async Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly, string reason = null)
         {
             string uri = Path.Combine(_baseUrl, endpoint);
@@ -111,7 +113,7 @@ namespace Discord.Net.Rest
                                 content.Add(new StreamContent(stream), p.Key, fileValue.Filename);
                                 continue;
                             }
-                            default: throw new InvalidOperationException($"Unsupported param type \"{p.Value.GetType().Name}\"");
+                            default: throw new InvalidOperationException($"Unsupported param type \"{p.Value.GetType().Name}\".");
                         }
                     }
                 }

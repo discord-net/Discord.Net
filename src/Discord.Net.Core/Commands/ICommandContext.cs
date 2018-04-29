@@ -1,7 +1,7 @@
 namespace Discord.Commands
 {
     /// <summary>
-    ///     Represents the context of a command. This may include the client, guild, channel, user, and message.
+    ///     Represents a context of a command. This may include the client, guild, channel, user, and message.
     /// </summary>
     public interface ICommandContext
     {

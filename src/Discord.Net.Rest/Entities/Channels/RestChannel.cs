@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,12 +8,14 @@ namespace Discord.Rest
 {
     public class RestChannel : RestEntity<ulong>, IChannel, IUpdateable
     {
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
         internal RestChannel(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
         }
+        /// <exception cref="InvalidOperationException">Unexpected channel type.</exception>
         internal static RestChannel Create(BaseDiscordClient discord, Model model)
         {
             switch (model.Type)
@@ -28,6 +30,7 @@ namespace Discord.Rest
                     return new RestChannel(discord, model.Id);
             }
         }
+        /// <exception cref="InvalidOperationException">Unexpected channel type.</exception>
         internal static IRestPrivateChannel CreatePrivate(BaseDiscordClient discord, Model model)
         {
             switch (model.Type)
@@ -42,13 +45,17 @@ namespace Discord.Rest
         }
         internal virtual void Update(Model model) { }
 
+        /// <inheritdoc />
         public virtual Task UpdateAsync(RequestOptions options = null) => Task.Delay(0);
 
         //IChannel
+        /// <inheritdoc />
         string IChannel.Name => null;
 
+        /// <inheritdoc />
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null); //Overridden
+        /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overridden
     }

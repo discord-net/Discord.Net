@@ -19,7 +19,8 @@ namespace Discord
         public static readonly ChannelPermissions DM = new ChannelPermissions(0b00000_1000110_1011100110000_000000);
         /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for group channels. </summary>
         public static readonly ChannelPermissions Group = new ChannelPermissions(0b00000_1000110_0001101100000_000000);
-        /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for a given channelType. </summary>
+        /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for a given channel type. </summary>
+        /// <exception cref="ArgumentException">Unknown channel type.</exception>
         public static ChannelPermissions All(IChannel channel)
         {
             switch (channel)

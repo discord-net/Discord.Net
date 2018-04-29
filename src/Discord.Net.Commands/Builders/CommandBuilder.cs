@@ -117,6 +117,7 @@ namespace Discord.Commands.Builders
             return this;
         }
 
+        /// <exception cref="InvalidOperationException">Only the last parameter in a command may have the Remainder or Multiple flag.</exception>
         internal CommandInfo Build(ModuleInfo info, CommandService service)
         {
             //Default name to primary alias

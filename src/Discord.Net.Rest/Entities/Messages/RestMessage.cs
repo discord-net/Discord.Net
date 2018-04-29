@@ -35,6 +35,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public virtual IReadOnlyCollection<ulong> MentionedRoleIds => ImmutableArray.Create<ulong>();
         public virtual IReadOnlyCollection<RestUser> MentionedUsers => ImmutableArray.Create<RestUser>();
+        /// <inheritdoc />
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
 
         /// <inheritdoc />
@@ -75,10 +76,14 @@ namespace Discord.Rest
 
         public override string ToString() => Content;
 
+        /// <inheritdoc />
         MessageType IMessage.Type => MessageType.Default;
         IUser IMessage.Author => Author;
+        /// <inheritdoc />
         IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
+        /// <inheritdoc />
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
+        /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
     }
 }

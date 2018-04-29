@@ -59,7 +59,8 @@ namespace Discord.Rest
 
         public override string ToString() => Url;
         private string DebuggerDisplay => $"{Url} ({GuildName} / {ChannelName})";
-        
+
+        /// <inheritdoc />
         IGuild IInvite.Guild
         {
             get
@@ -71,6 +72,7 @@ namespace Discord.Rest
                 throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
             }
         }
+        /// <inheritdoc />
         IChannel IInvite.Channel
         {
             get

@@ -172,7 +172,7 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Sets the title of an <see cref="Embed" /> .
+        ///     Sets the title of an <see cref="Embed" />.
         /// </summary>
         /// <param name="title">The title to be set.</param>
         /// <returns>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Integration;
@@ -10,18 +10,28 @@ namespace Discord.Rest
     {
         private long _syncedAtTicks;
 
+        /// <inheritdoc />
         public string Name { get; private set; }
+        /// <inheritdoc />
         public string Type { get; private set; }
+        /// <inheritdoc />
         public bool IsEnabled { get; private set; }
+        /// <inheritdoc />
         public bool IsSyncing { get; private set; }
+        /// <inheritdoc />
         public ulong ExpireBehavior { get; private set; }
+        /// <inheritdoc />
         public ulong ExpireGracePeriod { get; private set; }
+        /// <inheritdoc />
         public ulong GuildId { get; private set; }
+        /// <inheritdoc />
         public ulong RoleId { get; private set; }
         public RestUser User { get; private set; }
+        /// <inheritdoc />
         public IntegrationAccount Account { get; private set; }
         internal IGuild Guild { get; private set; }
 
+        /// <inheritdoc />
         public DateTimeOffset SyncedAt => DateTimeUtils.FromTicks(_syncedAtTicks);
 
         internal RestGuildIntegration(BaseDiscordClient discord, IGuild guild, ulong id)
@@ -78,6 +88,7 @@ namespace Discord.Rest
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id}{(IsEnabled ? ", Enabled" : "")})";
 
+        /// <inheritdoc />
         IGuild IGuildIntegration.Guild
         {
             get
@@ -87,6 +98,7 @@ namespace Discord.Rest
                 throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
             }
         }
+        /// <inheritdoc />
         IUser IGuildIntegration.User => User;
     }
 }

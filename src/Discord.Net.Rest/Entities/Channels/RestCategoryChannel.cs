@@ -7,7 +7,7 @@ using Model = Discord.API.Channel;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a REST category channel.
+    ///     Represents a REST-based category channel.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestCategoryChannel : RestGuildChannel, ICategoryChannel

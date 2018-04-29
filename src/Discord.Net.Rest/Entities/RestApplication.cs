@@ -19,6 +19,7 @@ namespace Discord.Rest
         public string Description { get; private set; }
         /// <inheritdoc />
         public string[] RPCOrigins { get; private set; }
+        /// <inheritdoc />
         public ulong Flags { get; private set; }
 
         /// <inheritdoc />
@@ -52,6 +53,7 @@ namespace Discord.Rest
                 Owner = RestUser.Create(Discord, model.Owner.Value);
         }
 
+        /// <exception cref="InvalidOperationException">Unable to update this object from a different application token.</exception>
         public async Task UpdateAsync()
         {
             var response = await Discord.ApiClient.GetMyApplicationAsync().ConfigureAwait(false);
@@ -60,6 +62,12 @@ namespace Discord.Rest
             Update(response);
         }
 
+        /// <summary>
+        ///     Gets the name of the application.
+        /// </summary>
+        /// <returns>
+        ///     Name of the application.
+        /// </returns>
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
     }

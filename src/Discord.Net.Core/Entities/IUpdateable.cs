@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     Represents whether the object is updatable or not.
+    ///     Defines whether the object is updateable or not.
     /// </summary>
     public interface IUpdateable
     {

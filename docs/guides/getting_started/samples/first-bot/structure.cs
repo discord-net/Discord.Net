@@ -36,7 +36,7 @@ class Program
             // you must set the MessageCacheSize. You may adjust the number as needed.
             //MessageCacheSize = 50,
 
-            // If your platform doesn't have native websockets,
+            // If your platform doesn't have native WebSockets,
             // add Discord.Net.Providers.WS4Net from NuGet,
             // add the `using` at the top, and uncomment this line:
             //WebSocketProvider = WS4NetProvider.Instance
