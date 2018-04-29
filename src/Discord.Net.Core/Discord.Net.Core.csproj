@@ -6,7 +6,6 @@
     <Description>The core components for the Discord.Net library.</Description>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net45;netstandard1.1;netstandard1.3;netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard1.1;netstandard1.3;netstandard2.0</TargetFrameworks>
-    <DefineConstants Condition=" '$(TargetFramework)' == 'netstandard2.0' ">NETSTANDARD2</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
