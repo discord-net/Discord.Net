@@ -897,7 +897,7 @@ namespace Discord.API
         }
 
         //Guild Invites
-        public async Task<Invite> GetInviteAsync(string inviteId, RequestOptions options = null)
+        public async Task<InviteMetadata> GetInviteAsync(string inviteId, GetInviteParams args, RequestOptions options = null)
         {
             Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
             options = RequestOptions.CreateOrClone(options);
@@ -910,9 +910,11 @@ namespace Discord.API
             if (index >= 0)
                 inviteId = inviteId.Substring(index + 1);
 
+            var withCounts = args.WithCounts.GetValueOrDefault(false);
+
             try
             {
-                return await SendAsync<Invite>("GET", () => $"invites/{inviteId}", new BucketIds(), options: options).ConfigureAwait(false);
+                return await SendAsync<InviteMetadata>("GET", () => $"invites/{inviteId}?with_counts={withCounts}", new BucketIds(), options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
@@ -949,13 +951,6 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             
             return await SendAsync<Invite>("DELETE", () => $"invites/{inviteId}", new BucketIds(), options: options).ConfigureAwait(false);
-        }
-        public async Task AcceptInviteAsync(string inviteId, RequestOptions options = null)
-        {
-            Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
-            options = RequestOptions.CreateOrClone(options);
-            
-            await SendAsync("POST", () => $"invites/{inviteId}", new BucketIds(), options: options).ConfigureAwait(false);
         }
 
         //Guild Members
