@@ -158,6 +158,7 @@ namespace Discord.Commands
                         builder.AddAliases(command.Text);
                         builder.RunMode = command.RunMode;
                         builder.Name = builder.Name ?? command.Text;
+                        builder.IgnoreExtraArgs = command.IgnoreExtraArgs ?? service._ignoreExtraArgs;
                         break;
                     case NameAttribute name:
                         builder.Name = name.Text;
