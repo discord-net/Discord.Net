@@ -1,4 +1,5 @@
-// (Note: This precondition is obsolete, it is recommended to use the RequireOwnerAttribute that is bundled with Discord.Commands)
+// (Note: This precondition is obsolete, it is recommended to use the
+// RequireOwnerAttribute that is bundled with Discord.Commands)
 
 using Discord.Commands;
 using Discord.WebSocket;

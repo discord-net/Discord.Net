@@ -14,8 +14,7 @@ public class Program
 
 		// Remember to keep this private or to read this
 		// from an external source!
-		string token = "abcdefg...";
-		await _client.LoginAsync(TokenType.Bot, token);
+		await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DiscordToken"));
 		await _client.StartAsync();
 
 		// Block this task until the program is closed.

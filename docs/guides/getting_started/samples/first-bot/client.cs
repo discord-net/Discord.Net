@@ -6,10 +6,9 @@ public async Task MainAsync()
 
 	_client.Log += Log;
 
-	// Remember to keep this private or to read this
+	// Remember to keep token private or to read it
 	// from an external source!
-	string token = "abcdefg...";
-	await _client.LoginAsync(TokenType.Bot, token);
+	await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DiscordToken"));
 	await _client.StartAsync();
 
 	// Block this task until the program is closed.
