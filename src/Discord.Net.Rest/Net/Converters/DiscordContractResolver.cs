@@ -1,4 +1,4 @@
-﻿using Discord.API;
+using Discord.API;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
@@ -25,7 +25,6 @@ namespace Discord.Net.Converters
                 if (converter != null)
                 {
                     property.Converter = converter;
-                    property.MemberConverter = converter;
                 }
             }
             else
