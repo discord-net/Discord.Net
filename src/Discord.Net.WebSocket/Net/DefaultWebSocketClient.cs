@@ -1,4 +1,3 @@
-﻿#if DEFAULTWEBSOCKET
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -248,4 +247,3 @@ namespace Discord.Net.WebSockets
         }
     }
 }
-#endif

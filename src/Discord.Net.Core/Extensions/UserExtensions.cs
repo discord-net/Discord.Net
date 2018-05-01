@@ -32,7 +32,6 @@ namespace Discord
             return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(stream, filename, text, isTTS, embed, options).ConfigureAwait(false);
         }
 
-#if FILESYSTEM
         /// <summary>
         /// Sends a file to the user via DM.
         /// </summary>
@@ -45,7 +44,6 @@ namespace Discord
         {
             return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(filePath, text, isTTS, embed, options).ConfigureAwait(false);
         }
-#endif
 
         public static Task BanAsync(this IGuildUser user, int pruneDays = 0, string reason = null, RequestOptions options = null)
             => user.Guild.AddBanAsync(user, pruneDays, reason, options);

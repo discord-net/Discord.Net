@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 namespace Discord
 {
     /// <summary>
@@ -15,7 +15,7 @@ namespace Discord
         {
             Stream = stream;
         }
-#if FILESYSTEM
+
         /// <summary>
         /// Create the image from a file path.
         /// </summary>
@@ -27,6 +27,6 @@ namespace Discord
         {
             Stream = File.OpenRead(path);
         }
-#endif
+
     }
 }

@@ -1,4 +1,3 @@
-﻿#if DEFAULTUDPCLIENT
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -132,4 +131,3 @@ namespace Discord.Net.Udp
         }
     }
 }
-#endif

@@ -16,10 +16,7 @@
     <PropertyGroup Condition=" '$(BuildNumber)' != '' And $(IsTagBuild) != 'true' ">
         <VersionSuffix Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)-$(BuildNumber)</VersionSuffix>
         <VersionSuffix Condition=" '$(VersionSuffix)' == '' ">build-$(BuildNumber)</VersionSuffix>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(TargetFramework)' != 'netstandard1.1' ">
-        <DefineConstants>$(DefineConstants);FILESYSTEM;DEFAULTUDPCLIENT;DEFAULTWEBSOCKET</DefineConstants>
-    </PropertyGroup>
+    </PropertyGroup> 
     <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' Or '$(TargetFramework)' == 'netstandard2.0' ">
         <DefineConstants>$(DefineConstants);FORMATSTR;UNIXTIME;MSTRYBUFFER;UDPDISPOSE</DefineConstants>
     </PropertyGroup>
