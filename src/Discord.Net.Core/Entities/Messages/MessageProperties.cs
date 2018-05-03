@@ -4,7 +4,7 @@ namespace Discord
     ///     Properties that are used to modify an <see cref="IUserMessage" /> with the specified changes.
     /// </summary>
     /// <remarks>
-    ///     The content of a message can be cleared with <see cref="string.Empty"/> if and only if an <see cref="Discord.Embed"> is present.
+    ///     The content of a message can be cleared with <see cref="string.Empty"/> if and only if an <see cref="Discord.Embed"/> is present.
     /// </remarks>
     /// <example>
     ///     <code lang="c#">

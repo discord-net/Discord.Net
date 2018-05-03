@@ -34,6 +34,8 @@ namespace Discord.Commands
 
         /// <inheritdoc/>
         public bool IsSuccess => !Error.HasValue;
+
+        /// <exception cref="InvalidOperationException">TypeReaderResult was not successful.</exception>
         public object BestMatch => IsSuccess
             ? (Values.Count == 1 ? Values.Single().Value : Values.OrderByDescending(v => v.Score).First().Value)
             : throw new InvalidOperationException("TypeReaderResult was not successful.");

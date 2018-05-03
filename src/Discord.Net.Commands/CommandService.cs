@@ -60,10 +60,12 @@ namespace Discord.Commands
         public CommandService() : this(new CommandServiceConfig()) { }
 
         /// <summary>
-        ///     Initializes a new <see cref="CommandService" /> class with the provided configuration.
+        ///     Initializes a new <see cref="CommandService"/> class with the provided configuration.
         /// </summary>
         /// <param name="config">The configuration class.</param>
-        /// <exception cref="InvalidOperationException">The <see cref="RunMode"/> is set to <see cref="RunMode.Default"/>.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The <see cref="RunMode"/> cannot be set to <see cref="RunMode.Default"/>.
+        /// </exception>
         public CommandService(CommandServiceConfig config)
         {
             _caseSensitive = config.CaseSensitiveCommands;
@@ -132,6 +134,8 @@ namespace Discord.Commands
         /// <returns>
         ///     A built module.
         /// </returns>
+        /// <exception cref="ArgumentException">This module has already been added.</exception>
+        /// <exception cref="InvalidOperationException">The <see cref="ModuleInfo"/> fails to be built; an invalid type may have been provided.</exception>
         public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services) => AddModuleAsync(typeof(T), services);
 
         /// <summary>

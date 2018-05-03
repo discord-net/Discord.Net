@@ -256,6 +256,7 @@ namespace Discord.Rest
         }
 
         //Users
+        /// <exception cref="InvalidOperationException">Resolving permissions requires the parent guild to be downloaded.</exception>
         public static async Task<RestGuildUser> GetUserAsync(IGuildChannel channel, IGuild guild, BaseDiscordClient client,
             ulong id, RequestOptions options)
         {

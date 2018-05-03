@@ -8,7 +8,7 @@ namespace Discord.Commands
     public static class MessageExtensions
     {
         /// <summary>
-        ///     Gets whether the message starts with the provided <see langword="char" />.
+        ///     Gets whether the message starts with the provided character.
         /// </summary>
         public static bool HasCharPrefix(this IUserMessage msg, char c, ref int argPos)
         {
@@ -21,7 +21,7 @@ namespace Discord.Commands
             return false;
         }
         /// <summary>
-        ///     Gets whether the message starts with the provided <see langword="string" />.
+        ///     Gets whether the message starts with the provided string.
         /// </summary>
         public static bool HasStringPrefix(this IUserMessage msg, string str, ref int argPos, StringComparison comparisonType = StringComparison.Ordinal)
         {
