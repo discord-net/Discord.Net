@@ -27,8 +27,8 @@ Discord Applications Portal first.
     ![Step 5](images/intro-create-bot.png)
 
 6. Confirm the popup.
-7. If this bot will be public, check "Public Bot." **Do not tick any
-    other options!**
+7. (Optional) If this bot will be public, check "Public Bot."
+    * **Do not tick any other options!**
 
 [Discord Applications Portal]: https://discordapp.com/developers/applications/me
 
