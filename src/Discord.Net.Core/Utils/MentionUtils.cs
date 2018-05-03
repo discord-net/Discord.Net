@@ -16,16 +16,25 @@ namespace Discord
         /// <summary>
         ///     Returns a mention string based on the user ID.
         /// </summary>
+        /// <returns>
+        ///     A user mention string (e.g. &lt;@80351110224678912&gt;).
+        /// </returns>
         public static string MentionUser(ulong id) => MentionUser(id.ToString(), true);
         internal static string MentionChannel(string id) => $"<#{id}>";
         /// <summary>
         ///     Returns a mention string based on the channel ID.
         /// </summary>
+        /// <returns>
+        ///     A channel mention string (e.g. &lt;#103735883630395392&gt;).
+        /// </returns>
         public static string MentionChannel(ulong id) => MentionChannel(id.ToString());
         internal static string MentionRole(string id) => $"<@&{id}>";
         /// <summary>
         ///     Returns a mention string based on the role ID.
         /// </summary>
+        /// <returns>
+        ///     A role mention string (e.g. &lt;@&amp;165511591545143296&gt;).
+        /// </returns>
         public static string MentionRole(ulong id) => MentionRole(id.ToString());
 
         /// <summary>
