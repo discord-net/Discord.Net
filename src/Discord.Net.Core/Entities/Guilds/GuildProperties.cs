@@ -3,28 +3,19 @@ namespace Discord
     /// <summary>
     ///     Properties that are used to modify an <see cref="IGuild" /> with the specified changes.
     /// </summary>
-    /// <example>
-    ///     <code lang="c#">
-    ///         await Context.Guild.ModifyAsync(async x =&gt;
-    ///         {
-    ///             x.Name = "aaaaaah";
-    ///         });
-    ///     </code>
-    /// </example>
-    /// <see cref="T:Discord.IGuild" />
+    /// <see cref="IGuild.ModifyAsync" />
     public class GuildProperties
     {
-        public Optional<string> Username { get; set; }
         /// <summary>
-        ///     Gets or sets the name of the Guild.
+        ///     Gets or sets the name of the guild. Must be within 100 characters.
         /// </summary>
         public Optional<string> Name { get; set; }
         /// <summary>
-        ///     Gets or sets the region for the Guild's voice connections.
+        ///     Gets or sets the region for the guild's voice connections.
         /// </summary>
         public Optional<IVoiceRegion> Region { get; set; }
         /// <summary>
-        ///     Gets or sets the ID of the region for the Guild's voice connections.
+        ///     Gets or sets the ID of the region for the guild's voice connections.
         /// </summary>
         public Optional<string> RegionId { get; set; }
         /// <summary>

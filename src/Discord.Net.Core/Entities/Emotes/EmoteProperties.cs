@@ -5,6 +5,7 @@ namespace Discord
     /// <summary>
     ///     Properties that are used to modify an <see cref="Emote" /> with the specified changes.
     /// </summary>
+    /// <seealso cref="IGuild.ModifyEmoteAsync"/>
     public class EmoteProperties
     {
         /// <summary>

@@ -3,16 +3,7 @@ namespace Discord
     /// <summary>
     ///     Properties that are used to modify an <see cref="IRole" /> with the specified changes.
     /// </summary>
-    /// <example>
-    ///     <code lang="c#">
-    ///         await role.ModifyAsync(x =&gt;
-    ///         {
-    ///             x.Color = new Color(180, 15, 40);
-    ///             x.Hoist = true;
-    ///         });
-    /// </code>
-    /// </example>
-    /// <seealso cref="T:Discord.IRole" />
+    /// <seealso cref="IRole.ModifyAsync" />
     public class RoleProperties
     {
         /// <summary>

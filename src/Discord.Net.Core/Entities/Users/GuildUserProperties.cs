@@ -5,15 +5,7 @@ namespace Discord
     /// <summary>
     ///     Properties that are used to modify an <see cref="IGuildUser" /> with the following parameters.
     /// </summary>
-    /// <example>
-    ///     <code lang="c#">
-    ///         await guildUser.ModifyAsync(x =&gt;
-    ///         {
-    ///             x.Nickname = $"festive {guildUser.Username}";
-    ///         });
-    /// </code>
-    /// </example>
-    /// <seealso cref="T:Discord.IGuildUser" />
+    /// <seealso cref="IGuildUser.ModifyAsync" />
     public class GuildUserProperties
     {
         /// <summary>

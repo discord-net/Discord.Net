@@ -3,16 +3,7 @@ namespace Discord
     /// <summary>
     ///     Properties used to modify an <see cref="IWebhook" /> with the specified changes.
     /// </summary>
-    /// <example>
-    ///     <code lang="c#">
-    /// await webhook.ModifyAsync(x =&gt;
-    /// {
-    ///     x.Name = "Bob";
-    ///     x.Avatar = new Image("avatar.jpg");
-    /// });
-    /// </code>
-    /// </example>
-    /// <seealso cref="T:Discord.IWebhook" />
+    /// <seealso cref="IWebhook.ModifyAsync"/>
     public class WebhookProperties
     {
         /// <summary>

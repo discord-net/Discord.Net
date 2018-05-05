@@ -4,23 +4,9 @@ namespace Discord
     ///     Properties that are used to modify an <see cref="IUserMessage" /> with the specified changes.
     /// </summary>
     /// <remarks>
-    ///     The content of a message can be cleared with <see cref="string.Empty"/> if and only if an <see cref="Discord.Embed"/> is present.
+    ///     The content of a message can be cleared with <see cref="System.String.Empty"/> if and only if an <see cref="Discord.Embed"/> is present.
     /// </remarks>
-    /// <example>
-    ///     <code lang="c#">
-    ///     var message = await ReplyAsync("abc");
-    ///     await message.ModifyAsync(x =&gt;
-    ///     {
-    ///         x.Content = "";
-    ///         x.Embed = new EmbedBuilder()
-    ///             .WithColor(new Color(40, 40, 120))
-    ///             .WithAuthor(a =&gt; a.Name = "foxbot")
-    ///             .WithTitle("Embed!")
-    ///             .WithDescription("This is an embed.")
-    ///             .Build();
-    ///     });
-    ///     </code>
-    /// </example>
+    /// <seealso cref="IUserMessage.ModifyAsync"/>
     public class MessageProperties
     {
         /// <summary>
