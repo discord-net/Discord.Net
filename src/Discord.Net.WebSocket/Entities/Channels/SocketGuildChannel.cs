@@ -21,7 +21,7 @@ namespace Discord.WebSocket
         ///     Gets the guild associated with this channel.
         /// </summary>
         /// <returns>
-        ///     The guild that this channel belongs to.
+        ///     A guild that this channel belongs to.
         /// </returns>
         public SocketGuild Guild { get; }
         /// <inheritdoc />
@@ -34,7 +34,7 @@ namespace Discord.WebSocket
         ///     Gets the parent category of this channel.
         /// </summary>
         /// <returns>
-        ///     The parent category ID associated with this channel, or <see langword="null"/> if none is set.
+        ///     A parent category ID associated with this channel, or <see langword="null"/> if none is set.
         /// </returns>
         public ICategoryChannel Category 
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
@@ -42,7 +42,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
         /// <summary>
-        ///     Returns a collection of users that are able to view the channel.
+        ///     Gets a collection of users that are able to view the channel.
         /// </summary>
         /// <returns>
         ///     A collection of users that can access the channel (i.e. the users seen in the user list).

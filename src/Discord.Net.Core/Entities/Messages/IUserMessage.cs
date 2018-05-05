@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a Discord message object.
+    ///     Represents a generic message sent by a user.
     /// </summary>
     public interface IUserMessage : IMessage
     {

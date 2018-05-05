@@ -30,7 +30,7 @@ namespace Discord.WebSocket
             Recipient = recipient;
             recipient.GlobalUser.AddRef();
             if (Discord.MessageCacheSize > 0)
-                _messages = new MessageCache(Discord, this);
+                _messages = new MessageCache(Discord);
         }
         internal static SocketDMChannel Create(DiscordSocketClient discord, ClientState state, Model model)
         {

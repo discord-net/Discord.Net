@@ -91,11 +91,11 @@ namespace Discord.WebSocket
         public Task SyncPromise => _syncPromise.Task;
         public Task DownloaderPromise => _downloaderPromise.Task;
         /// <summary>
-        ///     Returns the <see cref="IAudioClient" /> associated with this guild.
+        ///     Gets the <see cref="IAudioClient" /> associated with this guild.
         /// </summary>
         public IAudioClient AudioClient => _audioClient;
         /// <summary>
-        ///     Returns the first viewable text channel.
+        ///     Gets the first viewable text channel.
         /// </summary>
         /// <remarks>
         ///     This property does not guarantee the user can send message to it.
@@ -105,7 +105,7 @@ namespace Discord.WebSocket
             .OrderBy(c => c.Position)
             .FirstOrDefault();
         /// <summary>
-        ///     Returns the AFK voice channel, or <see langword="null" /> if none is set.
+        ///     Gets the AFK voice channel, or <see langword="null" /> if none is set.
         /// </summary>
         public SocketVoiceChannel AFKChannel
         {
@@ -138,31 +138,34 @@ namespace Discord.WebSocket
             }
         }
         /// <summary>
-        ///     Returns a collection of text channels present in this guild.
+        ///     Gets a collection of text channels present in this guild.
         /// </summary>
         public IReadOnlyCollection<SocketTextChannel> TextChannels
             => Channels.Select(x => x as SocketTextChannel).Where(x => x != null).ToImmutableArray();
         /// <summary>
-        ///     Returns a collection of voice channels present in this guild.
+        ///     Gets a collection of voice channels present in this guild.
         /// </summary>
         public IReadOnlyCollection<SocketVoiceChannel> VoiceChannels
             => Channels.Select(x => x as SocketVoiceChannel).Where(x => x != null).ToImmutableArray();
         /// <summary>
-        ///     Returns a collection of category channels present in this guild.
+        ///     Gets a collection of category channels present in this guild.
         /// </summary>
         public IReadOnlyCollection<SocketCategoryChannel> CategoryChannels
             => Channels.Select(x => x as SocketCategoryChannel).Where(x => x != null).ToImmutableArray();
         /// <summary>
-        ///     Returns the current logged-in user.
+        ///     Gets the current logged-in user.
         /// </summary>
         public SocketGuildUser CurrentUser => _members.TryGetValue(Discord.CurrentUser.Id, out SocketGuildUser member) ? member : null;
         /// <summary>
-        ///     Returns the @everyone role in this guild.
+        ///     Gets the @everyone role in this guild.
         /// </summary>
         public SocketRole EveryoneRole => GetRole(Id);
         /// <summary>
-        ///     Returns a collection of channels present in this guild.
+        ///     Gets a collection of channels present in this guild.
         /// </summary>
+        /// <returns>
+        ///     Collection of channels.
+        /// </returns>
         public IReadOnlyCollection<SocketGuildChannel> Channels
         {
             get
@@ -175,10 +178,16 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets a collection of emotes created in this guild.
         /// </summary>
+        /// <returns>
+        ///     Collection of emotes.
+        /// </returns>
         public IReadOnlyCollection<GuildEmote> Emotes => _emotes;
         /// <summary>
         ///     Gets a collection of features enabled in this guild.
         /// </summary>
+        /// <returns>
+        ///     Collection of features in string.
+        /// </returns>
         public IReadOnlyCollection<string> Features => _features;
         /// <summary>
         ///     Gets a collection of users in this guild.
@@ -188,10 +197,16 @@ namespace Discord.WebSocket
         /// You may need to enable <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/> to fetch the full user list
         /// upon startup, or use <see cref="DownloadUsersAsync"/> to manually download the users.
         /// </remarks>
+        /// <returns>
+        ///     Collection of users.
+        /// </returns>
         public IReadOnlyCollection<SocketGuildUser> Users => _members.ToReadOnlyCollection();
         /// <summary>
         ///     Gets a collection of roles in this guild.
         /// </summary>
+        /// <returns>
+        ///     Collection of roles.
+        /// </returns>
         public IReadOnlyCollection<SocketRole> Roles => _roles.ToReadOnlyCollection();
 
         internal SocketGuild(DiscordSocketClient client, ulong id)
@@ -378,7 +393,7 @@ namespace Discord.WebSocket
 
         //Bans
         /// <summary>
-        ///     Gets a collection of the banned users in this guild.
+        ///     Returns a collection of the banned users in this guild.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
@@ -634,7 +649,7 @@ namespace Discord.WebSocket
         /// <param name="id">The ID of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A webhook associated with the ID.
+        ///     An awaitable Task containing the webhook associated with the ID.
         /// </returns>
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => GuildHelper.GetWebhookAsync(this, Discord, id, options);
@@ -643,7 +658,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A collection of webhooks.
+        ///     An awaitable Task containing a collection of webhooks.
         /// </returns>
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => GuildHelper.GetWebhooksAsync(this, Discord, options);
