@@ -31,12 +31,20 @@ namespace Discord
         /// </summary>
         /// <param name="messages">The messages to be bulk-deleted.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <remarks>
+        ///     &gt; [!IMPORTANT]
+        ///     &gt; This method can only remove messages that are posted within 14 days!
+        /// </remarks>
         Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null);
         /// <summary>
         ///     Bulk-deletes multiple messages.
         /// </summary>
         /// <param name="messageIds">The IDs of the messages to be bulk-deleted.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <remarks>
+        ///     &gt; [!IMPORTANT]
+        ///     &gt; This method can only remove messages that are posted within 14 days!
+        /// </remarks>
         Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null);
 
         /// <summary>
