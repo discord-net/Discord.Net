@@ -8,11 +8,12 @@ title: Basic Questions about Client
 ## My client keeps returning 401 upon logging in!
 
 > [!WARNING]
-> Userbot/selfbot (logging in with a user token) is not
-> officially supported with this library.
+> Userbot/selfbot (logging in with a user token) is no
+> longer supported with this library starting from 2.0, as
+> logging in under a user account may result in account termination.
 >
-> Logging in under a user account may result in account
-> termination!
+> For more information, see issue [827] & [958], as well as the official
+> [Discord API Terms of Service].
 
 There are few possible reasons why this may occur.
 
@@ -20,9 +21,12 @@ There are few possible reasons why this may occur.
  bot account created from the Discord Developer portal, you should
  be using `TokenType.Bot`.
 2. You are not using the correct login credentials. Please keep in
- mind that tokens is different from a *client secret*.
+ mind that tokens is **different** from a *client secret*.
 
 [TokenType]: xref:Discord.TokenType
+[827]: https://github.com/RogueException/Discord.Net/issues/827
+[958]: https://github.com/RogueException/Discord.Net/issues/958
+[Discord API Terms of Service]: https://discordapp.com/developers/docs/legal
 
 ## How do I do X, Y, Z when my bot connects/logs on? Why do I get a `NullReferenceException` upon calling any client methods after connect?
 
