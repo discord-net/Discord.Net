@@ -1,7 +1,5 @@
 ---
 uid: Discord.Commands.PreconditionAttribute
-seealso:
-    - linkId: Discord.Commands.ParameterPreconditionAttribute
 remarks: *content
 ---
 
@@ -12,8 +10,6 @@ method-level for a command.
 
 ---
 uid: Discord.Commands.ParameterPreconditionAttribute
-seealso:
-    - linkId: Discord.Commands.PreconditionAttribute
 remarks: *content
 ---
 

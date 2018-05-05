@@ -6,6 +6,7 @@ namespace Discord.Commands
     /// <summary>
     ///     Requires the parameter to pass the specified precondition before execution can begin.
     /// </summary>
+    /// <seealso cref="PreconditionAttribute"/>
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = true, Inherited = true)]
     public abstract class ParameterPreconditionAttribute : Attribute
     {
