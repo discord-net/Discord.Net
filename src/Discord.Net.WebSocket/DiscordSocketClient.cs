@@ -1479,6 +1479,12 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<VoiceServerUpdateEvent>(_serializer);
                                     var guild = State.GetGuild(data.GuildId);
+                                    var cacheable = new Cacheable<IGuild, ulong>(guild, data.GuildId, guild != null,
+                                        async () => await ApiClient.GetGuildAsync(data.GuildId).ConfigureAwait(false) as IGuild);
+
+                                    var voiceServer = new SocketVoiceServer(cacheable, data.GuildId, data.Endpoint, data.Token);
+                                    await TimedInvokeAsync(_voiceServerUpdatedEvent, nameof(UserVoiceStateUpdated), voiceServer).ConfigureAwait(false);
+
                                     if (guild != null)
                                     {
                                         string endpoint = data.Endpoint.Substring(0, data.Endpoint.LastIndexOf(':'));
@@ -1489,6 +1495,7 @@ namespace Discord.WebSocket
                                         await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
                                         return;
                                     }
+
                                 }
                                 break;
 
