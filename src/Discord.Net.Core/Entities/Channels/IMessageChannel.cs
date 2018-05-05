@@ -20,7 +20,7 @@ namespace Discord
         Task<IUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null);
 #if FILESYSTEM
         /// <summary>
-        ///     Sends a file to this message channel, with an optional caption.
+        ///     Sends a file to this message channel with an optional caption.
         /// </summary>
         /// <param name="filePath">The file path of the file.</param>
         /// <param name="text">The message to be sent.</param>
@@ -35,7 +35,7 @@ namespace Discord
         Task<IUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
 #endif
         /// <summary>
-        ///     Sends a file to this message channel, with an optional caption.
+        ///     Sends a file to this message channel with an optional caption.
         /// </summary>
         /// <param name="stream">The <see cref="Stream"/> of the file to be sent.</param>
         /// <param name="filename">The name of the attachment.</param>

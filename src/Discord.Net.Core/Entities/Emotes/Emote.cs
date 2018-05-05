@@ -59,7 +59,7 @@ namespace Discord
         }
 
         /// <summary> Parses an <see cref="Emote"/> from its raw format. </summary>
-        /// <param name="text">The raw encoding of an emote; for example, &lt;:dab:277855270321782784&gt;.</param>
+        /// <param name="text">The raw encoding of an emote; for example, <:dab:277855270321782784&gt;.</param>
         /// <returns>An emote.</returns>
         /// <exception cref="ArgumentException">Invalid emote format.</exception>
         public static Emote Parse(string text)
@@ -70,7 +70,7 @@ namespace Discord
         }
 
         /// <summary> Tries to parse an <see cref="Emote"/> from its raw format. </summary>
-        /// <param name="text">The raw encoding of an emote; for example, &lt;:dab:277855270321782784&gt;.</param>
+        /// <param name="text">The raw encoding of an emote; for example, <:dab:277855270321782784&gt;.</param>
         /// <param name="result">An emote.</param>
         public static bool TryParse(string text, out Emote result)
         {

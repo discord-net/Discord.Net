@@ -14,6 +14,13 @@ namespace Discord
         /// <summary>
         ///     Gets the URL to this user's avatar.
         /// </summary>
+        /// <param name="format">The format to return.</param>
+        /// <param name="size">
+        /// The size of the image to return in. Image size can be any power of two between 16 and 2048.
+        /// </param>
+        /// <returns>
+        ///     User's avatar URL.
+        /// </returns>
         string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
         /// <summary>
         ///     Gets the URL to this user's default avatar.
@@ -43,6 +50,10 @@ namespace Discord
         /// <summary>
         ///     Returns a direct message channel to this user, or create one if it does not already exist.
         /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable Task containing the DM channel.
+        /// </returns>
         Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null);
     }
 }

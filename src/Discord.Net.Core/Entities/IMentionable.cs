@@ -9,7 +9,7 @@ namespace Discord
         ///     Returns a special string used to mention this object.
         /// </summary>
         /// <returns>
-        ///     A string that is recognized by Discord as a mention (e.g. &lt;@168693960628371456&gt;).
+        ///     A string that is recognized by Discord as a mention (e.g. <@168693960628371456&gt;).
         /// </returns>
         string Mention { get; }
     }
