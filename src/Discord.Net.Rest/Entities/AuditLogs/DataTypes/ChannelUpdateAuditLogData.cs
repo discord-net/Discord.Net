@@ -35,7 +35,6 @@ namespace Discord.Rest
             var before = new ChannelInfo(oldName, oldTopic, oldBitrate, oldLimit);
             var after = new ChannelInfo(newName, newTopic, newBitrate, newLimit);
 
-            // TODO: check category channels
             return new ChannelUpdateAuditLogData(entry.TargetId.Value, before, after);
         }
 

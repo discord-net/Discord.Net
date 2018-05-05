@@ -17,7 +17,7 @@ namespace Discord.Rest
 
         internal static MemberUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var changes = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "nick"); //TODO: only change?
+            var changes = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "nick");
 
             var newNick = changes.NewValue?.ToObject<string>();
             var oldNick = changes.OldValue?.ToObject<string>();
