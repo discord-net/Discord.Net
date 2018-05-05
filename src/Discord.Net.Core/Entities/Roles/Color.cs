@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a Discord color.
+    ///     Represents a color used in Discord.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct Color
@@ -65,7 +65,7 @@ namespace Discord
         /// <summary>
         ///     Initializes a <see cref="Color" /> struct with the given raw value.
         /// </summary>
-        /// <param name="rawValue">A raw value for the color (e.g. <c>0x607D8B</c>).</param>
+        /// <param name="rawValue">The raw value of the color (e.g. <c>0x607D8B</c>).</param>
         public Color(uint rawValue)
         {
             RawValue = rawValue;
@@ -73,9 +73,9 @@ namespace Discord
         /// <summary>
         ///     Initializes a <see cref="Color" /> struct with the given RGB bytes.
         /// </summary>
-        /// <param name="r">The <see langword="byte"/> that represents the red color.</param>
-        /// <param name="g">The <see langword="byte"/> that represents the green color.</param>
-        /// <param name="b">The <see langword="byte"/> that represents the blue color.</param>
+        /// <param name="r">The byte that represents the red color.</param>
+        /// <param name="g">The byte that represents the green color.</param>
+        /// <param name="b">The byte that represents the blue color.</param>
         public Color(byte r, byte g, byte b)
         {
             RawValue =
@@ -126,8 +126,11 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Gets the hexadecimal representation of the color (e.g. #000ccc).
+        ///     Gets the hexadecimal representation of the color (e.g. <c>#000ccc</c>).
         /// </summary>
+        /// <returns>
+        ///     A hexadecimal string of the color.
+        /// </returns>
         public override string ToString() =>
             $"#{Convert.ToString(RawValue, 16)}";
         private string DebuggerDisplay =>

@@ -12,11 +12,11 @@ namespace Discord
         /// </summary>
         string AvatarId { get; }
         /// <summary>
-        ///     Returns the URL to this user's avatar.
+        ///     Returns a URL to this user's avatar.
         /// </summary>
         /// <param name="format">The format to return.</param>
         /// <param name="size">
-        /// The size of the image to return in. Image size can be any power of two between 16 and 2048.
+        /// The size of the image to return in. This can be any power of two between 16 and 2048.
         /// </param>
         /// <returns>
         ///     User's avatar URL.
