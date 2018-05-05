@@ -50,30 +50,48 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets a Discord application information for the logged-in user.
         /// </summary>
+        /// <remarks>
+        ///     This method reflects your application information you submitted when creating a Discord application via
+        ///     the Developer Portal.
+        /// </remarks>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     Application information. This reflects your application information you submitted when creating a
-        ///     Discord application via the Developer Portal.
+        ///     An awaitable <see cref="Task"/> containing the application information.
         /// </returns>
         public abstract Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null);
         /// <summary>
         ///     Gets a user who shares a mutual guild with logged-in user with the provided snowflake ID.
         /// </summary>
         /// <param name="id">The user snowflake ID.</param>
+        /// <remarks>
+        ///     This method gets the user present in the WebSocket cache with the given condition.
+        ///     <note type="note">
+        ///         Sometimes a user may return <see langword="null"/> because Discord does not send offline users in
+        ///         large guilds (i.e. guild with 100+ members) actively. To download more users on startup, please
+        ///         enable <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/>.
+        ///     </note>
+        /// </remarks>
         /// <returns>
-        ///     A user who shares a mutual guild with the logged-in user and who is also present in the WebSocket cache;
-        ///     or <see langword="null"/> when the user cannot be found.
+        ///     A WebSocket-based generic user; <see langword="null"/> when the user cannot be found.
         /// </returns>
         public abstract SocketUser GetUser(ulong id);
 
         /// <summary>
-        ///     Gets a user who shares a mutual guild with the logged-in user with the provided username and discriminator value combo.
+        ///     Gets a user who shares a mutual guild with the logged-in user with the provided username and
+        ///     discriminator value combo.
         /// </summary>
         /// <param name="username">The name of the user.</param>
         /// <param name="discriminator">The discriminator value of the user.</param>
+        /// <remarks>
+        ///     This method gets the user present in the WebSocket cache with the given condition.
+        ///     <note type="note">
+        ///         Sometimes a user may return <see langword="null"/> because Discord does not send offline users in
+        ///         large guilds (i.e. guild with 100+ members) actively. To download more users on startup, please
+        ///         enable <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/>.
+        ///     </note>
+        /// </remarks>
         /// <returns>
-        ///     A user who shares a mutual guild with the logged-in user and who is also present in the WebSocket cache;
-        ///     or <see langword="null"/> when the user cannot be found.
+        ///     A WebSocket-based generic user; <see langword="null"/> when the user cannot be found.
         /// </returns>
         public abstract SocketUser GetUser(string username, string discriminator);
         /// <summary>
@@ -81,8 +99,8 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="id">The channel snowflake ID.</param>
         /// <returns>
-        ///     A generic channel object (voice, text, category, etc.); or <see langword="null" /> when the channel
-        ///     cannot be found.
+        ///     A generic WebSocket-based channel object (voice, text, category, etc.); <see langword="null" /> when the
+        ///     channel cannot be found.
         /// </returns>
         public abstract SocketChannel GetChannel(ulong id);
         /// <summary>
@@ -90,7 +108,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="id">The guild snowflake ID.</param>
         /// <returns>
-        ///     A guild; or <see langword="null"/> when the guild cannot be found.
+        ///     A WebSocket-based guild; <see langword="null"/> when the guild cannot be found.
         /// </returns>
         public abstract SocketGuild GetGuild(ulong id);
         /// <summary>
@@ -98,7 +116,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="id">The unique identifier of the voice region.</param>
         /// <returns>
-        ///     A voice region; or <see langword="null"/> if none can be found.
+        ///     A REST-based voice region; <see langword="null"/> if none can be found.
         /// </returns>
         public abstract RestVoiceRegion GetVoiceRegion(string id);
         /// <inheritdoc />
@@ -127,9 +145,14 @@ namespace Discord.WebSocket
         ///     Sets the <paramref name="activity"/> of the logged-in user.
         /// </summary>
         /// <remarks>
-        ///     This method sets the <paramref name="activity"/> of the user. Please note that Rich Presence cannot be
-        ///     set via this method or client. Rich Presence is strictly limited to RPC clients only. Furthermore,
-        ///     Discord will only accept setting of name and the type of activity.
+        ///     This method sets the <paramref name="activity"/> of the user. 
+        ///     <note type="note">
+        ///         Discord will only accept setting of name and the type of activity.
+        ///     </note>
+        ///     <note type="important">
+        ///         Rich Presence cannot be set via this method or client. Rich Presence is strictly limited to RPC
+        ///         clients only. 
+        ///     </note>
         /// </remarks>
         /// <param name="activity">The activty to be set.</param>
         /// <returns>
@@ -149,8 +172,10 @@ namespace Discord.WebSocket
         ///     Creates a guild for the logged-in user who is in less than 10 active guilds.
         /// </summary>
         /// <remarks>
-        ///     This method creates a new guild on behalf of the logged-in user. Note that due to Discord's limitation,
-        ///     this method will only work for users that are in less than 10 guilds.
+        ///     This method creates a new guild on behalf of the logged-in user. 
+        ///     <note type="warning">
+        ///         Due to Discord's limitation, this method will only work for users that are in less than 10 guilds.
+        ///     </note>
         /// </remarks>
         /// <param name="name">The name of the new guild.</param>
         /// <param name="region">The voice region to create the guild with.</param>
