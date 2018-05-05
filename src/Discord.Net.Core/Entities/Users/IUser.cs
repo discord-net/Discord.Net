@@ -12,7 +12,7 @@ namespace Discord
         /// </summary>
         string AvatarId { get; }
         /// <summary>
-        ///     Gets the URL to this user's avatar.
+        ///     Returns the URL to this user's avatar.
         /// </summary>
         /// <param name="format">The format to return.</param>
         /// <param name="size">
@@ -23,7 +23,7 @@ namespace Discord
         /// </returns>
         string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
         /// <summary>
-        ///     Gets the URL to this user's default avatar.
+        ///     Returns the URL to this user's default avatar.
         /// </summary>
         string GetDefaultAvatarUrl();
         /// <summary>
@@ -35,11 +35,11 @@ namespace Discord
         /// </summary>
         ushort DiscriminatorValue { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if this user is a bot user.
+        ///     Gets <see langword="true"/> if this user is a bot user.
         /// </summary>
         bool IsBot { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if this user is a webhook user.
+        ///     Gets <see langword="true"/> if this user is a webhook user.
         /// </summary>
         bool IsWebhook { get; }
         /// <summary>

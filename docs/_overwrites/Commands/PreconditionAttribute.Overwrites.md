@@ -31,11 +31,11 @@ The following example creates a precondition to see if the user has
 sufficient role required to access the command.
 
 ```cs
-public class RequireRoleAtribute : PreconditionAttribute
+public class RequireRoleAttribute : PreconditionAttribute
 {
     private readonly ulong _roleId;
 
-    public RequireRoleAtribute(ulong roleId)
+    public RequireRoleAttribute(ulong roleId)
     {
         _roleId = roleId;
     }
