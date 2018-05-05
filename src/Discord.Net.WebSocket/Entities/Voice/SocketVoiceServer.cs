@@ -9,7 +9,7 @@ namespace Discord.WebSocket
         public string Endpoint { get; private set; }
         public string Token { get; private set; }
 
-        internal SocketVoiceServer(Cacheable<IGuild, ulong> guild, ulong guildId, string endpoint, string token)
+        internal SocketVoiceServer(Cacheable<IGuild, ulong> guild, string endpoint, string token)
         {
             Guild = guild;
             Endpoint = endpoint;
