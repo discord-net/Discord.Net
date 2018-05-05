@@ -17,6 +17,9 @@ namespace Discord
         /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
         /// <param name="embed">The <see cref="EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable Task containing the message sent to the channel.
+        /// </returns>
         Task<IUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null);
 #if FILESYSTEM
         /// <summary>
@@ -32,6 +35,9 @@ namespace Discord
         ///     upload the file and refer to the file with "attachment://filename.ext" in the 
         ///     <see cref="Discord.EmbedBuilder.ImageUrl"/>.
         /// </remarks>
+        /// <returns>
+        ///     An awaitable Task containing the message sent to the channel.
+        /// </returns>
         Task<IUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
 #endif
         /// <summary>
@@ -48,6 +54,9 @@ namespace Discord
         ///     upload the file and refer to the file with "attachment://filename.ext" in the 
         ///     <see cref="Discord.EmbedBuilder.ImageUrl"/>.
         /// </remarks>
+        /// <returns>
+        ///     An awaitable Task containing the message sent to the channel.
+        /// </returns>
         Task<IUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
 
         /// <summary>

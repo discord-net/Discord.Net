@@ -6,7 +6,7 @@ using Model = Discord.API.Application;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a REST entity that contains information about a Discord application created via the developer portal.
+    ///     Represents a REST-based entity that contains information about a Discord application created via the developer portal.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestApplication : RestEntity<ulong>, IApplication
