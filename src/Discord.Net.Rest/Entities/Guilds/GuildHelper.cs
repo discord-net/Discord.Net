@@ -32,7 +32,6 @@ namespace Discord.Rest
                 Icon = args.Icon.IsSpecified ? args.Icon.Value?.ToModel() : Optional.Create<ImageModel?>(),
                 Name = args.Name,
                 Splash = args.Splash.IsSpecified ? args.Splash.Value?.ToModel() : Optional.Create<ImageModel?>(),
-                Username = args.Username,
                 VerificationLevel = args.VerificationLevel
             };
 
