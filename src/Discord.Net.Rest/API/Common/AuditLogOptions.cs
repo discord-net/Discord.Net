@@ -2,20 +2,19 @@
 
 namespace Discord.API
 {
-    //TODO: Complete this with all possible values for options
     internal class AuditLogOptions
     {
         //Message delete
         [JsonProperty("count")]
-        public int? MessageDeleteCount { get; set; } //TODO: what type of int? (returned as string)
+        public int? MessageDeleteCount { get; set; }
         [JsonProperty("channel_id")]
         public ulong? MessageDeleteChannelId { get; set; }
 
         //Prune
         [JsonProperty("delete_member_days")]
-        public int? PruneDeleteMemberDays { get; set; } //TODO: what type of int? (returned as string)
+        public int? PruneDeleteMemberDays { get; set; }
         [JsonProperty("members_removed")]
-        public int? PruneMembersRemoved { get; set; } //TODO: what type of int? (returned as string)
+        public int? PruneMembersRemoved { get; set; }
 
         //Overwrite Update
         [JsonProperty("role_name")]

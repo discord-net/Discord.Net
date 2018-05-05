@@ -7,10 +7,11 @@ namespace Discord.Rest
 {
     public class WebhookCreateAuditLogData : IAuditLogData
     {
-        private WebhookCreateAuditLogData(IWebhook webhook, string name, ulong channelId)
+        private WebhookCreateAuditLogData(IWebhook webhook, WebhookType type, string name, ulong channelId)
         {
             Webhook = webhook;
             Name = name;
+            Type = type;
             ChannelId = channelId;
         }
 
@@ -23,19 +24,20 @@ namespace Discord.Rest
             var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
 
             var channelId = channelIdModel.NewValue.ToObject<ulong>();
-            var type = typeModel.NewValue.ToObject<int>(); //TODO: what on *earth* is this for
+            var type = typeModel.NewValue.ToObject<WebhookType>();
             var name = nameModel.NewValue.ToObject<string>();
 
             var webhookInfo = log.Webhooks?.FirstOrDefault(x => x.Id == entry.TargetId);
             var webhook = RestWebhook.Create(discord, (IGuild)null, webhookInfo);
 
-            return new WebhookCreateAuditLogData(webhook, name, channelId);
+            return new WebhookCreateAuditLogData(webhook, type, name, channelId);
         }
 
         //Corresponds to the *current* data
         public IWebhook Webhook { get; }
 
         //Corresponds to the *audit log* data
+        public WebhookType Type { get; }
         public string Name { get; }
         public ulong ChannelId { get; }
     }

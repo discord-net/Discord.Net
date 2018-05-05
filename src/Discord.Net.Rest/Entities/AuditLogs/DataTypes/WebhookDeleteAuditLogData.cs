@@ -11,11 +11,12 @@ namespace Discord.Rest
 {
     public class WebhookDeleteAuditLogData : IAuditLogData
     {
-        private WebhookDeleteAuditLogData(ulong id, ulong channel, string name, string avatar)
+        private WebhookDeleteAuditLogData(ulong id, ulong channel, WebhookType type, string name, string avatar)
         {
             WebhookId = id;
             ChannelId = channel;
             Name = name;
+            Type = type;
             Avatar = avatar;
         }
 
@@ -29,15 +30,16 @@ namespace Discord.Rest
             var avatarHashModel = changes.FirstOrDefault(x => x.ChangedProperty == "avatar_hash");
 
             var channelId = channelIdModel.OldValue.ToObject<ulong>();
-            var type = typeModel.OldValue.ToObject<int>(); //TODO: what on *earth* is this for
+            var type = typeModel.OldValue.ToObject<WebhookType>();
             var name = nameModel.OldValue.ToObject<string>();
             var avatarHash = avatarHashModel?.OldValue?.ToObject<string>();
 
-            return new WebhookDeleteAuditLogData(entry.TargetId.Value, channelId, name, avatarHash);
+            return new WebhookDeleteAuditLogData(entry.TargetId.Value, channelId, type, name, avatarHash);
         }
 
         public ulong WebhookId { get; }
         public ulong ChannelId { get; }
+        public WebhookType Type { get; }
         public string Name { get; }
         public string Avatar { get; }
     }
