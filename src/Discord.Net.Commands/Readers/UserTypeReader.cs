@@ -7,9 +7,14 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    ///     A <see cref="TypeReader"/> for parsing objects implementing <see cref="IUser"/>.
+    /// </summary>
+    /// <typeparam name="T">The type to be checked; must implement <see cref="IUser"/>.</typeparam>
     public class UserTypeReader<T> : TypeReader
         where T : class, IUser
     {
+        /// <inheritdoc />
         public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
             var results = new Dictionary<ulong, TypeReaderValue>();
@@ -72,8 +77,8 @@ namespace Discord.Commands
                     .ForEachAsync(channelUser => AddResult(results, channelUser as T, (channelUser as IGuildUser).Nickname == input ? 0.65f : 0.55f))
                     .ConfigureAwait(false);
 
-                foreach (var guildUser in guildUsers.Where(x => string.Equals(input, (x as IGuildUser).Nickname, StringComparison.OrdinalIgnoreCase)))
-                    AddResult(results, guildUser as T, (guildUser as IGuildUser).Nickname == input ? 0.60f : 0.50f);
+                foreach (var guildUser in guildUsers.Where(x => string.Equals(input, x.Nickname, StringComparison.OrdinalIgnoreCase)))
+                    AddResult(results, guildUser as T, guildUser.Nickname == input ? 0.60f : 0.50f);
             }
 
             if (results.Count > 0)
