@@ -17,73 +17,37 @@ namespace Discord.Rest
         {
             var changes = entry.Changes;
 
-            int? oldAfkTimeout = null,
-                newAfkTimeout = null;
-            DefaultMessageNotifications? oldDefaultMessageNotifications = null,
-                newDefaultMessageNotifications = null;
-            ulong? oldAfkChannelId = null,
-                newAfkChannelId = null;
-            string oldName = null,
-                newName = null;
-            string oldRegionId = null,
-                newRegionId = null;
-            string oldIconHash = null,
-                newIconHash = null;
-            VerificationLevel? oldVerificationLevel = null,
-                newVerificationLevel = null;
-            ulong? oldOwnerId = null,
-                newOwnerId = null;
-            MfaLevel? oldMfaLevel = null,
-                newMfaLevel = null;
-            int? oldContentFilter = null,
-                newContentFilter = null;
+            var afkTimeoutModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
+            var defaultMessageNotificationsModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
+            var afkChannelModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
+            var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
+            var regionIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
+            var iconHashModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
+            var verificationLevelModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
+            var ownerIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
+            var mfaLevelModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
+            var contentFilterModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
 
-            foreach (var change in changes)
-            {
-                switch (change.ChangedProperty)
-                {
-                    case "afk_timeout":
-                        oldAfkTimeout = change.OldValue?.ToObject<int>();
-                        newAfkTimeout = change.NewValue?.ToObject<int>();
-                        break;
-                    case "default_message_notifications":
-                        oldDefaultMessageNotifications = change.OldValue?.ToObject<DefaultMessageNotifications>();
-                        newDefaultMessageNotifications = change.OldValue?.ToObject<DefaultMessageNotifications>();
-                        break;
-                    case "afk_channel_id":
-                        oldAfkChannelId = change.OldValue?.ToObject<ulong>();
-                        newAfkChannelId = change.NewValue?.ToObject<ulong>();
-                        break;
-                    case "name":
-                        oldName = change.OldValue?.ToObject<string>();
-                        newName = change.NewValue?.ToObject<string>();
-                        break;
-                    case "region":
-                        oldRegionId = change.OldValue?.ToObject<string>();
-                        newRegionId = change.NewValue?.ToObject<string>();
-                        break;
-                    case "icon_hash":
-                        oldIconHash = change.OldValue?.ToObject<string>();
-                        newIconHash = change.NewValue?.ToObject<string>();
-                        break;
-                    case "verification_level":
-                        oldVerificationLevel = change.OldValue?.ToObject<VerificationLevel>();
-                        newVerificationLevel = change.NewValue?.ToObject<VerificationLevel>();
-                        break;
-                    case "owner":
-                        oldOwnerId = change.OldValue?.ToObject<ulong>();
-                        newOwnerId = change.NewValue?.ToObject<ulong>();
-                        break;
-                    case "mfa_level":
-                        oldMfaLevel = change.OldValue?.ToObject<MfaLevel>();
-                        newMfaLevel = change.OldValue?.ToObject<MfaLevel>();
-                        break;
-                    case "explicit_content_filter":
-                        oldContentFilter = change.OldValue?.ToObject<int>();
-                        newContentFilter = change.NewValue?.ToObject<int>();
-                        break;
-                }
-            }
+            int? oldAfkTimeout = afkTimeoutModel?.OldValue?.ToObject<int>(),
+                newAfkTimeout = afkTimeoutModel?.NewValue?.ToObject<int>();
+            DefaultMessageNotifications? oldDefaultMessageNotifications = defaultMessageNotificationsModel?.OldValue?.ToObject<DefaultMessageNotifications>(),
+                newDefaultMessageNotifications = defaultMessageNotificationsModel?.NewValue?.ToObject<DefaultMessageNotifications>();
+            ulong? oldAfkChannelId = afkChannelModel?.OldValue?.ToObject<ulong>(),
+                newAfkChannelId = afkChannelModel?.NewValue?.ToObject<ulong>();
+            string oldName = nameModel?.OldValue?.ToObject<string>(),
+                newName = nameModel?.NewValue?.ToObject<string>();
+            string oldRegionId = regionIdModel?.OldValue?.ToObject<string>(),
+                newRegionId = regionIdModel?.NewValue?.ToObject<string>();
+            string oldIconHash = iconHashModel?.OldValue?.ToObject<string>(),
+                newIconHash = iconHashModel?.NewValue?.ToObject<string>();
+            VerificationLevel? oldVerificationLevel = verificationLevelModel?.OldValue?.ToObject<VerificationLevel>(),
+                newVerificationLevel = verificationLevelModel?.NewValue?.ToObject<VerificationLevel>();
+            ulong? oldOwnerId = ownerIdModel?.OldValue?.ToObject<ulong>(),
+                newOwnerId = ownerIdModel?.NewValue?.ToObject<ulong>();
+            MfaLevel? oldMfaLevel = mfaLevelModel?.OldValue?.ToObject<MfaLevel>(),
+                newMfaLevel = mfaLevelModel?.NewValue?.ToObject<MfaLevel>();
+            int? oldContentFilter = contentFilterModel?.OldValue?.ToObject<int>(),
+                newContentFilter = contentFilterModel?.NewValue?.ToObject<int>();
 
             IUser oldOwner = null;
             if (oldOwnerId != null)

@@ -1,4 +1,6 @@
-﻿using Model = Discord.API.AuditLog;
+﻿using System.Linq;
+
+using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
@@ -16,53 +18,36 @@ namespace Discord.Rest
         {
             var changes = entry.Changes;
 
+            var colorModel = changes.FirstOrDefault(x => x.ChangedProperty == "color");
+            var mentionableModel = changes.FirstOrDefault(x => x.ChangedProperty == "mentionable");
+            var hoistModel = changes.FirstOrDefault(x => x.ChangedProperty == "hoist");
+            var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
+            var permissionsModel = changes.FirstOrDefault(x => x.ChangedProperty == "permissions");
+
+            uint? oldColorRaw = colorModel?.OldValue?.ToObject<uint>(),
+                newColorRaw = colorModel?.NewValue?.ToObject<uint>();
+            bool? oldMentionable = mentionableModel?.OldValue?.ToObject<bool>(),
+                newMentionable = mentionableModel?.NewValue?.ToObject<bool>();
+            bool? oldHoist = hoistModel?.OldValue?.ToObject<bool>(),
+                newHoist = hoistModel?.NewValue?.ToObject<bool>();
+            string oldName = nameModel?.OldValue?.ToObject<string>(),
+                newName = nameModel?.NewValue?.ToObject<string>();
+            ulong? oldPermissionsRaw = permissionsModel?.OldValue?.ToObject<ulong>(),
+                newPermissionsRaw = permissionsModel?.OldValue?.ToObject<ulong>();
+
             Color? oldColor = null,
                 newColor = null;
-            bool? oldMentionable = null,
-                newMentionable = null;
-            bool? oldHoist = null,
-                newHoist = null;
-            string oldName = null,
-                newName = null;
             GuildPermissions? oldPermissions = null,
                 newPermissions = null;
 
-            foreach (var model in changes)
-            {
-                switch (model.ChangedProperty)
-                {
-                    case "color":
-                        if (model.NewValue != null)
-                            newColor = new Color(model.NewValue.ToObject<uint>());
-                        if (model.OldValue != null)
-                            oldColor = new Color(model.OldValue.ToObject<uint>());
-                        break;
-                    case "mentionable":
-                        if (model.NewValue != null)
-                            newMentionable = model.NewValue.ToObject<bool>();
-                        if (model.OldValue != null)
-                            oldMentionable = model.OldValue.ToObject<bool>();
-                        break;
-                    case "hoist":
-                        if (model.NewValue != null)
-                            newHoist = model.NewValue.ToObject<bool>();
-                        if (model.OldValue != null)
-                            oldHoist = model.OldValue.ToObject<bool>();
-                        break;
-                    case "name":
-                        if (model.NewValue != null)
-                            newName = model.NewValue.ToObject<string>();
-                        if (model.OldValue != null)
-                            oldName = model.OldValue.ToObject<string>();
-                        break;
-                    case "permissions":
-                        if (model.NewValue != null)
-                            newPermissions = new GuildPermissions(model.NewValue.ToObject<ulong>());
-                        if (model.OldValue != null)
-                            oldPermissions = new GuildPermissions(model.OldValue.ToObject<ulong>());
-                        break;
-                }
-            }
+            if (oldColorRaw.HasValue)
+                oldColor = new Color(oldColorRaw.Value);
+            if (newColorRaw.HasValue)
+                newColor = new Color(newColorRaw.Value);
+            if (oldPermissionsRaw.HasValue)
+                oldPermissions = new GuildPermissions(oldPermissionsRaw.Value);
+            if (newPermissionsRaw.HasValue)
+                newPermissions = new GuildPermissions(newPermissionsRaw.Value);
 
             var oldProps = new RoleInfo(oldColor, oldMentionable, oldHoist, oldName, oldPermissions);
             var newProps = new RoleInfo(newColor, newMentionable, newHoist, newName, newPermissions);
