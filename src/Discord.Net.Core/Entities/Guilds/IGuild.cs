@@ -121,6 +121,10 @@ namespace Discord
         /// <summary> Removes all users from this guild if they have not logged on in a provided number of days or, if simulate is true, returns the number of users that would be removed. </summary>
         Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null);
 
+        /// <summary> Gets the specified number of audit log entries for this guild. </summary>
+        Task<IReadOnlyCollection<IAuditLogEntry>> GetAuditLogAsync(int limit = DiscordConfig.MaxAuditLogEntriesPerBatch,
+            CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
         /// <summary> Gets the webhook in this guild with the provided id, or null if not found. </summary>
         Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
         /// <summary> Gets a collection of all webhooks for this guild. </summary>

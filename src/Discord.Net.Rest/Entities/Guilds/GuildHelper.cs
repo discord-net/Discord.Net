@@ -263,6 +263,35 @@ namespace Discord.Rest
             return model.Pruned;
         }
 
+        // Audit logs
+        public static IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(IGuild guild, BaseDiscordClient client,
+            ulong? from, int? limit, RequestOptions options)
+        {
+            return new PagedAsyncEnumerable<RestAuditLogEntry>(
+                DiscordConfig.MaxAuditLogEntriesPerBatch,
+                async (info, ct) =>
+                {
+                    var args = new GetAuditLogsParams
+                    {
+                        Limit = info.PageSize
+                    };
+                    if (info.Position != null)
+                        args.BeforeEntryId = info.Position.Value;
+                    var model = await client.ApiClient.GetAuditLogsAsync(guild.Id, args, options);
+                    return model.Entries.Select((x) => RestAuditLogEntry.Create(client, model, x)).ToImmutableArray();
+                },
+                nextPage: (info, lastPage) =>
+                {
+                    if (lastPage.Count != DiscordConfig.MaxAuditLogEntriesPerBatch)
+                        return false;
+                    info.Position = lastPage.Min(x => x.Id);
+                    return true;
+                },
+                start: from,
+                count: limit
+            );
+        }
+
         //Webhooks
         public static async Task<RestWebhook> GetWebhookAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
         {

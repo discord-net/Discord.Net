@@ -1197,6 +1197,26 @@ namespace Discord.API
             return await SendAsync<IReadOnlyCollection<VoiceRegion>>("GET", () => $"guilds/{guildId}/regions", ids, options: options).ConfigureAwait(false);
         }
 
+        //Audit logs
+        public async Task<AuditLog> GetAuditLogsAsync(ulong guildId, GetAuditLogsParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+            options = RequestOptions.CreateOrClone(options);
+
+            int limit = args.Limit.GetValueOrDefault(int.MaxValue);
+
+            var ids = new BucketIds(guildId: guildId);
+            Expression<Func<string>> endpoint;
+
+            if (args.BeforeEntryId.IsSpecified)
+                endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}&before={args.BeforeEntryId.Value}";
+            else
+                endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}";
+
+            return await SendAsync<AuditLog>("GET", endpoint, ids, options: options).ConfigureAwait(false);
+        }
+
         //Webhooks
         public async Task<Webhook> CreateWebhookAsync(ulong channelId, CreateWebhookParams args, RequestOptions options = null)
         {
