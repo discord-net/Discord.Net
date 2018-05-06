@@ -17,11 +17,11 @@ namespace Discord
         /// </summary>
         MessageSource Source { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if this message was sent as a text-to-speech message.
+        ///     Returns <c>true</c> if this message was sent as a text-to-speech message.
         /// </summary>
         bool IsTTS { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if this message was added to its channel's pinned messages.
+        ///     Returns <c>true</c> if this message was added to its channel's pinned messages.
         /// </summary>
         bool IsPinned { get; }
         /// <summary>

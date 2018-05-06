@@ -165,7 +165,7 @@ namespace Discord
             InitializeFromCollection(collection);
         }
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="collection" /> or <paramref name="comparer" /> is <see langword="null" />
+        /// <paramref name="collection" /> or <paramref name="comparer" /> is <c>null</c>
         /// </exception>
         public ConcurrentHashSet(int concurrencyLevel, IEnumerable<T> collection, IEqualityComparer<T> comparer)
             : this(concurrencyLevel, DefaultCapacity, false, comparer)

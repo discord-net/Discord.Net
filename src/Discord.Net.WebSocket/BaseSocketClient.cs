@@ -106,7 +106,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="id">The channel snowflake ID.</param>
         /// <returns>
-        ///     A generic WebSocket-based channel object (voice, text, category, etc.); <see langword="null" /> when the
+        ///     A generic WebSocket-based channel object (voice, text, category, etc.); <c>null</c> when the
         ///     channel cannot be found.
         /// </returns>
         public abstract SocketChannel GetChannel(ulong id);

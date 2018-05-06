@@ -11,7 +11,7 @@ namespace Discord
         public int ReactionCount { get; internal set; }
 
         /// <summary>
-        ///     Returns <see langword="true"/> if the current user has used this reaction.
+        ///     Returns <c>true</c> if the current user has used this reaction.
         /// </summary>
         public bool IsMe { get; internal set; }
     }

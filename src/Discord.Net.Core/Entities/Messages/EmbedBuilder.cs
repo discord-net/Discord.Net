@@ -125,28 +125,28 @@ namespace Discord
         ///     Gets or sets the timestamp of an <see cref="Embed" />.
         /// </summary>
         /// <returns>
-        ///     The timestamp of the embed, or <see langword="null" /> if none is set.
+        ///     The timestamp of the embed, or <c>null</c> if none is set.
         /// </returns>
         public DateTimeOffset? Timestamp { get; set; }
         /// <summary>
         ///     Gets or sets the sidebar color of an <see cref="Embed" />.
         /// </summary>
         /// <returns>
-        ///     The color of the embed, or <see langword="null" /> if none is set.
+        ///     The color of the embed, or <c>null</c> if none is set.
         /// </returns>
         public Color? Color { get; set; }
         /// <summary>
         ///     Gets or sets the <see cref="EmbedAuthorBuilder" /> of an <see cref="Embed" />.
         /// </summary>
         /// <returns>
-        ///     The author field builder of the embed, or <see langword="null" /> if none is set.
+        ///     The author field builder of the embed, or <c>null</c> if none is set.
         /// </returns>
         public EmbedAuthorBuilder Author { get; set; }
         /// <summary>
         ///     Gets or sets the <see cref="EmbedFooterBuilder" /> of an <see cref="Embed" />.
         /// </summary>
         /// <returns>
-        ///     The footer field builder of the embed, or <see langword="null" /> if none is set.
+        ///     The footer field builder of the embed, or <c>null</c> if none is set.
         /// </returns>
         public EmbedFooterBuilder Footer { get; set; }
 
@@ -452,7 +452,7 @@ namespace Discord
         ///     Gets or sets the field name.
         /// </summary>
         /// <exception cref="ArgumentException">
-        /// <para>Field name is <see langword="null" />, empty or entirely whitespace.</para>
+        /// <para>Field name is <c>null</c>, empty or entirely whitespace.</para>
         /// <para><c>- or -</c></para>
         /// <para>Field name length exceeds <see cref="MaxFieldNameLength"/>.</para>
         /// </exception>
@@ -474,7 +474,7 @@ namespace Discord
         ///     Gets or sets the field value.
         /// </summary>
         /// <exception cref="ArgumentException" accessor="set">
-        /// <para>Field value is <see langword="null" />, empty or entirely whitespace.</para>
+        /// <para>Field value is <c>null</c>, empty or entirely whitespace.</para>
         /// <para><c>- or -</c></para>
         /// <para>Field value length exceeds <see cref="MaxFieldValueLength"/>.</para>
         /// </exception>
@@ -540,7 +540,7 @@ namespace Discord
         ///     The current builder.
         /// </returns>
         /// <exception cref="ArgumentException">
-        /// <para><see cref="Name"/> or <see cref="Value"/> is <see langword="null" />, empty or entirely whitespace.</para>
+        /// <para><see cref="Name"/> or <see cref="Value"/> is <c>null</c>, empty or entirely whitespace.</para>
         /// <para><c>- or -</c></para>
         /// <para><see cref="Name"/> or <see cref="Value"/> exceeds the maximum length allowed by Discord.</para>
         /// </exception>

@@ -23,7 +23,7 @@ namespace Discord
         ///     Determines if this guild is embeddable (i.e. can use widget).
         /// </summary>
         /// <returns>
-        ///     <see langword="true"/> if this guild can be embedded via widgets; otherwise <see langword="false"/>.
+        ///     <c>true</c> if this guild can be embedded via widgets; otherwise <c>false</c>.
         /// </returns>
         bool IsEmbeddable { get; }
         /// <summary>
@@ -59,7 +59,7 @@ namespace Discord
         ///     Determines if this guild is currently connected and ready to be used.
         /// </summary>
         /// <returns>
-        ///     Returns <see langword="true"/> if this guild is currently connected and ready to be used. Only applies
+        ///     Returns <c>true</c> if this guild is currently connected and ready to be used. Only applies
         ///     to the WebSocket client.
         /// </returns>
         bool Available { get; }
@@ -260,7 +260,7 @@ namespace Discord
         /// </returns>
         Task<IReadOnlyCollection<ITextChannel>> GetTextChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
-        ///     Gets a text channel in this guild with the provided ID, or <see langword="null" /> if not found.
+        ///     Gets a text channel in this guild with the provided ID, or <c>null</c> if not found.
         /// </summary>
         /// <param name="id">The text channel ID.</param>
         /// <param name="mode">
@@ -328,7 +328,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the system channel within this guild, or 
-        ///     <see langword="null" /> if none is set.
+        ///     <c>null</c> if none is set.
         /// </returns>
         Task<ITextChannel> GetSystemChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -459,25 +459,29 @@ namespace Discord
         /// </returns>
         Task DownloadUsersAsync();
         /// <summary>
-        ///     Removes all users from this guild if they have not logged on in a provided number of
-        ///     <paramref name="days" /> or, if <paramref name="simulate" /> is <see langword="true"/>, returns the
-        ///     number of users that would be removed.
+        ///     Prunes inactive users.
         /// </summary>
+        /// <remarks>
+        ///     This method removes all users that have not logged on in the provided number of days or, if 
+        ///     <paramref name="simulate"/> is <c>true</c>, returns the number of users that would be removed.
+        /// </remarks>
         /// <param name="days">The number of days required for the users to be kicked.</param>
         /// <param name="simulate">Whether this prune action is a simulation.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing the number of users to be or has been removed from this guild.
+        ///     An awaitable <see cref="Task" /> containing the number of users to be or has been removed from this
+        ///     guild.
         /// </returns>
         Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null);
 
         /// <summary>
-        ///     Gets the webhook in this guild with the provided ID, or <c>null</c> if not found.
+        ///     Gets a webhook found within this guild.
         /// </summary>
         /// <param name="id">The webhook ID.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing the webhook with the specified ID, otherwise <c>null</c>.
+        ///     An awaitable <see cref="Task"/> containing the webhook with the specified ID; <c>null</c> if none is
+        ///     found.
         /// </returns>
         Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
         /// <summary>

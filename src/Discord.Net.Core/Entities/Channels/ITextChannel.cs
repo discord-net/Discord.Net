@@ -14,7 +14,7 @@ namespace Discord
         ///     Determines whether the channel is NSFW.
         /// </summary>
         /// <returns>
-        ///     <see langword="true"/> if the channel has the NSFW flag enabled; otherwise, <see langword="false"/>.
+        ///     <c>true</c> if the channel has the NSFW flag enabled; otherwise, <c>false</c>.
         /// </returns>
         bool IsNsfw { get; }
 

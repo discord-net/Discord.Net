@@ -35,11 +35,11 @@ namespace Discord
         /// </summary>
         ushort DiscriminatorValue { get; }
         /// <summary>
-        ///     Gets <see langword="true"/> if this user is a bot user.
+        ///     Gets <c>true</c> if this user is a bot user.
         /// </summary>
         bool IsBot { get; }
         /// <summary>
-        ///     Gets <see langword="true"/> if this user is a webhook user.
+        ///     Gets <c>true</c> if this user is a webhook user.
         /// </summary>
         bool IsWebhook { get; }
         /// <summary>

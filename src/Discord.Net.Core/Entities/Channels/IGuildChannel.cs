@@ -63,10 +63,10 @@ namespace Discord
         ///     The max amount of times this invite may be used. Set to <c>null</c> to have unlimited uses.
         /// </param>
         /// <param name="isTemporary">
-        ///     If <see langword="true"/>, a user accepting this invite will be kicked from the guild after closing their client.
+        ///     If <c>true</c>, a user accepting this invite will be kicked from the guild after closing their client.
         /// </param>
         /// <param name="isUnique">
-        ///     If <see langword="true"/>, don't try to reuse a similar invite (useful for creating many unique one time use invites).
+        ///     If <c>true</c>, don't try to reuse a similar invite (useful for creating many unique one time use invites).
         /// </param>
         /// <param name="options">
         ///     The options to be used when sending the request.

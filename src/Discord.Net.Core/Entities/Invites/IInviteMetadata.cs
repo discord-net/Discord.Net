@@ -10,11 +10,11 @@ namespace Discord
         /// </summary>
         IUser Inviter { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if this invite was revoked.
+        ///     Returns <c>true</c> if this invite was revoked.
         /// </summary>
         bool IsRevoked { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if users accepting this invite will be removed from the guild when they
+        ///     Returns <c>true</c> if users accepting this invite will be removed from the guild when they
         ///     log off.
         /// </summary>
         bool IsTemporary { get; }

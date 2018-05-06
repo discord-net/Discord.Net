@@ -105,7 +105,7 @@ namespace Discord.WebSocket
             .OrderBy(c => c.Position)
             .FirstOrDefault();
         /// <summary>
-        ///     Gets the AFK voice channel, or <see langword="null" /> if none is set.
+        ///     Gets the AFK voice channel, or <c>null</c> if none is set.
         /// </summary>
         public SocketVoiceChannel AFKChannel
         {
@@ -455,7 +455,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="name">The name of the new channel.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
         /// <returns>
         ///     The created text channel.
         /// </returns>
@@ -467,7 +467,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="name">The name of the new channel.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
         /// <returns>
         ///     The created voice channel.
         /// </returns>
@@ -479,7 +479,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="name">The name of the new channel.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
         /// <returns>
         ///     The created category channel.
         /// </returns>
@@ -537,12 +537,12 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="name">The name of the new role.</param>
         /// <param name="permissions">
-        /// The permissions that the new role possesses. Set to <see langword="null" /> to use the default permissions.
+        /// The permissions that the new role possesses. Set to <c>null</c> to use the default permissions.
         /// </param>
-        /// <param name="color">The color of the role. Set to <see langword="null" /> to use the default color.</param>
+        /// <param name="color">The color of the role. Set to <c>null</c> to use the default color.</param>
         /// <param name="isHoisted">Used to determine if users of this role are separated in the user list.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
         /// <returns>
         ///     The created role.
         /// </returns>

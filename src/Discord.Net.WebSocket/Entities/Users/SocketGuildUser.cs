@@ -61,7 +61,7 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<SocketRole> Roles 
             => _roleIds.Select(id => Guild.GetRole(id)).Where(x => x != null).ToReadOnlyCollection(() => _roleIds.Length);
         /// <summary>
-        ///     Returns the voice channel the user is in, or <see langword="null" /> if none.
+        ///     Returns the voice channel the user is in, or <c>null</c> if none.
         /// </summary>
         public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
         /// <inheritdoc />

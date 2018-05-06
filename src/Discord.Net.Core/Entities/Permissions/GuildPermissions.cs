@@ -16,65 +16,65 @@ namespace Discord
         /// <summary> Gets a packed value representing all the permissions in this <see cref="GuildPermissions"/>. </summary>
         public ulong RawValue { get; }
 
-        /// <summary> If <see langword="true"/>, a user may create invites. </summary>
+        /// <summary> If <c>true</c>, a user may create invites. </summary>
         public bool CreateInstantInvite => Permissions.GetValue(RawValue, GuildPermission.CreateInstantInvite);
-        /// <summary> If <see langword="true"/>, a user may ban users from the guild. </summary>
+        /// <summary> If <c>true</c>, a user may ban users from the guild. </summary>
         public bool BanMembers => Permissions.GetValue(RawValue, GuildPermission.BanMembers);
-        /// <summary> If <see langword="true"/>, a user may kick users from the guild. </summary>
+        /// <summary> If <c>true</c>, a user may kick users from the guild. </summary>
         public bool KickMembers => Permissions.GetValue(RawValue, GuildPermission.KickMembers);
-        /// <summary> If <see langword="true"/>, a user is granted all permissions, and cannot have them revoked via channel permissions. </summary>
+        /// <summary> If <c>true</c>, a user is granted all permissions, and cannot have them revoked via channel permissions. </summary>
         public bool Administrator => Permissions.GetValue(RawValue, GuildPermission.Administrator);
-        /// <summary> If <see langword="true"/>, a user may create, delete and modify channels. </summary>
+        /// <summary> If <c>true</c>, a user may create, delete and modify channels. </summary>
         public bool ManageChannels => Permissions.GetValue(RawValue, GuildPermission.ManageChannels);
-        /// <summary> If <see langword="true"/>, a user may adjust guild properties. </summary>
+        /// <summary> If <c>true</c>, a user may adjust guild properties. </summary>
         public bool ManageGuild => Permissions.GetValue(RawValue, GuildPermission.ManageGuild);
 
-        /// <summary> If <see langword="true"/>, a user may add reactions. </summary>
+        /// <summary> If <c>true</c>, a user may add reactions. </summary>
         public bool AddReactions => Permissions.GetValue(RawValue, GuildPermission.AddReactions);
-        /// <summary> If <see langword="true"/>, a user may view the audit log. </summary>
+        /// <summary> If <c>true</c>, a user may view the audit log. </summary>
         public bool ViewAuditLog => Permissions.GetValue(RawValue, GuildPermission.ViewAuditLog);
 
-        /// <summary> If <see langword="true"/>, a user may join channels. </summary>
+        /// <summary> If <c>true</c>, a user may join channels. </summary>
         public bool ReadMessages => Permissions.GetValue(RawValue, GuildPermission.ReadMessages);
-        /// <summary> If <see langword="true"/>, a user may send messages. </summary>
+        /// <summary> If <c>true</c>, a user may send messages. </summary>
         public bool SendMessages => Permissions.GetValue(RawValue, GuildPermission.SendMessages);
-        /// <summary> If <see langword="true"/>, a user may send text-to-speech messages. </summary>
+        /// <summary> If <c>true</c>, a user may send text-to-speech messages. </summary>
         public bool SendTTSMessages => Permissions.GetValue(RawValue, GuildPermission.SendTTSMessages);
-        /// <summary> If <see langword="true"/>, a user may delete messages. </summary>
+        /// <summary> If <c>true</c>, a user may delete messages. </summary>
         public bool ManageMessages => Permissions.GetValue(RawValue, GuildPermission.ManageMessages);
-        /// <summary> If <see langword="true"/>, Discord will auto-embed links sent by this user. </summary>
+        /// <summary> If <c>true</c>, Discord will auto-embed links sent by this user. </summary>
         public bool EmbedLinks => Permissions.GetValue(RawValue, GuildPermission.EmbedLinks);
-        /// <summary> If <see langword="true"/>, a user may send files. </summary>
+        /// <summary> If <c>true</c>, a user may send files. </summary>
         public bool AttachFiles => Permissions.GetValue(RawValue, GuildPermission.AttachFiles);
-        /// <summary> If <see langword="true"/>, a user may read previous messages. </summary>
+        /// <summary> If <c>true</c>, a user may read previous messages. </summary>
         public bool ReadMessageHistory => Permissions.GetValue(RawValue, GuildPermission.ReadMessageHistory);
-        /// <summary> If <see langword="true"/>, a user may mention @everyone. </summary>
+        /// <summary> If <c>true</c>, a user may mention @everyone. </summary>
         public bool MentionEveryone => Permissions.GetValue(RawValue, GuildPermission.MentionEveryone);
-        /// <summary> If <see langword="true"/>, a user may use custom emoji from other guilds. </summary>
+        /// <summary> If <c>true</c>, a user may use custom emoji from other guilds. </summary>
         public bool UseExternalEmojis => Permissions.GetValue(RawValue, GuildPermission.UseExternalEmojis);
 
-        /// <summary> If <see langword="true"/>, a user may connect to a voice channel. </summary>
+        /// <summary> If <c>true</c>, a user may connect to a voice channel. </summary>
         public bool Connect => Permissions.GetValue(RawValue, GuildPermission.Connect);
-        /// <summary> If <see langword="true"/>, a user may speak in a voice channel. </summary>
+        /// <summary> If <c>true</c>, a user may speak in a voice channel. </summary>
         public bool Speak => Permissions.GetValue(RawValue, GuildPermission.Speak);
-        /// <summary> If <see langword="true"/>, a user may mute users. </summary>
+        /// <summary> If <c>true</c>, a user may mute users. </summary>
         public bool MuteMembers => Permissions.GetValue(RawValue, GuildPermission.MuteMembers);
-        /// <summary> If <see langword="true"/>, a user may deafen users. </summary>
+        /// <summary> If <c>true</c>, a user may deafen users. </summary>
         public bool DeafenMembers => Permissions.GetValue(RawValue, GuildPermission.DeafenMembers);
-        /// <summary> If <see langword="true"/>, a user may move other users between voice channels. </summary>
+        /// <summary> If <c>true</c>, a user may move other users between voice channels. </summary>
         public bool MoveMembers => Permissions.GetValue(RawValue, GuildPermission.MoveMembers);
-        /// <summary> If <see langword="true"/>, a user may use voice-activity-detection rather than push-to-talk. </summary>
+        /// <summary> If <c>true</c>, a user may use voice-activity-detection rather than push-to-talk. </summary>
         public bool UseVAD => Permissions.GetValue(RawValue, GuildPermission.UseVAD);
 
-        /// <summary> If <see langword="true"/>, a user may change their own nickname. </summary>
+        /// <summary> If <c>true</c>, a user may change their own nickname. </summary>
         public bool ChangeNickname => Permissions.GetValue(RawValue, GuildPermission.ChangeNickname);
-        /// <summary> If <see langword="true"/>, a user may change the nickname of other users. </summary>
+        /// <summary> If <c>true</c>, a user may change the nickname of other users. </summary>
         public bool ManageNicknames => Permissions.GetValue(RawValue, GuildPermission.ManageNicknames);
-        /// <summary> If <see langword="true"/>, a user may adjust roles. </summary>
+        /// <summary> If <c>true</c>, a user may adjust roles. </summary>
         public bool ManageRoles => Permissions.GetValue(RawValue, GuildPermission.ManageRoles);
-        /// <summary> If <see langword="true"/>, a user may edit the webhooks for this guild. </summary>
+        /// <summary> If <c>true</c>, a user may edit the webhooks for this guild. </summary>
         public bool ManageWebhooks => Permissions.GetValue(RawValue, GuildPermission.ManageWebhooks);
-        /// <summary> If <see langword="true"/>, a user may edit the emojis for this guild. </summary>
+        /// <summary> If <c>true</c>, a user may edit the emojis for this guild. </summary>
         public bool ManageEmojis => Permissions.GetValue(RawValue, GuildPermission.ManageEmojis);
 
         /// <summary> Creates a new <see cref="GuildPermissions"/> with the provided packed value. </summary>

@@ -11,7 +11,7 @@ namespace Discord
         /// </summary>
         string IconUrl { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if the current user owns this guild.
+        ///     Returns <c>true</c> if the current user owns this guild.
         /// </summary>
         bool IsOwner { get; }
         /// <summary>
