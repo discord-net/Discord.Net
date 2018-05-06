@@ -116,7 +116,7 @@ namespace Discord.WebSocket
             }
         }
         /// <summary>
-        ///     Gets the embed channel set in the widget settings of this guild, or <see langword="null"/> if none is set.
+        ///     Gets the embed channel set in the widget settings of this guild, or <c>null</c> if none is set.
         /// </summary>
         public SocketGuildChannel EmbedChannel
         {
@@ -127,7 +127,7 @@ namespace Discord.WebSocket
             }
         }
         /// <summary>
-        ///     Gets the channel where randomized welcome messages are sent, or <see langword="null"/> if none is set.
+        ///     Gets the channel where randomized welcome messages are sent, or <c>null</c> if none is set.
         /// </summary>
         public SocketTextChannel SystemChannel
         {
@@ -372,12 +372,12 @@ namespace Discord.WebSocket
             => GuildHelper.DeleteAsync(this, Discord, options);
 
         /// <inheritdoc />
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
         public Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyAsync(this, Discord, func, options);
 
         /// <inheritdoc />
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
         public Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyEmbedAsync(this, Discord, func, options);
         /// <inheritdoc />
@@ -671,7 +671,7 @@ namespace Discord.WebSocket
         public Task<GuildEmote> CreateEmoteAsync(string name, Image image, Optional<IEnumerable<IRole>> roles = default(Optional<IEnumerable<IRole>>), RequestOptions options = null)
             => GuildHelper.CreateEmoteAsync(this, Discord, name, image, roles, options);
         /// <inheritdoc />
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
         public Task<GuildEmote> ModifyEmoteAsync(GuildEmote emote, Action<EmoteProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyEmoteAsync(this, Discord, emote.Id, func, options);
         /// <inheritdoc />

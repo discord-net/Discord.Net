@@ -23,7 +23,7 @@ namespace Discord.WebSocket
         private readonly Flags _voiceStates;
 
         /// <summary>
-        ///     Gets the voice channel that the user is currently in; or <see langword="null"/> if none.
+        ///     Gets the voice channel that the user is currently in; or <c>null</c> if none.
         /// </summary>
         public SocketVoiceChannel VoiceChannel { get; }
         /// <inheritdoc />

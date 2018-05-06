@@ -66,7 +66,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     This method gets the user present in the WebSocket cache with the given condition.
         ///     <note>
-        ///         Sometimes a user may return <see langword="null"/> due to Discord not sending offline users in large
+        ///         Sometimes a user may return <c>null</c> due to Discord not sending offline users in large
         ///         guilds (i.e. guild with 100+ members) actively. To download users on startup, consider enabling 
         ///         <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/>.
         ///     </note>
@@ -76,7 +76,7 @@ namespace Discord.WebSocket
         ///     </note>
         /// </remarks>
         /// <returns>
-        ///     A WebSocket-based generic user; <see langword="null"/> when the user cannot be found.
+        ///     A WebSocket-based generic user; <c>null</c> when the user cannot be found.
         /// </returns>
         public abstract SocketUser GetUser(ulong id);
 
@@ -88,7 +88,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     This method gets the user present in the WebSocket cache with the given condition.
         ///     <note>
-        ///         Sometimes a user may return <see langword="null"/> due to Discord not sending offline users in large
+        ///         Sometimes a user may return <c>null</c> due to Discord not sending offline users in large
         ///         guilds (i.e. guild with 100+ members) actively. To download users on startup, consider enabling 
         ///         <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/>.
         ///     </note>
@@ -98,7 +98,7 @@ namespace Discord.WebSocket
         ///     </note>
         /// </remarks>
         /// <returns>
-        ///     A WebSocket-based generic user; <see langword="null"/> when the user cannot be found.
+        ///     A WebSocket-based generic user; <c>null</c> when the user cannot be found.
         /// </returns>
         public abstract SocketUser GetUser(string username, string discriminator);
         /// <summary>
@@ -115,7 +115,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="id">The guild snowflake ID.</param>
         /// <returns>
-        ///     A WebSocket-based guild; <see langword="null"/> when the guild cannot be found.
+        ///     A WebSocket-based guild; <c>null</c> when the guild cannot be found.
         /// </returns>
         public abstract SocketGuild GetGuild(ulong id);
         /// <summary>
@@ -123,7 +123,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="id">The unique identifier of the voice region.</param>
         /// <returns>
-        ///     A REST-based voice region; <see langword="null"/> if none can be found.
+        ///     A REST-based voice region; <c>null</c> if none can be found.
         /// </returns>
         public abstract RestVoiceRegion GetVoiceRegion(string id);
         /// <inheritdoc />

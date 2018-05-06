@@ -132,7 +132,7 @@ namespace Discord.Rest
             => GuildHelper.DeleteAsync(this, Discord, options);
 
         /// <inheritdoc />
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
         public async Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null)
         {
             var model = await GuildHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
@@ -140,7 +140,7 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc />
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
         public async Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
         {
             var model = await GuildHelper.ModifyEmbedAsync(this, Discord, func, options).ConfigureAwait(false);

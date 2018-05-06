@@ -106,7 +106,7 @@ namespace Discord
 
         /// <summary> Gets or sets the list of <see cref="EmbedFieldBuilder"/> of an <see cref="Embed"/>. </summary>
         /// <exception cref="ArgumentNullException" accessor="set">An embed builder's fields collection is set to 
-        /// <see langword="null"/>.</exception>
+        /// <c>null</c>.</exception>
         /// <exception cref="ArgumentException" accessor="set">Description length exceeds <see cref="MaxFieldCount"/>.
         /// </exception>
         /// <returns> The list of existing <see cref="EmbedFieldBuilder"/>.</returns>

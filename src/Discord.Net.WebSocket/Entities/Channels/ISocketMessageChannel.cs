@@ -72,7 +72,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="id">The ID of the message.</param>
         /// <returns>
-        ///     Cached message object; <see langword="null"/> if it doesn't exist in the cache.
+        ///     Cached message object; <c>null</c> if it doesn't exist in the cache.
         /// </returns>
         SocketMessage GetCachedMessage(ulong id);
         /// <summary>

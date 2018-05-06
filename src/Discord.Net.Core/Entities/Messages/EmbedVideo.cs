@@ -13,11 +13,11 @@ namespace Discord
         /// </summary>
         public string Url { get; }
         /// <summary>
-        ///     Gets the height of the video, or <see langword="null"/> if none.
+        ///     Gets the height of the video, or <c>null</c> if none.
         /// </summary>
         public int? Height { get; }
         /// <summary>
-        ///     Gets the weight of the video, or <see langword="null"/> if none.
+        ///     Gets the weight of the video, or <c>null</c> if none.
         /// </summary>
         public int? Width { get; }
 

@@ -22,7 +22,7 @@ namespace Discord
         ///     Gets the current topic for this text channel.
         /// </summary>
         /// <returns>
-        ///     The topic set in the channel, or <see langword="null"/> if none is set.
+        ///     The topic set in the channel, or <c>null</c> if none is set.
         /// </returns>
         string Topic { get; }
 
@@ -72,7 +72,7 @@ namespace Discord
         /// <param name="id">The ID of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A webhook associated with the <paramref name="id"/>, or <see langword="null"/> if not found.
+        ///     A webhook associated with the <paramref name="id"/>, or <c>null</c> if not found.
         /// </returns>
         Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
         /// <summary>

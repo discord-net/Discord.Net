@@ -39,7 +39,7 @@ namespace Discord
         ///     Gets the time of this message's last edit.
         /// </summary>
         /// <returns>
-        ///     Time of when the message was last edited; <see langword="null"/> when the message is never edited.
+        ///     Time of when the message was last edited; <c>null</c> when the message is never edited.
         /// </returns>
         DateTimeOffset? EditedTimestamp { get; }
         

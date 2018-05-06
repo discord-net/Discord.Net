@@ -40,19 +40,19 @@ namespace Discord
         /// </summary>
         VerificationLevel VerificationLevel { get; }
         /// <summary>
-        ///     Returns the ID of this guild's icon, or <see langword="null"/> if none is set.
+        ///     Returns the ID of this guild's icon, or <c>null</c> if none is set.
         /// </summary>
         string IconId { get; }
         /// <summary>
-        ///     Returns the URL of this guild's icon, or <see langword="null"/> if none is set.
+        ///     Returns the URL of this guild's icon, or <c>null</c> if none is set.
         /// </summary>
         string IconUrl { get; }
         /// <summary>
-        ///     Returns the ID of this guild's splash image, or <see langword="null"/> if none is set.
+        ///     Returns the ID of this guild's splash image, or <c>null</c> if none is set.
         /// </summary>
         string SplashId { get; }
         /// <summary>
-        ///     Returns the URL of this guild's splash image, or <see langword="null"/> if none is set.
+        ///     Returns the URL of this guild's splash image, or <c>null</c> if none is set.
         /// </summary>
         string SplashUrl { get; }
         /// <summary>
@@ -65,7 +65,7 @@ namespace Discord
         bool Available { get; }
 
         /// <summary>
-        ///     Gets the ID of the AFK voice channel for this guild, or <see langword="null"/> if none is set.
+        ///     Gets the ID of the AFK voice channel for this guild, or <c>null</c> if none is set.
         /// </summary>
         ulong? AFKChannelId { get; }
         /// <summary>
@@ -73,11 +73,11 @@ namespace Discord
         /// </summary>
         ulong DefaultChannelId { get; }
         /// <summary>
-        ///     Gets the ID of the embed channel set in the widget settings of this guild, or <see langword="null"/> if none is set.
+        ///     Gets the ID of the embed channel set in the widget settings of this guild, or <c>null</c> if none is set.
         /// </summary>
         ulong? EmbedChannelId { get; }
         /// <summary>
-        ///     Gets the ID of the channel where randomized welcome messages are sent, or <see langword="null"/> if none is set.
+        ///     Gets the ID of the channel where randomized welcome messages are sent, or <c>null</c> if none is set.
         /// </summary>
         ulong? SystemChannelId { get; }
         /// <summary>
@@ -245,7 +245,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the generic channel with the specified ID, or 
-        ///     <see langword="null"/> if none is found.
+        ///     <c>null</c> if none is found.
         /// </returns>
         Task<IGuildChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -269,7 +269,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the text channel with the specified ID, or 
-        ///     <see langword="null"/> if none is found.
+        ///     <c>null</c> if none is found.
         /// </returns>
         Task<ITextChannel> GetTextChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -304,7 +304,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the voice channel with the specified ID, or 
-        ///     <see langword="null"/> if none is found.
+        ///     <c>null</c> if none is found.
         /// </returns>
         Task<IVoiceChannel> GetVoiceChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -316,7 +316,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the AFK voice channel set within this guild, or 
-        ///     <see langword="null"/> if none is set.
+        ///     <c>null</c> if none is set.
         /// </returns>
         Task<IVoiceChannel> GetAFKChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -340,7 +340,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the first viewable text channel in this guild, or 
-        ///     <see langword="null"/> if none is found.
+        ///     <c>null</c> if none is found.
         /// </returns>
         Task<ITextChannel> GetDefaultChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -352,7 +352,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the embed channel set within the server's widget settings, or
-        ///     <see langword="null"/> if none is set.
+        ///     <c>null</c> if none is set.
         /// </returns>
         Task<IGuildChannel> GetEmbedChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -392,7 +392,7 @@ namespace Discord
         Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null);
 
         /// <summary>
-        ///     Gets the role in this guild with the provided ID, or <see langword="null"/> if not found.
+        ///     Gets the role in this guild with the provided ID, or <c>null</c> if not found.
         /// </summary>
         /// <param name="id">The role ID.</param>
         IRole GetRole(ulong id);
@@ -424,13 +424,13 @@ namespace Discord
         /// </remarks>
         Task<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
-        ///     Gets the user in this guild with the provided ID, or <see langword="null"/> if not found.
+        ///     Gets the user in this guild with the provided ID, or <c>null</c> if not found.
         /// </summary>
         /// <param name="id">The user ID.</param>
         /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing the guild user with the specified ID, otherwise <see langword="null"/>.
+        ///     An awaitable <see cref="Task"/> containing the guild user with the specified ID, otherwise <c>null</c>.
         /// </returns>
         Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -472,12 +472,12 @@ namespace Discord
         Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null);
 
         /// <summary>
-        ///     Gets the webhook in this guild with the provided ID, or <see langword="null"/> if not found.
+        ///     Gets the webhook in this guild with the provided ID, or <c>null</c> if not found.
         /// </summary>
         /// <param name="id">The webhook ID.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing the webhook with the specified ID, otherwise <see langword="null"/>.
+        ///     An awaitable <see cref="Task"/> containing the webhook with the specified ID, otherwise <c>null</c>.
         /// </returns>
         Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
         /// <summary>
@@ -495,7 +495,7 @@ namespace Discord
         /// <param name="id">The guild emote ID.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing the emote found with the specified ID, or <see langword="null"/> if not found.
+        ///     An awaitable <see cref="Task"/> containing the emote found with the specified ID, or <c>null</c> if not found.
         /// </returns>
         Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null);
         /// <summary>

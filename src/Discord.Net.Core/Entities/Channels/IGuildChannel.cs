@@ -24,7 +24,7 @@ namespace Discord
         ///     Gets the parent ID (category) of this channel in the guild's channel list.
         /// </summary>
         /// <returns>
-        ///     The parent category ID associated with this channel, or <see langword="null"/> if none is set.
+        ///     The parent category ID associated with this channel, or <c>null</c> if none is set.
         /// </returns>
         ulong? CategoryId { get; }
         /// <summary>
@@ -57,10 +57,10 @@ namespace Discord
         ///     Creates a new invite to this channel.
         /// </summary>
         /// <param name="maxAge">
-        ///     The time (in seconds) until the invite expires. Set to <see langword="null"/> to never expire.
+        ///     The time (in seconds) until the invite expires. Set to <c>null</c> to never expire.
         /// </param>
         /// <param name="maxUses">
-        ///     The max amount of times this invite may be used. Set to <see langword="null"/> to have unlimited uses.
+        ///     The max amount of times this invite may be used. Set to <c>null</c> to have unlimited uses.
         /// </param>
         /// <param name="isTemporary">
         ///     If <see langword="true"/>, a user accepting this invite will be kicked from the guild after closing their client.
@@ -86,12 +86,12 @@ namespace Discord
         Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null);
 
         /// <summary>
-        ///     Gets the permission overwrite for a specific role, or <see langword="null"/> if one does not exist.
+        ///     Gets the permission overwrite for a specific role, or <c>null</c> if one does not exist.
         /// </summary>
         /// <param name="role">The role to get the overwrite from.</param>
         OverwritePermissions? GetPermissionOverwrite(IRole role);
         /// <summary>
-        ///     Gets the permission overwrite for a specific user, or <see langword="null"/> if one does not exist.
+        ///     Gets the permission overwrite for a specific user, or <c>null</c> if one does not exist.
         /// </summary>
         /// <param name="user">The user to get the overwrite from.</param>
         OverwritePermissions? GetPermissionOverwrite(IUser user);

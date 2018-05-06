@@ -23,7 +23,7 @@ namespace Discord.Net
         /// <returns>
         ///     A 
         ///     <see href="https://discordapp.com/developers/docs/topics/opcodes-and-status-codes#json">JSON error code</see>
-        ///     from Discord, or <see langword="null"/> if none.
+        ///     from Discord, or <c>null</c> if none.
         /// </returns>
         public int? DiscordCode { get; }
         /// <summary>

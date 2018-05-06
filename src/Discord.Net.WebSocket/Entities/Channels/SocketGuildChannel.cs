@@ -34,7 +34,7 @@ namespace Discord.WebSocket
         ///     Gets the parent category of this channel.
         /// </summary>
         /// <returns>
-        ///     A parent category ID associated with this channel, or <see langword="null"/> if none is set.
+        ///     A parent category ID associated with this channel, or <c>null</c> if none is set.
         /// </returns>
         public ICategoryChannel Category 
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;

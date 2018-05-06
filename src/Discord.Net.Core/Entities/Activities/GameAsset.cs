@@ -19,7 +19,7 @@ namespace Discord
         public string ImageId { get; internal set; }
 
         /// <summary>
-        ///     Returns the image URL of the asset, or <see langword="null"/> when the application ID does not exist.
+        ///     Returns the image URL of the asset, or <c>null</c> when the application ID does not exist.
         /// </summary>
         public string GetImageUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => ApplicationId.HasValue ? CDN.GetRichAssetUrl(ApplicationId.Value, ImageId, size, format) : null;
