@@ -60,15 +60,19 @@ namespace Discord.WebSocket
         /// </returns>
         public abstract Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null);
         /// <summary>
-        ///     Gets a user who shares a mutual guild with logged-in user with the provided snowflake ID.
+        ///     Gets a user.
         /// </summary>
         /// <param name="id">The user snowflake ID.</param>
         /// <remarks>
         ///     This method gets the user present in the WebSocket cache with the given condition.
-        ///     <note type="note">
-        ///         Sometimes a user may return <see langword="null"/> because Discord does not send offline users in
-        ///         large guilds (i.e. guild with 100+ members) actively. To download more users on startup, please
-        ///         enable <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/>.
+        ///     <note>
+        ///         Sometimes a user may return <see langword="null"/> due to Discord not sending offline users in large
+        ///         guilds (i.e. guild with 100+ members) actively. To download users on startup, consider enabling 
+        ///         <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/>.
+        ///     </note>
+        ///     <note>
+        ///         This method does not attempt to fetch users that the logged-in user does not have access to (i.e.
+        ///         users who don't share mutual guild(s) with the current user).
         ///     </note>
         /// </remarks>
         /// <returns>
@@ -77,17 +81,20 @@ namespace Discord.WebSocket
         public abstract SocketUser GetUser(ulong id);
 
         /// <summary>
-        ///     Gets a user who shares a mutual guild with the logged-in user with the provided username and
-        ///     discriminator value combo.
+        ///     Gets a user.
         /// </summary>
         /// <param name="username">The name of the user.</param>
         /// <param name="discriminator">The discriminator value of the user.</param>
         /// <remarks>
         ///     This method gets the user present in the WebSocket cache with the given condition.
-        ///     <note type="note">
-        ///         Sometimes a user may return <see langword="null"/> because Discord does not send offline users in
-        ///         large guilds (i.e. guild with 100+ members) actively. To download more users on startup, please
-        ///         enable <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/>.
+        ///     <note>
+        ///         Sometimes a user may return <see langword="null"/> due to Discord not sending offline users in large
+        ///         guilds (i.e. guild with 100+ members) actively. To download users on startup, consider enabling 
+        ///         <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/>.
+        ///     </note>
+        ///     <note>
+        ///         This method does not attempt to fetch users that the logged-in user does not have access to (i.e.
+        ///         users who don't share mutual guild(s) with the current user).
         ///     </note>
         /// </remarks>
         /// <returns>
@@ -95,7 +102,7 @@ namespace Discord.WebSocket
         /// </returns>
         public abstract SocketUser GetUser(string username, string discriminator);
         /// <summary>
-        ///     Gets a channel that the logged-in user is accessible to with the provided ID.
+        ///     Gets a channel.
         /// </summary>
         /// <param name="id">The channel snowflake ID.</param>
         /// <returns>
@@ -104,7 +111,7 @@ namespace Discord.WebSocket
         /// </returns>
         public abstract SocketChannel GetChannel(ulong id);
         /// <summary>
-        ///     Gets a guild that the logged-in user is accessible to with the provided ID.
+        ///     Gets a guild.
         /// </summary>
         /// <param name="id">The guild snowflake ID.</param>
         /// <returns>
@@ -112,7 +119,7 @@ namespace Discord.WebSocket
         /// </returns>
         public abstract SocketGuild GetGuild(ulong id);
         /// <summary>
-        ///     Gets a voice region with the provided ID.
+        ///     Gets a voice region.
         /// </summary>
         /// <param name="id">The unique identifier of the voice region.</param>
         /// <returns>
@@ -149,7 +156,7 @@ namespace Discord.WebSocket
         ///     <note type="note">
         ///         Discord will only accept setting of name and the type of activity.
         ///     </note>
-        ///     <note type="important">
+        ///     <note type="warning">
         ///         Rich Presence cannot be set via this method or client. Rich Presence is strictly limited to RPC
         ///         clients only. 
         ///     </note>
