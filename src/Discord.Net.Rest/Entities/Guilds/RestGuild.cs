@@ -1,4 +1,4 @@
-﻿using Discord.Audio;
+using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -140,6 +140,10 @@ namespace Discord.Rest
         //Bans
         public Task<IReadOnlyCollection<RestBan>> GetBansAsync(RequestOptions options = null)
             => GuildHelper.GetBansAsync(this, Discord, options);
+        public Task<RestBan> GetBanAsync(IUser user, RequestOptions options = null)
+            => GuildHelper.GetBanAsync(this, Discord, user.Id, options);
+        public Task<RestBan> GetBanAsync(ulong userId, RequestOptions options = null)
+            => GuildHelper.GetBanAsync(this, Discord, userId, options);
 
         public Task AddBanAsync(IUser user, int pruneDays = 0, string reason = null, RequestOptions options = null)
             => GuildHelper.AddBanAsync(this, Discord, user.Id, pruneDays, reason, options);
@@ -291,6 +295,12 @@ namespace Discord.Rest
 
         async Task<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(RequestOptions options)
             => await GetBansAsync(options).ConfigureAwait(false);
+        /// <inheritdoc/>
+        async Task<IBan> IGuild.GetBanAsync(IUser user, RequestOptions options)
+            => await GetBanAsync(user, options).ConfigureAwait(false);
+        /// <inheritdoc/>
+        async Task<IBan> IGuild.GetBanAsync(ulong userId, RequestOptions options)
+            => await GetBanAsync(userId, options).ConfigureAwait(false);
 
         async Task<IReadOnlyCollection<IGuildChannel>> IGuild.GetChannelsAsync(CacheMode mode, RequestOptions options)
         {
