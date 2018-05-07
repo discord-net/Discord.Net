@@ -211,6 +211,24 @@ namespace Discord
         /// </returns>
         Task<IReadOnlyCollection<IBan>> GetBansAsync(RequestOptions options = null);
         /// <summary>
+        ///     Gets a ban object for a banned user.
+        /// </summary>
+        /// <param name="user">The banned user.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing the ban object, which contains the user information and the
+        ///     reason for the ban; <c>null<c/> if the ban entry cannot be found.
+        /// </returns>
+        Task<IBan> GetBanAsync(IUser user, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a ban object for a banned user.
+        /// </summary>
+        /// <param name="userId">The snowflake identifier for the banned user.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing the ban object, which contains the user information and the
+        ///     reason for the ban; <c>null<c/> if the ban entry cannot be found.
+        /// </returns>
+        Task<IBan> GetBanAsync(ulong userId, RequestOptions options = null);
+        /// <summary>
         ///     Bans the user from this guild and optionally prunes their recent messages.
         /// </summary>
         /// <param name="user">The user to ban.</param>
