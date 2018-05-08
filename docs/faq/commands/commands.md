@@ -23,7 +23,7 @@ custom preconditions.
 [RequireUserPermission]: xref:Discord.Commands.RequireUserPermissionAttribute
 [Preconditions Addons]: https://github.com/Joe4evr/Discord.Addons/tree/master/src/Discord.Addons.Preconditions
 
-## I am getting an error about `Assembly.GetEntryAssembly`.
+## Why am I getting an error about `Assembly.GetEntryAssembly`?
 
 You may be confusing @Discord.Commands.CommandService.AddModulesAsync*
 with @Discord.Commands.CommandService.AddModuleAsync*. The former
@@ -65,7 +65,7 @@ A brief example of service and dependency injection can be seen below.
 [Dependency Injection]: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection
 [video]: https://www.youtube.com/watch?v=QtDTfn8YxXg
 
-## I have a long-running Task in my command, and Discord.Net keeps saying that a `MessageReceived` handler is blocking the gateway. What gives?
+## Discord.Net keeps saying that a `MessageReceived` handler is blocking the gateway, what should I do?
 
 By default, the library warns the user about any long-running event
 handler that persists for **more than 3 seconds**. Any event
@@ -77,9 +77,11 @@ In this case, the library detects that a `MessageReceived`
 event handler is blocking the gateway thread. This warning is
 typically associated with the command handler as it listens for that
 particular event. If the command handler is blocking the thread, then
-this **might** mean that you have a long-running command (in rare
-cases, runtime errors can also cause blockage, usually associated
-with Mono, which is not supported by this library).
+this **might** mean that you have a long-running command.
+
+> [!NOTE]
+> In rare cases, runtime errors can also cause blockage, usually
+> associated with Mono, which is not supported by this library.
 
 To prevent a long-running command from blocking the gateway
 thread, a flag called [RunMode] is explicitly designed to resolve
@@ -87,8 +89,20 @@ this issue.
 
 There are 2 main `RunMode`s.
 
-1. `RunMode.Sync` (default)
+1. `RunMode.Sync`
 2. `RunMode.Async`
+
+`Sync` is the default behavior and makes the command to be run on the
+same thread as the gateway one. `Async` will spin the task off to a
+different thread from the gateway one.
+
+> [!IMPORTANT]
+> While specifying `RunMode.Async` allows the command to be spun off
+> to a different thread, keep in mind that by doing so, there will be
+> **potentially unwanted consequences**. Before applying this flag,
+> please consider whether it is necessary to do so.
+>
+> Further details regarding `RunMode.Async` can be found below.
 
 You can set the `RunMode` either by specifying it individually via
 the `CommandAttribute` or by setting the global default with
@@ -105,14 +119,6 @@ the [DefaultRunMode] flag under `CommandServiceConfig`.
 ***
 
 ***
-
-> [!IMPORTANT]
-> While specifying `RunMode.Async` allows the command to be spun off
-> to a different thread, keep in mind that by doing so, there will be
-> **potentially unwanted consequences**. Before applying this flag,
-> please consider whether it is necessary to do so.
->
-> Further details regarding `RunMode.Async` can be found below.
 
 [RunMode]: xref:Discord.Commands.RunMode
 [CommandAttribute]: xref:Discord.Commands.CommandAttribute
@@ -142,7 +148,7 @@ For #3, in Discord.Net 2.0, the library introduces a new event called
 **successfully executed**. This event will be raised regardless of
 the `RunMode` type and will return the appropriate execution result.
 
-For #4, exceptions are caught in [CommandService#Log] event under
+For #4, exceptions are caught in [CommandService.Log] event under
 [LogMessage.Exception] as [CommandException].
 
 [Task.Run]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task.run
@@ -151,6 +157,6 @@ For #4, exceptions are caught in [CommandService#Log] event under
 [ExecuteResult]: xref:Discord.Commands.ExecuteResult
 [RuntimeResult]: xref:Discord.Commands.RuntimeResult
 [CommandExecuted]: xref:Discord.Commands.CommandService.CommandExecuted
-[CommandService#Log]: xref:Discord.Commands.CommandService.Log
+[CommandService.Log]: xref:Discord.Commands.CommandService.Log
 [LogMessage.Exception]: xref:Discord.LogMessage.Exception*
 [CommandException]: xref:Discord.Commands.CommandException
