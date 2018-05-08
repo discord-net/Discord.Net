@@ -8,7 +8,7 @@ title: Questions about Basic Operations
 ## How should I safely check a type?
 
 > [!WARNING]
-> Direct casting (e.g. `(Type)type`) is **the least recommended**
+> Direct casting (e.g., `(Type)type`) is **the least recommended**
 > way of casting, as it *can* throw an [InvalidCastException]
 > when the object isn't the desired type.
 >
@@ -28,9 +28,9 @@ A good and safe casting example:
 ## How do I send a message?
 
 > [!TIP]
-> The [GetChannel] method by default returns an [IChannel].
-> This means channels such as [IVoiceChannel], [ICategoryChannel]
-> can be returned. This is why that you cannot send message
+> The [GetChannel] method by default returns an [IChannel], allowing
+> channel types such as [IVoiceChannel], [ICategoryChannel]
+> to be returned; consequently, you cannot send a message
 > to channels like those.
 
 Any implementation of [IMessageChannel] has a [SendMessageAsync]

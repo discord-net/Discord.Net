@@ -56,7 +56,7 @@ DiscordSocketClient.
 > [FAQ](xref:FAQ.Basics.GetStarted) page.
 
 More detailed versions of entities can be pulled from the basic
-entities, e.g. `SocketGuild.GetUser`, which returns a
+entities, e.g., `SocketGuild.GetUser`, which returns a
 `SocketGuildUser`, or `SocketGuild.GetChannel`, which returns a
 `SocketGuildChannel`. Again, you may need to cast these objects to get
 a variant of the type that you need.

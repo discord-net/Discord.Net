@@ -7,8 +7,8 @@ title: Questions about Legacy Versions
 
 ## X, Y, Z does not work! It doesn't return a valid value anymore
 
-If you're currently using an older version in stable branch, please
-upgrade to the latest pre-release version to ensure maximum
+If you are currently using an older version of the stable branch,
+please upgrade to the latest pre-release version to ensure maximum
 compatibility. Several features may be broken in older
 versions and will likely not be fixed in the version branch due to
 their breaking nature.

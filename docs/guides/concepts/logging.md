@@ -16,7 +16,7 @@ section.
 > [!WARNING]
 > Due to the nature of Discord.Net's event system, all log event
 > handlers will be executed synchronously on the gateway thread. If your
-> log output will be dumped to a Web API (e.g. Sentry), you are advised
+> log output will be dumped to a Web API (e.g., Sentry), you are advised
 > to wrap your output in a `Task.Run` so the gateway thread does not
 > become blocked while waiting for logging data to be written.
 

@@ -8,25 +8,27 @@ title: Beginner Questions / How to Get Started
 ## How do I add my bot to my server/guild?
 
 You can do so by using the [permission calculator] provided
-by FiniteReality.
-This tool allows you to set the permissions that the bot will be
-added with, and invite the bot into your guild. With this method,
-bots will also be assigned their own special roles that normal users
-cannot use; this is what we call a `Managed` role, and this is a much
-safer method of permission management than to create a role that any
-users can be assigned to.
+by [FiniteReality].
+This tool allows you to set permissions that the bot will be assigned
+with, and invite the bot into your guild. With this method, bots will
+also be assigned a unique role that a regular user cannot use; this
+is what we call a `Managed` role. Because you cannot assign this
+role to any other users, it is much safer than creating a single
+role which, intentionally or not, can be applied to other users
+to escalate their privilege.
 
+[FiniteReality]: https://github.com/FiniteReality/permissions-calculator
 [permission calculator]: https://finitereality.github.io/permissions-calculator
 
 ## What is a token?
 
 A token is a credential used to log into an account. This information
 should be kept **private** and for your eyes only. Anyone with your
-token can log into your account. This applies to both user and bot
-accounts. That also means that you should never ever hardcode your
-token or add it into source control, as your identity may be stolen
-by scrape bots on the internet that scours through constantly to
-obtain a token.
+token can log into your account. This risk applies to both user
+and bot accounts. That also means that you should **never** hardcode
+your token or add it into source control, as your identity may be
+stolen by scrape bots on the internet that scours through 
+constantly to obtain a token.
 
 ## What is a client/user/object ID?
 

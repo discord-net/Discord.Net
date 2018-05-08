@@ -68,7 +68,7 @@ for use on another machine without installing the dependencies first.
 This can be achieved by using the dotnet CLI too on the development
 machine:
 
-  `dotnet publish -c Release`
+* `dotnet publish -c Release`
 
 Additionally, you may want to target a specific platform when
 publishing the application so you may use the application without
@@ -80,7 +80,7 @@ For example, when targeting a Windows 10 machine, you may want to use
 the following to create the application in Windows executable
 format (.exe):
 
-  `dotnet publish -c Release -r win10-x64`
+* `dotnet publish -c Release -r win10-x64`
 
 [.NET Core application deployment]: https://docs.microsoft.com/en-us/dotnet/core/deploying/
 [Runtime ID]: https://docs.microsoft.com/en-us/dotnet/core/rid-catalog
