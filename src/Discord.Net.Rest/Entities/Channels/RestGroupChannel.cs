@@ -144,7 +144,8 @@ namespace Discord.Rest
 
         //IAudioChannel
         Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) { throw new NotSupportedException(); }
-        Task<IAudioClient> IAudioChannel.ConnectAsync(bool external, Action<IAudioClient> configAction) { throw new NotSupportedException(); }
+        Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction, bool external) { throw new NotSupportedException(); }
+        Task IAudioChannel.DisconnectAsync() { throw new NotSupportedException(); }
 
         //IChannel        
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)

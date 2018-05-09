@@ -606,8 +606,11 @@ namespace Discord.WebSocket
             await _audioLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await RepopulateAudioStreamsAsync().ConfigureAwait(false);
-                await _audioClient.StartAsync(url, Discord.CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);
+                if (_audioClient != null)
+                {
+                    await RepopulateAudioStreamsAsync().ConfigureAwait(false);
+                    await _audioClient.StartAsync(url, Discord.CurrentUser.Id, voiceState.VoiceSessionId, token).ConfigureAwait(false);
+                }
             }
             catch (OperationCanceledException)
             {

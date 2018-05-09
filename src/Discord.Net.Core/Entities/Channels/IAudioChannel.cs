@@ -10,6 +10,9 @@ namespace Discord
         Task<IAudioClient> ConnectAsync(Action<IAudioClient> configAction = null);
 
         /// <summary> Connects to this audio channel but can specify if client is handled externally. </summary>
-        Task<IAudioClient> ConnectAsync(bool external, Action<IAudioClient> configAction = null);
+        Task<IAudioClient> ConnectAsync(Action<IAudioClient> configAction = null, bool external = false);
+
+        /// <summary> Disconnects from this audio channel if applicable. </summary>
+        Task DisconnectAsync();
     }
 }

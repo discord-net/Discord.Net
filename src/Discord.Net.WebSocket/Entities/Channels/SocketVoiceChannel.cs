@@ -45,10 +45,13 @@ namespace Discord.WebSocket
             return await Guild.ConnectAudioAsync(Id, false, false, configAction, false).ConfigureAwait(false);
         }
 
-        public async Task<IAudioClient> ConnectAsync(bool external, Action<IAudioClient> configAction = null)
+        public async Task<IAudioClient> ConnectAsync(Action<IAudioClient> configAction = null, bool external = false)
         {
             return await Guild.ConnectAudioAsync(Id, false, false, configAction, external).ConfigureAwait(false);
         }
+
+        public async Task DisconnectAsync()
+            => await Guild.DisconnectAudioAsync();
 
         public override SocketGuildUser GetUser(ulong id)
         {
