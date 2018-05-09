@@ -1,4 +1,4 @@
-﻿using Discord.Audio;
+using Discord.Audio;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
@@ -42,7 +42,12 @@ namespace Discord.WebSocket
 
         public async Task<IAudioClient> ConnectAsync(Action<IAudioClient> configAction = null)
         {
-            return await Guild.ConnectAudioAsync(Id, false, false, configAction).ConfigureAwait(false);
+            return await Guild.ConnectAudioAsync(Id, false, false, configAction, false).ConfigureAwait(false);
+        }
+
+        public async Task<IAudioClient> ConnectAsync(bool external, Action<IAudioClient> configAction = null)
+        {
+            return await Guild.ConnectAudioAsync(Id, false, false, configAction, external).ConfigureAwait(false);
         }
 
         public override SocketGuildUser GetUser(ulong id)

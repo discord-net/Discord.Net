@@ -1,4 +1,4 @@
-﻿using Discord.Audio;
+using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -42,6 +42,7 @@ namespace Discord.Rest
 
         //IAudioChannel
         Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) { throw new NotSupportedException(); }
+        Task<IAudioClient> IAudioChannel.ConnectAsync(bool external, Action<IAudioClient> configAction) { throw new NotSupportedException(); }
 
         //IGuildChannel
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
