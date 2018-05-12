@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
@@ -29,8 +29,8 @@ namespace Discord.Commands
             // local helper functions
             bool IsOpenQuote(IReadOnlyDictionary<char, char> dict, char ch)
             {
-                // return if the key is contained in the dictionary if it exists
-                if (dict != null)
+                // return if the key is contained in the dictionary if it is populated
+                if (dict.Count != 0)
                     return dict.ContainsKey(ch);
                 // or otherwise if it is the default double quote
                 return c == '\"';
@@ -39,7 +39,8 @@ namespace Discord.Commands
             char GetMatch(IReadOnlyDictionary<char, char> dict, char ch)
             {
                 // get the corresponding value for the key, if it exists
-                if (dict != null && dict.TryGetValue(c, out var value))
+                // and if the dictionary is populated
+                if (dict.Count != 0 && dict.TryGetValue(c, out var value))
                     return value;
                 // or get the default pair of the default double quote
                 return '\"';
