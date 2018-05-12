@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
@@ -14,7 +14,6 @@ namespace Discord.Commands
             Parameter,
             QuotedParameter
         }
-
         public static async Task<ParseResult> ParseArgsAsync(CommandInfo command, ICommandContext context, bool ignoreExtraArgs, IServiceProvider services, string input, int startPos, IReadOnlyDictionary<char, char> aliasMap)
         {
             ParameterInfo curParam = null;
@@ -132,7 +131,7 @@ namespace Discord.Commands
                 {
                     if (curParam == null)
                     {
-                        if (ignoreExtraArgs)
+                        if (command.IgnoreExtraArgs)
                             break;
                         else
                             return ParseResult.FromError(CommandError.BadArgCount, "The input text has too many parameters.");

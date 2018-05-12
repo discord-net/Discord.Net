@@ -1,4 +1,4 @@
-﻿using Discord.API.Rest;
+using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -110,6 +110,11 @@ namespace Discord.Rest
         {
             var models = await client.ApiClient.GetGuildBansAsync(guild.Id, options).ConfigureAwait(false);
             return models.Select(x => RestBan.Create(client, x)).ToImmutableArray();
+        }
+        public static async Task<RestBan> GetBanAsync(IGuild guild, BaseDiscordClient client, ulong userId, RequestOptions options)
+        {
+            var model = await client.ApiClient.GetGuildBanAsync(guild.Id, userId, options).ConfigureAwait(false);
+            return RestBan.Create(client, model);
         }
 
         public static async Task AddBanAsync(IGuild guild, BaseDiscordClient client,
