@@ -23,7 +23,7 @@ namespace Discord
         /// <summary> Removes all reactions from this message. </summary>
         Task RemoveAllReactionsAsync(RequestOptions options = null);
         /// <summary>  Gets all users that reacted to a message with a given emote </summary>
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit = 100, ulong? afterUserId = null, RequestOptions options = null);
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null);
 
         /// <summary> Transforms this message's text into a human readable form by resolving its tags. </summary>
         string Resolve(
