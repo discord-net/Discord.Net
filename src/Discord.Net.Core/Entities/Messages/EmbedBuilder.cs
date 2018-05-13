@@ -1,86 +1,102 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Discord
 {
     public class EmbedBuilder
     {
-        private readonly Embed _embed;
+        private string _title;
+        private string _description;
+        private string _url;
+        private EmbedImage? _image;
+        private EmbedThumbnail? _thumbnail;
+        private List<EmbedFieldBuilder> _fields;
 
         public const int MaxFieldCount = 25;
         public const int MaxTitleLength = 256;
         public const int MaxDescriptionLength = 2048;
-        public const int MaxEmbedLength = 6000; // user bot limit is 2000, but we don't validate that here.
+        public const int MaxEmbedLength = 6000;
 
         public EmbedBuilder()
         {
-            _embed = new Embed(EmbedType.Rich);
             Fields = new List<EmbedFieldBuilder>();
         }
 
         public string Title
         {
-            get => _embed.Title;
+            get => _title;
             set
             {
                 if (value?.Length > MaxTitleLength) throw new ArgumentException($"Title length must be less than or equal to {MaxTitleLength}.", nameof(Title));
-                _embed.Title = value;
+                _title = value;
             }
         }
-
         public string Description
         {
-            get => _embed.Description;
+            get => _description;
             set
             {
                 if (value?.Length > MaxDescriptionLength) throw new ArgumentException($"Description length must be less than or equal to {MaxDescriptionLength}.", nameof(Description));
-                _embed.Description = value;
+                _description = value;
             }
         }
 
         public string Url
         {
-            get => _embed.Url;
+            get => _url;
             set
             {
                 if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(Url));
-                _embed.Url = value;
+                _url = value;
             }
         }
         public string ThumbnailUrl
         {
-            get => _embed.Thumbnail?.Url;
+            get => _thumbnail?.Url;
             set
             {
                 if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(ThumbnailUrl));
-                _embed.Thumbnail = new EmbedThumbnail(value, null, null, null);
+                _thumbnail = new EmbedThumbnail(value, null, null, null);
             }
         }
         public string ImageUrl
         {
-            get => _embed.Image?.Url;
+            get => _image?.Url;
             set
             {
                 if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(ImageUrl));
-                _embed.Image = new EmbedImage(value, null, null, null);
+                _image = new EmbedImage(value, null, null, null);
             }
         }
-        public DateTimeOffset? Timestamp { get => _embed.Timestamp; set { _embed.Timestamp = value; } }
-        public Color? Color { get => _embed.Color; set { _embed.Color = value; } }
-
-        public EmbedAuthorBuilder Author { get; set; }
-        public EmbedFooterBuilder Footer { get; set; }
-        private List<EmbedFieldBuilder> _fields;
         public List<EmbedFieldBuilder> Fields
         {
             get => _fields;
             set
             {
-
                 if (value == null) throw new ArgumentNullException("Cannot set an embed builder's fields collection to null", nameof(Fields));
                 if (value.Count > MaxFieldCount) throw new ArgumentException($"Field count must be less than or equal to {MaxFieldCount}.", nameof(Fields));
                 _fields = value;
+            }
+        }
+
+        public DateTimeOffset? Timestamp { get; set; }
+        public Color? Color { get; set; }
+        public EmbedAuthorBuilder Author { get; set; }
+        public EmbedFooterBuilder Footer { get; set; }
+
+        public int Length
+        {
+            get
+            {
+                int titleLength = Title?.Length ?? 0;
+                int authorLength = Author?.Name?.Length ?? 0;
+                int descriptionLength = Description?.Length ?? 0;
+                int footerLength = Footer?.Text?.Length ?? 0;
+                int fieldSum = Fields.Sum(f => f.Name.Length + f.Value.ToString().Length);
+
+                return titleLength + authorLength + descriptionLength + footerLength + fieldSum;
             }
         }
 
@@ -180,7 +196,6 @@ namespace Discord
             AddField(field);
             return this;
         }
-
         public EmbedBuilder AddField(EmbedFieldBuilder field)
         {
             if (Fields.Count >= MaxFieldCount)
@@ -195,63 +210,53 @@ namespace Discord
         {
             var field = new EmbedFieldBuilder();
             action(field);
-            this.AddField(field);
+            AddField(field);
             return this;
         }
 
         public Embed Build()
         {
-            _embed.Footer = Footer?.Build();
-            _embed.Author = Author?.Build();
+            if (Length > MaxEmbedLength)
+                throw new InvalidOperationException($"Total embed length must be less than or equal to {MaxEmbedLength}");
+
             var fields = ImmutableArray.CreateBuilder<EmbedField>(Fields.Count);
             for (int i = 0; i < Fields.Count; i++)
                 fields.Add(Fields[i].Build());
-            _embed.Fields = fields.ToImmutable();
 
-            if (_embed.Length > MaxEmbedLength)
-            {
-                throw new InvalidOperationException($"Total embed length must be less than or equal to {MaxEmbedLength}");
-            }
-
-            return _embed;
+            return new Embed(EmbedType.Rich, Title, Description, Url, Timestamp, Color, _image, null, Author?.Build(), Footer?.Build(), null, _thumbnail, fields.ToImmutable());
         }
     }
 
     public class EmbedFieldBuilder
     {
-        private EmbedField _field;
-
+        private string _name;
+        private string _value;
         public const int MaxFieldNameLength = 256;
         public const int MaxFieldValueLength = 1024;
 
         public string Name
         {
-            get => _field.Name;
+            get => _name;
             set
             {
                 if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException($"Field name must not be null, empty or entirely whitespace.", nameof(Name));
                 if (value.Length > MaxFieldNameLength) throw new ArgumentException($"Field name length must be less than or equal to {MaxFieldNameLength}.", nameof(Name));
-                _field.Name = value;
+                _name = value;
             }
         }
 
         public object Value
         {
-            get => _field.Value;
+            get => _value;
             set
             {
                 var stringValue = value?.ToString();
                 if (string.IsNullOrEmpty(stringValue)) throw new ArgumentException($"Field value must not be null or empty.", nameof(Value));
                 if (stringValue.Length > MaxFieldValueLength) throw new ArgumentException($"Field value length must be less than or equal to {MaxFieldValueLength}.", nameof(Value));
-                _field.Value = stringValue;
+                _value = stringValue;
             }
         }
-        public bool IsInline { get => _field.Inline; set { _field.Inline = value; } }
-
-        public EmbedFieldBuilder()
-        {
-            _field = new EmbedField();
-        }
+        public bool IsInline { get; set; }
 
         public EmbedFieldBuilder WithName(string name)
         {
@@ -270,46 +275,42 @@ namespace Discord
         }
 
         public EmbedField Build()
-            => _field;
+            => new EmbedField(Name, Value.ToString(), IsInline);
     }
 
     public class EmbedAuthorBuilder
     {
-        private EmbedAuthor _author;
-
+        private string _name;
+        private string _url;
+        private string _iconUrl;
         public const int MaxAuthorNameLength = 256;
 
         public string Name
         {
-            get => _author.Name;
+            get => _name;
             set
             {
                 if (value?.Length > MaxAuthorNameLength) throw new ArgumentException($"Author name length must be less than or equal to {MaxAuthorNameLength}.", nameof(Name));
-                _author.Name = value;
+                _name = value;
             }
         }
         public string Url
         {
-            get => _author.Url;
+            get => _url;
             set
             {
                 if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(Url));
-                _author.Url = value;
+                _url = value;
             }
         }
         public string IconUrl
         {
-            get => _author.IconUrl;
+            get => _iconUrl;
             set
             {
                 if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(IconUrl));
-                _author.IconUrl = value;
+                _iconUrl = value;
             }
-        }
-
-        public EmbedAuthorBuilder()
-        {
-            _author = new EmbedAuthor();
         }
 
         public EmbedAuthorBuilder WithName(string name)
@@ -329,37 +330,33 @@ namespace Discord
         }
 
         public EmbedAuthor Build()
-            => _author;
+            => new EmbedAuthor(Name, Url, IconUrl, null);
     }
 
     public class EmbedFooterBuilder
     {
-        private EmbedFooter _footer;
+        private string _text;
+        private string _iconUrl;
 
         public const int MaxFooterTextLength = 2048;
 
         public string Text
         {
-            get => _footer.Text;
+            get => _text;
             set
             {
                 if (value?.Length > MaxFooterTextLength) throw new ArgumentException($"Footer text length must be less than or equal to {MaxFooterTextLength}.", nameof(Text));
-                _footer.Text = value;
+                _text = value;
             }
         }
         public string IconUrl
         {
-            get => _footer.IconUrl;
+            get => _iconUrl;
             set
             {
                 if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI", nameof(IconUrl));
-                _footer.IconUrl = value;
+                _iconUrl = value;
             }
-        }
-
-        public EmbedFooterBuilder()
-        {
-            _footer = new EmbedFooter();
         }
 
         public EmbedFooterBuilder WithText(string text)
@@ -374,6 +371,6 @@ namespace Discord
         }
 
         public EmbedFooter Build()
-            => _footer;
+            => new EmbedFooter(Text, IconUrl, null);
     }
 }

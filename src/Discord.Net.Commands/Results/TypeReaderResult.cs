@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Discord.Commands
 {
@@ -30,6 +31,9 @@ namespace Discord.Commands
         public string ErrorReason { get; }
 
         public bool IsSuccess => !Error.HasValue;
+        public object BestMatch => IsSuccess
+            ? (Values.Count == 1 ? Values.Single().Value : Values.OrderByDescending(v => v.Score).First().Value)
+            : throw new InvalidOperationException("TypeReaderResult was not successful.");
 
         private TypeReaderResult(IReadOnlyCollection<TypeReaderValue> values, CommandError? error, string errorReason)
         {
