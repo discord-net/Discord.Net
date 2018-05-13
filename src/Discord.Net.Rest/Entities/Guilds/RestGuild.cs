@@ -268,6 +268,10 @@ namespace Discord.Rest
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null)
             => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options);
 
+        //Audit logs
+        public IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(int limit, RequestOptions options = null)
+            => GuildHelper.GetAuditLogsAsync(this, Discord, null, limit, options);
+
         //Webhooks
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => GuildHelper.GetWebhookAsync(this, Discord, id, options);
@@ -428,6 +432,14 @@ namespace Discord.Rest
                 return ImmutableArray.Create<IGuildUser>();
         }
         Task IGuild.DownloadUsersAsync() { throw new NotSupportedException(); }
+
+        async Task<IReadOnlyCollection<IAuditLogEntry>> IGuild.GetAuditLogAsync(int limit, CacheMode cacheMode, RequestOptions options)
+        {
+            if (cacheMode == CacheMode.AllowDownload)
+                return (await GetAuditLogsAsync(limit, options).FlattenAsync().ConfigureAwait(false)).ToImmutableArray();
+            else
+                return ImmutableArray.Create<IAuditLogEntry>();
+        }
 
         async Task<IWebhook> IGuild.GetWebhookAsync(ulong id, RequestOptions options)
             => await GetWebhookAsync(id, options);
