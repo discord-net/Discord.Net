@@ -12,7 +12,7 @@ namespace Discord
         /// <summary> Gets a ChannelPermissions that grants all permissions for text channels. </summary>
         public static readonly ChannelPermissions Text = new ChannelPermissions(0b01100_0000000_1111111110001_010001);
         /// <summary> Gets a ChannelPermissions that grants all permissions for voice channels. </summary>
-        public static readonly ChannelPermissions Voice = new ChannelPermissions(0b00100_1111110_0000000000000_010001);
+        public static readonly ChannelPermissions Voice = new ChannelPermissions(0b00100_1111110_0000000010000_010001);
         /// <summary> Gets a ChannelPermissions that grants all permissions for direct message channels. </summary>
         public static readonly ChannelPermissions DM = new ChannelPermissions(0b00000_1000110_1011100110000_000000);
         /// <summary> Gets a ChannelPermissions that grants all permissions for group channels. </summary>
