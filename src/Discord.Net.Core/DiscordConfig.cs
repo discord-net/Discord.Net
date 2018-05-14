@@ -4,10 +4,10 @@ namespace Discord
 {
     public class DiscordConfig
     {
-        public const int APIVersion = 6;        
+        public const int APIVersion = 6;
         public static string Version { get; } =
             typeof(DiscordConfig).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ??
-            typeof(DiscordConfig).GetTypeInfo().Assembly.GetName().Version.ToString(3) ?? 
+            typeof(DiscordConfig).GetTypeInfo().Assembly.GetName().Version.ToString(3) ??
             "Unknown";
 
         public static string UserAgent { get; } = $"DiscordBot (https://github.com/RogueException/Discord.Net, v{Version})";
@@ -21,10 +21,11 @@ namespace Discord
         public const int MaxUsersPerBatch = 1000;
         public const int MaxGuildsPerBatch = 100;
         public const int MaxUserReactionsPerBatch = 100;
+        public const int MaxAuditLogEntriesPerBatch = 100;
 
         /// <summary> Gets or sets how a request should act in the case of an error, by default. </summary>
         public RetryMode DefaultRetryMode { get; set; } = RetryMode.AlwaysRetry;
-        
+
         /// <summary> Gets or sets the minimum log level severity that will be sent to the Log event. </summary>
         public LogSeverity LogLevel { get; set; } = LogSeverity.Info;
 

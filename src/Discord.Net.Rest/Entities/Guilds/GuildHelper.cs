@@ -1,4 +1,4 @@
-﻿using Discord.API.Rest;
+using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -110,6 +110,11 @@ namespace Discord.Rest
         {
             var models = await client.ApiClient.GetGuildBansAsync(guild.Id, options).ConfigureAwait(false);
             return models.Select(x => RestBan.Create(client, x)).ToImmutableArray();
+        }
+        public static async Task<RestBan> GetBanAsync(IGuild guild, BaseDiscordClient client, ulong userId, RequestOptions options)
+        {
+            var model = await client.ApiClient.GetGuildBanAsync(guild.Id, userId, options).ConfigureAwait(false);
+            return RestBan.Create(client, model);
         }
 
         public static async Task AddBanAsync(IGuild guild, BaseDiscordClient client,
@@ -261,6 +266,35 @@ namespace Discord.Rest
             else
                 model = await client.ApiClient.BeginGuildPruneAsync(guild.Id, args, options).ConfigureAwait(false);
             return model.Pruned;
+        }
+
+        // Audit logs
+        public static IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(IGuild guild, BaseDiscordClient client,
+            ulong? from, int? limit, RequestOptions options)
+        {
+            return new PagedAsyncEnumerable<RestAuditLogEntry>(
+                DiscordConfig.MaxAuditLogEntriesPerBatch,
+                async (info, ct) =>
+                {
+                    var args = new GetAuditLogsParams
+                    {
+                        Limit = info.PageSize
+                    };
+                    if (info.Position != null)
+                        args.BeforeEntryId = info.Position.Value;
+                    var model = await client.ApiClient.GetAuditLogsAsync(guild.Id, args, options);
+                    return model.Entries.Select((x) => RestAuditLogEntry.Create(client, model, x)).ToImmutableArray();
+                },
+                nextPage: (info, lastPage) =>
+                {
+                    if (lastPage.Count != DiscordConfig.MaxAuditLogEntriesPerBatch)
+                        return false;
+                    info.Position = lastPage.Min(x => x.Id);
+                    return true;
+                },
+                start: from,
+                count: limit
+            );
         }
 
         //Webhooks
