@@ -47,32 +47,25 @@ namespace Discord.Rest
         }
 
         public static IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, IEmote emote,
-            Action<GetReactionUsersParams> func, BaseDiscordClient client, RequestOptions options)
+            int? limit, BaseDiscordClient client, RequestOptions options)
         {
             Preconditions.NotNull(emote, nameof(emote));
             var emoji = (emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name);
-
-            var arguments = new GetReactionUsersParams();
-            func(arguments);
 
             return new PagedAsyncEnumerable<IUser>(
                 DiscordConfig.MaxUserReactionsPerBatch,
                 async (info, ct) =>
                 {
-                    var args = new GetReactionUsersParams();
-                    func(args);
-                    args.Limit = info.PageSize;
+                    var args = new GetReactionUsersParams
+                    {
+                        Limit = info.PageSize
+                    };
 
                     if (info.Position != null)
                         args.AfterUserId = info.Position.Value;
 
                     var models = await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false);
-                    var builder = ImmutableArray.CreateBuilder<IUser>();
-
-                    foreach (var model in models)
-                        builder.Add(RestUser.Create(client, model));
-
-                    return builder.ToImmutable();
+                    return models.Select(x => RestUser.Create(client, x)).ToImmutableArray();
                 },
                 nextPage: (info, lastPage) =>
                 {
@@ -82,8 +75,7 @@ namespace Discord.Rest
                     info.Position = lastPage.Max(x => x.Id);
                     return true;
                 },
-                start: arguments.AfterUserId.IsSpecified ? arguments.AfterUserId.Value : (ulong?)null,
-                count: arguments.Limit.GetValueOrDefault(DiscordConfig.MaxUserReactionsPerBatch)
+                count: limit
             );
 
         }
