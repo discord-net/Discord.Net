@@ -518,37 +518,38 @@ namespace Discord.WebSocket
                 promise = new TaskCompletionSource<AudioClient>();
                 _audioConnectPromise = promise;
 
-                if (!external)
-                {
-                    if (_audioClient == null)
-                    {
-                        var audioClient = new AudioClient(this, Discord.GetAudioId(), channelId);
-                        audioClient.Disconnected += async ex =>
-                        {
-                            if (!promise.Task.IsCompleted)
-                            {
-                                try
-                                { audioClient.Dispose(); }
-                                catch { }
-                                _audioClient = null;
-                                if (ex != null)
-                                    await promise.TrySetExceptionAsync(ex);
-                                else
-                                    await promise.TrySetCanceledAsync();
-                                return;
-                            }
-                        };
-                        audioClient.Connected += () =>
-                        {
-                            var _ = promise.TrySetResultAsync(_audioClient);
-                            return Task.Delay(0);
-                        };
-                        configAction?.Invoke(audioClient);
-                        _audioClient = audioClient;
-                    }
-                } else
+                if (external)
                 {
                     var _ = promise.TrySetResultAsync(null);
+                    await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, channelId, selfDeaf, selfMute).ConfigureAwait(false);
+                    return null;
+                }
+
+                if (_audioClient == null)
+                {
+                    var audioClient = new AudioClient(this, Discord.GetAudioId(), channelId);
+                    audioClient.Disconnected += async ex =>
+                    {
+                        if (!promise.Task.IsCompleted)
+                        {
+                            try
+                            { audioClient.Dispose(); }
+                            catch { }
+                            _audioClient = null;
+                            if (ex != null)
+                                await promise.TrySetExceptionAsync(ex);
+                            else
+                                await promise.TrySetCanceledAsync();
+                            return;
+                        }
+                    };
+                    audioClient.Connected += () =>
+                    {
+                        var _ = promise.TrySetResultAsync(_audioClient);
+                        return Task.Delay(0);
+                    };
+                    configAction?.Invoke(audioClient);
+                    _audioClient = audioClient;
                 }
 
                 await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, channelId, selfDeaf, selfMute).ConfigureAwait(false);

@@ -41,7 +41,6 @@ namespace Discord.Rest
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
 
         //IAudioChannel
-        Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) { throw new NotSupportedException(); }
         Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction, bool external) { throw new NotSupportedException(); }
         Task IAudioChannel.DisconnectAsync() { throw new NotSupportedException(); }
 
