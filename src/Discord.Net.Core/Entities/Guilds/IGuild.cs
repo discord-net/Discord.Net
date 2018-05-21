@@ -537,6 +537,10 @@ namespace Discord
         /// </returns>
         Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null);
 
+        /// <summary> Gets the specified number of audit log entries for this guild. </summary>
+        Task<IReadOnlyCollection<IAuditLogEntry>> GetAuditLogAsync(int limit = DiscordConfig.MaxAuditLogEntriesPerBatch,
+            CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
         /// <summary>
         ///     Gets a webhook found within this guild.
         /// </summary>
