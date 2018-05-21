@@ -5,37 +5,35 @@ title: Questions about Commands
 
 # Command-related Questions
 
-## How can I restrict some of my commands so only certain users can execute them?
+## How can I restrict some of my commands so only specific users can execute them?
 
 Based on how you want to implement the restrictions, you can use the
 built-in [RequireUserPermission] precondition, which allows you to
 restrict the command based on the user's current permissions in the
-guild or channel (*e.g. `GuildPermission.Administrator`,
-`ChannelPermission.ManageMessages` etc.*).
+guild or channel (*e.g., `GuildPermission.Administrator`,
+`ChannelPermission.ManageMessages`*).
 
 If, however, you wish to restrict the commands based on the user's
-role, you can either create your own custom precondition or use
+role, you can either create your custom precondition or use
 Joe4evr's [Preconditions Addons] that provides a few custom
 preconditions that aren't provided in the stock library.
-Its source can also be used as an example for creating your own
+Its source can also be used as an example for creating your
 custom preconditions.
 
 [RequireUserPermission]: xref:Discord.Commands.RequireUserPermissionAttribute
 [Preconditions Addons]: https://github.com/Joe4evr/Discord.Addons/tree/master/src/Discord.Addons.Preconditions
 
-## I'm getting an error about `Assembly#GetEntryAssembly`.
+## Why am I getting an error about `Assembly.GetEntryAssembly`?
 
-You may be confusing [CommandService#AddModulesAsync] with
-[CommandService#AddModuleAsync]. The former is used to add modules
-via the assembly, while the latter is used to add a single module.
-
-[CommandService#AddModulesAsync]: xref:Discord.Commands.CommandService.AddModulesAsync*
-[CommandService#AddModuleAsync]: xref:Discord.Commands.CommandService.AddModuleAsync*
+You may be confusing @Discord.Commands.CommandService.AddModulesAsync*
+with @Discord.Commands.CommandService.AddModuleAsync*. The former
+is used to add modules via the assembly, while the latter is used to
+add a single module.
 
 ## What does [Remainder] do in the command signature?
 
 The [RemainderAttribute] leaves the string unparsed, meaning you
-don't have to add quotes around the text for the text to be
+do not have to add quotes around the text for the text to be
 recognized as a single object. Please note that if your method has
 multiple parameters, the remainder attribute can only be applied to
 the last parameter.
@@ -47,13 +45,14 @@ the last parameter.
 ## What is a service? Why does my module not hold any data after execution?
 
 In Discord.Net, modules are created similarly to ASP.NET, meaning
-that they have a transient nature. This means that they are spawned
-every time when a request is received, and are killed from memory
-when the execution finishes. This is why you cannot store persistent
-data inside a module. To workaround this, consider using a service.
+that they have a transient nature; modules are spawned whenever a
+request is received, and are killed from memory when the execution
+finishes. In other words, you cannot store persistent
+data inside a module. Consider using a service if you wish to
+workaround this.
 
-Service is often used to hold data externally, so that they will
-persist throughout execution. Think of it like a chest that holds
+Service is often used to hold data externally so that they persist
+throughout execution. Think of it like a chest that holds
 whatever you throw at it that won't be affected by anything unless
 you want it to. Note that you should also learn Microsoft's
 implementation of [Dependency Injection] \([video]) before proceeding,
@@ -66,25 +65,47 @@ A brief example of service and dependency injection can be seen below.
 [Dependency Injection]: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection
 [video]: https://www.youtube.com/watch?v=QtDTfn8YxXg
 
-## I have a long-running Task in my command, and Discord.Net keeps saying that a `MessageReceived` handler is blocking the gateway. What gives?
+## Discord.Net keeps saying that a `MessageReceived` handler is blocking the gateway, what should I do?
 
-By default, all commands are executed on the same thread as the
-gateway task, which is responsible for keeping the connection from
-your client to Discord alive. When you execute a command,
-this blocks the gateway from communicating for as long as the command
-task is being executed. The library will warn you about any long
-running event handler (in this case, the command handler) that
-persists for **more than 3 seconds**.
+By default, the library warns the user about any long-running event
+handler that persists for **more than 3 seconds**. Any event
+handlers that are run on the same thread as the gateway task, the task
+in charge of keeping the connection alive, may block the processing of
+heartbeat, and thus terminating the connection.
 
-To resolve this, the library has designed a flag called [RunMode].
+In this case, the library detects that a `MessageReceived`
+event handler is blocking the gateway thread. This warning is
+typically associated with the command handler as it listens for that
+particular event. If the command handler is blocking the thread, then
+this **might** mean that you have a long-running command.
+
+> [!NOTE]
+> In rare cases, runtime errors can also cause blockage, usually
+> associated with Mono, which is not supported by this library.
+
+To prevent a long-running command from blocking the gateway
+thread, a flag called [RunMode] is explicitly designed to resolve
+this issue.
 
 There are 2 main `RunMode`s.
 
-1. `RunMode.Sync` (default)
+1. `RunMode.Sync`
 2. `RunMode.Async`
 
+`Sync` is the default behavior and makes the command to be run on the
+same thread as the gateway one. `Async` will spin the task off to a
+different thread from the gateway one.
+
+> [!IMPORTANT]
+> While specifying `RunMode.Async` allows the command to be spun off
+> to a different thread, keep in mind that by doing so, there will be
+> **potentially unwanted consequences**. Before applying this flag,
+> please consider whether it is necessary to do so.
+>
+> Further details regarding `RunMode.Async` can be found below.
+
 You can set the `RunMode` either by specifying it individually via
-the `CommandAttribute`, or by setting the global default with
+the `CommandAttribute` or by setting the global default with
 the [DefaultRunMode] flag under `CommandServiceConfig`.
 
 # [CommandAttribute](#tab/cmdattrib)
@@ -99,15 +120,6 @@ the [DefaultRunMode] flag under `CommandServiceConfig`.
 
 ***
 
-> [!IMPORTANT]
-> While specifying `RunMode.Async` allows the command to be spun off
-> to a different thread instead of the gateway thread,
-> keep in mind that there will be **potential consequences**
-> by doing so. Before applying this flag, please
-> consider whether it is necessary to do so.
->
-> Further details regarding `RunMode.Async` can be found below.
-
 [RunMode]: xref:Discord.Commands.RunMode
 [CommandAttribute]: xref:Discord.Commands.CommandAttribute
 [DefaultRunMode]: xref:Discord.Commands.CommandServiceConfig.DefaultRunMode
@@ -115,16 +127,15 @@ the [DefaultRunMode] flag under `CommandServiceConfig`.
 ## How does `RunMode.Async` work, and why is Discord.Net *not* using it by default?
 
 `RunMode.Async` works by spawning a new `Task` with an unawaited
-[Task.Run], essentially making `ExecuteAsyncInternalAsync`, the task
-that is used to invoke the command task, to be finished on a
-different thread. This means that [ExecuteAsync] will be forced to
-return a successful [ExecuteResult] regardless of the actual
-execution result.
+[Task.Run], essentially making the task that is used to invoke the
+command task to be finished on a different thread. This design means
+that [ExecuteAsync] will be forced to return a successful
+[ExecuteResult] regardless of the actual execution result.
 
 The following are the known caveats with `RunMode.Async`,
 
-1. You can potentially introduce race condition.
-2. Unnecessary overhead caused by [async state machine].
+1. You can potentially introduce a race condition.
+2. Unnecessary overhead caused by the [async state machine].
 3. [ExecuteAsync] will immediately return [ExecuteResult] instead of
  other result types (this is particularly important for those who wish
  to utilize [RuntimeResult] in 2.0).
@@ -137,7 +148,7 @@ For #3, in Discord.Net 2.0, the library introduces a new event called
 **successfully executed**. This event will be raised regardless of
 the `RunMode` type and will return the appropriate execution result.
 
-For #4, exceptions are caught in [CommandService#Log] event under
+For #4, exceptions are caught in [CommandService.Log] event under
 [LogMessage.Exception] as [CommandException].
 
 [Task.Run]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task.run
@@ -146,6 +157,6 @@ For #4, exceptions are caught in [CommandService#Log] event under
 [ExecuteResult]: xref:Discord.Commands.ExecuteResult
 [RuntimeResult]: xref:Discord.Commands.RuntimeResult
 [CommandExecuted]: xref:Discord.Commands.CommandService.CommandExecuted
-[CommandService#Log]: xref:Discord.Commands.CommandService.Log
+[CommandService.Log]: xref:Discord.Commands.CommandService.Log
 [LogMessage.Exception]: xref:Discord.LogMessage.Exception*
 [CommandException]: xref:Discord.Commands.CommandException

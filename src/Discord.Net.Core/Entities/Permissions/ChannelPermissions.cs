@@ -12,7 +12,7 @@ namespace Discord
         /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for text channels. </summary>
         public static readonly ChannelPermissions Text = new ChannelPermissions(0b01100_0000000_1111111110001_010001);
         /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for voice channels. </summary>
-        public static readonly ChannelPermissions Voice = new ChannelPermissions(0b00100_1111110_0000000000000_010001);
+        public static readonly ChannelPermissions Voice = new ChannelPermissions(0b00100_1111110_0000000010000_010001);
         /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for category channels. </summary>
         public static readonly ChannelPermissions Category = new ChannelPermissions(0b01100_1111110_1111111110001_010001);
         /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for direct message channels. </summary>
@@ -37,52 +37,52 @@ namespace Discord
         /// <summary> Gets a packed value representing all the permissions in this <see cref="ChannelPermissions"/>. </summary>
         public ulong RawValue { get; }
 
-        /// <summary> If <see langword="true"/>, a user may create invites. </summary>
+        /// <summary> If <c>true</c>, a user may create invites. </summary>
         public bool CreateInstantInvite => Permissions.GetValue(RawValue, ChannelPermission.CreateInstantInvite);
-        /// <summary> If <see langword="true"/>, a user may create, delete and modify this channel. </summary>
+        /// <summary> If <c>true</c>, a user may create, delete and modify this channel. </summary>
         public bool ManageChannel => Permissions.GetValue(RawValue, ChannelPermission.ManageChannels);
 
-        /// <summary> If <see langword="true"/>, a user may add reactions. </summary>
+        /// <summary> If <c>true</c>, a user may add reactions. </summary>
         public bool AddReactions => Permissions.GetValue(RawValue, ChannelPermission.AddReactions);
-        /// <summary> If <see langword="true"/>, a user may join channels. </summary>
+        /// <summary> If <c>true</c>, a user may join channels. </summary>
         [Obsolete("Use ViewChannel instead.")]
         public bool ReadMessages => ViewChannel;
-        /// <summary> If <see langword="true"/>, a user may view channels. </summary>
+        /// <summary> If <c>true</c>, a user may view channels. </summary>
         public bool ViewChannel => Permissions.GetValue(RawValue, ChannelPermission.ViewChannel);
 
-        /// <summary> If <see langword="true"/>, a user may send messages. </summary>
+        /// <summary> If <c>true</c>, a user may send messages. </summary>
         public bool SendMessages => Permissions.GetValue(RawValue, ChannelPermission.SendMessages);
-        /// <summary> If <see langword="true"/>, a user may send text-to-speech messages. </summary>
+        /// <summary> If <c>true</c>, a user may send text-to-speech messages. </summary>
         public bool SendTTSMessages => Permissions.GetValue(RawValue, ChannelPermission.SendTTSMessages);
-        /// <summary> If <see langword="true"/>, a user may delete messages. </summary>
+        /// <summary> If <c>true</c>, a user may delete messages. </summary>
         public bool ManageMessages => Permissions.GetValue(RawValue, ChannelPermission.ManageMessages);
-        /// <summary> If <see langword="true"/>, Discord will auto-embed links sent by this user. </summary>
+        /// <summary> If <c>true</c>, Discord will auto-embed links sent by this user. </summary>
         public bool EmbedLinks => Permissions.GetValue(RawValue, ChannelPermission.EmbedLinks);
-        /// <summary> If <see langword="true"/>, a user may send files. </summary>
+        /// <summary> If <c>true</c>, a user may send files. </summary>
         public bool AttachFiles => Permissions.GetValue(RawValue, ChannelPermission.AttachFiles);
-        /// <summary> If <see langword="true"/>, a user may read previous messages. </summary>
+        /// <summary> If <c>true</c>, a user may read previous messages. </summary>
         public bool ReadMessageHistory => Permissions.GetValue(RawValue, ChannelPermission.ReadMessageHistory);
-        /// <summary> If <see langword="true"/>, a user may mention @everyone. </summary>
+        /// <summary> If <c>true</c>, a user may mention @everyone. </summary>
         public bool MentionEveryone => Permissions.GetValue(RawValue, ChannelPermission.MentionEveryone);
-        /// <summary> If <see langword="true"/>, a user may use custom emoji from other guilds. </summary>
+        /// <summary> If <c>true</c>, a user may use custom emoji from other guilds. </summary>
         public bool UseExternalEmojis => Permissions.GetValue(RawValue, ChannelPermission.UseExternalEmojis);
 
-        /// <summary> If <see langword="true"/>, a user may connect to a voice channel. </summary>
+        /// <summary> If <c>true</c>, a user may connect to a voice channel. </summary>
         public bool Connect => Permissions.GetValue(RawValue, ChannelPermission.Connect);
-        /// <summary> If <see langword="true"/>, a user may speak in a voice channel. </summary>
+        /// <summary> If <c>true</c>, a user may speak in a voice channel. </summary>
         public bool Speak => Permissions.GetValue(RawValue, ChannelPermission.Speak);
-        /// <summary> If <see langword="true"/>, a user may mute users. </summary>
+        /// <summary> If <c>true</c>, a user may mute users. </summary>
         public bool MuteMembers => Permissions.GetValue(RawValue, ChannelPermission.MuteMembers);
-        /// <summary> If <see langword="true"/>, a user may deafen users. </summary>
+        /// <summary> If <c>true</c>, a user may deafen users. </summary>
         public bool DeafenMembers => Permissions.GetValue(RawValue, ChannelPermission.DeafenMembers);
-        /// <summary> If <see langword="true"/>, a user may move other users between voice channels. </summary>
+        /// <summary> If <c>true</c>, a user may move other users between voice channels. </summary>
         public bool MoveMembers => Permissions.GetValue(RawValue, ChannelPermission.MoveMembers);
-        /// <summary> If <see langword="true"/>, a user may use voice-activity-detection rather than push-to-talk. </summary>
+        /// <summary> If <c>true</c>, a user may use voice-activity-detection rather than push-to-talk. </summary>
         public bool UseVAD => Permissions.GetValue(RawValue, ChannelPermission.UseVAD);
 
-        /// <summary> If <see langword="true"/>, a user may adjust role permissions. This also implictly grants all other permissions. </summary>
+        /// <summary> If <c>true</c>, a user may adjust role permissions. This also implictly grants all other permissions. </summary>
         public bool ManageRoles => Permissions.GetValue(RawValue, ChannelPermission.ManageRoles);
-        /// <summary> If <see langword="true"/>, a user may edit the webhooks for this channel. </summary>
+        /// <summary> If <c>true</c>, a user may edit the webhooks for this channel. </summary>
         public bool ManageWebhooks => Permissions.GetValue(RawValue, ChannelPermission.ManageWebhooks);
 
         /// <summary> Creates a new <see cref="ChannelPermissions"/> with the provided packed value. </summary>

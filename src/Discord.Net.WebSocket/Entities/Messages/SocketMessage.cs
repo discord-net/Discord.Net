@@ -14,8 +14,20 @@ namespace Discord.WebSocket
     public abstract class SocketMessage : SocketEntity<ulong>, IMessage
     {
         private long _timestampTicks;
-        
+
+        /// <summary>
+        ///     Gets the author of this message.
+        /// </summary>
+        /// <returns>
+        ///     A WebSocket-based user object.
+        /// </returns>
         public SocketUser Author { get; }
+        /// <summary>
+        ///     Gets the source channel of the message.
+        /// </summary>
+        /// <returns>
+        ///     A WebSocket-based message channel.
+        /// </returns>
         public ISocketMessageChannel Channel { get; }
         /// <inheritdoc />
         public MessageSource Source { get; }
@@ -31,10 +43,40 @@ namespace Discord.WebSocket
         public virtual bool IsPinned => false;
         /// <inheritdoc />
         public virtual DateTimeOffset? EditedTimestamp => null;
+        /// <summary>
+        ///     Returns all attachments included in this message.
+        /// </summary>
+        /// <returns>
+        ///     Collection of attachments.
+        /// </returns>
         public virtual IReadOnlyCollection<Attachment> Attachments => ImmutableArray.Create<Attachment>();
+        /// <summary>
+        ///     Returns all embeds included in this message.
+        /// </summary>
+        /// <returns>
+        ///     Collection of embed objects.
+        /// </returns>
         public virtual IReadOnlyCollection<Embed> Embeds => ImmutableArray.Create<Embed>();
+        /// <summary>
+        ///     Returns the channels mentioned in this message.
+        /// </summary>
+        /// <returns>
+        ///     Collection of WebSocket-based guild channels.
+        /// </returns>
         public virtual IReadOnlyCollection<SocketGuildChannel> MentionedChannels => ImmutableArray.Create<SocketGuildChannel>();
+        /// <summary>
+        ///     Returns the roles mentioned in this message.
+        /// </summary>
+        /// <returns>
+        ///     Collection of WebSocket-based roles.
+        /// </returns>
         public virtual IReadOnlyCollection<SocketRole> MentionedRoles => ImmutableArray.Create<SocketRole>();
+        /// <summary>
+        ///     Returns the users mentioned in this message.
+        /// </summary>
+        /// <returns>
+        ///     Collection of WebSocket-based users.
+        /// </returns>
         public virtual IReadOnlyCollection<SocketUser> MentionedUsers => ImmutableArray.Create<SocketUser>();
         /// <inheritdoc />
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
@@ -69,6 +111,12 @@ namespace Discord.WebSocket
         public Task DeleteAsync(RequestOptions options = null)
             => MessageHelper.DeleteAsync(this, Discord, options);
 
+        /// <summary>
+        ///     Gets the content of the message.
+        /// </summary>
+        /// <returns>
+        ///     Content of the message.
+        /// </returns>
         public override string ToString() => Content;
         internal SocketMessage Clone() => MemberwiseClone() as SocketMessage;
 

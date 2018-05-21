@@ -40,7 +40,7 @@ Release builds of Discord.Net will be published to the
 Development builds of Discord.Net, as well as add-ons, will be
 published to our [MyGet feed].
 
-Direct feed link: `https://www.myget.org/F/discord-net/api/v3/index.json`
+* Direct feed link: `https://www.myget.org/F/discord-net/api/v3/index.json`
 
 Not sure how to add a direct feed? See how [with Visual Studio] or
 [without Visual Studio].

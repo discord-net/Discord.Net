@@ -74,7 +74,7 @@ object.
 [Cacheable]: xref:Discord.Cacheable`2
 
 > [!NOTE]
-> Many events relating to a Message entity (i.e. `MessageUpdated` and
+> Many events relating to a Message entity (i.e., `MessageUpdated` and
 > `ReactionAdded`) rely on the client's message cache, which is
 > **not** enabled by default. Set the `MessageCacheSize` flag in
 > @Discord.WebSocket.DiscordSocketConfig to enable it.

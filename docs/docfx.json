@@ -35,9 +35,10 @@
     "dest": "_site",
     "template": [
       "default",
-      "_template/light-dark-theme"
+      "_template/light-dark-theme",
+	  "_template/lastmodified"
     ],
-    "postProcessors": [ "ExtractSearchIndex" ],
+    "postProcessors": [ "ExtractSearchIndex", "LastModifiedPostProcessor" ],
     "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
 	  "_appTitle": "Discord.Net Documentation",

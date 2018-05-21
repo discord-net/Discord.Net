@@ -39,7 +39,7 @@ namespace Discord.WebSocket
             : base(discord, id, guild)
         {
             if (Discord.MessageCacheSize > 0)
-                _messages = new MessageCache(Discord, this);
+                _messages = new MessageCache(Discord);
         }
         internal new static SocketTextChannel Create(SocketGuild guild, ClientState state, Model model)
         {
@@ -152,7 +152,7 @@ namespace Discord.WebSocket
         /// <param name="id">The ID of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A webhook associated with the <paramref name="id"/>, or <see langword="null"/> if not found.
+        ///     A webhook associated with the <paramref name="id"/>, or <c>null</c> if not found.
         /// </returns>
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetWebhookAsync(this, Discord, id, options);

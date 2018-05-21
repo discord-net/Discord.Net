@@ -25,7 +25,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     This value is not guaranteed to be set; in cases where the entity cannot be pulled from cache, it is
-        ///     <see langword="null"/>.
+        ///     <c>null</c>.
         /// </remarks>
         public TEntity Value { get; }
         private Func<Task<TEntity>> DownloadFunc { get; }

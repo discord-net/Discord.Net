@@ -129,7 +129,7 @@ namespace Discord.Commands
         /// <typeparam name="T">The type of module.</typeparam>
         /// <param name="services">
         ///     The <see cref="IServiceProvider" /> for your dependency injection solution, if using one - otherwise, pass
-        ///     <see langword="null" />.
+        ///     <c>null</c>.
         /// </param>
         /// <returns>
         ///     A built module.
@@ -144,7 +144,7 @@ namespace Discord.Commands
         /// <param name="type">The type of module.</param>
         /// <param name="services">
         ///     The <see cref="IServiceProvider" /> for your dependency injection solution, if using one - otherwise, pass
-        ///     <see langword="null" />.
+        ///     <c>null</c>.
         /// </param>
         /// <returns>
         ///     A built module.
@@ -183,7 +183,7 @@ namespace Discord.Commands
         /// <param name="assembly">The <see cref="Assembly" /> containing command modules.</param>
         /// <param name="services">
         ///     An <see cref="IServiceProvider" /> for your dependency injection solution, if using one - otherwise, pass
-        ///     <see langword="null" />.
+        ///     <c>null</c>.
         /// </param>
         /// <returns>
         ///     A collection of built modules.

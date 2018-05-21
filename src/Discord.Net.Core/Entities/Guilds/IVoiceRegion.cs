@@ -14,19 +14,19 @@ namespace Discord
         /// </summary>
         string Name { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if this voice region is exclusive to VIP accounts.
+        ///     Returns <c>true</c> if this voice region is exclusive to VIP accounts.
         /// </summary>
         bool IsVip { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if this voice region is the closest to your machine.
+        ///     Returns <c>true</c> if this voice region is the closest to your machine.
         /// </summary>
         bool IsOptimal { get; }
         /// <summary> 
-        ///     Returns <see langword="true"/> if this is a deprecated voice region (avoid switching to these).
+        ///     Returns <c>true</c> if this is a deprecated voice region (avoid switching to these).
         /// </summary>
         bool IsDeprecated { get; }
         /// <summary> 
-        ///     Returns <see langword="true"/> if this is a custom voice region (used for events/etc).
+        ///     Returns <c>true</c> if this is a custom voice region (used for events/etc).
         /// </summary>
         bool IsCustom { get; }
     }

@@ -9,6 +9,9 @@ using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a WebSocket-based message sent by a user.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketUserMessage : SocketMessage, IUserMessage
     {

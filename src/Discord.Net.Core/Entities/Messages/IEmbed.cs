@@ -9,56 +9,96 @@ namespace Discord
     public interface IEmbed
     {
         /// <summary>
-        ///     Gets the title URL of the embed.
+        ///     Gets the title URL of this embed.
         /// </summary>
+        /// <returns>
+        ///     A string containing the URL set in a title of the embed.
+        /// </returns>
         string Url { get; }
         /// <summary>
-        ///     Gets the title of the embed.
+        ///     Gets the title of this embed.
         /// </summary>
+        /// <returns>
+        ///     The title of the embed.
+        /// </returns>
         string Title { get; }
         /// <summary>
-        ///     Gets the description of the embed.
+        ///     Gets the description of this embed.
         /// </summary>
+        /// <returns>
+        ///     The description field of the embed.
+        /// </returns>
         string Description { get; }
         /// <summary>
-        ///     Gets the type of the embed.
+        ///     Gets the type of this embed.
         /// </summary>
+        /// <returns>
+        ///     The type of the embed.
+        /// </returns>
         EmbedType Type { get; }
         /// <summary>
-        ///     Gets the timestamp of the embed, or <see langword="null" /> if none is set.
+        ///     Gets the timestamp of this embed.
         /// </summary>
+        /// <returns>
+        ///     A <see cref="DateTimeOffset"/> based on the timestamp present at the bottom left of the embed, or 
+        ///     <c>null</c> if none is set.
+        /// </returns>
         DateTimeOffset? Timestamp { get; }
         /// <summary>
-        ///     Gets the sidebar color of the embed, or <see langword="null" /> if none is set.
+        ///     Gets the color of this embed.
         /// </summary>
+        /// <returns>
+        ///     The color of the embed present on the side of the embed, or <c>null</c> if none is set.
+        /// </returns>
         Color? Color { get; }
         /// <summary>
-        ///     Gets the image of the embed, or <see langword="null" /> if none is set.
+        ///     Gets the image of this embed.
         /// </summary>
+        /// <returns>
+        ///     The image of the embed, or <c>null</c> if none is set.
+        /// </returns>
         EmbedImage? Image { get; }
         /// <summary>
-        ///     Gets the video of the embed, or <see langword="null" /> if none is set.
+        ///     Gets the video of this embed.
         /// </summary>
+        /// <returns>
+        ///     The video of the embed, or <c>null</c> if none is set.
+        /// </returns>
         EmbedVideo? Video { get; }
         /// <summary>
-        ///     Gets the author field of the embed, or <see langword="null" /> if none is set.
+        ///     Gets the author field of this embed.
         /// </summary>
+        /// <returns>
+        ///     The author field of the embed, or <c>null</c> if none is set.
+        /// </returns>
         EmbedAuthor? Author { get; }
         /// <summary>
-        ///     Gets the footer field of the embed, or <see langword="null" /> if none is set.
+        ///     Gets the footer field of this embed.
         /// </summary>
+        /// <returns>
+        ///     The author field of the embed, or <c>null</c> if none is set.
+        /// </returns>
         EmbedFooter? Footer { get; }
         /// <summary>
-        ///     Gets the provider of the embed, or <see langword="null" /> if none is set.
+        ///     Gets the provider of this embed.
         /// </summary>
+        /// <returns>
+        ///     The source of the embed, or <c>null</c> if none is set.
+        /// </returns>
         EmbedProvider? Provider { get; }
         /// <summary>
-        ///     Gets the thumbnail featured in the embed, or <see langword="null" /> if none is set.
+        ///     Gets the thumbnail featured in this embed.
         /// </summary>
+        /// <returns>
+        ///     The thumbnail featured in the embed, or <c>null</c> if none is set.
+        /// </returns>
         EmbedThumbnail? Thumbnail { get; }
         /// <summary>
         ///     Gets the fields of the embed.
         /// </summary>
+        /// <returns>
+        ///     An array of the fields of the embed.
+        /// </returns>
         ImmutableArray<EmbedField> Fields { get; }
     }
 }

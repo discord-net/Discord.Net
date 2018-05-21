@@ -107,7 +107,7 @@ be found in @Guides.Commands.TypeReaders.
 #### Optional Parameters
 
 Parameters, by default, are always required. To make a parameter
-optional, give it a default value (i.e. `int num = 0`).
+optional, give it a default value (i.e., `int num = 0`).
 
 #### Parameters with Spaces
 

@@ -13,11 +13,11 @@ namespace Discord
         /// </summary>
         string Email { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if this user's email has been verified.
+        ///     Returns <c>true</c> if this user's email has been verified.
         /// </summary>
         bool IsVerified { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if this user has enabled MFA on their account.
+        ///     Returns <c>true</c> if this user has enabled MFA on their account.
         /// </summary>
         bool IsMfaEnabled { get; }
 

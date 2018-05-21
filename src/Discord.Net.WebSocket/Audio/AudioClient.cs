@@ -16,7 +16,7 @@ using System.Collections.Generic;
 namespace Discord.Audio
 {
     //TODO: Add audio reconnecting
-    internal partial class AudioClient : IAudioClient, IDisposable
+    internal partial class AudioClient : IAudioClient
     {
         internal struct StreamPair
         {

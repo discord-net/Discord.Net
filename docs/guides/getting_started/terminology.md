@@ -28,13 +28,13 @@ addon will run on all platforms.
 
 `Discord.Net.Rest` provides a set of concrete classes to be used
 **strictly** with the REST portion of Discord's API. Entities in this
-implementation are prefixed with `Rest` (e.g. `RestChannel`).
+implementation are prefixed with `Rest` (e.g., `RestChannel`).
 
 `Discord.Net.Rpc` provides a set of concrete classes that are used
 with Discord's RPC API. Entities in this implementation are prefixed
-with `Rpc` (e.g. `RpcChannel`).
+with `Rpc` (e.g., `RpcChannel`).
 
 `Discord.Net.WebSocket` provides a set of concrete classes that are
 used primarily with Discord's WebSocket API or entities that are kept
 in cache. When developing bots, you will be using this implementation.
-All entities are prefixed with `Socket` (e.g. `SocketChannel`).
+All entities are prefixed with `Socket` (e.g., `SocketChannel`).

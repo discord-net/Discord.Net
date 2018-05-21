@@ -17,11 +17,11 @@ namespace Discord
         /// </summary>
         MessageSource Source { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if this message was sent as a text-to-speech message.
+        ///     Returns <c>true</c> if this message was sent as a text-to-speech message.
         /// </summary>
         bool IsTTS { get; }
         /// <summary>
-        ///     Returns <see langword="true"/> if this message was added to its channel's pinned messages.
+        ///     Returns <c>true</c> if this message was added to its channel's pinned messages.
         /// </summary>
         bool IsPinned { get; }
         /// <summary>
@@ -31,14 +31,20 @@ namespace Discord
         /// <summary>
         ///     Gets the time this message was sent.
         /// </summary>
+        /// <returns>
+        ///     Time of when the message was sent.
+        /// </returns>
         DateTimeOffset Timestamp { get; }
         /// <summary>
-        ///     Gets the time of this message's last edit, or <see langword="null" /> if none is set.
+        ///     Gets the time of this message's last edit.
         /// </summary>
+        /// <returns>
+        ///     Time of when the message was last edited; <c>null</c> when the message is never edited.
+        /// </returns>
         DateTimeOffset? EditedTimestamp { get; }
         
         /// <summary>
-        ///     Gets the channel this message was sent to.
+        ///     Gets the source channel of the message.
         /// </summary>
         IMessageChannel Channel { get; }
         /// <summary>
@@ -49,10 +55,16 @@ namespace Discord
         /// <summary>
         ///     Returns all attachments included in this message.
         /// </summary>
+        /// <returns>
+        ///     Collection of attachments.
+        /// </returns>
         IReadOnlyCollection<IAttachment> Attachments { get; }
         /// <summary>
         ///     Returns all embeds included in this message.
         /// </summary>
+        /// <returns>
+        ///     Collection of embed objects.
+        /// </returns>
         IReadOnlyCollection<IEmbed> Embeds { get; }
         /// <summary>
         ///     Returns all tags included in this message's content.
@@ -61,14 +73,23 @@ namespace Discord
         /// <summary>
         ///     Returns the IDs of channels mentioned in this message.
         /// </summary>
+        /// <returns>
+        ///     Collection of channel IDs.
+        /// </returns>
         IReadOnlyCollection<ulong> MentionedChannelIds { get; }
         /// <summary>
         ///     Returns the IDs of roles mentioned in this message.
         /// </summary>
+        /// <returns>
+        ///     Collection of role IDs.
+        /// </returns>
         IReadOnlyCollection<ulong> MentionedRoleIds { get; }
         /// <summary>
         ///     Returns the IDs of users mentioned in this message.
         /// </summary>
+        /// <returns>
+        ///     Collection of user IDs.
+        /// </returns>
         IReadOnlyCollection<ulong> MentionedUserIds { get; }
     }
 }

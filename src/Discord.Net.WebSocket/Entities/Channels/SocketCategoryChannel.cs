@@ -14,6 +14,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketCategoryChannel : SocketGuildChannel, ICategoryChannel
     {
+        /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuildUser> Users
             => Guild.Users.Where(x => Permissions.GetValue(
                Permissions.ResolveChannel(Guild, x, this, Permissions.ResolveGuild(Guild, x)),

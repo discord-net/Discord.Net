@@ -15,7 +15,7 @@ namespace Discord.WebSocket
         public const string GatewayEncoding = "json";
 
         /// <summary>
-        ///     Gets or sets the WebSocket host to connect to. If <see langword="null"/>, the client will use the
+        ///     Gets or sets the WebSocket host to connect to. If <c>null</c>, the client will use the
         ///     /gateway endpoint.
         /// </summary>
         public string GatewayHost { get; set; } = null;

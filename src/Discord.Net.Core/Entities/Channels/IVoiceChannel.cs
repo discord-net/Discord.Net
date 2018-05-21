@@ -14,7 +14,7 @@ namespace Discord
         int Bitrate { get; }
         /// <summary>
         ///     Gets the max amount of users allowed to be connected to this channel at one time, or
-        ///     <see langword="null"/> if none is set.
+        ///     <c>null</c> if none is set.
         /// </summary>
         int? UserLimit { get; }
 

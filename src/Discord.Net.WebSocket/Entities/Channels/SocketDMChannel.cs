@@ -30,7 +30,7 @@ namespace Discord.WebSocket
             Recipient = recipient;
             recipient.GlobalUser.AddRef();
             if (Discord.MessageCacheSize > 0)
-                _messages = new MessageCache(Discord, this);
+                _messages = new MessageCache(Discord);
         }
         internal static SocketDMChannel Create(DiscordSocketClient discord, ClientState state, Model model)
         {
@@ -78,6 +78,7 @@ namespace Discord.WebSocket
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
 
         /// <inheritdoc />
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
 #if FILESYSTEM
@@ -86,6 +87,7 @@ namespace Discord.WebSocket
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, options);
 #endif
         /// <inheritdoc />
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options);
 

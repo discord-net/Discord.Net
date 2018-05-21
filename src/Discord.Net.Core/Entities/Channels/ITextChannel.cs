@@ -14,7 +14,7 @@ namespace Discord
         ///     Determines whether the channel is NSFW.
         /// </summary>
         /// <returns>
-        ///     <see langword="true"/> if the channel has the NSFW flag enabled; otherwise, <see langword="false"/>.
+        ///     <c>true</c> if the channel has the NSFW flag enabled; otherwise, <c>false</c>.
         /// </returns>
         bool IsNsfw { get; }
 
@@ -22,19 +22,29 @@ namespace Discord
         ///     Gets the current topic for this text channel.
         /// </summary>
         /// <returns>
-        ///     The topic set in the channel, or <see langword="null"/> if none is set.
+        ///     The topic set in the channel, or <c>null</c> if none is set.
         /// </returns>
         string Topic { get; }
 
         /// <summary>
         ///     Bulk-deletes multiple messages.
         /// </summary>
+        /// <remarks>
+        ///     <note type="important">
+        ///     This method can only remove messages that are posted within 14 days!
+        ///     </note>
+        /// </remarks>
         /// <param name="messages">The messages to be bulk-deleted.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null);
         /// <summary>
         ///     Bulk-deletes multiple messages.
         /// </summary>
+        /// <remarks>
+        ///     <note type="important">
+        ///     This method can only remove messages that are posted within 14 days!
+        ///     </note>
+        /// </remarks>
         /// <param name="messageIds">The IDs of the messages to be bulk-deleted.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null);
@@ -62,7 +72,7 @@ namespace Discord
         /// <param name="id">The ID of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A webhook associated with the <paramref name="id"/>, or <see langword="null"/> if not found.
+        ///     A webhook associated with the <paramref name="id"/>, or <c>null</c> if not found.
         /// </returns>
         Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
         /// <summary>

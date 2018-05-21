@@ -35,6 +35,7 @@ namespace Discord.WebSocket
             return entity;
         }
 
+        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Group)";
         internal new SocketGroupUser Clone() => MemberwiseClone() as SocketGroupUser;
 
         //IVoiceState

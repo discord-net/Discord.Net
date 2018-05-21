@@ -27,8 +27,8 @@ Discord Applications Portal first.
     ![Step 5](images/intro-create-bot.png)
 
 6. Confirm the popup.
-7. If this bot will be public, check "Public Bot." **Do not tick any
-    other options!**
+7. (Optional) If this bot will be public, check "Public Bot."
+    * **Do not tick any other options!**
 
 [Discord Applications Portal]: https://discordapp.com/developers/applications/me
 
@@ -38,15 +38,18 @@ Bots **cannot** use invite links; they must be explicitly invited
 through the OAuth2 flow.
 
 1. Open your bot's application on the [Discord Applications Portal].
-2. Retrieve the application's **Client ID**.
+2. Navigate to `OAuth2 URL Generator` and click on `Generate OAuth2 URL`.
 
-    ![Step 2](images/intro-client-id.png)
+    ![Step 2](images/intro-generate-oauth.png)
 
-3. Create an OAuth2 authorization URL
+3. Select the permissions that you wish to assign your bot with.
 
-    - `https://discordapp.com/oauth2/authorize?client_id=<CLIENT ID>&scope=bot`
+    > [!NOTE]
+    > This will assign the bot with a special "managed" role that no
+    > one else can use. The permissions can be changed later in the
+    > roles settings if you ever change your mind!
 
-4. Open the authorization URL in your browser.
+4. Open the generated authorization URL in your browser.
 5. Select a server.
 6. Click on authorize.
 

@@ -16,5 +16,5 @@ public Task EchoAsync(string text) => ReplyAsync(text);
 //	Wrapping the message in quotes solves this.
 //	This way, the system knows the entire message is to be parsed as a 
 //	single String.
-//	e.g. 
+//	e.g., 
 //		!echo "Coffee Cake"

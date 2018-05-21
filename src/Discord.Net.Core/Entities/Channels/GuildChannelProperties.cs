@@ -3,14 +3,7 @@ namespace Discord
     /// <summary>
     ///     Properties that are used to modify an <see cref="IGuildChannel" /> with the specified changes.
     /// </summary>
-    /// <example>
-    ///     <code lang="c#">
-    ///         await (Context.Channel as ITextChannel)?.ModifyAsync(x =&gt;
-    ///         {
-    ///             x.Name = "do-not-enter";
-    ///         });
-    ///     </code>
-    /// </example>
+    /// <seealso cref="IGuildChannel.ModifyAsync"/>
     public class GuildChannelProperties
     {
         /// <summary>

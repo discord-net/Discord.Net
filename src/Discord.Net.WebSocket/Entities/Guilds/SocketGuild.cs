@@ -91,11 +91,11 @@ namespace Discord.WebSocket
         public Task SyncPromise => _syncPromise.Task;
         public Task DownloaderPromise => _downloaderPromise.Task;
         /// <summary>
-        ///     Returns the <see cref="IAudioClient" /> associated with this guild.
+        ///     Gets the <see cref="IAudioClient" /> associated with this guild.
         /// </summary>
         public IAudioClient AudioClient => _audioClient;
         /// <summary>
-        ///     Returns the first viewable text channel.
+        ///     Gets the first viewable text channel.
         /// </summary>
         /// <remarks>
         ///     This property does not guarantee the user can send message to it.
@@ -105,7 +105,7 @@ namespace Discord.WebSocket
             .OrderBy(c => c.Position)
             .FirstOrDefault();
         /// <summary>
-        ///     Returns the AFK voice channel, or <see langword="null" /> if none is set.
+        ///     Gets the AFK voice channel, or <c>null</c> if none is set.
         /// </summary>
         public SocketVoiceChannel AFKChannel
         {
@@ -116,7 +116,7 @@ namespace Discord.WebSocket
             }
         }
         /// <summary>
-        ///     Gets the embed channel set in the widget settings of this guild, or <see langword="null"/> if none is set.
+        ///     Gets the embed channel set in the widget settings of this guild, or <c>null</c> if none is set.
         /// </summary>
         public SocketGuildChannel EmbedChannel
         {
@@ -127,7 +127,7 @@ namespace Discord.WebSocket
             }
         }
         /// <summary>
-        ///     Gets the channel where randomized welcome messages are sent, or <see langword="null"/> if none is set.
+        ///     Gets the channel where randomized welcome messages are sent, or <c>null</c> if none is set.
         /// </summary>
         public SocketTextChannel SystemChannel
         {
@@ -138,31 +138,34 @@ namespace Discord.WebSocket
             }
         }
         /// <summary>
-        ///     Returns a collection of text channels present in this guild.
+        ///     Gets a collection of text channels present in this guild.
         /// </summary>
         public IReadOnlyCollection<SocketTextChannel> TextChannels
             => Channels.Select(x => x as SocketTextChannel).Where(x => x != null).ToImmutableArray();
         /// <summary>
-        ///     Returns a collection of voice channels present in this guild.
+        ///     Gets a collection of voice channels present in this guild.
         /// </summary>
         public IReadOnlyCollection<SocketVoiceChannel> VoiceChannels
             => Channels.Select(x => x as SocketVoiceChannel).Where(x => x != null).ToImmutableArray();
         /// <summary>
-        ///     Returns a collection of category channels present in this guild.
+        ///     Gets a collection of category channels present in this guild.
         /// </summary>
         public IReadOnlyCollection<SocketCategoryChannel> CategoryChannels
             => Channels.Select(x => x as SocketCategoryChannel).Where(x => x != null).ToImmutableArray();
         /// <summary>
-        ///     Returns the current logged-in user.
+        ///     Gets the current logged-in user.
         /// </summary>
         public SocketGuildUser CurrentUser => _members.TryGetValue(Discord.CurrentUser.Id, out SocketGuildUser member) ? member : null;
         /// <summary>
-        ///     Returns the @everyone role in this guild.
+        ///     Gets the @everyone role in this guild.
         /// </summary>
         public SocketRole EveryoneRole => GetRole(Id);
         /// <summary>
-        ///     Returns a collection of channels present in this guild.
+        ///     Gets a collection of channels present in this guild.
         /// </summary>
+        /// <returns>
+        ///     Collection of channels.
+        /// </returns>
         public IReadOnlyCollection<SocketGuildChannel> Channels
         {
             get
@@ -175,10 +178,16 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets a collection of emotes created in this guild.
         /// </summary>
+        /// <returns>
+        ///     Collection of emotes.
+        /// </returns>
         public IReadOnlyCollection<GuildEmote> Emotes => _emotes;
         /// <summary>
         ///     Gets a collection of features enabled in this guild.
         /// </summary>
+        /// <returns>
+        ///     Collection of features in string.
+        /// </returns>
         public IReadOnlyCollection<string> Features => _features;
         /// <summary>
         ///     Gets a collection of users in this guild.
@@ -188,10 +197,16 @@ namespace Discord.WebSocket
         /// You may need to enable <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/> to fetch the full user list
         /// upon startup, or use <see cref="DownloadUsersAsync"/> to manually download the users.
         /// </remarks>
+        /// <returns>
+        ///     Collection of users.
+        /// </returns>
         public IReadOnlyCollection<SocketGuildUser> Users => _members.ToReadOnlyCollection();
         /// <summary>
         ///     Gets a collection of roles in this guild.
         /// </summary>
+        /// <returns>
+        ///     Collection of roles.
+        /// </returns>
         public IReadOnlyCollection<SocketRole> Roles => _roles.ToReadOnlyCollection();
 
         internal SocketGuild(DiscordSocketClient client, ulong id)
@@ -357,12 +372,12 @@ namespace Discord.WebSocket
             => GuildHelper.DeleteAsync(this, Discord, options);
 
         /// <inheritdoc />
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
         public Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyAsync(this, Discord, func, options);
 
         /// <inheritdoc />
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
         public Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyEmbedAsync(this, Discord, func, options);
         /// <inheritdoc />
@@ -378,7 +393,7 @@ namespace Discord.WebSocket
 
         //Bans
         /// <summary>
-        ///     Gets a collection of the banned users in this guild.
+        ///     Returns a collection of the banned users in this guild.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
@@ -386,6 +401,10 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<IReadOnlyCollection<RestBan>> GetBansAsync(RequestOptions options = null)
             => GuildHelper.GetBansAsync(this, Discord, options);
+        public Task<RestBan> GetBanAsync(IUser user, RequestOptions options = null)
+            => GuildHelper.GetBanAsync(this, Discord, user.Id, options);
+        public Task<RestBan> GetBanAsync(ulong userId, RequestOptions options = null)
+            => GuildHelper.GetBanAsync(this, Discord, userId, options);
 
         /// <inheritdoc />
         public Task AddBanAsync(IUser user, int pruneDays = 0, string reason = null, RequestOptions options = null)
@@ -440,7 +459,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="name">The name of the new channel.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
         /// <returns>
         ///     The created text channel.
         /// </returns>
@@ -452,7 +471,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="name">The name of the new channel.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
         /// <returns>
         ///     The created voice channel.
         /// </returns>
@@ -464,7 +483,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="name">The name of the new channel.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
         /// <returns>
         ///     The created category channel.
         /// </returns>
@@ -522,12 +541,12 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="name">The name of the new role.</param>
         /// <param name="permissions">
-        /// The permissions that the new role possesses. Set to <see langword="null" /> to use the default permissions.
+        /// The permissions that the new role possesses. Set to <c>null</c> to use the default permissions.
         /// </param>
-        /// <param name="color">The color of the role. Set to <see langword="null" /> to use the default color.</param>
+        /// <param name="color">The color of the role. Set to <c>null</c> to use the default color.</param>
         /// <param name="isHoisted">Used to determine if users of this role are separated in the user list.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
         /// <returns>
         ///     The created role.
         /// </returns>
@@ -627,6 +646,10 @@ namespace Discord.WebSocket
             _downloaderPromise.TrySetResultAsync(true);
         }
 
+        //Audit logs
+        public IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(int limit, RequestOptions options = null)
+            => GuildHelper.GetAuditLogsAsync(this, Discord, null, limit, options);
+
         //Webhooks
         /// <summary>
         ///     Returns the webhook with the provided ID.
@@ -634,7 +657,7 @@ namespace Discord.WebSocket
         /// <param name="id">The ID of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A webhook associated with the ID.
+        ///     An awaitable Task containing the webhook associated with the ID.
         /// </returns>
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => GuildHelper.GetWebhookAsync(this, Discord, id, options);
@@ -643,7 +666,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A collection of webhooks.
+        ///     An awaitable Task containing a collection of webhooks.
         /// </returns>
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => GuildHelper.GetWebhooksAsync(this, Discord, options);
@@ -656,7 +679,7 @@ namespace Discord.WebSocket
         public Task<GuildEmote> CreateEmoteAsync(string name, Image image, Optional<IEnumerable<IRole>> roles = default(Optional<IEnumerable<IRole>>), RequestOptions options = null)
             => GuildHelper.CreateEmoteAsync(this, Discord, name, image, roles, options);
         /// <inheritdoc />
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
         public Task<GuildEmote> ModifyEmoteAsync(GuildEmote emote, Action<EmoteProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyEmoteAsync(this, Discord, emote.Id, func, options);
         /// <inheritdoc />
@@ -866,6 +889,12 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(RequestOptions options)
             => await GetBansAsync(options).ConfigureAwait(false);
+        /// <inheritdoc/>
+        async Task<IBan> IGuild.GetBanAsync(IUser user, RequestOptions options)
+            => await GetBanAsync(user, options).ConfigureAwait(false);
+        /// <inheritdoc/>
+        async Task<IBan> IGuild.GetBanAsync(ulong userId, RequestOptions options)
+            => await GetBanAsync(userId, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         Task<IReadOnlyCollection<IGuildChannel>> IGuild.GetChannelsAsync(CacheMode mode, RequestOptions options)
@@ -940,6 +969,14 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         Task<IGuildUser> IGuild.GetOwnerAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(Owner);
+
+        async Task<IReadOnlyCollection<IAuditLogEntry>> IGuild.GetAuditLogAsync(int limit, CacheMode cacheMode, RequestOptions options)
+        {
+            if (cacheMode == CacheMode.AllowDownload)
+                return (await GetAuditLogsAsync(limit, options).FlattenAsync().ConfigureAwait(false)).ToImmutableArray();
+            else
+                return ImmutableArray.Create<IAuditLogEntry>();
+        }
 
         /// <inheritdoc />
         async Task<IWebhook> IGuild.GetWebhookAsync(ulong id, RequestOptions options)

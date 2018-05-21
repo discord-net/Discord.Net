@@ -6,27 +6,27 @@ namespace Discord
     public interface IVoiceState
     {
         /// <summary>
-        ///     Returns <see langword="true" /> if the guild has deafened this user.
+        ///     Returns <c>true</c> if the guild has deafened this user.
         /// </summary>
         bool IsDeafened { get; }
         /// <summary>
-        ///     Returns <see langword="true" /> if the guild has muted this user.
+        ///     Returns <c>true</c> if the guild has muted this user.
         /// </summary>
         bool IsMuted { get; }
         /// <summary>
-        ///     Returns <see langword="true" /> if this user has marked themselves as deafened.
+        ///     Returns <c>true</c> if this user has marked themselves as deafened.
         /// </summary>
         bool IsSelfDeafened { get; }
         /// <summary>
-        ///     Returns <see langword="true" /> if this user has marked themselves as muted.
+        ///     Returns <c>true</c> if this user has marked themselves as muted.
         /// </summary>
         bool IsSelfMuted { get; }
         /// <summary>
-        ///     Returns <see langword="true" /> if the guild is temporarily blocking audio to/from this user.
+        ///     Returns <c>true</c> if the guild is temporarily blocking audio to/from this user.
         /// </summary>
         bool IsSuppressed { get; }
         /// <summary>
-        ///     Gets the voice channel this user is currently in, or <see langword="null"/> if none.
+        ///     Gets the voice channel this user is currently in, or <c>null</c> if none.
         /// </summary>
         IVoiceChannel VoiceChannel { get; }
         /// <summary>
