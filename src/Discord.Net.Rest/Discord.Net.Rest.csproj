@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../../Discord.Net.targets" />
   <PropertyGroup>
     <AssemblyName>Discord.Net.Rest</AssemblyName>
@@ -10,9 +10,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' != 'net45' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
     <PackageReference Include="System.Net.Http" Version="4.3.3" />
- </ItemGroup>
+  </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System.Net.Http" />
   </ItemGroup>
