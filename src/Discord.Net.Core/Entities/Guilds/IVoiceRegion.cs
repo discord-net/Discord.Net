@@ -1,4 +1,4 @@
-﻿namespace Discord
+namespace Discord
 {
     public interface IVoiceRegion
     {
@@ -10,9 +10,9 @@
         bool IsVip { get; }
         /// <summary> Returns true if this voice region is the closest to your machine. </summary>
         bool IsOptimal { get; }
-        /// <summary> Gets an example hostname for this voice region. </summary>
-        string SampleHostname { get; }
-        /// <summary> Gets an example port for this voice region. </summary>
-        int SamplePort { get; }
+        /// <summary> Returns true if this is a deprecated voice region (avoid switching to these). </summary>
+        bool IsDeprecated { get; }
+        /// <summary> Returns true if this is a custom voice region (used for events/etc) </summary>
+        bool IsCustom { get; }
     }
 }
