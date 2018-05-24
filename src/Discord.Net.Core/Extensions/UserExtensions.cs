@@ -9,7 +9,7 @@ namespace Discord
         /// Sends a message to the user via DM.
         /// </summary>
         public static async Task<IUserMessage> SendMessageAsync(this IUser user,
-            string text,
+            string text = null,
             bool isTTS = false,
             Embed embed = null,
             RequestOptions options = null)
