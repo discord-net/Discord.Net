@@ -65,6 +65,10 @@ namespace Discord.Commands
                 _defaultTypeReaders[typeof(Nullable<>).MakeGenericType(type)] = NullableTypeReader.Create(type, _defaultTypeReaders[type]);
             }
 
+            var tsreader = new TimeSpanTypeReader();
+            _defaultTypeReaders[typeof(TimeSpan)] = tsreader;
+            _defaultTypeReaders[typeof(TimeSpan?)] = NullableTypeReader.Create(typeof(TimeSpan), tsreader);
+
             _defaultTypeReaders[typeof(string)] =
                 new PrimitiveTypeReader<string>((string x, out string y) => { y = x; return true; }, 0);
 
