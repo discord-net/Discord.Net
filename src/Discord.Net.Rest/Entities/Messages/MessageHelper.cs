@@ -46,13 +46,38 @@ namespace Discord.Rest
             await client.ApiClient.RemoveAllReactionsAsync(msg.Channel.Id, msg.Id, options);
         }
 
-        public static async Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, IEmote emote,
-            Action<GetReactionUsersParams> func, BaseDiscordClient client, RequestOptions options)
+        public static IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, IEmote emote,
+            int? limit, BaseDiscordClient client, RequestOptions options)
         {
-            var args = new GetReactionUsersParams();
-            func(args);
-            string emoji = (emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name);
-            return (await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false)).Select(u => RestUser.Create(client, u)).ToImmutableArray();
+            Preconditions.NotNull(emote, nameof(emote));
+            var emoji = (emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name);
+
+            return new PagedAsyncEnumerable<IUser>(
+                DiscordConfig.MaxUserReactionsPerBatch,
+                async (info, ct) =>
+                {
+                    var args = new GetReactionUsersParams
+                    {
+                        Limit = info.PageSize
+                    };
+
+                    if (info.Position != null)
+                        args.AfterUserId = info.Position.Value;
+
+                    var models = await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false);
+                    return models.Select(x => RestUser.Create(client, x)).ToImmutableArray();
+                },
+                nextPage: (info, lastPage) =>
+                {
+                    if (lastPage.Count != DiscordConfig.MaxUsersPerBatch)
+                        return false;
+
+                    info.Position = lastPage.Max(x => x.Id);
+                    return true;
+                },
+                count: limit
+            );
+
         }
 
         public static async Task PinAsync(IMessage msg, BaseDiscordClient client,

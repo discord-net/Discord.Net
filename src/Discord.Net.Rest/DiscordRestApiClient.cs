@@ -618,11 +618,11 @@ namespace Discord.API
             Preconditions.NotNullOrWhitespace(emoji, nameof(emoji));
             Preconditions.NotNull(args, nameof(args));
             Preconditions.GreaterThan(args.Limit, 0, nameof(args.Limit));
-            Preconditions.AtMost(args.Limit, DiscordConfig.MaxUsersPerBatch, nameof(args.Limit));
+            Preconditions.AtMost(args.Limit, DiscordConfig.MaxUserReactionsPerBatch, nameof(args.Limit));
             Preconditions.GreaterThan(args.AfterUserId, 0, nameof(args.AfterUserId));
             options = RequestOptions.CreateOrClone(options);
 
-            int limit = args.Limit.GetValueOrDefault(int.MaxValue);
+            int limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxUserReactionsPerBatch);
             ulong afterUserId = args.AfterUserId.GetValueOrDefault(0);
 
             var ids = new BucketIds(channelId: channelId);
