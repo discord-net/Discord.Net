@@ -109,9 +109,9 @@ namespace Discord
         Task<ITextChannel> GetDefaultChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<IGuildChannel> GetEmbedChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Creates a new text channel. </summary>
-        Task<ITextChannel> CreateTextChannelAsync(string name, RequestOptions options = null);
+        Task<ITextChannel> CreateTextChannelAsync(string name, RequestOptions options = null, Action<TextChannelProperties> func = null);
         /// <summary> Creates a new voice channel. </summary>
-        Task<IVoiceChannel> CreateVoiceChannelAsync(string name, RequestOptions options = null);
+        Task<IVoiceChannel> CreateVoiceChannelAsync(string name, RequestOptions options = null, Action<VoiceChannelProperties> func = null);
         /// <summary> Creates a new channel category. </summary>
         Task<ICategoryChannel> CreateCategoryAsync(string name, RequestOptions options = null);
 
