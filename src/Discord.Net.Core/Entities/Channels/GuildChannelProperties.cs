@@ -1,4 +1,4 @@
-﻿namespace Discord
+namespace Discord
 {
     /// <summary>
     /// Modify an IGuildChannel with the specified changes.
@@ -30,5 +30,9 @@
         /// Sets the category for this channel
         /// </summary>
         public Optional<ulong?> CategoryId { get; set; }
+        /// <summary>
+        /// Syncs the permission with the channel's parent (category).
+        /// </summary>
+        public Optional<bool> SyncWithCategory { get; set; }
     }
 }

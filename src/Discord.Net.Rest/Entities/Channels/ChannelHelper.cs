@@ -19,6 +19,7 @@ namespace Discord.Rest
         {
             await client.ApiClient.DeleteChannelAsync(channel.Id, options).ConfigureAwait(false);
         }
+
         public static async Task<Model> ModifyAsync(IGuildChannel channel, BaseDiscordClient client,
             Action<GuildChannelProperties> func,
             RequestOptions options)
@@ -31,6 +32,16 @@ namespace Discord.Rest
                 Position = args.Position,
                 CategoryId = args.CategoryId
             };
+            if (args.SyncWithCategory.IsSpecified && args.SyncWithCategory.Value)
+            {
+                var categoryChannel = await channel.GetCategoryAsync().ConfigureAwait(false);
+                if (categoryChannel != null)
+                    apiArgs.Overwrites = categoryChannel.PermissionOverwrites
+                        .Select(overwrite => new API.Overwrite(overwrite.TargetId, overwrite.TargetType,
+                            overwrite.Permissions.AllowValue, overwrite.Permissions.DenyValue))
+                        .ToArray();
+            }
+
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task<Model> ModifyAsync(ITextChannel channel, BaseDiscordClient client,
