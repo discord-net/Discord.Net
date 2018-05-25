@@ -63,7 +63,7 @@ namespace Discord.Webhook
             => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent);
         
         /// <summary> Sends a message using to the channel for this webhook. Returns the ID of the created message. </summary>
-        public Task<ulong> SendMessageAsync(string text, bool isTTS = false, IEnumerable<Embed> embeds = null,
+        public Task<ulong> SendMessageAsync(string text = null, bool isTTS = false, IEnumerable<Embed> embeds = null,
             string username = null, string avatarUrl = null, RequestOptions options = null)
             => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, options);
 

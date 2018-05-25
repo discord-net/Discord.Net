@@ -25,10 +25,12 @@ namespace Discord.Rest
             };
             return await client.ApiClient.ModifyMessageAsync(msg.Channel.Id, msg.Id, apiArgs, options).ConfigureAwait(false);
         }
-        public static async Task DeleteAsync(IMessage msg, BaseDiscordClient client,
+        public static Task DeleteAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
+            => DeleteAsync(msg.Channel.Id, msg.Id, client, options);
+        public static async Task DeleteAsync(ulong channelId, ulong msgId, BaseDiscordClient client,
             RequestOptions options)
         {
-            await client.ApiClient.DeleteMessageAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
+            await client.ApiClient.DeleteMessageAsync(channelId, msgId, options).ConfigureAwait(false);
         }
 
         public static async Task AddReactionAsync(IMessage msg, IEmote emote, BaseDiscordClient client, RequestOptions options)
@@ -46,13 +48,38 @@ namespace Discord.Rest
             await client.ApiClient.RemoveAllReactionsAsync(msg.Channel.Id, msg.Id, options);
         }
 
-        public static async Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, IEmote emote,
-            Action<GetReactionUsersParams> func, BaseDiscordClient client, RequestOptions options)
+        public static IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, IEmote emote,
+            int? limit, BaseDiscordClient client, RequestOptions options)
         {
-            var args = new GetReactionUsersParams();
-            func(args);
-            string emoji = (emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name);
-            return (await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false)).Select(u => RestUser.Create(client, u)).ToImmutableArray();
+            Preconditions.NotNull(emote, nameof(emote));
+            var emoji = (emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name);
+
+            return new PagedAsyncEnumerable<IUser>(
+                DiscordConfig.MaxUserReactionsPerBatch,
+                async (info, ct) =>
+                {
+                    var args = new GetReactionUsersParams
+                    {
+                        Limit = info.PageSize
+                    };
+
+                    if (info.Position != null)
+                        args.AfterUserId = info.Position.Value;
+
+                    var models = await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false);
+                    return models.Select(x => RestUser.Create(client, x)).ToImmutableArray();
+                },
+                nextPage: (info, lastPage) =>
+                {
+                    if (lastPage.Count != DiscordConfig.MaxUsersPerBatch)
+                        return false;
+
+                    info.Position = lastPage.Max(x => x.Id);
+                    return true;
+                },
+                count: limit
+            );
+
         }
 
         public static async Task PinAsync(IMessage msg, BaseDiscordClient client,

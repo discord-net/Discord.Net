@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
@@ -29,7 +29,7 @@ namespace Discord.Commands
             parserBuilder[typeof(decimal)] = (TryParseDelegate<decimal>)decimal.TryParse;
             parserBuilder[typeof(DateTime)] = (TryParseDelegate<DateTime>)DateTime.TryParse;
             parserBuilder[typeof(DateTimeOffset)] = (TryParseDelegate<DateTimeOffset>)DateTimeOffset.TryParse;
-            parserBuilder[typeof(TimeSpan)] = (TryParseDelegate<TimeSpan>)TimeSpan.TryParse;
+            //parserBuilder[typeof(TimeSpan)] = (TryParseDelegate<TimeSpan>)TimeSpan.TryParse;
             parserBuilder[typeof(char)] = (TryParseDelegate<char>)char.TryParse;
             return parserBuilder.ToImmutable();
         }

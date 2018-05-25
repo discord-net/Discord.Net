@@ -618,11 +618,11 @@ namespace Discord.API
             Preconditions.NotNullOrWhitespace(emoji, nameof(emoji));
             Preconditions.NotNull(args, nameof(args));
             Preconditions.GreaterThan(args.Limit, 0, nameof(args.Limit));
-            Preconditions.AtMost(args.Limit, DiscordConfig.MaxUsersPerBatch, nameof(args.Limit));
+            Preconditions.AtMost(args.Limit, DiscordConfig.MaxUserReactionsPerBatch, nameof(args.Limit));
             Preconditions.GreaterThan(args.AfterUserId, 0, nameof(args.AfterUserId));
             options = RequestOptions.CreateOrClone(options);
 
-            int limit = args.Limit.GetValueOrDefault(int.MaxValue);
+            int limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxUserReactionsPerBatch);
             ulong afterUserId = args.AfterUserId.GetValueOrDefault(0);
 
             var ids = new BucketIds(channelId: channelId);
@@ -799,6 +799,15 @@ namespace Discord.API
 
             var ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<Ban>>("GET", () => $"guilds/{guildId}/bans", ids, options: options).ConfigureAwait(false);
+        }
+        public async Task<Ban> GetGuildBanAsync(ulong guildId, ulong userId, RequestOptions options)
+        {
+            Preconditions.NotEqual(userId, 0, nameof(userId));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(guildId: guildId);
+            return await SendAsync<Ban>("GET", () => $"guilds/{guildId}/bans/{userId}", ids, options: options).ConfigureAwait(false);
         }
         public async Task CreateGuildBanAsync(ulong guildId, ulong userId, CreateGuildBanParams args, RequestOptions options = null)
         {
@@ -1195,6 +1204,26 @@ namespace Discord.API
 
             var ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<VoiceRegion>>("GET", () => $"guilds/{guildId}/regions", ids, options: options).ConfigureAwait(false);
+        }
+
+        //Audit logs
+        public async Task<AuditLog> GetAuditLogsAsync(ulong guildId, GetAuditLogsParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+            options = RequestOptions.CreateOrClone(options);
+
+            int limit = args.Limit.GetValueOrDefault(int.MaxValue);
+
+            var ids = new BucketIds(guildId: guildId);
+            Expression<Func<string>> endpoint;
+
+            if (args.BeforeEntryId.IsSpecified)
+                endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}&before={args.BeforeEntryId.Value}";
+            else
+                endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}";
+
+            return await SendAsync<AuditLog>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
 
         //Webhooks
