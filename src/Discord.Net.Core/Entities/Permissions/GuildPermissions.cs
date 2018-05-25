@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord
@@ -35,7 +36,10 @@ namespace Discord
         public bool ViewAuditLog => Permissions.GetValue(RawValue, GuildPermission.ViewAuditLog);
 
         /// <summary> If True, a user may join channels. </summary>
-        public bool ReadMessages => Permissions.GetValue(RawValue, GuildPermission.ReadMessages);
+        [Obsolete("Use ViewChannel instead.")]
+        public bool ReadMessages => ViewChannel;
+        /// <summary> If True, a user may view channels. </summary>
+        public bool ViewChannel => Permissions.GetValue(RawValue, GuildPermission.ViewChannel);
         /// <summary> If True, a user may send messages. </summary>
         public bool SendMessages => Permissions.GetValue(RawValue, GuildPermission.SendMessages);
         /// <summary> If True, a user may send text-to-speech messages. </summary>
