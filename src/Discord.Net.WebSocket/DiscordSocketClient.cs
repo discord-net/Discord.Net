@@ -365,7 +365,7 @@ namespace Discord.WebSocket
             await ApiClient.SendStatusUpdateAsync(
                 status,
                 status == UserStatus.AFK,
-                statusSince != null ? DateTimeUtils.ToUnixMilliseconds(_statusSince.Value) : (long?)null,
+                statusSince != null ? _statusSince.Value.ToUnixTimeMilliseconds() : (long?)null,
                 gameModel).ConfigureAwait(false);
         }
 

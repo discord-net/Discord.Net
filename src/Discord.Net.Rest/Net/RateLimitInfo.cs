@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Discord.Net
@@ -21,7 +21,7 @@ namespace Discord.Net
             Remaining = headers.TryGetValue("X-RateLimit-Remaining", out temp) && 
                 int.TryParse(temp, out var remaining) ? remaining : (int?)null;
             Reset = headers.TryGetValue("X-RateLimit-Reset", out temp) && 
-                int.TryParse(temp, out var reset) ? DateTimeUtils.FromUnixSeconds(reset) : (DateTimeOffset?)null;
+                int.TryParse(temp, out var reset) ? DateTimeOffset.FromUnixTimeSeconds(reset) : (DateTimeOffset?)null;
             RetryAfter = headers.TryGetValue("Retry-After", out temp) &&
                 int.TryParse(temp, out var retryAfter) ? retryAfter : (int?)null;
             Lag = headers.TryGetValue("Date", out temp) &&

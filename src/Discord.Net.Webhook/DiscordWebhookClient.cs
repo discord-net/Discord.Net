@@ -67,12 +67,11 @@ namespace Discord.Webhook
             string username = null, string avatarUrl = null, RequestOptions options = null)
             => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, options);
 
-#if FILESYSTEM
         /// <summary> Send a message to the channel for this webhook with an attachment. Returns the ID of the created message. </summary>
         public Task<ulong> SendFileAsync(string filePath, string text, bool isTTS = false,
             IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null)
             => WebhookClientHelper.SendFileAsync(this, filePath, text, isTTS, embeds, username, avatarUrl, options);
-#endif
+
         /// <summary> Send a message to the channel for this webhook with an attachment. Returns the ID of the created message. </summary>
         public Task<ulong> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false,
             IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null)

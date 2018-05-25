@@ -49,35 +49,35 @@ namespace Discord
         }
         private static void CheckTextChannels(RestGuild guild, params RestTextChannel[] textChannels)
         {
-            Assert.Equal(textChannels.Length, 5);
+            Assert.Equal(5, textChannels.Length);
             Assert.All(textChannels, x =>
             {
                 Assert.NotNull(x);
-                Assert.NotEqual(x.Id, 0UL);
+                Assert.NotEqual(0UL, x.Id);
                 Assert.True(x.Position >= 0);
             });
 
-            var text1 = textChannels.Where(x => x.Name == "text1").FirstOrDefault();
-            var text2 = textChannels.Where(x => x.Name == "text2").FirstOrDefault();
-            var text3 = textChannels.Where(x => x.Name == "text3").FirstOrDefault();
-            var text4 = textChannels.Where(x => x.Name == "text4").FirstOrDefault();
-            var text5 = textChannels.Where(x => x.Name == "text5").FirstOrDefault();
+            var text1 = textChannels.FirstOrDefault(x => x.Name == "text1");
+            var text2 = textChannels.FirstOrDefault(x => x.Name == "text2");
+            var text3 = textChannels.FirstOrDefault(x => x.Name == "text3");
+            var text4 = textChannels.FirstOrDefault(x => x.Name == "text4");
+            var text5 = textChannels.FirstOrDefault(x => x.Name == "text5");
 
             Assert.NotNull(text1);
             //Assert.True(text1.Id == guild.DefaultChannelId);
-            Assert.Equal(text1.Position, 1);
-            Assert.Equal(text1.Topic, "Topic1");
+            Assert.Equal(1, text1.Position);
+            Assert.Equal("Topic1", text1.Topic);
 
             Assert.NotNull(text2);
-            Assert.Equal(text2.Position, 2);
+            Assert.Equal(2, text2.Position);
             Assert.Null(text2.Topic);
 
             Assert.NotNull(text3);
-            Assert.Equal(text3.Topic, "Topic2");
+            Assert.Equal("Topic2", text3.Topic);
 
             Assert.NotNull(text4);
-            Assert.Equal(text4.Position, 3);
-            Assert.Equal(text4.Topic, "Topic2");
+            Assert.Equal(3, text4.Position);
+            Assert.Equal("Topic2", text4.Topic);
 
             Assert.NotNull(text5);
             Assert.Null(text5.Topic);
@@ -114,31 +114,31 @@ namespace Discord
         }
         private static void CheckVoiceChannels(params RestVoiceChannel[] voiceChannels)
         {
-            Assert.Equal(voiceChannels.Length, 3);
+            Assert.Equal(3, voiceChannels.Length);
             Assert.All(voiceChannels, x =>
             {
                 Assert.NotNull(x);
-                Assert.NotEqual(x.Id, 0UL);
-                Assert.NotEqual(x.UserLimit, 0);
+                Assert.NotEqual(0UL, x.Id);
+                Assert.NotEqual(0, x.UserLimit);
                 Assert.True(x.Bitrate > 0);
                 Assert.True(x.Position >= 0);
             });
 
-            var voice1 = voiceChannels.Where(x => x.Name == "voice1").FirstOrDefault();
-            var voice2 = voiceChannels.Where(x => x.Name == "voice2").FirstOrDefault();
-            var voice3 = voiceChannels.Where(x => x.Name == "voice3").FirstOrDefault();
+            var voice1 = voiceChannels.FirstOrDefault(x => x.Name == "voice1");
+            var voice2 = voiceChannels.FirstOrDefault(x => x.Name == "voice2");
+            var voice3 = voiceChannels.FirstOrDefault(x => x.Name == "voice3");
 
             Assert.NotNull(voice1);
-            Assert.Equal(voice1.Bitrate, 96000);
-            Assert.Equal(voice1.Position, 1);
+            Assert.Equal(96000, voice1.Bitrate);
+            Assert.Equal(1, voice1.Position);
 
             Assert.NotNull(voice2);
-            Assert.Equal(voice2.UserLimit, null);
+            Assert.Null(voice2.UserLimit);
 
             Assert.NotNull(voice3);
-            Assert.Equal(voice3.Bitrate, 8000);
-            Assert.Equal(voice3.Position, 1);
-            Assert.Equal(voice3.UserLimit, 16);
+            Assert.Equal(8000, voice3.Bitrate);
+            Assert.Equal(1, voice3.Position);
+            Assert.Equal(16, voice3.UserLimit);
         }
     }
 }

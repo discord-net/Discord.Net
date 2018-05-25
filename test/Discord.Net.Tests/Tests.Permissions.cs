@@ -25,15 +25,15 @@ namespace Discord
 
             // check that toggling the bit works
             Permissions.UnsetFlag(ref rawValue, flagValue);
-            Assert.Equal(false, Permissions.GetValue(rawValue, flagValue));
+            Assert.False(Permissions.GetValue(rawValue, flagValue));
             Permissions.SetFlag(ref rawValue, flagValue);
-            Assert.Equal(true, Permissions.GetValue(rawValue, flagValue));
+            Assert.True(Permissions.GetValue(rawValue, flagValue));
 
             // do the same, but with the SetValue method
             Permissions.SetValue(ref rawValue, true, flagValue);
-            Assert.Equal(true, Permissions.GetValue(rawValue, flagValue));
+            Assert.True(Permissions.GetValue(rawValue, flagValue));
             Permissions.SetValue(ref rawValue, false, flagValue);
-            Assert.Equal(false, Permissions.GetValue(rawValue, flagValue));
+            Assert.False(Permissions.GetValue(rawValue, flagValue));
         }
 
         /// <summary>
