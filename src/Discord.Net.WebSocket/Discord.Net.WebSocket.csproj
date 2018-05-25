@@ -4,7 +4,7 @@
     <AssemblyName>Discord.Net.WebSocket</AssemblyName>
     <RootNamespace>Discord.WebSocket</RootNamespace>
     <Description>A core Discord.Net library containing the WebSocket client and models.</Description>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net45;netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net46;netstandard1.3;netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard1.3;netstandard2.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>

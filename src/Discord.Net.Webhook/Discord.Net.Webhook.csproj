@@ -1,11 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../../Discord.Net.targets" />
   <PropertyGroup>
     <AssemblyName>Discord.Net.Webhook</AssemblyName>
     <RootNamespace>Discord.Webhook</RootNamespace>
     <Description>A core Discord.Net library containing the Webhook client and models.</Description>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net45;netstandard1.3;netstandard2.0</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
