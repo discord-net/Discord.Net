@@ -136,8 +136,8 @@ namespace Discord.Rest
             => MessageHelper.RemoveReactionAsync(this, user, emote, Discord, options);
         public Task RemoveAllReactionsAsync(RequestOptions options = null)
             => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
-        public Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit = 100, ulong? afterUserId = null, RequestOptions options = null)
-            => MessageHelper.GetReactionUsersAsync(this, emote, x => { x.Limit = limit; x.AfterUserId = afterUserId ?? Optional.Create<ulong>(); }, Discord, options);
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit, RequestOptions options = null)
+            => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, options);
 
 
         public Task PinAsync(RequestOptions options = null)

@@ -1,4 +1,4 @@
-﻿using Discord.Audio;
+using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -66,6 +66,24 @@ namespace Discord
 
         /// <summary> Gets a collection of all users banned on this guild. </summary>
         Task<IReadOnlyCollection<IBan>> GetBansAsync(RequestOptions options = null);
+        /// <summary>
+        ///     Gets a ban object for a banned user.
+        /// </summary>
+        /// <param name="user">The banned user.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing the ban object, which contains the user information and the
+        ///     reason for the ban; <see langword="null"/> if the ban entry cannot be found.
+        /// </returns>
+        Task<IBan> GetBanAsync(IUser user, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a ban object for a banned user.
+        /// </summary>
+        /// <param name="userId">The snowflake identifier for the banned user.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing the ban object, which contains the user information and the
+        ///     reason for the ban; <see langword="null"/> if the ban entry cannot be found.
+        /// </returns>
+        Task<IBan> GetBanAsync(ulong userId, RequestOptions options = null);
         /// <summary> Bans the provided user from this guild and optionally prunes their recent messages. </summary>
         /// <param name="pruneDays">The number of days to remove messages from this user for - must be between [0, 7]</param>
         Task AddBanAsync(IUser user, int pruneDays = 0, string reason = null, RequestOptions options = null);
@@ -91,9 +109,9 @@ namespace Discord
         Task<ITextChannel> GetDefaultChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         Task<IGuildChannel> GetEmbedChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Creates a new text channel. </summary>
-        Task<ITextChannel> CreateTextChannelAsync(string name, RequestOptions options = null);
+        Task<ITextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null);
         /// <summary> Creates a new voice channel. </summary>
-        Task<IVoiceChannel> CreateVoiceChannelAsync(string name, RequestOptions options = null);
+        Task<IVoiceChannel> CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null);
         /// <summary> Creates a new channel category. </summary>
         Task<ICategoryChannel> CreateCategoryAsync(string name, RequestOptions options = null);
 
@@ -120,6 +138,10 @@ namespace Discord
         Task DownloadUsersAsync();
         /// <summary> Removes all users from this guild if they have not logged on in a provided number of days or, if simulate is true, returns the number of users that would be removed. </summary>
         Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null);
+
+        /// <summary> Gets the specified number of audit log entries for this guild. </summary>
+        Task<IReadOnlyCollection<IAuditLogEntry>> GetAuditLogAsync(int limit = DiscordConfig.MaxAuditLogEntriesPerBatch,
+            CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 
         /// <summary> Gets the webhook in this guild with the provided id, or null if not found. </summary>
         Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);

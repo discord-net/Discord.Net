@@ -158,6 +158,7 @@ namespace Discord.Commands
                         builder.AddAliases(command.Text);
                         builder.RunMode = command.RunMode;
                         builder.Name = builder.Name ?? command.Text;
+                        builder.IgnoreExtraArgs = command.IgnoreExtraArgs ?? service._ignoreExtraArgs;
                         break;
                     case NameAttribute name:
                         builder.Name = name.Text;
@@ -291,7 +292,7 @@ namespace Discord.Commands
 
             //We dont have a cached type reader, create one
             reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, services);
-            service.AddTypeReader(paramType, reader);
+            service.AddTypeReader(paramType, reader, false);
 
             return reader;
         }

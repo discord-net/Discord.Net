@@ -1,4 +1,4 @@
-﻿using Discord.Rest;
+using Discord.Rest;
 using System.Diagnostics;
 using Model = Discord.API.VoiceRegion;
 
@@ -7,11 +7,16 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class RestVoiceRegion : RestEntity<string>, IVoiceRegion
     {
+        /// <inheritdoc />
         public string Name { get; private set; }
+        /// <inheritdoc />
         public bool IsVip { get; private set; }
+        /// <inheritdoc />
         public bool IsOptimal { get; private set; }
-        public string SampleHostname { get; private set; }
-        public int SamplePort { get; private set; }
+        /// <inheritdoc />
+        public bool IsDeprecated { get; private set; }
+        /// <inheritdoc />
+        public bool IsCustom { get; private set; }
 
         internal RestVoiceRegion(BaseDiscordClient client, string id)
             : base(client, id)
@@ -28,8 +33,8 @@ namespace Discord
             Name = model.Name;
             IsVip = model.IsVip;
             IsOptimal = model.IsOptimal;
-            SampleHostname = model.SampleHostname;
-            SamplePort = model.SamplePort;
+            IsDeprecated = model.IsDeprecated;
+            IsCustom = model.IsCustom;
         }
 
         public override string ToString() => Name;

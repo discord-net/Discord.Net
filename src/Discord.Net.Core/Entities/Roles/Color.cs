@@ -1,5 +1,8 @@
 using System;
 using System.Diagnostics;
+#if NETSTANDARD2_0 || NET45
+using StandardColor = System.Drawing.Color;
+#endif
 
 namespace Discord
 {
@@ -96,7 +99,14 @@ namespace Discord
                 ((uint)(g * 255.0f) << 8) |
                 (uint)(b * 255.0f);
         }
-        
+
+#if NETSTANDARD2_0 || NET45
+        public static implicit operator StandardColor(Color color) =>
+            StandardColor.FromArgb((int)color.RawValue);
+        public static explicit operator Color(StandardColor color) =>
+            new Color((uint)color.ToArgb() << 8 >> 8);
+#endif
+
         public override string ToString() =>
             $"#{Convert.ToString(RawValue, 16)}";
         private string DebuggerDisplay =>

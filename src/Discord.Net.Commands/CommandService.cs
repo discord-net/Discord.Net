@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Discord.Commands.Builders;
 using Discord.Logging;
 
@@ -33,6 +32,7 @@ namespace Discord.Commands
         internal readonly RunMode _defaultRunMode;
         internal readonly Logger _cmdLogger;
         internal readonly LogManager _logManager;
+        internal readonly IReadOnlyDictionary<char, char> _quotationMarkAliasMap;
 
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
         public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
@@ -46,6 +46,7 @@ namespace Discord.Commands
             _ignoreExtraArgs = config.IgnoreExtraArgs;
             _separatorChar = config.SeparatorChar;
             _defaultRunMode = config.DefaultRunMode;
+            _quotationMarkAliasMap = (config.QuotationMarkAliasMap ?? new Dictionary<char, char>()).ToImmutableDictionary();
             if (_defaultRunMode == RunMode.Default)
                 throw new InvalidOperationException("The default run mode cannot be set to Default.");
 
@@ -65,6 +66,10 @@ namespace Discord.Commands
                 _defaultTypeReaders[type] = PrimitiveTypeReader.Create(type);
                 _defaultTypeReaders[typeof(Nullable<>).MakeGenericType(type)] = NullableTypeReader.Create(type, _defaultTypeReaders[type]);
             }
+
+            var tsreader = new TimeSpanTypeReader();
+            _defaultTypeReaders[typeof(TimeSpan)] = tsreader;
+            _defaultTypeReaders[typeof(TimeSpan?)] = NullableTypeReader.Create(typeof(TimeSpan), tsreader);
 
             _defaultTypeReaders[typeof(string)] =
                 new PrimitiveTypeReader<string>((string x, out string y) => { y = x; return true; }, 0);
@@ -215,10 +220,11 @@ namespace Discord.Commands
             return true;
         }
 
-        //Type Readers 
+        //Type Readers
         /// <summary>
         /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
         /// If <typeparamref name="T"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> will also be added.
+        /// If a default <see cref="TypeReader"/> exists for <typeparamref name="T"/>, a warning will be logged and the default <see cref="TypeReader"/> will be replaced. 
         /// </summary>
         /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
         /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
@@ -226,17 +232,54 @@ namespace Discord.Commands
             => AddTypeReader(typeof(T), reader);
         /// <summary>
         /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
-        /// If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added. 
+        /// If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added.
+        /// If a default <see cref="TypeReader"/> exists for <paramref name="type"/>, a warning will be logged and the default <see cref="TypeReader"/> will be replaced.
         /// </summary>
         /// <param name="type">A <see cref="Type"/> instance for the type to be read.</param>
         /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
         public void AddTypeReader(Type type, TypeReader reader)
         {
-            var readers = _typeReaders.GetOrAdd(type, x => new ConcurrentDictionary<Type, TypeReader>());
-            readers[reader.GetType()] = reader;
+            if (_defaultTypeReaders.ContainsKey(type))
+                _ = _cmdLogger.WarningAsync($"The default TypeReader for {type.FullName} was replaced by {reader.GetType().FullName}." +
+                    $"To suppress this message, use AddTypeReader<T>(reader, true).");
+            AddTypeReader(type, reader, true);
+        }
+        /// <summary>
+        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
+        /// If <typeparamref name="T"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> will also be added.
+        /// </summary>
+        /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
+        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
+        /// <param name="replaceDefault">If <paramref name="reader"/> should replace the default <see cref="TypeReader"/> for <typeparamref name="T"/> if one exists.</param>
+        public void AddTypeReader<T>(TypeReader reader, bool replaceDefault)
+            => AddTypeReader(typeof(T), reader, replaceDefault);
+        /// <summary>
+        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
+        /// If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added. 
+        /// </summary>
+        /// <param name="type">A <see cref="Type"/> instance for the type to be read.</param>
+        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
+        /// <param name="replaceDefault">If <paramref name="reader"/> should replace the default <see cref="TypeReader"/> for <paramref name="type"/> if one exists.</param>
+        public void AddTypeReader(Type type, TypeReader reader, bool replaceDefault)
+        {
+            if (replaceDefault && _defaultTypeReaders.ContainsKey(type))
+            {
+                _defaultTypeReaders.AddOrUpdate(type, reader, (k, v) => reader);
+                if (type.GetTypeInfo().IsValueType)
+                {
+                    var nullableType = typeof(Nullable<>).MakeGenericType(type);
+                    var nullableReader = NullableTypeReader.Create(type, reader);
+                    _defaultTypeReaders.AddOrUpdate(nullableType, nullableReader, (k, v) => nullableReader);
+                }
+            }
+            else
+            {
+                var readers = _typeReaders.GetOrAdd(type, x => new ConcurrentDictionary<Type, TypeReader>());
+                readers[reader.GetType()] = reader;
 
-            if (type.GetTypeInfo().IsValueType)
-                AddNullableTypeReader(type, reader);
+                if (type.GetTypeInfo().IsValueType)
+                    AddNullableTypeReader(type, reader);
+            }
         }
         internal void AddNullableTypeReader(Type valueType, TypeReader valueTypeReader)
         {
@@ -296,7 +339,6 @@ namespace Discord.Commands
         public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;
-
             var searchResult = Search(context, input);
             if (!searchResult.IsSuccess)
                 return searchResult;

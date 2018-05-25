@@ -1,4 +1,4 @@
-using Discord.Commands.Builders;
+﻿using Discord.Commands.Builders;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -27,6 +27,7 @@ namespace Discord.Commands
         public string Remarks { get; }
         public int Priority { get; }
         public bool HasVarArgs { get; }
+        public bool IgnoreExtraArgs { get; }
         public RunMode RunMode { get; }
 
         public IReadOnlyList<string> Aliases { get; }
@@ -63,6 +64,7 @@ namespace Discord.Commands
 
             Parameters = builder.Parameters.Select(x => x.Build(this)).ToImmutableArray();
             HasVarArgs = builder.Parameters.Count > 0 ? builder.Parameters[builder.Parameters.Count - 1].IsMultiple : false;
+            IgnoreExtraArgs = builder.IgnoreExtraArgs;
 
             _action = builder.Callback;
             _commandService = service;
@@ -119,7 +121,8 @@ namespace Discord.Commands
                 return ParseResult.FromError(preconditionResult);
 
             string input = searchResult.Text.Substring(startIndex);
-            return await CommandParser.ParseArgsAsync(this, context, _commandService._ignoreExtraArgs, services, input, 0).ConfigureAwait(false);
+
+            return await CommandParser.ParseArgsAsync(this, context, _commandService._ignoreExtraArgs, services, input, 0, _commandService._quotationMarkAliasMap).ConfigureAwait(false);
         }
 
         public Task<IResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)
@@ -165,11 +168,11 @@ namespace Discord.Commands
                 switch (RunMode)
                 {
                     case RunMode.Sync: //Always sync
-                        return await ExecuteAsyncInternalAsync(context, args, services).ConfigureAwait(false);
+                        return await ExecuteInternalAsync(context, args, services).ConfigureAwait(false);
                     case RunMode.Async: //Always async
                         var t2 = Task.Run(async () =>
                         {
-                            await ExecuteAsyncInternalAsync(context, args, services).ConfigureAwait(false);
+                            await ExecuteInternalAsync(context, args, services).ConfigureAwait(false);
                         });
                         break;
                 }
@@ -181,7 +184,7 @@ namespace Discord.Commands
             }
         }
 
-        private async Task<IResult> ExecuteAsyncInternalAsync(ICommandContext context, object[] args, IServiceProvider services)
+        private async Task<IResult> ExecuteInternalAsync(ICommandContext context, object[] args, IServiceProvider services)
         {
             await Module.Service._cmdLogger.DebugAsync($"Executing {GetLogText(context)}").ConfigureAwait(false);
             try
