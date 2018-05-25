@@ -280,7 +280,7 @@ namespace Discord
             TestHelper(value, GuildPermission.ManageGuild, false);
             TestHelper(value, GuildPermission.AddReactions, false);
             TestHelper(value, GuildPermission.ViewAuditLog, false);
-            TestHelper(value, GuildPermission.ReadMessages, false);
+            TestHelper(value, GuildPermission.ViewChannel, false);
             TestHelper(value, GuildPermission.SendMessages, false);
             TestHelper(value, GuildPermission.SendTTSMessages, false);
             TestHelper(value, GuildPermission.ManageMessages, false);
@@ -323,7 +323,7 @@ namespace Discord
             TestHelper(value, GuildPermission.ManageGuild, true);
             TestHelper(value, GuildPermission.AddReactions, true);
             TestHelper(value, GuildPermission.ViewAuditLog, true);
-            TestHelper(value, GuildPermission.ReadMessages, true);
+            TestHelper(value, GuildPermission.ViewChannel, true);
             TestHelper(value, GuildPermission.SendMessages, true);
             TestHelper(value, GuildPermission.SendTTSMessages, true);
             TestHelper(value, GuildPermission.ManageMessages, true);
@@ -367,7 +367,7 @@ namespace Discord
             TestHelper(value, GuildPermission.ManageGuild, false);
             TestHelper(value, GuildPermission.AddReactions, false);
             TestHelper(value, GuildPermission.ViewAuditLog, false);
-            TestHelper(value, GuildPermission.ReadMessages, false);
+            TestHelper(value, GuildPermission.ViewChannel, false);
             TestHelper(value, GuildPermission.SendMessages, true);
             TestHelper(value, GuildPermission.SendTTSMessages, true);
             TestHelper(value, GuildPermission.ManageMessages, false);
