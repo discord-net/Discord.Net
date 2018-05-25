@@ -104,6 +104,11 @@ namespace Discord.WebSocket
         public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options);
 
+        public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
+            => ChannelHelper.DeleteMessageAsync(this, messageId, Discord, options);
+        public Task DeleteMessageAsync(IMessage message, RequestOptions options = null)
+            => ChannelHelper.DeleteMessageAsync(this, message.Id, Discord, options);
+
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);
         public IDisposable EnterTypingState(RequestOptions options = null)

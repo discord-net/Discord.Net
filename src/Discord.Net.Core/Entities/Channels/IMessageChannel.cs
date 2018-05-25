@@ -30,6 +30,11 @@ namespace Discord
         /// <summary> Gets a collection of pinned messages in this channel. </summary>
         Task<IReadOnlyCollection<IMessage>> GetPinnedMessagesAsync(RequestOptions options = null);
 
+        /// <summary> Deletes a message based on the message ID in this channel. </summary>
+        Task DeleteMessageAsync(ulong messageId, RequestOptions options = null);
+        /// <summary> Deletes a message based on the provided message in this channel. </summary>
+        Task DeleteMessageAsync(IMessage message, RequestOptions options = null);
+
         /// <summary> Broadcasts the "user is typing" message to all users in this channel, lasting 10 seconds. </summary>
         Task TriggerTypingAsync(RequestOptions options = null);
         /// <summary> Continuously broadcasts the "user is typing" message to all users in this channel until the returned object is disposed. </summary>
