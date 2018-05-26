@@ -26,7 +26,7 @@ namespace Discord
         /// </returns>
         public static string Version { get; } =
             typeof(DiscordConfig).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ??
-            typeof(DiscordConfig).GetTypeInfo().Assembly.GetName().Version.ToString(3) ?? 
+            typeof(DiscordConfig).GetTypeInfo().Assembly.GetName().Version.ToString(3) ??
             "Unknown";
         
         /// <summary>
@@ -93,6 +93,7 @@ namespace Discord
         ///     The maximum number of guilds that can be gotten per-batch.
         /// </returns>
         public const int MaxGuildsPerBatch = 100;
+        public const int MaxAuditLogEntriesPerBatch = 100;
 
         /// <summary>
         ///     Gets or sets how a request should act in the case of an error, by default.

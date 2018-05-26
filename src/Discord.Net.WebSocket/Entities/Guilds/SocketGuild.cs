@@ -646,6 +646,10 @@ namespace Discord.WebSocket
             _downloaderPromise.TrySetResultAsync(true);
         }
 
+        //Audit logs
+        public IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(int limit, RequestOptions options = null)
+            => GuildHelper.GetAuditLogsAsync(this, Discord, null, limit, options);
+
         //Webhooks
         /// <summary>
         ///     Returns the webhook with the provided ID.
@@ -965,6 +969,14 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         Task<IGuildUser> IGuild.GetOwnerAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(Owner);
+
+        async Task<IReadOnlyCollection<IAuditLogEntry>> IGuild.GetAuditLogAsync(int limit, CacheMode cacheMode, RequestOptions options)
+        {
+            if (cacheMode == CacheMode.AllowDownload)
+                return (await GetAuditLogsAsync(limit, options).FlattenAsync().ConfigureAwait(false)).ToImmutableArray();
+            else
+                return ImmutableArray.Create<IAuditLogEntry>();
+        }
 
         /// <inheritdoc />
         async Task<IWebhook> IGuild.GetWebhookAsync(ulong id, RequestOptions options)

@@ -438,7 +438,6 @@ namespace Discord
     {
         private string _name;
         private string _value;
-        private EmbedField _field;
         /// <summary>
         ///     Gets the maximum field length for name allowed by Discord.
         /// </summary>
