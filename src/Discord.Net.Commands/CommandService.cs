@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -38,6 +38,7 @@ namespace Discord.Commands
         internal readonly RunMode _defaultRunMode;
         internal readonly Logger _cmdLogger;
         internal readonly LogManager _logManager;
+        internal readonly IReadOnlyDictionary<char, char> _quotationMarkAliasMap;
 
         /// <summary>
         ///     Represents all modules loaded within <see cref="CommandService" />.
@@ -73,6 +74,7 @@ namespace Discord.Commands
             _ignoreExtraArgs = config.IgnoreExtraArgs;
             _separatorChar = config.SeparatorChar;
             _defaultRunMode = config.DefaultRunMode;
+            _quotationMarkAliasMap = (config.QuotationMarkAliasMap ?? new Dictionary<char, char>()).ToImmutableDictionary();
             if (_defaultRunMode == RunMode.Default)
                 throw new InvalidOperationException("The default run mode cannot be set to Default.");
 
@@ -92,6 +94,10 @@ namespace Discord.Commands
                 _defaultTypeReaders[type] = PrimitiveTypeReader.Create(type);
                 _defaultTypeReaders[typeof(Nullable<>).MakeGenericType(type)] = NullableTypeReader.Create(type, _defaultTypeReaders[type]);
             }
+
+            var tsreader = new TimeSpanTypeReader();
+            _defaultTypeReaders[typeof(TimeSpan)] = tsreader;
+            _defaultTypeReaders[typeof(TimeSpan?)] = NullableTypeReader.Create(typeof(TimeSpan), tsreader);
 
             _defaultTypeReaders[typeof(string)] =
                 new PrimitiveTypeReader<string>((string x, out string y) => { y = x; return true; }, 0);
@@ -447,7 +453,6 @@ namespace Discord.Commands
         public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;
-
             var searchResult = Search(context, input);
             if (!searchResult.IsSuccess)
                 return searchResult;

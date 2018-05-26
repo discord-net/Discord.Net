@@ -162,7 +162,6 @@ namespace Discord.Rest
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }
 
-#if FILESYSTEM
         /// <exception cref="ArgumentException">
         /// <paramref name="filePath" /> is a zero-length string, contains only white space, or contains one or more
         /// invalid characters as defined by <see cref="System.IO.Path.InvalidPathChars" />.
@@ -194,7 +193,7 @@ namespace Discord.Rest
             using (var file = File.OpenRead(filePath))
                 return await SendFileAsync(channel, client, file, filename, text, isTTS, embed, options).ConfigureAwait(false);
         }
-#endif
+
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options)
@@ -203,6 +202,10 @@ namespace Discord.Rest
             var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }
+
+        public static Task DeleteMessageAsync(IMessageChannel channel, ulong messageId, BaseDiscordClient client,
+            RequestOptions options)
+            => MessageHelper.DeleteAsync(channel.Id, messageId, client, options);
 
         public static async Task DeleteMessagesAsync(ITextChannel channel, BaseDiscordClient client,
             IEnumerable<ulong> messageIds, RequestOptions options)

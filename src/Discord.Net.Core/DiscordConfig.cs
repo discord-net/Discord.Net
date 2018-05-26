@@ -93,6 +93,7 @@ namespace Discord
         ///     The maximum number of guilds that can be gotten per-batch.
         /// </returns>
         public const int MaxGuildsPerBatch = 100;
+        public const int MaxUserReactionsPerBatch = 100;
         public const int MaxAuditLogEntriesPerBatch = 100;
 
         /// <summary>

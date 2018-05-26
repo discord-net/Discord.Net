@@ -1,4 +1,4 @@
-using Discord.Commands.Builders;
+﻿using Discord.Commands.Builders;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -172,7 +172,8 @@ namespace Discord.Commands
                 return ParseResult.FromError(preconditionResult);
 
             string input = searchResult.Text.Substring(startIndex);
-            return await CommandParser.ParseArgsAsync(this, context, services, input, 0).ConfigureAwait(false);
+
+            return await CommandParser.ParseArgsAsync(this, context, _commandService._ignoreExtraArgs, services, input, 0, _commandService._quotationMarkAliasMap).ConfigureAwait(false);
         }
         
         public Task<IResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)

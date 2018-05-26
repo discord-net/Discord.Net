@@ -79,17 +79,21 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        public Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
-#if FILESYSTEM
+
         /// <inheritdoc />
         public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, options);
-#endif
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options);
+
+        public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
+            => ChannelHelper.DeleteMessageAsync(this, messageId, Discord, options);
+        public Task DeleteMessageAsync(IMessage message, RequestOptions options = null)
+            => ChannelHelper.DeleteMessageAsync(this, message.Id, Discord, options);
 
         /// <inheritdoc />
         public Task TriggerTypingAsync(RequestOptions options = null)
@@ -160,12 +164,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
-#if FILESYSTEM
-        /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendFileAsync(filePath, text, isTTS, embed, options).ConfigureAwait(false);
-#endif
-        /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendFileAsync(stream, filename, text, isTTS, embed, options).ConfigureAwait(false);
         /// <inheritdoc />

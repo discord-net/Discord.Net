@@ -138,12 +138,12 @@ namespace Discord
 
 
             // individual permission test
-            perm = perm.Modify(readMessages: true);
-            Assert.True(perm.ReadMessages);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.ReadMessages);
+            perm = perm.Modify(viewChannel: true);
+            Assert.True(perm.ViewChannel);
+            Assert.Equal(perm.RawValue, (ulong)GuildPermission.ViewChannel);
 
-            perm = perm.Modify(readMessages: false);
-            Assert.False(perm.ReadMessages);
+            perm = perm.Modify(viewChannel: false);
+            Assert.False(perm.ViewChannel);
             Assert.Equal(GuildPermissions.None.RawValue, perm.RawValue);
 
 

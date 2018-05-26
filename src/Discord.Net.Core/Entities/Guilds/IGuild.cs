@@ -414,7 +414,7 @@ namespace Discord
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the newly created text channel.
         /// </returns>
-        Task<ITextChannel> CreateTextChannelAsync(string name, RequestOptions options = null);
+        Task<ITextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null);
         /// <summary>
         ///     Creates a new voice channel.
         /// </summary>
@@ -423,13 +423,11 @@ namespace Discord
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the newly created voice channel.
         /// </returns>
-        Task<IVoiceChannel> CreateVoiceChannelAsync(string name, RequestOptions options = null);
+        Task<IVoiceChannel> CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null);
         /// <summary>
         ///     Creates a new channel category.
         /// </summary>
         /// <param name="name">The new name for the category.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
         ///     An awaitable <see cref="Task"/> containing the newly created category channel.
         /// </returns>
         Task<ICategoryChannel> CreateCategoryAsync(string name, RequestOptions options = null);
