@@ -1,4 +1,4 @@
-﻿using Discord.Audio;
+using Discord.Audio;
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
@@ -15,6 +15,9 @@ namespace Discord.WebSocket
     {
         public int Bitrate { get; private set; }
         public int? UserLimit { get; private set; }
+        public ulong? CategoryId { get; private set; }
+        public ICategoryChannel Category
+            => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
 
         public override IReadOnlyCollection<SocketGuildUser> Users
             => Guild.Users.Where(x => x.VoiceChannel?.Id == Id).ToImmutableArray();
@@ -32,7 +35,7 @@ namespace Discord.WebSocket
         internal override void Update(ClientState state, Model model)
         {
             base.Update(state, model);
-
+            CategoryId = model.CategoryId;
             Bitrate = model.Bitrate.Value;
             UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
         }
@@ -52,7 +55,7 @@ namespace Discord.WebSocket
                 return user;
             return null;
         }
-        
+
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
         internal new SocketVoiceChannel Clone() => MemberwiseClone() as SocketVoiceChannel;
 
@@ -61,5 +64,9 @@ namespace Discord.WebSocket
             => Task.FromResult<IGuildUser>(GetUser(id));
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
+
+        // INestedChannel
+        Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult(Category);
     }
 }

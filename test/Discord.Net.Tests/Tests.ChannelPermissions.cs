@@ -105,7 +105,7 @@ namespace Discord
             Assert.Equal(groupChannel, ChannelPermissions.Group.RawValue);
             return Task.CompletedTask;
         }
-      
+        [Fact]
         public Task TestChannelPermissionModify()
         {
             // test channel permission modify

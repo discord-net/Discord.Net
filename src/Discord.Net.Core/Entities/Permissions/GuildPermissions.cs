@@ -93,7 +93,7 @@ namespace Discord
             bool? manageGuild = null,
             bool? addReactions = null,
             bool? viewAuditLog = null,
-            bool? readMessages = null,
+            bool? viewChannel = null,
             bool? sendMessages = null,
             bool? sendTTSMessages = null,
             bool? manageMessages = null,
@@ -124,7 +124,7 @@ namespace Discord
             Permissions.SetValue(ref value, manageGuild, GuildPermission.ManageGuild);
             Permissions.SetValue(ref value, addReactions, GuildPermission.AddReactions);
             Permissions.SetValue(ref value, viewAuditLog, GuildPermission.ViewAuditLog);
-            Permissions.SetValue(ref value, readMessages, GuildPermission.ReadMessages);
+            Permissions.SetValue(ref value, viewChannel, GuildPermission.ViewChannel);
             Permissions.SetValue(ref value, sendMessages, GuildPermission.SendMessages);
             Permissions.SetValue(ref value, sendTTSMessages, GuildPermission.SendTTSMessages);
             Permissions.SetValue(ref value, manageMessages, GuildPermission.ManageMessages);
@@ -158,7 +158,7 @@ namespace Discord
             bool manageGuild = false,
             bool addReactions = false,
             bool viewAuditLog = false,
-            bool readMessages = false,
+            bool viewChannel = false,
             bool sendMessages = false,
             bool sendTTSMessages = false,
             bool manageMessages = false,
@@ -188,7 +188,7 @@ namespace Discord
                 manageGuild: manageGuild,
                 addReactions: addReactions,
                 viewAuditLog: viewAuditLog,
-                readMessages: readMessages,
+                viewChannel: viewChannel,
                 sendMessages: sendMessages,
                 sendTTSMessages: sendTTSMessages,
                 manageMessages: manageMessages,
@@ -219,7 +219,7 @@ namespace Discord
             bool? manageGuild = null,
             bool? addReactions = null,
             bool? viewAuditLog = null,
-            bool? readMessages = null,
+            bool? viewChannel = null,
             bool? sendMessages = null,
             bool? sendTTSMessages = null,
             bool? manageMessages = null,
@@ -240,7 +240,7 @@ namespace Discord
             bool? manageWebhooks = null,
             bool? manageEmojis = null)
             => new GuildPermissions(RawValue, createInstantInvite, kickMembers, banMembers, administrator, manageChannels, manageGuild, addReactions,
-                viewAuditLog, readMessages, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
+                viewAuditLog, viewChannel, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
                 useVoiceActivation, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojis);
 
