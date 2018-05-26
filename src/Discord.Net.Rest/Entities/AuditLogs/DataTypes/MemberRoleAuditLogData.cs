@@ -9,7 +9,7 @@ namespace Discord.Rest
 {
     public class MemberRoleAuditLogData : IAuditLogData
     {
-        private MemberRoleAuditLogData(IReadOnlyCollection<RoleInfo> roles, IUser target)
+        private MemberRoleAuditLogData(IReadOnlyCollection<MemberRoleEditInfo> roles, IUser target)
         {
             Roles = roles;
             Target = target;
@@ -21,7 +21,7 @@ namespace Discord.Rest
 
             var roleInfos = changes.SelectMany(x => x.NewValue.ToObject<API.Role[]>(),
                 (model, role) => new { model.ChangedProperty, Role = role })
-                .Select(x => new RoleInfo(x.Role.Name, x.Role.Id, x.ChangedProperty == "$add"))
+                .Select(x => new MemberRoleEditInfo(x.Role.Name, x.Role.Id, x.ChangedProperty == "$add"))
                 .ToList();
 
             var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
@@ -30,21 +30,7 @@ namespace Discord.Rest
             return new MemberRoleAuditLogData(roleInfos.ToReadOnlyCollection(), user);
         }
 
-        public IReadOnlyCollection<RoleInfo> Roles { get; }
+        public IReadOnlyCollection<MemberRoleEditInfo> Roles { get; }
         public IUser Target { get; }
-
-        public struct RoleInfo
-        {
-            internal RoleInfo(string name, ulong roleId, bool added)
-            {
-                Name = name;
-                RoleId = roleId;
-                Added = added;
-            }
-
-            public string Name { get; }
-            public ulong RoleId { get; }
-            public bool Added { get; }
-        }
     }
 }
