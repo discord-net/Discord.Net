@@ -1,10 +1,13 @@
-﻿using System.Linq;
+using System.Linq;
 
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    /// Represents an audit log data for a ban action.
+    /// </summary>
     public class BanAuditLogData : IAuditLogData
     {
         private BanAuditLogData(IUser user)
@@ -18,6 +21,9 @@ namespace Discord.Rest
             return new BanAuditLogData(RestUser.Create(discord, userInfo));
         }
 
+        /// <summary>
+        ///     Gets the user that was banned.
+        /// </summary>
         public IUser Target { get; }
     }
 }

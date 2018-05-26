@@ -25,9 +25,12 @@ namespace Discord
         public RetryMode? RetryMode { get; set; }
         public bool HeaderOnly { get; internal set; }
         /// <summary>
-        ///     Gets or sets the reason for this action in the guild's audit log. Note that this property may not apply
-        ///     to every action.
+        ///     Gets or sets the reason for this action in the guild's audit log.
         /// </summary>
+        /// <remarks>
+        ///     Gets or sets the reason that will be written to the guild's audit log if applicable. This may not apply
+        ///     to all actions.
+        /// </remarks>
         public string AuditLogReason { get; set; }
 
         internal bool IgnoreState { get; set; }
