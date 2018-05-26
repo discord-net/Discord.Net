@@ -214,18 +214,20 @@ namespace Discord
         ///     Gets a ban object for a banned user.
         /// </summary>
         /// <param name="user">The banned user.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the ban object, which contains the user information and the
-        ///     reason for the ban; <c>null<c/> if the ban entry cannot be found.
+        ///     reason for the ban; <c>null</c> if the ban entry cannot be found.
         /// </returns>
         Task<IBan> GetBanAsync(IUser user, RequestOptions options = null);
         /// <summary>
         ///     Gets a ban object for a banned user.
         /// </summary>
         /// <param name="userId">The snowflake identifier for the banned user.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the ban object, which contains the user information and the
-        ///     reason for the ban; <c>null<c/> if the ban entry cannot be found.
+        ///     reason for the ban; <c>null</c> if the ban entry cannot be found.
         /// </returns>
         Task<IBan> GetBanAsync(ulong userId, RequestOptions options = null);
         /// <summary>
@@ -406,10 +408,12 @@ namespace Discord
         ///     <c>null</c> if none is set.
         /// </returns>
         Task<IGuildChannel> GetEmbedChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
         /// <summary>
         ///     Creates a new text channel.
         /// </summary>
         /// <param name="name">The new name for the text channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the newly created text channel.
@@ -419,6 +423,7 @@ namespace Discord
         ///     Creates a new voice channel.
         /// </summary>
         /// <param name="name">The new name for the voice channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the newly created voice channel.
@@ -428,6 +433,8 @@ namespace Discord
         ///     Creates a new channel category.
         /// </summary>
         /// <param name="name">The new name for the category.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
         ///     An awaitable <see cref="Task"/> containing the newly created category channel.
         /// </returns>
         Task<ICategoryChannel> CreateCategoryAsync(string name, RequestOptions options = null);
