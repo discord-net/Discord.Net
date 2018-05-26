@@ -1,7 +1,7 @@
 namespace Discord.Rest
 {
     /// <summary>
-    /// Represents information for a channel.
+    ///     Represents information for a channel.
     /// </summary>
     public struct ChannelInfo
     {

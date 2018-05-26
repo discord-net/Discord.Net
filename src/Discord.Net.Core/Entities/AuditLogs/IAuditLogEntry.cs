@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    /// Represents an entry in an audit log.
+    ///     Represents a generic audit log entry.
     /// </summary>
     public interface IAuditLogEntry : IEntity<ulong>
     {

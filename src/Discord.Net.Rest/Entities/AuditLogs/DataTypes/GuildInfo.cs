@@ -57,7 +57,7 @@ namespace Discord.Rest
         ///     Gets the ID of this guild's icon.
         /// </summary>
         /// <returns>
-        ///     An identifier for the splash image; <c>null</c> if none is set.
+        ///     A string containing the identifier for the splash image; <c>null</c> if none is set.
         /// </returns>
         public string IconHash { get; }
         /// <summary>
@@ -71,7 +71,7 @@ namespace Discord.Rest
         ///     Gets the owner of this guild.
         /// </summary>
         /// <returns>
-        ///     An <see cref="IUser"/> object representing the owner of this guild.
+        ///     A generic <see cref="IUser"/> object representing the owner of this guild.
         /// </returns>
         public IUser Owner { get; }
         /// <summary>

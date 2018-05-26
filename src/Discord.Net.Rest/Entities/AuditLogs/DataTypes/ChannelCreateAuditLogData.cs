@@ -7,7 +7,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents an audit log data for a channel creation.
+    ///     Represents a piece of audit log data related to a channel creation.
     /// </summary>
     public class ChannelCreateAuditLogData : IAuditLogData
     {

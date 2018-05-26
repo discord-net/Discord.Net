@@ -6,7 +6,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    /// Represents an audit log data for a ban action.
+    ///     Represents a piece of audit log data related to a ban.
     /// </summary>
     public class BanAuditLogData : IAuditLogData
     {
@@ -24,6 +24,9 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the user that was banned.
         /// </summary>
+        /// <returns>
+        ///     A generic <see cref="IUser"/> object representing the banned user.
+        /// </returns>
         public IUser Target { get; }
     }
 }
