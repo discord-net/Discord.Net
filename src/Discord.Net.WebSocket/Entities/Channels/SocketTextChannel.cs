@@ -16,6 +16,9 @@ namespace Discord.WebSocket
         private readonly MessageCache _messages;
 
         public string Topic { get; private set; }
+        public ulong? CategoryId { get; private set; }
+        public ICategoryChannel Category
+            => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
 
         private bool _nsfw;
         public bool IsNsfw => _nsfw || ChannelHelper.IsNsfw(this);
@@ -42,7 +45,7 @@ namespace Discord.WebSocket
         internal override void Update(ClientState state, Model model)
         {
             base.Update(state, model);
-
+            CategoryId = model.CategoryId;
             Topic = model.Topic.Value;
             _nsfw = model.Nsfw.GetValueOrDefault();
         }
@@ -169,5 +172,9 @@ namespace Discord.WebSocket
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
         IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
             => EnterTypingState(options);
+
+        // INestedChannel
+        Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult(Category);
     }
 }

@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord
 {
-    public interface IVoiceChannel : IGuildChannel, IAudioChannel
+    public interface IVoiceChannel : INestedChannel, IAudioChannel
     {
         /// <summary> Gets the bitrate, in bits per second, clients in this voice channel are requested to use. </summary>
         int Bitrate { get; }

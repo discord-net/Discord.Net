@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,6 +24,8 @@ namespace Discord.Rest
                 case ChannelType.DM:
                 case ChannelType.Group:
                     return CreatePrivate(discord, model) as RestChannel;
+                case ChannelType.Category:
+                    return RestCategoryChannel.Create(discord, new RestGuild(discord, model.GuildId.Value), model);
                 default:
                     return new RestChannel(discord, model.Id);
             }

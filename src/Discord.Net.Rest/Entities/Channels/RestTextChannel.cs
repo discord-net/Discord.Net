@@ -12,6 +12,7 @@ namespace Discord.Rest
     public class RestTextChannel : RestGuildChannel, IRestMessageChannel, ITextChannel
     {
         public string Topic { get; private set; }
+        public ulong? CategoryId { get; private set; }
 
         public string Mention => MentionUtils.MentionChannel(Id);
 
@@ -31,7 +32,7 @@ namespace Discord.Rest
         internal override void Update(Model model)
         {
             base.Update(model);
-
+            CategoryId = model.CategoryId;
             Topic = model.Topic.Value;
             _nsfw = model.Nsfw.GetValueOrDefault();
         }
@@ -46,7 +47,7 @@ namespace Discord.Rest
             => ChannelHelper.GetUserAsync(this, Guild, Discord, id, options);
         public IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(RequestOptions options = null)
             => ChannelHelper.GetUsersAsync(this, Guild, Discord, null, null, options);
-
+        
         public Task<RestMessage> GetMessageAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetMessageAsync(this, Discord, id, options);
         public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
@@ -88,16 +89,19 @@ namespace Discord.Rest
             => ChannelHelper.GetWebhookAsync(this, Discord, id, options);
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => ChannelHelper.GetWebhooksAsync(this, Discord, options);
+    
+        public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
+            => ChannelHelper.GetCategoryAsync(this, Discord, options);
 
         private string DebuggerDisplay => $"{Name} ({Id}, Text)";
 
         //ITextChannel
         async Task<IWebhook> ITextChannel.CreateWebhookAsync(string name, Stream avatar, RequestOptions options)
-            => await CreateWebhookAsync(name, avatar, options);
+            => await CreateWebhookAsync(name, avatar, options).ConfigureAwait(false);
         async Task<IWebhook> ITextChannel.GetWebhookAsync(ulong id, RequestOptions options)
-            => await GetWebhookAsync(id, options);
+            => await GetWebhookAsync(id, options).ConfigureAwait(false);
         async Task<IReadOnlyCollection<IWebhook>> ITextChannel.GetWebhooksAsync(RequestOptions options)
-            => await GetWebhooksAsync(options);
+            => await GetWebhooksAsync(options).ConfigureAwait(false);
 
         //IMessageChannel
         async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id, CacheMode mode, RequestOptions options)
@@ -114,6 +118,7 @@ namespace Discord.Rest
             else
                 return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
         }
+        
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId, Direction dir, int limit, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -171,6 +176,14 @@ namespace Discord.Rest
                 return GetUsersAsync(options);
             else
                 return AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
+        }
+
+        // INestedChannel
+        async Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
+        {
+            if (CategoryId.HasValue && mode == CacheMode.AllowDownload)
+                return (await Guild.GetChannelAsync(CategoryId.Value, mode, options).ConfigureAwait(false)) as ICategoryChannel;
+            return null;
         }
     }
 }
