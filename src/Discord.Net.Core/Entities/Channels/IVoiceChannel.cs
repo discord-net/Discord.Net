@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a voice channel in a guild.
+    ///     Represents a generic voice channel in a guild.
     /// </summary>
     public interface IVoiceChannel : IGuildChannel, IAudioChannel
     {

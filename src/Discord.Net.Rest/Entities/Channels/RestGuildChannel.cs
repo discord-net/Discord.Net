@@ -8,7 +8,7 @@ using Model = Discord.API.Channel;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a private REST group channel.
+    ///     Represents a private REST-based group channel.
     /// </summary>
     public class RestGuildChannel : RestChannel, IGuildChannel
     {

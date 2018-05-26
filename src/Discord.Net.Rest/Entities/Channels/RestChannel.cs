@@ -6,6 +6,9 @@ using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a generic REST-based channel.
+    /// </summary>
     public class RestChannel : RestEntity<ulong>, IChannel, IUpdateable
     {
         /// <inheritdoc />
