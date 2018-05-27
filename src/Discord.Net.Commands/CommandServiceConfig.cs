@@ -27,6 +27,8 @@ namespace Discord.Commands
         /// The dictionary stores the opening delimiter as a key, and the matching closing delimiter as the value.
         /// If no value is supplied <see cref="QuotationAliasUtils.GetDefaultAliasMap"/> will be used, which contains
         /// many regional equivalents.
+        /// Only values that are specified in this map will be used as string delimiters, so if " is removed then
+        /// it won't be used.
         /// If this map is set to null or empty, the default delimiter of " will be used.
         /// </summary>
         /// <example>
