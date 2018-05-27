@@ -319,6 +319,15 @@ namespace Discord.Commands
             }
             return null;
         }
+        public void ReplaceDefaultTypereader<T>(TypeReader reader)
+            => ReplaceDefaultTypereader(typeof(T), reader);
+        public void ReplaceDefaultTypereader(Type type, TypeReader reader)
+        {
+            if (_defaultTypeReaders.ContainsKey(type))
+            {
+                _defaultTypeReaders.AddOrUpdate(type, k => throw new Exception("This shouldn't happen?"), (k, v) => reader);
+            }
+        }
 
         //Execution
         public SearchResult Search(ICommandContext context, int argPos)
