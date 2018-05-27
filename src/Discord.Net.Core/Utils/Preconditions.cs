@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Discord
 {
@@ -86,7 +86,7 @@ namespace Discord
 
         private static ArgumentException CreateNotEqualException<T>(string name, string msg, T value)
         {
-            if (msg == null) return new ArgumentException($"Value may not be equal to {value}", name);
+            if (msg == null) return new ArgumentException($"Value may not be equal to {value}.", name);
             else return new ArgumentException(msg, name);
         }
 
@@ -109,7 +109,7 @@ namespace Discord
 
         private static ArgumentException CreateAtLeastException<T>(string name, string msg, T value)
         {
-            if (msg == null) return new ArgumentException($"Value must be at least {value}", name);
+            if (msg == null) return new ArgumentException($"Value must be at least {value}.", name);
             else return new ArgumentException(msg, name);
         }
 
@@ -132,7 +132,7 @@ namespace Discord
 
         private static ArgumentException CreateGreaterThanException<T>(string name, string msg, T value)
         {
-            if (msg == null) return new ArgumentException($"Value must be greater than {value}", name);
+            if (msg == null) return new ArgumentException($"Value must be greater than {value}.", name);
             else return new ArgumentException(msg, name);
         }
 
@@ -155,7 +155,7 @@ namespace Discord
 
         private static ArgumentException CreateAtMostException<T>(string name, string msg, T value)
         {
-            if (msg == null) return new ArgumentException($"Value must be at most {value}", name);
+            if (msg == null) return new ArgumentException($"Value must be at most {value}.", name);
             else return new ArgumentException(msg, name);
         }
 
@@ -178,11 +178,12 @@ namespace Discord
 
         private static ArgumentException CreateLessThanException<T>(string name, string msg, T value)
         {
-            if (msg == null) return new ArgumentException($"Value must be less than {value}", name);
+            if (msg == null) return new ArgumentException($"Value must be less than {value}.", name);
             else return new ArgumentException(msg, name);
         }
 
         // Bulk Delete
+        /// <exception cref="ArgumentOutOfRangeException">Messages are younger than 2 weeks.</exception>
         public static void YoungerThanTwoWeeks(ulong[] collection, string name)
         {
             var minimum = SnowflakeUtils.ToSnowflake(DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(14)));
@@ -193,12 +194,13 @@ namespace Discord
                     throw new ArgumentOutOfRangeException(name, "Messages must be younger than two weeks old.");
             }
         }
+        /// <exception cref="ArgumentException">The everyone role cannot be assigned to a user.</exception>
         public static void NotEveryoneRole(ulong[] roles, ulong guildId, string name)
         {
             for (var i = 0; i < roles.Length; i++)
             {
                 if (roles[i] == guildId)
-                    throw new ArgumentException($"The everyone role cannot be assigned to a user", name);
+                    throw new ArgumentException("The everyone role cannot be assigned to a user.", name);
             }
         }
     }

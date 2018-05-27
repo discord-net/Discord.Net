@@ -1,4 +1,4 @@
-﻿using Discord.Rest;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;  
 using System.Diagnostics;
@@ -13,16 +13,25 @@ namespace Discord.WebSocket
     {
         public SocketGuild Guild { get; }
 
+        /// <inheritdoc />
         public Color Color { get; private set; }
+        /// <inheritdoc />
         public bool IsHoisted { get; private set; }
+        /// <inheritdoc />
         public bool IsManaged { get; private set; }
+        /// <inheritdoc />
         public bool IsMentionable { get; private set; }
+        /// <inheritdoc />
         public string Name { get; private set; }
+        /// <inheritdoc />
         public GuildPermissions Permissions { get; private set; }
+        /// <inheritdoc />
         public int Position { get; private set; }
 
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public bool IsEveryone => Id == Guild.Id;
+        /// <inheritdoc />
         public string Mention => IsEveryone ? "@everyone" : MentionUtils.MentionRole(Id);
         public IEnumerable<SocketGuildUser> Members 
             => Guild.Users.Where(x => x.Roles.Any(r => r.Id == Id));
@@ -49,8 +58,10 @@ namespace Discord.WebSocket
             Permissions = new GuildPermissions(model.Permissions);
         }
 
+        /// <inheritdoc />
         public Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
             => RoleHelper.ModifyAsync(this, Discord, func, options);
+        /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
             => RoleHelper.DeleteAsync(this, Discord, options);
 
@@ -58,9 +69,11 @@ namespace Discord.WebSocket
         private string DebuggerDisplay => $"{Name} ({Id})";
         internal SocketRole Clone() => MemberwiseClone() as SocketRole;
 
+        /// <inheritdoc />
         public int CompareTo(IRole role) => RoleUtils.Compare(this, role);
 
         //IRole
+        /// <inheritdoc />
         IGuild IRole.Guild => Guild;
     }
 }

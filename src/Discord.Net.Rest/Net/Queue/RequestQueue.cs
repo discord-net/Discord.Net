@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 #if DEBUG_LIMITS
 using System.Diagnostics;
@@ -117,7 +117,7 @@ namespace Discord.Net.Queue
                         if ((now - bucket.LastAttemptAt).TotalMinutes > 1.0)
                             _buckets.TryRemove(bucket.Id, out RequestBucket ignored);
                     }
-                    await Task.Delay(60000, _cancelToken.Token); //Runs each minute
+                    await Task.Delay(60000, _cancelToken.Token).ConfigureAwait(false); //Runs each minute
                 }
             }
             catch (OperationCanceledException) { }

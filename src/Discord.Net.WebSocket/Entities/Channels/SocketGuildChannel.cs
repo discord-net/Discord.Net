@@ -9,16 +9,34 @@ using Model = Discord.API.Channel;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a WebSocket-based guild channel.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGuildChannel : SocketChannel, IGuildChannel
     {
         private ImmutableArray<Overwrite> _overwrites;
 
+        /// <summary>
+        ///     Gets the guild associated with this channel.
+        /// </summary>
+        /// <returns>
+        ///     A guild that this channel belongs to.
+        /// </returns>
         public SocketGuild Guild { get; }
+        /// <inheritdoc />
         public string Name { get; private set; }
+        /// <inheritdoc />
         public int Position { get; private set; }        
 
+        /// <inheritdoc />
         public IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
+        /// <summary>
+        ///     Gets a collection of users that are able to view the channel.
+        /// </summary>
+        /// <returns>
+        ///     A collection of users that can access the channel (i.e. the users seen in the user list).
+        /// </returns>
         public new virtual IReadOnlyCollection<SocketGuildUser> Users => ImmutableArray.Create<SocketGuildUser>();
 
         internal SocketGuildChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
@@ -53,8 +71,10 @@ namespace Discord.WebSocket
             _overwrites = newOverwrites.ToImmutable();
         }
 
+        /// <inheritdoc />
         public Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
+        /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
 
@@ -120,7 +140,11 @@ namespace Discord.WebSocket
 
         public new virtual SocketGuildUser GetUser(ulong id) => null;
 
+        /// <summary>
+        ///     Gets the name of the channel.
+        /// </summary>
         public override string ToString() => Name;
+        private string DebuggerDisplay => $"{Name} ({Id}, Guild)";
         internal new SocketGuildChannel Clone() => MemberwiseClone() as SocketGuildChannel;
 
         //SocketChannel
@@ -128,35 +152,49 @@ namespace Discord.WebSocket
         internal override SocketUser GetUserInternal(ulong id) => GetUser(id);
 
         //IGuildChannel
+        /// <inheritdoc />
         IGuild IGuildChannel.Guild => Guild;
+        /// <inheritdoc />
         ulong IGuildChannel.GuildId => Guild.Id;
 
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuildChannel.GetInvitesAsync(RequestOptions options)
             => await GetInvitesAsync(options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task<IInviteMetadata> IGuildChannel.CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
             => await CreateInviteAsync(maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
 
+        /// <inheritdoc />
         OverwritePermissions? IGuildChannel.GetPermissionOverwrite(IRole role)
             => GetPermissionOverwrite(role);
+        /// <inheritdoc />
         OverwritePermissions? IGuildChannel.GetPermissionOverwrite(IUser user)
             => GetPermissionOverwrite(user);
+        /// <inheritdoc />
         async Task IGuildChannel.AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options)
             => await AddPermissionOverwriteAsync(role, permissions, options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task IGuildChannel.AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options)
             => await AddPermissionOverwriteAsync(user, permissions, options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task IGuildChannel.RemovePermissionOverwriteAsync(IRole role, RequestOptions options)
             => await RemovePermissionOverwriteAsync(role, options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task IGuildChannel.RemovePermissionOverwriteAsync(IUser user, RequestOptions options)
             => await RemovePermissionOverwriteAsync(user, options).ConfigureAwait(false);
 
+        /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
+        /// <inheritdoc />
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(GetUser(id));
 
         //IChannel
+        /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable(); //Overridden in Text/Voice
+        /// <inheritdoc />
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(id)); //Overridden in Text/Voice
     }

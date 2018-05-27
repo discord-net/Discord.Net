@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css?family=Titillium+Web');
+html,
+body {
+    font-family: 'Titillium Web', 'Segoe UI', Tahoma, Helvetica, sans-serif;
+    height: 100%;
+    font-size: 15px;
+}
+
+p,
+li,
+.toc {
+    line-height: 160%;
+}
+
+img {
+    box-shadow: 0px 0px 3px 0px rgb(66, 66, 66);
+    max-width: 95% !important;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    line-height: 130%;
+}
+
+.sideaffix {
+    line-height: 140%;
+}
+
+header .navbar {
+    border-width: 0 0 0px;
+    border-radius: 0;
+}
+
+body .toc {
+    background-color: inherit;
+    overflow: visible;
+}
+
+select {
+    display: inline-block;
+    overflow: auto;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0 30px 0 6px;
+    vertical-align: middle;
+    height: 28px;
+    border: 1px solid #e3e3e3;
+    line-height: 16px;
+    outline: 0;
+    text-overflow: ellipsis;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    background-image: linear-gradient(45deg, transparent 50%, #707070 0), linear-gradient(135deg, #707070 50%, transparent 0);
+    background-position: calc(100% - 13px) 11px, calc(100% - 8px) 11px;
+    background-size: 5px 5px, 5px 6px;
+    background-repeat: no-repeat;
+}

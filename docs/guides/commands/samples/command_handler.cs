@@ -1,46 +1,20 @@
-using System;
-using System.Threading.Tasks;
-using System.Reflection;
-using Discord;
-using Discord.WebSocket;
-using Discord.Commands;
-using Microsoft.Extensions.DependencyInjection;
-
-public class Program
+public class CommandHandle
 {
-    private CommandService _commands;
-    private DiscordSocketClient _client;
-    private IServiceProvider _services;
+    private readonly DiscordSocketClient _client;
+    private readonly CommandService _commands;
 
-    private static void Main(string[] args) => new Program().StartAsync().GetAwaiter().GetResult();
-
-    public async Task StartAsync()
+    public CommandHandle(DiscordSocketClient client)
     {
-        _client = new DiscordSocketClient();
+        _client = client;
         _commands = new CommandService();
-
-        // Avoid hard coding your token. Use an external source instead in your code.
-        string token = "bot token here";
-
-        _services = new ServiceCollection()
-            .AddSingleton(_client)
-            .AddSingleton(_commands)
-            .BuildServiceProvider();
-
-        await InstallCommandsAsync();
-
-        await _client.LoginAsync(TokenType.Bot, token);
-        await _client.StartAsync();
-
-        await Task.Delay(-1);
     }
-
+    
     public async Task InstallCommandsAsync()
     {
         // Hook the MessageReceived Event into our Command Handler
         _client.MessageReceived += HandleCommandAsync;
         // Discover all of the commands in this assembly and load them.
-        await _commands.AddModulesAsync(Assembly.GetEntryAssembly());
+        await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
     }
 
     private async Task HandleCommandAsync(SocketMessage messageParam)

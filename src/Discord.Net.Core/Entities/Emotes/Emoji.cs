@@ -1,28 +1,32 @@
-﻿namespace Discord
+namespace Discord
 {
     /// <summary>
-    /// A unicode emoji
+    ///     A Unicode emoji.
     /// </summary>
     public class Emoji : IEmote
     {
-        // TODO: need to constrain this to unicode-only emojis somehow
+        // TODO: need to constrain this to Unicode-only emojis somehow
 
-        /// <summary>
-        /// The unicode representation of this emote.
-        /// </summary>
+        /// <inheritdoc />
         public string Name { get; }
-
+        /// <summary>
+        ///     Gets the Unicode representation of this emote.
+        /// </summary>
         public override string ToString() => Name;
 
         /// <summary>
-        /// Creates a unicode emoji.
+        ///     Creates a Unicode emoji.
         /// </summary>
-        /// <param name="unicode">The pure UTF-8 encoding of an emoji</param>
+        /// <param name="unicode">The pure UTF-8 encoding of an emoji.</param>
         public Emoji(string unicode)
         {
             Name = unicode;
         }
 
+        /// <summary>
+        ///     Determines whether the specified emoji is equal to the current emoji.
+        /// </summary>
+        /// <param name="other">The object to compare with the current object.</param>
         public override bool Equals(object other)
         {
             if (other == null) return false;
@@ -34,6 +38,7 @@
             return string.Equals(Name, otherEmoji.Name);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode() => Name.GetHashCode();
     }
 }

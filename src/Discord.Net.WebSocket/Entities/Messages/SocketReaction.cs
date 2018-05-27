@@ -1,14 +1,48 @@
-﻿using Model = Discord.API.Gateway.Reaction;
+using Model = Discord.API.Gateway.Reaction;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a WebSocket-based reaction object.
+    /// </summary>
     public class SocketReaction : IReaction
     {
+        /// <summary>
+        ///     Gets the ID of the user who added the reaction.
+        /// </summary>
+        /// <returns>
+        ///     A user snowflake ID.
+        /// </returns>
         public ulong UserId { get; }
+        /// <summary>
+        ///     Gets the user who added the reaction if possible.
+        /// </summary>
+        /// <returns>
+        ///     A user object where possible. This value is not always returned.
+        /// </returns>
         public Optional<IUser> User { get; }
+        /// <summary>
+        ///     Gets the ID of the message that has been reacted to.
+        /// </summary>
+        /// <returns>
+        ///     A message snowflake ID.
+        /// </returns>
         public ulong MessageId { get; }
+        /// <summary>
+        ///     Gets the message that has been reacted to if possible.
+        /// </summary>
+        /// <returns>
+        ///     A WebSocket-based message where possible. This value is not always returned.
+        /// </returns>
         public Optional<SocketUserMessage> Message { get; }
+        /// <summary>
+        ///     Gets the channel where the reaction takes place in.
+        /// </summary>
+        /// <returns>
+        ///     A WebSocket-based message channel.
+        /// </returns>
         public ISocketMessageChannel Channel { get; }
+        /// <inheritdoc />
         public IEmote Emote { get; }
 
         internal SocketReaction(ISocketMessageChannel channel, ulong messageId, Optional<SocketUserMessage> message, ulong userId, Optional<IUser> user, IEmote emoji)
@@ -30,6 +64,7 @@ namespace Discord.WebSocket
             return new SocketReaction(channel, model.MessageId, message, model.UserId, user, emote);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object other)
         {
             if (other == null) return false;
@@ -41,6 +76,7 @@ namespace Discord.WebSocket
             return UserId == otherReaction.UserId && MessageId == otherReaction.MessageId && Emote.Equals(otherReaction.Emote);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             unchecked

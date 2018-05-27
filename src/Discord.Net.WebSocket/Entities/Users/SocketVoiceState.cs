@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using Model = Discord.API.VoiceState;
 
 namespace Discord.WebSocket
 {
-    //TODO: C#7 Candidate for record type
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct SocketVoiceState : IVoiceState
     {
@@ -22,14 +21,23 @@ namespace Discord.WebSocket
         }
 
         private readonly Flags _voiceStates;
-        
+
+        /// <summary>
+        ///     Gets the voice channel that the user is currently in; or <c>null</c> if none.
+        /// </summary>
         public SocketVoiceChannel VoiceChannel { get; }
+        /// <inheritdoc />
         public string VoiceSessionId { get; }
 
+        /// <inheritdoc />
         public bool IsMuted => (_voiceStates & Flags.Muted) != 0;
+        /// <inheritdoc />
         public bool IsDeafened => (_voiceStates & Flags.Deafened) != 0;
+        /// <inheritdoc />
         public bool IsSuppressed => (_voiceStates & Flags.Suppressed) != 0;
+        /// <inheritdoc />
         public bool IsSelfMuted => (_voiceStates & Flags.SelfMuted) != 0;
+        /// <inheritdoc />
         public bool IsSelfDeafened => (_voiceStates & Flags.SelfDeafened) != 0;
 
         internal SocketVoiceState(SocketVoiceChannel voiceChannel, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed)
@@ -55,6 +63,12 @@ namespace Discord.WebSocket
             return new SocketVoiceState(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Mute, model.Deaf, model.Suppress);
         }
 
+        /// <summary>
+        ///     Gets the name of the voice channel.
+        /// </summary>
+        /// <returns>
+        ///     The name of the voice channel.
+        /// </returns>
         public override string ToString() => VoiceChannel?.Name ?? "Unknown";
         private string DebuggerDisplay => $"{VoiceChannel?.Name ?? "Unknown"} ({_voiceStates})";
         internal SocketVoiceState Clone() => this;

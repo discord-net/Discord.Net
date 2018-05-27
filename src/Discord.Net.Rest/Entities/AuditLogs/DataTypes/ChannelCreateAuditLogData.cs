@@ -1,4 +1,3 @@
-﻿using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,6 +6,9 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a piece of audit log data related to a channel creation.
+    /// </summary>
     public class ChannelCreateAuditLogData : IAuditLogData
     {
         private ChannelCreateAuditLogData(ulong id, string name, ChannelType type, IReadOnlyCollection<Overwrite> overwrites)
@@ -44,9 +46,33 @@ namespace Discord.Rest
             return new ChannelCreateAuditLogData(entry.TargetId.Value, name, type, overwrites.ToReadOnlyCollection());
         }
 
+        /// <summary>
+        ///     Gets the snowflake ID of the created channel.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="ulong"/> representing the snowflake identifier for the created channel.
+        /// </returns>
         public ulong ChannelId { get; }
+        /// <summary>
+        ///     Gets the name of the created channel.
+        /// </summary>
+        /// <returns>
+        ///     A string containing the name of the created channel.
+        /// </returns>
         public string ChannelName { get; }
+        /// <summary>
+        ///     Gets the type of the created channel.
+        /// </summary>
+        /// <returns>
+        ///     The type of channel that was created.
+        /// </returns>
         public ChannelType ChannelType { get; }
+        /// <summary>
+        ///     Gets a collection of permission overwrites that was assigned to the created channel.
+        /// </summary>
+        /// <returns>
+        ///     A collection of permission <see cref="Overwrite" />.
+        /// </returns>
         public IReadOnlyCollection<Overwrite> Overwrites { get; }
     }
 }

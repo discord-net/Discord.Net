@@ -6,19 +6,23 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    ///     A <see cref="TypeReader"/> for parsing objects implementing <see cref="IChannel"/>.
+    /// </summary>
+    /// <typeparam name="T">The type to be checked; must implement <see cref="IChannel"/>.</typeparam>
     public class ChannelTypeReader<T> : TypeReader
         where T : class, IChannel
     {
+        /// <inheritdoc />
         public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
             if (context.Guild != null)
             {
                 var results = new Dictionary<ulong, TypeReaderValue>();
                 var channels = await context.Guild.GetChannelsAsync(CacheMode.CacheOnly).ConfigureAwait(false);
-                ulong id;
 
                 //By Mention (1.0)
-                if (MentionUtils.TryParseChannel(input, out id))
+                if (MentionUtils.TryParseChannel(input, out ulong id))
                     AddResult(results, await context.Guild.GetChannelAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 1.00f);
 
                 //By Id (0.9)

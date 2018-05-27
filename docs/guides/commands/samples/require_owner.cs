@@ -1,4 +1,5 @@
-// (Note: This precondition is obsolete, it is recommended to use the RequireOwnerAttribute that is bundled with Discord.Commands)
+// (Note: This precondition is obsolete, it is recommended to use the
+// RequireOwnerAttribute that is bundled with Discord.Commands)
 
 using Discord.Commands;
 using Discord.WebSocket;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 public class RequireOwnerAttribute : PreconditionAttribute
 {
     // Override the CheckPermissions method
-    public async override Task<PreconditionResult> CheckPermissions(ICommandContext context, CommandInfo command, IServiceProvider services)
+    public async override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
     {
         // Get the ID of the bot's owner
         var ownerId = (await services.GetService<DiscordSocketClient>().GetApplicationInfoAsync()).Owner.Id;

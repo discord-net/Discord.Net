@@ -1,13 +1,14 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Model = Discord.API.Presence;
 
 namespace Discord.WebSocket
 {
-    //TODO: C#7 Candidate for record type
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct SocketPresence : IPresence
     {
+        /// <inheritdoc />
         public UserStatus Status { get; }
+        /// <inheritdoc />
         public IActivity Activity { get; }
 
         internal SocketPresence(UserStatus status, IActivity activity)

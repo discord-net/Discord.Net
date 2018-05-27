@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Model = Discord.API.User;
 
 namespace Discord.Rest
@@ -16,14 +16,21 @@ namespace Discord.Rest
             entity.Update(model);
             return entity;
         }
-        
+
         //IVoiceState
+        /// <inheritdoc />
         bool IVoiceState.IsDeafened => false;
+        /// <inheritdoc />
         bool IVoiceState.IsMuted => false;
+        /// <inheritdoc />
         bool IVoiceState.IsSelfDeafened => false;
+        /// <inheritdoc />
         bool IVoiceState.IsSelfMuted => false;
+        /// <inheritdoc />
         bool IVoiceState.IsSuppressed => false;
+        /// <inheritdoc />
         IVoiceChannel IVoiceState.VoiceChannel => null;
+        /// <inheritdoc />
         string IVoiceState.VoiceSessionId => null;
     }
 }
