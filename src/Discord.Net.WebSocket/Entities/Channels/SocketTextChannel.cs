@@ -20,6 +20,9 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public string Topic { get; private set; }
+        public ulong? CategoryId { get; private set; }
+        public ICategoryChannel Category
+            => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
 
         private bool _nsfw;
         /// <inheritdoc />
@@ -50,7 +53,7 @@ namespace Discord.WebSocket
         internal override void Update(ClientState state, Model model)
         {
             base.Update(state, model);
-
+            CategoryId = model.CategoryId;
             Topic = model.Topic.Value;
             _nsfw = model.Nsfw.GetValueOrDefault();
         }
@@ -226,5 +229,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
             => EnterTypingState(options);
+
+        // INestedChannel
+        Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult(Category);
     }
 }

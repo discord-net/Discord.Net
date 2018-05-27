@@ -1,8 +1,8 @@
 namespace Discord.Rest
 {
-    public struct RoleInfo
+    public struct RoleEditInfo
     {
-        internal RoleInfo(Color? color, bool? mentionable, bool? hoist, string name,
+        internal RoleEditInfo(Color? color, bool? mentionable, bool? hoist, string name,
             GuildPermissions? permissions)
         {
             Color = color;

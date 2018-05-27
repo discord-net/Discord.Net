@@ -7,7 +7,7 @@ namespace Discord.Rest
 {
     public class RoleUpdateAuditLogData : IAuditLogData
     {
-        private RoleUpdateAuditLogData(ulong id, RoleInfo oldProps, RoleInfo newProps)
+        private RoleUpdateAuditLogData(ulong id, RoleEditInfo oldProps, RoleEditInfo newProps)
         {
             RoleId = id;
             Before = oldProps;
@@ -49,14 +49,14 @@ namespace Discord.Rest
             if (newPermissionsRaw.HasValue)
                 newPermissions = new GuildPermissions(newPermissionsRaw.Value);
 
-            var oldProps = new RoleInfo(oldColor, oldMentionable, oldHoist, oldName, oldPermissions);
-            var newProps = new RoleInfo(newColor, newMentionable, newHoist, newName, newPermissions);
+            var oldProps = new RoleEditInfo(oldColor, oldMentionable, oldHoist, oldName, oldPermissions);
+            var newProps = new RoleEditInfo(newColor, newMentionable, newHoist, newName, newPermissions);
 
             return new RoleUpdateAuditLogData(entry.TargetId.Value, oldProps, newProps);
         }
 
         public ulong RoleId { get; }
-        public RoleInfo Before { get; }
-        public RoleInfo After { get; }
+        public RoleEditInfo Before { get; }
+        public RoleEditInfo After { get; }
     }
 }

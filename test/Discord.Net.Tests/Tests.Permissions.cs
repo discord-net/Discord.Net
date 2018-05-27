@@ -702,5 +702,71 @@ namespace Discord
 
             return Task.CompletedTask;
         }
+
+        /// <summary>
+        /// Tests for the <see cref="OverwritePermissions.Modify(PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?)"/>
+        /// method to ensure that the default no-param call does not modify the resulting value
+        /// of the OverwritePermissions.
+        /// </summary>
+        /// <returns></returns>
+        public Task TestOverwritePermissionModifyNoParam()
+        {
+            // test for all Text allowed, none denied
+            var original = new OverwritePermissions(ChannelPermissions.Text.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, text denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Text.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // category allowed, none denied
+            original = new OverwritePermissions(ChannelPermissions.Category.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, category denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Category.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // DM allowed, none denied
+            original = new OverwritePermissions(ChannelPermissions.DM.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, DM denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.DM.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // voice allowed, none denied
+            original = new OverwritePermissions(ChannelPermissions.Voice.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, voice denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Voice.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // group allowed, none denied
+            original = new OverwritePermissions(ChannelPermissions.Group.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, group denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Group.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, none denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            return Task.CompletedTask;
+        }
     }
 }

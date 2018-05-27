@@ -18,6 +18,7 @@ namespace Discord.Rest
         public int Bitrate { get; private set; }
         /// <inheritdoc />
         public int? UserLimit { get; private set; }
+        public ulong? CategoryId { get; private set; }
 
         internal RestVoiceChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
@@ -33,7 +34,7 @@ namespace Discord.Rest
         internal override void Update(Model model)
         {
             base.Update(model);
-
+            CategoryId = model.CategoryId;
             Bitrate = model.Bitrate.Value;
             UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
         }
@@ -44,6 +45,9 @@ namespace Discord.Rest
             var model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
+
+        public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
+            => ChannelHelper.GetCategoryAsync(this, Discord, options);
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
 
@@ -59,5 +63,13 @@ namespace Discord.Rest
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
+
+        // INestedChannel
+        async Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
+        {
+            if (CategoryId.HasValue && mode == CacheMode.AllowDownload)
+                return (await Guild.GetChannelAsync(CategoryId.Value, mode, options).ConfigureAwait(false)) as ICategoryChannel;
+            return null;
+        }
     }
 }

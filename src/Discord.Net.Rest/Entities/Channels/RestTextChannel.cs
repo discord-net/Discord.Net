@@ -16,6 +16,7 @@ namespace Discord.Rest
     {
         /// <inheritdoc />
         public string Topic { get; private set; }
+        public ulong? CategoryId { get; private set; }
 
         /// <inheritdoc />
         public string Mention => MentionUtils.MentionChannel(Id);
@@ -37,7 +38,7 @@ namespace Discord.Rest
         internal override void Update(Model model)
         {
             base.Update(model);
-
+            CategoryId = model.CategoryId;
             Topic = model.Topic.Value;
             _nsfw = model.Nsfw.GetValueOrDefault();
         }
@@ -134,6 +135,9 @@ namespace Discord.Rest
             => ChannelHelper.GetWebhookAsync(this, Discord, id, options);
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => ChannelHelper.GetWebhooksAsync(this, Discord, options);
+    
+        public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
+            => ChannelHelper.GetCategoryAsync(this, Discord, options);
 
         private string DebuggerDisplay => $"{Name} ({Id}, Text)";
 
@@ -165,6 +169,7 @@ namespace Discord.Rest
             else
                 return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
         }
+        
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId, Direction dir, int limit, CacheMode mode, RequestOptions options)
         {
@@ -233,6 +238,14 @@ namespace Discord.Rest
                 return GetUsersAsync(options);
             else
                 return AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
+        }
+
+        // INestedChannel
+        async Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
+        {
+            if (CategoryId.HasValue && mode == CacheMode.AllowDownload)
+                return (await Guild.GetChannelAsync(CategoryId.Value, mode, options).ConfigureAwait(false)) as ICategoryChannel;
+            return null;
         }
     }
 }

@@ -21,17 +21,6 @@ namespace Discord
         int Position { get; }
 
         /// <summary>
-        ///     Gets the parent ID (category) of this channel in the guild's channel list.
-        /// </summary>
-        /// <returns>
-        ///     The parent category ID associated with this channel, or <c>null</c> if none is set.
-        /// </returns>
-        ulong? CategoryId { get; }
-        /// <summary>
-        ///     Gets the parent channel (category) of this channel.
-        /// </summary>
-        Task<ICategoryChannel> GetCategoryAsync();
-        /// <summary>
         ///     Gets the guild associated with this channel.
         /// </summary>
         /// <returns>

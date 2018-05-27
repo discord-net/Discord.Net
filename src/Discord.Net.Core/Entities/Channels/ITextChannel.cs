@@ -8,7 +8,7 @@ namespace Discord
     /// <summary>
     ///     Represents a generic channel in a guild that can send and receive messages.
     /// </summary>
-    public interface ITextChannel : IMessageChannel, IMentionable, IGuildChannel
+    public interface ITextChannel : IMessageChannel, IMentionable, INestedChannel
     {
         /// <summary>
         ///     Determines whether the channel is NSFW.

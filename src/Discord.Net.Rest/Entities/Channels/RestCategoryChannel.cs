@@ -28,14 +28,6 @@ namespace Discord.Rest
         // IGuildChannel
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">This method is not supported with category channels.</exception>
-        IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
-            => throw new NotSupportedException();
-        /// <inheritdoc />
-        /// <exception cref="NotSupportedException">This method is not supported with category channels.</exception>
-        Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
-            => throw new NotSupportedException();
-        /// <inheritdoc />
-        /// <exception cref="NotSupportedException">This method is not supported with category channels.</exception>
         Task<IInviteMetadata> IGuildChannel.CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
             => throw new NotSupportedException();
         /// <inheritdoc />

@@ -21,7 +21,7 @@ namespace Discord.WebSocket
                ChannelPermission.ViewChannel)).ToImmutableArray();
 
         public IReadOnlyCollection<SocketGuildChannel> Channels
-            => Guild.Channels.Where(x => x.CategoryId == Id).ToImmutableArray();
+            => Guild.Channels.Where(x => x is INestedChannel nestedChannel && nestedChannel.CategoryId == Id).ToImmutableArray();
 
         internal SocketCategoryChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
             : base(discord, id, guild)

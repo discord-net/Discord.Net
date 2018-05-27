@@ -48,7 +48,7 @@ namespace Discord.Rest
         ///     An <see cref="ulong"/> representing the snowflake identifier for the updated channel.
         /// </returns>
         public ulong ChannelId { get; }
-        public ChannelInfo Before { get; set; }
-        public ChannelInfo After { get; set; }
+        public ChannelInfo Before { get; }
+        public ChannelInfo After { get; }
     }
 }

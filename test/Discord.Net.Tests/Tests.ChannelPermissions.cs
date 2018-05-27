@@ -22,6 +22,27 @@ namespace Discord
             var copy = perm.Modify();
             Assert.Equal((ulong)0, copy.RawValue);
 
+            // test modify with no parameters after using all
+            copy = ChannelPermissions.Text;
+            var modified = copy.Modify(); // no params should not change the result
+            Assert.Equal(ChannelPermissions.Text.RawValue, modified.RawValue);
+
+            copy = ChannelPermissions.Voice;
+            modified = copy.Modify(); // no params should not change the result
+            Assert.Equal(ChannelPermissions.Voice.RawValue, modified.RawValue);
+
+            copy = ChannelPermissions.Group;
+            modified = copy.Modify(); // no params should not change the result
+            Assert.Equal(ChannelPermissions.Group.RawValue, modified.RawValue);
+
+            copy = ChannelPermissions.DM;
+            modified = copy.Modify(); // no params should not change the result
+            Assert.Equal(ChannelPermissions.DM.RawValue, modified.RawValue);
+
+            copy = new ChannelPermissions(useExternalEmojis: true);
+            modified = copy.Modify();
+            Assert.Equal(copy.RawValue, modified.RawValue);
+
             // test the values that are returned by ChannelPermission.All
             Assert.Equal((ulong)0, ChannelPermissions.None.RawValue);
 
