@@ -80,7 +80,7 @@ namespace Discord
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A collection of webhooks.
+        ///     An awaitable <see cref="Task"/> containing a collection of webhooks.
         /// </returns>
         Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions options = null);
     }

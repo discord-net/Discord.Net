@@ -74,7 +74,7 @@ namespace Discord.Rest
         ///     Gets the user that created this invite.
         /// </summary>
         /// <returns>
-        ///     A generic <see cref="IUser"/> that created this invite.
+        ///     A user that created this invite.
         /// </returns>
         public IUser Creator { get; }
         /// <summary>

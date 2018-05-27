@@ -9,7 +9,7 @@ namespace Discord
         ///     Gets the banned user.
         /// </summary>
         /// <returns>
-        ///     A generic <see cref="IUser"/> object that was banned.
+        ///     A user that was banned.
         /// </returns>
         IUser User { get; }
         /// <summary>

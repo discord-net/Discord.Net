@@ -46,7 +46,7 @@ namespace Discord
         ///     Gets the guild this invite is linked to.
         /// </summary>
         /// <returns>
-        ///     A generic <see cref="IGuild"/> representing the guild that the invite points to.
+        ///     A guild object representing the guild that the invite points to.
         /// </returns>
         IGuild Guild { get; }
         /// <summary>

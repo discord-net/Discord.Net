@@ -25,7 +25,7 @@ namespace Discord.Rest
         ///     Gets the user that was banned.
         /// </summary>
         /// <returns>
-        ///     A generic <see cref="IUser"/> object representing the banned user.
+        ///     A user object representing the banned user.
         /// </returns>
         public IUser Target { get; }
     }

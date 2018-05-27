@@ -11,7 +11,7 @@ namespace Discord
         ///     Gets the user that created this invite.
         /// </summary>
         /// <returns>
-        ///     A generic <see cref="IUser"/> that created this invite.
+        ///     A user that created this invite.
         /// </returns>
         IUser Inviter { get; }
         /// <summary>

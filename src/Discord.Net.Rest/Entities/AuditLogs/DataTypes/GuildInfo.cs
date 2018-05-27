@@ -71,7 +71,7 @@ namespace Discord.Rest
         ///     Gets the owner of this guild.
         /// </summary>
         /// <returns>
-        ///     A generic <see cref="IUser"/> object representing the owner of this guild.
+        ///     A user object representing the owner of this guild.
         /// </returns>
         public IUser Owner { get; }
         /// <summary>

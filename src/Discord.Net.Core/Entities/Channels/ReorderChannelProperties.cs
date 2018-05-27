@@ -8,10 +8,16 @@ namespace Discord
         /// <summary>
         ///     Gets the ID of the channel to apply this position to.
         /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identififer of this channel.
+        /// </returns>
         public ulong Id { get; }
         /// <summary>
         ///     Gets the new zero-based position of this channel.
         /// </summary>
+        /// <returns>
+        ///     An <see cref="int"/> representing the new position of this channel.
+        /// </returns>
         public int Position { get; }
 
         /// <summary> Creates a <see cref="ReorderChannelProperties"/> used to reorder a channel. </summary>
