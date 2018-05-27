@@ -1429,11 +1429,10 @@ namespace Discord.WebSocket
                                             after = SocketVoiceState.Create(null, data);
                                         }
 
-                                        user = guild.GetUser(data.UserId);
+                                        user = guild.GetUser(data.UserId) ?? guild.AddOrUpdateUser(data.Member.Value); //per g250k, this is always sent
                                         if (user == null)
                                         {
-                                            user = guild.AddOrUpdateUser(data.Member.Value); //per g250k, this is always sent
-                                            //await UnknownGuildUserAsync(type, data.UserId, guild.Id).ConfigureAwait(false);
+                                            await UnknownGuildUserAsync(type, data.UserId, guild.Id).ConfigureAwait(false);
                                             return;
                                         }
                                     }
