@@ -1,12 +1,14 @@
-public class CommandHandle
+public class CommandHandler
 {
     private readonly DiscordSocketClient _client;
     private readonly CommandService _commands;
+    private readonly IServiceProvider _services;
 
-    public CommandHandle(DiscordSocketClient client)
+    public CommandHandler(IServiceProvider services)
     {
-        _client = client;
-        _commands = new CommandService();
+        _services = services;
+        _commands = services.GetRequiredService<CommandService>();
+        _client = services.GetRequiredService<DiscordSocketClient>();
     }
     
     public async Task InstallCommandsAsync()
