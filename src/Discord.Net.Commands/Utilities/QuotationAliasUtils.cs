@@ -13,7 +13,9 @@ namespace Discord.Commands
         /// <summary>
         /// A default map of open-close pairs of quotation marks.
         /// Contains many regional and Unicode equivalents.
+        /// Used in the <see cref="CommandServiceConfig"/>.
         /// </summary>
+        /// <seealso cref="CommandServiceConfig.QuotationMarkAliasMap"/>
         internal static Dictionary<char, char> GetDefaultAliasMap
         {
             get
