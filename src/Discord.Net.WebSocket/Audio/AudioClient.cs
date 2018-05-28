@@ -107,7 +107,7 @@ namespace Discord.Audio
         private async Task OnConnectingAsync()
         {
             await _audioLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
-            await ApiClient.ConnectAsync("wss://" + _url + "?v=3").ConfigureAwait(false);
+            await ApiClient.ConnectAsync("wss://" + _url + "?v=" + DiscordConfig.VoiceAPIVersion).ConfigureAwait(false);
             await _audioLogger.DebugAsync("Listening on port " + ApiClient.UdpPort).ConfigureAwait(false);
             await _audioLogger.DebugAsync("Sending Identity").ConfigureAwait(false);
             await ApiClient.SendIdentityAsync(_userId, _sessionId, _token).ConfigureAwait(false);

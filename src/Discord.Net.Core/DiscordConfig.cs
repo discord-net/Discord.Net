@@ -5,6 +5,7 @@ namespace Discord
     public class DiscordConfig
     {
         public const int APIVersion = 6;
+        public const int VoiceAPIVersion = 3;
         public static string Version { get; } =
             typeof(DiscordConfig).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ??
             typeof(DiscordConfig).GetTypeInfo().Assembly.GetName().Version.ToString(3) ??
