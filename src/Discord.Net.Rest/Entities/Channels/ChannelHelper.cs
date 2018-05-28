@@ -338,8 +338,10 @@ namespace Discord.Rest
             return author;
         }
 
+        [Obsolete("Use channel.IsNsfw instead")]
         public static bool IsNsfw(IChannel channel)
             => IsNsfw(channel.Name);
+        [Obsolete("Use Channel.IsNsfw instead")]
         public static bool IsNsfw(string channelName) =>
             channelName == "nsfw" || channelName.StartsWith("nsfw-");
     }

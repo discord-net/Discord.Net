@@ -21,7 +21,7 @@ namespace Discord.WebSocket
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
 
         private bool _nsfw;
-        public bool IsNsfw => _nsfw || ChannelHelper.IsNsfw(this);
+        public bool IsNsfw => _nsfw;
 
         public string Mention => MentionUtils.MentionChannel(Id);
         public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();

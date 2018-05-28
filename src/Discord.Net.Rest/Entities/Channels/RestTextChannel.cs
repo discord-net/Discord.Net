@@ -17,7 +17,7 @@ namespace Discord.Rest
         public string Mention => MentionUtils.MentionChannel(Id);
 
         private bool _nsfw;
-        public bool IsNsfw => _nsfw || ChannelHelper.IsNsfw(this);
+        public bool IsNsfw => _nsfw;
 
         internal RestTextChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
@@ -47,7 +47,7 @@ namespace Discord.Rest
             => ChannelHelper.GetUserAsync(this, Guild, Discord, id, options);
         public IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(RequestOptions options = null)
             => ChannelHelper.GetUsersAsync(this, Guild, Discord, null, null, options);
-        
+
         public Task<RestMessage> GetMessageAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetMessageAsync(this, Discord, id, options);
         public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
@@ -89,7 +89,7 @@ namespace Discord.Rest
             => ChannelHelper.GetWebhookAsync(this, Discord, id, options);
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => ChannelHelper.GetWebhooksAsync(this, Discord, options);
-    
+
         public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
             => ChannelHelper.GetCategoryAsync(this, Discord, options);
 
@@ -118,7 +118,7 @@ namespace Discord.Rest
             else
                 return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
         }
-        
+
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId, Direction dir, int limit, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
