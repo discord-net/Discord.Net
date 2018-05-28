@@ -126,7 +126,7 @@ namespace Discord
             PermValue createInstantInvite = PermValue.Inherit,
             PermValue manageChannel = PermValue.Inherit,
             PermValue addReactions = PermValue.Inherit,
-            PermValue readMessages = PermValue.Inherit,
+            PermValue viewChannel = PermValue.Inherit,
             PermValue sendMessages = PermValue.Inherit,
             PermValue sendTTSMessages = PermValue.Inherit,
             PermValue manageMessages = PermValue.Inherit, 
@@ -143,7 +143,7 @@ namespace Discord
             PermValue useVoiceActivation = PermValue.Inherit,
             PermValue manageRoles = PermValue.Inherit,
             PermValue manageWebhooks = PermValue.Inherit)
-            : this(0, 0, createInstantInvite, manageChannel, addReactions, readMessages, sendMessages, sendTTSMessages, manageMessages, 
+            : this(0, 0, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages, 
                   embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, 
                   moveMembers, useVoiceActivation, manageRoles, manageWebhooks) { }
 
@@ -152,7 +152,7 @@ namespace Discord
             PermValue? createInstantInvite = null,
             PermValue? manageChannel = null,
             PermValue? addReactions = null,
-            PermValue? readMessages = null,
+            PermValue? viewChannel = null,
             PermValue? sendMessages = null,
             PermValue? sendTTSMessages = null,
             PermValue? manageMessages = null, 
@@ -169,7 +169,7 @@ namespace Discord
             PermValue? useVoiceActivation = null,
             PermValue? manageRoles = null,
             PermValue? manageWebhooks = null)
-            => new OverwritePermissions(AllowValue, DenyValue, createInstantInvite, manageChannel, addReactions, readMessages, sendMessages, sendTTSMessages, manageMessages, 
+            => new OverwritePermissions(AllowValue, DenyValue, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages, 
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, 
                 moveMembers, useVoiceActivation, manageRoles, manageWebhooks);
 
