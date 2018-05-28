@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -22,7 +21,6 @@ namespace Discord
         /// <param name="expected"></param>
         private void TestHelper(ulong rawValue, ulong flagValue, bool expected)
         {
-            Debug.Print($"Expecting {expected} for {rawValue} w/ {flagValue}");
             Assert.Equal(expected, Permissions.GetValue(rawValue, flagValue));
 
             // check that toggling the bit works
