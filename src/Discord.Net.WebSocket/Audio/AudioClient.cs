@@ -1,4 +1,4 @@
-﻿using Discord.API.Voice;
+using Discord.API.Voice;
 using Discord.Audio.Streams;
 using Discord.Logging;
 using Discord.Net.Converters;
@@ -107,7 +107,7 @@ namespace Discord.Audio
         private async Task OnConnectingAsync()
         {
             await _audioLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
-            await ApiClient.ConnectAsync("wss://" + _url).ConfigureAwait(false);
+            await ApiClient.ConnectAsync("wss://" + _url + "?v=3").ConfigureAwait(false);
             await _audioLogger.DebugAsync("Listening on port " + ApiClient.UdpPort).ConfigureAwait(false);
             await _audioLogger.DebugAsync("Sending Identity").ConfigureAwait(false);
             await ApiClient.SendIdentityAsync(_userId, _sessionId, _token).ConfigureAwait(false);
@@ -216,6 +216,14 @@ namespace Discord.Audio
             {
                 switch (opCode)
                 {
+                    case VoiceOpCode.Hello:
+                        {
+                            await _audioLogger.DebugAsync("Received Hello").ConfigureAwait(false);
+                            var data = (payload as JToken).ToObject<HelloEvent>(_serializer);
+
+                            _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _connection.CancelToken);
+                        }
+                        break;
                     case VoiceOpCode.Ready:
                         {
                             await _audioLogger.DebugAsync("Received Ready").ConfigureAwait(false);
@@ -225,8 +233,6 @@ namespace Discord.Audio
 
                             if (!data.Modes.Contains(DiscordVoiceAPIClient.Mode))
                                 throw new InvalidOperationException($"Discord does not support {DiscordVoiceAPIClient.Mode}");
-
-                            _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _connection.CancelToken);
                             
                             ApiClient.SetUdpEndpoint(data.Ip, data.Port);
                             await ApiClient.SendDiscoveryAsync(_ssrc).ConfigureAwait(false);
