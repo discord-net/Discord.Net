@@ -40,9 +40,9 @@ namespace Discord.WebSocket
         public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
-        public async Task<IAudioClient> ConnectAsync(Action<IAudioClient> configAction = null, bool external = false)
+        public async Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false)
         {
-            return await Guild.ConnectAudioAsync(Id, false, false, configAction, external).ConfigureAwait(false);
+            return await Guild.ConnectAudioAsync(Id, selfDeaf, selfMute, external).ConfigureAwait(false);
         }
 
         public async Task DisconnectAsync()

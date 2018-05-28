@@ -504,11 +504,8 @@ namespace Discord.WebSocket
         {
             return _audioClient?.GetInputStream(userId);
         }
-        internal async Task<IAudioClient> ConnectAudioAsync(ulong channelId, bool selfDeaf, bool selfMute, Action<IAudioClient> configAction, bool external)
+        internal async Task<IAudioClient> ConnectAudioAsync(ulong channelId, bool selfDeaf, bool selfMute, bool external)
         {
-            selfDeaf = false;
-            selfMute = false;
-
             TaskCompletionSource<AudioClient> promise;
 
             await _audioLock.WaitAsync().ConfigureAwait(false);
@@ -548,7 +545,6 @@ namespace Discord.WebSocket
                         var _ = promise.TrySetResultAsync(_audioClient);
                         return Task.Delay(0);
                     };
-                    configAction?.Invoke(audioClient);
                     _audioClient = audioClient;
                 }
 

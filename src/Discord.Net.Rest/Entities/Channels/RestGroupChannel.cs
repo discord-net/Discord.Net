@@ -143,7 +143,7 @@ namespace Discord.Rest
             => EnterTypingState(options);
 
         //IAudioChannel
-        Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction, bool external) { throw new NotSupportedException(); }
+        Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external) { throw new NotSupportedException(); }
         Task IAudioChannel.DisconnectAsync() { throw new NotSupportedException(); }
 
         //IChannel        
