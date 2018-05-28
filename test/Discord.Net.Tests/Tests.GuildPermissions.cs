@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -38,9 +39,13 @@ namespace Discord
             copy = GuildPermissions.Webhook.Modify();
             Assert.Equal(GuildPermissions.Webhook.RawValue, copy.RawValue);
 
+            // Get all distinct values (ReadMessages = ViewChannel)
+            var enumValues = (Enum.GetValues(typeof(GuildPermission)) as GuildPermission[])
+                .Distinct()
+                .ToArray();
             // test GuildPermissions.All
             ulong sumOfAllGuildPermissions = 0;
-            foreach(var v in Enum.GetValues(typeof(GuildPermission)))
+            foreach(var v in enumValues)
             {
                 sumOfAllGuildPermissions |= (ulong)v;
             }
@@ -51,7 +56,7 @@ namespace Discord
 
             // assert that GuildPermissions.All contains the same number of permissions as the
             // GuildPermissions enum
-            Assert.Equal(Enum.GetValues(typeof(GuildPermission)).Length, GuildPermissions.All.ToList().Count);
+            Assert.Equal(enumValues.Length, GuildPermissions.All.ToList().Count);
 
             // assert that webhook has the same raw value
             ulong webHookPermissions = (ulong)(

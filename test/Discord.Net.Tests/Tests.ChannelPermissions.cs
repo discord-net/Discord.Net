@@ -68,6 +68,7 @@ namespace Discord
             ulong voiceChannel = (ulong)(
                 ChannelPermission.CreateInstantInvite
                 | ChannelPermission.ManageChannels
+                | ChannelPermission.ViewChannel
                 | ChannelPermission.Connect
                 | ChannelPermission.Speak
                 | ChannelPermission.MuteMembers

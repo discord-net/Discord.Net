@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -21,6 +22,7 @@ namespace Discord
         /// <param name="expected"></param>
         private void TestHelper(ulong rawValue, ulong flagValue, bool expected)
         {
+            Debug.Print($"Expecting {expected} for {rawValue} w/ {flagValue}");
             Assert.Equal(expected, Permissions.GetValue(rawValue, flagValue));
 
             // check that toggling the bit works
@@ -239,7 +241,7 @@ namespace Discord
             TestHelper(value, ChannelPermission.CreateInstantInvite, true);
             TestHelper(value, ChannelPermission.ManageChannels, true);
             TestHelper(value, ChannelPermission.AddReactions, false);
-            TestHelper(value, ChannelPermission.ViewChannel, false);
+            TestHelper(value, ChannelPermission.ViewChannel, true);
             TestHelper(value, ChannelPermission.SendMessages, false);
             TestHelper(value, ChannelPermission.SendTTSMessages, false);
             TestHelper(value, ChannelPermission.ManageMessages, false);
@@ -659,7 +661,7 @@ namespace Discord
             TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Allow);
             TestHelper(value, ChannelPermission.ManageChannels, PermValue.Allow);
             TestHelper(value, ChannelPermission.AddReactions, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Allow);
             TestHelper(value, ChannelPermission.SendMessages, PermValue.Inherit);
             TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Inherit);
             TestHelper(value, ChannelPermission.ManageMessages, PermValue.Inherit);
@@ -682,7 +684,7 @@ namespace Discord
             TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Deny);
             TestHelper(value, ChannelPermission.ManageChannels, PermValue.Deny);
             TestHelper(value, ChannelPermission.AddReactions, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Deny);
             TestHelper(value, ChannelPermission.SendMessages, PermValue.Inherit);
             TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Inherit);
             TestHelper(value, ChannelPermission.ManageMessages, PermValue.Inherit);
