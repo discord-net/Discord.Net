@@ -49,7 +49,7 @@ namespace Discord
             Assert.Equal(sumOfAllGuildPermissions, GuildPermissions.All.RawValue);
             Assert.Equal((ulong)0, GuildPermissions.None.RawValue);
 
-            // assert that GuildPermissions.All contains the same number of permissions as the 
+            // assert that GuildPermissions.All contains the same number of permissions as the
             // GuildPermissions enum
             Assert.Equal(Enum.GetValues(typeof(GuildPermission)).Length, GuildPermissions.All.ToList().Count);
 
@@ -76,7 +76,7 @@ namespace Discord
             // ensure that when we modify it the parameter works
             perm = perm.Modify(createInstantInvite: true);
             Assert.True(perm.CreateInstantInvite);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.CreateInstantInvite);
+            Assert.Equal((ulong)GuildPermission.CreateInstantInvite, perm.RawValue);
 
             // set it false again, then move on to the next permission
             perm = perm.Modify(createInstantInvite: false);
@@ -86,7 +86,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(kickMembers: true);
             Assert.True(perm.KickMembers);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.KickMembers);
+            Assert.Equal((ulong)GuildPermission.KickMembers, perm.RawValue);
 
             perm = perm.Modify(kickMembers: false);
             Assert.False(perm.KickMembers);
@@ -95,7 +95,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(banMembers: true);
             Assert.True(perm.BanMembers);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.BanMembers);
+            Assert.Equal((ulong)GuildPermission.BanMembers, perm.RawValue);
 
             perm = perm.Modify(banMembers: false);
             Assert.False(perm.BanMembers);
@@ -104,7 +104,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(administrator: true);
             Assert.True(perm.Administrator);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.Administrator);
+            Assert.Equal((ulong)GuildPermission.Administrator, perm.RawValue);
 
             perm = perm.Modify(administrator: false);
             Assert.False(perm.Administrator);
@@ -113,7 +113,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(manageChannels: true);
             Assert.True(perm.ManageChannels);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.ManageChannels);
+            Assert.Equal((ulong)GuildPermission.ManageChannels, perm.RawValue);
 
             perm = perm.Modify(manageChannels: false);
             Assert.False(perm.ManageChannels);
@@ -122,7 +122,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(manageGuild: true);
             Assert.True(perm.ManageGuild);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.ManageGuild);
+            Assert.Equal((ulong)GuildPermission.ManageGuild, perm.RawValue);
 
             perm = perm.Modify(manageGuild: false);
             Assert.False(perm.ManageGuild);
@@ -132,7 +132,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(addReactions: true);
             Assert.True(perm.AddReactions);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.AddReactions);
+            Assert.Equal((ulong)GuildPermission.AddReactions, perm.RawValue);
 
             perm = perm.Modify(addReactions: false);
             Assert.False(perm.AddReactions);
@@ -142,7 +142,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(viewAuditLog: true);
             Assert.True(perm.ViewAuditLog);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.ViewAuditLog);
+            Assert.Equal((ulong)GuildPermission.ViewAuditLog, perm.RawValue);
 
             perm = perm.Modify(viewAuditLog: false);
             Assert.False(perm.ViewAuditLog);
@@ -152,7 +152,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(viewChannel: true);
             Assert.True(perm.ViewChannel);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.ViewChannel);
+            Assert.Equal((ulong)GuildPermission.ViewChannel, perm.RawValue);
 
             perm = perm.Modify(viewChannel: false);
             Assert.False(perm.ViewChannel);
@@ -162,7 +162,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(sendMessages: true);
             Assert.True(perm.SendMessages);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.SendMessages);
+            Assert.Equal((ulong)GuildPermission.SendMessages, perm.RawValue);
 
             perm = perm.Modify(sendMessages: false);
             Assert.False(perm.SendMessages);
@@ -171,7 +171,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(embedLinks: true);
             Assert.True(perm.EmbedLinks);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.EmbedLinks);
+            Assert.Equal((ulong)GuildPermission.EmbedLinks, perm.RawValue);
 
             perm = perm.Modify(embedLinks: false);
             Assert.False(perm.EmbedLinks);
@@ -180,7 +180,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(attachFiles: true);
             Assert.True(perm.AttachFiles);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.AttachFiles);
+            Assert.Equal((ulong)GuildPermission.AttachFiles, perm.RawValue);
 
             perm = perm.Modify(attachFiles: false);
             Assert.False(perm.AttachFiles);
@@ -189,7 +189,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(readMessageHistory: true);
             Assert.True(perm.ReadMessageHistory);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.ReadMessageHistory);
+            Assert.Equal((ulong)GuildPermission.ReadMessageHistory, perm.RawValue);
 
             perm = perm.Modify(readMessageHistory: false);
             Assert.False(perm.ReadMessageHistory);
@@ -198,7 +198,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(mentionEveryone: true);
             Assert.True(perm.MentionEveryone);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.MentionEveryone);
+            Assert.Equal((ulong)GuildPermission.MentionEveryone, perm.RawValue);
 
             perm = perm.Modify(mentionEveryone: false);
             Assert.False(perm.MentionEveryone);
@@ -207,7 +207,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(useExternalEmojis: true);
             Assert.True(perm.UseExternalEmojis);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.UseExternalEmojis);
+            Assert.Equal((ulong)GuildPermission.UseExternalEmojis, perm.RawValue);
 
             perm = perm.Modify(useExternalEmojis: false);
             Assert.False(perm.UseExternalEmojis);
@@ -216,7 +216,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(connect: true);
             Assert.True(perm.Connect);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.Connect);
+            Assert.Equal((ulong)GuildPermission.Connect, perm.RawValue);
 
             perm = perm.Modify(connect: false);
             Assert.False(perm.Connect);
@@ -225,7 +225,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(speak: true);
             Assert.True(perm.Speak);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.Speak);
+            Assert.Equal((ulong)GuildPermission.Speak, perm.RawValue);
 
             perm = perm.Modify(speak: false);
             Assert.False(perm.Speak);
@@ -234,7 +234,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(muteMembers: true);
             Assert.True(perm.MuteMembers);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.MuteMembers);
+            Assert.Equal((ulong)GuildPermission.MuteMembers, perm.RawValue);
 
             perm = perm.Modify(muteMembers: false);
             Assert.False(perm.MuteMembers);
@@ -243,7 +243,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(deafenMembers: true);
             Assert.True(perm.DeafenMembers);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.DeafenMembers);
+            Assert.Equal((ulong)GuildPermission.DeafenMembers, perm.RawValue);
 
             perm = perm.Modify(deafenMembers: false);
             Assert.False(perm.DeafenMembers);
@@ -252,7 +252,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(moveMembers: true);
             Assert.True(perm.MoveMembers);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.MoveMembers);
+            Assert.Equal((ulong)GuildPermission.MoveMembers, perm.RawValue);
 
             perm = perm.Modify(moveMembers: false);
             Assert.False(perm.MoveMembers);
@@ -261,7 +261,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(useVoiceActivation: true);
             Assert.True(perm.UseVAD);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.UseVAD);
+            Assert.Equal((ulong)GuildPermission.UseVAD, perm.RawValue);
 
             perm = perm.Modify(useVoiceActivation: false);
             Assert.False(perm.UseVAD);
@@ -270,7 +270,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(changeNickname: true);
             Assert.True(perm.ChangeNickname);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.ChangeNickname);
+            Assert.Equal((ulong)GuildPermission.ChangeNickname, perm.RawValue);
 
             perm = perm.Modify(changeNickname: false);
             Assert.False(perm.ChangeNickname);
@@ -279,7 +279,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(manageNicknames: true);
             Assert.True(perm.ManageNicknames);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.ManageNicknames);
+            Assert.Equal((ulong)GuildPermission.ManageNicknames, perm.RawValue);
 
             perm = perm.Modify(manageNicknames: false);
             Assert.False(perm.ManageNicknames);
@@ -288,7 +288,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(manageRoles: true);
             Assert.True(perm.ManageRoles);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.ManageRoles);
+            Assert.Equal((ulong)GuildPermission.ManageRoles, perm.RawValue);
 
             perm = perm.Modify(manageRoles: false);
             Assert.False(perm.ManageRoles);
@@ -297,7 +297,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(manageWebhooks: true);
             Assert.True(perm.ManageWebhooks);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.ManageWebhooks);
+            Assert.Equal((ulong)GuildPermission.ManageWebhooks, perm.RawValue);
 
             perm = perm.Modify(manageWebhooks: false);
             Assert.False(perm.ManageWebhooks);
@@ -306,7 +306,7 @@ namespace Discord
             // individual permission test
             perm = perm.Modify(manageEmojis: true);
             Assert.True(perm.ManageEmojis);
-            Assert.Equal(perm.RawValue, (ulong)GuildPermission.ManageEmojis);
+            Assert.Equal((ulong)GuildPermission.ManageEmojis, perm.RawValue);
 
             perm = perm.Modify(manageEmojis: false);
             Assert.False(perm.ManageEmojis);
