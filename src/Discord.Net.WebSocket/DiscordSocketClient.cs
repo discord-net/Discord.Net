@@ -1429,7 +1429,9 @@ namespace Discord.WebSocket
                                             after = SocketVoiceState.Create(null, data);
                                         }
 
-                                        user = guild.GetUser(data.UserId) ?? guild.AddOrUpdateUser(data.Member.Value); //per g250k, this is always sent
+                                        // per g250k, this should always be sent, but apparently not always
+                                        user = guild.GetUser(data.UserId)
+                                            ?? (data.Member.IsSpecified ? guild.AddOrUpdateUser(data.Member.Value) : null);
                                         if (user == null)
                                         {
                                             await UnknownGuildUserAsync(type, data.UserId, guild.Id).ConfigureAwait(false);
