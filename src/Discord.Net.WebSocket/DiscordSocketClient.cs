@@ -1104,7 +1104,7 @@ namespace Discord.WebSocket
                                         if (author == null)
                                         {
                                             if (guild != null)
-                                                author = guild.AddOrUpdateUser(data.Author.Value); //User has no guild-specific data
+                                                author = guild.AddOrUpdateUser(data.Member.Value); //per g250k, we can create an entire member now
                                             else if (channel is SocketGroupChannel)
                                                 author = (channel as SocketGroupChannel).GetOrAddUser(data.Author.Value);
                                             else
@@ -1374,6 +1374,11 @@ namespace Discord.WebSocket
                                         }
 
                                         var user = (channel as SocketChannel).GetUser(data.UserId);
+                                        if (user == null)
+                                        {
+                                            if (guild != null)
+                                                user = guild.AddOrUpdateUser(data.Member);
+                                        }
                                         if (user != null)
                                             await TimedInvokeAsync(_userIsTypingEvent, nameof(UserIsTyping), user, channel).ConfigureAwait(false);
                                     }
@@ -1437,7 +1442,7 @@ namespace Discord.WebSocket
                                             after = SocketVoiceState.Create(null, data);
                                         }
 
-                                        user = guild.GetUser(data.UserId);
+                                        user = guild.GetUser(data.UserId) ?? guild.AddOrUpdateUser(data.Member.Value); //per g250k, this is always sent
                                         if (user == null)
                                         {
                                             await UnknownGuildUserAsync(type, data.UserId, guild.Id).ConfigureAwait(false);
