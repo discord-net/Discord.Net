@@ -11,12 +11,19 @@ namespace Discord
         ///     Returns the API version Discord.Net uses. 
         /// </summary>
         /// <returns>
-        ///     A 32-bit integer representing the API version that Discord.Net uses to communicate with Discord.
+        ///     An <see cref="int"/> representing the API version that Discord.Net uses to communicate with Discord.
         ///     <para>A list of available API version can be seen on the official 
         ///     <see href="https://discordapp.com/developers/docs/reference#api-versioning">Discord API documentation</see>
         ///     .</para>
         /// </returns>
         public const int APIVersion = 6;
+        /// <summary>
+        /// Returns the Voice API version Discord.Net uses.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="int"/> representing the API version that Discord.Net uses to communicate with Discord's
+        ///     voice server.
+        /// </returns>
         public const int VoiceAPIVersion = 3;
         /// <summary>
         ///     Gets the Discord.Net version, including the build number.

@@ -10,7 +10,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     <para>
         ///         This event is fired when a generic channel has been created. The event handler must return a
-        ///         <see cref="Task"/>.
+        ///         <see cref="Task"/> and accept a <see cref="SocketChannel"/> as its parameter.
         ///     </para>
         ///     <para>
         ///         The newly created channel is passed into the event handler parameter. The given channel type may
@@ -28,7 +28,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     <para>
         ///         This event is fired when a generic channel has been destroyed. The event handler must return a
-        ///         <see cref="Task"/>.
+        ///         <see cref="Task"/> and accept a <see cref="SocketChannel"/> as its parameter.
         ///     </para>
         ///     <para>
         ///         The destroyed channel is passed into the event handler parameter. The given channel type may
@@ -45,7 +45,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     <para>
         ///         This event is fired when a generic channel has been destroyed. The event handler must return a
-        ///         <see cref="Task"/>.
+        ///         <see cref="Task"/> and accept 2 <see cref="SocketChannel"/> as its parameters.
         ///     </para>
         ///     <para>
         ///         The original (prior to update) channel is passed into the first <see cref="SocketChannel"/>, while
@@ -65,13 +65,13 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     <para>
         ///         This event is fired when a message is received. The event handler must return a
-        ///         <see cref="Task"/>.
+        ///         <see cref="Task"/> and accept a <see cref="SocketMessage"/> as its parameter.
         ///     </para>
         ///     <para>
         ///         The message that is sent to the client is passed into the event handler parameter as
         ///         <see cref="SocketMessage"/>. This message may be a system message (i.e.
-        ///         <see cref="SocketSystemMessage"/>) or a user message (i.e. <see cref="SocketUserMessage"/>. See
-        ///         the derived clsases of <see cref="SocketMessage"/> for more details.
+        ///         <see cref="SocketSystemMessage"/>) or a user message (i.e. <see cref="SocketUserMessage"/>. See the
+        ///         derived clsases of <see cref="SocketMessage"/> for more details.
         ///     </para>
         /// </remarks>
         public event Func<SocketMessage, Task> MessageReceived {
@@ -108,6 +108,26 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task>> _messageDeletedEvent = new AsyncEvent<Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task>>();
         /// <summary> Fired when a message is updated. </summary>
+        /// <remarks>
+        ///     <para>
+        ///         This event is fired when a message is updated. The event handler must return a
+        ///         <see cref="Task"/> and accept a <see cref="Cacheable{TEntity,TId}"/>, <see cref="SocketMessage"/>,
+        ///         and <see cref="ISocketMessageChannel"/> as its parameters.
+        ///     </para>
+        ///     <para>
+        ///         If caching is enabled via <see cref="DiscordSocketConfig"/>, the
+        ///         <see cref="Cacheable{TEntity,TId}"/> entity will contain the original message; otherwise, in event
+        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the 
+        ///         <see cref="ulong"/>.
+        ///     </para>
+        ///     <para>
+        ///         The updated message will be passed into the <see cref="SocketMessage"/> parameter.
+        ///     </para>
+        ///     <para>
+        ///         The source channel of the updated message will be passed into the 
+        ///         <see cref="ISocketMessageChannel"/> parameter.
+        ///     </para>
+        /// </remarks>
         public event Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task> MessageUpdated {
             add { _messageUpdatedEvent.Add(value); }
             remove { _messageUpdatedEvent.Remove(value); }
