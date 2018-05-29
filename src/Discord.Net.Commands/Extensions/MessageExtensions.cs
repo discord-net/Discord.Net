@@ -1,9 +1,15 @@
-﻿using System;
+using System;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    /// Extension methods for <see cref="IUserMessage"/> that related to commands.
+    /// </summary>
     public static class MessageExtensions
     {
+        /// <summary>
+        ///     Gets whether the message starts with the provided character.
+        /// </summary>
         public static bool HasCharPrefix(this IUserMessage msg, char c, ref int argPos)
         {
             var text = msg.Content;
@@ -14,6 +20,9 @@ namespace Discord.Commands
             }
             return false;
         }
+        /// <summary>
+        ///     Gets whether the message starts with the provided string.
+        /// </summary>
         public static bool HasStringPrefix(this IUserMessage msg, string str, ref int argPos, StringComparison comparisonType = StringComparison.Ordinal)
         {
             var text = msg.Content;
@@ -24,6 +33,9 @@ namespace Discord.Commands
             }
             return false;
         }
+        /// <summary>
+        ///     Gets whether the message starts with the user's mention string.
+        /// </summary>
         public static bool HasMentionPrefix(this IUserMessage msg, IUser user, ref int argPos)
         {
             var text = msg.Content;

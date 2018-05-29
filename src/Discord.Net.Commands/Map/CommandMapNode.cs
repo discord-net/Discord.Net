@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -7,7 +7,7 @@ namespace Discord.Commands
 {
     internal class CommandMapNode
     {
-        private static readonly char[] _whitespaceChars = new[] { ' ', '\r', '\n' };
+        private static readonly char[] WhitespaceChars = new[] { ' ', '\r', '\n' };
 
         private readonly ConcurrentDictionary<string, CommandMapNode> _nodes;
         private readonly string _name;
@@ -23,6 +23,7 @@ namespace Discord.Commands
             _commands = ImmutableArray.Create<CommandInfo>();
         }
 
+        /// <exception cref="InvalidOperationException">Cannot add commands to the root node.</exception>
         public void AddCommand(CommandService service, string text, int index, CommandInfo command)
         {
             int nextSegment = NextSegment(text, index, service._separatorChar);
@@ -100,7 +101,7 @@ namespace Discord.Commands
                 }
 
                 //Check if this is the last command segment before args
-                nextSegment = NextSegment(text, index, _whitespaceChars, service._separatorChar);
+                nextSegment = NextSegment(text, index, WhitespaceChars, service._separatorChar);
                 if (nextSegment != -1)
                 {
                     name = text.Substring(index, nextSegment - index);

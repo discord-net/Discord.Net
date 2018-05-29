@@ -1,15 +1,38 @@
-﻿using System;
+using System;
 using System.Text;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Represents a message used for logging purposes.
+    /// </summary>
     public struct LogMessage
     {
+        /// <summary>
+        ///     Gets the severity of the log message.
+        /// </summary>
         public LogSeverity Severity { get; }
+        /// <summary>
+        ///     Gets the source of the log message.
+        /// </summary>
         public string Source { get; }
+        /// <summary>
+        ///     Gets the message of the log message.
+        /// </summary>
         public string Message { get; }
+        /// <summary>
+        ///     Gets the exception of the log message.
+        /// </summary>
         public Exception Exception { get; }
 
+        /// <summary>
+        ///     Initializes a new <see cref="LogMessage" /> struct with the severity, source, message of the event, and
+        ///     optionally, an exception.
+        /// </summary>
+        /// <param name="severity">The severity of the event.</param>
+        /// <param name="source">The source of the event.</param>
+        /// <param name="message">The message of the event.</param>
+        /// <param name="exception">The exception of the event.</param>
         public LogMessage(LogSeverity severity, string source, string message, Exception exception = null)
         {
             Severity = severity;
@@ -17,8 +40,8 @@ namespace Discord
             Message = message;
             Exception = exception;
         }
-
-        public override string ToString() => ToString(null);
+        
+        public override string ToString() => ToString();
         public string ToString(StringBuilder builder = null, bool fullException = true, bool prependTimestamp = true, DateTimeKind timestampKind = DateTimeKind.Local, int? padSource = 11)
         {
             string sourceName = Source;

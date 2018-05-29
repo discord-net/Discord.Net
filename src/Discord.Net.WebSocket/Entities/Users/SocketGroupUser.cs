@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Model = Discord.API.User;
 
 namespace Discord.WebSocket
@@ -9,12 +9,17 @@ namespace Discord.WebSocket
         public SocketGroupChannel Channel { get; }
         internal override SocketGlobalUser GlobalUser { get; }
 
+        /// <inheritdoc />
         public override bool IsBot { get { return GlobalUser.IsBot; } internal set { GlobalUser.IsBot = value; } }
+        /// <inheritdoc />
         public override string Username { get { return GlobalUser.Username; } internal set { GlobalUser.Username = value; } }
+        /// <inheritdoc />
         public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
+        /// <inheritdoc />
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
         internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
 
+        /// <inheritdoc />
         public override bool IsWebhook => false;
 
         internal SocketGroupUser(SocketGroupChannel channel, SocketGlobalUser globalUser)
@@ -30,15 +35,23 @@ namespace Discord.WebSocket
             return entity;
         }
 
+        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Group)";
         internal new SocketGroupUser Clone() => MemberwiseClone() as SocketGroupUser;
 
         //IVoiceState
+        /// <inheritdoc />
         bool IVoiceState.IsDeafened => false;
+        /// <inheritdoc />
         bool IVoiceState.IsMuted => false;
+        /// <inheritdoc />
         bool IVoiceState.IsSelfDeafened => false;
+        /// <inheritdoc />
         bool IVoiceState.IsSelfMuted => false;
+        /// <inheritdoc />
         bool IVoiceState.IsSuppressed => false;
+        /// <inheritdoc />
         IVoiceChannel IVoiceState.VoiceChannel => null;
+        /// <inheritdoc />
         string IVoiceState.VoiceSessionId => null;
     }
 }

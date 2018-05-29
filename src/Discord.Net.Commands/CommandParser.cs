@@ -170,7 +170,7 @@ namespace Discord.Commands
             if (isEscaping)
                 return ParseResult.FromError(CommandError.ParseFailed, "Input text may not end on an incomplete escape.");
             if (curPart == ParserPart.QuotedParameter)
-                return ParseResult.FromError(CommandError.ParseFailed, "A quoted parameter is incomplete");
+                return ParseResult.FromError(CommandError.ParseFailed, "A quoted parameter is incomplete.");
             
             //Add missing optionals
             for (int i = argList.Count; i < command.Parameters.Count; i++)

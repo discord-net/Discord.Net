@@ -126,7 +126,7 @@ namespace Discord.Net.Queue
                     if ((request.Options.RetryMode & RetryMode.RetryTimeouts) == 0)
                         throw;
 
-                    await Task.Delay(500);
+                    await Task.Delay(500).ConfigureAwait(false);
                     continue; //Retry
                 }
                 /*catch (Exception)

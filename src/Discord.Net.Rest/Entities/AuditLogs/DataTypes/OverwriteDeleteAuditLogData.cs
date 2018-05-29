@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
-using ChangeModel = Discord.API.AuditLogChange;
-using OptionModel = Discord.API.AuditLogOptions;
 
 namespace Discord.Rest
 {

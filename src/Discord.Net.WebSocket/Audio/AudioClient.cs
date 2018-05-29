@@ -16,7 +16,7 @@ using System.Collections.Generic;
 namespace Discord.Audio
 {
     //TODO: Add audio reconnecting
-    internal partial class AudioClient : IAudioClient, IDisposable
+    internal partial class AudioClient : IAudioClient
     {
         internal struct StreamPair
         {
@@ -65,7 +65,7 @@ namespace Discord.Audio
 
             ApiClient = new DiscordVoiceAPIClient(guild.Id, Discord.WebSocketProvider, Discord.UdpSocketProvider);
             ApiClient.SentGatewayMessage += async opCode => await _audioLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
-            ApiClient.SentDiscovery += async () => await _audioLogger.DebugAsync($"Sent Discovery").ConfigureAwait(false);
+            ApiClient.SentDiscovery += async () => await _audioLogger.DebugAsync("Sent Discovery").ConfigureAwait(false);
             //ApiClient.SentData += async bytes => await _audioLogger.DebugAsync($"Sent {bytes} Bytes").ConfigureAwait(false);
             ApiClient.ReceivedEvent += ProcessMessageAsync;
             ApiClient.ReceivedPacket += ProcessPacketAsync;
@@ -297,7 +297,7 @@ namespace Discord.Audio
                 {
                     if (packet.Length != 70)
                     {
-                        await _audioLogger.DebugAsync($"Malformed Packet").ConfigureAwait(false);
+                        await _audioLogger.DebugAsync("Malformed Packet").ConfigureAwait(false);
                         return;
                     }
                     string ip;
@@ -309,7 +309,7 @@ namespace Discord.Audio
                     }
                     catch (Exception ex)
                     {
-                        await _audioLogger.DebugAsync($"Malformed Packet", ex).ConfigureAwait(false);
+                        await _audioLogger.DebugAsync("Malformed Packet", ex).ConfigureAwait(false);
                         return; 
                     }
                     
@@ -349,7 +349,7 @@ namespace Discord.Audio
                     {                        
                         if (!RTPReadStream.TryReadSsrc(packet, 0, out var ssrc))
                         {
-                            await _audioLogger.DebugAsync($"Malformed Frame").ConfigureAwait(false);
+                            await _audioLogger.DebugAsync("Malformed Frame").ConfigureAwait(false);
                             return;
                         }
                         if (!_ssrcMap.TryGetValue(ssrc, out var userId))
@@ -368,7 +368,7 @@ namespace Discord.Audio
                         }
                         catch (Exception ex)
                         {
-                            await _audioLogger.DebugAsync($"Malformed Frame", ex).ConfigureAwait(false);
+                            await _audioLogger.DebugAsync("Malformed Frame", ex).ConfigureAwait(false);
                             return;
                         }
                         //await _audioLogger.DebugAsync($"Received {packet.Length} bytes from user {userId}").ConfigureAwait(false);
@@ -377,7 +377,7 @@ namespace Discord.Audio
             }
             catch (Exception ex)
             {
-                await _audioLogger.WarningAsync($"Failed to process UDP packet", ex).ConfigureAwait(false);
+                await _audioLogger.WarningAsync("Failed to process UDP packet", ex).ConfigureAwait(false);
                 return;
             }
         }

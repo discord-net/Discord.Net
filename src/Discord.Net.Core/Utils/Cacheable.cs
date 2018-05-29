@@ -1,30 +1,31 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord
 {
     /// <summary>
-    /// Contains an entity that may be cached.
+    ///     Represents a cached entity.
     /// </summary>
-    /// <typeparam name="TEntity">The type of entity that is cached</typeparam>
-    /// <typeparam name="TId">The type of this entity's ID</typeparam>
+    /// <typeparam name="TEntity">The type of entity that is cached.</typeparam>
+    /// <typeparam name="TId">The type of this entity's ID.</typeparam>
     public struct Cacheable<TEntity, TId>
         where TEntity : IEntity<TId>
         where TId : IEquatable<TId>
     {
         /// <summary>
-        /// Is this entity cached?
+        ///     Gets whether this entity is cached.
         /// </summary>
         public bool HasValue { get; }
         /// <summary>
-        /// The ID of this entity.
+        ///     Gets the ID of this entity.
         /// </summary>
         public TId Id { get; }
         /// <summary>
-        /// The entity, if it could be pulled from cache.
+        ///     Gets the entity if it could be pulled from cache.
         /// </summary>
         /// <remarks>
-        /// This value is not guaranteed to be set; in cases where the entity cannot be pulled from cache, it is null.
+        ///     This value is not guaranteed to be set; in cases where the entity cannot be pulled from cache, it is
+        ///     <c>null</c>.
         /// </remarks>
         public TEntity Value { get; }
         private Func<Task<TEntity>> DownloadFunc { get; }
@@ -38,22 +39,26 @@ namespace Discord
         }
 
         /// <summary>
-        /// Downloads this entity to cache.
+        ///     Downloads this entity to cache.
         /// </summary>
-        /// <returns>An awaitable Task containing the downloaded entity.</returns>
         /// <exception cref="Discord.Net.HttpException">Thrown when used from a user account.</exception>
         /// <exception cref="NullReferenceException">Thrown when the message is deleted.</exception>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing the downloaded entity.
+        /// </returns>
         public async Task<TEntity> DownloadAsync()
         {
-            return await DownloadFunc();
+            return await DownloadFunc().ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Returns the cached entity if it exists; otherwise downloads it.
+        ///     Returns the cached entity if it exists; otherwise downloads it.
         /// </summary>
-        /// <returns>An awaitable Task containing a cached or downloaded entity.</returns>
         /// <exception cref="Discord.Net.HttpException">Thrown when used from a user account.</exception>
         /// <exception cref="NullReferenceException">Thrown when the message is deleted and is not in cache.</exception>
-        public async Task<TEntity> GetOrDownloadAsync() => HasValue ? Value : await DownloadAsync();
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing a cached or downloaded entity.
+        /// </returns>
+        public async Task<TEntity> GetOrDownloadAsync() => HasValue ? Value : await DownloadAsync().ConfigureAwait(false);
     }
 }

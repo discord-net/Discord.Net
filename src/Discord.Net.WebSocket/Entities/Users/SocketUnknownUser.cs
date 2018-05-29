@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using Model = Discord.API.User;
 
@@ -15,7 +15,8 @@ namespace Discord.WebSocket
         public override bool IsWebhook => false;
 
         internal override SocketPresence Presence { get { return new SocketPresence(UserStatus.Offline, null); } set { } }
-        internal override SocketGlobalUser GlobalUser { get { throw new NotSupportedException(); } }
+        internal override SocketGlobalUser GlobalUser =>
+            throw new NotSupportedException();
 
         internal SocketUnknownUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
@@ -28,6 +29,7 @@ namespace Discord.WebSocket
             return entity;
         }
 
+        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Unknown)";
         internal new SocketUnknownUser Clone() => MemberwiseClone() as SocketUnknownUser;
     }
 }

@@ -12,11 +12,12 @@ namespace Discord.Webhook
 {
     internal static class WebhookClientHelper
     {
+        /// <exception cref="InvalidOperationException">Could not find a webhook with the supplied credentials.</exception>
         public static async Task<RestInternalWebhook> GetWebhookAsync(DiscordWebhookClient client, ulong webhookId)
         {
-            var model = await client.ApiClient.GetWebhookAsync(webhookId);
+            var model = await client.ApiClient.GetWebhookAsync(webhookId).ConfigureAwait(false);
             if (model == null)
-                throw new InvalidOperationException("Could not find a webhook for the supplied credentials.");
+                throw new InvalidOperationException("Could not find a webhook with the supplied credentials.");
             return RestInternalWebhook.Create(client, model);
         }
         public static async Task<ulong> SendMessageAsync(DiscordWebhookClient client, 
