@@ -23,7 +23,7 @@ namespace Discord.Rest
 
         private bool _nsfw;
         /// <inheritdoc />
-        public bool IsNsfw => _nsfw || ChannelHelper.IsNsfw(this);
+        public bool IsNsfw => _nsfw;
 
         internal RestTextChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
@@ -135,7 +135,7 @@ namespace Discord.Rest
             => ChannelHelper.GetWebhookAsync(this, Discord, id, options);
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => ChannelHelper.GetWebhooksAsync(this, Discord, options);
-    
+
         public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
             => ChannelHelper.GetCategoryAsync(this, Discord, options);
 
@@ -169,7 +169,7 @@ namespace Discord.Rest
             else
                 return AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
         }
-        
+
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId, Direction dir, int limit, CacheMode mode, RequestOptions options)
         {

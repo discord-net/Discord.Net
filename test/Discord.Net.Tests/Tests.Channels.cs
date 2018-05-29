@@ -169,7 +169,7 @@ namespace Discord
         private async Task CheckChannelCategories(RestCategoryChannel[] categories, RestGuildChannel[] allChannels)
         {
             // 2 categories
-            Assert.Equal(categories.Length, 2);
+            Assert.Equal(2, categories.Length);
 
             var cat1 = categories.Where(x => x.Name == "cat1").FirstOrDefault();
             var cat2 = categories.Where(x => x.Name == "cat2").FirstOrDefault();
@@ -202,7 +202,7 @@ namespace Discord
 
             Assert.NotNull(voice1);
             Assert.NotNull(voice3);
-            
+
             Assert.Equal(voice1.CategoryId, cat2.Id);
             var voice1Cat = await voice1.GetCategoryAsync();
             Assert.Equal(voice1Cat.Id, cat2.Id);

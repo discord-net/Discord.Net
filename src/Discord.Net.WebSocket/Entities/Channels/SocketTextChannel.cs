@@ -26,7 +26,7 @@ namespace Discord.WebSocket
 
         private bool _nsfw;
         /// <inheritdoc />
-        public bool IsNsfw => _nsfw || ChannelHelper.IsNsfw(this);
+        public bool IsNsfw => _nsfw;
 
         /// <inheritdoc />
         public string Mention => MentionUtils.MentionChannel(Id);

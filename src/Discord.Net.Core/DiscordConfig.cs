@@ -17,6 +17,7 @@ namespace Discord
         ///     .</para>
         /// </returns>
         public const int APIVersion = 6;
+        public const int VoiceAPIVersion = 3;
         /// <summary>
         ///     Gets the Discord.Net version, including the build number.
         /// </summary>

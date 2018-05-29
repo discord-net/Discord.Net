@@ -77,7 +77,7 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
+        ///
         /// Tests that text channel permissions get the right value
         /// from the Has method.
         /// </summary>
@@ -114,7 +114,7 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
+        ///
         /// Tests that no channel permissions get the right value
         /// from the Has method.
         /// </summary>
@@ -151,7 +151,7 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
+        ///
         /// Tests that the dm channel permissions get the right value
         /// from the Has method.
         /// </summary>
@@ -188,7 +188,7 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
+        ///
         /// Tests that the group channel permissions get the right value
         /// from the Has method.
         /// </summary>
@@ -225,7 +225,7 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
+        ///
         /// Tests that the voice channel permissions get the right value
         /// from the Has method.
         /// </summary>
@@ -239,7 +239,7 @@ namespace Discord
             TestHelper(value, ChannelPermission.CreateInstantInvite, true);
             TestHelper(value, ChannelPermission.ManageChannels, true);
             TestHelper(value, ChannelPermission.AddReactions, false);
-            TestHelper(value, ChannelPermission.ViewChannel, false);
+            TestHelper(value, ChannelPermission.ViewChannel, true);
             TestHelper(value, ChannelPermission.SendMessages, false);
             TestHelper(value, ChannelPermission.SendTTSMessages, false);
             TestHelper(value, ChannelPermission.ManageMessages, false);
@@ -262,8 +262,8 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
-        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/> 
+        ///
+        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/>
         /// returns the correct value when no permissions are set.
         /// </summary>
         /// <returns></returns>
@@ -305,8 +305,8 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
-        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/> 
+        ///
+        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/>
         /// returns the correct value when all permissions are set.
         /// </summary>
         /// <returns></returns>
@@ -349,8 +349,8 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
-        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/> 
+        ///
+        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/>
         /// returns the correct value when webhook permissions are set.
         /// </summary>
         /// <returns></returns>
@@ -659,7 +659,7 @@ namespace Discord
             TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Allow);
             TestHelper(value, ChannelPermission.ManageChannels, PermValue.Allow);
             TestHelper(value, ChannelPermission.AddReactions, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Allow);
             TestHelper(value, ChannelPermission.SendMessages, PermValue.Inherit);
             TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Inherit);
             TestHelper(value, ChannelPermission.ManageMessages, PermValue.Inherit);
@@ -682,7 +682,7 @@ namespace Discord
             TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Deny);
             TestHelper(value, ChannelPermission.ManageChannels, PermValue.Deny);
             TestHelper(value, ChannelPermission.AddReactions, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Deny);
             TestHelper(value, ChannelPermission.SendMessages, PermValue.Inherit);
             TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Inherit);
             TestHelper(value, ChannelPermission.ManageMessages, PermValue.Inherit);
@@ -709,6 +709,7 @@ namespace Discord
         /// of the OverwritePermissions.
         /// </summary>
         /// <returns></returns>
+        [Fact]
         public Task TestOverwritePermissionModifyNoParam()
         {
             // test for all Text allowed, none denied
