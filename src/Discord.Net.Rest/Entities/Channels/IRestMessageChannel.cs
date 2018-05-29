@@ -19,8 +19,7 @@ namespace Discord.Rest
         /// <returns>
         ///     An awaitable Task containing the message sent to the channel.
         /// </returns>
-        new Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null);
-#if FILESYSTEM
+        new Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
         /// <summary>
         ///     Sends a file to this message channel, with an optional caption.
         /// </summary>
@@ -38,7 +37,6 @@ namespace Discord.Rest
         ///     An awaitable Task containing the message sent to the channel.
         /// </returns>
         new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
-#endif
         /// <summary>
         ///     Sends a file to this message channel, with an optional caption.
         /// </summary>

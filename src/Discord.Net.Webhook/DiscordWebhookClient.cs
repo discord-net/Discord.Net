@@ -62,20 +62,17 @@ namespace Discord.Webhook
         }
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
             => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent);
-
         /// <summary> Sends a message using to the channel for this webhook. </summary>
         /// <returns> Returns the ID of the created message. </returns>
-        public Task<ulong> SendMessageAsync(string text, bool isTTS = false, IEnumerable<Embed> embeds = null,
+        public Task<ulong> SendMessageAsync(string text = null, bool isTTS = false, IEnumerable<Embed> embeds = null,
             string username = null, string avatarUrl = null, RequestOptions options = null)
             => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, options);
 
-#if FILESYSTEM
         /// <summary> Sends a message to the channel for this webhook with an attachment. </summary>
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendFileAsync(string filePath, string text, bool isTTS = false,
             IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null)
             => WebhookClientHelper.SendFileAsync(this, filePath, text, isTTS, embeds, username, avatarUrl, options);
-#endif
         /// <summary> Sends a message to the channel for this webhook with an attachment. </summary>
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false,

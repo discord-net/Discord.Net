@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 namespace Discord
 {
@@ -22,7 +21,7 @@ namespace Discord
         {
             Stream = stream;
         }
-#if FILESYSTEM
+
         /// <summary>
         ///     Create the image from a file path.
         /// </summary>
@@ -31,21 +30,21 @@ namespace Discord
         ///     <see cref="File.OpenRead"/>.
         /// </remarks>
         /// <param name="path">The path to the file.</param>
-        /// <exception cref="ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// <paramref name="path" /> is a zero-length string, contains only white space, or contains one or more invalid
         /// characters as defined by <see cref="Path.GetInvalidPathChars" />.
         /// </exception>
-        /// <exception cref="ArgumentNullException"><paramref name="path" /> is <c>null</c>.</exception>
+        /// <exception cref="System.ArgumentNullException"><paramref name="path" /> is <c>null</c>.</exception>
         /// <exception cref="PathTooLongException">
         /// The specified path, file name, or both exceed the system-defined maximum length. For example, on
         /// Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260
         /// characters.
         /// </exception>
-        /// <exception cref="NotSupportedException"><paramref name="path" /> is in an invalid format.</exception>
+        /// <exception cref="System.NotSupportedException"><paramref name="path" /> is in an invalid format.</exception>
         /// <exception cref="DirectoryNotFoundException">
         /// The specified <paramref name="path"/> is invalid, (for example, it is on an unmapped drive).
         /// </exception>
-        /// <exception cref="UnauthorizedAccessException">
+        /// <exception cref="System.UnauthorizedAccessException">
         /// <paramref name="path" /> specified a directory.-or- The caller does not have the required permission. 
         /// </exception>
         /// <exception cref="FileNotFoundException">The file specified in <paramref name="path" /> was not found. 
@@ -55,6 +54,6 @@ namespace Discord
         {
             Stream = File.OpenRead(path);
         }
-#endif
+
     }
 }

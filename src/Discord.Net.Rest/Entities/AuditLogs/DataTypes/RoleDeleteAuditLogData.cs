@@ -7,7 +7,7 @@ namespace Discord.Rest
 {
     public class RoleDeleteAuditLogData : IAuditLogData
     {
-        private RoleDeleteAuditLogData(ulong id, RoleInfo props)
+        private RoleDeleteAuditLogData(ulong id, RoleEditInfo props)
         {
             RoleId = id;
             Properties = props;
@@ -38,10 +38,10 @@ namespace Discord.Rest
                 permissions = new GuildPermissions(permissionsRaw.Value);
 
             return new RoleDeleteAuditLogData(entry.TargetId.Value,
-                new RoleInfo(color, mentionable, hoist, name, permissions));
+                new RoleEditInfo(color, mentionable, hoist, name, permissions));
         }
 
         public ulong RoleId { get; }
-        public RoleInfo Properties { get; }
+        public RoleEditInfo Properties { get; }
     }
 }

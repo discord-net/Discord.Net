@@ -378,7 +378,7 @@ namespace Discord.WebSocket
             await ApiClient.SendStatusUpdateAsync(
                 status,
                 status == UserStatus.AFK,
-                statusSince != null ? DateTimeUtils.ToUnixMilliseconds(_statusSince.Value) : (long?)null,
+                statusSince != null ? _statusSince.Value.ToUnixTimeMilliseconds() : (long?)null,
                 gameModel).ConfigureAwait(false);
         }
 
@@ -1104,7 +1104,7 @@ namespace Discord.WebSocket
                                         if (author == null)
                                         {
                                             if (guild != null)
-                                                author = guild.AddOrUpdateUser(data.Author.Value); //User has no guild-specific data
+                                                author = guild.AddOrUpdateUser(data.Member.Value); //per g250k, we can create an entire member now
                                             else if (channel is SocketGroupChannel)
                                                 author = (channel as SocketGroupChannel).GetOrAddUser(data.Author.Value);
                                             else
@@ -1374,6 +1374,11 @@ namespace Discord.WebSocket
                                         }
 
                                         var user = (channel as SocketChannel).GetUser(data.UserId);
+                                        if (user == null)
+                                        {
+                                            if (guild != null)
+                                                user = guild.AddOrUpdateUser(data.Member);
+                                        }
                                         if (user != null)
                                             await TimedInvokeAsync(_userIsTypingEvent, nameof(UserIsTyping), user, channel).ConfigureAwait(false);
                                     }
@@ -1437,7 +1442,9 @@ namespace Discord.WebSocket
                                             after = SocketVoiceState.Create(null, data);
                                         }
 
-                                        user = guild.GetUser(data.UserId);
+                                        // per g250k, this should always be sent, but apparently not always
+                                        user = guild.GetUser(data.UserId)
+                                            ?? (data.Member.IsSpecified ? guild.AddOrUpdateUser(data.Member.Value) : null);
                                         if (user == null)
                                         {
                                             await UnknownGuildUserAsync(type, data.UserId, guild.Id).ConfigureAwait(false);

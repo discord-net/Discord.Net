@@ -1,10 +1,13 @@
-﻿using System.Linq;
+using System.Linq;
 
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a piece of audit log data related to a channel update.
+    /// </summary>
     public class ChannelUpdateAuditLogData : IAuditLogData
     {
         private ChannelUpdateAuditLogData(ulong id, ChannelInfo before, ChannelInfo after)
@@ -38,8 +41,14 @@ namespace Discord.Rest
             return new ChannelUpdateAuditLogData(entry.TargetId.Value, before, after);
         }
 
+        /// <summary>
+        ///     Gets the snowflake ID of the updated channel.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="ulong"/> representing the snowflake identifier for the updated channel.
+        /// </returns>
         public ulong ChannelId { get; }
-        public ChannelInfo Before { get; set; }
-        public ChannelInfo After { get; set; }
+        public ChannelInfo Before { get; }
+        public ChannelInfo After { get; }
     }
 }

@@ -463,9 +463,8 @@ namespace Discord.WebSocket
         /// <returns>
         ///     The created text channel.
         /// </returns>
-        public Task<RestTextChannel> CreateTextChannelAsync(string name, RequestOptions options = null)
-            => GuildHelper.CreateTextChannelAsync(this, Discord, name, options);
-
+        public Task<RestTextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null)
+            => GuildHelper.CreateTextChannelAsync(this, Discord, name, options, func);
         /// <summary>
         ///     Creates a voice channel with the provided name.
         /// </summary>
@@ -475,9 +474,8 @@ namespace Discord.WebSocket
         /// <returns>
         ///     The created voice channel.
         /// </returns>
-        public Task<RestVoiceChannel> CreateVoiceChannelAsync(string name, RequestOptions options = null)
-            => GuildHelper.CreateVoiceChannelAsync(this, Discord, name, options);
-
+        public Task<RestVoiceChannel> CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null)
+            => GuildHelper.CreateVoiceChannelAsync(this, Discord, name, options, func);
         /// <summary>
         ///     Creates a category channel with the provided name.
         /// </summary>
@@ -930,11 +928,11 @@ namespace Discord.WebSocket
         Task<ITextChannel> IGuild.GetSystemChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<ITextChannel>(SystemChannel);
         /// <inheritdoc />
-        async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, RequestOptions options)
-            => await CreateTextChannelAsync(name, options).ConfigureAwait(false);
+        async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, Action<TextChannelProperties> func, RequestOptions options)
+            => await CreateTextChannelAsync(name, func, options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, RequestOptions options)
-            => await CreateVoiceChannelAsync(name, options).ConfigureAwait(false);
+        async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func, RequestOptions options)
+            => await CreateVoiceChannelAsync(name, func, options).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<ICategoryChannel> IGuild.CreateCategoryAsync(string name, RequestOptions options)
             => await CreateCategoryChannelAsync(name, options).ConfigureAwait(false);

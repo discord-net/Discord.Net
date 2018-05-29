@@ -27,17 +27,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string Name { get; private set; }
         /// <inheritdoc />
-        public int Position { get; private set; }
-        /// <inheritdoc />
-        public ulong? CategoryId { get; private set; }
-        /// <summary>
-        ///     Gets the parent category of this channel.
-        /// </summary>
-        /// <returns>
-        ///     A parent category ID associated with this channel, or <c>null</c> if none is set.
-        /// </returns>
-        public ICategoryChannel Category 
-            => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
+        public int Position { get; private set; }        
 
         /// <inheritdoc />
         public IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
@@ -73,8 +63,7 @@ namespace Discord.WebSocket
         {
             Name = model.Name.Value;
             Position = model.Position.Value;
-            CategoryId = model.CategoryId;
-
+            
             var overwrites = model.PermissionOverwrites.Value;
             var newOverwrites = ImmutableArray.CreateBuilder<Overwrite>(overwrites.Length);
             for (int i = 0; i < overwrites.Length; i++)
@@ -167,10 +156,6 @@ namespace Discord.WebSocket
         IGuild IGuildChannel.Guild => Guild;
         /// <inheritdoc />
         ulong IGuildChannel.GuildId => Guild.Id;
-
-        /// <inheritdoc />
-        Task<ICategoryChannel> IGuildChannel.GetCategoryAsync()
-            => Task.FromResult(Category);
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuildChannel.GetInvitesAsync(RequestOptions options)

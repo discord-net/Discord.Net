@@ -18,7 +18,7 @@ namespace Discord
         ///     An awaitable Task containing the message sent to the channel.
         /// </returns>
         public static async Task<IUserMessage> SendMessageAsync(this IUser user,
-            string text,
+            string text = null,
             bool isTTS = false,
             Embed embed = null,
             RequestOptions options = null)
@@ -55,7 +55,6 @@ namespace Discord
             return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(stream, filename, text, isTTS, embed, options).ConfigureAwait(false);
         }
 
-#if FILESYSTEM
         /// <summary>
         ///     Sends a file via DM with an optional caption.
         /// </summary>
@@ -81,7 +80,7 @@ namespace Discord
         {
             return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(filePath, text, isTTS, embed, options).ConfigureAwait(false);
         }
-#endif
+
         /// <summary>
         ///     Bans the provided user from the guild and optionally prunes their recent messages.
         /// </summary>

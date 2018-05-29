@@ -10,7 +10,7 @@ using Model = Discord.API.Channel;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a REST-based DM channel.
+    ///     Represents a REST-based direct-message channel.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestDMChannel : RestChannel, IDMChannel, IRestPrivateChannel, IRestMessageChannel
@@ -74,16 +74,48 @@ namespace Discord.Rest
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
 
         /// <inheritdoc />
-        public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
+        public Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
-#if FILESYSTEM
+
         /// <inheritdoc />
+        /// <exception cref="ArgumentException">
+        /// <paramref name="filePath" /> is a zero-length string, contains only white space, or contains one or more
+        /// invalid characters as defined by <see cref="System.IO.Path.InvalidPathChars" />.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="filePath" /> is <c>null</c>.
+        /// </exception>
+        /// <exception cref="PathTooLongException">
+        /// The specified path, file name, or both exceed the system-defined maximum length. For example, on
+        /// Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260
+        /// characters.
+        /// </exception>
+        /// <exception cref="DirectoryNotFoundException">
+        /// The specified path is invalid, (for example, it is on an unmapped drive).
+        /// </exception>
+        /// <exception cref="UnauthorizedAccessException">
+        /// <paramref name="filePath" /> specified a directory.-or- The caller does not have the required permission.
+        /// </exception>
+        /// <exception cref="FileNotFoundException">
+        /// The file specified in <paramref name="filePath" /> was not found.
+        /// </exception>
+        /// <exception cref="NotSupportedException"><paramref name="filePath" /> is in an invalid format.</exception>
+        /// <exception cref="IOException">An I/O error occurred while opening the file.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, options);
-#endif
         /// <inheritdoc />
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options);
+
+        /// <inheritdoc />
+        public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
+            => ChannelHelper.DeleteMessageAsync(this, messageId, Discord, options);
+        /// <inheritdoc />
+        public Task DeleteMessageAsync(IMessage message, RequestOptions options = null)
+            => ChannelHelper.DeleteMessageAsync(this, message.Id, Discord, options);
 
         /// <inheritdoc />
         public Task TriggerTypingAsync(RequestOptions options = null)
@@ -143,12 +175,9 @@ namespace Discord.Rest
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
 
-#if FILESYSTEM
-        /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendFileAsync(filePath, text, isTTS, embed, options).ConfigureAwait(false);
-#endif
-        /// <inheritdoc />
+
         async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendFileAsync(stream, filename, text, isTTS, embed, options).ConfigureAwait(false);
         /// <inheritdoc />

@@ -22,7 +22,8 @@ namespace Discord
         ///     automatically moved to the AFK voice channel.
         /// </summary>
         /// <returns>
-        ///     The amount of time in seconds for a user to be marked as inactive and moved into the AFK voice channel.
+        ///     An <see cref="Int32"/> representing the amount of time in seconds for a user to be marked as inactive
+        ///     and moved into the AFK voice channel.
         /// </returns>
         int AFKTimeout { get; }
         /// <summary>
@@ -94,8 +95,12 @@ namespace Discord
         bool Available { get; }
 
         /// <summary>
-        ///     Gets the ID of the AFK voice channel for this guild, or <c>null</c> if none is set.
+        ///     Gets the ID of the AFK voice channel for this guild.
         /// </summary>
+        /// <returns>
+        ///     An <see cref="UInt64" /> representing the snowflake identifier of the AFK voice channel; <c>null</c> if
+        ///     none is set.
+        /// </returns>
         ulong? AFKChannelId { get; }
         /// <summary>
         ///     Gets the ID of the the default channel for this guild.
@@ -214,18 +219,20 @@ namespace Discord
         ///     Gets a ban object for a banned user.
         /// </summary>
         /// <param name="user">The banned user.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the ban object, which contains the user information and the
-        ///     reason for the ban; <c>null<c/> if the ban entry cannot be found.
+        ///     reason for the ban; <c>null</c> if the ban entry cannot be found.
         /// </returns>
         Task<IBan> GetBanAsync(IUser user, RequestOptions options = null);
         /// <summary>
         ///     Gets a ban object for a banned user.
         /// </summary>
         /// <param name="userId">The snowflake identifier for the banned user.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the ban object, which contains the user information and the
-        ///     reason for the ban; <c>null<c/> if the ban entry cannot be found.
+        ///     reason for the ban; <c>null</c> if the ban entry cannot be found.
         /// </returns>
         Task<IBan> GetBanAsync(ulong userId, RequestOptions options = null);
         /// <summary>
@@ -406,24 +413,27 @@ namespace Discord
         ///     <c>null</c> if none is set.
         /// </returns>
         Task<IGuildChannel> GetEmbedChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
         /// <summary>
         ///     Creates a new text channel.
         /// </summary>
         /// <param name="name">The new name for the text channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the newly created text channel.
         /// </returns>
-        Task<ITextChannel> CreateTextChannelAsync(string name, RequestOptions options = null);
+        Task<ITextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null);
         /// <summary>
         ///     Creates a new voice channel.
         /// </summary>
         /// <param name="name">The new name for the voice channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/> containing the newly created voice channel.
         /// </returns>
-        Task<IVoiceChannel> CreateVoiceChannelAsync(string name, RequestOptions options = null);
+        Task<IVoiceChannel> CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null);
         /// <summary>
         ///     Creates a new channel category.
         /// </summary>
@@ -537,7 +547,17 @@ namespace Discord
         /// </returns>
         Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null);
 
-        /// <summary> Gets the specified number of audit log entries for this guild. </summary>
+        /// <summary>
+        ///     Gets the specified number of audit log entries for this guild.
+        /// </summary>
+        /// <param name="limit">The number of audit log entries to fetch.</param>
+        /// <param name="mode">
+        /// The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.
+        /// </param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing a collection of requested audit log entries.
+        /// </returns>
         Task<IReadOnlyCollection<IAuditLogEntry>> GetAuditLogAsync(int limit = DiscordConfig.MaxAuditLogEntriesPerBatch,
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 

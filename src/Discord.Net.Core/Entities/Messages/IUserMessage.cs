@@ -42,7 +42,7 @@ namespace Discord
         /// <summary>
         ///     Gets all users that reacted to a message with a given emote.
         /// </summary>
-        Task<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit = 100, ulong? afterUserId = null, RequestOptions options = null);
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null);
 
         /// <summary>
         ///     Transforms this message's text into a human-readable form by resolving its tags.

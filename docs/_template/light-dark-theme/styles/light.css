@@ -10,11 +10,24 @@ body {
     overflow: visible;
 }
 
+/* links */
+
+a:active, a:hover, a:visited {
+    color: #0078d7;
+}
+
+a {
+    color: #0050c5;
+    cursor: pointer;
+    text-decoration: none;
+    word-wrap: break-word;
+}
+
 /* code */
 
 code {
-    color: #222f3d;
-    background-color: #f9f9f9;
+    color: #3b5269;
+    background-color: #ececec;
     border-radius: 4px;
     padding: 3px 7px;
 }

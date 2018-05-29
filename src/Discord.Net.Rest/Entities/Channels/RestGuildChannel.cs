@@ -8,7 +8,7 @@ using Model = Discord.API.Channel;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a private REST group channel.
+    ///     Represents a private REST-based group channel.
     /// </summary>
     public class RestGuildChannel : RestChannel, IGuildChannel
     {
@@ -22,8 +22,6 @@ namespace Discord.Rest
         public string Name { get; private set; }
         /// <inheritdoc />
         public int Position { get; private set; }
-        /// <inheritdoc />
-        public ulong? CategoryId { get; private set; }
         /// <inheritdoc />
         public ulong GuildId => Guild.Id;
 
@@ -43,7 +41,6 @@ namespace Discord.Rest
                 case ChannelType.Category:
                     return RestCategoryChannel.Create(discord, guild, model);
                 default:
-                    // TODO: Channel categories
                     return new RestGuildChannel(discord, guild, model.Id);
             }
         }
@@ -74,14 +71,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
-
-        /// <inheritdoc />
-        public async Task<ICategoryChannel> GetCategoryAsync()
-        {
-            if (CategoryId.HasValue)
-                return (await Guild.GetChannelAsync(CategoryId.Value).ConfigureAwait(false)) as ICategoryChannel;
-            return null;
-        }
 
         public OverwritePermissions? GetPermissionOverwrite(IUser user)
         {

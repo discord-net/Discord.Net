@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 using System;
 
@@ -12,10 +12,16 @@ namespace Discord.API
         public MessageType Type { get; set; }
         [JsonProperty("channel_id")]
         public ulong ChannelId { get; set; }
+        // ALWAYS sent on WebSocket messages
+        [JsonProperty("guild_id")]
+        public Optional<ulong> GuildId { get; set; }
         [JsonProperty("webhook_id")]
         public Optional<ulong> WebhookId { get; set; }
         [JsonProperty("author")]
         public Optional<User> Author { get; set; }
+        // ALWAYS sent on WebSocket messages
+        [JsonProperty("member")]
+        public Optional<GuildMember> Member { get; set; }
         [JsonProperty("content")]
         public Optional<string> Content { get; set; }
         [JsonProperty("timestamp")]

@@ -11,12 +11,20 @@ namespace Discord
         ///     Returns the API version Discord.Net uses. 
         /// </summary>
         /// <returns>
-        ///     A 32-bit integer representing the API version that Discord.Net uses to communicate with Discord.
+        ///     An <see cref="int"/> representing the API version that Discord.Net uses to communicate with Discord.
         ///     <para>A list of available API version can be seen on the official 
         ///     <see href="https://discordapp.com/developers/docs/reference#api-versioning">Discord API documentation</see>
         ///     .</para>
         /// </returns>
         public const int APIVersion = 6;
+        /// <summary>
+        /// Returns the Voice API version Discord.Net uses.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="int"/> representing the API version that Discord.Net uses to communicate with Discord's
+        ///     voice server.
+        /// </returns>
+        public const int VoiceAPIVersion = 3;
         /// <summary>
         ///     Gets the Discord.Net version, including the build number.
         /// </summary>
@@ -93,6 +101,19 @@ namespace Discord
         ///     The maximum number of guilds that can be gotten per-batch.
         /// </returns>
         public const int MaxGuildsPerBatch = 100;
+        /// <summary>
+        ///     Returns the max user reactions allowed to be in a request.
+        /// </summary>
+        /// <returns>
+        ///     The maximum number of user reactions that can be gotten per-batch.
+        /// </returns>
+        public const int MaxUserReactionsPerBatch = 100;
+        /// <summary> 
+        ///     Returns the max audit log entries allowed to be in a request. 
+        /// </summary>
+        /// <returns>
+        ///     The maximum number of audit log entries that can be gotten per-batch.
+        /// </returns>
         public const int MaxAuditLogEntriesPerBatch = 100;
 
         /// <summary>

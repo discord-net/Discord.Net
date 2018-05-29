@@ -76,7 +76,7 @@ namespace Discord.WebSocket
         ///     </note>
         /// </remarks>
         /// <returns>
-        ///     A WebSocket-based generic user; <c>null</c> when the user cannot be found.
+        ///     A generic WebSocket-based user; <c>null</c> when the user cannot be found.
         /// </returns>
         public abstract SocketUser GetUser(ulong id);
 
@@ -98,7 +98,7 @@ namespace Discord.WebSocket
         ///     </note>
         /// </remarks>
         /// <returns>
-        ///     A WebSocket-based generic user; <c>null</c> when the user cannot be found.
+        ///     A generic WebSocket-based user; <c>null</c> when the user cannot be found.
         /// </returns>
         public abstract SocketUser GetUser(string username, string discriminator);
         /// <summary>

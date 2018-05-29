@@ -8,7 +8,7 @@ namespace Discord
     /// <summary>
     ///     Represents a generic channel in a guild that can send and receive messages.
     /// </summary>
-    public interface ITextChannel : IMessageChannel, IMentionable, IGuildChannel
+    public interface ITextChannel : IMessageChannel, IMentionable, INestedChannel
     {
         /// <summary>
         ///     Determines whether the channel is NSFW.
@@ -80,7 +80,7 @@ namespace Discord
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A collection of webhooks.
+        ///     An awaitable <see cref="Task"/> containing a collection of webhooks.
         /// </returns>
         Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions options = null);
     }

@@ -1,4 +1,4 @@
-﻿namespace Discord.API.Rest
+namespace Discord.API.Rest
 {
     internal class GetReactionUsersParams
     {

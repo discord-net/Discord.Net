@@ -6,6 +6,9 @@ using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a generic REST-based channel.
+    /// </summary>
     public class RestChannel : RestEntity<ulong>, IChannel, IUpdateable
     {
         /// <inheritdoc />
@@ -26,6 +29,8 @@ namespace Discord.Rest
                 case ChannelType.DM:
                 case ChannelType.Group:
                     return CreatePrivate(discord, model) as RestChannel;
+                case ChannelType.Category:
+                    return RestCategoryChannel.Create(discord, new RestGuild(discord, model.GuildId.Value), model);
                 default:
                     return new RestChannel(discord, model.Id);
             }
