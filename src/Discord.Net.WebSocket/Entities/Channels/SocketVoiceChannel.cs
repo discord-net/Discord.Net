@@ -43,10 +43,13 @@ namespace Discord.WebSocket
         public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
-        public async Task<IAudioClient> ConnectAsync(Action<IAudioClient> configAction = null)
+        public async Task<IAudioClient> ConnectAsync(bool selfDeaf, bool selfMute, bool external)
         {
-            return await Guild.ConnectAudioAsync(Id, false, false, configAction).ConfigureAwait(false);
+            return await Guild.ConnectAudioAsync(Id, selfDeaf, selfMute, external).ConfigureAwait(false);
         }
+
+        public async Task DisconnectAsync()
+            => await Guild.DisconnectAudioAsync();
 
         public override SocketGuildUser GetUser(ulong id)
         {
