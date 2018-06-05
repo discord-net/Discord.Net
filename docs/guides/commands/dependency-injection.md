@@ -11,10 +11,11 @@ DI when writing your modules.
 
 ## Setup
 
-1. Create an @System.IServiceProvider.
+1. Create a @Microsoft.Extensions.DependencyInjection.ServiceCollection.
 2. Add the dependencies to the service collection that you wish
  to use in the modules.
-3. Pass the service collection into `AddModulesAsync`.
+3. Build the service collection into a service provider.
+4. Pass the service collection into @Discord.Commands.CommandService.AddModulesAsync* / @Discord.Commands.CommandService.AddModuleAsync* , @Discord.Commands.CommandService.ExecuteAsync* .
 
 ### Example - Setting up Injection
 

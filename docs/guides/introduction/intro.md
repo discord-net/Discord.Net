@@ -23,7 +23,6 @@ Here are some examples:
 > [!NOTE]
 > Please note that you should *not* try to blindly copy paste
 > the code. The examples are meant to be a template or a guide.
-> It is not meant to be something that will work out of the box.
 
 [Official template]: https://github.com/foxbot/DiscordBotBase/tree/csharp/src/DiscordBot
 [Official samples]: https://github.com/RogueException/Discord.Net/tree/dev/samples
@@ -33,7 +32,10 @@ Here are some examples:
 
 ## New to .NET/C#?
 
-If you are new to the language, using this lib may prove to be
+All examples or snippets featured in this guide and all API
+documentation will be written in C#.
+
+If you are new to the language, using this wrapper may prove to be
 difficult, but don't worry! There are many resources online that can
 help you get started in the wonderful world of .NET. Here are some
 resources to get you started.

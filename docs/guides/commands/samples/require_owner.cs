@@ -13,8 +13,11 @@ public class RequireOwnerAttribute : PreconditionAttribute
     // Override the CheckPermissions method
     public async override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
     {
+        // Get the client via Depedency Injection
+        var client = services.GetRequiredService<DiscordSocketClient>();
         // Get the ID of the bot's owner
-        var ownerId = (await services.GetService<DiscordSocketClient>().GetApplicationInfoAsync()).Owner.Id;
+        var appInfo = await client.GetApplicationInfoAsync().ConfigureAwait(false);
+        var ownerId = appInfo.Owner.Id;
         // If this command was executed by that user, return a success
         if (context.User.Id == ownerId)
             return PreconditionResult.FromSuccess();
