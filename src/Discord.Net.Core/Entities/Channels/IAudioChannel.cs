@@ -12,6 +12,9 @@ namespace Discord
         /// <summary>
         ///     Connects to this audio channel.
         /// </summary>
-        Task<IAudioClient> ConnectAsync(Action<IAudioClient> configAction = null);
+        Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false);
+
+        /// <summary> Disconnects from this audio channel. </summary>
+        Task DisconnectAsync();
     }
 }

@@ -51,10 +51,13 @@ namespace Discord.WebSocket
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
         /// <inheritdoc />
-        public async Task<IAudioClient> ConnectAsync(Action<IAudioClient> configAction = null)
+        public async Task<IAudioClient> ConnectAsync(bool selfDeaf, bool selfMute, bool external)
         {
-            return await Guild.ConnectAudioAsync(Id, false, false, configAction).ConfigureAwait(false);
+            return await Guild.ConnectAudioAsync(Id, selfDeaf, selfMute, external).ConfigureAwait(false);
         }
+
+        public async Task DisconnectAsync()
+            => await Guild.DisconnectAudioAsync();
 
         /// <inheritdoc />
         public override SocketGuildUser GetUser(ulong id)

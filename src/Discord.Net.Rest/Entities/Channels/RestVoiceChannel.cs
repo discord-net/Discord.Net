@@ -54,7 +54,8 @@ namespace Discord.Rest
         //IAudioChannel
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Connecting to a REST-based channel is not supported.</exception>
-        Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) => throw new NotSupportedException();
+        Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external) { throw new NotSupportedException(); }
+        Task IAudioChannel.DisconnectAsync() { throw new NotSupportedException(); }
 
         //IGuildChannel
         /// <inheritdoc />
