@@ -4,15 +4,22 @@ public class AdminModule : ModuleBase<SocketCommandContext>
     [Group("clean")]
     public class CleanModule : ModuleBase<SocketCommandContext>
     {
-        // ~admin clean 15
+        // ~admin clean
         [Command]
-        public async Task Default(int count = 10) => Messages(count);
+        public async Task DefaultCleanAsync()
+        {
+            // ...
+        }
 
         // ~admin clean messages 15
         [Command("messages")]
-        public async Task Messages(int count = 10) { }
+        public async Task CleanAsync(int count)
+        {
+            // ...
+        }
     }
     // ~admin ban foxbot#0282
     [Command("ban")]
-    public async Task Ban(IGuildUser user) { }
+    public Task BanAsync(IGuildUser user) => 
+        Context.Guild.AddBanAsync(user);
 }
