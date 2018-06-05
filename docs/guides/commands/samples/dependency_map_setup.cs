@@ -1,40 +1,34 @@
 public class Initialize
 {
-    private IServiceProvider _services;
-    private CommandService _commands;
-    private DiscordSocketClient _client;
+	private readonly CommandService _commands;
+	private readonly DiscordSocketClient _client;
 
-    public Initialize(CommandService commands = null, DiscordSocketClient client = null)
-    {
-	    _commands = commands ?? new CommandService();
-	    _client = client ?? new DiscordSocketClient();
-    }
+	public Initialize(CommandService commands = null, DiscordSocketClient client = null)
+	{
+		_commands = commands ?? new CommandService();
+		_client = client ?? new DiscordSocketClient();
+	}
 
-    public IServiceProvider BuildServiceProvider()
-    {
-	    // Here, we will inject the ServiceProvider with 
-	    // all of the services our client will use.
-	    return new ServiceCollection()
-		    .AddSingleton(_client)
-		    .AddSingleton(_commands)
-		    // You can pass in an instance of the desired type
-		    .AddSingleton(new NotificationService())
-		    // ...or by using the generic method.
-			//
-			// The benefit of using the generic method is that 
-			// ASP.NET DI will attempt to inject the required
-			// dependencies that are specified under the constructor 
-			// for us.
-		    .AddSingleton<DatabaseService>()
-		    .AddSingleton<CommandHandler>()
-		    .BuildServiceProvider();
-    }
+	public IServiceProvider BuildServiceProvider() => new ServiceCollection()
+		.AddSingleton(_client)
+		.AddSingleton(_commands)
+		// You can pass in an instance of the desired type
+		.AddSingleton(new NotificationService())
+		// ...or by using the generic method.
+		//
+		// The benefit of using the generic method is that 
+		// ASP.NET DI will attempt to inject the required
+		// dependencies that are specified under the constructor 
+		// for us.
+		.AddSingleton<DatabaseService>()
+		.AddSingleton<CommandHandler>()
+		.BuildServiceProvider();
 }
 public class CommandHandler
 {
+	private readonly DiscordSocketClient _client;
 	private readonly CommandService _commands;
 	private readonly IServiceProvider _services;
-	private readonly DiscordSocketClient _client;
 
 	public CommandHandler(IServiceProvider services, CommandService commands, DiscordSocketClient client)
 	{
@@ -48,8 +42,9 @@ public class CommandHandler
 		// Pass the service provider to the second parameter of
 		// AddModulesAsync to inject dependencies to all modules 
 		// that may require them.
-        await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(), 
-										services: _services);
+		await _commands.AddModulesAsync(
+			assembly: Assembly.GetEntryAssembly(), 
+			services: _services);
 		_client.MessageReceived += HandleCommandAsync;
 	}
 
@@ -58,8 +53,10 @@ public class CommandHandler
 		// ...
 		// Pass the service provider to the ExecuteAsync method for
 		// precondition checks.
-		await _commands.ExecuteAsync(context: context, argPos: argPos, 
-										services: _services);
+		await _commands.ExecuteAsync(
+			context: context, 
+			argPos: argPos, 
+			services: _services);
 		// ...
 	}
 }
