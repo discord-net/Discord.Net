@@ -126,6 +126,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);
+        /// <inheritdoc />
         public IDisposable EnterTypingState(RequestOptions options = null)
             => ChannelHelper.EnterTypingState(this, Discord, options);
         
@@ -200,9 +201,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
-        /// <inheritdoc />
-        IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
-            => EnterTypingState(options);
 
         //IGuildChannel
         /// <inheritdoc />

@@ -41,13 +41,17 @@ namespace Discord.Rest
 
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options);
 
+        /// <inheritdoc />
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
             => ChannelHelper.DeleteMessageAsync(this, messageId, Discord, options);
+        /// <inheritdoc />
         public Task DeleteMessageAsync(IMessage message, RequestOptions options = null)
             => ChannelHelper.DeleteMessageAsync(this, message.Id, Discord, options);
 
+        /// <inheritdoc />
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);
+        /// <inheritdoc />
         public IDisposable EnterTypingState(RequestOptions options = null)
             => ChannelHelper.EnterTypingState(this, Discord, options);
 
@@ -92,8 +96,6 @@ namespace Discord.Rest
             => await SendFileAsync(stream, filename, text, isTTS, embed, options).ConfigureAwait(false);
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
-        IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
-            => EnterTypingState(options);
 
         //IChannel
         string IChannel.Name => 

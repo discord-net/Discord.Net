@@ -118,6 +118,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);
+        /// <inheritdoc />
         public IDisposable EnterTypingState(RequestOptions options = null)
             => ChannelHelper.EnterTypingState(this, Discord, options);
 
@@ -226,9 +227,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
-        /// <inheritdoc />
-        IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
-            => EnterTypingState(options);
 
         // INestedChannel
         Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)

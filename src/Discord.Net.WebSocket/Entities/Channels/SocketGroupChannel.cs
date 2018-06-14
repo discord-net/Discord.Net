@@ -249,9 +249,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
-        /// <inheritdoc />
-        IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
-            => EnterTypingState(options);
 
         //IAudioChannel
         /// <inheritdoc />

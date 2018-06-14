@@ -113,7 +113,7 @@ namespace Discord.WebSocket
             if (id == Recipient.Id)
                 return Recipient;
             else if (id == Discord.CurrentUser.Id)
-                return Discord.CurrentUser as SocketSelfUser;
+                return Discord.CurrentUser;
             else
                 return null;
         }
@@ -171,9 +171,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
-        /// <inheritdoc />
-        IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
-            => EnterTypingState(options);
 
         //IChannel
         /// <inheritdoc />
