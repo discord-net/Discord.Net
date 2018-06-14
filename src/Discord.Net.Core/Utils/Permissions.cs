@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 
 namespace Discord
 {
@@ -151,7 +151,7 @@ namespace Discord
                 if (perms != null)
                     resolvedPermissions = (resolvedPermissions  & ~perms.Value.DenyValue) | perms.Value.AllowValue;
 
-                if (channel is ITextChannel textChannel)
+                if (channel is ITextChannel)
                 {
                     if (!GetValue(resolvedPermissions, ChannelPermission.ViewChannel))
                     {
@@ -167,7 +167,7 @@ namespace Discord
                         resolvedPermissions &= ~(ulong)ChannelPermission.AttachFiles;
                     }
                 }
-                resolvedPermissions &= mask; //Ensure we didnt get any permissions this channel doesnt support (from guildPerms, for example)
+                resolvedPermissions &= mask; //Ensure we didn't get any permissions this channel doesn't support (from guildPerms, for example)
             }
 
             return resolvedPermissions;

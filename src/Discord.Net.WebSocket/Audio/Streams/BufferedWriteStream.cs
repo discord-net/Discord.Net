@@ -169,7 +169,7 @@ namespace Discord.Audio.Streams
         {
             do
                 cancelToken.ThrowIfCancellationRequested();
-            while (_queuedFrames.TryDequeue(out Frame ignored));
+            while (_queuedFrames.TryDequeue(out _));
             return Task.Delay(0);
         }
     }

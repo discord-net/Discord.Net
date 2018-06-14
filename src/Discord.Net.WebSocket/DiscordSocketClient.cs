@@ -217,7 +217,7 @@ namespace Discord.WebSocket
                 await heartbeatTask.ConfigureAwait(false);
             _heartbeatTask = null;
 
-            while (_heartbeatTimes.TryDequeue(out long time)) { }
+            while (_heartbeatTimes.TryDequeue(out _)) { }
             _lastMessageTime = 0;
 
             await _gatewayLogger.DebugAsync("Waiting for guild downloader").ConfigureAwait(false);
@@ -228,7 +228,7 @@ namespace Discord.WebSocket
 
             //Clear large guild queue
             await _gatewayLogger.DebugAsync("Clearing large guild queue").ConfigureAwait(false);
-            while (_largeGuilds.TryDequeue(out ulong guildId)) { }
+            while (_largeGuilds.TryDequeue(out _)) { }
 
             //Raise virtual GUILD_UNAVAILABLEs
             await _gatewayLogger.DebugAsync("Raising virtual GuildUnavailables").ConfigureAwait(false);
@@ -1636,7 +1636,7 @@ namespace Discord.WebSocket
             var guild = State.RemoveGuild(id);
             if (guild != null)
             {
-                foreach (var channel in guild.Channels)
+                foreach (var _ in guild.Channels)
                     State.RemoveChannel(id);
                 foreach (var user in guild.Users)
                     user.GlobalUser.RemoveRef(this);

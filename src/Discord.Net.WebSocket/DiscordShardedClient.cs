@@ -14,10 +14,10 @@ namespace Discord.WebSocket
         private readonly DiscordSocketConfig _baseConfig;
         private readonly SemaphoreSlim _connectionGroupLock;
         private int[] _shardIds;
-        private Dictionary<int, int> _shardIdsToIndex;
+        private readonly Dictionary<int, int> _shardIdsToIndex;
         private DiscordSocketClient[] _shards;
         private int _totalShards;
-        private bool _automaticShards;
+        private readonly bool _automaticShards;
         
         /// <inheritdoc />
         public override int Latency { get => GetLatency(); protected set { } }
@@ -26,7 +26,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override IActivity Activity { get => _shards[0].Activity; protected set { } }
 
-        internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
+        internal new DiscordSocketApiClient ApiClient => base.ApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => GetGuilds().ToReadOnlyCollection(GetGuildCount);
         /// <inheritdoc />
@@ -95,13 +95,13 @@ namespace Discord.WebSocket
                 }
             }
 
-            //Assume threadsafe: already in a connection lock
+            //Assume thread safe: already in a connection lock
             for (int i = 0; i < _shards.Length; i++)
-                await _shards[i].LoginAsync(tokenType, token, false);
+                await _shards[i].LoginAsync(tokenType, token);
         }
         internal override async Task OnLogoutAsync()
         {
-            //Assume threadsafe: already in a connection lock
+            //Assume thread safe: already in a connection lock
             if (_shards != null)
             {
                 for (int i = 0; i < _shards.Length; i++)
@@ -218,11 +218,11 @@ namespace Discord.WebSocket
         public override RestVoiceRegion GetVoiceRegion(string id)
             => _shards[0].GetVoiceRegion(id);
 
-        /// <summary>
-        ///     Downloads the users list for the provided guilds if they don't have a complete list.
-        /// </summary>
+        /// <inheritdoc />
+        /// <exception cref="ArgumentNullException"><paramref name="guilds"/> is <see langword="null"/></exception>
         public override async Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
         {
+            if (guilds == null) throw new ArgumentNullException(nameof(guilds));
             for (int i = 0; i < _shards.Length; i++)
             {
                 int id = _shardIds[i];

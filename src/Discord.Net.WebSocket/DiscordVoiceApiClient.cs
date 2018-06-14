@@ -188,7 +188,7 @@ namespace Discord.Audio
 
                 ConnectionState = ConnectionState.Connected;
             }
-            catch (Exception)
+            catch
             {
                 await DisconnectInternalAsync().ConfigureAwait(false);
                 throw;

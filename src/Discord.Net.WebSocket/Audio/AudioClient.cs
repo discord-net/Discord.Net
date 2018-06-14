@@ -131,7 +131,7 @@ namespace Discord.Audio
                 await keepaliveTask.ConfigureAwait(false);
             _keepaliveTask = null;
 
-            while (_heartbeatTimes.TryDequeue(out long time)) { }
+            while (_heartbeatTimes.TryDequeue(out _)) { }
             _lastMessageTime = 0;
 
             await ClearInputStreamsAsync().ConfigureAwait(false);
@@ -425,7 +425,6 @@ namespace Discord.Audio
         }
         private async Task RunKeepaliveAsync(int intervalMillis, CancellationToken cancelToken)
         {
-            var packet = new byte[8];
             try
             {
                 await _audioLogger.DebugAsync("Keepalive Started").ConfigureAwait(false);

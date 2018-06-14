@@ -58,7 +58,7 @@ namespace Discord.Rest
             ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
         
-        public async Task LoginAsync(TokenType tokenType, string token, bool validateToken = true)
+        public async Task LoginAsync(TokenType tokenType, string token)
         {
             await _stateLock.WaitAsync().ConfigureAwait(false);
             try
@@ -85,7 +85,7 @@ namespace Discord.Rest
                 await OnLoginAsync(tokenType, token).ConfigureAwait(false);
                 LoginState = LoginState.LoggedIn;
             }
-            catch (Exception)
+            catch
             {
                 await LogoutInternalAsync().ConfigureAwait(false);
                 throw;
