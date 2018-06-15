@@ -8,15 +8,11 @@ public class Program
 	public async Task MainAsync()
 	{
 		_client = new DiscordSocketClient();
-
 		_client.Log += Log;
 		_client.MessageReceived += MessageReceivedAsync;
-
-		// Remember to keep this private or to read this
-		// from an external source!
 		await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DiscordToken"));
 		await _client.StartAsync();
-
+		
 		// Block this task until the program is closed.
 		await Task.Delay(-1);
 	}
