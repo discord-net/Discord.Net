@@ -125,7 +125,7 @@ Studio installation.
 
 ## Additional Information
 
-### <a id="unsupported-platform"/> Installing on Unsupported WebSocket Platform
+### Installing on Unsupported WebSocket Platform
 
 For older system such as Windows 7 or earlier that do not natively
 support WebSocket, you may encounter

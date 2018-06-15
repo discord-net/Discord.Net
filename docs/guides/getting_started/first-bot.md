@@ -176,7 +176,7 @@ online in Discord.
 [DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
 [LoginAsync]: xref:Discord.Rest.BaseDiscordClient.LoginAsync*
 [StartAsync]: xref:Discord.WebSocket.DiscordSocketClient.StartAsync*
-[installation guide]: xref:Guides.GettingStarted.Installation#unsupported-platform
+[installation guide]: xref:Guides.GettingStarted.Installation
 
 ### Handling a 'ping'
 
