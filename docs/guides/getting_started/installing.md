@@ -13,14 +13,14 @@ yourself.
 
 ## Supported Platforms
 
-Currently, Discord.Net targets [.NET Standard] 1.3 and offers support
-for .NET Standard 1.1. If your application will be targeting .NET
-Standard 1.1, please see the [additional steps].
+Currently, Discord.Net targets [.NET Standard] 1.3 and 2.0.
 
 Since Discord.Net is built on top of .NET Standard, it is also
-recommended to create applications using [.NET Core], although it is not
-required. When using .NET Framework, it is suggested to target
-`.NET Framework 4.6.1` or higher.
+recommended to create applications using [.NET Core],
+although it is not required.
+
+When using .NET Framework, it is suggested to
+target `.NET Framework 4.6.1` or higher.
 
 > [!WARNING]
 > Using this library with [Mono] is not recommended until further
@@ -113,37 +113,52 @@ In order to compile Discord.Net, you will need the following:
 
 ### Using Visual Studio
 
-- [Visual Studio 2017](https://www.visualstudio.com/)
-- [.NET Core SDK]
+* [Visual Studio 2017](https://www.visualstudio.com/)
+* [.NET Core SDK]
 
 The .NET Core and Docker (Preview) workload is required during Visual
 Studio installation.
 
 ### Using Command Line
 
-- [.NET Core SDK]
-
-[.NET Core SDK]: https://www.microsoft.com/net/download/
+* [.NET Core SDK]
 
 ## Additional Information
 
-### Installing on .NET Standard 1.1
+### <a id="unsupported-platform"/> Installing on Unsupported WebSocket Platform
 
-For applications targeting a runtime corresponding with .NET Standard
-1.1 or 1.2, the built-in WebSocket and UDP provider will not work. For
-applications which utilize a WebSocket connection to Discord, such as
-WebSocket or RPC, third-party provider packages will need to be
-installed and configured.
+For older system such as Windows 7 or earlier that do not natively
+support WebSocket, you may encounter
+@System.PlatformNotSupportedException upon connection.
+
+You may resolve this by either targeting .NET Core 2.1 or later, or
+by installing one or more custom packages as listed below.
+
+#### [Targeting .NET Core 2.1](#tab/core2-1)
+
+First, make sure your installed SDK supports .NET Core 2.1.
+Enter `dotnet --version`; the version number should be equal to or above
+`2.1.300`. If not, visit [.NET Core SDK] website to download the latest
+version.
+
+Next, ensure your project is set to target Core 2.1; you should replace
+the `<TargetFramework>` tag in your project file to `netcoreapp2.1` or
+above. Alternatively, you may specify the target framework upon build
+using the `-f` or `--framework` parameter.
+
+* For example, `dotnet build -c Release -f netcoreapp2.1`
+
+#### [Custom Packages](#tab/custom-pkg)
+
+First, install the following packages through NuGet, or, if you prefer
+compile them yourself:
+
+* `Discord.Net.Providers.WS4Net`
+* `Discord.Net.Providers.UDPClient`
 
 > [!NOTE]
 > `Discord.Net.Providers.UDPClient` is _only_ required if your
 > bot will be utilizing voice chat.
-
-First, install the following packages through NuGet, or compile them
-yourself, if you prefer:
-
-- Discord.Net.Providers.WS4Net
-- Discord.Net.Providers.UDPClient
 
 Next, you will need to configure your [DiscordSocketClient] to use
 these custom providers over the default ones.
@@ -152,10 +167,12 @@ To do this, set the `WebSocketProvider` and the optional
 `UdpSocketProvider` properties on the [DiscordSocketConfig] that you
 are passing into your client.
 
-[!code-csharp[NET Standard 1.1 Example](samples/netstd11.cs)]
+[!code-csharp[Example](samples/netstd11.cs)]
 
 [DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
 [DiscordSocketConfig]: xref:Discord.WebSocket.DiscordSocketConfig
+
+***
 
 ### Configuring NuGet without Visual Studio
 
@@ -170,3 +187,5 @@ Paste the following snippets into this configuration file, adding any
 additional feeds if necessary.
 
 [!code[NuGet Configuration](samples/nuget.config)]
+
+[.NET Core SDK]: https://www.microsoft.com/net/download/
