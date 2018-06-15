@@ -23,7 +23,7 @@ minimum.
 > look over the properties in [CommandServiceConfig] and their default
 > values.
 
-[!code-csharp[Command Handler](samples/command_handler.cs)]
+[!code-csharp[Command Handler](samples/intro/command_handler.cs)]
 
 [Command Service]: xref:Discord.Commands.CommandService
 [CommandServiceConfig]: xref:Discord.Commands.CommandServiceConfig
@@ -56,7 +56,7 @@ your module must:
 
 By now, your module should look like this:
 
-[!code-csharp[Empty Module](samples/empty-module.cs)]
+[!code-csharp[Empty Module](samples/intro/empty-module.cs)]
 
 > [!NOTE]
 > [ModuleBase] is an `abstract` class, meaning that you may extend it
@@ -162,7 +162,7 @@ accessing the channel through the [Context] and sending a message.
 
 > [!TIP]
 > At this point, your module should look comparable to this example:
-> [!code-csharp[Example Module](samples/module.cs)]
+> [!code-csharp[Example Module](samples/intro/module.cs)]
 
 #### Loading Modules Automatically
 
@@ -218,4 +218,4 @@ Submodules are "modules" that reside within another one. Typically,
 submodules are used to create nested groups (although not required to
 create nested groups).
 
-[!code-csharp[Groups and Submodules](samples/groups.cs)]
+[!code-csharp[Groups and Submodules](samples/intro/groups.cs)]

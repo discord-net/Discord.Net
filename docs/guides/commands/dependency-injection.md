@@ -19,7 +19,7 @@ DI when writing your modules.
 
 ### Example - Setting up Injection
 
-[!code-csharp[IServiceProvider Setup](samples/dependency_map_setup.cs)]
+[!code-csharp[IServiceProvider Setup](samples/dependency-injection/dependency_map_setup.cs)]
 
 ## Usage in Modules
 
@@ -41,6 +41,7 @@ manner.
 
 ### Example - Injection in Modules
 
-[!code-csharp[IServiceProvider in Modules](samples/dependency_module.cs)]
+[!code-csharp[Injection Modules](samples/dependency-injection/dependency_module.cs)]
+[!code-csharp[Disallow Dependency Injection](samples/dependency-injection/dependency_module_noinject.cs)]
 
 [DontInjectAttribute]: xref:Discord.Commands.DontInjectAttribute

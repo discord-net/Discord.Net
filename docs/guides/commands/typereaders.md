@@ -18,8 +18,9 @@ By default, the following Types are supported arguments:
 * `ulong`/`long`
 * `float`, `double`, `decimal`
 * `string`
+* `enum`
 * `DateTime`/`DateTimeOffset`/`TimeSpan`
-* `Nullable<T>` where applicible
+* `Nullable<T>` where applicable
 * Any implementation of `IChannel`/`IMessage`/`IUser`/`IRole`
 
 ## Creating a Type Reader
@@ -49,7 +50,7 @@ necessary.
 
 ### Example - Creating a Type Reader
 
-[!code-csharp[TypeReaders](samples/typereader.cs)]
+[!code-csharp[TypeReaders](samples/typereaders/typereader.cs)]
 
 ## Registering a Type Reader
 
@@ -66,4 +67,4 @@ To register a TypeReader, invoke [CommandService.AddTypeReader].
 
 ### Example - Adding a Type Reader
 
-[!code-csharp[Adding TypeReaders](samples/typereader-register.cs)]
+[!code-csharp[Adding TypeReaders](samples/typereaders/typereader-register.cs)]

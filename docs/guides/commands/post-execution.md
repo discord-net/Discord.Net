@@ -13,7 +13,7 @@ for you to work with.
 If you recall, in the [Command Guide], we have shown the following
 example for executing and handling commands,
 
-[!code[Command Handler](samples/command_handler.cs)]
+[!code[Command Handler](samples/intro/command_handler.cs)]
 
 You may notice that after we perform [ExecuteAsync], we store the
 result and print it to the chat, essentially creating the most
@@ -21,7 +21,7 @@ fundamental form of a post-execution handler.
 
 With this in mind, we could start doing things like the following,
 
-[!code[Basic Command Handler](samples/post-execution_basic.cs)]
+[!code[Basic Command Handler](samples/post-execution/post-execution_basic.cs)]
 
 However, this may not always be preferred, because you are
 creating your post-execution logic *with* the essential command
@@ -45,7 +45,7 @@ about this event is that it is not prone to `RunMode.Async`'s
 
 Thus, we can begin working on code such as:
 
-[!code[CommandExecuted demo](samples/command_executed_demo.cs)]
+[!code[CommandExecuted demo](samples/post-execution/command_executed_demo.cs)]
 
 So now we have a streamlined post-execution pipeline, great! What's
 next? We can take this further by using [RuntimeResult].
@@ -69,7 +69,7 @@ class.
 The following creates a bare-minimum required for a sub-class
 of `RuntimeResult`,
 
-[!code[Base Use](samples/customresult_base.cs)]
+[!code[Base Use](samples/post-execution/customresult_base.cs)]
 
 The sky is the limit from here. You can add any additional information
 you would like regarding the execution result.
@@ -78,7 +78,7 @@ For example, you may want to add your result type or other
 helpful information regarding the execution, or something
 simple like static methods to help you create return types easily.
 
-[!code[Extended Use](samples/customresult_extended.cs)]
+[!code[Extended Use](samples/post-execution/customresult_extended.cs)]
 
 After you're done creating your [RuntimeResult], you can
 implement it in your command by marking the command return type to
@@ -91,11 +91,11 @@ implement it in your command by marking the command return type to
 
 Here's an example of a command that utilizes such logic:
 
-[!code[Usage](samples/customresult_usage.cs)]
+[!code[Usage](samples/post-execution/customresult_usage.cs)]
 
 And now we can check for it in our [CommandExecuted] handler:
 
-[!code[Usage](samples/command_executed_adv_demo.cs)]
+[!code[Usage](samples/post-execution/command_executed_adv_demo.cs)]
 
 ## CommandService.Log Event
 
@@ -110,7 +110,7 @@ as a [CommandException] type. The [CommandException] class allows
 us to access the exception thrown, as well as the context
 of the command.
 
-[!code[Logger Sample](samples/command_exception_log.cs)]
+[!code[Logger Sample](samples/post-execution/command_exception_log.cs)]
 
 [CommandException]: xref:Discord.Commands.CommandException
 [LogMessage.Exception]: xref:Discord.LogMessage.Exception
