@@ -8,3 +8,4 @@
 <script type="text/javascript" src="{{_rel}}styles/styleswitcher.js"></script>
 <script type="text/javascript" src="//malsup.github.io/jquery.corner.js"></script>
 <script type="text/javascript" src="{{_rel}}styles/cornerify.js"></script>
+<script type="text/javascript" src="{{_rel}}styles/styleswitcher.js"></script>

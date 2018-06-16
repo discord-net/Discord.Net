@@ -36,12 +36,12 @@
     "template": [
       "default",
       "_template/light-dark-theme",
-	  "_template/lastmodified"
+      "_template/lastmodified"
     ],
-    "postProcessors": [ "ExtractSearchIndex", "LastModifiedPostProcessor" ],
+    "postProcessors": ["ExtractSearchIndex", "LastModifiedPostProcessor"],
     "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
-	  "_appTitle": "Discord.Net Documentation",
+      "_appTitle": "Discord.Net Documentation",
       "_appFooter": "Discord.Net (c) 2015-2018 2.0.0-beta",
       "_enableSearch": true
     },
