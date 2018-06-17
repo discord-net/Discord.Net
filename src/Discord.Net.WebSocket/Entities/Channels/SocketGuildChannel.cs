@@ -79,13 +79,11 @@ namespace Discord.WebSocket
             => ChannelHelper.DeleteAsync(this, Discord, options);
 
         /// <summary>
-        ///     Gets the overwrite permissions of the specified <paramref name="user"/>
+        ///     Gets the overwrite permissions of the specified <paramref name="user"/>.
         /// </summary>
-        /// <param name="user">
-        ///     The user that you want to get the overwrite permissions for
-        /// </param>
+        /// <param name="user">The user that you want to get the overwrite permissions for.</param>
         /// <returns>
-        ///     Null if the user has no overwrite permissions otherwise the overwrite permissions for the user
+        ///     The overwrite permissions for the requested user; otherwise <c>null</c>.
         /// </returns>
         public OverwritePermissions? GetPermissionOverwrite(IUser user)
         {
@@ -98,13 +96,11 @@ namespace Discord.WebSocket
         }
 
         /// <summary>
-        ///     Gets the overwrite permissions of the specified <paramref name="role"/>
+        ///     Gets the overwrite permissions of the specified <paramref name="role"/>.
         /// </summary>
-        /// <param name="role">
-        ///     The role that you want to get the overwrite permissions for
-        /// </param>
+        /// <param name="role">The role that you want to get the overwrite permissions for.</param>
         /// <returns>
-        ///     Null if the role has no overwrite permissions otherwise the overwrite permissions for the role
+        ///  The overwrite permissions for the requested role; otherwise <c>null</c>.
         /// </returns>
         public OverwritePermissions? GetPermissionOverwrite(IRole role)
         {
@@ -117,17 +113,11 @@ namespace Discord.WebSocket
         }
 
         /// <summary>
-        ///     Adds an overwrite permission for the specified <paramref name="user"/>
+        ///     Adds an overwrite permission for the specified <paramref name="user"/>.
         /// </summary>
-        /// <param name="user">
-        ///     The user you want the overwrite permission to apply to
-        /// </param>
-        /// <param name="perms">
-        ///     The overwrite permission you want to add
-        /// </param>
-        /// <param name="options">
-        ///     The options to be used when sending the request
-        /// </param>
+        /// <param name="user">The user you want the overwrite permission to apply to.</param>
+        /// <param name="perms">The overwrite permission you want to add.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
         public async Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions perms, RequestOptions options = null)
         {
             await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, user, perms, options).ConfigureAwait(false);
@@ -135,17 +125,11 @@ namespace Discord.WebSocket
         }
 
         /// <summary>
-        ///     Adds an overwrite permission for the specified <paramref name="role"/>
+        ///     Adds an overwrite permission for the specified <paramref name="role"/>.
         /// </summary>
-        /// <param name="role">
-        ///     The role you want the overwrite permission to apply to
-        /// </param>
-        /// <param name="perms">
-        ///     The overwrite permission you want to add
-        /// </param>
-        /// <param name="options">
-        ///     The options to be used when sending the request
-        /// </param>
+        /// <param name="role">The role you want the overwrite permission to apply to.</param>
+        /// <param name="perms">The overwrite permission you want to add.</param>
+        /// <param name="options">The options to be used when sending the request. </param>
         public async Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions perms, RequestOptions options = null)
         {
             await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, role, perms, options).ConfigureAwait(false);
