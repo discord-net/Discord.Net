@@ -78,6 +78,13 @@ namespace Discord.WebSocket
         public Task DeleteAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
 
+        /// <summary>
+        ///     Gets the overwrite permissions of the specified <paramref name="user"/>.
+        /// </summary>
+        /// <param name="user">The user that you want to get the overwrite permissions for.</param>
+        /// <returns>
+        ///     The overwrite permissions for the requested user; otherwise <c>null</c>.
+        /// </returns>
         public OverwritePermissions? GetPermissionOverwrite(IUser user)
         {
             for (int i = 0; i < _overwrites.Length; i++)
@@ -87,6 +94,14 @@ namespace Discord.WebSocket
             }
             return null;
         }
+
+        /// <summary>
+        ///     Gets the overwrite permissions of the specified <paramref name="role"/>.
+        /// </summary>
+        /// <param name="role">The role that you want to get the overwrite permissions for.</param>
+        /// <returns>
+        ///     The overwrite permissions for the requested role; otherwise <c>null</c>.
+        /// </returns>
         public OverwritePermissions? GetPermissionOverwrite(IRole role)
         {
             for (int i = 0; i < _overwrites.Length; i++)
@@ -96,11 +111,31 @@ namespace Discord.WebSocket
             }
             return null;
         }
+
+        /// <summary>
+        ///     Adds an overwrite permission for the specified <paramref name="user"/>.
+        /// </summary>
+        /// <param name="user">The user you want the overwrite permission to apply to.</param>
+        /// <param name="perms">The overwrite permission you want to add.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
         public async Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions perms, RequestOptions options = null)
         {
             await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, user, perms, options).ConfigureAwait(false);
             _overwrites = _overwrites.Add(new Overwrite(user.Id, PermissionTarget.User, new OverwritePermissions(perms.AllowValue, perms.DenyValue)));
         }
+
+        /// <summary>
+        ///     Adds an overwrite permission for the specified <paramref name="role"/>.
+        /// </summary>
+        /// <param name="role">The role you want the overwrite permission to apply to.</param>
+        /// <param name="perms">The overwrite permission you want to add.</param>
+        /// <param name="options">The options to be used when sending the request. </param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
         public async Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions perms, RequestOptions options = null)
         {
             await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, role, perms, options).ConfigureAwait(false);
