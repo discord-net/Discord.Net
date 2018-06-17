@@ -100,7 +100,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="role">The role that you want to get the overwrite permissions for.</param>
         /// <returns>
-        ///  The overwrite permissions for the requested role; otherwise <c>null</c>.
+        ///     The overwrite permissions for the requested role; otherwise <c>null</c>.
         /// </returns>
         public OverwritePermissions? GetPermissionOverwrite(IRole role)
         {
