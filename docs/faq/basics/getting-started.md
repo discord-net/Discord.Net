@@ -37,7 +37,7 @@ based on various conditions.
 
 ![Snowflake Generation](images/snowflake.png)
 
-The ID can be seen by anyone; it is public. It is merely used to
+Anyone can see the ID; it is public. It is merely used to
 identify an object in the Discord ecosystem. Many things in the
 Discord ecosystem require an ID to retrieve or identify the said
 object.

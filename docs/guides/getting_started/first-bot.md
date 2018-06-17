@@ -5,15 +5,15 @@ title: Start making a bot
 
 # Making a Ping-Pong bot
 
-One of ways to get started with the Discord API is to write a basic
-ping-pong bot. This bot will respond to a simple command "ping."
+One of the ways to get started with the Discord API is to write a
+basic ping-pong bot. This bot will respond to a simple command "ping."
 We will expand on this to create more diverse commands later, but for
 now, it is a good starting point.
 
 ## Creating a Discord Bot
 
-Before writing your bot, it is necessary to create a bot account via the
-Discord Applications Portal first.
+Before writing your bot, it is necessary to create a bot account via 
+the Discord Applications Portal first.
 
 1. Visit the [Discord Applications Portal].
 2. Create a New Application.
@@ -51,7 +51,7 @@ through the OAuth2 flow.
 
 4. Open the generated authorization URL in your browser.
 5. Select a server.
-6. Click on authorize.
+6. Click on Authorize.
 
     > [!NOTE]
     > Only servers where you have the `MANAGE_SERVER` permission will be
@@ -70,7 +70,7 @@ For more information, see @Guides.GettingStarted.Installation.
 
 Discord.Net uses .NET's [Task-based Asynchronous Pattern (TAP)]
 extensively - nearly every operation is asynchronous. It is highly
-recommended that these operations are awaited in a
+recommended for these operations to be awaited in a
 properly established async context whenever possible.
 
 To establish an async context, we will be creating an async main method
@@ -80,7 +80,7 @@ invoke the new async main.
 [!code-csharp[Async Context](samples/first-bot/async-context.cs)]
 
 As a result of this, your program will now start and immediately
-jump into an async context. This will allow us to create a connection
+jump into an async context. This allows us to create a connection
 to Discord later on without having to worry about setting up the
 correct async implementation.
 
@@ -133,7 +133,7 @@ Before connecting, we should hook the client's `Log` event to the
 log handler that we had just created. Events in Discord.Net work
 similarly to any other events in C#.
 
-Next, you will need to "login to Discord" with the [LoginAsync]
+Next, you will need to "log in to Discord" with the [LoginAsync]
 method with the application's "token."
 
 > [!NOTE]

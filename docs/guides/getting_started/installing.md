@@ -127,8 +127,8 @@ Studio installation.
 
 ### Installing on Unsupported WebSocket Platform
 
-For older system such as Windows 7 or earlier that do not natively
-support WebSocket, you may encounter
+For an older operating system such as Windows 7 or earlier that does
+not natively support WebSocket, you may encounter
 @System.PlatformNotSupportedException upon connection.
 
 You may resolve this by either targeting .NET Core 2.1 or later, or
@@ -137,9 +137,9 @@ by installing one or more custom packages as listed below.
 #### [Targeting .NET Core 2.1](#tab/core2-1)
 
 First, make sure your installed SDK supports .NET Core 2.1.
-Enter `dotnet --version`; the version number should be equal to or above
-`2.1.300`. If not, visit [.NET Core SDK] website to download the latest
-version.
+Enter `dotnet --version`; the version number should be equal to or
+above `2.1.300`. If not, visit the [.NET Core SDK] website to download
+the latest version.
 
 Next, ensure your project is set to target Core 2.1; you should replace
 the `<TargetFramework>` tag in your project file to `netcoreapp2.1` or
