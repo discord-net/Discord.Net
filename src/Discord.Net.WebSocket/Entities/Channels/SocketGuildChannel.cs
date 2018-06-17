@@ -118,7 +118,9 @@ namespace Discord.WebSocket
         /// <param name="user">The user you want the overwrite permission to apply to.</param>
         /// <param name="perms">The overwrite permission you want to add.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>An awaitable <see cref="Task"/>.</returns>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
         public async Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions perms, RequestOptions options = null)
         {
             await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, user, perms, options).ConfigureAwait(false);
@@ -131,7 +133,9 @@ namespace Discord.WebSocket
         /// <param name="role">The role you want the overwrite permission to apply to.</param>
         /// <param name="perms">The overwrite permission you want to add.</param>
         /// <param name="options">The options to be used when sending the request. </param>
-        /// <returns>An awaitable <see cref="Task"/>.</returns>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
         public async Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions perms, RequestOptions options = null)
         {
             await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, role, perms, options).ConfigureAwait(false);
