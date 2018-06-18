@@ -1,9 +1,9 @@
 ---
-uid: Guides.Concepts.Deployment
+uid: Guides.Deployment
 title: Deploying the Bot
 ---
 
-# Deploying the Bot
+# Deploying a Discord.Net Bot
 
 After finishing your application, you may want to deploy your bot to a
 remote location such as a Virtual Private Server (VPS) or another

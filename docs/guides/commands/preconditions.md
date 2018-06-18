@@ -28,7 +28,7 @@ a command method signature as an attribute.
 
 [!code-csharp[Precondition usage](samples/preconditions/precondition_usage.cs)]
 
-### ORing Preconditions
+## ORing Preconditions
 
 When writing commands, you may want to allow some of them to be
 executed when only some of the precondition checks are passed.
@@ -38,7 +38,7 @@ handy. By assigning two or more preconditions to a group, the command
 system will allow the command to be executed when one of the
 precondition passes.
 
-#### Example - ORing Preconditions
+### Example - ORing Preconditions
 
 [!code-csharp[OR Precondition](samples/preconditions/group_precondition.cs)]
 

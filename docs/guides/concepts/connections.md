@@ -3,11 +3,13 @@ uid: Guides.Concepts.ManageConnections
 title: Managing Connections
 ---
 
+# Managing Connections with Discord.Net
+
 In Discord.Net, once a client has been started, it will automatically
 maintain a connection to Discord's gateway until it is manually
 stopped.
 
-### Usage
+## Usage
 
 To start a connection, invoke the `StartAsync` method on a client that
 supports a WebSocket connection; to end a connection, invoke the
@@ -37,7 +39,7 @@ sync and has a completed guild cache.
 
 [!code-csharp[Connection Sample](samples/events.cs)]
 
-### Reconnection
+## Reconnection
 
 > [!TIP]
 > Avoid running long-running code on the gateway! If you deadlock the

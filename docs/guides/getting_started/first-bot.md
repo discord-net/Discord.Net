@@ -3,7 +3,7 @@ uid: Guides.GettingStarted.FirstBot
 title: Start making a bot
 ---
 
-# Making a Ping-Pong bot
+# Making Your First Bot with Discord.Net
 
 One of the ways to get started with the Discord API is to write a
 basic ping-pong bot. This bot will respond to a simple command "ping."

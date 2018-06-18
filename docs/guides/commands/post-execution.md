@@ -3,7 +3,7 @@ uid: Guides.Commands.PostExecution
 title: Post-command Execution Handling
 ---
 
-# Preface
+# Post-execution Handling for Commands
 
 When developing commands, you may want to consider building a
 post-execution handling system so you can have finer control
