@@ -322,8 +322,10 @@ namespace Discord.Commands
 
         //Execution
         public SearchResult Search(ICommandContext context, int argPos)
-            => Search(context, context.Message.Content.Substring(argPos));
+            => Search(context.Message.Content.Substring(argPos));
         public SearchResult Search(ICommandContext context, string input)
+            => Search(input);
+        public SearchResult Search(string input)
         {
             string searchInput = _caseSensitive ? input : input.ToLowerInvariant();
             var matches = _map.GetCommands(searchInput).OrderByDescending(x => x.Command.Priority).ToImmutableArray();
@@ -339,7 +341,8 @@ namespace Discord.Commands
         public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;
-            var searchResult = Search(context, input);
+
+            var searchResult = Search(input);
             if (!searchResult.IsSuccess)
                 return searchResult;
 
