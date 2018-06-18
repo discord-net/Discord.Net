@@ -261,3 +261,41 @@ select {
     background-color: #3b3b3b;
     border-color: #2e2e2e;
 }
+
+/* 
+    Following code regarding collapse container are fetched 
+    or modified from the Materialize project.
+
+    The MIT License (MIT)
+    Copyright (c) 2014-2018 Materialize
+    https://github.com/Dogfalo/materialize
+*/
+
+/* all collapse container */
+.collapse-container.last-modified {
+    -webkit-box-shadow: 0 2px 2px 0 rgba(50, 50, 50, 0.64), 0 3px 1px -2px rgba(50, 50, 50, 0.62), 0 1px 5px 0 rgba(50, 50, 50, 0.7);
+    box-shadow: 0 2px 2px 0 rgba(50, 50, 50, 0.64), 0 3px 1px -2px rgba(50, 50, 50, 0.62), 0 1px 5px 0 rgba(50, 50, 50, 0.7);
+    border-top: 1px solid rgba(96, 96, 96, 0.7);
+    border-right: 1px solid rgba(96, 96, 96, 0.7);
+    border-left: 1px solid rgba(96, 96, 96, 0.7);
+}
+
+/* header */
+.collapse-container.last-modified>:nth-child(odd) {
+    background-color: #3f3f3f;
+    border-bottom: 1px solid rgba(96, 96, 96, 0.7);
+}
+
+/* body */
+.collapse-container.last-modified>:nth-child(even) {
+    border-bottom: 1px solid rgba(96, 96, 96, 0.7);
+    background-color: inherit;
+}
+
+span.arrow-d{
+    border-top: 5px solid white
+}
+
+span.arrow-r{
+    border-left: 5px solid white
+}

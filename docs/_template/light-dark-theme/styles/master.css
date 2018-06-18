@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Titillium+Web');
+@import url('https://fonts.googleapis.com/css?family=Titillium+Web|Noto+Sans');
 html,
 body {
     font-family: 'Titillium Web', 'Segoe UI', Tahoma, Helvetica, sans-serif;
@@ -25,6 +25,7 @@ h3,
 h4,
 h5,
 h6 {
+    font-family: 'Noto Sans', Verdana, Geneva, Tahoma, sans-serif;
     line-height: 130%;
 }
 
@@ -62,4 +63,44 @@ select {
     background-position: calc(100% - 13px) 11px, calc(100% - 8px) 11px;
     background-size: 5px 5px, 5px 6px;
     background-repeat: no-repeat;
+}
+
+/* 
+    Following code regarding collapse container are fetched 
+    or modified from the Materialize project.
+
+    The MIT License (MIT)
+    Copyright (c) 2014-2018 Materialize
+    https://github.com/Dogfalo/materialize
+*/
+
+/* all collapse container */
+.collapse-container.last-modified {
+    margin: 0.5rem 0 1rem 0;
+}
+
+/* header */
+.collapse-container.last-modified>:nth-child(odd):focus {
+    outline: 0;
+}
+.collapse-container.last-modified>:nth-child(odd) {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    line-height: 1.5;
+    padding: 0.75rem;
+    background-image:none;
+    border: 0px;
+}
+
+/* body */
+.collapse-container.last-modified>:nth-child(even) {
+    display: none;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 1rem;
+    border: 0px;
 }
