@@ -1,4 +1,4 @@
-﻿using Discord.Net.Udp;
+using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
 
@@ -35,6 +35,8 @@ namespace Discord.WebSocket
         public bool AlwaysDownloadUsers { get; set; } = false;
         /// <summary> Gets or sets the timeout for event handlers, in milliseconds, after which a warning will be logged. Null disables this check. </summary>
         public int? HandlerTimeout { get; set; } = 3000;
+        /// <summary> Gets or sets whether or not offload all event handlers from the gateway task. This can have dangerous consequences. </summary>
+        public bool OffloadAllHandlers { get; set; } = false;
 
         public DiscordSocketConfig()
         {

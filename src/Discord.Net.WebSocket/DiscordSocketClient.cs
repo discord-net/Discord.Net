@@ -58,6 +58,7 @@ namespace Discord.WebSocket
         internal WebSocketProvider WebSocketProvider { get; private set; }
         internal bool AlwaysDownloadUsers { get; private set; }
         internal int? HandlerTimeout { get; private set; }
+        internal bool OffloadAllHandlers { get; private set; }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
@@ -84,8 +85,12 @@ namespace Discord.WebSocket
             WebSocketProvider = config.WebSocketProvider;
             AlwaysDownloadUsers = config.AlwaysDownloadUsers;
             HandlerTimeout = config.HandlerTimeout;
+            OffloadAllHandlers = config.OffloadAllHandlers;
             State = new ClientState(0, 0);
             _heartbeatTimes = new ConcurrentQueue<long>();
+
+            if (OffloadAllHandlers && !HandlerTimeout.HasValue)
+                throw new InvalidOperationException("If OffloadAllHandlers is set, the HandlerTimeout must also be set. To suppress this message, unset OffloadAllHandlers");
 
             _stateLock = new SemaphoreSlim(1, 1);
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : $"Shard #{ShardId}");
@@ -1735,8 +1740,10 @@ namespace Discord.WebSocket
         {
             try
             {
-                var timeoutTask = Task.Delay(HandlerTimeout.Value);
                 var handlersTask = action();
+                if (OffloadAllHandlers)
+                    return;
+                var timeoutTask = Task.Delay(HandlerTimeout.Value);
                 if (await Task.WhenAny(timeoutTask, handlersTask).ConfigureAwait(false) == timeoutTask)
                 {
                     await _gatewayLogger.WarningAsync($"A {name} handler is blocking the gateway task.").ConfigureAwait(false);
