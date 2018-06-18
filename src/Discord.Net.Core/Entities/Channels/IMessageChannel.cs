@@ -8,11 +8,10 @@ namespace Discord
     public interface IMessageChannel : IChannel
     {
         /// <summary> Sends a message to this message channel. </summary>
-        Task<IUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null);
-#if FILESYSTEM
+        Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
         /// <summary> Sends a file to this text channel, with an optional caption. </summary>
         Task<IUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
-#endif
+
         /// <summary> Sends a file to this text channel, with an optional caption. </summary>
         Task<IUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
 
@@ -29,6 +28,11 @@ namespace Discord
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary> Gets a collection of pinned messages in this channel. </summary>
         Task<IReadOnlyCollection<IMessage>> GetPinnedMessagesAsync(RequestOptions options = null);
+
+        /// <summary> Deletes a message based on the message ID in this channel. </summary>
+        Task DeleteMessageAsync(ulong messageId, RequestOptions options = null);
+        /// <summary> Deletes a message based on the provided message in this channel. </summary>
+        Task DeleteMessageAsync(IMessage message, RequestOptions options = null);
 
         /// <summary> Broadcasts the "user is typing" message to all users in this channel, lasting 10 seconds. </summary>
         Task TriggerTypingAsync(RequestOptions options = null);

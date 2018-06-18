@@ -1,4 +1,4 @@
-﻿using Discord.Audio;
+using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,6 +13,7 @@ namespace Discord.Rest
     {
         public int Bitrate { get; private set; }
         public int? UserLimit { get; private set; }
+        public ulong? CategoryId { get; private set; }
 
         internal RestVoiceChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
@@ -27,7 +28,7 @@ namespace Discord.Rest
         internal override void Update(Model model)
         {
             base.Update(model);
-
+            CategoryId = model.CategoryId;
             Bitrate = model.Bitrate.Value;
             UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
         }
@@ -38,15 +39,27 @@ namespace Discord.Rest
             Update(model);
         }
 
+        public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
+            => ChannelHelper.GetCategoryAsync(this, Discord, options);
+
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
 
         //IAudioChannel
-        Task<IAudioClient> IAudioChannel.ConnectAsync(Action<IAudioClient> configAction) { throw new NotSupportedException(); }
+        Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external) { throw new NotSupportedException(); }
+        Task IAudioChannel.DisconnectAsync() { throw new NotSupportedException(); }
 
         //IGuildChannel
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(null);
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
+
+        // INestedChannel
+        async Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
+        {
+            if (CategoryId.HasValue && mode == CacheMode.AllowDownload)
+                return (await Guild.GetChannelAsync(CategoryId.Value, mode, options).ConfigureAwait(false)) as ICategoryChannel;
+            return null;
+        }
     }
 }

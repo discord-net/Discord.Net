@@ -16,9 +16,12 @@ namespace Discord.WebSocket
         private readonly MessageCache _messages;
 
         public string Topic { get; private set; }
+        public ulong? CategoryId { get; private set; }
+        public ICategoryChannel Category
+            => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
 
         private bool _nsfw;
-        public bool IsNsfw => _nsfw || ChannelHelper.IsNsfw(this);
+        public bool IsNsfw => _nsfw;
 
         public string Mention => MentionUtils.MentionChannel(Id);
         public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();
@@ -42,7 +45,7 @@ namespace Discord.WebSocket
         internal override void Update(ClientState state, Model model)
         {
             base.Update(state, model);
-
+            CategoryId = model.CategoryId;
             Topic = model.Topic.Value;
             _nsfw = model.Nsfw.GetValueOrDefault();
         }
@@ -75,12 +78,12 @@ namespace Discord.WebSocket
         public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
 
-        public Task<RestUserMessage> SendMessageAsync(string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        public Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
-#if FILESYSTEM
+
         public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, options);
-#endif
+
         public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options);
 
@@ -88,6 +91,11 @@ namespace Discord.WebSocket
             => ChannelHelper.DeleteMessagesAsync(this, Discord, messages.Select(x => x.Id), options);
         public Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null)
             => ChannelHelper.DeleteMessagesAsync(this, Discord, messageIds, options);
+
+        public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
+            => ChannelHelper.DeleteMessageAsync(this, messageId, Discord, options);
+        public Task DeleteMessageAsync(IMessage message, RequestOptions options = null)
+            => ChannelHelper.DeleteMessageAsync(this, message.Id, Discord, options);
 
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);
@@ -154,15 +162,19 @@ namespace Discord.WebSocket
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessage.Id, dir, limit, mode, options);
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
-#if FILESYSTEM
+
         async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendFileAsync(filePath, text, isTTS, embed, options).ConfigureAwait(false);
-#endif
+
         async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendFileAsync(stream, filename, text, isTTS, embed, options).ConfigureAwait(false);
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
         IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
             => EnterTypingState(options);
+
+        // INestedChannel
+        Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult(Category);
     }
 }

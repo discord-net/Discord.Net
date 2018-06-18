@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -74,12 +74,26 @@ namespace Discord
             DenyValue = denyValue;
         }
 
-        private OverwritePermissions(ulong allowValue, ulong denyValue, PermValue? createInstantInvite = null, PermValue? manageChannel = null, 
+        private OverwritePermissions(ulong allowValue, ulong denyValue,
+            PermValue? createInstantInvite = null,
+            PermValue? manageChannel = null, 
             PermValue? addReactions = null,
-            PermValue? viewChannel = null, PermValue? sendMessages = null, PermValue? sendTTSMessages = null, PermValue? manageMessages = null, 
-            PermValue? embedLinks = null, PermValue? attachFiles = null, PermValue? readMessageHistory = null, PermValue? mentionEveryone = null, 
-            PermValue? useExternalEmojis = null, PermValue? connect = null, PermValue? speak = null, PermValue? muteMembers = null, 
-            PermValue? deafenMembers = null, PermValue? moveMembers = null, PermValue? useVoiceActivation = null, PermValue? manageRoles = null, 
+            PermValue? viewChannel = null,
+            PermValue? sendMessages = null,
+            PermValue? sendTTSMessages = null,
+            PermValue? manageMessages = null, 
+            PermValue? embedLinks = null,
+            PermValue? attachFiles = null,
+            PermValue? readMessageHistory = null,
+            PermValue? mentionEveryone = null, 
+            PermValue? useExternalEmojis = null,
+            PermValue? connect = null,
+            PermValue? speak = null,
+            PermValue? muteMembers = null, 
+            PermValue? deafenMembers = null,
+            PermValue? moveMembers = null,
+            PermValue? useVoiceActivation = null,
+            PermValue? manageRoles = null, 
             PermValue? manageWebhooks = null)
         {
             Permissions.SetValue(ref allowValue, ref denyValue, createInstantInvite, ChannelPermission.CreateInstantInvite);
@@ -108,24 +122,54 @@ namespace Discord
         }
 
         /// <summary> Creates a new ChannelPermissions with the provided permissions. </summary>
-        public OverwritePermissions(PermValue createInstantInvite = PermValue.Inherit, PermValue manageChannel = PermValue.Inherit,
+        public OverwritePermissions(
+            PermValue createInstantInvite = PermValue.Inherit,
+            PermValue manageChannel = PermValue.Inherit,
             PermValue addReactions = PermValue.Inherit,
-            PermValue readMessages = PermValue.Inherit, PermValue sendMessages = PermValue.Inherit, PermValue sendTTSMessages = PermValue.Inherit, PermValue manageMessages = PermValue.Inherit, 
-            PermValue embedLinks = PermValue.Inherit, PermValue attachFiles = PermValue.Inherit, PermValue readMessageHistory = PermValue.Inherit, PermValue mentionEveryone = PermValue.Inherit,
-            PermValue useExternalEmojis = PermValue.Inherit, PermValue connect = PermValue.Inherit, PermValue speak = PermValue.Inherit, PermValue muteMembers = PermValue.Inherit, PermValue deafenMembers = PermValue.Inherit,
-            PermValue moveMembers = PermValue.Inherit, PermValue useVoiceActivation = PermValue.Inherit, PermValue manageRoles = PermValue.Inherit, PermValue manageWebhooks = PermValue.Inherit)
-            : this(0, 0, createInstantInvite, manageChannel, addReactions, readMessages, sendMessages, sendTTSMessages, manageMessages, 
+            PermValue viewChannel = PermValue.Inherit,
+            PermValue sendMessages = PermValue.Inherit,
+            PermValue sendTTSMessages = PermValue.Inherit,
+            PermValue manageMessages = PermValue.Inherit, 
+            PermValue embedLinks = PermValue.Inherit,
+            PermValue attachFiles = PermValue.Inherit,
+            PermValue readMessageHistory = PermValue.Inherit,
+            PermValue mentionEveryone = PermValue.Inherit,
+            PermValue useExternalEmojis = PermValue.Inherit,
+            PermValue connect = PermValue.Inherit,
+            PermValue speak = PermValue.Inherit,
+            PermValue muteMembers = PermValue.Inherit,
+            PermValue deafenMembers = PermValue.Inherit,
+            PermValue moveMembers = PermValue.Inherit,
+            PermValue useVoiceActivation = PermValue.Inherit,
+            PermValue manageRoles = PermValue.Inherit,
+            PermValue manageWebhooks = PermValue.Inherit)
+            : this(0, 0, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages, 
                   embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, 
                   moveMembers, useVoiceActivation, manageRoles, manageWebhooks) { }
 
         /// <summary> Creates a new OverwritePermissions from this one, changing the provided non-null permissions. </summary>
-        public OverwritePermissions Modify(PermValue? createInstantInvite = null, PermValue? manageChannel = null,
+        public OverwritePermissions Modify(
+            PermValue? createInstantInvite = null,
+            PermValue? manageChannel = null,
             PermValue? addReactions = null,
-            PermValue? readMessages = null, PermValue? sendMessages = null, PermValue? sendTTSMessages = null, PermValue? manageMessages = null, 
-            PermValue? embedLinks = null, PermValue? attachFiles = null, PermValue? readMessageHistory = null, PermValue? mentionEveryone = null, 
-            PermValue? useExternalEmojis = null, PermValue? connect = null, PermValue? speak = null, PermValue? muteMembers = null, PermValue? deafenMembers = null,
-            PermValue? moveMembers = null, PermValue? useVoiceActivation = null, PermValue? manageRoles = null, PermValue? manageWebhooks = null)
-            => new OverwritePermissions(AllowValue, DenyValue, createInstantInvite, manageChannel, addReactions, readMessages, sendMessages, sendTTSMessages, manageMessages, 
+            PermValue? viewChannel = null,
+            PermValue? sendMessages = null,
+            PermValue? sendTTSMessages = null,
+            PermValue? manageMessages = null, 
+            PermValue? embedLinks = null,
+            PermValue? attachFiles = null,
+            PermValue? readMessageHistory = null,
+            PermValue? mentionEveryone = null, 
+            PermValue? useExternalEmojis = null,
+            PermValue? connect = null,
+            PermValue? speak = null,
+            PermValue? muteMembers = null,
+            PermValue? deafenMembers = null,
+            PermValue? moveMembers = null,
+            PermValue? useVoiceActivation = null,
+            PermValue? manageRoles = null,
+            PermValue? manageWebhooks = null)
+            => new OverwritePermissions(AllowValue, DenyValue, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages, 
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, 
                 moveMembers, useVoiceActivation, manageRoles, manageWebhooks);
 

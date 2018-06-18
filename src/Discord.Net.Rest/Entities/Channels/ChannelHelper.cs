@@ -168,7 +168,6 @@ namespace Discord.Rest
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }
 
-#if FILESYSTEM
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             string filePath, string text, bool isTTS, Embed embed, RequestOptions options)
         {
@@ -176,7 +175,7 @@ namespace Discord.Rest
             using (var file = File.OpenRead(filePath))
                 return await SendFileAsync(channel, client, file, filename, text, isTTS, embed, options).ConfigureAwait(false);
         }
-#endif
+
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options)
         {
@@ -184,6 +183,10 @@ namespace Discord.Rest
             var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }
+
+        public static Task DeleteMessageAsync(IMessageChannel channel, ulong messageId, BaseDiscordClient client,
+            RequestOptions options)
+            => MessageHelper.DeleteAsync(channel.Id, messageId, client, options);
 
         public static async Task DeleteMessagesAsync(ITextChannel channel, BaseDiscordClient client,
             IEnumerable<ulong> messageIds, RequestOptions options)
@@ -313,6 +316,16 @@ namespace Discord.Rest
             return models.Select(x => RestWebhook.Create(client, channel, x))
                 .ToImmutableArray();
         }
+        // Categories
+        public static async Task<ICategoryChannel> GetCategoryAsync(INestedChannel channel, BaseDiscordClient client, RequestOptions options)
+        {
+            // if no category id specified, return null
+            if (!channel.CategoryId.HasValue)
+                return null;
+            // CategoryId will contain a value here
+            var model = await client.ApiClient.GetChannelAsync(channel.CategoryId.Value, options).ConfigureAwait(false);
+            return RestCategoryChannel.Create(client, model) as ICategoryChannel;
+        }
 
         //Helpers
         private static IUser GetAuthor(BaseDiscordClient client, IGuild guild, UserModel model, ulong? webhookId)
@@ -324,10 +337,5 @@ namespace Discord.Rest
                 author = RestUser.Create(client, guild, model, webhookId);
             return author;
         }
-
-        public static bool IsNsfw(IChannel channel)
-            => IsNsfw(channel.Name);
-        public static bool IsNsfw(string channelName) =>
-            channelName == "nsfw" || channelName.StartsWith("nsfw-");
     }
 }

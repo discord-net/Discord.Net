@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -16,7 +16,6 @@ namespace Discord.Rest
         internal IGuild Guild { get; }
         public string Name { get; private set; }
         public int Position { get; private set; }
-        public ulong? CategoryId { get; private set; }
         public ulong GuildId => Guild.Id;
 
         internal RestGuildChannel(BaseDiscordClient discord, IGuild guild, ulong id)
@@ -35,7 +34,6 @@ namespace Discord.Rest
                 case ChannelType.Category:
                     return RestCategoryChannel.Create(discord, guild, model);
                 default:
-                    // TODO: Channel categories
                     return new RestGuildChannel(discord, guild, model.Id);
             }
         }
@@ -63,13 +61,6 @@ namespace Discord.Rest
         }
         public Task DeleteAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
-
-        public async Task<ICategoryChannel> GetCategoryAsync()
-        {
-            if (CategoryId.HasValue)
-                return (await Guild.GetChannelAsync(CategoryId.Value).ConfigureAwait(false)) as ICategoryChannel;
-            return null;
-        }
 
         public OverwritePermissions? GetPermissionOverwrite(IUser user)
         {

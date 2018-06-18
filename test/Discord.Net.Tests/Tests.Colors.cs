@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Xunit;
 
 namespace Discord
@@ -12,6 +12,7 @@ namespace Discord
             Assert.Equal(uint.MinValue, new Color(uint.MinValue).RawValue);
             Assert.Equal(uint.MaxValue, new Color(uint.MaxValue).RawValue);
         }
+        [Fact]
         public void Color_Default()
         {
             Assert.Equal(0u, Color.Default.RawValue);

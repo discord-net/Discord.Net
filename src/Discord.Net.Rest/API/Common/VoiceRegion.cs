@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -13,9 +13,9 @@ namespace Discord.API
         public bool IsVip { get; set; }
         [JsonProperty("optimal")]
         public bool IsOptimal { get; set; }
-        [JsonProperty("sample_hostname")]
-        public string SampleHostname { get; set; }
-        [JsonProperty("sample_port")]
-        public int SamplePort { get; set; }
+        [JsonProperty("deprecated")]
+        public bool IsDeprecated { get; set; }
+        [JsonProperty("custom")]
+        public bool IsCustom { get; set; }
     }
 }

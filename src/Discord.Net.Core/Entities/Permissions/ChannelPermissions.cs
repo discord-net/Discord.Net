@@ -12,7 +12,7 @@ namespace Discord
         /// <summary> Gets a ChannelPermissions that grants all permissions for text channels. </summary>
         public static readonly ChannelPermissions Text = new ChannelPermissions(0b01100_0000000_1111111110001_010001);
         /// <summary> Gets a ChannelPermissions that grants all permissions for voice channels. </summary>
-        public static readonly ChannelPermissions Voice = new ChannelPermissions(0b00100_1111110_0000000000000_010001);
+        public static readonly ChannelPermissions Voice = new ChannelPermissions(0b00100_1111110_0000000010000_010001);
         /// <summary> Gets a ChannelPermissions that grants all permissions for category channels. </summary>
         public static readonly ChannelPermissions Category = new ChannelPermissions(0b01100_1111110_1111111110001_010001);
         /// <summary> Gets a ChannelPermissions that grants all permissions for direct message channels. </summary>
@@ -87,12 +87,27 @@ namespace Discord
         /// <summary> Creates a new ChannelPermissions with the provided packed value. </summary>
         public ChannelPermissions(ulong rawValue) { RawValue = rawValue; }
 
-        private ChannelPermissions(ulong initialValue, bool? createInstantInvite = null, bool? manageChannel = null,
+        private ChannelPermissions(ulong initialValue,
+            bool? createInstantInvite = null,
+            bool? manageChannel = null,
             bool? addReactions = null,
-            bool? viewChannel = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
-            bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
-            bool? useExternalEmojis = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
-            bool? moveMembers = null, bool? useVoiceActivation = null, bool? manageRoles = null, bool? manageWebhooks = null)
+            bool? viewChannel = null,
+            bool? sendMessages = null,
+            bool? sendTTSMessages = null,
+            bool? manageMessages = null,
+            bool? embedLinks = null,
+            bool? attachFiles = null,
+            bool? readMessageHistory = null,
+            bool? mentionEveryone = null,
+            bool? useExternalEmojis = null,
+            bool? connect = null,
+            bool? speak = null,
+            bool? muteMembers = null,
+            bool? deafenMembers = null,
+            bool? moveMembers = null,
+            bool? useVoiceActivation = null,
+            bool? manageRoles = null,
+            bool? manageWebhooks = null)
         {
             ulong value = initialValue;
 
@@ -121,27 +136,75 @@ namespace Discord
         }
 
         /// <summary> Creates a new ChannelPermissions with the provided permissions. </summary>
-        public ChannelPermissions(bool createInstantInvite = false, bool manageChannel = false,
+        public ChannelPermissions(
+            bool createInstantInvite = false,
+            bool manageChannel = false,
             bool addReactions = false,
-            bool viewChannel = false, bool sendMessages = false, bool sendTTSMessages = false, bool manageMessages = false,
-            bool embedLinks = false, bool attachFiles = false, bool readMessageHistory = false, bool mentionEveryone = false,
-            bool useExternalEmojis = false, bool connect = false, bool speak = false, bool muteMembers = false, bool deafenMembers = false,
-            bool moveMembers = false, bool useVoiceActivation = false, bool manageRoles = false, bool manageWebhooks = false)
+            bool viewChannel = false,
+            bool sendMessages = false,
+            bool sendTTSMessages = false,
+            bool manageMessages = false,
+            bool embedLinks = false,
+            bool attachFiles = false,
+            bool readMessageHistory = false,
+            bool mentionEveryone = false,
+            bool useExternalEmojis = false,
+            bool connect = false,
+            bool speak = false,
+            bool muteMembers = false,
+            bool deafenMembers = false,
+            bool moveMembers = false,
+            bool useVoiceActivation = false,
+            bool manageRoles = false,
+            bool manageWebhooks = false)
             : this(0, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages,
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect,
                 speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, manageRoles, manageWebhooks)
         { }
 
         /// <summary> Creates a new ChannelPermissions from this one, changing the provided non-null permissions. </summary>
-        public ChannelPermissions Modify(bool? createInstantInvite = null, bool? manageChannel = null,
+        public ChannelPermissions Modify(
+            bool? createInstantInvite = null,
+            bool? manageChannel = null,
             bool? addReactions = null,
-            bool? viewChannel = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
-            bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
-            bool useExternalEmojis = false, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
-            bool? moveMembers = null, bool? useVoiceActivation = null, bool? manageRoles = null, bool? manageWebhooks = null)
-            => new ChannelPermissions(RawValue, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages,
-                embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect,
-                speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, manageRoles, manageWebhooks);
+            bool? viewChannel = null,
+            bool? sendMessages = null,
+            bool? sendTTSMessages = null,
+            bool? manageMessages = null,
+            bool? embedLinks = null,
+            bool? attachFiles = null,
+            bool? readMessageHistory = null,
+            bool? mentionEveryone = null,
+            bool? useExternalEmojis = null,
+            bool? connect = null,
+            bool? speak = null,
+            bool? muteMembers = null,
+            bool? deafenMembers = null,
+            bool? moveMembers = null,
+            bool? useVoiceActivation = null,
+            bool? manageRoles = null,
+            bool? manageWebhooks = null)
+            => new ChannelPermissions(RawValue,
+                createInstantInvite,
+                manageChannel,
+                addReactions,
+                viewChannel,
+                sendMessages,
+                sendTTSMessages,
+                manageMessages,
+                embedLinks,
+                attachFiles,
+                readMessageHistory,
+                mentionEveryone,
+                useExternalEmojis,
+                connect,
+                speak,
+                muteMembers,
+                deafenMembers,
+                moveMembers,
+                useVoiceActivation,
+                manageRoles,
+                manageWebhooks);
 
         public bool Has(ChannelPermission permission) => Permissions.GetValue(RawValue, permission);
 

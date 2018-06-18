@@ -1,4 +1,4 @@
-﻿using Discord.Audio;
+using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -140,6 +140,10 @@ namespace Discord.Rest
         //Bans
         public Task<IReadOnlyCollection<RestBan>> GetBansAsync(RequestOptions options = null)
             => GuildHelper.GetBansAsync(this, Discord, options);
+        public Task<RestBan> GetBanAsync(IUser user, RequestOptions options = null)
+            => GuildHelper.GetBanAsync(this, Discord, user.Id, options);
+        public Task<RestBan> GetBanAsync(ulong userId, RequestOptions options = null)
+            => GuildHelper.GetBanAsync(this, Discord, userId, options);
 
         public Task AddBanAsync(IUser user, int pruneDays = 0, string reason = null, RequestOptions options = null)
             => GuildHelper.AddBanAsync(this, Discord, user.Id, pruneDays, reason, options);
@@ -218,10 +222,10 @@ namespace Discord.Rest
             }
             return null;
         }
-        public Task<RestTextChannel> CreateTextChannelAsync(string name, RequestOptions options = null)
-            => GuildHelper.CreateTextChannelAsync(this, Discord, name, options);
-        public Task<RestVoiceChannel> CreateVoiceChannelAsync(string name, RequestOptions options = null)
-            => GuildHelper.CreateVoiceChannelAsync(this, Discord, name, options);
+        public Task<RestTextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null)
+            => GuildHelper.CreateTextChannelAsync(this, Discord, name, options, func);
+        public Task<RestVoiceChannel> CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null)
+            => GuildHelper.CreateVoiceChannelAsync(this, Discord, name, options, func);
         public Task<RestCategoryChannel> CreateCategoryChannelAsync(string name, RequestOptions options = null)
             => GuildHelper.CreateCategoryChannelAsync(this, Discord, name, options);
 
@@ -264,6 +268,10 @@ namespace Discord.Rest
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null)
             => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options);
 
+        //Audit logs
+        public IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(int limit, RequestOptions options = null)
+            => GuildHelper.GetAuditLogsAsync(this, Discord, null, limit, options);
+
         //Webhooks
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => GuildHelper.GetWebhookAsync(this, Discord, id, options);
@@ -291,6 +299,12 @@ namespace Discord.Rest
 
         async Task<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(RequestOptions options)
             => await GetBansAsync(options).ConfigureAwait(false);
+        /// <inheritdoc/>
+        async Task<IBan> IGuild.GetBanAsync(IUser user, RequestOptions options)
+            => await GetBanAsync(user, options).ConfigureAwait(false);
+        /// <inheritdoc/>
+        async Task<IBan> IGuild.GetBanAsync(ulong userId, RequestOptions options)
+            => await GetBanAsync(userId, options).ConfigureAwait(false);
 
         async Task<IReadOnlyCollection<IGuildChannel>> IGuild.GetChannelsAsync(CacheMode mode, RequestOptions options)
         {
@@ -369,10 +383,10 @@ namespace Discord.Rest
             else
                 return null;
         }
-        async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, RequestOptions options)
-            => await CreateTextChannelAsync(name, options).ConfigureAwait(false);
-        async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, RequestOptions options)
-            => await CreateVoiceChannelAsync(name, options).ConfigureAwait(false);
+        async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, Action<TextChannelProperties> func, RequestOptions options)
+            => await CreateTextChannelAsync(name, func, options).ConfigureAwait(false);
+        async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func, RequestOptions options)
+            => await CreateVoiceChannelAsync(name, func, options).ConfigureAwait(false);
         async Task<ICategoryChannel> IGuild.CreateCategoryAsync(string name, RequestOptions options)
             => await CreateCategoryChannelAsync(name, options).ConfigureAwait(false);
 
@@ -418,6 +432,14 @@ namespace Discord.Rest
                 return ImmutableArray.Create<IGuildUser>();
         }
         Task IGuild.DownloadUsersAsync() { throw new NotSupportedException(); }
+
+        async Task<IReadOnlyCollection<IAuditLogEntry>> IGuild.GetAuditLogAsync(int limit, CacheMode cacheMode, RequestOptions options)
+        {
+            if (cacheMode == CacheMode.AllowDownload)
+                return (await GetAuditLogsAsync(limit, options).FlattenAsync().ConfigureAwait(false)).ToImmutableArray();
+            else
+                return ImmutableArray.Create<IAuditLogEntry>();
+        }
 
         async Task<IWebhook> IGuild.GetWebhookAsync(ulong id, RequestOptions options)
             => await GetWebhookAsync(id, options);

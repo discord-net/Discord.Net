@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord
@@ -35,7 +36,10 @@ namespace Discord
         public bool ViewAuditLog => Permissions.GetValue(RawValue, GuildPermission.ViewAuditLog);
 
         /// <summary> If True, a user may join channels. </summary>
-        public bool ReadMessages => Permissions.GetValue(RawValue, GuildPermission.ReadMessages);
+        [Obsolete("Use ViewChannel instead.")]
+        public bool ReadMessages => ViewChannel;
+        /// <summary> If True, a user may view channels. </summary>
+        public bool ViewChannel => Permissions.GetValue(RawValue, GuildPermission.ViewChannel);
         /// <summary> If True, a user may send messages. </summary>
         public bool SendMessages => Permissions.GetValue(RawValue, GuildPermission.SendMessages);
         /// <summary> If True, a user may send text-to-speech messages. </summary>
@@ -80,14 +84,35 @@ namespace Discord
         /// <summary> Creates a new GuildPermissions with the provided packed value. </summary>
         public GuildPermissions(ulong rawValue) { RawValue = rawValue; }
 
-        private GuildPermissions(ulong initialValue, bool? createInstantInvite = null, bool? kickMembers = null,
-            bool? banMembers = null, bool? administrator = null, bool? manageChannels = null, bool? manageGuild = null,
-            bool? addReactions = null, bool? viewAuditLog = null,
-            bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
-            bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
-            bool? useExternalEmojis = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
-            bool? moveMembers = null, bool? useVoiceActivation = null, bool? changeNickname = null, bool? manageNicknames = null,
-            bool? manageRoles = null, bool? manageWebhooks = null, bool? manageEmojis = null)
+        private GuildPermissions(ulong initialValue,
+            bool? createInstantInvite = null,
+            bool? kickMembers = null,
+            bool? banMembers = null,
+            bool? administrator = null,
+            bool? manageChannels = null,
+            bool? manageGuild = null,
+            bool? addReactions = null,
+            bool? viewAuditLog = null,
+            bool? viewChannel = null,
+            bool? sendMessages = null,
+            bool? sendTTSMessages = null,
+            bool? manageMessages = null,
+            bool? embedLinks = null,
+            bool? attachFiles = null,
+            bool? readMessageHistory = null,
+            bool? mentionEveryone = null,
+            bool? useExternalEmojis = null,
+            bool? connect = null,
+            bool? speak = null,
+            bool? muteMembers = null,
+            bool? deafenMembers = null,
+            bool? moveMembers = null,
+            bool? useVoiceActivation = null,
+            bool? changeNickname = null,
+            bool? manageNicknames = null,
+            bool? manageRoles = null,
+            bool? manageWebhooks = null,
+            bool? manageEmojis = null)
         {
             ulong value = initialValue;
 
@@ -99,7 +124,7 @@ namespace Discord
             Permissions.SetValue(ref value, manageGuild, GuildPermission.ManageGuild);
             Permissions.SetValue(ref value, addReactions, GuildPermission.AddReactions);
             Permissions.SetValue(ref value, viewAuditLog, GuildPermission.ViewAuditLog);
-            Permissions.SetValue(ref value, readMessages, GuildPermission.ReadMessages);
+            Permissions.SetValue(ref value, viewChannel, GuildPermission.ViewChannel);
             Permissions.SetValue(ref value, sendMessages, GuildPermission.SendMessages);
             Permissions.SetValue(ref value, sendTTSMessages, GuildPermission.SendTTSMessages);
             Permissions.SetValue(ref value, manageMessages, GuildPermission.ManageMessages);
@@ -124,34 +149,98 @@ namespace Discord
         }
 
         /// <summary> Creates a new GuildPermissions with the provided permissions. </summary>
-        public GuildPermissions(bool createInstantInvite = false, bool kickMembers = false,
-            bool banMembers = false, bool administrator = false, bool manageChannels = false, bool manageGuild = false,
-            bool addReactions = false, bool viewAuditLog = false,
-            bool readMessages = false, bool sendMessages = false, bool sendTTSMessages = false, bool manageMessages = false,
-            bool embedLinks = false, bool attachFiles = false, bool readMessageHistory = false, bool mentionEveryone = false,
-            bool useExternalEmojis = false, bool connect = false, bool speak = false, bool muteMembers = false, bool deafenMembers = false,
-            bool moveMembers = false, bool useVoiceActivation = false, bool? changeNickname = false, bool? manageNicknames = false,
-            bool manageRoles = false, bool manageWebhooks = false, bool manageEmojis = false)
-            : this(0, createInstantInvite: createInstantInvite, manageRoles: manageRoles, kickMembers: kickMembers, banMembers: banMembers,
-                  administrator: administrator, manageChannels: manageChannels, manageGuild: manageGuild, addReactions: addReactions,
-                  viewAuditLog: viewAuditLog, readMessages: readMessages, sendMessages: sendMessages, sendTTSMessages: sendTTSMessages,
-                  manageMessages: manageMessages, embedLinks: embedLinks, attachFiles: attachFiles, readMessageHistory: readMessageHistory,
-                  mentionEveryone: mentionEveryone, useExternalEmojis: useExternalEmojis, connect: connect, speak: speak, muteMembers: muteMembers,
-                  deafenMembers: deafenMembers, moveMembers: moveMembers, useVoiceActivation: useVoiceActivation, changeNickname: changeNickname,
-                  manageNicknames: manageNicknames, manageWebhooks: manageWebhooks, manageEmojis: manageEmojis)
+        public GuildPermissions(
+            bool createInstantInvite = false,
+            bool kickMembers = false,
+            bool banMembers = false,
+            bool administrator = false,
+            bool manageChannels = false,
+            bool manageGuild = false,
+            bool addReactions = false,
+            bool viewAuditLog = false,
+            bool viewChannel = false,
+            bool sendMessages = false,
+            bool sendTTSMessages = false,
+            bool manageMessages = false,
+            bool embedLinks = false,
+            bool attachFiles = false,
+            bool readMessageHistory = false,
+            bool mentionEveryone = false,
+            bool useExternalEmojis = false,
+            bool connect = false,
+            bool speak = false,
+            bool muteMembers = false,
+            bool deafenMembers = false,
+            bool moveMembers = false,
+            bool useVoiceActivation = false,
+            bool changeNickname = false,
+            bool manageNicknames = false,
+            bool manageRoles = false,
+            bool manageWebhooks = false,
+            bool manageEmojis = false)
+            : this(0,
+                createInstantInvite: createInstantInvite,
+                manageRoles: manageRoles,
+                kickMembers: kickMembers,
+                banMembers: banMembers,
+                administrator: administrator,
+                manageChannels: manageChannels,
+                manageGuild: manageGuild,
+                addReactions: addReactions,
+                viewAuditLog: viewAuditLog,
+                viewChannel: viewChannel,
+                sendMessages: sendMessages,
+                sendTTSMessages: sendTTSMessages,
+                manageMessages: manageMessages,
+                embedLinks: embedLinks,
+                attachFiles: attachFiles,
+                readMessageHistory: readMessageHistory,
+                mentionEveryone: mentionEveryone,
+                useExternalEmojis: useExternalEmojis,
+                connect: connect,
+                speak: speak,
+                muteMembers: muteMembers,
+                deafenMembers: deafenMembers,
+                moveMembers: moveMembers,
+                useVoiceActivation: useVoiceActivation,
+                changeNickname: changeNickname,
+                manageNicknames: manageNicknames,
+                manageWebhooks: manageWebhooks,
+                manageEmojis: manageEmojis)
         { }
 
         /// <summary> Creates a new GuildPermissions from this one, changing the provided non-null permissions. </summary>
-        public GuildPermissions Modify(bool? createInstantInvite = null, bool? kickMembers = null,
-            bool? banMembers = null, bool? administrator = null, bool? manageChannels = null, bool? manageGuild = null,
-            bool? addReactions = null, bool? viewAuditLog = null,
-            bool? readMessages = null, bool? sendMessages = null, bool? sendTTSMessages = null, bool? manageMessages = null,
-            bool? embedLinks = null, bool? attachFiles = null, bool? readMessageHistory = null, bool? mentionEveryone = null,
-            bool? useExternalEmojis = null, bool? connect = null, bool? speak = null, bool? muteMembers = null, bool? deafenMembers = null,
-            bool? moveMembers = null, bool? useVoiceActivation = null, bool? changeNickname = null, bool? manageNicknames = null,
-            bool? manageRoles = null, bool? manageWebhooks = null, bool? manageEmojis = null)
+        public GuildPermissions Modify(
+            bool? createInstantInvite = null,
+            bool? kickMembers = null,
+            bool? banMembers = null,
+            bool? administrator = null,
+            bool? manageChannels = null,
+            bool? manageGuild = null,
+            bool? addReactions = null,
+            bool? viewAuditLog = null,
+            bool? viewChannel = null,
+            bool? sendMessages = null,
+            bool? sendTTSMessages = null,
+            bool? manageMessages = null,
+            bool? embedLinks = null,
+            bool? attachFiles = null,
+            bool? readMessageHistory = null,
+            bool? mentionEveryone = null,
+            bool? useExternalEmojis = null,
+            bool? connect = null,
+            bool? speak = null,
+            bool? muteMembers = null,
+            bool? deafenMembers = null,
+            bool? moveMembers = null,
+            bool? useVoiceActivation = null,
+            bool? changeNickname = null,
+            bool? manageNicknames = null,
+            bool? manageRoles = null,
+            bool? manageWebhooks = null,
+            bool? manageEmojis = null)
             => new GuildPermissions(RawValue, createInstantInvite, kickMembers, banMembers, administrator, manageChannels, manageGuild, addReactions,
-                viewAuditLog, readMessages, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
+                viewAuditLog, viewChannel, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
                 useVoiceActivation, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojis);
 

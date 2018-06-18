@@ -1,10 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../../Discord.Net.targets" />
   <PropertyGroup>
     <AssemblyName>Discord.Net.WebSocket</AssemblyName>
     <RootNamespace>Discord.WebSocket</RootNamespace>
     <Description>A core Discord.Net library containing the WebSocket client and models.</Description>
-    <TargetFrameworks>net45;netstandard1.1;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net46;netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard1.3;netstandard2.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
@@ -12,6 +13,6 @@
     <ProjectReference Include="..\Discord.Net.Rest\Discord.Net.Rest.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="System.Net.WebSockets.Client" Version="4.3.1" />
+    <PackageReference Include="System.Net.WebSockets.Client" Version="4.3.2" />
   </ItemGroup>
 </Project>

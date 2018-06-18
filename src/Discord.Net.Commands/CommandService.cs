@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Discord.Commands.Builders;
 using Discord.Logging;
 
@@ -33,6 +32,7 @@ namespace Discord.Commands
         internal readonly RunMode _defaultRunMode;
         internal readonly Logger _cmdLogger;
         internal readonly LogManager _logManager;
+        internal readonly IReadOnlyDictionary<char, char> _quotationMarkAliasMap;
 
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
         public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
@@ -46,6 +46,7 @@ namespace Discord.Commands
             _ignoreExtraArgs = config.IgnoreExtraArgs;
             _separatorChar = config.SeparatorChar;
             _defaultRunMode = config.DefaultRunMode;
+            _quotationMarkAliasMap = (config.QuotationMarkAliasMap ?? new Dictionary<char, char>()).ToImmutableDictionary();
             if (_defaultRunMode == RunMode.Default)
                 throw new InvalidOperationException("The default run mode cannot be set to Default.");
 
@@ -65,6 +66,10 @@ namespace Discord.Commands
                 _defaultTypeReaders[type] = PrimitiveTypeReader.Create(type);
                 _defaultTypeReaders[typeof(Nullable<>).MakeGenericType(type)] = NullableTypeReader.Create(type, _defaultTypeReaders[type]);
             }
+
+            var tsreader = new TimeSpanTypeReader();
+            _defaultTypeReaders[typeof(TimeSpan)] = tsreader;
+            _defaultTypeReaders[typeof(TimeSpan?)] = NullableTypeReader.Create(typeof(TimeSpan), tsreader);
 
             _defaultTypeReaders[typeof(string)] =
                 new PrimitiveTypeReader<string>((string x, out string y) => { y = x; return true; }, 0);
@@ -318,6 +323,8 @@ namespace Discord.Commands
         //Execution
         public SearchResult Search(ICommandContext context, int argPos)
             => Search(context.Message.Content.Substring(argPos));
+        public SearchResult Search(ICommandContext context, string input)
+            => Search(input);
         public SearchResult Search(string input)
         {
             string searchInput = _caseSensitive ? input : input.ToLowerInvariant();

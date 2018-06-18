@@ -129,7 +129,7 @@ namespace Discord.WebSocket
         private int GetShardIdFor(ulong guildId)
             => (int)((guildId >> 22) % (uint)_totalShards);
         public int GetShardIdFor(IGuild guild)
-            => GetShardIdFor(guild.Id);
+            => GetShardIdFor(guild?.Id ?? 0);
         private DiscordSocketClient GetShardFor(ulong guildId)
             => GetShard(GetShardIdFor(guildId));
         public DiscordSocketClient GetShardFor(IGuild guild)
@@ -309,6 +309,7 @@ namespace Discord.WebSocket
             client.UserUpdated += (oldUser, newUser) => _userUpdatedEvent.InvokeAsync(oldUser, newUser);
             client.GuildMemberUpdated += (oldUser, newUser) => _guildMemberUpdatedEvent.InvokeAsync(oldUser, newUser);
             client.UserVoiceStateUpdated += (user, oldVoiceState, newVoiceState) => _userVoiceStateUpdatedEvent.InvokeAsync(user, oldVoiceState, newVoiceState);
+            client.VoiceServerUpdated += (server) => _voiceServerUpdatedEvent.InvokeAsync(server);
             client.CurrentUserUpdated += (oldUser, newUser) => _selfUpdatedEvent.InvokeAsync(oldUser, newUser);
             client.UserIsTyping += (oldUser, newUser) => _userIsTypingEvent.InvokeAsync(oldUser, newUser);
             client.RecipientAdded += (user) => _recipientAddedEvent.InvokeAsync(user);
@@ -327,8 +328,8 @@ namespace Discord.WebSocket
         async Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync(RequestOptions options)
             => await GetConnectionsAsync().ConfigureAwait(false);
 
-        async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, RequestOptions options)
-            => await GetInviteAsync(inviteId).ConfigureAwait(false);
+        async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, bool withCount, RequestOptions options)
+            => await GetInviteAsync(inviteId, withCount, options).ConfigureAwait(false);
 
         Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuild>(GetGuild(id));

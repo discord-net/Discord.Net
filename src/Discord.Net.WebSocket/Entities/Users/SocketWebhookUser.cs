@@ -26,6 +26,7 @@ namespace Discord.WebSocket
         internal SocketWebhookUser(SocketGuild guild, ulong id, ulong webhookId)
             : base(guild.Discord, id)
         {
+            Guild = guild;
             WebhookId = webhookId;
         }
         internal static SocketWebhookUser Create(SocketGuild guild, ClientState state, Model model, ulong webhookId)
