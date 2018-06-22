@@ -74,3 +74,8 @@ After obtaining the raw emote string, you could use
 > [!TIP]
 > For WebSocket users, you may also consider fetching the Emote
 > via the @Discord.WebSocket.SocketGuild.Emotes collection.
+
+## Additional Information
+
+To learn more about emote and emojis and how they could be used,
+see the documentation of @Discord.IEmote.
