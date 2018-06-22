@@ -1,0 +1,76 @@
+---
+uid: Guides.Emoji
+title: Emoji
+---
+
+# Emoji in Discord.Net
+
+Before we delve into the difference between an @Discord.Emoji and an
+@Discord.Emote in Discord.Net, it is **crucial** to understand what
+they both look like behind the scene. When the end-users are sending
+or receiving an emoji or emote, they are typically in the form of
+`:ok_hand:` or `:reeee:`; however, what goes under the hood is that,
+depending on the type of emoji, they are sent in an entirely
+different format.
+
+What does this all mean? It means that you should know that by
+doing something like
+`channel.SendMessageAsync(“Discord.Net is :ok_hand:”);`, it will not
+translate to `Discord.Net is 👌`, rather, it will be not be
+translated at all, and will simply send `Discord.Net is :ok_hand:`.
+
+## Emoji
+
+An emoji is a standard emoji that can be found anywhere else outside
+of Discord, which means strings like `👌`, `♥`, `👀` are all
+considered an emoji in Discord. However, from the
+introduction paragraph we have learned that we cannot
+simply send `:ok_hand:` and have Discord take
+care of it, but what do we need to send exactly?
+
+To send an emoji correctly, one must send the emoji in its Unicode
+form; this can be obtained in several different ways.
+
+1. (Easiest) Escape the emoji by using the escape character, `\`, in
+ your Discord chat client; this will reveal the emoji’s pure Unicode
+ form, which will allow you to copy-paste into your code.
+2. Look it up on Emojipedia, from which you can copy the emoji
+ easily into your code.
+ ![Emojipedia](images/emojipedia.png)
+3. (Recommended) Look it up in the Emoji list from [FileFormat.Info];
+ this will give you the .NET-compatible code that
+ represents the emoji.
+    * This is the most recommended method because some systems or
+    IDE sometimes do not render the Unicode emoji correctly.
+    ![Fileformat Emoji Source Code](images/fileformat-emoji-src.png)
+
+Your method relating to an emoji should now look something like this:
+
+[!code-csharp[Emoji Sample](samples/emoji-sample.cs)]
+
+[FileFormat.Info]: https://www.fileformat.info/info/emoji/list.htm
+
+## Emote
+
+The meat of the debate is here; what is an emote and how does it
+differ from an emoji? An emote refers to a **custom emoji**
+created on Discord, like those wacky meme emojis you have seen all
+over the platform.
+
+The underlying structure of an emote also differs drastically; an
+emote looks sort-of like a mention on Discord. It consists of two
+main elements as illustrated below:
+
+![Emote illustration](images/emote-format.png)
+
+As you can see, emote uses a completely different format. To obtain
+the raw string as shown above for your emote, you would need to
+escape the emote using the escape character `\` in chat somewhere.
+
+After obtaining the raw emote string, you could use
+@Discord.Emote.Parse* or @Discord.Emote.TryParse* to create an
+@Discord.Emote to be used.
+
+> [!TIP]
+> For WebSocket users, you may also consider fetching the Emote
+> via the @Discord.WebSocket.SocketGuild.Emotes collection.

@@ -33,6 +33,8 @@
       topicUid: Guides.Commands.DI
     - name: Post-execution Handling
       topicUid: Guides.Commands.PostExecution
+- name: Emoji
+  topicUid: Guides.Emoji
 - name: Voice
   topicUid: Guides.Voice.SendingVoice
 - name: Deployment
