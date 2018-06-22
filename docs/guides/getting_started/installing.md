@@ -38,25 +38,13 @@ Release builds of Discord.Net will be published to the
 [official NuGet feed].
 
 Development builds of Discord.Net, as well as add-ons, will be
-published to our [MyGet feed].
-
-* Direct feed link: `https://www.myget.org/F/discord-net/api/v3/index.json`
-
-Not sure how to add a direct feed? See how [with Visual Studio] or
-[without Visual Studio].
+published to our [MyGet feed]. See
+@Guides.GettingStarted.Installation.Nightlies to learn more.
 
 [official NuGet feed]: https://nuget.org
 [MyGet feed]: https://www.myget.org/feed/Packages/discord-net
-[with Visual Studio]: https://docs.microsoft.com/en-us/nuget/tools/package-manager-ui#package-sources
-[without Visual Studio]: #configuring-nuget-without-visual-studio
 
 ### [Using Visual Studio](#tab/vs-install)
-
-> [!TIP]
-> Don't forget to change your package source if you're installing from
-> the developer feed.
-> Also make sure to check "Enable Prereleases" if installing a dev
-> build!
 
 1. Create a new solution for your bot.
 2. In the Solution Explorer, find the "Dependencies" element under your
@@ -69,9 +57,6 @@ Not sure how to add a direct feed? See how [with Visual Studio] or
 
 ### [Using JetBrains Rider](#tab/rider-install)
 
-> [!TIP]
-> Make sure to check the "Prerelease" box if installing a dev build!
-
 1. Create a new solution for your bot.
 2. Open the NuGet window (Tools > NuGet > Manage NuGet packages for
  Solution).
@@ -83,27 +68,15 @@ Not sure how to add a direct feed? See how [with Visual Studio] or
 
 ### [Using Visual Studio Code](#tab/vs-code)
 
-> [!TIP]
-> Don't forget to add the package source to a [NuGet.Config file] if
-> you're installing from the developer feed.
-
 1. Create a new project for your bot.
 2. Add `Discord.Net` to your .csproj.
 
 [!code[Sample .csproj](samples/project.xml)]
 
-[NuGet.Config file]: #configuring-nuget-without-visual-studio
-
 ### [Using dotnet CLI](#tab/dotnet-cli)
-
-> [!TIP]
-> Don't forget to add the package source to a [NuGet.Config file] if
-> you're installing from the developer feed.
 
 1. Open command-line and navigate to where your .csproj is located.
 2. Enter `dotnet add package Discord.Net`.
-
-[NuGet.Config file]: #configuring-nuget-without-visual-studio
 
 ***
 
@@ -173,19 +146,5 @@ are passing into your client.
 [DiscordSocketConfig]: xref:Discord.WebSocket.DiscordSocketConfig
 
 ***
-
-### Configuring NuGet without Visual Studio
-
-If you plan on deploying your bot or developing outside of Visual
-Studio, you will need to create a local NuGet configuration file for
-your project.
-
-To do this, create a file named `NuGet.Config` alongside the root of
-your application, where the project is located.
-
-Paste the following snippets into this configuration file, adding any
-additional feeds if necessary.
-
-[!code[NuGet Configuration](samples/nuget.config)]
 
 [.NET Core SDK]: https://www.microsoft.com/net/download/

@@ -4,6 +4,9 @@
   items:
     - name: Installation
       topicUid: Guides.GettingStarted.Installation
+      items:
+        - name: Nightly Builds
+          topicUid: Guides.GettingStarted.Installation.Nightlies
     - name: Your First Bot
       topicUid: Guides.GettingStarted.FirstBot
     - name: Terminology
