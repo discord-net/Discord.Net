@@ -16,7 +16,7 @@ to our MyGet feed.
 > are generally stable and have more features and bug fixes than
 > the current stable build on NuGet, there **will** be breaking
 > changes during the development or breaking bugs. Although breaking
-> bugs are usually fixed as soon as they are discovered. It is still
+> bugs are usually fixed as soon as they are discovered, it is still
 > important to keep this in mind.
 
 ## Installing with MyGet (Recommended)

@@ -104,7 +104,7 @@ have not talked about what to do if the command enters a catastrophic
 failure (i.e., exceptions). To resolve this, we can make use of the
 [CommandService.Log] event.
 
-All exceptions thrown during a command execution are caught and sent 
+All exceptions thrown during a command execution are caught and sent
 to the Log event under the [LogMessage.Exception] property
 as a [CommandException] type. The [CommandException] class allows
 us to access the exception thrown, as well as the context
