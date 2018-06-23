@@ -14,7 +14,7 @@ namespace Discord.Rest
         public int? PresenceCount { get; private set; }
         public int? MemberCount { get; private set; }
         public ulong ChannelId { get; private set; }
-        public ulong GuildId { get; private set; }
+        public ulong? GuildId { get; private set; }
         internal IChannel Channel { get; private set; }
         internal IGuild Guild { get; private set; }
 
@@ -35,9 +35,9 @@ namespace Discord.Rest
         }
         internal void Update(Model model)
         {
-            GuildId = model.Guild.Id;
+            GuildId = model.Guild.IsSpecified ? model.Guild.Value.Id : default(ulong?);
             ChannelId = model.Channel.Id;
-            GuildName = model.Guild.Name;
+            GuildName = model.Guild.IsSpecified ? model.Guild.Value.Name : null;
             ChannelName = model.Channel.Name;
             MemberCount = model.MemberCount.IsSpecified ? model.MemberCount.Value : null;
             PresenceCount = model.PresenceCount.IsSpecified ? model.PresenceCount.Value : null;
