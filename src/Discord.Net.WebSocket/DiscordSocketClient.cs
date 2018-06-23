@@ -19,6 +19,9 @@ using GameModel = Discord.API.Game;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a WebSocket-based Discord client.
+    /// </summary>
     public partial class DiscordSocketClient : BaseSocketClient, IDiscordClient
     {
         private readonly ConcurrentQueue<ulong> _largeGuilds;
@@ -66,16 +69,47 @@ namespace Discord.WebSocket
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
         /// <inheritdoc />
         public override IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => State.PrivateChannels;
+        /// <summary>
+        ///     Gets a collection of direct message channels opened in this session.
+        /// </summary>
+        /// <remarks>
+        ///     This method returns a collection of currently opened direct message channels.
+        ///     <note type="warning">
+        ///         This method will not return previously opened DM channels outside of the current session! If you
+        ///         have just started the client, this may return an empty collection.
+        ///     </note>
+        /// </remarks>
+        /// <returns>
+        ///     An collection of DM channels that have been opened in this session.
+        /// </returns>
         public IReadOnlyCollection<SocketDMChannel> DMChannels
             => State.PrivateChannels.Select(x => x as SocketDMChannel).Where(x => x != null).ToImmutableArray();
+        /// <summary>
+        ///     Gets a collection of group channels opened in this session.
+        /// </summary>
+        /// <remarks>
+        ///     This method returns a collection of currently opened group channels.
+        ///     <note type="warning">
+        ///         This method will not return previously opened group channels outside of the current session! If you
+        ///         have just started the client, this may return an empty collection.
+        ///     </note>
+        /// </remarks>
+        /// <returns>
+        ///     An collection of group channels that have been opened in this session.
+        /// </returns>
         public IReadOnlyCollection<SocketGroupChannel> GroupChannels
             => State.PrivateChannels.Select(x => x as SocketGroupChannel).Where(x => x != null).ToImmutableArray();
         /// <inheritdoc />
         public override IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
 
-        /// <summary> Creates a new REST/WebSocket Discord client. </summary>
+        /// <summary>
+        ///     Initializes a new REST/WebSocket-based Discord client.
+        /// </summary>
         public DiscordSocketClient() : this(new DiscordSocketConfig()) { }
-        /// <summary> Creates a new REST/WebSocket Discord client. </summary>
+        /// <summary>
+        ///     Initializes a new REST/WebSocket-based Discord client with the provided configuration.
+        /// </summary>
+        /// <param name="config">The configuration to be used with the client.</param>
         public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null, null) { }
         internal DiscordSocketClient(DiscordSocketConfig config, SemaphoreSlim groupLock, DiscordSocketClient parentClient) : this(config, CreateApiClient(config), groupLock, parentClient) { }
         private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, SemaphoreSlim groupLock, DiscordSocketClient parentClient)

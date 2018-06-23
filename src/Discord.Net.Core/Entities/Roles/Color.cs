@@ -66,8 +66,15 @@ namespace Discord
         public byte B => (byte)(RawValue);
 
         /// <summary>
-        ///     Initializes a <see cref="Color" /> struct with the given raw value.
+        ///     Initializes a <see cref="Color" /> <see langword="struct"/> with the given raw value.
         /// </summary>
+        /// <example>
+        ///     The following will create a color that has a hex value of 
+        ///     <see href="http://www.color-hex.com/color/607d8b">#607D8B</see>.
+        ///     <code language="cs">
+        ///         Color darkGrey = new Color(0x607D8B);
+        ///     </code>
+        /// </example>
         /// <param name="rawValue">The raw value of the color (e.g. <c>0x607D8B</c>).</param>
         public Color(uint rawValue)
         {
@@ -76,6 +83,13 @@ namespace Discord
         /// <summary>
         ///     Initializes a <see cref="Color" /> struct with the given RGB bytes.
         /// </summary>
+        /// <example>
+        ///     The following will create a color that has a value of 
+        ///     <see href="http://www.color-hex.com/color/607d8b">#607D8B</see>.
+        ///     <code language="cs">
+        ///         Color darkGrey = new Color((byte)0b_01100000, (byte)0b_01111101, (byte)0b_10001011);
+        ///     </code>
+        /// </example>
         /// <param name="r">The byte that represents the red color.</param>
         /// <param name="g">The byte that represents the green color.</param>
         /// <param name="b">The byte that represents the blue color.</param>
@@ -90,6 +104,13 @@ namespace Discord
         /// <summary>
         ///     Initializes a <see cref="Color"/> struct with the given RGB value.
         /// </summary>
+        /// <example>
+        ///     The following will create a color that has a value of 
+        ///     <see href="http://www.color-hex.com/color/607d8b">#607D8B</see>.
+        ///     <code language="cs">
+        ///         Color darkGrey = new Color(96, 125, 139);
+        ///     </code>
+        /// </example>
         /// <param name="r">The value that represents the red color. Must be within 0~255.</param>
         /// <param name="g">The value that represents the green color. Must be within 0~255.</param>
         /// <param name="b">The value that represents the blue color. Must be within 0~255.</param>
@@ -110,6 +131,13 @@ namespace Discord
         /// <summary>
         ///     Initializes a <see cref="Color"/> struct with the given RGB float value.
         /// </summary>
+        /// <example>
+        ///     The following will create a color that has a value of 
+        ///     <see href="http://www.color-hex.com/color/607c8c">#607c8c</see>.
+        ///     <code language="cs">
+        ///         Color darkGrey = new Color(0.38f, 0.49f, 0.55f);
+        ///     </code>
+        /// </example>
         /// <param name="r">The value that represents the red color. Must be within 0~1.</param>
         /// <param name="g">The value that represents the green color. Must be within 0~1.</param>
         /// <param name="b">The value that represents the blue color. Must be within 0~1.</param>

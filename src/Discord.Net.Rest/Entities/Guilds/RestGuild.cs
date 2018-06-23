@@ -258,10 +258,39 @@ namespace Discord.Rest
             }
             return null;
         }
+        /// <summary>
+        ///     Creates a text channel with the provided name.
+        /// </summary>
+        /// <param name="name">The name of the new channel.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
+        /// <returns>
+        ///     The created text channel.
+        /// </returns>
         public Task<RestTextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateTextChannelAsync(this, Discord, name, options, func);
+        /// <summary>
+        ///     Creates a voice channel with the provided name.
+        /// </summary>
+        /// <param name="name">The name of the new channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
+        /// <returns>
+        ///     The created voice channel.
+        /// </returns>
         public Task<RestVoiceChannel> CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateVoiceChannelAsync(this, Discord, name, options, func);
+        /// <summary>
+        ///     Creates a category channel with the provided name.
+        /// </summary>
+        /// <param name="name">The name of the new channel.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
+        /// <returns>
+        ///     The created category channel.
+        /// </returns>
         public Task<RestCategoryChannel> CreateCategoryChannelAsync(string name, RequestOptions options = null)
             => GuildHelper.CreateCategoryChannelAsync(this, Discord, name, options);
 

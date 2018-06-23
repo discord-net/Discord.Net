@@ -6,6 +6,9 @@ using Discord.Rest;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents the base of a WebSocket-based Discord client.
+    /// </summary>
     public abstract partial class BaseSocketClient : BaseDiscordClient, IDiscordClient
     {
         protected readonly DiscordSocketConfig BaseConfig;

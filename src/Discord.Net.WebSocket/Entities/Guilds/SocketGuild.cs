@@ -54,8 +54,8 @@ namespace Discord.WebSocket
         ///     Gets the number of members.
         /// </summary>
         /// <remarks>
-        ///     The number of members is returned by Discord and is the most accurate. You may see discrepancy between
-        ///     the <see cref="Users"/> collection and this.
+        ///     This property retrieves the number of members returned by Discord and is the most accurate. You may see
+        ///     discrepancy between the <see cref="Users"/> collection and this property.
         /// </remarks>
         public int MemberCount { get; internal set; }
         /// <summary> Gets the number of members downloaded to the local guild cache. </summary>
@@ -98,15 +98,19 @@ namespace Discord.WebSocket
         ///     Gets the first viewable text channel.
         /// </summary>
         /// <remarks>
-        ///     This property does not guarantee the user can send message to it.
+        ///     This method gets the first viewable text channel for the logged-in user. This property does not
+        ///     guarantee the user can send message to it.
         /// </remarks>
         public SocketTextChannel DefaultChannel => TextChannels
             .Where(c => CurrentUser.GetPermissions(c).ViewChannel)
             .OrderBy(c => c.Position)
             .FirstOrDefault();
         /// <summary>
-        ///     Gets the AFK voice channel, or <c>null</c> if none is set.
+        ///     Gets the AFK voice channel in this guild.
         /// </summary>
+        /// <returns>
+        ///     A voice channel set within this guild that AFK users get moved to; otherwise <c>null</c> if none is set.
+        /// </returns>
         public SocketVoiceChannel AFKChannel
         {
             get
@@ -116,8 +120,11 @@ namespace Discord.WebSocket
             }
         }
         /// <summary>
-        ///     Gets the embed channel set in the widget settings of this guild, or <c>null</c> if none is set.
+        ///     Gets the embed channel set in the widget settings of this guild.
         /// </summary>
+        /// <returns>
+        ///     A channel set in the widget settings of this guild; otherwise <c>null</c> if none is set.
+        /// </returns>
         public SocketGuildChannel EmbedChannel
         {
             get
@@ -127,8 +134,12 @@ namespace Discord.WebSocket
             }
         }
         /// <summary>
-        ///     Gets the channel where randomized welcome messages are sent, or <c>null</c> if none is set.
+        ///     Gets the channel where randomized welcome messages are sent.
         /// </summary>
+        /// <returns>
+        ///     A channel where randomized welcome messages are sent in this guild; otherwise <c>null</c> if none is
+        ///     set.
+        /// </returns>
         public SocketTextChannel SystemChannel
         {
             get
@@ -140,6 +151,9 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets a collection of text channels present in this guild.
         /// </summary>
+        /// <returns>
+        ///     A collection of text channels in this guild.
+        /// </returns>
         public IReadOnlyCollection<SocketTextChannel> TextChannels
             => Channels.Select(x => x as SocketTextChannel).Where(x => x != null).ToImmutableArray();
         /// <summary>
@@ -459,6 +473,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="name">The name of the new channel.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
         /// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
         /// <returns>
         ///     The created text channel.
@@ -469,6 +484,7 @@ namespace Discord.WebSocket
         ///     Creates a voice channel with the provided name.
         /// </summary>
         /// <param name="name">The name of the new channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
         /// <returns>
@@ -521,11 +537,11 @@ namespace Discord.WebSocket
 
         //Roles
         /// <summary>
-        ///     Returns a role with the provided role ID.
+        ///     Gets a role.
         /// </summary>
-        /// <param name="id">The ID of the role.</param>
+        /// <param name="id">The snowflake identifier of the role.</param>
         /// <returns>
-        ///     The role associated with the ID.
+        ///     The role associated with the snowflake identifier.
         /// </returns>
         public SocketRole GetRole(ulong id)
         {
@@ -655,7 +671,7 @@ namespace Discord.WebSocket
         /// <param name="id">The ID of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable Task containing the webhook associated with the ID.
+        ///     An awaitable <see cref="Task"/> containing the webhook associated with the ID.
         /// </returns>
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => GuildHelper.GetWebhookAsync(this, Discord, id, options);
@@ -664,7 +680,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable Task containing a collection of webhooks.
+        ///     An awaitable <see cref="Task"/> containing a collection of webhooks.
         /// </returns>
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => GuildHelper.GetWebhooksAsync(this, Discord, options);
