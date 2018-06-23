@@ -216,14 +216,6 @@ namespace Discord.Audio
             {
                 switch (opCode)
                 {
-                    case VoiceOpCode.Hello:
-                        {
-                            await _audioLogger.DebugAsync("Received Hello").ConfigureAwait(false);
-                            var data = (payload as JToken).ToObject<HelloEvent>(_serializer);
-
-                            _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _connection.CancelToken);
-                        }
-                        break;
                     case VoiceOpCode.Ready:
                         {
                             await _audioLogger.DebugAsync("Received Ready").ConfigureAwait(false);
@@ -236,6 +228,9 @@ namespace Discord.Audio
                             
                             ApiClient.SetUdpEndpoint(data.Ip, data.Port);
                             await ApiClient.SendDiscoveryAsync(_ssrc).ConfigureAwait(false);
+
+                            
+                            _heartbeatTask = RunHeartbeatAsync(41250, _connection.CancelToken);
                         }
                         break;
                     case VoiceOpCode.SessionDescription:
