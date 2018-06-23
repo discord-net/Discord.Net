@@ -19,6 +19,17 @@ You may visit their respective API documentation to find out more.
 [PreconditionAttribute]: xref:Discord.Commands.PreconditionAttribute
 [ParameterPreconditionAttribute]: xref:Discord.Commands.ParameterPreconditionAttribute
 
+## Bundled Preconditions
+
+@Discord.Commands ships with several bundled Preconditions for you
+to use.
+
+* @Discord.Commands.RequireContextAttribute
+* @Discord.Commands.RequireOwnerAttribute
+* @Discord.Commands.RequireBotPermissionAttribute
+* @Discord.Commands.RequireUserPermissionAttribute
+* @Discord.Commands.RequireNsfwAttribute
+
 ## Using Preconditions
 
 To use a precondition, simply apply any valid precondition candidate to
@@ -43,17 +54,6 @@ precondition passes.
 [!code-csharp[OR Precondition](samples/preconditions/group_precondition.cs)]
 
 [Group]: xref:Discord.Commands.PreconditionAttribute.Group
-
-## Bundled Preconditions
-
-@Discord.Commands ships with several bundled Preconditions for you
-to use.
-
-* @Discord.Commands.RequireContextAttribute
-* @Discord.Commands.RequireOwnerAttribute
-* @Discord.Commands.RequireBotPermissionAttribute
-* @Discord.Commands.RequireUserPermissionAttribute
-* @Discord.Commands.RequireNsfwAttribute
 
 ## Custom Preconditions
 
