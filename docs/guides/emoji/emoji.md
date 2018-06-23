@@ -14,10 +14,9 @@ depending on the type of emoji, they are sent in an entirely
 different format.
 
 What does this all mean? It means that you should know that by
-doing something like
-`channel.SendMessageAsync(“Discord.Net is :ok_hand:”);`, it will not
-translate to `Discord.Net is 👌`, rather, it will be not be
-translated at all, and will simply send `Discord.Net is :ok_hand:`.
+sending a string like `“Discord.Net is :ok_hand:”` will **NOT**
+translate to `Discord.Net is 👌`; rather, it will be treated as-is,
+like `Discord.Net is :ok_hand:`.
 
 ## Emoji
 
@@ -44,7 +43,14 @@ form; this can be obtained in several different ways.
     IDE sometimes do not render the Unicode emoji correctly.
     ![Fileformat Emoji Source Code](images/fileformat-emoji-src.png)
 
-Your method relating to an emoji should now look something like this:
+### Emoji Declaration
+
+After obtaining the Unicode representation of the emoji, you may
+create the @Discord.Emoji object by passing the string into its
+constructor (e.g. `new Emoji("👌");` or `new Emoji("\uD83D\uDC4C");`).
+
+Your method of declaring an @Discord.Emoji should look similar to
+this:
 
 [!code-csharp[Emoji Sample](samples/emoji-sample.cs)]
 
@@ -54,8 +60,7 @@ Your method relating to an emoji should now look something like this:
 
 The meat of the debate is here; what is an emote and how does it
 differ from an emoji? An emote refers to a **custom emoji**
-created on Discord, like those wacky meme emojis you have seen all
-over the platform.
+created on Discord.
 
 The underlying structure of an emote also differs drastically; an
 emote looks sort-of like a mention on Discord. It consists of two
@@ -67,13 +72,21 @@ As you can see, emote uses a completely different format. To obtain
 the raw string as shown above for your emote, you would need to
 escape the emote using the escape character `\` in chat somewhere.
 
-After obtaining the raw emote string, you could use
-@Discord.Emote.Parse* or @Discord.Emote.TryParse* to create an
-@Discord.Emote to be used.
+### Emote Declaration
+
+After obtaining the raw emote string, you would need to use
+@Discord.Emote.Parse* or @Discord.Emote.TryParse* to create a valid
+emote object.
+
+Your method of declaring an @Discord.Emote should look similar to
+this:
+
+[!code[Emote Sample](samples/emote-sample.cs)]
 
 > [!TIP]
 > For WebSocket users, you may also consider fetching the Emote
 > via the @Discord.WebSocket.SocketGuild.Emotes collection.
+> [!code-csharp[Socket emote sample](samples/socket-emote-sample.cs)]
 
 ## Additional Information
 

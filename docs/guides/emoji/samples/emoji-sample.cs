@@ -1,6 +1,6 @@
-public async Task SendEmojiAndEmote(ISocketMessageChannel channel)
+public async Task ReactAsync(SocketUserMessage userMsg)
 {
-    await channel.SendMessageAsync("\uD83D\uDC4C");
-    // or
-    // await channel.SendMessageAsync("👌");
+    // equivalent to "👌"
+    var emoji = new Emoji("\uD83D\uDC4C");
+    await userMsg.AddReactionAsync(emoji);
 }
