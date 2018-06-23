@@ -29,7 +29,8 @@
     "resource": [{
       "files": [
         "**/images/**",
-        "**/samples/**"
+        "**/samples/**",
+        "langwordMapping.yml"
       ]
     }],
     "dest": "_site",
@@ -46,7 +47,6 @@
       "_appFooter": "Discord.Net (c) 2015-2018 2.0.0-beta",
       "_enableSearch": true
     },
-    "noLangKeyword": false,
     "xrefService": [
       "https://xref.docs.microsoft.com/query?uid={uid}"
     ]
