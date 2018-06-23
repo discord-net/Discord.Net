@@ -23,10 +23,29 @@ a {
     word-wrap: break-word;
 }
 
+/* alert */
+.alert-info {
+    color: hsl(200, 70%, 30%);
+    background-color: hsl(200, 60%, 85%);
+    border-color: hsl(200, 50%, 70%);
+}
+
+.alert-danger {
+    color: hsl(0, 70%, 30%);
+    background-color: hsl(0, 60%, 85%);
+    border-color: hsl(0, 50%, 70%);
+}
+
+.alert-warning {
+    color: hsl(40, 70%, 30%);
+    background-color: hsl(40, 60%, 85%);
+    border-color: hsl(40, 50%, 70%);
+}
+
 /* code */
 
 code {
-    color: #3b5269;
+    color: #9c3a3f;
     background-color: #ececec;
     border-radius: 4px;
     padding: 3px 7px;

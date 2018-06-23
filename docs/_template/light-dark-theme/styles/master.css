@@ -9,6 +9,7 @@ body {
 p,
 li,
 .toc {
+    text-rendering: optimizeLegibility;
     line-height: 160%;
 }
 
@@ -17,6 +18,21 @@ img {
     max-width: 95% !important;
     margin-top: 15px;
     margin-bottom: 15px;
+}
+
+article.content p{
+    -webkit-transition: all .75s ease-in-out;
+    transition: all .75s ease-in-out;
+}
+
+article.content h1,
+article.content h2,
+article.content h3,
+article.content h4,
+article.content h5,
+article.content h6{
+    -webkit-transition: all .25s ease-in-out;
+    transition: all .25s ease-in-out;
 }
 
 h1,
@@ -66,8 +82,8 @@ select {
 }
 
 /* 
-    Following code regarding collapse container are fetched 
-    or modified from the Materialize project.
+    Following code are fetched or modified from 
+    the Materialize project.
 
     The MIT License (MIT)
     Copyright (c) 2014-2018 Materialize
@@ -75,14 +91,17 @@ select {
 */
 
 /* all collapse container */
+
 .collapse-container.last-modified {
     margin: 0.5rem 0 1rem 0;
 }
 
 /* header */
+
 .collapse-container.last-modified>:nth-child(odd):focus {
     outline: 0;
 }
+
 .collapse-container.last-modified>:nth-child(odd) {
     display: -webkit-box;
     display: -webkit-flex;
@@ -92,15 +111,33 @@ select {
     -webkit-tap-highlight-color: transparent;
     line-height: 1.5;
     padding: 0.75rem;
-    background-image:none;
+    background-image: none;
     border: 0px;
 }
 
 /* body */
+
 .collapse-container.last-modified>:nth-child(even) {
     display: none;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     padding: 1rem;
     border: 0px;
+}
+
+/* nav bar */
+
+.nav {
+    margin: 0;
+}
+
+.nav li {
+    -webkit-transition: background-color .3s, color .3s;
+    transition: background-color .3s, color .3s;
+}
+
+.nav a {
+    -webkit-transition: background-color .3s, color .3s;
+    transition: background-color .3s, color .3s;
+    cursor: pointer;
 }
