@@ -45,10 +45,7 @@ namespace Discord.Rest
         
         public async Task UpdateAsync(RequestOptions options = null)
         {
-            var args = new GetInviteParams();
-            if (MemberCount != null || PresenceCount != null)
-                args.WithCounts = true;
-            var model = await Discord.ApiClient.GetInviteAsync(Code, args, options).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetInviteAsync(Code, options).ConfigureAwait(false);
             Update(model);
         }
         public Task DeleteAsync(RequestOptions options = null)

@@ -56,7 +56,7 @@ namespace Discord.WebSocket
             => ClientHelper.GetConnectionsAsync(this, options ?? RequestOptions.Default);
         /// <inheritdoc />
         public Task<RestInviteMetadata> GetInviteAsync(string inviteId, bool withCount = false, RequestOptions options = null)
-            => ClientHelper.GetInviteAsync(this, inviteId, withCount, options ?? RequestOptions.Default);
+            => ClientHelper.GetInviteAsync(this, inviteId, options ?? RequestOptions.Default);
         
         // IDiscordClient
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
