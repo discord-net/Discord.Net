@@ -12,12 +12,11 @@ compiled by AppVeyor whenever a new commit is made and will be pushed
 to our MyGet feed.
 
 > [!IMPORTANT]
-> Before beginning, it is important to note that although nightlies
-> are generally stable and have more features and bug fixes than
-> the current stable build on NuGet, there **will** be breaking
-> changes during the development or breaking bugs. Although breaking
-> bugs are usually fixed as soon as they are discovered, it is still
-> important to keep this in mind.
+> Although nightlies are generally stable and have more features
+> and bug fixes than the current stable build on NuGet, there
+> will be breaking changes during the development or
+> breaking bugs; these bugs are usually fixed as soon as they
+> are discovered, but you should still be aware of that.
 
 ## Installing with MyGet (Recommended)
 
@@ -70,8 +69,9 @@ or by using PowerShell (`Install-Package Discord.Net -Prerelease`).
 ## Installing from AppVeyor Artifacts
 
 As mentioned in the first paragraph, we utilize AppVeyor to perform
-automated test and build publishing. During the publishing process,
-we also upload the NuGet packages onto AppVeyor's Artifact collection.
+automated tests and publish the new build. During the publishing
+process, we also upload the NuGet packages onto
+AppVeyor's Artifact collection.
 
 The latest build status can be found within our [AppVeyor project].
 
