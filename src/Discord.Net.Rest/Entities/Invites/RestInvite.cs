@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Discord.API.Rest;
 using Model = Discord.API.Invite;
 
 namespace Discord.Rest
@@ -9,14 +8,15 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestInvite : RestEntity<string>, IInvite, IUpdateable
     {
+        public ChannelType ChannelType { get; private set; }
         public string ChannelName { get; private set; }
         public string GuildName { get; private set; }
         public int? PresenceCount { get; private set; }
         public int? MemberCount { get; private set; }
         public ulong ChannelId { get; private set; }
         public ulong? GuildId { get; private set; }
-        internal IChannel Channel { get; private set; }
-        internal IGuild Guild { get; private set; }
+        internal IChannel Channel { get; }
+        internal IGuild Guild { get; }
 
         public string Code => Id;
         public string Url => $"{DiscordConfig.InviteUrl}{Code}";
@@ -41,6 +41,7 @@ namespace Discord.Rest
             ChannelName = model.Channel.Name;
             MemberCount = model.MemberCount.IsSpecified ? model.MemberCount.Value : null;
             PresenceCount = model.PresenceCount.IsSpecified ? model.PresenceCount.Value : null;
+            ChannelType = (ChannelType)model.Channel.Type;
         }
         
         public async Task UpdateAsync(RequestOptions options = null)
