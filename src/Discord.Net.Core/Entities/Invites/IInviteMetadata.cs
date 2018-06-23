@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Discord
 {
@@ -15,8 +15,8 @@ namespace Discord
         /// <summary> Gets the max amount of times this invite may be used, or null if there is no limit. </summary>
         int? MaxUses { get; }
         /// <summary> Gets the amount of times this invite has been used. </summary>
-        int Uses { get; }
+        int? Uses { get; }
         /// <summary> Gets when this invite was created. </summary>
-        DateTimeOffset CreatedAt { get; }
+        DateTimeOffset? CreatedAt { get; }
     }
 }
