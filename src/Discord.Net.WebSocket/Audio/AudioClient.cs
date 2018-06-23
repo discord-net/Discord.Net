@@ -45,7 +45,6 @@ namespace Discord.Audio
         private ulong _userId;
         private uint _ssrc;
         private bool _isSpeaking;
-        private int _heartbeatInterval = 0;
 
         public SocketGuild Guild { get; }
         public DiscordVoiceAPIClient ApiClient { get; private set; }
@@ -217,14 +216,6 @@ namespace Discord.Audio
             {
                 switch (opCode)
                 {
-                    case VoiceOpCode.Hello:
-                        {
-                            await _audioLogger.DebugAsync("Received Hello").ConfigureAwait(false);
-                            var data = (payload as JToken).ToObject<HelloEvent>(_serializer);
-
-                            _heartbeatInterval = (data.HeartbeatInterval / 4) * 3;
-                        }
-                        break;
                     case VoiceOpCode.Ready:
                         {
                             await _audioLogger.DebugAsync("Received Ready").ConfigureAwait(false);
@@ -239,7 +230,7 @@ namespace Discord.Audio
                             await ApiClient.SendDiscoveryAsync(_ssrc).ConfigureAwait(false);
 
                             
-                            _heartbeatTask = RunHeartbeatAsync(_heartbeatInterval, _connection.CancelToken);
+                            _heartbeatTask = RunHeartbeatAsync(41250, _connection.CancelToken);
                         }
                         break;
                     case VoiceOpCode.SessionDescription:
