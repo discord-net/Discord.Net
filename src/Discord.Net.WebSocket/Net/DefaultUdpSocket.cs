@@ -113,16 +113,20 @@ namespace Discord.Net.Udp
 
         private async Task RunAsync(CancellationToken cancelToken)
         {
-            var closeTask = Task.Delay(-1, cancelToken);
             while (!cancelToken.IsCancellationRequested)
             {
-                var receiveTask = _udp.ReceiveAsync();
-                var task = await Task.WhenAny(closeTask, receiveTask).ConfigureAwait(false);
-                if (task == closeTask)
-                    break;
+                try
+                {
+                    var result = await _udp.ReceiveAsync()
+                    .ConfigureAwait(false);
 
-                var result = receiveTask.Result;
-                await ReceivedDatagram(result.Buffer, 0, result.Buffer.Length).ConfigureAwait(false);
+                    await ReceivedDatagram(result.Buffer, 0, result.Buffer.Length).ConfigureAwait(false);
+                }
+                catch (ObjectDisposedException)
+                {
+                    //if we get this the UDP socket has been closed (by dispose, so it has been cancelled)
+                    break;
+                }
             }
         }
     }
