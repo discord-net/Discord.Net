@@ -113,20 +113,26 @@ namespace Discord.Net.Udp
 
         private async Task RunAsync(CancellationToken cancelToken)
         {
+            var closeTask = Task.Delay(-1, cancelToken);
             while (!cancelToken.IsCancellationRequested)
             {
-                try
-                {
-                    var result = await _udp.ReceiveAsync()
-                    .ConfigureAwait(false);
+                var receiveTask = _udp.ReceiveAsync();
 
-                    await ReceivedDatagram(result.Buffer, 0, result.Buffer.Length).ConfigureAwait(false);
-                }
-                catch (ObjectDisposedException)
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                receiveTask.ContinueWith((recieveResult) =>
                 {
-                    //if we get this the UDP socket has been closed (by dispose, so it has been cancelled)
+                    //observe the exception as to not recieve as unhandled exception
+                    _ = recieveResult.Exception;
+
+                }, TaskContinuationOptions.OnlyOnFaulted);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+
+                var task = await Task.WhenAny(closeTask, receiveTask).ConfigureAwait(false);
+                if (task == closeTask)
                     break;
-                }
+
+                var result = receiveTask.Result;
+                await ReceivedDatagram(result.Buffer, 0, result.Buffer.Length).ConfigureAwait(false);
             }
         }
     }
