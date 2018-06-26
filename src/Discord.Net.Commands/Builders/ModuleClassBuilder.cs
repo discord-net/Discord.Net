@@ -109,7 +109,7 @@ namespace Discord.Commands
                     case SummaryAttribute summary:
                         builder.Summary = summary.Text;
                         break;
-                    case RemarksAttribute remarks:
+                    case RemarkAttribute remarks:
                         builder.Remarks = remarks.Text;
                         break;
                     case AliasAttribute alias:
@@ -169,7 +169,7 @@ namespace Discord.Commands
                     case SummaryAttribute summary:
                         builder.Summary = summary.Text;
                         break;
-                    case RemarksAttribute remarks:
+                    case RemarkAttribute remarks:
                         builder.Remarks = remarks.Text;
                         break;
                     case AliasAttribute alias:
