@@ -45,6 +45,7 @@ namespace Discord.API
         internal IRestClient RestClient { get; private set; }
         internal ulong? CurrentUserId { get; set;}
 
+        /// <exception cref="ArgumentException">Unknown OAuth token type.</exception>
         public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, 
             JsonSerializer serializer = null)
         {
@@ -60,7 +61,6 @@ namespace Discord.API
         }
 
         /// <exception cref="ArgumentException">Unknown OAuth token type.</exception>
-        /// <exception cref="Exception">A delegate callback throws an exception.</exception>
         internal void SetBaseUrl(string baseUrl)
         {
             RestClient = _restClientProvider(baseUrl);

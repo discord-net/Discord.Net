@@ -62,12 +62,12 @@ namespace Discord
         ///     Gets a generic channel via the snowflake identifier.
         /// </summary>
         /// <example>
-        ///     <code lang="cs" title="Example method">
-        ///         var channel = await _client.GetChannelAsync(381889909113225237);
-        ///         if (channel != null &amp;&amp; channel is IMessageChannel msgChannel)
-        ///         {
-        ///             await msgChannel.SendMessageAsync($"{msgChannel} is created at {msgChannel.CreatedAt}");
-        ///         }
+        ///     <code language="cs" title="Example method">
+        ///     var channel = await _client.GetChannelAsync(381889909113225237);
+        ///     if (channel != null &amp;&amp; channel is IMessageChannel msgChannel)
+        ///     {
+        ///         await msgChannel.SendMessageAsync($"{msgChannel} is created at {msgChannel.CreatedAt}");
+        ///     }
         ///    </code>
         /// </example>
         /// <param name="id">The snowflake identifier of the channel (e.g. `381889909113225237`).</param>
@@ -150,10 +150,10 @@ namespace Discord
         ///     Gets a user via the snowflake identifier.
         /// </summary>
         /// <example>
-        ///     <code lang="cs" title="Example method">
-        ///         var user = await _client.GetUserAsync(168693960628371456);
-        ///         if (user != null)
-        ///             Console.WriteLine($"{user} is created at {user.CreatedAt}.";
+        ///     <code language="cs" title="Example method">
+        ///     var user = await _client.GetUserAsync(168693960628371456);
+        ///     if (user != null)
+        ///         Console.WriteLine($"{user} is created at {user.CreatedAt}.";
         ///     </code>
         /// </example>
         /// <param name="id">The snowflake identifier of the user (e.g. `168693960628371456`).</param>
@@ -170,9 +170,9 @@ namespace Discord
         /// </summary>
         /// <example>
         ///     <code language="cs" title="Example method">
-        ///         var user = await _client.GetUserAsync("Still", "2876");
-        ///         if (user != null)
-        ///             Console.WriteLine($"{user} is created at {user.CreatedAt}.";
+        ///     var user = await _client.GetUserAsync("Still", "2876");
+        ///     if (user != null)
+        ///         Console.WriteLine($"{user} is created at {user.CreatedAt}.";
         ///     </code>
         /// </example>
         /// <param name="username">The name of the user (e.g. `Still`).</param>

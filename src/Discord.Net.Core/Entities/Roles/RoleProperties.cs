@@ -10,7 +10,7 @@ namespace Discord
         ///     Gets or sets the name of the role.
         /// </summary>
         /// <remarks>
-        ///     If this role is the EveryoneRole, this value may not be set.
+        ///     This value may not be set if the role is an @everyone role.
         /// </remarks>
         public Optional<string> Name { get; set; }
         /// <summary>
@@ -21,28 +21,28 @@ namespace Discord
         ///     Gets or sets the position of the role. This is 0-based!
         /// </summary>
         /// <remarks>
-        ///     If this role is the EveryoneRole, this value may not be set.
+        ///     This value may not be set if the role is an @everyone role.
         /// </remarks>
         public Optional<int> Position { get; set; }
         /// <summary>
         ///     Gets or sets the color of the role.
         /// </summary>
         /// <remarks>
-        ///     If this role is the EveryoneRole, this value may not be set.
+        ///     This value may not be set if the role is an @everyone role.
         /// </remarks>
         public Optional<Color> Color { get; set; }
         /// <summary>
         ///     Gets or sets whether or not this role should be displayed independently in the user list.
         /// </summary>
         /// <remarks>
-        ///     If this role is the EveryoneRole, this value may not be set.
+        ///     This value may not be set if the role is an @everyone role.
         /// </remarks>
         public Optional<bool> Hoist { get; set; }
         /// <summary>
         ///     Gets or sets whether or not this role can be mentioned.
         /// </summary>
         /// <remarks>
-        ///     If this role is the EveryoneRole, this value may not be set.
+        ///     This value may not be set if the role is an @everyone role.
         /// </remarks>
         public Optional<bool> Mentionable { get; set; }
     }

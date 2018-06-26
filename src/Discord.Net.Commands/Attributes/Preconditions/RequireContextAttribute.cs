@@ -37,11 +37,12 @@ namespace Discord.Commands
         /// <summary> Requires the command to be invoked in the specified context. </summary>
         /// <param name="contexts">The type of context the command can be invoked in. Multiple contexts can be specified by ORing the contexts together.</param>
         /// <example>
-        /// <code language="c#">
-        ///     [Command("private_only")]
+        /// <code language="cs">
+        ///     [Command("secret")]
         ///     [RequireContext(ContextType.DM | ContextType.Group)]
-        ///     public async Task PrivateOnly()
+        ///     public Task PrivateOnlyAsync()
         ///     {
+        ///         return ReplyAsync("shhh, this command is a secret");
         ///     }
         /// </code>
         /// </example>
@@ -50,12 +51,13 @@ namespace Discord.Commands
             Contexts = contexts;
         }
 
+        /// <inheritdoc />
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
             bool isValid = false;
 
             if ((Contexts & ContextType.Guild) != 0)
-                isValid = isValid || context.Channel is IGuildChannel;
+                isValid = context.Channel is IGuildChannel;
             if ((Contexts & ContextType.DM) != 0)
                 isValid = isValid || context.Channel is IDMChannel;
             if ((Contexts & ContextType.Group) != 0)

@@ -44,7 +44,7 @@ namespace Discord.Commands
         /// If this map is set to null or empty, the default delimiter of " will be used.
         /// </summary>
         /// <example>
-        /// <code language="C#">
+        /// <code language="cs">
         /// QuotationMarkAliasMap = new Dictionary&lt;char, char%gt;()
         /// {
         ///     {'\"', '\"' },

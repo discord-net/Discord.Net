@@ -14,10 +14,12 @@ namespace Discord
             builder.WithColor(new Color(r, g, b));
 
         /// <summary> Adds embed color based on the provided RGB <see cref="int"/> value. </summary>
+        /// <exception cref="ArgumentOutOfRangeException">The argument value is not between 0 to 255.</exception>
         public static EmbedBuilder WithColor(this EmbedBuilder builder, int r, int g, int b) =>
             builder.WithColor(new Color(r, g, b));
 
         /// <summary> Adds embed color based on the provided RGB <see cref="float"/> value. </summary>
+        /// <exception cref="ArgumentOutOfRangeException">The argument value is not between 0 to 1.</exception>
         public static EmbedBuilder WithColor(this EmbedBuilder builder, float r, float g, float b) =>
             builder.WithColor(new Color(r, g, b));
 

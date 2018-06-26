@@ -1,5 +1,8 @@
 namespace Discord
 {
+    /// <summary>
+    ///     Represent a permission object.
+    /// </summary>
     public struct Overwrite
     {
         /// <summary>
@@ -16,7 +19,7 @@ namespace Discord
         public OverwritePermissions Permissions { get; }
 
         /// <summary>
-        ///     Creates a new <see cref="Overwrite"/> with provided target information and modified permissions.
+        ///     Initializes a new <see cref="Overwrite"/> with provided target information and modified permissions.
         /// </summary>
         public Overwrite(ulong targetId, PermissionTarget targetType, OverwritePermissions permissions)
         {

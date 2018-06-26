@@ -5,13 +5,24 @@ using System.Threading.Tasks;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Provides a client to send REST-based requests to Discord.
+    /// </summary>
     public class DiscordRestClient : BaseDiscordClient, IDiscordClient
     {
         private RestApplication _applicationInfo;
 
+        /// <summary>
+        ///     Gets the logged-in user.
+        /// </summary>
         public new RestSelfUser CurrentUser => base.CurrentUser as RestSelfUser;
 
+        /// <inheritdoc />
         public DiscordRestClient() : this(new DiscordRestConfig()) { }
+        /// <summary>
+        ///     Initializes a new <see cref="DiscordRestClient"/> with the provided configuratation.
+        /// </summary>
+        /// <param name="config">The configuration to be used with the client.</param>
         public DiscordRestClient(DiscordRestConfig config) : base(config, CreateApiClient(config)) { }
 
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)

@@ -8,9 +8,12 @@ namespace Discord.Commands
     {
         public Exception Exception { get; }
 
+        /// <inheritdoc />
         public CommandError? Error { get; }
+        /// <inheritdoc />
         public string ErrorReason { get; }
 
+        /// <inheritdoc />
         public bool IsSuccess => !Error.HasValue;
 
         private ExecuteResult(Exception exception, CommandError? error, string errorReason)

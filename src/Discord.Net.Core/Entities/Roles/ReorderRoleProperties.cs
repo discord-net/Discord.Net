@@ -6,12 +6,18 @@ namespace Discord
     public class ReorderRoleProperties
     {
         /// <summary>
-        ///     Gets the ID of the role to be edited.
+        ///     Gets the identifier of the role to be edited.
         /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the role to be modified.
+        /// </returns>
         public ulong Id { get; }
         /// <summary>
         ///     Gets the new zero-based position of the role.
         /// </summary>
+        /// <returns>
+        ///     A <see cref="int"/> representing the new zero-based position of the role.
+        /// </returns>
         public int Position { get; }
 
         /// <summary>

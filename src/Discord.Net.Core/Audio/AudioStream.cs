@@ -11,6 +11,7 @@ namespace Discord.Audio
         public override bool CanSeek => false;
         public override bool CanWrite => false;
 
+        /// <exception cref="InvalidOperationException">This stream does not accept headers.</exception>
         public virtual void WriteHeader(ushort seq, uint timestamp, bool missed) => 
             throw new InvalidOperationException("This stream does not accept headers.");
         public override void Write(byte[] buffer, int offset, int count)

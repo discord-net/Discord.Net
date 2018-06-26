@@ -4,6 +4,9 @@ using System.Diagnostics;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Represents a container for a series of overwrite permissions.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct OverwritePermissions
     {
@@ -14,11 +17,13 @@ namespace Discord
         /// <summary>
         ///     Gets a <see cref="OverwritePermissions" /> that grants all permissions for the given channel.
         /// </summary>
+        /// <exception cref="ArgumentException">Unknown channel type.</exception>
         public static OverwritePermissions AllowAll(IChannel channel) 
             => new OverwritePermissions(ChannelPermissions.All(channel).RawValue, 0);
         /// <summary>
         ///     Gets a <see cref="OverwritePermissions" /> that denies all permissions for the given channel.
         /// </summary>
+        /// <exception cref="ArgumentException">Unknown channel type.</exception>
         public static OverwritePermissions DenyAll(IChannel channel)
             => new OverwritePermissions(0, ChannelPermissions.All(channel).RawValue);
 
@@ -132,7 +137,7 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Creates a new <see cref="ChannelPermissions" /> with the provided permissions.
+        ///     Initializes a new <see cref="ChannelPermissions"/> struct with the provided permissions.
         /// </summary>
         public OverwritePermissions(
             PermValue createInstantInvite = PermValue.Inherit,
@@ -160,8 +165,8 @@ namespace Discord
                   moveMembers, useVoiceActivation, manageRoles, manageWebhooks) { }
 
         /// <summary>
-        ///     Creates a new <see cref="OverwritePermissions" /> from this one, changing the provided non-null
-        ///     permissions.
+        ///     Initializes a new <see cref="OverwritePermissions" /> from the current one, changing the provided
+        ///     non-null permissions.
         /// </summary>
         public OverwritePermissions Modify(
             PermValue? createInstantInvite = null,
