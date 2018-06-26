@@ -11,7 +11,7 @@ namespace Discord.WebSocket
         ///     Gets the ID of the user who added the reaction.
         /// </summary>
         /// <returns>
-        ///     A user snowflake ID.
+        ///     A user snowflake identifier associated with the user.
         /// </returns>
         public ulong UserId { get; }
         /// <summary>
@@ -25,15 +25,16 @@ namespace Discord.WebSocket
         ///     Gets the ID of the message that has been reacted to.
         /// </summary>
         /// <returns>
-        ///     A message snowflake ID.
+        ///     A message snowflake identifier associated with the message.
         /// </returns>
         public ulong MessageId { get; }
         /// <summary>
         ///     Gets the message that has been reacted to if possible.
         /// </summary>
         /// <returns>
-        ///     A WebSocket-based message where possible. This value is not always returned.
+        ///     A WebSocket-based message where possible; a value is not always returned.
         /// </returns>
+        /// <seealso cref="Optional{T}"/>
         public Optional<SocketUserMessage> Message { get; }
         /// <summary>
         ///     Gets the channel where the reaction takes place in.

@@ -5,7 +5,7 @@ using System.Reflection;
 namespace Discord.Commands
 {
     /// <summary>
-    ///     Marks the <see cref="Type"/> to be read by the specified <see cref="TypeReader" />.
+    ///     Marks the <see cref="Type"/> to be read by the specified <see cref="TypeReader"/>.
     /// </summary>
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
     public class OverrideTypeReaderAttribute : Attribute

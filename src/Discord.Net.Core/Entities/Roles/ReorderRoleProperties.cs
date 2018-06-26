@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    ///     Properties that are used to reorder an <see cref="IRole" />.
+    ///     Properties that are used to reorder an <see cref="IRole"/>.
     /// </summary>
     public class ReorderRoleProperties
     {

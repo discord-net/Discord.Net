@@ -107,18 +107,19 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets a channel.
         /// </summary>
-        /// <param name="id">The channel snowflake ID.</param>
+        /// <param name="id">The channel snowflake identifier.</param>
         /// <returns>
-        ///     A generic WebSocket-based channel object (voice, text, category, etc.); <c>null</c> when the
-        ///     channel cannot be found.
+        ///     A generic WebSocket-based channel object (voice, text, category, etc.) associated with the identifier;
+        ///     <c>null</c> when the channel cannot be found.
         /// </returns>
         public abstract SocketChannel GetChannel(ulong id);
         /// <summary>
         ///     Gets a guild.
         /// </summary>
-        /// <param name="id">The guild snowflake ID.</param>
+        /// <param name="id">The guild snowflake identifier.</param>
         /// <returns>
-        ///     A WebSocket-based guild; <c>null</c> when the guild cannot be found.
+        ///     A WebSocket-based guild associated with the snowflake identifier; <c>null</c> when the guild cannot be
+        ///     found.
         /// </returns>
         public abstract SocketGuild GetGuild(ulong id);
         /// <summary>

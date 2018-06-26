@@ -6,7 +6,7 @@ using System.Linq;
 namespace Discord
 {
     /// <summary>
-    ///     Represents an embed object seen in an <see cref="IUserMessage" />.
+    ///     Represents an embed object seen in an <see cref="IUserMessage"/>.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Embed : IEmbed

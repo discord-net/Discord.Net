@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace Discord
 {
     /// <summary>
-    ///     A author field of an <see cref="Embed" />.
+    ///     A author field of an <see cref="Embed"/>.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct EmbedAuthor

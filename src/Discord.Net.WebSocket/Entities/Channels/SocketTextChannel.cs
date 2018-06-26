@@ -155,21 +155,21 @@ namespace Discord.WebSocket
         public Task<RestWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null)
             => ChannelHelper.CreateWebhookAsync(this, Discord, name, avatar, options);
         /// <summary>
-        ///     Gets the webhook in this text channel with the provided ID.
+        ///     Gets a webhook available in this text channel.
         /// </summary>
-        /// <param name="id">The ID of the webhook.</param>
+        /// <param name="id">The identifier of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A webhook associated with the <paramref name="id"/>, or <c>null</c> if not found.
+        ///     An awaitable <see cref="Task"/> webhook associated with the identifier, or <c>null</c> if not found.
         /// </returns>
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetWebhookAsync(this, Discord, id, options);
         /// <summary>
-        ///     Gets the webhooks for this text channel.
+        ///     Gets the webhooks available in this text channel.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A collection of webhooks.
+        ///     An awaitable <see cref="Task"/> collection of webhooks.
         /// </returns>
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => ChannelHelper.GetWebhooksAsync(this, Discord, options);

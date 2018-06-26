@@ -98,7 +98,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         /// <exception cref="ArgumentException">
         /// <paramref name="filePath" /> is a zero-length string, contains only white space, or contains one or more
-        /// invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars" />.
+        /// invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.
         /// </exception>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="filePath" /> is <c>null</c>.

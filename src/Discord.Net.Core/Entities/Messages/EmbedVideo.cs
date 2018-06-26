@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace Discord
 {
     /// <summary>
-    ///     A video featured in an <see cref="Embed" />.
+    ///     A video featured in an <see cref="Embed"/>.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct EmbedVideo

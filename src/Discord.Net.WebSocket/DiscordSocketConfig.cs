@@ -5,7 +5,7 @@ using Discord.Rest;
 namespace Discord.WebSocket
 {
     /// <summary>
-    ///     Represents a configuration class for <see cref="DiscordSocketClient" />.
+    ///     Represents a configuration class for <see cref="DiscordSocketClient"/>.
     /// </summary>
     public class DiscordSocketConfig : DiscordRestConfig
     {

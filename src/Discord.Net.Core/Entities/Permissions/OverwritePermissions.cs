@@ -23,11 +23,11 @@ namespace Discord
             => new OverwritePermissions(0, ChannelPermissions.All(channel).RawValue);
 
         /// <summary>
-        ///     Gets a packed value representing all the allowed permissions in this <see cref="OverwritePermissions" />.
+        ///     Gets a packed value representing all the allowed permissions in this <see cref="OverwritePermissions"/>.
         /// </summary>
         public ulong AllowValue { get; }
         /// <summary>
-        ///     Gets a packed value representing all the denied permissions in this <see cref="OverwritePermissions" />.
+        ///     Gets a packed value representing all the denied permissions in this <see cref="OverwritePermissions"/>.
         /// </summary>
         public ulong DenyValue { get; }
 

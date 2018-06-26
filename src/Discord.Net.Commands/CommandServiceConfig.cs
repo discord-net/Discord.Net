@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Discord.Commands
 {
     /// <summary>
-    ///     Represents a configuration class for <see cref="CommandService" />.
+    ///     Represents a configuration class for <see cref="CommandService"/>.
     /// </summary>
     public class CommandServiceConfig
     {

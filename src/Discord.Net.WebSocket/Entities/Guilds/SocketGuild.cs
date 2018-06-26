@@ -530,7 +530,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A collection of invites.
+        ///     An awaitable <see cref="Task"/> containing a collection of invites.
         /// </returns>
         public Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
             => GuildHelper.GetInvitesAsync(this, Discord, options);

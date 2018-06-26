@@ -48,11 +48,11 @@ namespace Discord.WebSocket
         /// </summary>
         /// <remarks>
         ///     This method does NOT attempt to fetch the user if they don't exist in the cache. To guarantee a return
-        ///     from an existing user that doesn't exist in cache, use <see cref="Rest.DiscordRestClient.GetUserAsync" />.
+        ///     from an existing user that doesn't exist in cache, use <see cref="Rest.DiscordRestClient.GetUserAsync"/>.
         /// </remarks>
-        /// <param name="id">The ID of the user.</param>
+        /// <param name="id">The snowflake identifier of the user.</param>
         /// <returns>
-        ///     The user.
+        ///     A user object associated with the snowflake identifier.
         /// </returns>
         public SocketUser GetUser(ulong id) => GetUserInternal(id);
         internal abstract SocketUser GetUserInternal(ulong id);

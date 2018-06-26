@@ -6,7 +6,7 @@ using System.Linq;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a builder class for creating a <see cref="EmbedType.Rich"/> <see cref="Embed" />.
+    ///     Represents a builder class for creating a <see cref="EmbedType.Rich"/> <see cref="Embed"/>.
     /// </summary>
     public class EmbedBuilder
     {
@@ -122,28 +122,28 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Gets or sets the timestamp of an <see cref="Embed" />.
+        ///     Gets or sets the timestamp of an <see cref="Embed"/>.
         /// </summary>
         /// <returns>
         ///     The timestamp of the embed, or <c>null</c> if none is set.
         /// </returns>
         public DateTimeOffset? Timestamp { get; set; }
         /// <summary>
-        ///     Gets or sets the sidebar color of an <see cref="Embed" />.
+        ///     Gets or sets the sidebar color of an <see cref="Embed"/>.
         /// </summary>
         /// <returns>
         ///     The color of the embed, or <c>null</c> if none is set.
         /// </returns>
         public Color? Color { get; set; }
         /// <summary>
-        ///     Gets or sets the <see cref="EmbedAuthorBuilder" /> of an <see cref="Embed" />.
+        ///     Gets or sets the <see cref="EmbedAuthorBuilder" /> of an <see cref="Embed"/>.
         /// </summary>
         /// <returns>
         ///     The author field builder of the embed, or <c>null</c> if none is set.
         /// </returns>
         public EmbedAuthorBuilder Author { get; set; }
         /// <summary>
-        ///     Gets or sets the <see cref="EmbedFooterBuilder" /> of an <see cref="Embed" />.
+        ///     Gets or sets the <see cref="EmbedFooterBuilder" /> of an <see cref="Embed"/>.
         /// </summary>
         /// <returns>
         ///     The footer field builder of the embed, or <c>null</c> if none is set.
@@ -172,7 +172,7 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Sets the title of an <see cref="Embed" />.
+        ///     Sets the title of an <see cref="Embed"/>.
         /// </summary>
         /// <param name="title">The title to be set.</param>
         /// <returns>
@@ -220,7 +220,7 @@ namespace Discord
             return this;
         }
         /// <summary>
-        ///     Sets the image URL of an <see cref="Embed" />.
+        ///     Sets the image URL of an <see cref="Embed"/>.
         /// </summary>
         /// <param name="imageUrl">The image URL to be set.</param>
         /// <returns>
@@ -243,7 +243,7 @@ namespace Discord
             return this;
         }
         /// <summary>
-        ///     Sets the timestamp of an <see cref="Embed" />.
+        ///     Sets the timestamp of an <see cref="Embed"/>.
         /// </summary>
         /// <param name="dateTimeOffset">The timestamp to be set.</param>
         /// <returns>
@@ -255,7 +255,7 @@ namespace Discord
             return this;
         }
         /// <summary>
-        ///     Sets the sidebar color of an <see cref="Embed" />.
+        ///     Sets the sidebar color of an <see cref="Embed"/>.
         /// </summary>
         /// <param name="color">The color to be set.</param>
         /// <returns>
@@ -268,7 +268,7 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Sets the <see cref="EmbedAuthorBuilder" /> of an <see cref="Embed" />.
+        ///     Sets the <see cref="EmbedAuthorBuilder" /> of an <see cref="Embed"/>.
         /// </summary>
         /// <param name="author">The author builder class containing the author field properties.</param>
         /// <returns>
@@ -314,7 +314,7 @@ namespace Discord
             return this;
         }
         /// <summary>
-        ///     Sets the <see cref="EmbedFooterBuilder" /> of an <see cref="Embed" />.
+        ///     Sets the <see cref="EmbedFooterBuilder" /> of an <see cref="Embed"/>.
         /// </summary>
         /// <param name="footer">The footer builder class containing the footer field properties.</param>
         /// <returns>
@@ -379,7 +379,7 @@ namespace Discord
 
         /// <summary>
         ///     Adds a field with the provided <see cref="EmbedFieldBuilder" /> to an
-        ///     <see cref="Embed" />.
+        ///     <see cref="Embed"/>.
         /// </summary>
         /// <param name="field">The field builder class containing the field properties.</param>
         /// <exception cref="ArgumentException">Field count exceeds <see cref="MaxFieldCount"/>.</exception>
@@ -564,7 +564,7 @@ namespace Discord
         ///     Gets or sets the author name.
         /// </summary>
         /// <exception cref="ArgumentException">
-        /// Author name length is longer than <see cref="MaxAuthorNameLength" />.
+        /// Author name length is longer than <see cref="MaxAuthorNameLength"/>.
         /// </exception>
         /// <returns>
         ///     The author name.
@@ -652,11 +652,11 @@ namespace Discord
         ///     Builds the author field to be used.
         /// </summary>
         /// <exception cref="ArgumentException">
-        /// <para>Author name length is longer than <see cref="MaxAuthorNameLength" />.</para>
+        /// <para>Author name length is longer than <see cref="MaxAuthorNameLength"/>.</para>
         /// <para><c>- or -</c></para>
-        /// <para><see cref="Url"/> is not a well-formed <see cref="Uri" />.</para>
+        /// <para><see cref="Url"/> is not a well-formed <see cref="Uri"/>.</para>
         /// <para><c>- or -</c></para>
-        /// <para><see cref="IconUrl"/> is not a well-formed <see cref="Uri" />.</para>
+        /// <para><see cref="IconUrl"/> is not a well-formed <see cref="Uri"/>.</para>
         /// </exception>
         /// <returns>
         ///     The built author field.
@@ -682,7 +682,7 @@ namespace Discord
         ///     Gets or sets the footer text.
         /// </summary>
         /// <exception cref="ArgumentException">
-        /// Author name length is longer than <see cref="MaxFooterTextLength" />.
+        /// Author name length is longer than <see cref="MaxFooterTextLength"/>.
         /// </exception>
         /// <returns>
         ///     The footer text.
@@ -743,7 +743,7 @@ namespace Discord
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentException">
-        /// <para><see cref="Text"/> length is longer than <see cref="MaxFooterTextLength" />.</para>
+        /// <para><see cref="Text"/> length is longer than <see cref="MaxFooterTextLength"/>.</para>
         /// <para><c>- or -</c></para>
         /// <para><see cref="IconUrl"/> is not a well-formed <see cref="Uri"/>.</para>
         /// </exception>

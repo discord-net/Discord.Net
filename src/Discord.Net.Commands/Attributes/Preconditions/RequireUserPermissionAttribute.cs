@@ -19,7 +19,7 @@ namespace Discord.Commands
         public ChannelPermission? ChannelPermission { get; }
 
         /// <summary>
-        ///     Requires that the user invoking the command to have a specific <see cref="Discord.GuildPermission" />.
+        ///     Requires that the user invoking the command to have a specific <see cref="Discord.GuildPermission"/>.
         /// </summary>
         /// <remarks>
         ///     This precondition will always fail if the command is being invoked in a <see cref="IPrivateChannel"/>.

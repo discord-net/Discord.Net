@@ -11,7 +11,7 @@ namespace Discord
         /// </summary>
         public Stream Stream { get; }
         /// <summary>
-        ///     Create the image with a <see cref="System.IO.Stream" />.
+        ///     Create the image with a <see cref="System.IO.Stream"/>.
         /// </summary>
         /// <param name="stream">
         ///     The <see cref="System.IO.Stream" /> to create the image with. Note that this must be some type of stream
@@ -32,7 +32,7 @@ namespace Discord
         /// <param name="path">The path to the file.</param>
         /// <exception cref="System.ArgumentException">
         /// <paramref name="path" /> is a zero-length string, contains only white space, or contains one or more invalid
-        /// characters as defined by <see cref="Path.GetInvalidPathChars" />.
+        /// characters as defined by <see cref="Path.GetInvalidPathChars"/>.
         /// </exception>
         /// <exception cref="System.ArgumentNullException"><paramref name="path" /> is <c>null</c>.</exception>
         /// <exception cref="PathTooLongException">

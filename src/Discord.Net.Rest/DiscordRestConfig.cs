@@ -3,7 +3,7 @@ using Discord.Net.Rest;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a configuration class for <see cref="DiscordRestClient" />.
+    ///     Represents a configuration class for <see cref="DiscordRestClient"/>.
     /// </summary>
     public class DiscordRestConfig : DiscordConfig
     {

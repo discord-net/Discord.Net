@@ -142,9 +142,9 @@ namespace Discord.WebSocket
         /// </summary>
         /// <remarks>
         ///     This method does NOT attempt to fetch the user if they don't exist in the cache. To guarantee a return
-        ///     from an existing user that doesn't exist in cache, use <see cref="DiscordRestClient.GetUserAsync" />.
+        ///     from an existing user that doesn't exist in cache, use <see cref="DiscordRestClient.GetUserAsync"/>.
         /// </remarks>
-        /// <param name="id">The ID of the user.</param>
+        /// <param name="id">The snowflake identifier of the user.</param>
         /// <returns>
         ///     The user in the group.
         /// </returns>
