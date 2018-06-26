@@ -4,7 +4,7 @@ using System.Net;
 namespace Discord.Net
 {
     /// <summary>
-    ///     Describes an exception that occurred during the processing of Discord HTTP requests.
+    ///     The exception that is thrown if an error occurs while processing an Discord HTTP request.
     /// </summary>
     public class HttpException : Exception
     {

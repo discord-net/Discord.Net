@@ -2,7 +2,7 @@ using System;
 namespace Discord.Net
 {
     /// <summary>
-    ///     Describes an exception that causes the WebSocket to close during a session.
+    ///     The exception that is thrown when the WebSocket session is closed by Discord.
     /// </summary>
     public class WebSocketClosedException : Exception
     {

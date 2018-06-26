@@ -3,7 +3,7 @@ using System;
 namespace Discord.Commands
 {
     /// <summary>
-    ///     Describes an exception that occurred during a command execution.
+    ///     The exception that is thrown if another exception occurs during a command execution.
     /// </summary>
     public class CommandException : Exception
     {
