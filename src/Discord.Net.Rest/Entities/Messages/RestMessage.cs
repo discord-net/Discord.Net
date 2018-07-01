@@ -63,7 +63,8 @@ namespace Discord.Rest
 
         public override string ToString() => Content;
 
-        public string GetJumpUrl() => MessageHelper.GetJumpUrl(this);
+        public string GetJumpUrl() 
+            => MessageHelper.GetJumpUrl(this);
 
         MessageType IMessage.Type => MessageType.Default;
         IUser IMessage.Author => Author;
