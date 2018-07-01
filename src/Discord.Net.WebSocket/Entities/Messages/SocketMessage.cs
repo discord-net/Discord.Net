@@ -59,7 +59,8 @@ namespace Discord.WebSocket
 
         public override string ToString() => Content;
 
-        public string GetJumpUrl() => MessageHelper.GetJumpUrl(this);
+        public string GetJumpUrl() 
+            => MessageHelper.GetJumpUrl(this);
 
         internal SocketMessage Clone() => MemberwiseClone() as SocketMessage;
 
