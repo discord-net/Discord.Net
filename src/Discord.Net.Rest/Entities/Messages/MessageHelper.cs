@@ -93,6 +93,12 @@ namespace Discord.Rest
             await client.ApiClient.RemovePinAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
         }
 
+        public static string GetJumpUrl(IMessage msg)
+        {
+            var channel = msg.Channel;
+            return $"https://discordapp.com/channels/{(channel is IDMChannel ? "@me" : $"{(channel as IGuildChannel).GuildId}")}/{channel.Id}/{msg.Id}";
+        }
+
         public static ImmutableArray<ITag> ParseTags(string text, IMessageChannel channel, IGuild guild, IReadOnlyCollection<IUser> userMentions)
         {
             var tags = ImmutableArray.CreateBuilder<ITag>();

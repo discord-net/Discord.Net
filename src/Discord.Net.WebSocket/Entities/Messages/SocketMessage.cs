@@ -1,4 +1,4 @@
-﻿using Discord.Rest;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -58,6 +58,9 @@ namespace Discord.WebSocket
             => MessageHelper.DeleteAsync(this, Discord, options);
 
         public override string ToString() => Content;
+
+        public string GetJumpUrl() => MessageHelper.GetJumpUrl(this);
+
         internal SocketMessage Clone() => MemberwiseClone() as SocketMessage;
 
         //IMessage

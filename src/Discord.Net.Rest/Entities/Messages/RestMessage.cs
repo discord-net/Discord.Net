@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -62,6 +62,8 @@ namespace Discord.Rest
             => MessageHelper.DeleteAsync(this, Discord, options);
 
         public override string ToString() => Content;
+
+        public string GetJumpUrl() => MessageHelper.GetJumpUrl(this);
 
         MessageType IMessage.Type => MessageType.Default;
         IUser IMessage.Author => Author;

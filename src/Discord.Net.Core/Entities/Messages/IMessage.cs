@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Discord
@@ -15,6 +15,8 @@ namespace Discord
         bool IsPinned { get; }
         /// <summary> Returns the content for this message. </summary>
         string Content { get; }
+        /// <summary> Returns a jump url for this message. </summary>
+        string GetJumpUrl();
         /// <summary> Gets the time this message was sent. </summary>
         DateTimeOffset Timestamp { get; }
         /// <summary> Gets the time of this message's last edit, if any. </summary>
