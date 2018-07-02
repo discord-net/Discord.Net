@@ -42,7 +42,6 @@ namespace Discord.Commands
             }
             return false;
         }
-
         public static string GetJumpUrl(this IMessage msg)
         {
             var channel = msg.Channel;
