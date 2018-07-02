@@ -8,7 +8,7 @@ namespace Discord.API
         [JsonProperty("code")]
         public string Code { get; set; }
         [JsonProperty("guild")]
-        public InviteGuild Guild { get; set; }
+        public Optional<InviteGuild> Guild { get; set; }
         [JsonProperty("channel")]
         public InviteChannel Channel { get; set; }
         [JsonProperty("approximate_presence_count")]

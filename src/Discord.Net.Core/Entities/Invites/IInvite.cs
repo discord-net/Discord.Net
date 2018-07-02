@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace Discord
 {
     public interface IInvite : IEntity<string>, IDeletable
@@ -11,6 +9,8 @@ namespace Discord
 
         /// <summary> Gets the channel this invite is linked to. </summary>
         IChannel Channel { get; }
+        /// <summary> Gets the type of the channel this invite is linked to. </summary>
+        ChannelType ChannelType { get; }
         /// <summary> Gets the id of the channel this invite is linked to. </summary>
         ulong ChannelId { get; }
         /// <summary> Gets the name of the channel this invite is linked to. </summary>
@@ -19,7 +19,7 @@ namespace Discord
         /// <summary> Gets the guild this invite is linked to. </summary>
         IGuild Guild { get; }
         /// <summary> Gets the id of the guild this invite is linked to. </summary>
-        ulong GuildId { get; }
+        ulong? GuildId { get; }
         /// <summary> Gets the name of the guild this invite is linked to. </summary>
         string GuildName { get; }
         /// <summary> Gets the approximated count of online members in the guild. </summary>
