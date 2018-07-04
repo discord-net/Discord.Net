@@ -27,6 +27,8 @@ namespace Discord
         ///     A generic channel that the invite points to.
         /// </returns>
         IChannel Channel { get; }
+        /// <summary> Gets the type of the channel this invite is linked to. </summary>
+        ChannelType ChannelType { get; }
         /// <summary>
         ///     Gets the ID of the channel this invite is linked to.
         /// </summary>
@@ -55,7 +57,7 @@ namespace Discord
         /// <returns>
         ///     An <see cref="ulong"/> representing the guild snowflake identifier that the invite points to.
         /// </returns>
-        ulong GuildId { get; }
+        ulong? GuildId { get; }
         /// <summary>
         ///     Gets the name of the guild this invite is linked to.
         /// </summary>

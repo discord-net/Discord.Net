@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -352,7 +352,7 @@ namespace Discord.Commands
         /// </param>
         public void AddTypeReader(Type type, TypeReader reader, bool replaceDefault)
         {
-            if (replaceDefault && _defaultTypeReaders.ContainsKey(type))
+            if (replaceDefault && HasDefaultTypeReader(type))
             {
                 _defaultTypeReaders.AddOrUpdate(type, reader, (k, v) => reader);
                 if (type.GetTypeInfo().IsValueType)
@@ -370,6 +370,16 @@ namespace Discord.Commands
                 if (type.GetTypeInfo().IsValueType)
                     AddNullableTypeReader(type, reader);
             }
+        }
+        internal bool HasDefaultTypeReader(Type type)
+        {
+            if (_defaultTypeReaders.ContainsKey(type))
+                return true;
+
+            var typeInfo = type.GetTypeInfo();
+            if (typeInfo.IsEnum)
+                return true;
+            return _entityTypeReaders.Any(x => type == x.Item1 || typeInfo.ImplementedInterfaces.Contains(x.Item2));
         }
         internal void AddNullableTypeReader(Type valueType, TypeReader valueTypeReader)
         {

@@ -215,7 +215,7 @@ namespace Discord.WebSocket
         ///     An awaitable <see cref="Task"/> containing the invite information.
         /// </returns>
         public Task<RestInviteMetadata> GetInviteAsync(string inviteId, bool withCount = false, RequestOptions options = null)
-            => ClientHelper.GetInviteAsync(this, inviteId, withCount, options ?? RequestOptions.Default);
+            => ClientHelper.GetInviteAsync(this, inviteId, options ?? RequestOptions.Default);
         
         // IDiscordClient
         /// <inheritdoc />

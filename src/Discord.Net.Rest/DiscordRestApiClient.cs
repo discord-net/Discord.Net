@@ -918,7 +918,7 @@ namespace Discord.API
         }
 
         //Guild Invites
-        public async Task<InviteMetadata> GetInviteAsync(string inviteId, GetInviteParams args, RequestOptions options = null)
+        public async Task<InviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null)
         {
             Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
             options = RequestOptions.CreateOrClone(options);
@@ -931,13 +931,19 @@ namespace Discord.API
             if (index >= 0)
                 inviteId = inviteId.Substring(index + 1);
 
-            var withCounts = args.WithCounts.GetValueOrDefault(false);
-
             try
             {
-                return await SendAsync<InviteMetadata>("GET", () => $"invites/{inviteId}?with_counts={withCounts}", new BucketIds(), options: options).ConfigureAwait(false);
+                return await SendAsync<InviteMetadata>("GET", () => $"invites/{inviteId}?with_counts=true", new BucketIds(), options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
+        }
+        public async Task<InviteMetadata> GetVanityInviteAsync(ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(guildId: guildId);
+            return await SendAsync<InviteMetadata>("GET", () => $"guilds/{guildId}/vanity-url", ids, options: options).ConfigureAwait(false);
         }
         public async Task<IReadOnlyCollection<InviteMetadata>> GetGuildInvitesAsync(ulong guildId, RequestOptions options = null)
         {
