@@ -20,7 +20,14 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public string Topic { get; private set; }
+        /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
+        /// <summary>
+        ///     Gets the Category this channel belongs to.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="ICategoryChannel"/> that this channel belongs to otherwise; <c>null</c>.
+        /// </returns>
         public ICategoryChannel Category
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
 
@@ -66,6 +73,15 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public SocketMessage GetCachedMessage(ulong id)
             => _messages?.Get(id);
+
+        /// <summary>
+        ///     Gets the message associated with the passed <paramref name="id"/>.
+        /// </summary>
+        /// <param name="id">The id of the message you want to retrieve</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
         public async Task<IMessage> GetMessageAsync(ulong id, RequestOptions options = null)
         {
             IMessage msg = _messages?.Get(id);
@@ -73,6 +89,15 @@ namespace Discord.WebSocket
                 msg = await ChannelHelper.GetMessageAsync(this, Discord, id, options).ConfigureAwait(false);
             return msg;
         }
+
+        /// <summary>
+        ///     Gets a nested collection of messages.
+        /// </summary>
+        /// <param name="limit">The number of messages you want to get.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit, CacheMode.AllowDownload, options);
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
@@ -109,9 +134,10 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null)
             => ChannelHelper.DeleteMessagesAsync(this, Discord, messageIds, options);
-
+        /// <inheritdoc />
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
             => ChannelHelper.DeleteMessageAsync(this, messageId, Discord, options);
+        /// <inheritdoc />
         public Task DeleteMessageAsync(IMessage message, RequestOptions options = null)
             => ChannelHelper.DeleteMessageAsync(this, message.Id, Discord, options);
 

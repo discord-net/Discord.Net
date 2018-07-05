@@ -18,6 +18,9 @@ namespace Discord.WebSocket
     {
         private readonly MessageCache _messages;
 
+        /// <summary>
+        ///     Gets the recipient of the channel.
+        /// </summary>
         public SocketUser Recipient { get; }
 
         /// <inheritdoc />
@@ -51,6 +54,14 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public SocketMessage GetCachedMessage(ulong id)
             => _messages?.Get(id);
+        /// <summary>
+        ///     Gets the message associated with the passed <paramref name="id"/>.
+        /// </summary>
+        /// <param name="id">The id of the message you want to retrieve</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
         public async Task<IMessage> GetMessageAsync(ulong id, RequestOptions options = null)
         {
             IMessage msg = _messages?.Get(id);
@@ -58,6 +69,15 @@ namespace Discord.WebSocket
                 msg = await ChannelHelper.GetMessageAsync(this, Discord, id, options).ConfigureAwait(false);
             return msg;
         }
+
+        /// <summary>
+        ///     Gets a nested collection of messages.
+        /// </summary>
+        /// <param name="limit">The number of messages you want to get.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit, CacheMode.AllowDownload, options);
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
@@ -89,9 +109,10 @@ namespace Discord.WebSocket
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options);
-
+        /// <inheritdoc />
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
             => ChannelHelper.DeleteMessageAsync(this, messageId, Discord, options);
+        /// <inheritdoc />
         public Task DeleteMessageAsync(IMessage message, RequestOptions options = null)
             => ChannelHelper.DeleteMessageAsync(this, message.Id, Discord, options);
 
@@ -108,6 +129,13 @@ namespace Discord.WebSocket
             => _messages?.Remove(id);
 
         //Users
+        /// <summary>
+        ///     Gets a user in this channel from the passed <paramref name="id"/>.
+        /// </summary>
+        /// <param name="id">The id of the user you want to get.</param>
+        /// <returns>
+        ///     The recipient, or the CurrentUSer otherwise; <c>null</c>
+        /// </returns>
         public new SocketUser GetUser(ulong id)
         {
             if (id == Recipient.Id)
@@ -164,8 +192,10 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendFileAsync(filePath, text, isTTS, embed, options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendFileAsync(stream, filename, text, isTTS, embed, options).ConfigureAwait(false);
         /// <inheritdoc />

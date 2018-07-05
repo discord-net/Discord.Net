@@ -141,6 +141,14 @@ namespace Discord.WebSocket
             await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, role, perms, options).ConfigureAwait(false);
             _overwrites = _overwrites.Add(new Overwrite(role.Id, PermissionTarget.Role, new OverwritePermissions(perms.AllowValue, perms.DenyValue)));
         }
+        /// <summary>
+        ///     Removes an overwrite permission for the specified <paramref name="user"/>.
+        /// </summary>
+        /// <param name="user">The user you want to remove the overwrite permission from.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
         public async Task RemovePermissionOverwriteAsync(IUser user, RequestOptions options = null)
         {
             await ChannelHelper.RemovePermissionOverwriteAsync(this, Discord, user, options).ConfigureAwait(false);
@@ -154,6 +162,14 @@ namespace Discord.WebSocket
                 }
             }
         }
+        /// <summary>
+        ///     Removes an overwrite permission for the specified <paramref name="role"/>.
+        /// </summary>
+        /// <param name="role">The role you want the overwrite permissions to be removed from.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
         public async Task RemovePermissionOverwriteAsync(IRole role, RequestOptions options = null)
         {
             await ChannelHelper.RemovePermissionOverwriteAsync(this, Discord, role, options).ConfigureAwait(false);
@@ -168,8 +184,26 @@ namespace Discord.WebSocket
             }
         }
 
+        /// <summary>
+        ///     Gets the invites for this channel.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
         public async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
             => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
+        /// <summary>
+        ///     Creates an invite for this channel.
+        /// </summary>
+        /// <param name="maxAge">The number of seconds that you want the invite to be valid for.</param>
+        /// <param name="maxUses">The number of times this invite can be used before it expires.</param>
+        /// <param name="isTemporary">Whether or not the invite grants temporary membership.</param>
+        /// <param name="isUnique">Whether to try reuse a similar invite or not.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/>.
+        /// </returns>
         public async Task<RestInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
             => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
 
