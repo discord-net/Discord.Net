@@ -303,6 +303,15 @@ namespace Discord.Rest
         //Invites
         public Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
             => GuildHelper.GetInvitesAsync(this, Discord, options);
+        /// <summary>
+        ///     Gets the vanity invite URL of this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A partial metadata of the vanity invite found within this guild.
+        /// </returns>
+        public Task<RestInviteMetadata> GetVanityInviteAsync(RequestOptions options = null)
+            => GuildHelper.GetVanityInviteAsync(this, Discord, options);
 
         //Roles
         public RestRole GetRole(ulong id)
@@ -496,6 +505,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IInviteMetadata>> IGuild.GetInvitesAsync(RequestOptions options)
             => await GetInvitesAsync(options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IInviteMetadata> IGuild.GetVanityInviteAsync(RequestOptions options)
+            => await GetVanityInviteAsync(options).ConfigureAwait(false);
 
         /// <inheritdoc />
         IRole IGuild.GetRole(ulong id)

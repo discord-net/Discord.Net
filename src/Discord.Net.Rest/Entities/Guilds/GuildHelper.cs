@@ -214,6 +214,12 @@ namespace Discord.Rest
             var models = await client.ApiClient.GetGuildInvitesAsync(guild.Id, options).ConfigureAwait(false);
             return models.Select(x => RestInviteMetadata.Create(client, guild, null, x)).ToImmutableArray();
         }
+        public static async Task<RestInviteMetadata> GetVanityInviteAsync(IGuild guild, BaseDiscordClient client,
+            RequestOptions options)
+        {
+            var model = await client.ApiClient.GetVanityInviteAsync(guild.Id, options).ConfigureAwait(false);
+            return RestInviteMetadata.Create(client, guild, null, model);
+        }
 
         //Roles
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>

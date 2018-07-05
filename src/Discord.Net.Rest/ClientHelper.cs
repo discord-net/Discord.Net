@@ -53,13 +53,9 @@ namespace Discord.Rest
         }
         
         public static async Task<RestInviteMetadata> GetInviteAsync(BaseDiscordClient client,
-            string inviteId, bool withCount, RequestOptions options)
+            string inviteId, RequestOptions options)
         {
-            var args = new GetInviteParams
-            {
-                WithCounts = withCount
-            };
-            var model = await client.ApiClient.GetInviteAsync(inviteId, args, options).ConfigureAwait(false);
+            var model = await client.ApiClient.GetInviteAsync(inviteId, options).ConfigureAwait(false);
             if (model != null)
                 return RestInviteMetadata.Create(client, null, null, model);
             return null;

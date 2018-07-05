@@ -52,13 +52,13 @@ namespace Discord
         /// <returns>
         ///     An <see cref="int"/> representing the number of times this invite has been used.
         /// </returns>
-        int Uses { get; }
+        int? Uses { get; }
         /// <summary>
         ///     Gets when this invite was created.
         /// </summary>
         /// <returns>
         ///     A <see cref="DateTimeOffset"/> representing the time of which the invite was first created.
         /// </returns>
-        DateTimeOffset CreatedAt { get; }
+        DateTimeOffset? CreatedAt { get; }
     }
 }

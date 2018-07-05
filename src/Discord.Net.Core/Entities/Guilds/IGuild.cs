@@ -455,6 +455,15 @@ namespace Discord
         ///     An awaitable <see cref="Task"/> containing a collection of invites found within this guild.
         /// </returns>
         Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null);
+        /// <summary>
+        ///     Gets the vanity invite URL of this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing the partial metadata of the vanity invite found within
+        ///     this guild.
+        /// </returns>
+        Task<IInviteMetadata> GetVanityInviteAsync(RequestOptions options = null);
 
         /// <summary>
         ///     Gets a role in this guild.
