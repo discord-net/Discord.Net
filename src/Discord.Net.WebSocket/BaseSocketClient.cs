@@ -63,12 +63,12 @@ namespace Discord.WebSocket
         /// </returns>
         public abstract Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null);
         /// <summary>
-        ///     Gets a user.
+        ///     Gets a generic user.
         /// </summary>
         /// <param name="id">The user snowflake ID.</param>
         /// <remarks>
         ///     This method gets the user present in the WebSocket cache with the given condition.
-        ///     <note>
+        ///     <note type="warning">
         ///         Sometimes a user may return <c>null</c> due to Discord not sending offline users in large
         ///         guilds (i.e. guild with 100+ members) actively. To download users on startup, consider enabling 
         ///         <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/>.
@@ -90,7 +90,7 @@ namespace Discord.WebSocket
         /// <param name="discriminator">The discriminator value of the user.</param>
         /// <remarks>
         ///     This method gets the user present in the WebSocket cache with the given condition.
-        ///     <note>
+        ///     <note type="warning">
         ///         Sometimes a user may return <c>null</c> due to Discord not sending offline users in large
         ///         guilds (i.e. guild with 100+ members) actively. To download users on startup, consider enabling 
         ///         <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/>.

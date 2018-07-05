@@ -582,11 +582,11 @@ namespace Discord.WebSocket
 
         //Users
         /// <summary>
-        ///     Gets the user with the provided ID.
+        ///     Gets a user from this guild.
         /// </summary>
-        /// <param name="id">The ID of the user.</param>
+        /// <param name="id">The snowflake identifier of the user (e.g. `168693960628371456`).</param>
         /// <returns>
-        ///     The user associated with the ID.
+        ///     A WebSocket-based guild user associated with the snowflake identifier.
         /// </returns>
         public SocketGuildUser GetUser(ulong id)
         {

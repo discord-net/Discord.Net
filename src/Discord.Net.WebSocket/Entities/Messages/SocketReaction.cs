@@ -18,8 +18,9 @@ namespace Discord.WebSocket
         ///     Gets the user who added the reaction if possible.
         /// </summary>
         /// <returns>
-        ///     A user object where possible. This value is not always returned.
+        ///     A user object where possible; a value is not always returned.
         /// </returns>
+        /// <seealso cref="Optional{T}"/>
         public Optional<IUser> User { get; }
         /// <summary>
         ///     Gets the ID of the message that has been reacted to.

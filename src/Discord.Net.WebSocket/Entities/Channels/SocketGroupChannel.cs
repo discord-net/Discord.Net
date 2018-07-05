@@ -138,15 +138,11 @@ namespace Discord.WebSocket
 
         //Users
         /// <summary>
-        ///     Gets the group user from the WebSocket cache.
+        ///     Gets a user from this group.
         /// </summary>
-        /// <remarks>
-        ///     This method does NOT attempt to fetch the user if they don't exist in the cache. To guarantee a return
-        ///     from an existing user that doesn't exist in cache, use <see cref="DiscordRestClient.GetUserAsync"/>.
-        /// </remarks>
         /// <param name="id">The snowflake identifier of the user.</param>
         /// <returns>
-        ///     The user in the group.
+        ///     A WebSocket-based group user associated with the snowflake identifier.
         /// </returns>
         public new SocketGroupUser GetUser(ulong id)
         {
