@@ -189,7 +189,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/>.
+        ///     An awaitable <see cref="Task"/> containing a <see cref="IReadOnlyCollection{RestInviteMetaData}"/>.
         /// </returns>
         public async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
             => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
@@ -202,7 +202,7 @@ namespace Discord.WebSocket
         /// <param name="isUnique">Whether to try reuse a similar invite or not.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/>.
+        ///     An awaitable <see cref="Task"/> containing a <see cref="RestInviteMetadata"/>.
         /// </returns>
         public async Task<RestInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
             => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
