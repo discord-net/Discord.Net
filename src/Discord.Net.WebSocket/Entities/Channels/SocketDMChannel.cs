@@ -57,10 +57,10 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets the message associated with the passed <paramref name="id"/>.
         /// </summary>
-        /// <param name="id">The id of the message you want to retrieve</param>
+        /// <param name="id">The snowflake identifier of the message you want to retrieve.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/>.
+        ///     An awaitable <see cref="Task"/> containing an <see cref="IMesage"/>.
         /// </returns>
         public async Task<IMessage> GetMessageAsync(ulong id, RequestOptions options = null)
         {
@@ -76,7 +76,7 @@ namespace Discord.WebSocket
         /// <param name="limit">The number of messages you want to get.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/>.
+        ///     An awaitable <see cref="Task"/> containing an <see cref="IReadOnlyCollection{IMessage}"/>.
         /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit, CacheMode.AllowDownload, options);
@@ -130,11 +130,11 @@ namespace Discord.WebSocket
 
         //Users
         /// <summary>
-        ///     Gets a user in this channel from the passed <paramref name="id"/>.
+        ///     Gets a user in this channel from the provided <paramref name="id"/>.
         /// </summary>
-        /// <param name="id">The id of the user you want to get.</param>
+        /// <param name="id">The ID of the user.</param>
         /// <returns>
-        ///     The recipient, or the CurrentUSer otherwise; <c>null</c>
+        ///     A <see cref="SocketUser"/> object that is a recipient of this channel; otherwise <c>null</c>.
         /// </returns>
         public new SocketUser GetUser(ulong id)
         {
