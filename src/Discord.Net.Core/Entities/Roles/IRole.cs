@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a generic role object.
+    ///     Represents a generic role object to be given to a guild user.
     /// </summary>
     public interface IRole : ISnowflakeEntity, IDeletable, IMentionable, IComparable<IRole>
     {
         /// <summary>
-        ///     Gets the guild owning this role.
+        ///     Gets the guild that owns this role.
         /// </summary>
         /// <returns>
         ///     A guild representing the parent guild of this role.

@@ -55,7 +55,7 @@ namespace Discord
         /// <param name="func">The properties to modify the channel with.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null);
-
+        
         /// <summary>
         ///     Creates a webhook in this text channel.
         /// </summary>
@@ -63,24 +63,25 @@ namespace Discord
         /// <param name="avatar">The avatar of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     The created webhook.
+        ///     An awaitable <see cref="Task"/> containing the created webhook.
         /// </returns>
         Task<IWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null);
         /// <summary>
-        ///     Gets the webhook in this text channel with the provided ID.
+        ///     Gets a webhook available in this text channel.
         /// </summary>
-        /// <param name="id">The ID of the webhook.</param>
+        /// <param name="id">The identifier of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A webhook associated with the <paramref name="id"/>, or <c>null</c> if not found.
+        ///     An awaitable <see cref="Task"/> containing a webhook associated with the identifier; <c>null</c> if not
+        ///     found.
         /// </returns>
         Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
         /// <summary>
-        ///     Gets the webhooks for this text channel.
+        ///     Gets the webhooks available in this text channel.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing a collection of webhooks.
+        ///     An awaitable <see cref="Task"/> containing a collection of found webhooks.
         /// </returns>
         Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions options = null);
     }

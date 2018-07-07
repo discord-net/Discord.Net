@@ -19,7 +19,7 @@ namespace Discord
         string[] RPCOrigins { get; }
         ulong Flags { get; }
         /// <summary>
-        /// Gets the icon URL of the application.
+        ///     Gets the icon URL of the application.
         /// </summary>
         string IconUrl  { get; }
 

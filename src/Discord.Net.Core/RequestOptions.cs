@@ -13,11 +13,23 @@ namespace Discord
         public static RequestOptions Default => new RequestOptions();
 
         /// <summary>
-        ///     Gets or set the max time, in milliseconds, to wait for this request to complete. If 
-        ///     <c>null</c>, a request will not time out. If a rate limit has been triggered for this
-        ///     request's bucket and will not be unpaused in time, this request will fail immediately.
+        ///     Gets or sets the maximum time to wait for for this request to complete.
         /// </summary>
+        /// <remarks>
+        ///     Gets or set the max time, in milliseconds, to wait for for this request to complete. If 
+        ///     <c>null</c>, a request will not time out. If a rate limit has been triggered for this request's bucket
+        ///     and will not be unpaused in time, this request will fail immediately.
+        /// </remarks>
+        /// <returns>
+        ///     A <see cref="int"/> in milliseconds for when the request times out.
+        /// </returns>
         public int? Timeout { get; set; }
+        /// <summary>
+        ///     Gets or sets the cancellation token for this request.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="CancellationToken"/> for this request.
+        /// </returns>
         public CancellationToken CancelToken { get; set; } = CancellationToken.None;
         /// <summary>
         ///     Gets or sets the retry behavior when the request fails.

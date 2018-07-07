@@ -4,29 +4,41 @@ using System.Text;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a message used for logging purposes.
+    ///     Provides a message object used for logging purposes.
     /// </summary>
     public struct LogMessage
     {
         /// <summary>
-        ///     Gets the severity of the log message.
+        ///     Gets the severity of the log entry.
         /// </summary>
+        /// <returns>
+        ///     A <see cref="LogSeverity"/> enum to indicate the severeness of the incident or event.
+        /// </returns>
         public LogSeverity Severity { get; }
         /// <summary>
-        ///     Gets the source of the log message.
+        ///     Gets the source of the log entry.
         /// </summary>
+        /// <returns>
+        ///     A string representing the source of the log entry.
+        /// </returns>
         public string Source { get; }
         /// <summary>
-        ///     Gets the message of the log message.
+        ///     Gets the message of this log entry.
         /// </summary>
+        /// <returns>
+        ///     A string containing the message of this log entry.
+        /// </returns>
         public string Message { get; }
         /// <summary>
-        ///     Gets the exception of the log message.
+        ///     Gets the exception of this log entry.
         /// </summary>
+        /// <returns>
+        ///     An <see cref="Discord.LogMessage.Exception" /> object associated with an incident; otherwise <c>null</c>.
+        /// </returns>
         public Exception Exception { get; }
 
         /// <summary>
-        ///     Initializes a new <see cref="LogMessage" /> struct with the severity, source, message of the event, and
+        ///     Initializes a new <see cref="LogMessage"/> struct with the severity, source, message of the event, and
         ///     optionally, an exception.
         /// </summary>
         /// <param name="severity">The severity of the event.</param>

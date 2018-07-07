@@ -415,8 +415,26 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<IReadOnlyCollection<RestBan>> GetBansAsync(RequestOptions options = null)
             => GuildHelper.GetBansAsync(this, Discord, options);
+        /// <summary>
+        ///     Gets a ban object for a banned user.
+        /// </summary>
+        /// <param name="user">The banned user.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing a REST-based ban object, which contains the user information
+        ///     and the reason for the ban; <c>null</c> if the ban entry cannot be found.
+        /// </returns>
         public Task<RestBan> GetBanAsync(IUser user, RequestOptions options = null)
             => GuildHelper.GetBanAsync(this, Discord, user.Id, options);
+        /// <summary>
+        ///     Gets a ban object for a banned user.
+        /// </summary>
+        /// <param name="userId">The snowflake identifier for the banned user.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing a REST-based ban object, which contains the user information
+        ///     and the reason for the ban; <c>null</c> if the ban entry cannot be found.
+        /// </returns>
         public Task<RestBan> GetBanAsync(ulong userId, RequestOptions options = null)
             => GuildHelper.GetBanAsync(this, Discord, userId, options);
 
@@ -895,6 +913,9 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets the name of the guild.
         /// </summary>
+        /// <returns>
+        ///     A string that resolves to the <see cref="Discord.WebSocket.SocketGuild.Name" /> of this guild.
+        /// </returns>
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
         internal SocketGuild Clone() => MemberwiseClone() as SocketGuild;

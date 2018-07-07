@@ -53,18 +53,20 @@ namespace Discord
         ///     <see cref="Discord.EmbedBuilder.ImageUrl"/>.
         /// </remarks>
         /// <returns>
-        ///     An awaitable Task containing the message sent to the channel.
+        ///     An awaitable <see cref="Task"/> containing the message sent to the channel.
         /// </returns>
         Task<IUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
 
         /// <summary>
-        ///     Gets a message from this message channel with the given id, or <c>null</c> if not found.
+        ///     Gets a message from this message channel.
         /// </summary>
         /// <param name="id">The ID of the message.</param>
-        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from
+        /// cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     The message gotten from either the cache or the download, or <c>null</c> if none is found.
+        ///     An awaitable <see cref="Task"/> containing the message gotten from either the cache or the download; 
+        ///     <c>null</c> if none is found or if the message fails to be retrieved.
         /// </returns>
         Task<IMessage> GetMessageAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 
@@ -94,7 +96,6 @@ namespace Discord
         /// </returns>
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, 
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
-
         /// <summary>
         ///     Gets a collection of messages in this channel.
         /// </summary>

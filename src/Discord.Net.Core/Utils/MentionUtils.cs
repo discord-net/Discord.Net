@@ -5,7 +5,7 @@ using System.Text;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a helper class for mention-related parsing.
+    ///     Provides a series of helper methods for parsing mentions.
     /// </summary>
     public static class MentionUtils
     {
