@@ -77,7 +77,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets the message associated with the passed <paramref name="id"/>.
         /// </summary>
-        /// <param name="id">The id of the message you want to retrieve</param>
+        /// <param name="id">The snowflake identifier of the message you want to retrieve</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     An awaitable <see cref="Task"/>.

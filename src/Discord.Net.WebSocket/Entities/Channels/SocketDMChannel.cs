@@ -132,7 +132,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets a user in this channel from the provided <paramref name="id"/>.
         /// </summary>
-        /// <param name="id">The ID of the user.</param>
+        /// <param name="id">The snowflake identifier of the user.</param>
         /// <returns>
         ///     A <see cref="SocketUser"/> object that is a recipient of this channel; otherwise <c>null</c>.
         /// </returns>
