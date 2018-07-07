@@ -96,7 +96,7 @@ namespace Discord.WebSocket
         /// <param name="limit">The number of messages you want to get.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/>.
+        ///     An awaitable <see cref="Task"/> containing an <see cref="IReadOnlyCollection{IMessage}"/>.
         /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit, CacheMode.AllowDownload, options);
