@@ -189,7 +189,9 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing a <see cref="IReadOnlyCollection{RestInviteMetaData}"/>.
+        ///     An awaitable <see cref="Task"/> containing an <see cref="IReadOnlyCollection{RestInviteMetaData}"/>.
+        ///     <see cref="RestInviteMetadata"/> contains information such as, the number of times the invite has
+        ///     been used, who created the invite, and when the invite was created.
         /// </returns>
         public async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
             => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
