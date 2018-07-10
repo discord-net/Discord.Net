@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    ///     Properties that are used to reorder an <see cref="IGuildChannel"/>.
+    ///     Provides properties that are used to reorder an <see cref="IGuildChannel"/>.
     /// </summary>
     public class ReorderChannelProperties
     {
@@ -20,7 +20,7 @@ namespace Discord
         /// </returns>
         public int Position { get; }
 
-        /// <summary> Creates a <see cref="ReorderChannelProperties"/> used to reorder a channel. </summary>
+        /// <summary> Initializes a new instance of the <see cref="ReorderChannelProperties"/> class used to reorder a channel. </summary>
         /// <param name="id"> Sets the ID of the channel to apply this position to. </param>
         /// <param name="position"> Sets the new zero-based position of this channel. </param>
         public ReorderChannelProperties(ulong id, int position)

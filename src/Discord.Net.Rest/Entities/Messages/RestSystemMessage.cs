@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Model = Discord.API.Message;
 
 namespace Discord.Rest
@@ -6,6 +6,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestSystemMessage : RestMessage, ISystemMessage
     {
+        /// <inheritdoc />
         public MessageType Type { get; private set; }
 
         internal RestSystemMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author)

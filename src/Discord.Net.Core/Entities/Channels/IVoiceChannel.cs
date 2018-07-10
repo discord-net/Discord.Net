@@ -9,13 +9,20 @@ namespace Discord
     public interface IVoiceChannel : INestedChannel, IAudioChannel
     {
         /// <summary>
-        ///     Gets the bitrate, in bits per second, clients in this voice channel are requested to use.
+        ///     Gets the bitrate that the clients in this voice channel are requested to use.
         /// </summary>
+        /// <returns>
+        ///     An <see cref="int"/> representing the bitrate (bps) that this voice channel defines and requests the
+        ///     client(s) to use.
+        /// </returns>
         int Bitrate { get; }
         /// <summary>
-        ///     Gets the max amount of users allowed to be connected to this channel at one time, or
-        ///     <c>null</c> if none is set.
+        ///     Gets the max number of users allowed to be connected to this channel at once.
         /// </summary>
+        /// <returns>
+        ///     An <see cref="int"/> representing the maxmimum number of users that are allowed to be connected to this
+        ///     channel at once; <c>null</c> if a limit is not set.
+        /// </returns>
         int? UserLimit { get; }
 
         /// <summary>
@@ -23,6 +30,10 @@ namespace Discord
         /// </summary>
         /// <param name="func">The properties to modify the channel with.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        /// <seealso cref="VoiceChannelProperties"/>
         Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null);
     }
 }

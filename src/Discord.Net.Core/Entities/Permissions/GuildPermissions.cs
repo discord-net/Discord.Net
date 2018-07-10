@@ -148,7 +148,7 @@ namespace Discord
             RawValue = value;
         }
 
-        /// <summary> Creates a new <see cref="GuildPermissions"/> with the provided permissions. </summary>
+        /// <summary> Creates a new <see cref="GuildPermissions"/> structure with the provided permissions. </summary>
         public GuildPermissions(
             bool createInstantInvite = false,
             bool kickMembers = false,

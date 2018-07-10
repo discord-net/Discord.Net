@@ -17,14 +17,18 @@ namespace Discord
         /// <summary>
         ///     Gets whether this emote is animated.
         /// </summary>
+        /// <returns>
+        ///     A boolean that determines whether or not this emote is an animated one.
+        /// </returns>
         public bool Animated { get; }
-        /// <summary>
-        ///     Gets the date when this emote is created.
-        /// </summary>
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <summary>
         ///     Gets the image URL of this emote.
         /// </summary>
+        /// <returns>
+        ///     A string that points to the URL of this emote.
+        /// </returns>
         public string Url => CDN.GetEmojiUrl(Id, Animated);
 
         internal Emote(ulong id, string name, bool animated)
@@ -59,7 +63,7 @@ namespace Discord
         }
 
         /// <summary> Parses an <see cref="Emote"/> from its raw format. </summary>
-        /// <param name="text">The raw encoding of an emote; for example, &lt;:dab:277855270321782784&gt;.</param>
+        /// <param name="text">The raw encoding of an emote (e.g. <c>&lt;:dab:277855270321782784&gt;</c>).</param>
         /// <returns>An emote.</returns>
         /// <exception cref="ArgumentException">Invalid emote format.</exception>
         public static Emote Parse(string text)
@@ -99,6 +103,9 @@ namespace Discord
         /// <summary>
         ///     Returns the raw representation of the emote.
         /// </summary>
+        /// <returns>
+        ///     A string representing the raw presentation of the emote (e.g. <c>&lt;:thonkang:282745590985523200&gt;</c>).
+        /// </returns>
         public override string ToString() => $"<{(Animated ? "a" : "")}:{Name}:{Id}>";
     }
 }

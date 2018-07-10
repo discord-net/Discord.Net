@@ -13,12 +13,18 @@ namespace Discord
         /// </summary>
         string Email { get; }
         /// <summary>
-        ///     Returns <c>true</c> if this user's email has been verified.
+        ///     Indicates whether or not this user has their email verified.
         /// </summary>
+        /// <returns>
+        ///     <c>true</c> if this user's email has been verified; <c>false</c> if not.
+        /// </returns>
         bool IsVerified { get; }
         /// <summary>
-        ///     Returns <c>true</c> if this user has enabled MFA on their account.
+        ///     Indicates whether or not this user has MFA enabled on their account.
         /// </summary>
+        /// <returns>
+        ///     <c>true</c> if this user has enabled multi-factor authentication on their account; <c>false</c> if not.
+        /// </returns>
         bool IsMfaEnabled { get; }
 
         /// <summary>

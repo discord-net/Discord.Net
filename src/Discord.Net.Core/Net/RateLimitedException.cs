@@ -3,7 +3,7 @@ using System;
 namespace Discord.Net
 {
     /// <summary>
-    ///     Describes an exception that indicates the user is being rate limited by Discord.
+    ///     The exception that is thrown when the user is being rate limited by Discord.
     /// </summary>
     public class RateLimitedException : TimeoutException
     {

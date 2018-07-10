@@ -18,6 +18,7 @@ namespace Discord.Rest
         public int Bitrate { get; private set; }
         /// <inheritdoc />
         public int? UserLimit { get; private set; }
+        /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
 
         internal RestVoiceChannel(BaseDiscordClient discord, IGuild guild, ulong id)

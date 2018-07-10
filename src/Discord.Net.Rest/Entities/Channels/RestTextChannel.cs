@@ -16,14 +16,13 @@ namespace Discord.Rest
     {
         /// <inheritdoc />
         public string Topic { get; private set; }
+        /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
 
         /// <inheritdoc />
         public string Mention => MentionUtils.MentionChannel(Id);
-
-        private bool _nsfw;
         /// <inheritdoc />
-        public bool IsNsfw => _nsfw;
+        public bool IsNsfw { get; private set; }
 
         internal RestTextChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
@@ -40,7 +39,7 @@ namespace Discord.Rest
             base.Update(model);
             CategoryId = model.CategoryId;
             Topic = model.Topic.Value;
-            _nsfw = model.Nsfw.GetValueOrDefault();
+            IsNsfw = model.Nsfw.GetValueOrDefault();
         }
 
         /// <inheritdoc />
@@ -239,6 +238,7 @@ namespace Discord.Rest
         }
 
         // INestedChannel
+        /// <inheritdoc />
         async Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
         {
             if (CategoryId.HasValue && mode == CacheMode.AllowDownload)

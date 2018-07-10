@@ -10,16 +10,25 @@ namespace Discord
     public class GuildEmote : Emote
     {
         /// <summary>
-        ///     Gets whether this emoji is managed.
+        ///     Gets whether this emoji is managed by an integration.
         /// </summary>
+        /// <returns>
+        ///     A boolean that determines whether or not this emote is managed by a Twitch integration.
+        /// </returns>
         public bool IsManaged { get; }
         /// <summary>
         ///     Gets whether this emoji must be wrapped in colons.
         /// </summary>
+        /// <returns>
+        ///     A boolean that determines whether or not this emote requires the use of colons in chat to be used.
+        /// </returns>
         public bool RequireColons { get; }
         /// <summary>
-        ///     Gets the roles this emoji is whitelisted to.
+        ///     Gets the roles that are allowed to use this emoji.
         /// </summary>
+        /// <returns>
+        ///     A read-only list containing snowflake identifiers for roles that are allowed to use this emoji.
+        /// </returns>
         public IReadOnlyList<ulong> RoleIds { get; }
 
         internal GuildEmote(ulong id, string name, bool animated, bool isManaged, bool requireColons, IReadOnlyList<ulong> roleIds) : base(id, name, animated)
