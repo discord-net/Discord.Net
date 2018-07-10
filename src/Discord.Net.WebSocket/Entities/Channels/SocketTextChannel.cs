@@ -26,7 +26,7 @@ namespace Discord.WebSocket
         ///     Gets the Category this channel belongs to.
         /// </summary>
         /// <returns>
-        ///     An <see cref="ICategoryChannel"/> that this channel belongs to otherwise; <c>null</c>.
+        ///     An <see cref="ICategoryChannel"/> that this channel belongs to; otherwise <c>null</c>.
         /// </returns>
         public ICategoryChannel Category
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
@@ -77,10 +77,10 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets the message associated with the passed <paramref name="id"/>.
         /// </summary>
-        /// <param name="id">The snowflake identifier of the message you want to retrieve</param>
+        /// <param name="id">The snowflake identifier of the message you want to retrieve.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/>.
+        ///     An awaitable <see cref="Task"/> containing an <see cref="IMessage"/>.
         /// </returns>
         public async Task<IMessage> GetMessageAsync(ulong id, RequestOptions options = null)
         {
@@ -91,12 +91,13 @@ namespace Discord.WebSocket
         }
 
         /// <summary>
-        ///     Gets a nested collection of messages.
+        ///     Gets the last N messages from this message channel.
         /// </summary>
         /// <param name="limit">The number of messages you want to get.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing an <see cref="IReadOnlyCollection{IMessage}"/>.
+        ///     Paged collection of messages. Flattening the paginated response into a collection of messages with 
+        ///     <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> is required if you wish to access the messages.
         /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit, CacheMode.AllowDownload, options);
