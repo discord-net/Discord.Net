@@ -55,12 +55,12 @@ namespace Discord.WebSocket
         public SocketMessage GetCachedMessage(ulong id)
             => _messages?.Get(id);
         /// <summary>
-        ///     Gets the message associated with the passed <paramref name="id"/>.
+        ///     Gets the message associated with the given <paramref name="id"/>.
         /// </summary>
-        /// <param name="id">The snowflake identifier of the message you want to retrieve.</param>
+        /// <param name="id">TThe ID of the message.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing an <see cref="IMesage"/>.
+        ///     The message gotten from either the cache or the download, or <c>null</c> if none is found.
         /// </returns>
         public async Task<IMessage> GetMessageAsync(ulong id, RequestOptions options = null)
         {
@@ -71,12 +71,13 @@ namespace Discord.WebSocket
         }
 
         /// <summary>
-        ///     Gets a nested collection of messages.
+        ///     Gets the last N messages from this channel.
         /// </summary>
-        /// <param name="limit">The number of messages you want to get.</param>
+        /// <param name="limit">The number of messages to get.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing an <see cref="IReadOnlyCollection{IMessage}"/>.
+        ///     Paged collection of messages. Flattening the paginated response into a collection of messages with 
+        ///     <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> is required if you wish to access the messages.
         /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit, CacheMode.AllowDownload, options);
