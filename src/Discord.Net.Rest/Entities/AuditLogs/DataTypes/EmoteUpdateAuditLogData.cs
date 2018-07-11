@@ -31,7 +31,7 @@ namespace Discord.Rest
         ///     Gets the snowflake ID of the updated emoji.
         /// </summary>
         /// <returns>
-        ///     An <see cref="System.UInt64"/> representing the snowflake identifier of the updated emoji.
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the updated emoji.
         /// </returns>
         public ulong EmoteId { get; }
         /// <summary>

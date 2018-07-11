@@ -50,7 +50,7 @@ namespace Discord.Rest
         ///     Gets the snowflake ID of the created channel.
         /// </summary>
         /// <returns>
-        ///     An <see cref="ulong"/> representing the snowflake identifier for the created channel.
+        ///     A <see cref="ulong"/> representing the snowflake identifier for the created channel.
         /// </returns>
         public ulong ChannelId { get; }
         /// <summary>

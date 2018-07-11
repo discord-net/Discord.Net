@@ -38,7 +38,7 @@ namespace Discord.Rest
         ///     Gets the ID of the AFK voice channel for this guild.
         /// </summary>
         /// <returns>
-        ///     An <see cref="ulong"/> representing the snowflake identifier of the AFK voice channel; <c>null</c> if
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the AFK voice channel; <c>null</c> if
         ///     none is set.
         /// </returns>
         public ulong? AfkChannelId { get; }

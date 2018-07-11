@@ -29,7 +29,7 @@ namespace Discord.Rest
         ///     Gets the snowflake ID of the deleted emoji.
         /// </summary>
         /// <returns>
-        ///     An <see cref="System.UInt64"/> representing the snowflake identifier for the deleted emoji.
+        ///     A <see cref="System.UInt64"/> representing the snowflake identifier for the deleted emoji.
         /// </returns>
         public ulong EmoteId { get; }
         /// <summary>

@@ -28,7 +28,7 @@ namespace Discord.Rest
         ///     Gets the snowflake ID of the created emoji.
         /// </summary>
         /// <returns>
-        ///     An <see cref="System.UInt64"/> representing the snowflake identifier for the created emoji.
+        ///     A <see cref="System.UInt64"/> representing the snowflake identifier for the created emoji.
         /// </returns>
         public ulong EmoteId { get; }
         /// <summary>

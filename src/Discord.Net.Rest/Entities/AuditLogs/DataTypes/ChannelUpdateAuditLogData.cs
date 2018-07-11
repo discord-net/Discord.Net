@@ -45,10 +45,22 @@ namespace Discord.Rest
         ///     Gets the snowflake ID of the updated channel.
         /// </summary>
         /// <returns>
-        ///     An <see cref="ulong"/> representing the snowflake identifier for the updated channel.
+        ///     A <see cref="ulong"/> representing the snowflake identifier for the updated channel.
         /// </returns>
         public ulong ChannelId { get; }
+        /// <summary>
+        ///     Gets the channel information before the changes.
+        /// </summary>
+        /// <returns>
+        ///     An information object containing the original channel information before the changes were made.
+        /// </returns>
         public ChannelInfo Before { get; }
+        /// <summary>
+        ///     Gets the channel information after the changes.
+        /// </summary>
+        /// <returns>
+        ///     An information object containing the channel information after the changes were made.
+        /// </returns>
         public ChannelInfo After { get; }
     }
 }
