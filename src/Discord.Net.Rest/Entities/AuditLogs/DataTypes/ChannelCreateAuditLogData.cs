@@ -71,7 +71,8 @@ namespace Discord.Rest
         ///     Gets a collection of permission overwrites that was assigned to the created channel.
         /// </summary>
         /// <returns>
-        ///     A collection of permission <see cref="Overwrite"/>.
+        ///     A collection of permission <see cref="Overwrite"/>, containing the permission overwrites that were 
+        ///     assigned to the created channel.
         /// </returns>
         public IReadOnlyCollection<Overwrite> Overwrites { get; }
     }
