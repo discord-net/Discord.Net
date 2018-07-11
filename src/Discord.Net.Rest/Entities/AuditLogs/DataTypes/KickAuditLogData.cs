@@ -6,7 +6,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a piece of audit log data related to a kick.
+    ///     Contains audit log data related to a kick.
     /// </summary>
     public class KickAuditLogData : IAuditLogData
     {

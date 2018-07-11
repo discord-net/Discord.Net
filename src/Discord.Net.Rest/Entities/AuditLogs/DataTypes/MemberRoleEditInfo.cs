@@ -1,7 +1,7 @@
 namespace Discord.Rest
 {
     /// <summary>
-    ///     An information object representing a change in one of a member's roles.
+    ///     An information object representing a change in one of a guild member's roles.
     /// </summary>
     public struct MemberRoleEditInfo
     {

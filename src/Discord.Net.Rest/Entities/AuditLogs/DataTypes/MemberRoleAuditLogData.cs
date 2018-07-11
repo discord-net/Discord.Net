@@ -7,7 +7,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     A piece of audit log data related to a change in a guild member's roles.
+    ///     Contains audit log data related to a change in a guild member's roles.
     /// </summary>
     public class MemberRoleAuditLogData : IAuditLogData
     {
@@ -36,7 +36,7 @@ namespace Discord.Rest
         ///     Gets a collection of role changes that were performed on the member.
         /// </summary>
         /// <returns>
-        ///     A read-only collection of <see cref="MemberRoleEditInfo"/>.
+        ///     A read-only collection of <see cref="MemberRoleEditInfo"/>, containing the changes
         /// </returns>
         public IReadOnlyCollection<MemberRoleEditInfo> Roles { get; }
         /// <summary>

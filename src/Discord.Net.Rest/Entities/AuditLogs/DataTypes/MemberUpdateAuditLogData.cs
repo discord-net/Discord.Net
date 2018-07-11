@@ -5,6 +5,9 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains audit log data related to a change in a guild member.
+    /// </summary>
     public class MemberUpdateAuditLogData : IAuditLogData
     {
         private MemberUpdateAuditLogData(IUser target, string newNick, string oldNick)
