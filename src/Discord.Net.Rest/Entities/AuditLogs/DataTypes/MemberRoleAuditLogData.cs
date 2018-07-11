@@ -37,7 +37,7 @@ namespace Discord.Rest
         /// </summary>
         /// <returns>
         ///     A read-only collection of <see cref="MemberRoleEditInfo"/>, containing the roles that were changed on
-        ///     this user.
+        ///     the member.
         /// </returns>
         public IReadOnlyCollection<MemberRoleEditInfo> Roles { get; }
         /// <summary>
