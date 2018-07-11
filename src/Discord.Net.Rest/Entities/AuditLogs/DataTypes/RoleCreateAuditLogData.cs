@@ -5,6 +5,9 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains audit log data related to a role creation.
+    /// </summary>
     public class RoleCreateAuditLogData : IAuditLogData
     {
         private RoleCreateAuditLogData(ulong id, RoleEditInfo props)
@@ -41,7 +44,19 @@ namespace Discord.Rest
                 new RoleEditInfo(color, mentionable, hoist, name, permissions));
         }
 
+        /// <summary>
+        ///     Gets the ID of the role that has been created.
+        /// </summary>
+        /// <return>
+        ///     A <see cref="ulong"/> representing the snowflake identifer to the role that has been created.
+        /// </return>
         public ulong RoleId { get; }
+        /// <summary>
+        ///     Gets the role information that has been created.
+        /// </summary>
+        /// <return>
+        ///     An information object representing the properties of the role that has been created.
+        /// </return>
         public RoleEditInfo Properties { get; }
     }
 }
