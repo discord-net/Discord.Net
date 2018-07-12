@@ -5,6 +5,9 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains audit log data relating to a role deletion.
+    /// </summary>
     public class RoleDeleteAuditLogData : IAuditLogData
     {
         private RoleDeleteAuditLogData(ulong id, RoleEditInfo props)
@@ -41,7 +44,19 @@ namespace Discord.Rest
                 new RoleEditInfo(color, mentionable, hoist, name, permissions));
         }
 
+        /// <summary>
+        ///     Gets the ID of the role that has been deleted.
+        /// </summary>
+        /// <return>
+        ///     A <see cref="ulong"/> representing the snowflake identifer to the role that has been deleted.
+        /// </return>
         public ulong RoleId { get; }
+        /// <summary>
+        ///     Gets the role information that has been deleted.
+        /// </summary>
+        /// <return>
+        ///     An information object representing the properties of the role that has been deleted.
+        /// </return>
         public RoleEditInfo Properties { get; }
     }
 }
