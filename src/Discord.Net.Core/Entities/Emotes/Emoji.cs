@@ -12,10 +12,13 @@ namespace Discord
         /// <summary>
         ///     Gets the Unicode representation of this emote.
         /// </summary>
+        /// <returns>
+        ///     A string that resolves to <see cref="Emoji.Name"/>.
+        /// </returns>
         public override string ToString() => Name;
 
         /// <summary>
-        ///     Creates a Unicode emoji.
+        ///     Initializes a new <see cref="Emoji"/> class with the provided Unicode.
         /// </summary>
         /// <param name="unicode">The pure UTF-8 encoding of an emoji.</param>
         public Emoji(string unicode)

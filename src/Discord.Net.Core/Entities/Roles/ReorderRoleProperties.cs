@@ -16,7 +16,7 @@ namespace Discord
         ///     Gets the new zero-based position of the role.
         /// </summary>
         /// <returns>
-        ///     A <see cref="int"/> representing the new zero-based position of the role.
+        ///     An <see cref="int"/> representing the new zero-based position of the role.
         /// </returns>
         public int Position { get; }
 

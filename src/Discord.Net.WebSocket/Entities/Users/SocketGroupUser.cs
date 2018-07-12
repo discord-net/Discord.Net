@@ -6,7 +6,14 @@ namespace Discord.WebSocket
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class SocketGroupUser : SocketUser, IGroupUser
     {
+        /// <summary>
+        ///     Gets the group channel of the user.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="SocketGroupChannel" /> representing the channel of which the user belongs to.
+        /// </returns>
         public SocketGroupChannel Channel { get; }
+        /// <inheritdoc />
         internal override SocketGlobalUser GlobalUser { get; }
 
         /// <inheritdoc />
@@ -17,6 +24,7 @@ namespace Discord.WebSocket
         public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
         /// <inheritdoc />
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
+        /// <inheritdoc />
         internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
 
         /// <inheritdoc />

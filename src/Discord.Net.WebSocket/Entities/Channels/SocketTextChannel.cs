@@ -23,10 +23,10 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
         /// <summary>
-        ///     Gets the Category this channel belongs to.
+        ///     Gets the parent (category) of this channel in the guild's channel list.
         /// </summary>
         /// <returns>
-        ///     An <see cref="ICategoryChannel"/> that this channel belongs to; otherwise <c>null</c>.
+        ///     An <see cref="ICategoryChannel"/> representing the parent of this channel; <c>null</c> if none is set.
         /// </returns>
         public ICategoryChannel Category
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
@@ -73,14 +73,14 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public SocketMessage GetCachedMessage(ulong id)
             => _messages?.Get(id);
-
         /// <summary>
-        ///     Gets the message associated with the passed <paramref name="id"/>.
+        ///     Gets a message from this message channel.
         /// </summary>
-        /// <param name="id">The snowflake identifier of the message you want to retrieve.</param>
+        /// <param name="id">The ID of the message.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing an <see cref="IMessage"/>.
+        ///     An awaitable <see cref="Task"/> containing the downloaded message; <c>null</c> if none is found or if
+        ///     the message fails to be retrieved.
         /// </returns>
         public async Task<IMessage> GetMessageAsync(ulong id, RequestOptions options = null)
         {
@@ -89,11 +89,10 @@ namespace Discord.WebSocket
                 msg = await ChannelHelper.GetMessageAsync(this, Discord, id, options).ConfigureAwait(false);
             return msg;
         }
-
         /// <summary>
         ///     Gets the last N messages from this message channel.
         /// </summary>
-        /// <param name="limit">The number of messages you want to get.</param>
+        /// <param name="limit">The numbers of message to be gotten from.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     Paged collection of messages. Flattening the paginated response into a collection of messages with 
@@ -101,8 +100,30 @@ namespace Discord.WebSocket
         /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit, CacheMode.AllowDownload, options);
+        /// <summary>
+        ///     Gets a collection of messages in this channel.
+        /// </summary>
+        /// <param name="fromMessageId">The ID of the starting message to get the messages from.</param>
+        /// <param name="dir">The direction of the messages to be gotten from.</param>
+        /// <param name="limit">The numbers of message to be gotten from.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     Paged collection of messages. Flattening the paginated response into a collection of messages with 
+        ///     <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> is required if you wish to access the messages.
+        /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessageId, dir, limit, CacheMode.AllowDownload, options);
+        /// <summary>
+        ///     Gets a collection of messages in this channel.
+        /// </summary>
+        /// <param name="fromMessage">The starting message to get the messages from.</param>
+        /// <param name="dir">The direction of the messages to be gotten from.</param>
+        /// <param name="limit">The numbers of message to be gotten from.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     Paged collection of messages. Flattening the paginated response into a collection of messages with 
+        ///     <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> is required if you wish to access the messages.
+        /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessage.Id, dir, limit, CacheMode.AllowDownload, options);
         /// <inheritdoc />
@@ -119,13 +140,16 @@ namespace Discord.WebSocket
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
 
         /// <inheritdoc />
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
 
         /// <inheritdoc />
         public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, options);
+
         /// <inheritdoc />
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options);
 
@@ -135,6 +159,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null)
             => ChannelHelper.DeleteMessagesAsync(this, Discord, messageIds, options);
+
         /// <inheritdoc />
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
             => ChannelHelper.DeleteMessageAsync(this, messageId, Discord, options);
@@ -177,7 +202,7 @@ namespace Discord.WebSocket
         /// <param name="avatar">The avatar of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     The created webhook.
+        ///     An awaitable <see cref="Task"/> containing the created webhook.
         /// </returns>
         public Task<RestWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null)
             => ChannelHelper.CreateWebhookAsync(this, Discord, name, avatar, options);
@@ -187,7 +212,8 @@ namespace Discord.WebSocket
         /// <param name="id">The identifier of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> webhook associated with the identifier, or <c>null</c> if not found.
+        ///     An awaitable <see cref="Task"/> containing a webhook associated with the identifier; <c>null</c> if not
+        ///     found.
         /// </returns>
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetWebhookAsync(this, Discord, id, options);
@@ -196,7 +222,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> collection of webhooks.
+        ///     An awaitable <see cref="Task"/> containing a collection of found webhooks.
         /// </returns>
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => ChannelHelper.GetWebhooksAsync(this, Discord, options);
@@ -256,6 +282,7 @@ namespace Discord.WebSocket
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
 
         // INestedChannel
+        /// <inheritdoc />
         Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult(Category);
     }

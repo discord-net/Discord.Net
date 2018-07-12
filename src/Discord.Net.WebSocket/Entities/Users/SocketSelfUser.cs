@@ -6,6 +6,9 @@ using Model = Discord.API.User;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents the logged-in WebSocker-based user.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketSelfUser : SocketUser, ISelfUser
     {

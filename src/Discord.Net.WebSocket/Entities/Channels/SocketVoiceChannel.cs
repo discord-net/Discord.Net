@@ -20,7 +20,14 @@ namespace Discord.WebSocket
         public int Bitrate { get; private set; }
         /// <inheritdoc />
         public int? UserLimit { get; private set; }
+        /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
+        /// <summary>
+        ///     Gets the parent (category) of this channel in the guild's channel list.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="ICategoryChannel"/> representing the parent of this channel; <c>null</c> if none is set.
+        /// </returns>
         public ICategoryChannel Category
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
 
@@ -56,6 +63,12 @@ namespace Discord.WebSocket
             return await Guild.ConnectAudioAsync(Id, selfDeaf, selfMute, external).ConfigureAwait(false);
         }
 
+        /// <summary>
+        ///     Disconnects from this voice channel if the client is in an active voice connection.
+        /// </summary>
+        /// <returns>
+        ///     An awaitable <see cref="Task" /> .
+        /// </returns>
         public async Task DisconnectAsync()
             => await Guild.DisconnectAudioAsync();
 
@@ -80,6 +93,7 @@ namespace Discord.WebSocket
             => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
 
         // INestedChannel
+        /// <inheritdoc />
         Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult(Category);
     }

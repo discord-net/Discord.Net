@@ -10,8 +10,11 @@ namespace Discord
         ///     Gets or sets the channel to this name.
         /// </summary>
         /// <remarks>
-        ///     When modifying an <see cref="ITextChannel" />, the <see cref="Name" />
-        ///     MUST be alphanumeric with dashes. It must match the following RegEx: [a-z0-9-_]{2,100}
+        ///     This property defines the new name for this channel.
+        ///     <note type="warning">
+        ///         When modifying an <see cref="ITextChannel"/>, the <see cref="Name"/> must be alphanumeric with
+        ///         dashes. It must match the RegEx <c>[a-z0-9-_]{2,100}</c>.
+        ///     </note>
         /// </remarks>
         public Optional<string> Name { get; set; }
         /// <summary>

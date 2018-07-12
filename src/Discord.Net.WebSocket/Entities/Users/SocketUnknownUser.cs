@@ -4,17 +4,30 @@ using Model = Discord.API.User;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a WebSocket-based user that is yet to be recognized by the client.
+    /// </summary>
+    /// <remarks>
+    ///     A user may not be recognized due to the user missing from the cache or failed to be recognized properly.
+    /// </remarks>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketUnknownUser : SocketUser
     {
+        /// <inheritdoc />
         public override string Username { get; internal set; }
+        /// <inheritdoc />
         public override ushort DiscriminatorValue { get; internal set; }
+        /// <inheritdoc />
         public override string AvatarId { get; internal set; }
+        /// <inheritdoc />
         public override bool IsBot { get; internal set; }
-
+        
+        /// <inheritdoc />
         public override bool IsWebhook => false;
 
         internal override SocketPresence Presence { get { return new SocketPresence(UserStatus.Offline, null); } set { } }
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">This field is not supported for an unknown user.</exception>
         internal override SocketGlobalUser GlobalUser =>
             throw new NotSupportedException();
 

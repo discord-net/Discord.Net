@@ -553,7 +553,7 @@ namespace Discord.Rest
         Task IGuild.DownloadUsersAsync() =>
             throw new NotSupportedException();
 
-        async Task<IReadOnlyCollection<IAuditLogEntry>> IGuild.GetAuditLogAsync(int limit, CacheMode cacheMode, RequestOptions options)
+        async Task<IReadOnlyCollection<IAuditLogEntry>> IGuild.GetAuditLogsAsync(int limit, CacheMode cacheMode, RequestOptions options)
         {
             if (cacheMode == CacheMode.AllowDownload)
                 return (await GetAuditLogsAsync(limit, options).FlattenAsync().ConfigureAwait(false)).ToImmutableArray();

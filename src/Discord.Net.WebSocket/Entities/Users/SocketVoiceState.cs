@@ -4,9 +4,15 @@ using Model = Discord.API.VoiceState;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a WebSocket user's voice connection status.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct SocketVoiceState : IVoiceState
     {
+        /// <summary>
+        ///     Initializes a default <see cref="SocketVoiceState"/> with everything set to <c>null</c> or <c>false</c>.
+        /// </summary>
         public static readonly SocketVoiceState Default = new SocketVoiceState(null, null, false, false, false, false, false);
 
         [Flags]
@@ -64,15 +70,16 @@ namespace Discord.WebSocket
         }
 
         /// <summary>
-        ///     Gets the name of the voice channel.
+        ///     Gets the name of this voice channel.
         /// </summary>
         /// <returns>
-        ///     The name of the voice channel.
+        ///     A string that resolves to name of this voice channel; otherwise "Unknown".
         /// </returns>
         public override string ToString() => VoiceChannel?.Name ?? "Unknown";
         private string DebuggerDisplay => $"{VoiceChannel?.Name ?? "Unknown"} ({_voiceStates})";
         internal SocketVoiceState Clone() => this;
 
+        /// <inheritdoc />
         IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;
     }
 }

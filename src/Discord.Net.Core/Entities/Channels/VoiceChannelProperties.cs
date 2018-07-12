@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    ///     Properties that are used to modify an <see cref="IVoiceChannel" /> with the specified changes.
+    ///     Provides properties that are used to modify an <see cref="IVoiceChannel" /> with the specified changes.
     /// </summary>
     public class VoiceChannelProperties : GuildChannelProperties
     {

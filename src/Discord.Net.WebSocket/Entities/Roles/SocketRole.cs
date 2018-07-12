@@ -8,9 +8,18 @@ using Model = Discord.API.Role;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a WebSocket-based role to be given to a guild user.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketRole : SocketEntity<ulong>, IRole
     {
+        /// <summary>
+        ///     Gets the guild that owns this role.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="SocketGuild"/> representing the parent guild of this role.
+        /// </returns>
         public SocketGuild Guild { get; }
 
         /// <inheritdoc />
@@ -30,6 +39,12 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
+        /// <summary>
+        ///     Returns a value that determines if the role is an @everyone role.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if the role is @everyone; otherwise <c>false</c>.
+        /// </returns>
         public bool IsEveryone => Id == Guild.Id;
         /// <inheritdoc />
         public string Mention => IsEveryone ? "@everyone" : MentionUtils.MentionRole(Id);
@@ -65,6 +80,12 @@ namespace Discord.WebSocket
         public Task DeleteAsync(RequestOptions options = null)
             => RoleHelper.DeleteAsync(this, Discord, options);
 
+        /// <summary>
+        ///     Gets the name of the role.
+        /// </summary>
+        /// <returns>
+        ///     A string that resolves to <see cref="Discord.WebSocket.SocketRole.Name" />.
+        /// </returns>
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
         internal SocketRole Clone() => MemberwiseClone() as SocketRole;

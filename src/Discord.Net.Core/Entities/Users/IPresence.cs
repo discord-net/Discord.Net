@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    ///     Represents a Discord user's presence status.
+    ///     Represents the user's presence status. This may include their online status and their activity.
     /// </summary>
     public interface IPresence
     {

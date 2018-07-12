@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    ///     Properties that are used to modify an <see cref="IGuild" /> with the specified changes.
+    ///     Provides properties that are used to modify an <see cref="IGuild" /> with the specified changes.
     /// </summary>
     /// <see cref="IGuild.ModifyAsync"/>
     public class GuildProperties

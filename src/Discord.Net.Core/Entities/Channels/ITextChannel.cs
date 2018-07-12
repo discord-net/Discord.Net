@@ -14,7 +14,7 @@ namespace Discord
         ///     Determines whether the channel is NSFW.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if the channel has the NSFW flag enabled; otherwise, <c>false</c>.
+        ///     <c>true</c> if the channel has the NSFW flag enabled; otherwise <c>false</c>.
         /// </returns>
         bool IsNsfw { get; }
 
@@ -22,7 +22,7 @@ namespace Discord
         ///     Gets the current topic for this text channel.
         /// </summary>
         /// <returns>
-        ///     The topic set in the channel, or <c>null</c> if none is set.
+        ///     A string representing the topic set in the channel; <c>null</c> if none is set.
         /// </returns>
         string Topic { get; }
 
@@ -30,32 +30,44 @@ namespace Discord
         ///     Bulk-deletes multiple messages.
         /// </summary>
         /// <remarks>
+        ///     This method attempts to remove the messages specified in bulk.
         ///     <note type="important">
-        ///     This method can only remove messages that are posted within 14 days!
+        ///         Due to the limitation set by Discord, this method can only remove messages that are posted within 14 days!
         ///     </note>
         /// </remarks>
         /// <param name="messages">The messages to be bulk-deleted.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous bulk-removal operation.
+        /// </returns>
         Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null);
         /// <summary>
         ///     Bulk-deletes multiple messages.
         /// </summary>
         /// <remarks>
+        ///     This method attempts to remove the messages specified in bulk.
         ///     <note type="important">
-        ///     This method can only remove messages that are posted within 14 days!
+        ///         Due to the limitation set by Discord, this method can only remove messages that are posted within 14 days!
         ///     </note>
         /// </remarks>
-        /// <param name="messageIds">The IDs of the messages to be bulk-deleted.</param>
+        /// <param name="messageIds">The snowflake identifier of the messages to be bulk-deleted.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous bulk-removal operation.
+        /// </returns>
         Task DeleteMessagesAsync(IEnumerable<ulong> messageIds, RequestOptions options = null);
 
         /// <summary>
         ///     Modifies this text channel.
         /// </summary>
-        /// <param name="func">The properties to modify the channel with.</param>
+        /// <param name="func">The delegate containing the properties to modify the channel with.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        /// <seealso cref="TextChannelProperties"/>
         Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null);
-
+        
         /// <summary>
         ///     Creates a webhook in this text channel.
         /// </summary>
@@ -63,24 +75,27 @@ namespace Discord
         /// <param name="avatar">The avatar of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     The created webhook.
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     webhook.
         /// </returns>
         Task<IWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null);
         /// <summary>
-        ///     Gets the webhook in this text channel with the provided ID.
+        ///     Gets a webhook available in this text channel.
         /// </summary>
-        /// <param name="id">The ID of the webhook.</param>
+        /// <param name="id">The identifier of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A webhook associated with the <paramref name="id"/>, or <c>null</c> if not found.
+        ///     A task that represents the asynchronous get operation. The task result contains a webhook associated
+        ///     with the identifier; <c>null</c> if the webhook is not found.
         /// </returns>
         Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
         /// <summary>
-        ///     Gets the webhooks for this text channel.
+        ///     Gets the webhooks available in this text channel.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing a collection of webhooks.
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of webhooks that is available in this channel.
         /// </returns>
         Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions options = null);
     }

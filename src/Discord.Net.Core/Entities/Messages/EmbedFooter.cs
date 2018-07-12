@@ -6,12 +6,27 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct EmbedFooter
     {
-        /// <summary> Gets the text of the footer.</summary>
-        public string Text { get; internal set; }
-        /// <summary> Gets the icon URL of the footer.</summary>
-        public string IconUrl { get; internal set; }
-        /// <summary> Gets the proxified icon URL of the footer.</summary>
-        public string ProxyUrl { get; internal set; }
+        /// <summary>
+        ///     Gets the text of the footer field.
+        /// </summary>
+        /// <returns>
+        ///     A string containing the text of the footer field.
+        /// </returns>
+        public string Text { get; }
+        /// <summary>
+        ///     Gets the URL of the footer icon.
+        /// </summary>
+        /// <returns>
+        ///     A string containing the URL of the footer icon.
+        /// </returns>
+        public string IconUrl { get; }
+        /// <summary>
+        ///     Gets the proxied URL of the footer icon link.
+        /// </summary>
+        /// <returns>
+        ///     A string containing the proxied URL of the footer icon.
+        /// </returns>
+        public string ProxyUrl { get; }
 
         internal EmbedFooter(string text, string iconUrl, string proxyUrl)
         {
@@ -21,6 +36,12 @@ namespace Discord
         }
 
         private string DebuggerDisplay => $"{Text} ({IconUrl})";
+        /// <summary>
+        ///     Gets the text of the footer field.
+        /// </summary>
+        /// <returns>
+        ///     A string that resolves to <see cref="Discord.EmbedFooter.Text"/>.
+        /// </returns>
         public override string ToString() => Text;
     }
 }

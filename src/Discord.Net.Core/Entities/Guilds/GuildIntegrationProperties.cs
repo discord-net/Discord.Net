@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    ///     Properties used to modify an <see cref="IGuildIntegration" /> with the specified changes.
+    ///     Provides properties used to modify an <see cref="IGuildIntegration" /> with the specified changes.
     /// </summary>
     public class GuildIntegrationProperties
     {

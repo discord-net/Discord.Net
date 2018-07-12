@@ -11,7 +11,7 @@ namespace Discord
         ///     Gets the users that can access this channel.
         /// </summary>
         /// <returns>
-        ///     A collection of users that can access this channel.
+        ///     A read-only collection of users that can access this channel.
         /// </returns>
         IReadOnlyCollection<IUser> Recipients { get; }
     }
