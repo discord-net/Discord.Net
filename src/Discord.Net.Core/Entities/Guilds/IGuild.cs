@@ -590,7 +590,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of the requested audit log entries.
         /// </returns>
-        Task<IReadOnlyCollection<IAuditLogEntry>> GetAuditLogAsync(int limit = DiscordConfig.MaxAuditLogEntriesPerBatch,
+        Task<IReadOnlyCollection<IAuditLogEntry>> GetAuditLogsAsync(int limit = DiscordConfig.MaxAuditLogEntriesPerBatch,
             CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 
         /// <summary>

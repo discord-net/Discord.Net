@@ -56,11 +56,15 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     This property retrieves the number of members returned by Discord.
         ///     <note type="tip">
+        ///     <para>
         ///         Due to how this property is returned by Discord instead of relying on the WebSocket cache, the
-        ///         number here is the most accurate in terms of counting the number of users within this guild. Use
-        ///         this instead of enumerating the count of the <see cref="Discord.WebSocket.SocketGuild.Users" />
-        ///         collection, as you may see discrepancy between the count of
-        ///         <see cref="Discord.WebSocket.SocketGuild.Users" />collection and this property.
+        ///         number here is the most accurate in terms of counting the number of users within this guild.
+        ///     </para>
+        ///     <para>
+        ///         Use this instead of enumerating the count of the 
+        ///         <see cref="Discord.WebSocket.SocketGuild.Users" /> collection, as you may see discrepancy
+        ///         between that and this property.
+        ///     </para>
         ///     </note>
         /// </remarks>
         public int MemberCount { get; internal set; }
@@ -220,10 +224,16 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     This property retrieves all users found within this guild.
         ///     <note type="warning">
-        ///         This property may not always return all the members for large guilds (i.e. guilds containing 100+ users).
-        ///         If you are simply looking to get the number of users present in this guild, consider <see cref="MemberCount"/> instead.
-        ///         Otherwise, you may need to enable <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/> to fetch the full user list
-        ///         upon startup, or use <see cref="DownloadUsersAsync"/> to manually download the users.
+        ///         <para>
+        ///             This property may not always return all the members for large guilds (i.e. guilds containing
+        ///             100+ users). If you are simply looking to get the number of users present in this guild,
+        ///             consider using <see cref="MemberCount"/> instead.
+        ///         </para>
+        ///         <para>
+        ///             Otherwise, you may need to enable <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/> to fetch
+        ///             the full user list upon startup, or use <see cref="DownloadUsersAsync"/> to manually download
+        ///             the users.
+        ///         </para>
         ///     </note>
         /// </remarks>
         /// <returns>
@@ -1061,7 +1071,7 @@ namespace Discord.WebSocket
             => Task.FromResult<IGuildUser>(Owner);
 
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IAuditLogEntry>> IGuild.GetAuditLogAsync(int limit, CacheMode cacheMode, RequestOptions options)
+        async Task<IReadOnlyCollection<IAuditLogEntry>> IGuild.GetAuditLogsAsync(int limit, CacheMode cacheMode, RequestOptions options)
         {
             if (cacheMode == CacheMode.AllowDownload)
                 return (await GetAuditLogsAsync(limit, options).FlattenAsync().ConfigureAwait(false)).ToImmutableArray();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Discord.WebSocket
 {
@@ -6,6 +6,7 @@ namespace Discord.WebSocket
         where T : IEquatable<T>
     {
         internal DiscordSocketClient Discord { get; }
+        /// <inheritdoc />
         public T Id { get; }
 
         internal SocketEntity(DiscordSocketClient discord, T id)
