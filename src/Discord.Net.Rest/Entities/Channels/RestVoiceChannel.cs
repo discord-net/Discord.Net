@@ -47,6 +47,13 @@ namespace Discord.Rest
             Update(model);
         }
 
+        /// <summary>
+        ///     Gets the parent category of this channel.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing an <see cref="ICategoryChannel"/>.
+        /// </returns>
         public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
             => ChannelHelper.GetCategoryAsync(this, Discord, options);
 
