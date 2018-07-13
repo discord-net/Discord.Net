@@ -49,8 +49,25 @@ namespace Discord.Rest
             Update(model);
         }
 
+        /// <summary>
+        ///     Gets a user that is able to view this channel from the associate <paramref name="id"/>.
+        /// </summary>
+        /// <param name="id">The snowflake identifier of the user you want to get.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing a <see cref="RestGuildUser"/>.
+        /// </returns>
         public Task<RestGuildUser> GetUserAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetUserAsync(this, Guild, Discord, id, options);
+
+        /// <summary>
+        ///     Gets the collection of users that can view this channel.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     Paged collection of users. Flattening the paginated response into a collection of <see cref="RestGuildUser"/>
+        ///     with <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> is required if you wish to access the users. 
+        /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(RequestOptions options = null)
             => ChannelHelper.GetUsersAsync(this, Guild, Discord, null, null, options);
 
@@ -128,7 +145,16 @@ namespace Discord.Rest
         /// <inheritdoc />
         public IDisposable EnterTypingState(RequestOptions options = null)
             => ChannelHelper.EnterTypingState(this, Discord, options);
-        
+
+        /// <summary>
+        ///     Creates a webhook for this channel.
+        /// </summary>
+        /// <param name="name">The name you want to give the webhook.</param>
+        /// <param name="avatar">The avatar that you want the webook to have.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing a <see cref="RestWebhook"/>.
+        /// </returns>
         public Task<RestWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null)
             => ChannelHelper.CreateWebhookAsync(this, Discord, name, avatar, options);
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
@@ -136,6 +162,13 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => ChannelHelper.GetWebhooksAsync(this, Discord, options);
 
+        /// <summary>
+        ///     Gets the parent category of this channel.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing an <see cref="ICategoryChannel"/>.
+        /// </returns>
         public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
             => ChannelHelper.GetCategoryAsync(this, Discord, options);
 

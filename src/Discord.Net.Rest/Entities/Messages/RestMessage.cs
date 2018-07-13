@@ -13,6 +13,9 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public IMessageChannel Channel { get; }
+        /// <summary>
+        ///     Gets the Author of the message.
+        /// </summary>
         public IUser Author { get; }
         /// <inheritdoc />
         public MessageSource Source { get; }
@@ -28,12 +31,21 @@ namespace Discord.Rest
         public virtual bool IsPinned => false;
         /// <inheritdoc />
         public virtual DateTimeOffset? EditedTimestamp => null;
+        /// <summary>
+        ///     Gets a collection of the <see cref="Attachment"/>'s on the message.
+        /// </summary>
         public virtual IReadOnlyCollection<Attachment> Attachments => ImmutableArray.Create<Attachment>();
+        /// <summary>
+        ///     Gets a collection of the <see cref="Embed"/>'s on the message.
+        /// </summary>
         public virtual IReadOnlyCollection<Embed> Embeds => ImmutableArray.Create<Embed>();
         /// <inheritdoc />
         public virtual IReadOnlyCollection<ulong> MentionedChannelIds => ImmutableArray.Create<ulong>();
         /// <inheritdoc />
         public virtual IReadOnlyCollection<ulong> MentionedRoleIds => ImmutableArray.Create<ulong>();
+        /// <summary>
+        ///     Gets a collection of the mentioned users in the message.
+        /// </summary>
         public virtual IReadOnlyCollection<RestUser> MentionedUsers => ImmutableArray.Create<RestUser>();
         /// <inheritdoc />
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
@@ -74,6 +86,12 @@ namespace Discord.Rest
         public Task DeleteAsync(RequestOptions options = null)
             => MessageHelper.DeleteAsync(this, Discord, options);
 
+        /// <summary>
+        ///     Gets the <see cref="Content"/> of the message.
+        /// </summary>
+        /// <returns>
+        ///     A string that is the <see cref="Content"/> of the message.
+        /// </returns>
         public override string ToString() => Content;
 
         /// <inheritdoc />

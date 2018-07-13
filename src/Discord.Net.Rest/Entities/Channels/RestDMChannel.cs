@@ -47,6 +47,14 @@ namespace Discord.Rest
         public Task CloseAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
 
+
+        /// <summary>
+        ///     Gets a user in this channel from the provided <paramref name="id"/>.
+        /// </summary>
+        /// <param name="id">The snowflake identifier of the user.</param>
+        /// <returns>
+        ///     A <see cref="RestUser"/> object that is a recipient of this channel; otherwise <c>null</c>.
+        /// </returns>
         public RestUser GetUser(ulong id)
         {
             if (id == Recipient.Id)
@@ -175,10 +183,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
-
+        /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendFileAsync(filePath, text, isTTS, embed, options).ConfigureAwait(false);
-
+        /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendFileAsync(stream, filename, text, isTTS, embed, options).ConfigureAwait(false);
         /// <inheritdoc />

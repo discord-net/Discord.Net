@@ -26,6 +26,9 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
+        /// <summary>
+        ///     Gets if this role is the @everyone role of the guild or not.
+        /// </summary>
         public bool IsEveryone => Id == Guild.Id;
         /// <inheritdoc />
         public string Mention => IsEveryone ? "@everyone" : MentionUtils.MentionRole(Id);
@@ -65,6 +68,12 @@ namespace Discord.Rest
         /// <inheritdoc />
         public int CompareTo(IRole role) => RoleUtils.Compare(this, role);
 
+        /// <summary>
+        ///     Gets the name of the role.
+        /// </summary>
+        /// <returns>
+        ///     A string that is the name of the role.
+        /// </returns>
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
 
