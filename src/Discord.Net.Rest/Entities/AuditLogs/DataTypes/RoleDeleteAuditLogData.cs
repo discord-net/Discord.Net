@@ -45,17 +45,17 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        ///     Gets the ID of the role that has been deleted.
+        ///     Gets the ID of the role that was deleted.
         /// </summary>
         /// <return>
-        ///     A <see cref="ulong"/> representing the snowflake identifer to the role that has been deleted.
+        ///     A <see cref="ulong"/> representing the snowflake identifer to the role that was deleted.
         /// </return>
         public ulong RoleId { get; }
         /// <summary>
-        ///     Gets the role information that has been deleted.
+        ///     Gets the role information that was deleted.
         /// </summary>
         /// <return>
-        ///     An information object representing the properties of the role that has been deleted.
+        ///     An information object representing the properties of the role that was deleted.
         /// </return>
         public RoleEditInfo Properties { get; }
     }

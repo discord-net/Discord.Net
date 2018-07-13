@@ -45,17 +45,17 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        ///     Gets the ID of the role that has been created.
+        ///     Gets the ID of the role that was created.
         /// </summary>
         /// <return>
-        ///     A <see cref="ulong"/> representing the snowflake identifer to the role that has been created.
+        ///     A <see cref="ulong"/> representing the snowflake identifer to the role that was created.
         /// </return>
         public ulong RoleId { get; }
         /// <summary>
-        ///     Gets the role information that has been created.
+        ///     Gets the role information that was created.
         /// </summary>
         /// <return>
-        ///     An information object representing the properties of the role that has been created.
+        ///     An information object representing the properties of the role that was created.
         /// </return>
         public RoleEditInfo Properties { get; }
     }

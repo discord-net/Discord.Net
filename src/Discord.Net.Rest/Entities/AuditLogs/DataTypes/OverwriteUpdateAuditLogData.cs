@@ -50,15 +50,15 @@ namespace Discord.Rest
         ///     Gets the overwrite permissions after the changes.
         /// </summary>
         /// <returns>
-        ///     An overwrite permissions object representing the overwrite permissions that the overwrite now has after
-        ///     the changes.
+        ///     An overwrite permissions object representing the overwrite permissions that the overwrite had after the
+        ///     changes.
         /// </returns>
         public OverwritePermissions NewPermissions { get; }
         /// <summary>
-        ///     Gets the snowflake ID of the overwrite that has been updated.
+        ///     Gets the ID of the overwrite that was updated.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identifier of the overwrite that has been updated.
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the overwrite that was updated.
         /// </returns>
         public ulong OverwriteTargetId { get; }
         /// <summary>

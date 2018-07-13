@@ -64,10 +64,11 @@ namespace Discord.Rest
         /// </returns>
         public string Name { get; }
         /// <summary>
-        ///     Gets the ID of the channel that the webhook can send to.
+        ///     Gets the ID of the channel that the webhook could send to.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identifier of the channel that the webhook can send to.
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the channel that the webhook could send
+        ///     to.
         /// </returns>
         public ulong ChannelId { get; }
     }

@@ -59,10 +59,10 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        ///     Gets the ID of the role that has been changed.
+        ///     Gets the ID of the role that was changed.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identifier of the role that has been changed.
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the role that was changed.
         /// </returns>
         public ulong RoleId { get; }
         /// <summary>

@@ -41,7 +41,7 @@ namespace Discord.Rest
         ///     Gets the new nickname of the user.
         /// </summary>
         /// <returns>
-        ///     A string containing the new nickname of the user; <c>null</c> if the user no longer has a nickname.
+        ///     A string containing the new nickname of the user; <c>null</c> if the user no longer had a nickname.
         /// </returns>
         public string NewNick { get; }
         /// <summary>

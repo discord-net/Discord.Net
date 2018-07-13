@@ -88,7 +88,7 @@ namespace Discord.Rest
         ///     Gets the number of times this invite has been used.
         /// </summary>
         /// <returns>
-        ///     An <see cref="int"/> representing the number of times this invite has been used.
+        ///     An <see cref="int"/> representing the number of times this invite was used.
         /// </returns>
         public int Uses { get; }
         /// <summary>
