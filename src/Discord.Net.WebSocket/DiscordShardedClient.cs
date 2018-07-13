@@ -343,8 +343,8 @@ namespace Discord.WebSocket
             => await GetConnectionsAsync().ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, bool withCount, RequestOptions options)
-            => await GetInviteAsync(inviteId, withCount, options).ConfigureAwait(false);
+        async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, RequestOptions options)
+            => await GetInviteAsync(inviteId, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode, RequestOptions options)
