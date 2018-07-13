@@ -6,7 +6,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Contains audit log data relating to an invite update.
+    ///     Contains a piece of audit log data relating to an invite update.
     /// </summary>
     public class InviteUpdateAuditLogData : IAuditLogData
     {

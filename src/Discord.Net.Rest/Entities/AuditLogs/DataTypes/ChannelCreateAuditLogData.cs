@@ -7,7 +7,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Contains audit log data related to a channel creation.
+    ///     Contains a piece of audit log data related to a channel creation.
     /// </summary>
     public class ChannelCreateAuditLogData : IAuditLogData
     {
@@ -71,7 +71,7 @@ namespace Discord.Rest
         ///     Gets a collection of permission overwrites that was assigned to the created channel.
         /// </summary>
         /// <returns>
-        ///     A collection of permission <see cref="Overwrite"/>, containing the permission overwrites that were 
+        ///     A collection of permission <see cref="Overwrite"/>, containing the permission overwrites that were
         ///     assigned to the created channel.
         /// </returns>
         public IReadOnlyCollection<Overwrite> Overwrites { get; }

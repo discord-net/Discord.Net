@@ -6,7 +6,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Contains audit log data related to the update of a permission overwrite.
+    ///     Contains a piece of audit log data related to the update of a permission overwrite.
     /// </summary>
     public class OverwriteUpdateAuditLogData : IAuditLogData
     {
@@ -42,7 +42,7 @@ namespace Discord.Rest
         ///     Gets the overwrite permissions before the changes.
         /// </summary>
         /// <returns>
-        ///     An overwrite permissions object representing the overwrite permissions that the overwrite had before 
+        ///     An overwrite permissions object representing the overwrite permissions that the overwrite had before
         ///     the changes were made.
         /// </returns>
         public OverwritePermissions OldPermissions { get; }

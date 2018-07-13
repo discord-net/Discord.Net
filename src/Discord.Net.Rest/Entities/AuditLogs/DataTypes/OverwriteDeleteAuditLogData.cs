@@ -6,7 +6,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Contains audit log data related to the deletion of a permission overwrite.
+    ///     Contains a piece of audit log data related to the deletion of a permission overwrite.
     /// </summary>
     public class OverwriteDeleteAuditLogData : IAuditLogData
     {

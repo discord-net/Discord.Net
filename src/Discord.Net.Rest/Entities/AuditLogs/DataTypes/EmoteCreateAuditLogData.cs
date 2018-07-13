@@ -6,7 +6,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Contains audit log data related to an emoji creation.
+    ///     Contains a piece of audit log data related to an emoji creation.
     /// </summary>
     public class EmoteCreateAuditLogData : IAuditLogData
     {

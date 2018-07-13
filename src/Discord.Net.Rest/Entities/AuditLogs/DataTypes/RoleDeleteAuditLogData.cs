@@ -6,7 +6,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Contains audit log data relating to a role deletion.
+    ///     Contains a piece of audit log data relating to a role deletion.
     /// </summary>
     public class RoleDeleteAuditLogData : IAuditLogData
     {

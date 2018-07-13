@@ -6,7 +6,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Contains audit log data related to an invite creation.
+    ///     Contains a piece of audit log data related to an invite creation.
     /// </summary>
     public class InviteCreateAuditLogData : IAuditLogData
     {
@@ -66,7 +66,7 @@ namespace Discord.Rest
         ///     when the user logs off).
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if users accepting this invite will be removed from the guild when they log off; otherwise 
+        ///     <c>true</c> if users accepting this invite will be removed from the guild when they log off; otherwise
         ///     <c>false</c>.
         /// </returns>
         public bool Temporary { get; }
