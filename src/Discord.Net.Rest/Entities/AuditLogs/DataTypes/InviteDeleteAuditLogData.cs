@@ -6,7 +6,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a piece of audit log data related to an invite removal.
+    ///     Contains a piece of audit log data related to an invite removal.
     /// </summary>
     public class InviteDeleteAuditLogData : IAuditLogData
     {
@@ -66,7 +66,7 @@ namespace Discord.Rest
         ///     when the user logs off).
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if users accepting this invite will be removed from the guild when they log off; otherwise 
+        ///     <c>true</c> if users accepting this invite will be removed from the guild when they log off; otherwise
         ///     <c>false</c>.
         /// </returns>
         public bool Temporary { get; }
@@ -81,7 +81,7 @@ namespace Discord.Rest
         ///     Gets the ID of the channel this invite is linked to.
         /// </summary>
         /// <returns>
-        ///     An <see cref="ulong"/> representing the channel snowflake identifier that the invite points to.
+        ///     A <see cref="ulong"/> representing the channel snowflake identifier that the invite points to.
         /// </returns>
         public ulong ChannelId { get; }
         /// <summary>

@@ -7,7 +7,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a piece of audit log data related to a channel deletion.
+    ///     Contains a piece of audit log data related to a channel deletion.
     /// </summary>
     public class ChannelDeleteAuditLogData : IAuditLogData
     {
@@ -41,7 +41,7 @@ namespace Discord.Rest
         ///     Gets the snowflake ID of the deleted channel.
         /// </summary>
         /// <returns>
-        ///     An <see cref="ulong"/> representing the snowflake identifier for the deleted channel.
+        ///     A <see cref="ulong"/> representing the snowflake identifier for the deleted channel.
         /// </returns>
         public ulong ChannelId { get; }
         /// <summary>

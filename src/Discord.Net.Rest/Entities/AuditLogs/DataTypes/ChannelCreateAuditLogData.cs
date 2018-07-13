@@ -7,7 +7,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a piece of audit log data related to a channel creation.
+    ///     Contains a piece of audit log data related to a channel creation.
     /// </summary>
     public class ChannelCreateAuditLogData : IAuditLogData
     {
@@ -50,7 +50,7 @@ namespace Discord.Rest
         ///     Gets the snowflake ID of the created channel.
         /// </summary>
         /// <returns>
-        ///     An <see cref="ulong"/> representing the snowflake identifier for the created channel.
+        ///     A <see cref="ulong"/> representing the snowflake identifier for the created channel.
         /// </returns>
         public ulong ChannelId { get; }
         /// <summary>
@@ -71,7 +71,8 @@ namespace Discord.Rest
         ///     Gets a collection of permission overwrites that was assigned to the created channel.
         /// </summary>
         /// <returns>
-        ///     A collection of permission <see cref="Overwrite"/>.
+        ///     A collection of permission <see cref="Overwrite"/>, containing the permission overwrites that were
+        ///     assigned to the created channel.
         /// </returns>
         public IReadOnlyCollection<Overwrite> Overwrites { get; }
     }

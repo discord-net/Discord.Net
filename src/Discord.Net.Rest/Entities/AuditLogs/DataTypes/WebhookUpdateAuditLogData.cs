@@ -5,6 +5,9 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains a piece of audit log data related to a webhook update.
+    /// </summary>
     public class WebhookUpdateAuditLogData : IAuditLogData
     {
         private WebhookUpdateAuditLogData(IWebhook webhook, WebhookInfo before, WebhookInfo after)
@@ -38,11 +41,28 @@ namespace Discord.Rest
             return new WebhookUpdateAuditLogData(webhook, before, after);
         }
 
-        //Again, the *current* data
+        /// <summary>
+        ///     Gets the webhook that was updated.
+        /// </summary>
+        /// <returns>
+        ///     A webhook objet representing the webhook that was updated.
+        /// </returns>
         public IWebhook Webhook { get; }
 
-        //And the *audit log* data
+        /// <summary>
+        ///     Gets the webhook information before the changes.
+        /// </summary>
+        /// <returns>
+        ///     A webhook information object representing the webhook before the changes were made.
+        /// </returns>
         public WebhookInfo Before { get; }
+
+        /// <summary>
+        ///     Gets the webhook information after the changes.
+        /// </summary>
+        /// <returns>
+        ///     A webhook information object representing the webhook after the changes were made.
+        /// </returns>
         public WebhookInfo After { get; }
     }
 }

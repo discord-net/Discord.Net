@@ -6,7 +6,7 @@ using EntryModel = Discord.API.AuditLogEntry;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a piece of audit log data related to an emoji deletion.
+    ///     Contains a piece of audit log data related to an emoji deletion.
     /// </summary>
     public class EmoteDeleteAuditLogData : IAuditLogData
     {
@@ -29,7 +29,7 @@ namespace Discord.Rest
         ///     Gets the snowflake ID of the deleted emoji.
         /// </summary>
         /// <returns>
-        ///     An <see cref="System.UInt64"/> representing the snowflake identifier for the deleted emoji.
+        ///     A <see cref="System.UInt64"/> representing the snowflake identifier for the deleted emoji.
         /// </returns>
         public ulong EmoteId { get; }
         /// <summary>

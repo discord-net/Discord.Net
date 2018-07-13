@@ -5,6 +5,9 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains a piece of audit log data related to a change in a guild member.
+    /// </summary>
     public class MemberUpdateAuditLogData : IAuditLogData
     {
         private MemberUpdateAuditLogData(IUser target, string newNick, string oldNick)
@@ -27,8 +30,26 @@ namespace Discord.Rest
             return new MemberUpdateAuditLogData(user, newNick, oldNick);
         }
 
+        /// <summary>
+        ///     Gets the user that the changes were performed on.
+        /// </summary>
+        /// <returns>
+        ///     A user object representing the user who the changes were performed on.
+        /// </returns>
         public IUser Target { get; }
+        /// <summary>
+        ///     Gets the new nickname of the user.
+        /// </summary>
+        /// <returns>
+        ///     A string containing the new nickname of the user; <c>null</c> if the user no longer had a nickname.
+        /// </returns>
         public string NewNick { get; }
+        /// <summary>
+        ///     Gets the old nickname of the user.
+        /// </summary>
+        /// <returns>
+        ///     A string containing the old nickname of the user; <c>null</c> if the user did not have a nickname.
+        /// </returns>
         public string OldNick { get; }
     }
 }

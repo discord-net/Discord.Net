@@ -5,6 +5,9 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains a piece of audit log data related to a webhook creation.
+    /// </summary>
     public class WebhookCreateAuditLogData : IAuditLogData
     {
         private WebhookCreateAuditLogData(IWebhook webhook, WebhookType type, string name, ulong channelId)
@@ -33,12 +36,40 @@ namespace Discord.Rest
             return new WebhookCreateAuditLogData(webhook, type, name, channelId);
         }
 
-        //Corresponds to the *current* data
+        // Doc Note: Corresponds to the *current* data
+
+        /// <summary>
+        ///     Gets the webhook that was created.
+        /// </summary>
+        /// <returns>
+        ///     A webhook object representing the webhook that was created.
+        /// </returns>
         public IWebhook Webhook { get; }
 
-        //Corresponds to the *audit log* data
+        // Doc Note: Corresponds to the *audit log* data
+
+        /// <summary>
+        ///     Gets the type of webhook that was created.
+        /// </summary>
+        /// <returns>
+        ///     The type of webhook that was created.
+        /// </returns>
         public WebhookType Type { get; }
+
+        /// <summary>
+        ///     Gets the name of the webhook.
+        /// </summary>
+        /// <returns>
+        ///     A string containing the name of the webhook.
+        /// </returns>
         public string Name { get; }
+        /// <summary>
+        ///     Gets the ID of the channel that the webhook could send to.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the channel that the webhook could send
+        ///     to.
+        /// </returns>
         public ulong ChannelId { get; }
     }
 }

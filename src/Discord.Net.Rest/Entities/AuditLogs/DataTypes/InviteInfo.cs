@@ -42,7 +42,7 @@ namespace Discord.Rest
         ///     Gets the ID of the channel this invite is linked to.
         /// </summary>
         /// <returns>
-        ///     An <see cref="ulong"/> representing the channel snowflake identifier that the invite points to; 
+        ///     A <see cref="ulong"/> representing the channel snowflake identifier that the invite points to; 
         ///     <c>null</c> if not specified.
         /// </returns>
         public ulong? ChannelId { get; }
