@@ -55,7 +55,9 @@ namespace Discord.Commands
         /// </example>
         public Dictionary<char, char> QuotationMarkAliasMap { get; set; } = QuotationAliasUtils.GetDefaultAliasMap;
 
-        /// <summary> Determines whether extra parameters should be ignored. </summary>
+        /// <summary>
+        ///     Gets or sets a value that indicates whether extra parameters should be ignored.
+        /// </summary>
         public bool IgnoreExtraArgs { get; set; } = false;
     }
 }

@@ -23,10 +23,10 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
         /// <summary>
-        ///     Gets the parent (category) of this channel in the guild's channel list.
+        ///     Gets the parent (category) channel of this channel.
         /// </summary>
         /// <returns>
-        ///     An <see cref="ICategoryChannel"/> representing the parent of this channel; <c>null</c> if none is set.
+        ///     A category channel representing the parent of this channel; <c>null</c> if none is set.
         /// </returns>
         public ICategoryChannel Category
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
@@ -45,6 +45,7 @@ namespace Discord.WebSocket
             entity.Update(state, model);
             return entity;
         }
+        /// <inheritdoc />
         internal override void Update(ClientState state, Model model)
         {
             base.Update(state, model);
@@ -63,12 +64,7 @@ namespace Discord.WebSocket
             return await Guild.ConnectAudioAsync(Id, selfDeaf, selfMute, external).ConfigureAwait(false);
         }
 
-        /// <summary>
-        ///     Disconnects from this voice channel if the client is in an active voice connection.
-        /// </summary>
-        /// <returns>
-        ///     An awaitable <see cref="Task" /> .
-        /// </returns>
+        /// <inheritdoc />
         public async Task DisconnectAsync()
             => await Guild.DisconnectAudioAsync();
 

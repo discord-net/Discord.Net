@@ -21,7 +21,7 @@ namespace Discord
         /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchrnous get operation. The task result contains the category channel
+        ///     A task that represents the asynchronous get operation. The task result contains the category channel
         ///     representing the parent of this channel; <c>null</c> if none is set.
         /// </returns>
         Task<ICategoryChannel> GetCategoryAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);

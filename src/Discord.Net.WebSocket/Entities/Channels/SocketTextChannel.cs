@@ -76,11 +76,11 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets a message from this message channel.
         /// </summary>
-        /// <param name="id">The ID of the message.</param>
+        /// <param name="id">The snowflake identifier of the message.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing the downloaded message; <c>null</c> if none is found or if
-        ///     the message fails to be retrieved.
+        ///     A task that represents an asynchrnous get operation for retrieving the message. The task result contains
+        ///     the retrieved message; <c>null</c> if no message is found with the specified identifier.
         /// </returns>
         public async Task<IMessage> GetMessageAsync(ulong id, RequestOptions options = null)
         {
@@ -202,7 +202,8 @@ namespace Discord.WebSocket
         /// <param name="avatar">The avatar of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing the created webhook.
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     webhook.
         /// </returns>
         public Task<RestWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null)
             => ChannelHelper.CreateWebhookAsync(this, Discord, name, avatar, options);
@@ -212,8 +213,8 @@ namespace Discord.WebSocket
         /// <param name="id">The identifier of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing a webhook associated with the identifier; <c>null</c> if not
-        ///     found.
+        ///     A task that represents the asynchronous get operation. The task result contains a webhook associated
+        ///     with the identifier; <c>null</c> if the webhook is not found.
         /// </returns>
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetWebhookAsync(this, Discord, id, options);
@@ -222,7 +223,8 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing a collection of found webhooks.
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of webhooks that is available in this channel.
         /// </returns>
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => ChannelHelper.GetWebhooksAsync(this, Discord, options);

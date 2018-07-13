@@ -18,7 +18,7 @@ namespace Discord
         /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents an asynchrnous send operation for delievering the message. The task result
+        ///     A task that represents an asynchronous send operation for delievering the message. The task result
         ///     contains the sent message.
         /// </returns>
         Task<IUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
@@ -39,7 +39,7 @@ namespace Discord
         /// <param name="embed">The <see cref="Discord.EmbedType.Rich" /> <see cref="Embed" /> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents an asynchrnous send operation for delievering the message. The task result
+        ///     A task that represents an asynchronous send operation for delievering the message. The task result
         ///     contains the sent message.
         /// </returns>
         Task<IUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
@@ -61,7 +61,7 @@ namespace Discord
         /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents an asynchrnous send operation for delievering the message. The task result
+        ///     A task that represents an asynchronous send operation for delievering the message. The task result
         ///     contains the sent message.
         /// </returns>
         Task<IUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
@@ -73,7 +73,7 @@ namespace Discord
         /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents an asynchrnous get operation for retrieving the message. The task result contains
+        ///     A task that represents an asynchronous get operation for retrieving the message. The task result contains
         ///     the retrieved message; <c>null</c> if no message is found with the specified identifier.
         /// </returns>
         Task<IMessage> GetMessageAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);

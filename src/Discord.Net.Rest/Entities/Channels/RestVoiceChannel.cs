@@ -48,11 +48,12 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        ///     Gets the parent category of this channel.
+        ///     Gets the parent (category) channel of this channel.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing an <see cref="ICategoryChannel"/>.
+        ///     A task that represents the asynchronous get operation. The task result contains the category channel
+        ///     representing the parent of this channel; <c>null</c> if none is set.
         /// </returns>
         public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
             => ChannelHelper.GetCategoryAsync(this, Discord, options);

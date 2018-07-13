@@ -27,7 +27,7 @@ namespace Discord.Rest
         /// </returns>
         public ulong RoleId { get; }
         /// <summary>
-        ///     Determines whether the role was added to the user.
+        ///     Gets a value that indicates whether the role was added to the user.
         /// </summary>
         /// <returns>
         ///     <c>true</c> if the role was added to the user; otherwise <c>false</c>.

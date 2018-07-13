@@ -32,9 +32,7 @@ namespace Discord.Rest
         ///     Gets the logged-in user.
         /// </summary>
         public ISelfUser CurrentUser { get; protected set; }
-        /// <summary>
-        ///     Gets the type of the authentication token.
-        /// </summary>
+        /// <inheritdoc />
         public TokenType TokenType => ApiClient.AuthTokenType;
         
         /// <summary> Creates a new REST-only Discord client. </summary>

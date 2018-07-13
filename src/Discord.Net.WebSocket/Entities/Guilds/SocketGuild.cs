@@ -738,21 +738,23 @@ namespace Discord.WebSocket
 
         //Webhooks
         /// <summary>
-        ///     Returns the webhook with the provided ID.
+        ///     Gets a webhook found within this guild.
         /// </summary>
-        /// <param name="id">The ID of the webhook.</param>
+        /// <param name="id">The identifier for the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing the webhook associated with the ID.
+        ///     A task that represents the asynchronous get operation. The task result contains the webhook with the
+        ///     specified <paramref name="id"/>; <c>null</c> if none is found.
         /// </returns>
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => GuildHelper.GetWebhookAsync(this, Discord, id, options);
         /// <summary>
-        ///     Gets a collection of webhooks that exist in the guild.
+        ///     Gets a collection of all webhook from this guild.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing a collection of webhooks.
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of webhooks found within the guild.
         /// </returns>
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => GuildHelper.GetWebhooksAsync(this, Discord, options);

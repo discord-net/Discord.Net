@@ -15,15 +15,14 @@ namespace Discord
         /// </returns>
         IUser Inviter { get; }
         /// <summary>
-        ///     Determines whether the invite has been revoked.
+        ///     Gets a value that indicates whether the invite has been revoked.
         /// </summary>
         /// <returns>
         ///     <c>true</c> if this invite was revoked; otherwise <c>false</c>.
         /// </returns>
         bool IsRevoked { get; }
         /// <summary>
-        ///     Determines whether the invite is a temporary one (i.e. whether the invite will be removed from the guild
-        ///     when the user logs off).
+        ///     Gets a value that indicates whether the invite is a temporary one.
         /// </summary>
         /// <returns>
         ///     <c>true</c> if users accepting this invite will be removed from the guild when they log off; otherwise 

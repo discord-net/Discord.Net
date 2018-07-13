@@ -27,7 +27,7 @@ namespace Discord
         /// </returns>
         int AFKTimeout { get; }
         /// <summary>
-        ///     Determines if this guild is embeddable (i.e. can use widget).
+        ///     Gets a value that indicates whether this guild is embeddable (i.e. can use widget).
         /// </summary>
         /// <returns>
         ///     <c>true</c> if this guild can be embedded via widgets; otherwise <c>false</c>.

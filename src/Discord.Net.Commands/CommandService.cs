@@ -130,33 +130,33 @@ namespace Discord.Commands
         }
 
         /// <summary>
-        ///     Add a command module from a <see cref="Type"/>.
+        ///     Add a command module from a <see cref="Type" /> .
         /// </summary>
         /// <typeparam name="T">The type of module.</typeparam>
-        /// <param name="services">
-        ///     The <see cref="IServiceProvider"/> for your dependency injection solution if using one; otherwise, pass
-        ///     <c>null</c>.
-        /// </param>
-        /// <returns>
-        ///     An awaitable <see cref="Task"/> containing the built module.
-        /// </returns>
+        /// <param name="services">The <see cref="IServiceProvider" /> for your dependency injection solution if using one; otherwise, pass <c>null</c> .</param>
         /// <exception cref="ArgumentException">This module has already been added.</exception>
-        /// <exception cref="InvalidOperationException">The <see cref="ModuleInfo"/> fails to be built; an invalid type may have been provided.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The <see cref="ModuleInfo"/> fails to be built; an invalid type may have been provided.
+        /// </exception>
+        /// <returns>
+        ///     A task that represents the asynchronous operation for adding the module. The task result contains the
+        ///     built module.
+        /// </returns>
         public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services) => AddModuleAsync(typeof(T), services);
 
         /// <summary>
-        ///     Adds a command module from a <see cref="Type"/>.
+        ///     Adds a command module from a <see cref="Type" /> .
         /// </summary>
         /// <param name="type">The type of module.</param>
-        /// <param name="services">
-        ///     The <see cref="IServiceProvider"/> for your dependency injection solution if using one; otherwise, pass
-        ///     <c>null</c>.
-        /// </param>
-        /// <returns>
-        ///     An awaitable <see cref="Task"/> containing the built module.
-        /// </returns>
+        /// <param name="services">The <see cref="IServiceProvider" /> for your dependency injection solution if using one; otherwise, pass <c>null</c> .</param>
         /// <exception cref="ArgumentException">This module has already been added.</exception>
-        /// <exception cref="InvalidOperationException">The <see cref="ModuleInfo"/> fails to be built; an invalid type may have been provided.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The <see cref="ModuleInfo"/> fails to be built; an invalid type may have been provided.
+        /// </exception>
+        /// <returns>
+        ///     A task that represents the asynchronous operation for adding the module. The task result contains the
+        ///     built module.
+        /// </returns>
         public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services)
         {
             services = services ?? EmptyServiceProvider.Instance;
@@ -186,13 +186,11 @@ namespace Discord.Commands
         /// <summary>
         ///     Add command modules from an <see cref="Assembly"/>.
         /// </summary>
-        /// <param name="assembly">The <see cref="Assembly" /> containing command modules.</param>
-        /// <param name="services">
-        ///     The <see cref="IServiceProvider"/> for your dependency injection solution if using one; otherwise, pass
-        ///     <c>null</c>.
-        /// </param>
+        /// <param name="assembly">The <see cref="Assembly"/> containing command modules.</param>
+        /// <param name="services">The <see cref="IServiceProvider"/> for your dependency injection solution if using one; otherwise, pass <c>null</c>.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing the built module.
+        ///     A task that represents the asynchronous operation for adding the command modules. The task result
+        ///     contains an enumerable collection of modules added.
         /// </returns>
         public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly, IServiceProvider services)
         {
@@ -234,7 +232,8 @@ namespace Discord.Commands
         /// </summary>
         /// <param name="module">The <see cref="ModuleInfo" /> to be removed from the service.</param>
         /// <returns>
-        ///     Returns whether the module is successfully removed.
+        ///     A task that represents the asynchronous removal operation. The task result contains a value that
+        ///     indicates whether the <paramref name="module"/> is successfully removed.
         /// </returns>
         public async Task<bool> RemoveModuleAsync(ModuleInfo module)
         {
@@ -253,7 +252,8 @@ namespace Discord.Commands
         /// </summary>
         /// <typeparam name="T">The <see cref="Type"/> of the module.</typeparam>
         /// <returns>
-        ///     Returns whether the module is successfully removed.
+        ///     A task that represents the asynchronous removal operation. The task result contains a value that
+        ///     indicates whether the module is successfully removed.
         /// </returns>
         public Task<bool> RemoveModuleAsync<T>() => RemoveModuleAsync(typeof(T));
         /// <summary>
@@ -261,7 +261,8 @@ namespace Discord.Commands
         /// </summary>
         /// <param name="type">The <see cref="Type"/> of the module.</param>
         /// <returns>
-        ///     Returns whether the module is successfully removed.
+        ///     A task that represents the asynchronous removal operation. The task result contains a value that
+        ///     indicates whether the module is successfully removed.
         /// </returns>
         public async Task<bool> RemoveModuleAsync(Type type)
         {
@@ -455,7 +456,10 @@ namespace Discord.Commands
         /// <param name="argPos">The position of which the command starts at.</param>
         /// <param name="services">The service to be used in the command's dependency injection.</param>
         /// <param name="multiMatchHandling">The handling mode when multiple command matches are found.</param>
-        /// <returns>The result of the command execution.</returns>
+        /// <returns>
+        ///     A task that represents the asynchronous execution operation. The task result contains the result of the
+        ///     command execution.
+        /// </returns>
         public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
             => ExecuteAsync(context, context.Message.Content.Substring(argPos), services, multiMatchHandling);
         /// <summary>
@@ -465,7 +469,10 @@ namespace Discord.Commands
         /// <param name="input">The command string.</param>
         /// <param name="services">The service to be used in the command's dependency injection.</param>
         /// <param name="multiMatchHandling">The handling mode when multiple command matches are found.</param>
-        /// <returns>The result of the command execution.</returns>
+        /// <returns>
+        ///     A task that represents the asynchronous execution operation. The task result contains the result of the
+        ///     command execution.
+        /// </returns>
         public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;

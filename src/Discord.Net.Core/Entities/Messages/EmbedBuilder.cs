@@ -492,7 +492,7 @@ namespace Discord
             }
         }
         /// <summary>
-        ///     Determines whether the field should be in-line with each other.
+        ///     Gets or sets a value that indicates whether the field should be in-line with each other.
         /// </summary>
         public bool IsInline { get; set; }
 

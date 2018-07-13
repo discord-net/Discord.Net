@@ -42,6 +42,9 @@ namespace Discord
         /// <summary>
         ///     Gets the raw representation of the emote.
         /// </summary>
+        /// <returns>
+        ///     A string representing the raw presentation of the emote (e.g. <c>&lt;:thonkang:282745590985523200&gt;</c>).
+        /// </returns>
         public override string ToString() => $"<{(Animated ? "a" : "")}:{Name}:{Id}>";
     }
 }

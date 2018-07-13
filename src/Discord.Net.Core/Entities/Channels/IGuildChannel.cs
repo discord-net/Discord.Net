@@ -58,7 +58,7 @@ namespace Discord
         /// </returns>
         Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null);
         /// <summary>
-        ///     Returns a collection of all invites to this channel.
+        ///     Gets a collection of all invites to this channel.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
@@ -78,7 +78,7 @@ namespace Discord
         Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null);
 
         /// <summary>
-        ///     Gets the permission overwrite for a specific role, or <c>null</c> if one does not exist.
+        ///     Gets the permission overwrite for a specific role.
         /// </summary>
         /// <param name="role">The role to get the overwrite from.</param>
         /// <returns>
@@ -86,7 +86,7 @@ namespace Discord
         /// </returns>
         OverwritePermissions? GetPermissionOverwrite(IRole role);
         /// <summary>
-        ///     Gets the permission overwrite for a specific user, or <c>null</c> if one does not exist.
+        ///     Gets the permission overwrite for a specific user.
         /// </summary>
         /// <param name="user">The user to get the overwrite from.</param>
         /// <returns>
@@ -99,7 +99,7 @@ namespace Discord
         /// <param name="role">The role to remove the overwrite from.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task representing the asynchronous removal operation.
+        ///     A task representing the asynchronous operation for removing the specified permissions from the channel.
         /// </returns>
         Task RemovePermissionOverwriteAsync(IRole role, RequestOptions options = null);
         /// <summary>
@@ -108,7 +108,7 @@ namespace Discord
         /// <param name="user">The user to remove the overwrite from.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task representing the asynchronous removal operation.
+        ///     A task representing the asynchronous operation for removing the specified permissions from the channel.
         /// </returns>
         Task RemovePermissionOverwriteAsync(IUser user, RequestOptions options = null);
 
@@ -119,7 +119,7 @@ namespace Discord
         /// <param name="permissions">The overwrite to add to the role.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task representing the asynchronous permission addition operation.
+        ///     A task representing the asynchronous permission operation for adding the specified permissions to the channel.
         /// </returns>
         Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null);
         /// <summary>
@@ -129,16 +129,14 @@ namespace Discord
         /// <param name="permissions">The overwrite to add to the user.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task representing the asynchronous permission addition operation.
+        ///     A task representing the asynchronous permission operation for adding the specified permissions to the channel.
         /// </returns>
         Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null);
 
         /// <summary>
-        ///     Gets a collection of all users in this channel.
+        ///     Gets a collection of users that are able to view the channel.
         /// </summary>
-        /// <param name="mode">
-        /// The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.
-        /// </param>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A paged collection containing a collection of guild users that can access this channel. Flattening the
@@ -147,13 +145,13 @@ namespace Discord
         /// </returns>
         new IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
-        ///     Gets a user in this channel with the provided ID.
+        ///     Gets a user in this channel.
         /// </summary>
-        /// <param name="id">The ID of the user.</param>
+        /// <param name="id">The snowflake identifier of the user.</param>
         /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task representing the asynchrnous get operation. The task result contains a guild user object that
+        ///     A task representing the asynchronous get operation. The task result contains a guild user object that
         ///     represents the user; <c>null</c> if none is found.
         /// </returns>
         new Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);

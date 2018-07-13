@@ -34,6 +34,7 @@ namespace Discord.Rest
             entity.Update(model);
             return entity;
         }
+        /// <inheritdoc />
         internal override void Update(Model model)
         {
             base.Update(model);
@@ -50,23 +51,31 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        ///     Gets a user that is able to view this channel from the associate <paramref name="id"/>.
+        ///     Gets a user in this channel.
         /// </summary>
-        /// <param name="id">The snowflake identifier of the user you want to get.</param>
+        /// <param name="id">The snowflake identifier of the user.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Resolving permissions requires the parent guild to be downloaded.
+        /// </exception>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing a <see cref="RestGuildUser"/>.
+        ///     A task representing the asynchronous get operation. The task result contains a guild user object that
+        ///     represents the user; <c>null</c> if none is found.
         /// </returns>
         public Task<RestGuildUser> GetUserAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetUserAsync(this, Guild, Discord, id, options);
 
         /// <summary>
-        ///     Gets the collection of users that can view this channel.
+        ///     Gets a collection of users that are able to view the channel.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Resolving permissions requires the parent guild to be downloaded.
+        /// </exception>
         /// <returns>
-        ///     Paged collection of users. Flattening the paginated response into a collection of <see cref="RestGuildUser"/>
-        ///     with <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> is required if you wish to access the users. 
+        ///     A paged collection containing a collection of guild users that can access this channel. Flattening the
+        ///     paginated response into a collection of users with 
+        ///     <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> is required if you wish to access the users.
         /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(RequestOptions options = null)
             => ChannelHelper.GetUsersAsync(this, Guild, Discord, null, null, options);
@@ -147,27 +156,46 @@ namespace Discord.Rest
             => ChannelHelper.EnterTypingState(this, Discord, options);
 
         /// <summary>
-        ///     Creates a webhook for this channel.
+        ///     Creates a webhook in this text channel.
         /// </summary>
-        /// <param name="name">The name you want to give the webhook.</param>
-        /// <param name="avatar">The avatar that you want the webook to have.</param>
+        /// <param name="name">The name of the webhook.</param>
+        /// <param name="avatar">The avatar of the webhook.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing a <see cref="RestWebhook"/>.
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     webhook.
         /// </returns>
         public Task<RestWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null)
             => ChannelHelper.CreateWebhookAsync(this, Discord, name, avatar, options);
+        /// <summary>
+        ///     Gets a webhook available in this text channel.
+        /// </summary>
+        /// <param name="id">The identifier of the webhook.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a webhook associated
+        ///     with the identifier; <c>null</c> if the webhook is not found.
+        /// </returns>
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetWebhookAsync(this, Discord, id, options);
+        /// <summary>
+        ///     Gets the webhooks available in this text channel.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of webhooks that is available in this channel.
+        /// </returns>
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => ChannelHelper.GetWebhooksAsync(this, Discord, options);
 
         /// <summary>
-        ///     Gets the parent category of this channel.
+        ///     Gets the parent (category) channel of this channel.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing an <see cref="ICategoryChannel"/>.
+        ///     A task that represents the asynchronous get operation. The task result contains the category channel
+        ///     representing the parent of this channel; <c>null</c> if none is set.
         /// </returns>
         public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
             => ChannelHelper.GetCategoryAsync(this, Discord, options);

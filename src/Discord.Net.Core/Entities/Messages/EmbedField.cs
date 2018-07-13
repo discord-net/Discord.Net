@@ -17,7 +17,7 @@ namespace Discord
         /// </summary>
         public string Value { get; internal set; }
         /// <summary>
-        ///     Determines whether the field should be in-line with each other.
+        ///     Gets a value that indicates whether the field should be in-line with each other.
         /// </summary>
         public bool Inline { get; internal set; }
 
@@ -32,6 +32,9 @@ namespace Discord
         /// <summary>
         ///     Gets the name of the field.
         /// </summary>
+        /// <returns>
+        ///     A string that resolves to <see cref="EmbedField.Name"/>.
+        /// </returns>
         public override string ToString() => Name;
     }
 }

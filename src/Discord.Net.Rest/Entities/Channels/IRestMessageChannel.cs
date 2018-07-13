@@ -13,56 +13,67 @@ namespace Discord.Rest
         ///     Sends a message to this message channel.
         /// </summary>
         /// <param name="text">The message to be sent.</param>
-        /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
-        /// <param name="embed">The <see cref="EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
+        /// <param name="isTTS">Determines whether the message should be read aloud by Discord or not.</param>
+        /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable Task containing the message sent to the channel.
+        ///     A task that represents an asynchronous send operation for delievering the message. The task result
+        ///     contains the sent message.
         /// </returns>
         new Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
         /// <summary>
-        ///     Sends a file to this message channel, with an optional caption.
+        ///     Sends a file to this message channel with an optional caption.
         /// </summary>
+        /// <remarks>
+        ///     This method sends a file as if you are uploading an attachment directly from your Discord client.
+        ///     <note>
+        ///         If you wish to upload an image and have it embedded in a <see cref="Discord.EmbedType.Rich"/>embed,
+        ///         you may upload the file and refer to the file with "attachment://filename.ext" in the
+        ///         <see cref="Discord.EmbedBuilder.ImageUrl"/>.
+        ///     </note>
+        /// </remarks>
         /// <param name="filePath">The file path of the file.</param>
         /// <param name="text">The message to be sent.</param>
         /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
-        /// <param name="embed">The <see cref="EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
+        /// <param name="embed">The <see cref="Discord.EmbedType.Rich" /> <see cref="Embed" /> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <remarks>
-        ///     If you wish to upload an image and have it embedded in a <see cref="EmbedType.Rich"/> embed, you may
-        ///     upload the file and refer to the file with "attachment://filename.ext" in the 
-        ///     <see cref="Discord.EmbedBuilder.ImageUrl"/>.
-        /// </remarks>
         /// <returns>
-        ///     An awaitable Task containing the message sent to the channel.
+        ///     A task that represents an asynchronous send operation for delievering the message. The task result
+        ///     contains the sent message.
         /// </returns>
         new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
         /// <summary>
-        ///     Sends a file to this message channel, with an optional caption.
+        ///     Sends a file to this message channel with an optional caption.
         /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> of the file to be sent.</param>
+        /// <remarks>
+        ///     This method sends a file as if you are uploading an attachment directly from your Discord client.
+        ///     <note>
+        ///         If you wish to upload an image and have it embedded in a <see cref="Discord.EmbedType.Rich"/>embed,
+        ///         you may upload the file and refer to the file with "attachment://filename.ext" in the
+        ///         <see cref="Discord.EmbedBuilder.ImageUrl"/>.
+        ///     </note>
+        /// </remarks>
+        /// <param name="stream">The <see cref="Stream" /> of the file to be sent.</param>
         /// <param name="filename">The name of the attachment.</param>
         /// <param name="text">The message to be sent.</param>
         /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
-        /// <param name="embed">The <see cref="EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
+        /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <remarks>
-        ///     If you wish to upload an image and have it embedded in a <see cref="EmbedType.Rich"/> embed, you may
-        ///     upload the file and refer to the file with "attachment://filename.ext" in the 
-        ///     <see cref="Discord.EmbedBuilder.ImageUrl"/>.
-        /// </remarks>
         /// <returns>
-        ///     An awaitable Task containing the message sent to the channel.
+        ///     A task that represents an asynchronous send operation for delievering the message. The task result
+        ///     contains the sent message.
         /// </returns>
         new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
 
         /// <summary>
-        ///     Gets a message from this message channel with the given id, or <c>null</c> if not found.
+        ///     Gets a message from this message channel.
         /// </summary>
-        /// <param name="id">The ID of the message.</param>
+        /// <param name="id">The snowflake identifier of the message.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     The message gotten from either the cache or the download, or <c>null</c> if none is found.
+        ///     A task that represents an asynchronous get operation for retrieving the message. The task result contains
+        ///     the retrieved message; <c>null</c> if no message is found with the specified identifier.
         /// </returns>
         Task<RestMessage> GetMessageAsync(ulong id, RequestOptions options = null);
         /// <summary>
@@ -104,7 +115,8 @@ namespace Discord.Rest
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable Task containing a collection of messages.
+        ///     A task that represents the asynchronous get operation for retrieving pinned messages in this channel.
+        ///     The task result contains a collection of messages found in the pinned messages.
         /// </returns>
         new Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null);
     }

@@ -17,12 +17,18 @@ namespace Discord
         /// </summary>
         MessageSource Source { get; }
         /// <summary>
-        ///     Returns <c>true</c> if this message was sent as a text-to-speech message.
+        ///     Gets the value that indicates whether this message was meant to be read-aloud by Discord.
         /// </summary>
+        /// <returns>
+        ///     <c>true</c> if this message was sent as a text-to-speech message; otherwise <c>false</c>.
+        /// </returns>
         bool IsTTS { get; }
         /// <summary>
-        ///     Returns <c>true</c> if this message was added to its channel's pinned messages.
+        ///     Gets the value that indicates whether this message is pinned.
         /// </summary>
+        /// <returns>
+        ///     <c>true</c> if this message was added to its channel's pinned messages; otherwise <c>false</c>.
+        /// </returns>
         bool IsPinned { get; }
         /// <summary>
         ///     Returns the content for this message.
@@ -56,14 +62,14 @@ namespace Discord
         ///     Returns all attachments included in this message.
         /// </summary>
         /// <returns>
-        ///     Collection of attachments.
+        ///     A read-only collection of attachments.
         /// </returns>
         IReadOnlyCollection<IAttachment> Attachments { get; }
         /// <summary>
         ///     Returns all embeds included in this message.
         /// </summary>
         /// <returns>
-        ///     Collection of embed objects.
+        ///     A read-only collection of embed objects.
         /// </returns>
         IReadOnlyCollection<IEmbed> Embeds { get; }
         /// <summary>
@@ -74,21 +80,21 @@ namespace Discord
         ///     Returns the IDs of channels mentioned in this message.
         /// </summary>
         /// <returns>
-        ///     Collection of channel IDs.
+        ///     A read-only collection of channel IDs.
         /// </returns>
         IReadOnlyCollection<ulong> MentionedChannelIds { get; }
         /// <summary>
         ///     Returns the IDs of roles mentioned in this message.
         /// </summary>
         /// <returns>
-        ///     Collection of role IDs.
+        ///     A read-only collection of role IDs.
         /// </returns>
         IReadOnlyCollection<ulong> MentionedRoleIds { get; }
         /// <summary>
         ///     Returns the IDs of users mentioned in this message.
         /// </summary>
         /// <returns>
-        ///     Collection of user IDs.
+        ///     A read-only collection of user IDs.
         /// </returns>
         IReadOnlyCollection<ulong> MentionedUserIds { get; }
     }

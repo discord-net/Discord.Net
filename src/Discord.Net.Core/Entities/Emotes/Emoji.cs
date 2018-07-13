@@ -27,7 +27,7 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Determines whether the specified emoji is equal to the current emoji.
+        ///     Determines whether the specified emoji is equal to the current one.
         /// </summary>
         /// <param name="other">The object to compare with the current object.</param>
         public override bool Equals(object other)

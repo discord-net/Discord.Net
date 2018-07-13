@@ -21,7 +21,7 @@ namespace Discord.WebSocket
         ///     Gets the guild associated with this channel.
         /// </summary>
         /// <returns>
-        ///     A guild that this channel belongs to.
+        ///     A guild object that this channel belongs to.
         /// </returns>
         public SocketGuild Guild { get; }
         /// <inheritdoc />
@@ -35,7 +35,7 @@ namespace Discord.WebSocket
         ///     Gets a collection of users that are able to view the channel.
         /// </summary>
         /// <returns>
-        ///     A collection of users that can access the channel (i.e. the users seen in the user list).
+        ///     A read-only collection of users that can access the channel (i.e. the users seen in the user list).
         /// </returns>
         public new virtual IReadOnlyCollection<SocketGuildUser> Users => ImmutableArray.Create<SocketGuildUser>();
 
@@ -59,6 +59,7 @@ namespace Discord.WebSocket
                     return new SocketGuildChannel(guild.Discord, model.Id, guild);
             }
         }
+        /// <inheritdoc />
         internal override void Update(ClientState state, Model model)
         {
             Name = model.Name.Value;
@@ -79,11 +80,11 @@ namespace Discord.WebSocket
             => ChannelHelper.DeleteAsync(this, Discord, options);
 
         /// <summary>
-        ///     Gets the overwrite permissions of the specified <paramref name="user"/>.
+        ///     Gets the permission overwrite for a specific user.
         /// </summary>
-        /// <param name="user">The user that you want to get the overwrite permissions for.</param>
+        /// <param name="user">The user to get the overwrite from.</param>
         /// <returns>
-        ///     The overwrite permissions for the requested user; otherwise <c>null</c>.
+        ///     An overwrite object for the targeted user; <c>null</c> if none is set.
         /// </returns>
         public OverwritePermissions? GetPermissionOverwrite(IUser user)
         {
@@ -94,13 +95,12 @@ namespace Discord.WebSocket
             }
             return null;
         }
-
         /// <summary>
-        ///     Gets the overwrite permissions of the specified <paramref name="role"/>.
+        ///     Gets the permission overwrite for a specific role.
         /// </summary>
-        /// <param name="role">The role that you want to get the overwrite permissions for.</param>
+        /// <param name="role">The role to get the overwrite from.</param>
         /// <returns>
-        ///     The overwrite permissions for the requested role; otherwise <c>null</c>.
+        ///     An overwrite object for the targeted role; <c>null</c> if none is set.
         /// </returns>
         public OverwritePermissions? GetPermissionOverwrite(IRole role)
         {
@@ -113,41 +113,41 @@ namespace Discord.WebSocket
         }
 
         /// <summary>
-        ///     Adds an overwrite permission for the specified <paramref name="user"/>.
+        ///     Adds or updates the permission overwrite for the given user.
         /// </summary>
-        /// <param name="user">The user you want the overwrite permission to apply to.</param>
-        /// <param name="perms">The overwrite permission you want to add.</param>
+        /// <param name="user">The user to add the overwrite to.</param>
+        /// <param name="permissions">The overwrite to add to the user.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/>.
+        ///     A task representing the asynchronous permission operation for adding the specified permissions to the channel.
         /// </returns>
-        public async Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions perms, RequestOptions options = null)
+        public async Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null)
         {
-            await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, user, perms, options).ConfigureAwait(false);
-            _overwrites = _overwrites.Add(new Overwrite(user.Id, PermissionTarget.User, new OverwritePermissions(perms.AllowValue, perms.DenyValue)));
+            await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, user, permissions, options).ConfigureAwait(false);
+            _overwrites = _overwrites.Add(new Overwrite(user.Id, PermissionTarget.User, new OverwritePermissions(permissions.AllowValue, permissions.DenyValue)));
         }
 
         /// <summary>
-        ///     Adds an overwrite permission for the specified <paramref name="role"/>.
+        ///     Adds or updates the permission overwrite for the given role.
         /// </summary>
-        /// <param name="role">The role you want the overwrite permission to apply to.</param>
-        /// <param name="perms">The overwrite permission you want to add.</param>
-        /// <param name="options">The options to be used when sending the request. </param>
-        /// <returns>
-        ///     An awaitable <see cref="Task"/>.
-        /// </returns>
-        public async Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions perms, RequestOptions options = null)
-        {
-            await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, role, perms, options).ConfigureAwait(false);
-            _overwrites = _overwrites.Add(new Overwrite(role.Id, PermissionTarget.Role, new OverwritePermissions(perms.AllowValue, perms.DenyValue)));
-        }
-        /// <summary>
-        ///     Removes an overwrite permission for the specified <paramref name="user"/>.
-        /// </summary>
-        /// <param name="user">The user you want to remove the overwrite permission from.</param>
+        /// <param name="role">The role to add the overwrite to.</param>
+        /// <param name="permissions">The overwrite to add to the role.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/>.
+        ///     A task representing the asynchronous permission operation for adding the specified permissions to the channel.
+        /// </returns>
+        public async Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null)
+        {
+            await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, role, permissions, options).ConfigureAwait(false);
+            _overwrites = _overwrites.Add(new Overwrite(role.Id, PermissionTarget.Role, new OverwritePermissions(permissions.AllowValue, permissions.DenyValue)));
+        }
+        /// <summary>
+        ///     Removes the permission overwrite for the given user, if one exists.
+        /// </summary>
+        /// <param name="user">The user to remove the overwrite from.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task representing the asynchronous operation for removing the specified permissions from the channel.
         /// </returns>
         public async Task RemovePermissionOverwriteAsync(IUser user, RequestOptions options = null)
         {
@@ -163,12 +163,12 @@ namespace Discord.WebSocket
             }
         }
         /// <summary>
-        ///     Removes an overwrite permission for the specified <paramref name="role"/>.
+        ///     Removes the permission overwrite for the given role, if one exists.
         /// </summary>
-        /// <param name="role">The role you want the overwrite permissions to be removed from.</param>
+        /// <param name="role">The role to remove the overwrite from.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/>.
+        ///     A task representing the asynchronous operation for removing the specified permissions from the channel.
         /// </returns>
         public async Task RemovePermissionOverwriteAsync(IRole role, RequestOptions options = null)
         {
@@ -185,26 +185,26 @@ namespace Discord.WebSocket
         }
 
         /// <summary>
-        ///     Gets the invites for this channel.
+        ///     Returns a collection of all invites to this channel.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing an <see cref="IReadOnlyCollection{RestInviteMetaData}"/>.
-        ///     <see cref="RestInviteMetadata"/> contains information such as, the number of times the invite has
-        ///     been used, who created the invite, and when the invite was created.
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of invite metadata that are created for this channel.
         /// </returns>
         public async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
             => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
         /// <summary>
-        ///     Creates an invite for this channel.
+        ///     Creates a new invite to this channel.
         /// </summary>
-        /// <param name="maxAge">The number of seconds that you want the invite to be valid for.</param>
-        /// <param name="maxUses">The number of times this invite can be used before it expires.</param>
-        /// <param name="isTemporary">Whether or not the invite grants temporary membership.</param>
-        /// <param name="isUnique">Whether to try reuse a similar invite or not.</param>
+        /// <param name="maxAge">The time (in seconds) until the invite expires. Set to <c>null</c> to never expire.</param>
+        /// <param name="maxUses">The max amount of times this invite may be used. Set to <c>null</c> to have unlimited uses.</param>
+        /// <param name="isTemporary">If <c>true</c>, the user accepting this invite will be kicked from the guild after closing their client.</param>
+        /// <param name="isUnique">If <c>true</c>, don't try to reuse a similar invite (useful for creating many unique one time use invites).</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing a <see cref="RestInviteMetadata"/>.
+        ///     A task that represents the asynchronous invite creation operation. The task result contains an invite
+        ///     metadata object containing information for the created invite.
         /// </returns>
         public async Task<RestInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
             => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
@@ -214,12 +214,18 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets the name of the channel.
         /// </summary>
+        /// <returns>
+        ///     A string that resolves to <see cref="SocketGuildChannel.Name"/>.
+        /// </returns>
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id}, Guild)";
+        /// <inheritdoc />
         internal new SocketGuildChannel Clone() => MemberwiseClone() as SocketGuildChannel;
 
         //SocketChannel
+        /// <inheritdoc />
         internal override IReadOnlyCollection<SocketUser> GetUsersInternal() => Users;
+        /// <inheritdoc />
         internal override SocketUser GetUserInternal(ulong id) => GetUser(id);
 
         //IGuildChannel

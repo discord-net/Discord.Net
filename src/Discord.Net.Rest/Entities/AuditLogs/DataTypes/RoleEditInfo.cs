@@ -24,19 +24,20 @@ namespace Discord.Rest
         /// </returns>
         public Color? Color { get; }
         /// <summary>
-        ///     Determines whether this role is mentionable (i.e. it can be mentioned in a text channel).
+        ///     Gets a value that indicates whether this role is mentionable.
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if other members can mention this role in a text channel; otherwise <c>false</c>.
+        ///     <c>true</c> if other members can mention this role in a text channel; otherwise <c>false</c>; 
+        ///     <c>null</c> if this is not mentioned in this entry.
         /// </returns>
         public bool? Mentionable { get; }
         /// <summary>
-        ///     Determines whether this role is hoisted (i.e its members will appear in a seperate section on the user
-        ///     list).
+        ///     Gets a value that indicates whether this role is hoisted (i.e. its members will appear in a separate
+        ///     section on the user list).
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if this role's members will appear in a seperate section in the user list; otherwise
-        ///     <c>false</c>.
+        ///     <c>true</c> if this role's members will appear in a separate section in the user list; otherwise 
+        ///     <c>false</c>; <c>null</c> if this is not mentioned in this entry.
         /// </returns>
         public bool? Hoist { get; }
         /// <summary>

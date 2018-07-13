@@ -15,9 +15,7 @@ namespace Discord
         ///     Returns a URL to this user's avatar.
         /// </summary>
         /// <param name="format">The format to return.</param>
-        /// <param name="size">
-        /// The size of the image to return in. This can be any power of two between 16 and 2048.
-        /// </param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.</param>
         /// <returns>
         ///     User's avatar URL.
         /// </returns>
@@ -35,12 +33,18 @@ namespace Discord
         /// </summary>
         ushort DiscriminatorValue { get; }
         /// <summary>
-        ///     Gets <c>true</c> if this user is a bot user.
+        ///     Gets a value that indicates whether this user is a bot user.
         /// </summary>
+        /// <returns>
+        ///     <c>true</c> if the user is a bot; otherwise <c>false</c>.
+        /// </returns>
         bool IsBot { get; }
         /// <summary>
-        ///     Gets <c>true</c> if this user is a webhook user.
+        ///     Gets a value that indicates whether this user is a webhook user.
         /// </summary>
+        /// <returns>
+        ///     <c>true</c> if the user is a webhook; otherwise <c>false</c>.
+        /// </returns>
         bool IsWebhook { get; }
         /// <summary>
         ///     Gets the username for this user.
@@ -52,7 +56,7 @@ namespace Discord
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable Task containing the DM channel.
+        ///     A task that represents the asynchronous operation for getting or creating a DM channel.
         /// </returns>
         Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null);
     }

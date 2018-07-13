@@ -25,7 +25,7 @@ namespace Discord
         ///     Disconnects from this audio channel.
         /// </summary>
         /// <returns>
-        ///     A task representing the asynchronous disconnection operation.
+        ///     A task representing the asynchronous operation for disconnecting from the audio channel.
         /// </returns>
         Task DisconnectAsync();
     }

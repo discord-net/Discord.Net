@@ -16,33 +16,60 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets the estimated round-trip latency, in milliseconds, to the gateway server.
         /// </summary>
+        /// <returns>
+        ///     An <see cref="int"/> that represents the round-trip latency to the WebSocket server. Please
+        ///     note that this value does not represent a "true" latency for operations such as sending a message.
+        /// </returns>
         public abstract int Latency { get; protected set; }
         /// <summary>
         ///     Gets the status for the logged-in user.
         /// </summary>
+        /// <returns>
+        ///     A status object that represents the user's online presence status.
+        /// </returns>
         public abstract UserStatus Status { get; protected set; }
         /// <summary>
         ///     Gets the activity for the logged-in user.
         /// </summary>
+        /// <returns>
+        ///     An activity object that represents the user's current activity.
+        /// </returns>
         public abstract IActivity Activity { get; protected set; }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
 
         /// <summary>
-        /// Gets the current logged-in user.
+        ///     Gets the current logged-in user.
         /// </summary>
         public new SocketSelfUser CurrentUser { get => base.CurrentUser as SocketSelfUser; protected set => base.CurrentUser = value; }
         /// <summary>
-        ///     Gets a collection of guilds that the logged-in user is currently in.
+        ///     Gets a collection of guilds that the user is currently in.
         /// </summary>
+        /// <returns>
+        ///     A read-only collection of guilds that the current user is in.
+        /// </returns>
         public abstract IReadOnlyCollection<SocketGuild> Guilds { get; }
         /// <summary>
-        ///     Gets a collection of private channels that are currently open for the logged-in user.
+        ///     Gets a collection of private channels opened in this session.
         /// </summary>
+        /// <remarks>
+        ///     This method will retrieve all private channels (including direct-message, group channel and such) that
+        ///     are currently opened in this session.
+        ///     <note type="warning">
+        ///         This method will not return previously opened private channels outside of the current session! If
+        ///         you have just started the client, this may return an empty collection.
+        ///     </note>
+        /// </remarks>
+        /// <returns>
+        ///     A read-only collection of private channels that the user currently partakes in.
+        /// </returns>
         public abstract IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels { get; }
         /// <summary>
-        ///     Gets a collection of available voice regions for the logged-in user.
+        ///     Gets a collection of available voice regions.
         /// </summary>
+        /// <returns>
+        ///     A read-only collection of voice regions that the user has access to.
+        /// </returns>
         public abstract IReadOnlyCollection<RestVoiceRegion> VoiceRegions { get; }
 
         internal BaseSocketClient(DiscordSocketConfig config, DiscordRestApiClient client)
@@ -59,7 +86,8 @@ namespace Discord.WebSocket
         /// </remarks>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing the application information.
+        ///     A task that represents the asynchronous get operation. The task result contains the application
+        ///     information.
         /// </returns>
         public abstract Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null);
         /// <summary>
@@ -107,7 +135,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets a channel.
         /// </summary>
-        /// <param name="id">The channel snowflake identifier.</param>
+        /// <param name="id">The snowflake identifier of the channel (e.g. `381889909113225237`).</param>
         /// <returns>
         ///     A generic WebSocket-based channel object (voice, text, category, etc.) associated with the identifier;
         ///     <c>null</c> when the channel cannot be found.
@@ -125,9 +153,10 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets a voice region.
         /// </summary>
-        /// <param name="id">The unique identifier of the voice region.</param>
+        /// <param name="id">The identifier of the voice region (e.g. <c>eu-central</c> ).</param>
         /// <returns>
-        ///     A REST-based voice region; <c>null</c> if none can be found.
+        ///     A REST-based voice region associated with the identifier; <c>null</c> if the voice region is not
+        ///     found.
         /// </returns>
         public abstract RestVoiceRegion GetVoiceRegion(string id);
         /// <inheritdoc />
@@ -135,21 +164,21 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public abstract Task StopAsync();
         /// <summary>
-        ///     Sets the current status of the logged-in user (e.g. Online, Do not Disturb).
+        ///     Sets the current status of the user (e.g. Online, Do not Disturb).
         /// </summary>
         /// <param name="status">The new status to be set.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/>.
+        ///     A task that represents the asynchronous set operation.
         /// </returns>
         public abstract Task SetStatusAsync(UserStatus status);
         /// <summary>
-        ///     Sets the game of the logged-in user.
+        ///     Sets the game of the user.
         /// </summary>
         /// <param name="name">The name of the game.</param>
         /// <param name="streamUrl">If streaming, the URL of the stream. Must be a valid Twitch URL.</param>
         /// <param name="type">The type of the game.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/>.
+        ///     A task that represents the asynchronous set operation.
         /// </returns>
         public abstract Task SetGameAsync(string name, string streamUrl = null, ActivityType type = ActivityType.Playing);
         /// <summary>
@@ -167,7 +196,7 @@ namespace Discord.WebSocket
         /// </remarks>
         /// <param name="activity">The activty to be set.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/>.
+        ///     A task that represents the asynchronous set operation.
         /// </returns>
         public abstract Task SetActivityAsync(IActivity activity);
         /// <summary>
@@ -175,7 +204,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="guilds">The guilds to download the members from.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/>.
+        ///     A task that represents the asynchronous download operation.
         /// </returns>
         public abstract Task DownloadUsersAsync(IEnumerable<IGuild> guilds);
 
@@ -193,26 +222,26 @@ namespace Discord.WebSocket
         /// <param name="jpegIcon">The icon of the guild.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing the newly created guild.
+        ///     A task that represents the asynchronous creation operation. The task result contains the created guild.
         /// </returns>
         public Task<RestGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null, RequestOptions options = null)
             => ClientHelper.CreateGuildAsync(this, name, region, jpegIcon, options ?? RequestOptions.Default);
         /// <summary>
-        ///     Gets the connections that the logged-in user has set up.
+        ///     Gets the connections that the user has set up.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing a collection of connections.
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of connections.
         /// </returns>
         public Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(RequestOptions options = null)
             => ClientHelper.GetConnectionsAsync(this, options ?? RequestOptions.Default);
         /// <summary>
-        ///     Gets an invite with the provided invite identifier.
+        ///     Gets an invite.
         /// </summary>
         /// <param name="inviteId">The invitation identifier.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing the invite information.
+        ///     A task that represents the asynchronous get operation. The task result contains the invite information.
         /// </returns>
         public Task<RestInviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null)
             => ClientHelper.GetInviteAsync(this, inviteId, options ?? RequestOptions.Default);

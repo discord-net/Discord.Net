@@ -15,7 +15,7 @@ namespace Discord.Commands
         /// <param name="input">The raw input of the command.</param>
         /// <param name="services">The service collection used for dependency injection.</param>
         /// <returns>
-        ///     An awaitable Task containing the result of the type reading process.
+        ///     A task that represents the asynchronous parsing operation. The task result contains the parsing result.
         /// </returns>
         public abstract Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services);
     }

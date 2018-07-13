@@ -11,7 +11,7 @@ namespace Discord
     public interface ITextChannel : IMessageChannel, IMentionable, INestedChannel
     {
         /// <summary>
-        ///     Determines whether the channel is NSFW.
+        ///     Gets a value that indicates whether the channel is NSFW.
         /// </summary>
         /// <returns>
         ///     <c>true</c> if the channel has the NSFW flag enabled; otherwise <c>false</c>.
