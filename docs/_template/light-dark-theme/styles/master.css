@@ -141,3 +141,13 @@ select {
     transition: background-color .3s, color .3s;
     cursor: pointer;
 }
+
+/* arrow */
+
+span.arrow-d{
+    top: 6px; position: relative;
+}
+
+span.arrow-r{
+    top: 6px; position: relative;
+}
