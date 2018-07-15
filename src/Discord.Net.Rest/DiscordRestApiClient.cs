@@ -583,6 +583,7 @@ namespace Discord.API
             Preconditions.NotNullOrWhitespace(emoji, nameof(emoji));
 
             options = RequestOptions.CreateOrClone(options);
+            options.IsReactionBucket = true;
 
             var ids = new BucketIds(channelId: channelId);
 
@@ -595,6 +596,7 @@ namespace Discord.API
             Preconditions.NotNullOrWhitespace(emoji, nameof(emoji));
 
             options = RequestOptions.CreateOrClone(options);
+            options.IsReactionBucket = true;
 
             var ids = new BucketIds(channelId: channelId);
 
