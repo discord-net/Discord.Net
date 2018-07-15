@@ -20,7 +20,7 @@ By default, the following Types are supported arguments:
 * `string`
 * `enum`
 * `DateTime`/`DateTimeOffset`/`TimeSpan`
-* `Nullable<T>` where applicable
+* Any nullable value-type (e.g. `int?`, `bool?`)
 * Any implementation of `IChannel`/`IMessage`/`IUser`/`IRole`
 
 ## Creating a Type Reader
