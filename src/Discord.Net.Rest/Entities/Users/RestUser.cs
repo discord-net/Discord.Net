@@ -65,6 +65,13 @@ namespace Discord.Rest
             Update(model);
         }
 
+        /// <summary>
+        ///     Returns a direct message channel to this user, or create one if it does not already exist.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     An awaitable <see cref="Task"/> containing a <see cref="RestDMChannel"/>.
+        /// </returns>
         public Task<RestDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
             => UserHelper.CreateDMChannelAsync(this, Discord, options);
 
