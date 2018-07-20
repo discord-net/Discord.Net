@@ -63,9 +63,9 @@ namespace Discord.WebSocket
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
         public override IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => State.PrivateChannels;
         public IReadOnlyCollection<SocketDMChannel> DMChannels
-            => State.PrivateChannels.Select(x => x as SocketDMChannel).Where(x => x != null).ToImmutableArray();
+            => State.PrivateChannels.OfType<SocketDMChannel>().ToImmutableArray();
         public IReadOnlyCollection<SocketGroupChannel> GroupChannels
-            => State.PrivateChannels.Select(x => x as SocketGroupChannel).Where(x => x != null).ToImmutableArray();
+            => State.PrivateChannels.OfType<SocketGroupChannel>().ToImmutableArray();
         public override IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>
