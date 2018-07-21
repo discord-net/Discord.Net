@@ -563,7 +563,7 @@ namespace Discord.WebSocket
 
                 await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, channelId, selfDeaf, selfMute).ConfigureAwait(false);
             }
-            catch (Exception)
+            catch
             {
                 await DisconnectAudioInternalAsync().ConfigureAwait(false);
                 throw;
@@ -580,7 +580,7 @@ namespace Discord.WebSocket
                     throw new TimeoutException();
                 return await promise.Task.ConfigureAwait(false);
             }
-            catch (Exception)
+            catch
             {
                 await DisconnectAudioAsync().ConfigureAwait(false);
                 throw;

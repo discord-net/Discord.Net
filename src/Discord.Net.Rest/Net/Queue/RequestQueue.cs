@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 #if DEBUG_LIMITS
 using System.Diagnostics;
@@ -16,10 +16,10 @@ namespace Discord.Net.Queue
 
         private readonly ConcurrentDictionary<string, RequestBucket> _buckets;
         private readonly SemaphoreSlim _tokenLock;
+        private readonly CancellationTokenSource _cancelToken; //Dispose token
         private CancellationTokenSource _clearToken;
         private CancellationToken _parentToken;
         private CancellationToken _requestCancelToken; //Parent token + Clear token
-        private CancellationTokenSource _cancelToken; //Dispose token
         private DateTimeOffset _waitUntil;
 
         private Task _cleanupTask;
@@ -115,7 +115,7 @@ namespace Discord.Net.Queue
                     foreach (var bucket in _buckets.Select(x => x.Value))
                     {
                         if ((now - bucket.LastAttemptAt).TotalMinutes > 1.0)
-                            _buckets.TryRemove(bucket.Id, out RequestBucket ignored);
+                            _buckets.TryRemove(bucket.Id, out _);
                     }
                     await Task.Delay(60000, _cancelToken.Token); //Runs each minute
                 }

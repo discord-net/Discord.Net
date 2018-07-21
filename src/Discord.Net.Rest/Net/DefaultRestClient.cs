@@ -131,14 +131,14 @@ namespace Discord.Net.Rest
             return new RestResponse(response.StatusCode, headers, stream);
         }
 
-        private static readonly HttpMethod _patch = new HttpMethod("PATCH");
+        private static readonly HttpMethod Patch = new HttpMethod("PATCH");
         private HttpMethod GetMethod(string method)
         {
             switch (method)
             {
                 case "DELETE": return HttpMethod.Delete;
                 case "GET": return HttpMethod.Get;
-                case "PATCH": return _patch;
+                case "PATCH": return Patch;
                 case "POST": return HttpMethod.Post;
                 case "PUT": return HttpMethod.Put;
                 default: throw new ArgumentOutOfRangeException(nameof(method), $"Unknown HttpMethod: {method}");

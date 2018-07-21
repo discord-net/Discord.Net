@@ -10,7 +10,7 @@ using Model = Discord.API.Channel;
 namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestDMChannel : RestChannel, IDMChannel, IRestPrivateChannel, IRestMessageChannel, IUpdateable
+    public class RestDMChannel : RestChannel, IDMChannel, IRestPrivateChannel, IRestMessageChannel
     {
         public RestUser CurrentUser { get; private set; }
         public RestUser Recipient { get; private set; }

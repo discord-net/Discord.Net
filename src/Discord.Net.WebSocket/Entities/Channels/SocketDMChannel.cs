@@ -97,7 +97,7 @@ namespace Discord.WebSocket
             if (id == Recipient.Id)
                 return Recipient;
             else if (id == Discord.CurrentUser.Id)
-                return Discord.CurrentUser as SocketSelfUser;
+                return Discord.CurrentUser;
             else
                 return null;
         }

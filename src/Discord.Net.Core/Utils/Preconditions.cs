@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Discord
 {
@@ -198,7 +198,7 @@ namespace Discord
             for (var i = 0; i < roles.Length; i++)
             {
                 if (roles[i] == guildId)
-                    throw new ArgumentException($"The everyone role cannot be assigned to a user", name);
+                    throw new ArgumentException("The everyone role cannot be assigned to a user", name);
             }
         }
     }

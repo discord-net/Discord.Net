@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -28,7 +28,7 @@ namespace Discord.WebSocket
                 _orderedMessages.Enqueue(message.Id);
 
                 while (_orderedMessages.Count > _size && _orderedMessages.TryDequeue(out ulong msgId))
-                    _messages.TryRemove(msgId, out SocketMessage msg);
+                    _messages.TryRemove(msgId, out _);
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 
 namespace Discord.Net.Queue
 {
@@ -9,8 +9,8 @@ namespace Discord.Net.Queue
     }
     internal struct ClientBucket
     {
-        private static readonly ImmutableDictionary<ClientBucketType, ClientBucket> _defsByType;
-        private static readonly ImmutableDictionary<string, ClientBucket> _defsById;
+        private static readonly ImmutableDictionary<ClientBucketType, ClientBucket> DefsByType;
+        private static readonly ImmutableDictionary<string, ClientBucket> DefsById;
 
         static ClientBucket()
         {
@@ -23,16 +23,16 @@ namespace Discord.Net.Queue
             var builder = ImmutableDictionary.CreateBuilder<ClientBucketType, ClientBucket>();
             foreach (var bucket in buckets)
                 builder.Add(bucket.Type, bucket);
-            _defsByType = builder.ToImmutable();
+            DefsByType = builder.ToImmutable();
 
             var builder2 = ImmutableDictionary.CreateBuilder<string, ClientBucket>();
             foreach (var bucket in buckets)
                 builder2.Add(bucket.Id, bucket);
-            _defsById = builder2.ToImmutable();
+            DefsById = builder2.ToImmutable();
         }
 
-        public static ClientBucket Get(ClientBucketType type) => _defsByType[type];
-        public static ClientBucket Get(string id) => _defsById[id];
+        public static ClientBucket Get(ClientBucketType type) => DefsByType[type];
+        public static ClientBucket Get(string id) => DefsById[id];
         
         public ClientBucketType Type { get; }
         public string Id { get; }

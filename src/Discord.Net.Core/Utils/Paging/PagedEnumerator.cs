@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,7 +60,7 @@ namespace Discord
                     if (Current.Count == 0)
                         _info.Remaining = 0;
                 }
-                _info.PageSize = _info.Remaining != null ? (int)Math.Min(_info.Remaining.Value, _source.PageSize) : _source.PageSize;
+                _info.PageSize = _info.Remaining != null ? Math.Min(_info.Remaining.Value, _source.PageSize) : _source.PageSize;
 
                 if (_info.Remaining != 0)
                 {
