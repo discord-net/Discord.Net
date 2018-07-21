@@ -10,24 +10,38 @@ namespace Discord.Rest
     /// </summary>
     public class MemberUpdateAuditLogData : IAuditLogData
     {
-        private MemberUpdateAuditLogData(IUser target, string newNick, string oldNick)
+        private MemberUpdateAuditLogData(IUser target, MemberInfo before, MemberInfo after)
         {
             Target = target;
-            NewNick = newNick;
-            OldNick = oldNick;
+            Before = before;
+            After = after;
         }
 
         internal static MemberUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var changes = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "nick");
+            var changes = entry.Changes;
 
-            var newNick = changes.NewValue?.ToObject<string>();
-            var oldNick = changes.OldValue?.ToObject<string>();
+            var nickModel = changes.FirstOrDefault(x => x.ChangedProperty == "nick");
+            var deafModel = changes.FirstOrDefault(x => x.ChangedProperty == "deaf");
+            var muteModel = changes.FirstOrDefault(x => x.ChangedProperty == "mute");
+            var avatarModel = changes.FirstOrDefault(x => x.ChangedProperty == "avatar_hash");
+
+            string oldNick = nickModel?.OldValue?.ToObject<string>(),
+                newNick = nickModel?.NewValue?.ToObject<string>();
+            bool? oldDeaf = deafModel?.OldValue?.ToObject<bool>(),
+                newDeaf = deafModel?.NewValue?.ToObject<bool>();
+            bool? oldMute = muteModel?.OldValue?.ToObject<bool>(),
+                newMute = muteModel?.NewValue?.ToObject<bool>();
+            string oldAvatar = avatarModel?.OldValue?.ToObject<string>(),
+                newAvatar = avatarModel?.NewValue?.ToObject<string>();
 
             var targetInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
             var user = RestUser.Create(discord, targetInfo);
 
-            return new MemberUpdateAuditLogData(user, newNick, oldNick);
+            var before = new MemberInfo(oldNick, oldDeaf, oldMute, oldAvatar);
+            var after = new MemberInfo(newNick, newDeaf, newMute, newAvatar);
+
+            return new MemberUpdateAuditLogData(user, before, after);
         }
 
         /// <summary>
@@ -37,19 +51,7 @@ namespace Discord.Rest
         ///     A user object representing the user who the changes were performed on.
         /// </returns>
         public IUser Target { get; }
-        /// <summary>
-        ///     Gets the new nickname of the user.
-        /// </summary>
-        /// <returns>
-        ///     A string containing the new nickname of the user; <c>null</c> if the user no longer had a nickname.
-        /// </returns>
-        public string NewNick { get; }
-        /// <summary>
-        ///     Gets the old nickname of the user.
-        /// </summary>
-        /// <returns>
-        ///     A string containing the old nickname of the user; <c>null</c> if the user did not have a nickname.
-        /// </returns>
-        public string OldNick { get; }
+        public MemberInfo Before { get; }
+        public MemberInfo After { get; }
     }
 }
