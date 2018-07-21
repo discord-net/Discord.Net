@@ -1,6 +1,5 @@
 #pragma warning disable CS1591
 using Discord.API.Gateway;
-using Discord.API.Rest;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
 using Discord.Net.WebSockets;

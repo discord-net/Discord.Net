@@ -1,4 +1,4 @@
-﻿using Discord.Net.WebSockets;
+using Discord.Net.WebSockets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -151,7 +151,7 @@ namespace Discord.Net.Providers.WS4Net
         }
         private void OnBinaryMessage(object sender, DataReceivedEventArgs e)
         {
-            BinaryMessage(e.Data, 0, e.Data.Count()).GetAwaiter().GetResult();
+            BinaryMessage(e.Data, 0, e.Data.Length).GetAwaiter().GetResult();
         }
         private void OnConnected(object sender, object e)
         {

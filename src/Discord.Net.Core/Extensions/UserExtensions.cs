@@ -10,6 +10,19 @@ namespace Discord
         /// <summary>
         ///     Sends a message via DM.
         /// </summary>
+        /// <remarks>
+        ///     This method attempts to send a direct-message to the user.
+        ///     <note type="warning">
+        ///         <para>
+        ///         Please note that this method <strong>will</strong> throw an <see cref="Discord.Net.HttpException"/>
+        ///         if the user cannot receive DMs due to privacy reasons or if the user has the sender blocked.
+        ///         </para>
+        ///         <para>
+        ///         You may want to consider catching for <see cref="Discord.Net.HttpException.DiscordCode"/> 
+        ///         <c>50007</c> when using this method.
+        ///         </para>
+        ///     </note>
+        /// </remarks>
         /// <param name="user">The user to send the DM to.</param>
         /// <param name="text">The message to be sent.</param>
         /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
@@ -30,6 +43,19 @@ namespace Discord
         /// <summary>
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
+        /// <remarks>
+        ///     This method attempts to send an attachment as a direct-message to the user.
+        ///     <note type="warning">
+        ///         <para>
+        ///         Please note that this method <strong>will</strong> throw an <see cref="Discord.Net.HttpException"/>
+        ///         if the user cannot receive DMs due to privacy reasons or if the user has the sender blocked.
+        ///         </para>
+        ///         <para>
+        ///         You may want to consider catching for <see cref="Discord.Net.HttpException.DiscordCode"/> 
+        ///         <c>50007</c> when using this method.
+        ///         </para>
+        ///     </note>
+        /// </remarks>
         /// <param name="user">The user to send the DM to.</param>
         /// <param name="stream">The <see cref="Stream"/> of the file to be sent.</param>
         /// <param name="filename">The name of the attachment.</param>
@@ -60,6 +86,19 @@ namespace Discord
         /// <summary>
         ///     Sends a file via DM with an optional caption.
         /// </summary>
+        /// <remarks>
+        ///     This method attempts to send an attachment as a direct-message to the user.
+        ///     <note type="warning">
+        ///         <para>
+        ///         Please note that this method <strong>will</strong> throw an <see cref="Discord.Net.HttpException"/>
+        ///         if the user cannot receive DMs due to privacy reasons or if the user has the sender blocked.
+        ///         </para>
+        ///         <para>
+        ///         You may want to consider catching for <see cref="Discord.Net.HttpException.DiscordCode"/> 
+        ///         <c>50007</c> when using this method.
+        ///         </para>
+        ///     </note>
+        /// </remarks>
         /// <param name="user">The user to send the DM to.</param>
         /// <param name="filePath">The file path of the file.</param>
         /// <param name="text">The message to be sent.</param>
