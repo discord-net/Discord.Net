@@ -1806,6 +1806,7 @@ namespace Discord.WebSocket
         internal int GetAudioId() => _nextAudioId++;
 
         //IDiscordClient
+        /*
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
             => await GetApplicationInfoAsync().ConfigureAwait(false);
 
@@ -1839,7 +1840,7 @@ namespace Discord.WebSocket
         Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync(RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IVoiceRegion>>(VoiceRegions);
         Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
-            => Task.FromResult<IVoiceRegion>(GetVoiceRegion(id));
+            => Task.FromResult<IVoiceRegion>(GetVoiceRegion(id));*/
 
         async Task IDiscordClient.StartAsync()
             => await StartAsync().ConfigureAwait(false);

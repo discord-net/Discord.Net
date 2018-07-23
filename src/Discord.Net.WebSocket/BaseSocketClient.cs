@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord.API;
 using Discord.Rest;
@@ -46,7 +48,56 @@ namespace Discord.WebSocket
         public abstract Task SetStatusAsync(UserStatus status);
         public abstract Task SetGameAsync(string name, string streamUrl = null, ActivityType type = ActivityType.Playing);
         public abstract Task SetActivityAsync(IActivity activity);
-        public abstract Task DownloadUsersAsync(IEnumerable<IGuild> guilds);  
+        public abstract Task DownloadUsersAsync(IEnumerable<IGuild> guilds);
+
+        public Task<IChannel> GetChannelAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            Func<Task<IChannel>> restAction = async () =>
+                await ClientHelper.GetChannelAsync(this, id, options).ConfigureAwait(false) as IChannel;
+            Func<IChannel> cacheAction = () => GetChannel(id);
+
+            return CacheHelper(mode, restAction, cacheAction);
+        }
+        public Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync(CacheMode mode, RequestOptions options)
+        {
+            Func<Task<IReadOnlyCollection<IPrivateChannel>>> restAction = async () =>
+            {
+                var col = (await ClientHelper.GetPrivateChannelsAsync(this, options).ConfigureAwait(false)).OfType<IPrivateChannel>();
+                return col.ToReadOnlyCollection(col.Count);
+            };
+            Func<IReadOnlyCollection<IPrivateChannel>> cacheAction = () => PrivateChannels;
+
+            return CacheHelper(mode, restAction, cacheAction);
+        }
+
+        public Task<IGuild> GetGuildAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            Func<Task<IGuild>> restAction = async () =>
+                await ClientHelper.GetGuildAsync(this, id, options).ConfigureAwait(false) as IGuild;
+            Func<IGuild> cacheAction = () => GetGuild(id);
+
+            return CacheHelper(mode, restAction, cacheAction);
+        }
+        public Task<IReadOnlyCollection<IGuild>> GetGuildsAsync(CacheMode mode, RequestOptions options)
+        {
+            Func<Task<IReadOnlyCollection<IGuild>>> restAction = async () =>
+            {
+                var col = (await ClientHelper.GetGuildsAsync(this, options)).OfType<IGuild>();
+                return col.ToReadOnlyCollection(col.Count);
+            };
+            Func<IReadOnlyCollection<IGuild>> cacheAction = () => Guilds;
+
+            return CacheHelper(mode, restAction, cacheAction);
+        }
+
+        public Task<IUser> GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            Func<Task<IUser>> restAction = async () =>
+                await ClientHelper.GetUserAsync(this, id, options).ConfigureAwait(false) as IUser;
+            Func<IUser> cacheAction = () => GetUser(id);
+
+            return CacheHelper(mode, restAction, cacheAction);
+        }
 
         /// <inheritdoc />
         public Task<RestGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null, RequestOptions options = null)
@@ -90,5 +141,21 @@ namespace Discord.WebSocket
             => Task.FromResult<IVoiceRegion>(GetVoiceRegion(id));
         Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync(RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IVoiceRegion>>(VoiceRegions);
+
+        public async Task<T> CacheHelper<T>(CacheMode mode, Func<Task<T>> restAction, Func<T> cacheAction)
+            where T : class
+        {
+            switch (mode)
+            {
+                case CacheMode.CacheOnly:
+                    return cacheAction();
+                case CacheMode.AllowDownload:
+                    return cacheAction() ?? await restAction().ConfigureAwait(false);
+                case CacheMode.ForceDownload:
+                    return await restAction().ConfigureAwait(false);
+                default:
+                    throw new InvalidOperationException("Unhandled CacheMode");
+            }
+        }
     }
 }
