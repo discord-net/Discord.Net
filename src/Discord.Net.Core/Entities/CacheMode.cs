@@ -1,8 +1,9 @@
-﻿namespace Discord
+namespace Discord
 {
     public enum CacheMode
     {
         AllowDownload,
-        CacheOnly
+        CacheOnly,
+        ForceDownload
     }
 }
