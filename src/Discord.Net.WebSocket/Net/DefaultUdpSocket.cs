@@ -118,14 +118,12 @@ namespace Discord.Net.Udp
             {
                 var receiveTask = _udp.ReceiveAsync();
 
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                receiveTask.ContinueWith((recieveResult) =>
+                _ = receiveTask.ContinueWith((recieveResult) =>
                 {
                     //observe the exception as to not recieve as unhandled exception
                     _ = recieveResult.Exception;
 
                 }, TaskContinuationOptions.OnlyOnFaulted);
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
                 var task = await Task.WhenAny(closeTask, receiveTask).ConfigureAwait(false);
                 if (task == closeTask)
