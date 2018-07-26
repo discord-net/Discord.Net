@@ -1,4 +1,15 @@
-@import url('https://fonts.googleapis.com/css?family=Titillium+Web|Noto+Sans');
+@font-face{
+    font-family: 'Titillium Web';
+    font-display: optional;
+    src: local('Titillium Web'), url('https://fonts.googleapis.com/css?family=Titillium+Web')
+}
+
+@font-face{
+    font-family: 'Noto Sans';
+    font-display: optional;
+    src: local('Noto Sans'), url('https://fonts.googleapis.com/css?family=Noto+Sans')
+}
+
 html,
 body {
     font-family: 'Titillium Web', 'Segoe UI', Tahoma, Helvetica, sans-serif;

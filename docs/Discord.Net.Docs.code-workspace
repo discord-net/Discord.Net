@@ -14,7 +14,8 @@
 			"**/.hg": true,
 			"**/CVS": true,
 			"**/.DS_Store": true,
-			"obj/": true
+			"obj/": true,
+			"_site/": true,
 		}
 	}
 }
