@@ -59,7 +59,14 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
 
+        /// <summary>
+        ///     Gets the built-in role containing all users in this guild.
+        /// </summary>
         public RestRole EveryoneRole => GetRole(Id);
+
+        /// <summary>
+        ///     Gets a collection of all roles in this guild.
+        /// </summary>
         public IReadOnlyCollection<RestRole> Roles => _roles.ToReadOnlyCollection();
         /// <inheritdoc />
         public IReadOnlyCollection<GuildEmote> Emotes => _emotes;
@@ -170,10 +177,38 @@ namespace Discord.Rest
             => GuildHelper.LeaveAsync(this, Discord, options);
 
         //Bans
+        //Bans
+        /// <summary>
+        ///     Gets a collection of all users banned in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     ban objects that this guild currently possesses, with each object containing the user banned and reason
+        ///     behind the ban.
+        /// </returns>
         public Task<IReadOnlyCollection<RestBan>> GetBansAsync(RequestOptions options = null)
             => GuildHelper.GetBansAsync(this, Discord, options);
+        /// <summary>
+        ///     Gets a ban object for a banned user.
+        /// </summary>
+        /// <param name="user">The banned user.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a ban object, which
+        ///     contains the user information and the reason for the ban; <c>null</c> if the ban entry cannot be found.
+        /// </returns>
         public Task<RestBan> GetBanAsync(IUser user, RequestOptions options = null)
             => GuildHelper.GetBanAsync(this, Discord, user.Id, options);
+        /// <summary>
+        ///     Gets a ban object for a banned user.
+        /// </summary>
+        /// <param name="userId">The snowflake identifier for the banned user.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a ban object, which
+        ///     contains the user information and the reason for the ban; <c>null</c> if the ban entry cannot be found.
+        /// </returns>
         public Task<RestBan> GetBanAsync(ulong userId, RequestOptions options = null)
             => GuildHelper.GetBanAsync(this, Discord, userId, options);
 
@@ -192,36 +227,110 @@ namespace Discord.Rest
             => GuildHelper.RemoveBanAsync(this, Discord, userId, options);
 
         //Channels
+        /// <summary>
+        ///     Gets a collection of all channels in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     generic channels found within this guild.
+        /// </returns>
         public Task<IReadOnlyCollection<RestGuildChannel>> GetChannelsAsync(RequestOptions options = null)
             => GuildHelper.GetChannelsAsync(this, Discord, options);
+
+        /// <summary>
+        ///     Gets a channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the channel.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the generic channel
+        ///     associated with the specified <paramref name="id"/>; <c>null</c> if none is found.
+        /// </returns>
         public Task<RestGuildChannel> GetChannelAsync(ulong id, RequestOptions options = null)
             => GuildHelper.GetChannelAsync(this, Discord, id, options);
+
+        /// <summary>
+        ///     Gets a text channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the text channel.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the text channel
+        ///     associated with the specified <paramref name="id"/>; <c>null</c> if none is found.
+        /// </returns>
         public async Task<RestTextChannel> GetTextChannelAsync(ulong id, RequestOptions options = null)
         {
             var channel = await GuildHelper.GetChannelAsync(this, Discord, id, options).ConfigureAwait(false);
             return channel as RestTextChannel;
         }
+
+        /// <summary>
+        ///     Gets a collection of all text channels in this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     message channels found within this guild.
+        /// </returns>
         public async Task<IReadOnlyCollection<RestTextChannel>> GetTextChannelsAsync(RequestOptions options = null)
         {
             var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
             return channels.Select(x => x as RestTextChannel).Where(x => x != null).ToImmutableArray();
         }
+
+        /// <summary>
+        ///     Gets a voice channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the voice channel.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the voice channel associated
+        ///     with the specified <paramref name="id"/>; <c>null</c> if none is found.
+        /// </returns>
         public async Task<RestVoiceChannel> GetVoiceChannelAsync(ulong id, RequestOptions options = null)
         {
             var channel = await GuildHelper.GetChannelAsync(this, Discord, id, options).ConfigureAwait(false);
             return channel as RestVoiceChannel;
         }
+
+        /// <summary>
+        ///     Gets a collection of all voice channels in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     voice channels found within this guild.
+        /// </returns>
         public async Task<IReadOnlyCollection<RestVoiceChannel>> GetVoiceChannelsAsync(RequestOptions options = null)
         {
             var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
             return channels.Select(x => x as RestVoiceChannel).Where(x => x != null).ToImmutableArray();
         }
+
+        /// <summary>
+        ///     Gets a collection of all category channels in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     category channels found within this guild.
+        /// </returns>
         public async Task<IReadOnlyCollection<RestCategoryChannel>> GetCategoryChannelsAsync(RequestOptions options = null)
         {
             var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
             return channels.Select(x => x as RestCategoryChannel).Where(x => x != null).ToImmutableArray();
         }
 
+        /// <summary>
+        ///     Gets the AFK voice channel in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the voice channel that the
+        ///     AFK users will be moved to after they have idled for too long; <c>null</c> if none is set.
+        /// </returns>
         public async Task<RestVoiceChannel> GetAFKChannelAsync(RequestOptions options = null)
         {
             var afkId = AFKChannelId;
@@ -232,6 +341,15 @@ namespace Discord.Rest
             }
             return null;
         }
+
+        /// <summary>
+        ///     Gets the first viewable text channel in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the first viewable text
+        ///     channel in this guild; <c>null</c> if none is found.
+        /// </returns>
         public async Task<RestTextChannel> GetDefaultChannelAsync(RequestOptions options = null)
         {
             var channels = await GetTextChannelsAsync(options).ConfigureAwait(false);
@@ -241,6 +359,15 @@ namespace Discord.Rest
                 .OrderBy(c => c.Position)
                 .FirstOrDefault();
         }
+
+        /// <summary>
+        ///     Gets the embed channel (i.e. the channel set in the guild's widget settings) in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the embed channel set
+        ///     within the server's widget settings; <c>null</c> if none is set.
+        /// </returns>
         public async Task<RestGuildChannel> GetEmbedChannelAsync(RequestOptions options = null)
         {
             var embedId = EmbedChannelId;
@@ -248,6 +375,15 @@ namespace Discord.Rest
                 return await GuildHelper.GetChannelAsync(this, Discord, embedId.Value, options).ConfigureAwait(false);
             return null;
         }
+
+        /// <summary>
+        ///     Gets the first viewable text channel in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the first viewable text
+        ///     channel in this guild; <c>null</c> if none is found.
+        /// </returns>
         public async Task<RestTextChannel> GetSystemChannelAsync(RequestOptions options = null)
         {
             var systemId = SystemChannelId;
@@ -301,6 +437,14 @@ namespace Discord.Rest
             => GuildHelper.CreateIntegrationAsync(this, Discord, id, type, options);
 
         //Invites
+        /// <summary>
+        ///     Gets a collection of all invites in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     invite metadata, each representing information for an invite found within this guild.
+        /// </returns>
         public Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
             => GuildHelper.GetInvitesAsync(this, Discord, options);
         /// <summary>
@@ -314,6 +458,13 @@ namespace Discord.Rest
             => GuildHelper.GetVanityInviteAsync(this, Discord, options);
 
         //Roles
+        /// <summary>
+        ///     Gets a role in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the role.</param>
+        /// <returns>
+        ///     A role that is associated with the specified <paramref name="id"/>; <c>null</c> if none is found.
+        /// </returns>
         public RestRole GetRole(ulong id)
         {
             if (_roles.TryGetValue(id, out RestRole value))
@@ -321,6 +472,18 @@ namespace Discord.Rest
             return null;
         }
 
+        /// <summary>
+        ///     Creates a new role with the provided name.
+        /// </summary>
+        /// <param name="name">The new name for the role.</param>
+        /// <param name="permissions">The guild permission that the role should possess.</param>
+        /// <param name="color">The color of the role.</param>
+        /// <param name="isHoisted">Whether the role is separated from others on the sidebar.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     role.
+        /// </returns>
         public async Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?),
             bool isHoisted = false, RequestOptions options = null)
         {
@@ -330,26 +493,113 @@ namespace Discord.Rest
         }
 
         //Users
+        /// <summary>
+        ///     Gets a collection of all users in this guild.
+        /// </summary>
+        /// <remarks>
+        ///     This method retrieves all users found within this guild.
+        /// </remarks>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a collection of guild
+        ///     users found within this guild.
+        /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(RequestOptions options = null)
             => GuildHelper.GetUsersAsync(this, Discord, null, null, options);
+
+        /// <summary>
+        ///     Gets a user from this guild.
+        /// </summary>
+        /// <remarks>
+        ///     This method retrieves a user found within this guild.
+        /// </remarks>
+        /// <param name="id">The snowflake identifier of the user.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the guild user
+        ///     associated with the specified <paramref name="id"/>; <c>null</c> if none is found.
+        /// </returns>
         public Task<RestGuildUser> GetUserAsync(ulong id, RequestOptions options = null)
             => GuildHelper.GetUserAsync(this, Discord, id, options);
+
+        /// <summary>
+        ///     Gets the current user for this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the currently logged-in
+        ///     user within this guild.
+        /// </returns>
         public Task<RestGuildUser> GetCurrentUserAsync(RequestOptions options = null)
             => GuildHelper.GetUserAsync(this, Discord, Discord.CurrentUser.Id, options);
+
+        /// <summary>
+        ///     Gets the owner of this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the owner of this guild.
+        /// </returns>
         public Task<RestGuildUser> GetOwnerAsync(RequestOptions options = null)
             => GuildHelper.GetUserAsync(this, Discord, OwnerId, options);
 
         /// <inheritdoc />
+        /// <summary>
+        ///     Prunes inactive users.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         This method removes all users that have not logged on in the provided number of <paramref name="days"/>.
+        ///     </para>
+        ///     <para>
+        ///         If <paramref name="simulate" /> is <c>true</c>, this method will only return the number of users that
+        ///         would be removed without kicking the users.
+        ///     </para>
+        /// </remarks>
+        /// <param name="days">The number of days required for the users to be kicked.</param>
+        /// <param name="simulate">Whether this prune action is a simulation.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous prune operation. The task result contains the number of users to
+        ///     be or has been removed from this guild.
+        /// </returns>
         public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null)
             => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options);
 
         //Audit logs
+        /// <summary>
+        ///     Gets the specified number of audit log entries for this guild.
+        /// </summary>
+        /// <param name="limit">The number of audit log entries to fetch.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of the requested audit log entries.
+        /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(int limit, RequestOptions options = null)
             => GuildHelper.GetAuditLogsAsync(this, Discord, null, limit, options);
 
         //Webhooks
+        /// <summary>
+        ///     Gets a webhook found within this guild.
+        /// </summary>
+        /// <param name="id">The identifier for the webhook.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the webhook with the
+        ///     specified <paramref name="id"/>; <c>null</c> if none is found.
+        /// </returns>
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => GuildHelper.GetWebhookAsync(this, Discord, id, options);
+
+        /// <summary>
+        ///     Gets a collection of all webhook from this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of webhooks found within the guild.
+        /// </returns>
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => GuildHelper.GetWebhooksAsync(this, Discord, options);
 
