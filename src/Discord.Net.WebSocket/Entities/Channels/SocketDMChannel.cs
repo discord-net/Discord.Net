@@ -88,11 +88,11 @@ namespace Discord.WebSocket
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit, CacheMode.AllowDownload, options);
 
         /// <summary>
-        ///     Gets the last N messages from this channel based on the passed id and the direction to get the messages.
+        ///     Gets a collection of messages in this channel.
         /// </summary>
-        /// <param name="fromMessageId">The id of the starting message.</param>
-        /// <param name="dir">The direction that you want the messages to be retrieved from.</param>
-        /// <param name="limit">The number of messages you want to retrieve.</param>
+        /// <param name="fromMessageId">The ID of the starting message to get the messages from.</param>
+        /// <param name="dir">The direction of the messages to be gotten from.</param>
+        /// <param name="limit">The numbers of message to be gotten from.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     Paged collection of messages. Flattening the paginated response into a collection of messages with 
@@ -102,11 +102,11 @@ namespace Discord.WebSocket
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessageId, dir, limit, CacheMode.AllowDownload, options);
 
         /// <summary>
-        ///     Gets the last N messages from this channel based on the passed message and the direction to get the messages.
+        ///     Gets a collection of messages in this channel.
         /// </summary>
-        /// <param name="fromMessage">The message you want to start from.</param>
-        /// <param name="dir">The direction that you want the messages to be retrieved from.</param>
-        /// <param name="limit">The number of messages you want to retrieve.</param>
+        /// <param name="fromMessage">The starting message to get the messages from.</param>
+        /// <param name="dir">The direction of the messages to be gotten from.</param>
+        /// <param name="limit">The numbers of message to be gotten from.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     Paged collection of messages. Flattening the paginated response into a collection of messages with 
