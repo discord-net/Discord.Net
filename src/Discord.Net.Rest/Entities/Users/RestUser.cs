@@ -70,7 +70,7 @@ namespace Discord.Rest
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     An awaitable <see cref="Task"/> containing a <see cref="RestDMChannel"/>.
+        ///     A task that represents the asynchronous get operation. The task result contains a rest DM channel where the user is the recipient.
         /// </returns>
         public Task<RestDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
             => UserHelper.CreateDMChannelAsync(this, Discord, options);
@@ -87,7 +87,7 @@ namespace Discord.Rest
         ///     Gets the Username#Descriminator of the user.
         /// </summary>
         /// <returns>
-        ///     A string that is the Username#Descriminator of the user.
+        ///     A string that resolves to Username#Descriminator of the user.
         /// </returns>
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
