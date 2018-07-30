@@ -26,6 +26,10 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();
+
+        /// <summary>
+        ///     Gets a collection that is the current logged-in user and the recipient.
+        /// </summary>
         public new IReadOnlyCollection<SocketUser> Users => ImmutableArray.Create(Discord.CurrentUser, Recipient);
 
         internal SocketDMChannel(DiscordSocketClient discord, ulong id, SocketGlobalUser recipient)
@@ -82,8 +86,32 @@ namespace Discord.WebSocket
         /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit, CacheMode.AllowDownload, options);
+
+        /// <summary>
+        ///     Gets the last N messages from this channel based on the passed id and the direction to get the messages.
+        /// </summary>
+        /// <param name="fromMessageId">The id of the starting message.</param>
+        /// <param name="dir">The direction that you want the messages to be retrieved from.</param>
+        /// <param name="limit">The number of messages you want to retrieve.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     Paged collection of messages. Flattening the paginated response into a collection of messages with 
+        ///     <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> is required if you wish to access the messages.
+        /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessageId, dir, limit, CacheMode.AllowDownload, options);
+
+        /// <summary>
+        ///     Gets the last N messages from this channel based on the passed message and the direction to get the messages.
+        /// </summary>
+        /// <param name="fromMessage">The message you want to start from.</param>
+        /// <param name="dir">The direction that you want the messages to be retrieved from.</param>
+        /// <param name="limit">The number of messages you want to retrieve.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     Paged collection of messages. Flattening the paginated response into a collection of messages with 
+        ///     <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> is required if you wish to access the messages.
+        /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessage.Id, dir, limit, CacheMode.AllowDownload, options);
         /// <inheritdoc />
