@@ -15,9 +15,19 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestDMChannel : RestChannel, IDMChannel, IRestPrivateChannel, IRestMessageChannel
     {
+        /// <summary>
+        ///     Gets the current logged-in user.
+        /// </summary>
         public RestUser CurrentUser { get; }
+
+        /// <summary>
+        ///     Gets the recipient of the channel.
+        /// </summary>
         public RestUser Recipient { get; }
 
+        /// <summary>
+        ///     Gets a collection that is the current logged-in user and the recipient.
+        /// </summary>
         public IReadOnlyCollection<RestUser> Users => ImmutableArray.Create(CurrentUser, Recipient);
 
         internal RestDMChannel(BaseDiscordClient discord, ulong id, ulong recipientId)
@@ -132,6 +142,10 @@ namespace Discord.Rest
         public IDisposable EnterTypingState(RequestOptions options = null)
             => ChannelHelper.EnterTypingState(this, Discord, options);
 
+        /// <summary>
+        ///     Gets a string that represents the Username#Discriminator of the recipient.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString() => $"@{Recipient}";
         private string DebuggerDisplay => $"@{Recipient} ({Id}, DM)";
 
