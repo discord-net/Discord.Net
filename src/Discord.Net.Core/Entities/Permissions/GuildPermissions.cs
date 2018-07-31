@@ -244,8 +244,19 @@ namespace Discord
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
                 useVoiceActivation, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojis);
 
+        /// <summary>
+        ///     Returns a value that indicates if a specific <see cref="GuildPermission"/> is enabled
+        ///     in these permissions.
+        /// </summary>
+        /// <param name="permission">The permission value to check for.</param>
+        /// <returns><c>true</c> if the permission is enabled, <c>false</c> otherwise.</returns>
         public bool Has(GuildPermission permission) => Permissions.GetValue(RawValue, permission);
 
+        /// <summary>
+        ///     Returns a <see cref="List{T}"/> containing all of the <see cref="GuildPermission"/>
+        ///     flags that are enabled.
+        /// </summary>
+        /// <returns>A <see cref="List{T}"/> containing <see cref="GuildPermission"/> flags. Empty if none are enabled.</returns>
         public List<GuildPermission> ToList()
         {
             var perms = new List<GuildPermission>();
