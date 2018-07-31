@@ -4,41 +4,36 @@ namespace Discord
 {
     public interface IGuildIntegration
     {
-        /// <summary>
-        ///     The integration ID.
-        /// </summary>
+        /// <summary> Gets the integration ID. </summary>
+        /// <returns> Gets the integration ID. </returns>
         ulong Id { get; }
-        /// <summary>
-        ///     The integration name.
-        /// </summary>
+        /// <summary> Gets the integration name. </summary>
+        /// <returns> Gets the integration name. </returns>
         string Name { get; }
-        /// <summary>
-        ///     The integration type (twich, youtube, etc).
-        /// </summary>
+        /// <summary> Gets the integration type (twitch, youtube, etc). </summary>
+        /// <returns> Gets the integration type (twitch, youtube, etc). </returns>
         string Type { get; }
-        /// <summary>
-        ///     Is this integration enabled?
-        /// </summary>
+        /// <summary> Gets if this integration is enabled or not. </summary>
+        /// <summary> Gets if this integration is enabled or not. </returns>
         bool IsEnabled { get; }
-        /// <summary>
-        ///     Is this integration syncing?
-        /// </summary>
+        /// <summary> Gets if this integration is syncing or not. </summary>
+        /// <returns> Gets if this integration is syncing or not. </returns>
         bool IsSyncing { get; }
-        /// <summary>
-        ///     ID that this integration uses for "subscribers".
-        /// </summary>
+        /// <summary> Gets the ID that this integration uses for "subscribers". </summary>
+        /// <returns> Gets the ID that this integration uses for "subscribers". </returns>
         ulong ExpireBehavior { get; }
-        /// <summary>
-        ///     The grace period before expiring subscribers.
-        /// </summary>
+        /// <summary> Gets the grace period before expiring subscribers. </summary>
+        /// <returns> Gets the grace period before expiring subscribers. </returns>
         ulong ExpireGracePeriod { get; }
-        /// <summary>
-        ///     When this integration was last synced.
-        /// </summary>
+        /// <summary> Gets when this integration was last synced. </summary>
+        /// <returns> Gets when this integration was last synced. </returns>
         DateTimeOffset SyncedAt { get; }
         /// <summary>
-        ///     Integration account information. See <see cref="IntegrationAccount"/>.
+        ///     Gets integration account information. See <see cref="IntegrationAccount"/>.
         /// </summary>
+        /// <returns>
+        ///     Gets integration account information. See <see cref="IntegrationAccount"/>.
+        /// </returns>
         IntegrationAccount Account { get; }
 
         IGuild Guild { get; }
