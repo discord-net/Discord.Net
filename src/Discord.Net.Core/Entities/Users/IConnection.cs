@@ -17,7 +17,7 @@ namespace Discord
         /// </summary>
         string Name { get; }
         /// <summary>
-        ///     Wheter the connection is revoked.
+        ///     Whether the connection is revoked.
         /// </summary>
         bool IsRevoked { get; }
 
