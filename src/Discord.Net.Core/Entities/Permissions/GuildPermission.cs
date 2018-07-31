@@ -26,7 +26,7 @@ namespace Discord
         ///     This permission requires the owner account to use two-factor
         ///     authentication when used on a guild that has server-wide 2FA enabled.
         /// </remarks>
-        BanMembers          = 0x00_00_00_04,
+        BanMembers			= 0x00_00_00_04,
         /// <summary>
         ///     Allows all permissions and bypasses channel permission overwrites.
         /// </summary>
