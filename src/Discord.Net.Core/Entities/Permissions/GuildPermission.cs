@@ -14,23 +14,43 @@ namespace Discord
         /// <summary>
         ///     Allows kicking members.
         /// </summary>
+        /// <remarks>
+        ///     This permission requires the owner account to use two-factor
+        ///     authentication when used on a guild that has server-wide 2FA enabled.
+        /// </remarks>
         KickMembers			= 0x00_00_00_02,
         /// <summary>
         ///     Allows banning members.
         /// </summary>
-        BanMembers			= 0x00_00_00_04,
+        /// <remarks>
+        ///     This permission requires the owner account to use two-factor
+        ///     authentication when used on a guild that has server-wide 2FA enabled.
+        /// </remarks>
+        BanMembers          = 0x00_00_00_04,
         /// <summary>
         ///     Allows all permissions and bypasses channel permission overwrites.
         /// </summary>
-        Administrator		= 0x00_00_00_08,
+        /// <remarks>
+        ///     This permission requires the owner account to use two-factor
+        ///     authentication when used on a guild that has server-wide 2FA enabled.
+        /// </remarks>
+        Administrator       = 0x00_00_00_08,
         /// <summary>
         ///     Allows management and editing of channels.
         /// </summary>
-        ManageChannels		= 0x00_00_00_10,
+        /// <remarks>
+        ///     This permission requires the owner account to use two-factor
+        ///     authentication when used on a guild that has server-wide 2FA enabled.
+        /// </remarks>
+        ManageChannels      = 0x00_00_00_10,
         /// <summary>
         ///     Allows management and editing of the guild.
         /// </summary>
-        ManageGuild			= 0x00_00_00_20,
+        /// <remarks>
+        ///     This permission requires the owner account to use two-factor
+        ///     authentication when used on a guild that has server-wide 2FA enabled.
+        /// </remarks>
+        ManageGuild         = 0x00_00_00_20,
 
         // Text
 		/// <summary>
@@ -52,7 +72,11 @@ namespace Discord
         /// <summary>
         ///     Allows for deletion of other users messages.
         /// </summary>
-        ManageMessages		= 0x00_00_20_00,
+        /// <remarks>
+        ///     This permission requires the owner account to use two-factor
+        ///     authentication when used on a guild that has server-wide 2FA enabled.
+        /// </remarks>
+        ManageMessages      = 0x00_00_20_00,
         /// <summary>
         ///     Allows links sent by users with this permission will be auto-embedded.
         /// </summary>
@@ -114,14 +138,26 @@ namespace Discord
         /// <summary>
         ///     Allows management and editing of roles.
         /// </summary>
+        /// <remarks>
+        ///     This permission requires the owner account to use two-factor
+        ///     authentication when used on a guild that has server-wide 2FA enabled.
+        /// </remarks>
         ManageRoles         = 0x10_00_00_00,
         /// <summary>
         ///     Allows management and editing of webhooks.
         /// </summary>
+        /// <remarks>
+        ///     This permission requires the owner account to use two-factor
+        ///     authentication when used on a guild that has server-wide 2FA enabled.
+        /// </remarks>
         ManageWebhooks      = 0x20_00_00_00,
         /// <summary>
         ///     Allows management and editing of emojis.
         /// </summary>
+        /// <remarks>
+        ///     This permission requires the owner account to use two-factor
+        ///     authentication when used on a guild that has server-wide 2FA enabled.
+        /// </remarks>
         ManageEmojis        = 0x40_00_00_00
     }
 }
