@@ -5,13 +5,11 @@ namespace Discord
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public struct IntegrationAccount
     {
-        /// <summary>
-        ///     ID of the account.
-        /// </summary>
+        /// <summary> Gets the ID of the account. </summary>
+        /// <returns> Gets the ID of the account. </returns>
         public string Id { get; }
-        /// <summary>
-        ///     Name of the account.
-        /// </summary>
+        /// <summary> Gets the name of the account. </summary>
+        /// <returns> Gets the name of the account. </returns>
         public string Name { get; private set; }
 
         public override string ToString() => Name;
