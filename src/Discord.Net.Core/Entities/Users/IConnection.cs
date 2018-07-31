@@ -4,26 +4,20 @@ namespace Discord
 {
     public interface IConnection
     {
-        /// <summary>
-        ///     ID of the connection account.
-        /// </summary>
+        /// <summary> Gets the ID of the connection account. </summary>
+        /// <returns> Gets the ID of the connection account. </returns>
         string Id { get; }
-        /// <summary>
-        ///     The service of the connection (twich, youtube).
-        /// </summary>
+        /// <summary> Gets the service of the connection (twitch, youtube). </summary>
+        /// <returns> Gets the service of the connection (twitch, youtube). </returns>
         string Type { get; }
-        /// <summary>
-        ///     The username of the connection account.
-        /// </summary>
+        /// <summary> Gets the username of the connection account. </summary>
+        /// <returns> Gets the username of the connection account. </returns>
         string Name { get; }
-        /// <summary>
-        ///     Whether the connection is revoked.
-        /// </summary>
+        /// <summary> Gets whether the connection is revoked. </summary>
+        /// <returns> Gets whether the connection is revoked. </returns>
         bool IsRevoked { get; }
-
-        /// <summary>
-        ///     A <see cref="IReadOnlyCollection{T}"/> of integration IDs.
-        /// </summary>
+        /// <summary> Gets a <see cref="IReadOnlyCollection{T}"/> of integration IDs. </summary>
+        /// <returns> Gets a <see cref="IReadOnlyCollection{T}"/> of integration IDs. </returns>
         IReadOnlyCollection<ulong> IntegrationIds { get; }
     }
 }
