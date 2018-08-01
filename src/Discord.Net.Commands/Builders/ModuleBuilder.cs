@@ -120,7 +120,7 @@ namespace Discord.Commands.Builders
             if (Name == null)
                 Name = _aliases[0];
 
-            if (TypeInfo != null)
+            if (TypeInfo != null && !TypeInfo.IsAbstract)
             {
                 var moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(TypeInfo, service, services);
                 moduleInstance.OnModuleBuilding(service, this);
