@@ -145,7 +145,9 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets a string that represents the Username#Discriminator of the recipient.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        ///     A string that resolves to the Recipient of this channel.
+        /// </returns>
         public override string ToString() => $"@{Recipient}";
         private string DebuggerDisplay => $"@{Recipient} ({Id}, DM)";
 
