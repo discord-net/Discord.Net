@@ -5,7 +5,7 @@ namespace Discord
     public interface IGuildIntegration
     {
         /// <summary> Gets the integration ID. </summary>
-        /// <returns> A unique identifier value of this integration. </returns>
+        /// <returns> The unique identifier value of this integration. </returns>
         ulong Id { get; }
         /// <summary> Gets the integration name. </summary>
         /// <returns> A string containing the name of this integration. </returns>
