@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Discord
 {
@@ -30,6 +30,7 @@ namespace Discord
         DeafenMembers       = 0x00_80_00_00,
         MoveMembers         = 0x01_00_00_00,
         UseVAD              = 0x02_00_00_00,
+        PrioritySpeaker     = 0x00_00_01_00,
 
         // More General
         ManageRoles         = 0x10_00_00_00,

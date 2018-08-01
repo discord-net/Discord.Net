@@ -12,7 +12,7 @@ namespace Discord
         /// <summary> Gets a ChannelPermissions that grants all permissions for text channels. </summary>
         public static readonly ChannelPermissions Text = new ChannelPermissions(0b01100_0000000_1111111110001_010001);
         /// <summary> Gets a ChannelPermissions that grants all permissions for voice channels. </summary>
-        public static readonly ChannelPermissions Voice = new ChannelPermissions(0b00100_1111110_0000000010000_010001);
+        public static readonly ChannelPermissions Voice = new ChannelPermissions(0b00100_1111110_0000000010100_010001);
         /// <summary> Gets a ChannelPermissions that grants all permissions for category channels. </summary>
         public static readonly ChannelPermissions Category = new ChannelPermissions(0b01100_1111110_1111111110001_010001);
         /// <summary> Gets a ChannelPermissions that grants all permissions for direct message channels. </summary>
@@ -78,6 +78,8 @@ namespace Discord
         public bool MoveMembers => Permissions.GetValue(RawValue, ChannelPermission.MoveMembers);
         /// <summary> If True, a user may use voice-activity-detection rather than push-to-talk. </summary>
         public bool UseVAD => Permissions.GetValue(RawValue, ChannelPermission.UseVAD);
+        /// <summary> If True, a user may use priority speaker in a voice channel. </summary>
+        public bool PrioritySpeaker => Permissions.GetValue(RawValue, ChannelPermission.PrioritySpeaker);
 
         /// <summary> If True, a user may adjust role permissions. This also implictly grants all other permissions. </summary>
         public bool ManageRoles => Permissions.GetValue(RawValue, ChannelPermission.ManageRoles);
@@ -106,6 +108,7 @@ namespace Discord
             bool? deafenMembers = null,
             bool? moveMembers = null,
             bool? useVoiceActivation = null,
+            bool? prioritySpeaker = null,
             bool? manageRoles = null,
             bool? manageWebhooks = null)
         {
@@ -129,6 +132,7 @@ namespace Discord
             Permissions.SetValue(ref value, deafenMembers, ChannelPermission.DeafenMembers);
             Permissions.SetValue(ref value, moveMembers, ChannelPermission.MoveMembers);
             Permissions.SetValue(ref value, useVoiceActivation, ChannelPermission.UseVAD);
+            Permissions.SetValue(ref value, prioritySpeaker, ChannelPermission.PrioritySpeaker);
             Permissions.SetValue(ref value, manageRoles, ChannelPermission.ManageRoles);
             Permissions.SetValue(ref value, manageWebhooks, ChannelPermission.ManageWebhooks);
 
@@ -155,11 +159,12 @@ namespace Discord
             bool deafenMembers = false,
             bool moveMembers = false,
             bool useVoiceActivation = false,
+            bool prioritySpeaker = false,
             bool manageRoles = false,
             bool manageWebhooks = false)
             : this(0, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages,
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect,
-                speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, manageRoles, manageWebhooks)
+                speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, prioritySpeaker, manageRoles, manageWebhooks)
         { }
 
         /// <summary> Creates a new ChannelPermissions from this one, changing the provided non-null permissions. </summary>
@@ -182,6 +187,7 @@ namespace Discord
             bool? deafenMembers = null,
             bool? moveMembers = null,
             bool? useVoiceActivation = null,
+            bool? prioritySpeaker = null,
             bool? manageRoles = null,
             bool? manageWebhooks = null)
             => new ChannelPermissions(RawValue,
@@ -203,6 +209,7 @@ namespace Discord
                 deafenMembers,
                 moveMembers,
                 useVoiceActivation,
+                prioritySpeaker,
                 manageRoles,
                 manageWebhooks);
 
