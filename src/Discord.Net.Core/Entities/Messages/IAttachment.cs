@@ -17,7 +17,7 @@ namespace Discord
         ///     Gets the filename of this attachment.
         /// </summary>
         /// <returns>
-        ///     A string containing the full filename of this attachment (e.g. textFile.txt).
+        ///     A string containing the full filename of this attachment (e.g. <c>textFile.txt</c>).
         /// </returns>
         string Filename { get; }
         /// <summary>

@@ -31,8 +31,11 @@ namespace Discord
         /// </returns>
         bool IsPinned { get; }
         /// <summary>
-        ///     Returns the content for this message.
+        ///     Gets the content for this message.
         /// </summary>
+        /// <returns>
+        ///     A string that contains the body of the message; note that this field may be empty if there is an embed.
+        /// </returns>
         string Content { get; }
         /// <summary>
         ///     Gets the time this message was sent.

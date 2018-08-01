@@ -8,6 +8,7 @@ namespace Discord
     public struct ChannelPermissions
     {
         /// <summary> Gets a blank <see cref="ChannelPermissions"/> that grants no permissions. </summary>
+        /// <returns>A <see cref="ChannelPermissions"/> structure that does not contain any set permissions.</returns>
         public static readonly ChannelPermissions None = new ChannelPermissions();
         /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for text channels. </summary>
         public static readonly ChannelPermissions Text = new ChannelPermissions(0b01100_0000000_1111111110001_010001);

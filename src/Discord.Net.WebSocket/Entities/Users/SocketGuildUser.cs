@@ -66,6 +66,13 @@ namespace Discord.WebSocket
         public SocketVoiceChannel VoiceChannel => VoiceState?.VoiceChannel;
         /// <inheritdoc />
         public string VoiceSessionId => VoiceState?.VoiceSessionId ?? "";
+        /// <summary>
+        ///     Gets the voice connection status of the user if any.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="SocketVoiceState" /> representing the user's voice status; <c>null</c> if the user is not
+        ///     connected to a voice channel.
+        /// </returns>
         public SocketVoiceState? VoiceState => Guild.GetVoiceState(Id);
         public AudioInStream AudioStream => Guild.GetAudioStream(Id);
 

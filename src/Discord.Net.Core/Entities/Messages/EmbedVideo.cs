@@ -11,14 +11,25 @@ namespace Discord
         /// <summary>
         ///     Gets the URL of the video.
         /// </summary>
+        /// <returns>
+        ///     A string containing the URL of the image.
+        /// </returns>
         public string Url { get; }
         /// <summary>
-        ///     Gets the height of the video, or <c>null</c> if none.
+        ///     Gets the height of the video.
         /// </summary>
+        /// <returns>
+        ///     A <see cref="int"/> representing the height of this video if it can be retrieved; otherwise 
+        ///     <c>null</c>.
+        /// </returns>
         public int? Height { get; }
         /// <summary>
-        ///     Gets the weight of the video, or <c>null</c> if none.
+        ///     Gets the weight of the video.
         /// </summary>
+        /// <returns>
+        ///     A <see cref="int"/> representing the width of this video if it can be retrieved; otherwise 
+        ///     <c>null</c>.
+        /// </returns>
         public int? Width { get; }
 
         internal EmbedVideo(string url, int? height, int? width)
@@ -32,6 +43,9 @@ namespace Discord
         /// <summary>
         ///     Gets the URL of the video.
         /// </summary>
+        /// <returns>
+        ///     A string that resolves to <see cref="Url"/>.
+        /// </returns>
         public override string ToString() => Url;
     }
 }

@@ -38,6 +38,10 @@ namespace Discord.Net
         /// <summary>
         ///     Initializes a new instance of the <see cref="HttpException" /> class.
         /// </summary>
+        /// <param name="httpCode">The HTTP status code returned.</param>
+        /// <param name="request">The request that was sent prior to the exception.</param>
+        /// <param name="discordCode">The Discord status code returned.</param>
+        /// <param name="reason">The reason behind the exception.</param>
         public HttpException(HttpStatusCode httpCode, IRequest request, int? discordCode = null, string reason = null)
             : base(CreateMessage(httpCode, discordCode, reason))
         {
