@@ -5,7 +5,7 @@ namespace Discord
     public interface IConnection
     {
         /// <summary> Gets the ID of the connection account. </summary>
-        /// <returns> The unique idenitifer of this connection. </returns>
+        /// <returns> A <see cref="string"/> representing the unique identifier value of this connection. </returns>
         string Id { get; }
         /// <summary> Gets the service of the connection (twitch, youtube). </summary>
         /// <returns> A string containing the name of this type of connection. </returns>
@@ -17,7 +17,10 @@ namespace Discord
         /// <returns> A value which if true indicates that this connection has been revoked, otherwise false. </returns>
         bool IsRevoked { get; }
         /// <summary> Gets a <see cref="IReadOnlyCollection{T}"/> of integration IDs. </summary>
-        /// <returns> An <see cref="IReadOnlyCollection{T}"/> containing the unique identifier values of integrations. </returns>
+        /// <returns>
+        ///     An <see cref="IReadOnlyCollection{T}"/> containing <see cref="ulong"/>
+        ///     representations of unique identifier values of integrations.
+        /// </returns>
         IReadOnlyCollection<ulong> IntegrationIds { get; }
     }
 }
