@@ -62,6 +62,12 @@ namespace Discord.Rest
         public Task DeleteAsync(RequestOptions options = null)
             => InviteHelper.DeleteAsync(this, Discord, options);
 
+        /// <summary>
+        ///     Gets the URL of the invite.
+        /// </summary>
+        /// <returns>
+        ///     A string that resolves to the Url of the invite.
+        /// </returns>
         public override string ToString() => Url;
         private string DebuggerDisplay => $"{Url} ({GuildName} / {ChannelName})";
 
