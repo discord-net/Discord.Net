@@ -89,6 +89,7 @@ namespace Discord
         ///     Allows for using voice-activity-detection in a voice channel.
         /// </summary>
         UseVAD         		= 0x02_00_00_00,
+        PrioritySpeaker     = 0x00_00_01_00,
 
         // More General
         /// <summary>

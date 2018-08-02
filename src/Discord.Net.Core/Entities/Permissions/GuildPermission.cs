@@ -80,27 +80,28 @@ namespace Discord
         /// <summary>
         ///     Allows for joining of a voice channel.
         /// </summary>
-        Connect				= 0x00_10_00_00,
+        Connect             = 0x00_10_00_00,
         /// <summary>
         ///     Allows for speaking in a voice channel.
         /// </summary>
-        Speak				= 0x00_20_00_00,
+        Speak               = 0x00_20_00_00,
         /// <summary>
         ///     Allows for muting members in a voice channel.
         /// </summary>
-        MuteMembers			= 0x00_40_00_00,
+        MuteMembers         = 0x00_40_00_00,
         /// <summary>
         ///     Allows for deafening of members in a voice channel.
         /// </summary>
-        DeafenMembers		= 0x00_80_00_00,
+        DeafenMembers       = 0x00_80_00_00,
         /// <summary>
         ///     Allows for moving of members between voice channels.
         /// </summary>
-        MoveMembers			= 0x01_00_00_00,
+        MoveMembers         = 0x01_00_00_00,
         /// <summary>
         ///     Allows for using voice-activity-detection in a voice channel.
         /// </summary>
-        UseVAD				= 0x02_00_00_00,
+        UseVAD              = 0x02_00_00_00,
+        PrioritySpeaker     = 0x00_00_01_00,
 
         // General 2
         /// <summary>
