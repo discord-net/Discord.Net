@@ -37,4 +37,4 @@ The .NET Core workload must be selected during Visual Studio installation.
 ## Known Issues
 
 ### WebSockets (Win7 and earlier)
-.NET Core 1.1 does not support WebSockets on Win7 and earlier. This issue has been fixed since the release of .NET Core 2.1. it is recommended to target .NET Core 2.1 or above for your project if you wish to run your bot on legacy platforms; otherwise, you may also install the[Discord.Net.Providers.WS4Net](https://www.nuget.org/packages/Discord.Net.Providers.WS4Net/) package.
+.NET Core 1.1 does not support WebSockets on Win7 and earlier. This issue has been fixed since the release of .NET Core 2.1. it is recommended to target .NET Core 2.1 or above for your project if you wish to run your bot on legacy platforms; alternatively, you may choose to install the [Discord.Net.Providers.WS4Net](https://www.nuget.org/packages/Discord.Net.Providers.WS4Net/) package.
