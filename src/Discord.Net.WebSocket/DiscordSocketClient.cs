@@ -1270,13 +1270,17 @@ namespace Discord.WebSocket
                                             return;
                                         }
 
+                                        var cacheablelist = new List<Cacheable<IMessage, ulong>>();
                                         foreach (ulong id in data.Ids)
                                         {
                                             var msg = SocketChannelHelper.RemoveMessage(channel, this, id);
                                             bool isCached = msg != null;
                                             var cacheable = new Cacheable<IMessage, ulong>(msg, id, isCached, async () => await channel.GetMessageAsync(id));
-                                            await TimedInvokeAsync(_messageDeletedEvent, nameof(MessageDeleted), cacheable, channel).ConfigureAwait(false);
+                                            cacheablelist.Add(cacheable);
                                         }
+                                        await TimedInvokeAsync(_messageBulkDeletedEvent, nameof(MessageBulkDeleted), cacheablelist, channel).ConfigureAwait(false);
+
+
                                     }
                                     else
                                     {
