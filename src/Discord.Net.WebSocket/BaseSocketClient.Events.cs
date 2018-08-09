@@ -40,13 +40,13 @@ namespace Discord.WebSocket
             remove { _messageDeletedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task>> _messageDeletedEvent = new AsyncEvent<Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task>>();
-        /// <summary> Fired when multiple messages bulk deleted. </summary>
-        public event Func<List<Cacheable<IMessage, ulong>>, ISocketMessageChannel, Task> MessageBulkDeleted {
+        /// <summary> Fired when multiple messages are bulk deleted. </summary>
+        public event Func<IReadOnlyCollection<Cacheable<IMessage, ulong>>, ISocketMessageChannel, Task> MessageBulkDeleted {
             add { _messageBulkDeletedEvent.Add(value); }
             remove { _messageBulkDeletedEvent.Remove(value); }
          
         }   
-        internal readonly AsyncEvent<Func<List<Cacheable<IMessage, ulong>>, ISocketMessageChannel, Task>> _messageBulkDeletedEvent = new AsyncEvent<Func<List<Cacheable<IMessage, ulong>>, ISocketMessageChannel, Task>>();
+        internal readonly AsyncEvent<Func<IReadOnlyCollection<Cacheable<IMessage, ulong>>, ISocketMessageChannel, Task>> _messageBulkDeletedEvent = new AsyncEvent<Func<IReadOnlyCollection<Cacheable<IMessage, ulong>>, ISocketMessageChannel, Task>>();
         /// <summary> Fired when a message is updated. </summary>
         public event Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task> MessageUpdated {
             add { _messageUpdatedEvent.Add(value); }

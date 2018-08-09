@@ -1278,7 +1278,7 @@ namespace Discord.WebSocket
                                             var cacheable = new Cacheable<IMessage, ulong>(msg, id, isCached, async () => await channel.GetMessageAsync(id));
                                             cacheablelist.Add(cacheable);
                                         }
-                                        await TimedInvokeAsync(_messageBulkDeletedEvent, nameof(MessageBulkDeleted), cacheablelist, channel).ConfigureAwait(false);
+                                        await TimedInvokeAsync(_messageBulkDeletedEvent, nameof(MessageBulkDeleted), cacheablelist.ToReadOnlyCollection(), channel).ConfigureAwait(false);
 
 
                                     }
