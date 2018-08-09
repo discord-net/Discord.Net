@@ -74,7 +74,15 @@ In Discord.Net, an Emote represents a custom-image emote, while an
 Emoji is a Unicode emoji (standard emoji). Both [Emoji] and [Emote]
 implement [IEmote] and are valid options.
 
-[!code-csharp[Emoji](samples/emoji.cs)]
+# [Adding a reaction to another message](#tab/emoji-others)
+
+[!code-csharp[Emoji](samples/emoji-others.cs)]
+
+# [Adding a reaction to a sent message](#tab/emoji-self)
+
+[!code-csharp[Emoji](samples/emoji-self.cs)]
+
+***
 
 [AddReactionAsync]: xref:Discord.IUserMessage.AddReactionAsync*
 
