@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord.Commands
@@ -26,6 +27,8 @@ namespace Discord.Commands
             => new SearchResult(text, commands, null, null);
         public static SearchResult FromError(CommandError error, string reason)
             => new SearchResult(null, null, error, reason);
+        public static SearchResult FromError(Exception ex)
+            => FromError(CommandError.Exception, ex.Message);
         public static SearchResult FromError(IResult result)
             => new SearchResult(null, null, result.Error, result.ErrorReason);
 
