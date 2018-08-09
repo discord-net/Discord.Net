@@ -56,11 +56,27 @@ namespace Discord.Commands.Builders
 
         private TypeReader GetReader(Type type)
         {
-            var readers = Command.Module.Service.GetTypeReaders(type);
+            var commands = Command.Module.Service;
+            if (type.GetTypeInfo().GetCustomAttribute<NamedArgumentTypeAttribute>() != null)
+            {
+                IsRemainder = true;
+                var reader = commands.GetTypeReaders(type)?.FirstOrDefault().Value;
+                if (reader == null)
+                {
+                    var readerType = typeof(NamedArgumentTypeReader<>).MakeGenericType(new[] { type });
+                    reader = (TypeReader)Activator.CreateInstance(readerType, new[] { commands });
+                    commands.AddTypeReader(type, reader);
+                }
+
+                return reader;
+            }
+
+
+            var readers = commands.GetTypeReaders(type);
             if (readers != null)
                 return readers.FirstOrDefault().Value;
             else
-                return Command.Module.Service.GetDefaultTypeReader(type);
+                return commands.GetDefaultTypeReader(type);
         }
 
         public ParameterBuilder WithSummary(string summary)
