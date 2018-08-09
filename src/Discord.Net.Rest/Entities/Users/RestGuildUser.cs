@@ -9,7 +9,7 @@ using Model = Discord.API.GuildMember;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a REST-based guild user
+    ///     Represents a REST-based guild user.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestGuildUser : RestUser, IGuildUser
