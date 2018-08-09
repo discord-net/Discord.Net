@@ -32,6 +32,32 @@ namespace Discord
             Assert.Equal(expected: 42, actual: m.Foo);
             Assert.Equal(expected: "hello", actual: m.Bar);
         }
+
+        [Fact]
+        public async Task TestQuotedArgumentValue()
+        {
+            var commands = new CommandService();
+            var module = await commands.AddModuleAsync<TestModule>(null);
+
+            Assert.NotNull(module);
+            Assert.NotEmpty(module.Commands);
+
+            var cmd = module.Commands[0];
+            Assert.NotNull(cmd);
+            Assert.NotEmpty(cmd.Parameters);
+
+            var param = cmd.Parameters[0];
+            Assert.NotNull(param);
+            Assert.True(param.IsRemainder);
+
+            var result = await param.ParseAsync(null, "bar: 《hello》 foo: 42");
+            Assert.True(result.IsSuccess);
+
+            var m = result.BestMatch as ArgumentType;
+            Assert.NotNull(m);
+            Assert.Equal(expected: 42, actual: m.Foo);
+            Assert.Equal(expected: "hello", actual: m.Bar);
+        }
     }
 
     [NamedArgumentType]

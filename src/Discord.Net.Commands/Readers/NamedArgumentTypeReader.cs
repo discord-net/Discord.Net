@@ -96,13 +96,20 @@ namespace Discord.Commands
 
                 PropertyInfo GetPropAndValue(out string argv)
                 {
+                    bool quoted = state == ReadState.InQuotedArgument;
                     state = (currentRead == input.Length)
                         ? ReadState.End
                         : ReadState.LookingForParameter;
 
-                    var prop = _tProps[currentParam];
-                    argv = input.Substring(beginRead, currentRead - beginRead);
-                    return prop;
+                    if (quoted)
+                    {
+                        argv = input.Substring(beginRead + 1, currentRead - beginRead - 1);
+                        currentRead++;
+                    }
+                    else 
+                        argv = input.Substring(beginRead, currentRead - beginRead);
+
+                    return _tProps[currentParam];
                 }
             }
 
