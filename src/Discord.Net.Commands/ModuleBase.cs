@@ -4,8 +4,15 @@ using Discord.Commands.Builders;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    ///     The base class that command modules inherit from where the context is of type <see cref="ICommandContext"/>.
+    /// </summary>
     public abstract class ModuleBase : ModuleBase<ICommandContext> { }
 
+    /// <summary>
+    ///     The base class that command modules inherit from.
+    /// </summary>
+    /// <typeparam name="T">A class that implements <see cref="ICommandContext"/>.</typeparam>
     public abstract class ModuleBase<T> : IModuleBase
         where T : class, ICommandContext
     {

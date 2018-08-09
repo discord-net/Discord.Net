@@ -5,6 +5,9 @@ using Model = Discord.API.Role;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a REST-based role.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestRole : RestEntity<ulong>, IRole
     {

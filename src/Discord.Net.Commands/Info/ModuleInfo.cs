@@ -6,6 +6,9 @@ using Discord.Commands.Builders;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    ///     Provides the information of a module.
+    /// </summary>
     public class ModuleInfo
     {
         public CommandService Service { get; }
