@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +9,7 @@ namespace Discord
     /// <summary>
     /// Represents an entry in an audit log
     /// </summary>
-    public interface IAuditLogEntry : IEntity<ulong>
+    public interface IAuditLogEntry : ISnowflakeEntity
     {
         /// <summary>
         /// The action which occured to create this entry
