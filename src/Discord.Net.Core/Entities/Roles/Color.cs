@@ -75,6 +75,10 @@ namespace Discord
         public static readonly Color DarkerGrey = new Color(0x546E7A);
 
         /// <summary> Gets the encoded value for this color. </summary>
+        /// <remarks>
+        ///     This value is encoded as an unsigned integer value. The most-significant 8 bits contain the red value,
+        ///     the middle 8 bits contain the green value, and the least-significant 8 bits contain the blue value.
+        /// </remarks>
         public uint RawValue { get; }
 
         /// <summary> Gets the red component for this color. </summary>

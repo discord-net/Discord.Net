@@ -193,6 +193,10 @@ namespace Discord
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, 
                 moveMembers, useVoiceActivation, manageRoles, manageWebhooks);
 
+        /// <summary>
+        ///     Creates a <see cref="List{T}"/> of all the <see cref="ChannelPermission"/> values that are allowed.
+        /// </summary>
+        /// <returns>A <see cref="List{T}"/> of all allowed <see cref="ChannelPermission"/> flags. If none, the list will be empty.</returns>
         public List<ChannelPermission> ToAllowList()
         {
             var perms = new List<ChannelPermission>();
@@ -205,6 +209,11 @@ namespace Discord
             }
             return perms;
         }
+
+        /// <summary>
+        ///     Creates a <see cref="List{T}"/> of all the <see cref="ChannelPermission"/> values that are denied.
+        /// </summary>
+        /// <returns>A <see cref="List{T}"/> of all denied <see cref="ChannelPermission"/> flags. If none, the list will be empty.</returns>
         public List<ChannelPermission> ToDenyList()
         {
             var perms = new List<ChannelPermission>();
