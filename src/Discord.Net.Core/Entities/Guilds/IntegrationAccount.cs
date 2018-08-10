@@ -6,7 +6,7 @@ namespace Discord
     public struct IntegrationAccount
     {
         /// <summary> Gets the ID of the account. </summary>
-        /// <returns> A <see cref="string"> unique identifier of this integration account. </returns>
+        /// <returns> A <see cref="string"/> unique identifier of this integration account. </returns>
         public string Id { get; }
         /// <summary> Gets the name of the account. </summary>
         /// <returns> A string containing the name of this integration account. </returns>
