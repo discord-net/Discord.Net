@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 
 using Model = Discord.API.AuditLog;
@@ -29,6 +30,8 @@ namespace Discord.Rest
             return new RestAuditLogEntry(discord, fullLog, model, user);
         }
 
+        /// <inheritdoc/>
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc/>
         public ActionType Action { get; }
         /// <inheritdoc/>

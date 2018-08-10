@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 
 namespace Discord.Commands
@@ -40,6 +41,8 @@ namespace Discord.Commands
         /// <param name="reason">The reason of failure.</param>
         public static PreconditionResult FromError(string reason)
             => new PreconditionResult(CommandError.UnmetPrecondition, reason);
+        public static PreconditionResult FromError(Exception ex)
+            => new PreconditionResult(CommandError.Exception, ex.Message);
         /// <summary>
         ///     Returns a <see cref="PreconditionResult" /> with the specified <paramref name="result"/> type.
         /// </summary>

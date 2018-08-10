@@ -1,9 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace Discord
 {
     /// <summary>
     ///     Represents a generic audit log entry.
     /// </summary>
-    public interface IAuditLogEntry : IEntity<ulong>
+    public interface IAuditLogEntry : ISnowflakeEntity
     {
         /// <summary>
         ///     Gets the action which occurred to create this entry.

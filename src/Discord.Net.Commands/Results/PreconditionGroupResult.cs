@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -18,7 +19,9 @@ namespace Discord.Commands
             => new PreconditionGroupResult(null, null, null);
         public static PreconditionGroupResult FromError(string reason, ICollection<PreconditionResult> preconditions)
             => new PreconditionGroupResult(CommandError.UnmetPrecondition, reason, preconditions);
-        public new static PreconditionGroupResult FromError(IResult result) //needed?
+        public static new PreconditionGroupResult FromError(Exception ex)
+            => new PreconditionGroupResult(CommandError.Exception, ex.Message, null);
+        public static new PreconditionGroupResult FromError(IResult result) //needed?
             => new PreconditionGroupResult(result.Error, result.ErrorReason, null);
 
         public override string ToString() => IsSuccess ? "Success" : $"{Error}: {ErrorReason}";
