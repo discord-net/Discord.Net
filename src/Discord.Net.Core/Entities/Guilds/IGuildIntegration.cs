@@ -19,7 +19,7 @@ namespace Discord
         /// <summary> Gets if this integration is syncing or not. </summary>
         /// <returns> A value indicating if this integration is syncing. </returns>
         /// <remarks>
-        ///     An integration with syncing enabled will update it's "subscribers" on
+        ///     An integration with syncing enabled will update its "subscribers" on
         ///     an interval, while one with syncing disabled will not.
         ///     A user must manually choose when sync the integration
         ///     if syncing is disabled.
