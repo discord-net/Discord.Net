@@ -27,7 +27,7 @@ namespace Discord
         /// <returns> A <see cref="DateTimeOffset"/> containing a date and time of day when the integration was last synced. </returns>
         DateTimeOffset SyncedAt { get; }
         /// <summary>
-        ///     Gets integration account information. See <see cref="IntegrationAccount"/>.
+        ///     Gets integration account information.
         /// </summary>
         IntegrationAccount Account { get; }
 
