@@ -3,6 +3,9 @@ using Model = Discord.API.User;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a REST-based group user.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestGroupUser : RestUser, IGroupUser
     {

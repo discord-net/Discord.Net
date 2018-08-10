@@ -3,6 +3,9 @@ using Model = Discord.API.Message;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a REST-based system message.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestSystemMessage : RestMessage, ISystemMessage
     {

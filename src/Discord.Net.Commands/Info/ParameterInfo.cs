@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    ///     Provides the information of a parameter.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class ParameterInfo
     {

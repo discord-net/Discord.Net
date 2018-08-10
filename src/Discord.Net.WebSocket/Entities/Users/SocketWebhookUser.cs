@@ -7,6 +7,9 @@ using Model = Discord.API.User;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a WebSocket-based webhook user.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketWebhookUser : SocketUser, IWebhookUser
     {

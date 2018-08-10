@@ -7,6 +7,9 @@ using Model = Discord.API.Message;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a REST-based message.
+    /// </summary>
     public abstract class RestMessage : RestEntity<ulong>, IMessage, IUpdateable
     {
         private long _timestampTicks;

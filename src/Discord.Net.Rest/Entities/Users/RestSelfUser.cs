@@ -5,6 +5,9 @@ using Model = Discord.API.User;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents the logged-in REST-based user.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestSelfUser : RestUser, ISelfUser
     {
