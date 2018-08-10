@@ -16,6 +16,7 @@ namespace Discord
         /// <summary> Gets whether the connection is revoked. </summary>
         /// <returns> A value which if true indicates that this connection has been revoked, otherwise false. </returns>
         bool IsRevoked { get; }
+
         /// <summary> Gets a <see cref="IReadOnlyCollection{T}"/> of integration IDs. </summary>
         /// <returns>
         ///     An <see cref="IReadOnlyCollection{T}"/> containing <see cref="ulong"/>
