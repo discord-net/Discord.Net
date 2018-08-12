@@ -9,7 +9,7 @@ namespace Discord.Commands
         public static async Task<IReadOnlyCollection<CommandInfo>> GetExecutableCommandsAsync(this IEnumerable<CommandInfo> commands, ICommandContext context, IServiceProvider provider)
         {
             var executableCommands = new List<CommandInfo>();
-            
+
             foreach (var command in commands)
             {
                 var result = await command.CheckPreconditionsAsync(context, provider).ConfigureAwait(false);
@@ -29,7 +29,7 @@ namespace Discord.Commands
 
             foreach (var subModule in module.Submodules)
                 executableCommands.AddRange(await subModule.GetExecutableCommandsAsync(context, provider).ConfigureAwait(false));
-            
+
             return executableCommands;
         }
     }
