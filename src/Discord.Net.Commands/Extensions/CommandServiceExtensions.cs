@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord.Commands
@@ -10,11 +11,14 @@ namespace Discord.Commands
         {
             var executableCommands = new List<CommandInfo>();
 
-            foreach (var command in commands)
+            var tasks = commands.Select(async c => { var result = await c.CheckPreconditionsAsync(context, provider).ConfigureAwait(false); return new { Command = c, PreconditionResult = result }; });
+
+            var results = await Task.WhenAll(tasks);
+
+            foreach (var result in results)
             {
-                var result = await command.CheckPreconditionsAsync(context, provider).ConfigureAwait(false);
-                if (result.IsSuccess)
-                    executableCommands.Add(command);
+                if (result.PreconditionResult.IsSuccess)
+                    executableCommands.Add(result.Command);
             }
 
             return executableCommands;
@@ -27,8 +31,10 @@ namespace Discord.Commands
 
             executableCommands.AddRange(await module.Commands.GetExecutableCommandsAsync(context, provider).ConfigureAwait(false));
 
-            foreach (var subModule in module.Submodules)
-                executableCommands.AddRange(await subModule.GetExecutableCommandsAsync(context, provider).ConfigureAwait(false));
+            var tasks = module.Submodules.Select(async s => await s.GetExecutableCommandsAsync(context, provider).ConfigureAwait(false));
+            var results = await Task.WhenAll(tasks);
+
+            executableCommands.AddRange(results.SelectMany(c => c));
 
             return executableCommands;
         }
