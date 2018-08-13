@@ -252,7 +252,7 @@ namespace Discord.Net.Queue
                     resetTick = info.Reset.Value.AddSeconds(info.Lag?.TotalSeconds ?? 1.0);
 
                     if (request.Options.IsReactionBucket)
-                        resetTick = new DateTimeOffset(resetTick.Value.Ticks / 4, TimeSpan.Zero);
+                        resetTick = DateTimeOffset.Now.AddMilliseconds(250);
 
                     int diff = (int)(resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds;
 #if DEBUG_LIMITS
