@@ -49,14 +49,17 @@ namespace Discord
         /// <summary>
         ///     Gets the ID that this integration uses for "subscribers".
         /// </summary>
-        /// <returns>
-        ///     A 
-        /// </returns>
         ulong ExpireBehavior { get; }
-        /// <summary> Gets the grace period before expiring "subscribers". </summary>
+        /// <summary>
+        ///     Gets the grace period before expiring "subscribers".
+        /// </summary>
         ulong ExpireGracePeriod { get; }
-        /// <summary> Gets when this integration was last synced. </summary>
-        /// <returns> A <see cref="DateTimeOffset"/> containing a date and time of day when the integration was last synced. </returns>
+        /// <summary>
+        ///     Gets when this integration was last synced.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="DateTimeOffset"/> containing a date and time of day when the integration was last synced.
+        /// </returns>
         DateTimeOffset SyncedAt { get; }
         /// <summary>
         ///     Gets integration account information.
