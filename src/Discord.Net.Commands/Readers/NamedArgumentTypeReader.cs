@@ -113,7 +113,7 @@ namespace Discord.Commands
 
                     if (quoted)
                     {
-                        argv = input.Substring(beginRead + 1, currentRead - beginRead - 1);
+                        argv = input.Substring(beginRead + 1, currentRead - beginRead - 1).Trim();
                         currentRead++;
                     }
                     else 
