@@ -63,7 +63,16 @@ namespace Discord.Commands.Builders
                 var reader = commands.GetTypeReaders(type)?.FirstOrDefault().Value;
                 if (reader == null)
                 {
-                    var readerType = typeof(NamedArgumentTypeReader<>).MakeGenericType(new[] { type });
+                    Type readerType;
+                    try
+                    {
+                        readerType = typeof(NamedArgumentTypeReader<>).MakeGenericType(new[] { type });
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        throw new InvalidOperationException($"Parameter type '{type.Name}' for command '{Command.Name}' must be a class with a public parameterless constructor to use as a NamedArgumentType.", ex);
+                    }
+
                     reader = (TypeReader)Activator.CreateInstance(readerType, new[] { commands });
                     commands.AddTypeReader(type, reader);
                 }
