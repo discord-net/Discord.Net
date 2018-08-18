@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -125,22 +126,57 @@ namespace Discord.Commands
 
             async Task<object> ReadArgumentAsync(PropertyInfo prop, string arg)
             {
+                var elemType = prop.PropertyType;
+                bool isCollection = false;
+                if (elemType.GetTypeInfo().IsGenericType && elemType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                {
+                    elemType = prop.PropertyType.GenericTypeArguments[0];
+                    isCollection = true;
+                }
+
                 var overridden = prop.GetCustomAttribute<OverrideTypeReaderAttribute>();
                 var reader = (overridden != null)
-                    ? ModuleClassBuilder.GetTypeReader(_commands, prop.PropertyType, overridden.TypeReader, services)
-                    : (_commands.GetDefaultTypeReader(prop.PropertyType)
-                        ?? _commands.GetTypeReaders(prop.PropertyType).FirstOrDefault().Value);
+                    ? ModuleClassBuilder.GetTypeReader(_commands, elemType, overridden.TypeReader, services)
+                    : (_commands.GetDefaultTypeReader(elemType)
+                        ?? _commands.GetTypeReaders(elemType).FirstOrDefault().Value);
 
                 if (reader != null)
                 {
-                    var readResult = await reader.ReadAsync(context, arg, services).ConfigureAwait(false);
-                    return (readResult.IsSuccess)
-                        ? readResult.BestMatch
-                        : null;
+                    if (isCollection)
+                    {
+                        var method = _readMultipleMethod.MakeGenericMethod(elemType);
+                        var task = (Task<IEnumerable>)method.Invoke(null, new object[] { reader, context, arg.Split(','), services });
+                        return await task.ConfigureAwait(false);
+                    }
+                    else
+                        return await ReadSingle(reader, context, arg, services).ConfigureAwait(false);
                 }
                 return null;
             }
         }
+
+        private static async Task<object> ReadSingle(TypeReader reader, ICommandContext context, string arg, IServiceProvider services)
+        {
+            var readResult = await reader.ReadAsync(context, arg, services).ConfigureAwait(false);
+            return (readResult.IsSuccess)
+                ? readResult.BestMatch
+                : null;
+        }
+        private static async Task<IEnumerable> ReadMultiple<TObj>(TypeReader reader, ICommandContext context, IEnumerable<string> args, IServiceProvider services)
+        {
+            var objs = new List<TObj>();
+            foreach (var arg in args)
+            {
+                var read = await ReadSingle(reader, context, arg.Trim(), services).ConfigureAwait(false);
+                if (read != null)
+                    objs.Add((TObj)read);
+            }
+            return objs.ToImmutableArray();
+        }
+        private static readonly MethodInfo _readMultipleMethod = typeof(NamedArgumentTypeReader<T>)
+            .GetTypeInfo()
+            .DeclaredMethods
+            .Single(m => m.IsPrivate && m.IsStatic && m.Name == nameof(ReadMultiple));
 
         private enum ReadState
         {

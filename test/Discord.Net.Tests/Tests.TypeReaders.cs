@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord.Commands;
 using Xunit;
@@ -80,6 +81,27 @@ namespace Discord
             Assert.False(result.IsSuccess);
             Assert.Equal(expected: CommandError.Exception, actual: result.Error);
         }
+
+        [Fact]
+        public async Task TestMultiple()
+        {
+            var commands = new CommandService();
+            var module = await commands.AddModuleAsync<TestModule>(null);
+
+            Assert.NotNull(module);
+            Assert.NotEmpty(module.Commands);
+
+            var cmd = module.Commands[0];
+            Assert.NotNull(cmd);
+            Assert.NotEmpty(cmd.Parameters);
+
+            var param = cmd.Parameters[0];
+            Assert.NotNull(param);
+            Assert.True(param.IsRemainder);
+
+            var result = await param.ParseAsync(null, "manyints: \"1, 2, 3, 4, 5, 6, 7\"");
+            Assert.True(result.IsSuccess);
+        }
     }
 
     [NamedArgumentType]
@@ -89,6 +111,8 @@ namespace Discord
 
         [OverrideTypeReader(typeof(CustomTypeReader))]
         public string Bar { get; set; }
+
+        public IEnumerable<int> ManyInts { get; set; }
     }
 
     public sealed class CustomTypeReader : TypeReader
