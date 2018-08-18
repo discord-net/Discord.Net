@@ -58,6 +58,28 @@ namespace Discord
             Assert.Equal(expected: 42, actual: m.Foo);
             Assert.Equal(expected: "hello", actual: m.Bar);
         }
+
+        [Fact]
+        public async Task TestNonPatternInput()
+        {
+            var commands = new CommandService();
+            var module = await commands.AddModuleAsync<TestModule>(null);
+
+            Assert.NotNull(module);
+            Assert.NotEmpty(module.Commands);
+
+            var cmd = module.Commands[0];
+            Assert.NotNull(cmd);
+            Assert.NotEmpty(cmd.Parameters);
+
+            var param = cmd.Parameters[0];
+            Assert.NotNull(param);
+            Assert.True(param.IsRemainder);
+
+            var result = await param.ParseAsync(null, "foobar");
+            Assert.False(result.IsSuccess);
+            Assert.Equal(expected: CommandError.Exception, actual: result.Error);
+        }
     }
 
     [NamedArgumentType]

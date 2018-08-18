@@ -10,8 +10,7 @@ namespace Discord.Commands
     internal sealed class NamedArgumentTypeReader<T> : TypeReader
         where T : class, new()
     {
-        private static readonly TypeInfo _tInfo = typeof(T).GetTypeInfo();
-        private static readonly IReadOnlyDictionary<string, PropertyInfo> _tProps = _tInfo.DeclaredProperties
+        private static readonly IReadOnlyDictionary<string, PropertyInfo> _tProps = typeof(T).GetTypeInfo().DeclaredProperties
             .Where(p => p.SetMethod != null && p.SetMethod.IsPublic && !p.SetMethod.IsStatic)
             .ToImmutableDictionary(p => p.Name, StringComparer.OrdinalIgnoreCase);
 
@@ -30,12 +29,20 @@ namespace Discord.Commands
 
             while (state != ReadState.End)
             {
-                var prop = Read(out var arg);
-                var propVal = await ReadArgumentAsync(prop, arg).ConfigureAwait(false);
-                if (propVal != null)
-                    prop.SetMethod.Invoke(result, new[] { propVal });
-                else
-                    return TypeReaderResult.FromError(CommandError.ParseFailed, $"Could not parse the argument for the parameter '{prop.Name}' as type '{prop.PropertyType}'.");
+                try
+                {
+                    var prop = Read(out var arg);
+                    var propVal = await ReadArgumentAsync(prop, arg).ConfigureAwait(false);
+                    if (propVal != null)
+                        prop.SetMethod.Invoke(result, new[] { propVal });
+                    else
+                        return TypeReaderResult.FromError(CommandError.ParseFailed, $"Could not parse the argument for the parameter '{prop.Name}' as type '{prop.PropertyType}'.");
+                }
+                catch (Exception ex)
+                {
+                    //TODO: use the Exception overload after a rebase on latest
+                    return TypeReaderResult.FromError(CommandError.Exception, ex.Message);
+                }
             }
 
             return TypeReaderResult.FromSuccess(result);
@@ -91,6 +98,9 @@ namespace Discord.Commands
                                 return GetPropAndValue(out arg);
                     }
                 }
+
+                if (currentParam == null)
+                    throw new InvalidOperationException("No parameter name was read.");
 
                 return GetPropAndValue(out arg);
 
