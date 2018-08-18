@@ -100,6 +100,17 @@ namespace Discord
                 (uint)(b * 255.0f);
         }
 
+        public static bool operator ==(Color lhs, Color rhs)
+            => lhs.RawValue == rhs.RawValue;
+
+        public static bool operator !=(Color lhs, Color rhs)
+            => lhs.RawValue != rhs.RawValue;
+
+        public override bool Equals(object obj)
+            => (obj is Color c && RawValue == c.RawValue);
+
+        public override int GetHashCode() => RawValue.GetHashCode();
+
 #if NETSTANDARD2_0 || NET45
         public static implicit operator StandardColor(Color color) =>
             StandardColor.FromArgb((int)color.RawValue);
