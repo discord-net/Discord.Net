@@ -107,7 +107,7 @@ namespace Discord.Commands
                 PropertyInfo GetPropAndValue(out string argv)
                 {
                     bool quoted = state == ReadState.InQuotedArgument;
-                    state = (currentRead == input.Length)
+                    state = (currentRead == (quoted ? input.Length - 1 : input.Length))
                         ? ReadState.End
                         : ReadState.LookingForParameter;
 
