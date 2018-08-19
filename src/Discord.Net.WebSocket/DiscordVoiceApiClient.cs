@@ -37,10 +37,10 @@ namespace Discord.Audio
             new AsyncEvent<Func<string, string, double, Task>>();
 
         private readonly JsonSerializer _serializer;
+        private readonly IUdpSocket _udp;
         private CancellationTokenSource _connectCancelToken;
         private bool _isDisposed;
         private ulong _nextKeepalive;
-        private readonly IUdpSocket _udp;
 
         internal DiscordVoiceAPIClient(ulong guildId, WebSocketProvider webSocketProvider,
             UdpSocketProvider udpSocketProvider, JsonSerializer serializer = null)

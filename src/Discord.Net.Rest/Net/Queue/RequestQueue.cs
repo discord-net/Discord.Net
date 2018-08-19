@@ -14,8 +14,8 @@ namespace Discord.Net.Queue
     internal class RequestQueue : IDisposable
     {
         private readonly ConcurrentDictionary<string, RequestBucket> _buckets;
-        private readonly SemaphoreSlim _tokenLock;
         private readonly CancellationTokenSource _cancelToken; //Dispose token
+        private readonly SemaphoreSlim _tokenLock;
 
         private Task _cleanupTask;
         private CancellationTokenSource _clearToken;

@@ -29,7 +29,9 @@ namespace Discord.Commands
             foreach (var role in roles.Where(x => string.Equals(input, x.Name, StringComparison.OrdinalIgnoreCase)))
                 AddResult(results, role as T, role.Name == input ? 0.80f : 0.70f);
 
-            return Task.FromResult(results.Count > 0 ? TypeReaderResult.FromSuccess(results.Values.ToReadOnlyCollection()) : TypeReaderResult.FromError(CommandError.ObjectNotFound, "Role not found."));
+            return Task.FromResult(results.Count > 0
+                ? TypeReaderResult.FromSuccess(results.Values.ToReadOnlyCollection())
+                : TypeReaderResult.FromError(CommandError.ObjectNotFound, "Role not found."));
         }
 
         private void AddResult(Dictionary<ulong, TypeReaderValue> results, T role, float score)

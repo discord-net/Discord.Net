@@ -58,7 +58,9 @@ namespace Discord.Commands
             var result = new List<PropertyInfo>();
             while (ownerType != _objectTypeInfo)
             {
-                result.AddRange(ownerType.DeclaredProperties.Where(prop => prop.SetMethod?.IsStatic == false && prop.SetMethod?.IsPublic == true && prop.GetCustomAttribute<DontInjectAttribute>() == null));
+                result.AddRange(ownerType.DeclaredProperties.Where(prop =>
+                    prop.SetMethod?.IsStatic == false && prop.SetMethod?.IsPublic == true &&
+                    prop.GetCustomAttribute<DontInjectAttribute>() == null));
                 ownerType = ownerType.BaseType.GetTypeInfo();
             }
 

@@ -28,9 +28,7 @@ namespace Discord
         }
 
         /// <summary> Sanitizes the string, safely escaping any Markdown sequences. </summary>
-        public static string Sanitize(string text)
-        {
-            return SensitiveCharacters.Aggregate(text, (current, unsafeChar) => current.Replace(unsafeChar, $"\\{unsafeChar}"));
-        }
+        public static string Sanitize(string text) => SensitiveCharacters.Aggregate(text,
+            (current, unsafeChar) => current.Replace(unsafeChar, $"\\{unsafeChar}"));
     }
 }

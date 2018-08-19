@@ -19,10 +19,10 @@ namespace Discord.WebSocket
         ISocketAudioChannel
     {
         private readonly MessageCache _messages;
+        private readonly ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
 
         private string _iconId;
         private ConcurrentDictionary<ulong, SocketGroupUser> _users;
-        private readonly ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
 
         internal SocketGroupChannel(DiscordSocketClient discord, ulong id)
             : base(discord, id)
@@ -211,10 +211,7 @@ namespace Discord.WebSocket
             => _messages?.Remove(id);
 
         //Users
-        public new SocketGroupUser GetUser(ulong id)
-        {
-            return _users.TryGetValue(id, out var user) ? user : null;
-        }
+        public new SocketGroupUser GetUser(ulong id) => _users.TryGetValue(id, out var user) ? user : null;
 
         internal SocketGroupUser GetOrAddUser(UserModel model)
         {
@@ -231,7 +228,6 @@ namespace Discord.WebSocket
             if (!_users.TryRemove(id, out var user)) return null;
             user.GlobalUser.RemoveRef(Discord);
             return user;
-
         }
 
         //Voice States

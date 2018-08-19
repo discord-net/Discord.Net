@@ -357,10 +357,8 @@ namespace Discord.WebSocket
             => State.RemoveUser(id);
 
         /// <inheritdoc />
-        public override RestVoiceRegion GetVoiceRegion(string id)
-        {
-            return _voiceRegions.TryGetValue(id, out var region) ? region : null;
-        }
+        public override RestVoiceRegion GetVoiceRegion(string id) =>
+            _voiceRegions.TryGetValue(id, out var region) ? region : null;
 
         /// <summary> Downloads the users list for the provided guilds, if they don't have a complete list. </summary>
         public override async Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
@@ -1152,7 +1150,7 @@ namespace Discord.WebSocket
                                             author = guild.GetUser(data.Author.Value.Id);
                                     }
                                     else
-                                        author = ((SocketChannel) channel).GetUser(data.Author.Value.Id);
+                                        author = ((SocketChannel)channel).GetUser(data.Author.Value.Id);
 
                                     if (author == null)
                                     {
@@ -1205,8 +1203,11 @@ namespace Discord.WebSocket
                                     else if (data.Author.IsSpecified)
                                     {
                                         //Edited message isnt in cache, create a detached one
-                                        var author = (guild != null ? guild.GetUser(data.Author.Value.Id) : ((SocketChannel) channel).GetUser(data.Author.Value.Id)) ??
-                                                            SocketUnknownUser.Create(this, State, data.Author.Value);
+                                        var author =
+                                            (guild != null
+                                                ? guild.GetUser(data.Author.Value.Id)
+                                                : ((SocketChannel)channel).GetUser(data.Author.Value.Id)) ??
+                                            SocketUnknownUser.Create(this, State, data.Author.Value);
 
                                         after = SocketMessage.Create(this, State, author, channel, data);
                                     }

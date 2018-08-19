@@ -10,7 +10,6 @@ namespace Discord.Commands
             if (text.Length <= 0 || text[0] != c) return false;
             argPos = 1;
             return true;
-
         }
 
         public static bool HasStringPrefix(this IUserMessage msg, string str, ref int argPos,
@@ -20,7 +19,6 @@ namespace Discord.Commands
             if (!text.StartsWith(str, comparisonType)) return false;
             argPos = str.Length;
             return true;
-
         }
 
         public static bool HasMentionPrefix(this IUserMessage msg, IUser user, ref int argPos)
@@ -37,7 +35,6 @@ namespace Discord.Commands
             if (userId != user.Id) return false;
             argPos = endPos + 2;
             return true;
-
         }
     }
 }

@@ -86,7 +86,6 @@ namespace Discord
             var name = text.Substring(startIndex, splitIndex - startIndex);
             result = new Emote(id, name, animated);
             return true;
-
         }
 
         public override string ToString() => $"<{(Animated ? "a" : "")}:{Name}:{Id}>";

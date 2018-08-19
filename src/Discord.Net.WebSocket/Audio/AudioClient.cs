@@ -198,10 +198,8 @@ namespace Discord.Audio
             }
         }
 
-        internal AudioInStream GetInputStream(ulong id)
-        {
-            return _streams.TryGetValue(id, out var streamPair) ? streamPair.Reader : null;
-        }
+        internal AudioInStream GetInputStream(ulong id) =>
+            _streams.TryGetValue(id, out var streamPair) ? streamPair.Reader : null;
 
         internal async Task RemoveInputStreamAsync(ulong userId)
         {

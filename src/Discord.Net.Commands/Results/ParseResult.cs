@@ -29,15 +29,11 @@ namespace Discord.Commands
             IReadOnlyList<TypeReaderResult> paramValues)
         {
             if (argValues.Any(t => t.Values.Count > 1))
-            {
                 return new ParseResult(argValues, paramValues, CommandError.MultipleMatches,
                     "Multiple matches found.");
-            }
             if (paramValues.Any(t => t.Values.Count > 1))
-            {
                 return new ParseResult(argValues, paramValues, CommandError.MultipleMatches,
                     "Multiple matches found.");
-            }
 
             return new ParseResult(argValues, paramValues, null, null);
         }

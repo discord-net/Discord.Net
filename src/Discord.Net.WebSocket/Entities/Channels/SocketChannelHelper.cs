@@ -23,7 +23,9 @@ namespace Discord.WebSocket
 
             if (dir == Direction.Before || mode == CacheMode.CacheOnly)
             {
-                cachedMessages = messages != null ? messages.GetMany(fromMessageId, dir, limit) : ImmutableArray.Create<SocketMessage>();
+                cachedMessages = messages != null
+                    ? messages.GetMany(fromMessageId, dir, limit)
+                    : ImmutableArray.Create<SocketMessage>();
                 result = ImmutableArray.Create(cachedMessages).ToAsyncEnumerable<IReadOnlyCollection<IMessage>>();
             }
 
@@ -45,10 +47,9 @@ namespace Discord.WebSocket
 
         public static IReadOnlyCollection<SocketMessage> GetCachedMessages(SocketChannel channel,
             DiscordSocketClient discord, MessageCache messages,
-            ulong? fromMessageId, Direction dir, int limit)
-        {
-            return messages != null ? messages.GetMany(fromMessageId, dir, limit) : ImmutableArray.Create<SocketMessage>();
-        }
+            ulong? fromMessageId, Direction dir, int limit) => messages != null
+            ? messages.GetMany(fromMessageId, dir, limit)
+            : ImmutableArray.Create<SocketMessage>();
 
         public static void AddMessage(ISocketMessageChannel channel, DiscordSocketClient discord,
             SocketMessage msg)

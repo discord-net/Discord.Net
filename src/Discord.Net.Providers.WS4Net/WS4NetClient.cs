@@ -16,11 +16,11 @@ namespace Discord.Net.Providers.WS4Net
         private readonly Dictionary<string, string> _headers;
 
         private readonly SemaphoreSlim _lock;
+        private readonly ManualResetEventSlim _waitUntilConnect;
         private CancellationToken _cancelToken, _parentToken;
         private CancellationTokenSource _cancelTokenSource;
         private WS4NetSocket _client;
         private bool _isDisposed;
-        private readonly ManualResetEventSlim _waitUntilConnect;
 
         public WS4NetClient()
         {

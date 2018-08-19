@@ -49,7 +49,9 @@ namespace Discord.Rest
         internal static RestUser Create(BaseDiscordClient discord, IGuild guild, Model model, ulong? webhookId)
         {
             RestUser entity;
-            entity = webhookId.HasValue ? new RestWebhookUser(discord, guild, model.Id, webhookId.Value) : new RestUser(discord, model.Id);
+            entity = webhookId.HasValue
+                ? new RestWebhookUser(discord, guild, model.Id, webhookId.Value)
+                : new RestUser(discord, model.Id);
             entity.Update(model);
             return entity;
         }

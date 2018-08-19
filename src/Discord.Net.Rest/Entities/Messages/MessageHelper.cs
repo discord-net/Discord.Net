@@ -204,7 +204,9 @@ namespace Discord.Rest
                 return MessageSource.System;
             if (msg.WebhookId.IsSpecified)
                 return MessageSource.Webhook;
-            return msg.Author.GetValueOrDefault()?.Bot.GetValueOrDefault(false) == true ? MessageSource.Bot : MessageSource.User;
+            return msg.Author.GetValueOrDefault()?.Bot.GetValueOrDefault(false) == true
+                ? MessageSource.Bot
+                : MessageSource.User;
         }
     }
 }

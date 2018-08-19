@@ -70,7 +70,9 @@ namespace Discord.Commands
             else
                 perms = ChannelPermissions.All(context.Channel);
 
-            return !perms.Has(ChannelPermission.Value) ? PreconditionResult.FromError($"Bot requires channel permission {ChannelPermission.Value}") : PreconditionResult.FromSuccess();
+            return !perms.Has(ChannelPermission.Value)
+                ? PreconditionResult.FromError($"Bot requires channel permission {ChannelPermission.Value}")
+                : PreconditionResult.FromSuccess();
         }
     }
 }

@@ -133,7 +133,9 @@ namespace Discord.Audio.Streams
 
         public override async Task WriteAsync(byte[] data, int offset, int count, CancellationToken cancelToken)
         {
-            cancelToken = cancelToken.CanBeCanceled ? CancellationTokenSource.CreateLinkedTokenSource(cancelToken, _cancelToken).Token : _cancelToken;
+            cancelToken = cancelToken.CanBeCanceled
+                ? CancellationTokenSource.CreateLinkedTokenSource(cancelToken, _cancelToken).Token
+                : _cancelToken;
 
             await _queueLock.WaitAsync(-1, cancelToken).ConfigureAwait(false);
             if (!_bufferPool.TryDequeue(out var buffer))

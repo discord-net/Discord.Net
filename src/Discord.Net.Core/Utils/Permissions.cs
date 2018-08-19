@@ -111,7 +111,8 @@ namespace Discord
                 resolvedPermissions = GuildPermissions.Webhook.RawValue;
             else
             {
-                resolvedPermissions = user.RoleIds.Aggregate(resolvedPermissions, (current, roleId) => current | (guild.GetRole(roleId)?.Permissions.RawValue ?? 0));
+                resolvedPermissions = user.RoleIds.Aggregate(resolvedPermissions,
+                    (current, roleId) => current | (guild.GetRole(roleId)?.Permissions.RawValue ?? 0));
                 if (GetValue(resolvedPermissions, GuildPermission.Administrator))
                     resolvedPermissions = GuildPermissions.All.RawValue; //Administrators always have all permissions
             }

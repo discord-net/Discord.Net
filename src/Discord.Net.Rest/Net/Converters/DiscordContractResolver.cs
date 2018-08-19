@@ -89,7 +89,9 @@ namespace Discord.Net.Converters
             var typeInfo = type.GetTypeInfo();
             if (typeInfo.ImplementedInterfaces.Any(x => x == typeof(IEntity<ulong>)))
                 return UInt64EntityConverter.Instance;
-            return typeInfo.ImplementedInterfaces.Any(x => x == typeof(IEntity<string>)) ? StringEntityConverter.Instance : null;
+            return typeInfo.ImplementedInterfaces.Any(x => x == typeof(IEntity<string>))
+                ? StringEntityConverter.Instance
+                : null;
         }
 
         private static bool ShouldSerialize<TOwner, TValue>(object owner, Delegate getter) =>

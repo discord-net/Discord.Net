@@ -66,24 +66,19 @@ namespace Discord.Rest
         }
 
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(int limit, CacheMode mode,
-            RequestOptions options)
-        {
-            return mode == CacheMode.AllowDownload
-                ? GetMessagesAsync(limit, options)
-                : AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
-        }
+            RequestOptions options) => mode == CacheMode.AllowDownload
+            ? GetMessagesAsync(limit, options)
+            : AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
 
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId,
-            Direction dir, int limit, CacheMode mode, RequestOptions options)
-        {
-            return mode == CacheMode.AllowDownload ? GetMessagesAsync(fromMessageId, dir, limit, options) : AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
-        }
+            Direction dir, int limit, CacheMode mode, RequestOptions options) => mode == CacheMode.AllowDownload
+            ? GetMessagesAsync(fromMessageId, dir, limit, options)
+            : AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
 
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(IMessage fromMessage,
-            Direction dir, int limit, CacheMode mode, RequestOptions options)
-        {
-            return mode == CacheMode.AllowDownload ? GetMessagesAsync(fromMessage, dir, limit, options) : AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
-        }
+            Direction dir, int limit, CacheMode mode, RequestOptions options) => mode == CacheMode.AllowDownload
+            ? GetMessagesAsync(fromMessage, dir, limit, options)
+            : AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
 
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
@@ -111,10 +106,10 @@ namespace Discord.Rest
             return null;
         }
 
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
-        {
-            return mode == CacheMode.AllowDownload ? GetUsersAsync(options) : AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
-        }
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options) =>
+            mode == CacheMode.AllowDownload
+                ? GetUsersAsync(options)
+                : AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
 
         public string Topic { get; private set; }
         public ulong? CategoryId { get; private set; }
@@ -153,10 +148,9 @@ namespace Discord.Rest
         }
 
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode,
-            RequestOptions options)
-        {
-            return mode == CacheMode.AllowDownload ? GetUsersAsync(options) : AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
-        }
+            RequestOptions options) => mode == CacheMode.AllowDownload
+            ? GetUsersAsync(options)
+            : AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
 
         // INestedChannel
         async Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)

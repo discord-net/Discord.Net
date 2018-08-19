@@ -202,7 +202,8 @@ namespace Discord.Commands
                     case Task<IResult> resultTask:
                     {
                         var result = await resultTask.ConfigureAwait(false);
-                        await Module.Service._commandExecutedEvent.InvokeAsync(this, context, result).ConfigureAwait(false);
+                        await Module.Service._commandExecutedEvent.InvokeAsync(this, context, result)
+                            .ConfigureAwait(false);
                         if (result is RuntimeResult execResult)
                             return execResult;
                         break;
@@ -210,14 +211,16 @@ namespace Discord.Commands
                     case Task<ExecuteResult> execTask:
                     {
                         var result = await execTask.ConfigureAwait(false);
-                        await Module.Service._commandExecutedEvent.InvokeAsync(this, context, result).ConfigureAwait(false);
+                        await Module.Service._commandExecutedEvent.InvokeAsync(this, context, result)
+                            .ConfigureAwait(false);
                         return result;
                     }
                     default:
                     {
                         await task.ConfigureAwait(false);
                         var result = ExecuteResult.FromSuccess();
-                        await Module.Service._commandExecutedEvent.InvokeAsync(this, context, result).ConfigureAwait(false);
+                        await Module.Service._commandExecutedEvent.InvokeAsync(this, context, result)
+                            .ConfigureAwait(false);
                         break;
                     }
                 }
@@ -280,9 +283,8 @@ namespace Discord.Commands
         private static T[] ConvertParamsList<T>(IEnumerable<object> paramsList)
             => paramsList.Cast<T>().ToArray();
 
-        internal string GetLogText(ICommandContext context)
-        {
-            return context.Guild != null ? $"\"{Name}\" for {context.User} in {context.Guild}/{context.Channel}" : $"\"{Name}\" for {context.User} in {context.Channel}";
-        }
+        internal string GetLogText(ICommandContext context) => context.Guild != null
+            ? $"\"{Name}\" for {context.User} in {context.Guild}/{context.Channel}"
+            : $"\"{Name}\" for {context.User} in {context.Channel}";
     }
 }

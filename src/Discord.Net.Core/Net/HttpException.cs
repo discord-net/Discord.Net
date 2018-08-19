@@ -23,13 +23,13 @@ namespace Discord.Net
         {
             string msg;
             if (discordCode != null && discordCode != 0)
-            {
-                msg = reason != null ? $"The server responded with error {(int)discordCode}: {reason}" : $"The server responded with error {(int)discordCode}: {httpCode}";
-            }
+                msg = reason != null
+                    ? $"The server responded with error {(int)discordCode}: {reason}"
+                    : $"The server responded with error {(int)discordCode}: {httpCode}";
             else
-            {
-                msg = reason != null ? $"The server responded with error {(int)httpCode}: {reason}" : $"The server responded with error {(int)httpCode}: {httpCode}";
-            }
+                msg = reason != null
+                    ? $"The server responded with error {(int)httpCode}: {reason}"
+                    : $"The server responded with error {(int)httpCode}: {httpCode}";
 
             return msg;
         }

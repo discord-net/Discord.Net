@@ -11,11 +11,11 @@ namespace Discord.WebSocket
 {
     public partial class DiscordShardedClient : BaseSocketClient, IDiscordClient
     {
+        private readonly bool _automaticShards;
         private readonly DiscordSocketConfig _baseConfig;
         private readonly SemaphoreSlim _connectionGroupLock;
-        private readonly bool _automaticShards;
-        private int[] _shardIds;
         private readonly Dictionary<int, int> _shardIdsToIndex;
+        private int[] _shardIds;
         private DiscordSocketClient[] _shards;
         private int _totalShards;
 
@@ -192,10 +192,7 @@ namespace Discord.WebSocket
             }
         }
 
-        public DiscordSocketClient GetShard(int id)
-        {
-            return _shardIdsToIndex.TryGetValue(id, out id) ? _shards[id] : null;
-        }
+        public DiscordSocketClient GetShard(int id) => _shardIdsToIndex.TryGetValue(id, out id) ? _shards[id] : null;
 
         private int GetShardIdFor(ulong guildId)
             => (int)((guildId >> 22) % (uint)_totalShards);
@@ -218,42 +215,24 @@ namespace Discord.WebSocket
             => GetShardFor(id).GetGuild(id);
 
         /// <inheritdoc />
-        public override SocketChannel GetChannel(ulong id)
-        {
-            return _shards.Select(t => t.GetChannel(id)).FirstOrDefault(channel => channel != null);
-        }
+        public override SocketChannel GetChannel(ulong id) =>
+            _shards.Select(t => t.GetChannel(id)).FirstOrDefault(channel => channel != null);
 
-        private IEnumerable<ISocketPrivateChannel> GetPrivateChannels()
-        {
-            return _shards.SelectMany(t => t.PrivateChannels);
-        }
+        private IEnumerable<ISocketPrivateChannel> GetPrivateChannels() => _shards.SelectMany(t => t.PrivateChannels);
 
-        private int GetPrivateChannelCount()
-        {
-            return _shards.Sum(t => t.PrivateChannels.Count);
-        }
+        private int GetPrivateChannelCount() => _shards.Sum(t => t.PrivateChannels.Count);
 
-        private IEnumerable<SocketGuild> GetGuilds()
-        {
-            return _shards.SelectMany(t => t.Guilds);
-        }
+        private IEnumerable<SocketGuild> GetGuilds() => _shards.SelectMany(t => t.Guilds);
 
-        private int GetGuildCount()
-        {
-            return _shards.Sum(t => t.Guilds.Count);
-        }
+        private int GetGuildCount() => _shards.Sum(t => t.Guilds.Count);
 
         /// <inheritdoc />
-        public override SocketUser GetUser(ulong id)
-        {
-            return _shards.Select(t => t.GetUser(id)).FirstOrDefault(user => user != null);
-        }
+        public override SocketUser GetUser(ulong id) =>
+            _shards.Select(t => t.GetUser(id)).FirstOrDefault(user => user != null);
 
         /// <inheritdoc />
-        public override SocketUser GetUser(string username, string discriminator)
-        {
-            return _shards.Select(t => t.GetUser(username, discriminator)).FirstOrDefault(user => user != null);
-        }
+        public override SocketUser GetUser(string username, string discriminator) => _shards
+            .Select(t => t.GetUser(username, discriminator)).FirstOrDefault(user => user != null);
 
         /// <inheritdoc />
         public override RestVoiceRegion GetVoiceRegion(string id)

@@ -214,6 +214,7 @@ namespace Discord
                 case TagHandling.Sanitize:
                     return $"@{SanitizeChar}everyone";
             }
+
             return "";
         }
 
@@ -230,6 +231,7 @@ namespace Discord
                 case TagHandling.Sanitize:
                     return $"@{SanitizeChar}here";
             }
+
             return "";
         }
 
@@ -239,10 +241,7 @@ namespace Discord
             var emoji = (Emote)tag.Value;
 
             //Remove if its name contains any bad chars (prevents a few tag exploits)
-            if (emoji.Name.Any(c => !char.IsLetterOrDigit(c) && c != '_' && c != '-'))
-            {
-                return "";
-            }
+            if (emoji.Name.Any(c => !char.IsLetterOrDigit(c) && c != '_' && c != '-')) return "";
 
             switch (mode)
             {

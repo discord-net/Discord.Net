@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.API;
 using Discord.Audio;
 using EmbedModel = Discord.API.GuildEmbed;
 using Model = Discord.API.Guild;
@@ -473,10 +472,7 @@ namespace Discord.Rest
             => GuildHelper.GetVanityInviteAsync(this, Discord, options);
 
         //Roles
-        public RestRole GetRole(ulong id)
-        {
-            return _roles.TryGetValue(id, out var value) ? value : null;
-        }
+        public RestRole GetRole(ulong id) => _roles.TryGetValue(id, out var value) ? value : null;
 
         public async Task<RestRole> CreateRoleAsync(string name,
             GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?),

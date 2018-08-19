@@ -52,22 +52,19 @@ namespace Discord.Rest
         }
 
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(int limit, CacheMode mode,
-            RequestOptions options)
-        {
-            return mode == CacheMode.AllowDownload ? GetMessagesAsync(limit, options) : AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
-        }
+            RequestOptions options) => mode == CacheMode.AllowDownload
+            ? GetMessagesAsync(limit, options)
+            : AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
 
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(ulong fromMessageId,
-            Direction dir, int limit, CacheMode mode, RequestOptions options)
-        {
-            return mode == CacheMode.AllowDownload ? GetMessagesAsync(fromMessageId, dir, limit, options) : AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
-        }
+            Direction dir, int limit, CacheMode mode, RequestOptions options) => mode == CacheMode.AllowDownload
+            ? GetMessagesAsync(fromMessageId, dir, limit, options)
+            : AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
 
         IAsyncEnumerable<IReadOnlyCollection<IMessage>> IMessageChannel.GetMessagesAsync(IMessage fromMessage,
-            Direction dir, int limit, CacheMode mode, RequestOptions options)
-        {
-            return mode == CacheMode.AllowDownload ? GetMessagesAsync(fromMessage, dir, limit, options) : AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
-        }
+            Direction dir, int limit, CacheMode mode, RequestOptions options) => mode == CacheMode.AllowDownload
+            ? GetMessagesAsync(fromMessage, dir, limit, options)
+            : AsyncEnumerable.Empty<IReadOnlyCollection<IMessage>>();
 
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);

@@ -10,10 +10,10 @@ namespace Discord.Audio.Streams
         protected readonly byte[] _buffer;
         private readonly byte[] _header;
         private readonly AudioStream _next;
+        private readonly uint _ssrc;
         private bool _hasHeader;
         private ushort _nextSeq;
         private uint _nextTimestamp;
-        private readonly uint _ssrc;
 
         public RTPWriteStream(AudioStream next, uint ssrc, int bufferSize = 4000)
         {

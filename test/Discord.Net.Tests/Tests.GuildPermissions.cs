@@ -44,7 +44,8 @@ namespace Discord
                 .Distinct()
                 .ToArray();
             // test GuildPermissions.All
-            var sumOfAllGuildPermissions = enumValues.Aggregate<GuildPermission, ulong>(0, (current, v) => current | (ulong)v);
+            var sumOfAllGuildPermissions =
+                enumValues.Aggregate<GuildPermission, ulong>(0, (current, v) => current | (ulong)v);
 
             // assert that the raw values match
             Assert.Equal(sumOfAllGuildPermissions, GuildPermissions.All.RawValue);

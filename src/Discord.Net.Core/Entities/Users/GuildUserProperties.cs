@@ -46,7 +46,8 @@ namespace Discord
         /// <remarks>
         ///     To add a role to a user:
         ///     <see cref="IGuildUser.AddRolesAsync(System.Collections.Generic.IEnumerable{Discord.IRole}, RequestOptions)" />
-        ///     To remove a role from a user: <see cref="IGuildUser.RemoveRolesAsync(System.Collections.Generic.IEnumerable{Discord.IRole}, RequestOptions)" />
+        ///     To remove a role from a user:
+        ///     <see cref="IGuildUser.RemoveRolesAsync(System.Collections.Generic.IEnumerable{Discord.IRole}, RequestOptions)" />
         /// </remarks>
         public Optional<IEnumerable<IRole>> Roles { get; set; }
 

@@ -11,12 +11,12 @@ namespace Discord.Audio.Streams
         private const int MaxFrames = 100; //1-2 Seconds
 
         private readonly ConcurrentQueue<RTPFrame> _frames;
+        private readonly SemaphoreSlim _signal;
         private bool _hasHeader;
         private bool _isDisposed;
         private bool _nextMissed;
         private ushort _nextSeq;
         private uint _nextTimestamp;
-        private readonly SemaphoreSlim _signal;
 
         public InputStream()
         {

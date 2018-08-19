@@ -18,11 +18,11 @@ namespace Discord.Net.WebSockets
         private readonly Dictionary<string, string> _headers;
 
         private readonly SemaphoreSlim _lock;
+        private readonly IWebProxy _proxy;
         private CancellationToken _cancelToken, _parentToken;
         private CancellationTokenSource _cancelTokenSource;
         private ClientWebSocket _client;
         private bool _isDisposed, _isDisconnecting;
-        private readonly IWebProxy _proxy;
         private Task _task;
 
         public DefaultWebSocketClient(IWebProxy proxy = null)

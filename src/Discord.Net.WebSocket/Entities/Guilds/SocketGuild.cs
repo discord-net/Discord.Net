@@ -523,10 +523,7 @@ namespace Discord.WebSocket
             => GuildHelper.GetVanityInviteAsync(this, Discord, options);
 
         //Roles
-        public SocketRole GetRole(ulong id)
-        {
-            return _roles.TryGetValue(id, out var value) ? value : null;
-        }
+        public SocketRole GetRole(ulong id) => _roles.TryGetValue(id, out var value) ? value : null;
 
         public Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?),
             Color? color = default(Color?),
@@ -540,16 +537,10 @@ namespace Discord.WebSocket
             return role;
         }
 
-        internal SocketRole RemoveRole(ulong id)
-        {
-            return _roles.TryRemove(id, out var role) ? role : null;
-        }
+        internal SocketRole RemoveRole(ulong id) => _roles.TryRemove(id, out var role) ? role : null;
 
         //Users
-        public SocketGuildUser GetUser(ulong id)
-        {
-            return _members.TryGetValue(id, out var member) ? member : null;
-        }
+        public SocketGuildUser GetUser(ulong id) => _members.TryGetValue(id, out var member) ? member : null;
 
         internal SocketGuildUser AddOrUpdateUser(UserModel model)
         {
@@ -602,7 +593,6 @@ namespace Discord.WebSocket
             DownloadedMemberCount--;
             member.GlobalUser.RemoveRef(Discord);
             return member;
-
         }
 
         internal void CompleteDownloadUsers() => _downloaderPromise.TrySetResultAsync(true);

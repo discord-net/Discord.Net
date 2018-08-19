@@ -36,7 +36,9 @@ namespace Discord.Commands
                         _commands = _commands.Add(command);
                         break;
                     default:
-                        var name = nextSegment == -1 ? text.Substring(index) : text.Substring(index, nextSegment - index);
+                        var name = nextSegment == -1
+                            ? text.Substring(index)
+                            : text.Substring(index, nextSegment - index);
 
                         var fullName = _name == "" ? name : _name + service._separatorChar + name;
                         var nextNode = _nodes.GetOrAdd(name, x => new CommandMapNode(fullName));

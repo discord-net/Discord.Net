@@ -18,6 +18,7 @@ namespace Discord.API
     internal class DiscordSocketApiClient : DiscordRestApiClient
     {
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
+        private readonly bool _isExplicitUrl;
 
         private readonly AsyncEvent<Func<GatewayOpCode, int?, string, object, Task>> _receivedGatewayEvent =
             new AsyncEvent<Func<GatewayOpCode, int?, string, object, Task>>();
@@ -31,7 +32,6 @@ namespace Discord.API
         private CancellationTokenSource _connectCancelToken;
         private DeflateStream _decompressor;
         private string _gatewayUrl;
-        private readonly bool _isExplicitUrl;
 
         public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider,
             string userAgent,

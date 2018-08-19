@@ -37,10 +37,7 @@ namespace Discord.WebSocket
             return msg;
         }
 
-        public SocketMessage Get(ulong id)
-        {
-            return _messages.TryGetValue(id, out var result) ? result : null;
-        }
+        public SocketMessage Get(ulong id) => _messages.TryGetValue(id, out var result) ? result : null;
 
         public IReadOnlyCollection<SocketMessage> GetMany(ulong? fromMessageId, Direction dir,
             int limit = DiscordConfig.MaxMessagesPerBatch)
@@ -60,10 +57,7 @@ namespace Discord.WebSocket
                 cachedMessageIds = cachedMessageIds.Reverse();
 
             return cachedMessageIds
-                .Select(x =>
-                {
-                    return _messages.TryGetValue(x, out var msg) ? msg : null;
-                })
+                .Select(x => { return _messages.TryGetValue(x, out var msg) ? msg : null; })
                 .Where(x => x != null)
                 .Take(limit)
                 .ToImmutableArray();

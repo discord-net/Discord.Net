@@ -47,9 +47,7 @@ namespace Discord.Rest
                     [ActionType.MessageDeleted] = MessageDeleteAuditLogData.Create
                 };
 
-        public static IAuditLogData CreateData(BaseDiscordClient discord, Model log, EntryModel entry)
-        {
-            return CreateMapping.TryGetValue(entry.Action, out var func) ? func(discord, log, entry) : null;
-        }
+        public static IAuditLogData CreateData(BaseDiscordClient discord, Model log, EntryModel entry) =>
+            CreateMapping.TryGetValue(entry.Action, out var func) ? func(discord, log, entry) : null;
     }
 }

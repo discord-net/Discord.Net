@@ -52,7 +52,9 @@ namespace Discord.Commands
             if ((Contexts & ContextType.Group) != 0)
                 isValid = isValid || context.Channel is IGroupChannel;
 
-            return Task.FromResult(isValid ? PreconditionResult.FromSuccess() : PreconditionResult.FromError($"Invalid context for command; accepted contexts: {Contexts}"));
+            return Task.FromResult(isValid
+                ? PreconditionResult.FromSuccess()
+                : PreconditionResult.FromError($"Invalid context for command; accepted contexts: {Contexts}"));
         }
     }
 }

@@ -15,11 +15,11 @@ namespace Discord.Net
 {
     internal class CachedRestClient : IRestClient
     {
+        private readonly IBlobCache _blobCache;
+        private readonly CancellationTokenSource _cancelTokenSource;
         private readonly Dictionary<string, string> _headers;
         private string _baseUrl;
-        private readonly IBlobCache _blobCache;
         private CancellationToken _cancelToken, _parentToken;
-        private readonly CancellationTokenSource _cancelTokenSource;
         private bool _isDisposed;
 
         public CachedRestClient()

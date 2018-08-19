@@ -68,10 +68,8 @@ namespace Discord.Commands
         }
 
         private IEnumerable<ModuleInfo> BuildSubmodules(ModuleBuilder parent, CommandService service,
-            IServiceProvider services)
-        {
-            return parent.Modules.Select(submodule => submodule.Build(service, services, this)).ToList();
-        }
+            IServiceProvider services) =>
+            parent.Modules.Select(submodule => submodule.Build(service, services, this)).ToList();
 
         private static IEnumerable<PreconditionAttribute> BuildPreconditions(ModuleBuilder builder)
         {

@@ -47,15 +47,10 @@ namespace Discord.WebSocket
                     _groupChannels.Select(x => GetChannel(x) as ISocketPrivateChannel))
                 .ToReadOnlyCollection(() => _dmChannels.Count + _groupChannels.Count);
 
-        internal SocketChannel GetChannel(ulong id)
-        {
-            return _channels.TryGetValue(id, out var channel) ? channel : null;
-        }
+        internal SocketChannel GetChannel(ulong id) => _channels.TryGetValue(id, out var channel) ? channel : null;
 
-        internal SocketDMChannel GetDMChannel(ulong userId)
-        {
-            return _dmChannels.TryGetValue(userId, out var channel) ? channel : null;
-        }
+        internal SocketDMChannel GetDMChannel(ulong userId) =>
+            _dmChannels.TryGetValue(userId, out var channel) ? channel : null;
 
         internal void AddChannel(SocketChannel channel)
         {
@@ -86,32 +81,19 @@ namespace Discord.WebSocket
             }
 
             return channel;
-
         }
 
-        internal SocketGuild GetGuild(ulong id)
-        {
-            return _guilds.TryGetValue(id, out var guild) ? guild : null;
-        }
+        internal SocketGuild GetGuild(ulong id) => _guilds.TryGetValue(id, out var guild) ? guild : null;
 
         internal void AddGuild(SocketGuild guild) => _guilds[guild.Id] = guild;
 
-        internal SocketGuild RemoveGuild(ulong id)
-        {
-            return _guilds.TryRemove(id, out var guild) ? guild : null;
-        }
+        internal SocketGuild RemoveGuild(ulong id) => _guilds.TryRemove(id, out var guild) ? guild : null;
 
-        internal SocketGlobalUser GetUser(ulong id)
-        {
-            return _users.TryGetValue(id, out var user) ? user : null;
-        }
+        internal SocketGlobalUser GetUser(ulong id) => _users.TryGetValue(id, out var user) ? user : null;
 
         internal SocketGlobalUser GetOrAddUser(ulong id, Func<ulong, SocketGlobalUser> userFactory) =>
             _users.GetOrAdd(id, userFactory);
 
-        internal SocketGlobalUser RemoveUser(ulong id)
-        {
-            return _users.TryRemove(id, out var user) ? user : null;
-        }
+        internal SocketGlobalUser RemoveUser(ulong id) => _users.TryRemove(id, out var user) ? user : null;
     }
 }

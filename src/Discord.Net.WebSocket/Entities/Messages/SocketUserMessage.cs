@@ -12,11 +12,11 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{" + nameof(DebuggerDisplay) + @",nq}")]
     public class SocketUserMessage : SocketMessage, IUserMessage
     {
+        private readonly List<SocketReaction> _reactions = new List<SocketReaction>();
         private ImmutableArray<Attachment> _attachments;
         private long? _editedTimestampTicks;
         private ImmutableArray<Embed> _embeds;
         private bool _isMentioningEveryone, _isTTS, _isPinned;
-        private readonly List<SocketReaction> _reactions = new List<SocketReaction>();
         private ImmutableArray<ITag> _tags;
 
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel,
@@ -142,10 +142,8 @@ namespace Discord.WebSocket
                 {
                     var newMentions = ImmutableArray.CreateBuilder<SocketUnknownUser>(value.Length);
                     foreach (var val in value)
-                    {
                         if (val.Object != null)
                             newMentions.Add(SocketUnknownUser.Create(Discord, state, val.Object));
-                    }
 
                     mentions = newMentions.ToImmutable();
                 }

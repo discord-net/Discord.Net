@@ -41,8 +41,8 @@ namespace Discord
 
     public partial class Tests : IClassFixture<TestsFixture>
     {
-        private DiscordRestClient _client;
         private readonly RestGuild _guild;
+        private DiscordRestClient _client;
 
         public Tests(TestsFixture fixture)
         {
