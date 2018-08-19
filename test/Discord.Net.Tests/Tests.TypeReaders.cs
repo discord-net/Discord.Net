@@ -25,7 +25,7 @@ namespace Discord
             Assert.NotNull(param);
             Assert.True(param.IsRemainder);
 
-            var result = await param.ParseAsync(null, "foo: 42 bar: hello");
+            var result = await param.ParseAsync(null, "bar: hello foo: 42");
             Assert.True(result.IsSuccess);
 
             var m = result.BestMatch as ArgumentType;
@@ -51,7 +51,7 @@ namespace Discord
             Assert.NotNull(param);
             Assert.True(param.IsRemainder);
 
-            var result = await param.ParseAsync(null, "bar: 《hello》 foo: 42");
+            var result = await param.ParseAsync(null, "foo: 42 bar: 《hello》");
             Assert.True(result.IsSuccess);
 
             var m = result.BestMatch as ArgumentType;
