@@ -7,6 +7,6 @@
         Idle,
         AFK,
         DoNotDisturb,
-        Invisible,
+        Invisible
     }
 }

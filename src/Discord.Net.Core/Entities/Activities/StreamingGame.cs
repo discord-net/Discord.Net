@@ -2,11 +2,9 @@
 
 namespace Discord
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
+    [DebuggerDisplay(@"{" + nameof(DebuggerDisplay) + @",nq}")]
     public class StreamingGame : Game
     {
-        public string Url { get; internal set; }
-
         public StreamingGame(string name, string url)
         {
             Name = name;
@@ -14,7 +12,9 @@ namespace Discord
             Type = ActivityType.Streaming;
         }
 
-        public override string ToString() => Name;
+        public string Url { get; internal set; }
         private string DebuggerDisplay => $"{Name} ({Url})";
+
+        public override string ToString() => Name;
     }
 }

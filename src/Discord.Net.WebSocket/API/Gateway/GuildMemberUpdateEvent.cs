@@ -5,7 +5,6 @@ namespace Discord.API.Gateway
 {
     internal class GuildMemberUpdateEvent : GuildMember
     {
-        [JsonProperty("guild_id")]
-        public ulong GuildId { get; set; }
+        [JsonProperty("guild_id")] public ulong GuildId { get; set; }
     }
 }

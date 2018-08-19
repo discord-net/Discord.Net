@@ -6,13 +6,6 @@ namespace Discord
     {
         public const int APIVersion = 6;
         public const int VoiceAPIVersion = 3;
-        public static string Version { get; } =
-            typeof(DiscordConfig).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ??
-            typeof(DiscordConfig).GetTypeInfo().Assembly.GetName().Version.ToString(3) ??
-            "Unknown";
-
-        public static string UserAgent { get; } = $"DiscordBot (https://github.com/RogueException/Discord.Net, v{Version})";
-        public static readonly string APIUrl = $"https://discordapp.com/api/v{APIVersion}/";
         public const string CDNUrl = "https://cdn.discordapp.com/";
         public const string InviteUrl = "https://discord.gg/";
 
@@ -23,6 +16,16 @@ namespace Discord
         public const int MaxGuildsPerBatch = 100;
         public const int MaxUserReactionsPerBatch = 100;
         public const int MaxAuditLogEntriesPerBatch = 100;
+        public static readonly string APIUrl = $"https://discordapp.com/api/v{APIVersion}/";
+
+        public static string Version { get; } =
+            typeof(DiscordConfig).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion ??
+            typeof(DiscordConfig).GetTypeInfo().Assembly.GetName().Version.ToString(3) ??
+            "Unknown";
+
+        public static string UserAgent { get; } =
+            $"DiscordBot (https://github.com/RogueException/Discord.Net, v{Version})";
 
         /// <summary> Gets or sets how a request should act in the case of an error, by default. </summary>
         public RetryMode DefaultRetryMode { get; set; } = RetryMode.AlwaysRetry;

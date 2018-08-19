@@ -1,6 +1,6 @@
 ﻿namespace Discord.Audio
 {
-    internal enum OpusError : int
+    internal enum OpusError
     {
         OK = 0,
         BadArg = -1,

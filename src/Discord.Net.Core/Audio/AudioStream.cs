@@ -11,34 +11,28 @@ namespace Discord.Audio
         public override bool CanSeek => false;
         public override bool CanWrite => false;
 
-        public virtual void WriteHeader(ushort seq, uint timestamp, bool missed) 
-        { 
-            throw new InvalidOperationException("This stream does not accept headers");
-        }
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            WriteAsync(buffer, offset, count, CancellationToken.None).GetAwaiter().GetResult();
-        }
-        public override void Flush()
-        {
-            FlushAsync(CancellationToken.None).GetAwaiter().GetResult();
-        }
-        public void Clear()
-        {
-            ClearAsync(CancellationToken.None).GetAwaiter().GetResult();
-        }
+        public override long Length => throw new NotSupportedException();
 
-        public virtual Task ClearAsync(CancellationToken cancellationToken) { return Task.Delay(0); }
-
-        public override long Length { get { throw new NotSupportedException(); } }
         public override long Position
         {
-            get { throw new NotSupportedException(); }
-            set { throw new NotSupportedException(); }
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
         }
 
-        public override int Read(byte[] buffer, int offset, int count) { throw new NotSupportedException(); }
-        public override void SetLength(long value) { throw new NotSupportedException(); }
-        public override long Seek(long offset, SeekOrigin origin) { throw new NotSupportedException(); }
+        public virtual void WriteHeader(ushort seq, uint timestamp, bool missed) =>
+            throw new InvalidOperationException("This stream does not accept headers");
+
+        public override void Write(byte[] buffer, int offset, int count) =>
+            WriteAsync(buffer, offset, count, CancellationToken.None).GetAwaiter().GetResult();
+
+        public override void Flush() => FlushAsync(CancellationToken.None).GetAwaiter().GetResult();
+
+        public void Clear() => ClearAsync(CancellationToken.None).GetAwaiter().GetResult();
+
+        public virtual Task ClearAsync(CancellationToken cancellationToken) => Task.Delay(0);
+
+        public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
     }
 }

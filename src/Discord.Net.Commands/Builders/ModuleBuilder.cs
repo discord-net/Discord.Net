@@ -7,11 +7,33 @@ namespace Discord.Commands.Builders
 {
     public class ModuleBuilder
     {
-        private readonly List<CommandBuilder> _commands;
-        private readonly List<ModuleBuilder> _submodules;
-        private readonly List<PreconditionAttribute> _preconditions;
-        private readonly List<Attribute> _attributes;
         private readonly List<string> _aliases;
+        private readonly List<Attribute> _attributes;
+        private readonly List<CommandBuilder> _commands;
+        private readonly List<PreconditionAttribute> _preconditions;
+        private readonly List<ModuleBuilder> _submodules;
+
+        //Automatic
+        internal ModuleBuilder(CommandService service, ModuleBuilder parent)
+        {
+            Service = service;
+            Parent = parent;
+
+            _commands = new List<CommandBuilder>();
+            _submodules = new List<ModuleBuilder>();
+            _preconditions = new List<PreconditionAttribute>();
+            _attributes = new List<Attribute>();
+            _aliases = new List<string>();
+        }
+
+        //User-defined
+        internal ModuleBuilder(CommandService service, ModuleBuilder parent, string primaryAlias)
+            : this(service, parent)
+        {
+            Discord.Preconditions.NotNull(primaryAlias, nameof(primaryAlias));
+
+            _aliases = new List<string> {primaryAlias};
+        }
 
         public CommandService Service { get; }
         public ModuleBuilder Parent { get; }
@@ -28,37 +50,18 @@ namespace Discord.Commands.Builders
 
         internal TypeInfo TypeInfo { get; set; }
 
-        //Automatic
-        internal ModuleBuilder(CommandService service, ModuleBuilder parent)
-        {
-            Service = service;
-            Parent = parent;
-
-            _commands = new List<CommandBuilder>();
-            _submodules = new List<ModuleBuilder>();
-            _preconditions = new List<PreconditionAttribute>();
-            _attributes = new List<Attribute>();
-            _aliases = new List<string>();
-        }
-        //User-defined
-        internal ModuleBuilder(CommandService service, ModuleBuilder parent, string primaryAlias)
-            : this(service, parent)
-        {
-            Discord.Preconditions.NotNull(primaryAlias, nameof(primaryAlias));
-
-            _aliases = new List<string> { primaryAlias };
-        }
-
         public ModuleBuilder WithName(string name)
         {
             Name = name;
             return this;
         }
+
         public ModuleBuilder WithSummary(string summary)
         {
             Summary = summary;
             return this;
         }
+
         public ModuleBuilder WithRemarks(string remarks)
         {
             Remarks = remarks;
@@ -67,31 +70,38 @@ namespace Discord.Commands.Builders
 
         public ModuleBuilder AddAliases(params string[] aliases)
         {
-            for (int i = 0; i < aliases.Length; i++)
+            foreach (var t in aliases)
             {
-                string alias = aliases[i] ?? "";
+                var alias = t ?? "";
                 if (!_aliases.Contains(alias))
                     _aliases.Add(alias);
             }
+
             return this;
         }
+
         public ModuleBuilder AddAttributes(params Attribute[] attributes)
         {
             _attributes.AddRange(attributes);
             return this;
         }
+
         public ModuleBuilder AddPrecondition(PreconditionAttribute precondition)
         {
             _preconditions.Add(precondition);
             return this;
         }
-        public ModuleBuilder AddCommand(string primaryAlias, Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> callback, Action<CommandBuilder> createFunc)
+
+        public ModuleBuilder AddCommand(string primaryAlias,
+            Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> callback,
+            Action<CommandBuilder> createFunc)
         {
             var builder = new CommandBuilder(this, primaryAlias, callback);
             createFunc(builder);
             _commands.Add(builder);
             return this;
         }
+
         internal ModuleBuilder AddCommand(Action<CommandBuilder> createFunc)
         {
             var builder = new CommandBuilder(this);
@@ -99,6 +109,7 @@ namespace Discord.Commands.Builders
             _commands.Add(builder);
             return this;
         }
+
         public ModuleBuilder AddModule(string primaryAlias, Action<ModuleBuilder> createFunc)
         {
             var builder = new ModuleBuilder(Service, this, primaryAlias);
@@ -106,6 +117,7 @@ namespace Discord.Commands.Builders
             _submodules.Add(builder);
             return this;
         }
+
         internal ModuleBuilder AddModule(Action<ModuleBuilder> createFunc)
         {
             var builder = new ModuleBuilder(Service, this);
@@ -120,17 +132,16 @@ namespace Discord.Commands.Builders
             if (Name == null)
                 Name = _aliases[0];
 
-            if (TypeInfo != null && !TypeInfo.IsAbstract)
-            {
-                var moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(TypeInfo, service, services);
-                moduleInstance.OnModuleBuilding(service, this);
-            }
+            if (TypeInfo == null || TypeInfo.IsAbstract) return new ModuleInfo(this, service, services, parent);
+            var moduleInstance = ReflectionUtils.CreateObject<IModuleBase>(TypeInfo, service, services);
+            moduleInstance.OnModuleBuilding(service, this);
 
             return new ModuleInfo(this, service, services, parent);
         }
 
         public ModuleInfo Build(CommandService service, IServiceProvider services) => BuildImpl(service, services);
 
-        internal ModuleInfo Build(CommandService service, IServiceProvider services, ModuleInfo parent) => BuildImpl(service, services, parent);
+        internal ModuleInfo Build(CommandService service, IServiceProvider services, ModuleInfo parent) =>
+            BuildImpl(service, services, parent);
     }
 }

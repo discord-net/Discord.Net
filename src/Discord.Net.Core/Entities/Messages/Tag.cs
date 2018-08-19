@@ -2,15 +2,9 @@
 
 namespace Discord
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
+    [DebuggerDisplay(@"{" + nameof(DebuggerDisplay) + @",nq}")]
     public class Tag<T> : ITag
     {
-        public TagType Type { get; }
-        public int Index { get; }
-        public int Length { get; }
-        public ulong Key { get; }
-        public T Value { get; }
-
         internal Tag(TagType type, int index, int length, ulong key, T value)
         {
             Type = type;
@@ -20,9 +14,15 @@ namespace Discord
             Value = value;
         }
 
+        public T Value { get; }
+
         private string DebuggerDisplay => $"{Value?.ToString() ?? "null"} ({Type})";
-        public override string ToString() => $"{Value?.ToString() ?? "null"} ({Type})";
+        public TagType Type { get; }
+        public int Index { get; }
+        public int Length { get; }
+        public ulong Key { get; }
 
         object ITag.Value => Value;
+        public override string ToString() => $"{Value?.ToString() ?? "null"} ({Type})";
     }
 }

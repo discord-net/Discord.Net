@@ -8,15 +8,13 @@ namespace Discord.Net.Converters
     internal class ImageConverter : JsonConverter
     {
         public static readonly ImageConverter Instance = new ImageConverter();
-
-        public override bool CanConvert(Type objectType) => true;
         public override bool CanRead => true;
         public override bool CanWrite => true;
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            throw new InvalidOperationException();
-        }
+        public override bool CanConvert(Type objectType) => true;
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+            JsonSerializer serializer) => throw new InvalidOperationException();
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
@@ -41,7 +39,7 @@ namespace Discord.Net.Converters
                     length = (int)cloneStream.Length;
                 }
 
-                string base64 = Convert.ToBase64String(bytes, 0, length);
+                var base64 = Convert.ToBase64String(bytes, 0, length);
                 writer.WriteValue($"data:image/jpeg;base64,{base64}");
             }
             else if (image.Hash != null)

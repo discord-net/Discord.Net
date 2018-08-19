@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -14,6 +13,10 @@ namespace Discord.Rest
             NewName = newName;
         }
 
+        public ulong EmoteId { get; }
+        public string NewName { get; }
+        public string OldName { get; }
+
         internal static EmoteUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
             var change = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "name");
@@ -23,9 +26,5 @@ namespace Discord.Rest
 
             return new EmoteUpdateAuditLogData(entry.TargetId.Value, oldName, newName);
         }
-
-        public ulong EmoteId { get; }
-        public string NewName { get; }
-        public string OldName { get; }
     }
 }

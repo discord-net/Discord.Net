@@ -1,17 +1,22 @@
 #pragma warning disable CS1591
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Discord.Net.Converters;
 using Discord.Net.Rest;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Text;
 
 namespace Discord.API.Rest
 {
     internal class UploadFileParams
     {
-        private static JsonSerializer _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
+        private static readonly JsonSerializer _serializer = new JsonSerializer
+            {ContractResolver = new DiscordContractResolver()};
+
+        public UploadFileParams(Stream file)
+        {
+            File = file;
+        }
 
         public Stream File { get; }
 
@@ -20,11 +25,6 @@ namespace Discord.API.Rest
         public Optional<string> Nonce { get; set; }
         public Optional<bool> IsTTS { get; set; }
         public Optional<Embed> Embed { get; set; }
-
-        public UploadFileParams(Stream file)
-        {
-            File = file;
-        }
 
         public IReadOnlyDictionary<string, object> ToDictionary()
         {

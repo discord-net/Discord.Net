@@ -10,24 +10,24 @@ namespace Discord.Audio.Streams
     {
         private const int MaxFrames = 100; //1-2 Seconds
 
-        private ConcurrentQueue<RTPFrame> _frames;
-        private SemaphoreSlim _signal;
-        private ushort _nextSeq;
-        private uint _nextTimestamp;
-        private bool _nextMissed;
+        private readonly ConcurrentQueue<RTPFrame> _frames;
+        private readonly SemaphoreSlim _signal;
         private bool _hasHeader;
         private bool _isDisposed;
-
-        public override bool CanRead => !_isDisposed;
-        public override bool CanSeek => false;
-        public override bool CanWrite => false;
-        public override int AvailableFrames => _signal.CurrentCount;
+        private bool _nextMissed;
+        private ushort _nextSeq;
+        private uint _nextTimestamp;
 
         public InputStream()
         {
             _frames = new ConcurrentQueue<RTPFrame>();
             _signal = new SemaphoreSlim(0, MaxFrames);
         }
+
+        public override bool CanRead => !_isDisposed;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override int AvailableFrames => _signal.CurrentCount;
 
         public override bool TryReadFrame(CancellationToken cancelToken, out RTPFrame frame)
         {
@@ -38,9 +38,11 @@ namespace Discord.Audio.Streams
                 _frames.TryDequeue(out frame);
                 return true;
             }
+
             frame = default(RTPFrame);
             return false;
         }
+
         public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
             cancelToken.ThrowIfCancellationRequested();
@@ -51,12 +53,13 @@ namespace Discord.Audio.Streams
             Buffer.BlockCopy(frame.Payload, 0, buffer, offset, frame.Payload.Length);
             return frame.Payload.Length;
         }
+
         public override async Task<RTPFrame> ReadFrameAsync(CancellationToken cancelToken)
         {
             cancelToken.ThrowIfCancellationRequested();
 
             await _signal.WaitAsync(cancelToken).ConfigureAwait(false);
-            _frames.TryDequeue(out RTPFrame frame);
+            _frames.TryDequeue(out var frame);
             return frame;
         }
 
@@ -69,6 +72,7 @@ namespace Discord.Audio.Streams
             _nextTimestamp = timestamp;
             _nextMissed = missed;
         }
+
         public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
             cancelToken.ThrowIfCancellationRequested();
@@ -78,15 +82,16 @@ namespace Discord.Audio.Streams
                 _hasHeader = false;
                 return Task.Delay(0); //Buffer overloaded
             }
+
             if (!_hasHeader)
                 throw new InvalidOperationException("Received payload without an RTP header");
             _hasHeader = false;
-            byte[] payload = new byte[count];
+            var payload = new byte[count];
             Buffer.BlockCopy(buffer, offset, payload, 0, count);
 
             _frames.Enqueue(new RTPFrame(
-                sequence: _nextSeq,
-                timestamp: _nextTimestamp,
+                _nextSeq,
+                _nextTimestamp,
                 missed: _nextMissed,
                 payload: payload
             ));
@@ -94,9 +99,6 @@ namespace Discord.Audio.Streams
             return Task.Delay(0);
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            _isDisposed = true;
-        }
+        protected override void Dispose(bool isDisposing) => _isDisposed = true;
     }
 }

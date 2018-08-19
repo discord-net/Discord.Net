@@ -14,13 +14,13 @@ namespace _01_basic_ping_bot
     // - Here, under the 02_commands_framework sample
     // - https://github.com/foxbot/DiscordBotBase - a barebones bot template
     // - https://github.com/foxbot/patek - a more feature-filled bot, utilizing more aspects of the library
-    class Program
+    internal class Program
     {
         private DiscordSocketClient _client;
 
         // Discord.Net heavily utilizes TAP for async, so we create
         // an asynchronous context from the beginning.
-        static void Main(string[] args)
+        private static void Main(string[] args)
             => new Program().MainAsync().GetAwaiter().GetResult();
 
         public async Task MainAsync()

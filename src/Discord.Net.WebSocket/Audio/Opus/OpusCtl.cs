@@ -1,7 +1,7 @@
 ﻿namespace Discord.Audio
 {
     //https://github.com/gcp/opus/blob/master/include/opus_defines.h
-    internal enum OpusCtl : int
+    internal enum OpusCtl
     {
         SetBitrate = 4002,
         SetBandwidth = 4008,

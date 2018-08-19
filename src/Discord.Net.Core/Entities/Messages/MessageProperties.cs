@@ -1,13 +1,13 @@
 ﻿namespace Discord
 {
     /// <summary>
-    /// Modify a message with the specified parameters.
+    ///     Modify a message with the specified parameters.
     /// </summary>
     /// <remarks>
-    /// The content of a message can be cleared with String.Empty; if and only if an Embed is present.
+    ///     The content of a message can be cleared with String.Empty; if and only if an Embed is present.
     /// </remarks>
     /// <example>
-    /// <code language="c#">
+    ///     <code language="c#">
     /// var message = await ReplyAsync("abc");
     /// await message.ModifyAsync(x =>
     /// {
@@ -23,14 +23,15 @@
     public class MessageProperties
     {
         /// <summary>
-        /// The content of the message
+        ///     The content of the message
         /// </summary>
         /// <remarks>
-        /// This must be less than 2000 characters.
+        ///     This must be less than 2000 characters.
         /// </remarks>
         public Optional<string> Content { get; set; }
+
         /// <summary>
-        /// The embed the message should display
+        ///     The embed the message should display
         /// </summary>
         public Optional<Embed> Embed { get; set; }
     }

@@ -1,5 +1,4 @@
-﻿using Discord.Rest;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -11,13 +10,23 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class SocketChannel : SocketEntity<ulong>, IChannel
     {
-        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
-        public IReadOnlyCollection<SocketUser> Users => GetUsersInternal();
-
         internal SocketChannel(DiscordSocketClient discord, ulong id)
             : base(discord, id)
         {
         }
+
+        public IReadOnlyCollection<SocketUser> Users => GetUsersInternal();
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
+
+        //IChannel
+        string IChannel.Name => null;
+
+        Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
+            => Task.FromResult<IUser>(null); //Overridden
+
+        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
+            => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overridden
+
         internal static ISocketPrivateChannel CreatePrivate(DiscordSocketClient discord, ClientState state, Model model)
         {
             switch (model.Type)
@@ -30,6 +39,7 @@ namespace Discord.WebSocket
                     throw new InvalidOperationException($"Unexpected channel type: {model.Type}");
             }
         }
+
         internal abstract void Update(ClientState state, Model model);
 
         //User
@@ -38,13 +48,5 @@ namespace Discord.WebSocket
         internal abstract IReadOnlyCollection<SocketUser> GetUsersInternal();
 
         internal SocketChannel Clone() => MemberwiseClone() as SocketChannel;
-
-        //IChannel
-        string IChannel.Name => null;
-
-        Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
-            => Task.FromResult<IUser>(null); //Overridden
-        IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
-            => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overridden
     }
 }

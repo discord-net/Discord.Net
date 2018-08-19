@@ -1,16 +1,17 @@
-using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord.API.Rest;
 using Model = Discord.API.Message;
 
 namespace Discord.Rest
 {
     internal static class MessageHelper
     {
-        public static async Task<Model> ModifyAsync(IMessage msg, BaseDiscordClient client, Action<MessageProperties> func,
+        public static async Task<Model> ModifyAsync(IMessage msg, BaseDiscordClient client,
+            Action<MessageProperties> func,
             RequestOptions options)
         {
             if (msg.Author.Id != client.CurrentUser.Id)
@@ -18,41 +19,41 @@ namespace Discord.Rest
 
             var args = new MessageProperties();
             func(args);
-            var apiArgs = new API.Rest.ModifyMessageParams
+            var apiArgs = new ModifyMessageParams
             {
                 Content = args.Content,
                 Embed = args.Embed.IsSpecified ? args.Embed.Value.ToModel() : Optional.Create<API.Embed>()
             };
-            return await client.ApiClient.ModifyMessageAsync(msg.Channel.Id, msg.Id, apiArgs, options).ConfigureAwait(false);
+            return await client.ApiClient.ModifyMessageAsync(msg.Channel.Id, msg.Id, apiArgs, options)
+                .ConfigureAwait(false);
         }
+
         public static Task DeleteAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
             => DeleteAsync(msg.Channel.Id, msg.Id, client, options);
+
         public static async Task DeleteAsync(ulong channelId, ulong msgId, BaseDiscordClient client,
-            RequestOptions options)
-        {
+            RequestOptions options) =>
             await client.ApiClient.DeleteMessageAsync(channelId, msgId, options).ConfigureAwait(false);
-        }
 
-        public static async Task AddReactionAsync(IMessage msg, IEmote emote, BaseDiscordClient client, RequestOptions options)
-        {
-            await client.ApiClient.AddReactionAsync(msg.Channel.Id, msg.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
-        }
+        public static async Task
+            AddReactionAsync(IMessage msg, IEmote emote, BaseDiscordClient client, RequestOptions options) =>
+            await client.ApiClient
+                .AddReactionAsync(msg.Channel.Id, msg.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options)
+                .ConfigureAwait(false);
 
-        public static async Task RemoveReactionAsync(IMessage msg, IUser user, IEmote emote, BaseDiscordClient client, RequestOptions options)
-        {
-            await client.ApiClient.RemoveReactionAsync(msg.Channel.Id, msg.Id, user.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
-        }
+        public static async Task RemoveReactionAsync(IMessage msg, IUser user, IEmote emote, BaseDiscordClient client,
+            RequestOptions options) => await client.ApiClient.RemoveReactionAsync(msg.Channel.Id, msg.Id, user.Id,
+            emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
 
-        public static async Task RemoveAllReactionsAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
-        {
+        public static async Task
+            RemoveAllReactionsAsync(IMessage msg, BaseDiscordClient client, RequestOptions options) =>
             await client.ApiClient.RemoveAllReactionsAsync(msg.Channel.Id, msg.Id, options);
-        }
 
         public static IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, IEmote emote,
             int? limit, BaseDiscordClient client, RequestOptions options)
         {
             Preconditions.NotNull(emote, nameof(emote));
-            var emoji = (emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name);
+            var emoji = emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name;
 
             return new PagedAsyncEnumerable<IUser>(
                 DiscordConfig.MaxUserReactionsPerBatch,
@@ -66,10 +67,11 @@ namespace Discord.Rest
                     if (info.Position != null)
                         args.AfterUserId = info.Position.Value;
 
-                    var models = await client.ApiClient.GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false);
+                    var models = await client.ApiClient
+                        .GetReactionUsersAsync(msg.Channel.Id, msg.Id, emoji, args, options).ConfigureAwait(false);
                     return models.Select(x => RestUser.Create(client, x)).ToImmutableArray();
                 },
-                nextPage: (info, lastPage) =>
+                (info, lastPage) =>
                 {
                     if (lastPage.Count != DiscordConfig.MaxUsersPerBatch)
                         return false;
@@ -79,38 +81,34 @@ namespace Discord.Rest
                 },
                 count: limit
             );
-
         }
 
         public static async Task PinAsync(IMessage msg, BaseDiscordClient client,
-            RequestOptions options)
-        {
+            RequestOptions options) =>
             await client.ApiClient.AddPinAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
-        }
-        public static async Task UnpinAsync(IMessage msg, BaseDiscordClient client,
-            RequestOptions options)
-        {
-            await client.ApiClient.RemovePinAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
-        }
 
-        public static ImmutableArray<ITag> ParseTags(string text, IMessageChannel channel, IGuild guild, IReadOnlyCollection<IUser> userMentions)
+        public static async Task UnpinAsync(IMessage msg, BaseDiscordClient client,
+            RequestOptions options) =>
+            await client.ApiClient.RemovePinAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
+
+        public static ImmutableArray<ITag> ParseTags(string text, IMessageChannel channel, IGuild guild,
+            IReadOnlyCollection<IUser> userMentions)
         {
             var tags = ImmutableArray.CreateBuilder<ITag>();
-            
-            int index = 0;
+
+            var index = 0;
             while (true)
             {
                 index = text.IndexOf('<', index);
                 if (index == -1) break;
-                int endIndex = text.IndexOf('>', index + 1);
+                var endIndex = text.IndexOf('>', index + 1);
                 if (endIndex == -1) break;
-                string content = text.Substring(index, endIndex - index + 1);
+                var content = text.Substring(index, endIndex - index + 1);
 
-                if (MentionUtils.TryParseUser(content, out ulong id))
+                if (MentionUtils.TryParseUser(content, out var id))
                 {
                     IUser mentionedUser = null;
                     foreach (var mention in userMentions)
-                    {
                         if (mention.Id == id)
                         {
                             mentionedUser = channel?.GetUserAsync(id, CacheMode.CacheOnly).GetAwaiter().GetResult();
@@ -118,7 +116,7 @@ namespace Discord.Rest
                                 mentionedUser = mention;
                             break;
                         }
-                    }
+
                     tags.Add(new Tag<IUser>(TagType.UserMention, index, content.Length, id, mentionedUser));
                 }
                 else if (MentionUtils.TryParseChannel(content, out id))
@@ -142,6 +140,7 @@ namespace Discord.Rest
                     index = index + 1;
                     continue;
                 }
+
                 index = endIndex + 1;
             }
 
@@ -153,7 +152,8 @@ namespace Discord.Rest
 
                 var tagIndex = FindIndex(tags, index);
                 if (tagIndex.HasValue)
-                    tags.Insert(tagIndex.Value, new Tag<object>(TagType.EveryoneMention, index, "@everyone".Length, 0, null));
+                    tags.Insert(tagIndex.Value,
+                        new Tag<object>(TagType.EveryoneMention, index, "@everyone".Length, 0, null));
                 index++;
             }
 
@@ -171,44 +171,42 @@ namespace Discord.Rest
 
             return tags.ToImmutable();
         }
+
         private static int? FindIndex(IReadOnlyList<ITag> tags, int index)
         {
-            int i = 0;
+            var i = 0;
             for (; i < tags.Count; i++)
             {
                 var tag = tags[i];
                 if (index < tag.Index)
                     break; //Position before this tag
             }
+
             if (i > 0 && index < tags[i - 1].Index + tags[i - 1].Length)
                 return null; //Overlaps tag before this
             return i;
         }
-        public static ImmutableArray<ulong> FilterTagsByKey(TagType type, ImmutableArray<ITag> tags)
-        {
-            return tags
-                .Where(x => x.Type == type)
-                .Select(x => x.Key)
-                .ToImmutableArray();
-        }
-        public static ImmutableArray<T> FilterTagsByValue<T>(TagType type, ImmutableArray<ITag> tags)
-        {
-            return tags
-                .Where(x => x.Type == type)
-                .Select(x => (T)x.Value)
-                .Where(x => x != null)
-                .ToImmutableArray();
-        }
+
+        public static ImmutableArray<ulong> FilterTagsByKey(TagType type, ImmutableArray<ITag> tags) => tags
+            .Where(x => x.Type == type)
+            .Select(x => x.Key)
+            .ToImmutableArray();
+
+        public static ImmutableArray<T> FilterTagsByValue<T>(TagType type, ImmutableArray<ITag> tags) => tags
+            .Where(x => x.Type == type)
+            .Select(x => (T)x.Value)
+            .Where(x => x != null)
+            .ToImmutableArray();
 
         public static MessageSource GetSource(Model msg)
         {
             if (msg.Type != MessageType.Default)
                 return MessageSource.System;
-            else if (msg.WebhookId.IsSpecified)
+            if (msg.WebhookId.IsSpecified)
                 return MessageSource.Webhook;
-            else if (msg.Author.GetValueOrDefault()?.Bot.GetValueOrDefault(false) == true)
-                return MessageSource.Bot;
-            return MessageSource.User;
+            return msg.Author.GetValueOrDefault()?.Bot.GetValueOrDefault(false) == true
+                ? MessageSource.Bot
+                : MessageSource.User;
         }
     }
 }

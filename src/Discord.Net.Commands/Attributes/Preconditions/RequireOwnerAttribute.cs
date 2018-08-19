@@ -4,13 +4,14 @@ using System.Threading.Tasks;
 namespace Discord.Commands
 {
     /// <summary>
-    /// Require that the command is invoked by the owner of the bot.
+    ///     Require that the command is invoked by the owner of the bot.
     /// </summary>
     /// <remarks>This precondition will only work if the bot is a bot account.</remarks>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
     public class RequireOwnerAttribute : PreconditionAttribute
     {
-        public override async Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
+        public override async Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context,
+            CommandInfo command, IServiceProvider services)
         {
             switch (context.Client.TokenType)
             {
@@ -20,7 +21,8 @@ namespace Discord.Commands
                         return PreconditionResult.FromError("Command can only be run by the owner of the bot");
                     return PreconditionResult.FromSuccess();
                 default:
-                    return PreconditionResult.FromError($"{nameof(RequireOwnerAttribute)} is not supported by this {nameof(TokenType)}.");                    
+                    return PreconditionResult.FromError(
+                        $"{nameof(RequireOwnerAttribute)} is not supported by this {nameof(TokenType)}.");
             }
         }
     }

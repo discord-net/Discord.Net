@@ -1,17 +1,29 @@
-﻿using Discord.Rest;
-using System;
-using System.Collections.Generic;  
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord.Rest;
 using Model = Discord.API.Role;
 
 namespace Discord.WebSocket
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
+    [DebuggerDisplay(@"{" + nameof(DebuggerDisplay) + @",nq}")]
     public class SocketRole : SocketEntity<ulong>, IRole
     {
+        internal SocketRole(SocketGuild guild, ulong id)
+            : base(guild.Discord, id)
+        {
+            Guild = guild;
+        }
+
         public SocketGuild Guild { get; }
+        public bool IsEveryone => Id == Guild.Id;
+
+        public IEnumerable<SocketGuildUser> Members
+            => Guild.Users.Where(x => x.Roles.Any(r => r.Id == Id));
+
+        private string DebuggerDisplay => $"{Name} ({Id})";
 
         public Color Color { get; private set; }
         public bool IsHoisted { get; private set; }
@@ -22,22 +34,26 @@ namespace Discord.WebSocket
         public int Position { get; private set; }
 
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
-        public bool IsEveryone => Id == Guild.Id;
         public string Mention => IsEveryone ? "@everyone" : MentionUtils.MentionRole(Id);
-        public IEnumerable<SocketGuildUser> Members 
-            => Guild.Users.Where(x => x.Roles.Any(r => r.Id == Id));
 
-        internal SocketRole(SocketGuild guild, ulong id)
-            : base(guild.Discord, id)
-        {
-            Guild = guild;
-        }
+        public Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
+            => RoleHelper.ModifyAsync(this, Discord, func, options);
+
+        public Task DeleteAsync(RequestOptions options = null)
+            => RoleHelper.DeleteAsync(this, Discord, options);
+
+        public int CompareTo(IRole role) => RoleUtils.Compare(this, role);
+
+        //IRole
+        IGuild IRole.Guild => Guild;
+
         internal static SocketRole Create(SocketGuild guild, ClientState state, Model model)
         {
             var entity = new SocketRole(guild, model.Id);
             entity.Update(state, model);
             return entity;
         }
+
         internal void Update(ClientState state, Model model)
         {
             Name = model.Name;
@@ -49,18 +65,7 @@ namespace Discord.WebSocket
             Permissions = new GuildPermissions(model.Permissions);
         }
 
-        public Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
-            => RoleHelper.ModifyAsync(this, Discord, func, options);
-        public Task DeleteAsync(RequestOptions options = null)
-            => RoleHelper.DeleteAsync(this, Discord, options);
-
         public override string ToString() => Name;
-        private string DebuggerDisplay => $"{Name} ({Id})";
         internal SocketRole Clone() => MemberwiseClone() as SocketRole;
-
-        public int CompareTo(IRole role) => RoleUtils.Compare(this, role);
-
-        //IRole
-        IGuild IRole.Guild => Guild;
     }
 }

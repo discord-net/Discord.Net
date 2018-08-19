@@ -1,20 +1,17 @@
-﻿using System;
+﻿using Discord.Commands;
 using Microsoft.CodeAnalysis;
-using Discord.Commands;
 
 namespace Discord.Analyzers
 {
     internal static class SymbolExtensions
     {
-        private static readonly string _moduleBaseName = typeof(ModuleBase<>).Name;
+        private static readonly string ModuleBaseName = typeof(ModuleBase<>).Name;
 
         public static bool DerivesFromModuleBase(this ITypeSymbol symbol)
         {
             for (var bType = symbol.BaseType; bType != null; bType = bType.BaseType)
-            {
-                if (bType.MetadataName == _moduleBaseName)
+                if (bType.MetadataName == ModuleBaseName)
                     return true;
-            }
             return false;
         }
     }

@@ -2,7 +2,7 @@ using System;
 
 namespace Discord.Commands
 {
-    [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Parameter)]
     public class RemainderAttribute : Attribute
     {
     }

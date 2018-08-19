@@ -1,9 +1,8 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace Discord
 {
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public struct EmbedThumbnail
     {
         public string Url { get; }
@@ -20,6 +19,6 @@ namespace Discord
         }
 
         private string DebuggerDisplay => $"{Url} ({(Width != null && Height != null ? $"{Width}x{Height}" : "0x0")})";
-        public override string ToString() => Url.ToString();
+        public override string ToString() => Url;
     }
 }

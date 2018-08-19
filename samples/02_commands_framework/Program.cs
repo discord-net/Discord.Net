@@ -1,10 +1,10 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Discord;
-using Discord.WebSocket;
 using Discord.Commands;
+using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using _02_commands_framework.Services;
 
 namespace _02_commands_framework
@@ -17,9 +17,9 @@ namespace _02_commands_framework
     // - Here, under the 02_commands_framework sample
     // - https://github.com/foxbot/DiscordBotBase - a barebones bot template
     // - https://github.com/foxbot/patek - a more feature-filled bot, utilizing more aspects of the library
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
             => new Program().MainAsync().GetAwaiter().GetResult();
 
         public async Task MainAsync()
@@ -46,15 +46,12 @@ namespace _02_commands_framework
             return Task.CompletedTask;
         }
 
-        private IServiceProvider ConfigureServices()
-        {
-            return new ServiceCollection()
-                .AddSingleton<DiscordSocketClient>()
-                .AddSingleton<CommandService>()
-                .AddSingleton<CommandHandlingService>()
-                .AddSingleton<HttpClient>()
-                .AddSingleton<PictureService>()
-                .BuildServiceProvider();
-        }
+        private IServiceProvider ConfigureServices() => new ServiceCollection()
+            .AddSingleton<DiscordSocketClient>()
+            .AddSingleton<CommandService>()
+            .AddSingleton<CommandHandlingService>()
+            .AddSingleton<HttpClient>()
+            .AddSingleton<PictureService>()
+            .BuildServiceProvider();
     }
 }

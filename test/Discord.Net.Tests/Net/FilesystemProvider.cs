@@ -2,7 +2,6 @@
 //Copyright (c) 2012 GitHub
 //TODO: Remove once netstandard support is added
 
-using Akavache;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,20 +12,17 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reflection;
+using Akavache;
 
 namespace Discord
 {
     public class FilesystemProvider : IFilesystemProvider
     {
-        public IObservable<Stream> OpenFileForReadAsync(string path, IScheduler scheduler)
-        {
-            return SafeOpenFileAsync(path, FileMode.Open, FileAccess.Read, FileShare.Read, scheduler);
-        }
+        public IObservable<Stream> OpenFileForReadAsync(string path, IScheduler scheduler) =>
+            SafeOpenFileAsync(path, FileMode.Open, FileAccess.Read, FileShare.Read, scheduler);
 
-        public IObservable<Stream> OpenFileForWriteAsync(string path, IScheduler scheduler)
-        {
-            return SafeOpenFileAsync(path, FileMode.Create, FileAccess.Write, FileShare.None, scheduler);
-        }
+        public IObservable<Stream> OpenFileForWriteAsync(string path, IScheduler scheduler) =>
+            SafeOpenFileAsync(path, FileMode.Create, FileAccess.Write, FileShare.None, scheduler);
 
         public IObservable<Unit> CreateRecursive(string path)
         {
@@ -34,25 +30,13 @@ namespace Discord
             return Observable.Return(Unit.Default);
         }
 
-        public IObservable<Unit> Delete(string path)
-        {
-            return Observable.Start(() => File.Delete(path), Scheduler.Default);
-        }
-                
-        public string GetDefaultRoamingCacheDirectory()
-        {
-            throw new NotSupportedException();
-        }
+        public IObservable<Unit> Delete(string path) => Observable.Start(() => File.Delete(path), Scheduler.Default);
 
-        public string GetDefaultSecretCacheDirectory()
-        {
-            throw new NotSupportedException();
-        }
+        public string GetDefaultRoamingCacheDirectory() => throw new NotSupportedException();
 
-        public string GetDefaultLocalMachineCacheDirectory()
-        {
-            throw new NotSupportedException();
-        }
+        public string GetDefaultSecretCacheDirectory() => throw new NotSupportedException();
+
+        public string GetDefaultLocalMachineCacheDirectory() => throw new NotSupportedException();
 
         protected static string GetAssemblyDirectoryName()
         {
@@ -61,7 +45,8 @@ namespace Discord
             return assemblyDirectoryName;
         }
 
-        private static IObservable<Stream> SafeOpenFileAsync(string path, FileMode mode, FileAccess access, FileShare share, IScheduler scheduler = null)
+        private static IObservable<Stream> SafeOpenFileAsync(string path, FileMode mode, FileAccess access,
+            FileShare share, IScheduler scheduler = null)
         {
             scheduler = scheduler ?? Scheduler.Default;
             var ret = new AsyncSubject<Stream>();
@@ -74,7 +59,7 @@ namespace Discord
                     {
                         FileMode.Create,
                         FileMode.CreateNew,
-                        FileMode.OpenOrCreate,
+                        FileMode.OpenOrCreate
                     };
 
 
@@ -88,7 +73,8 @@ namespace Discord
                         return;
                     }
 
-                    Observable.Start(() => new FileStream(path, mode, access, share, 4096, false), scheduler).Cast<Stream>().Subscribe(ret);
+                    Observable.Start(() => new FileStream(path, mode, access, share, 4096, false), scheduler)
+                        .Cast<Stream>().Subscribe(ret);
                 }
                 catch (Exception ex)
                 {
@@ -98,16 +84,14 @@ namespace Discord
 
             return ret;
         }
-        private static void CreateRecursive(DirectoryInfo info)
+
+        private static void CreateRecursive(DirectoryInfo info) => SplitFullPath(info).Aggregate((parent, dir) =>
         {
-            SplitFullPath(info).Aggregate((parent, dir) =>
-            {
-                var path = Path.Combine(parent, dir);
-                if (!Directory.Exists(path))
-                    Directory.CreateDirectory(path);
-                return path;
-            });
-        }
+            var path = Path.Combine(parent, dir);
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            return path;
+        });
 
         private static IEnumerable<string> SplitFullPath(DirectoryInfo info)
         {
@@ -116,10 +100,11 @@ namespace Discord
             for (var path = info.FullName; path != root && path != null; path = Path.GetDirectoryName(path))
             {
                 var filename = Path.GetFileName(path);
-                if (String.IsNullOrEmpty(filename))
+                if (string.IsNullOrEmpty(filename))
                     continue;
                 components.Add(filename);
             }
+
             components.Add(root);
             components.Reverse();
             return components;

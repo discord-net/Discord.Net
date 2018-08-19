@@ -47,25 +47,25 @@ namespace Discord
             Assert.Equal((ulong)0, ChannelPermissions.None.RawValue);
 
             // for text channels
-            ulong textChannel = (ulong)( ChannelPermission.CreateInstantInvite
-                | ChannelPermission.ManageChannels
-                | ChannelPermission.AddReactions
-                | ChannelPermission.ViewChannel
-                | ChannelPermission.SendMessages
-                | ChannelPermission.SendTTSMessages
-                | ChannelPermission.ManageMessages
-                | ChannelPermission.EmbedLinks
-                | ChannelPermission.AttachFiles
-                | ChannelPermission.ReadMessageHistory
-                | ChannelPermission.MentionEveryone
-                | ChannelPermission.UseExternalEmojis
-                | ChannelPermission.ManageRoles
-                | ChannelPermission.ManageWebhooks);
+            var textChannel = (ulong)(ChannelPermission.CreateInstantInvite
+                                      | ChannelPermission.ManageChannels
+                                      | ChannelPermission.AddReactions
+                                      | ChannelPermission.ViewChannel
+                                      | ChannelPermission.SendMessages
+                                      | ChannelPermission.SendTTSMessages
+                                      | ChannelPermission.ManageMessages
+                                      | ChannelPermission.EmbedLinks
+                                      | ChannelPermission.AttachFiles
+                                      | ChannelPermission.ReadMessageHistory
+                                      | ChannelPermission.MentionEveryone
+                                      | ChannelPermission.UseExternalEmojis
+                                      | ChannelPermission.ManageRoles
+                                      | ChannelPermission.ManageWebhooks);
 
             Assert.Equal(textChannel, ChannelPermissions.Text.RawValue);
 
             // voice channels
-            ulong voiceChannel = (ulong)(
+            var voiceChannel = (ulong)(
                 ChannelPermission.CreateInstantInvite
                 | ChannelPermission.ManageChannels
                 | ChannelPermission.ViewChannel
@@ -80,7 +80,7 @@ namespace Discord
             Assert.Equal(voiceChannel, ChannelPermissions.Voice.RawValue);
 
             // DM Channels
-            ulong dmChannel = (ulong)(
+            var dmChannel = (ulong)(
                 ChannelPermission.ViewChannel
                 | ChannelPermission.SendMessages
                 | ChannelPermission.EmbedLinks
@@ -90,11 +90,11 @@ namespace Discord
                 | ChannelPermission.Connect
                 | ChannelPermission.Speak
                 | ChannelPermission.UseVAD
-                );
+            );
             Assert.Equal(dmChannel, ChannelPermissions.DM.RawValue);
 
             // group channel
-            ulong groupChannel = (ulong)(
+            var groupChannel = (ulong)(
                 ChannelPermission.SendMessages
                 | ChannelPermission.EmbedLinks
                 | ChannelPermission.AttachFiles
@@ -102,10 +102,11 @@ namespace Discord
                 | ChannelPermission.Connect
                 | ChannelPermission.Speak
                 | ChannelPermission.UseVAD
-                );
+            );
             Assert.Equal(groupChannel, ChannelPermissions.Group.RawValue);
             return Task.CompletedTask;
         }
+
         [Fact]
         public Task TestChannelPermissionModify()
         {
@@ -117,12 +118,12 @@ namespace Discord
             Assert.False(perm.CreateInstantInvite);
 
             // ensure that when modified it works
-            perm = perm.Modify(createInstantInvite: true);
+            perm = perm.Modify(true);
             Assert.True(perm.CreateInstantInvite);
             Assert.Equal((ulong)ChannelPermission.CreateInstantInvite, perm.RawValue);
 
             // set false again, move on to next permission
-            perm = perm.Modify(createInstantInvite: false);
+            perm = perm.Modify(false);
             Assert.False(perm.CreateInstantInvite);
             Assert.Equal(ChannelPermissions.None.RawValue, perm.RawValue);
 
@@ -340,9 +341,8 @@ namespace Discord
         [Fact]
         public Task TestChannelTypeResolution()
         {
-            ITextChannel someChannel = null;
             // null channels will throw exception
-            Assert.Throws<ArgumentException>(() => ChannelPermissions.All(someChannel));
+            Assert.Throws<ArgumentException>(() => ChannelPermissions.All(null));
             return Task.CompletedTask;
         }
     }

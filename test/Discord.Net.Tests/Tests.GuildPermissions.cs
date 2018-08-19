@@ -44,11 +44,8 @@ namespace Discord
                 .Distinct()
                 .ToArray();
             // test GuildPermissions.All
-            ulong sumOfAllGuildPermissions = 0;
-            foreach(var v in enumValues)
-            {
-                sumOfAllGuildPermissions |= (ulong)v;
-            }
+            var sumOfAllGuildPermissions =
+                enumValues.Aggregate<GuildPermission, ulong>(0, (current, v) => current | (ulong)v);
 
             // assert that the raw values match
             Assert.Equal(sumOfAllGuildPermissions, GuildPermissions.All.RawValue);
@@ -59,7 +56,7 @@ namespace Discord
             Assert.Equal(enumValues.Length, GuildPermissions.All.ToList().Count);
 
             // assert that webhook has the same raw value
-            ulong webHookPermissions = (ulong)(
+            var webHookPermissions = (ulong)(
                 GuildPermission.SendMessages | GuildPermission.SendTTSMessages | GuildPermission.EmbedLinks |
                 GuildPermission.AttachFiles);
             Assert.Equal(webHookPermissions, GuildPermissions.Webhook.RawValue);
@@ -79,12 +76,12 @@ namespace Discord
             Assert.False(perm.CreateInstantInvite);
 
             // ensure that when we modify it the parameter works
-            perm = perm.Modify(createInstantInvite: true);
+            perm = perm.Modify(true);
             Assert.True(perm.CreateInstantInvite);
             Assert.Equal((ulong)GuildPermission.CreateInstantInvite, perm.RawValue);
 
             // set it false again, then move on to the next permission
-            perm = perm.Modify(createInstantInvite: false);
+            perm = perm.Modify(false);
             Assert.False(perm.CreateInstantInvite);
             Assert.Equal(GuildPermissions.None.RawValue, perm.RawValue);
 
@@ -319,6 +316,5 @@ namespace Discord
 
             return Task.CompletedTask;
         }
-
     }
 }

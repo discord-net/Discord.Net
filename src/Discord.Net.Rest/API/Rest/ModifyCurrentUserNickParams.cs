@@ -6,12 +6,11 @@ namespace Discord.API.Rest
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class ModifyCurrentUserNickParams
     {
-        [JsonProperty("nick")]
-        public string Nickname { get; }
-
         public ModifyCurrentUserNickParams(string nickname)
         {
             Nickname = nickname;
         }
+
+        [JsonProperty("nick")] public string Nickname { get; }
     }
 }

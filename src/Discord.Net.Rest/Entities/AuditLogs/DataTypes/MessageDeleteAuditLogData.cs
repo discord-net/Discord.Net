@@ -11,12 +11,11 @@ namespace Discord.Rest
             MessageCount = count;
         }
 
-        internal static MessageDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
-        {
-            return new MessageDeleteAuditLogData(entry.Options.MessageDeleteChannelId.Value, entry.Options.MessageDeleteCount.Value);
-        }
-
         public int MessageCount { get; }
         public ulong ChannelId { get; }
+
+        internal static MessageDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry) =>
+            new MessageDeleteAuditLogData(entry.Options.MessageDeleteChannelId.Value,
+                entry.Options.MessageDeleteCount.Value);
     }
 }

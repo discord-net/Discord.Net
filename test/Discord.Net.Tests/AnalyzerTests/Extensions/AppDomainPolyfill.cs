@@ -8,16 +8,16 @@ namespace System
     /// <summary> Polyfill of the AppDomain class from full framework. </summary>
     internal class AppDomain
     {
-        public static AppDomain CurrentDomain { get; private set; }
+        static AppDomain()
+        {
+            CurrentDomain = new AppDomain();
+        }
 
         private AppDomain()
         {
         }
 
-        static AppDomain()
-        {
-            CurrentDomain = new AppDomain();
-        }
+        public static AppDomain CurrentDomain { get; }
 
         public Assembly[] GetAssemblies()
         {

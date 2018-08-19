@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-
+using Discord.API;
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -15,12 +14,19 @@ namespace Discord.Rest
             Target = target;
         }
 
+        public IReadOnlyCollection<MemberRoleEditInfo> Roles { get; }
+        public IUser Target { get; }
+
         internal static MemberRoleAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
             var changes = entry.Changes;
 
-            var roleInfos = changes.SelectMany(x => x.NewValue.ToObject<API.Role[]>(),
-                (model, role) => new { model.ChangedProperty, Role = role })
+            var roleInfos = changes.SelectMany(x => x.NewValue.ToObject<Role[]>(),
+                    (model, role) => new
+                    {
+                        model.ChangedProperty,
+                        Role = role
+                    })
                 .Select(x => new MemberRoleEditInfo(x.Role.Name, x.Role.Id, x.ChangedProperty == "$add"))
                 .ToList();
 
@@ -29,8 +35,5 @@ namespace Discord.Rest
 
             return new MemberRoleAuditLogData(roleInfos.ToReadOnlyCollection(), user);
         }
-
-        public IReadOnlyCollection<MemberRoleEditInfo> Roles { get; }
-        public IUser Target { get; }
     }
 }

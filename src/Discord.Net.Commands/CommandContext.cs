@@ -2,14 +2,6 @@
 {
     public class CommandContext : ICommandContext
     {
-        public IDiscordClient Client { get; }
-        public IGuild Guild { get; }
-        public IMessageChannel Channel { get; }
-        public IUser User { get; }
-        public IUserMessage Message { get; }
-
-        public bool IsPrivate => Channel is IPrivateChannel;
-        
         public CommandContext(IDiscordClient client, IUserMessage msg)
         {
             Client = client;
@@ -18,5 +10,12 @@
             User = msg.Author;
             Message = msg;
         }
+
+        public bool IsPrivate => Channel is IPrivateChannel;
+        public IDiscordClient Client { get; }
+        public IGuild Guild { get; }
+        public IMessageChannel Channel { get; }
+        public IUser User { get; }
+        public IUserMessage Message { get; }
     }
 }

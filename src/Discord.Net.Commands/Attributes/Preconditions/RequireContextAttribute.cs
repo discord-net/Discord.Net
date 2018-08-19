@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands
 {
@@ -13,19 +12,20 @@ namespace Discord.Commands
     }
 
     /// <summary>
-    /// Require that the command be invoked in a specified context.
+    ///     Require that the command be invoked in a specified context.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
     public class RequireContextAttribute : PreconditionAttribute
     {
-        public ContextType Contexts { get; }
-
         /// <summary>
-        /// Require that the command be invoked in a specified context.
+        ///     Require that the command be invoked in a specified context.
         /// </summary>
-        /// <param name="contexts">The type of context the command can be invoked in. Multiple contexts can be specified by ORing the contexts together.</param>
+        /// <param name="contexts">
+        ///     The type of context the command can be invoked in. Multiple contexts can be specified by ORing
+        ///     the contexts together.
+        /// </param>
         /// <example>
-        /// <code language="c#">
+        ///     <code language="c#">
         ///     [Command("private_only")]
         ///     [RequireContext(ContextType.DM | ContextType.Group)]
         ///     public async Task PrivateOnly()
@@ -38,21 +38,23 @@ namespace Discord.Commands
             Contexts = contexts;
         }
 
-        public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
+        public ContextType Contexts { get; }
+
+        public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command,
+            IServiceProvider services)
         {
-            bool isValid = false;
+            var isValid = false;
 
             if ((Contexts & ContextType.Guild) != 0)
-                isValid = isValid || context.Channel is IGuildChannel;
+                isValid = context.Channel is IGuildChannel;
             if ((Contexts & ContextType.DM) != 0)
                 isValid = isValid || context.Channel is IDMChannel;
             if ((Contexts & ContextType.Group) != 0)
                 isValid = isValid || context.Channel is IGroupChannel;
 
-            if (isValid)
-                return Task.FromResult(PreconditionResult.FromSuccess());
-            else
-                return Task.FromResult(PreconditionResult.FromError($"Invalid context for command; accepted contexts: {Contexts}"));
+            return Task.FromResult(isValid
+                ? PreconditionResult.FromSuccess()
+                : PreconditionResult.FromError($"Invalid context for command; accepted contexts: {Contexts}"));
         }
     }
 }

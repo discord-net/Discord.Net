@@ -10,13 +10,7 @@ namespace Discord.Rest
             : base(discord, id)
         {
         }
-        internal new static RestGroupUser Create(BaseDiscordClient discord, Model model)
-        {
-            var entity = new RestGroupUser(discord, model.Id);
-            entity.Update(model);
-            return entity;
-        }
-        
+
         //IVoiceState
         bool IVoiceState.IsDeafened => false;
         bool IVoiceState.IsMuted => false;
@@ -25,5 +19,12 @@ namespace Discord.Rest
         bool IVoiceState.IsSuppressed => false;
         IVoiceChannel IVoiceState.VoiceChannel => null;
         string IVoiceState.VoiceSessionId => null;
+
+        internal new static RestGroupUser Create(BaseDiscordClient discord, Model model)
+        {
+            var entity = new RestGroupUser(discord, model.Id);
+            entity.Update(model);
+            return entity;
+        }
     }
 }

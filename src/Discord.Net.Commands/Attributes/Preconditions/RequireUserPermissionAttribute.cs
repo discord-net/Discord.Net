@@ -4,30 +4,34 @@ using System.Threading.Tasks;
 namespace Discord.Commands
 {
     /// <summary>
-    /// This attribute requires that the user invoking the command has a specified permission.
+    ///     This attribute requires that the user invoking the command has a specified permission.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
     public class RequireUserPermissionAttribute : PreconditionAttribute
     {
-        public GuildPermission? GuildPermission { get; }
-        public ChannelPermission? ChannelPermission { get; }
-
         /// <summary>
-        /// Require that the user invoking the command has a specified GuildPermission
+        ///     Require that the user invoking the command has a specified GuildPermission
         /// </summary>
         /// <remarks>This precondition will always fail if the command is being invoked in a private channel.</remarks>
-        /// <param name="permission">The GuildPermission that the user must have. Multiple permissions can be specified by ORing the permissions together.</param>
+        /// <param name="permission">
+        ///     The GuildPermission that the user must have. Multiple permissions can be specified by ORing
+        ///     the permissions together.
+        /// </param>
         public RequireUserPermissionAttribute(GuildPermission permission)
         {
             GuildPermission = permission;
             ChannelPermission = null;
         }
+
         /// <summary>
-        /// Require that the user invoking the command has a specified ChannelPermission.
+        ///     Require that the user invoking the command has a specified ChannelPermission.
         /// </summary>
-        /// <param name="permission">The ChannelPermission that the user must have. Multiple permissions can be specified by ORing the permissions together.</param>
+        /// <param name="permission">
+        ///     The ChannelPermission that the user must have. Multiple permissions can be specified by ORing
+        ///     the permissions together.
+        /// </param>
         /// <example>
-        /// <code language="c#">
+        ///     <code language="c#">
         ///     [Command("permission")]
         ///     [RequireUserPermission(ChannelPermission.ReadMessageHistory | ChannelPermission.ReadMessages)]
         ///     public async Task HasPermission()
@@ -41,32 +45,34 @@ namespace Discord.Commands
             ChannelPermission = permission;
             GuildPermission = null;
         }
-        
-        public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
+
+        public GuildPermission? GuildPermission { get; }
+        public ChannelPermission? ChannelPermission { get; }
+
+        public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command,
+            IServiceProvider services)
         {
             var guildUser = context.User as IGuildUser;
 
             if (GuildPermission.HasValue)
             {
                 if (guildUser == null)
-                    return Task.FromResult(PreconditionResult.FromError("Command must be used in a guild channel"));                
+                    return Task.FromResult(PreconditionResult.FromError("Command must be used in a guild channel"));
                 if (!guildUser.GuildPermissions.Has(GuildPermission.Value))
-                    return Task.FromResult(PreconditionResult.FromError($"User requires guild permission {GuildPermission.Value}"));
+                    return Task.FromResult(
+                        PreconditionResult.FromError($"User requires guild permission {GuildPermission.Value}"));
             }
 
-            if (ChannelPermission.HasValue)
-            {
-                ChannelPermissions perms;
-                if (context.Channel is IGuildChannel guildChannel)
-                    perms = guildUser.GetPermissions(guildChannel);
-                else
-                    perms = ChannelPermissions.All(context.Channel);
+            if (!ChannelPermission.HasValue) return Task.FromResult(PreconditionResult.FromSuccess());
+            ChannelPermissions perms;
+            if (context.Channel is IGuildChannel guildChannel)
+                perms = guildUser.GetPermissions(guildChannel);
+            else
+                perms = ChannelPermissions.All(context.Channel);
 
-                if (!perms.Has(ChannelPermission.Value))
-                    return Task.FromResult(PreconditionResult.FromError($"User requires channel permission {ChannelPermission.Value}"));
-            }
-
-            return Task.FromResult(PreconditionResult.FromSuccess());
+            return Task.FromResult(!perms.Has(ChannelPermission.Value)
+                ? PreconditionResult.FromError($"User requires channel permission {ChannelPermission.Value}")
+                : PreconditionResult.FromSuccess());
         }
     }
 }

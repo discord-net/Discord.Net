@@ -5,9 +5,22 @@ using Model = Discord.API.User;
 
 namespace Discord.Rest
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
+    [DebuggerDisplay(@"{" + nameof(DebuggerDisplay) + @",nq}")]
     public class RestUser : RestEntity<ulong>, IUser, IUpdateable
     {
+        internal RestUser(BaseDiscordClient discord, ulong id)
+            : base(discord, id)
+        {
+        }
+
+        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
+
+        public virtual async Task UpdateAsync(RequestOptions options = null)
+        {
+            var model = await Discord.ApiClient.GetUserAsync(Id, options).ConfigureAwait(false);
+            Update(model);
+        }
+
         public bool IsBot { get; private set; }
         public string Username { get; private set; }
         public ushort DiscriminatorValue { get; private set; }
@@ -20,22 +33,29 @@ namespace Discord.Rest
         public virtual UserStatus Status => UserStatus.Offline;
         public virtual bool IsWebhook => false;
 
-        internal RestUser(BaseDiscordClient discord, ulong id)
-            : base(discord, id)
-        {
-        }
+        public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
+
+        public string GetDefaultAvatarUrl()
+            => CDN.GetDefaultUserAvatarUrl(DiscriminatorValue);
+
+        //IUser
+        async Task<IDMChannel> IUser.GetOrCreateDMChannelAsync(RequestOptions options)
+            => await GetOrCreateDMChannelAsync(options);
+
         internal static RestUser Create(BaseDiscordClient discord, Model model)
             => Create(discord, null, model, null);
+
         internal static RestUser Create(BaseDiscordClient discord, IGuild guild, Model model, ulong? webhookId)
         {
             RestUser entity;
-            if (webhookId.HasValue)
-                entity = new RestWebhookUser(discord, guild, model.Id, webhookId.Value);
-            else
-                entity = new RestUser(discord, model.Id);
+            entity = webhookId.HasValue
+                ? new RestWebhookUser(discord, guild, model.Id, webhookId.Value)
+                : new RestUser(discord, model.Id);
             entity.Update(model);
             return entity;
         }
+
         internal virtual void Update(Model model)
         {
             if (model.Avatar.IsSpecified)
@@ -48,26 +68,9 @@ namespace Discord.Rest
                 Username = model.Username.Value;
         }
 
-        public virtual async Task UpdateAsync(RequestOptions options = null)
-        {
-            var model = await Discord.ApiClient.GetUserAsync(Id, options).ConfigureAwait(false);
-            Update(model);
-        }
-
         public Task<RestDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
             => UserHelper.CreateDMChannelAsync(this, Discord, options);
 
-        public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-            => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
-
-        public string GetDefaultAvatarUrl()
-            => CDN.GetDefaultUserAvatarUrl(DiscriminatorValue);
-
         public override string ToString() => $"{Username}#{Discriminator}";
-        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
-
-        //IUser
-        async Task<IDMChannel> IUser.GetOrCreateDMChannelAsync(RequestOptions options)
-            => await GetOrCreateDMChannelAsync(options);
     }
 }

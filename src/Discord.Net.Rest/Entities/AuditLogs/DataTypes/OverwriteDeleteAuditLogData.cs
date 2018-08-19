@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using System.Linq;
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 using ChangeModel = Discord.API.AuditLogChange;
@@ -17,6 +12,8 @@ namespace Discord.Rest
         {
             Overwrite = deletedOverwrite;
         }
+
+        public Overwrite Overwrite { get; }
 
         internal static OverwriteDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
@@ -32,11 +29,9 @@ namespace Discord.Rest
             var id = idModel.OldValue.ToObject<ulong>();
             var allow = allowModel.OldValue.ToObject<ulong>();
 
-            PermissionTarget target = type == "member" ? PermissionTarget.User : PermissionTarget.Role;
+            var target = type == "member" ? PermissionTarget.User : PermissionTarget.Role;
 
             return new OverwriteDeleteAuditLogData(new Overwrite(id, target, new OverwritePermissions(allow, deny)));
         }
-
-        public Overwrite Overwrite { get; }
     }
 }

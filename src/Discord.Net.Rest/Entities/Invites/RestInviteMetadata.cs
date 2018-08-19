@@ -7,25 +7,31 @@ namespace Discord.Rest
     {
         private long? _createdAtTicks;
 
+        internal RestInviteMetadata(BaseDiscordClient discord, IGuild guild, IChannel channel, string id)
+            : base(discord, guild, channel, id)
+        {
+        }
+
+        public RestUser Inviter { get; private set; }
+
         public bool IsRevoked { get; private set; }
         public bool IsTemporary { get; private set; }
         public int? MaxAge { get; private set; }
         public int? MaxUses { get; private set; }
         public int? Uses { get; private set; }
-        public RestUser Inviter { get; private set; }
 
         public DateTimeOffset? CreatedAt => DateTimeUtils.FromTicks(_createdAtTicks);
 
-        internal RestInviteMetadata(BaseDiscordClient discord, IGuild guild, IChannel channel, string id)
-            : base(discord, guild, channel, id)
-        {
-        }
-        internal static RestInviteMetadata Create(BaseDiscordClient discord, IGuild guild, IChannel channel, Model model)
+        IUser IInviteMetadata.Inviter => Inviter;
+
+        internal static RestInviteMetadata Create(BaseDiscordClient discord, IGuild guild, IChannel channel,
+            Model model)
         {
             var entity = new RestInviteMetadata(discord, guild, channel, model.Code);
             entity.Update(model);
             return entity;
         }
+
         internal void Update(Model model)
         {
             base.Update(model);
@@ -37,7 +43,5 @@ namespace Discord.Rest
             Uses = model.Uses.IsSpecified ? model.Uses.Value : (int?)null;
             _createdAtTicks = model.CreatedAt.IsSpecified ? model.CreatedAt.Value.UtcTicks : (long?)null;
         }
-
-        IUser IInviteMetadata.Inviter => Inviter;
     }
 }

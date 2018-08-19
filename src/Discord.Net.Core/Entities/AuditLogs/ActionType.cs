@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Discord
+﻿namespace Discord
 {
     /// <summary>
-    /// The action type within a <see cref="IAuditLogEntry"/>
+    ///     The action type within a <see cref="IAuditLogEntry" />
     /// </summary>
     public enum ActionType
     {

@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Discord.Net.Converters
 {
@@ -8,16 +8,18 @@ namespace Discord.Net.Converters
     {
         private readonly JsonConverter _innerConverter;
 
-        public override bool CanConvert(Type objectType) => true;
-        public override bool CanRead => true;
-        public override bool CanWrite => true;
-
         public ArrayConverter(JsonConverter innerConverter)
         {
             _innerConverter = innerConverter;
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override bool CanRead => true;
+        public override bool CanWrite => true;
+
+        public override bool CanConvert(Type objectType) => true;
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+            JsonSerializer serializer)
         {
             var result = new List<T>();
             if (reader.TokenType == JsonToken.StartArray)
@@ -34,21 +36,21 @@ namespace Discord.Net.Converters
                     reader.Read();
                 }
             }
+
             return result.ToArray();
         }
+
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             if (value != null)
             {
                 writer.WriteStartArray();
                 var a = (T[])value;
-                for (int i = 0; i < a.Length; i++)
-                {
+                for (var i = 0; i < a.Length; i++)
                     if (_innerConverter != null)
                         _innerConverter.WriteJson(writer, a[i], serializer);
                     else
                         serializer.Serialize(writer, a[i], typeof(T));
-                }
 
                 writer.WriteEndArray();
             }

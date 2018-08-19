@@ -1,6 +1,6 @@
 ﻿namespace Discord.Audio
 {
-    internal enum OpusApplication : int
+    internal enum OpusApplication
     {
         Voice = 2048,
         MusicOrMixed = 2049,

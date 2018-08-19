@@ -5,11 +5,18 @@ using Model = Discord.API.Application;
 
 namespace Discord.Rest
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
+    [DebuggerDisplay(@"{" + nameof(DebuggerDisplay) + @",nq}")]
     public class RestApplication : RestEntity<ulong>, IApplication
     {
         protected string _iconId;
-        
+
+        internal RestApplication(BaseDiscordClient discord, ulong id)
+            : base(discord, id)
+        {
+        }
+
+        private string DebuggerDisplay => $"{Name} ({Id})";
+
         public string Name { get; private set; }
         public string Description { get; private set; }
         public string[] RPCOrigins { get; private set; }
@@ -20,18 +27,15 @@ namespace Discord.Rest
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         public string IconUrl => CDN.GetApplicationIconUrl(Id, _iconId);
 
-        internal RestApplication(BaseDiscordClient discord, ulong id)
-            : base(discord, id)
-        {
-        }
         internal static RestApplication Create(BaseDiscordClient discord, Model model)
         {
             var entity = new RestApplication(discord, model.Id);
             entity.Update(model);
             return entity;
         }
+
         internal void Update(Model model)
-        {            
+        {
             Description = model.Description;
             RPCOrigins = model.RPCOrigins;
             Name = model.Name;
@@ -52,6 +56,5 @@ namespace Discord.Rest
         }
 
         public override string ToString() => Name;
-        private string DebuggerDisplay => $"{Name} ({Id})";
     }
 }

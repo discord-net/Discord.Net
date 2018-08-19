@@ -6,9 +6,9 @@ namespace Discord.Rest
 {
     internal class TypingNotifier : IDisposable
     {
-        private readonly BaseDiscordClient _client;
         private readonly CancellationTokenSource _cancelToken;
         private readonly IMessageChannel _channel;
+        private readonly BaseDiscordClient _client;
         private readonly RequestOptions _options;
 
         public TypingNotifier(BaseDiscordClient discord, IMessageChannel channel, RequestOptions options)
@@ -19,6 +19,8 @@ namespace Discord.Rest
             _options = options;
             var _ = Run();
         }
+
+        public void Dispose() => _cancelToken.Cancel();
 
         private async Task Run()
         {
@@ -31,16 +33,16 @@ namespace Discord.Rest
                     {
                         await _channel.TriggerTypingAsync(_options).ConfigureAwait(false);
                     }
-                    catch { }
+                    catch
+                    {
+                    }
+
                     await Task.Delay(9500, token).ConfigureAwait(false);
                 }
             }
-            catch (OperationCanceledException) { }
-        }
-
-        public void Dispose()
-        {
-            _cancelToken.Cancel();
+            catch (OperationCanceledException)
+            {
+            }
         }
     }
 }

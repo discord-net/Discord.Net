@@ -8,32 +8,85 @@ using Model = Discord.API.Message;
 
 namespace Discord.Rest
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
+    [DebuggerDisplay(@"{" + nameof(DebuggerDisplay) + @",nq}")]
     public class RestUserMessage : RestMessage, IUserMessage
     {
-        private bool _isMentioningEveryone, _isTTS, _isPinned;
-        private long? _editedTimestampTicks;
         private ImmutableArray<Attachment> _attachments;
+        private long? _editedTimestampTicks;
         private ImmutableArray<Embed> _embeds;
-        private ImmutableArray<ITag> _tags;
+        private bool _isMentioningEveryone, _isTTS, _isPinned;
         private ImmutableArray<RestReaction> _reactions;
-        
-        public override bool IsTTS => _isTTS;
-        public override bool IsPinned => _isPinned;
-        public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
-        public override IReadOnlyCollection<Attachment> Attachments => _attachments;
-        public override IReadOnlyCollection<Embed> Embeds => _embeds;
-        public override IReadOnlyCollection<ulong> MentionedChannelIds => MessageHelper.FilterTagsByKey(TagType.ChannelMention, _tags);
-        public override IReadOnlyCollection<ulong> MentionedRoleIds => MessageHelper.FilterTagsByKey(TagType.RoleMention, _tags);
-        public override IReadOnlyCollection<RestUser> MentionedUsers => MessageHelper.FilterTagsByValue<RestUser>(TagType.UserMention, _tags);
-        public override IReadOnlyCollection<ITag> Tags => _tags;
-        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.ToDictionary(x => x.Emote, x => new ReactionMetadata { ReactionCount = x.Count, IsMe = x.Me });
+        private ImmutableArray<ITag> _tags;
 
-        internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
+        internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author,
+            MessageSource source)
             : base(discord, id, channel, author, source)
         {
         }
-        internal static new RestUserMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author, Model model)
+
+        public override IReadOnlyCollection<Attachment> Attachments => _attachments;
+        public override IReadOnlyCollection<Embed> Embeds => _embeds;
+
+        public override IReadOnlyCollection<RestUser> MentionedUsers =>
+            MessageHelper.FilterTagsByValue<RestUser>(TagType.UserMention, _tags);
+
+        private string DebuggerDisplay =>
+            $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")})";
+
+        public override bool IsTTS => _isTTS;
+        public override bool IsPinned => _isPinned;
+        public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
+
+        public override IReadOnlyCollection<ulong> MentionedChannelIds =>
+            MessageHelper.FilterTagsByKey(TagType.ChannelMention, _tags);
+
+        public override IReadOnlyCollection<ulong> MentionedRoleIds =>
+            MessageHelper.FilterTagsByKey(TagType.RoleMention, _tags);
+
+        public override IReadOnlyCollection<ITag> Tags => _tags;
+
+        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.ToDictionary(x => x.Emote, x =>
+            new ReactionMetadata
+            {
+                ReactionCount = x.Count,
+                IsMe = x.Me
+            });
+
+        public async Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
+        {
+            var model = await MessageHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
+            Update(model);
+        }
+
+        public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
+            => MessageHelper.AddReactionAsync(this, emote, Discord, options);
+
+        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null)
+            => MessageHelper.RemoveReactionAsync(this, user, emote, Discord, options);
+
+        public Task RemoveAllReactionsAsync(RequestOptions options = null)
+            => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
+
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit,
+            RequestOptions options = null)
+            => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, options);
+
+
+        public Task PinAsync(RequestOptions options = null)
+            => MessageHelper.PinAsync(this, Discord, options);
+
+        public Task UnpinAsync(RequestOptions options = null)
+            => MessageHelper.UnpinAsync(this, Discord, options);
+
+        public string Resolve(TagHandling userHandling = TagHandling.Name,
+            TagHandling channelHandling = TagHandling.Name,
+            TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore,
+            TagHandling emojiHandling = TagHandling.Name)
+            => MentionUtils.Resolve(this, 0, userHandling, channelHandling, roleHandling, everyoneHandling,
+                emojiHandling);
+
+        internal new static RestUserMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author,
+            Model model)
         {
             var entity = new RestUserMessage(discord, model.Id, channel, author, MessageHelper.GetSource(model));
             entity.Update(model);
@@ -59,7 +112,7 @@ namespace Discord.Rest
                 if (value.Length > 0)
                 {
                     var attachments = ImmutableArray.CreateBuilder<Attachment>(value.Length);
-                    for (int i = 0; i < value.Length; i++)
+                    for (var i = 0; i < value.Length; i++)
                         attachments.Add(Attachment.Create(value[i]));
                     _attachments = attachments.ToImmutable();
                 }
@@ -73,7 +126,7 @@ namespace Discord.Rest
                 if (value.Length > 0)
                 {
                     var embeds = ImmutableArray.CreateBuilder<Embed>(value.Length);
-                    for (int i = 0; i < value.Length; i++)
+                    for (var i = 0; i < value.Length; i++)
                         embeds.Add(value[i].ToEntity());
                     _embeds = embeds.ToImmutable();
                 }
@@ -81,19 +134,20 @@ namespace Discord.Rest
                     _embeds = ImmutableArray.Create<Embed>();
             }
 
-            ImmutableArray<IUser> mentions = ImmutableArray.Create<IUser>();
+            var mentions = ImmutableArray.Create<IUser>();
             if (model.UserMentions.IsSpecified)
             {
                 var value = model.UserMentions.Value;
                 if (value.Length > 0)
                 {
                     var newMentions = ImmutableArray.CreateBuilder<IUser>(value.Length);
-                    for (int i = 0; i < value.Length; i++)
+                    for (var i = 0; i < value.Length; i++)
                     {
                         var val = value[i];
                         if (val.Object != null)
                             newMentions.Add(RestUser.Create(Discord, val.Object));
                     }
+
                     mentions = newMentions.ToImmutable();
                 }
             }
@@ -104,7 +158,7 @@ namespace Discord.Rest
                 if (value.Length > 0)
                 {
                     var reactions = ImmutableArray.CreateBuilder<RestReaction>(value.Length);
-                    for (int i = 0; i < value.Length; i++)
+                    for (var i = 0; i < value.Length; i++)
                         reactions.Add(RestReaction.Create(value[i]));
                     _reactions = reactions.ToImmutable();
                 }
@@ -118,40 +172,19 @@ namespace Discord.Rest
             {
                 var text = model.Content.Value;
                 var guildId = (Channel as IGuildChannel)?.GuildId;
-                var guild = guildId != null ? (Discord as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
+                var guild = guildId != null
+                    ? (Discord as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result
+                    : null;
                 _tags = MessageHelper.ParseTags(text, null, guild, mentions);
                 model.Content = text;
             }
         }
 
-        public async Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
-        {
-            var model = await MessageHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
-            Update(model);
-        }
-
-        public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
-            => MessageHelper.AddReactionAsync(this, emote, Discord, options);
-        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null)
-            => MessageHelper.RemoveReactionAsync(this, user, emote, Discord, options);
-        public Task RemoveAllReactionsAsync(RequestOptions options = null)
-            => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
-        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit, RequestOptions options = null)
-            => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, options);
-
-
-        public Task PinAsync(RequestOptions options = null)
-            => MessageHelper.PinAsync(this, Discord, options);
-        public Task UnpinAsync(RequestOptions options = null)
-            => MessageHelper.UnpinAsync(this, Discord, options);
-
-        public string Resolve(int startIndex, TagHandling userHandling = TagHandling.Name, TagHandling channelHandling = TagHandling.Name,
-            TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)
-            => MentionUtils.Resolve(this, startIndex, userHandling, channelHandling, roleHandling, everyoneHandling, emojiHandling);
-        public string Resolve(TagHandling userHandling = TagHandling.Name, TagHandling channelHandling = TagHandling.Name,
-            TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)
-            => MentionUtils.Resolve(this, 0, userHandling, channelHandling, roleHandling, everyoneHandling, emojiHandling);
-
-        private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")})";
+        public string Resolve(int startIndex, TagHandling userHandling = TagHandling.Name,
+            TagHandling channelHandling = TagHandling.Name,
+            TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore,
+            TagHandling emojiHandling = TagHandling.Name)
+            => MentionUtils.Resolve(this, startIndex, userHandling, channelHandling, roleHandling, everyoneHandling,
+                emojiHandling);
     }
 }

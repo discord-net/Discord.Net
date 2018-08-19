@@ -4,16 +4,17 @@ namespace Discord.Rest
 {
     public class RestReaction : IReaction
     {
-        public IEmote Emote { get; }
-        public int Count { get; }
-        public bool Me { get; }
-
         internal RestReaction(IEmote emote, int count, bool me)
         {
             Emote = emote;
             Count = count;
             Me = me;
         }
+
+        public int Count { get; }
+        public bool Me { get; }
+        public IEmote Emote { get; }
+
         internal static RestReaction Create(Model model)
         {
             IEmote emote;

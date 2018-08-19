@@ -6,7 +6,7 @@
         string Description { get; }
         string[] RPCOrigins { get; }
         ulong Flags { get; }
-        string IconUrl  { get; }
+        string IconUrl { get; }
 
         IUser Owner { get; }
     }

@@ -10,6 +10,5 @@ namespace Discord
 
         /// <summary> Gets the unique identifier for this object. </summary>
         TId Id { get; }
-
     }
 }

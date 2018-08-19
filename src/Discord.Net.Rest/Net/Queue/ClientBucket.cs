@@ -7,6 +7,7 @@ namespace Discord.Net.Queue
         Unbucketed = 0,
         SendEdit = 1
     }
+
     internal struct ClientBucket
     {
         private static readonly ImmutableDictionary<ClientBucketType, ClientBucket> _defsByType;
@@ -33,7 +34,7 @@ namespace Discord.Net.Queue
 
         public static ClientBucket Get(ClientBucketType type) => _defsByType[type];
         public static ClientBucket Get(string id) => _defsById[id];
-        
+
         public ClientBucketType Type { get; }
         public string Id { get; }
         public int WindowCount { get; }

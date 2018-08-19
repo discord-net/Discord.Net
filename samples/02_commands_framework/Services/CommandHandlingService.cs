@@ -1,10 +1,10 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace _02_commands_framework.Services
 {
@@ -23,10 +23,7 @@ namespace _02_commands_framework.Services
             _discord.MessageReceived += MessageReceivedAsync;
         }
 
-        public async Task InitializeAsync()
-        {
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
-        }
+        public async Task InitializeAsync() => await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
 
         public async Task MessageReceivedAsync(SocketMessage rawMessage)
         {

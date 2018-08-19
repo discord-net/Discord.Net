@@ -14,12 +14,13 @@ namespace Discord.Commands
 
     internal class PrimitiveTypeReader<T> : TypeReader
     {
-        private readonly TryParseDelegate<T> _tryParse;
         private readonly float _score;
+        private readonly TryParseDelegate<T> _tryParse;
 
         public PrimitiveTypeReader()
             : this(PrimitiveParsers.Get<T>(), 1)
-        { }
+        {
+        }
 
         public PrimitiveTypeReader(TryParseDelegate<T> tryParse, float score)
         {
@@ -30,11 +31,13 @@ namespace Discord.Commands
             _score = score;
         }
 
-        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
+        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input,
+            IServiceProvider services)
         {
-            if (_tryParse(input, out T value))
+            if (_tryParse(input, out var value))
                 return Task.FromResult(TypeReaderResult.FromSuccess(new TypeReaderValue(value, _score)));
-            return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Failed to parse {typeof(T).Name}"));
+            return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
+                $"Failed to parse {typeof(T).Name}"));
         }
     }
 }

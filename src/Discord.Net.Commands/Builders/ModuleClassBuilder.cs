@@ -1,9 +1,8 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-
 using Discord.Commands.Builders;
 
 namespace Discord.Commands
@@ -17,38 +16,37 @@ namespace Discord.Commands
             bool IsLoadableModule(TypeInfo info)
             {
                 return info.DeclaredMethods.Any(x => x.GetCustomAttribute<CommandAttribute>() != null) &&
-                    info.GetCustomAttribute<DontAutoLoadAttribute>() == null;
+                       info.GetCustomAttribute<DontAutoLoadAttribute>() == null;
             }
 
             var result = new List<TypeInfo>();
 
             foreach (var typeInfo in assembly.DefinedTypes)
-            {
                 if (typeInfo.IsPublic || typeInfo.IsNestedPublic)
                 {
                     if (IsValidModuleDefinition(typeInfo) &&
                         !typeInfo.IsDefined(typeof(DontAutoLoadAttribute)))
-                    {
                         result.Add(typeInfo);
-                    }
                 }
                 else if (IsLoadableModule(typeInfo))
-                {
-                    await service._cmdLogger.WarningAsync($"Class {typeInfo.FullName} is not public and cannot be loaded. To suppress this message, mark the class with {nameof(DontAutoLoadAttribute)}.");
-                }
-            }
+                    await service._cmdLogger.WarningAsync(
+                        $"Class {typeInfo.FullName} is not public and cannot be loaded. To suppress this message, mark the class with {nameof(DontAutoLoadAttribute)}.");
 
             return result;
         }
 
 
-        public static Task<Dictionary<Type, ModuleInfo>> BuildAsync(CommandService service, IServiceProvider services, params TypeInfo[] validTypes) => BuildAsync(validTypes, service, services);
-        public static async Task<Dictionary<Type, ModuleInfo>> BuildAsync(IEnumerable<TypeInfo> validTypes, CommandService service, IServiceProvider services)
+        public static Task<Dictionary<Type, ModuleInfo>> BuildAsync(CommandService service, IServiceProvider services,
+            params TypeInfo[] validTypes) => BuildAsync(validTypes, service, services);
+
+        public static async Task<Dictionary<Type, ModuleInfo>> BuildAsync(IEnumerable<TypeInfo> validTypes,
+            CommandService service, IServiceProvider services)
         {
             /*if (!validTypes.Any())
                 throw new InvalidOperationException("Could not find any valid modules from the given selection");*/
 
-            var topLevelGroups = validTypes.Where(x => x.DeclaringType == null || !IsValidModuleDefinition(x.DeclaringType.GetTypeInfo()));
+            var topLevelGroups = validTypes.Where(x =>
+                x.DeclaringType == null || !IsValidModuleDefinition(x.DeclaringType.GetTypeInfo()));
 
             var builtTypes = new List<TypeInfo>();
 
@@ -69,22 +67,24 @@ namespace Discord.Commands
                 result[typeInfo.AsType()] = module.Build(service, services);
             }
 
-            await service._cmdLogger.DebugAsync($"Successfully built {builtTypes.Count} modules.").ConfigureAwait(false);
+            await service._cmdLogger.DebugAsync($"Successfully built {builtTypes.Count} modules.")
+                .ConfigureAwait(false);
 
             return result;
         }
 
-        private static void BuildSubTypes(ModuleBuilder builder, IEnumerable<TypeInfo> subTypes, List<TypeInfo> builtTypes, CommandService service, IServiceProvider services)
+        private static void BuildSubTypes(ModuleBuilder builder, IEnumerable<TypeInfo> subTypes,
+            List<TypeInfo> builtTypes, CommandService service, IServiceProvider services)
         {
             foreach (var typeInfo in subTypes)
             {
                 if (!IsValidModuleDefinition(typeInfo))
                     continue;
-                
+
                 if (builtTypes.Contains(typeInfo))
                     continue;
-                
-                builder.AddModule((module) => 
+
+                builder.AddModule(module =>
                 {
                     BuildModule(module, typeInfo, service, services);
                     BuildSubTypes(module, typeInfo.DeclaredNestedTypes, builtTypes, service, services);
@@ -94,13 +94,13 @@ namespace Discord.Commands
             }
         }
 
-        private static void BuildModule(ModuleBuilder builder, TypeInfo typeInfo, CommandService service, IServiceProvider services)
+        private static void BuildModule(ModuleBuilder builder, TypeInfo typeInfo, CommandService service,
+            IServiceProvider services)
         {
             var attributes = typeInfo.GetCustomAttributes();
             builder.TypeInfo = typeInfo;
 
             foreach (var attribute in attributes)
-            {
                 switch (attribute)
                 {
                     case NameAttribute name:
@@ -127,7 +127,6 @@ namespace Discord.Commands
                         builder.AddAttributes(attribute);
                         break;
                 }
-            }
 
             //Check for unspecified info
             if (builder.Aliases.Count == 0)
@@ -138,20 +137,15 @@ namespace Discord.Commands
             var validCommands = typeInfo.DeclaredMethods.Where(x => IsValidCommandDefinition(x));
 
             foreach (var method in validCommands)
-            {
-                builder.AddCommand((command) => 
-                {
-                    BuildCommand(command, typeInfo, method, service, services);
-                });
-            }
+                builder.AddCommand(command => { BuildCommand(command, typeInfo, method, service, services); });
         }
 
-        private static void BuildCommand(CommandBuilder builder, TypeInfo typeInfo, MethodInfo method, CommandService service, IServiceProvider serviceprovider)
+        private static void BuildCommand(CommandBuilder builder, TypeInfo typeInfo, MethodInfo method,
+            CommandService service, IServiceProvider serviceprovider)
         {
             var attributes = method.GetCustomAttributes();
-            
+
             foreach (var attribute in attributes)
-            {
                 switch (attribute)
                 {
                     case CommandAttribute command:
@@ -182,7 +176,6 @@ namespace Discord.Commands
                         builder.AddAttributes(attribute);
                         break;
                 }
-            }
 
             if (builder.Name == null)
                 builder.Name = method.Name;
@@ -190,16 +183,15 @@ namespace Discord.Commands
             var parameters = method.GetParameters();
             int pos = 0, count = parameters.Length;
             foreach (var paramInfo in parameters)
-            {
-                builder.AddParameter((parameter) => 
+                builder.AddParameter(parameter =>
                 {
                     BuildParameter(parameter, paramInfo, pos++, count, service, serviceprovider);
                 });
-            }
 
             var createInstance = ReflectionUtils.CreateBuilder<IModuleBase>(typeInfo, service);
 
-            async Task<IResult> ExecuteCallback(ICommandContext context, object[] args, IServiceProvider services, CommandInfo cmd)
+            async Task<IResult> ExecuteCallback(ICommandContext context, object[] args, IServiceProvider services,
+                CommandInfo cmd)
             {
                 var instance = createInstance(services);
                 instance.SetContext(context);
@@ -210,9 +202,7 @@ namespace Discord.Commands
 
                     var task = method.Invoke(instance, args) as Task ?? Task.Delay(0);
                     if (task is Task<RuntimeResult> resultTask)
-                    {
                         return await resultTask.ConfigureAwait(false);
-                    }
                     else
                     {
                         await task.ConfigureAwait(false);
@@ -229,7 +219,8 @@ namespace Discord.Commands
             builder.Callback = ExecuteCallback;
         }
 
-        private static void BuildParameter(ParameterBuilder builder, System.Reflection.ParameterInfo paramInfo, int position, int count, CommandService service, IServiceProvider services)
+        private static void BuildParameter(ParameterBuilder builder, System.Reflection.ParameterInfo paramInfo,
+            int position, int count, CommandService service, IServiceProvider services)
         {
             var attributes = paramInfo.GetCustomAttributes();
             var paramType = paramInfo.ParameterType;
@@ -240,7 +231,6 @@ namespace Discord.Commands
             builder.DefaultValue = paramInfo.HasDefaultValue ? paramInfo.DefaultValue : null;
 
             foreach (var attribute in attributes)
-            {
                 switch (attribute)
                 {
                     case SummaryAttribute summary:
@@ -261,7 +251,8 @@ namespace Discord.Commands
                         break;
                     case RemainderAttribute _:
                         if (position != count - 1)
-                            throw new InvalidOperationException($"Remainder parameters must be the last parameter in a command. Parameter: {paramInfo.Name} in {paramInfo.Member.DeclaringType.Name}.{paramInfo.Member.Name}");
+                            throw new InvalidOperationException(
+                                $"Remainder parameters must be the last parameter in a command. Parameter: {paramInfo.Name} in {paramInfo.Member.DeclaringType.Name}.{paramInfo.Member.Name}");
 
                         builder.IsRemainder = true;
                         break;
@@ -269,26 +260,22 @@ namespace Discord.Commands
                         builder.AddAttributes(attribute);
                         break;
                 }
-            }
 
             builder.ParameterType = paramType;
 
             if (builder.TypeReader == null)
-            {
                 builder.TypeReader = service.GetDefaultTypeReader(paramType)
-                    ?? service.GetTypeReaders(paramType)?.FirstOrDefault().Value;
-            }
+                                     ?? service.GetTypeReaders(paramType)?.FirstOrDefault().Value;
         }
 
-        private static TypeReader GetTypeReader(CommandService service, Type paramType, Type typeReaderType, IServiceProvider services)
+        private static TypeReader GetTypeReader(CommandService service, Type paramType, Type typeReaderType,
+            IServiceProvider services)
         {
             var readers = service.GetTypeReaders(paramType);
-            TypeReader reader = null;
+            TypeReader reader;
             if (readers != null)
-            {
                 if (readers.TryGetValue(typeReaderType, out reader))
                     return reader;
-            }
 
             //We dont have a cached type reader, create one
             reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, services);
@@ -297,19 +284,14 @@ namespace Discord.Commands
             return reader;
         }
 
-        private static bool IsValidModuleDefinition(TypeInfo typeInfo)
-        {
-            return _moduleTypeInfo.IsAssignableFrom(typeInfo) &&
-                   !typeInfo.IsAbstract &&
-                   !typeInfo.ContainsGenericParameters;
-        }
+        private static bool IsValidModuleDefinition(TypeInfo typeInfo) => _moduleTypeInfo.IsAssignableFrom(typeInfo) &&
+                                                                          !typeInfo.IsAbstract &&
+                                                                          !typeInfo.ContainsGenericParameters;
 
-        private static bool IsValidCommandDefinition(MethodInfo methodInfo)
-        {
-            return methodInfo.IsDefined(typeof(CommandAttribute)) &&
-                   (methodInfo.ReturnType == typeof(Task) || methodInfo.ReturnType == typeof(Task<RuntimeResult>)) &&
-                   !methodInfo.IsStatic &&
-                   !methodInfo.IsGenericMethod;
-        }
+        private static bool IsValidCommandDefinition(MethodInfo methodInfo) =>
+            methodInfo.IsDefined(typeof(CommandAttribute)) &&
+            (methodInfo.ReturnType == typeof(Task) || methodInfo.ReturnType == typeof(Task<RuntimeResult>)) &&
+            !methodInfo.IsStatic &&
+            !methodInfo.IsGenericMethod;
     }
 }

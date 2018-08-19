@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord.Commands
 {
@@ -8,15 +9,8 @@ namespace Discord.Commands
         public static IEnumerable<TResult> Permutate<TFirst, TSecond, TResult>(
             this IEnumerable<TFirst> set,
             IEnumerable<TSecond> others,
-            Func<TFirst, TSecond, TResult> func)
-        {
-            foreach (TFirst elem in set)
-            {
-                foreach (TSecond elem2 in others)
-                {
-                    yield return func(elem, elem2);
-                }
-            }
-        }
+            Func<TFirst, TSecond, TResult> func) => from elem in set
+            from elem2 in others
+            select func(elem, elem2);
     }
 }

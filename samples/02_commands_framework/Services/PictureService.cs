@@ -9,7 +9,9 @@ namespace _02_commands_framework.Services
         private readonly HttpClient _http;
 
         public PictureService(HttpClient http)
-            => _http = http;
+        {
+            _http = http;
+        }
 
         public async Task<Stream> GetCatPictureAsync()
         {

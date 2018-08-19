@@ -11,9 +11,10 @@ namespace Discord.Commands
     {
         public static TypeReader GetReader(Type type)
         {
-            Type baseType = Enum.GetUnderlyingType(type);
-            var constructor = typeof(EnumTypeReader<>).MakeGenericType(baseType).GetTypeInfo().DeclaredConstructors.First();
-            return (TypeReader)constructor.Invoke(new object[] { type, PrimitiveParsers.Get(baseType) });
+            var baseType = Enum.GetUnderlyingType(type);
+            var constructor = typeof(EnumTypeReader<>).MakeGenericType(baseType).GetTypeInfo().DeclaredConstructors
+                .First();
+            return (TypeReader)constructor.Invoke(new object[] {type, PrimitiveParsers.Get(baseType)});
         }
     }
 
@@ -23,7 +24,7 @@ namespace Discord.Commands
         private readonly IReadOnlyDictionary<T, object> _enumsByValue;
         private readonly Type _enumType;
         private readonly TryParseDelegate<T> _tryParse;
-        
+
         public EnumTypeReader(Type type, TryParseDelegate<T> parser)
         {
             _enumType = type;
@@ -33,7 +34,7 @@ namespace Discord.Commands
             var byValueBuilder = ImmutableDictionary.CreateBuilder<T, object>();
 
             foreach (var v in Enum.GetNames(_enumType))
-            {      
+            {
                 var parsedValue = Enum.Parse(_enumType, v);
                 byNameBuilder.Add(v.ToLower(), parsedValue);
                 if (!byValueBuilder.ContainsKey((T)parsedValue))
@@ -44,24 +45,23 @@ namespace Discord.Commands
             _enumsByValue = byValueBuilder.ToImmutable();
         }
 
-        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
+        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input,
+            IServiceProvider services)
         {
             object enumValue;
 
-            if (_tryParse(input, out T baseValue))
+            if (_tryParse(input, out var baseValue))
             {
                 if (_enumsByValue.TryGetValue(baseValue, out enumValue))
                     return Task.FromResult(TypeReaderResult.FromSuccess(enumValue));
-                else
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Value is not a {_enumType.Name}"));
+                return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
+                    $"Value is not a {_enumType.Name}"));
             }
-            else
-            {
-                if (_enumsByName.TryGetValue(input.ToLower(), out enumValue))
-                    return Task.FromResult(TypeReaderResult.FromSuccess(enumValue));
-                else
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Value is not a {_enumType.Name}"));
-            }
+
+            if (_enumsByName.TryGetValue(input.ToLower(), out enumValue))
+                return Task.FromResult(TypeReaderResult.FromSuccess(enumValue));
+            return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
+                $"Value is not a {_enumType.Name}"));
         }
     }
 }

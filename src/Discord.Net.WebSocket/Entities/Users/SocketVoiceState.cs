@@ -5,10 +5,11 @@ using Model = Discord.API.VoiceState;
 namespace Discord.WebSocket
 {
     //TODO: C#7 Candidate for record type
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
+    [DebuggerDisplay(@"{" + nameof(DebuggerDisplay) + @",nq}")]
     public struct SocketVoiceState : IVoiceState
     {
-        public static readonly SocketVoiceState Default = new SocketVoiceState(null, null, false, false, false, false, false);
+        public static readonly SocketVoiceState Default =
+            new SocketVoiceState(null, null, false, false, false, false, false);
 
         [Flags]
         private enum Flags : byte
@@ -18,11 +19,11 @@ namespace Discord.WebSocket
             Muted = 0x02,
             Deafened = 0x04,
             SelfMuted = 0x08,
-            SelfDeafened = 0x10,
+            SelfDeafened = 0x10
         }
 
         private readonly Flags _voiceStates;
-        
+
         public SocketVoiceChannel VoiceChannel { get; }
         public string VoiceSessionId { get; }
 
@@ -32,12 +33,13 @@ namespace Discord.WebSocket
         public bool IsSelfMuted => (_voiceStates & Flags.SelfMuted) != 0;
         public bool IsSelfDeafened => (_voiceStates & Flags.SelfDeafened) != 0;
 
-        internal SocketVoiceState(SocketVoiceChannel voiceChannel, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed)
+        internal SocketVoiceState(SocketVoiceChannel voiceChannel, string sessionId, bool isSelfMuted,
+            bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed)
         {
             VoiceChannel = voiceChannel;
             VoiceSessionId = sessionId;
 
-            Flags voiceStates = Flags.Normal;
+            var voiceStates = Flags.Normal;
             if (isSelfMuted)
                 voiceStates |= Flags.SelfMuted;
             if (isSelfDeafened)
@@ -50,10 +52,9 @@ namespace Discord.WebSocket
                 voiceStates |= Flags.Suppressed;
             _voiceStates = voiceStates;
         }
-        internal static SocketVoiceState Create(SocketVoiceChannel voiceChannel, Model model)
-        {
-            return new SocketVoiceState(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Mute, model.Deaf, model.Suppress);
-        }
+
+        internal static SocketVoiceState Create(SocketVoiceChannel voiceChannel, Model model) => new SocketVoiceState(
+            voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Mute, model.Deaf, model.Suppress);
 
         public override string ToString() => VoiceChannel?.Name ?? "Unknown";
         private string DebuggerDisplay => $"{VoiceChannel?.Name ?? "Unknown"} ({_voiceStates})";

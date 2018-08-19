@@ -7,14 +7,12 @@ namespace Discord.Commands
 {
     internal class CommandMapNode
     {
-        private static readonly char[] _whitespaceChars = new[] { ' ', '\r', '\n' };
+        private static readonly char[] _whitespaceChars = {' ', '\r', '\n'};
+        private readonly object _lockObj = new object();
+        private readonly string _name;
 
         private readonly ConcurrentDictionary<string, CommandMapNode> _nodes;
-        private readonly string _name;
-        private readonly object _lockObj = new object();
         private ImmutableArray<CommandInfo> _commands;
-
-        public bool IsEmpty => _commands.Length == 0 && _nodes.Count == 0;
 
         public CommandMapNode(string name)
         {
@@ -23,113 +21,92 @@ namespace Discord.Commands
             _commands = ImmutableArray.Create<CommandInfo>();
         }
 
+        public bool IsEmpty => _commands.Length == 0 && _nodes.Count == 0;
+
         public void AddCommand(CommandService service, string text, int index, CommandInfo command)
         {
-            int nextSegment = NextSegment(text, index, service._separatorChar);
-            string name;
+            var nextSegment = NextSegment(text, index, service._separatorChar);
 
             lock (_lockObj)
-            {
-                if (text == "")
+                switch (text)
                 {
-                    if (_name == "")
+                    case "" when _name == "":
                         throw new InvalidOperationException("Cannot add commands to the root node.");
-                    _commands = _commands.Add(command);
-                }
-                else
-                {
-                    if (nextSegment == -1)
-                        name = text.Substring(index);
-                    else
-                        name = text.Substring(index, nextSegment - index);
+                    case "":
+                        _commands = _commands.Add(command);
+                        break;
+                    default:
+                        var name = nextSegment == -1
+                            ? text.Substring(index)
+                            : text.Substring(index, nextSegment - index);
 
-                    string fullName = _name == "" ? name : _name + service._separatorChar + name;
-                    var nextNode = _nodes.GetOrAdd(name, x => new CommandMapNode(fullName));
-                    nextNode.AddCommand(service, nextSegment == -1 ? "" : text, nextSegment + 1, command);
+                        var fullName = _name == "" ? name : _name + service._separatorChar + name;
+                        var nextNode = _nodes.GetOrAdd(name, x => new CommandMapNode(fullName));
+                        nextNode.AddCommand(service, nextSegment == -1 ? "" : text, nextSegment + 1, command);
+                        break;
                 }
-            }
         }
+
         public void RemoveCommand(CommandService service, string text, int index, CommandInfo command)
         {
-            int nextSegment = NextSegment(text, index, service._separatorChar);
-            string name;
+            var nextSegment = NextSegment(text, index, service._separatorChar);
 
             lock (_lockObj)
-            {
                 if (text == "")
                     _commands = _commands.Remove(command);
                 else
                 {
-                    if (nextSegment == -1)
-                        name = text.Substring(index);
-                    else
-                        name = text.Substring(index, nextSegment - index);
+                    var name = nextSegment == -1 ? text.Substring(index) : text.Substring(index, nextSegment - index);
 
-                    CommandMapNode nextNode;
-                    if (_nodes.TryGetValue(name, out nextNode))
-                    {
-                        nextNode.RemoveCommand(service, nextSegment == -1 ? "" : text, nextSegment + 1, command);
-                        if (nextNode.IsEmpty)
-                            _nodes.TryRemove(name, out nextNode);
-                    }
+                    if (!_nodes.TryGetValue(name, out var nextNode)) return;
+                    nextNode.RemoveCommand(service, nextSegment == -1 ? "" : text, nextSegment + 1, command);
+                    if (nextNode.IsEmpty)
+                        _nodes.TryRemove(name, out nextNode);
                 }
-            }
         }
 
-        public IEnumerable<CommandMatch> GetCommands(CommandService service, string text, int index, bool visitChildren = true)
+        public IEnumerable<CommandMatch> GetCommands(CommandService service, string text, int index,
+            bool visitChildren = true)
         {
             var commands = _commands;
-            for (int i = 0; i < commands.Length; i++)
+            for (var i = 0; i < commands.Length; i++)
                 yield return new CommandMatch(_commands[i], _name);
 
-            if (visitChildren)
+            if (!visitChildren) yield break;
+            //Search for next segment
+            var nextSegment = NextSegment(text, index, service._separatorChar);
+            var name = nextSegment == -1 ? text.Substring(index) : text.Substring(index, nextSegment - index);
+            if (_nodes.TryGetValue(name, out var nextNode))
+                foreach (var cmd in nextNode.GetCommands(service, nextSegment == -1 ? "" : text, nextSegment + 1))
+                    yield return cmd;
+
+            //Check if this is the last command segment before args
+            nextSegment = NextSegment(text, index, _whitespaceChars, service._separatorChar);
+            if (nextSegment == -1) yield break;
             {
-                string name;
-                CommandMapNode nextNode;
-
-                //Search for next segment
-                int nextSegment = NextSegment(text, index, service._separatorChar);
-                if (nextSegment == -1)
-                    name = text.Substring(index);
-                else
-                    name = text.Substring(index, nextSegment - index);
-                if (_nodes.TryGetValue(name, out nextNode))
-                {
-                    foreach (var cmd in nextNode.GetCommands(service, nextSegment == -1 ? "" : text, nextSegment + 1, true))
-                        yield return cmd;
-                }
-
-                //Check if this is the last command segment before args
-                nextSegment = NextSegment(text, index, _whitespaceChars, service._separatorChar);
-                if (nextSegment != -1)
-                {
-                    name = text.Substring(index, nextSegment - index);
-                    if (_nodes.TryGetValue(name, out nextNode))
-                    {
-                        foreach (var cmd in nextNode.GetCommands(service, nextSegment == -1 ? "" : text, nextSegment + 1, false))
-                            yield return cmd;
-                    }
-                }
+                name = text.Substring(index, nextSegment - index);
+                if (!_nodes.TryGetValue(name, out nextNode)) yield break;
+                foreach (var cmd in nextNode.GetCommands(service, nextSegment == -1 ? "" : text,
+                    nextSegment + 1, false))
+                    yield return cmd;
             }
         }
 
-        private static int NextSegment(string text, int startIndex, char separator)
-        {
-            return text.IndexOf(separator, startIndex);
-        }
+        private static int NextSegment(string text, int startIndex, char separator) =>
+            text.IndexOf(separator, startIndex);
+
         private static int NextSegment(string text, int startIndex, char[] separators, char except)
         {
-            int lowest = int.MaxValue;
-            for (int i = 0; i < separators.Length; i++)
-            {
-                if (separators[i] != except)
+            var lowest = int.MaxValue;
+            foreach (var t in separators)
+                if (t != except)
                 {
-                    int index = text.IndexOf(separators[i], startIndex);
+                    var index = text.IndexOf(t, startIndex);
                     if (index != -1 && index < lowest)
                         lowest = index;
                 }
-            }
-            return (lowest != int.MaxValue) ? lowest : -1;
+
+            return lowest != int.MaxValue ? lowest : -1;
         }
     }
 }

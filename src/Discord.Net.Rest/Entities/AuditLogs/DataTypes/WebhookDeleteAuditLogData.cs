@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using System.Linq;
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -19,6 +14,12 @@ namespace Discord.Rest
             Type = type;
             Avatar = avatar;
         }
+
+        public ulong WebhookId { get; }
+        public ulong ChannelId { get; }
+        public WebhookType Type { get; }
+        public string Name { get; }
+        public string Avatar { get; }
 
         internal static WebhookDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
@@ -36,11 +37,5 @@ namespace Discord.Rest
 
             return new WebhookDeleteAuditLogData(entry.TargetId.Value, channelId, type, name, avatarHash);
         }
-
-        public ulong WebhookId { get; }
-        public ulong ChannelId { get; }
-        public WebhookType Type { get; }
-        public string Name { get; }
-        public string Avatar { get; }
     }
 }
