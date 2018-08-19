@@ -7,6 +7,11 @@ namespace Discord.API.Rest
 {
     internal class UploadWebhookFileParams
     {
+        public UploadWebhookFileParams(Stream file)
+        {
+            File = file;
+        }
+
         public Stream File { get; }
 
         public Optional<string> Filename { get; set; }
@@ -16,11 +21,6 @@ namespace Discord.API.Rest
         public Optional<string> Username { get; set; }
         public Optional<string> AvatarUrl { get; set; }
         public Optional<Embed[]> Embeds { get; set; }
-
-        public UploadWebhookFileParams(Stream file)
-        {
-            File = file;
-        }
 
         public IReadOnlyDictionary<string, object> ToDictionary()
         {

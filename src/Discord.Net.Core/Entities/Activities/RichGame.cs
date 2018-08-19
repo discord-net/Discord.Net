@@ -2,10 +2,12 @@ using System.Diagnostics;
 
 namespace Discord
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
+    [DebuggerDisplay(@"{" + nameof(DebuggerDisplay) + @",nq}")]
     public class RichGame : Game
     {
-        internal RichGame() { }
+        internal RichGame()
+        {
+        }
 
         public string Details { get; internal set; }
         public string State { get; internal set; }
@@ -15,8 +17,8 @@ namespace Discord
         public GameParty Party { get; internal set; }
         public GameSecrets Secrets { get; internal set; }
         public GameTimestamps Timestamps { get; internal set; }
-        
-        public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} (Rich)";
+
+        public override string ToString() => Name;
     }
 }

@@ -5,10 +5,20 @@ using Model = Discord.API.Webhook;
 
 namespace Discord.Webhook
 {
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
+    [DebuggerDisplay(@"{" + nameof(DebuggerDisplay) + @",nq}")]
     internal class RestInternalWebhook : IWebhook
     {
-        private DiscordWebhookClient _client;
+        private readonly DiscordWebhookClient _client;
+
+        internal RestInternalWebhook(DiscordWebhookClient apiClient, Model model)
+        {
+            _client = apiClient;
+            Id = model.Id;
+            ChannelId = model.Id;
+            Token = model.Token;
+        }
+
+        private string DebuggerDisplay => $"Webhook: {Name} ({Id})";
 
         public ulong Id { get; }
         public ulong ChannelId { get; }
@@ -20,13 +30,22 @@ namespace Discord.Webhook
 
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
-        internal RestInternalWebhook(DiscordWebhookClient apiClient, Model model)
+        public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
+
+        public async Task ModifyAsync(Action<WebhookProperties> func, RequestOptions options = null)
         {
-            _client = apiClient;
-            Id = model.Id;
-            ChannelId = model.Id;
-            Token = model.Token;
+            var model = await WebhookClientHelper.ModifyAsync(_client, func, options);
+            Update(model);
         }
+
+        public Task DeleteAsync(RequestOptions options = null)
+            => WebhookClientHelper.DeleteAsync(_client, options);
+
+        IUser IWebhook.Creator => null;
+        ITextChannel IWebhook.Channel => null;
+        IGuild IWebhook.Guild => null;
+
         internal static RestInternalWebhook Create(DiscordWebhookClient client, Model model)
         {
             var entity = new RestInternalWebhook(client, model);
@@ -44,23 +63,6 @@ namespace Discord.Webhook
                 Name = model.Name.Value;
         }
 
-        public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-           => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
-
-        public async Task ModifyAsync(Action<WebhookProperties> func, RequestOptions options = null)
-        {
-            var model = await WebhookClientHelper.ModifyAsync(_client, func, options);
-            Update(model);
-        }
-
-        public Task DeleteAsync(RequestOptions options = null)
-            => WebhookClientHelper.DeleteAsync(_client, options);
-
         public override string ToString() => $"Webhook: {Name}:{Id}";
-        private string DebuggerDisplay => $"Webhook: {Name} ({Id})";
-
-        IUser IWebhook.Creator => null;
-        ITextChannel IWebhook.Channel => null;
-        IGuild IWebhook.Guild => null;
     }
 }

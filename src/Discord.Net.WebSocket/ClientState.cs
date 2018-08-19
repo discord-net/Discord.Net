@@ -13,44 +13,50 @@ namespace Discord.WebSocket
 
         private readonly ConcurrentDictionary<ulong, SocketChannel> _channels;
         private readonly ConcurrentDictionary<ulong, SocketDMChannel> _dmChannels;
+        private readonly ConcurrentHashSet<ulong> _groupChannels;
         private readonly ConcurrentDictionary<ulong, SocketGuild> _guilds;
         private readonly ConcurrentDictionary<ulong, SocketGlobalUser> _users;
-        private readonly ConcurrentHashSet<ulong> _groupChannels;
+
+        public ClientState(int guildCount, int dmChannelCount)
+        {
+            var estimatedChannelCount = guildCount * AverageChannelsPerGuild + dmChannelCount;
+            var estimatedUsersCount = guildCount * AverageUsersPerGuild;
+            _channels = new ConcurrentDictionary<ulong, SocketChannel>(ConcurrentHashSet.DefaultConcurrencyLevel,
+                (int)(estimatedChannelCount * CollectionMultiplier));
+            _dmChannels = new ConcurrentDictionary<ulong, SocketDMChannel>(ConcurrentHashSet.DefaultConcurrencyLevel,
+                (int)(dmChannelCount * CollectionMultiplier));
+            _guilds = new ConcurrentDictionary<ulong, SocketGuild>(ConcurrentHashSet.DefaultConcurrencyLevel,
+                (int)(guildCount * CollectionMultiplier));
+            _users = new ConcurrentDictionary<ulong, SocketGlobalUser>(ConcurrentHashSet.DefaultConcurrencyLevel,
+                (int)(estimatedUsersCount * CollectionMultiplier));
+            _groupChannels = new ConcurrentHashSet<ulong>(ConcurrentHashSet.DefaultConcurrencyLevel,
+                (int)(10 * CollectionMultiplier));
+        }
 
         internal IReadOnlyCollection<SocketChannel> Channels => _channels.ToReadOnlyCollection();
         internal IReadOnlyCollection<SocketDMChannel> DMChannels => _dmChannels.ToReadOnlyCollection();
-        internal IReadOnlyCollection<SocketGroupChannel> GroupChannels => _groupChannels.Select(x => GetChannel(x) as SocketGroupChannel).ToReadOnlyCollection(_groupChannels);
+
+        internal IReadOnlyCollection<SocketGroupChannel> GroupChannels => _groupChannels
+            .Select(x => GetChannel(x) as SocketGroupChannel).ToReadOnlyCollection(_groupChannels);
+
         internal IReadOnlyCollection<SocketGuild> Guilds => _guilds.ToReadOnlyCollection();
         internal IReadOnlyCollection<SocketGlobalUser> Users => _users.ToReadOnlyCollection();
 
         internal IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels =>
             _dmChannels.Select(x => x.Value as ISocketPrivateChannel).Concat(
-                _groupChannels.Select(x => GetChannel(x) as ISocketPrivateChannel))
-            .ToReadOnlyCollection(() => _dmChannels.Count + _groupChannels.Count);
-
-        public ClientState(int guildCount, int dmChannelCount)
-        {
-            double estimatedChannelCount = guildCount * AverageChannelsPerGuild + dmChannelCount;
-            double estimatedUsersCount = guildCount * AverageUsersPerGuild;
-            _channels = new ConcurrentDictionary<ulong, SocketChannel>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(estimatedChannelCount * CollectionMultiplier));
-            _dmChannels = new ConcurrentDictionary<ulong, SocketDMChannel>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(dmChannelCount * CollectionMultiplier));
-            _guilds = new ConcurrentDictionary<ulong, SocketGuild>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(guildCount * CollectionMultiplier));
-            _users = new ConcurrentDictionary<ulong, SocketGlobalUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
-            _groupChannels = new ConcurrentHashSet<ulong>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(10 * CollectionMultiplier));
-        }
+                    _groupChannels.Select(x => GetChannel(x) as ISocketPrivateChannel))
+                .ToReadOnlyCollection(() => _dmChannels.Count + _groupChannels.Count);
 
         internal SocketChannel GetChannel(ulong id)
         {
-            if (_channels.TryGetValue(id, out SocketChannel channel))
-                return channel;
-            return null;
+            return _channels.TryGetValue(id, out var channel) ? channel : null;
         }
+
         internal SocketDMChannel GetDMChannel(ulong userId)
         {
-            if (_dmChannels.TryGetValue(userId, out SocketDMChannel channel))
-                return channel;
-            return null;
+            return _dmChannels.TryGetValue(userId, out var channel) ? channel : null;
         }
+
         internal void AddChannel(SocketChannel channel)
         {
             _channels[channel.Id] = channel;
@@ -65,56 +71,47 @@ namespace Discord.WebSocket
                     break;
             }
         }
+
         internal SocketChannel RemoveChannel(ulong id)
         {
-            if (_channels.TryRemove(id, out SocketChannel channel))
+            if (!_channels.TryRemove(id, out var channel)) return null;
+            switch (channel)
             {
-                switch (channel)
-                {
-                    case SocketDMChannel dmChannel:
-                        _dmChannels.TryRemove(dmChannel.Recipient.Id, out var ignored);
-                        break;
-                    case SocketGroupChannel groupChannel:
-                        _groupChannels.TryRemove(id);
-                        break;
-                }
-                return channel;
+                case SocketDMChannel dmChannel:
+                    _dmChannels.TryRemove(dmChannel.Recipient.Id, out var ignored);
+                    break;
+                case SocketGroupChannel groupChannel:
+                    _groupChannels.TryRemove(id);
+                    break;
             }
-            return null;
+
+            return channel;
+
         }
 
         internal SocketGuild GetGuild(ulong id)
         {
-            if (_guilds.TryGetValue(id, out SocketGuild guild))
-                return guild;
-            return null;
+            return _guilds.TryGetValue(id, out var guild) ? guild : null;
         }
-        internal void AddGuild(SocketGuild guild)
-        {
-            _guilds[guild.Id] = guild;
-        }
+
+        internal void AddGuild(SocketGuild guild) => _guilds[guild.Id] = guild;
+
         internal SocketGuild RemoveGuild(ulong id)
         {
-            if (_guilds.TryRemove(id, out SocketGuild guild))
-                return guild;
-            return null;
+            return _guilds.TryRemove(id, out var guild) ? guild : null;
         }
 
         internal SocketGlobalUser GetUser(ulong id)
         {
-            if (_users.TryGetValue(id, out SocketGlobalUser user))
-                return user;
-            return null;
+            return _users.TryGetValue(id, out var user) ? user : null;
         }
-        internal SocketGlobalUser GetOrAddUser(ulong id, Func<ulong, SocketGlobalUser> userFactory)
-        {
-            return _users.GetOrAdd(id, userFactory);
-        }
+
+        internal SocketGlobalUser GetOrAddUser(ulong id, Func<ulong, SocketGlobalUser> userFactory) =>
+            _users.GetOrAdd(id, userFactory);
+
         internal SocketGlobalUser RemoveUser(ulong id)
         {
-            if (_users.TryRemove(id, out SocketGlobalUser user))
-                return user;
-            return null;
+            return _users.TryRemove(id, out var user) ? user : null;
         }
     }
 }

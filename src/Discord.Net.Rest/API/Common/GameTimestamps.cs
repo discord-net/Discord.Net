@@ -8,8 +8,7 @@ namespace Discord.API
         [JsonProperty("start")]
         [UnixTimestamp]
         public Optional<DateTimeOffset> Start { get; set; }
-        [JsonProperty("end")]
-        [UnixTimestamp]
-        public Optional<DateTimeOffset> End { get; set; }
+
+        [JsonProperty("end")] [UnixTimestamp] public Optional<DateTimeOffset> End { get; set; }
     }
 }

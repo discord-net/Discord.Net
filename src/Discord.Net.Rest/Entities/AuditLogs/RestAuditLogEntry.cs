@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -17,6 +16,21 @@ namespace Discord.Rest
             Reason = model.Reason;
         }
 
+        /// <inheritdoc />
+        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
+
+        /// <inheritdoc />
+        public ActionType Action { get; }
+
+        /// <inheritdoc />
+        public IAuditLogData Data { get; }
+
+        /// <inheritdoc />
+        public IUser User { get; }
+
+        /// <inheritdoc />
+        public string Reason { get; }
+
         internal static RestAuditLogEntry Create(BaseDiscordClient discord, Model fullLog, EntryModel model)
         {
             var userInfo = fullLog.Users.FirstOrDefault(x => x.Id == model.UserId);
@@ -26,16 +40,5 @@ namespace Discord.Rest
 
             return new RestAuditLogEntry(discord, fullLog, model, user);
         }
-
-        /// <inheritdoc/>
-        public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
-        /// <inheritdoc/>
-        public ActionType Action { get; }
-        /// <inheritdoc/>
-        public IAuditLogData Data { get; }
-        /// <inheritdoc/>
-        public IUser User { get; }
-        /// <inheritdoc/>
-        public string Reason { get; }
     }
 }

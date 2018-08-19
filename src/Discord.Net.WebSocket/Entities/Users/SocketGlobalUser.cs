@@ -8,6 +8,14 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     internal class SocketGlobalUser : SocketUser
     {
+        private readonly object _lockObj = new object();
+        private ushort _references;
+
+        private SocketGlobalUser(DiscordSocketClient discord, ulong id)
+            : base(discord, id)
+        {
+        }
+
         public override bool IsBot { get; internal set; }
         public override string Username { get; internal set; }
         public override ushort DiscriminatorValue { get; internal set; }
@@ -18,13 +26,6 @@ namespace Discord.WebSocket
         public override bool IsWebhook => false;
         internal override SocketGlobalUser GlobalUser => this;
 
-        private readonly object _lockObj = new object();
-        private ushort _references;
-
-        private SocketGlobalUser(DiscordSocketClient discord, ulong id)
-            : base(discord, id)
-        {
-        }
         internal static SocketGlobalUser Create(DiscordSocketClient discord, ClientState state, Model model)
         {
             var entity = new SocketGlobalUser(discord, model.Id);
@@ -40,21 +41,20 @@ namespace Discord.WebSocket
                     _references++;
             }
         }
+
         internal void RemoveRef(DiscordSocketClient discord)
         {
             lock (_lockObj)
-            {
                 if (--_references <= 0)
                     discord.RemoveUser(Id);
-            }
         }
-        
+
         internal void Update(ClientState state, PresenceModel model)
         {
             Presence = SocketPresence.Create(model);
             DMChannel = state.DMChannels.FirstOrDefault(x => x.Recipient.Id == Id);
         }
-        
+
         internal new SocketGlobalUser Clone() => MemberwiseClone() as SocketGlobalUser;
     }
 }

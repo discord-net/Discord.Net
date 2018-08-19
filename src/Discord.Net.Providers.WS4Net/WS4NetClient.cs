@@ -1,10 +1,11 @@
-﻿using Discord.Net.WebSockets;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Discord.Net.WebSockets;
+using SuperSocket.ClientEngine;
 using WebSocket4Net;
 using WS4NetSocket = WebSocket4Net.WebSocket;
 
@@ -12,17 +13,14 @@ namespace Discord.Net.Providers.WS4Net
 {
     internal class WS4NetClient : IWebSocketClient, IDisposable
     {
-        public event Func<byte[], int, int, Task> BinaryMessage;
-        public event Func<string, Task> TextMessage;
-        public event Func<Exception, Task> Closed;
+        private readonly Dictionary<string, string> _headers;
 
         private readonly SemaphoreSlim _lock;
-        private readonly Dictionary<string, string> _headers;
-        private WS4NetSocket _client;
-        private CancellationTokenSource _cancelTokenSource;
         private CancellationToken _cancelToken, _parentToken;
-        private ManualResetEventSlim _waitUntilConnect;
+        private CancellationTokenSource _cancelTokenSource;
+        private WS4NetSocket _client;
         private bool _isDisposed;
+        private readonly ManualResetEventSlim _waitUntilConnect;
 
         public WS4NetClient()
         {
@@ -33,19 +31,12 @@ namespace Discord.Net.Providers.WS4Net
             _parentToken = CancellationToken.None;
             _waitUntilConnect = new ManualResetEventSlim();
         }
-        private void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                    DisconnectInternalAsync(true).GetAwaiter().GetResult();
-                _isDisposed = true;
-            }
-        }
-        public void Dispose()
-        {
-            Dispose(true);
-        }
+
+        public void Dispose() => Dispose(true);
+
+        public event Func<byte[], int, int, Task> BinaryMessage;
+        public event Func<string, Task> TextMessage;
+        public event Func<Exception, Task> Closed;
 
         public async Task ConnectAsync(string host)
         {
@@ -58,28 +49,6 @@ namespace Discord.Net.Providers.WS4Net
             {
                 _lock.Release();
             }
-        }
-        private async Task ConnectInternalAsync(string host)
-        {
-            await DisconnectInternalAsync().ConfigureAwait(false);
-
-            _cancelTokenSource = new CancellationTokenSource();
-            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
-
-            _client = new WS4NetSocket(host, "", customHeaderItems: _headers.ToList())
-            {
-                EnableAutoSendPing = false,
-                NoDelay = true,
-                Proxy = null
-            };
-
-            _client.MessageReceived += OnTextMessage;
-            _client.DataReceived += OnBinaryMessage;
-            _client.Opened += OnConnected;
-            _client.Closed += OnClosed;
-
-            _client.Open();
-            _waitUntilConnect.Wait(_cancelToken);
         }
 
         public async Task DisconnectAsync()
@@ -94,39 +63,14 @@ namespace Discord.Net.Providers.WS4Net
                 _lock.Release();
             }
         }
-        private Task DisconnectInternalAsync(bool isDisposing = false)
-        {
-            _cancelTokenSource.Cancel();
-            if (_client == null)
-                return Task.Delay(0);
 
-            if (_client.State == WebSocketState.Open)
-            {
-                try { _client.Close(1000, ""); }
-                catch { }
-            }
+        public void SetHeader(string key, string value) => _headers[key] = value;
 
-            _client.MessageReceived -= OnTextMessage;
-            _client.DataReceived -= OnBinaryMessage;
-            _client.Opened -= OnConnected;
-            _client.Closed -= OnClosed;
-
-            try { _client.Dispose(); }
-            catch { }
-            _client = null;
-
-            _waitUntilConnect.Reset();
-            return Task.Delay(0);
-        }
-
-        public void SetHeader(string key, string value)
-        {
-            _headers[key] = value;
-        }
         public void SetCancelToken(CancellationToken cancelToken)
         {
             _parentToken = cancelToken;
-            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
+            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token)
+                .Token;
         }
 
         public async Task SendAsync(byte[] data, int index, int count, bool isText)
@@ -145,21 +89,83 @@ namespace Discord.Net.Providers.WS4Net
             }
         }
 
-        private void OnTextMessage(object sender, MessageReceivedEventArgs e)
+        private void Dispose(bool disposing)
         {
+            if (_isDisposed) return;
+            if (disposing)
+                DisconnectInternalAsync(true).GetAwaiter().GetResult();
+            _isDisposed = true;
+        }
+
+        private async Task ConnectInternalAsync(string host)
+        {
+            await DisconnectInternalAsync().ConfigureAwait(false);
+
+            _cancelTokenSource = new CancellationTokenSource();
+            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token)
+                .Token;
+
+            _client = new WS4NetSocket(host, "", customHeaderItems: _headers.ToList())
+            {
+                EnableAutoSendPing = false,
+                NoDelay = true,
+                Proxy = null
+            };
+
+            _client.MessageReceived += OnTextMessage;
+            _client.DataReceived += OnBinaryMessage;
+            _client.Opened += OnConnected;
+            _client.Closed += OnClosed;
+
+            _client.Open();
+            _waitUntilConnect.Wait(_cancelToken);
+        }
+
+        private Task DisconnectInternalAsync(bool isDisposing = false)
+        {
+            _cancelTokenSource.Cancel();
+            if (_client == null)
+                return Task.Delay(0);
+
+            if (_client.State == WebSocketState.Open)
+                try
+                {
+                    _client.Close(1000, "");
+                }
+                catch
+                {
+                }
+
+            _client.MessageReceived -= OnTextMessage;
+            _client.DataReceived -= OnBinaryMessage;
+            _client.Opened -= OnConnected;
+            _client.Closed -= OnClosed;
+
+            try
+            {
+                _client.Dispose();
+            }
+            catch
+            {
+            }
+
+            _client = null;
+
+            _waitUntilConnect.Reset();
+            return Task.Delay(0);
+        }
+
+        private void OnTextMessage(object sender, MessageReceivedEventArgs e) =>
             TextMessage(e.Message).GetAwaiter().GetResult();
-        }
-        private void OnBinaryMessage(object sender, DataReceivedEventArgs e)
-        {
-            BinaryMessage(e.Data, 0, e.Data.Count()).GetAwaiter().GetResult();
-        }
-        private void OnConnected(object sender, object e)
-        {
-            _waitUntilConnect.Set();
-        }
+
+        private void OnBinaryMessage(object sender, DataReceivedEventArgs e) =>
+            BinaryMessage(e.Data, 0, e.Data.Length).GetAwaiter().GetResult();
+
+        private void OnConnected(object sender, object e) => _waitUntilConnect.Set();
+
         private void OnClosed(object sender, object e)
         {
-            var ex = (e as SuperSocket.ClientEngine.ErrorEventArgs)?.Exception ?? new Exception("Unexpected close");
+            var ex = (e as ErrorEventArgs)?.Exception ?? new Exception("Unexpected close");
             Closed(ex).GetAwaiter().GetResult();
         }
     }

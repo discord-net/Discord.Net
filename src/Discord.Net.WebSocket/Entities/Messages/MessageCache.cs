@@ -12,39 +12,38 @@ namespace Discord.WebSocket
         private readonly ConcurrentQueue<ulong> _orderedMessages;
         private readonly int _size;
 
-        public IReadOnlyCollection<SocketMessage> Messages => _messages.ToReadOnlyCollection();
-
         public MessageCache(DiscordSocketClient discord, IChannel channel)
         {
             _size = discord.MessageCacheSize;
-            _messages = new ConcurrentDictionary<ulong, SocketMessage>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(_size * 1.05));
+            _messages = new ConcurrentDictionary<ulong, SocketMessage>(ConcurrentHashSet.DefaultConcurrencyLevel,
+                (int)(_size * 1.05));
             _orderedMessages = new ConcurrentQueue<ulong>();
         }
 
+        public IReadOnlyCollection<SocketMessage> Messages => _messages.ToReadOnlyCollection();
+
         public void Add(SocketMessage message)
         {
-            if (_messages.TryAdd(message.Id, message))
-            {
-                _orderedMessages.Enqueue(message.Id);
+            if (!_messages.TryAdd(message.Id, message)) return;
+            _orderedMessages.Enqueue(message.Id);
 
-                while (_orderedMessages.Count > _size && _orderedMessages.TryDequeue(out ulong msgId))
-                    _messages.TryRemove(msgId, out SocketMessage msg);
-            }
+            while (_orderedMessages.Count > _size && _orderedMessages.TryDequeue(out var msgId))
+                _messages.TryRemove(msgId, out _);
         }
 
         public SocketMessage Remove(ulong id)
         {
-            _messages.TryRemove(id, out SocketMessage msg);
+            _messages.TryRemove(id, out var msg);
             return msg;
         }
 
         public SocketMessage Get(ulong id)
         {
-            if (_messages.TryGetValue(id, out SocketMessage result))
-                return result;
-            return null;
+            return _messages.TryGetValue(id, out var result) ? result : null;
         }
-        public IReadOnlyCollection<SocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
+
+        public IReadOnlyCollection<SocketMessage> GetMany(ulong? fromMessageId, Direction dir,
+            int limit = DiscordConfig.MaxMessagesPerBatch)
         {
             if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));
             if (limit == 0) return ImmutableArray<SocketMessage>.Empty;
@@ -63,9 +62,7 @@ namespace Discord.WebSocket
             return cachedMessageIds
                 .Select(x =>
                 {
-                    if (_messages.TryGetValue(x, out SocketMessage msg))
-                        return msg;
-                    return null;
+                    return _messages.TryGetValue(x, out var msg) ? msg : null;
                 })
                 .Where(x => x != null)
                 .Take(limit)

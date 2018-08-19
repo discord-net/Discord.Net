@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -14,6 +13,14 @@ namespace Discord.Rest
             Type = type;
             ChannelId = channelId;
         }
+
+        //Corresponds to the *current* data
+        public IWebhook Webhook { get; }
+
+        //Corresponds to the *audit log* data
+        public WebhookType Type { get; }
+        public string Name { get; }
+        public ulong ChannelId { get; }
 
         internal static WebhookCreateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
@@ -32,13 +39,5 @@ namespace Discord.Rest
 
             return new WebhookCreateAuditLogData(webhook, type, name, channelId);
         }
-
-        //Corresponds to the *current* data
-        public IWebhook Webhook { get; }
-
-        //Corresponds to the *audit log* data
-        public WebhookType Type { get; }
-        public string Name { get; }
-        public ulong ChannelId { get; }
     }
 }

@@ -7,9 +7,9 @@ namespace Discord
 {
     public partial class TestsFixture : IDisposable
     {
-        private readonly TestConfig _config;
         private readonly CachedRestClient _cache;
         internal readonly DiscordRestClient _client;
+        private readonly TestConfig _config;
         internal readonly RestGuild _guild;
 
         public TestsFixture()
@@ -42,7 +42,7 @@ namespace Discord
     public partial class Tests : IClassFixture<TestsFixture>
     {
         private DiscordRestClient _client;
-        private RestGuild _guild;
+        private readonly RestGuild _guild;
 
         public Tests(TestsFixture fixture)
         {

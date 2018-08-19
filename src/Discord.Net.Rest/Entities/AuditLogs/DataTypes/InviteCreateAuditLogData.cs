@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -7,7 +6,8 @@ namespace Discord.Rest
 {
     public class InviteCreateAuditLogData : IAuditLogData
     {
-        private InviteCreateAuditLogData(int maxAge, string code, bool temporary, IUser inviter, ulong channelId, int uses, int maxUses)
+        private InviteCreateAuditLogData(int maxAge, string code, bool temporary, IUser inviter, ulong channelId,
+            int uses, int maxUses)
         {
             MaxAge = maxAge;
             Code = code;
@@ -17,6 +17,14 @@ namespace Discord.Rest
             Uses = uses;
             MaxUses = maxUses;
         }
+
+        public int MaxAge { get; }
+        public string Code { get; }
+        public bool Temporary { get; }
+        public IUser Creator { get; }
+        public ulong ChannelId { get; }
+        public int Uses { get; }
+        public int MaxUses { get; }
 
         internal static InviteCreateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
@@ -43,13 +51,5 @@ namespace Discord.Rest
 
             return new InviteCreateAuditLogData(maxAge, code, temporary, inviter, channelId, uses, maxUses);
         }
-
-        public int MaxAge { get; }
-        public string Code { get; }
-        public bool Temporary { get; }
-        public IUser Creator { get; }
-        public ulong ChannelId { get; }
-        public int Uses { get; }
-        public int MaxUses { get; }
     }
 }

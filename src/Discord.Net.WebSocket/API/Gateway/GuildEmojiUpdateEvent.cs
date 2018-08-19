@@ -5,9 +5,8 @@ namespace Discord.API.Gateway
 {
     internal class GuildEmojiUpdateEvent
     {
-        [JsonProperty("guild_id")]
-        public ulong GuildId { get; set; }
-        [JsonProperty("emojis")]
-        public Emoji[] Emojis { get; set; }
+        [JsonProperty("guild_id")] public ulong GuildId { get; set; }
+
+        [JsonProperty("emojis")] public Emoji[] Emojis { get; set; }
     }
 }

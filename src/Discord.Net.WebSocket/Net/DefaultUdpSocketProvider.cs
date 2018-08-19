@@ -4,7 +4,7 @@ namespace Discord.Net.Udp
 {
     public static class DefaultUdpSocketProvider
     {
-        public static readonly UdpSocketProvider Instance = () => 
+        public static readonly UdpSocketProvider Instance = () =>
         {
             try
             {
@@ -12,7 +12,8 @@ namespace Discord.Net.Udp
             }
             catch (PlatformNotSupportedException ex)
             {
-                throw new PlatformNotSupportedException("The default UdpSocketProvider is not supported on this platform.", ex);
+                throw new PlatformNotSupportedException(
+                    "The default UdpSocketProvider is not supported on this platform.", ex);
             }
         };
     }

@@ -8,12 +8,12 @@ namespace Discord.Audio.Streams
     public class OpusDecodeStream : AudioOutStream
     {
         public const int SampleRate = OpusEncodeStream.SampleRate;
+        private readonly byte[] _buffer;
+        private readonly OpusDecoder _decoder;
 
         private readonly AudioStream _next;
-        private readonly OpusDecoder _decoder;
-        private readonly byte[] _buffer;
-        private bool _nextMissed;
         private bool _hasHeader;
+        private bool _nextMissed;
 
         public OpusDecodeStream(AudioStream next)
         {
@@ -25,12 +25,13 @@ namespace Discord.Audio.Streams
         public override void WriteHeader(ushort seq, uint timestamp, bool missed)
         {
             if (_hasHeader)
-                throw new InvalidOperationException("Header received with no payload");                
+                throw new InvalidOperationException("Header received with no payload");
             _hasHeader = true;
 
             _nextMissed = missed;
             _next.WriteHeader(seq, timestamp, missed);
         }
+
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
             if (!_hasHeader)
@@ -54,14 +55,11 @@ namespace Discord.Audio.Streams
             }
         }
 
-        public override async Task FlushAsync(CancellationToken cancelToken)
-        {
+        public override async Task FlushAsync(CancellationToken cancelToken) =>
             await _next.FlushAsync(cancelToken).ConfigureAwait(false);
-        }
-        public override async Task ClearAsync(CancellationToken cancelToken)
-        {
+
+        public override async Task ClearAsync(CancellationToken cancelToken) =>
             await _next.ClearAsync(cancelToken).ConfigureAwait(false);
-        }
 
         protected override void Dispose(bool disposing)
         {

@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -13,6 +12,10 @@ namespace Discord.Rest
             Before = before;
             After = after;
         }
+
+        public ulong ChannelId { get; }
+        public ChannelInfo Before { get; }
+        public ChannelInfo After { get; }
 
         internal static ChannelUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
@@ -37,9 +40,5 @@ namespace Discord.Rest
 
             return new ChannelUpdateAuditLogData(entry.TargetId.Value, before, after);
         }
-
-        public ulong ChannelId { get; }
-        public ChannelInfo Before { get; }
-        public ChannelInfo After { get; }
     }
 }

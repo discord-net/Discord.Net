@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using System.Linq;
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -17,6 +12,13 @@ namespace Discord.Rest
             Before = before;
             After = after;
         }
+
+        //Again, the *current* data
+        public IWebhook Webhook { get; }
+
+        //And the *audit log* data
+        public WebhookInfo Before { get; }
+        public WebhookInfo After { get; }
 
         internal static WebhookUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
@@ -41,12 +43,5 @@ namespace Discord.Rest
 
             return new WebhookUpdateAuditLogData(webhook, before, after);
         }
-
-        //Again, the *current* data
-        public IWebhook Webhook { get; }
-
-        //And the *audit log* data
-        public WebhookInfo Before { get; }
-        public WebhookInfo After { get; }
     }
 }

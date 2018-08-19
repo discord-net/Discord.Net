@@ -3,5 +3,7 @@
 namespace Discord.API
 {
     [AttributeUsage(AttributeTargets.Property)]
-    internal class UnixTimestampAttribute : Attribute { }
+    internal class UnixTimestampAttribute : Attribute
+    {
+    }
 }

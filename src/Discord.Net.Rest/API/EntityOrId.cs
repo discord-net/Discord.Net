@@ -10,6 +10,7 @@
             Id = id;
             Object = default(T);
         }
+
         public EntityOrId(T obj)
         {
             Id = 0;

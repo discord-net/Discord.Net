@@ -10,7 +10,22 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketWebhookUser : SocketUser, IWebhookUser
     {
+        internal SocketWebhookUser(SocketGuild guild, ulong id, ulong webhookId)
+            : base(guild.Discord, id)
+        {
+            Guild = guild;
+            WebhookId = webhookId;
+        }
+
         public SocketGuild Guild { get; }
+
+        internal override SocketPresence Presence
+        {
+            get => new SocketPresence(UserStatus.Offline, null);
+            set { }
+        }
+
+        internal override SocketGlobalUser GlobalUser => throw new NotSupportedException();
         public ulong WebhookId { get; }
 
         public override string Username { get; internal set; }
@@ -19,24 +34,6 @@ namespace Discord.WebSocket
         public override bool IsBot { get; internal set; }
 
         public override bool IsWebhook => true;
-
-        internal override SocketPresence Presence { get { return new SocketPresence(UserStatus.Offline, null); } set { } }
-        internal override SocketGlobalUser GlobalUser { get { throw new NotSupportedException(); } }
-
-        internal SocketWebhookUser(SocketGuild guild, ulong id, ulong webhookId)
-            : base(guild.Discord, id)
-        {
-            Guild = guild;
-            WebhookId = webhookId;
-        }
-        internal static SocketWebhookUser Create(SocketGuild guild, ClientState state, Model model, ulong webhookId)
-        {
-            var entity = new SocketWebhookUser(guild, model.Id, webhookId);
-            entity.Update(state, model);
-            return entity;
-        }
-
-        internal new SocketWebhookUser Clone() => MemberwiseClone() as SocketWebhookUser;
 
 
         //IGuildUser
@@ -47,32 +44,26 @@ namespace Discord.WebSocket
         string IGuildUser.Nickname => null;
         GuildPermissions IGuildUser.GuildPermissions => GuildPermissions.Webhook;
 
-        ChannelPermissions IGuildUser.GetPermissions(IGuildChannel channel) => Permissions.ToChannelPerms(channel, GuildPermissions.Webhook.RawValue);
-        Task IGuildUser.KickAsync(string reason, RequestOptions options)
-        {
-            throw new NotSupportedException("Webhook users cannot be kicked.");
-        }
-        Task IGuildUser.ModifyAsync(Action<GuildUserProperties> func, RequestOptions options)
-        {
-            throw new NotSupportedException("Webhook users cannot be modified.");
-        }
+        ChannelPermissions IGuildUser.GetPermissions(IGuildChannel channel) =>
+            Permissions.ToChannelPerms(channel, GuildPermissions.Webhook.RawValue);
 
-        Task IGuildUser.AddRoleAsync(IRole role, RequestOptions options)
-        {
+        Task IGuildUser.KickAsync(string reason, RequestOptions options) =>
+            throw new NotSupportedException("Webhook users cannot be kicked.");
+
+        Task IGuildUser.ModifyAsync(Action<GuildUserProperties> func, RequestOptions options) =>
+            throw new NotSupportedException("Webhook users cannot be modified.");
+
+        Task IGuildUser.AddRoleAsync(IRole role, RequestOptions options) =>
             throw new NotSupportedException("Roles are not supported on webhook users.");
-        }
-        Task IGuildUser.AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options)
-        {
+
+        Task IGuildUser.AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options) =>
             throw new NotSupportedException("Roles are not supported on webhook users.");
-        }
-        Task IGuildUser.RemoveRoleAsync(IRole role, RequestOptions options)
-        {
+
+        Task IGuildUser.RemoveRoleAsync(IRole role, RequestOptions options) =>
             throw new NotSupportedException("Roles are not supported on webhook users.");
-        }
-        Task IGuildUser.RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options)
-        {
+
+        Task IGuildUser.RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options) =>
             throw new NotSupportedException("Roles are not supported on webhook users.");
-        }
 
         //IVoiceState
         bool IVoiceState.IsDeafened => false;
@@ -82,5 +73,14 @@ namespace Discord.WebSocket
         bool IVoiceState.IsSuppressed => false;
         IVoiceChannel IVoiceState.VoiceChannel => null;
         string IVoiceState.VoiceSessionId => null;
+
+        internal static SocketWebhookUser Create(SocketGuild guild, ClientState state, Model model, ulong webhookId)
+        {
+            var entity = new SocketWebhookUser(guild, model.Id, webhookId);
+            entity.Update(state, model);
+            return entity;
+        }
+
+        internal new SocketWebhookUser Clone() => MemberwiseClone() as SocketWebhookUser;
     }
 }

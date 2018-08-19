@@ -15,19 +15,15 @@ namespace Discord.Net.WebSockets
         public const int ReceiveChunkSize = 16 * 1024; //16KB
         public const int SendChunkSize = 4 * 1024; //4KB
         private const int HR_TIMEOUT = -2147012894;
-
-        public event Func<byte[], int, int, Task> BinaryMessage;
-        public event Func<string, Task> TextMessage;
-        public event Func<Exception, Task> Closed;
+        private readonly Dictionary<string, string> _headers;
 
         private readonly SemaphoreSlim _lock;
-        private readonly Dictionary<string, string> _headers;
-        private ClientWebSocket _client;
-        private IWebProxy _proxy;
-        private Task _task;
-        private CancellationTokenSource _cancelTokenSource;
         private CancellationToken _cancelToken, _parentToken;
+        private CancellationTokenSource _cancelTokenSource;
+        private ClientWebSocket _client;
         private bool _isDisposed, _isDisconnecting;
+        private readonly IWebProxy _proxy;
+        private Task _task;
 
         public DefaultWebSocketClient(IWebProxy proxy = null)
         {
@@ -38,19 +34,12 @@ namespace Discord.Net.WebSockets
             _headers = new Dictionary<string, string>();
             _proxy = proxy;
         }
-        private void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                    DisconnectInternalAsync(true).GetAwaiter().GetResult();
-                _isDisposed = true;
-            }
-        }
-        public void Dispose()
-        {
-            Dispose(true);
-        }
+
+        public void Dispose() => Dispose(true);
+
+        public event Func<byte[], int, int, Task> BinaryMessage;
+        public event Func<string, Task> TextMessage;
+        public event Func<Exception, Task> Closed;
 
         public async Task ConnectAsync(string host)
         {
@@ -63,25 +52,6 @@ namespace Discord.Net.WebSockets
             {
                 _lock.Release();
             }
-        }
-        private async Task ConnectInternalAsync(string host)
-        {
-            await DisconnectInternalAsync().ConfigureAwait(false);
-
-            _cancelTokenSource = new CancellationTokenSource();
-            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
-
-            _client = new ClientWebSocket();
-            _client.Options.Proxy = _proxy;
-            _client.Options.KeepAliveInterval = TimeSpan.Zero;
-            foreach (var header in _headers)
-            {
-                if (header.Value != null)
-                    _client.Options.SetRequestHeader(header.Key, header.Value);
-            }
-
-            await _client.ConnectAsync(new Uri(host), _cancelToken).ConfigureAwait(false);
-            _task = RunAsync(_cancelToken);
         }
 
         public async Task DisconnectAsync()
@@ -96,56 +66,14 @@ namespace Discord.Net.WebSockets
                 _lock.Release();
             }
         }
-        private async Task DisconnectInternalAsync(bool isDisposing = false)
-        {
-            try { _cancelTokenSource.Cancel(false); } catch { }
 
-            _isDisconnecting = true;
-            try
-            {
-                await (_task ?? Task.Delay(0)).ConfigureAwait(false);
-                _task = null;
-            }
-            finally { _isDisconnecting = false; }
+        public void SetHeader(string key, string value) => _headers[key] = value;
 
-            if (_client != null)
-            {
-                if (!isDisposing)
-                {
-                    try { await _client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", new CancellationToken()); }
-                    catch { }
-                }
-                try { _client.Dispose(); }
-                catch { }
-                
-                _client = null;
-            }
-        }
-        private async Task OnClosed(Exception ex)
-        {
-            if (_isDisconnecting)
-                return; //Ignore, this disconnect was requested.
-
-            await _lock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await DisconnectInternalAsync(false);
-            }
-            finally
-            {
-                _lock.Release();
-            }
-            await Closed(ex);
-        }
-
-        public void SetHeader(string key, string value)
-        {
-            _headers[key] = value;
-        }
         public void SetCancelToken(CancellationToken cancelToken)
         {
             _parentToken = cancelToken;
-            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
+            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token)
+                .Token;
         }
 
         public async Task SendAsync(byte[] data, int index, int count, bool isText)
@@ -155,20 +83,21 @@ namespace Discord.Net.WebSockets
             {
                 if (_client == null) return;
 
-                int frameCount = (int)Math.Ceiling((double)count / SendChunkSize);
+                var frameCount = (int)Math.Ceiling((double)count / SendChunkSize);
 
-                for (int i = 0; i < frameCount; i++, index += SendChunkSize)
+                for (var i = 0; i < frameCount; i++, index += SendChunkSize)
                 {
-                    bool isLast = i == (frameCount - 1);
+                    var isLast = i == frameCount - 1;
 
                     int frameSize;
                     if (isLast)
-                        frameSize = count - (i * SendChunkSize);
+                        frameSize = count - i * SendChunkSize;
                     else
                         frameSize = SendChunkSize;
-                    
+
                     var type = isText ? WebSocketMessageType.Text : WebSocketMessageType.Binary;
-                    await _client.SendAsync(new ArraySegment<byte>(data, index, count), type, isLast, _cancelToken).ConfigureAwait(false);
+                    await _client.SendAsync(new ArraySegment<byte>(data, index, count), type, isLast, _cancelToken)
+                        .ConfigureAwait(false);
                 }
             }
             finally
@@ -176,7 +105,96 @@ namespace Discord.Net.WebSockets
                 _lock.Release();
             }
         }
-        
+
+        private void Dispose(bool disposing)
+        {
+            if (_isDisposed) return;
+            if (disposing)
+                DisconnectInternalAsync(true).GetAwaiter().GetResult();
+            _isDisposed = true;
+        }
+
+        private async Task ConnectInternalAsync(string host)
+        {
+            await DisconnectInternalAsync().ConfigureAwait(false);
+
+            _cancelTokenSource = new CancellationTokenSource();
+            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token)
+                .Token;
+
+            _client = new ClientWebSocket();
+            _client.Options.Proxy = _proxy;
+            _client.Options.KeepAliveInterval = TimeSpan.Zero;
+            foreach (var header in _headers)
+                if (header.Value != null)
+                    _client.Options.SetRequestHeader(header.Key, header.Value);
+
+            await _client.ConnectAsync(new Uri(host), _cancelToken).ConfigureAwait(false);
+            _task = RunAsync(_cancelToken);
+        }
+
+        private async Task DisconnectInternalAsync(bool isDisposing = false)
+        {
+            try
+            {
+                _cancelTokenSource.Cancel(false);
+            }
+            catch
+            {
+            }
+
+            _isDisconnecting = true;
+            try
+            {
+                await (_task ?? Task.Delay(0)).ConfigureAwait(false);
+                _task = null;
+            }
+            finally
+            {
+                _isDisconnecting = false;
+            }
+
+            if (_client != null)
+            {
+                if (!isDisposing)
+                    try
+                    {
+                        await _client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", new CancellationToken());
+                    }
+                    catch
+                    {
+                    }
+
+                try
+                {
+                    _client.Dispose();
+                }
+                catch
+                {
+                }
+
+                _client = null;
+            }
+        }
+
+        private async Task OnClosed(Exception ex)
+        {
+            if (_isDisconnecting)
+                return; //Ignore, this disconnect was requested.
+
+            await _lock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                await DisconnectInternalAsync();
+            }
+            finally
+            {
+                _lock.Release();
+            }
+
+            await Closed(ex);
+        }
+
         private async Task RunAsync(CancellationToken cancelToken)
         {
             var buffer = new ArraySegment<byte>(new byte[ReceiveChunkSize]);
@@ -185,16 +203,15 @@ namespace Discord.Net.WebSockets
             {
                 while (!cancelToken.IsCancellationRequested)
                 {
-                    WebSocketReceiveResult socketResult = await _client.ReceiveAsync(buffer, cancelToken).ConfigureAwait(false);
+                    var socketResult = await _client.ReceiveAsync(buffer, cancelToken).ConfigureAwait(false);
                     byte[] result;
                     int resultCount;
-                        
+
                     if (socketResult.MessageType == WebSocketMessageType.Close)
-                        throw new WebSocketClosedException((int)socketResult.CloseStatus, socketResult.CloseStatusDescription);
+                        throw new WebSocketClosedException((int)socketResult.CloseStatus,
+                            socketResult.CloseStatusDescription);
 
                     if (!socketResult.EndOfMessage)
-                    {
-                        //This is a large message (likely just READY), lets create a temporary expandable stream
                         using (var stream = new MemoryStream())
                         {
                             stream.Write(buffer.Array, 0, socketResult.Count);
@@ -203,26 +220,23 @@ namespace Discord.Net.WebSockets
                                 if (cancelToken.IsCancellationRequested) return;
                                 socketResult = await _client.ReceiveAsync(buffer, cancelToken).ConfigureAwait(false);
                                 stream.Write(buffer.Array, 0, socketResult.Count);
-                            }
-                            while (socketResult == null || !socketResult.EndOfMessage);
+                            } while (!socketResult.EndOfMessage);
 
                             //Use the internal buffer if we can get it
                             resultCount = (int)stream.Length;
 
                             result = stream.TryGetBuffer(out var streamBuffer) ? streamBuffer.Array : stream.ToArray();
-
                         }
-                    }
                     else
                     {
                         //Small message
                         resultCount = socketResult.Count;
                         result = buffer.Array;
                     }
-                    
+
                     if (socketResult.MessageType == WebSocketMessageType.Text)
                     {
-                        string text = Encoding.UTF8.GetString(result, 0, resultCount);
+                        var text = Encoding.UTF8.GetString(result, 0, resultCount);
                         await TextMessage(text).ConfigureAwait(false);
                     }
                     else
@@ -233,7 +247,9 @@ namespace Discord.Net.WebSockets
             {
                 var _ = OnClosed(new Exception("Connection timed out.", ex));
             }
-            catch (OperationCanceledException) { }
+            catch (OperationCanceledException)
+            {
+            }
             catch (Exception ex)
             {
                 //This cannot be awaited otherwise we'll deadlock when DiscordApiClient waits for this task to complete.

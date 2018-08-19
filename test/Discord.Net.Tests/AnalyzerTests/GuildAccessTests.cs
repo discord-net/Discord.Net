@@ -1,24 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using System.Threading.Tasks;
+using Discord.Analyzers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Discord.Analyzers;
 using TestHelper;
 using Xunit;
 
 namespace Discord
 {
-    public partial class AnalyserTests
+    public class AnalyserTests
     {
         public class GuildAccessTests : DiagnosticVerifier
         {
+            protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
+                => new GuildAccessAnalyzer();
+
             [Fact]
             public void VerifyDiagnosticWhenLackingRequireContext()
             {
-                string source = @"using System;
+                var source = @"using System;
 using System.Threading.Tasks;
 using Discord.Commands;
 
@@ -30,11 +29,12 @@ namespace Test
         public Task TestCmd() => ReplyAsync(Context.Guild.Name);
     }
 }";
-                var expected = new DiagnosticResult()
+                var expected = new DiagnosticResult
                 {
                     Id = "DNET0001",
-                    Locations = new[] { new DiagnosticResultLocation("Test0.cs", line: 10, column: 45) },
-                    Message = "Command method 'TestCmd' is accessing 'Context.Guild' but is not restricted to Guild contexts.",
+                    Locations = new[] {new DiagnosticResultLocation("Test0.cs", 10, 45)},
+                    Message =
+                        "Command method 'TestCmd' is accessing 'Context.Guild' but is not restricted to Guild contexts.",
                     Severity = DiagnosticSeverity.Warning
                 };
                 VerifyCSharpDiagnostic(source, expected);
@@ -43,7 +43,7 @@ namespace Test
             [Fact]
             public void VerifyDiagnosticWhenWrongRequireContext()
             {
-                string source = @"using System;
+                var source = @"using System;
 using System.Threading.Tasks;
 using Discord.Commands;
 
@@ -55,39 +55,21 @@ namespace Test
         public Task TestCmd() => ReplyAsync(Context.Guild.Name);
     }
 }";
-                var expected = new DiagnosticResult()
+                var expected = new DiagnosticResult
                 {
                     Id = "DNET0001",
-                    Locations = new[] { new DiagnosticResultLocation("Test0.cs", line: 10, column: 45) },
-                    Message = "Command method 'TestCmd' is accessing 'Context.Guild' but is not restricted to Guild contexts.",
+                    Locations = new[] {new DiagnosticResultLocation("Test0.cs", 10, 45)},
+                    Message =
+                        "Command method 'TestCmd' is accessing 'Context.Guild' but is not restricted to Guild contexts.",
                     Severity = DiagnosticSeverity.Warning
                 };
                 VerifyCSharpDiagnostic(source, expected);
             }
 
             [Fact]
-            public void VerifyNoDiagnosticWhenRequireContextOnMethod()
-            {
-                string source = @"using System;
-using System.Threading.Tasks;
-using Discord.Commands;
-
-namespace Test
-{
-    public class TestModule : ModuleBase<ICommandContext>
-    {
-        [Command(""test""), RequireContext(ContextType.Guild)]
-        public Task TestCmd() => ReplyAsync(Context.Guild.Name);
-    }
-}";
-
-                VerifyCSharpDiagnostic(source, Array.Empty<DiagnosticResult>());
-            }
-
-            [Fact]
             public void VerifyNoDiagnosticWhenRequireContextOnClass()
             {
-                string source = @"using System;
+                var source = @"using System;
 using System.Threading.Tasks;
 using Discord.Commands;
 
@@ -104,8 +86,24 @@ namespace Test
                 VerifyCSharpDiagnostic(source, Array.Empty<DiagnosticResult>());
             }
 
-            protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-                => new GuildAccessAnalyzer();
+            [Fact]
+            public void VerifyNoDiagnosticWhenRequireContextOnMethod()
+            {
+                var source = @"using System;
+using System.Threading.Tasks;
+using Discord.Commands;
+
+namespace Test
+{
+    public class TestModule : ModuleBase<ICommandContext>
+    {
+        [Command(""test""), RequireContext(ContextType.Guild)]
+        public Task TestCmd() => ReplyAsync(Context.Guild.Name);
+    }
+}";
+
+                VerifyCSharpDiagnostic(source, Array.Empty<DiagnosticResult>());
+            }
         }
     }
 }

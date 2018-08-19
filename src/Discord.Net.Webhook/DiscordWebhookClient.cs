@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Discord.API;
 using Discord.Logging;
 using Discord.Rest;
 
@@ -9,22 +10,23 @@ namespace Discord.Webhook
 {
     public class DiscordWebhookClient : IDisposable
     {
-        public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
-        internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
+        internal readonly AsyncEvent<Func<LogMessage, Task>> LogEvent = new AsyncEvent<Func<LogMessage, Task>>();
+        internal readonly Logger RestLogger;
 
         private readonly ulong _webhookId;
         internal IWebhook Webhook;
-        internal readonly Logger _restLogger;
-        
-        internal API.DiscordRestApiClient ApiClient { get; }
-        internal LogManager LogManager { get; }
 
         /// <summary> Creates a new Webhook discord client. </summary>
         public DiscordWebhookClient(IWebhook webhook)
-            : this(webhook.Id, webhook.Token, new DiscordRestConfig()) {  }
+            : this(webhook.Id, webhook.Token, new DiscordRestConfig())
+        {
+        }
+
         /// <summary> Creates a new Webhook discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken)
-            : this(webhookId, webhookToken, new DiscordRestConfig()) { }
+            : this(webhookId, webhookToken, new DiscordRestConfig())
+        {
+        }
 
         /// <summary> Creates a new Webhook discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken, DiscordRestConfig config)
@@ -34,6 +36,7 @@ namespace Discord.Webhook
             ApiClient.LoginAsync(TokenType.Webhook, webhookToken).GetAwaiter().GetResult();
             Webhook = WebhookClientHelper.GetWebhookAsync(this, webhookId).GetAwaiter().GetResult();
         }
+
         /// <summary> Creates a new Webhook discord client. </summary>
         public DiscordWebhookClient(IWebhook webhook, DiscordRestConfig config)
             : this(config)
@@ -46,22 +49,36 @@ namespace Discord.Webhook
         {
             ApiClient = CreateApiClient(config);
             LogManager = new LogManager(config.LogLevel);
-            LogManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
+            LogManager.Message += async msg => await LogEvent.InvokeAsync(msg).ConfigureAwait(false);
 
-            _restLogger = LogManager.CreateLogger("Rest");
+            RestLogger = LogManager.CreateLogger("Rest");
 
             ApiClient.RequestQueue.RateLimitTriggered += async (id, info) =>
             {
                 if (info == null)
-                    await _restLogger.VerboseAsync($"Preemptive Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
+                    await RestLogger.VerboseAsync($"Preemptive Rate limit triggered: {id ?? "null"}")
+                        .ConfigureAwait(false);
                 else
-                    await _restLogger.WarningAsync($"Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
+                    await RestLogger.WarningAsync($"Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
             };
-            ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
+            ApiClient.SentRequest += async (method, endpoint, millis) =>
+                await RestLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
-        private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
-            => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent);
-        
+
+        internal DiscordRestApiClient ApiClient { get; }
+        internal LogManager LogManager { get; }
+
+        public void Dispose() => ApiClient?.Dispose();
+
+        public event Func<LogMessage, Task> Log
+        {
+            add => LogEvent.Add(value);
+            remove => LogEvent.Remove(value);
+        }
+
+        private static DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
+            => new DiscordRestApiClient(config.RestClientProvider, DiscordConfig.UserAgent);
+
         /// <summary> Sends a message using to the channel for this webhook. Returns the ID of the created message. </summary>
         public Task<ulong> SendMessageAsync(string text = null, bool isTTS = false, IEnumerable<Embed> embeds = null,
             string username = null, string avatarUrl = null, RequestOptions options = null)
@@ -69,13 +86,16 @@ namespace Discord.Webhook
 
         /// <summary> Send a message to the channel for this webhook with an attachment. Returns the ID of the created message. </summary>
         public Task<ulong> SendFileAsync(string filePath, string text, bool isTTS = false,
-            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null)
+            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null,
+            RequestOptions options = null)
             => WebhookClientHelper.SendFileAsync(this, filePath, text, isTTS, embeds, username, avatarUrl, options);
 
         /// <summary> Send a message to the channel for this webhook with an attachment. Returns the ID of the created message. </summary>
         public Task<ulong> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false,
-            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null)
-            => WebhookClientHelper.SendFileAsync(this, stream, filename, text, isTTS, embeds, username, avatarUrl, options);
+            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null,
+            RequestOptions options = null)
+            => WebhookClientHelper.SendFileAsync(this, stream, filename, text, isTTS, embeds, username, avatarUrl,
+                options);
 
         /// <summary> Modifies the properties of this webhook. </summary>
         public Task ModifyWebhookAsync(Action<WebhookProperties> func, RequestOptions options = null)
@@ -86,11 +106,6 @@ namespace Discord.Webhook
         {
             await Webhook.DeleteAsync(options).ConfigureAwait(false);
             Dispose();
-        }
-
-        public void Dispose()
-        {
-            ApiClient?.Dispose();
         }
     }
 }

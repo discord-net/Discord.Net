@@ -23,7 +23,7 @@ namespace Discord
                     guild = await client.GetGuildAsync(_config.GuildId);
                 }
 
-                uint nextVer = _cache.Info.Version + 1;
+                var nextVer = _cache.Info.Version + 1;
                 try
                 {
                     await DoMigrateAsync(client, guild, nextVer).ConfigureAwait(false);
@@ -54,19 +54,15 @@ namespace Discord
             var textChannels = await guild.GetTextChannelsAsync();
             var voiceChannels = await guild.GetVoiceChannelsAsync();
             var roles = guild.Roles;
-            
+
             foreach (var channel in textChannels)
-            {
                 //if (channel.Id != guild.DefaultChannelId)
-                    await channel.DeleteAsync();
-            }
+                await channel.DeleteAsync();
             foreach (var channel in voiceChannels)
                 await channel.DeleteAsync();
             foreach (var role in roles)
-            {
                 if (role.Id != guild.EveryoneRole.Id)
                     await role.DeleteAsync();
-            }
         }
     }
 }

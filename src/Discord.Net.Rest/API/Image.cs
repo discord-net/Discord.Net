@@ -12,6 +12,7 @@ namespace Discord.API
             Stream = stream;
             Hash = null;
         }
+
         public Image(string hash)
         {
             Stream = null;

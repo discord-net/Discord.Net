@@ -1,6 +1,6 @@
-﻿using Discord.API;
+﻿using System;
+using Discord.API;
 using Newtonsoft.Json;
-using System;
 
 namespace Discord.Net.Converters
 {
@@ -8,16 +8,18 @@ namespace Discord.Net.Converters
     {
         private readonly JsonConverter _innerConverter;
 
-        public override bool CanConvert(Type objectType) => true;
-        public override bool CanRead => true;
-        public override bool CanWrite => false;
-
         public UInt64EntityOrIdConverter(JsonConverter innerConverter)
         {
             _innerConverter = innerConverter;
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override bool CanRead => true;
+        public override bool CanWrite => false;
+
+        public override bool CanConvert(Type objectType) => true;
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+            JsonSerializer serializer)
         {
             switch (reader.TokenType)
             {
@@ -34,9 +36,7 @@ namespace Discord.Net.Converters
             }
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) =>
             throw new InvalidOperationException();
-        }
     }
 }

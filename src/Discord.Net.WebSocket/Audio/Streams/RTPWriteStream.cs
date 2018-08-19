@@ -7,13 +7,13 @@ namespace Discord.Audio.Streams
     ///<summary> Wraps data in an RTP frame </summary>
     public class RTPWriteStream : AudioOutStream
     {
-        private readonly AudioStream _next;
-        private readonly byte[] _header;
         protected readonly byte[] _buffer;
-        private uint _ssrc;
+        private readonly byte[] _header;
+        private readonly AudioStream _next;
+        private bool _hasHeader;
         private ushort _nextSeq;
         private uint _nextTimestamp;
-        private bool _hasHeader;
+        private readonly uint _ssrc;
 
         public RTPWriteStream(AudioStream next, uint ssrc, int bufferSize = 4000)
         {
@@ -33,11 +33,12 @@ namespace Discord.Audio.Streams
         {
             if (_hasHeader)
                 throw new InvalidOperationException("Header received with no payload");
-                
+
             _hasHeader = true;
             _nextSeq = seq;
             _nextTimestamp = timestamp;
         }
+
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
             cancelToken.ThrowIfCancellationRequested();
@@ -54,6 +55,7 @@ namespace Discord.Audio.Streams
                 _header[6] = (byte)(_nextTimestamp >> 8);
                 _header[7] = (byte)(_nextTimestamp >> 0);
             }
+
             Buffer.BlockCopy(_header, 0, _buffer, 0, 12); //Copy RTP header from to the buffer
             Buffer.BlockCopy(buffer, offset, _buffer, 12, count);
 
@@ -61,13 +63,10 @@ namespace Discord.Audio.Streams
             await _next.WriteAsync(_buffer, 0, count + 12).ConfigureAwait(false);
         }
 
-        public override async Task FlushAsync(CancellationToken cancelToken)
-        {
+        public override async Task FlushAsync(CancellationToken cancelToken) =>
             await _next.FlushAsync(cancelToken).ConfigureAwait(false);
-        }
-        public override async Task ClearAsync(CancellationToken cancelToken)
-        {
+
+        public override async Task ClearAsync(CancellationToken cancelToken) =>
             await _next.ClearAsync(cancelToken).ConfigureAwait(false);
-        }
     }
 }

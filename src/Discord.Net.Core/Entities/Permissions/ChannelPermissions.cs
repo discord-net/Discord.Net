@@ -4,21 +4,28 @@ using System.Diagnostics;
 
 namespace Discord
 {
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public struct ChannelPermissions
     {
         /// <summary> Gets a blank ChannelPermissions that grants no permissions. </summary>
         public static readonly ChannelPermissions None = new ChannelPermissions();
+
         /// <summary> Gets a ChannelPermissions that grants all permissions for text channels. </summary>
         public static readonly ChannelPermissions Text = new ChannelPermissions(0b01100_0000000_1111111110001_010001);
+
         /// <summary> Gets a ChannelPermissions that grants all permissions for voice channels. </summary>
         public static readonly ChannelPermissions Voice = new ChannelPermissions(0b00100_1111110_0000000010100_010001);
+
         /// <summary> Gets a ChannelPermissions that grants all permissions for category channels. </summary>
-        public static readonly ChannelPermissions Category = new ChannelPermissions(0b01100_1111110_1111111110001_010001);
+        public static readonly ChannelPermissions Category =
+            new ChannelPermissions(0b01100_1111110_1111111110001_010001);
+
         /// <summary> Gets a ChannelPermissions that grants all permissions for direct message channels. </summary>
         public static readonly ChannelPermissions DM = new ChannelPermissions(0b00000_1000110_1011100110000_000000);
+
         /// <summary> Gets a ChannelPermissions that grants all permissions for group channels. </summary>
         public static readonly ChannelPermissions Group = new ChannelPermissions(0b00000_1000110_0001101100000_000000);
+
         /// <summary> Gets a ChannelPermissions that grants all permissions for a given channelType. </summary>
         public static ChannelPermissions All(IChannel channel)
         {
@@ -38,56 +45,76 @@ namespace Discord
 
         /// <summary> If True, a user may create invites. </summary>
         public bool CreateInstantInvite => Permissions.GetValue(RawValue, ChannelPermission.CreateInstantInvite);
+
         /// <summary> If True, a user may create, delete and modify this channel. </summary>
         public bool ManageChannel => Permissions.GetValue(RawValue, ChannelPermission.ManageChannels);
 
         /// <summary> If true, a user may add reactions. </summary>
         public bool AddReactions => Permissions.GetValue(RawValue, ChannelPermission.AddReactions);
+
         /// <summary> If True, a user may join channels. </summary>
         [Obsolete("Use ViewChannel instead.")]
         public bool ReadMessages => ViewChannel;
+
         /// <summary> If True, a user may view channels. </summary>
         public bool ViewChannel => Permissions.GetValue(RawValue, ChannelPermission.ViewChannel);
 
         /// <summary> If True, a user may send messages. </summary>
         public bool SendMessages => Permissions.GetValue(RawValue, ChannelPermission.SendMessages);
+
         /// <summary> If True, a user may send text-to-speech messages. </summary>
         public bool SendTTSMessages => Permissions.GetValue(RawValue, ChannelPermission.SendTTSMessages);
+
         /// <summary> If True, a user may delete messages. </summary>
         public bool ManageMessages => Permissions.GetValue(RawValue, ChannelPermission.ManageMessages);
+
         /// <summary> If True, Discord will auto-embed links sent by this user. </summary>
         public bool EmbedLinks => Permissions.GetValue(RawValue, ChannelPermission.EmbedLinks);
+
         /// <summary> If True, a user may send files. </summary>
         public bool AttachFiles => Permissions.GetValue(RawValue, ChannelPermission.AttachFiles);
+
         /// <summary> If True, a user may read previous messages. </summary>
         public bool ReadMessageHistory => Permissions.GetValue(RawValue, ChannelPermission.ReadMessageHistory);
+
         /// <summary> If True, a user may mention @everyone. </summary>
         public bool MentionEveryone => Permissions.GetValue(RawValue, ChannelPermission.MentionEveryone);
+
         /// <summary> If True, a user may use custom emoji from other guilds. </summary>
         public bool UseExternalEmojis => Permissions.GetValue(RawValue, ChannelPermission.UseExternalEmojis);
 
         /// <summary> If True, a user may connect to a voice channel. </summary>
         public bool Connect => Permissions.GetValue(RawValue, ChannelPermission.Connect);
+
         /// <summary> If True, a user may speak in a voice channel. </summary>
         public bool Speak => Permissions.GetValue(RawValue, ChannelPermission.Speak);
+
         /// <summary> If True, a user may mute users. </summary>
         public bool MuteMembers => Permissions.GetValue(RawValue, ChannelPermission.MuteMembers);
+
         /// <summary> If True, a user may deafen users. </summary>
         public bool DeafenMembers => Permissions.GetValue(RawValue, ChannelPermission.DeafenMembers);
+
         /// <summary> If True, a user may move other users between voice channels. </summary>
         public bool MoveMembers => Permissions.GetValue(RawValue, ChannelPermission.MoveMembers);
+
         /// <summary> If True, a user may use voice-activity-detection rather than push-to-talk. </summary>
         public bool UseVAD => Permissions.GetValue(RawValue, ChannelPermission.UseVAD);
+
         /// <summary> If True, a user may use priority speaker in a voice channel. </summary>
         public bool PrioritySpeaker => Permissions.GetValue(RawValue, ChannelPermission.PrioritySpeaker);
 
         /// <summary> If True, a user may adjust role permissions. This also implictly grants all other permissions. </summary>
         public bool ManageRoles => Permissions.GetValue(RawValue, ChannelPermission.ManageRoles);
+
         /// <summary> If True, a user may edit the webhooks for this channel. </summary>
         public bool ManageWebhooks => Permissions.GetValue(RawValue, ChannelPermission.ManageWebhooks);
 
         /// <summary> Creates a new ChannelPermissions with the provided packed value. </summary>
-        public ChannelPermissions(ulong rawValue) { RawValue = rawValue; }
+        public ChannelPermissions(ulong rawValue)
+        {
+            RawValue = rawValue;
+        }
 
         private ChannelPermissions(ulong initialValue,
             bool? createInstantInvite = null,
@@ -112,7 +139,7 @@ namespace Discord
             bool? manageRoles = null,
             bool? manageWebhooks = null)
         {
-            ulong value = initialValue;
+            var value = initialValue;
 
             Permissions.SetValue(ref value, createInstantInvite, ChannelPermission.CreateInstantInvite);
             Permissions.SetValue(ref value, manageChannel, ChannelPermission.ManageChannels);
@@ -162,10 +189,13 @@ namespace Discord
             bool prioritySpeaker = false,
             bool manageRoles = false,
             bool manageWebhooks = false)
-            : this(0, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages,
+            : this(0, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages,
+                manageMessages,
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect,
-                speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, prioritySpeaker, manageRoles, manageWebhooks)
-        { }
+                speak, muteMembers, deafenMembers, moveMembers, useVoiceActivation, prioritySpeaker, manageRoles,
+                manageWebhooks)
+        {
+        }
 
         /// <summary> Creates a new ChannelPermissions from this one, changing the provided non-null permissions. </summary>
         public ChannelPermissions Modify(
@@ -220,10 +250,11 @@ namespace Discord
             var perms = new List<ChannelPermission>();
             for (byte i = 0; i < Permissions.MaxBits; i++)
             {
-                ulong flag = ((ulong)1 << i);
+                var flag = (ulong)1 << i;
                 if ((RawValue & flag) != 0)
                     perms.Add((ChannelPermission)flag);
             }
+
             return perms;
         }
 

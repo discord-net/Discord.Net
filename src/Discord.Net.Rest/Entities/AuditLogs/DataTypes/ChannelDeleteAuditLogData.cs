@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -11,13 +7,19 @@ namespace Discord.Rest
 {
     public class ChannelDeleteAuditLogData : IAuditLogData
     {
-        private ChannelDeleteAuditLogData(ulong id, string name, ChannelType type, IReadOnlyCollection<Overwrite> overwrites)
+        private ChannelDeleteAuditLogData(ulong id, string name, ChannelType type,
+            IReadOnlyCollection<Overwrite> overwrites)
         {
             ChannelId = id;
             ChannelName = name;
             ChannelType = type;
             Overwrites = overwrites;
         }
+
+        public ulong ChannelId { get; }
+        public string ChannelName { get; }
+        public ChannelType ChannelType { get; }
+        public IReadOnlyCollection<Overwrite> Overwrites { get; }
 
         internal static ChannelDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
@@ -36,10 +38,5 @@ namespace Discord.Rest
 
             return new ChannelDeleteAuditLogData(id, name, type, overwrites.ToReadOnlyCollection());
         }
-
-        public ulong ChannelId { get; }
-        public string ChannelName { get; }
-        public ChannelType ChannelType { get; }
-        public IReadOnlyCollection<Overwrite> Overwrites { get; }
     }
 }

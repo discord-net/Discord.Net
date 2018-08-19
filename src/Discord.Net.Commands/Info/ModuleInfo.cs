@@ -1,28 +1,15 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using Discord.Commands.Builders;
 
 namespace Discord.Commands
 {
     public class ModuleInfo
     {
-        public CommandService Service { get; }
-        public string Name { get; }
-        public string Summary { get; }
-        public string Remarks { get; }
-        public string Group { get; }
-
-        public IReadOnlyList<string> Aliases { get; }
-        public IReadOnlyList<CommandInfo> Commands { get; }
-        public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
-        public IReadOnlyList<Attribute> Attributes { get; }
-        public IReadOnlyList<ModuleInfo> Submodules { get; }
-        public ModuleInfo Parent { get; }
-        public bool IsSubmodule => Parent != null;
-
-        internal ModuleInfo(ModuleBuilder builder, CommandService service, IServiceProvider services, ModuleInfo parent = null)
+        internal ModuleInfo(ModuleBuilder builder, CommandService service, IServiceProvider services,
+            ModuleInfo parent = null)
         {
             Service = service;
 
@@ -39,6 +26,20 @@ namespace Discord.Commands
 
             Submodules = BuildSubmodules(builder, service, services).ToImmutableArray();
         }
+
+        public CommandService Service { get; }
+        public string Name { get; }
+        public string Summary { get; }
+        public string Remarks { get; }
+        public string Group { get; }
+
+        public IReadOnlyList<string> Aliases { get; }
+        public IReadOnlyList<CommandInfo> Commands { get; }
+        public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
+        public IReadOnlyList<Attribute> Attributes { get; }
+        public IReadOnlyList<ModuleInfo> Submodules { get; }
+        public ModuleInfo Parent { get; }
+        public bool IsSubmodule => Parent != null;
 
         private static IEnumerable<string> BuildAliases(ModuleBuilder builder, CommandService service)
         {
@@ -57,31 +58,26 @@ namespace Discord.Commands
                 {
                     if (first == "")
                         return second;
-                    else if (second == "")
+                    if (second == "")
                         return first;
-                    else
-                        return first + service._separatorChar + second;
+                    return first + service._separatorChar + second;
                 }).ToList();
             }
 
             return result;
         }
 
-        private List<ModuleInfo> BuildSubmodules(ModuleBuilder parent, CommandService service, IServiceProvider services)
+        private IEnumerable<ModuleInfo> BuildSubmodules(ModuleBuilder parent, CommandService service,
+            IServiceProvider services)
         {
-            var result = new List<ModuleInfo>();
-
-            foreach (var submodule in parent.Modules)
-                result.Add(submodule.Build(service, services, this));
-
-            return result;
+            return parent.Modules.Select(submodule => submodule.Build(service, services, this)).ToList();
         }
 
-        private static List<PreconditionAttribute> BuildPreconditions(ModuleBuilder builder)
+        private static IEnumerable<PreconditionAttribute> BuildPreconditions(ModuleBuilder builder)
         {
             var result = new List<PreconditionAttribute>();
 
-            ModuleBuilder parent = builder;
+            var parent = builder;
             while (parent != null)
             {
                 result.AddRange(parent.Preconditions);
@@ -95,7 +91,7 @@ namespace Discord.Commands
         {
             var result = new List<Attribute>();
 
-            ModuleBuilder parent = builder;
+            var parent = builder;
             while (parent != null)
             {
                 result.AddRange(parent.Attributes);

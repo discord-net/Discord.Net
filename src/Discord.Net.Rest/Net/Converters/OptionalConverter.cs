@@ -1,5 +1,5 @@
-using Newtonsoft.Json;
 using System;
+using Newtonsoft.Json;
 
 namespace Discord.Net.Converters
 {
@@ -7,22 +7,24 @@ namespace Discord.Net.Converters
     {
         private readonly JsonConverter _innerConverter;
 
-        public override bool CanConvert(Type objectType) => true;
-        public override bool CanRead => true;
-        public override bool CanWrite => true;
-
         public OptionalConverter(JsonConverter innerConverter)
         {
             _innerConverter = innerConverter;
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override bool CanRead => true;
+        public override bool CanWrite => true;
+
+        public override bool CanConvert(Type objectType) => true;
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+            JsonSerializer serializer)
         {
             T obj;
             // custom converters need to be able to safely fail; move this check in here to prevent wasteful casting when parsing primitives
             if (_innerConverter != null)
             {
-                object o = _innerConverter.ReadJson(reader, typeof(T), null, serializer);
+                var o = _innerConverter.ReadJson(reader, typeof(T), null, serializer);
                 if (o is Optional<T>)
                     return o;
 

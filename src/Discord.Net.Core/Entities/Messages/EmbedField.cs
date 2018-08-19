@@ -2,7 +2,7 @@
 
 namespace Discord
 {
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("{" + nameof(DebuggerDisplay) + ",nq}")]
     public struct EmbedField
     {
         public string Name { get; internal set; }

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Linq;
+using Discord.Commands;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Discord.Commands;
 
 namespace Discord.Analyzers
 {
@@ -14,18 +14,25 @@ namespace Discord.Analyzers
     {
         private const string DiagnosticId = "DNET0001";
         private const string Title = "Limit command to Guild contexts.";
-        private const string MessageFormat = "Command method '{0}' is accessing 'Context.Guild' but is not restricted to Guild contexts.";
-        private const string Description = "Accessing 'Context.Guild' in a command without limiting the command to run only in guilds.";
+
+        private const string MessageFormat =
+            "Command method '{0}' is accessing 'Context.Guild' but is not restricted to Guild contexts.";
+
+        private const string Description =
+            "Accessing 'Context.Guild' in a command without limiting the command to run only in guilds.";
+
         private const string Category = "API Usage";
 
-        private static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat,
+            Category, DiagnosticSeverity.Warning, true, Description);
+
+        private static readonly Func<AttributeData, bool> AttributeDataPredicate =
+            a => a.AttributeClass.Name == nameof(RequireContextAttribute);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
-        public override void Initialize(AnalysisContext context)
-        {
+        public override void Initialize(AnalysisContext context) =>
             context.RegisterSyntaxNodeAction(AnalyzeMemberAccess, SyntaxKind.SimpleMemberAccessExpression);
-        }
 
         private static void AnalyzeMemberAccess(SyntaxNodeAnalysisContext context)
         {
@@ -53,18 +60,14 @@ namespace Discord.Analyzers
 
             // Is the '[RequireContext]' attribute not applied to either the
             // method or the class, or its argument isn't 'ContextType.Guild'?
-            var ctxAttribute = methodAttributes.SingleOrDefault(_attributeDataPredicate)
-                ?? typeSymbol.GetAttributes().SingleOrDefault(_attributeDataPredicate);
+            var ctxAttribute = methodAttributes.SingleOrDefault(AttributeDataPredicate)
+                               ?? typeSymbol.GetAttributes().SingleOrDefault(AttributeDataPredicate);
 
-            if (ctxAttribute == null || ctxAttribute.ConstructorArguments.Any(arg => !arg.Value.Equals((int)ContextType.Guild)))
-            {
-                // Report the diagnostic
-                var diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation(), methodSymbol.Name);
-                context.ReportDiagnostic(diagnostic);
-            }
+            if (ctxAttribute != null &&
+                !ctxAttribute.ConstructorArguments.Any(arg => !arg.Value.Equals((int)ContextType.Guild))) return;
+            // Report the diagnostic
+            var diagnostic = Diagnostic.Create(Rule, context.Node.GetLocation(), methodSymbol.Name);
+            context.ReportDiagnostic(diagnostic);
         }
-
-        private static readonly Func<AttributeData, bool> _attributeDataPredicate =
-            (a => a.AttributeClass.Name == nameof(RequireContextAttribute));
     }
 }

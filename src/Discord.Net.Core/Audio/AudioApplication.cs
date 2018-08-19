@@ -1,6 +1,6 @@
 namespace Discord.Audio
 {
-    public enum AudioApplication : int
+    public enum AudioApplication
     {
         Voice,
         Music,

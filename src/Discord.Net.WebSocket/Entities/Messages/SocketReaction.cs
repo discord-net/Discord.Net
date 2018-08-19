@@ -4,14 +4,8 @@ namespace Discord.WebSocket
 {
     public class SocketReaction : IReaction
     {
-        public ulong UserId { get; }
-        public Optional<IUser> User { get; }
-        public ulong MessageId { get; }
-        public Optional<SocketUserMessage> Message { get; }
-        public ISocketMessageChannel Channel { get; }
-        public IEmote Emote { get; }
-
-        internal SocketReaction(ISocketMessageChannel channel, ulong messageId, Optional<SocketUserMessage> message, ulong userId, Optional<IUser> user, IEmote emoji)
+        internal SocketReaction(ISocketMessageChannel channel, ulong messageId, Optional<SocketUserMessage> message,
+            ulong userId, Optional<IUser> user, IEmote emoji)
         {
             Channel = channel;
             MessageId = messageId;
@@ -20,7 +14,16 @@ namespace Discord.WebSocket
             User = user;
             Emote = emoji;
         }
-        internal static SocketReaction Create(Model model, ISocketMessageChannel channel, Optional<SocketUserMessage> message, Optional<IUser> user)
+
+        public ulong UserId { get; }
+        public Optional<IUser> User { get; }
+        public ulong MessageId { get; }
+        public Optional<SocketUserMessage> Message { get; }
+        public ISocketMessageChannel Channel { get; }
+        public IEmote Emote { get; }
+
+        internal static SocketReaction Create(Model model, ISocketMessageChannel channel,
+            Optional<SocketUserMessage> message, Optional<IUser> user)
         {
             IEmote emote;
             if (model.Emoji.Id.HasValue)
@@ -38,7 +41,8 @@ namespace Discord.WebSocket
             var otherReaction = other as SocketReaction;
             if (otherReaction == null) return false;
 
-            return UserId == otherReaction.UserId && MessageId == otherReaction.MessageId && Emote.Equals(otherReaction.Emote);
+            return UserId == otherReaction.UserId && MessageId == otherReaction.MessageId &&
+                   Emote.Equals(otherReaction.Emote);
         }
 
         public override int GetHashCode()

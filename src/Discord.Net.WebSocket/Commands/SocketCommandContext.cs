@@ -4,14 +4,6 @@ namespace Discord.Commands
 {
     public class SocketCommandContext : ICommandContext
     {
-        public DiscordSocketClient Client { get; }
-        public SocketGuild Guild { get; }
-        public ISocketMessageChannel Channel { get; }
-        public SocketUser User { get; }
-        public SocketUserMessage Message { get; }
-
-        public bool IsPrivate => Channel is IPrivateChannel;
-
         public SocketCommandContext(DiscordSocketClient client, SocketUserMessage msg)
         {
             Client = client;
@@ -20,6 +12,14 @@ namespace Discord.Commands
             User = msg.Author;
             Message = msg;
         }
+
+        public DiscordSocketClient Client { get; }
+        public SocketGuild Guild { get; }
+        public ISocketMessageChannel Channel { get; }
+        public SocketUser User { get; }
+        public SocketUserMessage Message { get; }
+
+        public bool IsPrivate => Channel is IPrivateChannel;
 
         //ICommandContext
         IDiscordClient ICommandContext.Client => Client;

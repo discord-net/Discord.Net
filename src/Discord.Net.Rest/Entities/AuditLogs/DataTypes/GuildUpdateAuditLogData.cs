@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -12,6 +11,9 @@ namespace Discord.Rest
             Before = before;
             After = after;
         }
+
+        public GuildInfo Before { get; }
+        public GuildInfo After { get; }
 
         internal static GuildUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
@@ -30,8 +32,10 @@ namespace Discord.Rest
 
             int? oldAfkTimeout = afkTimeoutModel?.OldValue?.ToObject<int>(),
                 newAfkTimeout = afkTimeoutModel?.NewValue?.ToObject<int>();
-            DefaultMessageNotifications? oldDefaultMessageNotifications = defaultMessageNotificationsModel?.OldValue?.ToObject<DefaultMessageNotifications>(),
-                newDefaultMessageNotifications = defaultMessageNotificationsModel?.NewValue?.ToObject<DefaultMessageNotifications>();
+            DefaultMessageNotifications? oldDefaultMessageNotifications =
+                    defaultMessageNotificationsModel?.OldValue?.ToObject<DefaultMessageNotifications>(),
+                newDefaultMessageNotifications =
+                    defaultMessageNotificationsModel?.NewValue?.ToObject<DefaultMessageNotifications>();
             ulong? oldAfkChannelId = afkChannelModel?.OldValue?.ToObject<ulong>(),
                 newAfkChannelId = afkChannelModel?.NewValue?.ToObject<ulong>();
             string oldName = nameModel?.OldValue?.ToObject<string>(),
@@ -72,8 +76,5 @@ namespace Discord.Rest
 
             return new GuildUpdateAuditLogData(before, after);
         }
-
-        public GuildInfo Before { get; }
-        public GuildInfo After { get; }
     }
 }

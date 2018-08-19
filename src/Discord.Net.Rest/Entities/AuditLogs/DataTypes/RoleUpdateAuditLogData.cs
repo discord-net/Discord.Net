@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -13,6 +12,10 @@ namespace Discord.Rest
             Before = oldProps;
             After = newProps;
         }
+
+        public ulong RoleId { get; }
+        public RoleEditInfo Before { get; }
+        public RoleEditInfo After { get; }
 
         internal static RoleUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
@@ -54,9 +57,5 @@ namespace Discord.Rest
 
             return new RoleUpdateAuditLogData(entry.TargetId.Value, oldProps, newProps);
         }
-
-        public ulong RoleId { get; }
-        public RoleEditInfo Before { get; }
-        public RoleEditInfo After { get; }
     }
 }

@@ -10,6 +10,6 @@ namespace Discord
         Gifv,
         Article,
         Tweet,
-        Html,
+        Html
     }
 }

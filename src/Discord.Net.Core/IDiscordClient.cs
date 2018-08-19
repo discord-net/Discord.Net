@@ -16,17 +16,28 @@ namespace Discord
 
         Task<IApplication> GetApplicationInfoAsync(RequestOptions options = null);
 
-        Task<IChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
-        Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
-        Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
-        Task<IReadOnlyCollection<IGroupChannel>> GetGroupChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        Task<IChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload,
+            RequestOptions options = null);
+
+        Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync(CacheMode mode = CacheMode.AllowDownload,
+            RequestOptions options = null);
+
+        Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync(CacheMode mode = CacheMode.AllowDownload,
+            RequestOptions options = null);
+
+        Task<IReadOnlyCollection<IGroupChannel>> GetGroupChannelsAsync(CacheMode mode = CacheMode.AllowDownload,
+            RequestOptions options = null);
 
         Task<IReadOnlyCollection<IConnection>> GetConnectionsAsync(RequestOptions options = null);
 
         Task<IGuild> GetGuildAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
-        Task<IReadOnlyCollection<IGuild>> GetGuildsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
-        Task<IGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null, RequestOptions options = null);
-        
+
+        Task<IReadOnlyCollection<IGuild>> GetGuildsAsync(CacheMode mode = CacheMode.AllowDownload,
+            RequestOptions options = null);
+
+        Task<IGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null,
+            RequestOptions options = null);
+
         Task<IInvite> GetInviteAsync(string inviteId, RequestOptions options = null);
 
         Task<IUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);

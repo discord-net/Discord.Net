@@ -19,10 +19,12 @@ namespace Discord.Webhook
                 throw new InvalidOperationException("Could not find a webhook for the supplied credentials.");
             return RestInternalWebhook.Create(client, model);
         }
-        public static async Task<ulong> SendMessageAsync(DiscordWebhookClient client, 
-            string text, bool isTTS, IEnumerable<Embed> embeds, string username, string avatarUrl, RequestOptions options)
+
+        public static async Task<ulong> SendMessageAsync(DiscordWebhookClient client,
+            string text, bool isTTS, IEnumerable<Embed> embeds, string username, string avatarUrl,
+            RequestOptions options)
         {
-            var args = new CreateWebhookMessageParams(text) { IsTTS = isTTS };
+            var args = new CreateWebhookMessageParams(text) {IsTTS = isTTS};
             if (embeds != null)
                 args.Embeds = embeds.Select(x => x.ToModel()).ToArray();
             if (username != null)
@@ -30,27 +32,39 @@ namespace Discord.Webhook
             if (avatarUrl != null)
                 args.AvatarUrl = avatarUrl;
 
-            var model = await client.ApiClient.CreateWebhookMessageAsync(client.Webhook.Id, args, options: options).ConfigureAwait(false);
+            var model = await client.ApiClient.CreateWebhookMessageAsync(client.Webhook.Id, args, options)
+                .ConfigureAwait(false);
             return model.Id;
         }
-        public static async Task<ulong> SendFileAsync(DiscordWebhookClient client, string filePath, string text, bool isTTS, 
+
+        public static async Task<ulong> SendFileAsync(DiscordWebhookClient client, string filePath, string text,
+            bool isTTS,
             IEnumerable<Embed> embeds, string username, string avatarUrl, RequestOptions options)
         {
-            string filename = Path.GetFileName(filePath);
+            var filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
-                return await SendFileAsync(client, file, filename, text, isTTS, embeds, username, avatarUrl, options).ConfigureAwait(false);
+                return await SendFileAsync(client, file, filename, text, isTTS, embeds, username, avatarUrl, options)
+                    .ConfigureAwait(false);
         }
-        public static async Task<ulong> SendFileAsync(DiscordWebhookClient client, Stream stream, string filename, string text, bool isTTS,
+
+        public static async Task<ulong> SendFileAsync(DiscordWebhookClient client, Stream stream, string filename,
+            string text, bool isTTS,
             IEnumerable<Embed> embeds, string username, string avatarUrl, RequestOptions options)
         {
-            var args = new UploadWebhookFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS };
+            var args = new UploadWebhookFileParams(stream)
+            {
+                Filename = filename,
+                Content = text,
+                IsTTS = isTTS
+            };
             if (username != null)
                 args.Username = username;
             if (avatarUrl != null)
                 args.AvatarUrl = avatarUrl;
             if (embeds != null)
                 args.Embeds = embeds.Select(x => x.ToModel()).ToArray();
-            var msg = await client.ApiClient.UploadWebhookFileAsync(client.Webhook.Id, args, options).ConfigureAwait(false);
+            var msg = await client.ApiClient.UploadWebhookFileAsync(client.Webhook.Id, args, options)
+                .ConfigureAwait(false);
             return msg.Id;
         }
 
@@ -71,9 +85,7 @@ namespace Discord.Webhook
             return await client.ApiClient.ModifyWebhookAsync(client.Webhook.Id, apiArgs, options).ConfigureAwait(false);
         }
 
-        public static async Task DeleteAsync(DiscordWebhookClient client, RequestOptions options)
-        {
+        public static async Task DeleteAsync(DiscordWebhookClient client, RequestOptions options) =>
             await client.ApiClient.DeleteWebhookAsync(client.Webhook.Id, options).ConfigureAwait(false);
-        }
     }
 }

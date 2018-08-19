@@ -4,7 +4,7 @@ using Model = Discord.API.Presence;
 namespace Discord.WebSocket
 {
     //TODO: C#7 Candidate for record type
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
+    [DebuggerDisplay(@"{" + nameof(DebuggerDisplay) + @",nq}")]
     public struct SocketPresence : IPresence
     {
         public UserStatus Status { get; }
@@ -13,15 +13,13 @@ namespace Discord.WebSocket
         internal SocketPresence(UserStatus status, IActivity activity)
         {
             Status = status;
-            Activity= activity;
-        }
-        internal static SocketPresence Create(Model model)
-        {
-            return new SocketPresence(model.Status, model.Game?.ToEntity());
+            Activity = activity;
         }
 
+        internal static SocketPresence Create(Model model) => new SocketPresence(model.Status, model.Game?.ToEntity());
+
         public override string ToString() => Status.ToString();
-        private string DebuggerDisplay => $"{Status}{(Activity != null ? $", {Activity.Name}": "")}";
+        private string DebuggerDisplay => $"{Status}{(Activity != null ? $", {Activity.Name}" : "")}";
 
         internal SocketPresence Clone() => this;
     }

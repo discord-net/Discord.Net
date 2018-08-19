@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 using ChangeModel = Discord.API.AuditLogChange;
@@ -14,6 +13,10 @@ namespace Discord.Rest
             Before = before;
             After = after;
         }
+
+        public IUser Target { get; }
+        public MemberInfo Before { get; }
+        public MemberInfo After { get; }
 
         internal static MemberUpdateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
@@ -41,9 +44,5 @@ namespace Discord.Rest
 
             return new MemberUpdateAuditLogData(user, before, after);
         }
-
-        public IUser Target { get; }
-        public MemberInfo Before { get; }
-        public MemberInfo After { get; }
     }
 }

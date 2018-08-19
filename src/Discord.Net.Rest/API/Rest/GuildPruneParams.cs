@@ -6,12 +6,11 @@ namespace Discord.API.Rest
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     internal class GuildPruneParams
     {
-        [JsonProperty("days")]
-        public int Days { get; }
-
         public GuildPruneParams(int days)
         {
             Days = days;
         }
+
+        [JsonProperty("days")] public int Days { get; }
     }
 }

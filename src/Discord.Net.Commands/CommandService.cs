@@ -13,40 +13,39 @@ namespace Discord.Commands
 {
     public class CommandService
     {
-        public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
-        internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
+        internal readonly bool CaseSensitive, _throwOnError, _ignoreExtraArgs;
+        internal readonly Logger _cmdLogger;
 
-        public event Func<CommandInfo, ICommandContext, IResult, Task> CommandExecuted { add { _commandExecutedEvent.Add(value); } remove { _commandExecutedEvent.Remove(value); } }
-        internal readonly AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>> _commandExecutedEvent = new AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>>();
+        internal readonly AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>> _commandExecutedEvent =
+            new AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>>();
 
-        private readonly SemaphoreSlim _moduleLock;
-        private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
-        private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>> _typeReaders;
+        internal readonly RunMode _defaultRunMode;
         private readonly ConcurrentDictionary<Type, TypeReader> _defaultTypeReaders;
         private readonly ImmutableList<Tuple<Type, Type>> _entityTypeReaders; //TODO: Candidate for C#7 Tuple
-        private readonly HashSet<ModuleInfo> _moduleDefs;
-        private readonly CommandMap _map;
-
-        internal readonly bool _caseSensitive, _throwOnError, _ignoreExtraArgs;
-        internal readonly char _separatorChar;
-        internal readonly RunMode _defaultRunMode;
-        internal readonly Logger _cmdLogger;
+        internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
         internal readonly LogManager _logManager;
+        private readonly CommandMap _map;
+        private readonly HashSet<ModuleInfo> _moduleDefs;
+
+        private readonly SemaphoreSlim _moduleLock;
         internal readonly IReadOnlyDictionary<char, char> _quotationMarkAliasMap;
+        internal readonly char _separatorChar;
+        private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
+        private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>> _typeReaders;
 
-        public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
-        public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
-        public ILookup<Type, TypeReader> TypeReaders => _typeReaders.SelectMany(x => x.Value.Select(y => new { y.Key, y.Value })).ToLookup(x => x.Key, x => x.Value);
+        public CommandService() : this(new CommandServiceConfig())
+        {
+        }
 
-        public CommandService() : this(new CommandServiceConfig()) { }
         public CommandService(CommandServiceConfig config)
         {
-            _caseSensitive = config.CaseSensitiveCommands;
+            CaseSensitive = config.CaseSensitiveCommands;
             _throwOnError = config.ThrowOnError;
             _ignoreExtraArgs = config.IgnoreExtraArgs;
             _separatorChar = config.SeparatorChar;
             _defaultRunMode = config.DefaultRunMode;
-            _quotationMarkAliasMap = (config.QuotationMarkAliasMap ?? new Dictionary<char, char>()).ToImmutableDictionary();
+            _quotationMarkAliasMap =
+                (config.QuotationMarkAliasMap ?? new Dictionary<char, char>()).ToImmutableDictionary();
             if (_defaultRunMode == RunMode.Default)
                 throw new InvalidOperationException("The default run mode cannot be set to Default.");
 
@@ -64,7 +63,8 @@ namespace Discord.Commands
             foreach (var type in PrimitiveParsers.SupportedTypes)
             {
                 _defaultTypeReaders[type] = PrimitiveTypeReader.Create(type);
-                _defaultTypeReaders[typeof(Nullable<>).MakeGenericType(type)] = NullableTypeReader.Create(type, _defaultTypeReaders[type]);
+                _defaultTypeReaders[typeof(Nullable<>).MakeGenericType(type)] =
+                    NullableTypeReader.Create(type, _defaultTypeReaders[type]);
             }
 
             var tsreader = new TimeSpanTypeReader();
@@ -72,7 +72,11 @@ namespace Discord.Commands
             _defaultTypeReaders[typeof(TimeSpan?)] = NullableTypeReader.Create(typeof(TimeSpan), tsreader);
 
             _defaultTypeReaders[typeof(string)] =
-                new PrimitiveTypeReader<string>((string x, out string y) => { y = x; return true; }, 0);
+                new PrimitiveTypeReader<string>((string x, out string y) =>
+                {
+                    y = x;
+                    return true;
+                }, 0);
 
             var entityTypeReaders = ImmutableList.CreateBuilder<Tuple<Type, Type>>();
             entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IMessage), typeof(MessageTypeReader<>)));
@@ -80,6 +84,27 @@ namespace Discord.Commands
             entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IRole), typeof(RoleTypeReader<>)));
             entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IUser), typeof(UserTypeReader<>)));
             _entityTypeReaders = entityTypeReaders.ToImmutable();
+        }
+
+        public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
+        public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
+
+        public ILookup<Type, TypeReader> TypeReaders => _typeReaders.SelectMany(x => x.Value.Select(y => new
+        {
+            y.Key,
+            y.Value
+        })).ToLookup(x => x.Key, x => x.Value);
+
+        public event Func<LogMessage, Task> Log
+        {
+            add => _logEvent.Add(value);
+            remove => _logEvent.Remove(value);
+        }
+
+        public event Func<CommandInfo, ICommandContext, IResult, Task> CommandExecuted
+        {
+            add => _commandExecutedEvent.Add(value);
+            remove => _commandExecutedEvent.Remove(value);
         }
 
         //Modules
@@ -102,12 +127,13 @@ namespace Discord.Commands
         }
 
         /// <summary>
-        /// Add a command module from a type
+        ///     Add a command module from a type
         /// </summary>
         /// <typeparam name="T">The type of module</typeparam>
         /// <param name="services">An IServiceProvider for your dependency injection solution, if using one - otherwise, pass null</param>
         /// <returns>A built module</returns>
         public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services) => AddModuleAsync(typeof(T), services);
+
         public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services)
         {
             services = services ?? EmptyServiceProvider.Instance;
@@ -118,14 +144,13 @@ namespace Discord.Commands
                 var typeInfo = type.GetTypeInfo();
 
                 if (_typedModuleDefs.ContainsKey(type))
-                    throw new ArgumentException($"This module has already been added.");
+                    throw new ArgumentException("This module has already been added.");
 
-                var module = (await ModuleClassBuilder.BuildAsync(this, services, typeInfo).ConfigureAwait(false)).FirstOrDefault();
+                var module = (await ModuleClassBuilder.BuildAsync(this, services, typeInfo).ConfigureAwait(false))
+                    .FirstOrDefault();
 
-                if (module.Value == default(ModuleInfo))
-                    throw new InvalidOperationException($"Could not build the module {type.FullName}, did you pass an invalid type?");
-
-                _typedModuleDefs[module.Key] = module.Value;
+                _typedModuleDefs[module.Key] = module.Value ?? throw new InvalidOperationException(
+                                                   $"Could not build the module {type.FullName}, did you pass an invalid type?");
 
                 return LoadModuleInternal(module.Value);
             }
@@ -134,8 +159,9 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
+
         /// <summary>
-        /// Add command modules from an assembly
+        ///     Add command modules from an assembly
         /// </summary>
         /// <param name="assembly">The assembly containing command modules</param>
         /// <param name="services">An IServiceProvider for your dependency injection solution, if using one - otherwise, pass null</param>
@@ -163,6 +189,7 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
+
         private ModuleInfo LoadModuleInternal(ModuleInfo module)
         {
             _moduleDefs.Add(module);
@@ -188,22 +215,22 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
+
         public Task<bool> RemoveModuleAsync<T>() => RemoveModuleAsync(typeof(T));
+
         public async Task<bool> RemoveModuleAsync(Type type)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                if (!_typedModuleDefs.TryRemove(type, out var module))
-                    return false;
-
-                return RemoveModuleInternal(module);
+                return _typedModuleDefs.TryRemove(type, out var module) && RemoveModuleInternal(module);
             }
             finally
             {
                 _moduleLock.Release();
             }
         }
+
         private bool RemoveModuleInternal(ModuleInfo module)
         {
             if (!_moduleDefs.Remove(module))
@@ -212,60 +239,73 @@ namespace Discord.Commands
             foreach (var cmd in module.Commands)
                 _map.RemoveCommand(cmd);
 
-            foreach (var submodule in module.Submodules)
-            {
-                RemoveModuleInternal(submodule);
-            }
+            foreach (var submodule in module.Submodules) RemoveModuleInternal(submodule);
 
             return true;
         }
 
         //Type Readers
         /// <summary>
-        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
-        /// If <typeparamref name="T"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> will also be added.
-        /// If a default <see cref="TypeReader"/> exists for <typeparamref name="T"/>, a warning will be logged and the default <see cref="TypeReader"/> will be replaced. 
+        ///     Adds a custom <see cref="TypeReader" /> to this <see cref="CommandService" /> for the supplied object type.
+        ///     If <typeparamref name="T" /> is a <see cref="ValueType" />, a <see cref="NullableTypeReader{T}" /> will also be
+        ///     added.
+        ///     If a default <see cref="TypeReader" /> exists for <typeparamref name="T" />, a warning will be logged and the
+        ///     default <see cref="TypeReader" /> will be replaced.
         /// </summary>
-        /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
-        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
+        /// <typeparam name="T">The object type to be read by the <see cref="TypeReader" />.</typeparam>
+        /// <param name="reader">An instance of the <see cref="TypeReader" /> to be added.</param>
         public void AddTypeReader<T>(TypeReader reader)
             => AddTypeReader(typeof(T), reader);
+
         /// <summary>
-        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
-        /// If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added.
-        /// If a default <see cref="TypeReader"/> exists for <paramref name="type"/>, a warning will be logged and the default <see cref="TypeReader"/> will be replaced.
+        ///     Adds a custom <see cref="TypeReader" /> to this <see cref="CommandService" /> for the supplied object type.
+        ///     If <paramref name="type" /> is a <see cref="ValueType" />, a <see cref="NullableTypeReader{T}" /> for the value
+        ///     type will also be added.
+        ///     If a default <see cref="TypeReader" /> exists for <paramref name="type" />, a warning will be logged and the
+        ///     default <see cref="TypeReader" /> will be replaced.
         /// </summary>
-        /// <param name="type">A <see cref="Type"/> instance for the type to be read.</param>
-        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
+        /// <param name="type">A <see cref="Type" /> instance for the type to be read.</param>
+        /// <param name="reader">An instance of the <see cref="TypeReader" /> to be added.</param>
         public void AddTypeReader(Type type, TypeReader reader)
         {
             if (_defaultTypeReaders.ContainsKey(type))
-                _ = _cmdLogger.WarningAsync($"The default TypeReader for {type.FullName} was replaced by {reader.GetType().FullName}." +
-                    $"To suppress this message, use AddTypeReader<T>(reader, true).");
+                _ = _cmdLogger.WarningAsync(
+                    $"The default TypeReader for {type.FullName} was replaced by {reader.GetType().FullName}." +
+                    "To suppress this message, use AddTypeReader<T>(reader, true).");
             AddTypeReader(type, reader, true);
         }
+
         /// <summary>
-        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
-        /// If <typeparamref name="T"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> will also be added.
+        ///     Adds a custom <see cref="TypeReader" /> to this <see cref="CommandService" /> for the supplied object type.
+        ///     If <typeparamref name="T" /> is a <see cref="ValueType" />, a <see cref="NullableTypeReader{T}" /> will also be
+        ///     added.
         /// </summary>
-        /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
-        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
-        /// <param name="replaceDefault">If <paramref name="reader"/> should replace the default <see cref="TypeReader"/> for <typeparamref name="T"/> if one exists.</param>
+        /// <typeparam name="T">The object type to be read by the <see cref="TypeReader" />.</typeparam>
+        /// <param name="reader">An instance of the <see cref="TypeReader" /> to be added.</param>
+        /// <param name="replaceDefault">
+        ///     If <paramref name="reader" /> should replace the default <see cref="TypeReader" /> for
+        ///     <typeparamref name="T" /> if one exists.
+        /// </param>
         public void AddTypeReader<T>(TypeReader reader, bool replaceDefault)
             => AddTypeReader(typeof(T), reader, replaceDefault);
+
         /// <summary>
-        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
-        /// If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added. 
+        ///     Adds a custom <see cref="TypeReader" /> to this <see cref="CommandService" /> for the supplied object type.
+        ///     If <paramref name="type" /> is a <see cref="ValueType" />, a <see cref="NullableTypeReader{T}" /> for the value
+        ///     type will also be added.
         /// </summary>
-        /// <param name="type">A <see cref="Type"/> instance for the type to be read.</param>
-        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
-        /// <param name="replaceDefault">If <paramref name="reader"/> should replace the default <see cref="TypeReader"/> for <paramref name="type"/> if one exists.</param>
+        /// <param name="type">A <see cref="Type" /> instance for the type to be read.</param>
+        /// <param name="reader">An instance of the <see cref="TypeReader" /> to be added.</param>
+        /// <param name="replaceDefault">
+        ///     If <paramref name="reader" /> should replace the default <see cref="TypeReader" /> for
+        ///     <paramref name="type" /> if one exists.
+        /// </param>
         public void AddTypeReader(Type type, TypeReader reader, bool replaceDefault)
         {
             if (replaceDefault && HasDefaultTypeReader(type))
             {
                 _defaultTypeReaders.AddOrUpdate(type, reader, (k, v) => reader);
-                if (type.GetTypeInfo().IsValueType)
+                if (!type.GetTypeInfo().IsValueType) return;
                 {
                     var nullableType = typeof(Nullable<>).MakeGenericType(type);
                     var nullableReader = NullableTypeReader.Create(type, reader);
@@ -281,28 +321,29 @@ namespace Discord.Commands
                     AddNullableTypeReader(type, reader);
             }
         }
+
         internal bool HasDefaultTypeReader(Type type)
         {
             if (_defaultTypeReaders.ContainsKey(type))
                 return true;
 
             var typeInfo = type.GetTypeInfo();
-            if (typeInfo.IsEnum)
-                return true;
-            return _entityTypeReaders.Any(x => type == x.Item1 || typeInfo.ImplementedInterfaces.Contains(x.Item2));
+            return typeInfo.IsEnum || _entityTypeReaders.Any(x => type == x.Item1 || typeInfo.ImplementedInterfaces.Contains(x.Item2));
         }
+
         internal void AddNullableTypeReader(Type valueType, TypeReader valueTypeReader)
         {
-            var readers = _typeReaders.GetOrAdd(typeof(Nullable<>).MakeGenericType(valueType), x => new ConcurrentDictionary<Type, TypeReader>());
+            var readers = _typeReaders.GetOrAdd(typeof(Nullable<>).MakeGenericType(valueType),
+                x => new ConcurrentDictionary<Type, TypeReader>());
             var nullableReader = NullableTypeReader.Create(valueType, valueTypeReader);
             readers[nullableReader.GetType()] = nullableReader;
         }
+
         internal IDictionary<Type, TypeReader> GetTypeReaders(Type type)
         {
-            if (_typeReaders.TryGetValue(type, out var definedTypeReaders))
-                return definedTypeReaders;
-            return null;
+            return _typeReaders.TryGetValue(type, out var definedTypeReaders) ? definedTypeReaders : null;
         }
+
         internal TypeReader GetDefaultTypeReader(Type type)
         {
             if (_defaultTypeReaders.TryGetValue(type, out var reader))
@@ -318,37 +359,39 @@ namespace Discord.Commands
             }
 
             //Is this an entity?
-            for (int i = 0; i < _entityTypeReaders.Count; i++)
-            {
-                if (type == _entityTypeReaders[i].Item1 || typeInfo.ImplementedInterfaces.Contains(_entityTypeReaders[i].Item1))
+            foreach (var t in _entityTypeReaders)
+                if (type == t.Item1 ||
+                    typeInfo.ImplementedInterfaces.Contains(t.Item1))
                 {
-                    reader = Activator.CreateInstance(_entityTypeReaders[i].Item2.MakeGenericType(type)) as TypeReader;
+                    reader = Activator.CreateInstance(t.Item2.MakeGenericType(type)) as TypeReader;
                     _defaultTypeReaders[type] = reader;
                     return reader;
                 }
-            }
+
             return null;
         }
 
         //Execution
         public SearchResult Search(ICommandContext context, int argPos)
             => Search(context.Message.Content.Substring(argPos));
+
         public SearchResult Search(ICommandContext context, string input)
             => Search(input);
+
         public SearchResult Search(string input)
         {
-            string searchInput = _caseSensitive ? input : input.ToLowerInvariant();
+            var searchInput = CaseSensitive ? input : input.ToLowerInvariant();
             var matches = _map.GetCommands(searchInput).OrderByDescending(x => x.Command.Priority).ToImmutableArray();
 
-            if (matches.Length > 0)
-                return SearchResult.FromSuccess(input, matches);
-            else
-                return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
+            return matches.Length > 0 ? SearchResult.FromSuccess(input, matches) : SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
 
-        public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IServiceProvider services,
+            MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
             => ExecuteAsync(context, context.Message.Content.Substring(argPos), services, multiMatchHandling);
-        public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+
+        public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services,
+            MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;
 
@@ -360,9 +403,8 @@ namespace Discord.Commands
             var preconditionResults = new Dictionary<CommandMatch, PreconditionResult>();
 
             foreach (var match in commands)
-            {
-                preconditionResults[match] = await match.Command.CheckPreconditionsAsync(context, services).ConfigureAwait(false);
-            }
+                preconditionResults[match] =
+                    await match.Command.CheckPreconditionsAsync(context, services).ConfigureAwait(false);
 
             var successfulPreconditions = preconditionResults
                 .Where(x => x.Value.IsSuccess)
@@ -382,16 +424,18 @@ namespace Discord.Commands
             var parseResultsDict = new Dictionary<CommandMatch, ParseResult>();
             foreach (var pair in successfulPreconditions)
             {
-                var parseResult = await pair.Key.ParseAsync(context, searchResult, pair.Value, services).ConfigureAwait(false);
+                var parseResult = await pair.Key.ParseAsync(context, searchResult, pair.Value, services)
+                    .ConfigureAwait(false);
 
                 if (parseResult.Error == CommandError.MultipleMatches)
                 {
-                    IReadOnlyList<TypeReaderValue> argList, paramList;
                     switch (multiMatchHandling)
                     {
                         case MultiMatchHandling.Best:
-                            argList = parseResult.ArgValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
-                            paramList = parseResult.ParamValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
+                            IReadOnlyList<TypeReaderValue> argList = parseResult.ArgValues
+                                .Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
+                            IReadOnlyList<TypeReaderValue> paramList = parseResult.ParamValues
+                                .Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
                             parseResult = ParseResult.FromSuccess(argList, paramList);
                             break;
                     }
@@ -407,8 +451,11 @@ namespace Discord.Commands
 
                 if (match.Command.Parameters.Count > 0)
                 {
-                    var argValuesSum = parseResult.ArgValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
-                    var paramValuesSum = parseResult.ParamValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
+                    var argValuesSum =
+                        parseResult.ArgValues?.Sum(x =>
+                            x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
+                    var paramValuesSum = parseResult.ParamValues?.Sum(x =>
+                                             x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
 
                     argValuesScore = argValuesSum / match.Command.Parameters.Count;
                     paramValuesScore = paramValuesSum / match.Command.Parameters.Count;

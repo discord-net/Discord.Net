@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -13,6 +12,9 @@ namespace Discord.Rest
             Properties = props;
         }
 
+        public ulong RoleId { get; }
+        public RoleEditInfo Properties { get; }
+
         internal static RoleDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
             var changes = entry.Changes;
@@ -23,11 +25,11 @@ namespace Discord.Rest
             var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
             var permissionsModel = changes.FirstOrDefault(x => x.ChangedProperty == "permissions");
 
-            uint? colorRaw = colorModel?.OldValue?.ToObject<uint>();
-            bool? mentionable = mentionableModel?.OldValue?.ToObject<bool>();
-            bool? hoist = hoistModel?.OldValue?.ToObject<bool>();
-            string name = nameModel?.OldValue?.ToObject<string>();
-            ulong? permissionsRaw = permissionsModel?.OldValue?.ToObject<ulong>();
+            var colorRaw = colorModel?.OldValue?.ToObject<uint>();
+            var mentionable = mentionableModel?.OldValue?.ToObject<bool>();
+            var hoist = hoistModel?.OldValue?.ToObject<bool>();
+            var name = nameModel?.OldValue?.ToObject<string>();
+            var permissionsRaw = permissionsModel?.OldValue?.ToObject<ulong>();
 
             Color? color = null;
             GuildPermissions? permissions = null;
@@ -40,8 +42,5 @@ namespace Discord.Rest
             return new RoleDeleteAuditLogData(entry.TargetId.Value,
                 new RoleEditInfo(color, mentionable, hoist, name, permissions));
         }
-
-        public ulong RoleId { get; }
-        public RoleEditInfo Properties { get; }
     }
 }

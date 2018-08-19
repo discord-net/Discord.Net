@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -11,6 +10,8 @@ namespace Discord.Rest
         {
             Overwrite = overwrite;
         }
+
+        public Overwrite Overwrite { get; }
 
         internal static OverwriteCreateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
@@ -27,11 +28,9 @@ namespace Discord.Rest
             var id = entry.Options.OverwriteTargetId.Value;
             var type = entry.Options.OverwriteType;
 
-            PermissionTarget target = type == "member" ? PermissionTarget.User : PermissionTarget.Role;
+            var target = type == "member" ? PermissionTarget.User : PermissionTarget.Role;
 
             return new OverwriteCreateAuditLogData(new Overwrite(id, target, permissions));
         }
-
-        public Overwrite Overwrite { get; }
     }
 }

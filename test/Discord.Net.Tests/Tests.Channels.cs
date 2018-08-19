@@ -1,7 +1,6 @@
-using Discord.Rest;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord.Rest;
 using Xunit;
 
 namespace Discord
@@ -19,11 +18,7 @@ namespace Discord
             // create a channel category
             var cat1 = await guild.CreateCategoryChannelAsync("cat1");
 
-            if (text1 == null)
-            {
-                // the guild did not have a default channel, so make a new one
-                text1 = await guild.CreateTextChannelAsync("default");
-            }
+            if (text1 == null) text1 = await guild.CreateTextChannelAsync("default");
 
             //Modify #general
             await text1.ModifyAsync(x =>
@@ -39,26 +34,17 @@ namespace Discord
                 x.Position = 2;
                 x.CategoryId = cat1.Id;
             });
-            await text3.ModifyAsync(x =>
-            {
-                x.Topic = "Topic2";
-            });
+            await text3.ModifyAsync(x => { x.Topic = "Topic2"; });
             await text4.ModifyAsync(x =>
             {
                 x.Position = 3;
                 x.Topic = "Topic2";
             });
-            await text5.ModifyAsync(x =>
-            {
-            });
+            await text5.ModifyAsync(x => { });
 
             CheckTextChannels(guild, text1, text2, text3, text4, text5);
         }
-        [Fact]
-        public async Task TestTextChannels()
-        {
-            CheckTextChannels(_guild, (await _guild.GetTextChannelsAsync()).ToArray());
-        }
+
         private static void CheckTextChannels(RestGuild guild, params RestTextChannel[] textChannels)
         {
             Assert.Equal(5, textChannels.Length);
@@ -109,10 +95,7 @@ namespace Discord
                 x.Position = 1;
                 x.CategoryId = cat2.Id;
             });
-            await voice2.ModifyAsync(x =>
-            {
-                x.UserLimit = null;
-            });
+            await voice2.ModifyAsync(x => { x.UserLimit = null; });
             await voice3.ModifyAsync(x =>
             {
                 x.Bitrate = 8000;
@@ -123,11 +106,7 @@ namespace Discord
 
             CheckVoiceChannels(voice1, voice2, voice3);
         }
-        [Fact]
-        public async Task TestVoiceChannels()
-        {
-            CheckVoiceChannels((await _guild.GetVoiceChannelsAsync()).ToArray());
-        }
+
         private static void CheckVoiceChannels(params RestVoiceChannel[] voiceChannels)
         {
             Assert.Equal(3, voiceChannels.Length);
@@ -155,15 +134,6 @@ namespace Discord
             Assert.Equal(8000, voice3.Bitrate);
             Assert.Equal(1, voice3.Position);
             Assert.Equal(16, voice3.UserLimit);
-        }
-
-        [Fact]
-        public async Task TestChannelCategories()
-        {
-            // (await _guild.GetVoiceChannelsAsync()).ToArray()
-            var channels = await _guild.GetCategoryChannelsAsync();
-
-            await CheckChannelCategories(channels.ToArray(), (await _guild.GetChannelsAsync()).ToArray());
         }
 
         private async Task CheckChannelCategories(RestCategoryChannel[] categories, RestGuildChannel[] allChannels)
@@ -212,7 +182,22 @@ namespace Discord
             var voice3Cat = await voice3.GetCategoryAsync();
             Assert.Equal(voice3Cat.Id, cat2.Id);
             Assert.Equal(voice3Cat.Name, cat2.Name);
-
         }
+
+        [Fact]
+        public async Task TestChannelCategories()
+        {
+            // (await _guild.GetVoiceChannelsAsync()).ToArray()
+            var channels = await _guild.GetCategoryChannelsAsync();
+
+            await CheckChannelCategories(channels.ToArray(), (await _guild.GetChannelsAsync()).ToArray());
+        }
+
+        [Fact]
+        public async Task TestTextChannels() =>
+            CheckTextChannels(_guild, (await _guild.GetTextChannelsAsync()).ToArray());
+
+        [Fact]
+        public async Task TestVoiceChannels() => CheckVoiceChannels((await _guild.GetVoiceChannelsAsync()).ToArray());
     }
 }

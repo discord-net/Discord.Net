@@ -11,12 +11,10 @@ namespace Discord.Rest
             MembersRemoved = membersRemoved;
         }
 
-        internal static PruneAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
-        {
-            return new PruneAuditLogData(entry.Options.PruneDeleteMemberDays.Value, entry.Options.PruneMembersRemoved.Value);
-        }
-
         public int PruneDays { get; }
         public int MembersRemoved { get; }
+
+        internal static PruneAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry) =>
+            new PruneAuditLogData(entry.Options.PruneDeleteMemberDays.Value, entry.Options.PruneMembersRemoved.Value);
     }
 }

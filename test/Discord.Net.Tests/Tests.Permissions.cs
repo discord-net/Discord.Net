@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -13,8 +12,8 @@ namespace Discord
             => TestHelper(value.RawValue, (ulong)permission, expected);
 
         /// <summary>
-        /// Tests the flag of the given permissions value to the expected output
-        /// and then tries to toggle the flag on and off
+        ///     Tests the flag of the given permissions value to the expected output
+        ///     and then tries to toggle the flag on and off
         /// </summary>
         /// <param name="rawValue"></param>
         /// <param name="flagValue"></param>
@@ -37,9 +36,9 @@ namespace Discord
         }
 
         /// <summary>
-        /// Tests that flag of the given permissions value to be the expected output
-        /// and then tries cycling through the states of the allow and deny values
-        /// for that flag
+        ///     Tests that flag of the given permissions value to be the expected output
+        ///     and then tries cycling through the states of the allow and deny values
+        ///     for that flag
         /// </summary>
         /// <param name="value"></param>
         /// <param name="flag"></param>
@@ -51,8 +50,8 @@ namespace Discord
 
             // check toggling bits for both allow and deny
             // have to make copies to get around read only property
-            ulong allow = value.AllowValue;
-            ulong deny = value.DenyValue;
+            var allow = value.AllowValue;
+            var deny = value.DenyValue;
 
             // both unset should be inherit
             Permissions.UnsetFlag(ref allow, (ulong)flag);
@@ -76,381 +75,193 @@ namespace Discord
         }
 
         /// <summary>
-        /// Tests for the <see cref="Discord.Permissions"/> class.
-        ///
-        /// Tests that text channel permissions get the right value
-        /// from the Has method.
+        ///     Tests for the
+        ///     <see
+        ///         cref="OverwritePermissions.Modify(PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?)" />
+        ///     method to ensure that the default no-param call does not modify the resulting value
+        ///     of the OverwritePermissions.
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public Task TestPermissionsHasChannelPermissionText()
+        public Task TestOverwritePermissionModifyNoParam()
         {
-            var value = ChannelPermissions.Text;
-            // check that the result of GetValue matches for all properties of text channel
-            TestHelper(value, ChannelPermission.CreateInstantInvite, true);
-            TestHelper(value, ChannelPermission.ManageChannels, true);
-            TestHelper(value, ChannelPermission.AddReactions, true);
-            TestHelper(value, ChannelPermission.ViewChannel, true);
-            TestHelper(value, ChannelPermission.SendMessages, true);
-            TestHelper(value, ChannelPermission.SendTTSMessages, true);
-            TestHelper(value, ChannelPermission.ManageMessages, true);
-            TestHelper(value, ChannelPermission.EmbedLinks, true);
-            TestHelper(value, ChannelPermission.AttachFiles, true);
-            TestHelper(value, ChannelPermission.ReadMessageHistory, true);
-            TestHelper(value, ChannelPermission.MentionEveryone, true);
-            TestHelper(value, ChannelPermission.UseExternalEmojis, true);
-            TestHelper(value, ChannelPermission.ManageRoles, true);
-            TestHelper(value, ChannelPermission.ManageWebhooks, true);
+            // test for all Text allowed, none denied
+            var original = new OverwritePermissions(ChannelPermissions.Text.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
 
-            TestHelper(value, ChannelPermission.Connect, false);
-            TestHelper(value, ChannelPermission.Speak, false);
-            TestHelper(value, ChannelPermission.MuteMembers, false);
-            TestHelper(value, ChannelPermission.DeafenMembers, false);
-            TestHelper(value, ChannelPermission.MoveMembers, false);
-            TestHelper(value, ChannelPermission.UseVAD, false);
+            // none allowed, text denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Text.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // category allowed, none denied
+            original = new OverwritePermissions(ChannelPermissions.Category.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, category denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Category.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // DM allowed, none denied
+            original = new OverwritePermissions(ChannelPermissions.DM.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, DM denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.DM.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // voice allowed, none denied
+            original = new OverwritePermissions(ChannelPermissions.Voice.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, voice denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Voice.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // group allowed, none denied
+            original = new OverwritePermissions(ChannelPermissions.Group.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, group denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Group.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, none denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
 
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Tests for the <see cref="Discord.Permissions"/> class.
-        ///
-        /// Tests that no channel permissions get the right value
-        /// from the Has method.
+        ///     Test <see cref="Discord.OverwritePermissions" />
+        ///     for when all dm permissions are allowed and denied
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public Task TestPermissionsHasChannelPermissionNone()
-        {
-            // check that none will fail all
-            var value = ChannelPermissions.None;
-
-            TestHelper(value, ChannelPermission.CreateInstantInvite, false);
-            TestHelper(value, ChannelPermission.ManageChannels, false);
-            TestHelper(value, ChannelPermission.AddReactions, false);
-            TestHelper(value, ChannelPermission.ViewChannel, false);
-            TestHelper(value, ChannelPermission.SendMessages, false);
-            TestHelper(value, ChannelPermission.SendTTSMessages, false);
-            TestHelper(value, ChannelPermission.ManageMessages, false);
-            TestHelper(value, ChannelPermission.EmbedLinks, false);
-            TestHelper(value, ChannelPermission.AttachFiles, false);
-            TestHelper(value, ChannelPermission.ReadMessageHistory, false);
-            TestHelper(value, ChannelPermission.MentionEveryone, false);
-            TestHelper(value, ChannelPermission.UseExternalEmojis, false);
-            TestHelper(value, ChannelPermission.ManageRoles, false);
-            TestHelper(value, ChannelPermission.ManageWebhooks, false);
-            TestHelper(value, ChannelPermission.Connect, false);
-            TestHelper(value, ChannelPermission.Speak, false);
-            TestHelper(value, ChannelPermission.MuteMembers, false);
-            TestHelper(value, ChannelPermission.DeafenMembers, false);
-            TestHelper(value, ChannelPermission.MoveMembers, false);
-            TestHelper(value, ChannelPermission.UseVAD, false);
-
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Tests for the <see cref="Discord.Permissions"/> class.
-        ///
-        /// Tests that the dm channel permissions get the right value
-        /// from the Has method.
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public Task TestPermissionsHasChannelPermissionDM()
-        {
-            // check that none will fail all
-            var value = ChannelPermissions.DM;
-
-            TestHelper(value, ChannelPermission.CreateInstantInvite, false);
-            TestHelper(value, ChannelPermission.ManageChannels, false);
-            TestHelper(value, ChannelPermission.AddReactions, false);
-            TestHelper(value, ChannelPermission.ViewChannel, true);
-            TestHelper(value, ChannelPermission.SendMessages, true);
-            TestHelper(value, ChannelPermission.SendTTSMessages, false);
-            TestHelper(value, ChannelPermission.ManageMessages, false);
-            TestHelper(value, ChannelPermission.EmbedLinks, true);
-            TestHelper(value, ChannelPermission.AttachFiles, true);
-            TestHelper(value, ChannelPermission.ReadMessageHistory, true);
-            TestHelper(value, ChannelPermission.MentionEveryone, false);
-            TestHelper(value, ChannelPermission.UseExternalEmojis, true);
-            TestHelper(value, ChannelPermission.ManageRoles, false);
-            TestHelper(value, ChannelPermission.ManageWebhooks, false);
-            TestHelper(value, ChannelPermission.Connect, true);
-            TestHelper(value, ChannelPermission.Speak, true);
-            TestHelper(value, ChannelPermission.MuteMembers, false);
-            TestHelper(value, ChannelPermission.DeafenMembers, false);
-            TestHelper(value, ChannelPermission.MoveMembers, false);
-            TestHelper(value, ChannelPermission.UseVAD, true);
-
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Tests for the <see cref="Discord.Permissions"/> class.
-        ///
-        /// Tests that the group channel permissions get the right value
-        /// from the Has method.
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public Task TestPermissionsHasChannelPermissionGroup()
-        {
-            var value = ChannelPermissions.Group;
-
-            TestHelper(value, ChannelPermission.CreateInstantInvite, false);
-            TestHelper(value, ChannelPermission.ManageChannels, false);
-            TestHelper(value, ChannelPermission.AddReactions, false);
-            TestHelper(value, ChannelPermission.ViewChannel, false);
-            TestHelper(value, ChannelPermission.SendMessages, true);
-            TestHelper(value, ChannelPermission.SendTTSMessages, true);
-            TestHelper(value, ChannelPermission.ManageMessages, false);
-            TestHelper(value, ChannelPermission.EmbedLinks, true);
-            TestHelper(value, ChannelPermission.AttachFiles, true);
-            TestHelper(value, ChannelPermission.ReadMessageHistory, false);
-            TestHelper(value, ChannelPermission.MentionEveryone, false);
-            TestHelper(value, ChannelPermission.UseExternalEmojis, false);
-            TestHelper(value, ChannelPermission.ManageRoles, false);
-            TestHelper(value, ChannelPermission.ManageWebhooks, false);
-            TestHelper(value, ChannelPermission.Connect, true);
-            TestHelper(value, ChannelPermission.Speak, true);
-            TestHelper(value, ChannelPermission.MuteMembers, false);
-            TestHelper(value, ChannelPermission.DeafenMembers, false);
-            TestHelper(value, ChannelPermission.MoveMembers, false);
-            TestHelper(value, ChannelPermission.UseVAD, true);
-
-            return Task.CompletedTask;
-        }
-
-
-        /// <summary>
-        /// Tests for the <see cref="Discord.Permissions"/> class.
-        ///
-        /// Tests that the voice channel permissions get the right value
-        /// from the Has method.
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public Task TestPermissionsHasChannelPermissionVoice()
-        {
-            // make a flag with all possible values for Voice channel permissions
-            var value = ChannelPermissions.Voice;
-
-            TestHelper(value, ChannelPermission.CreateInstantInvite, true);
-            TestHelper(value, ChannelPermission.ManageChannels, true);
-            TestHelper(value, ChannelPermission.AddReactions, false);
-            TestHelper(value, ChannelPermission.ViewChannel, true);
-            TestHelper(value, ChannelPermission.SendMessages, false);
-            TestHelper(value, ChannelPermission.SendTTSMessages, false);
-            TestHelper(value, ChannelPermission.ManageMessages, false);
-            TestHelper(value, ChannelPermission.EmbedLinks, false);
-            TestHelper(value, ChannelPermission.AttachFiles, false);
-            TestHelper(value, ChannelPermission.ReadMessageHistory, false);
-            TestHelper(value, ChannelPermission.MentionEveryone, false);
-            TestHelper(value, ChannelPermission.UseExternalEmojis, false);
-            TestHelper(value, ChannelPermission.ManageRoles, true);
-            TestHelper(value, ChannelPermission.ManageWebhooks, false);
-            TestHelper(value, ChannelPermission.Connect, true);
-            TestHelper(value, ChannelPermission.Speak, true);
-            TestHelper(value, ChannelPermission.MuteMembers, true);
-            TestHelper(value, ChannelPermission.DeafenMembers, true);
-            TestHelper(value, ChannelPermission.MoveMembers, true);
-            TestHelper(value, ChannelPermission.UseVAD, true);
-
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Tests for the <see cref="Discord.Permissions"/> class.
-        ///
-        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/>
-        /// returns the correct value when no permissions are set.
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public Task TestPermissionsHasGuildPermissionNone()
-        {
-            var value = GuildPermissions.None;
-
-            TestHelper(value, GuildPermission.CreateInstantInvite, false);
-            TestHelper(value, GuildPermission.KickMembers, false);
-            TestHelper(value, GuildPermission.BanMembers, false);
-            TestHelper(value, GuildPermission.Administrator, false);
-            TestHelper(value, GuildPermission.ManageChannels, false);
-            TestHelper(value, GuildPermission.ManageGuild, false);
-            TestHelper(value, GuildPermission.AddReactions, false);
-            TestHelper(value, GuildPermission.ViewAuditLog, false);
-            TestHelper(value, GuildPermission.ViewChannel, false);
-            TestHelper(value, GuildPermission.SendMessages, false);
-            TestHelper(value, GuildPermission.SendTTSMessages, false);
-            TestHelper(value, GuildPermission.ManageMessages, false);
-            TestHelper(value, GuildPermission.EmbedLinks, false);
-            TestHelper(value, GuildPermission.AttachFiles, false);
-            TestHelper(value, GuildPermission.ReadMessageHistory, false);
-            TestHelper(value, GuildPermission.MentionEveryone, false);
-            TestHelper(value, GuildPermission.UseExternalEmojis, false);
-            TestHelper(value, GuildPermission.Connect, false);
-            TestHelper(value, GuildPermission.Speak, false);
-            TestHelper(value, GuildPermission.MuteMembers, false);
-            TestHelper(value, GuildPermission.MoveMembers, false);
-            TestHelper(value, GuildPermission.UseVAD, false);
-            TestHelper(value, GuildPermission.ChangeNickname, false);
-            TestHelper(value, GuildPermission.ManageNicknames, false);
-            TestHelper(value, GuildPermission.ManageRoles, false);
-            TestHelper(value, GuildPermission.ManageWebhooks, false);
-            TestHelper(value, GuildPermission.ManageEmojis, false);
-
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Tests for the <see cref="Discord.Permissions"/> class.
-        ///
-        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/>
-        /// returns the correct value when all permissions are set.
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public Task TestPermissionsHasGuildPermissionAll()
-        {
-            var value = GuildPermissions.All;
-
-            TestHelper(value, GuildPermission.CreateInstantInvite, true);
-            TestHelper(value, GuildPermission.KickMembers, true);
-            TestHelper(value, GuildPermission.BanMembers, true);
-            TestHelper(value, GuildPermission.Administrator, true);
-            TestHelper(value, GuildPermission.ManageChannels, true);
-            TestHelper(value, GuildPermission.ManageGuild, true);
-            TestHelper(value, GuildPermission.AddReactions, true);
-            TestHelper(value, GuildPermission.ViewAuditLog, true);
-            TestHelper(value, GuildPermission.ViewChannel, true);
-            TestHelper(value, GuildPermission.SendMessages, true);
-            TestHelper(value, GuildPermission.SendTTSMessages, true);
-            TestHelper(value, GuildPermission.ManageMessages, true);
-            TestHelper(value, GuildPermission.EmbedLinks, true);
-            TestHelper(value, GuildPermission.AttachFiles, true);
-            TestHelper(value, GuildPermission.ReadMessageHistory, true);
-            TestHelper(value, GuildPermission.MentionEveryone, true);
-            TestHelper(value, GuildPermission.UseExternalEmojis, true);
-            TestHelper(value, GuildPermission.Connect, true);
-            TestHelper(value, GuildPermission.Speak, true);
-            TestHelper(value, GuildPermission.MuteMembers, true);
-            TestHelper(value, GuildPermission.MoveMembers, true);
-            TestHelper(value, GuildPermission.UseVAD, true);
-            TestHelper(value, GuildPermission.ChangeNickname, true);
-            TestHelper(value, GuildPermission.ManageNicknames, true);
-            TestHelper(value, GuildPermission.ManageRoles, true);
-            TestHelper(value, GuildPermission.ManageWebhooks, true);
-            TestHelper(value, GuildPermission.ManageEmojis, true);
-
-
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Tests for the <see cref="Discord.Permissions"/> class.
-        ///
-        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/>
-        /// returns the correct value when webhook permissions are set.
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public Task TestPermissionsHasGuildPermissionWebhook()
-        {
-            var value = GuildPermissions.Webhook;
-
-            TestHelper(value, GuildPermission.CreateInstantInvite, false);
-            TestHelper(value, GuildPermission.KickMembers, false);
-            TestHelper(value, GuildPermission.BanMembers, false);
-            TestHelper(value, GuildPermission.Administrator, false);
-            TestHelper(value, GuildPermission.ManageChannels, false);
-            TestHelper(value, GuildPermission.ManageGuild, false);
-            TestHelper(value, GuildPermission.AddReactions, false);
-            TestHelper(value, GuildPermission.ViewAuditLog, false);
-            TestHelper(value, GuildPermission.ViewChannel, false);
-            TestHelper(value, GuildPermission.SendMessages, true);
-            TestHelper(value, GuildPermission.SendTTSMessages, true);
-            TestHelper(value, GuildPermission.ManageMessages, false);
-            TestHelper(value, GuildPermission.EmbedLinks, true);
-            TestHelper(value, GuildPermission.AttachFiles, true);
-            TestHelper(value, GuildPermission.ReadMessageHistory, false);
-            TestHelper(value, GuildPermission.MentionEveryone, false);
-            TestHelper(value, GuildPermission.UseExternalEmojis, false);
-            TestHelper(value, GuildPermission.Connect, false);
-            TestHelper(value, GuildPermission.Speak, false);
-            TestHelper(value, GuildPermission.MuteMembers, false);
-            TestHelper(value, GuildPermission.MoveMembers, false);
-            TestHelper(value, GuildPermission.UseVAD, false);
-            TestHelper(value, GuildPermission.ChangeNickname, false);
-            TestHelper(value, GuildPermission.ManageNicknames, false);
-            TestHelper(value, GuildPermission.ManageRoles, false);
-            TestHelper(value, GuildPermission.ManageWebhooks, false);
-            TestHelper(value, GuildPermission.ManageEmojis, false);
-
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Test <see cref="Discord.OverwritePermissions"/>
-        /// for when all text permissions are allowed and denied
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public Task TestOverwritePermissionsText()
+        public Task TestOverwritePermissionsDM()
         {
             // allow all for text channel
-            var value = new OverwritePermissions(ChannelPermissions.Text.RawValue, ChannelPermissions.None.RawValue);
+            var value = new OverwritePermissions(ChannelPermissions.DM.RawValue, ChannelPermissions.None.RawValue);
 
-            TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Allow);
-            TestHelper(value, ChannelPermission.ManageChannels, PermValue.Allow);
-            TestHelper(value, ChannelPermission.AddReactions, PermValue.Allow);
+            TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ManageChannels, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.AddReactions, PermValue.Inherit);
             TestHelper(value, ChannelPermission.ViewChannel, PermValue.Allow);
             TestHelper(value, ChannelPermission.SendMessages, PermValue.Allow);
-            TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Allow);
-            TestHelper(value, ChannelPermission.ManageMessages, PermValue.Allow);
+            TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ManageMessages, PermValue.Inherit);
             TestHelper(value, ChannelPermission.EmbedLinks, PermValue.Allow);
             TestHelper(value, ChannelPermission.AttachFiles, PermValue.Allow);
             TestHelper(value, ChannelPermission.ReadMessageHistory, PermValue.Allow);
-            TestHelper(value, ChannelPermission.MentionEveryone, PermValue.Allow);
+            TestHelper(value, ChannelPermission.MentionEveryone, PermValue.Inherit);
             TestHelper(value, ChannelPermission.UseExternalEmojis, PermValue.Allow);
-            TestHelper(value, ChannelPermission.ManageRoles, PermValue.Allow);
-            TestHelper(value, ChannelPermission.ManageWebhooks, PermValue.Allow);
-            TestHelper(value, ChannelPermission.Connect, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.Speak, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ManageRoles, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ManageWebhooks, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.Connect, PermValue.Allow);
+            TestHelper(value, ChannelPermission.Speak, PermValue.Allow);
             TestHelper(value, ChannelPermission.MuteMembers, PermValue.Inherit);
             TestHelper(value, ChannelPermission.DeafenMembers, PermValue.Inherit);
             TestHelper(value, ChannelPermission.MoveMembers, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.UseVAD, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.UseVAD, PermValue.Allow);
 
-            value = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Text.RawValue);
+            value = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.DM.RawValue);
 
-            TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Deny);
-            TestHelper(value, ChannelPermission.ManageChannels, PermValue.Deny);
-            TestHelper(value, ChannelPermission.AddReactions, PermValue.Deny);
+            TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ManageChannels, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.AddReactions, PermValue.Inherit);
             TestHelper(value, ChannelPermission.ViewChannel, PermValue.Deny);
             TestHelper(value, ChannelPermission.SendMessages, PermValue.Deny);
-            TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Deny);
-            TestHelper(value, ChannelPermission.ManageMessages, PermValue.Deny);
+            TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ManageMessages, PermValue.Inherit);
             TestHelper(value, ChannelPermission.EmbedLinks, PermValue.Deny);
             TestHelper(value, ChannelPermission.AttachFiles, PermValue.Deny);
             TestHelper(value, ChannelPermission.ReadMessageHistory, PermValue.Deny);
-            TestHelper(value, ChannelPermission.MentionEveryone, PermValue.Deny);
+            TestHelper(value, ChannelPermission.MentionEveryone, PermValue.Inherit);
             TestHelper(value, ChannelPermission.UseExternalEmojis, PermValue.Deny);
-            TestHelper(value, ChannelPermission.ManageRoles, PermValue.Deny);
-            TestHelper(value, ChannelPermission.ManageWebhooks, PermValue.Deny);
-            TestHelper(value, ChannelPermission.Connect, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.Speak, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ManageRoles, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ManageWebhooks, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.Connect, PermValue.Deny);
+            TestHelper(value, ChannelPermission.Speak, PermValue.Deny);
             TestHelper(value, ChannelPermission.MuteMembers, PermValue.Inherit);
             TestHelper(value, ChannelPermission.DeafenMembers, PermValue.Inherit);
             TestHelper(value, ChannelPermission.MoveMembers, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.UseVAD, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.UseVAD, PermValue.Deny);
 
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Test <see cref="Discord.OverwritePermissions"/>
-        /// for when none of the permissions are set.
+        ///     Test <see cref="Discord.OverwritePermissions" />
+        ///     for when all group permissions are allowed and denied
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public Task TestOverwritePermissionsGroup()
+        {
+            // allow all for group channels
+            var value = new OverwritePermissions(ChannelPermissions.Group.RawValue, ChannelPermissions.None.RawValue);
+
+            TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ManageChannels, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.AddReactions, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.SendMessages, PermValue.Allow);
+            TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Allow);
+            TestHelper(value, ChannelPermission.ManageMessages, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.EmbedLinks, PermValue.Allow);
+            TestHelper(value, ChannelPermission.AttachFiles, PermValue.Allow);
+            TestHelper(value, ChannelPermission.ReadMessageHistory, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.MentionEveryone, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.UseExternalEmojis, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ManageRoles, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ManageWebhooks, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.Connect, PermValue.Allow);
+            TestHelper(value, ChannelPermission.Speak, PermValue.Allow);
+            TestHelper(value, ChannelPermission.MuteMembers, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.DeafenMembers, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.MoveMembers, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.UseVAD, PermValue.Allow);
+
+            value = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Group.RawValue);
+
+            TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ManageChannels, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.AddReactions, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.SendMessages, PermValue.Deny);
+            TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Deny);
+            TestHelper(value, ChannelPermission.ManageMessages, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.EmbedLinks, PermValue.Deny);
+            TestHelper(value, ChannelPermission.AttachFiles, PermValue.Deny);
+            TestHelper(value, ChannelPermission.ReadMessageHistory, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.MentionEveryone, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.UseExternalEmojis, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ManageRoles, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ManageWebhooks, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.Connect, PermValue.Deny);
+            TestHelper(value, ChannelPermission.Speak, PermValue.Deny);
+            TestHelper(value, ChannelPermission.MuteMembers, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.DeafenMembers, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.MoveMembers, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.UseVAD, PermValue.Deny);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        ///     Test <see cref="Discord.OverwritePermissions" />
+        ///     for when none of the permissions are set.
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -530,124 +341,66 @@ namespace Discord
         }
 
         /// <summary>
-        /// Test <see cref="Discord.OverwritePermissions"/>
-        /// for when all dm permissions are allowed and denied
+        ///     Test <see cref="Discord.OverwritePermissions" />
+        ///     for when all text permissions are allowed and denied
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public Task TestOverwritePermissionsDM()
+        public Task TestOverwritePermissionsText()
         {
             // allow all for text channel
-            var value = new OverwritePermissions(ChannelPermissions.DM.RawValue, ChannelPermissions.None.RawValue);
+            var value = new OverwritePermissions(ChannelPermissions.Text.RawValue, ChannelPermissions.None.RawValue);
 
-            TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ManageChannels, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.AddReactions, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Allow);
+            TestHelper(value, ChannelPermission.ManageChannels, PermValue.Allow);
+            TestHelper(value, ChannelPermission.AddReactions, PermValue.Allow);
             TestHelper(value, ChannelPermission.ViewChannel, PermValue.Allow);
             TestHelper(value, ChannelPermission.SendMessages, PermValue.Allow);
-            TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ManageMessages, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Allow);
+            TestHelper(value, ChannelPermission.ManageMessages, PermValue.Allow);
             TestHelper(value, ChannelPermission.EmbedLinks, PermValue.Allow);
             TestHelper(value, ChannelPermission.AttachFiles, PermValue.Allow);
             TestHelper(value, ChannelPermission.ReadMessageHistory, PermValue.Allow);
-            TestHelper(value, ChannelPermission.MentionEveryone, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.MentionEveryone, PermValue.Allow);
             TestHelper(value, ChannelPermission.UseExternalEmojis, PermValue.Allow);
-            TestHelper(value, ChannelPermission.ManageRoles, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ManageWebhooks, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.Connect, PermValue.Allow);
-            TestHelper(value, ChannelPermission.Speak, PermValue.Allow);
+            TestHelper(value, ChannelPermission.ManageRoles, PermValue.Allow);
+            TestHelper(value, ChannelPermission.ManageWebhooks, PermValue.Allow);
+            TestHelper(value, ChannelPermission.Connect, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.Speak, PermValue.Inherit);
             TestHelper(value, ChannelPermission.MuteMembers, PermValue.Inherit);
             TestHelper(value, ChannelPermission.DeafenMembers, PermValue.Inherit);
             TestHelper(value, ChannelPermission.MoveMembers, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.UseVAD, PermValue.Allow);
+            TestHelper(value, ChannelPermission.UseVAD, PermValue.Inherit);
 
-            value = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.DM.RawValue);
+            value = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Text.RawValue);
 
-            TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ManageChannels, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.AddReactions, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Deny);
+            TestHelper(value, ChannelPermission.ManageChannels, PermValue.Deny);
+            TestHelper(value, ChannelPermission.AddReactions, PermValue.Deny);
             TestHelper(value, ChannelPermission.ViewChannel, PermValue.Deny);
             TestHelper(value, ChannelPermission.SendMessages, PermValue.Deny);
-            TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ManageMessages, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Deny);
+            TestHelper(value, ChannelPermission.ManageMessages, PermValue.Deny);
             TestHelper(value, ChannelPermission.EmbedLinks, PermValue.Deny);
             TestHelper(value, ChannelPermission.AttachFiles, PermValue.Deny);
             TestHelper(value, ChannelPermission.ReadMessageHistory, PermValue.Deny);
-            TestHelper(value, ChannelPermission.MentionEveryone, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.MentionEveryone, PermValue.Deny);
             TestHelper(value, ChannelPermission.UseExternalEmojis, PermValue.Deny);
-            TestHelper(value, ChannelPermission.ManageRoles, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ManageWebhooks, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.Connect, PermValue.Deny);
-            TestHelper(value, ChannelPermission.Speak, PermValue.Deny);
+            TestHelper(value, ChannelPermission.ManageRoles, PermValue.Deny);
+            TestHelper(value, ChannelPermission.ManageWebhooks, PermValue.Deny);
+            TestHelper(value, ChannelPermission.Connect, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.Speak, PermValue.Inherit);
             TestHelper(value, ChannelPermission.MuteMembers, PermValue.Inherit);
             TestHelper(value, ChannelPermission.DeafenMembers, PermValue.Inherit);
             TestHelper(value, ChannelPermission.MoveMembers, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.UseVAD, PermValue.Deny);
+            TestHelper(value, ChannelPermission.UseVAD, PermValue.Inherit);
 
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Test <see cref="Discord.OverwritePermissions"/>
-        /// for when all group permissions are allowed and denied
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public Task TestOverwritePermissionsGroup()
-        {
-            // allow all for group channels
-            var value = new OverwritePermissions(ChannelPermissions.Group.RawValue, ChannelPermissions.None.RawValue);
-
-            TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ManageChannels, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.AddReactions, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.SendMessages, PermValue.Allow);
-            TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Allow);
-            TestHelper(value, ChannelPermission.ManageMessages, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.EmbedLinks, PermValue.Allow);
-            TestHelper(value, ChannelPermission.AttachFiles, PermValue.Allow);
-            TestHelper(value, ChannelPermission.ReadMessageHistory, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.MentionEveryone, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.UseExternalEmojis, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ManageRoles, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ManageWebhooks, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.Connect, PermValue.Allow);
-            TestHelper(value, ChannelPermission.Speak, PermValue.Allow);
-            TestHelper(value, ChannelPermission.MuteMembers, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.DeafenMembers, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.MoveMembers, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.UseVAD, PermValue.Allow);
-
-            value = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Group.RawValue);
-
-            TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ManageChannels, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.AddReactions, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.SendMessages, PermValue.Deny);
-            TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Deny);
-            TestHelper(value, ChannelPermission.ManageMessages, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.EmbedLinks, PermValue.Deny);
-            TestHelper(value, ChannelPermission.AttachFiles, PermValue.Deny);
-            TestHelper(value, ChannelPermission.ReadMessageHistory, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.MentionEveryone, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.UseExternalEmojis, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ManageRoles, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ManageWebhooks, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.Connect, PermValue.Deny);
-            TestHelper(value, ChannelPermission.Speak, PermValue.Deny);
-            TestHelper(value, ChannelPermission.MuteMembers, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.DeafenMembers, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.MoveMembers, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.UseVAD, PermValue.Deny);
-
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Test <see cref="Discord.OverwritePermissions"/>
-        /// for when all group permissions are allowed and denied
+        ///     Test <see cref="Discord.OverwritePermissions" />
+        ///     for when all group permissions are allowed and denied
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -704,68 +457,308 @@ namespace Discord
         }
 
         /// <summary>
-        /// Tests for the <see cref="OverwritePermissions.Modify(PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?)"/>
-        /// method to ensure that the default no-param call does not modify the resulting value
-        /// of the OverwritePermissions.
+        ///     Tests for the <see cref="Discord.Permissions" /> class.
+        ///     Tests that the dm channel permissions get the right value
+        ///     from the Has method.
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public Task TestOverwritePermissionModifyNoParam()
+        public Task TestPermissionsHasChannelPermissionDM()
         {
-            // test for all Text allowed, none denied
-            var original = new OverwritePermissions(ChannelPermissions.Text.RawValue, ChannelPermissions.None.RawValue);
-            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
-            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+            // check that none will fail all
+            var value = ChannelPermissions.DM;
 
-            // none allowed, text denied
-            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Text.RawValue);
-            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
-            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+            TestHelper(value, ChannelPermission.CreateInstantInvite);
+            TestHelper(value, ChannelPermission.ManageChannels);
+            TestHelper(value, ChannelPermission.AddReactions);
+            TestHelper(value, ChannelPermission.ViewChannel, true);
+            TestHelper(value, ChannelPermission.SendMessages, true);
+            TestHelper(value, ChannelPermission.SendTTSMessages);
+            TestHelper(value, ChannelPermission.ManageMessages);
+            TestHelper(value, ChannelPermission.EmbedLinks, true);
+            TestHelper(value, ChannelPermission.AttachFiles, true);
+            TestHelper(value, ChannelPermission.ReadMessageHistory, true);
+            TestHelper(value, ChannelPermission.MentionEveryone);
+            TestHelper(value, ChannelPermission.UseExternalEmojis, true);
+            TestHelper(value, ChannelPermission.ManageRoles);
+            TestHelper(value, ChannelPermission.ManageWebhooks);
+            TestHelper(value, ChannelPermission.Connect, true);
+            TestHelper(value, ChannelPermission.Speak, true);
+            TestHelper(value, ChannelPermission.MuteMembers);
+            TestHelper(value, ChannelPermission.DeafenMembers);
+            TestHelper(value, ChannelPermission.MoveMembers);
+            TestHelper(value, ChannelPermission.UseVAD, true);
 
-            // category allowed, none denied
-            original = new OverwritePermissions(ChannelPermissions.Category.RawValue, ChannelPermissions.None.RawValue);
-            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
-            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+            return Task.CompletedTask;
+        }
 
-            // none allowed, category denied
-            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Category.RawValue);
-            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
-            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+        /// <summary>
+        ///     Tests for the <see cref="Discord.Permissions" /> class.
+        ///     Tests that the group channel permissions get the right value
+        ///     from the Has method.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public Task TestPermissionsHasChannelPermissionGroup()
+        {
+            var value = ChannelPermissions.Group;
 
-            // DM allowed, none denied
-            original = new OverwritePermissions(ChannelPermissions.DM.RawValue, ChannelPermissions.None.RawValue);
-            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
-            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+            TestHelper(value, ChannelPermission.CreateInstantInvite);
+            TestHelper(value, ChannelPermission.ManageChannels);
+            TestHelper(value, ChannelPermission.AddReactions);
+            TestHelper(value, ChannelPermission.ViewChannel);
+            TestHelper(value, ChannelPermission.SendMessages, true);
+            TestHelper(value, ChannelPermission.SendTTSMessages, true);
+            TestHelper(value, ChannelPermission.ManageMessages);
+            TestHelper(value, ChannelPermission.EmbedLinks, true);
+            TestHelper(value, ChannelPermission.AttachFiles, true);
+            TestHelper(value, ChannelPermission.ReadMessageHistory);
+            TestHelper(value, ChannelPermission.MentionEveryone);
+            TestHelper(value, ChannelPermission.UseExternalEmojis);
+            TestHelper(value, ChannelPermission.ManageRoles);
+            TestHelper(value, ChannelPermission.ManageWebhooks);
+            TestHelper(value, ChannelPermission.Connect, true);
+            TestHelper(value, ChannelPermission.Speak, true);
+            TestHelper(value, ChannelPermission.MuteMembers);
+            TestHelper(value, ChannelPermission.DeafenMembers);
+            TestHelper(value, ChannelPermission.MoveMembers);
+            TestHelper(value, ChannelPermission.UseVAD, true);
 
-            // none allowed, DM denied
-            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.DM.RawValue);
-            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
-            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+            return Task.CompletedTask;
+        }
 
-            // voice allowed, none denied
-            original = new OverwritePermissions(ChannelPermissions.Voice.RawValue, ChannelPermissions.None.RawValue);
-            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
-            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+        /// <summary>
+        ///     Tests for the <see cref="Discord.Permissions" /> class.
+        ///     Tests that no channel permissions get the right value
+        ///     from the Has method.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public Task TestPermissionsHasChannelPermissionNone()
+        {
+            // check that none will fail all
+            var value = ChannelPermissions.None;
 
-            // none allowed, voice denied
-            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Voice.RawValue);
-            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
-            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+            TestHelper(value, ChannelPermission.CreateInstantInvite);
+            TestHelper(value, ChannelPermission.ManageChannels);
+            TestHelper(value, ChannelPermission.AddReactions);
+            TestHelper(value, ChannelPermission.ViewChannel);
+            TestHelper(value, ChannelPermission.SendMessages);
+            TestHelper(value, ChannelPermission.SendTTSMessages);
+            TestHelper(value, ChannelPermission.ManageMessages);
+            TestHelper(value, ChannelPermission.EmbedLinks);
+            TestHelper(value, ChannelPermission.AttachFiles);
+            TestHelper(value, ChannelPermission.ReadMessageHistory);
+            TestHelper(value, ChannelPermission.MentionEveryone);
+            TestHelper(value, ChannelPermission.UseExternalEmojis);
+            TestHelper(value, ChannelPermission.ManageRoles);
+            TestHelper(value, ChannelPermission.ManageWebhooks);
+            TestHelper(value, ChannelPermission.Connect);
+            TestHelper(value, ChannelPermission.Speak);
+            TestHelper(value, ChannelPermission.MuteMembers);
+            TestHelper(value, ChannelPermission.DeafenMembers);
+            TestHelper(value, ChannelPermission.MoveMembers);
+            TestHelper(value, ChannelPermission.UseVAD);
 
-            // group allowed, none denied
-            original = new OverwritePermissions(ChannelPermissions.Group.RawValue, ChannelPermissions.None.RawValue);
-            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
-            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+            return Task.CompletedTask;
+        }
 
-            // none allowed, group denied
-            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Group.RawValue);
-            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
-            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+        /// <summary>
+        ///     Tests for the <see cref="Discord.Permissions" /> class.
+        ///     Tests that text channel permissions get the right value
+        ///     from the Has method.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public Task TestPermissionsHasChannelPermissionText()
+        {
+            var value = ChannelPermissions.Text;
+            // check that the result of GetValue matches for all properties of text channel
+            TestHelper(value, ChannelPermission.CreateInstantInvite, true);
+            TestHelper(value, ChannelPermission.ManageChannels, true);
+            TestHelper(value, ChannelPermission.AddReactions, true);
+            TestHelper(value, ChannelPermission.ViewChannel, true);
+            TestHelper(value, ChannelPermission.SendMessages, true);
+            TestHelper(value, ChannelPermission.SendTTSMessages, true);
+            TestHelper(value, ChannelPermission.ManageMessages, true);
+            TestHelper(value, ChannelPermission.EmbedLinks, true);
+            TestHelper(value, ChannelPermission.AttachFiles, true);
+            TestHelper(value, ChannelPermission.ReadMessageHistory, true);
+            TestHelper(value, ChannelPermission.MentionEveryone, true);
+            TestHelper(value, ChannelPermission.UseExternalEmojis, true);
+            TestHelper(value, ChannelPermission.ManageRoles, true);
+            TestHelper(value, ChannelPermission.ManageWebhooks, true);
 
-            // none allowed, none denied
-            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.None.RawValue);
-            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
-            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+            TestHelper(value, ChannelPermission.Connect);
+            TestHelper(value, ChannelPermission.Speak);
+            TestHelper(value, ChannelPermission.MuteMembers);
+            TestHelper(value, ChannelPermission.DeafenMembers);
+            TestHelper(value, ChannelPermission.MoveMembers);
+            TestHelper(value, ChannelPermission.UseVAD);
+
+            return Task.CompletedTask;
+        }
+
+
+        /// <summary>
+        ///     Tests for the <see cref="Discord.Permissions" /> class.
+        ///     Tests that the voice channel permissions get the right value
+        ///     from the Has method.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public Task TestPermissionsHasChannelPermissionVoice()
+        {
+            // make a flag with all possible values for Voice channel permissions
+            var value = ChannelPermissions.Voice;
+
+            TestHelper(value, ChannelPermission.CreateInstantInvite, true);
+            TestHelper(value, ChannelPermission.ManageChannels, true);
+            TestHelper(value, ChannelPermission.AddReactions);
+            TestHelper(value, ChannelPermission.ViewChannel, true);
+            TestHelper(value, ChannelPermission.SendMessages);
+            TestHelper(value, ChannelPermission.SendTTSMessages);
+            TestHelper(value, ChannelPermission.ManageMessages);
+            TestHelper(value, ChannelPermission.EmbedLinks);
+            TestHelper(value, ChannelPermission.AttachFiles);
+            TestHelper(value, ChannelPermission.ReadMessageHistory);
+            TestHelper(value, ChannelPermission.MentionEveryone);
+            TestHelper(value, ChannelPermission.UseExternalEmojis);
+            TestHelper(value, ChannelPermission.ManageRoles, true);
+            TestHelper(value, ChannelPermission.ManageWebhooks);
+            TestHelper(value, ChannelPermission.Connect, true);
+            TestHelper(value, ChannelPermission.Speak, true);
+            TestHelper(value, ChannelPermission.MuteMembers, true);
+            TestHelper(value, ChannelPermission.DeafenMembers, true);
+            TestHelper(value, ChannelPermission.MoveMembers, true);
+            TestHelper(value, ChannelPermission.UseVAD, true);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        ///     Tests for the <see cref="Discord.Permissions" /> class.
+        ///     Test that that the Has method of <see cref="Discord.GuildPermissions" />
+        ///     returns the correct value when all permissions are set.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public Task TestPermissionsHasGuildPermissionAll()
+        {
+            var value = GuildPermissions.All;
+
+            TestHelper(value, GuildPermission.CreateInstantInvite, true);
+            TestHelper(value, GuildPermission.KickMembers, true);
+            TestHelper(value, GuildPermission.BanMembers, true);
+            TestHelper(value, GuildPermission.Administrator, true);
+            TestHelper(value, GuildPermission.ManageChannels, true);
+            TestHelper(value, GuildPermission.ManageGuild, true);
+            TestHelper(value, GuildPermission.AddReactions, true);
+            TestHelper(value, GuildPermission.ViewAuditLog, true);
+            TestHelper(value, GuildPermission.ViewChannel, true);
+            TestHelper(value, GuildPermission.SendMessages, true);
+            TestHelper(value, GuildPermission.SendTTSMessages, true);
+            TestHelper(value, GuildPermission.ManageMessages, true);
+            TestHelper(value, GuildPermission.EmbedLinks, true);
+            TestHelper(value, GuildPermission.AttachFiles, true);
+            TestHelper(value, GuildPermission.ReadMessageHistory, true);
+            TestHelper(value, GuildPermission.MentionEveryone, true);
+            TestHelper(value, GuildPermission.UseExternalEmojis, true);
+            TestHelper(value, GuildPermission.Connect, true);
+            TestHelper(value, GuildPermission.Speak, true);
+            TestHelper(value, GuildPermission.MuteMembers, true);
+            TestHelper(value, GuildPermission.MoveMembers, true);
+            TestHelper(value, GuildPermission.UseVAD, true);
+            TestHelper(value, GuildPermission.ChangeNickname, true);
+            TestHelper(value, GuildPermission.ManageNicknames, true);
+            TestHelper(value, GuildPermission.ManageRoles, true);
+            TestHelper(value, GuildPermission.ManageWebhooks, true);
+            TestHelper(value, GuildPermission.ManageEmojis, true);
+
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        ///     Tests for the <see cref="Discord.Permissions" /> class.
+        ///     Test that that the Has method of <see cref="Discord.GuildPermissions" />
+        ///     returns the correct value when no permissions are set.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public Task TestPermissionsHasGuildPermissionNone()
+        {
+            var value = GuildPermissions.None;
+
+            TestHelper(value, GuildPermission.CreateInstantInvite);
+            TestHelper(value, GuildPermission.KickMembers);
+            TestHelper(value, GuildPermission.BanMembers);
+            TestHelper(value, GuildPermission.Administrator);
+            TestHelper(value, GuildPermission.ManageChannels);
+            TestHelper(value, GuildPermission.ManageGuild);
+            TestHelper(value, GuildPermission.AddReactions);
+            TestHelper(value, GuildPermission.ViewAuditLog);
+            TestHelper(value, GuildPermission.ViewChannel);
+            TestHelper(value, GuildPermission.SendMessages);
+            TestHelper(value, GuildPermission.SendTTSMessages);
+            TestHelper(value, GuildPermission.ManageMessages);
+            TestHelper(value, GuildPermission.EmbedLinks);
+            TestHelper(value, GuildPermission.AttachFiles);
+            TestHelper(value, GuildPermission.ReadMessageHistory);
+            TestHelper(value, GuildPermission.MentionEveryone);
+            TestHelper(value, GuildPermission.UseExternalEmojis);
+            TestHelper(value, GuildPermission.Connect);
+            TestHelper(value, GuildPermission.Speak);
+            TestHelper(value, GuildPermission.MuteMembers);
+            TestHelper(value, GuildPermission.MoveMembers);
+            TestHelper(value, GuildPermission.UseVAD);
+            TestHelper(value, GuildPermission.ChangeNickname);
+            TestHelper(value, GuildPermission.ManageNicknames);
+            TestHelper(value, GuildPermission.ManageRoles);
+            TestHelper(value, GuildPermission.ManageWebhooks);
+            TestHelper(value, GuildPermission.ManageEmojis);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        ///     Tests for the <see cref="Discord.Permissions" /> class.
+        ///     Test that that the Has method of <see cref="Discord.GuildPermissions" />
+        ///     returns the correct value when webhook permissions are set.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public Task TestPermissionsHasGuildPermissionWebhook()
+        {
+            var value = GuildPermissions.Webhook;
+
+            TestHelper(value, GuildPermission.CreateInstantInvite);
+            TestHelper(value, GuildPermission.KickMembers);
+            TestHelper(value, GuildPermission.BanMembers);
+            TestHelper(value, GuildPermission.Administrator);
+            TestHelper(value, GuildPermission.ManageChannels);
+            TestHelper(value, GuildPermission.ManageGuild);
+            TestHelper(value, GuildPermission.AddReactions);
+            TestHelper(value, GuildPermission.ViewAuditLog);
+            TestHelper(value, GuildPermission.ViewChannel);
+            TestHelper(value, GuildPermission.SendMessages, true);
+            TestHelper(value, GuildPermission.SendTTSMessages, true);
+            TestHelper(value, GuildPermission.ManageMessages);
+            TestHelper(value, GuildPermission.EmbedLinks, true);
+            TestHelper(value, GuildPermission.AttachFiles, true);
+            TestHelper(value, GuildPermission.ReadMessageHistory);
+            TestHelper(value, GuildPermission.MentionEveryone);
+            TestHelper(value, GuildPermission.UseExternalEmojis);
+            TestHelper(value, GuildPermission.Connect);
+            TestHelper(value, GuildPermission.Speak);
+            TestHelper(value, GuildPermission.MuteMembers);
+            TestHelper(value, GuildPermission.MoveMembers);
+            TestHelper(value, GuildPermission.UseVAD);
+            TestHelper(value, GuildPermission.ChangeNickname);
+            TestHelper(value, GuildPermission.ManageNicknames);
+            TestHelper(value, GuildPermission.ManageRoles);
+            TestHelper(value, GuildPermission.ManageWebhooks);
+            TestHelper(value, GuildPermission.ManageEmojis);
 
             return Task.CompletedTask;
         }

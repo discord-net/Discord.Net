@@ -18,18 +18,20 @@ namespace Discord
             Exception = exception;
         }
 
-        public override string ToString() => ToString(null);
-        public string ToString(StringBuilder builder = null, bool fullException = true, bool prependTimestamp = true, DateTimeKind timestampKind = DateTimeKind.Local, int? padSource = 11)
-        {
-            string sourceName = Source;
-            string message = Message;
-            string exMessage = fullException ? Exception?.ToString() : Exception?.Message;
+        public override string ToString() => ToString();
 
-            int maxLength = 1 + 
-                (prependTimestamp ? 8 : 0) + 1 +
-                (padSource.HasValue ? padSource.Value : sourceName?.Length ?? 0) + 1 + 
-                (message?.Length ?? 0) +
-                (exMessage?.Length ?? 0) + 3;
+        public string ToString(StringBuilder builder = null, bool fullException = true, bool prependTimestamp = true,
+            DateTimeKind timestampKind = DateTimeKind.Local, int? padSource = 11)
+        {
+            var sourceName = Source;
+            var message = Message;
+            var exMessage = fullException ? Exception?.ToString() : Exception?.Message;
+
+            var maxLength = 1 +
+                            (prependTimestamp ? 8 : 0) + 1 +
+                            (padSource.HasValue ? padSource.Value : sourceName?.Length ?? 0) + 1 +
+                            (message?.Length ?? 0) +
+                            (exMessage?.Length ?? 0) + 3;
 
             if (builder == null)
                 builder = new StringBuilder(maxLength);
@@ -42,10 +44,7 @@ namespace Discord
             if (prependTimestamp)
             {
                 DateTime now;
-                if (timestampKind == DateTimeKind.Utc)
-                    now = DateTime.UtcNow;
-                else
-                    now = DateTime.Now;
+                now = timestampKind == DateTimeKind.Utc ? DateTime.UtcNow : DateTime.Now;
                 if (now.Hour < 10)
                     builder.Append('0');
                 builder.Append(now.Hour);
@@ -59,6 +58,7 @@ namespace Discord
                 builder.Append(now.Second);
                 builder.Append(' ');
             }
+
             if (sourceName != null)
             {
                 if (padSource.HasValue)
@@ -73,27 +73,27 @@ namespace Discord
                     else
                         builder.Append(sourceName);
                 }
+
                 builder.Append(' ');
             }
+
             if (!string.IsNullOrEmpty(Message))
-            {
-                for (int i = 0; i < message.Length; i++)
+                for (var i = 0; i < message.Length; i++)
                 {
                     //Strip control chars
-                    char c = message[i];
+                    var c = message[i];
                     if (!char.IsControl(c))
                         builder.Append(c);
                 }
-            }
-            if (exMessage != null)
+
+            if (exMessage == null) return builder.ToString();
+            if (!string.IsNullOrEmpty(Message))
             {
-                if (!string.IsNullOrEmpty(Message))
-                {
-                    builder.Append(':');
-                    builder.AppendLine();
-                }
-                builder.Append(exMessage);
+                builder.Append(':');
+                builder.AppendLine();
             }
+
+            builder.Append(exMessage);
 
             return builder.ToString();
         }

@@ -6,6 +6,6 @@
         WebP,
         Png,
         Jpeg,
-        Gif,
+        Gif
     }
 }

@@ -4,8 +4,10 @@
     {
         /// <summary> Gets the unique identifier for the object this overwrite is targeting. </summary>
         public ulong TargetId { get; }
+
         /// <summary> Gets the type of object this overwrite is targeting. </summary>
         public PermissionTarget TargetType { get; }
+
         /// <summary> Gets the permissions associated with this overwrite entry. </summary>
         public OverwritePermissions Permissions { get; }
 

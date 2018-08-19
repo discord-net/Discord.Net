@@ -2,7 +2,7 @@ using System;
 
 namespace Discord.Commands
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class)]
     public class DontAutoLoadAttribute : Attribute
     {
     }

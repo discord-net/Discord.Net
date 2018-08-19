@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Discord
 {
     //Based on https://github.com/dotnet/coreclr/blob/master/src/mscorlib/src/System/Nullable.cs
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
+    [DebuggerDisplay(@"{" + nameof(DebuggerDisplay) + @",nq}")]
     public struct Optional<T>
     {
         public static Optional<T> Unspecified => default(Optional<T>);
@@ -20,6 +20,7 @@ namespace Discord
                 return _value;
             }
         }
+
         /// <summary> Returns true if this value has been specified. </summary>
         public bool IsSpecified { get; }
 
@@ -39,14 +40,16 @@ namespace Discord
             if (other == null) return false;
             return _value.Equals(other);
         }
+
         public override int GetHashCode() => IsSpecified ? _value.GetHashCode() : 0;
 
         public override string ToString() => IsSpecified ? _value?.ToString() : null;
-        private string DebuggerDisplay => IsSpecified ? (_value?.ToString() ?? "<null>") : "<unspecified>";
+        private string DebuggerDisplay => IsSpecified ? _value?.ToString() ?? "<null>" : "<unspecified>";
 
         public static implicit operator Optional<T>(T value) => new Optional<T>(value);
         public static explicit operator T(Optional<T> value) => value.Value;
     }
+
     public static class Optional
     {
         public static Optional<T> Create<T>() => Optional<T>.Unspecified;

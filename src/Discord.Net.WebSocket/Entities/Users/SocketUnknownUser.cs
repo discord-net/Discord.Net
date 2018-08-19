@@ -7,6 +7,11 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketUnknownUser : SocketUser
     {
+        internal SocketUnknownUser(DiscordSocketClient discord, ulong id)
+            : base(discord, id)
+        {
+        }
+
         public override string Username { get; internal set; }
         public override ushort DiscriminatorValue { get; internal set; }
         public override string AvatarId { get; internal set; }
@@ -14,13 +19,14 @@ namespace Discord.WebSocket
 
         public override bool IsWebhook => false;
 
-        internal override SocketPresence Presence { get { return new SocketPresence(UserStatus.Offline, null); } set { } }
-        internal override SocketGlobalUser GlobalUser { get { throw new NotSupportedException(); } }
-
-        internal SocketUnknownUser(DiscordSocketClient discord, ulong id)
-            : base(discord, id)
+        internal override SocketPresence Presence
         {
+            get => new SocketPresence(UserStatus.Offline, null);
+            set { }
         }
+
+        internal override SocketGlobalUser GlobalUser => throw new NotSupportedException();
+
         internal static SocketUnknownUser Create(DiscordSocketClient discord, ClientState state, Model model)
         {
             var entity = new SocketUnknownUser(discord, model.Id);
