@@ -72,6 +72,16 @@ namespace Discord.API
                 case default(TokenType):
                     return token;
                 case TokenType.Bot:
+                    // Validate that the supplied bot token is at least 50 characters long.
+                    // Using other tokens and the ones in the discord docs as an example,
+                    // bot tokens typically appear to be 59 characters long, but it is unknown
+                    // if this is a constant.
+                    // This validation helps catch users who input the wrong type of token (bearer, client secret)
+                    // instead of a Bot token.
+                    if (token.Length <= 50)
+                    {
+                        throw new ArgumentException("Invalid Bot token length.", nameof(token));
+                    }
                     return $"Bot {token}";
                 case TokenType.Bearer:
                     return $"Bearer {token}";
