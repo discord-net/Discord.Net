@@ -18,7 +18,7 @@ namespace Discord
         public static void ValidateToken(TokenType tokenType, string token)
         {
             // A Null or WhiteSpace token of any type is invalid.
-            if (!string.IsNullOrWhiteSpace(token))
+            if (string.IsNullOrWhiteSpace(token))
                 throw new ArgumentNullException("A token cannot be null, empty, or contain only whitespace.", nameof(token));
 
             switch (tokenType)
