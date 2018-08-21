@@ -52,6 +52,11 @@ namespace Discord.Rest
         /// <inheritdoc />
         public async Task LoginAsync(TokenType tokenType, string token, bool validateToken = true)
         {
+            // If token validation is enabled, validate the token and let it throw any ArgumentExceptions
+            // that result from invalid parameters
+            if (validateToken)
+                TokenUtils.ValidateToken(tokenType, token);
+
             await _stateLock.WaitAsync().ConfigureAwait(false);
             try
             {
