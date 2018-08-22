@@ -348,6 +348,21 @@ namespace Discord.Commands
 
         public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
             => ExecuteAsync(context, context.Message.Content.Substring(argPos), services, multiMatchHandling);
+        public Task<IResult> ExecuteAsync(ICommandContext context, char suffix, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+            => ExecuteAsync(context, context.Message.Content.Trim(suffix), services, multiMatchHandling);
+        
+        public Task<IResult> ExecuteAsync(ICommandContext context, string suffix, IServiceProvider services, SuffixType type, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        {
+            var text = context.Message.Content;
+            switch (type)
+            {
+                case SuffixType.String:
+                    return ExecuteAsync(context, text.Remove(text.IndexOf(suffix) - 1), services, multiMatchHandling);
+                case SuffixType.Mention:
+                    return ExecuteAsync(context, text.Remove(text.IndexOf(context.Client.CurrentUser.Mention) - 1), services, multiMatchHandling);
+            }
+            return ExecuteAsync(context, text, services, multiMatchHandling);
+        }
         public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;
