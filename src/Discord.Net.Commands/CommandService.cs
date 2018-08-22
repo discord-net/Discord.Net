@@ -357,9 +357,9 @@ namespace Discord.Commands
             switch (type)
             {
                 case SuffixType.String:
-                    return ExecuteAsync(context, text.Remove(text.IndexOf(suffix) - 1), services, multiMatchHandling);
+                    return ExecuteAsync(context, text.Remove(text.LastIndexOf(suffix) - 1), services, multiMatchHandling);
                 case SuffixType.Mention:
-                    return ExecuteAsync(context, text.Remove(text.IndexOf(context.Client.CurrentUser.Mention) - 1), services, multiMatchHandling);
+                    return ExecuteAsync(context, text.Remove(text.LastIndexOf(context.Client.CurrentUser.Mention) - 1), services, multiMatchHandling);
             }
             return ExecuteAsync(context, text, services, multiMatchHandling);
         }
