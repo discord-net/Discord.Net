@@ -25,11 +25,22 @@ namespace Discord.Commands
             "%s's'",                //      1s
         };
 
+
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
-            return (TimeSpan.TryParseExact(input.ToLowerInvariant(), _formats, CultureInfo.InvariantCulture, out var timeSpan))
-                ? Task.FromResult(TypeReaderResult.FromSuccess(timeSpan))
-                : Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse TimeSpan"));
+            //Store as variable, to prevent multiple calls to this method.
+            string data = input.ToLowerInvariant();
+
+            //First, try using the built-in TimeSpan.Parse. (Default Implementation)
+            if (TimeSpan.TryParseExact(data, _formats, CultureInfo.InvariantCulture, out TimeSpan timeSpan))
+                return Task.FromResult(TypeReaderResult.FromSuccess(new TimeSpanext(timeSpan)));
+            //@XtremeOwnage - Try using the regular TimeSpan.TryPrase
+            else if (TimeSpan.TryParse(data, out TimeSpan Time))
+                return Task.FromResult(TypeReaderResult.FromSuccess(new TimeSpanext(Time)));
+            else
+            {
+                return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse TimeSpan"));
+            }
         }
     }
 }
