@@ -52,7 +52,7 @@ namespace Discord.Commands
             var text = msg.Content;
             if (text.Length <= 3 || text[text.Length - 1] != '>') return false;
 
-            int iniPos = text.IndexOf('<');
+            int iniPos = text.LastIndexOf('<');
             if (iniPos == -1) return false;
             if (!MentionUtils.TryParseUser(text.Substring(iniPos, text.Length - iniPos), out ulong userId)) return false;
             if (user.Id == userId) return true;
