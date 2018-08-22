@@ -33,13 +33,29 @@ namespace Discord.Commands
             if (endPos == -1) return false;
             if (text.Length < endPos + 2 || text[endPos + 1] != ' ') return false; //Must end in "> "
 
-            ulong userId;
-            if (!MentionUtils.TryParseUser(text.Substring(0, endPos + 1), out userId)) return false;
+            if (!MentionUtils.TryParseUser(text.Substring(0, endPos + 1), out ulong userId)) return false;
             if (userId == user.Id)
             {
                 argPos = endPos + 2;
                 return true;
             }
+            return false;
+        }
+        public static bool HasCharSuffix(this IUserMessage msg, char c)
+            => msg.Content.Length > 0 && msg.Content[msg.Content.Length - 1] == c;
+        public static bool HasStringSuffix(this IUserMessage msg, string str, StringComparison comparisonType = StringComparison.Ordinal)
+            => msg.Content.EndsWith(str, comparisonType);
+        
+        public static bool HasMentionSuffix(this IUserMessage msg, IUser user)
+        {
+            var text = msg.Content;
+            if (text.Length <= 3 || text[text.Length - 1] != '>') return false;
+
+            int iniPos = text.LastIndexOf('<');
+            if (iniPos == -1) return false;
+            if (!MentionUtils.TryParseUser(text.Substring(iniPos, text.Length - iniPos), out ulong userId)) return false;
+            if (user.Id == userId) return true;
+
             return false;
         }
     }
