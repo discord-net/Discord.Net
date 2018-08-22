@@ -42,5 +42,22 @@ namespace Discord.Commands
             }
             return false;
         }
+        public static bool HasCharSuffix(this IUserMessage msg, char c)
+            => msg.Content.Length > 0 && msg.Content[msg.Content.Length - 1] == c;
+        public static bool HasStringSuffix(this IUserMessage msg, string str, StringComparison comparisonType = StringComparison.Ordinal)
+            => msg.Content.EndsWith(str, comparisonType);
+        
+        public static bool HasMentionSuffix(this IUserMessage msg, IUser user)
+        {
+            var text = msg.Content;
+            if (text.Length <= 3 || text[text.Length - 1] != '>') return false;
+
+            int iniPos = text.IndexOf('<');
+            if (iniPos == -1) return false;
+            if (!MentionUtils.TryParseUser(text.Substring(iniPos, text.Length - iniPos), out ulong userId)) return false;
+            if (user.Id == userId) return true;
+
+            return false;
+        }
     }
 }
