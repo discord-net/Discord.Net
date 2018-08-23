@@ -34,13 +34,12 @@ namespace Discord.Commands
             //First, try using the built-in TimeSpan.Parse. (Default Implementation)
             if (TimeSpan.TryParseExact(data, _formats, CultureInfo.InvariantCulture, out var timeSpan))
                 return Task.FromResult(TypeReaderResult.FromSuccess(timeSpan));
-            //@ericmck2000 - Try using the regular TimeSpan.TryPrase. Greatly improves success rate.
-            else if (TimeSpan.TryParse(data, out var time))
-                return Task.FromResult(TypeReaderResult.FromSuccess(time));
+            //Try using the regular TimeSpan.TryPrase. Greatly improves success rate.
+            else if (TimeSpan.TryParse(data, out timeSpan))
+                return Task.FromResult(TypeReaderResult.FromSuccess(timeSpan));
+            //Else, return parse failed error.
             else
-            {
                 return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse TimeSpan"));
-            }
         }
     }
 }
