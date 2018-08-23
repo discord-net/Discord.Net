@@ -37,7 +37,7 @@ namespace Discord.Rest
             var after = new WebhookInfo(newName, newChannelId, newAvatar);
 
             var webhookInfo = log.Webhooks?.FirstOrDefault(x => x.Id == entry.TargetId);
-            var webhook = RestWebhook.Create(discord, (IGuild)null, webhookInfo);
+            var webhook = webhookInfo != null ? RestWebhook.Create(discord, (IGuild)null, webhookInfo) : null;
 
             return new WebhookUpdateAuditLogData(webhook, before, after);
         }
