@@ -196,6 +196,17 @@ namespace Discord
             AddField(field);
             return this;
         }
+        
+        public EmbedBuilder AddBlankField(bool inline = false)
+        {
+            var field = new EmbedFieldBuilder()
+                .WithIsInline(inline)
+                .WithName(null)
+                .WithValue(null);
+            AddField(field);
+            return this;
+        }
+        
         public EmbedBuilder AddField(EmbedFieldBuilder field)
         {
             if (Fields.Count >= MaxFieldCount)
@@ -231,6 +242,8 @@ namespace Discord
     {
         private string _name;
         private string _value;
+        private const string emptyString = "_ _";
+        
         public const int MaxFieldNameLength = 256;
         public const int MaxFieldValueLength = 1024;
 
@@ -240,7 +253,7 @@ namespace Discord
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
-                    _name = "_ _";
+                    _name = emptyString;
                 else if (value.Length > MaxFieldNameLength)
                     throw new ArgumentException($"Field name length must be less than or equal to {MaxFieldNameLength}.", nameof(Name));
                 else
@@ -255,7 +268,7 @@ namespace Discord
             {
                 var stringValue = value?.ToString();
                 if (string.IsNullOrWhiteSpace(stringValue)) 
-                    _value = "_ _";
+                    _value = emptyString;
                 else if (stringValue.Length > MaxFieldValueLength)
                     throw new ArgumentException($"Field value length must be less than or equal to {MaxFieldValueLength}.", nameof(Value));
                 else 
