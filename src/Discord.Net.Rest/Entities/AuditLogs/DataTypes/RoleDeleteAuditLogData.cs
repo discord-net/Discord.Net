@@ -23,11 +23,11 @@ namespace Discord.Rest
             var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
             var permissionsModel = changes.FirstOrDefault(x => x.ChangedProperty == "permissions");
 
-            uint? colorRaw = colorModel?.OldValue?.ToObject<uint>();
-            bool? mentionable = mentionableModel?.OldValue?.ToObject<bool>();
-            bool? hoist = hoistModel?.OldValue?.ToObject<bool>();
-            string name = nameModel?.OldValue?.ToObject<string>();
-            ulong? permissionsRaw = permissionsModel?.OldValue?.ToObject<ulong>();
+            uint? colorRaw = colorModel?.OldValue?.ToObject<uint>(discord.ApiClient.Serializer);
+            bool? mentionable = mentionableModel?.OldValue?.ToObject<bool>(discord.ApiClient.Serializer);
+            bool? hoist = hoistModel?.OldValue?.ToObject<bool>(discord.ApiClient.Serializer);
+            string name = nameModel?.OldValue?.ToObject<string>(discord.ApiClient.Serializer);
+            ulong? permissionsRaw = permissionsModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer);
 
             Color? color = null;
             GuildPermissions? permissions = null;

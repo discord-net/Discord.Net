@@ -21,7 +21,7 @@ namespace Discord.Rest
         {
             var change = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "name");
 
-            var emoteName = change.NewValue?.ToObject<string>();
+            var emoteName = change.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
             return new EmoteCreateAuditLogData(entry.TargetId.Value, emoteName);
         }
 
