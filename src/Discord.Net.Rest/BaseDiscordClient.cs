@@ -148,7 +148,7 @@ namespace Discord.Rest
         Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync(RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IConnection>>(ImmutableArray.Create<IConnection>());
 
-        Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, bool withCount, RequestOptions options)
+        Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, RequestOptions options)
             => Task.FromResult<IInvite>(null);
 
         Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode, RequestOptions options)

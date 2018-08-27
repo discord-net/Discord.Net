@@ -50,6 +50,8 @@ namespace Discord.Commands
             => new TypeReaderResult(values, null, null);
         public static TypeReaderResult FromError(CommandError error, string reason)
             => new TypeReaderResult(null, error, reason);
+        public static TypeReaderResult FromError(Exception ex)
+            => FromError(CommandError.Exception, ex.Message);
         public static TypeReaderResult FromError(IResult result)
             => new TypeReaderResult(null, result.Error, result.ErrorReason);
 
