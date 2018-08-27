@@ -251,7 +251,12 @@ namespace Discord.WebSocket
                 await heartbeatTask.ConfigureAwait(false);
             _heartbeatTask = null;
 
+<<<<<<< HEAD
             while (_heartbeatTimes.TryDequeue(out _)) { }
+=======
+            // Check if hearbeatTimes is not empty before dequeuing. TryDequeue can cause blocking.
+            if (!_heartbeatTimes.IsEmpty) while (_heartbeatTimes.TryDequeue(out long time)) { }
+>>>>>>> Disconnecting block fix
             _lastMessageTime = 0;
 
             await _gatewayLogger.DebugAsync("Waiting for guild downloader").ConfigureAwait(false);
