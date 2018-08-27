@@ -17,5 +17,10 @@ namespace Discord.Commands
         {
             Text = text;
         }
+        public CommandAttribute(string text, bool ignoreExtraArgs)
+        {
+            Text = text;
+            IgnoreExtraArgs = ignoreExtraArgs;
+        }
     }
 }
