@@ -117,6 +117,14 @@ namespace Discord.Net.Udp
             while (!cancelToken.IsCancellationRequested)
             {
                 var receiveTask = _udp.ReceiveAsync();
+
+                _ = receiveTask.ContinueWith((recieveResult) =>
+                {
+                    //observe the exception as to not recieve as unhandled exception
+                    _ = recieveResult.Exception;
+
+                }, TaskContinuationOptions.OnlyOnFaulted);
+
                 var task = await Task.WhenAny(closeTask, receiveTask).ConfigureAwait(false);
                 if (task == closeTask)
                     break;

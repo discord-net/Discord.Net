@@ -103,12 +103,10 @@ namespace Discord
                 finally { _stateLock.Release(); }
             });
         }
-        public virtual async Task StopAsync()
+        public virtual Task StopAsync()
         {
             Cancel();
-            var task = _task;
-            if (task != null)
-                await task.ConfigureAwait(false);
+            return Task.CompletedTask;
         }
 
         private async Task ConnectAsync(CancellationTokenSource reconnectCancelToken)
@@ -159,9 +157,9 @@ namespace Discord
 
             await _onDisconnecting(ex).ConfigureAwait(false);
 
-            await _logger.InfoAsync("Disconnected").ConfigureAwait(false);
-            State = ConnectionState.Disconnected;
             await _disconnectedEvent.InvokeAsync(ex, isReconnecting).ConfigureAwait(false);
+            State = ConnectionState.Disconnected;
+            await _logger.InfoAsync("Disconnected").ConfigureAwait(false);
         }
 
         public async Task CompleteAsync()
