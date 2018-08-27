@@ -7,7 +7,7 @@ namespace Discord.Commands
     {
         public string Text { get; }
         public RunMode RunMode { get; set; } = RunMode.Default;
-        public bool? IgnoreExtraArgs { get; private set; }
+        public bool? IgnoreExtraArgs { get; }
 
         public CommandAttribute()
         {
