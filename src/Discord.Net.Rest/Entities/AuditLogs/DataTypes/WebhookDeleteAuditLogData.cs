@@ -29,10 +29,10 @@ namespace Discord.Rest
             var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
             var avatarHashModel = changes.FirstOrDefault(x => x.ChangedProperty == "avatar_hash");
 
-            var channelId = channelIdModel.OldValue.ToObject<ulong>();
-            var type = typeModel.OldValue.ToObject<WebhookType>();
-            var name = nameModel.OldValue.ToObject<string>();
-            var avatarHash = avatarHashModel?.OldValue?.ToObject<string>();
+            var channelId = channelIdModel.OldValue.ToObject<ulong>(discord.ApiClient.Serializer);
+            var type = typeModel.OldValue.ToObject<WebhookType>(discord.ApiClient.Serializer);
+            var name = nameModel.OldValue.ToObject<string>(discord.ApiClient.Serializer);
+            var avatarHash = avatarHashModel?.OldValue?.ToObject<string>(discord.ApiClient.Serializer);
 
             return new WebhookDeleteAuditLogData(entry.TargetId.Value, channelId, type, name, avatarHash);
         }

@@ -27,14 +27,12 @@ namespace Discord.Rest
             var idModel = changes.FirstOrDefault(x => x.ChangedProperty == "id");
             var allowModel = changes.FirstOrDefault(x => x.ChangedProperty == "allow");
 
-            var deny = denyModel.OldValue.ToObject<ulong>();
-            var type = typeModel.OldValue.ToObject<string>();
-            var id = idModel.OldValue.ToObject<ulong>();
-            var allow = allowModel.OldValue.ToObject<ulong>();
+            var deny = denyModel.OldValue.ToObject<ulong>(discord.ApiClient.Serializer);
+            var type = typeModel.OldValue.ToObject<PermissionTarget>(discord.ApiClient.Serializer);
+            var id = idModel.OldValue.ToObject<ulong>(discord.ApiClient.Serializer);
+            var allow = allowModel.OldValue.ToObject<ulong>(discord.ApiClient.Serializer);
 
-            PermissionTarget target = type == "member" ? PermissionTarget.User : PermissionTarget.Role;
-
-            return new OverwriteDeleteAuditLogData(new Overwrite(id, target, new OverwritePermissions(allow, deny)));
+            return new OverwriteDeleteAuditLogData(new Overwrite(id, type, new OverwritePermissions(allow, deny)));
         }
 
         public Overwrite Overwrite { get; }

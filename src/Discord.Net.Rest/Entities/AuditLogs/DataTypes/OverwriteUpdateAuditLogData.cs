@@ -22,17 +22,17 @@ namespace Discord.Rest
             var denyModel = changes.FirstOrDefault(x => x.ChangedProperty == "deny");
             var allowModel = changes.FirstOrDefault(x => x.ChangedProperty == "allow");
 
-            var beforeAllow = allowModel?.OldValue?.ToObject<ulong>();
-            var afterAllow = allowModel?.NewValue?.ToObject<ulong>();
-            var beforeDeny = denyModel?.OldValue?.ToObject<ulong>();
-            var afterDeny = denyModel?.OldValue?.ToObject<ulong>();
+            var beforeAllow = allowModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            var afterAllow = allowModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            var beforeDeny = denyModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            var afterDeny = denyModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer);
 
             var beforePermissions = new OverwritePermissions(beforeAllow ?? 0, beforeDeny ?? 0);
             var afterPermissions = new OverwritePermissions(afterAllow ?? 0, afterDeny ?? 0);
 
-            PermissionTarget target = entry.Options.OverwriteType == "member" ? PermissionTarget.User : PermissionTarget.Role;
+            var type = entry.Options.OverwriteType;
 
-            return new OverwriteUpdateAuditLogData(beforePermissions, afterPermissions, entry.Options.OverwriteTargetId.Value, target);
+            return new OverwriteUpdateAuditLogData(beforePermissions, afterPermissions, entry.Options.OverwriteTargetId.Value, type);
         }
 
         public OverwritePermissions OldPermissions { get; }

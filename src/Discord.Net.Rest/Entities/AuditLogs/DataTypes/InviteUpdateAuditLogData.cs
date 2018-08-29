@@ -23,16 +23,16 @@ namespace Discord.Rest
             var channelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "channel_id");
             var maxUsesModel = changes.FirstOrDefault(x => x.ChangedProperty == "max_uses");
 
-            int? oldMaxAge = maxAgeModel?.OldValue?.ToObject<int>(),
-                newMaxAge = maxAgeModel?.NewValue?.ToObject<int>();
-            string oldCode = codeModel?.OldValue?.ToObject<string>(),
-                newCode = codeModel?.NewValue?.ToObject<string>();
-            bool? oldTemporary = temporaryModel?.OldValue?.ToObject<bool>(),
-                newTemporary = temporaryModel?.NewValue?.ToObject<bool>();
-            ulong? oldChannelId = channelIdModel?.OldValue?.ToObject<ulong>(),
-                newChannelId = channelIdModel?.NewValue?.ToObject<ulong>();
-            int? oldMaxUses = maxUsesModel?.OldValue?.ToObject<int>(),
-                newMaxUses = maxUsesModel?.NewValue?.ToObject<int>();
+            int? oldMaxAge = maxAgeModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer),
+                newMaxAge = maxAgeModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
+            string oldCode = codeModel?.OldValue?.ToObject<string>(discord.ApiClient.Serializer),
+                newCode = codeModel?.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
+            bool? oldTemporary = temporaryModel?.OldValue?.ToObject<bool>(discord.ApiClient.Serializer),
+                newTemporary = temporaryModel?.NewValue?.ToObject<bool>(discord.ApiClient.Serializer);
+            ulong? oldChannelId = channelIdModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer),
+                newChannelId = channelIdModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            int? oldMaxUses = maxUsesModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer),
+                newMaxUses = maxUsesModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
 
             var before = new InviteInfo(oldMaxAge, oldCode, oldTemporary, oldChannelId, oldMaxUses);
             var after = new InviteInfo(newMaxAge, newCode, newTemporary, newChannelId, newMaxUses);
