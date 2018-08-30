@@ -45,14 +45,7 @@ namespace Discord.Commands.Builders
 
         internal void SetType(Type type)
         {
-            var readers = Command.Module.Service.GetTypeReaders(type);
-            if (readers != null)
-                TypeReader = readers.FirstOrDefault().Value;
-            else
-                TypeReader = Command.Module.Service.GetDefaultTypeReader(type);
-
-            if (TypeReader == null)
-                throw new InvalidOperationException($"{type} does not have a TypeReader registered for it. Parameter: {Name} in {Command.PrimaryAlias}");            
+            TypeReader = GetReader(type);
 
             if (type.GetTypeInfo().IsValueType)
                 DefaultValue = Activator.CreateInstance(type);
@@ -60,7 +53,16 @@ namespace Discord.Commands.Builders
                 type = ParameterType.GetElementType();
             ParameterType = type;
         }
-        
+
+        private TypeReader GetReader(Type type)
+        {
+            var readers = Command.Module.Service.GetTypeReaders(type);
+            if (readers != null)
+                return readers.FirstOrDefault().Value;
+            else
+                return Command.Module.Service.GetDefaultTypeReader(type);
+        }
+
         public ParameterBuilder WithSummary(string summary)
         {
             Summary = summary;
@@ -100,7 +102,7 @@ namespace Discord.Commands.Builders
 
         internal ParameterInfo Build(CommandInfo info)
         {
-            if (TypeReader == null)
+            if ((TypeReader ?? (TypeReader = GetReader(ParameterType))) == null)
                 throw new InvalidOperationException($"No type reader found for type {ParameterType.Name}, one must be specified");
 
             return new ParameterInfo(this, info, Command.Module.Service);

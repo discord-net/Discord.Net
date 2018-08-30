@@ -23,14 +23,14 @@ namespace Discord.Rest
             var bitrateModel = changes.FirstOrDefault(x => x.ChangedProperty == "bitrate");
             var userLimitModel = changes.FirstOrDefault(x => x.ChangedProperty == "user_limit");
 
-            string oldName = nameModel?.OldValue?.ToObject<string>(),
-                newName = nameModel?.NewValue?.ToObject<string>();
-            string oldTopic = topicModel?.OldValue?.ToObject<string>(),
-                newTopic = topicModel?.NewValue?.ToObject<string>();
-            int? oldBitrate = bitrateModel?.OldValue?.ToObject<int>(),
-                newBitrate = bitrateModel?.NewValue?.ToObject<int>();
-            int? oldLimit = userLimitModel?.OldValue?.ToObject<int>(),
-                newLimit = userLimitModel?.NewValue?.ToObject<int>();
+            string oldName = nameModel?.OldValue?.ToObject<string>(discord.ApiClient.Serializer),
+                newName = nameModel?.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
+            string oldTopic = topicModel?.OldValue?.ToObject<string>(discord.ApiClient.Serializer),
+                newTopic = topicModel?.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
+            int? oldBitrate = bitrateModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer),
+                newBitrate = bitrateModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
+            int? oldLimit = userLimitModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer),
+                newLimit = userLimitModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
 
             var before = new ChannelInfo(oldName, oldTopic, oldBitrate, oldLimit);
             var after = new ChannelInfo(newName, newTopic, newBitrate, newLimit);

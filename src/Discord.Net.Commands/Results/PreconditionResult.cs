@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+using System;
+using System.Diagnostics;
 
 namespace Discord.Commands
 {
@@ -20,6 +21,8 @@ namespace Discord.Commands
             => new PreconditionResult(null, null);
         public static PreconditionResult FromError(string reason)
             => new PreconditionResult(CommandError.UnmetPrecondition, reason);
+        public static PreconditionResult FromError(Exception ex)
+            => new PreconditionResult(CommandError.Exception, ex.Message);
         public static PreconditionResult FromError(IResult result)
             => new PreconditionResult(result.Error, result.ErrorReason);
 

@@ -30,13 +30,13 @@ namespace Discord.Rest
             var usesModel = changes.FirstOrDefault(x => x.ChangedProperty == "uses");
             var maxUsesModel = changes.FirstOrDefault(x => x.ChangedProperty == "max_uses");
 
-            var maxAge = maxAgeModel.OldValue.ToObject<int>();
-            var code = codeModel.OldValue.ToObject<string>();
-            var temporary = temporaryModel.OldValue.ToObject<bool>();
-            var inviterId = inviterIdModel.OldValue.ToObject<ulong>();
-            var channelId = channelIdModel.OldValue.ToObject<ulong>();
-            var uses = usesModel.OldValue.ToObject<int>();
-            var maxUses = maxUsesModel.OldValue.ToObject<int>();
+            var maxAge = maxAgeModel.OldValue.ToObject<int>(discord.ApiClient.Serializer);
+            var code = codeModel.OldValue.ToObject<string>(discord.ApiClient.Serializer);
+            var temporary = temporaryModel.OldValue.ToObject<bool>(discord.ApiClient.Serializer);
+            var inviterId = inviterIdModel.OldValue.ToObject<ulong>(discord.ApiClient.Serializer);
+            var channelId = channelIdModel.OldValue.ToObject<ulong>(discord.ApiClient.Serializer);
+            var uses = usesModel.OldValue.ToObject<int>(discord.ApiClient.Serializer);
+            var maxUses = maxUsesModel.OldValue.ToObject<int>(discord.ApiClient.Serializer);
 
             var inviterInfo = log.Users.FirstOrDefault(x => x.Id == inviterId);
             var inviter = RestUser.Create(discord, inviterInfo);
