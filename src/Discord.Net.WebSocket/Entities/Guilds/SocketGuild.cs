@@ -91,11 +91,11 @@ namespace Discord.WebSocket
             }
         }
         public IReadOnlyCollection<SocketTextChannel> TextChannels
-            => Channels.Select(x => x as SocketTextChannel).Where(x => x != null).ToImmutableArray();
+            => Channels.OfType<SocketTextChannel>().ToImmutableArray();
         public IReadOnlyCollection<SocketVoiceChannel> VoiceChannels
-            => Channels.Select(x => x as SocketVoiceChannel).Where(x => x != null).ToImmutableArray();
+            => Channels.OfType<SocketVoiceChannel>().ToImmutableArray();
         public IReadOnlyCollection<SocketCategoryChannel> CategoryChannels
-            => Channels.Select(x => x as SocketCategoryChannel).Where(x => x != null).ToImmutableArray();
+            => Channels.OfType<SocketCategoryChannel>().ToImmutableArray();
         public SocketGuildUser CurrentUser => _members.TryGetValue(Discord.CurrentUser.Id, out SocketGuildUser member) ? member : null;
         public SocketRole EveryoneRole => GetRole(Id);
         public IReadOnlyCollection<SocketGuildChannel> Channels
@@ -563,7 +563,7 @@ namespace Discord.WebSocket
 
                 await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, channelId, selfDeaf, selfMute).ConfigureAwait(false);
             }
-            catch (Exception)
+            catch
             {
                 await DisconnectAudioInternalAsync().ConfigureAwait(false);
                 throw;
@@ -580,7 +580,7 @@ namespace Discord.WebSocket
                     throw new TimeoutException();
                 return await promise.Task.ConfigureAwait(false);
             }
-            catch (Exception)
+            catch
             {
                 await DisconnectAudioAsync().ConfigureAwait(false);
                 throw;

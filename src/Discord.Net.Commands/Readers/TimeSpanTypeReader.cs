@@ -6,8 +6,7 @@ namespace Discord.Commands
 {
     internal class TimeSpanTypeReader : TypeReader
     {
-        private static readonly string[] _formats = new[]
-        {
+        private static readonly string[] Formats = {
             "%d'd'%h'h'%m'm'%s's'", //4d3h2m1s
             "%d'd'%h'h'%m'm'",      //4d3h2m
             "%d'd'%h'h'%s's'",      //4d3h  1s
@@ -27,7 +26,7 @@ namespace Discord.Commands
 
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
-            return (TimeSpan.TryParseExact(input.ToLowerInvariant(), _formats, CultureInfo.InvariantCulture, out var timeSpan))
+            return (TimeSpan.TryParseExact(input.ToLowerInvariant(), Formats, CultureInfo.InvariantCulture, out var timeSpan))
                 ? Task.FromResult(TypeReaderResult.FromSuccess(timeSpan))
                 : Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse TimeSpan"));
         }

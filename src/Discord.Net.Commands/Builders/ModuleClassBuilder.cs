@@ -10,7 +10,7 @@ namespace Discord.Commands
 {
     internal static class ModuleClassBuilder
     {
-        private static readonly TypeInfo _moduleTypeInfo = typeof(IModuleBase).GetTypeInfo();
+        private static readonly TypeInfo ModuleTypeInfo = typeof(IModuleBase).GetTypeInfo();
 
         public static async Task<IReadOnlyList<TypeInfo>> SearchAsync(Assembly assembly, CommandService service)
         {
@@ -135,7 +135,7 @@ namespace Discord.Commands
             if (builder.Name == null)
                 builder.Name = typeInfo.Name;
 
-            var validCommands = typeInfo.DeclaredMethods.Where(x => IsValidCommandDefinition(x));
+            var validCommands = typeInfo.DeclaredMethods.Where(IsValidCommandDefinition);
 
             foreach (var method in validCommands)
             {
@@ -299,7 +299,7 @@ namespace Discord.Commands
 
         private static bool IsValidModuleDefinition(TypeInfo typeInfo)
         {
-            return _moduleTypeInfo.IsAssignableFrom(typeInfo) &&
+            return ModuleTypeInfo.IsAssignableFrom(typeInfo) &&
                    !typeInfo.IsAbstract &&
                    !typeInfo.ContainsGenericParameters;
         }

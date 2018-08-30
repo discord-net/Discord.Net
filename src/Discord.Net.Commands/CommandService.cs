@@ -118,7 +118,7 @@ namespace Discord.Commands
                 var typeInfo = type.GetTypeInfo();
 
                 if (_typedModuleDefs.ContainsKey(type))
-                    throw new ArgumentException($"This module has already been added.");
+                    throw new ArgumentException("This module has already been added.");
 
                 var module = (await ModuleClassBuilder.BuildAsync(this, services, typeInfo).ConfigureAwait(false)).FirstOrDefault();
 
@@ -241,7 +241,7 @@ namespace Discord.Commands
         {
             if (_defaultTypeReaders.ContainsKey(type))
                 _ = _cmdLogger.WarningAsync($"The default TypeReader for {type.FullName} was replaced by {reader.GetType().FullName}." +
-                    $"To suppress this message, use AddTypeReader<T>(reader, true).");
+                    "To suppress this message, use AddTypeReader<T>(reader, true).");
             AddTypeReader(type, reader, true);
         }
         /// <summary>

@@ -92,7 +92,7 @@ namespace Discord.Rest
                 await OnLoginAsync(tokenType, token).ConfigureAwait(false);
                 LoginState = LoginState.LoggedIn;
             }
-            catch (Exception)
+            catch
             {
                 await LogoutInternalAsync().ConfigureAwait(false);
                 throw;

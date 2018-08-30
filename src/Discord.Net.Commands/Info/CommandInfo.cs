@@ -1,4 +1,4 @@
-﻿using Discord.Commands.Builders;
+using Discord.Commands.Builders;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -63,7 +63,7 @@ namespace Discord.Commands
             Attributes = builder.Attributes.ToImmutableArray();
 
             Parameters = builder.Parameters.Select(x => x.Build(this)).ToImmutableArray();
-            HasVarArgs = builder.Parameters.Count > 0 ? builder.Parameters[builder.Parameters.Count - 1].IsMultiple : false;
+            HasVarArgs = builder.Parameters.Count > 0 && builder.Parameters[builder.Parameters.Count - 1].IsMultiple;
             IgnoreExtraArgs = builder.IgnoreExtraArgs;
 
             _action = builder.Callback;

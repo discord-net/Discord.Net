@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Text;
 
@@ -139,22 +139,22 @@ namespace Discord
                         if (user != null)
                             return $"@{guildUser?.Nickname ?? user?.Username}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.NameNoPrefix:
                         if (user != null)
                             return $"{guildUser?.Nickname ?? user?.Username}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.FullName:
                         if (user != null)
                             return $"@{user.Username}#{user.Discriminator}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.FullNameNoPrefix:
                         if (user != null)
                             return $"{user.Username}#{user.Discriminator}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.Sanitize:
                         if (guildUser != null && guildUser.Nickname == null)
                             return MentionUser($"{SanitizeChar}{tag.Key}", false);
@@ -176,13 +176,13 @@ namespace Discord
                         if (channel != null)
                             return $"#{channel.Name}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.NameNoPrefix:
                     case TagHandling.FullNameNoPrefix:
                         if (channel != null)
                             return $"{channel.Name}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.Sanitize:
                         return MentionChannel($"{SanitizeChar}{tag.Key}");
                 }
@@ -201,13 +201,13 @@ namespace Discord
                         if (role != null)
                             return $"@{role.Name}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.NameNoPrefix:
                     case TagHandling.FullNameNoPrefix:
                         if (role != null)
                             return $"{role.Name}";
                         else
-                            return $"";
+                            return "";
                     case TagHandling.Sanitize:
                         return MentionRole($"{SanitizeChar}{tag.Key}");
                 }

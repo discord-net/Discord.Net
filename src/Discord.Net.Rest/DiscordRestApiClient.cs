@@ -125,7 +125,7 @@ namespace Discord.API
 
                 LoginState = LoginState.LoggedIn;
             }
-            catch (Exception)
+            catch
             {
                 await LogoutInternalAsync().ConfigureAwait(false);
                 throw;
@@ -1394,9 +1394,9 @@ namespace Discord.API
 
                     int argId = int.Parse(format.Substring(leftIndex + 1, rightIndex - leftIndex - 1));
                     string fieldName = GetFieldName(methodArgs[argId + 1]);
-                    int? mappedId;
 
-                    mappedId = BucketIds.GetIndex(fieldName);
+                    var mappedId = BucketIds.GetIndex(fieldName);
+
                     if(!mappedId.HasValue && rightIndex != endIndex && format.Length > rightIndex + 1 && format[rightIndex + 1] == '/') //Ignore the next slash
                         rightIndex++;
 

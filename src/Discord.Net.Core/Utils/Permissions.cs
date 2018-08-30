@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 
 namespace Discord
 {
@@ -119,13 +119,11 @@ namespace Discord
                 resolvedPermissions = mask; //Owners and administrators always have all permissions
             else
             {
-                OverwritePermissions? perms;
-
                 //Start with this user's guild permissions
                 resolvedPermissions = guildPermissions;
 
                 //Give/Take Everyone permissions
-                perms = channel.GetPermissionOverwrite(guild.EveryoneRole);
+                var perms = channel.GetPermissionOverwrite(guild.EveryoneRole);
                 if (perms != null)
                     resolvedPermissions = (resolvedPermissions & ~perms.Value.DenyValue) | perms.Value.AllowValue;
 
@@ -133,7 +131,7 @@ namespace Discord
                 ulong deniedPermissions = 0UL, allowedPermissions = 0UL;
                 foreach (var roleId in user.RoleIds)
                 {
-                    IRole role = null;
+                    IRole role;
                     if (roleId != guild.EveryoneRole.Id && (role = guild.GetRole(roleId)) != null)
                     {
                         perms = channel.GetPermissionOverwrite(role);
@@ -151,7 +149,7 @@ namespace Discord
                 if (perms != null)
                     resolvedPermissions = (resolvedPermissions  & ~perms.Value.DenyValue) | perms.Value.AllowValue;
 
-                if (channel is ITextChannel textChannel)
+                if (channel is ITextChannel)
                 {
                     if (!GetValue(resolvedPermissions, ChannelPermission.ViewChannel))
                     {
