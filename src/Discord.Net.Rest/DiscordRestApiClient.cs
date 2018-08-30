@@ -43,10 +43,12 @@ namespace Discord.API
         public TokenType AuthTokenType { get; private set; }
         internal string AuthToken { get; private set; }
         internal IRestClient RestClient { get; private set; }
-        internal ulong? CurrentUserId { get; set;}
+        internal ulong? CurrentUserId { get; set; }
+
+        internal JsonSerializer Serializer => _serializer;
 
         /// <exception cref="ArgumentException">Unknown OAuth token type.</exception>
-        public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, 
+        public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry,
             JsonSerializer serializer = null)
         {
             _restClientProvider = restClientProvider;
@@ -418,7 +420,7 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             await SendAsync("DELETE", () => $"guilds/{guildId}/members/{userId}/roles/{roleId}", ids, options: options).ConfigureAwait(false);
         }
-        
+
         //Channel Messages
         public async Task<Message> GetChannelMessageAsync(ulong channelId, ulong messageId, RequestOptions options = null)
         {
@@ -497,7 +499,7 @@ namespace Discord.API
             if (args.Content?.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             options = RequestOptions.CreateOrClone(options);
-            
+
             return await SendJsonAsync<Message>("POST", () => $"webhooks/{webhookId}/{AuthToken}?wait=true", args, new BucketIds(), clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
@@ -749,7 +751,7 @@ namespace Discord.API
             Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
             Preconditions.NotNullOrWhitespace(args.RegionId, nameof(args.RegionId));
             options = RequestOptions.CreateOrClone(options);
-            
+
             return await SendJsonAsync<Guild>("POST", () => "guilds", args, new BucketIds(), options: options).ConfigureAwait(false);
         }
         public async Task<Guild> DeleteGuildAsync(ulong guildId, RequestOptions options = null)
@@ -976,7 +978,7 @@ namespace Discord.API
         {
             Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
             options = RequestOptions.CreateOrClone(options);
-            
+
             return await SendAsync<Invite>("DELETE", () => $"invites/{inviteId}", new BucketIds(), options: options).ConfigureAwait(false);
         }
 
@@ -1175,7 +1177,7 @@ namespace Discord.API
 
             int limit = args.Limit.GetValueOrDefault(int.MaxValue);
             ulong afterGuildId = args.AfterGuildId.GetValueOrDefault(0);
-            
+
             return await SendAsync<IReadOnlyCollection<UserGuild>>("GET", () => $"users/@me/guilds?limit={limit}&after={afterGuildId}", new BucketIds(), options: options).ConfigureAwait(false);
         }
         public async Task<Application> GetMyApplicationAsync(RequestOptions options = null)
@@ -1275,7 +1277,7 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
             options = RequestOptions.CreateOrClone(options);
-            
+
             if (AuthTokenType == TokenType.Webhook)
                 return await SendJsonAsync<Webhook>("PATCH", () => $"webhooks/{webhookId}/{AuthToken}", args, new BucketIds(), options: options).ConfigureAwait(false);
             else
@@ -1406,7 +1408,7 @@ namespace Discord.API
                     int argId = int.Parse(format.Substring(leftIndex + 1, rightIndex - leftIndex - 1));
                     string fieldName = GetFieldName(methodArgs[argId + 1]);
                     int? mappedId;
-                    
+
                     mappedId = BucketIds.GetIndex(fieldName);
                     if(!mappedId.HasValue && rightIndex != endIndex && format.Length > rightIndex + 1 && format[rightIndex + 1] == '/') //Ignore the next slash
                         rightIndex++;

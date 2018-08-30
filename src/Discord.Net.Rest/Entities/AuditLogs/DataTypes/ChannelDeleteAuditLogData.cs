@@ -27,11 +27,11 @@ namespace Discord.Rest
             var typeModel = changes.FirstOrDefault(x => x.ChangedProperty == "type");
             var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
 
-            var overwrites = overwritesModel.OldValue.ToObject<API.Overwrite[]>()
+            var overwrites = overwritesModel.OldValue.ToObject<API.Overwrite[]>(discord.ApiClient.Serializer)
                 .Select(x => new Overwrite(x.TargetId, x.TargetType, new OverwritePermissions(x.Allow, x.Deny)))
                 .ToList();
-            var type = typeModel.OldValue.ToObject<ChannelType>();
-            var name = nameModel.OldValue.ToObject<string>();
+            var type = typeModel.OldValue.ToObject<ChannelType>(discord.ApiClient.Serializer);
+            var name = nameModel.OldValue.ToObject<string>(discord.ApiClient.Serializer);
             var id = entry.TargetId.Value;
 
             return new ChannelDeleteAuditLogData(id, name, type, overwrites.ToReadOnlyCollection());

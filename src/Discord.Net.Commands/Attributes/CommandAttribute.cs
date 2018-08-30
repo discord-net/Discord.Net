@@ -14,7 +14,7 @@ namespace Discord.Commands
         ///     Specifies the <see cref="RunMode" /> of the command. This affects how the command is executed.
         /// </summary>
         public RunMode RunMode { get; set; } = RunMode.Default;
-        public bool? IgnoreExtraArgs { get; set; }
+        public bool? IgnoreExtraArgs { get; }
 
         /// <inheritdoc />
         public CommandAttribute()
@@ -29,6 +29,11 @@ namespace Discord.Commands
         public CommandAttribute(string text)
         {
             Text = text;
+        }
+        public CommandAttribute(string text, bool ignoreExtraArgs)
+        {
+            Text = text;
+            IgnoreExtraArgs = ignoreExtraArgs;
         }
     }
 }
