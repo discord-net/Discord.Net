@@ -77,7 +77,8 @@ namespace Discord.Rest
             int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
         {
             if (maxAge.HasValue && maxAge > 86400)
-                throw new InvalidOperationException("The maximum age of an invite must be less than or equal to a day (86400).");
+                throw new ArgumentOutOfRangeException(nameof(maxAge), maxAge,
+                    "The maximum age of an invite must be less than or equal to a day (86400).");
             var args = new API.Rest.CreateChannelInviteParams
             {
                 IsTemporary = isTemporary,
