@@ -12,25 +12,26 @@ now, it is a good starting point.
 
 ## Creating a Discord Bot
 
-Before writing your bot, it is necessary to create a bot account via 
+Before writing your bot, it is necessary to create a bot account via
 the Discord Applications Portal first.
 
 1. Visit the [Discord Applications Portal].
-2. Create a New Application.
+2. Create a new application.
 3. Give the application a name (this will be the bot's initial username).
-4. Create the Application.
+4. On the left-hand side, under `Settings`, click `Bot`.
 
-    ![Step 4](images/intro-create-app.png)
+    ![Step 4](images/intro-bot-settings.png)
 
-5. In the application review page, click **Create a Bot User**.
+5. Click on `Add Bot`.
 
-    ![Step 5](images/intro-create-bot.png)
+    ![Step 5](images/intro-add-bot.png)
 
 6. Confirm the popup.
-7. (Optional) If this bot will be public, check "Public Bot."
-    * **Do not tick any other options!**
+7. (Optional) If this bot will be public, tick `Public Bot`.
 
-[Discord Applications Portal]: https://discordapp.com/developers/applications/me
+    ![Step 7](images/intro-public-bot.png)
+
+[Discord Applications Portal]: https://discordapp.com/developers/applications/
 
 ## Adding your bot to a server
 
@@ -38,26 +39,31 @@ Bots **cannot** use invite links; they must be explicitly invited
 through the OAuth2 flow.
 
 1. Open your bot's application on the [Discord Applications Portal].
-2. Navigate to `OAuth2 URL Generator` and click on `Generate OAuth2 URL`.
+2. On the left-hand side, under `Settings`, click `OAuth2`.
 
-    ![Step 2](images/intro-generate-oauth.png)
+    ![Step 2](images/intro-oauth-settings.png)
 
-3. Select the permissions that you wish to assign your bot with.
+3. Scroll down to `OAuth2 URL Generator` and under `Scopes` tick `bot`.
+
+    ![Step 3](images/intro-scopes-bot.png)
+
+4. Scroll down further to `Bot Permissions` and select the
+ permissions that you wish to assign your bot with.
 
     > [!NOTE]
     > This will assign the bot with a special "managed" role that no
     > one else can use. The permissions can be changed later in the
     > roles settings if you ever change your mind!
 
-4. Open the generated authorization URL in your browser.
-5. Select a server.
-6. Click on Authorize.
+5. Open the generated authorization URL in your browser.
+6. Select a server.
+7. Click on Authorize.
 
     > [!NOTE]
     > Only servers where you have the `MANAGE_SERVER` permission will be
     > present in this list.
 
-    ![Step 6](images/intro-add-bot.png)
+    ![Step 6](images/intro-authorize.png)
 
 ## Connecting to Discord
 
@@ -166,6 +172,12 @@ The following lines can now be added:
 
 At this point, feel free to start your program and see your bot come
 online in Discord.
+
+> [!INFO]
+> Getting a warning saying `A supplied token was invalid.` and having
+> trouble with logging in? Double-check whether you put in the correct
+> credentials. Note that a client secret is not the same as a bot
+> token!
 
 > [!TIP]
 > Encountering a `PlatformNotSupportedException` when starting your bot?
