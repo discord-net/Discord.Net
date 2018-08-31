@@ -173,7 +173,7 @@ The following lines can now be added:
 At this point, feel free to start your program and see your bot come
 online in Discord.
 
-> [!INFO]
+> [!NOTE]
 > Getting a warning saying `A supplied token was invalid.` and having
 > trouble with logging in? Double-check whether you put in the correct
 > credentials. Note that a client secret is not the same as a bot
