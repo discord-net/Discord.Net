@@ -6,6 +6,7 @@
       <p>Theme</p>
       <select id="theme-switcher">
         <option value="dark">Dark</option>
+        <option value="gray">Gray</option>
         <option value="light">Light</option>
       </select>
     </div>

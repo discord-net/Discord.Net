@@ -3,8 +3,8 @@
 @import url('vs2015.css');
 html,
 body {
-    background: #212121;
-    color: #C0C0C0;
+    background: #23272A;
+    color: #dddddd;
 }
 
 button,
@@ -38,9 +38,16 @@ hr {
     border-color: #37474F;
 }
 
-.subnav {
-    background: #383838
+/* top navbar */
+.navbar-inverse[role="navigation"] {
+    background-color: #2C2F33;
 }
+
+/* sub navbar (below top) */
+.subnav {
+    background: #282B2F
+}
+
 
 .inheritance h5,
 .inheritedMembers h5 {
@@ -129,26 +136,26 @@ article h4 {
 
 .footer {
     border-top: 1px solid #5F5F5F;
-    background: #616161;
+    background: #2C2F33;
 }
 
 /* alert */
 .alert-info {
-    color: #d9edf7;
-    background: #004458;
-    border-color: #005873;
+    color: #f3fdff;
+    background: #40788A;
+    border-color: #2F7A95;
 }
 
 .alert-warning {
     color: #fffaf2;
-    background: #80551a;
-    border-color: #99661f;
+    background: #936C36;
+    border-color: #AE8443;
 }
 
 .alert-danger {
-    color: #fff2f2;
-    background: #4d0000;
-    border-color: #660000;
+    color: #fff4f4;
+    background: #834040;
+    border-color: #8C2F2F
 }
 
 /* For tabbed content */
@@ -233,7 +240,7 @@ article h4 {
 
 code {
     color: white;
-    background-color: #4a4c52;
+    background-color: #5B646B;
     border-radius: 4px;
     padding: 3px 7px;
 }

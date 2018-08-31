@@ -25,21 +25,21 @@ a {
 
 /* alert */
 .alert-info {
-    color: hsl(200, 70%, 30%);
-    background-color: hsl(200, 60%, 85%);
-    border-color: hsl(200, 50%, 70%);
-}
-
-.alert-danger {
-    color: hsl(0, 70%, 30%);
-    background-color: hsl(0, 60%, 85%);
-    border-color: hsl(0, 50%, 70%);
+    color: #165e82;
+    background-color: #c1e0ef;
+    border-color: #8cbfd8;
 }
 
 .alert-warning {
-    color: hsl(40, 70%, 30%);
-    background-color: hsl(40, 60%, 85%);
-    border-color: hsl(40, 50%, 70%);
+    color: #825e16;
+    background-color: #efe0c1;
+    border-color: #d8bf8c;
+}
+
+.alert-danger {
+    color: #821616;
+    background-color: #efc1c1;
+    border-color: #d88c8c;
 }
 
 /* code */
