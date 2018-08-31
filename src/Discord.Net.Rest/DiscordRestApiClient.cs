@@ -78,7 +78,7 @@ namespace Discord.API
                 case TokenType.Bearer:
                     return $"Bearer {token}";
                 default:
-                    throw new ArgumentException("Unknown OAuth token type", nameof(tokenType));
+                    throw new ArgumentException(message: "Unknown OAuth token type", paramName: nameof(tokenType));
             }
         }
         internal virtual void Dispose(bool disposing)
@@ -473,7 +473,7 @@ namespace Discord.API
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
             if (args.Content?.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
+                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
@@ -490,7 +490,7 @@ namespace Discord.API
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
             if (args.Content?.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
+                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
             options = RequestOptions.CreateOrClone(options);
 
             return await SendJsonAsync<Message>("POST", () => $"webhooks/{webhookId}/{AuthToken}?wait=true", args, new BucketIds(), clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);

@@ -29,7 +29,7 @@ namespace Discord
                 case ICategoryChannel _: return Category;
                 case IDMChannel _: return DM;
                 case IGroupChannel _: return Group;
-                default: throw new ArgumentException("Unknown channel type", nameof(channel));
+                default: throw new ArgumentException(message: "Unknown channel type", paramName: nameof(channel));
             }
         }
 

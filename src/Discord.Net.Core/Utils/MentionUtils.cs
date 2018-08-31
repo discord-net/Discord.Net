@@ -21,7 +21,7 @@ namespace Discord
         {
             if (TryParseUser(text, out ulong id))
                 return id;
-            throw new ArgumentException("Invalid mention format", nameof(text));
+            throw new ArgumentException(message: "Invalid mention format", paramName: nameof(text));
         }
         /// <summary> Tries to parse a provided user mention string. </summary>
         public static bool TryParseUser(string text, out ulong userId)
@@ -45,7 +45,7 @@ namespace Discord
         {
             if (TryParseChannel(text, out ulong id))
                 return id;
-            throw new ArgumentException("Invalid mention format", nameof(text));
+            throw new ArgumentException(message: "Invalid mention format", paramName: nameof(text));
         }
         /// <summary>Tries to parse a provided channel mention string. </summary>
         public static bool TryParseChannel(string text, out ulong channelId)
@@ -66,7 +66,7 @@ namespace Discord
         {
             if (TryParseRole(text, out ulong id))
                 return id;
-            throw new ArgumentException("Invalid mention format", nameof(text));
+            throw new ArgumentException(message: "Invalid mention format", paramName: nameof(text));
         }
         /// <summary>Tries to parse a provided role mention string. </summary>
         public static bool TryParseRole(string text, out ulong roleId)

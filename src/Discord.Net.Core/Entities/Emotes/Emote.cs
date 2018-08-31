@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 
 namespace Discord
@@ -58,7 +58,7 @@ namespace Discord
         {
             if (TryParse(text, out Emote result))
                 return result;
-            throw new ArgumentException("Invalid emote format", nameof(text));
+            throw new ArgumentException(message: "Invalid emote format", paramName: nameof(text));
         }
 
         public static bool TryParse(string text, out Emote result)
