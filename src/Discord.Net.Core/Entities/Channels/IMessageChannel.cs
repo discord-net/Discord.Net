@@ -13,6 +13,15 @@ namespace Discord
         /// <summary>
         ///     Sends a message to this message channel.
         /// </summary>
+        /// <example>
+        ///     The following example sends a message with the current system time in RFC 1123 format to the channel and
+        ///     deletes itself after 5 seconds.
+        ///     <code language="cs">
+        ///     var message = await channel.SendMessageAsync(DateTimeOffset.UtcNow.ToString("R"));
+        ///     await Task.Delay(TimeSpan.FromSeconds(5))
+        ///         .ContinueWith(x => message.DeleteAsync());
+        ///     </code>
+        /// </example>
         /// <param name="text">The message to be sent.</param>
         /// <param name="isTTS">Determines whether the message should be read aloud by Discord or not.</param>
         /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
@@ -25,12 +34,26 @@ namespace Discord
         /// <summary>
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
+        /// <example>
+        ///     The following example uploads a local file called <c>wumpus.txt</c> along with the text 
+        ///     <c>good discord boi</c> to the channel.
+        ///     <code language="cs">
+        ///     await channel.SendFileAsync("wumpus.txt", "good discord boi");
+        ///     </code>
+        /// 
+        ///     The following example uploads a local image called <c>b1nzy.jpg</c> embedded inside a rich embed to the
+        ///     channel.
+        ///     <code language="cs">
+        ///     await channel.SendFileAsync("b1nzy.jpg",
+        ///         embed: new EmbedBuilder {ImageUrl = "attachment://b1nzy.jpg"}.Build());
+        ///     </code>
+        /// </example>
         /// <remarks>
         ///     This method sends a file as if you are uploading an attachment directly from your Discord client.
         ///     <note>
-        ///         If you wish to upload an image and have it embedded in a <see cref="Discord.EmbedType.Rich"/>embed,
+        ///         If you wish to upload an image and have it embedded in a <see cref="Discord.EmbedType.Rich"/> embed,
         ///         you may upload the file and refer to the file with "attachment://filename.ext" in the
-        ///         <see cref="Discord.EmbedBuilder.ImageUrl"/>.
+        ///         <see cref="Discord.EmbedBuilder.ImageUrl"/>. See the example section for its usage.
         ///     </note>
         /// </remarks>
         /// <param name="filePath">The file path of the file.</param>
@@ -46,12 +69,20 @@ namespace Discord
         /// <summary>
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
+        /// <example>
+        ///     The following example uploads a streamed image that will be called <c>b1nzy.jpg</c> embedded inside a
+        ///     rich embed to the channel.
+        ///     <code language="cs">
+        ///     await channel.SendFileAsync(b1nzyStream, "b1nzy.jpg",
+        ///         embed: new EmbedBuilder {ImageUrl = "attachment://b1nzy.jpg"}.Build());
+        ///     </code>
+        /// </example>
         /// <remarks>
         ///     This method sends a file as if you are uploading an attachment directly from your Discord client.
         ///     <note>
-        ///         If you wish to upload an image and have it embedded in a <see cref="Discord.EmbedType.Rich"/>embed,
+        ///         If you wish to upload an image and have it embedded in a <see cref="Discord.EmbedType.Rich"/> embed,
         ///         you may upload the file and refer to the file with "attachment://filename.ext" in the
-        ///         <see cref="Discord.EmbedBuilder.ImageUrl"/>.
+        ///         <see cref="Discord.EmbedBuilder.ImageUrl"/>. See the example section for its usage.
         ///     </note>
         /// </remarks>
         /// <param name="stream">The <see cref="Stream" /> of the file to be sent.</param>
