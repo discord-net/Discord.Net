@@ -14,9 +14,9 @@ depending on the type of emoji, they are sent in an entirely
 different format.
 
 What does this all mean? It means that you should know that by
-sending a string like `“Discord.Net is :ok_hand:”` will **NOT**
-translate to `Discord.Net is 👌`; rather, it will be treated as-is,
-like `Discord.Net is :ok_hand:`.
+reacting with a string like `“:ok_hand:”` will **NOT** automatically
+translate to `👌`; rather, it will be treated as-is,
+like `:ok_hand:`, thus the server will return a `400 Bad Request`.
 
 ## Emoji
 
