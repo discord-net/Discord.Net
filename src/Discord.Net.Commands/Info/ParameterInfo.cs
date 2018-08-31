@@ -15,16 +15,43 @@ namespace Discord.Commands
     {
         private readonly TypeReader _reader;
 
+        /// <summary>
+        ///     Gets the command that associates with this parameter.
+        /// </summary>
         public CommandInfo Command { get; }
+        /// <summary>
+        ///     Gets the name of this parameter.
+        /// </summary>
         public string Name { get; }
+        /// <summary>
+        ///     Gets the summary of this parameter.
+        /// </summary>
         public string Summary { get; }
+        /// <summary>
+        ///     Gets a value that indicates whether this parameter is optional or not.
+        /// </summary>
         public bool IsOptional { get; }
+        /// <summary>
+        ///     Gets a value that indicates whether this parameter is a remainder parameter or not.
+        /// </summary>
         public bool IsRemainder { get; }
         public bool IsMultiple { get; }
+        /// <summary>
+        ///     Gets the type of the parameter.
+        /// </summary>
         public Type Type { get; }
+        /// <summary>
+        ///     Gets the default value for this optional parameter if applicable.
+        /// </summary>
         public object DefaultValue { get; }
 
+        /// <summary>
+        ///     Gets a read-only list of precondition that apply to this parameter.
+        /// </summary>
         public IReadOnlyList<ParameterPreconditionAttribute> Preconditions { get; }
+        /// <summary>
+        ///     Gets a read-only list of attributes that apply to this parameter.
+        /// </summary>
         public IReadOnlyList<Attribute> Attributes { get; }
 
         internal ParameterInfo(ParameterBuilder builder, CommandInfo command, CommandService service)

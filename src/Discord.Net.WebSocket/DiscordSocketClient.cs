@@ -361,6 +361,12 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
+        /// <example>
+        ///     The following example sets the status of the current user to Do Not Disturb.
+        ///     <code language="cs">
+        ///     await client.SetStatusAsync(UserStatus.DoNotDisturb);
+        ///     </code>
+        /// </example>
         public override async Task SetStatusAsync(UserStatus status)
         {
             Status = status;
@@ -371,6 +377,20 @@ namespace Discord.WebSocket
             await SendStatusAsync().ConfigureAwait(false);
         }
         /// <inheritdoc />
+        /// <example>
+        /// <para>
+        ///     The following example sets the activity of the current user to the specified game name.
+        ///     <code language="cs">
+        ///     await client.SetGameAsync("A Strange Game");
+        ///     </code>
+        /// </para>
+        /// <para>
+        ///     The following example sets the activity of the current user to a streaming status.
+        ///     <code language="cs">
+        ///     await client.SetGameAsync("Great Stream 10/10", "https://twitch.tv/MyAmazingStream1337", ActivityType.Streaming);
+        ///     </code>
+        /// </para>
+        /// </example>
         public override async Task SetGameAsync(string name, string streamUrl = null, ActivityType type = ActivityType.Playing)
         {
             if (!string.IsNullOrEmpty(streamUrl))

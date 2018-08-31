@@ -6,6 +6,9 @@ namespace Discord.Commands
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct ExecuteResult : IResult
     {
+        /// <summary>
+        ///     Gets the exception that may have occurred during the command execution.
+        /// </summary>
         public Exception Exception { get; }
 
         /// <inheritdoc />

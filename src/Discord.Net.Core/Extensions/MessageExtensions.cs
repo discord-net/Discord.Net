@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    /// Provides extension methods for <see cref="IMessage"/>.
+    ///     Provides extension methods for <see cref="IMessage" />.
     /// </summary>
     public static class MessageExtensions
     {

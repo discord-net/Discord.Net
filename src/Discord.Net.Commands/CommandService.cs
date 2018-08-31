@@ -11,6 +11,22 @@ using Discord.Logging;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    ///     Provides a framework for building Discord commands.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The service provides a framework for building Discord commands both dynamically via runtime builders or
+    ///         statically via compile-time modules. To create a command module at compile-time, see
+    ///         <see cref="ModuleBase" /> (most common); otherwise, see <see cref="ModuleBuilder" />.
+    ///     </para>
+    ///     <para>
+    ///         This service also provides several events for monitoring command usages; such as
+    ///         <see cref="Discord.Commands.CommandService.Log" /> for any command-related log events, and
+    ///         <see cref="Discord.Commands.CommandService.CommandExecuted" /> for information about commands that have
+    ///         been successfully executed.
+    ///     </para>
+    /// </remarks>
     public class CommandService
     {
         /// <summary>
@@ -20,8 +36,19 @@ namespace Discord.Commands
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
 
         /// <summary>
-        ///     Occurs when a command is successfully executed without any runtime error.
+        ///     Occurs when a command is successfully executed without any error.
         /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         This event is fired when a command has been successfully executed without any of the following errors:
+        ///     </para>
+        ///         <para>* Parsing error</para>
+        ///         <para>* Precondition error</para>
+        ///         <para>* Runtime exception</para>
+        ///     <para>
+        ///         Should the command encounter any of the aforementioned error, this event will not be raised.
+        ///     </para>
+        /// </remarks>
         public event Func<CommandInfo, ICommandContext, IResult, Task> CommandExecuted { add { _commandExecutedEvent.Add(value); } remove { _commandExecutedEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>> _commandExecutedEvent = new AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>>();
 
@@ -132,8 +159,14 @@ namespace Discord.Commands
         /// <summary>
         ///     Add a command module from a <see cref="Type" /> .
         /// </summary>
+        /// <example>
+        ///     <para>The following example registers the module <c>MyModule</c> to <c>commandService</c>.</para>
+        ///     <code language="cs">
+        ///     await commandService.AddModuleAsync&lt;MyModule&gt;(serviceProvider);
+        ///     </code>
+        /// </example>
         /// <typeparam name="T">The type of module.</typeparam>
-        /// <param name="services">The <see cref="IServiceProvider" /> for your dependency injection solution if using one; otherwise, pass <c>null</c> .</param>
+        /// <param name="services">The <see cref="IServiceProvider"/> for your dependency injection solution if using one; otherwise, pass <c>null</c>.</param>
         /// <exception cref="ArgumentException">This module has already been added.</exception>
         /// <exception cref="InvalidOperationException">
         /// The <see cref="ModuleInfo"/> fails to be built; an invalid type may have been provided.
@@ -145,7 +178,7 @@ namespace Discord.Commands
         public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services) => AddModuleAsync(typeof(T), services);
 
         /// <summary>
-        ///     Adds a command module from a <see cref="Type" /> .
+        ///     Adds a command module from a <see cref="Type" />.
         /// </summary>
         /// <param name="type">The type of module.</param>
         /// <param name="services">The <see cref="IServiceProvider" /> for your dependency injection solution if using one; otherwise, pass <c>null</c> .</param>
