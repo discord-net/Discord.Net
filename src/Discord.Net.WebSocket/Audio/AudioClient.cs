@@ -331,7 +331,7 @@ namespace Discord.Audio
                         {
                             if (pair.Key == value)
                             {
-                                int latency = (int)(Environment.TickCount - pair.Value);
+                                int latency = Environment.TickCount - pair.Value;
                                 int before = UdpLatency;
                                 UdpLatency = latency;
 

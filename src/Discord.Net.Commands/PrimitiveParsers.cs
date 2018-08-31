@@ -8,9 +8,9 @@ namespace Discord.Commands
 
     internal static class PrimitiveParsers
     {
-        private static readonly Lazy<IReadOnlyDictionary<Type, Delegate>> _parsers = new Lazy<IReadOnlyDictionary<Type, Delegate>>(CreateParsers);
+        private static readonly Lazy<IReadOnlyDictionary<Type, Delegate>> Parsers = new Lazy<IReadOnlyDictionary<Type, Delegate>>(CreateParsers);
 
-        public static IEnumerable<Type> SupportedTypes = _parsers.Value.Keys;
+        public static IEnumerable<Type> SupportedTypes = Parsers.Value.Keys;
 
         static IReadOnlyDictionary<Type, Delegate> CreateParsers()
         {
@@ -34,7 +34,7 @@ namespace Discord.Commands
             return parserBuilder.ToImmutable();
         }
 
-        public static TryParseDelegate<T> Get<T>() => (TryParseDelegate<T>)_parsers.Value[typeof(T)];
-        public static Delegate Get(Type type) => _parsers.Value[type];
+        public static TryParseDelegate<T> Get<T>() => (TryParseDelegate<T>)Parsers.Value[typeof(T)];
+        public static Delegate Get(Type type) => Parsers.Value[type];
     }
 }

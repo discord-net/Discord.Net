@@ -7,7 +7,7 @@ namespace Discord.Commands
 {
     internal class CommandMapNode
     {
-        private static readonly char[] WhitespaceChars = new[] { ' ', '\r', '\n' };
+        private static readonly char[] WhitespaceChars = { ' ', '\r', '\n' };
 
         private readonly ConcurrentDictionary<string, CommandMapNode> _nodes;
         private readonly string _name;
@@ -53,7 +53,6 @@ namespace Discord.Commands
         public void RemoveCommand(CommandService service, string text, int index, CommandInfo command)
         {
             int nextSegment = NextSegment(text, index, service._separatorChar);
-            string name;
 
             lock (_lockObj)
             {
@@ -61,13 +60,13 @@ namespace Discord.Commands
                     _commands = _commands.Remove(command);
                 else
                 {
+                    string name;
                     if (nextSegment == -1)
                         name = text.Substring(index);
                     else
                         name = text.Substring(index, nextSegment - index);
 
-                    CommandMapNode nextNode;
-                    if (_nodes.TryGetValue(name, out nextNode))
+                    if (_nodes.TryGetValue(name, out var nextNode))
                     {
                         nextNode.RemoveCommand(service, nextSegment == -1 ? "" : text, nextSegment + 1, command);
                         if (nextNode.IsEmpty)

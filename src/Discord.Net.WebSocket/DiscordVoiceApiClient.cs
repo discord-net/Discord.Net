@@ -39,8 +39,8 @@ namespace Discord.Audio
         
         private readonly JsonSerializer _serializer;
         private readonly SemaphoreSlim _connectionLock;
+        private readonly IUdpSocket _udp;
         private CancellationTokenSource _connectCancelToken;
-        private IUdpSocket _udp;
         private bool _isDisposed;
         private ulong _nextKeepalive;
 

@@ -59,7 +59,7 @@ namespace Discord.WebSocket
             => ChannelHelper.ModifyAsync(this, Discord, func, options);
 
         /// <inheritdoc />
-        public async Task<IAudioClient> ConnectAsync(bool selfDeaf, bool selfMute, bool external)
+        public async Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false)
         {
             return await Guild.ConnectAudioAsync(Id, selfDeaf, selfMute, external).ConfigureAwait(false);
         }

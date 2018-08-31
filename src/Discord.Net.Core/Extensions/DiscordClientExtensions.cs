@@ -16,14 +16,14 @@ namespace Discord
             => await client.GetPrivateChannelAsync(id).ConfigureAwait(false) as IDMChannel;
         /// <summary> Gets all available DM channels for the client. </summary>
         public static async Task<IEnumerable<IDMChannel>> GetDMChannelsAsync(this IDiscordClient client)
-            => (await client.GetPrivateChannelsAsync().ConfigureAwait(false)).Select(x => x as IDMChannel).Where(x => x != null);
+            => (await client.GetPrivateChannelsAsync().ConfigureAwait(false)).OfType<IDMChannel>();
 
         /// <summary> Gets the group channel with the provided ID. </summary>
         public static async Task<IGroupChannel> GetGroupChannelAsync(this IDiscordClient client, ulong id)
             => await client.GetPrivateChannelAsync(id).ConfigureAwait(false) as IGroupChannel;
         /// <summary> Gets all available group channels for the client. </summary>
         public static async Task<IEnumerable<IGroupChannel>> GetGroupChannelsAsync(this IDiscordClient client)
-            => (await client.GetPrivateChannelsAsync().ConfigureAwait(false)).Select(x => x as IGroupChannel).Where(x => x != null);
+            => (await client.GetPrivateChannelsAsync().ConfigureAwait(false)).OfType<IGroupChannel>();
 
         /// <summary> Gets the most optimal voice region for the client. </summary>
         public static async Task<IVoiceRegion> GetOptimalVoiceRegionAsync(this IDiscordClient discord)

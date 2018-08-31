@@ -16,10 +16,10 @@ namespace Discord.Net.Queue
 
         private readonly ConcurrentDictionary<string, RequestBucket> _buckets;
         private readonly SemaphoreSlim _tokenLock;
+        private readonly CancellationTokenSource _cancelToken; //Dispose token
         private CancellationTokenSource _clearToken;
         private CancellationToken _parentToken;
         private CancellationToken _requestCancelToken; //Parent token + Clear token
-        private CancellationTokenSource _cancelToken; //Dispose token
         private DateTimeOffset _waitUntil;
 
         private Task _cleanupTask;

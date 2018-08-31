@@ -83,7 +83,7 @@ namespace Discord.WebSocket
         ///     An collection of DM channels that have been opened in this session.
         /// </returns>
         public IReadOnlyCollection<SocketDMChannel> DMChannels
-            => State.PrivateChannels.Select(x => x as SocketDMChannel).Where(x => x != null).ToImmutableArray();
+            => State.PrivateChannels.OfType<SocketDMChannel>().ToImmutableArray();
         /// <summary>
         ///     Gets a collection of group channels opened in this session.
         /// </summary>
@@ -98,7 +98,7 @@ namespace Discord.WebSocket
         ///     An collection of group channels that have been opened in this session.
         /// </returns>
         public IReadOnlyCollection<SocketGroupChannel> GroupChannels
-            => State.PrivateChannels.Select(x => x as SocketGroupChannel).Where(x => x != null).ToImmutableArray();
+            => State.PrivateChannels.OfType<SocketGroupChannel>().ToImmutableArray();
         /// <inheritdoc />
         public override IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
 
@@ -1747,7 +1747,7 @@ namespace Discord.WebSocket
             if (eventHandler.HasSubscribers)
             {
                 if (HandlerTimeout.HasValue)
-                    await TimeoutWrap(name, () => eventHandler.InvokeAsync()).ConfigureAwait(false);
+                    await TimeoutWrap(name, eventHandler.InvokeAsync).ConfigureAwait(false);
                 else
                     await eventHandler.InvokeAsync().ConfigureAwait(false);
             }

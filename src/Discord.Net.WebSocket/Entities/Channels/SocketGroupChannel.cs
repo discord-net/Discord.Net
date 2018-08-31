@@ -21,10 +21,10 @@ namespace Discord.WebSocket
     public class SocketGroupChannel : SocketChannel, IGroupChannel, ISocketPrivateChannel, ISocketMessageChannel, ISocketAudioChannel
     {
         private readonly MessageCache _messages;
+        private readonly ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
 
         private string _iconId;
         private ConcurrentDictionary<ulong, SocketGroupUser> _users;
-        private readonly ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
 
         /// <inheritdoc />
         public string Name { get; private set; }
@@ -153,7 +153,7 @@ namespace Discord.WebSocket
         internal SocketGroupUser GetOrAddUser(UserModel model)
         {
             if (_users.TryGetValue(model.Id, out SocketGroupUser user))
-                return user as SocketGroupUser;
+                return user;
             else
             {
                 var privateUser = SocketGroupUser.Create(this, Discord.State, model);
@@ -167,7 +167,7 @@ namespace Discord.WebSocket
             if (_users.TryRemove(id, out SocketGroupUser user))
             {
                 user.GlobalUser.RemoveRef(Discord);
-                return user as SocketGroupUser;
+                return user;
             }
             return null;
         }

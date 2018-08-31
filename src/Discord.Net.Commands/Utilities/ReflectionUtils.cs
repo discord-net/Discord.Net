@@ -7,7 +7,7 @@ namespace Discord.Commands
 {
     internal static class ReflectionUtils
     {
-        private static readonly TypeInfo _objectTypeInfo = typeof(object).GetTypeInfo();
+        private static readonly TypeInfo ObjectTypeInfo = typeof(object).GetTypeInfo();
 
         internal static T CreateObject<T>(TypeInfo typeInfo, CommandService commands, IServiceProvider services = null)
             => CreateBuilder<T>(typeInfo, commands)(services);
@@ -52,8 +52,8 @@ namespace Discord.Commands
         }
         private static PropertyInfo[] GetProperties(TypeInfo ownerType)
         {
-            var result = new List<PropertyInfo>();
-            while (ownerType != _objectTypeInfo)
+            var result = new List<System.Reflection.PropertyInfo>();
+            while (ownerType != ObjectTypeInfo)
             {
                 foreach (var prop in ownerType.DeclaredProperties)
                 {

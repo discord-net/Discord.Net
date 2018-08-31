@@ -171,7 +171,7 @@ namespace Discord.WebSocket
         ///     A read-only collection of message channels found within this guild.
         /// </returns>
         public IReadOnlyCollection<SocketTextChannel> TextChannels
-            => Channels.Select(x => x as SocketTextChannel).Where(x => x != null).ToImmutableArray();
+            => Channels.OfType<SocketTextChannel>().ToImmutableArray();
         /// <summary>
         ///     Gets a collection of all voice channels in this guild.
         /// </summary>
@@ -179,7 +179,7 @@ namespace Discord.WebSocket
         ///     A read-only collection of voice channels found within this guild.
         /// </returns>
         public IReadOnlyCollection<SocketVoiceChannel> VoiceChannels
-            => Channels.Select(x => x as SocketVoiceChannel).Where(x => x != null).ToImmutableArray();
+            => Channels.OfType<SocketVoiceChannel>().ToImmutableArray();
         /// <summary>
         ///     Gets a collection of all category channels in this guild.
         /// </summary>
@@ -187,7 +187,7 @@ namespace Discord.WebSocket
         ///     A read-only collection of category channels found within this guild.
         /// </returns>
         public IReadOnlyCollection<SocketCategoryChannel> CategoryChannels
-            => Channels.Select(x => x as SocketCategoryChannel).Where(x => x != null).ToImmutableArray();
+            => Channels.OfType<SocketCategoryChannel>().ToImmutableArray();
         /// <summary>
         ///     Gets the current logged-in user.
         /// </summary>
@@ -870,7 +870,7 @@ namespace Discord.WebSocket
 
                 await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, channelId, selfDeaf, selfMute).ConfigureAwait(false);
             }
-            catch (Exception)
+            catch
             {
                 await DisconnectAudioInternalAsync().ConfigureAwait(false);
                 throw;
@@ -887,7 +887,7 @@ namespace Discord.WebSocket
                     throw new TimeoutException();
                 return await promise.Task.ConfigureAwait(false);
             }
-            catch (Exception)
+            catch
             {
                 await DisconnectAudioAsync().ConfigureAwait(false);
                 throw;

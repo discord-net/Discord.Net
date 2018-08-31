@@ -13,11 +13,11 @@ namespace Discord.WebSocket
     {
         private readonly DiscordSocketConfig _baseConfig;
         private readonly SemaphoreSlim _connectionGroupLock;
-        private int[] _shardIds;
         private readonly Dictionary<int, int> _shardIdsToIndex;
+        private readonly bool _automaticShards;
+        private int[] _shardIds;
         private DiscordSocketClient[] _shards;
         private int _totalShards;
-        private readonly bool _automaticShards;
         
         /// <inheritdoc />
         public override int Latency { get => GetLatency(); protected set { } }
@@ -26,7 +26,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override IActivity Activity { get => _shards[0].Activity; protected set { } }
 
-        internal new DiscordSocketApiClient ApiClient => base.ApiClient;
+        internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => GetGuilds().ToReadOnlyCollection(GetGuildCount);
         /// <inheritdoc />

@@ -277,7 +277,7 @@ namespace Discord.Rest
         public async Task<IReadOnlyCollection<RestTextChannel>> GetTextChannelsAsync(RequestOptions options = null)
         {
             var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
-            return channels.Select(x => x as RestTextChannel).Where(x => x != null).ToImmutableArray();
+            return channels.OfType<RestTextChannel>().ToImmutableArray();
         }
 
         /// <summary>
@@ -306,7 +306,7 @@ namespace Discord.Rest
         public async Task<IReadOnlyCollection<RestVoiceChannel>> GetVoiceChannelsAsync(RequestOptions options = null)
         {
             var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
-            return channels.Select(x => x as RestVoiceChannel).Where(x => x != null).ToImmutableArray();
+            return channels.OfType<RestVoiceChannel>().ToImmutableArray();
         }
 
         /// <summary>
@@ -320,7 +320,7 @@ namespace Discord.Rest
         public async Task<IReadOnlyCollection<RestCategoryChannel>> GetCategoryChannelsAsync(RequestOptions options = null)
         {
             var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
-            return channels.Select(x => x as RestCategoryChannel).Where(x => x != null).ToImmutableArray();
+            return channels.OfType<RestCategoryChannel>().ToImmutableArray();
         }
 
         /// <summary>
