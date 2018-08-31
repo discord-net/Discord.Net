@@ -19,7 +19,7 @@ namespace Discord
         {
             // A Null or WhiteSpace token of any type is invalid.
             if (string.IsNullOrWhiteSpace(token))
-                throw new ArgumentNullException("A token cannot be null, empty, or contain only whitespace.", nameof(token));
+                throw new ArgumentNullException(nameof(token), "A token cannot be null, empty, or contain only whitespace.");
 
             switch (tokenType)
             {

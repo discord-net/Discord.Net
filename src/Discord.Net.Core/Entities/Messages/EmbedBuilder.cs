@@ -75,7 +75,7 @@ namespace Discord
             get => _fields;
             set
             {
-                if (value == null) throw new ArgumentNullException("Cannot set an embed builder's fields collection to null", nameof(Fields));
+                if (value == null) throw new ArgumentNullException(nameof(Fields), "Cannot set an embed builder's fields collection to null");
                 if (value.Count > MaxFieldCount) throw new ArgumentException($"Field count must be less than or equal to {MaxFieldCount}.", nameof(Fields));
                 _fields = value;
             }

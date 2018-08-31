@@ -45,10 +45,7 @@ namespace Discord
         }        
 
         private static ArgumentException CreateNotEmptyException(string name, string msg)
-        {
-            if (msg == null) return new ArgumentException("Argument cannot be blank", name);
-            else return new ArgumentException(name, msg);
-        }
+            => new ArgumentException(msg ?? "Argument cannot be blank.", name);
 
         //Numerics
         public static void NotEqual(sbyte obj, sbyte value, string name, string msg = null) { if (obj == value) throw CreateNotEqualException(name, msg, value); }
