@@ -76,15 +76,15 @@ namespace Discord.Rest
         public static async Task<RestInviteMetadata> CreateInviteAsync(IGuildChannel channel, BaseDiscordClient client,
             int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
         {
-            var args = new CreateChannelInviteParams { IsTemporary = isTemporary, IsUnique = isUnique };
-            if (maxAge.HasValue)
-                args.MaxAge = maxAge.Value;
-            else
-                args.MaxAge = 0;
-            if (maxUses.HasValue)
-                args.MaxUses = maxUses.Value;
-            else
-                args.MaxUses = 0;
+            if (maxAge.HasValue && maxAge > 86400)
+                throw new InvalidOperationException("The maximum age of an invite must be less than or equal to a day (86400).");
+            var args = new API.Rest.CreateChannelInviteParams
+            {
+                IsTemporary = isTemporary,
+                IsUnique = isUnique,
+                MaxAge = maxAge ?? 0,
+                MaxUses = maxUses ?? 0
+            };
             var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestInviteMetadata.Create(client, null, channel, model);
         }
