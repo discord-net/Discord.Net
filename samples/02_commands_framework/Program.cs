@@ -15,7 +15,7 @@ namespace _02_commands_framework
     //
     // You can find samples of using the command framework:
     // - Here, under the 02_commands_framework sample
-    // - https://github.com/foxbot/DiscordBotBase - a barebones bot template
+    // - https://github.com/foxbot/DiscordBotBase - a bare-bones bot template
     // - https://github.com/foxbot/patek - a more feature-filled bot, utilizing more aspects of the library
     class Program
     {

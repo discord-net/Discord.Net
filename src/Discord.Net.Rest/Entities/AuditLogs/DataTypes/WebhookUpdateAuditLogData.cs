@@ -45,7 +45,7 @@ namespace Discord.Rest
         ///     Gets the webhook that was updated.
         /// </summary>
         /// <returns>
-        ///     A webhook objet representing the webhook that was updated.
+        ///     A webhook object representing the webhook that was updated.
         /// </returns>
         public IWebhook Webhook { get; }
 

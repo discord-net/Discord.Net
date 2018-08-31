@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 
 namespace Discord.Audio.Streams
 {
-    ///<summary> Encrypts an RTP frame using libsodium </summary>
+    /// <summary>
+    ///     Encrypts an RTP frame using libsodium.
+    /// </summary>
     public class SodiumEncryptStream : AudioOutStream
     {
         private readonly AudioClient _client;

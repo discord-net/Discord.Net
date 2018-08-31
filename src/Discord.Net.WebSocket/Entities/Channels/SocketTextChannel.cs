@@ -79,7 +79,7 @@ namespace Discord.WebSocket
         /// <param name="id">The snowflake identifier of the message.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents an asynchrnous get operation for retrieving the message. The task result contains
+        ///     A task that represents an asynchronous get operation for retrieving the message. The task result contains
         ///     the retrieved message; <c>null</c> if no message is found with the specified identifier.
         /// </returns>
         public async Task<IMessage> GetMessageAsync(ulong id, RequestOptions options = null)

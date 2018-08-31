@@ -30,7 +30,7 @@ namespace Discord.Rest
         ///     Gets the ID of the channel that the messages were deleted from.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identifer for the channel that the messages were
+        ///     A <see cref="ulong"/> representing the snowflake identifier for the channel that the messages were
         ///     deleted from.
         /// </returns>
         public ulong ChannelId { get; }

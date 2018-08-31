@@ -9,7 +9,7 @@ namespace Discord
         ///     Gets the ID of the channel to apply this position to.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identififer of this channel.
+        ///     A <see cref="ulong"/> representing the snowflake identifier of this channel.
         /// </returns>
         public ulong Id { get; }
         /// <summary>

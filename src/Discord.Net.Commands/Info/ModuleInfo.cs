@@ -49,7 +49,7 @@ namespace Discord.Commands
         /// </summary>
         public IReadOnlyList<Attribute> Attributes { get; }
         /// <summary>
-        ///     Gets a read-only list of submodules associated with tihs module.
+        ///     Gets a read-only list of submodules associated with this module.
         /// </summary>
         public IReadOnlyList<ModuleInfo> Submodules { get; }
         /// <summary>

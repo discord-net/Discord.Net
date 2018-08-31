@@ -87,10 +87,10 @@ namespace Discord.Rest
             => CDN.GetDefaultUserAvatarUrl(DiscriminatorValue);
 
         /// <summary>
-        ///     Gets the Username#Descriminator of the user.
+        ///     Gets the Username#Discriminator of the user.
         /// </summary>
         /// <returns>
-        ///     A string that resolves to Username#Descriminator of the user.
+        ///     A string that resolves to Username#Discriminator of the user.
         /// </returns>
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";

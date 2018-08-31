@@ -9,10 +9,10 @@ namespace Discord
     public interface IVoiceChannel : INestedChannel, IAudioChannel
     {
         /// <summary>
-        ///     Gets the bitrate that the clients in this voice channel are requested to use.
+        ///     Gets the bit-rate that the clients in this voice channel are requested to use.
         /// </summary>
         /// <returns>
-        ///     An <see cref="int"/> representing the bitrate (bps) that this voice channel defines and requests the
+        ///     An <see cref="int"/> representing the bit-rate (bps) that this voice channel defines and requests the
         ///     client(s) to use.
         /// </returns>
         int Bitrate { get; }
@@ -20,7 +20,7 @@ namespace Discord
         ///     Gets the max number of users allowed to be connected to this channel at once.
         /// </summary>
         /// <returns>
-        ///     An <see cref="int"/> representing the maxmimum number of users that are allowed to be connected to this
+        ///     An <see cref="int"/> representing the maximum number of users that are allowed to be connected to this
         ///     channel at once; <c>null</c> if a limit is not set.
         /// </returns>
         int? UserLimit { get; }

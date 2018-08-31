@@ -42,7 +42,7 @@ namespace Discord.Commands
         ///     [RequireContext(ContextType.DM | ContextType.Group)]
         ///     public Task PrivateOnlyAsync()
         ///     {
-        ///         return ReplyAsync("shhh, this command is a secret");
+        ///         return ReplyAsync("shh, this command is a secret");
         ///     }
         /// </code>
         /// </example>

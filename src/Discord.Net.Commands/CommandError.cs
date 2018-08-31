@@ -26,7 +26,7 @@ namespace Discord.Commands
         /// </summary>
         ObjectNotFound,
         /// <summary>
-        /// Thrown when more than one objects is matched by <see cref="TypeReader"/>.
+        /// Thrown when more than one object is matched by <see cref="TypeReader"/>.
         /// </summary>
         MultipleMatches,
 

@@ -71,7 +71,7 @@ namespace Discord.WebSocket
         ///         The message that is sent to the client is passed into the event handler parameter as
         ///         <see cref="SocketMessage"/>. This message may be a system message (i.e.
         ///         <see cref="SocketSystemMessage"/>) or a user message (i.e. <see cref="SocketUserMessage"/>. See the
-        ///         derived clsases of <see cref="SocketMessage"/> for more details.
+        ///         derived classes of <see cref="SocketMessage"/> for more details.
         ///     </para>
         /// </remarks>
         public event Func<SocketMessage, Task> MessageReceived {

@@ -194,7 +194,7 @@ namespace Discord.WebSocket
         ///         clients only. 
         ///     </note>
         /// </remarks>
-        /// <param name="activity">The activty to be set.</param>
+        /// <param name="activity">The activity to be set.</param>
         /// <returns>
         ///     A task that represents the asynchronous set operation.
         /// </returns>

@@ -20,7 +20,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public DiscordRestClient() : this(new DiscordRestConfig()) { }
         /// <summary>
-        ///     Initializes a new <see cref="DiscordRestClient"/> with the provided configuratation.
+        ///     Initializes a new <see cref="DiscordRestClient"/> with the provided configuration.
         /// </summary>
         /// <param name="config">The configuration to be used with the client.</param>
         public DiscordRestClient(DiscordRestConfig config) : base(config, CreateApiClient(config)) { }

@@ -28,10 +28,10 @@ namespace Discord.Rest
         /// </returns>
         public string Topic { get; }
         /// <summary>
-        ///     Gets the bitrate of this channel if applicable.
+        ///     Gets the bit-rate of this channel if applicable.
         /// </summary>
         /// <returns>
-        ///     An <see cref="System.Int32"/> representing the bitrate set for the voice channel; <c>null</c> if not
+        ///     An <see cref="System.Int32"/> representing the bit-rate set for the voice channel; <c>null</c> if not
         ///     applicable.
         /// </returns>
         public int? Bitrate { get; }
