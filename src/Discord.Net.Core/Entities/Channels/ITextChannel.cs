@@ -29,6 +29,13 @@ namespace Discord
         /// <summary>
         ///     Bulk-deletes multiple messages.
         /// </summary>
+        /// <example>
+        ///     The following example gets 250 messages from the channel and deletes them.
+        ///     <code lang="cs">
+        ///     var messages = await textChannel.GetMessagesAsync(250).FlattenAsync();
+        ///     await textChannel.DeleteMessagesAsync(messages);
+        ///     </code>
+        /// </example>
         /// <remarks>
         ///     This method attempts to remove the messages specified in bulk.
         ///     <note type="important">
