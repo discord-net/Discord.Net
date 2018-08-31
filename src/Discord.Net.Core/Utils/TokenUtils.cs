@@ -13,13 +13,13 @@ namespace Discord
         /// </summary>
         /// <param name="tokenType"> The type of token to validate. </param>
         /// <param name="token"> The token value to validate. </param>
-        /// <exception cref="ArgumentNullException"> Thrown when the supplied token string is null, empty, or contains only whitespace.</exception>
-        /// <exception cref="ArgumentException"> Thrown when the supplied TokenType or token value is invalid. </exception>
+        /// <exception cref="ArgumentNullException"> Thrown when the supplied token string is <c>null</c>, empty, or contains only whitespace.</exception>
+        /// <exception cref="ArgumentException"> Thrown when the supplied <see cref="TokenType"/> or token value is invalid. </exception>
         public static void ValidateToken(TokenType tokenType, string token)
         {
             // A Null or WhiteSpace token of any type is invalid.
             if (string.IsNullOrWhiteSpace(token))
-                throw new ArgumentNullException("A token cannot be null, empty, or contain only whitespace.", nameof(token));
+                throw new ArgumentNullException(nameof(token), "A token cannot be null, empty, or contain only whitespace.");
 
             switch (tokenType)
             {
@@ -38,7 +38,7 @@ namespace Discord
                     break;
                 default:
                     // All unrecognized TokenTypes (including User tokens) are considered to be invalid.
-                    throw new ArgumentException("Unrecognized TokenType.", nameof(token));
+                    throw new ArgumentException($"Unrecognized {nameof(token)}.", nameof(token));
             }
         }
 
