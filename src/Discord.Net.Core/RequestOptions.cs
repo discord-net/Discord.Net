@@ -22,6 +22,7 @@ namespace Discord
         internal bool IgnoreState { get; set; }
         internal string BucketId { get; set; }
         internal bool IsClientBucket { get; set; }
+        internal bool IsReactionBucket { get; set; }
 
         internal static RequestOptions CreateOrClone(RequestOptions options)
         {            
