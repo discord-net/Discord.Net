@@ -1,5 +1,5 @@
 ---
-uid: FAQ.Misc.Legacy
+uid: FAQ.Legacy
 title: Questions about Legacy Versions
 ---
 

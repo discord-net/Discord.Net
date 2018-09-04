@@ -1,5 +1,5 @@
 ---
-uid: FAQ.Misc.Glossary
+uid: FAQ.Glossary
 title: Common Terminologies / Glossary
 ---
 
@@ -20,22 +20,25 @@ channels, and are often referred to as "servers".
 ## Channel Types
 
 ### Message Channels
-* A **Text channel** ([ITextChannel]) is a message channel from a
+* A **Text Channel** ([ITextChannel]) is a message channel from a
 Guild.
-* A **DM channel** ([IDMChannel]) is a message channel from a DM.
-* A **Group channel** ([IGroupChannel]) is a message channel from a
+* A **DM Channel** ([IDMChannel]) is a message channel from a DM.
+* A **Group Channel** ([IGroupChannel]) is a message channel from a
 Group.
 	- This is rarely used due to the bot's inability to join groups.
-* A **Private channel** ([IPrivateChannel]) is a DM or a Group.
-* A **Message channel** ([IMessageChannel]) can be any of the above.
+* A **Private Channel** ([IPrivateChannel]) is a DM or a Group.
+* A **Message Channel** ([IMessageChannel]) can be any of the above.
 
 ### Misc Channels
-* A **Guild channel** ([IGuildChannel]) is a guild channel in a guild.
+* A **Guild Channel** ([IGuildChannel]) is a guild channel in a guild.
 	- This can be any channels that may exist in a guild.
-* A **Voice channel** ([IVoiceChannel]) is a voice channel in a guild.
-* A **Category channel** ([ICategoryChannel]) (2.0+) is a category that
+* A **Voice Channel** ([IVoiceChannel]) is a voice channel in a guild.
+* A **Category Channel** ([ICategoryChannel]) (2.0+) is a category that
 holds one or more sub-channels.
+* A **Nested Channel** ([INestedChannel]) (2.0+) is a channel that can
+exist under a category.
 
+[INestedChannel]: xref:Discord.INestedChannel
 [IGuildChannel]: xref:Discord.IGuildChannel
 [IMessageChannel]: xref:Discord.IMessageChannel
 [ITextChannel]: xref:Discord.ITextChannel

@@ -7,12 +7,8 @@
     - name: Client Basics
       topicUid: FAQ.Basics.ClientBasics
 - name: Command
-  items:
-    - name: Commands
-      topicUid: FAQ.Commands
-- name: Misc
-  items:
-    - name: Glossary
-      topicUid: FAQ.Misc.Glossary
-    - name: Legacy or Upgrade
-      topicUid: FAQ.Misc.Legacy
+  topicUid: FAQ.Commands
+- name: Glossary
+  topicUid: FAQ.Glossary
+- name: Legacy or Upgrade
+  topicUid: FAQ.Legacy
