@@ -161,6 +161,26 @@ th {
     }
 }
 
+.collapsing,
+.dropdown,
+.dropup {
+    position: relative
+}
+
+.collapsing {
+    height: 0;
+    overflow: hidden;
+    -webkit-transition-timing-function: ease;
+    -o-transition-timing-function: ease;
+    transition-timing-function: ease;
+    -webkit-transition-duration: .35s;
+    -o-transition-duration: .35s;
+    transition-duration: .35s;
+    -webkit-transition-property: height, visibility;
+    -o-transition-property: height, visibility;
+    transition-property: height, visibility
+}
+
 .btn,
 .btn:active,
 .form-control,
@@ -578,7 +598,11 @@ pre code {
 }
 
 .collapse {
-    display: none;
+    display: none
+}
+
+.collapse.in {
+    display: block
 }
 
 .nav>li,
