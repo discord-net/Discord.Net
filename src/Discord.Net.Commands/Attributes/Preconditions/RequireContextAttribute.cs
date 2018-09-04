@@ -66,7 +66,7 @@ namespace Discord.Commands
             if (isValid)
                 return Task.FromResult(PreconditionResult.FromSuccess());
             else
-                return Task.FromResult(PreconditionResult.FromError($"Invalid context for command; accepted contexts: {Contexts}"));
+                return Task.FromResult(PreconditionResult.FromError($"Invalid context for command; accepted contexts: {Contexts}."));
         }
     }
 }

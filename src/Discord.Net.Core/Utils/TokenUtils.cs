@@ -1,11 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Provides a series of helper methods for handling Discord login tokens.
+    /// </summary>
     public static class TokenUtils
     {
         /// <summary>

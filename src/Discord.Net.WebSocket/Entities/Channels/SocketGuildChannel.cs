@@ -219,7 +219,6 @@ namespace Discord.WebSocket
         /// </returns>
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id}, Guild)";
-        /// <inheritdoc />
         internal new SocketGuildChannel Clone() => MemberwiseClone() as SocketGuildChannel;
 
         //SocketChannel

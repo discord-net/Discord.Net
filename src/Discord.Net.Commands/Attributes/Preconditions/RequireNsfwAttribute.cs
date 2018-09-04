@@ -6,6 +6,11 @@ namespace Discord.Commands
     /// <summary>
     ///     Requires the command to be invoked in a channel marked NSFW.
     /// </summary>
+    /// <remarks>
+    ///     The precondition will restrict the access of the command or module to be accessed within a guild channel
+    ///     that has been marked as mature or NSFW. If the channel is not of type <see cref="ITextChannel"/> or the
+    ///     channel is not marked as NSFW, the precondition will fail with an erroneous <see cref="PreconditionResult"/>.
+    /// </remarks>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RequireNsfwAttribute : PreconditionAttribute
     {

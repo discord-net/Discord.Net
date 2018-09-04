@@ -47,6 +47,13 @@ namespace Discord
         /// <summary>
         ///     Creates a new invite to this channel.
         /// </summary>
+        /// <example>
+        ///     The following example creates a new invite to this channel; the invite lasts for 12 hours and can only
+        ///     be used 3 times throughout its lifespan.
+        ///     <code language="cs">
+        ///     await guildChannel.CreateInviteAsync(maxAge: 43200, maxUses: 3);
+        ///     </code>
+        /// </example>
         /// <param name="maxAge">The time (in seconds) until the invite expires. Set to <c>null</c> to never expire.</param>
         /// <param name="maxUses">The max amount of times this invite may be used. Set to <c>null</c> to have unlimited uses.</param>
         /// <param name="isTemporary">If <c>true</c>, the user accepting this invite will be kicked from the guild after closing their client.</param>
@@ -60,6 +67,15 @@ namespace Discord
         /// <summary>
         ///     Gets a collection of all invites to this channel.
         /// </summary>
+        /// <example>
+        ///     The following example gets all of the invites that have been created in this channel and selects the
+        ///     most used invite.
+        ///     <code language="cs">
+        ///     var invites = await channel.GetInvitesAsync();
+        ///     if (invites.Count == 0) return;
+        ///     var invite = invites.OrderByDescending(x => x.Uses).FirstOrDefault();
+        ///     </code>
+        /// </example>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
