@@ -49,6 +49,32 @@ namespace _02_commands_framework.Modules
             await ReplyAsync("ok!");
         }
 
+        // Unban a user
+        [Command("unban")]
+        [RequireContext(ContextType.Guild)]
+        // make sure the user invoking the coomand can unban
+        [RequireUserPermission(GuildPermission.BanMembers)]
+        // make sure the bot itself can unban
+        [RequireBotPermission(GuildPermission.BanMembers)]
+        public async Task UnbanUserAsync(IGuildUser user)
+        {
+            await user.Guild.RemoveBanAsync(user);
+            await ReplyAsync("ok!");
+        }
+
+        // Kick a user
+        [Command("kick")]
+        [RequireContext(ContextType.Guild)]
+        // make sure the user invoking the coomand can kick
+        [RequireUserPermission(GuildPermission.KickMembers)]
+        // make sure the bot itself can kick
+        [RequireBotPermission(GuildPermission.KickMembers)]
+        public async Task KickUserAsync(IGuildUser user, [Remainder] string reason = null)
+        {
+            await user.KickAsync(reason);
+            await ReplyAsync("ok!");
+        }
+
         // [Remainder] takes the rest of the command's arguments as one argument, rather than splitting every space
         [Command("echo")]
         public Task EchoAsync([Remainder] string text)
@@ -59,5 +85,18 @@ namespace _02_commands_framework.Modules
         [Command("list")]
         public Task ListAsync(params string[] objects)
             => ReplyAsync("You listed: " + string.Join("; ", objects));
+
+        // Can be used to example put information
+        [Command("info")]
+        public async Task InformationAsync()
+        {
+            // Creates the pattern TextBlock
+            EmbedBuilder builder = new EmbedBuilder();
+            //builder.AddField("title", "");
+            builder.WithTitle("This is Discord!")
+                .WithColor(Color.Orange);
+
+            await ReplyAsync("", false, builder.Build());
+        }
     }
 }
