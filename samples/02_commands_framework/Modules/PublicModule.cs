@@ -49,19 +49,6 @@ namespace _02_commands_framework.Modules
             await ReplyAsync("ok!");
         }
 
-        // Unban a user
-        [Command("unban")]
-        [RequireContext(ContextType.Guild)]
-        // make sure the user invoking the coomand can unban
-        [RequireUserPermission(GuildPermission.BanMembers)]
-        // make sure the bot itself can unban
-        [RequireBotPermission(GuildPermission.BanMembers)]
-        public async Task UnbanUserAsync(IGuildUser user)
-        {
-            await user.Guild.RemoveBanAsync(user);
-            await ReplyAsync("ok!");
-        }
-
         // Kick a user
         [Command("kick")]
         [RequireContext(ContextType.Guild)]
@@ -71,7 +58,7 @@ namespace _02_commands_framework.Modules
         [RequireBotPermission(GuildPermission.KickMembers)]
         public async Task KickUserAsync(IGuildUser user, [Remainder] string reason = null)
         {
-            await user.KickAsync(reason);
+            await user.KickAsync(reason, null);
             await ReplyAsync("ok!");
         }
 
