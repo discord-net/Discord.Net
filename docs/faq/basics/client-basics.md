@@ -5,6 +5,10 @@ title: Basic Questions about Client
 
 # Client Basics Questions
 
+In the following section, you will find commonly asked questions and
+answers about common issues that you may face when utilizing the
+various clients offered by the library.
+
 ## My client keeps returning 401 upon logging in!
 
 > [!WARNING]

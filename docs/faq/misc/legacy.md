@@ -5,7 +5,10 @@ title: Questions about Legacy Versions
 
 # Legacy Questions
 
-## X, Y, Z does not work! It doesn't return a valid value anymore
+This section refers to legacy library-related questions that do not
+apply to the latest or recent version of the Discord.Net library.
+
+## X, Y, Z does not work! It doesn't return a valid value anymore.
 
 If you are currently using an older version of the stable branch,
 please upgrade to the latest pre-release version to ensure maximum

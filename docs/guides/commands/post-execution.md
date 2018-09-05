@@ -31,7 +31,7 @@ be a violation of the SRP (Single Responsibility Principle).
 Another major issue is if your command is marked with
 `RunMode.Async`, [ExecuteAsync] will **always** return a successful
 [ExecuteResult] instead of the actual result. You can learn more
-about the impact in the [FAQ](xref:FAQ.Commands).
+about the impact in the [FAQ](xref:FAQ.Commands.General).
 
 ## CommandExecuted Event
 

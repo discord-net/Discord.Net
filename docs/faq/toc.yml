@@ -6,8 +6,12 @@
       topicUid: FAQ.Basics.BasicOp
     - name: Client Basics
       topicUid: FAQ.Basics.ClientBasics
-- name: Command
-  topicUid: FAQ.Commands
+- name: Commands
+  items: 
+    - name: General
+      topicUid: FAQ.Commands.General
+    - name: Dependency Injection
+      topicUid: FAQ.Commands.DI
 - name: Glossary
   topicUid: FAQ.Glossary
 - name: Legacy or Upgrade

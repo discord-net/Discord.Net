@@ -5,6 +5,10 @@ title: Questions about Basic Operations
 
 # Basic Operations Questions
 
+In the following section, you will find commonly asked questions and
+answers regarding basic usage of the library, as well as
+language-specific tips when using this library.
+
 ## How should I safely check a type?
 
 > [!WARNING]

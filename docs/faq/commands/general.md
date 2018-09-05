@@ -1,9 +1,12 @@
 ---
-uid: FAQ.Commands
-title: Questions about Commands
+uid: FAQ.Commands.General
+title: General Questions about Commands
 ---
 
 # Command-related Questions
+
+In the following section, you will find commonly asked questions and
+answered regarding general command usage when using @Discord.Commands.
 
 ## How can I restrict some of my commands so only specific users can execute them?
 
@@ -41,29 +44,6 @@ the last parameter.
 [!code-csharp[Remainder](samples/Remainder.cs)]
 
 [RemainderAttribute]: xref:Discord.Commands.RemainderAttribute
-
-## What is a service? Why does my module not hold any data after execution?
-
-In Discord.Net, modules are created similarly to ASP.NET, meaning
-that they have a transient nature; modules are spawned whenever a
-request is received, and are killed from memory when the execution
-finishes. In other words, you cannot store persistent
-data inside a module. Consider using a service if you wish to
-workaround this.
-
-Service is often used to hold data externally so that they persist
-throughout execution. Think of it like a chest that holds
-whatever you throw at it that won't be affected by anything unless
-you want it to. Note that you should also learn Microsoft's
-implementation of [Dependency Injection] \([video]) before proceeding,
-as well as how it works in [Discord.Net](xref:Guides.Commands.DI#usage-in-modules).
-
-A brief example of service and dependency injection can be seen below.
-
-[!code-csharp[DI](samples/DI.cs)]
-
-[Dependency Injection]: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection
-[video]: https://www.youtube.com/watch?v=QtDTfn8YxXg
 
 ## Discord.Net keeps saying that a `MessageReceived` handler is blocking the gateway, what should I do?
 

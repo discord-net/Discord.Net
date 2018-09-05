@@ -157,7 +157,7 @@ namespace Discord.Commands
         }
 
         /// <summary>
-        ///     Add a command module from a <see cref="Type" /> .
+        ///     Add a command module from a <see cref="Type" />.
         /// </summary>
         /// <example>
         ///     <para>The following example registers the module <c>MyModule</c> to <c>commandService</c>.</para>

@@ -5,6 +5,12 @@ title: Common Terminologies / Glossary
 
 # Glossary
 
+This is an additional chapter for quick references to various common
+types that you may see within Discord.Net. To see more information
+regarding each type of object, click on the object to navigate
+to our API documentation page where you might find more explanation
+about it.
+
 ## Common Types
 
 * A **Guild** ([IGuild]) is an isolated collection of users and

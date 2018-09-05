@@ -5,6 +5,10 @@ title: Beginner Questions / How to Get Started
 
 # Basic Concepts / Getting Started
 
+In this following section, you will find commonly asked questions and
+answers about how to get started with Discord.Net, as well as basic
+introduction to the Discord API ecosystem.
+
 ## How do I add my bot to my server/guild?
 
 You can do so by using the [permission calculator] provided
