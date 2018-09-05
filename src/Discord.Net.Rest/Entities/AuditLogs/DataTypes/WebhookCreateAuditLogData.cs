@@ -23,9 +23,9 @@ namespace Discord.Rest
             var typeModel = changes.FirstOrDefault(x => x.ChangedProperty == "type");
             var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
 
-            var channelId = channelIdModel.NewValue.ToObject<ulong>();
-            var type = typeModel.NewValue.ToObject<WebhookType>();
-            var name = nameModel.NewValue.ToObject<string>();
+            var channelId = channelIdModel.NewValue.ToObject<ulong>(discord.ApiClient.Serializer);
+            var type = typeModel.NewValue.ToObject<WebhookType>(discord.ApiClient.Serializer);
+            var name = nameModel.NewValue.ToObject<string>(discord.ApiClient.Serializer);
 
             var webhookInfo = log.Webhooks?.FirstOrDefault(x => x.Id == entry.TargetId);
             var webhook = RestWebhook.Create(discord, (IGuild)null, webhookInfo);

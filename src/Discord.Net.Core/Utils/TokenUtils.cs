@@ -1,0 +1,46 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Discord
+{
+    public static class TokenUtils
+    {
+        /// <summary>
+        ///     Checks the validity of the supplied token of a specific type.
+        /// </summary>
+        /// <param name="tokenType"> The type of token to validate. </param>
+        /// <param name="token"> The token value to validate. </param>
+        /// <exception cref="ArgumentNullException"> Thrown when the supplied token string is null, empty, or contains only whitespace.</exception>
+        /// <exception cref="ArgumentException"> Thrown when the supplied TokenType or token value is invalid. </exception>
+        public static void ValidateToken(TokenType tokenType, string token)
+        {
+            // A Null or WhiteSpace token of any type is invalid.
+            if (string.IsNullOrWhiteSpace(token))
+                throw new ArgumentNullException("A token cannot be null, empty, or contain only whitespace.", nameof(token));
+
+            switch (tokenType)
+            {
+                case TokenType.Webhook:
+                    // no validation is performed on Webhook tokens
+                    break;
+                case TokenType.Bearer:
+                    // no validation is performed on Bearer tokens
+                    break;
+                case TokenType.Bot:
+                    // bot tokens are assumed to be at least 59 characters in length
+                    // this value was determined by referencing examples in the discord documentation, and by comparing with
+                    // pre-existing tokens
+                    if (token.Length < 59)
+                        throw new ArgumentException("A Bot token must be at least 59 characters in length.", nameof(token));
+                    break;
+                default:
+                    // All unrecognized TokenTypes (including User tokens) are considered to be invalid.
+                    throw new ArgumentException("Unrecognized TokenType.", nameof(token));
+            }
+        }
+
+    }
+}

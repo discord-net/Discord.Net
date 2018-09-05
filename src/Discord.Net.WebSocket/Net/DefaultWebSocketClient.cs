@@ -22,8 +22,8 @@ namespace Discord.Net.WebSockets
 
         private readonly SemaphoreSlim _lock;
         private readonly Dictionary<string, string> _headers;
+        private readonly IWebProxy _proxy;
         private ClientWebSocket _client;
-        private IWebProxy _proxy;
         private Task _task;
         private CancellationTokenSource _cancelTokenSource;
         private CancellationToken _cancelToken, _parentToken;

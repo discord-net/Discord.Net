@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -9,7 +9,7 @@ using Model = Discord.API.GuildMember;
 namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestGuildUser : RestUser, IGuildUser, IUpdateable
+    public class RestGuildUser : RestUser, IGuildUser
     {
         private long? _joinedAtTicks;
         private ImmutableArray<ulong> _roleIds;

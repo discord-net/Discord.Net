@@ -26,9 +26,9 @@ namespace Discord.API
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
 
+        private readonly bool _isExplicitUrl;
         private CancellationTokenSource _connectCancelToken;
         private string _gatewayUrl;
-        private bool _isExplicitUrl;
 
         //Store our decompression streams for zlib shared state
         private MemoryStream _compressed;

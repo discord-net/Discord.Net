@@ -13,11 +13,11 @@ namespace Discord.WebSocket
     {
         private readonly DiscordSocketConfig _baseConfig;
         private readonly SemaphoreSlim _connectionGroupLock;
+        private readonly Dictionary<int, int> _shardIdsToIndex;
+        private readonly bool _automaticShards;
         private int[] _shardIds;
-        private Dictionary<int, int> _shardIdsToIndex;
         private DiscordSocketClient[] _shards;
         private int _totalShards;
-        private bool _automaticShards;
         
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the gateway server. </summary>
         public override int Latency { get => GetLatency(); protected set { } }
@@ -25,8 +25,8 @@ namespace Discord.WebSocket
         public override IActivity Activity { get => _shards[0].Activity; protected set { } }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
-        public override IReadOnlyCollection<SocketGuild> Guilds => GetGuilds().ToReadOnlyCollection(() => GetGuildCount());
-        public override IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => GetPrivateChannels().ToReadOnlyCollection(() => GetPrivateChannelCount());
+        public override IReadOnlyCollection<SocketGuild> Guilds => GetGuilds().ToReadOnlyCollection(GetGuildCount);
+        public override IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => GetPrivateChannels().ToReadOnlyCollection(GetPrivateChannelCount);
         public IReadOnlyCollection<DiscordSocketClient> Shards => _shards;
         public override IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _shards[0].VoiceRegions;
 

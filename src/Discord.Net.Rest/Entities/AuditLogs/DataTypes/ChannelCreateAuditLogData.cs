@@ -26,17 +26,15 @@ namespace Discord.Rest
             var typeModel = changes.FirstOrDefault(x => x.ChangedProperty == "type");
             var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
 
-            var type = typeModel.NewValue.ToObject<ChannelType>();
-            var name = nameModel.NewValue.ToObject<string>();
+            var type = typeModel.NewValue.ToObject<ChannelType>(discord.ApiClient.Serializer);
+            var name = nameModel.NewValue.ToObject<string>(discord.ApiClient.Serializer);
 
             foreach (var overwrite in overwritesModel.NewValue)
             {
                 var deny = overwrite.Value<ulong>("deny");
-                var _type = overwrite.Value<string>("type");
+                var permType = overwrite.Value<PermissionTarget>("type");
                 var id = overwrite.Value<ulong>("id");
                 var allow = overwrite.Value<ulong>("allow");
-
-                PermissionTarget permType = _type == "member" ? PermissionTarget.User : PermissionTarget.Role;
 
                 overwrites.Add(new Overwrite(id, permType, new OverwritePermissions(allow, deny)));
             }

@@ -26,18 +26,18 @@ namespace Discord.Rest
             var channelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "channel_id");
             var avatarHashModel = changes.FirstOrDefault(x => x.ChangedProperty == "avatar_hash");
 
-            var oldName = nameModel?.OldValue?.ToObject<string>();
-            var oldChannelId = channelIdModel?.OldValue?.ToObject<ulong>();
-            var oldAvatar = avatarHashModel?.OldValue?.ToObject<string>();
+            var oldName = nameModel?.OldValue?.ToObject<string>(discord.ApiClient.Serializer);
+            var oldChannelId = channelIdModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            var oldAvatar = avatarHashModel?.OldValue?.ToObject<string>(discord.ApiClient.Serializer);
             var before = new WebhookInfo(oldName, oldChannelId, oldAvatar);
 
-            var newName = nameModel?.NewValue?.ToObject<string>();
-            var newChannelId = channelIdModel?.NewValue?.ToObject<ulong>();
-            var newAvatar = avatarHashModel?.NewValue?.ToObject<string>();
+            var newName = nameModel?.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
+            var newChannelId = channelIdModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            var newAvatar = avatarHashModel?.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
             var after = new WebhookInfo(newName, newChannelId, newAvatar);
 
             var webhookInfo = log.Webhooks?.FirstOrDefault(x => x.Id == entry.TargetId);
-            var webhook = RestWebhook.Create(discord, (IGuild)null, webhookInfo);
+            var webhook = webhookInfo != null ? RestWebhook.Create(discord, (IGuild)null, webhookInfo) : null;
 
             return new WebhookUpdateAuditLogData(webhook, before, after);
         }

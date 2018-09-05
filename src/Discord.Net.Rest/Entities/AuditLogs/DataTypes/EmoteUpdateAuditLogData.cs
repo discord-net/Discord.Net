@@ -18,8 +18,8 @@ namespace Discord.Rest
         {
             var change = entry.Changes.FirstOrDefault(x => x.ChangedProperty == "name");
 
-            var newName = change.NewValue?.ToObject<string>();
-            var oldName = change.OldValue?.ToObject<string>();
+            var newName = change.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
+            var oldName = change.OldValue?.ToObject<string>(discord.ApiClient.Serializer);
 
             return new EmoteUpdateAuditLogData(entry.TargetId.Value, oldName, newName);
         }

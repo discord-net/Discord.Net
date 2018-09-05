@@ -239,7 +239,7 @@ namespace Discord
             get => _name;
             set
             {
-                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException($"Field name must not be null, empty or entirely whitespace.", nameof(Name));
+                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("Field name must not be null, empty or entirely whitespace.", nameof(Name));
                 if (value.Length > MaxFieldNameLength) throw new ArgumentException($"Field name length must be less than or equal to {MaxFieldNameLength}.", nameof(Name));
                 _name = value;
             }
@@ -251,7 +251,7 @@ namespace Discord
             set
             {
                 var stringValue = value?.ToString();
-                if (string.IsNullOrEmpty(stringValue)) throw new ArgumentException($"Field value must not be null or empty.", nameof(Value));
+                if (string.IsNullOrEmpty(stringValue)) throw new ArgumentException("Field value must not be null or empty.", nameof(Value));
                 if (stringValue.Length > MaxFieldValueLength) throw new ArgumentException($"Field value length must be less than or equal to {MaxFieldValueLength}.", nameof(Value));
                 _value = stringValue;
             }

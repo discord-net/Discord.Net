@@ -20,7 +20,7 @@ namespace Discord.API
         [JsonProperty("role_name")]
         public string OverwriteRoleName { get; set; }
         [JsonProperty("type")]
-        public string OverwriteType { get; set; }
+        public PermissionTarget OverwriteType { get; set; }
         [JsonProperty("id")]
         public ulong? OverwriteTargetId { get; set; }
     }

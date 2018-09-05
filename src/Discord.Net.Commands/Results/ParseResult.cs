@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord.Commands
@@ -53,6 +54,8 @@ namespace Discord.Commands
 
         public static ParseResult FromError(CommandError error, string reason)
             => new ParseResult(null, null, error, reason);
+        public static ParseResult FromError(Exception ex)
+            => FromError(CommandError.Exception, ex.Message);
         public static ParseResult FromError(IResult result)
             => new ParseResult(null, null, result.Error, result.ErrorReason);
 

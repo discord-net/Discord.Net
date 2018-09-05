@@ -47,7 +47,7 @@ namespace Discord.Rest
         public static async Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(BaseDiscordClient client, RequestOptions options)
         {
             var models = await client.ApiClient.GetMyConnectionsAsync(options).ConfigureAwait(false);
-            return models.Select(x => RestConnection.Create(x)).ToImmutableArray();
+            return models.Select(RestConnection.Create).ToImmutableArray();
         }
         
         public static async Task<RestInviteMetadata> GetInviteAsync(BaseDiscordClient client,

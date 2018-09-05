@@ -7,7 +7,7 @@ namespace Discord.Commands
     {
         public string Text { get; }
         public RunMode RunMode { get; set; } = RunMode.Default;
-        public bool? IgnoreExtraArgs { get; set; }
+        public bool? IgnoreExtraArgs { get; }
 
         public CommandAttribute()
         {
@@ -16,6 +16,11 @@ namespace Discord.Commands
         public CommandAttribute(string text)
         {
             Text = text;
+        }
+        public CommandAttribute(string text, bool ignoreExtraArgs)
+        {
+            Text = text;
+            IgnoreExtraArgs = ignoreExtraArgs;
         }
     }
 }

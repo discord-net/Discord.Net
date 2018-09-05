@@ -7,7 +7,7 @@ using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
-    public class RestGuildChannel : RestChannel, IGuildChannel, IUpdateable
+    public class RestGuildChannel : RestChannel, IGuildChannel
     {
         private ImmutableArray<Overwrite> _overwrites;
 

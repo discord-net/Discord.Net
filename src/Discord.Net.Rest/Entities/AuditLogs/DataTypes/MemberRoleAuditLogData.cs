@@ -19,7 +19,7 @@ namespace Discord.Rest
         {
             var changes = entry.Changes;
 
-            var roleInfos = changes.SelectMany(x => x.NewValue.ToObject<API.Role[]>(),
+            var roleInfos = changes.SelectMany(x => x.NewValue.ToObject<API.Role[]>(discord.ApiClient.Serializer),
                 (model, role) => new { model.ChangedProperty, Role = role })
                 .Select(x => new MemberRoleEditInfo(x.Role.Name, x.Role.Id, x.ChangedProperty == "$add"))
                 .ToList();
