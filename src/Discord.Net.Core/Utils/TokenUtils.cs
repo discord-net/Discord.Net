@@ -19,7 +19,7 @@ namespace Discord
         {
             // A Null or WhiteSpace token of any type is invalid.
             if (string.IsNullOrWhiteSpace(token))
-                throw new ArgumentNullException("A token cannot be null, empty, or contain only whitespace.", nameof(token));
+                throw new ArgumentNullException(paramName: nameof(token), message: "A token cannot be null, empty, or contain only whitespace.");
 
             switch (tokenType)
             {
@@ -34,11 +34,11 @@ namespace Discord
                     // this value was determined by referencing examples in the discord documentation, and by comparing with
                     // pre-existing tokens
                     if (token.Length < 59)
-                        throw new ArgumentException("A Bot token must be at least 59 characters in length.", nameof(token));
+                        throw new ArgumentException(message: "A Bot token must be at least 59 characters in length.", paramName: nameof(token));
                     break;
                 default:
                     // All unrecognized TokenTypes (including User tokens) are considered to be invalid.
-                    throw new ArgumentException("Unrecognized TokenType.", nameof(token));
+                    throw new ArgumentException(message: "Unrecognized TokenType.", paramName: nameof(token));
             }
         }
 
