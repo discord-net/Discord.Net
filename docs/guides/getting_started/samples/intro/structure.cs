@@ -36,7 +36,7 @@ class Program
             // you must set the MessageCacheSize. You may adjust the number as needed.
             //MessageCacheSize = 50,
 
-            // If your platform doesn't have native websockets,
+            // If your platform doesn't have native WebSockets,
             // add Discord.Net.Providers.WS4Net from NuGet,
             // add the `using` at the top, and uncomment this line:
             //WebSocketProvider = WS4NetProvider.Instance
@@ -57,7 +57,7 @@ class Program
         _commands.Log += Log;
         
         // Setup your DI container.
-        _services = ConfigureServices(),
+        _services = ConfigureServices();
         
     }
     
@@ -116,7 +116,9 @@ class Program
         await InitCommands();
 
         // Login and connect.
-        await _client.LoginAsync(TokenType.Bot, /* <DON'T HARDCODE YOUR TOKEN> */);
+        await _client.LoginAsync(TokenType.Bot,
+            // < DO NOT HARDCODE YOUR TOKEN >
+            Environment.GetEnvironmentVariable("DiscordToken"));
         await _client.StartAsync();
 
         // Wait infinitely so your bot actually stays connected.
@@ -160,7 +162,7 @@ class Program
             
             // Execute the command. (result does not indicate a return value, 
             // rather an object stating if the command executed successfully).
-            var result = await _commands.ExecuteAsync(context, pos);
+            var result = await _commands.ExecuteAsync(context, pos, _services);
 
             // Uncomment the following lines if you want the bot
             // to send a message if it failed.
