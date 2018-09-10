@@ -326,6 +326,20 @@ namespace Discord.Rest
             var model = await client.ApiClient.GetChannelAsync(channel.CategoryId.Value, options).ConfigureAwait(false);
             return RestCategoryChannel.Create(client, model) as ICategoryChannel;
         }
+        public static async Task SyncPermissionsAsync(INestedChannel channel, BaseDiscordClient client, RequestOptions options)
+        {
+            var category = await GetCategoryAsync(channel, client, options).ConfigureAwait(false);
+            if (category == null) return;
+
+            var apiArgs = new ModifyGuildChannelParams
+            {
+                Overwrites = category.PermissionOverwrites
+                    .Select(overwrite => new API.Overwrite(overwrite.TargetId, overwrite.TargetType,
+                        overwrite.Permissions.AllowValue, overwrite.Permissions.DenyValue))
+                    .ToArray()
+            };
+            await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
+        }
 
         //Helpers
         private static IUser GetAuthor(BaseDiscordClient client, IGuild guild, UserModel model, ulong? webhookId)

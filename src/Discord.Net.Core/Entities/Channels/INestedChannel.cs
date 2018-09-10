@@ -12,5 +12,10 @@ namespace Discord
         ulong? CategoryId { get; }
         /// <summary> Gets the parent channel (category) of this channel, if it is set. If unset, returns null.</summary>
         Task<ICategoryChannel> GetCategoryAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Syncs the permissions of this nested channel with its parent's.
+        /// </summary>
+        Task SyncPermissionsAsync(RequestOptions options = null);
     }
 }

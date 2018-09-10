@@ -19,6 +19,8 @@ namespace Discord.WebSocket
         public ulong? CategoryId { get; private set; }
         public ICategoryChannel Category
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
+        public Task SyncPermissionsAsync(RequestOptions options = null)
+            => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
 
         private bool _nsfw;
         public bool IsNsfw => _nsfw;

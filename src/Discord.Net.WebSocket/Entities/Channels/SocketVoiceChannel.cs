@@ -18,6 +18,8 @@ namespace Discord.WebSocket
         public ulong? CategoryId { get; private set; }
         public ICategoryChannel Category
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
+        public Task SyncPermissionsAsync(RequestOptions options = null)
+            => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
 
         public override IReadOnlyCollection<SocketGuildUser> Users
             => Guild.Users.Where(x => x.VoiceChannel?.Id == Id).ToImmutableArray();
