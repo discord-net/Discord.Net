@@ -23,7 +23,7 @@ namespace Discord.Commands
         public OverrideTypeReaderAttribute(Type overridenTypeReader)
         {
             if (!TypeReaderTypeInfo.IsAssignableFrom(overridenTypeReader.GetTypeInfo()))
-                throw new ArgumentException($"{nameof(overridenTypeReader)} must inherit from {nameof(TypeReader)}");
+                throw new ArgumentException($"{nameof(overridenTypeReader)} must inherit from {nameof(TypeReader)}.");
             
             TypeReader = overridenTypeReader;
         }

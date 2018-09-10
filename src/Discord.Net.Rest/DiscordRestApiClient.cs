@@ -82,7 +82,7 @@ namespace Discord.API
                 case TokenType.Bearer:
                     return $"Bearer {token}";
                 default:
-                    throw new ArgumentException(message: "Unknown OAuth token type", paramName: nameof(tokenType));
+                    throw new ArgumentException(message: "Unknown OAuth token type.", paramName: nameof(tokenType));
             }
         }
         internal virtual void Dispose(bool disposing)
