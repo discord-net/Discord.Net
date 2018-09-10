@@ -13,9 +13,9 @@ to stay in line with Discord internally.
 
 ## Implementation Specific Entities
 
-Discord.Net is split into a core library and three different
-implementations - `Discord.Net.Core`, `Discord.Net.Rest`,
-`Discord.Net.Rpc`, and `Discord.Net.WebSockets`.
+Discord.Net is split into a core library and two different
+implementations - `Discord.Net.Core`, `Discord.Net.Rest`, and
+`Discord.Net.WebSockets`.
 
 As a bot developer, you will only need to use `Discord.Net.WebSockets`,
 but you should be aware of the differences between them.
@@ -29,10 +29,6 @@ addon will run on all platforms.
 `Discord.Net.Rest` provides a set of concrete classes to be used
 **strictly** with the REST portion of Discord's API. Entities in this
 implementation are prefixed with `Rest` (e.g., `RestChannel`).
-
-`Discord.Net.Rpc` provides a set of concrete classes that are used
-with Discord's RPC API. Entities in this implementation are prefixed
-with `Rpc` (e.g., `RpcChannel`).
 
 `Discord.Net.WebSocket` provides a set of concrete classes that are
 used primarily with Discord's WebSocket API or entities that are kept
