@@ -10,7 +10,8 @@ public class Program
 		_client = new DiscordSocketClient();
 		_client.Log += Log;
 		_client.MessageReceived += MessageReceivedAsync;
-		await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DiscordToken"));
+		await _client.LoginAsync(TokenType.Bot, 
+			Environment.GetEnvironmentVariable("DiscordToken"));
 		await _client.StartAsync();
 		
 		// Block this task until the program is closed.

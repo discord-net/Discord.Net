@@ -12,7 +12,8 @@ public async Task MainAsync()
 	// environment variables, you may find more information on the 
 	// Internet or by using other methods such as reading from 
 	// a configuration.
-	await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DiscordToken"));
+	await _client.LoginAsync(TokenType.Bot, 
+		Environment.GetEnvironmentVariable("DiscordToken"));
 	await _client.StartAsync();
 
 	// Block this task until the program is closed.
