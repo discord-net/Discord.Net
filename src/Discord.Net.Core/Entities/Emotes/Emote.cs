@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Globalization;
 
 namespace Discord
@@ -70,7 +69,7 @@ namespace Discord
         {
             if (TryParse(text, out Emote result))
                 return result;
-            throw new ArgumentException("Invalid emote format.", nameof(text));
+            throw new ArgumentException(message: "Invalid emote format", paramName: nameof(text));
         }
 
         /// <summary> Tries to parse an <see cref="Emote"/> from its raw format. </summary>

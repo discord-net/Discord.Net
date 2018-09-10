@@ -149,7 +149,7 @@ namespace Discord.Rest
         public static async Task<RestTextChannel> CreateTextChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<TextChannelProperties> func = null)
         {
-            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (name == null) throw new ArgumentNullException(paramName: nameof(name));
 
             var props = new TextChannelProperties();
             func?.Invoke(props);
@@ -167,7 +167,7 @@ namespace Discord.Rest
         public static async Task<RestVoiceChannel> CreateVoiceChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<VoiceChannelProperties> func = null)
         {
-            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (name == null) throw new ArgumentNullException(paramName: nameof(name));
 
             var props = new VoiceChannelProperties();
             func?.Invoke(props);
@@ -185,7 +185,7 @@ namespace Discord.Rest
         public static async Task<RestCategoryChannel> CreateCategoryChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options)
         {
-            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (name == null) throw new ArgumentNullException(paramName: nameof(name));
 
             var args = new CreateGuildChannelParams(name, ChannelType.Category);
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
@@ -226,7 +226,7 @@ namespace Discord.Rest
         public static async Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client,
             string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options)
         {
-            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (name == null) throw new ArgumentNullException(paramName: nameof(name));
 
             var model = await client.ApiClient.CreateGuildRoleAsync(guild.Id, options).ConfigureAwait(false);
             var role = RestRole.Create(client, guild, model);
@@ -362,7 +362,7 @@ namespace Discord.Rest
         public static async Task<GuildEmote> ModifyEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, Action<EmoteProperties> func, 
             RequestOptions options)
         {
-            if (func == null) throw new ArgumentNullException(nameof(func));
+            if (func == null) throw new ArgumentNullException(paramName: nameof(func));
 
             var props = new EmoteProperties();
             func(props);

@@ -49,7 +49,7 @@ namespace Discord
             get => _title;
             set
             {
-                if (value?.Length > MaxTitleLength) throw new ArgumentException($"Title length must be less than or equal to {MaxTitleLength}.", nameof(Title));
+                if (value?.Length > MaxTitleLength) throw new ArgumentException(message: $"Title length must be less than or equal to {MaxTitleLength}.", paramName: nameof(Title));
                 _title = value;
             }
         }
@@ -62,7 +62,7 @@ namespace Discord
             get => _description;
             set
             {
-                if (value?.Length > MaxDescriptionLength) throw new ArgumentException($"Description length must be less than or equal to {MaxDescriptionLength}.", nameof(Description));
+                if (value?.Length > MaxDescriptionLength) throw new ArgumentException(message: $"Description length must be less than or equal to {MaxDescriptionLength}.", paramName: nameof(Description));
                 _description = value;
             }
         }
@@ -75,7 +75,7 @@ namespace Discord
             get => _url;
             set
             {
-                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI.", nameof(Url));
+                if (!value.IsNullOrUri()) throw new ArgumentException(message: "Url must be a well-formed URI", paramName: nameof(Url));
                 _url = value;
             }
         }
@@ -87,7 +87,7 @@ namespace Discord
             get => _thumbnail?.Url;
             set
             {
-                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI.", nameof(ThumbnailUrl));
+                if (!value.IsNullOrUri()) throw new ArgumentException(message: "Url must be a well-formed URI", paramName: nameof(ThumbnailUrl));
                 _thumbnail = new EmbedThumbnail(value, null, null, null);
             }
         }
@@ -99,7 +99,7 @@ namespace Discord
             get => _image?.Url;
             set
             {
-                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI.", nameof(ImageUrl));
+                if (!value.IsNullOrUri()) throw new ArgumentException(message: "Url must be a well-formed URI", paramName: nameof(ImageUrl));
                 _image = new EmbedImage(value, null, null, null);
             }
         }
@@ -115,8 +115,8 @@ namespace Discord
             get => _fields;
             set
             {
-                if (value == null) throw new ArgumentNullException(nameof(Fields), "Cannot set an embed builder's fields collection to null.");
-                if (value.Count > MaxFieldCount) throw new ArgumentException($"Field count must be less than or equal to {MaxFieldCount}.", nameof(Fields));
+                if (value == null) throw new ArgumentNullException(paramName: nameof(Fields), message: "Cannot set an embed builder's fields collection to null");
+                if (value.Count > MaxFieldCount) throw new ArgumentException(message: $"Field count must be less than or equal to {MaxFieldCount}.", paramName: nameof(Fields));
                 _fields = value;
             }
         }
@@ -390,7 +390,7 @@ namespace Discord
         {
             if (Fields.Count >= MaxFieldCount)
             {
-                throw new ArgumentException($"Field count must be less than or equal to {MaxFieldCount}.", nameof(field));
+                throw new ArgumentException(message: $"Field count must be less than or equal to {MaxFieldCount}.", paramName: nameof(field));
             }
 
             Fields.Add(field);
@@ -463,8 +463,8 @@ namespace Discord
             get => _name;
             set
             {
-                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("Field name must not be null, empty or entirely whitespace.", nameof(Name));
-                if (value.Length > MaxFieldNameLength) throw new ArgumentException($"Field name length must be less than or equal to {MaxFieldNameLength}.", nameof(Name));
+                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException(message: "Field name must not be null, empty or entirely whitespace.", paramName: nameof(Name));
+                if (value.Length > MaxFieldNameLength) throw new ArgumentException(message: $"Field name length must be less than or equal to {MaxFieldNameLength}.", paramName: nameof(Name));
                 _name = value;
             }
         }
@@ -486,8 +486,8 @@ namespace Discord
             set
             {
                 var stringValue = value?.ToString();
-                if (string.IsNullOrEmpty(stringValue)) throw new ArgumentException("Field value must not be null or empty.", nameof(Value));
-                if (stringValue.Length > MaxFieldValueLength) throw new ArgumentException($"Field value length must be less than or equal to {MaxFieldValueLength}.", nameof(Value));
+                if (string.IsNullOrEmpty(stringValue)) throw new ArgumentException(message: "Field value must not be null or empty.", paramName: nameof(Value));
+                if (stringValue.Length > MaxFieldValueLength) throw new ArgumentException(message: $"Field value length must be less than or equal to {MaxFieldValueLength}.", paramName: nameof(Value));
                 _value = stringValue;
             }
         }
@@ -574,7 +574,7 @@ namespace Discord
             get => _name;
             set
             {
-                if (value?.Length > MaxAuthorNameLength) throw new ArgumentException($"Author name length must be less than or equal to {MaxAuthorNameLength}.", nameof(Name));
+                if (value?.Length > MaxAuthorNameLength) throw new ArgumentException(message: $"Author name length must be less than or equal to {MaxAuthorNameLength}.", paramName: nameof(Name));
                 _name = value;
             }
         }
@@ -590,7 +590,7 @@ namespace Discord
             get => _url;
             set
             {
-                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI.", nameof(Url));
+                if (!value.IsNullOrUri()) throw new ArgumentException(message: "Url must be a well-formed URI", paramName: nameof(Url));
                 _url = value;
             }
         }
@@ -606,7 +606,7 @@ namespace Discord
             get => _iconUrl;
             set
             {
-                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI.", nameof(IconUrl));
+                if (!value.IsNullOrUri()) throw new ArgumentException(message: "Url must be a well-formed URI", paramName: nameof(IconUrl));
                 _iconUrl = value;
             }
         }
@@ -692,7 +692,7 @@ namespace Discord
             get => _text;
             set
             {
-                if (value?.Length > MaxFooterTextLength) throw new ArgumentException($"Footer text length must be less than or equal to {MaxFooterTextLength}.", nameof(Text));
+                if (value?.Length > MaxFooterTextLength) throw new ArgumentException(message: $"Footer text length must be less than or equal to {MaxFooterTextLength}.", paramName: nameof(Text));
                 _text = value;
             }
         }
@@ -708,7 +708,7 @@ namespace Discord
             get => _iconUrl;
             set
             {
-                if (!value.IsNullOrUri()) throw new ArgumentException("Url must be a well-formed URI.", nameof(IconUrl));
+                if (!value.IsNullOrUri()) throw new ArgumentException(message: "Url must be a well-formed URI", paramName: nameof(IconUrl));
                 _iconUrl = value;
             }
         }
