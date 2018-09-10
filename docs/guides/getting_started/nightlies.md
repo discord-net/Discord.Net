@@ -61,8 +61,9 @@ additional feeds if necessary.
 [!code[NuGet Configuration](samples/nuget.config)]
 
 After which, you may install the packages by directly modifying the
-project file, using the dotnet CLI (`dotnet add package Discord.Net`),
-or by using PowerShell (`Install-Package Discord.Net -Prerelease`).
+project file and specifying a version, or by using
+the [Package Manager Console](https://docs.microsoft.com/en-us/nuget/tools/powershell-reference)
+(`Install-Package Discord.Net -IncludePrerelease`).
 
 ***
 
