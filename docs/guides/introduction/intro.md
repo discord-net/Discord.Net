@@ -7,13 +7,14 @@ title: Introduction to Discord.Net
 
 ## Looking to get started?
 
-First of all, welcome! You may visit us on our Discord should you
-have any questions. Before you delve into using the library,
-however, you should have some decent understanding of the language
+Welcome! Before you dive into this library, however, you should have
+some decent understanding of the language
 you are about to use. This library touches on
 [Task-based Asynchronous Pattern] \(TAP), [polymorphism], [interface]
 and many more advanced topics extensively. Please make sure that you
-understand these topics to some extent before proceeding.
+understand these topics to some extent before proceeding. With all
+that being said, feel free to visit us on Discord at the link below
+if you have any questions!
 
 Here are some examples:
 

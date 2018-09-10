@@ -173,11 +173,11 @@ The following lines can now be added:
 At this point, feel free to start your program and see your bot come
 online in Discord.
 
-> [!NOTE]
-> Getting a warning saying `A supplied token was invalid.` and having
-> trouble with logging in? Double-check whether you put in the correct
-> credentials. Note that a client secret is not the same as a bot
-> token!
+> [!TIP]
+> Getting a warning about `A supplied token was invalid.` and/or
+> having trouble logging in? Double-check whether you have put in
+> the correct credentials and make sure that it is _not_ a client
+> secret, which is different from a token.
 
 > [!TIP]
 > Encountering a `PlatformNotSupportedException` when starting your bot?
