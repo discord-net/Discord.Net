@@ -12,7 +12,7 @@ namespace Discord.Rest
     public class RestTextChannel : RestGuildChannel, IRestMessageChannel, ITextChannel
     {
         public string Topic { get; private set; }
-        public int SlowMode { get; private set; } 
+        public int SlowModeInterval { get; private set; } 
         public ulong? CategoryId { get; private set; }
 
         public string Mention => MentionUtils.MentionChannel(Id);
@@ -35,7 +35,7 @@ namespace Discord.Rest
             base.Update(model);
             CategoryId = model.CategoryId;
             Topic = model.Topic.Value;
-            SlowMode = model.SlowMode.Value;
+            SlowModeInterval = model.SlowMode.Value;
             _nsfw = model.Nsfw.GetValueOrDefault();
         }
 

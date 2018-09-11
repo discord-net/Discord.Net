@@ -14,7 +14,7 @@ namespace Discord
         string Topic { get; }
 
         ///<summary> Gets the current slow-mode delay for this channel. 0 if disabled. </summary>
-        int SlowMode { get; }
+        int SlowModeInterval { get; }
 
         /// <summary> Bulk deletes multiple messages. </summary>
         Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null);

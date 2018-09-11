@@ -11,6 +11,6 @@ namespace Discord.API.Rest
         [JsonProperty("nsfw")]
         public Optional<bool> IsNsfw { get; set; }
         [JsonProperty("rate_limit_per_user")]
-        public Optional<int> SlowMode { get; set; }
+        public Optional<int> SlowModeInterval { get; set; }
     }
 }

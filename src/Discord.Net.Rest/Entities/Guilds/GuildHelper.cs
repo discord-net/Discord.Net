@@ -156,7 +156,7 @@ namespace Discord.Rest
             {
                 CategoryId = props.CategoryId,
                 Topic = props.Topic,
-                IsNsfw = props.IsNsfw
+                IsNsfw = props.IsNsfw,
             };
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestTextChannel.Create(client, guild, model);
