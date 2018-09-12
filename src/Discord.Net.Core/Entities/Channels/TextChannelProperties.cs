@@ -15,14 +15,15 @@ namespace Discord
         /// </summary>
         public Optional<bool> IsNsfw { get; set; }
         /// <summary>
-        /// What the slow-mode ratelimit for this channel should be set to; 0 will disable slow-mode.
+        ///     Gets or sets the slow-mode ratelimit in seconds for this channel.
         /// </summary>
         /// <remarks>
-        /// This value must fall within [0, 120]
-        /// 
-        /// Users with <see cref="ChannelPermission.ManageMessages"/> will be exempt from slow-mode.
+        ///     Setting this value to <c>0</c> will disable slow-mode for this channel.
+        ///     <note>
+        ///         Users with <see cref="Discord.ChannelPermission.ManageMessages" /> will be exempt from slow-mode.
+        ///     </note>
         /// </remarks>
-        /// <exception cref="ArgumentOutOfRangeException">Throws ArgummentOutOfRange if the value does not fall within [0, 120]</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the value does not fall within [0, 120].</exception>
         public Optional<int> SlowModeInterval { get; set; }
     }
 }

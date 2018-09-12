@@ -26,7 +26,13 @@ namespace Discord
         /// </returns>
         string Topic { get; }
 
-        ///<summary> Gets the current slow-mode delay for this channel. 0 if disabled. </summary>
+        /// <summary>
+        ///     Gets the current slow-mode delay for this channel.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="Int32"/> representing the time in seconds required before the user can send another
+        ///     message; <c>0</c> if disabled.
+        /// </returns>
         int SlowModeInterval { get; }
 
         /// <summary>
