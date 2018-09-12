@@ -26,6 +26,9 @@ namespace Discord
         /// </returns>
         string Topic { get; }
 
+        ///<summary> Gets the current slow-mode delay for this channel. 0 if disabled. </summary>
+        int SlowModeInterval { get; }
+
         /// <summary>
         ///     Bulk-deletes multiple messages.
         /// </summary>

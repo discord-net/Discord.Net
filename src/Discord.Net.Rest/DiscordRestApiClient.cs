@@ -360,6 +360,8 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
             Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
+            Preconditions.AtLeast(args.SlowModeInterval, 0, nameof(args.SlowModeInterval));
+            Preconditions.AtMost(args.SlowModeInterval, 120, nameof(args.SlowModeInterval));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);

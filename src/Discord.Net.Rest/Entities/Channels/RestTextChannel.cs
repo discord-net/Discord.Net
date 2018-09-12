@@ -16,6 +16,7 @@ namespace Discord.Rest
     {
         /// <inheritdoc />
         public string Topic { get; private set; }
+        public int SlowModeInterval { get; private set; } 
         /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
 
@@ -40,6 +41,7 @@ namespace Discord.Rest
             base.Update(model);
             CategoryId = model.CategoryId;
             Topic = model.Topic.Value;
+            SlowModeInterval = model.SlowMode.Value;
             IsNsfw = model.Nsfw.GetValueOrDefault();
         }
 

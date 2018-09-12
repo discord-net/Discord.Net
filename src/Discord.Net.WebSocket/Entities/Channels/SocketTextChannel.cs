@@ -20,6 +20,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public string Topic { get; private set; }
+        public int SlowModeInterval { get; private set; }
         /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
         /// <summary>
@@ -62,6 +63,7 @@ namespace Discord.WebSocket
             base.Update(state, model);
             CategoryId = model.CategoryId;
             Topic = model.Topic.Value;
+            SlowModeInterval = model.SlowMode.GetValueOrDefault(); // some guilds haven't been patched to include this yet?
             _nsfw = model.Nsfw.GetValueOrDefault();
         }
 
