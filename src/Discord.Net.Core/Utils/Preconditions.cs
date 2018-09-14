@@ -10,8 +10,8 @@ namespace Discord
 
         private static ArgumentNullException CreateNotNullException(string name, string msg)
         {
-            if (msg == null) return new ArgumentNullException(name);
-            else return new ArgumentNullException(name, msg);
+            if (msg == null) return new ArgumentNullException(paramName: name);
+            else return new ArgumentNullException(paramName: name, message: msg);
         }
 
         //Strings
@@ -45,10 +45,7 @@ namespace Discord
         }        
 
         private static ArgumentException CreateNotEmptyException(string name, string msg)
-        {
-            if (msg == null) return new ArgumentException("Argument cannot be blank", name);
-            else return new ArgumentException(name, msg);
-        }
+            => new ArgumentException(message: msg ?? "Argument cannot be blank.", paramName: name);
 
         //Numerics
         public static void NotEqual(sbyte obj, sbyte value, string name, string msg = null) { if (obj == value) throw CreateNotEqualException(name, msg, value); }
@@ -85,11 +82,8 @@ namespace Discord
         public static void NotEqual(Optional<ulong?> obj, ulong value, string name, string msg = null) { if (obj.IsSpecified && obj.Value == value) throw CreateNotEqualException(name, msg, value); }
 
         private static ArgumentException CreateNotEqualException<T>(string name, string msg, T value)
-        {
-            if (msg == null) return new ArgumentException($"Value may not be equal to {value}", name);
-            else return new ArgumentException(msg, name);
-        }
-
+            => new ArgumentException(message: msg ?? $"Value may not be equal to {value}", paramName: name);
+        
         public static void AtLeast(sbyte obj, sbyte value, string name, string msg = null) { if (obj < value) throw CreateAtLeastException(name, msg, value); }
         public static void AtLeast(byte obj, byte value, string name, string msg = null) { if (obj < value) throw CreateAtLeastException(name, msg, value); }
         public static void AtLeast(short obj, short value, string name, string msg = null) { if (obj < value) throw CreateAtLeastException(name, msg, value); }
@@ -108,10 +102,7 @@ namespace Discord
         public static void AtLeast(Optional<ulong> obj, ulong value, string name, string msg = null) { if (obj.IsSpecified && obj.Value < value) throw CreateAtLeastException(name, msg, value); }
 
         private static ArgumentException CreateAtLeastException<T>(string name, string msg, T value)
-        {
-            if (msg == null) return new ArgumentException($"Value must be at least {value}", name);
-            else return new ArgumentException(msg, name);
-        }
+            => new ArgumentException(message: msg ?? $"Value must be at least {value}", paramName: name);
 
         public static void GreaterThan(sbyte obj, sbyte value, string name, string msg = null) { if (obj <= value) throw CreateGreaterThanException(name, msg, value); }
         public static void GreaterThan(byte obj, byte value, string name, string msg = null) { if (obj <= value) throw CreateGreaterThanException(name, msg, value); }
@@ -131,10 +122,7 @@ namespace Discord
         public static void GreaterThan(Optional<ulong> obj, ulong value, string name, string msg = null) { if (obj.IsSpecified && obj.Value <= value) throw CreateGreaterThanException(name, msg, value); }
 
         private static ArgumentException CreateGreaterThanException<T>(string name, string msg, T value)
-        {
-            if (msg == null) return new ArgumentException($"Value must be greater than {value}", name);
-            else return new ArgumentException(msg, name);
-        }
+            => new ArgumentException(message: msg ?? $"Value must be greater than {value}", paramName: name);
 
         public static void AtMost(sbyte obj, sbyte value, string name, string msg = null) { if (obj > value) throw CreateAtMostException(name, msg, value); }
         public static void AtMost(byte obj, byte value, string name, string msg = null) { if (obj > value) throw CreateAtMostException(name, msg, value); }
@@ -154,10 +142,7 @@ namespace Discord
         public static void AtMost(Optional<ulong> obj, ulong value, string name, string msg = null) { if (obj.IsSpecified && obj.Value > value) throw CreateAtMostException(name, msg, value); }
 
         private static ArgumentException CreateAtMostException<T>(string name, string msg, T value)
-        {
-            if (msg == null) return new ArgumentException($"Value must be at most {value}", name);
-            else return new ArgumentException(msg, name);
-        }
+            => new ArgumentException(message: msg ?? $"Value must be at most {value}", paramName: name);
 
         public static void LessThan(sbyte obj, sbyte value, string name, string msg = null) { if (obj >= value) throw CreateLessThanException(name, msg, value); }
         public static void LessThan(byte obj, byte value, string name, string msg = null) { if (obj >= value) throw CreateLessThanException(name, msg, value); }
@@ -177,10 +162,7 @@ namespace Discord
         public static void LessThan(Optional<ulong> obj, ulong value, string name, string msg = null) { if (obj.IsSpecified && obj.Value >= value) throw CreateLessThanException(name, msg, value); }
 
         private static ArgumentException CreateLessThanException<T>(string name, string msg, T value)
-        {
-            if (msg == null) return new ArgumentException($"Value must be less than {value}", name);
-            else return new ArgumentException(msg, name);
-        }
+            => new ArgumentException(message: msg ?? $"Value must be less than {value}", paramName: name);
 
         // Bulk Delete
         public static void YoungerThanTwoWeeks(ulong[] collection, string name)
@@ -198,7 +180,7 @@ namespace Discord
             for (var i = 0; i < roles.Length; i++)
             {
                 if (roles[i] == guildId)
-                    throw new ArgumentException("The everyone role cannot be assigned to a user", name);
+                    throw new ArgumentException(message: "The everyone role cannot be assigned to a user", paramName: name);
             }
         }
     }

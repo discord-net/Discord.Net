@@ -13,6 +13,9 @@ namespace Discord
         /// <summary> Gets the current topic for this text channel. </summary>
         string Topic { get; }
 
+        ///<summary> Gets the current slow-mode delay for this channel. 0 if disabled. </summary>
+        int SlowModeInterval { get; }
+
         /// <summary> Bulk deletes multiple messages. </summary>
         Task DeleteMessagesAsync(IEnumerable<IMessage> messages, RequestOptions options = null);
         /// <summary> Bulk deletes multiple messages. </summary>

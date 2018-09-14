@@ -16,6 +16,7 @@ namespace Discord.WebSocket
         private readonly MessageCache _messages;
 
         public string Topic { get; private set; }
+        public int SlowModeInterval { get; private set; }
         public ulong? CategoryId { get; private set; }
         public ICategoryChannel Category
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
@@ -47,6 +48,7 @@ namespace Discord.WebSocket
             base.Update(state, model);
             CategoryId = model.CategoryId;
             Topic = model.Topic.Value;
+            SlowModeInterval = model.SlowMode.GetValueOrDefault(); // some guilds haven't been patched to include this yet?
             _nsfw = model.Nsfw.GetValueOrDefault();
         }
 

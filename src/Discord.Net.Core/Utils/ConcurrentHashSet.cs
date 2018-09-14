@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -160,23 +160,23 @@ namespace Discord
         public ConcurrentHashSet(IEnumerable<T> collection, IEqualityComparer<T> comparer) 
             : this(comparer)
         {
-            if (collection == null) throw new ArgumentNullException(nameof(collection));
+            if (collection == null) throw new ArgumentNullException(paramName: nameof(collection));
             InitializeFromCollection(collection);
         }
         public ConcurrentHashSet(int concurrencyLevel, IEnumerable<T> collection, IEqualityComparer<T> comparer)
             : this(concurrencyLevel, DefaultCapacity, false, comparer)
         {
-            if (collection == null) throw new ArgumentNullException(nameof(collection));
-            if (comparer == null) throw new ArgumentNullException(nameof(comparer));
+            if (collection == null) throw new ArgumentNullException(paramName: nameof(collection));
+            if (comparer == null) throw new ArgumentNullException(paramName: nameof(comparer));
             InitializeFromCollection(collection);
         }        
         public ConcurrentHashSet(int concurrencyLevel, int capacity, IEqualityComparer<T> comparer)
             : this(concurrencyLevel, capacity, false, comparer) { }
         internal ConcurrentHashSet(int concurrencyLevel, int capacity, bool growLockArray, IEqualityComparer<T> comparer)
         {
-            if (concurrencyLevel < 1) throw new ArgumentOutOfRangeException(nameof(concurrencyLevel));
-            if (capacity < 0) throw new ArgumentOutOfRangeException(nameof(capacity));
-            if (comparer == null) throw new ArgumentNullException(nameof(comparer));
+            if (concurrencyLevel < 1) throw new ArgumentOutOfRangeException(paramName: nameof(concurrencyLevel));
+            if (capacity < 0) throw new ArgumentOutOfRangeException(paramName: nameof(capacity));
+            if (comparer == null) throw new ArgumentNullException(paramName: nameof(comparer));
                         
             if (capacity < concurrencyLevel)
                 capacity = concurrencyLevel;
@@ -197,7 +197,7 @@ namespace Discord
         {
             foreach (var value in collection)
             {
-                if (value == null) throw new ArgumentNullException("key");
+                if (value == null) throw new ArgumentNullException(paramName: "key");
 
                 if (!TryAddInternal(value, _comparer.GetHashCode(value), false))
                     throw new ArgumentException();
@@ -209,7 +209,7 @@ namespace Discord
         
         public bool ContainsKey(T value)
         {
-            if (value == null) throw new ArgumentNullException("key");
+            if (value == null) throw new ArgumentNullException(paramName: "key");
             return ContainsKeyInternal(value, _comparer.GetHashCode(value));
         }
         private bool ContainsKeyInternal(T value, int hashcode)
@@ -232,7 +232,7 @@ namespace Discord
 
         public bool TryAdd(T value)
         {
-            if (value == null)  throw new ArgumentNullException("key");
+            if (value == null) throw new ArgumentNullException(paramName: "key");
             return TryAddInternal(value, _comparer.GetHashCode(value), true);
         }
         private bool TryAddInternal(T value, int hashcode, bool acquireLock)
@@ -281,7 +281,7 @@ namespace Discord
 
         public bool TryRemove(T value)
         {
-            if (value == null) throw new ArgumentNullException("key");
+            if (value == null) throw new ArgumentNullException(paramName: "key");
             return TryRemoveInternal(value);
         }        
         private bool TryRemoveInternal(T value)
