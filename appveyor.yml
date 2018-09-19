@@ -41,11 +41,11 @@ after_build:
 - ps: dotnet pack "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
 - ps: >-
     if ($Env:APPVEYOR_REPO_TAG -eq "true") {
-      nuget pack src\Discord.Net\Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix=""
+      nuget pack src/Discord.Net/Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix=""
     } else {
-      nuget pack src\Discord.Net\Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix="-$Env:BUILD"
+      nuget pack src/Discord.Net/Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix="-$Env:BUILD"
     }
-- ps: Get-ChildItem artifacts\*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+- ps: Get-ChildItem artifacts/*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 
 test_script:
 - ps: >-
