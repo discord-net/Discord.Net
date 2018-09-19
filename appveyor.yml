@@ -51,20 +51,23 @@ build_script:
     }
 - ps: dotnet build Discord.Net.sln -c "Release" /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
 after_build:
-- ps: dotnet pack "src\Discord.Net.Core\Discord.Net.Core.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
-- ps: dotnet pack "src\Discord.Net.Rest\Discord.Net.Rest.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
-- ps: dotnet pack "src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
-- ps: dotnet pack "src\Discord.Net.Commands\Discord.Net.Commands.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
-- ps: dotnet pack "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
-- ps: dotnet pack "src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
-- ps: dotnet pack "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
+- ps: if ($isWindows) { dotnet pack "src\Discord.Net.Core\Discord.Net.Core.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG" }
+- ps: if ($isWindows) { dotnet pack "src\Discord.Net.Rest\Discord.Net.Rest.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG" }
+- ps: if ($isWindows) { dotnet pack "src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG" }
+- ps: if ($isWindows) { dotnet pack "src\Discord.Net.Commands\Discord.Net.Commands.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG" }
+- ps: if ($isWindows) { dotnet pack "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG" }
+- ps: if ($isWindows) { dotnet pack "src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG" }
+- ps: if ($isWindows) { dotnet pack "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG" }
 - ps: >-
-    if ($Env:APPVEYOR_REPO_TAG -eq "true") {
-      nuget pack src/Discord.Net/Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix=""
-    } else {
-      nuget pack src/Discord.Net/Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix="-$Env:BUILD"
+    if ($isWindows)
+    {
+      if ($Env:APPVEYOR_REPO_TAG -eq "true") {
+        nuget pack src/Discord.Net/Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix=""
+      } else {
+        nuget pack src/Discord.Net/Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix="-$Env:BUILD"
+      }
     }
-- ps: Get-ChildItem artifacts/*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+- ps: if ($isWindows) { Get-ChildItem artifacts/*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name } }
 
 test_script:
 - ps: >-
