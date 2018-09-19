@@ -83,6 +83,7 @@ deploy:
   symbol_server: https://www.myget.org/F/discord-net/symbols/api/v2/package
   on:
     branch: dev
+    isWindows: True
 - provider: NuGet
   server: https://www.myget.org/F/rogueexception/api/v2/package
   api_key:
@@ -90,3 +91,4 @@ deploy:
   symbol_server: https://www.myget.org/F/rogueexception/symbols/api/v2/package
   on:
     branch: dev
+    isWindows: True
