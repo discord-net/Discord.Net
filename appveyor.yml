@@ -10,9 +10,9 @@ nuget:
   disable_publish_on_pr: true
 pull_requests:
   do_not_increment_build_number: true
-# This is the default on Windows
-# For Ubuntu, it's /home/appveyor/projects/
-# clone_folder: C:\Projects\Discord.Net
+# Use the default clone_folder
+# Windows: C:\Projects\discord-net
+# Ubuntu: /home/appveyor/projects/discord-net
 cache: test/Discord.Net.Tests/cache.db
 
 environment:
