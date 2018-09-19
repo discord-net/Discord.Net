@@ -25,12 +25,9 @@ init:
 
 build_script:
 - ps: |
-  if ($isLinux)
-  {
+  if ($isLinux) {
     ./appveyor-retry dotnet restore Discord.Net.sln -v Minimal /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
-  }
-  else
-  {
+  } else {
     appveyor-retry dotnet restore Discord.Net.sln -v Minimal /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
   }
 - ps: dotnet build Discord.Net.sln -c "Release" /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
