@@ -516,10 +516,22 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Creates a new text channel in this guild.
         /// </summary>
+        /// <example>
+        ///     The following example creates a new text channel under an existing category named <c>Wumpus</c> with a set topic.
+        ///     <code lang="cs">
+        ///     var categories = await guild.GetCategoriesAsync();
+        ///     var targetCategory = categories.FirstOrDefault(x => x.Name == "wumpus");
+        ///     if (targetCategory == null) return;
+        ///     await Context.Guild.CreateTextChannelAsync(name, x =>
+        ///     {
+        ///         x.CategoryId = targetCategory.Id;
+        ///         x.Topic = $"This channel was created at {DateTimeOffset.UtcNow} by {user}.";
+        ///     });
+        ///     </code>
+        /// </example>
         /// <param name="name">The new name for the text channel.</param>
         /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     text channel.

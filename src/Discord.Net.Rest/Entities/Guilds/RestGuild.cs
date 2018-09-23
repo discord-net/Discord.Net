@@ -395,14 +395,27 @@ namespace Discord.Rest
             return null;
         }
         /// <summary>
-        ///     Creates a text channel with the provided name.
+        ///     Creates a new text channel in this guild.
         /// </summary>
-        /// <param name="name">The name of the new channel.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
+        /// <example>
+        ///     The following example creates a new text channel under an existing category named <c>Wumpus</c> with a set topic.
+        ///     <code lang="cs">
+        ///     var categories = await guild.GetCategoriesAsync();
+        ///     var targetCategory = categories.FirstOrDefault(x => x.Name == "wumpus");
+        ///     if (targetCategory == null) return;
+        ///     await Context.Guild.CreateTextChannelAsync(name, x =>
+        ///     {
+        ///         x.CategoryId = targetCategory.Id;
+        ///         x.Topic = $"This channel was created at {DateTimeOffset.UtcNow} by {user}.";
+        ///     });
+        ///     </code>
+        /// </example>
+        /// <param name="name">The new name for the text channel.</param>
         /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
+        /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     The created text channel.
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     text channel.
         /// </returns>
         public Task<RestTextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateTextChannelAsync(this, Discord, name, options, func);
