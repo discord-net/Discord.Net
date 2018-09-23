@@ -88,6 +88,12 @@ this:
 > via the @Discord.WebSocket.SocketGuild.Emotes collection.
 > [!code-csharp[Socket emote sample](samples/socket-emote-sample.cs)]
 
+> [!TIP]
+> On Discord, any user with Discord Nitro subscription may use
+> custom emotes from any guilds they are currently in. This is also
+> true for _any_ standard bot accounts; this does not require
+> the bot owner to have a Nitro subscription.
+
 ## Additional Information
 
 To learn more about emote and emojis and how they could be used,
