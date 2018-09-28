@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 #if DEBUG_LIMITS
 using System.Diagnostics;
