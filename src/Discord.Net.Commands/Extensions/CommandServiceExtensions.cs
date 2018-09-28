@@ -7,7 +7,7 @@ namespace Discord.Commands
 {
     public static class CommandServiceExtensions
     {
-        public static async Task<IReadOnlyCollection<CommandInfo>> GetExecutableCommandsAsync(this IEnumerable<CommandInfo> commands, ICommandContext context, IServiceProvider provider)
+        public static async Task<IReadOnlyCollection<CommandInfo>> GetExecutableCommandsAsync(this ICollection<CommandInfo> commands, ICommandContext context, IServiceProvider provider)
         {
             var executableCommands = new List<CommandInfo>();
 
