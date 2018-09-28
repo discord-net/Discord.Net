@@ -213,8 +213,10 @@ namespace Discord.Rest
         public static async Task<RestInviteMetadata> GetVanityInviteAsync(IGuild guild, BaseDiscordClient client,
             RequestOptions options)
         {
-            var model = await client.ApiClient.GetVanityInviteAsync(guild.Id, options).ConfigureAwait(false);
-            return RestInviteMetadata.Create(client, guild, null, model);
+            var vanityModel = await client.ApiClient.GetVanityInviteAsync(guild.Id, options).ConfigureAwait(false);
+            if (vanityModel == null) throw new InvalidOperationException("This guild does not have a vanity URL.");
+            var inviteModel = await client.ApiClient.GetInviteAsync(vanityModel.Code, options).ConfigureAwait(false);
+            return RestInviteMetadata.Create(client, guild, null, inviteModel);
         }
 
         //Roles
