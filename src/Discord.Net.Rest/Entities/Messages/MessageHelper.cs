@@ -73,7 +73,7 @@ namespace Discord.Rest
                 },
                 nextPage: (info, lastPage) =>
                 {
-                    if (lastPage.Count != DiscordConfig.MaxUsersPerBatch)
+                    if (lastPage.Count != DiscordConfig.MaxUserReactionsPerBatch)
                         return false;
 
                     info.Position = lastPage.Max(x => x.Id);
