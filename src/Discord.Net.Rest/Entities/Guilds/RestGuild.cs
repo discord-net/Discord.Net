@@ -23,6 +23,7 @@ namespace Discord.Rest
         public VerificationLevel VerificationLevel { get; private set; }
         public MfaLevel MfaLevel { get; private set; }
         public DefaultMessageNotifications DefaultMessageNotifications { get; private set; }
+        public ExplicitContentFilterLevel ExplicitContentFilter { get; private set; }
 
         public ulong? AFKChannelId { get; private set; }
         public ulong? EmbedChannelId { get; private set; }
@@ -70,6 +71,7 @@ namespace Discord.Rest
             VerificationLevel = model.VerificationLevel;
             MfaLevel = model.MfaLevel;
             DefaultMessageNotifications = model.DefaultMessageNotifications;
+            ExplicitContentFilter = model.ExplicitContentFilter;            
 
             if (model.Emojis != null)
             {
