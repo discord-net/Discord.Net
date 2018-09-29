@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -41,5 +41,7 @@ namespace Discord.API
         public MfaLevel MfaLevel { get; set; }
         [JsonProperty("default_message_notifications")]
         public DefaultMessageNotifications DefaultMessageNotifications { get; set; }
+        [JsonProperty("explicit_content_filter")]
+        public ExplicitContentFilterLevel ExplicitContentFilter { get; set; }
     }
 }
