@@ -1,3 +1,6 @@
+using Discord.Commands.Builders;
+using Discord.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -350,8 +353,25 @@ namespace Discord.Commands
             => ExecuteAsync(context, context.Message.Content.Substring(argPos), services, multiMatchHandling);
         public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
+            // Create service scope and command context so dependent services can consume the command context, with a scoped lifespan
             services = services ?? EmptyServiceProvider.Instance;
+            using (var serviceScope = services.CreateScope())
+            {
+                var scopedServices = serviceScope.ServiceProvider;
 
+                // If the context accessor is registered in the IoC container, set it
+                var contextAccessor = scopedServices.GetService<ICommandContextAccessor>();
+                if (contextAccessor != null)
+                {
+                    contextAccessor.CommandContext = context;
+                }
+                return await ExecuteAsyncInternal(context, input, scopedServices, multiMatchHandling);
+            }
+        }
+
+        internal async Task<IResult> ExecuteAsyncInternal(ICommandContext context, string input,
+            IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        {
             var searchResult = Search(input);
             if (!searchResult.IsSuccess)
                 return searchResult;
