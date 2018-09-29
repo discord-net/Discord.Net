@@ -957,6 +957,8 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.AtLeast(args.MaxAge, 0, nameof(args.MaxAge));
             Preconditions.AtLeast(args.MaxUses, 0, nameof(args.MaxUses));
+            Preconditions.AtMost(args.MaxAge, 86400, nameof(args.MaxAge),
+                "The maximum age of an invite must be less than or equal to a day (86400 seconds).");
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
