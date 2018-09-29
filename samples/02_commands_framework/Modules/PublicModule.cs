@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using _02_commands_framework.Services;
+using System;
 
 namespace _02_commands_framework.Modules
 {
@@ -47,6 +48,29 @@ namespace _02_commands_framework.Modules
         {
             await user.Guild.AddBanAsync(user, reason: reason);
             await ReplyAsync("ok!");
+        }
+
+        // Kick a user
+        [Command("kick")]
+        [RequireContext(ContextType.Guild)]
+        // make sure the user invoking the command can kick
+        [RequireUserPermission(GuildPermission.KickMembers)]
+        // make sure the bot itself can kick
+        [RequireBotPermission(GuildPermission.KickMembers)]
+        public async Task KickUserAsync(IGuildUser user, [Remainder] string reason = null)
+        {
+            // Creates the pattern TextBlock
+            EmbedBuilder builder = new EmbedBuilder();
+
+            builder.WithTitle(user.Username + " kicked from server!")
+                .WithColor(Color.Orange)
+                .WithDescription("by " +
+                                $"{Context.User.Username}" +
+                                Environment.NewLine +
+                                "Reason: " + reason);
+
+            await user.KickAsync(reason, null);
+            await ReplyAsync("", false, builder.Build());
         }
 
         // [Remainder] takes the rest of the command's arguments as one argument, rather than splitting every space
