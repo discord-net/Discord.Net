@@ -25,8 +25,11 @@ init:
 
 build_script:
 - ps: >-
+    # Debug the values of CI_WINDOWS and CI_LINUX
+    Write-Output "Windows: $Env:CI_WINDOWS Linux: $Env:CI_LINUX"
     if ($isLinux)
     {
+      
       # AppVeyor Linux images do not have appveyor-retry, which retries the commands a few times
       # until the command exits with code 0.
       # So, this is done with a short script.
@@ -83,7 +86,7 @@ deploy:
   symbol_server: https://www.myget.org/F/discord-net/symbols/api/v2/package
   on:
     branch: dev
-    isWindows: True
+    CI_WINDOWS: true
 - provider: NuGet
   server: https://www.myget.org/F/rogueexception/api/v2/package
   api_key:
@@ -91,4 +94,4 @@ deploy:
   symbol_server: https://www.myget.org/F/rogueexception/symbols/api/v2/package
   on:
     branch: dev
-    isWindows: True
+    CI_WINDOWS: true
