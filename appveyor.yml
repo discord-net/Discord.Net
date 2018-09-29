@@ -29,7 +29,6 @@ build_script:
     Write-Output "Windows: $Env:CI_WINDOWS Linux: $Env:CI_LINUX"
     if ($isLinux)
     {
-      
       # AppVeyor Linux images do not have appveyor-retry, which retries the commands a few times
       # until the command exits with code 0.
       # So, this is done with a short script.
