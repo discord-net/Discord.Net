@@ -33,6 +33,7 @@ namespace Discord.Rest
         public string IconId { get; private set; }
         public string SplashId { get; private set; }
         internal bool Available { get; private set; }
+        public ulong? ApplicationId { get; private set; }
 
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
@@ -71,7 +72,8 @@ namespace Discord.Rest
             VerificationLevel = model.VerificationLevel;
             MfaLevel = model.MfaLevel;
             DefaultMessageNotifications = model.DefaultMessageNotifications;
-            ExplicitContentFilter = model.ExplicitContentFilter;            
+            ExplicitContentFilter = model.ExplicitContentFilter;
+            ApplicationId = model.ApplicationId;
 
             if (model.Emojis != null)
             {

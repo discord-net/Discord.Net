@@ -41,6 +41,8 @@ namespace Discord.API
         public string[] Features { get; set; }
         [JsonProperty("mfa_level")]
         public MfaLevel MfaLevel { get; set; }
+        [JsonProperty("application_id")]
+        public ulong? ApplicationId { get; set; }
         [JsonProperty("system_channel_id")]
         public ulong? SystemChannelId { get; set; }
     }

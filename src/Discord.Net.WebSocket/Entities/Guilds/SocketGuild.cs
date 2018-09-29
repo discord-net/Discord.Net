@@ -45,6 +45,7 @@ namespace Discord.WebSocket
         public int DownloadedMemberCount { get; private set; }
         internal bool IsAvailable { get; private set; }
         public bool IsConnected { get; internal set; }
+        public ulong? ApplicationId { get; internal set; }
 
         internal ulong? AFKChannelId { get; private set; }
         internal ulong? EmbedChannelId { get; private set; }
@@ -212,6 +213,7 @@ namespace Discord.WebSocket
             MfaLevel = model.MfaLevel;
             DefaultMessageNotifications = model.DefaultMessageNotifications;
             ExplicitContentFilter = model.ExplicitContentFilter;
+            ApplicationId = model.ApplicationId;
 
             if (model.Emojis != null)
             {
