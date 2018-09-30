@@ -5,13 +5,24 @@ using System.Threading.Tasks;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Provides a client to send REST-based requests to Discord.
+    /// </summary>
     public class DiscordRestClient : BaseDiscordClient, IDiscordClient
     {
         private RestApplication _applicationInfo;
 
+        /// <summary>
+        ///     Gets the logged-in user.
+        /// </summary>
         public new RestSelfUser CurrentUser => base.CurrentUser as RestSelfUser;
 
+        /// <inheritdoc />
         public DiscordRestClient() : this(new DiscordRestConfig()) { }
+        /// <summary>
+        ///     Initializes a new <see cref="DiscordRestClient"/> with the provided configuration.
+        /// </summary>
+        /// <param name="config">The configuration to be used with the client.</param>
         public DiscordRestClient(DiscordRestConfig config) : base(config, CreateApiClient(config)) { }
 
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
@@ -22,83 +33,71 @@ namespace Discord.Rest
                 ApiClient.Dispose();
         }
 
+        /// <inheritdoc />
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
             var user = await ApiClient.GetMyUserAsync(new RequestOptions { RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
             ApiClient.CurrentUserId = user.Id;
             base.CurrentUser = RestSelfUser.Create(this, user);
         }
+        /// <inheritdoc />
         internal override Task OnLogoutAsync()
         {
             _applicationInfo = null;
             return Task.Delay(0);
         }
-
-        /// <inheritdoc />
+        
         public async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
         {
-            return _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this, options));
+            return _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this, options).ConfigureAwait(false));
         }
         
-        /// <inheritdoc />
         public Task<RestChannel> GetChannelAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetChannelAsync(this, id, options);
-        /// <inheritdoc />
         public Task<IReadOnlyCollection<IRestPrivateChannel>> GetPrivateChannelsAsync(RequestOptions options = null)
             => ClientHelper.GetPrivateChannelsAsync(this, options);
         public Task<IReadOnlyCollection<RestDMChannel>> GetDMChannelsAsync(RequestOptions options = null)
             => ClientHelper.GetDMChannelsAsync(this, options);
         public Task<IReadOnlyCollection<RestGroupChannel>> GetGroupChannelsAsync(RequestOptions options = null)
             => ClientHelper.GetGroupChannelsAsync(this, options);
-
-        /// <inheritdoc />
+        
         public Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(RequestOptions options = null)
             => ClientHelper.GetConnectionsAsync(this, options);
 
-        /// <inheritdoc />
         public Task<RestInviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null)
             => ClientHelper.GetInviteAsync(this, inviteId, options);
 
-        /// <inheritdoc />
         public Task<RestGuild> GetGuildAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildAsync(this, id, options);
-        /// <inheritdoc />
         public Task<RestGuildEmbed?> GetGuildEmbedAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildEmbedAsync(this, id, options);
-        /// <inheritdoc />
         public IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(RequestOptions options = null)
             => ClientHelper.GetGuildSummariesAsync(this, null, null, options);
-        /// <inheritdoc />
         public IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(ulong fromGuildId, int limit, RequestOptions options = null)
             => ClientHelper.GetGuildSummariesAsync(this, fromGuildId, limit, options);
-        /// <inheritdoc />
         public Task<IReadOnlyCollection<RestGuild>> GetGuildsAsync(RequestOptions options = null)
             => ClientHelper.GetGuildsAsync(this, options);
-        /// <inheritdoc />
         public Task<RestGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null, RequestOptions options = null)
             => ClientHelper.CreateGuildAsync(this, name, region, jpegIcon, options);
-
-        /// <inheritdoc />
+        
         public Task<RestUser> GetUserAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetUserAsync(this, id, options);
-        /// <inheritdoc />
         public Task<RestGuildUser> GetGuildUserAsync(ulong guildId, ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildUserAsync(this, guildId, id, options);
-
-        /// <inheritdoc />
+        
         public Task<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
             => ClientHelper.GetVoiceRegionsAsync(this, options);
-        /// <inheritdoc />
         public Task<RestVoiceRegion> GetVoiceRegionAsync(string id, RequestOptions options = null)
             => ClientHelper.GetVoiceRegionAsync(this, id, options);
-        /// <inheritdoc />
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetWebhookAsync(this, id, options);
 
         //IDiscordClient
+        /// <inheritdoc />
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
             => await GetApplicationInfoAsync(options).ConfigureAwait(false);
 
+        /// <inheritdoc />
         async Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -106,6 +105,7 @@ namespace Discord.Rest
             else
                 return null;
         }
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -113,6 +113,7 @@ namespace Discord.Rest
             else
                 return ImmutableArray.Create<IPrivateChannel>();
         }
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IDMChannel>> IDiscordClient.GetDMChannelsAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -120,6 +121,7 @@ namespace Discord.Rest
             else
                 return ImmutableArray.Create<IDMChannel>();
         }
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IGroupChannel>> IDiscordClient.GetGroupChannelsAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -128,12 +130,14 @@ namespace Discord.Rest
                 return ImmutableArray.Create<IGroupChannel>();
         }
 
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync(RequestOptions options)
             => await GetConnectionsAsync(options).ConfigureAwait(false);
 
         async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, RequestOptions options)
             => await GetInviteAsync(inviteId, options).ConfigureAwait(false);
 
+        /// <inheritdoc />
         async Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -141,6 +145,7 @@ namespace Discord.Rest
             else
                 return null;
         }
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -148,9 +153,11 @@ namespace Discord.Rest
             else
                 return ImmutableArray.Create<IGuild>();
         }
+        /// <inheritdoc />
         async Task<IGuild> IDiscordClient.CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon, RequestOptions options)
             => await CreateGuildAsync(name, region, jpegIcon, options).ConfigureAwait(false);
 
+        /// <inheritdoc />
         async Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -159,12 +166,15 @@ namespace Discord.Rest
                 return null;
         }
 
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync(RequestOptions options)
             => await GetVoiceRegionsAsync(options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
             => await GetVoiceRegionAsync(id, options).ConfigureAwait(false);
 
+        /// <inheritdoc />
         async Task<IWebhook> IDiscordClient.GetWebhookAsync(ulong id, RequestOptions options)
-            => await GetWebhookAsync(id, options);
+            => await GetWebhookAsync(id, options).ConfigureAwait(false);
     }
 }

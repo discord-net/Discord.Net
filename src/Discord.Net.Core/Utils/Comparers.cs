@@ -3,13 +3,31 @@ using System.Collections.Generic;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Represents a collection of <see cref="IEqualityComparer{T}"/> for various Discord objects.
+    /// </summary>
     public static class DiscordComparers
     {
         // TODO: simplify with '??=' slated for C# 8.0
+        /// <summary>
+        ///     Gets an <see cref="IEqualityComparer{T}"/> to be used to compare users.
+        /// </summary>
         public static IEqualityComparer<IUser> UserComparer => _userComparer ?? (_userComparer = new EntityEqualityComparer<IUser, ulong>());
+        /// <summary>
+        ///     Gets an <see cref="IEqualityComparer{T}"/> to be used to compare guilds.
+        /// </summary>
         public static IEqualityComparer<IGuild> GuildComparer => _guildComparer ?? (_guildComparer = new EntityEqualityComparer<IGuild, ulong>());
+        /// <summary>
+        ///     Gets an <see cref="IEqualityComparer{T}"/> to be used to compare channels.
+        /// </summary>
         public static IEqualityComparer<IChannel> ChannelComparer => _channelComparer ?? (_channelComparer = new EntityEqualityComparer<IChannel, ulong>());
+        /// <summary>
+        ///     Gets an <see cref="IEqualityComparer{T}"/> to be used to compare roles.
+        /// </summary>
         public static IEqualityComparer<IRole> RoleComparer => _roleComparer ?? (_roleComparer = new EntityEqualityComparer<IRole, ulong>());
+        /// <summary>
+        ///     Gets an <see cref="IEqualityComparer{T}"/> to be used to compare messages.
+        /// </summary>
         public static IEqualityComparer<IMessage> MessageComparer => _messageComparer ?? (_messageComparer = new EntityEqualityComparer<IMessage, ulong>());
 
         private static IEqualityComparer<IUser> _userComparer;

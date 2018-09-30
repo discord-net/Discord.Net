@@ -15,7 +15,7 @@ namespace Discord.Commands
             PreconditionResults = (preconditions ?? new List<PreconditionResult>(0)).ToReadOnlyCollection();
         }
 
-        public static new PreconditionGroupResult FromSuccess()
+        public new static PreconditionGroupResult FromSuccess()
             => new PreconditionGroupResult(null, null, null);
         public static PreconditionGroupResult FromError(string reason, ICollection<PreconditionResult> preconditions)
             => new PreconditionGroupResult(CommandError.UnmetPrecondition, reason, preconditions);

@@ -1,10 +1,13 @@
-﻿using System.Linq;
+using System.Linq;
 
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains a piece of audit log data related to a guild update.
+    /// </summary>
     public class GuildUpdateAuditLogData : IAuditLogData
     {
         private GuildUpdateAuditLogData(GuildInfo before, GuildInfo after)
@@ -73,7 +76,19 @@ namespace Discord.Rest
             return new GuildUpdateAuditLogData(before, after);
         }
 
+        /// <summary>
+        ///     Gets the guild information before the changes.
+        /// </summary>
+        /// <returns>
+        ///     An information object containing the original guild information before the changes were made.
+        /// </returns>
         public GuildInfo Before { get; }
+        /// <summary>
+        ///     Gets the guild information after the changes.
+        /// </summary>
+        /// <returns>
+        ///     An information object containing the guild information after the changes were made.
+        /// </returns>
         public GuildInfo After { get; }
     }
 }

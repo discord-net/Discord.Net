@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -44,6 +44,7 @@ namespace Discord.Commands
             _enumsByValue = byValueBuilder.ToImmutable();
         }
 
+        /// <inheritdoc />
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
             object enumValue;
@@ -53,14 +54,14 @@ namespace Discord.Commands
                 if (_enumsByValue.TryGetValue(baseValue, out enumValue))
                     return Task.FromResult(TypeReaderResult.FromSuccess(enumValue));
                 else
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Value is not a {_enumType.Name}"));
+                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Value is not a {_enumType.Name}."));
             }
             else
             {
                 if (_enumsByName.TryGetValue(input.ToLower(), out enumValue))
                     return Task.FromResult(TypeReaderResult.FromSuccess(enumValue));
                 else
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Value is not a {_enumType.Name}"));
+                    return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Value is not a {_enumType.Name}."));
             }
         }
     }

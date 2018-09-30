@@ -1,78 +1,69 @@
-﻿namespace Discord
+namespace Discord
 {
     /// <summary>
-    /// Modify an IGuild with the specified changes
+    ///     Provides properties that are used to modify an <see cref="IGuild" /> with the specified changes.
     /// </summary>
-    /// <example>
-    /// <code language="c#">
-    /// await Context.Guild.ModifyAsync(async x =>
-    /// {
-    ///     x.Name = "aaaaaah";
-    ///     x.RegionId = (await Context.Client.GetOptimalVoiceRegionAsync()).Id;
-    /// });
-    /// </code>
-    /// </example>
-    /// <see cref="IGuild"/>
+    /// <see cref="IGuild.ModifyAsync"/>
     public class GuildProperties
     {
-        public Optional<string> Username { get; set; }
         /// <summary>
-        /// The name of the Guild
+        ///     Gets or sets the name of the guild. Must be within 100 characters.
         /// </summary>
         public Optional<string> Name { get; set; }
         /// <summary>
-        /// The region for the Guild's voice connections
+        ///     Gets or sets the region for the guild's voice connections.
         /// </summary>
         public Optional<IVoiceRegion> Region { get; set; }
         /// <summary>
-        /// The ID of the region for the Guild's voice connections
+        ///     Gets or sets the ID of the region for the guild's voice connections.
         /// </summary>
         public Optional<string> RegionId { get; set; }
         /// <summary>
-        /// What verification level new users need to achieve before speaking
+        ///     Gets or sets the verification level new users need to achieve before speaking.
         /// </summary>
         public Optional<VerificationLevel> VerificationLevel { get; set; }
         /// <summary>
-        /// The default message notification state for the guild
+        ///     Gets or sets the default message notification state for the guild.
         /// </summary>
         public Optional<DefaultMessageNotifications> DefaultMessageNotifications { get; set; }
         /// <summary>
-        /// How many seconds before a user is sent to AFK. This value MUST be one of: (60, 300, 900, 1800, 3600).
+        ///     Gets or sets how many seconds before a user is sent to AFK. This value MUST be one of: (60, 300, 900,
+        ///     1800, 3600).
         /// </summary>
         public Optional<int> AfkTimeout { get; set; }
         /// <summary>
-        /// The icon of the guild
+        ///     Gets or sets the icon of the guild.
         /// </summary>
         public Optional<Image?> Icon { get; set; }
         /// <summary>
-        /// The guild's splash image
+        ///     Gets or sets the guild's splash image.
         /// </summary>
         /// <remarks>
-        /// The guild must be partnered for this value to have any effect.
+        ///     The guild must be partnered for this value to have any effect.
         /// </remarks>
         public Optional<Image?> Splash { get; set; }
         /// <summary>
-        /// The IVoiceChannel where AFK users should be sent.
+        ///     Gets or sets the <see cref="IVoiceChannel"/> where AFK users should be sent.
         /// </summary>
         public Optional<IVoiceChannel> AfkChannel { get; set; }
         /// <summary>
-        /// The ID of the IVoiceChannel where AFK users should be sent.
+        ///     Gets or sets the ID of the <see cref="IVoiceChannel"/> where AFK users should be sent.
         /// </summary>
         public Optional<ulong?> AfkChannelId { get; set; }
         /// <summary>
-        /// The ITextChannel where System messages should be sent.
+        ///     Gets or sets the <see cref="ITextChannel" /> where system messages should be sent.
         /// </summary>
         public Optional<ITextChannel> SystemChannel { get; set; }
         /// <summary>
-        /// The ID of the ITextChannel where System messages should be sent.
+        ///     Gets or sets the ID of the <see cref="ITextChannel" /> where system messages should be sent.
         /// </summary>
         public Optional<ulong?> SystemChannelId { get; set; }
         /// <summary>
-        /// The owner of this guild.
+        ///     Gets or sets the owner of this guild.
         /// </summary>
         public Optional<IUser> Owner { get; set; }
         /// <summary>
-        /// The ID of the owner of this guild.
+        ///     Gets or sets the ID of the owner of this guild.
         /// </summary>
         public Optional<ulong> OwnerId { get; set; }
     }

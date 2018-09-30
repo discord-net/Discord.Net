@@ -1,11 +1,13 @@
-﻿using System.Linq;
+using System.Linq;
 
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
-using ChangeModel = Discord.API.AuditLogChange;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains a piece of audit log data related to a change in a guild member.
+    /// </summary>
     public class MemberUpdateAuditLogData : IAuditLogData
     {
         private MemberUpdateAuditLogData(IUser target, MemberInfo before, MemberInfo after)
@@ -42,6 +44,12 @@ namespace Discord.Rest
             return new MemberUpdateAuditLogData(user, before, after);
         }
 
+        /// <summary>
+        ///     Gets the user that the changes were performed on.
+        /// </summary>
+        /// <returns>
+        ///     A user object representing the user who the changes were performed on.
+        /// </returns>
         public IUser Target { get; }
         public MemberInfo Before { get; }
         public MemberInfo After { get; }

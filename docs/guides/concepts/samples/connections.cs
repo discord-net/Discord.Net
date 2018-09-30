@@ -10,7 +10,7 @@ public class Program
 	{
 		_client = new DiscordSocketClient();
 
-		await _client.LoginAsync(TokenType.Bot, "bot token");
+		await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DiscordToken"));
 		await _client.StartAsync();
 
 		Console.WriteLine("Press any key to exit...");

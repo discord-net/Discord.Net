@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 
 namespace Discord.Net.Converters
@@ -11,6 +11,7 @@ namespace Discord.Net.Converters
         public override bool CanRead => true;
         public override bool CanWrite => true;
 
+        /// <exception cref="JsonSerializationException">Unknown permission target.</exception>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             switch ((string)reader.Value)
@@ -20,10 +21,11 @@ namespace Discord.Net.Converters
                 case "role":
                     return PermissionTarget.Role;
                 default:
-                    throw new JsonSerializationException("Unknown permission target");
+                    throw new JsonSerializationException("Unknown permission target.");
             }
         }
 
+        /// <exception cref="JsonSerializationException">Invalid permission target.</exception>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             switch ((PermissionTarget)value)
@@ -35,7 +37,7 @@ namespace Discord.Net.Converters
                     writer.WriteValue("role");
                     break;
                 default:
-                    throw new JsonSerializationException("Invalid permission target");
+                    throw new JsonSerializationException("Invalid permission target.");
             }
         }
     }

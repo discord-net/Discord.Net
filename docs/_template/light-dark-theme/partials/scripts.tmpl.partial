@@ -1,0 +1,10 @@
+{{!Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE file in the project root for full license information.}}
+
+<script type="text/javascript" src="{{_rel}}styles/docfx.vendor.js"></script>
+<script type="text/javascript" src="{{_rel}}styles/docfx.js"></script>
+<script type="text/javascript" src="{{_rel}}styles/main.js"></script>
+<script type="text/javascript" src="https://cdn.rawgit.com/noelboss/featherlight/master/release/featherlight.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="{{_rel}}styles/plugin-featherlight.js"></script>
+<script type="text/javascript" src="{{_rel}}styles/styleswitcher.js"></script>
+<script type="text/javascript" src="https://malsup.github.io/jquery.corner.js"></script>
+<script type="text/javascript" src="{{_rel}}styles/cornerify.js"></script>

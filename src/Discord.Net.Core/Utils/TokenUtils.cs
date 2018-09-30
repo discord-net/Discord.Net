@@ -1,11 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Provides a series of helper methods for handling Discord login tokens.
+    /// </summary>
     public static class TokenUtils
     {
         /// <summary>
@@ -13,8 +12,8 @@ namespace Discord
         /// </summary>
         /// <param name="tokenType"> The type of token to validate. </param>
         /// <param name="token"> The token value to validate. </param>
-        /// <exception cref="ArgumentNullException"> Thrown when the supplied token string is null, empty, or contains only whitespace.</exception>
-        /// <exception cref="ArgumentException"> Thrown when the supplied TokenType or token value is invalid. </exception>
+        /// <exception cref="ArgumentNullException"> Thrown when the supplied token string is <c>null</c>, empty, or contains only whitespace.</exception>
+        /// <exception cref="ArgumentException"> Thrown when the supplied <see cref="TokenType"/> or token value is invalid. </exception>
         public static void ValidateToken(TokenType tokenType, string token)
         {
             // A Null or WhiteSpace token of any type is invalid.

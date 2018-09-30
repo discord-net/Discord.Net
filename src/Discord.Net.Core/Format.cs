@@ -1,5 +1,6 @@
 namespace Discord
 {
+    /// <summary> A helper class for formatting characters. </summary>
     public static class Format
     {
         // Characters which need escaping

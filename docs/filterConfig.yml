@@ -1,11 +1,7 @@
 apiRules:
 - exclude:
-    uidRegex: ^Discord\.API$
+    uidRegex: ^Discord\.Net\..*$
+    type: Namespace
 - exclude:
-    uidRegex: ^Discord\.API.*$
-- exclude:
-    uidRegex: ^Discord\.Net\.Converters$
-- exclude:
-    uidRegex: ^Discord\.Net.*$
-- exclude:
-    uidRegex: ^RegexAnalyzer$
+    uidRegex: ^Discord\.Analyzers$
+    type: Namespace

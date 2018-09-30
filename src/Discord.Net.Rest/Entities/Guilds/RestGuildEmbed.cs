@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Model = Discord.API.GuildEmbed;
 
 namespace Discord
@@ -19,7 +19,7 @@ namespace Discord
             return new RestGuildEmbed(model.Enabled, model.ChannelId);
         }
 
-        public override string ToString() => ChannelId?.ToString();
+        public override string ToString() => ChannelId?.ToString() ?? "Unknown";
         private string DebuggerDisplay => $"{ChannelId} ({(IsEnabled ? "Enabled" : "Disabled")})";
     }
 }

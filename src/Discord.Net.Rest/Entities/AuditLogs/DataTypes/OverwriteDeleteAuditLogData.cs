@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
-using ChangeModel = Discord.API.AuditLogChange;
-using OptionModel = Discord.API.AuditLogOptions;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains a piece of audit log data related to the deletion of a permission overwrite.
+    /// </summary>
     public class OverwriteDeleteAuditLogData : IAuditLogData
     {
         private OverwriteDeleteAuditLogData(Overwrite deletedOverwrite)
@@ -35,6 +32,12 @@ namespace Discord.Rest
             return new OverwriteDeleteAuditLogData(new Overwrite(id, type, new OverwritePermissions(allow, deny)));
         }
 
+        /// <summary>
+        ///     Gets the permission overwrite object that was deleted.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="Overwrite"/> object representing the overwrite that was deleted.
+        /// </returns>
         public Overwrite Overwrite { get; }
     }
 }

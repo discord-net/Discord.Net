@@ -7,6 +7,7 @@ using Discord.Rest;
 
 namespace Discord.Webhook
 {
+    /// <summary> A client responsible for connecting as a Webhook. </summary>
     public class DiscordWebhookClient : IDisposable
     {
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
@@ -19,14 +20,14 @@ namespace Discord.Webhook
         internal API.DiscordRestApiClient ApiClient { get; }
         internal LogManager LogManager { get; }
 
-        /// <summary> Creates a new Webhook discord client. </summary>
+        /// <summary> Creates a new Webhook Discord client. </summary>
         public DiscordWebhookClient(IWebhook webhook)
             : this(webhook.Id, webhook.Token, new DiscordRestConfig()) {  }
-        /// <summary> Creates a new Webhook discord client. </summary>
+        /// <summary> Creates a new Webhook Discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken)
             : this(webhookId, webhookToken, new DiscordRestConfig()) { }
 
-        /// <summary> Creates a new Webhook discord client. </summary>
+        /// <summary> Creates a new Webhook Discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken, DiscordRestConfig config)
             : this(config)
         {
@@ -34,7 +35,7 @@ namespace Discord.Webhook
             ApiClient.LoginAsync(TokenType.Webhook, webhookToken).GetAwaiter().GetResult();
             Webhook = WebhookClientHelper.GetWebhookAsync(this, webhookId).GetAwaiter().GetResult();
         }
-        /// <summary> Creates a new Webhook discord client. </summary>
+        /// <summary> Creates a new Webhook Discord client. </summary>
         public DiscordWebhookClient(IWebhook webhook, DiscordRestConfig config)
             : this(config)
         {
@@ -61,18 +62,19 @@ namespace Discord.Webhook
         }
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
             => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent);
-        
-        /// <summary> Sends a message using to the channel for this webhook. Returns the ID of the created message. </summary>
+        /// <summary> Sends a message using to the channel for this webhook. </summary>
+        /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendMessageAsync(string text = null, bool isTTS = false, IEnumerable<Embed> embeds = null,
             string username = null, string avatarUrl = null, RequestOptions options = null)
             => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, options);
 
-        /// <summary> Send a message to the channel for this webhook with an attachment. Returns the ID of the created message. </summary>
+        /// <summary> Sends a message to the channel for this webhook with an attachment. </summary>
+        /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendFileAsync(string filePath, string text, bool isTTS = false,
             IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null)
             => WebhookClientHelper.SendFileAsync(this, filePath, text, isTTS, embeds, username, avatarUrl, options);
-
-        /// <summary> Send a message to the channel for this webhook with an attachment. Returns the ID of the created message. </summary>
+        /// <summary> Sends a message to the channel for this webhook with an attachment. </summary>
+        /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false,
             IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null)
             => WebhookClientHelper.SendFileAsync(this, stream, filename, text, isTTS, embeds, username, avatarUrl, options);

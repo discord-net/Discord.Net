@@ -1,46 +1,52 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
     /// <summary>
-    /// This attribute requires that the bot has a specified permission in the channel a command is invoked in.
+    ///     Requires the bot to have a specific permission in the channel a command is invoked in.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RequireBotPermissionAttribute : PreconditionAttribute
     {
+        /// <summary>
+        ///     Gets the specified <see cref="Discord.GuildPermission" /> of the precondition.
+        /// </summary>
         public GuildPermission? GuildPermission { get; }
+        /// <summary>
+        ///     Gets the specified <see cref="Discord.ChannelPermission" /> of the precondition.
+        /// </summary>
         public ChannelPermission? ChannelPermission { get; }
 
         /// <summary>
-        /// Require that the bot account has a specified GuildPermission
+        ///     Requires the bot account to have a specific <see cref="Discord.GuildPermission"/>.
         /// </summary>
-        /// <remarks>This precondition will always fail if the command is being invoked in a private channel.</remarks>
-        /// <param name="permission">The GuildPermission that the bot must have. Multiple permissions can be specified by ORing the permissions together.</param>
+        /// <remarks>
+        ///     This precondition will always fail if the command is being invoked in a <see cref="IPrivateChannel"/>.
+        /// </remarks>
+        /// <param name="permission">
+        ///     The <see cref="Discord.GuildPermission"/> that the bot must have. Multiple permissions can be specified
+        ///     by ORing the permissions together.
+        /// </param>
         public RequireBotPermissionAttribute(GuildPermission permission)
         {
             GuildPermission = permission;
             ChannelPermission = null;
         }
         /// <summary>
-        /// Require that the bot account has a specified ChannelPermission.
+        ///     Requires that the bot account to have a specific <see cref="Discord.ChannelPermission"/>.
         /// </summary>
-        /// <param name="permission">The ChannelPermission that the bot must have. Multiple permissions can be specified by ORing the permissions together.</param>
-        /// <example>
-        /// <code language="c#">
-        ///     [Command("permission")]
-        ///     [RequireBotPermission(ChannelPermission.ManageMessages)]
-        ///     public async Task Purge()
-        ///     {
-        ///     }
-        /// </code>
-        /// </example>
+        /// <param name="permission">
+        ///     The <see cref="Discord.ChannelPermission"/> that the bot must have. Multiple permissions can be
+        ///     specified by ORing the permissions together.
+        /// </param>
         public RequireBotPermissionAttribute(ChannelPermission permission)
         {
             ChannelPermission = permission;
             GuildPermission = null;
         }
 
+        /// <inheritdoc />
         public override async Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
             IGuildUser guildUser = null;
@@ -50,9 +56,9 @@ namespace Discord.Commands
             if (GuildPermission.HasValue)
             {
                 if (guildUser == null)
-                    return PreconditionResult.FromError("Command must be used in a guild channel");
+                    return PreconditionResult.FromError("Command must be used in a guild channel.");
                 if (!guildUser.GuildPermissions.Has(GuildPermission.Value))
-                    return PreconditionResult.FromError($"Bot requires guild permission {GuildPermission.Value}");
+                    return PreconditionResult.FromError($"Bot requires guild permission {GuildPermission.Value}.");
             }
 
             if (ChannelPermission.HasValue)
@@ -64,7 +70,7 @@ namespace Discord.Commands
                     perms = ChannelPermissions.All(context.Channel);
 
                 if (!perms.Has(ChannelPermission.Value))
-                    return PreconditionResult.FromError($"Bot requires channel permission {ChannelPermission.Value}");
+                    return PreconditionResult.FromError($"Bot requires channel permission {ChannelPermission.Value}.");
             }
 
             return PreconditionResult.FromSuccess();
