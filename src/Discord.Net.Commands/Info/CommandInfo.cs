@@ -179,10 +179,7 @@ namespace Discord.Commands
         public Task<IResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)
         {
             if (!parseResult.IsSuccess)
-            {
-
                 return Task.FromResult((IResult)ExecuteResult.FromError(parseResult));
-            }
 
             var argList = new object[parseResult.ArgValues.Count];
             for (int i = 0; i < parseResult.ArgValues.Count; i++)
