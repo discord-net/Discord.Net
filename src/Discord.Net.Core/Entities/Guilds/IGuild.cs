@@ -52,7 +52,12 @@ namespace Discord
         ///     The level of requirements.
         /// </returns>
         VerificationLevel VerificationLevel { get; }
-        /// <summary> Gets the level of content filtering applied to user's content in a Guild. </summary>
+        /// <summary>
+        ///     Gets the level of content filtering applied to user's content in a Guild.
+        /// </summary>
+        /// <returns>
+        ///     The level of explicit content filtering.
+        /// </returns>
         ExplicitContentFilterLevel ExplicitContentFilter { get; }
         /// <summary>
         ///     Gets the ID of this guild's icon.
