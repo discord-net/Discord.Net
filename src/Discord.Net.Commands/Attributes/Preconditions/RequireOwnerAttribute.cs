@@ -15,6 +15,22 @@ namespace Discord.Commands
     ///     ;otherwise, this precondition will always fail.
     ///     </note>
     /// </remarks>
+    /// <example>
+    ///     The following example restricts the command to a set of sensitive commands that only the owner of the bot
+    ///     application should be able to access.
+    ///     <code language="cs">
+    ///     [RequireOwner]
+    ///     [Group("admin")]
+    ///     public class AdminModule : ModuleBase
+    ///     {
+    ///         [Command("exit")]
+    ///         public async Task ExitAsync()
+    ///         {
+    ///             Environment.Exit(0);
+    ///         }
+    ///     }
+    ///     </code>
+    /// </example>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RequireOwnerAttribute : PreconditionAttribute
     {

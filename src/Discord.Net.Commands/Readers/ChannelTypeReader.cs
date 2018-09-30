@@ -9,6 +9,12 @@ namespace Discord.Commands
     /// <summary>
     ///     A <see cref="TypeReader"/> for parsing objects implementing <see cref="IChannel"/>.
     /// </summary>
+    /// <remarks>
+    ///     This <see cref="TypeReader"/> is shipped with Discord.Net and is used by default to parse any 
+    ///     <see cref="IChannel"/> implemented object within a command. The TypeReader will attempt to first parse the
+    ///     input by mention, then the snowflake identifier, then by name; the highest candidate will be chosen as the
+    ///     final output; otherwise, an erroneous <see cref="TypeReaderResult"/> is returned.
+    /// </remarks>
     /// <typeparam name="T">The type to be checked; must implement <see cref="IChannel"/>.</typeparam>
     public class ChannelTypeReader<T> : TypeReader
         where T : class, IChannel

@@ -24,6 +24,7 @@ namespace Discord.Commands
             "%s's'",                //      1s
         };
 
+        /// <inheritdoc />
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
             return (TimeSpan.TryParseExact(input.ToLowerInvariant(), Formats, CultureInfo.InvariantCulture, out var timeSpan))

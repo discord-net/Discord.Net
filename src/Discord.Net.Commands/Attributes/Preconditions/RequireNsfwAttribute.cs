@@ -11,6 +11,22 @@ namespace Discord.Commands
     ///     that has been marked as mature or NSFW. If the channel is not of type <see cref="ITextChannel"/> or the
     ///     channel is not marked as NSFW, the precondition will fail with an erroneous <see cref="PreconditionResult"/>.
     /// </remarks>
+    /// <example>
+    ///     The following example restricts the command <c>too-cool</c> to an NSFW-enabled channel only.
+    ///     <code language="cs">
+    ///     public class DankModule : ModuleBase
+    ///     {
+    ///         [Command("cool")]
+    ///         public Task CoolAsync()
+    ///             => ReplyAsync("I'm cool for everyone.");
+    ///
+    ///         [RequireNsfw]
+    ///         [Command("too-cool")]
+    ///         public Task TooCoolAsync()
+    ///             => ReplyAsync("You can only see this if you're cool enough.");
+    ///     }
+    ///     </code>
+    /// </example>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RequireNsfwAttribute : PreconditionAttribute
     {
