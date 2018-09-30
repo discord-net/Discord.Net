@@ -148,10 +148,10 @@ namespace Discord
         /// </returns>
         ulong OwnerId { get; }
         /// <summary>
-        ///     Gets the application id of the guild creator if it is bot-created.
+        ///     Gets the application ID of the guild creator if it is bot-created.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identifier of the application Id that created this guild, or <c>null</c> if it was not bot-created.
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the application ID that created this guild, or <c>null</c> if it was not bot-created.
         /// </returns>
         ulong? ApplicationId { get; }
         /// <summary>
