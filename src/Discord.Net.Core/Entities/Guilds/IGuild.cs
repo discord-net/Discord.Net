@@ -140,19 +140,20 @@ namespace Discord
         ///     welcome messages are sent; <c>null</c> if none is set.
         /// </returns>
         ulong? SystemChannelId { get; }
-<<<<<<< HEAD
         /// <summary>
         ///     Gets the ID of the user that owns this guild.
         /// </summary>
         /// <returns>
         ///     A <see cref="ulong"/> representing the snowflake identifier of the user that owns this guild.
         /// </returns>
-=======
-        /// <summary> Gets the application id of the guild creator if it is bot-created. </summary>
-        ulong? ApplicationId { get; }
-        /// <summary> Gets the id of the user that created this guild. </summary>
->>>>>>> Implement ApplicationId in Guild model
         ulong OwnerId { get; }
+        /// <summary>
+        ///     Gets the application id of the guild creator if it is bot-created.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the application Id that created this guild, or <c>null</c> if it was not bot-created.
+        /// </returns>
+        ulong? ApplicationId { get; }
         /// <summary>
         ///     Gets the ID of the region hosting this guild's voice channels.
         /// </summary>

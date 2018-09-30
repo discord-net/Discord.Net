@@ -75,6 +75,7 @@ namespace Discord.WebSocket
         internal bool IsAvailable { get; private set; }
         /// <summary> Indicates whether the client is connected to this guild. </summary>
         public bool IsConnected { get; internal set; }
+        /// <inheritdoc />
         public ulong? ApplicationId { get; internal set; }
 
         internal ulong? AFKChannelId { get; private set; }

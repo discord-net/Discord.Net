@@ -32,6 +32,7 @@ namespace Discord.Rest
         public MfaLevel MfaLevel { get; private set; }
         /// <inheritdoc />
         public DefaultMessageNotifications DefaultMessageNotifications { get; private set; }
+        /// <inheritdoc />
         public ExplicitContentFilterLevel ExplicitContentFilter { get; private set; }
 
         /// <inheritdoc />
