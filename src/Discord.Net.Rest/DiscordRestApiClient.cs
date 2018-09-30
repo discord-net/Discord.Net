@@ -1415,6 +1415,9 @@ namespace Discord.API
                 }
 
                 format = builder.ToString();
+                if (format.LastIndexOf('/') == format.Length-1)
+                    format = format.Substring(0, format.Length - 1); // perf: change the code above so this isn't necessary
+
                 return x => string.Format(format, x.ToArray());
             }
             catch (Exception ex)
