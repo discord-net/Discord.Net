@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Discord
 {
-    public class GuidPermissionsTests
+    public class GuildTests
     {
         [Fact]
         public Task TestGuildPermission()
