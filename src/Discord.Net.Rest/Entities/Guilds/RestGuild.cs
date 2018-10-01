@@ -50,6 +50,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string SplashId { get; private set; }
         internal bool Available { get; private set; }
+        /// <inheritdoc />
         public ulong? ApplicationId { get; private set; }
 
         /// <inheritdoc />
