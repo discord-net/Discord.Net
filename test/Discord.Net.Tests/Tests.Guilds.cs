@@ -13,14 +13,12 @@ namespace Discord
         [Fact]
         public async Task TestExplicitContentFilter()
         {
-            async Task ModifyAndAssert(ExplicitContentFilterLevel level)
+            foreach (var level in Enum.GetValues(typeof(ExplicitContentFilterLevel)))
             {
-                await _guild.ModifyAsync(x => x.ExplicitContentFilter = level);
+                await _guild.ModifyAsync(x => x.ExplicitContentFilter = (ExplicitContentFilterLevel)level);
+                await _guild.UpdateAsync();
                 Assert.Equal(level, _guild.ExplicitContentFilter);
             }
-
-            foreach (var level in Enum.GetValues(typeof(ExplicitContentFilterLevel)))
-                await ModifyAndAssert((ExplicitContentFilterLevel)level);
         }
 
         /// <summary>
