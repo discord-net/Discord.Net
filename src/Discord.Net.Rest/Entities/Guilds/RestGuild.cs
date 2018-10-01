@@ -443,6 +443,17 @@ namespace Discord.Rest
         public Task<RestCategoryChannel> CreateCategoryChannelAsync(string name, RequestOptions options = null)
             => GuildHelper.CreateCategoryChannelAsync(this, Discord, name, options);
 
+        /// <summary>
+        ///     Gets a collection of all the voice regions this guild can access.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     voice regions the guild can access.
+        /// </returns>
+        public Task<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
+            => GuildHelper.GetVoiceRegionsAsync(this, Discord, options);
+
         //Integrations
         public Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(RequestOptions options = null)
             => GuildHelper.GetIntegrationsAsync(this, Discord, options);
@@ -757,6 +768,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<ICategoryChannel> IGuild.CreateCategoryAsync(string name, RequestOptions options)
             => await CreateCategoryChannelAsync(name, options).ConfigureAwait(false);
+
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IVoiceRegion>> IGuild.GetVoiceRegionsAsync(RequestOptions options)
+            => await GetVoiceRegionsAsync(options).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IGuildIntegration>> IGuild.GetIntegrationsAsync(RequestOptions options)

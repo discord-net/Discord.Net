@@ -192,6 +192,14 @@ namespace Discord.Rest
             return RestCategoryChannel.Create(client, guild, model);
         }
 
+        //Voice Regions
+        public static async Task<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(IGuild guild, BaseDiscordClient client,
+            RequestOptions options)
+        {
+            var models = await client.ApiClient.GetGuildVoiceRegionsAsync(guild.Id, options).ConfigureAwait(false);
+            return models.Select(x => RestVoiceRegion.Create(client, x)).ToImmutableArray();
+        }
+
         //Integrations
         public static async Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(IGuild guild, BaseDiscordClient client,
             RequestOptions options)
