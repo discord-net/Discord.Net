@@ -467,6 +467,16 @@ namespace Discord
         /// </returns>
         Task<ICategoryChannel> CreateCategoryAsync(string name, RequestOptions options = null);
 
+        /// <summary>
+        ///     Gets a collection of all the voice regions this guild can access.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     voice regions the guild can access.
+        /// </returns>
+        Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null);
+
         Task<IReadOnlyCollection<IGuildIntegration>> GetIntegrationsAsync(RequestOptions options = null);
         Task<IGuildIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null);
 
