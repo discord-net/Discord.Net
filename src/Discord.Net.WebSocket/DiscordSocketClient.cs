@@ -19,6 +19,9 @@ using GameModel = Discord.API.Game;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a WebSocket-based Discord client.
+    /// </summary>
     public partial class DiscordSocketClient : BaseSocketClient, IDiscordClient
     {
         private readonly ConcurrentQueue<ulong> _largeGuilds;
@@ -46,7 +49,9 @@ namespace Discord.WebSocket
         public ConnectionState ConnectionState => _connection.State;
         /// <inheritdoc />
         public override int Latency { get; protected set; }
+        /// <inheritdoc />
         public override UserStatus Status { get; protected set; } = UserStatus.Online;
+        /// <inheritdoc />
         public override IActivity Activity { get; protected set; }
 
         //From DiscordSocketConfig
@@ -58,19 +63,53 @@ namespace Discord.WebSocket
         internal WebSocketProvider WebSocketProvider { get; private set; }
         internal bool AlwaysDownloadUsers { get; private set; }
         internal int? HandlerTimeout { get; private set; }
-
+        
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
+        /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
+        /// <inheritdoc />
         public override IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => State.PrivateChannels;
+        /// <summary>
+        ///     Gets a collection of direct message channels opened in this session.
+        /// </summary>
+        /// <remarks>
+        ///     This method returns a collection of currently opened direct message channels.
+        ///     <note type="warning">
+        ///         This method will not return previously opened DM channels outside of the current session! If you
+        ///         have just started the client, this may return an empty collection.
+        ///     </note>
+        /// </remarks>
+        /// <returns>
+        ///     An collection of DM channels that have been opened in this session.
+        /// </returns>
         public IReadOnlyCollection<SocketDMChannel> DMChannels
             => State.PrivateChannels.OfType<SocketDMChannel>().ToImmutableArray();
+        /// <summary>
+        ///     Gets a collection of group channels opened in this session.
+        /// </summary>
+        /// <remarks>
+        ///     This method returns a collection of currently opened group channels.
+        ///     <note type="warning">
+        ///         This method will not return previously opened group channels outside of the current session! If you
+        ///         have just started the client, this may return an empty collection.
+        ///     </note>
+        /// </remarks>
+        /// <returns>
+        ///     An collection of group channels that have been opened in this session.
+        /// </returns>
         public IReadOnlyCollection<SocketGroupChannel> GroupChannels
             => State.PrivateChannels.OfType<SocketGroupChannel>().ToImmutableArray();
+        /// <inheritdoc />
         public override IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
 
-        /// <summary> Creates a new REST/WebSocket discord client. </summary>
+        /// <summary>
+        ///     Initializes a new REST/WebSocket-based Discord client.
+        /// </summary>
         public DiscordSocketClient() : this(new DiscordSocketConfig()) { }
-        /// <summary> Creates a new REST/WebSocket discord client. </summary>
+        /// <summary>
+        ///     Initializes a new REST/WebSocket-based Discord client with the provided configuration.
+        /// </summary>
+        /// <param name="config">The configuration to be used with the client.</param>
         public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null, null) { }
         internal DiscordSocketClient(DiscordSocketConfig config, SemaphoreSlim groupLock, DiscordSocketClient parentClient) : this(config, CreateApiClient(config), groupLock, parentClient) { }
         private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, SemaphoreSlim groupLock, DiscordSocketClient parentClient)
@@ -128,6 +167,7 @@ namespace Discord.WebSocket
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
             => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.GatewayHost);
+        /// <inheritdoc />
         internal override void Dispose(bool disposing)
         {
             if (disposing)
@@ -137,6 +177,7 @@ namespace Discord.WebSocket
             }
         }
 
+        /// <inheritdoc />
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
             if (_parentClient == null)
@@ -147,6 +188,7 @@ namespace Discord.WebSocket
             else
                 _voiceRegions = _parentClient._voiceRegions;
         }
+        /// <inheritdoc />
         internal override async Task OnLogoutAsync()
         {
             await StopAsync().ConfigureAwait(false);
@@ -154,9 +196,11 @@ namespace Discord.WebSocket
             _voiceRegions = ImmutableDictionary.Create<string, RestVoiceRegion>();
         }
 
-        public override async Task StartAsync()
+        /// <inheritdoc />
+        public override async Task StartAsync() 
             => await _connection.StartAsync().ConfigureAwait(false);
-        public override async Task StopAsync()
+        /// <inheritdoc />
+        public override async Task StopAsync() 
             => await _connection.StopAsync().ConfigureAwait(false);
 
         private async Task OnConnectingAsync()
@@ -277,7 +321,7 @@ namespace Discord.WebSocket
             return null;
         }
 
-        /// <summary> Downloads the users list for the provided guilds, if they don't have a complete list. </summary>
+        /// <inheritdoc />
         public override async Task DownloadUsersAsync(IEnumerable<IGuild> guilds)
         {
             if (ConnectionState == ConnectionState.Connected)
@@ -316,6 +360,13 @@ namespace Discord.WebSocket
             }
         }
 
+        /// <inheritdoc />
+        /// <example>
+        ///     The following example sets the status of the current user to Do Not Disturb.
+        ///     <code language="cs">
+        ///     await client.SetStatusAsync(UserStatus.DoNotDisturb);
+        ///     </code>
+        /// </example>
         public override async Task SetStatusAsync(UserStatus status)
         {
             Status = status;
@@ -325,6 +376,21 @@ namespace Discord.WebSocket
                 _statusSince = null;
             await SendStatusAsync().ConfigureAwait(false);
         }
+        /// <inheritdoc />
+        /// <example>
+        /// <para>
+        ///     The following example sets the activity of the current user to the specified game name.
+        ///     <code language="cs">
+        ///     await client.SetGameAsync("A Strange Game");
+        ///     </code>
+        /// </para>
+        /// <para>
+        ///     The following example sets the activity of the current user to a streaming status.
+        ///     <code language="cs">
+        ///     await client.SetGameAsync("Great Stream 10/10", "https://twitch.tv/MyAmazingStream1337", ActivityType.Streaming);
+        ///     </code>
+        /// </para>
+        /// </example>
         public override async Task SetGameAsync(string name, string streamUrl = null, ActivityType type = ActivityType.Playing)
         {
             if (!string.IsNullOrEmpty(streamUrl))
@@ -335,6 +401,7 @@ namespace Discord.WebSocket
                 Activity = null;
             await SendStatusAsync().ConfigureAwait(false);
         }
+        /// <inheritdoc />
         public override async Task SetActivityAsync(IActivity activity)
         {
             Activity = activity;
@@ -352,7 +419,7 @@ namespace Discord.WebSocket
             var gameModel = new GameModel();
             // Discord only accepts rich presence over RPC, don't even bother building a payload
             if (Activity is RichGame)
-                throw new NotSupportedException("Outgoing Rich Presences are not supported");
+                throw new NotSupportedException("Outgoing Rich Presences are not supported via WebSocket.");
 
             if (Activity != null)
             {
@@ -1148,7 +1215,7 @@ namespace Discord.WebSocket
 
                                             after = SocketMessage.Create(this, State, author, channel, data);
                                         }
-                                        var cacheableBefore = new Cacheable<IMessage, ulong>(before, data.Id, isCached, async () => await channel.GetMessageAsync(data.Id));
+                                        var cacheableBefore = new Cacheable<IMessage, ulong>(before, data.Id, isCached, async () => await channel.GetMessageAsync(data.Id).ConfigureAwait(false));
 
                                         await TimedInvokeAsync(_messageUpdatedEvent, nameof(MessageUpdated), cacheableBefore, after, channel).ConfigureAwait(false);
                                     }
@@ -1175,7 +1242,7 @@ namespace Discord.WebSocket
 
                                         var msg = SocketChannelHelper.RemoveMessage(channel, this, data.Id);
                                         bool isCached = msg != null;
-                                        var cacheable = new Cacheable<IMessage, ulong>(msg, data.Id, isCached, async () => await channel.GetMessageAsync(data.Id));
+                                        var cacheable = new Cacheable<IMessage, ulong>(msg, data.Id, isCached, async () => await channel.GetMessageAsync(data.Id).ConfigureAwait(false));
 
                                         await TimedInvokeAsync(_messageDeletedEvent, nameof(MessageDeleted), cacheable, channel).ConfigureAwait(false);
                                     }
@@ -1195,9 +1262,9 @@ namespace Discord.WebSocket
                                     {
                                         var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
                                         bool isCached = cachedMsg != null;
-                                        var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly);
+                                        var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly).ConfigureAwait(false);
                                         var reaction = SocketReaction.Create(data, channel, cachedMsg, Optional.Create(user));
-                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId) as IUserMessage);
+                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId).ConfigureAwait(false) as IUserMessage);
 
                                         cachedMsg?.AddReaction(reaction);
 
@@ -1219,9 +1286,9 @@ namespace Discord.WebSocket
                                     {
                                         var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
                                         bool isCached = cachedMsg != null;
-                                        var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly);
+                                        var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly).ConfigureAwait(false);
                                         var reaction = SocketReaction.Create(data, channel, cachedMsg, Optional.Create(user));
-                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId) as IUserMessage);
+                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId).ConfigureAwait(false) as IUserMessage);
 
                                         cachedMsg?.RemoveReaction(reaction);
 
@@ -1243,7 +1310,7 @@ namespace Discord.WebSocket
                                     {
                                         var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
                                         bool isCached = cachedMsg != null;
-                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId) as IUserMessage);
+                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => (await channel.GetMessageAsync(data.MessageId).ConfigureAwait(false)) as IUserMessage);
 
                                         cachedMsg?.ClearReactions();
 
@@ -1274,7 +1341,7 @@ namespace Discord.WebSocket
                                         {
                                             var msg = SocketChannelHelper.RemoveMessage(channel, this, id);
                                             bool isCached = msg != null;
-                                            var cacheable = new Cacheable<IMessage, ulong>(msg, id, isCached, async () => await channel.GetMessageAsync(id));
+                                            var cacheable = new Cacheable<IMessage, ulong>(msg, id, isCached, async () => await channel.GetMessageAsync(id).ConfigureAwait(false));
                                             await TimedInvokeAsync(_messageDeletedEvent, nameof(MessageDeleted), cacheable, channel).ConfigureAwait(false);
                                         }
                                     }
@@ -1634,6 +1701,7 @@ namespace Discord.WebSocket
             return guild;
         }
 
+        /// <exception cref="InvalidOperationException">Unexpected channel type is created.</exception>
         internal ISocketPrivateChannel AddPrivateChannel(API.Channel model, ClientState state)
         {
             var channel = SocketChannel.CreatePrivate(this, state, model);
@@ -1806,43 +1874,59 @@ namespace Discord.WebSocket
         internal int GetAudioId() => _nextAudioId++;
 
         //IDiscordClient
+        /// <inheritdoc />
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
             => await GetApplicationInfoAsync().ConfigureAwait(false);
 
+        /// <inheritdoc />
         Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IChannel>(GetChannel(id));
+        /// <inheritdoc />
         Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IPrivateChannel>>(PrivateChannels);
+        /// <inheritdoc />
         Task<IReadOnlyCollection<IDMChannel>> IDiscordClient.GetDMChannelsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IDMChannel>>(DMChannels);
+        /// <inheritdoc />
         Task<IReadOnlyCollection<IGroupChannel>> IDiscordClient.GetGroupChannelsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IGroupChannel>>(GroupChannels);
 
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync(RequestOptions options)
             => await GetConnectionsAsync().ConfigureAwait(false);
 
+        /// <inheritdoc />
         async Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, RequestOptions options)
             => await GetInviteAsync(inviteId, options).ConfigureAwait(false);
 
+        /// <inheritdoc />
         Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuild>(GetGuild(id));
+        /// <inheritdoc />
         Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IGuild>>(Guilds);
+        /// <inheritdoc />
         async Task<IGuild> IDiscordClient.CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon, RequestOptions options)
             => await CreateGuildAsync(name, region, jpegIcon).ConfigureAwait(false);
 
+        /// <inheritdoc />
         Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(id));
+        /// <inheritdoc />
         Task<IUser> IDiscordClient.GetUserAsync(string username, string discriminator, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(username, discriminator));
 
+        /// <inheritdoc />
         Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync(RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IVoiceRegion>>(VoiceRegions);
+        /// <inheritdoc />
         Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
             => Task.FromResult<IVoiceRegion>(GetVoiceRegion(id));
 
+        /// <inheritdoc />
         async Task IDiscordClient.StartAsync()
             => await StartAsync().ConfigureAwait(false);
+        /// <inheritdoc />
         async Task IDiscordClient.StopAsync()
             => await StopAsync().ConfigureAwait(false);
     }

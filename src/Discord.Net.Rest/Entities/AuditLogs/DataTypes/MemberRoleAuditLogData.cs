@@ -1,4 +1,3 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,6 +6,9 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains a piece of audit log data related to a change in a guild member's roles.
+    /// </summary>
     public class MemberRoleAuditLogData : IAuditLogData
     {
         private MemberRoleAuditLogData(IReadOnlyCollection<MemberRoleEditInfo> roles, IUser target)
@@ -30,7 +32,20 @@ namespace Discord.Rest
             return new MemberRoleAuditLogData(roleInfos.ToReadOnlyCollection(), user);
         }
 
+        /// <summary>
+        ///     Gets a collection of role changes that were performed on the member.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection of <see cref="MemberRoleEditInfo"/>, containing the roles that were changed on
+        ///     the member.
+        /// </returns>
         public IReadOnlyCollection<MemberRoleEditInfo> Roles { get; }
+        /// <summary>
+        ///     Gets the user that the roles changes were performed on.
+        /// </summary>
+        /// <returns>
+        ///     A user object representing the user that the role changes were performed on.
+        /// </returns>
         public IUser Target { get; }
     }
 }

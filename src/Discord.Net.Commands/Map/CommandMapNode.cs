@@ -23,6 +23,7 @@ namespace Discord.Commands
             _commands = ImmutableArray.Create<CommandInfo>();
         }
 
+        /// <exception cref="InvalidOperationException">Cannot add commands to the root node.</exception>
         public void AddCommand(CommandService service, string text, int index, CommandInfo command)
         {
             int nextSegment = NextSegment(text, index, service._separatorChar);

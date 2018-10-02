@@ -15,7 +15,7 @@ namespace Discord.Audio
 
         /// <summary> Gets the current connection state of this client. </summary>
         ConnectionState ConnectionState { get; }
-        /// <summary> Gets the estimated round-trip latency, in milliseconds, to the voice websocket server. </summary>
+        /// <summary> Gets the estimated round-trip latency, in milliseconds, to the voice WebSocket server. </summary>
         int Latency { get; }
         /// <summary> Gets the estimated round-trip latency, in milliseconds, to the voice UDP server. </summary>
         int UdpLatency { get; }

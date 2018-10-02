@@ -19,7 +19,7 @@ namespace Discord
                 if (client == null)
                 {
                     client = new DiscordRestClient();
-                    await client.LoginAsync(TokenType.Bot, _config.Token, false).ConfigureAwait(false);
+                    await client.LoginAsync(TokenType.Bot, _config.Token).ConfigureAwait(false);
                     guild = await client.GetGuildAsync(_config.GuildId);
                 }
 

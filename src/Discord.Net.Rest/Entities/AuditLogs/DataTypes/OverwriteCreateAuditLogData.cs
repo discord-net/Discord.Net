@@ -5,6 +5,9 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains a piece of audit log data for a permissions overwrite creation.
+    /// </summary>
     public class OverwriteCreateAuditLogData : IAuditLogData
     {
         private OverwriteCreateAuditLogData(Overwrite overwrite)
@@ -30,6 +33,12 @@ namespace Discord.Rest
             return new OverwriteCreateAuditLogData(new Overwrite(id, type, permissions));
         }
 
+        /// <summary>
+        ///     Gets the permission overwrite object that was created.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="Overwrite"/> object representing the overwrite that was created.
+        /// </returns>
         public Overwrite Overwrite { get; }
     }
 }

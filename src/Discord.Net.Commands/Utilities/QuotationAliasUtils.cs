@@ -1,19 +1,18 @@
-using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Globalization;
 
 namespace Discord.Commands
 {
     /// <summary>
-    /// Utility methods for generating matching pairs of unicode quotation marks for CommandServiceConfig
+    /// Utility class which contains the default matching pairs of quotation marks for CommandServiceConfig
     /// </summary>
     internal static class QuotationAliasUtils
     {
         /// <summary>
-        /// Generates an IEnumerable of characters representing open-close pairs of
-        /// quotation punctuation.
+        /// A default map of open-close pairs of quotation marks.
+        /// Contains many regional and Unicode equivalents.
+        /// Used in the <see cref="CommandServiceConfig"/>.
         /// </summary>
+        /// <seealso cref="CommandServiceConfig.QuotationMarkAliasMap"/>
         internal static Dictionary<char, char> GetDefaultAliasMap
         {
             get

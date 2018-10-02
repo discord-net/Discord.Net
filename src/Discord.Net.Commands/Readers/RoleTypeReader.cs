@@ -6,20 +6,23 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    ///     A <see cref="TypeReader"/> for parsing objects implementing <see cref="IRole"/>.
+    /// </summary>
+    /// <typeparam name="T">The type to be checked; must implement <see cref="IRole"/>.</typeparam>
     public class RoleTypeReader<T> : TypeReader
         where T : class, IRole
     {
+        /// <inheritdoc />
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
-            ulong id;
-
             if (context.Guild != null)
             {
                 var results = new Dictionary<ulong, TypeReaderValue>();
                 var roles = context.Guild.Roles;
 
                 //By Mention (1.0)
-                if (MentionUtils.TryParseRole(input, out id))
+                if (MentionUtils.TryParseRole(input, out var id))
                     AddResult(results, context.Guild.GetRole(id) as T, 1.00f);
 
                 //By Id (0.9)

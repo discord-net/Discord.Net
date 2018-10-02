@@ -420,7 +420,6 @@ namespace Discord.Audio
         }
         private async Task RunKeepaliveAsync(int intervalMillis, CancellationToken cancelToken)
         {
-            var packet = new byte[8];
             try
             {
                 await _audioLogger.DebugAsync("Keepalive Started").ConfigureAwait(false);

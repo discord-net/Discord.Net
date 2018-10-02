@@ -1,23 +1,33 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Application;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a REST-based entity that contains information about a Discord application created via the developer portal.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestApplication : RestEntity<ulong>, IApplication
     {
         protected string _iconId;
-        
+
+        /// <inheritdoc />
         public string Name { get; private set; }
+        /// <inheritdoc />
         public string Description { get; private set; }
+        /// <inheritdoc />
         public string[] RPCOrigins { get; private set; }
+        /// <inheritdoc />
         public ulong Flags { get; private set; }
 
+        /// <inheritdoc />
         public IUser Owner { get; private set; }
 
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
+        /// <inheritdoc />
         public string IconUrl => CDN.GetApplicationIconUrl(Id, _iconId);
 
         internal RestApplication(BaseDiscordClient discord, ulong id)
@@ -43,6 +53,7 @@ namespace Discord.Rest
                 Owner = RestUser.Create(Discord, model.Owner.Value);
         }
 
+        /// <exception cref="InvalidOperationException">Unable to update this object from a different application token.</exception>
         public async Task UpdateAsync()
         {
             var response = await Discord.ApiClient.GetMyApplicationAsync().ConfigureAwait(false);
@@ -51,6 +62,12 @@ namespace Discord.Rest
             Update(response);
         }
 
+        /// <summary>
+        ///     Gets the name of the application.
+        /// </summary>
+        /// <returns>
+        ///     Name of the application.
+        /// </returns>
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
     }

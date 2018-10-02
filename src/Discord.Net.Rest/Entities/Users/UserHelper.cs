@@ -76,13 +76,13 @@ namespace Discord.Rest
         public static async Task AddRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<IRole> roles, RequestOptions options)
         {
             foreach (var role in roles)
-                await client.ApiClient.AddRoleAsync(user.Guild.Id, user.Id, role.Id, options);
+                await client.ApiClient.AddRoleAsync(user.Guild.Id, user.Id, role.Id, options).ConfigureAwait(false);
         }
 
         public static async Task RemoveRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<IRole> roles, RequestOptions options)
         {
             foreach (var role in roles)
-                await client.ApiClient.RemoveRoleAsync(user.Guild.Id, user.Id, role.Id, options);
+                await client.ApiClient.RemoveRoleAsync(user.Guild.Id, user.Id, role.Id, options).ConfigureAwait(false);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using Discord.API.Rest;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -24,6 +25,7 @@ namespace Discord.Rest
                 return RestChannel.Create(client, model);
             return null;
         }
+        /// <exception cref="InvalidOperationException">Unexpected channel type.</exception>
         public static async Task<IReadOnlyCollection<IRestPrivateChannel>> GetPrivateChannelsAsync(BaseDiscordClient client, RequestOptions options)
         {
             var models = await client.ApiClient.GetMyPrivateChannelsAsync(options).ConfigureAwait(false);
@@ -151,7 +153,7 @@ namespace Discord.Rest
 
         public static async Task<RestWebhook> GetWebhookAsync(BaseDiscordClient client, ulong id, RequestOptions options)
         {
-            var model = await client.ApiClient.GetWebhookAsync(id);
+            var model = await client.ApiClient.GetWebhookAsync(id).ConfigureAwait(false);
             if (model != null)
                 return RestWebhook.Create(client, (IGuild)null, model);
             return null;

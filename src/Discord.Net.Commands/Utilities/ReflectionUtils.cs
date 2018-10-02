@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands
 {
@@ -38,7 +37,7 @@ namespace Discord.Commands
             }
             catch (Exception ex)
             {
-                throw new Exception($"Failed to create \"{ownerType.FullName}\"", ex);
+                throw new Exception($"Failed to create \"{ownerType.FullName}\".", ex);
             }
         }
 
@@ -46,12 +45,12 @@ namespace Discord.Commands
         {
             var constructors = ownerType.DeclaredConstructors.Where(x => !x.IsStatic).ToArray();
             if (constructors.Length == 0)
-                throw new InvalidOperationException($"No constructor found for \"{ownerType.FullName}\"");
+                throw new InvalidOperationException($"No constructor found for \"{ownerType.FullName}\".");
             else if (constructors.Length > 1)
-                throw new InvalidOperationException($"Multiple constructors found for \"{ownerType.FullName}\"");
+                throw new InvalidOperationException($"Multiple constructors found for \"{ownerType.FullName}\".");
             return constructors[0];
         }
-        private static System.Reflection.PropertyInfo[] GetProperties(TypeInfo ownerType)
+        private static PropertyInfo[] GetProperties(TypeInfo ownerType)
         {
             var result = new List<System.Reflection.PropertyInfo>();
             while (ownerType != ObjectTypeInfo)
@@ -71,7 +70,7 @@ namespace Discord.Commands
                 return commands;
             if (memberType == typeof(IServiceProvider) || memberType == services.GetType())
                 return services;
-            var service = services?.GetService(memberType);
+            var service = services.GetService(memberType);
             if (service != null)
                 return service;
             throw new InvalidOperationException($"Failed to create \"{ownerType.FullName}\", dependency \"{memberType.Name}\" was not found.");

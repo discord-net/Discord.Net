@@ -10,11 +10,13 @@ namespace Discord.Rest
 {
     internal static class MessageHelper
     {
+        /// <exception cref="InvalidOperationException">Only the author of a message may modify the message.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public static async Task<Model> ModifyAsync(IMessage msg, BaseDiscordClient client, Action<MessageProperties> func,
             RequestOptions options)
         {
             if (msg.Author.Id != client.CurrentUser.Id)
-                throw new InvalidOperationException("Only the author of a message may change it.");
+                throw new InvalidOperationException("Only the author of a message may modify the message.");
 
             var args = new MessageProperties();
             func(args);
@@ -45,7 +47,7 @@ namespace Discord.Rest
 
         public static async Task RemoveAllReactionsAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
         {
-            await client.ApiClient.RemoveAllReactionsAsync(msg.Channel.Id, msg.Id, options);
+            await client.ApiClient.RemoveAllReactionsAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
         }
 
         public static IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, IEmote emote,
@@ -71,7 +73,7 @@ namespace Discord.Rest
                 },
                 nextPage: (info, lastPage) =>
                 {
-                    if (lastPage.Count != DiscordConfig.MaxUsersPerBatch)
+                    if (lastPage.Count != DiscordConfig.MaxUserReactionsPerBatch)
                         return false;
 
                     info.Position = lastPage.Max(x => x.Id);

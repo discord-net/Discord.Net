@@ -126,7 +126,7 @@ namespace Discord.Net.Queue
                     if ((request.Options.RetryMode & RetryMode.RetryTimeouts) == 0)
                         throw;
 
-                    await Task.Delay(500);
+                    await Task.Delay(500).ConfigureAwait(false);
                     continue; //Retry
                 }
                 /*catch (Exception)
@@ -250,6 +250,10 @@ namespace Discord.Net.Queue
                 else if (info.Reset.HasValue)
                 {
                     resetTick = info.Reset.Value.AddSeconds(info.Lag?.TotalSeconds ?? 1.0);
+
+                    if (request.Options.IsReactionBucket)
+                        resetTick = DateTimeOffset.Now.AddMilliseconds(250);
+
                     int diff = (int)(resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds;
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] X-RateLimit-Reset: {info.Reset.Value.ToUnixTimeSeconds()} ({diff} ms, {info.Lag?.TotalMilliseconds} ms lag)");

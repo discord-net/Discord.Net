@@ -31,11 +31,11 @@ namespace Discord
             copy = GuildPermissions.None.Modify();
             Assert.Equal(GuildPermissions.None.RawValue, copy.RawValue);
 
-            // test modify with no paramters on all permissions
+            // test modify with no parameters on all permissions
             copy = GuildPermissions.All.Modify();
             Assert.Equal(GuildPermissions.All.RawValue, copy.RawValue);
 
-            // test modify with no paramters on webhook permissions
+            // test modify with no parameters on webhook permissions
             copy = GuildPermissions.Webhook.Modify();
             Assert.Equal(GuildPermissions.Webhook.RawValue, copy.RawValue);
 

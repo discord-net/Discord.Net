@@ -1,20 +1,20 @@
-﻿namespace Discord
+namespace Discord
 {
     /// <summary>
-    /// Modify the widget of an IGuild with the specified parameters
+    ///     Provides properties that are used to modify the widget of an <see cref="IGuild" /> with the specified changes.
     /// </summary>
     public class GuildEmbedProperties
     {
         /// <summary>
-        /// Should the widget be enabled?
+        ///     Sets whether the widget should be enabled.
         /// </summary>
         public Optional<bool> Enabled { get; set; }
         /// <summary>
-        /// What channel should the invite place users in, if not null.
+        ///     Sets the channel that the invite should place its users in, if not <c>null</c>.
         /// </summary>
         public Optional<IChannel> Channel { get; set; }
         /// <summary>
-        /// What channel should the invite place users in, if not null.
+        ///     Sets the channel the invite should place its users in, if not <c>null</c>.
         /// </summary>
         public Optional<ulong?> ChannelId { get; set; }
     }

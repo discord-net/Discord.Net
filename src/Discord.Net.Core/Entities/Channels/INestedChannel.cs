@@ -3,14 +3,27 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    /// A type of guild channel that can be nested within a category.
-    /// Contains a CategoryId that is set to the parent category, if it is set.
+    ///     Represents a type of guild channel that can be nested within a category.
     /// </summary>
     public interface INestedChannel : IGuildChannel
     {
-        /// <summary> Gets the parentid (category) of this channel in the guild's channel list. </summary>
+        /// <summary>
+        ///     Gets the parent (category) ID of this channel in the guild's channel list.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the parent of this channel; 
+        ///     <c>null</c> if none is set.
+        /// </returns>
         ulong? CategoryId { get; }
-        /// <summary> Gets the parent channel (category) of this channel, if it is set. If unset, returns null.</summary>
+        /// <summary>
+        ///     Gets the parent (category) channel of this channel.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the category channel
+        ///     representing the parent of this channel; <c>null</c> if none is set.
+        /// </returns>
         Task<ICategoryChannel> GetCategoryAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
     }
 }

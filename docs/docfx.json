@@ -1,74 +1,54 @@
 {
-  "metadata": [
-    {
-      "src": [
-        {
-          "src": "..",
-          "files": [
-            "src/**/*.cs"
-          ],
-          "exclude": [
-            "**/obj/**",
-            "**/bin/**",
-            "_site/**"
-          ]
-        }
-      ],
-      "dest": "api",
-      "filter": "filterConfig.yml"
+  "metadata": [{
+    "src": [{
+      "src": "../src",
+      "files": [
+        "**.csproj"
+      ]
+    }],
+    "dest": "api",
+    "filter": "filterConfig.yml",
+    "properties": {
+      "TargetFramework": "netstandard1.3"
     }
-  ],
+  }],
   "build": {
-    "content": [
-      {
-        "files": [
-          "api/**.yml",
-          "api/index.md"
-        ]
+    "content": [{
+        "files": ["api/**.yml", "api/index.md"]
       },
       {
-        "files": [
-          "guides/**.md",
-          "guides/**/toc.yml",
-          "toc.yml",
-          "*.md"
-        ],
-        "exclude": [
-          "obj/**",
-          "_site/**"
-        ]
-      }
-    ],
-    "resource": [
+        "files": ["toc.yml", "index.md"]
+      },
       {
-        "files": [
-          "**/images/**",
-          "**/samples/**"
-        ],
-        "exclude": [
-          "obj/**",
-          "_site/**"
-        ]
-      }
-    ],
-    "overwrite": [
+        "files": ["faq/**.md", "faq/**/toc.yml"]
+      },
       {
-        "files": [
-          "apidoc/**.md"
-        ],
-        "exclude": [
-          "obj/**",
-          "_site/**"
-        ]
+        "files": ["guides/**.md", "guides/**/toc.yml"]
       }
     ],
+    "resource": [{
+      "files": [
+        "**/images/**",
+        "**/samples/**",
+        "langwordMapping.yml"
+      ]
+    }],
     "dest": "_site",
     "template": [
-      "default"
+      "default",
+      "_template/light-dark-theme",
+      "_template/last-modified",
+      "_template/description-generator"
     ],
+    "postProcessors": ["ExtractSearchIndex", "LastModifiedPostProcessor", "DescriptionPostProcessor"],
+    "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
-      "_appFooter": "Discord.Net (c) 2015-2018 2.0.0-beta"
+      "_appTitle": "Discord.Net Documentation",
+      "_appFooter": "Discord.Net (c) 2015-2018 2.0.0-beta",
+      "_enableSearch": true
     },
-    "noLangKeyword": false
+    "xrefService": [
+      "https://xref.docs.microsoft.com/query?uid={uid}"
+    ]
   }
 }

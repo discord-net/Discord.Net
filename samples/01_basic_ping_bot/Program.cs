@@ -5,14 +5,14 @@ using Discord.WebSocket;
 
 namespace _01_basic_ping_bot
 {
-    // This is a minimal, barebones example of using Discord.Net
+    // This is a minimal, bare-bones example of using Discord.Net
     //
     // If writing a bot with commands, we recommend using the Discord.Net.Commands
     // framework, rather than handling commands yourself, like we do in this sample.
     //
     // You can find samples of using the command framework:
     // - Here, under the 02_commands_framework sample
-    // - https://github.com/foxbot/DiscordBotBase - a barebones bot template
+    // - https://github.com/foxbot/DiscordBotBase - a bare-bones bot template
     // - https://github.com/foxbot/patek - a more feature-filled bot, utilizing more aspects of the library
     class Program
     {
@@ -54,7 +54,7 @@ namespace _01_basic_ping_bot
             return Task.CompletedTask;
         }
 
-        // This is not the recommmended way to write a bot - consider
+        // This is not the recommended way to write a bot - consider
         // reading over the Commands Framework sample.
         private async Task MessageReceivedAsync(SocketMessage message)
         {

@@ -5,6 +5,9 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains a piece of audit log data related to the update of a permission overwrite.
+    /// </summary>
     public class OverwriteUpdateAuditLogData : IAuditLogData
     {
         private OverwriteUpdateAuditLogData(OverwritePermissions before, OverwritePermissions after, ulong targetId, PermissionTarget targetType)
@@ -35,10 +38,35 @@ namespace Discord.Rest
             return new OverwriteUpdateAuditLogData(beforePermissions, afterPermissions, entry.Options.OverwriteTargetId.Value, type);
         }
 
+        /// <summary>
+        ///     Gets the overwrite permissions before the changes.
+        /// </summary>
+        /// <returns>
+        ///     An overwrite permissions object representing the overwrite permissions that the overwrite had before
+        ///     the changes were made.
+        /// </returns>
         public OverwritePermissions OldPermissions { get; }
+        /// <summary>
+        ///     Gets the overwrite permissions after the changes.
+        /// </summary>
+        /// <returns>
+        ///     An overwrite permissions object representing the overwrite permissions that the overwrite had after the
+        ///     changes.
+        /// </returns>
         public OverwritePermissions NewPermissions { get; }
-
+        /// <summary>
+        ///     Gets the ID of the overwrite that was updated.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the overwrite that was updated.
+        /// </returns>
         public ulong OverwriteTargetId { get; }
+        /// <summary>
+        ///     Gets the target of the updated permission overwrite.
+        /// </summary>
+        /// <returns>
+        ///     The target of the updated permission overwrite.
+        /// </returns>
         public PermissionTarget OverwriteType { get; }
     }
 }

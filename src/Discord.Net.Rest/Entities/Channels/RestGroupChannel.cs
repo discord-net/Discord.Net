@@ -10,12 +10,16 @@ using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a REST-based group-message channel.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestGroupChannel : RestChannel, IGroupChannel, IRestPrivateChannel, IRestMessageChannel, IRestAudioChannel
     {
         private string _iconId;
         private ImmutableDictionary<ulong, RestGroupUser> _users;
 
+        /// <inheritdoc />
         public string Name { get; private set; }
 
         public IReadOnlyCollection<RestGroupUser> Users => _users.ToReadOnlyCollection();
@@ -49,12 +53,13 @@ namespace Discord.Rest
                 users[models[i].Id] = RestGroupUser.Create(Discord, models[i]);
             _users = users.ToImmutable();
         }
-
+        /// <inheritdoc />
         public override async Task UpdateAsync(RequestOptions options = null)
         {
             var model = await Discord.ApiClient.GetChannelAsync(Id, options).ConfigureAwait(false);
             Update(model);
         }
+        /// <inheritdoc />
         public Task LeaveAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
 
@@ -65,33 +70,70 @@ namespace Discord.Rest
             return null;
         }
 
+        /// <inheritdoc />
         public Task<RestMessage> GetMessageAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetMessageAsync(this, Discord, id, options);
+        /// <inheritdoc />
         public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => ChannelHelper.GetMessagesAsync(this, Discord, null, Direction.Before, limit, options);
+        /// <inheritdoc />
         public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => ChannelHelper.GetMessagesAsync(this, Discord, fromMessageId, dir, limit, options);
+        /// <inheritdoc />
         public IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => ChannelHelper.GetMessagesAsync(this, Discord, fromMessage.Id, dir, limit, options);
+        /// <inheritdoc />
         public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
 
+        /// <inheritdoc />
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
             => ChannelHelper.DeleteMessageAsync(this, messageId, Discord, options);
+        /// <inheritdoc />
         public Task DeleteMessageAsync(IMessage message, RequestOptions options = null)
             => ChannelHelper.DeleteMessageAsync(this, message.Id, Discord, options);
 
+        /// <inheritdoc />
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
 
+        /// <inheritdoc />
+        /// <exception cref="ArgumentException">
+        /// <paramref name="filePath" /> is a zero-length string, contains only white space, or contains one or more
+        /// invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="filePath" /> is <c>null</c>.
+        /// </exception>
+        /// <exception cref="PathTooLongException">
+        /// The specified path, file name, or both exceed the system-defined maximum length. For example, on
+        /// Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260
+        /// characters.
+        /// </exception>
+        /// <exception cref="DirectoryNotFoundException">
+        /// The specified path is invalid, (for example, it is on an unmapped drive).
+        /// </exception>
+        /// <exception cref="UnauthorizedAccessException">
+        /// <paramref name="filePath" /> specified a directory.-or- The caller does not have the required permission.
+        /// </exception>
+        /// <exception cref="FileNotFoundException">
+        /// The file specified in <paramref name="filePath" /> was not found.
+        /// </exception>
+        /// <exception cref="NotSupportedException"><paramref name="filePath" /> is in an invalid format.</exception>
+        /// <exception cref="IOException">An I/O error occurred while opening the file.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, options);
-
+        /// <inheritdoc />
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options);
 
+        /// <inheritdoc />
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);
+        /// <inheritdoc />
         public IDisposable EnterTypingState(RequestOptions options = null)
             => ChannelHelper.EnterTypingState(this, Discord, options);
 
@@ -143,10 +185,10 @@ namespace Discord.Rest
             => await SendFileAsync(stream, filename, text, isTTS, embed, options).ConfigureAwait(false);
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
-        IDisposable IMessageChannel.EnterTypingState(RequestOptions options)
-            => EnterTypingState(options);
 
         //IAudioChannel
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Connecting to a group channel is not supported.</exception>
         Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external) { throw new NotSupportedException(); }
         Task IAudioChannel.DisconnectAsync() { throw new NotSupportedException(); }
 
