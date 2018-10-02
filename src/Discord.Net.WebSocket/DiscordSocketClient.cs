@@ -1158,7 +1158,12 @@ namespace Discord.WebSocket
                                         if (author == null)
                                         {
                                             if (guild != null)
-                                                author = guild.AddOrUpdateUser(data.Member.Value); //per g250k, we can create an entire member now
+                                            {
+                                                if (data.Member.IsSpecified) // member isn't always specified...
+                                                    author = guild.AddOrUpdateUser(data.Member.Value); //per g250k, we can create an entire member now
+                                                else
+                                                    author = guild.AddOrUpdateUser(data.Author.Value); // user has no guild-specific data
+                                            }
                                             else if (channel is SocketGroupChannel)
                                                 author = (channel as SocketGroupChannel).GetOrAddUser(data.Author.Value);
                                             else
