@@ -33,5 +33,8 @@ namespace Discord
 
         private string DebuggerDisplay
             => $"{Name} ({Id}): {Description}";
+
+        public override string ToString()
+            => DebuggerDisplay;
     }
 }
