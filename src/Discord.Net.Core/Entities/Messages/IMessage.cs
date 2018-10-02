@@ -100,5 +100,25 @@ namespace Discord
         ///     A read-only collection of user IDs.
         /// </returns>
         IReadOnlyCollection<ulong> MentionedUserIds { get; }
+        /// <summary>
+        ///     Returns the Activity associated with a message.
+        /// </summary>
+        /// <remarks>
+        ///     Sent with Rich Presence-related chat embeds.
+        /// </remarks>
+        /// <returns>
+        ///     A message's activity, if any is associated.
+        /// </returns>
+        MessageActivity Activity { get; }
+        /// <summary>
+        ///     Returns the Application associated with a messsage.
+        /// </summary>
+        /// <remarks>
+        ///     Sent with Rich-Presence-related chat embeds.
+        /// </remarks>
+        /// <returns>
+        ///     A message's application, if any is associated.
+        /// </returns>
+        MessageApplication Application { get; }
     }
 }

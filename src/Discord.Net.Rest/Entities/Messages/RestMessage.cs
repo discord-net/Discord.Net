@@ -55,6 +55,9 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
+        //todo Rest impl
+        public MessageActivity Activity => null;
+        public MessageApplication Application => null;
 
         internal RestMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
             : base(discord, id)
