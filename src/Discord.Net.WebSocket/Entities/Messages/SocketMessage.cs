@@ -50,7 +50,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public MessageApplication Application { get; private set; }
 
-
         /// <summary>
         ///     Returns all attachments included in this message.
         /// </summary>
