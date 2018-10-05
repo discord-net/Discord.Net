@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.WebSockets
 {
-    public interface IWebSocketClient
+    public interface IWebSocketClient : IDisposable
     {
         event Func<byte[], int, int, Task> BinaryMessage;
         event Func<string, Task> TextMessage;

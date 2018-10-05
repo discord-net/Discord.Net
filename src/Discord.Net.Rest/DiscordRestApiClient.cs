@@ -66,6 +66,7 @@ namespace Discord.API
         /// <exception cref="ArgumentException">Unknown OAuth token type.</exception>
         internal void SetBaseUrl(string baseUrl)
         {
+            RestClient?.Dispose();
             RestClient = _restClientProvider(baseUrl);
             RestClient.SetHeader("accept", "*/*");
             RestClient.SetHeader("user-agent", UserAgent);
@@ -93,7 +94,9 @@ namespace Discord.API
                 if (disposing)
                 {
                     _loginCancelToken?.Dispose();
-                    (RestClient as IDisposable)?.Dispose();
+                    RestClient?.Dispose();
+                    RequestQueue?.Dispose();
+                    _stateLock?.Dispose();
                 }
                 _isDisposed = true;
             }
@@ -117,6 +120,7 @@ namespace Discord.API
 
             try
             {
+                _loginCancelToken?.Dispose();
                 _loginCancelToken = new CancellationTokenSource();
 
                 AuthToken = null;
@@ -242,7 +246,7 @@ namespace Discord.API
         internal Task<TResponse> SendMultipartAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, IReadOnlyDictionary<string, object> multipartArgs, BucketIds ids,
              ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
             => SendMultipartAsync<TResponse>(method, GetEndpoint(endpointExpr), multipartArgs, GetBucketId(ids, endpointExpr, funcName), clientBucket, options);
-        public async Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs, 
+        public async Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
             string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
             options = options ?? new RequestOptions();

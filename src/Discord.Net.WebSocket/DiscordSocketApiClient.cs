@@ -108,6 +108,8 @@ namespace Discord.API
                 }
                 _isDisposed = true;
             }
+
+            base.Dispose(disposing);
         }
 
         public async Task ConnectAsync()
@@ -137,6 +139,7 @@ namespace Discord.API
             ConnectionState = ConnectionState.Connecting;
             try
             {
+                _connectCancelToken?.Dispose();
                 _connectCancelToken = new CancellationTokenSource();
                 if (WebSocketClient != null)
                     WebSocketClient.SetCancelToken(_connectCancelToken.Token);
@@ -209,7 +212,7 @@ namespace Discord.API
             await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, null, bytes, true, options)).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
-        
+
         public async Task SendIdentifyAsync(int largeThreshold = 100, int shardID = 0, int totalShards = 1, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);

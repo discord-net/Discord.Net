@@ -43,6 +43,8 @@ namespace Discord.WebSocket
         private DateTimeOffset? _statusSince;
         private RestApplication _applicationInfo;
 
+        private bool _isDisposed;
+
         /// <summary> Gets the shard of of this client. </summary>
         public int ShardId { get; }
         /// <summary> Gets the current connection state of this client. </summary>
@@ -63,7 +65,7 @@ namespace Discord.WebSocket
         internal WebSocketProvider WebSocketProvider { get; private set; }
         internal bool AlwaysDownloadUsers { get; private set; }
         internal int? HandlerTimeout { get; private set; }
-        
+
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
@@ -110,8 +112,10 @@ namespace Discord.WebSocket
         ///     Initializes a new REST/WebSocket-based Discord client with the provided configuration.
         /// </summary>
         /// <param name="config">The configuration to be used with the client.</param>
+#pragma warning disable IDISP004
         public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null, null) { }
         internal DiscordSocketClient(DiscordSocketConfig config, SemaphoreSlim groupLock, DiscordSocketClient parentClient) : this(config, CreateApiClient(config), groupLock, parentClient) { }
+#pragma warning restore IDISP004
         private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, SemaphoreSlim groupLock, DiscordSocketClient parentClient)
             : base(config, client)
         {
@@ -170,11 +174,18 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         internal override void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!_isDisposed)
             {
-                StopAsync().GetAwaiter().GetResult();
-                ApiClient.Dispose();
+                if (disposing)
+                {
+                    StopAsync().GetAwaiter().GetResult();
+                    ApiClient?.Dispose();
+                    _stateLock?.Dispose();
+                }
+                _isDisposed = true;
             }
+
+            base.Dispose(disposing);
         }
 
         /// <inheritdoc />
@@ -197,10 +208,10 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public override async Task StartAsync() 
+        public override async Task StartAsync()
             => await _connection.StartAsync().ConfigureAwait(false);
         /// <inheritdoc />
-        public override async Task StopAsync() 
+        public override async Task StopAsync()
             => await _connection.StopAsync().ConfigureAwait(false);
 
         private async Task OnConnectingAsync()

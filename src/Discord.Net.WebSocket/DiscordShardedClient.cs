@@ -18,7 +18,9 @@ namespace Discord.WebSocket
         private int[] _shardIds;
         private DiscordSocketClient[] _shards;
         private int _totalShards;
-        
+
+        private bool _isDisposed;
+
         /// <inheritdoc />
         public override int Latency { get => GetLatency(); protected set { } }
         /// <inheritdoc />
@@ -38,11 +40,15 @@ namespace Discord.WebSocket
         /// <summary> Creates a new REST/WebSocket Discord client. </summary>
         public DiscordShardedClient() : this(null, new DiscordSocketConfig()) { }
         /// <summary> Creates a new REST/WebSocket Discord client. </summary>
+#pragma warning disable IDISP004
         public DiscordShardedClient(DiscordSocketConfig config) : this(null, config, CreateApiClient(config)) { }
+#pragma warning restore IDISP004
         /// <summary> Creates a new REST/WebSocket Discord client. </summary>
         public DiscordShardedClient(int[] ids) : this(ids, new DiscordSocketConfig()) { }
         /// <summary> Creates a new REST/WebSocket Discord client. </summary>
+#pragma warning disable IDISP004
         public DiscordShardedClient(int[] ids, DiscordSocketConfig config) : this(ids, config, CreateApiClient(config)) { }
+#pragma warning restore IDISP004
         private DiscordShardedClient(int[] ids, DiscordSocketConfig config, API.DiscordSocketApiClient client)
             : base(config, client)
         {
@@ -119,10 +125,10 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public override async Task StartAsync() 
+        public override async Task StartAsync()
             => await Task.WhenAll(_shards.Select(x => x.StartAsync())).ConfigureAwait(false);
         /// <inheritdoc />
-        public override async Task StopAsync() 
+        public override async Task StopAsync()
             => await Task.WhenAll(_shards.Select(x => x.StopAsync())).ConfigureAwait(false);
 
         public DiscordSocketClient GetShard(int id)
@@ -145,7 +151,7 @@ namespace Discord.WebSocket
             => await _shards[0].GetApplicationInfoAsync(options).ConfigureAwait(false);
 
         /// <inheritdoc />
-        public override SocketGuild GetGuild(ulong id) 
+        public override SocketGuild GetGuild(ulong id)
             => GetShardFor(id).GetGuild(id);
 
         /// <inheritdoc />
@@ -173,7 +179,7 @@ namespace Discord.WebSocket
             for (int i = 0; i < _shards.Length; i++)
                 result += _shards[i].PrivateChannels.Count;
             return result;
-        }                                                                    
+        }
 
         private IEnumerable<SocketGuild> GetGuilds()
         {
@@ -189,7 +195,7 @@ namespace Discord.WebSocket
             for (int i = 0; i < _shards.Length; i++)
                 result += _shards[i].Guilds.Count;
             return result;
-        }                    
+        }
 
         /// <inheritdoc />
         public override SocketUser GetUser(ulong id)
@@ -369,5 +375,20 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
             => Task.FromResult<IVoiceRegion>(GetVoiceRegion(id));
+
+        internal override void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _connectionGroupLock?.Dispose();
+                }
+
+                _isDisposed = true;
+            }
+
+            base.Dispose(disposing);
+        }
     }
 }

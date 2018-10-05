@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Audio
 {
-    internal class DiscordVoiceAPIClient
+    internal class DiscordVoiceAPIClient : IDisposable
     {
         public const int MaxBitrate = 128 * 1024;
         public const string Mode = "xsalsa20_poly1305";
@@ -36,7 +36,7 @@ namespace Discord.Audio
         private readonly AsyncEvent<Func<byte[], Task>> _receivedPacketEvent = new AsyncEvent<Func<byte[], Task>>();
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
-        
+
         private readonly JsonSerializer _serializer;
         private readonly SemaphoreSlim _connectionLock;
         private readonly IUdpSocket _udp;
@@ -103,8 +103,9 @@ namespace Discord.Audio
                 if (disposing)
                 {
                     _connectCancelToken?.Dispose();
-                    (_udp as IDisposable)?.Dispose();
-                    (WebSocketClient as IDisposable)?.Dispose();
+                    _udp?.Dispose();
+                    WebSocketClient?.Dispose();
+                    _connectionLock?.Dispose();
                 }
                 _isDisposed = true;
             }
@@ -122,7 +123,7 @@ namespace Discord.Audio
         }
         public async Task SendAsync(byte[] data, int offset, int bytes)
         {
-            await _udp.SendAsync(data, offset, bytes).ConfigureAwait(false);                
+            await _udp.SendAsync(data, offset, bytes).ConfigureAwait(false);
             await _sentDataEvent.InvokeAsync(bytes).ConfigureAwait(false);
         }
 
@@ -177,6 +178,7 @@ namespace Discord.Audio
             ConnectionState = ConnectionState.Connecting;
             try
             {
+                _connectCancelToken?.Dispose();
                 _connectCancelToken = new CancellationTokenSource();
                 var cancelToken = _connectCancelToken.Token;
 
@@ -208,7 +210,7 @@ namespace Discord.Audio
         {
             if (ConnectionState == ConnectionState.Disconnected) return;
             ConnectionState = ConnectionState.Disconnecting;
-            
+
             try { _connectCancelToken?.Cancel(false); }
             catch { }
 

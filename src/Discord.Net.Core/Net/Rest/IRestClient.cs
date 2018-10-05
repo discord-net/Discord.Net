@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ namespace Discord.Net.Rest
     /// <summary>
     ///     Represents a generic REST-based client.
     /// </summary>
-    public interface IRestClient
+    public interface IRestClient : IDisposable
     {
         /// <summary>
         ///     Sets the HTTP header of this client for all requests.
