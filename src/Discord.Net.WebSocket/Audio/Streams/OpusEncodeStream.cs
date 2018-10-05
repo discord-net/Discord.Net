@@ -15,7 +15,7 @@ namespace Discord.Audio.Streams
         private int _partialFramePos;
         private ushort _seq;
         private uint _timestamp;
-        
+
         public OpusEncodeStream(AudioStream next, int bitrate, AudioApplication application, int packetLoss)
         {
             _next = next;
@@ -92,7 +92,11 @@ namespace Discord.Audio.Streams
             base.Dispose(disposing);
 
             if (disposing)
+            {
                 _encoder.Dispose();
+                _next.Dispose();  //Try this
+            }
+
         }
     }
 }
