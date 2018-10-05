@@ -26,21 +26,17 @@ namespace Discord
         ///     Gets the ID of the application's icon.
         /// </summary>
         public string Icon { get; set; }
-
         /// <summary>
         ///     Gets the Url of the application's icon.
         /// </summary>
         public string IconUrl
             => $"https://cdn.discordapp.com/app-icons/{Id}/{Icon}";
-
         /// <summary>
         ///     Gets the name of the application.
         /// </summary>
         public string Name { get; set; }
-
         private string DebuggerDisplay
             => $"{Name} ({Id}): {Description}";
-
         public override string ToString()
             => DebuggerDisplay;
     }
