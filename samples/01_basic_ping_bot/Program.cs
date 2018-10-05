@@ -16,7 +16,7 @@ namespace _01_basic_ping_bot
     // - https://github.com/foxbot/patek - a more feature-filled bot, utilizing more aspects of the library
     class Program : IDisposable
     {
-        private DiscordSocketClient _client;
+        private readonly DiscordSocketClient _client;
 
         // Discord.Net heavily utilizes TAP for async, so we create
         // an asynchronous context from the beginning.
@@ -26,7 +26,7 @@ namespace _01_basic_ping_bot
                 program.MainAsync().GetAwaiter().GetResult();
         }
 
-        public async Task MainAsync()
+        public Program()
         {
             // It is recommended to Dispose of a client when you are finished
             // using it, at the end of your app's lifetime.
@@ -35,7 +35,10 @@ namespace _01_basic_ping_bot
             _client.Log += LogAsync;
             _client.Ready += ReadyAsync;
             _client.MessageReceived += MessageReceivedAsync;
+        }
 
+        public async Task MainAsync()
+        {
             // Tokens should be considered secret data, and never hard-coded.
             await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
             await _client.StartAsync();
