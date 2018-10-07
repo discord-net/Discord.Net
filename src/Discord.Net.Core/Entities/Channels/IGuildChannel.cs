@@ -47,6 +47,10 @@ namespace Discord
         /// <summary>
         ///     Modifies this guild channel.
         /// </summary>
+        /// <remarks>
+        ///     This method modifies the current guild channel with the specified properties. To see an example of this
+        ///     method and what properties are available, please refer to <see cref="GuildChannelProperties"/>.
+        /// </remarks>
         /// <param name="func">The delegate containing the properties to modify the channel with.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
@@ -92,16 +96,61 @@ namespace Discord
         /// <summary>
         ///     Adds or updates the permission overwrite for the given role.
         /// </summary>
+        /// <example>
+        ///     The following example fetches a role via <see cref="IGuild.GetRole"/> and a channel via 
+        ///     <see cref="IGuild.GetChannelAsync"/>. Next, it checks if an overwrite had already been set via 
+        ///     <see cref="GetPermissionOverwrite(Discord.IRole)"/>; if not, it denies the role from sending any
+        ///     messages to the channel.
+        ///     <code lang="cs">
+        ///     // Fetches the role and channels
+        ///     var role = guild.GetRole(339805618376540160);
+        ///     var channel = await guild.GetChannelAsync(233937283911385098);
+        /// 
+        ///     // If either the of the object does not exist, bail
+        ///     if (role == null || channel == null) return;
+        ///
+        ///     // Fetches the previous overwrite and bail if one is found
+        ///     var previousOverwrite = channel.GetPermissionOverwrite(role);
+        ///     if (previousOverwrite.HasValue) return;
+        /// 
+        ///     // Creates a new OverwritePermissions with send message set to deny and pass it into the method
+        ///     await channel.AddPermissionOverwriteAsync(role,
+        ///         new OverwritePermissions(sendMessage: PermValue.Deny));
+        ///     </code>
+        /// </example>
         /// <param name="role">The role to add the overwrite to.</param>
         /// <param name="permissions">The overwrite to add to the role.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task representing the asynchronous permission operation for adding the specified permissions to the channel.
+        ///     A task representing the asynchronous permission operation for adding the specified permissions to the
+        ///     channel.
         /// </returns>
         Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null);
         /// <summary>
         ///     Adds or updates the permission overwrite for the given user.
         /// </summary>
+        /// <example>
+        ///     The following example fetches a user via <see cref="IGuild.GetUserAsync"/> and a channel via 
+        ///     <see cref="IGuild.GetChannelAsync"/>. Next, it checks if an overwrite had already been set via 
+        ///     <see cref="GetPermissionOverwrite(Discord.IUser)"/>; if not, it denies the user from sending any
+        ///     messages to the channel.
+        ///     <code lang="cs">
+        ///     // Fetches the role and channels
+        ///     var user = await guild.GetUserAsync(168693960628371456);
+        ///     var channel = await guild.GetChannelAsync(233937283911385098);
+        /// 
+        ///     // If either the of the object does not exist, bail
+        ///     if (user == null || channel == null) return;
+        ///
+        ///     // Fetches the previous overwrite and bail if one is found
+        ///     var previousOverwrite = channel.GetPermissionOverwrite(user);
+        ///     if (previousOverwrite.HasValue) return;
+        /// 
+        ///     // Creates a new OverwritePermissions with send message set to deny and pass it into the method
+        ///     await channel.AddPermissionOverwriteAsync(role,
+        ///         new OverwritePermissions(sendMessage: PermValue.Deny));
+        ///     </code>
+        /// </example>
         /// <param name="user">The user to add the overwrite to.</param>
         /// <param name="permissions">The overwrite to add to the user.</param>
         /// <param name="options">The options to be used when sending the request.</param>
