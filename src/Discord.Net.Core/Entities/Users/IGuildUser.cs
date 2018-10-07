@@ -59,6 +59,14 @@ namespace Discord
         /// <summary>
         ///     Gets the level permissions granted to this user to a given channel.
         /// </summary>
+        /// <example>
+        ///     The following example checks if the current user has the ability to send a message with attachment in
+        ///     this channel; if so, uploads a file via <see cref="IMessageChannel.SendFileAsync"/>.
+        ///     <code language="cs">
+        ///     if (currentUser?.GetPermissions(targetChannel)?.AttachFiles)
+        ///         await targetChannel.SendFileAsync("fortnite.png");
+        ///     </code>
+        /// </example>
         /// <param name="channel">The channel to get the permission from.</param>
         /// <returns>
         ///     A <see cref="Discord.ChannelPermissions"/> structure representing the permissions that a user has in the
@@ -78,6 +86,10 @@ namespace Discord
         /// <summary>
         ///     Modifies this user's properties in this guild.
         /// </summary>
+        /// <remarks>
+        ///     This method modifies the current guild user with the specified properties. To see an example of this
+        ///     method and what properties are available, please refer to <see cref="GuildUserProperties"/>.
+        /// </remarks>
         /// <param name="func">The delegate containing the properties to modify the user with.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
