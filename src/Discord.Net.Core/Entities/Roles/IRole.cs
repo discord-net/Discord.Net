@@ -69,16 +69,10 @@ namespace Discord
         /// <summary>
         ///     Modifies this role.
         /// </summary>
-        /// <example>
-        ///     <code language="cs">
-        ///     await role.ModifyAsync(x =&gt;
-        ///     {
-        ///         x.Name = "Sonic";
-        ///         x.Color = new Color(0x1A50BC);
-        ///         x.Mentionable = true;
-        ///     });
-        ///     </code>
-        /// </example>
+        /// <remarks>
+        ///     This method modifies this role with the specified properties. To see an example of this
+        ///     method and what properties are available, please refer to <see cref="RoleProperties"/>.
+        /// </remarks>
         /// <param name="func">A delegate containing the properties to modify the role with.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>

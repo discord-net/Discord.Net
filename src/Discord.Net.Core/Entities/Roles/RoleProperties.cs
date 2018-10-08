@@ -3,6 +3,18 @@ namespace Discord
     /// <summary>
     ///     Properties that are used to modify an <see cref="IRole" /> with the specified changes.
     /// </summary>
+    /// <example>
+    ///     The following example modifies the role to a mentionable one, renames the role into <c>Sonic</c>, and
+    ///     changes the color to a light-blue.
+    ///     <code language="cs">
+    ///     await role.ModifyAsync(x =&gt;
+    ///     {
+    ///         x.Name = "Sonic";
+    ///         x.Color = new Color(0x1A50BC);
+    ///         x.Mentionable = true;
+    ///     });
+    ///     </code>
+    /// </example>
     /// <seealso cref="IRole.ModifyAsync" />
     public class RoleProperties
     {
