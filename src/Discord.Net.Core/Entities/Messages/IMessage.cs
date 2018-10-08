@@ -48,7 +48,7 @@ namespace Discord
         ///     Gets the time of this message's last edit.
         /// </summary>
         /// <returns>
-        ///     Time of when the message was last edited; <c>null</c> when the message is never edited.
+        ///     Time of when the message was last edited; <c>null</c> if the message is never edited.
         /// </returns>
         DateTimeOffset? EditedTimestamp { get; }
         
@@ -62,39 +62,39 @@ namespace Discord
         IUser Author { get; }
 
         /// <summary>
-        ///     Returns all attachments included in this message.
+        ///     Gets all attachments included in this message.
         /// </summary>
         /// <returns>
         ///     A read-only collection of attachments.
         /// </returns>
         IReadOnlyCollection<IAttachment> Attachments { get; }
         /// <summary>
-        ///     Returns all embeds included in this message.
+        ///     Gets all embeds included in this message.
         /// </summary>
         /// <returns>
         ///     A read-only collection of embed objects.
         /// </returns>
         IReadOnlyCollection<IEmbed> Embeds { get; }
         /// <summary>
-        ///     Returns all tags included in this message's content.
+        ///     Gets all tags included in this message's content.
         /// </summary>
         IReadOnlyCollection<ITag> Tags { get; }
         /// <summary>
-        ///     Returns the IDs of channels mentioned in this message.
+        ///     Gets the IDs of channels mentioned in this message.
         /// </summary>
         /// <returns>
         ///     A read-only collection of channel IDs.
         /// </returns>
         IReadOnlyCollection<ulong> MentionedChannelIds { get; }
         /// <summary>
-        ///     Returns the IDs of roles mentioned in this message.
+        ///     Gets the IDs of roles mentioned in this message.
         /// </summary>
         /// <returns>
         ///     A read-only collection of role IDs.
         /// </returns>
         IReadOnlyCollection<ulong> MentionedRoleIds { get; }
         /// <summary>
-        ///     Returns the IDs of users mentioned in this message.
+        ///     Gets the IDs of users mentioned in this message.
         /// </summary>
         /// <returns>
         ///     A read-only collection of user IDs.
