@@ -50,6 +50,11 @@ namespace Discord
         /// <summary>
         ///     Gets a collection of IDs for the roles that this user currently possesses in the guild.
         /// </summary>
+        /// <remarks>
+        ///     This property returns a read-only collection of the identifiers of the roles that this user possesses.
+        ///     For WebSocket users, a Roles property can be found in place of this property. Due to the REST
+        ///     implementation, only a collection of identifiers can be retrieved instead of the full role objects.
+        /// </remarks>
         /// <returns>
         ///     A read-only collection of <see cref="ulong"/>, each representing a snowflake identifier for a role that
         ///     this user possesses.
