@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 
 namespace Discord.Audio.Streams
 {
-    ///<summary> Decrypts an RTP frame using libsodium </summary>
+    /// <summary>
+    ///     Decrypts an RTP frame using libsodium.
+    /// </summary>
     public class SodiumDecryptStream : AudioOutStream
     {
         private readonly AudioClient _client;

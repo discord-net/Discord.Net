@@ -1,15 +1,21 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents the logged-in REST-based user.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestSelfUser : RestUser, ISelfUser
     {
+        /// <inheritdoc />
         public string Email { get; private set; }
+        /// <inheritdoc />
         public bool IsVerified { get; private set; }
+        /// <inheritdoc />
         public bool IsMfaEnabled { get; private set; }
 
         internal RestSelfUser(BaseDiscordClient discord, ulong id)
@@ -22,6 +28,7 @@ namespace Discord.Rest
             entity.Update(model);
             return entity;
         }
+        /// <inheritdoc />
         internal override void Update(Model model)
         {
             base.Update(model);
@@ -34,6 +41,8 @@ namespace Discord.Rest
                 IsMfaEnabled = model.MfaEnabled.Value;
         }
 
+        /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">Unable to update this object using a different token.</exception>
         public override async Task UpdateAsync(RequestOptions options = null)
         {
             var model = await Discord.ApiClient.GetMyUserAsync(options).ConfigureAwait(false);
@@ -42,6 +51,8 @@ namespace Discord.Rest
             Update(model);
         }
 
+        /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">Unable to modify this object using a different token.</exception>
         public async Task ModifyAsync(Action<SelfUserProperties> func, RequestOptions options = null)
         {
             if (Id != Discord.CurrentUser.Id)

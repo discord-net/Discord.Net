@@ -4,6 +4,9 @@ using Model = Discord.API.VoiceRegion;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Represents a REST-based voice region.
+    /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class RestVoiceRegion : RestEntity<string>, IVoiceRegion
     {

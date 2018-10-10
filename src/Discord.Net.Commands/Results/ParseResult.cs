@@ -4,15 +4,21 @@ using System.Diagnostics;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    ///     Contains information for the parsing result from the command service's parser.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct ParseResult : IResult
     {
         public IReadOnlyList<TypeReaderResult> ArgValues { get; }
         public IReadOnlyList<TypeReaderResult> ParamValues { get; }
 
+        /// <inheritdoc/>
         public CommandError? Error { get; }
+        /// <inheritdoc/>
         public string ErrorReason { get; }
 
+        /// <inheritdoc/>
         public bool IsSuccess => !Error.HasValue;
 
         private ParseResult(IReadOnlyList<TypeReaderResult> argValues, IReadOnlyList<TypeReaderResult> paramValues, CommandError? error, string errorReason)
@@ -22,7 +28,7 @@ namespace Discord.Commands
             Error = error;
             ErrorReason = errorReason;
         }
-
+        
         public static ParseResult FromSuccess(IReadOnlyList<TypeReaderResult> argValues, IReadOnlyList<TypeReaderResult> paramValues)
         {
             for (int i = 0; i < argValues.Count; i++)

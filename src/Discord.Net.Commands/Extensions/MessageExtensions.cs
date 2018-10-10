@@ -2,8 +2,20 @@ using System;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    ///     Provides extension methods for <see cref="IUserMessage" /> that relates to commands.
+    /// </summary>
     public static class MessageExtensions
     {
+        /// <summary>
+        ///     Gets whether the message starts with the provided character.
+        /// </summary>
+        /// <param name="msg">The message to check against.</param>
+        /// <param name="c">The char prefix.</param>
+        /// <param name="argPos">References where the command starts.</param>
+        /// <returns>
+        ///     <c>true</c> if the message begins with the char <paramref name="c"/>; otherwise <c>false</c>.
+        /// </returns>
         public static bool HasCharPrefix(this IUserMessage msg, char c, ref int argPos)
         {
             var text = msg.Content;
@@ -14,6 +26,9 @@ namespace Discord.Commands
             }
             return false;
         }
+        /// <summary>
+        ///     Gets whether the message starts with the provided string.
+        /// </summary>
         public static bool HasStringPrefix(this IUserMessage msg, string str, ref int argPos, StringComparison comparisonType = StringComparison.Ordinal)
         {
             var text = msg.Content;
@@ -24,6 +39,9 @@ namespace Discord.Commands
             }
             return false;
         }
+        /// <summary>
+        ///     Gets whether the message starts with the user's mention string.
+        /// </summary>
         public static bool HasMentionPrefix(this IUserMessage msg, IUser user, ref int argPos)
         {
             var text = msg.Content;

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Discord.Commands
 {
@@ -6,7 +6,7 @@ namespace Discord.Commands
     {
         private readonly CommandService _service;
         private readonly CommandMapNode _root;
-        private static readonly string[] _blankAliases = new[] { "" };
+        private static readonly string[] BlankAliases = { "" };
 
         public CommandMap(CommandService service)
         {

@@ -8,11 +8,17 @@ using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a REST-based voice channel in a guild.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestVoiceChannel : RestGuildChannel, IVoiceChannel, IRestAudioChannel
     {
+        /// <inheritdoc />
         public int Bitrate { get; private set; }
+        /// <inheritdoc />
         public int? UserLimit { get; private set; }
+        /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
 
         internal RestVoiceChannel(BaseDiscordClient discord, IGuild guild, ulong id)
@@ -25,6 +31,7 @@ namespace Discord.Rest
             entity.Update(model);
             return entity;
         }
+        /// <inheritdoc />
         internal override void Update(Model model)
         {
             base.Update(model);
@@ -33,24 +40,37 @@ namespace Discord.Rest
             UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
         }
 
+        /// <inheritdoc />
         public async Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
         {
             var model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
 
+        /// <summary>
+        ///     Gets the parent (category) channel of this channel.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the category channel
+        ///     representing the parent of this channel; <c>null</c> if none is set.
+        /// </returns>
         public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
             => ChannelHelper.GetCategoryAsync(this, Discord, options);
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
 
         //IAudioChannel
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Connecting to a REST-based channel is not supported.</exception>
         Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external) { throw new NotSupportedException(); }
         Task IAudioChannel.DisconnectAsync() { throw new NotSupportedException(); }
 
         //IGuildChannel
+        /// <inheritdoc />
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(null);
+        /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
 

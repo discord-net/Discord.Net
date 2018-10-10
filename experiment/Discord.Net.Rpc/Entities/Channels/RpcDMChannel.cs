@@ -9,6 +9,7 @@ using Model = Discord.API.Rpc.Channel;
 
 namespace Discord.Rpc
 {
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RpcDMChannel : RpcChannel, IRpcMessageChannel, IRpcPrivateChannel, IDMChannel
     {
         public IReadOnlyCollection<RpcMessage> CachedMessages { get; private set; }

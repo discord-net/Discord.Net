@@ -1,33 +1,28 @@
-﻿namespace Discord
+namespace Discord
 {
     /// <summary>
-    /// Modify an IGuildChannel with the specified changes.
+    ///     Properties that are used to modify an <see cref="IGuildChannel" /> with the specified changes.
     /// </summary>
-    /// <example>
-    /// <code language="c#">
-    /// await (Context.Channel as ITextChannel)?.ModifyAsync(x =>
-    /// {
-    ///     x.Name = "do-not-enter";
-    /// });
-    /// </code>
-    /// </example>
+    /// <seealso cref="IGuildChannel.ModifyAsync"/>
     public class GuildChannelProperties
     {
         /// <summary>
-        /// Set the channel to this name
+        ///     Gets or sets the channel to this name.
         /// </summary>
         /// <remarks>
-        /// When modifying an ITextChannel, the Name MUST be alphanumeric with dashes.
-        /// It must match the following RegEx: [a-z0-9-_]{2,100}
+        ///     This property defines the new name for this channel.
+        ///     <note type="warning">
+        ///         When modifying an <see cref="ITextChannel"/>, the <see cref="Name"/> must be alphanumeric with
+        ///         dashes. It must match the RegEx <c>[a-z0-9-_]{2,100}</c>.
+        ///     </note>
         /// </remarks>
-        /// <exception cref="Net.HttpException">A BadRequest will be thrown if the name does not match the above RegEx.</exception>
         public Optional<string> Name { get; set; }
         /// <summary>
-        /// Move the channel to the following position. This is 0-based!
+        ///     Moves the channel to the following position. This property is zero-based.
         /// </summary>
         public Optional<int> Position { get; set; }
         /// <summary>
-        /// Sets the category for this channel
+        ///     Gets or sets the category ID for this channel.
         /// </summary>
         public Optional<ulong?> CategoryId { get; set; }
     }

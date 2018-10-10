@@ -8,7 +8,9 @@ namespace Discord
         ///// <summary> Gets the IDiscordClient that created this object. </summary>
         //IDiscordClient Discord { get; }
 
-        /// <summary> Gets the unique identifier for this object. </summary>
+        /// <summary>
+        ///     Gets the unique identifier for this object.
+        /// </summary>
         TId Id { get; }
 
     }

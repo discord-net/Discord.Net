@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -14,7 +14,7 @@ namespace Discord.WebSocket
 
         public IReadOnlyCollection<SocketMessage> Messages => _messages.ToReadOnlyCollection();
 
-        public MessageCache(DiscordSocketClient discord, IChannel channel)
+        public MessageCache(DiscordSocketClient discord)
         {
             _size = discord.MessageCacheSize;
             _messages = new ConcurrentDictionary<ulong, SocketMessage>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(_size * 1.05));
@@ -28,7 +28,7 @@ namespace Discord.WebSocket
                 _orderedMessages.Enqueue(message.Id);
 
                 while (_orderedMessages.Count > _size && _orderedMessages.TryDequeue(out ulong msgId))
-                    _messages.TryRemove(msgId, out SocketMessage msg);
+                    _messages.TryRemove(msgId, out _);
             }
         }
 
@@ -44,6 +44,8 @@ namespace Discord.WebSocket
                 return result;
             return null;
         }
+
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="limit"/> is less than 0.</exception>
         public IReadOnlyCollection<SocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
         {
             if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));

@@ -15,7 +15,7 @@ public class Program
 
 		_client.Log += Log;
 
-		await _client.LoginAsync(TokenType.Bot, "bot token");
+		await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DiscordToken"));
 		await _client.StartAsync();
 		
 		await Task.Delay(-1);
