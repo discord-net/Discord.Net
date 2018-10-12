@@ -329,14 +329,17 @@ namespace Discord.Rest
         public static async Task SyncPermissionsAsync(INestedChannel channel, BaseDiscordClient client, RequestOptions options)
         {
             var category = await GetCategoryAsync(channel, client, options).ConfigureAwait(false);
-            if (category == null) return;
+            if (category == null) throw new InvalidOperationException("This channel does not have a parent channel.");
 
             var apiArgs = new ModifyGuildChannelParams
             {
                 Overwrites = category.PermissionOverwrites
-                    .Select(overwrite => new API.Overwrite(overwrite.TargetId, overwrite.TargetType,
-                        overwrite.Permissions.AllowValue, overwrite.Permissions.DenyValue))
-                    .ToArray()
+                    .Select(overwrite => new API.Overwrite{
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue,
+                        Deny = overwrite.Permissions.DenyValue
+                    }).ToArray()
             };
             await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
