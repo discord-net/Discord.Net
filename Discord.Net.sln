@@ -26,9 +26,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Analyzers", "sr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{BB59D5B5-E7B0-4BF4-8F82-D14431B2799B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "01_basic_ping_bot", "samples\01_basic_ping_bot\01_basic_ping_bot.csproj", "{F2FF84FB-F6AD-47E5-9EE5-18206CAE136E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "01_basic_ping_bot", "samples\01_basic_ping_bot\01_basic_ping_bot.csproj", "{F2FF84FB-F6AD-47E5-9EE5-18206CAE136E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "02_commands_framework", "samples\02_commands_framework\02_commands_framework.csproj", "{4E1F1F40-B1DD-40C9-A4B1-A2046A4C9C76}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "03_sharded_client", "samples\03_sharded_client\03_sharded_client.csproj", "{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -160,6 +162,18 @@ Global
 		{4E1F1F40-B1DD-40C9-A4B1-A2046A4C9C76}.Release|x64.Build.0 = Release|Any CPU
 		{4E1F1F40-B1DD-40C9-A4B1-A2046A4C9C76}.Release|x86.ActiveCfg = Release|Any CPU
 		{4E1F1F40-B1DD-40C9-A4B1-A2046A4C9C76}.Release|x86.Build.0 = Release|Any CPU
+		{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26}.Debug|x64.Build.0 = Debug|Any CPU
+		{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26}.Debug|x86.Build.0 = Debug|Any CPU
+		{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26}.Release|x64.ActiveCfg = Release|Any CPU
+		{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26}.Release|x64.Build.0 = Release|Any CPU
+		{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26}.Release|x86.ActiveCfg = Release|Any CPU
+		{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -173,6 +187,7 @@ Global
 		{BBA8E7FB-C834-40DC-822F-B112CB7F0140} = {CC3D4B1C-9DE0-448B-8AE7-F3F1F3EC5C3A}
 		{F2FF84FB-F6AD-47E5-9EE5-18206CAE136E} = {BB59D5B5-E7B0-4BF4-8F82-D14431B2799B}
 		{4E1F1F40-B1DD-40C9-A4B1-A2046A4C9C76} = {BB59D5B5-E7B0-4BF4-8F82-D14431B2799B}
+		{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26} = {BB59D5B5-E7B0-4BF4-8F82-D14431B2799B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D2404771-EEC8-45F2-9D71-F3373F6C1495}
