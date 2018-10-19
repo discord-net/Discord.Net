@@ -27,15 +27,16 @@ namespace _03_sharded_client
                 TotalShards = 2
             };
 
-            var services = ConfigureServices();
-
             _client = new DiscordShardedClient(config);
+            var services = ConfigureServices();
 
             // The Sharded Client does not have a Ready event.
             // The ShardReady event is used instead, allowing for individual
             // control per shard.
             _client.ShardReady += ReadyAsync;
             _client.Log += LogAsync;
+
+            await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
 
             await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
             await _client.StartAsync();
