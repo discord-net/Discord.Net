@@ -1,3 +1,4 @@
+
 #pragma warning disable CS1591
 using Discord.API.Rest;
 using Discord.Net;
@@ -1413,10 +1414,10 @@ namespace Discord.API
 
                     lastIndex = rightIndex + 1;
                 }
+                if (builder[builder.Length - 1] == '/')
+                    builder.Remove(builder.Length - 1, 1);
 
                 format = builder.ToString();
-                if (format.LastIndexOf('/') == format.Length-1)
-                    format = format.Substring(0, format.Length - 1); // perf: change the code above so this isn't necessary
 
                 return x => string.Format(format, x.ToArray());
             }
