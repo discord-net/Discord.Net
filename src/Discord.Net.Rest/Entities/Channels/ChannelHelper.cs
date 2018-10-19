@@ -348,6 +348,23 @@ namespace Discord.Rest
             var model = await client.ApiClient.GetChannelAsync(channel.CategoryId.Value, options).ConfigureAwait(false);
             return RestCategoryChannel.Create(client, model) as ICategoryChannel;
         }
+        public static async Task SyncPermissionsAsync(INestedChannel channel, BaseDiscordClient client, RequestOptions options)
+        {
+            var category = await GetCategoryAsync(channel, client, options).ConfigureAwait(false);
+            if (category == null) throw new InvalidOperationException("This channel does not have a parent channel.");
+
+            var apiArgs = new ModifyGuildChannelParams
+            {
+                Overwrites = category.PermissionOverwrites
+                    .Select(overwrite => new API.Overwrite{
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue,
+                        Deny = overwrite.Permissions.DenyValue
+                    }).ToArray()
+            };
+            await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
+        }
 
         //Helpers
         private static IUser GetAuthor(BaseDiscordClient client, IGuild guild, UserModel model, ulong? webhookId)

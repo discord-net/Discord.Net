@@ -25,5 +25,10 @@ namespace Discord
         ///     representing the parent of this channel; <c>null</c> if none is set.
         /// </returns>
         Task<ICategoryChannel> GetCategoryAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Syncs the permissions of this nested channel with its parent's.
+        /// </summary>
+        Task SyncPermissionsAsync(RequestOptions options = null);
     }
 }

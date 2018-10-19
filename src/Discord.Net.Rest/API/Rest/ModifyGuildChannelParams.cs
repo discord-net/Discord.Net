@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API.Rest
@@ -12,5 +12,7 @@ namespace Discord.API.Rest
         public Optional<int> Position { get; set; }
         [JsonProperty("parent_id")]
         public Optional<ulong?> CategoryId { get; set; }
+        [JsonProperty("permission_overwrites")]
+        public Optional<Overwrite[]> Overwrites { get; set; }
     }
 }
