@@ -39,6 +39,23 @@ namespace Discord
         {
             return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
         }
+        
+        public static async Task<IUserMessage> SendDMAsync(this IUser user,
+            string text = null,
+            bool isTTS = false,
+            Embed embed = null,
+            RequestOptions options = null)
+        {
+            try
+            { 
+                return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
+            }
+            catch(Exception e)
+            {
+                // I didn't know what to do here
+            }
+        }
+                    
 
         /// <summary>
         ///     Sends a file to this message channel with an optional caption.
