@@ -50,6 +50,8 @@ namespace Discord.WebSocket
         public MfaLevel MfaLevel { get; private set; }
         /// <inheritdoc />
         public DefaultMessageNotifications DefaultMessageNotifications { get; private set; }
+        /// <inheritdoc />
+        public ExplicitContentFilterLevel ExplicitContentFilter { get; private set; }
         /// <summary>
         ///     Gets the number of members.
         /// </summary>
@@ -73,6 +75,8 @@ namespace Discord.WebSocket
         internal bool IsAvailable { get; private set; }
         /// <summary> Indicates whether the client is connected to this guild. </summary>
         public bool IsConnected { get; internal set; }
+        /// <inheritdoc />
+        public ulong? ApplicationId { get; internal set; }
 
         internal ulong? AFKChannelId { get; private set; }
         internal ulong? EmbedChannelId { get; private set; }
@@ -346,6 +350,8 @@ namespace Discord.WebSocket
             VerificationLevel = model.VerificationLevel;
             MfaLevel = model.MfaLevel;
             DefaultMessageNotifications = model.DefaultMessageNotifications;
+            ExplicitContentFilter = model.ExplicitContentFilter;
+            ApplicationId = model.ApplicationId;
 
             if (model.Emojis != null)
             {
