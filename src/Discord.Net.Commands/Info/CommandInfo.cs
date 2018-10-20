@@ -273,7 +273,7 @@ namespace Discord.Commands
                 var wrappedEx = new CommandException(this, context, ex);
                 await Module.Service._cmdLogger.ErrorAsync(wrappedEx).ConfigureAwait(false);
 
-                var result = ExecuteResult.FromError(CommandError.Exception, ex.Message);
+                var result = ExecuteResult.FromError(ex);
                 await Module.Service._commandExecutedEvent.InvokeAsync(this, context, result).ConfigureAwait(false);
 
                 if (Module.Service._throwOnError)
