@@ -192,7 +192,7 @@ namespace Discord.API
         internal override async Task DisconnectInternalAsync()
         {
             if (_webSocketClient == null)
-                throw new NotSupportedException("This client is not configured with websocket support.");
+                throw new NotSupportedException("This client is not configured with WebSocket support.");
 
             if (ConnectionState == ConnectionState.Disconnected) return;
             ConnectionState = ConnectionState.Disconnecting;

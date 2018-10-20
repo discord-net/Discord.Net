@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,8 +14,7 @@ namespace Discord.Commands
             Parameter,
             QuotedParameter
         }
-        
-        public static async Task<ParseResult> ParseArgsAsync(CommandInfo command, ICommandContext context, bool ignoreExtraArgs, IServiceProvider services, string input, int startPos)
+        public static async Task<ParseResult> ParseArgsAsync(CommandInfo command, ICommandContext context, bool ignoreExtraArgs, IServiceProvider services, string input, int startPos, IReadOnlyDictionary<char, char> aliasMap)
         {
             ParameterInfo curParam = null;
             StringBuilder argBuilder = new StringBuilder(input.Length);
@@ -24,7 +24,27 @@ namespace Discord.Commands
             var argList = ImmutableArray.CreateBuilder<TypeReaderResult>();
             var paramList = ImmutableArray.CreateBuilder<TypeReaderResult>();
             bool isEscaping = false;
-            char c;
+            char c, matchQuote = '\0';
+
+            // local helper functions
+            bool IsOpenQuote(IReadOnlyDictionary<char, char> dict, char ch)
+            {
+                // return if the key is contained in the dictionary if it is populated
+                if (dict.Count != 0)
+                    return dict.ContainsKey(ch);
+                // or otherwise if it is the default double quote
+                return c == '\"';
+            }
+
+            char GetMatch(IReadOnlyDictionary<char, char> dict, char ch)
+            {
+                // get the corresponding value for the key, if it exists
+                // and if the dictionary is populated
+                if (dict.Count != 0 && dict.TryGetValue(c, out var value))
+                    return value;
+                // or get the default pair of the default double quote
+                return '\"';
+            }
 
             for (int curPos = startPos; curPos <= endPos; curPos++)
             {
@@ -74,9 +94,11 @@ namespace Discord.Commands
                             argBuilder.Append(c);
                             continue;
                         }
-                        if (c == '\"')
+                        
+                        if (IsOpenQuote(aliasMap, c))
                         {
                             curPart = ParserPart.QuotedParameter;
+                            matchQuote = GetMatch(aliasMap, c);
                             continue;
                         }
                         curPart = ParserPart.Parameter;
@@ -97,7 +119,7 @@ namespace Discord.Commands
                 }
                 else if (curPart == ParserPart.QuotedParameter)
                 {
-                    if (c == '\"')
+                    if (c == matchQuote)
                     {
                         argString = argBuilder.ToString(); //Remove quotes
                         lastArgEndPos = curPos + 1;
@@ -110,7 +132,7 @@ namespace Discord.Commands
                 {
                     if (curParam == null)
                     {
-                        if (ignoreExtraArgs)
+                        if (command.IgnoreExtraArgs)
                             break;
                         else
                             return ParseResult.FromError(CommandError.BadArgCount, "The input text has too many parameters.");
@@ -148,7 +170,7 @@ namespace Discord.Commands
             if (isEscaping)
                 return ParseResult.FromError(CommandError.ParseFailed, "Input text may not end on an incomplete escape.");
             if (curPart == ParserPart.QuotedParameter)
-                return ParseResult.FromError(CommandError.ParseFailed, "A quoted parameter is incomplete");
+                return ParseResult.FromError(CommandError.ParseFailed, "A quoted parameter is incomplete.");
             
             //Add missing optionals
             for (int i = argList.Count; i < command.Parameters.Count; i++)

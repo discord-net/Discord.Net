@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -11,6 +11,9 @@ namespace Discord.API
         public ulong? ChannelId { get; set; }
         [JsonProperty("user_id")]
         public ulong UserId { get; set; }
+        // ALWAYS sent over WebSocket, never on REST
+        [JsonProperty("member")]
+        public Optional<GuildMember> Member { get; set; }
         [JsonProperty("session_id")]
         public string SessionId { get; set; }
         [JsonProperty("deaf")]

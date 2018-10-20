@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Discord.Commands
 {
@@ -26,10 +27,18 @@ namespace Discord.Commands
     {
         public IReadOnlyCollection<TypeReaderValue> Values { get; }
 
+        /// <inheritdoc/>
         public CommandError? Error { get; }
+        /// <inheritdoc/>
         public string ErrorReason { get; }
 
+        /// <inheritdoc/>
         public bool IsSuccess => !Error.HasValue;
+
+        /// <exception cref="InvalidOperationException">TypeReaderResult was not successful.</exception>
+        public object BestMatch => IsSuccess
+            ? (Values.Count == 1 ? Values.Single().Value : Values.OrderByDescending(v => v.Score).First().Value)
+            : throw new InvalidOperationException("TypeReaderResult was not successful.");
 
         private TypeReaderResult(IReadOnlyCollection<TypeReaderValue> values, CommandError? error, string errorReason)
         {
@@ -46,6 +55,8 @@ namespace Discord.Commands
             => new TypeReaderResult(values, null, null);
         public static TypeReaderResult FromError(CommandError error, string reason)
             => new TypeReaderResult(null, error, reason);
+        public static TypeReaderResult FromError(Exception ex)
+            => FromError(CommandError.Exception, ex.Message);
         public static TypeReaderResult FromError(IResult result)
             => new TypeReaderResult(null, result.Error, result.ErrorReason);
 

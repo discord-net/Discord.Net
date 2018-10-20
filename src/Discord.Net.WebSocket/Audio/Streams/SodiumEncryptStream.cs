@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 
 namespace Discord.Audio.Streams
 {
-    ///<summary> Encrypts an RTP frame using libsodium </summary>
+    /// <summary>
+    ///     Encrypts an RTP frame using libsodium.
+    /// </summary>
     public class SodiumEncryptStream : AudioOutStream
     {
         private readonly AudioClient _client;
@@ -20,21 +22,25 @@ namespace Discord.Audio.Streams
             _client = (AudioClient)client;
             _nonce = new byte[24];
         }
-        
+
+        /// <exception cref="InvalidOperationException">Header received with no payload.</exception>
         public override void WriteHeader(ushort seq, uint timestamp, bool missed)
         {
             if (_hasHeader)
-                throw new InvalidOperationException("Header received with no payload");
+                throw new InvalidOperationException("Header received with no payload.");
 
             _nextSeq = seq;
             _nextTimestamp = timestamp;
             _hasHeader = true;
         }
+        /// <exception cref="InvalidOperationException">Received payload without an RTP header.</exception>
+        /// <exception cref="OperationCanceledException">The token has had cancellation requested.</exception>
+        /// <exception cref="ObjectDisposedException">The associated <see cref="T:System.Threading.CancellationTokenSource" /> has been disposed.</exception>
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
             cancelToken.ThrowIfCancellationRequested();
             if (!_hasHeader)
-                throw new InvalidOperationException("Received payload without an RTP header");
+                throw new InvalidOperationException("Received payload without an RTP header.");
             _hasHeader = false;
 
             if (_client.SecretKey == null)

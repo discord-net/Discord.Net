@@ -10,7 +10,7 @@ namespace Discord.Commands
 {
     internal static class ModuleClassBuilder
     {
-        private static readonly TypeInfo _moduleTypeInfo = typeof(IModuleBase).GetTypeInfo();
+        private static readonly TypeInfo ModuleTypeInfo = typeof(IModuleBase).GetTypeInfo();
 
         public static async Task<IReadOnlyList<TypeInfo>> SearchAsync(Assembly assembly, CommandService service)
         {
@@ -34,7 +34,7 @@ namespace Discord.Commands
                 }
                 else if (IsLoadableModule(typeInfo))
                 {
-                    await service._cmdLogger.WarningAsync($"Class {typeInfo.FullName} is not public and cannot be loaded. To suppress this message, mark the class with {nameof(DontAutoLoadAttribute)}.");
+                    await service._cmdLogger.WarningAsync($"Class {typeInfo.FullName} is not public and cannot be loaded. To suppress this message, mark the class with {nameof(DontAutoLoadAttribute)}.").ConfigureAwait(false);
                 }
             }
 
@@ -135,7 +135,7 @@ namespace Discord.Commands
             if (builder.Name == null)
                 builder.Name = typeInfo.Name;
 
-            var validCommands = typeInfo.DeclaredMethods.Where(x => IsValidCommandDefinition(x));
+            var validCommands = typeInfo.DeclaredMethods.Where(IsValidCommandDefinition);
 
             foreach (var method in validCommands)
             {
@@ -158,6 +158,7 @@ namespace Discord.Commands
                         builder.AddAliases(command.Text);
                         builder.RunMode = command.RunMode;
                         builder.Name = builder.Name ?? command.Text;
+                        builder.IgnoreExtraArgs = command.IgnoreExtraArgs ?? service._ignoreExtraArgs;
                         break;
                     case NameAttribute name:
                         builder.Name = name.Text;
@@ -291,14 +292,14 @@ namespace Discord.Commands
 
             //We dont have a cached type reader, create one
             reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, services);
-            service.AddTypeReader(paramType, reader);
+            service.AddTypeReader(paramType, reader, false);
 
             return reader;
         }
 
         private static bool IsValidModuleDefinition(TypeInfo typeInfo)
         {
-            return _moduleTypeInfo.IsAssignableFrom(typeInfo) &&
+            return ModuleTypeInfo.IsAssignableFrom(typeInfo) &&
                    !typeInfo.IsAbstract &&
                    !typeInfo.ContainsGenericParameters;
         }

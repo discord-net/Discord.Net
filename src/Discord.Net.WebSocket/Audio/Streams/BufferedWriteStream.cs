@@ -116,7 +116,7 @@ namespace Discord.Audio.Streams
                                     timestamp += OpusEncoder.FrameSamplesPerChannel;
                                 }
 #if DEBUG
-                                var _ = _logger?.DebugAsync($"Buffer underrun");
+                                var _ = _logger?.DebugAsync("Buffer underrun");
 #endif
                             }
                         }
@@ -140,7 +140,7 @@ namespace Discord.Audio.Streams
             if (!_bufferPool.TryDequeue(out byte[] buffer))
             {
 #if DEBUG
-                var _ = _logger?.DebugAsync($"Buffer overflow"); //Should never happen because of the queueLock
+                var _ = _logger?.DebugAsync("Buffer overflow"); //Should never happen because of the queueLock
 #endif
                 return;
             }
@@ -149,7 +149,7 @@ namespace Discord.Audio.Streams
             if (!_isPreloaded && _queuedFrames.Count == _queueLength)
             {
 #if DEBUG
-                var _ = _logger?.DebugAsync($"Preloaded");
+                var _ = _logger?.DebugAsync("Preloaded");
 #endif
                 _isPreloaded = true;
             }
@@ -169,7 +169,7 @@ namespace Discord.Audio.Streams
         {
             do
                 cancelToken.ThrowIfCancellationRequested();
-            while (_queuedFrames.TryDequeue(out Frame ignored));
+            while (_queuedFrames.TryDequeue(out _));
             return Task.Delay(0);
         }
     }

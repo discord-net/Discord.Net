@@ -1,6 +1,5 @@
 #pragma warning disable CS1591
 using Discord.API.Gateway;
-using Discord.API.Rest;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
 using Discord.Net.WebSockets;
@@ -26,9 +25,9 @@ namespace Discord.API
         public event Func<Exception, Task> Disconnected { add { _disconnectedEvent.Add(value); } remove { _disconnectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
 
+        private readonly bool _isExplicitUrl;
         private CancellationTokenSource _connectCancelToken;
         private string _gatewayUrl;
-        private bool _isExplicitUrl;
 
         //Store our decompression streams for zlib shared state
         private MemoryStream _compressed;
@@ -120,12 +119,14 @@ namespace Discord.API
             }
             finally { _stateLock.Release(); }
         }
+        /// <exception cref="InvalidOperationException">The client must be logged in before connecting.</exception>
+        /// <exception cref="NotSupportedException">This client is not configured with WebSocket support.</exception>
         internal override async Task ConnectInternalAsync()
         {
             if (LoginState != LoginState.LoggedIn)
-                throw new InvalidOperationException("You must log in before connecting.");
+                throw new InvalidOperationException("The client must be logged in before connecting.");
             if (WebSocketClient == null)
-                throw new NotSupportedException("This client is not configured with websocket support.");
+                throw new NotSupportedException("This client is not configured with WebSocket support.");
 
             //Re-create streams to reset the zlib state
             _compressed?.Dispose();
@@ -176,10 +177,11 @@ namespace Discord.API
             }
             finally { _stateLock.Release(); }
         }
+        /// <exception cref="NotSupportedException">This client is not configured with WebSocket support.</exception>
         internal override async Task DisconnectInternalAsync()
         {
             if (WebSocketClient == null)
-                throw new NotSupportedException("This client is not configured with websocket support.");
+                throw new NotSupportedException("This client is not configured with WebSocket support.");
 
             if (ConnectionState == ConnectionState.Disconnected) return;
             ConnectionState = ConnectionState.Disconnecting;

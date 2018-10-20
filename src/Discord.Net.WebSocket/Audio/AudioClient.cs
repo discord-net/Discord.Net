@@ -1,4 +1,4 @@
-﻿using Discord.API.Voice;
+using Discord.API.Voice;
 using Discord.Audio.Streams;
 using Discord.Logging;
 using Discord.Net.Converters;
@@ -16,7 +16,7 @@ using System.Collections.Generic;
 namespace Discord.Audio
 {
     //TODO: Add audio reconnecting
-    internal partial class AudioClient : IAudioClient, IDisposable
+    internal partial class AudioClient : IAudioClient
     {
         internal struct StreamPair
         {
@@ -65,7 +65,7 @@ namespace Discord.Audio
 
             ApiClient = new DiscordVoiceAPIClient(guild.Id, Discord.WebSocketProvider, Discord.UdpSocketProvider);
             ApiClient.SentGatewayMessage += async opCode => await _audioLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
-            ApiClient.SentDiscovery += async () => await _audioLogger.DebugAsync($"Sent Discovery").ConfigureAwait(false);
+            ApiClient.SentDiscovery += async () => await _audioLogger.DebugAsync("Sent Discovery").ConfigureAwait(false);
             //ApiClient.SentData += async bytes => await _audioLogger.DebugAsync($"Sent {bytes} Bytes").ConfigureAwait(false);
             ApiClient.ReceivedEvent += ProcessMessageAsync;
             ApiClient.ReceivedPacket += ProcessPacketAsync;
@@ -107,7 +107,7 @@ namespace Discord.Audio
         private async Task OnConnectingAsync()
         {
             await _audioLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
-            await ApiClient.ConnectAsync("wss://" + _url).ConfigureAwait(false);
+            await ApiClient.ConnectAsync("wss://" + _url + "?v=" + DiscordConfig.VoiceAPIVersion).ConfigureAwait(false);
             await _audioLogger.DebugAsync("Listening on port " + ApiClient.UdpPort).ConfigureAwait(false);
             await _audioLogger.DebugAsync("Sending Identity").ConfigureAwait(false);
             await ApiClient.SendIdentityAsync(_userId, _sessionId, _token).ConfigureAwait(false);
@@ -131,7 +131,7 @@ namespace Discord.Audio
                 await keepaliveTask.ConfigureAwait(false);
             _keepaliveTask = null;
 
-            while (_heartbeatTimes.TryDequeue(out long time)) { }
+            while (_heartbeatTimes.TryDequeue(out _)) { }
             _lastMessageTime = 0;
 
             await ClearInputStreamsAsync().ConfigureAwait(false);
@@ -225,11 +225,12 @@ namespace Discord.Audio
 
                             if (!data.Modes.Contains(DiscordVoiceAPIClient.Mode))
                                 throw new InvalidOperationException($"Discord does not support {DiscordVoiceAPIClient.Mode}");
-
-                            _heartbeatTask = RunHeartbeatAsync(data.HeartbeatInterval, _connection.CancelToken);
                             
                             ApiClient.SetUdpEndpoint(data.Ip, data.Port);
                             await ApiClient.SendDiscoveryAsync(_ssrc).ConfigureAwait(false);
+
+                            
+                            _heartbeatTask = RunHeartbeatAsync(41250, _connection.CancelToken);
                         }
                         break;
                     case VoiceOpCode.SessionDescription:
@@ -291,7 +292,7 @@ namespace Discord.Audio
                 {
                     if (packet.Length != 70)
                     {
-                        await _audioLogger.DebugAsync($"Malformed Packet").ConfigureAwait(false);
+                        await _audioLogger.DebugAsync("Malformed Packet").ConfigureAwait(false);
                         return;
                     }
                     string ip;
@@ -303,7 +304,7 @@ namespace Discord.Audio
                     }
                     catch (Exception ex)
                     {
-                        await _audioLogger.DebugAsync($"Malformed Packet", ex).ConfigureAwait(false);
+                        await _audioLogger.DebugAsync("Malformed Packet", ex).ConfigureAwait(false);
                         return; 
                     }
                     
@@ -330,7 +331,7 @@ namespace Discord.Audio
                         {
                             if (pair.Key == value)
                             {
-                                int latency = (int)(Environment.TickCount - pair.Value);
+                                int latency = Environment.TickCount - pair.Value;
                                 int before = UdpLatency;
                                 UdpLatency = latency;
 
@@ -343,7 +344,7 @@ namespace Discord.Audio
                     {                        
                         if (!RTPReadStream.TryReadSsrc(packet, 0, out var ssrc))
                         {
-                            await _audioLogger.DebugAsync($"Malformed Frame").ConfigureAwait(false);
+                            await _audioLogger.DebugAsync("Malformed Frame").ConfigureAwait(false);
                             return;
                         }
                         if (!_ssrcMap.TryGetValue(ssrc, out var userId))
@@ -362,7 +363,7 @@ namespace Discord.Audio
                         }
                         catch (Exception ex)
                         {
-                            await _audioLogger.DebugAsync($"Malformed Frame", ex).ConfigureAwait(false);
+                            await _audioLogger.DebugAsync("Malformed Frame", ex).ConfigureAwait(false);
                             return;
                         }
                         //await _audioLogger.DebugAsync($"Received {packet.Length} bytes from user {userId}").ConfigureAwait(false);
@@ -371,7 +372,7 @@ namespace Discord.Audio
             }
             catch (Exception ex)
             {
-                await _audioLogger.WarningAsync($"Failed to process UDP packet", ex).ConfigureAwait(false);
+                await _audioLogger.WarningAsync("Failed to process UDP packet", ex).ConfigureAwait(false);
                 return;
             }
         }
@@ -419,7 +420,6 @@ namespace Discord.Audio
         }
         private async Task RunKeepaliveAsync(int intervalMillis, CancellationToken cancelToken)
         {
-            var packet = new byte[8];
             try
             {
                 await _audioLogger.DebugAsync("Keepalive Started").ConfigureAwait(false);

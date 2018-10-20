@@ -126,7 +126,7 @@ namespace Discord.Net.Queue
                     if ((request.Options.RetryMode & RetryMode.RetryTimeouts) == 0)
                         throw;
 
-                    await Task.Delay(500);
+                    await Task.Delay(500).ConfigureAwait(false);
                     continue; //Retry
                 }
                 /*catch (Exception)
@@ -163,7 +163,7 @@ namespace Discord.Net.Queue
                     if (!isRateLimited)
                         throw new TimeoutException();
                     else
-                        throw new RateLimitedException(request);
+                        ThrowRetryLimit(request);
                 }
 
                 lock (_lock)
@@ -181,13 +181,12 @@ namespace Discord.Net.Queue
                         await _queue.RaiseRateLimitTriggered(Id, null).ConfigureAwait(false);
                     }
 
-                    if ((request.Options.RetryMode & RetryMode.RetryRatelimit) == 0)
-                        throw new RateLimitedException(request);
+                    ThrowRetryLimit(request);
 
                     if (resetAt.HasValue)
                     {
                         if (resetAt > timeoutAt)
-                            throw new RateLimitedException(request);
+                            ThrowRetryLimit(request);
                         int millis = (int)Math.Ceiling((resetAt.Value - DateTimeOffset.UtcNow).TotalMilliseconds);
 #if DEBUG_LIMITS
                         Debug.WriteLine($"[{id}] Sleeping {millis} ms (Pre-emptive)");
@@ -198,7 +197,7 @@ namespace Discord.Net.Queue
                     else
                     {
                         if ((timeoutAt.Value - DateTimeOffset.UtcNow).TotalMilliseconds < 500.0)
-                            throw new RateLimitedException(request);
+                            ThrowRetryLimit(request);
 #if DEBUG_LIMITS
                         Debug.WriteLine($"[{id}] Sleeping 500* ms (Pre-emptive)");
 #endif
@@ -231,7 +230,7 @@ namespace Discord.Net.Queue
 #endif
                 }
 
-                var now = DateTimeUtils.ToUnixSeconds(DateTimeOffset.UtcNow);
+                var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                 DateTimeOffset? resetTick = null;
 
                 //Using X-RateLimit-Remaining causes a race condition
@@ -251,6 +250,10 @@ namespace Discord.Net.Queue
                 else if (info.Reset.HasValue)
                 {
                     resetTick = info.Reset.Value.AddSeconds(info.Lag?.TotalSeconds ?? 1.0);
+
+                    if (request.Options.IsReactionBucket)
+                        resetTick = DateTimeOffset.Now.AddMilliseconds(250);
+
                     int diff = (int)(resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds;
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] X-RateLimit-Reset: {info.Reset.Value.ToUnixTimeSeconds()} ({diff} ms, {info.Lag?.TotalMilliseconds} ms lag)");
@@ -308,6 +311,12 @@ namespace Discord.Net.Queue
                     }
                 }
             }
+        }
+
+        private void ThrowRetryLimit(RestRequest request)
+        {
+            if ((request.Options.RetryMode & RetryMode.RetryRatelimit) == 0)
+                throw new RateLimitedException(request);
         }
     }
 }

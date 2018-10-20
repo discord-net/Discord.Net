@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Discord.API;
 using Discord.API.Voice;
 using Discord.Net.Converters;
@@ -39,8 +39,8 @@ namespace Discord.Audio
         
         private readonly JsonSerializer _serializer;
         private readonly SemaphoreSlim _connectionLock;
+        private readonly IUdpSocket _udp;
         private CancellationTokenSource _connectCancelToken;
-        private IUdpSocket _udp;
         private bool _isDisposed;
         private ulong _nextKeepalive;
 
@@ -129,7 +129,7 @@ namespace Discord.Audio
         //WebSocket
         public async Task SendHeartbeatAsync(RequestOptions options = null)
         {
-            await SendAsync(VoiceOpCode.Heartbeat, DateTimeUtils.ToUnixMilliseconds(DateTimeOffset.UtcNow), options: options).ConfigureAwait(false);
+            await SendAsync(VoiceOpCode.Heartbeat, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), options: options).ConfigureAwait(false);
         }
         public async Task SendIdentityAsync(ulong userId, string sessionId, string token)
         {
@@ -188,7 +188,7 @@ namespace Discord.Audio
 
                 ConnectionState = ConnectionState.Connected;
             }
-            catch (Exception)
+            catch
             {
                 await DisconnectInternalAsync().ConfigureAwait(false);
                 throw;

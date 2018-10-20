@@ -1,3 +1,4 @@
+using System;
 using Discord.API.Rest;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -24,6 +25,7 @@ namespace Discord.Rest
                 return RestChannel.Create(client, model);
             return null;
         }
+        /// <exception cref="InvalidOperationException">Unexpected channel type.</exception>
         public static async Task<IReadOnlyCollection<IRestPrivateChannel>> GetPrivateChannelsAsync(BaseDiscordClient client, RequestOptions options)
         {
             var models = await client.ApiClient.GetMyPrivateChannelsAsync(options).ConfigureAwait(false);
@@ -47,15 +49,15 @@ namespace Discord.Rest
         public static async Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(BaseDiscordClient client, RequestOptions options)
         {
             var models = await client.ApiClient.GetMyConnectionsAsync(options).ConfigureAwait(false);
-            return models.Select(x => RestConnection.Create(x)).ToImmutableArray();
+            return models.Select(RestConnection.Create).ToImmutableArray();
         }
         
-        public static async Task<RestInvite> GetInviteAsync(BaseDiscordClient client,
+        public static async Task<RestInviteMetadata> GetInviteAsync(BaseDiscordClient client,
             string inviteId, RequestOptions options)
         {
             var model = await client.ApiClient.GetInviteAsync(inviteId, options).ConfigureAwait(false);
             if (model != null)
-                return RestInvite.Create(client, null, null, model);
+                return RestInviteMetadata.Create(client, null, null, model);
             return null;
         }
         
@@ -138,15 +140,20 @@ namespace Discord.Rest
         public static async Task<RestGuildUser> GetGuildUserAsync(BaseDiscordClient client,
             ulong guildId, ulong id, RequestOptions options)
         {
+            var guild = await GetGuildAsync(client, guildId, options).ConfigureAwait(false);
+            if (guild == null)
+                return null;
+
             var model = await client.ApiClient.GetGuildMemberAsync(guildId, id, options).ConfigureAwait(false);
             if (model != null)
-                return RestGuildUser.Create(client, new RestGuild(client, guildId), model);
+                return RestGuildUser.Create(client, guild, model);
+
             return null;
         }
 
         public static async Task<RestWebhook> GetWebhookAsync(BaseDiscordClient client, ulong id, RequestOptions options)
         {
-            var model = await client.ApiClient.GetWebhookAsync(id);
+            var model = await client.ApiClient.GetWebhookAsync(id).ConfigureAwait(false);
             if (model != null)
                 return RestWebhook.Create(client, (IGuild)null, model);
             return null;

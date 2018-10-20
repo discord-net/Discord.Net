@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Xunit;
 
 namespace Discord
@@ -34,6 +34,7 @@ namespace Discord
             Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1514056829775), emote.CreatedAt);
             Assert.EndsWith("gif", emote.Url);
         }
+        [Fact]
         public void Test_Invalid_Amimated_Emote_Parse()
         {
             Assert.False(Emote.TryParse("<x:typingstatus:394207658351263745>", out _));

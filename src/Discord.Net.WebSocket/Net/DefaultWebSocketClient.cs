@@ -1,4 +1,3 @@
-﻿#if DEFAULTWEBSOCKET
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,8 +22,8 @@ namespace Discord.Net.WebSockets
 
         private readonly SemaphoreSlim _lock;
         private readonly Dictionary<string, string> _headers;
+        private readonly IWebProxy _proxy;
         private ClientWebSocket _client;
-        private IWebProxy _proxy;
         private Task _task;
         private CancellationTokenSource _cancelTokenSource;
         private CancellationToken _cancelToken, _parentToken;
@@ -209,14 +208,9 @@ namespace Discord.Net.WebSockets
 
                             //Use the internal buffer if we can get it
                             resultCount = (int)stream.Length;
-#if MSTRYBUFFER
-                            if (stream.TryGetBuffer(out var streamBuffer))
-                                result = streamBuffer.Array;
-                            else
-                                result = stream.ToArray();
-#else
-                                result = stream.GetBuffer();
-#endif
+
+                            result = stream.TryGetBuffer(out var streamBuffer) ? streamBuffer.Array : stream.ToArray();
+
                         }
                     }
                     else
@@ -248,4 +242,3 @@ namespace Discord.Net.WebSockets
         }
     }
 }
-#endif

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
@@ -8,9 +8,9 @@ namespace Discord.Commands
 
     internal static class PrimitiveParsers
     {
-        private static readonly Lazy<IReadOnlyDictionary<Type, Delegate>> _parsers = new Lazy<IReadOnlyDictionary<Type, Delegate>>(CreateParsers);
+        private static readonly Lazy<IReadOnlyDictionary<Type, Delegate>> Parsers = new Lazy<IReadOnlyDictionary<Type, Delegate>>(CreateParsers);
 
-        public static IEnumerable<Type> SupportedTypes = _parsers.Value.Keys;
+        public static IEnumerable<Type> SupportedTypes = Parsers.Value.Keys;
 
         static IReadOnlyDictionary<Type, Delegate> CreateParsers()
         {
@@ -29,12 +29,12 @@ namespace Discord.Commands
             parserBuilder[typeof(decimal)] = (TryParseDelegate<decimal>)decimal.TryParse;
             parserBuilder[typeof(DateTime)] = (TryParseDelegate<DateTime>)DateTime.TryParse;
             parserBuilder[typeof(DateTimeOffset)] = (TryParseDelegate<DateTimeOffset>)DateTimeOffset.TryParse;
-            parserBuilder[typeof(TimeSpan)] = (TryParseDelegate<TimeSpan>)TimeSpan.TryParse;
+            //parserBuilder[typeof(TimeSpan)] = (TryParseDelegate<TimeSpan>)TimeSpan.TryParse;
             parserBuilder[typeof(char)] = (TryParseDelegate<char>)char.TryParse;
             return parserBuilder.ToImmutable();
         }
 
-        public static TryParseDelegate<T> Get<T>() => (TryParseDelegate<T>)_parsers.Value[typeof(T)];
-        public static Delegate Get(Type type) => _parsers.Value[type];
+        public static TryParseDelegate<T> Get<T>() => (TryParseDelegate<T>)Parsers.Value[typeof(T)];
+        public static Delegate Get(Type type) => Parsers.Value[type];
     }
 }

@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands.Builders
 {
@@ -22,6 +21,7 @@ namespace Discord.Commands.Builders
         public string PrimaryAlias { get; set; }
         public RunMode RunMode { get; set; }
         public int Priority { get; set; }
+        public bool IgnoreExtraArgs { get; set; }
 
         public IReadOnlyList<PreconditionAttribute> Preconditions => _preconditions;
         public IReadOnlyList<ParameterBuilder> Parameters => _parameters;
@@ -118,6 +118,7 @@ namespace Discord.Commands.Builders
             return this;
         }
 
+        /// <exception cref="InvalidOperationException">Only the last parameter in a command may have the Remainder or Multiple flag.</exception>
         internal CommandInfo Build(ModuleInfo info, CommandService service)
         {
             //Default name to primary alias

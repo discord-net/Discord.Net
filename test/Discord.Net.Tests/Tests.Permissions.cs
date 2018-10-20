@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -25,15 +24,15 @@ namespace Discord
 
             // check that toggling the bit works
             Permissions.UnsetFlag(ref rawValue, flagValue);
-            Assert.Equal(false, Permissions.GetValue(rawValue, flagValue));
+            Assert.False(Permissions.GetValue(rawValue, flagValue));
             Permissions.SetFlag(ref rawValue, flagValue);
-            Assert.Equal(true, Permissions.GetValue(rawValue, flagValue));
+            Assert.True(Permissions.GetValue(rawValue, flagValue));
 
             // do the same, but with the SetValue method
             Permissions.SetValue(ref rawValue, true, flagValue);
-            Assert.Equal(true, Permissions.GetValue(rawValue, flagValue));
+            Assert.True(Permissions.GetValue(rawValue, flagValue));
             Permissions.SetValue(ref rawValue, false, flagValue);
-            Assert.Equal(false, Permissions.GetValue(rawValue, flagValue));
+            Assert.False(Permissions.GetValue(rawValue, flagValue));
         }
 
         /// <summary>
@@ -77,7 +76,7 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
+        ///
         /// Tests that text channel permissions get the right value
         /// from the Has method.
         /// </summary>
@@ -114,7 +113,7 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
+        ///
         /// Tests that no channel permissions get the right value
         /// from the Has method.
         /// </summary>
@@ -151,7 +150,7 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
+        ///
         /// Tests that the dm channel permissions get the right value
         /// from the Has method.
         /// </summary>
@@ -188,7 +187,7 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
+        ///
         /// Tests that the group channel permissions get the right value
         /// from the Has method.
         /// </summary>
@@ -225,7 +224,7 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
+        ///
         /// Tests that the voice channel permissions get the right value
         /// from the Has method.
         /// </summary>
@@ -239,7 +238,7 @@ namespace Discord
             TestHelper(value, ChannelPermission.CreateInstantInvite, true);
             TestHelper(value, ChannelPermission.ManageChannels, true);
             TestHelper(value, ChannelPermission.AddReactions, false);
-            TestHelper(value, ChannelPermission.ViewChannel, false);
+            TestHelper(value, ChannelPermission.ViewChannel, true);
             TestHelper(value, ChannelPermission.SendMessages, false);
             TestHelper(value, ChannelPermission.SendTTSMessages, false);
             TestHelper(value, ChannelPermission.ManageMessages, false);
@@ -262,8 +261,8 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
-        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/> 
+        ///
+        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/>
         /// returns the correct value when no permissions are set.
         /// </summary>
         /// <returns></returns>
@@ -280,7 +279,7 @@ namespace Discord
             TestHelper(value, GuildPermission.ManageGuild, false);
             TestHelper(value, GuildPermission.AddReactions, false);
             TestHelper(value, GuildPermission.ViewAuditLog, false);
-            TestHelper(value, GuildPermission.ReadMessages, false);
+            TestHelper(value, GuildPermission.ViewChannel, false);
             TestHelper(value, GuildPermission.SendMessages, false);
             TestHelper(value, GuildPermission.SendTTSMessages, false);
             TestHelper(value, GuildPermission.ManageMessages, false);
@@ -305,8 +304,8 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
-        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/> 
+        ///
+        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/>
         /// returns the correct value when all permissions are set.
         /// </summary>
         /// <returns></returns>
@@ -323,7 +322,7 @@ namespace Discord
             TestHelper(value, GuildPermission.ManageGuild, true);
             TestHelper(value, GuildPermission.AddReactions, true);
             TestHelper(value, GuildPermission.ViewAuditLog, true);
-            TestHelper(value, GuildPermission.ReadMessages, true);
+            TestHelper(value, GuildPermission.ViewChannel, true);
             TestHelper(value, GuildPermission.SendMessages, true);
             TestHelper(value, GuildPermission.SendTTSMessages, true);
             TestHelper(value, GuildPermission.ManageMessages, true);
@@ -349,8 +348,8 @@ namespace Discord
 
         /// <summary>
         /// Tests for the <see cref="Discord.Permissions"/> class.
-        /// 
-        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/> 
+        ///
+        /// Test that that the Has method of <see cref="Discord.GuildPermissions"/>
         /// returns the correct value when webhook permissions are set.
         /// </summary>
         /// <returns></returns>
@@ -367,7 +366,7 @@ namespace Discord
             TestHelper(value, GuildPermission.ManageGuild, false);
             TestHelper(value, GuildPermission.AddReactions, false);
             TestHelper(value, GuildPermission.ViewAuditLog, false);
-            TestHelper(value, GuildPermission.ReadMessages, false);
+            TestHelper(value, GuildPermission.ViewChannel, false);
             TestHelper(value, GuildPermission.SendMessages, true);
             TestHelper(value, GuildPermission.SendTTSMessages, true);
             TestHelper(value, GuildPermission.ManageMessages, false);
@@ -659,7 +658,7 @@ namespace Discord
             TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Allow);
             TestHelper(value, ChannelPermission.ManageChannels, PermValue.Allow);
             TestHelper(value, ChannelPermission.AddReactions, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Allow);
             TestHelper(value, ChannelPermission.SendMessages, PermValue.Inherit);
             TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Inherit);
             TestHelper(value, ChannelPermission.ManageMessages, PermValue.Inherit);
@@ -682,7 +681,7 @@ namespace Discord
             TestHelper(value, ChannelPermission.CreateInstantInvite, PermValue.Deny);
             TestHelper(value, ChannelPermission.ManageChannels, PermValue.Deny);
             TestHelper(value, ChannelPermission.AddReactions, PermValue.Inherit);
-            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Inherit);
+            TestHelper(value, ChannelPermission.ViewChannel, PermValue.Deny);
             TestHelper(value, ChannelPermission.SendMessages, PermValue.Inherit);
             TestHelper(value, ChannelPermission.SendTTSMessages, PermValue.Inherit);
             TestHelper(value, ChannelPermission.ManageMessages, PermValue.Inherit);
@@ -699,6 +698,73 @@ namespace Discord
             TestHelper(value, ChannelPermission.DeafenMembers, PermValue.Deny);
             TestHelper(value, ChannelPermission.MoveMembers, PermValue.Deny);
             TestHelper(value, ChannelPermission.UseVAD, PermValue.Deny);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Tests for the <see cref="OverwritePermissions.Modify(PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?, PermValue?)"/>
+        /// method to ensure that the default no-param call does not modify the resulting value
+        /// of the OverwritePermissions.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public Task TestOverwritePermissionModifyNoParam()
+        {
+            // test for all Text allowed, none denied
+            var original = new OverwritePermissions(ChannelPermissions.Text.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, text denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Text.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // category allowed, none denied
+            original = new OverwritePermissions(ChannelPermissions.Category.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, category denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Category.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // DM allowed, none denied
+            original = new OverwritePermissions(ChannelPermissions.DM.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, DM denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.DM.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // voice allowed, none denied
+            original = new OverwritePermissions(ChannelPermissions.Voice.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, voice denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Voice.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // group allowed, none denied
+            original = new OverwritePermissions(ChannelPermissions.Group.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, group denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.Group.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
+
+            // none allowed, none denied
+            original = new OverwritePermissions(ChannelPermissions.None.RawValue, ChannelPermissions.None.RawValue);
+            Assert.Equal(original.AllowValue, original.Modify().AllowValue);
+            Assert.Equal(original.DenyValue, original.Modify().DenyValue);
 
             return Task.CompletedTask;
         }
