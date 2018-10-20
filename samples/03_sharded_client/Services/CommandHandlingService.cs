@@ -28,7 +28,6 @@ namespace _03_sharded_client.Services
         public async Task InitializeAsync()
         {
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
-            _discord.MessageReceived += MessageReceivedAsync;
         }
 
         public async Task MessageReceivedAsync(SocketMessage rawMessage)
