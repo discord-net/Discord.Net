@@ -19,6 +19,10 @@ namespace _03_sharded_client.Services
             _commands = services.GetRequiredService<CommandService>();
             _discord = services.GetRequiredService<DiscordShardedClient>();
             _services = services;
+
+            _commands.CommandExecuted += CommandExecutedAsync;
+            _commands.Log += LogAsync;
+            _discord.MessageReceived += MessageReceivedAsync;
         }
 
         public async Task InitializeAsync()
@@ -42,11 +46,28 @@ namespace _03_sharded_client.Services
 
             // A new kind of command context, ShardedCommandContext can be utilized with the commands framework
             var context = new ShardedCommandContext(_discord, message);
-            var result = await _commands.ExecuteAsync(context, argPos, _services);
+            await _commands.ExecuteAsync(context, argPos, _services);
+        }
 
-            if (result.Error.HasValue &&
-                result.Error.Value != CommandError.UnknownCommand) // it's bad practice to send 'unknown command' errors
-                await context.Channel.SendMessageAsync(result.ToString());
+        public async Task CommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
+        {
+            // command is unspecified when there was a search failure (command not found); we don't care about these errors
+            if (!command.IsSpecified)
+                return;
+
+            // the command was succesful, we don't care about this result, unless we want to log that a command succeeded.
+            if (result.IsSuccess)
+                return;
+
+            // the command failed, let's notify the user that something happened.
+            await context.Channel.SendMessageAsync($"error: {result.ToString()}");
+        }
+
+        private Task LogAsync(LogMessage log)
+        {
+            Console.WriteLine(log.ToString());
+
+            return Task.CompletedTask;
         }
     }
 }
