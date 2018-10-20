@@ -76,9 +76,13 @@ namespace Discord.Rest
         public static async Task<RestInviteMetadata> CreateInviteAsync(IGuildChannel channel, BaseDiscordClient client,
             int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
         {
-            var args = new CreateChannelInviteParams { IsTemporary = isTemporary, IsUnique = isUnique };
-            args.MaxAge = maxAge.GetValueOrDefault(0);
-            args.MaxUses = maxUses.GetValueOrDefault(0);
+            var args = new API.Rest.CreateChannelInviteParams
+            {
+                IsTemporary = isTemporary,
+                IsUnique = isUnique,
+                MaxAge = maxAge ?? 0,
+                MaxUses = maxUses ?? 0
+            };
             var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestInviteMetadata.Create(client, null, channel, model);
         }
