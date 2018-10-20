@@ -6,7 +6,7 @@ public async Task SetupAsync()
     // Hook the command handler
     _client.MessageReceived += HandleCommandAsync;
 }
-public async Task OnCommandExecutedAsync(CommandInfo command, ICommandContext context, IResult result)
+public async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
 {
     // We have access to the information of the command executed,
     // the context of the command, and the result returned from the
@@ -20,7 +20,8 @@ public async Task OnCommandExecutedAsync(CommandInfo command, ICommandContext co
 
     // ...or even log the result (the method used should fit into
     // your existing log handler)
-    await _log.LogAsync(new LogMessage(LogSeverity.Info, "CommandExecution", $"{command?.Name} was executed at {DateTime.UtcNow}."));
+    var commandName = command.HasValue ? command.Name : "A command";
+    await _log.LogAsync(new LogMessage(LogSeverity.Info, "CommandExecution", $"{commandName} was executed at {DateTime.UtcNow}."));
 }
 public async Task HandleCommandAsync(SocketMessage msg)
 {

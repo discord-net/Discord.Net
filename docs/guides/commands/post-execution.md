@@ -37,11 +37,10 @@ about the impact in the [FAQ](xref:FAQ.Commands.General).
 
 Enter [CommandExecuted], an event that was introduced in
 Discord.Net 2.0. This event is raised whenever a command is
-successfully executed **without any run-time exceptions** or **any
-parsing or precondition failure**. This means this event can be
-used to streamline your post-execution design, and the best thing
-about this event is that it is not prone to `RunMode.Async`'s
-[ExecuteAsync] drawbacks.
+executed, regardless of its execution status. This means this 
+event can be used to streamline your post-execution design, and the
+best thing about this event is that it is not prone
+to `RunMode.Async`'s [ExecuteAsync] drawbacks.
 
 Thus, we can begin working on code such as:
 
