@@ -20,15 +20,19 @@ public async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommand
 
     // ...or even log the result (the method used should fit into
     // your existing log handler)
-    var commandName = command.HasValue ? command.Name : "A command";
-    await _log.LogAsync(new LogMessage(LogSeverity.Info, "CommandExecution", $"{commandName} was executed at {DateTime.UtcNow}."));
+    var commandName = command.IsSpecified ? command.Value.Name : "A command";
+    await _log.LogAsync(new LogMessage(LogSeverity.Info, 
+        "CommandExecution", 
+        $"{commandName} was executed at {DateTime.UtcNow}."));
 }
 public async Task HandleCommandAsync(SocketMessage msg)
 {
     var message = messageParam as SocketUserMessage;
     if (message == null) return;
     int argPos = 0;
-    if (!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)) || message.Author.IsBot) return;
+    if (!(message.HasCharPrefix('!', ref argPos) || 
+        message.HasMentionPrefix(_client.CurrentUser, ref argPos)) || 
+        message.Author.IsBot) return;
     var context = new SocketCommandContext(_client, message);
     await _commands.ExecuteAsync(context, argPos, _services);
 }
