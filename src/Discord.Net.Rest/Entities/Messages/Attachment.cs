@@ -3,9 +3,7 @@ using Model = Discord.API.Attachment;
 
 namespace Discord
 {
-    /// <summary>
-    ///     An attachment file seen in a <see cref="IUserMessage"/>.
-    /// </summary>
+    /// <inheritdoc/>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Attachment : IAttachment
     {

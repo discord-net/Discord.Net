@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    ///     Represents a Discord attachment.
+    ///     Represents a message attachment found in a <see cref="IUserMessage"/>.
     /// </summary>
     public interface IAttachment
     {

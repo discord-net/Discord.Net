@@ -64,6 +64,11 @@ namespace Discord
         /// <summary>
         ///     Gets all attachments included in this message.
         /// </summary>
+        /// <remarks>
+        ///     This property gets a read-only collection of attachments associated with this message. Depending on the
+        ///     user's end-client, a sent message may contain one or more attachments. For example, mobile users may
+        ///     attach more than one file in their message, while the desktop client only allows for one.
+        /// </remarks>
         /// <returns>
         ///     A read-only collection of attachments.
         /// </returns>
@@ -71,6 +76,11 @@ namespace Discord
         /// <summary>
         ///     Gets all embeds included in this message.
         /// </summary>
+        /// <remarks>
+        /// </remarks>
+        ///     This property gets a read-only collection of embeds associated with this message. Depending on the
+        ///     message, a sent message may contain one or more embeds. This is usually true when multiple link previews
+        ///     are generated; however, only one <see cref="EmbedType.Rich"/> <see cref="Embed"/> can be featured.
         /// <returns>
         ///     A read-only collection of embed objects.
         /// </returns>
