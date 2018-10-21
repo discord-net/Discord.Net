@@ -38,6 +38,9 @@ namespace Discord.WebSocket
         public IActivity Activity => Presence.Activity;
         /// <inheritdoc />
         public UserStatus Status => Presence.Status;
+        /// <summary>
+        ///     Gets mutual guilds shared with this user.
+        /// </summary>
         public IReadOnlyCollection<SocketGuild> MutualGuilds
             => Discord.Guilds.Where(g => g.Users.Any(u => u.Id == Id)).ToImmutableArray();
 

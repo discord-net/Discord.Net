@@ -5,8 +5,20 @@ using System.Threading.Tasks;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    ///     Provides extension methods for the <see cref="CommandService"/> class.
+    /// </summary>
     public static class CommandServiceExtensions
     {
+        /// <summary>
+        ///     Returns commands that can be executed under the current context.
+        /// </summary>
+        /// <param name="commands">The set of commands to be checked against.</param>
+        /// <param name="context">The current command context.</param>
+        /// <param name="provider">The service provider used for dependency injection upon precondition check.</param>
+        /// <returns>
+        ///     A read-only collection of commands that can be executed under the current context.
+        /// </returns>
         public static async Task<IReadOnlyCollection<CommandInfo>> GetExecutableCommandsAsync(this ICollection<CommandInfo> commands, ICommandContext context, IServiceProvider provider)
         {
             var executableCommands = new List<CommandInfo>();
@@ -27,8 +39,26 @@ namespace Discord.Commands
 
             return executableCommands;
         }
+        /// <summary>
+        ///     Returns commands that can be executed under the current context.
+        /// </summary>
+        /// <param name="commandService">The desired command service class to check against.</param>
+        /// <param name="context">The current command context.</param>
+        /// <param name="provider">The service provider used for dependency injection upon precondition check.</param>
+        /// <returns>
+        ///     A read-only collection of commands that can be executed under the current context.
+        /// </returns>
         public static Task<IReadOnlyCollection<CommandInfo>> GetExecutableCommandsAsync(this CommandService commandService, ICommandContext context, IServiceProvider provider)
             => GetExecutableCommandsAsync(commandService.Commands.ToArray(), context, provider);
+        /// <summary>
+        ///     Returns commands that can be executed under the current context.
+        /// </summary>
+        /// <param name="module">The module to be checked against.</param>
+        /// <param name="context">The current command context.</param>
+        /// <param name="provider">The service provider used for dependency injection upon precondition check.</param>
+        /// <returns>
+        ///     A read-only collection of commands that can be executed under the current context.
+        /// </returns>
         public static async Task<IReadOnlyCollection<CommandInfo>> GetExecutableCommandsAsync(this ModuleInfo module, ICommandContext context, IServiceProvider provider)
         {
             var executableCommands = new List<CommandInfo>();
