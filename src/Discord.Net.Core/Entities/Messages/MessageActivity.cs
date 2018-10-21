@@ -13,11 +13,11 @@ namespace Discord
         /// <summary>
         ///     Gets the type of activity of this message.
         /// </summary>
-        public MessageActivityType Type { get; set; }
+        public MessageActivityType Type { get; internal set; }
         /// <summary>
         ///     Gets the party ID of this activity, if any.
         /// </summary>
-        public string PartyId { get; set; }
+        public string PartyId { get; internal set; }
 
         private string DebuggerDisplay
             => $"{Type}{(string.IsNullOrWhiteSpace(PartyId) ? "" : $" {PartyId}")}";

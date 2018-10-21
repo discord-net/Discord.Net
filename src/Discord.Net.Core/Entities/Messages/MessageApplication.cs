@@ -13,19 +13,19 @@ namespace Discord
         /// <summary>
         ///     Gets the snowflake ID of the application.
         /// </summary>
-        public ulong Id { get; set; }
+        public ulong Id { get; internal set; }
         /// <summary>
         ///     Gets the ID of the embed's image asset.
         /// </summary>
-        public string CoverImage { get; set; }
+        public string CoverImage { get; internal set; }
         /// <summary>
         ///     Gets the application's description.
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; internal set; }
         /// <summary>
         ///     Gets the ID of the application's icon.
         /// </summary>
-        public string Icon { get; set; }
+        public string Icon { get; internal set; }
         /// <summary>
         ///     Gets the Url of the application's icon.
         /// </summary>
@@ -34,7 +34,7 @@ namespace Discord
         /// <summary>
         ///     Gets the name of the application.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; internal set; }
         private string DebuggerDisplay
             => $"{Name} ({Id}): {Description}";
         public override string ToString()
