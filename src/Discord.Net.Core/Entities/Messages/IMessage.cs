@@ -111,17 +111,18 @@ namespace Discord
         /// </returns>
         IReadOnlyCollection<ulong> MentionedUserIds { get; }
         /// <summary>
-        ///     Returns the Activity associated with a message.
+        ///     Gets the activity associated with a message.
         /// </summary>
         /// <remarks>
-        ///     Sent with Rich Presence-related chat embeds.
+        ///     Sent with Rich Presence-related chat embeds. This often refers to activity that requires end-user's
+        ///     interaction, such as a Spotify Invite activity.
         /// </remarks>
         /// <returns>
         ///     A message's activity, if any is associated.
         /// </returns>
         MessageActivity Activity { get; }
         /// <summary>
-        ///     Returns the Application associated with a messsage.
+        ///     Gets the application associated with a message.
         /// </summary>
         /// <remarks>
         ///     Sent with Rich-Presence-related chat embeds.
