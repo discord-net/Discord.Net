@@ -11,9 +11,13 @@ namespace Discord.Commands
         {
             var executableCommands = new List<CommandInfo>();
 
-            var tasks = commands.Select(async c => { var result = await c.CheckPreconditionsAsync(context, provider).ConfigureAwait(false); return new { Command = c, PreconditionResult = result }; });
+            var tasks = commands.Select(async c =>
+            {
+                var result = await c.CheckPreconditionsAsync(context, provider).ConfigureAwait(false);
+                return new { Command = c, PreconditionResult = result };
+            });
 
-            var results = await Task.WhenAll(tasks);
+            var results = await Task.WhenAll(tasks).ConfigureAwait(false);
 
             foreach (var result in results)
             {
@@ -32,7 +36,7 @@ namespace Discord.Commands
             executableCommands.AddRange(await module.Commands.ToArray().GetExecutableCommandsAsync(context, provider).ConfigureAwait(false));
 
             var tasks = module.Submodules.Select(async s => await s.GetExecutableCommandsAsync(context, provider).ConfigureAwait(false));
-            var results = await Task.WhenAll(tasks);
+            var results = await Task.WhenAll(tasks).ConfigureAwait(false);
 
             executableCommands.AddRange(results.SelectMany(c => c));
 

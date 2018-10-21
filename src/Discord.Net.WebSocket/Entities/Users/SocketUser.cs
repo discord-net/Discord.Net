@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -37,8 +38,8 @@ namespace Discord.WebSocket
         public IActivity Activity => Presence.Activity;
         /// <inheritdoc />
         public UserStatus Status => Presence.Status;
-        public IEnumerable<SocketGuild> MutualGuilds
-            => Discord.Guilds.Where(g => g.Users.Any(u => u.Id == Id));
+        public IReadOnlyCollection<SocketGuild> MutualGuilds
+            => Discord.Guilds.Where(g => g.Users.Any(u => u.Id == Id)).ToImmutableArray();
 
         internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
