@@ -24,6 +24,10 @@
       },
       {
         "files": ["guides/**.md", "guides/**/toc.yml"]
+      },
+      {
+        "src": "../",
+        "files": ["CHANGELOG.md"]
       }
     ],
     "resource": [{
