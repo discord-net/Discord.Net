@@ -25,8 +25,9 @@ namespace Discord.WebSocket
     ///     Represents a WebSocket-based guild object.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class SocketGuild : SocketEntity<ulong>, IGuild
+    public class SocketGuild : SocketEntity<ulong>, IGuild, IDisposable
     {
+#pragma warning disable IDISP002, IDISP006
         private readonly SemaphoreSlim _audioLock;
         private TaskCompletionSource<bool> _syncPromise, _downloaderPromise;
         private TaskCompletionSource<AudioClient> _audioConnectPromise;
@@ -37,6 +38,7 @@ namespace Discord.WebSocket
         private ImmutableArray<GuildEmote> _emotes;
         private ImmutableArray<string> _features;
         private AudioClient _audioClient;
+#pragma warning restore IDISP002, IDISP006
 
         /// <inheritdoc />
         public string Name { get; private set; }
@@ -63,7 +65,7 @@ namespace Discord.WebSocket
         ///         number here is the most accurate in terms of counting the number of users within this guild.
         ///     </para>
         ///     <para>
-        ///         Use this instead of enumerating the count of the 
+        ///         Use this instead of enumerating the count of the
         ///         <see cref="Discord.WebSocket.SocketGuild.Users" /> collection, as you may see discrepancy
         ///         between that and this property.
         ///     </para>
@@ -871,9 +873,11 @@ namespace Discord.WebSocket
 
                 if (external)
                 {
+#pragma warning disable IDISP001
                     var _ = promise.TrySetResultAsync(null);
                     await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, channelId, selfDeaf, selfMute).ConfigureAwait(false);
                     return null;
+#pragma warning restore IDISP001
                 }
 
                 if (_audioClient == null)
@@ -896,10 +900,14 @@ namespace Discord.WebSocket
                     };
                     audioClient.Connected += () =>
                     {
+#pragma warning disable IDISP001
                         var _ = promise.TrySetResultAsync(_audioClient);
+#pragma warning restore IDISP001
                         return Task.Delay(0);
                     };
+#pragma warning disable IDISP003
                     _audioClient = audioClient;
+#pragma warning restore IDISP003
                 }
 
                 await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, channelId, selfDeaf, selfMute).ConfigureAwait(false);
@@ -947,6 +955,7 @@ namespace Discord.WebSocket
             if (_audioClient != null)
                 await _audioClient.StopAsync().ConfigureAwait(false);
             await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, null, false, false).ConfigureAwait(false);
+            _audioClient?.Dispose();
             _audioClient = null;
         }
         internal async Task FinishConnectAudio(string url, string token)
@@ -1129,5 +1138,12 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IWebhook>> IGuild.GetWebhooksAsync(RequestOptions options)
             => await GetWebhooksAsync(options).ConfigureAwait(false);
+
+        void IDisposable.Dispose()
+        {
+            DisconnectAudioAsync().GetAwaiter().GetResult();
+            _audioLock?.Dispose();
+            _audioClient?.Dispose();
+        }
     }
 }
