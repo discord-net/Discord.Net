@@ -53,6 +53,13 @@ namespace Discord
         /// </returns>
         VerificationLevel VerificationLevel { get; }
         /// <summary>
+        ///     Gets the level of content filtering applied to user's content in a Guild.
+        /// </summary>
+        /// <returns>
+        ///     The level of explicit content filtering.
+        /// </returns>
+        ExplicitContentFilterLevel ExplicitContentFilter { get; }
+        /// <summary>
         ///     Gets the ID of this guild's icon.
         /// </summary>
         /// <returns>
@@ -140,6 +147,13 @@ namespace Discord
         ///     A <see cref="ulong"/> representing the snowflake identifier of the user that owns this guild.
         /// </returns>
         ulong OwnerId { get; }
+        /// <summary>
+        ///     Gets the application ID of the guild creator if it is bot-created.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the application ID that created this guild, or <c>null</c> if it was not bot-created.
+        /// </returns>
+        ulong? ApplicationId { get; }
         /// <summary>
         ///     Gets the ID of the region hosting this guild's voice channels.
         /// </summary>

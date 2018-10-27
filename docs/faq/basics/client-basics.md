@@ -64,3 +64,31 @@ use the cached message entity. Read more about it [here](xref:Guides.Concepts.Ev
 [MessageCacheSize]: xref:Discord.WebSocket.DiscordSocketConfig.MessageCacheSize
 [DiscordSocketConfig]: xref:Discord.WebSocket.DiscordSocketConfig
 [MessageUpdated]: xref:Discord.WebSocket.BaseSocketClient.MessageUpdated
+
+## What is a shard/sharded client, and how is it different from the `DiscordSocketClient`?
+As your bot grows in popularity, it is recommended that you should section your bot off into separate processes.
+The [DiscordShardedClient] is essentially a class that allows you to easily create and manage multiple [DiscordSocketClient]
+instances, with each one serving a different amount of guilds.
+
+There are very few differences from the [DiscordSocketClient] class, and it is very straightforward
+to modify your existing code to use a [DiscordShardedClient] when necessary.
+
+1. You need to specify the total amount of shards, or shard ids, via [DiscordShardedClient]'s constructors.
+2. The [Connected], [Disconnected], [Ready], and [LatencyUpdated] events
+ are replaced with [ShardConnected], [ShardDisconnected], [ShardReady], and [ShardLatencyUpdated].
+3. Every event handler you apply/remove to the [DiscordShardedClient] is applied/removed to each shard.
+ If you wish to control a specific shard's events, you can access an individual shard through the `Shards` property.
+
+If you do not wish to use the [DiscordShardedClient] and instead reuse the same [DiscordSocketClient] code and manually shard them,
+you can do so by specifying the [ShardId] for the [DiscordSocketConfig] and pass that to the [DiscordSocketClient]'s constructor.
+
+[DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
+[DiscordShardedClient]: xref:Discord.WebSocket.DiscordShardedClient
+[Connected]: xref:Discord.WebSocket.DiscordSocketClient.Connected
+[Disconnected]: xref:Discord.WebSocket.DiscordSocketClient.Disconnected
+[LatencyUpdated]: xref:Discord.WebSocket.DiscordSocketClient.LatencyUpdated
+[ShardConnected]: xref:Discord.WebSocket.DiscordShardedClient.ShardConnected
+[ShardDisconnected]: xref:Discord.WebSocket.DiscordShardedClient.ShardDisconnected
+[ShardReady]: xref:Discord.WebSocket.DiscordShardedClient.ShardReady
+[ShardLatencyUpdated]: xref:Discord.WebSocket.DiscordShardedClient.ShardLatencyUpdated
+[ShardId]: xref:Discord.WebSocket.DiscordSocketConfig.ShardId

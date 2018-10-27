@@ -6,18 +6,18 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace _02_commands_framework.Services
+namespace _03_sharded_client.Services
 {
     public class CommandHandlingService
     {
         private readonly CommandService _commands;
-        private readonly DiscordSocketClient _discord;
+        private readonly DiscordShardedClient _discord;
         private readonly IServiceProvider _services;
 
         public CommandHandlingService(IServiceProvider services)
         {
             _commands = services.GetRequiredService<CommandService>();
-            _discord = services.GetRequiredService<DiscordSocketClient>();
+            _discord = services.GetRequiredService<DiscordShardedClient>();
             _services = services;
 
             _commands.CommandExecuted += CommandExecutedAsync;
@@ -33,15 +33,19 @@ namespace _02_commands_framework.Services
         public async Task MessageReceivedAsync(SocketMessage rawMessage)
         {
             // Ignore system messages, or messages from other bots
-            if (!(rawMessage is SocketUserMessage message)) return;
-            if (message.Source != MessageSource.User) return;
+            if (!(rawMessage is SocketUserMessage message))
+                return;
+            if (message.Source != MessageSource.User)
+                return;
 
             // This value holds the offset where the prefix ends
             var argPos = 0;
-            if (!message.HasMentionPrefix(_discord.CurrentUser, ref argPos)) return;
+            if (!message.HasMentionPrefix(_discord.CurrentUser, ref argPos))
+                return;
 
-            var context = new SocketCommandContext(_discord, message);
-            await _commands.ExecuteAsync(context, argPos, _services); // we will handle the result in CommandExecutedAsync
+            // A new kind of command context, ShardedCommandContext can be utilized with the commands framework
+            var context = new ShardedCommandContext(_discord, message);
+            await _commands.ExecuteAsync(context, argPos, _services);
         }
 
         public async Task CommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
