@@ -264,8 +264,14 @@ namespace Discord.Rest
             func?.Invoke(args);
 
             if (args.Roles.IsSpecified)
-                args.RoleIds = Optional.Create(args.Roles.Value.Select(r => r.Id));
+            {
+                var ids = args.Roles.Value.Select(r => r.Id);
 
+                if (args.RoleIds.IsSpecified)
+                    args.RoleIds.Value.Concat(args.Roles.Value.Select(r => r.Id));
+                else
+                    args.RoleIds = Optional.Create(args.Roles.Value.Select(r => r.Id));
+            }
             var apiArgs = new AddGuildMemberParams
             {
                 AccessToken = accessToken,
