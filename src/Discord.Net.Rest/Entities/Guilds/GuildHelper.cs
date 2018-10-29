@@ -268,9 +268,9 @@ namespace Discord.Rest
                 var ids = args.Roles.Value.Select(r => r.Id);
 
                 if (args.RoleIds.IsSpecified)
-                    args.RoleIds.Value.Concat(args.Roles.Value.Select(r => r.Id));
+                    args.RoleIds.Value.Concat(ids);
                 else
-                    args.RoleIds = Optional.Create(args.Roles.Value.Select(r => r.Id));
+                    args.RoleIds = Optional.Create(ids);
             }
             var apiArgs = new AddGuildMemberParams
             {
@@ -278,7 +278,7 @@ namespace Discord.Rest
                 Nickname = args.Nickname,
                 IsDeafened = args.Deaf,
                 IsMuted = args.Mute,
-                RoleIds = args.RoleIds.IsSpecified ? args.RoleIds.Value.ToArray() : Optional.Create<ulong[]>()
+                RoleIds = args.RoleIds.IsSpecified ? args.RoleIds.Value.Distinct().ToArray() : Optional.Create<ulong[]>()
             };
 
             var model = await client.ApiClient.AddGuildMemberAsync(guild.Id, userId, apiArgs, options);
