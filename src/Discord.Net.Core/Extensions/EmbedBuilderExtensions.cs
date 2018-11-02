@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord
 {
@@ -65,5 +67,15 @@ namespace Discord
 
             return builder;
         }
+
+        public static EmbedBuilder WithFields(this EmbedBuilder builder, IEnumerable<EmbedFieldBuilder> fields)
+        {
+            foreach (var field in fields)
+                builder.AddField(field);
+
+            return builder;
+        }
+        public static EmbedBuilder WithFields(this EmbedBuilder builder, params EmbedFieldBuilder[] fields)
+            => WithFields(builder, fields.AsEnumerable());
     }
 }

@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API.Rest
@@ -28,5 +28,7 @@ namespace Discord.API.Rest
         public Optional<ulong?> AfkChannelId { get; set; }
         [JsonProperty("owner_id")]
         public Optional<ulong> OwnerId { get; set; }
+        [JsonProperty("explicit_content_filter")]
+        public Optional<ExplicitContentFilterLevel> ExplicitContentFilter { get; set; }
     }
 }

@@ -201,6 +201,8 @@ namespace Discord.Rest
         /// </returns>
         public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
             => ChannelHelper.GetCategoryAsync(this, Discord, options);
+        public Task SyncPermissionsAsync(RequestOptions options = null)
+            => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
 
         private string DebuggerDisplay => $"{Name} ({Id}, Text)";
 

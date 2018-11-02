@@ -55,6 +55,10 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
+        /// <inheritdoc />
+        public MessageActivity Activity { get; private set; }
+        /// <inheritdoc />
+        public MessageApplication Application { get; private set; }
 
         internal RestMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
             : base(discord, id)
@@ -77,6 +81,29 @@ namespace Discord.Rest
 
             if (model.Content.IsSpecified)
                 Content = model.Content.Value;
+
+            if (model.Application.IsSpecified)
+            {
+                // create a new Application from the API model
+                Application = new MessageApplication()
+                {
+                    Id = model.Application.Value.Id,
+                    CoverImage = model.Application.Value.CoverImage,
+                    Description = model.Application.Value.Description,
+                    Icon = model.Application.Value.Icon,
+                    Name = model.Application.Value.Name
+                };
+            }
+
+            if (model.Activity.IsSpecified)
+            {
+                // create a new Activity from the API model
+                Activity = new MessageActivity()
+                {
+                    Type = model.Activity.Value.Type.Value,
+                    PartyId = model.Activity.Value.PartyId.Value
+                };
+            }
         }
 
         /// <inheritdoc />

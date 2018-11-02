@@ -76,9 +76,13 @@ namespace Discord.Rest
         public static async Task<RestInviteMetadata> CreateInviteAsync(IGuildChannel channel, BaseDiscordClient client,
             int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
         {
-            var args = new CreateChannelInviteParams { IsTemporary = isTemporary, IsUnique = isUnique };
-            args.MaxAge = maxAge.GetValueOrDefault(0);
-            args.MaxUses = maxUses.GetValueOrDefault(0);
+            var args = new API.Rest.CreateChannelInviteParams
+            {
+                IsTemporary = isTemporary,
+                IsUnique = isUnique,
+                MaxAge = maxAge ?? 0,
+                MaxUses = maxUses ?? 0
+            };
             var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestInviteMetadata.Create(client, null, channel, model);
         }
@@ -347,6 +351,23 @@ namespace Discord.Rest
             // CategoryId will contain a value here
             var model = await client.ApiClient.GetChannelAsync(channel.CategoryId.Value, options).ConfigureAwait(false);
             return RestCategoryChannel.Create(client, model) as ICategoryChannel;
+        }
+        public static async Task SyncPermissionsAsync(INestedChannel channel, BaseDiscordClient client, RequestOptions options)
+        {
+            var category = await GetCategoryAsync(channel, client, options).ConfigureAwait(false);
+            if (category == null) throw new InvalidOperationException("This channel does not have a parent channel.");
+
+            var apiArgs = new ModifyGuildChannelParams
+            {
+                Overwrites = category.PermissionOverwrites
+                    .Select(overwrite => new API.Overwrite{
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue,
+                        Deny = overwrite.Permissions.DenyValue
+                    }).ToArray()
+            };
+            await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
 
         //Helpers
