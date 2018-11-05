@@ -173,12 +173,12 @@ namespace Discord
                 {
                     case TagHandling.Name:
                         if (user != null)
-                            return $"@{guildUser?.Nickname ?? user?.Username}";
+                            return $"@{guildUser?.Nickname ?? user.Username}";
                         else
                             return "";
                     case TagHandling.NameNoPrefix:
                         if (user != null)
-                            return $"{guildUser?.Nickname ?? user?.Username}";
+                            return $"{guildUser?.Nickname ?? user.Username}";
                         else
                             return "";
                     case TagHandling.FullName:

@@ -106,7 +106,7 @@ namespace Discord.Commands
                     name = text.Substring(index, nextSegment - index);
                     if (_nodes.TryGetValue(name, out nextNode))
                     {
-                        foreach (var cmd in nextNode.GetCommands(service, nextSegment == -1 ? "" : text, nextSegment + 1, false))
+                        foreach (var cmd in nextNode.GetCommands(service, text, nextSegment + 1, false))
                             yield return cmd;
                     }
                 }
