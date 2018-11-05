@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Model = Discord.API.GuildEmbed;
 
-namespace Discord
+namespace Discord.Rest
 {
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct RestGuildEmbed
