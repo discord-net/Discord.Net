@@ -669,6 +669,10 @@ namespace Discord.WebSocket
         }
 
         //Users
+        /// <inheritdoc />
+        public Task<RestGuildUser> AddGuildUserAsync(ulong id, string accessToken, Action<AddGuildUserProperties> func = null, RequestOptions options = null)
+            => GuildHelper.AddGuildUserAsync(this, Discord, id, accessToken, func, options);
+
         /// <summary>
         ///     Gets a user from this guild.
         /// </summary>
@@ -1096,6 +1100,10 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         Task<IReadOnlyCollection<IGuildUser>> IGuild.GetUsersAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Users);
+
+        /// <inheritdoc />
+        async Task<IGuildUser> IGuild.AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func, RequestOptions options)
+            => await AddGuildUserAsync(userId, accessToken, func, options);
         /// <inheritdoc />
         Task<IGuildUser> IGuild.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(GetUser(id));

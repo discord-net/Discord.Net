@@ -257,6 +257,34 @@ namespace Discord.Rest
         }
 
         //Users
+        public static async Task<RestGuildUser> AddGuildUserAsync(IGuild guild, BaseDiscordClient client, ulong userId, string accessToken,
+            Action<AddGuildUserProperties> func, RequestOptions options)
+        {
+            var args = new AddGuildUserProperties();
+            func?.Invoke(args);
+
+            if (args.Roles.IsSpecified)
+            {
+                var ids = args.Roles.Value.Select(r => r.Id);
+
+                if (args.RoleIds.IsSpecified)
+                    args.RoleIds.Value.Concat(ids);
+                else
+                    args.RoleIds = Optional.Create(ids);
+            }
+            var apiArgs = new AddGuildMemberParams
+            {
+                AccessToken = accessToken,
+                Nickname = args.Nickname,
+                IsDeafened = args.Deaf,
+                IsMuted = args.Mute,
+                RoleIds = args.RoleIds.IsSpecified ? args.RoleIds.Value.Distinct().ToArray() : Optional.Create<ulong[]>()
+            };
+
+            var model = await client.ApiClient.AddGuildMemberAsync(guild.Id, userId, apiArgs, options);
+
+            return model is null ? null : RestGuildUser.Create(client, guild, model);
+        }
         public static async Task<RestGuildUser> GetUserAsync(IGuild guild, BaseDiscordClient client,
             ulong id, RequestOptions options)
         {
