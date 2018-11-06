@@ -280,7 +280,7 @@ namespace Discord.Commands
             }
         }
 
-        private static TypeReader GetTypeReader(CommandService service, Type paramType, Type typeReaderType, IServiceProvider services)
+        internal static TypeReader GetTypeReader(CommandService service, Type paramType, Type typeReaderType, IServiceProvider services)
         {
             var readers = service.GetTypeReaders(paramType);
             TypeReader reader = null;
