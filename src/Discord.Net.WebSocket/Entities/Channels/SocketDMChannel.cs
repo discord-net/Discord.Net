@@ -78,30 +78,9 @@ namespace Discord.WebSocket
         ///     Gets the last N messages from this message channel.
         /// </summary>
         /// <remarks>
-        ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
-        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
-        ///         collection.
-        ///     </note>
-        ///     <note type="warning">
-        ///         Do not fetch too many messages at once! This may cause unwanted preemptive rate limit or even actual
-        ///         rate limit, causing your bot to freeze!
-        ///     </note>
-        ///     This method will attempt to fetch the number of messages specified under <paramref name="limit"/>. The
-        ///     library will attempt to split up the requests according to your <paramref name="limit"/> and 
-        ///     <see cref="DiscordConfig.MaxMessagesPerBatch"/>. In other words, should the user request 500 messages,
-        ///     and the <see cref="Discord.DiscordConfig.MaxMessagesPerBatch"/> constant is <c>100</c>, the request will
-        ///     be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
-        ///     of flattening.
+        ///     This method follows the same behavior as described in <see cref="IMessageChannel.GetMessagesAsync(int, CacheMode, RequestOptions)"/>.
+        ///     Please visit its documentation for more details on this method.
         /// </remarks>
-        /// <example>
-        ///     The following example downloads 300 messages and gets messages that belong to the user 
-        ///     <c>53905483156684800</c>.
-        ///     <code lang="cs">
-        ///     var messages = await messageChannel.GetMessagesAsync(300).FlattenAsync();
-        ///     var userMessages = messages.Where(x =&gt; x.Author.Id == 53905483156684800);
-        ///     </code>
-        /// </example>
         /// <param name="limit">The numbers of message to be gotten from.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
@@ -113,29 +92,9 @@ namespace Discord.WebSocket
         ///     Gets a collection of messages in this channel.
         /// </summary>
         /// <remarks>
-        ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
-        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
-        ///         collection.
-        ///     </note>
-        ///     <note type="warning">
-        ///         Do not fetch too many messages at once! This may cause unwanted preemptive rate limit or even actual
-        ///         rate limit, causing your bot to freeze!
-        ///     </note>
-        ///     This method will attempt to fetch the number of messages specified under <paramref name="limit"/> around
-        ///     the message <paramref name="fromMessageId"/> depending on the <paramref name="dir"/>. The library will
-        ///     attempt to split up the requests according to your <paramref name="limit"/> and 
-        ///     <see cref="DiscordConfig.MaxMessagesPerBatch"/>. In other words, should the user request 500 messages,
-        ///     and the <see cref="Discord.DiscordConfig.MaxMessagesPerBatch"/> constant is <c>100</c>, the request will
-        ///     be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
-        ///     of flattening.
+        ///     This method follows the same behavior as described in <see cref="IMessageChannel.GetMessagesAsync(ulong, Direction, int, CacheMode, RequestOptions)"/>.
+        ///     Please visit its documentation for more details on this method.
         /// </remarks>
-        /// <example>
-        ///     The following example gets 5 message prior to the message identifier <c>442012544660537354</c>.
-        ///     <code lang="cs">
-        ///     var messages = await channel.GetMessagesAsync(442012544660537354, Direction.Before, 5).FlattenAsync();
-        ///     </code>
-        /// </example>
         /// <param name="fromMessageId">The ID of the starting message to get the messages from.</param>
         /// <param name="dir">The direction of the messages to be gotten from.</param>
         /// <param name="limit">The numbers of message to be gotten from.</param>
@@ -149,29 +108,9 @@ namespace Discord.WebSocket
         ///     Gets a collection of messages in this channel.
         /// </summary>
         /// <remarks>
-        ///     <note type="important">
-        ///         The returned collection is an asynchronous enumerable object; one must call 
-        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the individual messages as a
-        ///         collection.
-        ///     </note>
-        ///     <note type="warning">
-        ///         Do not fetch too many messages at once! This may cause unwanted preemptive rate limit or even actual
-        ///         rate limit, causing your bot to freeze!
-        ///     </note>
-        ///     This method will attempt to fetch the number of messages specified under <paramref name="limit"/> around
-        ///     the message <paramref name="fromMessage"/> depending on the <paramref name="dir"/>. The library will
-        ///     attempt to split up the requests according to your <paramref name="limit"/> and 
-        ///     <see cref="DiscordConfig.MaxMessagesPerBatch"/>. In other words, should the user request 500 messages,
-        ///     and the <see cref="Discord.DiscordConfig.MaxMessagesPerBatch"/> constant is <c>100</c>, the request will
-        ///     be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
-        ///     of flattening.
+        ///     This method follows the same behavior as described in <see cref="IMessageChannel.GetMessagesAsync(IMessage, Direction, int, CacheMode, RequestOptions)"/>.
+        ///     Please visit its documentation for more details on this method.
         /// </remarks>
-        /// <example>
-        ///     The following example gets 5 message prior to a specific message, <c>oldMessage</c>.
-        ///     <code lang="cs">
-        ///     var messages = await channel.GetMessagesAsync(oldMessage, Direction.Before, 5).FlattenAsync();
-        ///     </code>
-        /// </example>
         /// <param name="fromMessage">The starting message to get the messages from.</param>
         /// <param name="dir">The direction of the messages to be gotten from.</param>
         /// <param name="limit">The numbers of message to be gotten from.</param>
