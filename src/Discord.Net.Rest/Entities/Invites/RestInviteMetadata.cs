@@ -3,17 +3,27 @@ using Model = Discord.API.InviteMetadata;
 
 namespace Discord.Rest
 {
+    /// <summary> Represents additional information regarding the REST-based invite object. </summary>
     public class RestInviteMetadata : RestInvite, IInviteMetadata
     {
         private long? _createdAtTicks;
 
+        /// <inheritdoc />
         public bool IsRevoked { get; private set; }
+        /// <inheritdoc />
         public bool IsTemporary { get; private set; }
+        /// <inheritdoc />
         public int? MaxAge { get; private set; }
+        /// <inheritdoc />
         public int? MaxUses { get; private set; }
+        /// <inheritdoc />
         public int? Uses { get; private set; }
+        /// <summary>
+        ///     Gets the user that created this invite.
+        /// </summary>
         public RestUser Inviter { get; private set; }
 
+        /// <inheritdoc />
         public DateTimeOffset? CreatedAt => DateTimeUtils.FromTicks(_createdAtTicks);
 
         internal RestInviteMetadata(BaseDiscordClient discord, IGuild guild, IChannel channel, string id)
@@ -38,6 +48,7 @@ namespace Discord.Rest
             _createdAtTicks = model.CreatedAt.IsSpecified ? model.CreatedAt.Value.UtcTicks : (long?)null;
         }
 
+        /// <inheritdoc />
         IUser IInviteMetadata.Inviter => Inviter;
     }
 }

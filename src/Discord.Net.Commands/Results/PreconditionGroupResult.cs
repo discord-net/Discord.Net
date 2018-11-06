@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Discord.Commands
@@ -14,10 +15,12 @@ namespace Discord.Commands
             PreconditionResults = (preconditions ?? new List<PreconditionResult>(0)).ToReadOnlyCollection();
         }
 
-        public static new PreconditionGroupResult FromSuccess()
+        public new static PreconditionGroupResult FromSuccess()
             => new PreconditionGroupResult(null, null, null);
         public static PreconditionGroupResult FromError(string reason, ICollection<PreconditionResult> preconditions)
             => new PreconditionGroupResult(CommandError.UnmetPrecondition, reason, preconditions);
+        public static new PreconditionGroupResult FromError(Exception ex)
+            => new PreconditionGroupResult(CommandError.Exception, ex.Message, null);
         public static new PreconditionGroupResult FromError(IResult result) //needed?
             => new PreconditionGroupResult(result.Error, result.ErrorReason, null);
 

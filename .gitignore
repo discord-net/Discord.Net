@@ -206,3 +206,6 @@ project.lock.json
 docs/api/\.manifest
 
 \.idea/
+
+# Codealike UID
+codealike.json

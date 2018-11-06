@@ -5,6 +5,9 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains a piece of audit log data related to a role creation.
+    /// </summary>
     public class RoleCreateAuditLogData : IAuditLogData
     {
         private RoleCreateAuditLogData(ulong id, RoleEditInfo props)
@@ -23,11 +26,11 @@ namespace Discord.Rest
             var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
             var permissionsModel = changes.FirstOrDefault(x => x.ChangedProperty == "permissions");
 
-            uint? colorRaw = colorModel?.NewValue?.ToObject<uint>();
-            bool? mentionable = mentionableModel?.NewValue?.ToObject<bool>();
-            bool? hoist = hoistModel?.NewValue?.ToObject<bool>();
-            string name = nameModel?.NewValue?.ToObject<string>();
-            ulong? permissionsRaw = permissionsModel?.NewValue?.ToObject<ulong>();
+            uint? colorRaw = colorModel?.NewValue?.ToObject<uint>(discord.ApiClient.Serializer);
+            bool? mentionable = mentionableModel?.NewValue?.ToObject<bool>(discord.ApiClient.Serializer);
+            bool? hoist = hoistModel?.NewValue?.ToObject<bool>(discord.ApiClient.Serializer);
+            string name = nameModel?.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
+            ulong? permissionsRaw = permissionsModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
 
             Color? color = null;
             GuildPermissions? permissions = null;
@@ -41,7 +44,19 @@ namespace Discord.Rest
                 new RoleEditInfo(color, mentionable, hoist, name, permissions));
         }
 
+        /// <summary>
+        ///     Gets the ID of the role that was created.
+        /// </summary>
+        /// <return>
+        ///     A <see cref="ulong"/> representing the snowflake identifier to the role that was created.
+        /// </return>
         public ulong RoleId { get; }
+        /// <summary>
+        ///     Gets the role information that was created.
+        /// </summary>
+        /// <return>
+        ///     An information object representing the properties of the role that was created.
+        /// </return>
         public RoleEditInfo Properties { get; }
     }
 }

@@ -15,7 +15,7 @@ namespace Discord.Net
         internal RateLimitInfo(Dictionary<string, string> headers)
         {
             IsGlobal = headers.TryGetValue("X-RateLimit-Global", out string temp) &&
-    bool.TryParse(temp, out var isGlobal) ? isGlobal : false;
+                       bool.TryParse(temp, out var isGlobal) && isGlobal;
             Limit = headers.TryGetValue("X-RateLimit-Limit", out temp) && 
                 int.TryParse(temp, out var limit) ? limit : (int?)null;
             Remaining = headers.TryGetValue("X-RateLimit-Remaining", out temp) && 

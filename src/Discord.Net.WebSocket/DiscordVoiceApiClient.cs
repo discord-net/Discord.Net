@@ -39,8 +39,8 @@ namespace Discord.Audio
         
         private readonly JsonSerializer _serializer;
         private readonly SemaphoreSlim _connectionLock;
+        private readonly IUdpSocket _udp;
         private CancellationTokenSource _connectCancelToken;
-        private IUdpSocket _udp;
         private bool _isDisposed;
         private ulong _nextKeepalive;
 
@@ -188,7 +188,7 @@ namespace Discord.Audio
 
                 ConnectionState = ConnectionState.Connected;
             }
-            catch (Exception)
+            catch
             {
                 await DisconnectInternalAsync().ConfigureAwait(false);
                 throw;

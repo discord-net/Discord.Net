@@ -2,13 +2,17 @@ version: build-{build}
 branches:
   only:
   - dev
-image: Visual Studio 2017
+image:
+- Visual Studio 2017
+- Ubuntu
 
 nuget:
   disable_publish_on_pr: true
 pull_requests:
   do_not_increment_build_number: true
-clone_folder: C:\Projects\Discord.Net
+# Use the default clone_folder
+# Windows: C:\Projects\discord-net
+# Ubuntu: /home/appveyor/projects/discord-net
 cache: test/Discord.Net.Tests/cache.db
 
 environment:
@@ -20,23 +24,50 @@ init:
 - ps: $Env:BUILD = "$($Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0"))"
 
 build_script:
-- ps: appveyor-retry dotnet restore Discord.Net.sln -v Minimal /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
+- ps: >-
+    if ($isLinux)
+    {
+      # AppVeyor Linux images do not have appveyor-retry, which retries the commands a few times
+      # until the command exits with code 0.
+      # So, this is done with a short script.
+      $code = 0
+      $counter = 0
+      do
+      {
+        dotnet restore Discord.Net.sln -v Minimal /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
+        $code = $LASTEXITCODE
+        $counter++
+        if ($code -ne 0)
+        {
+          # Wait 5s before attempting to run again
+          Start-sleep -Seconds 5
+        }
+      }
+      until ($counter -eq 5 -or $code -eq 0)
+    }
+    else
+    {
+      appveyor-retry dotnet restore Discord.Net.sln -v Minimal /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
+    }
 - ps: dotnet build Discord.Net.sln -c "Release" /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
 after_build:
-- ps: dotnet pack "src\Discord.Net.Core\Discord.Net.Core.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
-- ps: dotnet pack "src\Discord.Net.Rest\Discord.Net.Rest.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
-- ps: dotnet pack "src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
-- ps: dotnet pack "src\Discord.Net.Commands\Discord.Net.Commands.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
-- ps: dotnet pack "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
-- ps: dotnet pack "src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
-- ps: dotnet pack "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG"
+- ps: if ($isWindows) { dotnet pack "src\Discord.Net.Core\Discord.Net.Core.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG" }
+- ps: if ($isWindows) { dotnet pack "src\Discord.Net.Rest\Discord.Net.Rest.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG" }
+- ps: if ($isWindows) { dotnet pack "src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG" }
+- ps: if ($isWindows) { dotnet pack "src\Discord.Net.Commands\Discord.Net.Commands.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG" }
+- ps: if ($isWindows) { dotnet pack "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG" }
+- ps: if ($isWindows) { dotnet pack "src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG" }
+- ps: if ($isWindows) { dotnet pack "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj" -c "Release" -o "../../artifacts" --no-build /p:BuildNumber="$Env:BUILD" /p:IsTagBuild="$Env:APPVEYOR_REPO_TAG" }
 - ps: >-
-    if ($Env:APPVEYOR_REPO_TAG -eq "true") {
-      nuget pack src\Discord.Net\Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix=""
-    } else {
-      nuget pack src\Discord.Net\Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix="-$Env:BUILD"
+    if ($isWindows)
+    {
+      if ($Env:APPVEYOR_REPO_TAG -eq "true") {
+        nuget pack src/Discord.Net/Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix=""
+      } else {
+        nuget pack src/Discord.Net/Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix="-$Env:BUILD"
+      }
     }
-- ps: Get-ChildItem artifacts\*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+- ps: if ($isWindows) { Get-ChildItem artifacts/*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name } }
 
 test_script:
 - ps: >-
@@ -52,6 +83,7 @@ deploy:
   symbol_server: https://www.myget.org/F/discord-net/symbols/api/v2/package
   on:
     branch: dev
+    CI_WINDOWS: true
 - provider: NuGet
   server: https://www.myget.org/F/rogueexception/api/v2/package
   api_key:
@@ -59,3 +91,4 @@ deploy:
   symbol_server: https://www.myget.org/F/rogueexception/symbols/api/v2/package
   on:
     branch: dev
+    CI_WINDOWS: true

@@ -1,11 +1,15 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a WebSocket-based message sent by the system.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketSystemMessage : SocketMessage, ISystemMessage
     {
+        /// <inheritdoc />
         public MessageType Type { get; private set; }
 
         internal SocketSystemMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author)

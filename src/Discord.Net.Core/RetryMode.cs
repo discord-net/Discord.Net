@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Discord
 {
@@ -12,7 +12,7 @@ namespace Discord
         RetryTimeouts = 0x1,
         // /// <summary> Retry if a request failed due to a network error. </summary>
         //RetryErrors = 0x2,
-        /// <summary> Retry if a request failed due to a ratelimit. </summary>
+        /// <summary> Retry if a request failed due to a rate-limit. </summary>
         RetryRatelimit = 0x4,
         /// <summary> Retry if a request failed due to an HTTP error 502. </summary>
         Retry502 = 0x8,

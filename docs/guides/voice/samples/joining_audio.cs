@@ -1,4 +1,5 @@
-[Command("join")]
+// The command's Run Mode MUST be set to RunMode.Async, otherwise, being connected to a voice channel will block the gateway thread.
+[Command("join", RunMode = RunMode.Async)] 
 public async Task JoinChannel(IVoiceChannel channel = null)
 {
     // Get the audio channel

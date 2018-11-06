@@ -1,4 +1,4 @@
-﻿using Discord.Rest;
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -57,7 +57,7 @@ namespace Discord.WebSocket
             else
                 return ImmutableArray.Create<SocketMessage>();
         }
-
+        /// <exception cref="NotSupportedException">Unexpected <see cref="ISocketMessageChannel"/> type.</exception>
         public static void AddMessage(ISocketMessageChannel channel, DiscordSocketClient discord,
             SocketMessage msg)
         {
@@ -66,9 +66,10 @@ namespace Discord.WebSocket
                 case SocketDMChannel dmChannel: dmChannel.AddMessage(msg); break;
                 case SocketGroupChannel groupChannel: groupChannel.AddMessage(msg); break;
                 case SocketTextChannel textChannel: textChannel.AddMessage(msg); break;
-                default: throw new NotSupportedException("Unexpected ISocketMessageChannel type");
+                default: throw new NotSupportedException($"Unexpected {nameof(ISocketMessageChannel)} type.");
             }
         }
+        /// <exception cref="NotSupportedException">Unexpected <see cref="ISocketMessageChannel"/> type.</exception>
         public static SocketMessage RemoveMessage(ISocketMessageChannel channel, DiscordSocketClient discord,
             ulong id)
         {
@@ -77,7 +78,7 @@ namespace Discord.WebSocket
                 case SocketDMChannel dmChannel: return dmChannel.RemoveMessage(id);
                 case SocketGroupChannel groupChannel: return groupChannel.RemoveMessage(id);
                 case SocketTextChannel textChannel: return textChannel.RemoveMessage(id);
-                default: throw new NotSupportedException("Unexpected ISocketMessageChannel type");
+                default: throw new NotSupportedException($"Unexpected {nameof(ISocketMessageChannel)} type.");
             }
         }
     }

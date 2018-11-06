@@ -1,5 +1,4 @@
 using Discord.Rest;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -171,15 +170,15 @@ namespace Discord
             // 2 categories
             Assert.Equal(2, categories.Length);
 
-            var cat1 = categories.Where(x => x.Name == "cat1").FirstOrDefault();
-            var cat2 = categories.Where(x => x.Name == "cat2").FirstOrDefault();
+            var cat1 = categories.FirstOrDefault(x => x.Name == "cat1");
+            var cat2 = categories.FirstOrDefault(x => x.Name == "cat2");
 
             Assert.NotNull(cat1);
             Assert.NotNull(cat2);
 
             // get text1, text2, ensure they have category id == cat1
-            var text1 = allChannels.Where(x => x.Name == "text1").FirstOrDefault() as RestTextChannel;
-            var text2 = allChannels.Where(x => x.Name == "text2").FirstOrDefault() as RestTextChannel;
+            var text1 = allChannels.FirstOrDefault(x => x.Name == "text1") as RestTextChannel;
+            var text2 = allChannels.FirstOrDefault(x => x.Name == "text2") as RestTextChannel;
 
             Assert.NotNull(text1);
             Assert.NotNull(text2);
@@ -197,8 +196,8 @@ namespace Discord
             Assert.Equal(text2Cat.Name, cat1.Name);
 
             // do the same for the voice channels
-            var voice1 = allChannels.Where(x => x.Name == "voice1").FirstOrDefault() as RestVoiceChannel;
-            var voice3 = allChannels.Where(x => x.Name == "voice3").FirstOrDefault() as RestVoiceChannel;
+            var voice1 = allChannels.FirstOrDefault(x => x.Name == "voice1") as RestVoiceChannel;
+            var voice3 = allChannels.FirstOrDefault(x => x.Name == "voice3") as RestVoiceChannel;
 
             Assert.NotNull(voice1);
             Assert.NotNull(voice3);
