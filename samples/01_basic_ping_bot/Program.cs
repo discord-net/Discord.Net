@@ -14,7 +14,7 @@ namespace _01_basic_ping_bot
     // - Here, under the 02_commands_framework sample
     // - https://github.com/foxbot/DiscordBotBase - a bare-bones bot template
     // - https://github.com/foxbot/patek - a more feature-filled bot, utilizing more aspects of the library
-    class Program : IDisposable
+    class Program
     {
         private readonly DiscordSocketClient _client;
 
@@ -22,8 +22,7 @@ namespace _01_basic_ping_bot
         // an asynchronous context from the beginning.
         static void Main(string[] args)
         {
-            using (var program = new Program())
-                program.MainAsync().GetAwaiter().GetResult();
+            new Program().MainAsync().GetAwaiter().GetResult();
         }
 
         public Program()
@@ -72,12 +71,6 @@ namespace _01_basic_ping_bot
 
             if (message.Content == "!ping")
                 await message.Channel.SendMessageAsync("pong!");
-        }
-
-        public void Dispose()
-        {
-            // Dispose of the client when we are done with it
-            _client.Dispose();
         }
     }
 }

@@ -37,6 +37,7 @@ namespace _02_commands_framework
                 client.Log += LogAsync;
                 services.GetRequiredService<CommandService>().Log += LogAsync;
 
+                // Tokens should be considered secret data, and never hard-coded.
                 await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
                 await client.StartAsync();
 
