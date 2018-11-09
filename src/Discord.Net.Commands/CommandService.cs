@@ -603,6 +603,8 @@ namespace Discord.Commands
             //If we get this far, at least one parse was successful. Execute the most likely overload.
             var chosenOverload = successfulParses[0];
             var result = await chosenOverload.Key.ExecuteAsync(context, chosenOverload.Value, services).ConfigureAwait(false);
+            if (!result.IsSuccess && result is ExecuteResult)
+                await _commandExecutedEvent.InvokeAsync(chosenOverload.Key.Command, context, result);
             return result;
         }
     }
