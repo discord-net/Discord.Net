@@ -251,14 +251,11 @@ namespace Discord.WebSocket
                 await heartbeatTask.ConfigureAwait(false);
             _heartbeatTask = null;
 
-            // Check if hearbeatTimes is not empty before dequeuing. TryDequeue can cause blocking.
             if (!_heartbeatTimes.IsEmpty) while (_heartbeatTimes.TryDequeue(out long time)) { }
-            _lastMessageTime = 0;
 
             await _gatewayLogger.DebugAsync("Waiting for guild downloader").ConfigureAwait(false);
-            var guildDownloadTask = _guildDownloadTask;
-            if (guildDownloadTask != null)
-                await guildDownloadTask.ConfigureAwait(false);
+            if (_guildDownloadTask != null)
+                await _guildDownloadTask.ConfigureAwait(false);
             _guildDownloadTask = null;
 
             //Clear large guild queue
