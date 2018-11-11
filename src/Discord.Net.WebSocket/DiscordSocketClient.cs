@@ -63,7 +63,7 @@ namespace Discord.WebSocket
         internal WebSocketProvider WebSocketProvider { get; private set; }
         internal bool AlwaysDownloadUsers { get; private set; }
         internal int? HandlerTimeout { get; private set; }
-        
+
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
@@ -197,10 +197,10 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public override async Task StartAsync() 
+        public override async Task StartAsync()
             => await _connection.StartAsync().ConfigureAwait(false);
         /// <inheritdoc />
-        public override async Task StopAsync() 
+        public override async Task StopAsync()
             => await _connection.StopAsync().ConfigureAwait(false);
 
         private async Task OnConnectingAsync()
@@ -251,7 +251,9 @@ namespace Discord.WebSocket
                 await heartbeatTask.ConfigureAwait(false);
             _heartbeatTask = null;
 
+            // Check if hearbeatTimes is not empty before dequeuing. TryDequeue can cause blocking.
             if (!_heartbeatTimes.IsEmpty) while (_heartbeatTimes.TryDequeue(out long time)) { }
+            _lastMessageTime = 0;
 
             await _gatewayLogger.DebugAsync("Waiting for guild downloader").ConfigureAwait(false);
             if (_guildDownloadTask != null)
