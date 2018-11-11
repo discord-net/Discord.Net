@@ -537,6 +537,10 @@ namespace Discord.Rest
         public IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(RequestOptions options = null)
             => GuildHelper.GetUsersAsync(this, Discord, null, null, options);
 
+        /// <inheritdoc />
+        public Task<RestGuildUser> AddGuildUserAsync(ulong id, string accessToken, Action<AddGuildUserProperties> func = null, RequestOptions options = null)
+            => GuildHelper.AddGuildUserAsync(this, Discord, id, accessToken, func, options);
+
         /// <summary>
         ///     Gets a user from this guild.
         /// </summary>
@@ -799,6 +803,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options)
             => await CreateRoleAsync(name, permissions, color, isHoisted, options).ConfigureAwait(false);
+
+        /// <inheritdoc />
+        async Task<IGuildUser> IGuild.AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func, RequestOptions options)
+            => await AddGuildUserAsync(userId, accessToken, func, options);
 
         /// <inheritdoc />
         async Task<IGuildUser> IGuild.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)

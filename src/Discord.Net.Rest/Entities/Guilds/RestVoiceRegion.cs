@@ -2,7 +2,7 @@ using Discord.Rest;
 using System.Diagnostics;
 using Model = Discord.API.VoiceRegion;
 
-namespace Discord
+namespace Discord.Rest
 {
     /// <summary>
     ///     Represents a REST-based voice region.

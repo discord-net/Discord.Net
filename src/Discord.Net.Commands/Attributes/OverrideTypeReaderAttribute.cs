@@ -1,5 +1,4 @@
 using System;
-
 using System.Reflection;
 
 namespace Discord.Commands
@@ -27,8 +26,8 @@ namespace Discord.Commands
     ///         => ReplyAsync(time);
     ///     </code>
     /// </example>
-    [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
-    public class OverrideTypeReaderAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    public sealed class OverrideTypeReaderAttribute : Attribute
     {
         private static readonly TypeInfo TypeReaderTypeInfo = typeof(TypeReader).GetTypeInfo();
 

@@ -994,6 +994,25 @@ namespace Discord.API
         }
 
         //Guild Members
+        public async Task<GuildMember> AddGuildMemberAsync(ulong guildId, ulong userId, AddGuildMemberParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(userId, 0, nameof(userId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotNullOrWhitespace(args.AccessToken, nameof(args.AccessToken));
+
+            if (args.RoleIds.IsSpecified)
+            {
+                foreach (var roleId in args.RoleIds.Value)
+                    Preconditions.NotEqual(roleId, 0, nameof(roleId));
+            }                
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(guildId: guildId);
+
+            return await SendJsonAsync<GuildMember>("PUT", () => $"guilds/{guildId}/members/{userId}", args, ids, options: options);
+        }
         public async Task<GuildMember> GetGuildMemberAsync(ulong guildId, ulong userId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
