@@ -204,7 +204,7 @@ namespace Discord
         {
             if (mode != TagHandling.Remove)
             {
-                var channel = tag.Value as IChannel;
+                var channel = tag.Value as IGuildChannel;
                 switch (mode)
                 {
                     case TagHandling.Name:

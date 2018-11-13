@@ -9,14 +9,6 @@ namespace Discord
     public interface IChannel : ISnowflakeEntity
     {
         /// <summary>
-        ///     Gets the name of this channel.
-        /// </summary>
-        /// <returns>
-        ///     A string containing the name of this channel.
-        /// </returns>
-        string Name { get; }
-
-        /// <summary>
         ///     Gets a collection of all users in this channel.
         /// </summary>
         /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>

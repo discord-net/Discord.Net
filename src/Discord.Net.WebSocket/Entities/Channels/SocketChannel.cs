@@ -58,8 +58,6 @@ namespace Discord.WebSocket
         internal SocketChannel Clone() => MemberwiseClone() as SocketChannel;
 
         //IChannel
-        /// <inheritdoc />
-        string IChannel.Name => null;
 
         /// <inheritdoc />
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)

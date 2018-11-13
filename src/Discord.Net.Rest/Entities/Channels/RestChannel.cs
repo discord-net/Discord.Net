@@ -54,8 +54,6 @@ namespace Discord.Rest
         public virtual Task UpdateAsync(RequestOptions options = null) => Task.Delay(0);
 
         //IChannel
-        /// <inheritdoc />
-        string IChannel.Name => null;
 
         /// <inheritdoc />
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)

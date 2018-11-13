@@ -210,8 +210,6 @@ namespace Discord.Rest
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
 
         //IChannel
-        /// <inheritdoc />
-        string IChannel.Name => $"@{Recipient}";
 
         /// <inheritdoc />
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)

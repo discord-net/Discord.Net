@@ -13,6 +13,14 @@ namespace Discord
     public interface IGuildChannel : IChannel, IDeletable
     {
         /// <summary>
+        ///     Gets the name of this channel.
+        /// </summary>
+        /// <returns>
+        ///     A string containing the name of this channel.
+        /// </returns>
+        string Name { get; }
+
+        /// <summary>
         ///     Gets the position of this channel.
         /// </summary>
         /// <returns>
