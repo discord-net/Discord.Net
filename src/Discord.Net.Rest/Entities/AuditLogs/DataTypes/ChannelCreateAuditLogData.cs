@@ -33,10 +33,10 @@ namespace Discord.Rest
 
             foreach (var overwrite in overwritesModel.NewValue)
             {
-                var deny = overwrite.Value<ulong>("deny");
-                var permType = overwrite.Value<PermissionTarget>("type");
-                var id = overwrite.Value<ulong>("id");
-                var allow = overwrite.Value<ulong>("allow");
+                var deny = overwrite["deny"].ToObject<ulong>(discord.ApiClient.Serializer);
+                var permType = overwrite["type"].ToObject<PermissionTarget>(discord.ApiClient.Serializer);
+                var id = overwrite["id"].ToObject<ulong>(discord.ApiClient.Serializer);
+                var allow = overwrite["allow"].ToObject<ulong>(discord.ApiClient.Serializer);
 
                 overwrites.Add(new Overwrite(id, permType, new OverwritePermissions(allow, deny)));
             }
