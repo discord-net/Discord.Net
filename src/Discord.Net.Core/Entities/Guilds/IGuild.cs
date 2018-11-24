@@ -53,6 +53,13 @@ namespace Discord
         /// </returns>
         VerificationLevel VerificationLevel { get; }
         /// <summary>
+        ///     Gets the level of content filtering applied to user's content in a Guild.
+        /// </summary>
+        /// <returns>
+        ///     The level of explicit content filtering.
+        /// </returns>
+        ExplicitContentFilterLevel ExplicitContentFilter { get; }
+        /// <summary>
         ///     Gets the ID of this guild's icon.
         /// </summary>
         /// <returns>
@@ -140,6 +147,13 @@ namespace Discord
         ///     A <see cref="ulong"/> representing the snowflake identifier of the user that owns this guild.
         /// </returns>
         ulong OwnerId { get; }
+        /// <summary>
+        ///     Gets the application ID of the guild creator if it is bot-created.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the application ID that created this guild, or <c>null</c> if it was not bot-created.
+        /// </returns>
+        ulong? ApplicationId { get; }
         /// <summary>
         ///     Gets the ID of the region hosting this guild's voice channels.
         /// </summary>
@@ -521,6 +535,18 @@ namespace Discord
         /// </returns>
         Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, RequestOptions options = null);
 
+        /// <summary>
+        ///     Adds a user to this guild.
+        /// </summary>
+        /// <remarks>
+        ///     This method requires you have an OAuth2 access token for the user, requested with the guilds.join scope, and that the bot have the MANAGE_INVITES permission in the guild.
+        /// </remarks>
+        /// <param name="id">The snowflake identifier of the user.</param>
+        /// <param name="accessToken">The OAuth2 access token for the user, requested with the guilds.join scope.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the user upon being added to the guild.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>A guild user associated with the specified <paramref name="id" />; <c>null</c> if the user is already in the guild.</returns>
+        Task<IGuildUser> AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func = null, RequestOptions options = null);
         /// <summary>
         ///     Gets a collection of all users in this guild.
         /// </summary>

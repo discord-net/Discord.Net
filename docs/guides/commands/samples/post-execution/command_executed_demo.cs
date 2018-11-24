@@ -27,7 +27,7 @@ public async Task HandleCommandAsync(SocketMessage msg)
     var message = messageParam as SocketUserMessage;
     if (message == null) return;
     int argPos = 0;
-    if (!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))) return;
+    if (!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)) || message.Author.IsBot) return;
     var context = new SocketCommandContext(_client, message);
     var result = await _commands.ExecuteAsync(context, argPos, _services);
     // Optionally, you may pass the result manually into your

@@ -1,3 +1,4 @@
+
 #pragma warning disable CS1591
 using Discord.API.Rest;
 using Discord.Net;
@@ -977,6 +978,8 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.AtLeast(args.MaxAge, 0, nameof(args.MaxAge));
             Preconditions.AtLeast(args.MaxUses, 0, nameof(args.MaxUses));
+            Preconditions.AtMost(args.MaxAge, 86400, nameof(args.MaxAge),
+                "The maximum age of an invite must be less than or equal to a day (86400 seconds).");
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
@@ -991,6 +994,25 @@ namespace Discord.API
         }
 
         //Guild Members
+        public async Task<GuildMember> AddGuildMemberAsync(ulong guildId, ulong userId, AddGuildMemberParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(userId, 0, nameof(userId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotNullOrWhitespace(args.AccessToken, nameof(args.AccessToken));
+
+            if (args.RoleIds.IsSpecified)
+            {
+                foreach (var roleId in args.RoleIds.Value)
+                    Preconditions.NotEqual(roleId, 0, nameof(roleId));
+            }                
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(guildId: guildId);
+
+            return await SendJsonAsync<GuildMember>("PUT", () => $"guilds/{guildId}/members/{userId}", args, ids, options: options);
+        }
         public async Task<GuildMember> GetGuildMemberAsync(ulong guildId, ulong userId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
@@ -1426,8 +1448,11 @@ namespace Discord.API
 
                     lastIndex = rightIndex + 1;
                 }
+                if (builder[builder.Length - 1] == '/')
+                    builder.Remove(builder.Length - 1, 1);
 
                 format = builder.ToString();
+
                 return x => string.Format(format, x.ToArray());
             }
             catch (Exception ex)

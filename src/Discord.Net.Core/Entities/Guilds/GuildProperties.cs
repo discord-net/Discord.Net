@@ -66,5 +66,9 @@ namespace Discord
         ///     Gets or sets the ID of the owner of this guild.
         /// </summary>
         public Optional<ulong> OwnerId { get; set; }
+        /// <summary>
+        ///     Gets or sets the explicit content filter level of this guild.
+        /// </summary>
+        public Optional<ExplicitContentFilterLevel> ExplicitContentFilter { get; set; }
     }
 }

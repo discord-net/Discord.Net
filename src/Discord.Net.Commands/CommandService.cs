@@ -49,8 +49,8 @@ namespace Discord.Commands
         ///         Should the command encounter any of the aforementioned error, this event will not be raised.
         ///     </para>
         /// </remarks>
-        public event Func<CommandInfo, ICommandContext, IResult, Task> CommandExecuted { add { _commandExecutedEvent.Add(value); } remove { _commandExecutedEvent.Remove(value); } }
-        internal readonly AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>> _commandExecutedEvent = new AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>>();
+        public event Func<Optional<CommandInfo>, ICommandContext, IResult, Task> CommandExecuted { add { _commandExecutedEvent.Add(value); } remove { _commandExecutedEvent.Remove(value); } }
+        internal readonly AsyncEvent<Func<Optional<CommandInfo>, ICommandContext, IResult, Task>> _commandExecutedEvent = new AsyncEvent<Func<Optional<CommandInfo>, ICommandContext, IResult, Task>>();
 
         private readonly SemaphoreSlim _moduleLock;
         private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
@@ -512,7 +512,11 @@ namespace Discord.Commands
 
             var searchResult = Search(input);
             if (!searchResult.IsSuccess)
+            {
+                await _commandExecutedEvent.InvokeAsync(Optional.Create<CommandInfo>(), context, searchResult).ConfigureAwait(false);
                 return searchResult;
+            }
+                
 
             var commands = searchResult.Commands;
             var preconditionResults = new Dictionary<CommandMatch, PreconditionResult>();
@@ -532,6 +536,8 @@ namespace Discord.Commands
                 var bestCandidate = preconditionResults
                     .OrderByDescending(x => x.Key.Command.Priority)
                     .FirstOrDefault(x => !x.Value.IsSuccess);
+
+                await _commandExecutedEvent.InvokeAsync(bestCandidate.Key.Command, context, bestCandidate.Value).ConfigureAwait(false);
                 return bestCandidate.Value;
             }
 
@@ -589,12 +595,17 @@ namespace Discord.Commands
                 //All parses failed, return the one from the highest priority command, using score as a tie breaker
                 var bestMatch = parseResults
                     .FirstOrDefault(x => !x.Value.IsSuccess);
+
+                await _commandExecutedEvent.InvokeAsync(bestMatch.Key.Command, context, bestMatch.Value).ConfigureAwait(false);
                 return bestMatch.Value;
             }
 
             //If we get this far, at least one parse was successful. Execute the most likely overload.
             var chosenOverload = successfulParses[0];
-            return await chosenOverload.Key.ExecuteAsync(context, chosenOverload.Value, services).ConfigureAwait(false);
+            var result = await chosenOverload.Key.ExecuteAsync(context, chosenOverload.Value, services).ConfigureAwait(false);
+            if (!result.IsSuccess && !(result is RuntimeResult)) // succesful results raise the event in CommandInfo#ExecuteInternalAsync (have to raise it there b/c deffered execution)
+                await _commandExecutedEvent.InvokeAsync(chosenOverload.Key.Command, context, result);
+            return result;
         }
     }
 }

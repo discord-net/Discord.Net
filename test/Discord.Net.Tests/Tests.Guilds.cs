@@ -5,8 +5,25 @@ using Xunit;
 
 namespace Discord
 {
-    public class GuidPermissionsTests
+    public partial class Tests
     {
+        /// <summary>
+        ///     Tests the behavior of modifying the ExplicitContentFilter property of a Guild.
+        /// </summary>
+        [Fact]
+        public async Task TestExplicitContentFilter()
+        {
+            foreach (var level in Enum.GetValues(typeof(ExplicitContentFilterLevel)))
+            {
+                await _guild.ModifyAsync(x => x.ExplicitContentFilter = (ExplicitContentFilterLevel)level);
+                await _guild.UpdateAsync();
+                Assert.Equal(level, _guild.ExplicitContentFilter);
+            }
+        }
+
+        /// <summary>
+        ///     Tests the behavior of the GuildPermissions class.
+        /// </summary>
         [Fact]
         public Task TestGuildPermission()
         {
