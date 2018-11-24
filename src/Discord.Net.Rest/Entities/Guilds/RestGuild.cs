@@ -441,13 +441,14 @@ namespace Discord.Rest
         ///     Creates a category channel with the provided name.
         /// </summary>
         /// <param name="name">The name of the new channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
         /// <returns>
         ///     The created category channel.
         /// </returns>
-        public Task<RestCategoryChannel> CreateCategoryChannelAsync(string name, RequestOptions options = null)
-            => GuildHelper.CreateCategoryChannelAsync(this, Discord, name, options);
+        public Task<RestCategoryChannel> CreateCategoryChannelAsync(string name, Action<GuildChannelProperties> func = null, RequestOptions options = null)
+            => GuildHelper.CreateCategoryChannelAsync(this, Discord, name, options, func);
 
         /// <summary>
         ///     Gets a collection of all the voice regions this guild can access.
@@ -776,8 +777,8 @@ namespace Discord.Rest
         async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func, RequestOptions options)
             => await CreateVoiceChannelAsync(name, func, options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<ICategoryChannel> IGuild.CreateCategoryAsync(string name, RequestOptions options)
-            => await CreateCategoryChannelAsync(name, options).ConfigureAwait(false);
+        async Task<ICategoryChannel> IGuild.CreateCategoryAsync(string name, Action<GuildChannelProperties> func, RequestOptions options)
+            => await CreateCategoryChannelAsync(name, func, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IVoiceRegion>> IGuild.GetVoiceRegionsAsync(RequestOptions options)
