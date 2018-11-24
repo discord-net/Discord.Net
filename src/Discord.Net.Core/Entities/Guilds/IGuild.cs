@@ -474,12 +474,13 @@ namespace Discord
         ///     Creates a new channel category in this guild.
         /// </summary>
         /// <param name="name">The new name for the category.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     category channel.
         /// </returns>
-        Task<ICategoryChannel> CreateCategoryAsync(string name, RequestOptions options = null);
+        Task<ICategoryChannel> CreateCategoryAsync(string name, Action<GuildChannelProperties> func = null, RequestOptions options = null);
 
         /// <summary>
         ///     Gets a collection of all the voice regions this guild can access.

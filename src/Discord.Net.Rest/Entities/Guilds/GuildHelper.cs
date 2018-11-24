@@ -189,11 +189,18 @@ namespace Discord.Rest
         }
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
         public static async Task<RestCategoryChannel> CreateCategoryChannelAsync(IGuild guild, BaseDiscordClient client,
-            string name, RequestOptions options)
+            string name, RequestOptions options, Action<GuildChannelProperties> func = null)
         {
             if (name == null) throw new ArgumentNullException(paramName: nameof(name));
 
-            var args = new CreateGuildChannelParams(name, ChannelType.Category);
+            var props = new GuildChannelProperties();
+            func?.Invoke(props);
+
+            var args = new CreateGuildChannelParams(name, ChannelType.Category)
+            {
+                Position = props.Position
+            };
+
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestCategoryChannel.Create(client, guild, model);
         }
