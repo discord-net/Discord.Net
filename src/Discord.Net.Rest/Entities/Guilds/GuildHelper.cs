@@ -163,6 +163,7 @@ namespace Discord.Rest
                 CategoryId = props.CategoryId,
                 Topic = props.Topic,
                 IsNsfw = props.IsNsfw,
+                Position = props.Position
             };
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestTextChannel.Create(client, guild, model);
@@ -180,7 +181,8 @@ namespace Discord.Rest
             {
                 CategoryId = props.CategoryId,
                 Bitrate = props.Bitrate,
-                UserLimit = props.UserLimit
+                UserLimit = props.UserLimit,
+                Position = props.Position
             };
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestVoiceChannel.Create(client, guild, model);

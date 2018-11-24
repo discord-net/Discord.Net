@@ -12,6 +12,8 @@ namespace Discord.API.Rest
         public ChannelType Type { get; }
         [JsonProperty("parent_id")]
         public Optional<ulong?> CategoryId { get; set; }
+        [JsonProperty("position")]
+        public Optional<int> Position { get; set; }
 
         //Text channels
         [JsonProperty("topic")]
