@@ -163,6 +163,7 @@ namespace Discord.Rest
                 CategoryId = props.CategoryId,
                 Topic = props.Topic,
                 IsNsfw = props.IsNsfw,
+                Position = props.Position
             };
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestTextChannel.Create(client, guild, model);
@@ -180,18 +181,26 @@ namespace Discord.Rest
             {
                 CategoryId = props.CategoryId,
                 Bitrate = props.Bitrate,
-                UserLimit = props.UserLimit
+                UserLimit = props.UserLimit,
+                Position = props.Position
             };
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestVoiceChannel.Create(client, guild, model);
         }
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
         public static async Task<RestCategoryChannel> CreateCategoryChannelAsync(IGuild guild, BaseDiscordClient client,
-            string name, RequestOptions options)
+            string name, RequestOptions options, Action<GuildChannelProperties> func = null)
         {
             if (name == null) throw new ArgumentNullException(paramName: nameof(name));
 
-            var args = new CreateGuildChannelParams(name, ChannelType.Category);
+            var props = new GuildChannelProperties();
+            func?.Invoke(props);
+
+            var args = new CreateGuildChannelParams(name, ChannelType.Category)
+            {
+                Position = props.Position
+            };
+
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestCategoryChannel.Create(client, guild, model);
         }
