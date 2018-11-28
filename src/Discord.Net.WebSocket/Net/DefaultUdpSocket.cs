@@ -120,7 +120,7 @@ namespace Discord.Net.Udp
 
                 _ = receiveTask.ContinueWith((recieveResult) =>
                 {
-                    //observe the exception as to not recieve as unhandled exception
+                    //observe the exception as to not receive as unhandled exception
                     _ = recieveResult.Exception;
 
                 }, TaskContinuationOptions.OnlyOnFaulted);
