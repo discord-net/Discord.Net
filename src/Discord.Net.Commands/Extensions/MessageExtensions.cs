@@ -19,7 +19,7 @@ namespace Discord.Commands
         public static bool HasCharPrefix(this IUserMessage msg, char c, ref int argPos)
         {
             var text = msg.Content;
-            if (!string.IsNullOrEmpty(text) && text.Length > 0 && text[0] == c)
+            if (!string.IsNullOrEmpty(text) && text[0] == c)
             {
                 argPos = 1;
                 return true;
@@ -45,7 +45,7 @@ namespace Discord.Commands
         public static bool HasMentionPrefix(this IUserMessage msg, IUser user, ref int argPos)
         {
             var text = msg.Content;
-            if (!string.IsNullOrEmpty(text) && text.Length <= 3 || text[0] != '<' || text[1] != '@') return false;
+            if ((!string.IsNullOrEmpty(text) && text.Length <= 3) || text[0] != '<' || text[1] != '@') return false;
 
             int endPos = text.IndexOf('>');
             if (endPos == -1) return false;
