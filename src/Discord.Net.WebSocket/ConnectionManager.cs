@@ -157,9 +157,9 @@ namespace Discord
 
             await _onDisconnecting(ex).ConfigureAwait(false);
 
-            await _logger.InfoAsync("Disconnected").ConfigureAwait(false);
-            State = ConnectionState.Disconnected;
             await _disconnectedEvent.InvokeAsync(ex, isReconnecting).ConfigureAwait(false);
+            State = ConnectionState.Disconnected;
+            await _logger.InfoAsync("Disconnected").ConfigureAwait(false);
         }
 
         public async Task CompleteAsync()
