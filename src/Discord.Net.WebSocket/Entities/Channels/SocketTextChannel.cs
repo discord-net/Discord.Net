@@ -126,7 +126,6 @@ namespace Discord.WebSocket
         /// <returns>
         ///     Paged collection of messages.
         /// </returns>
-
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit, CacheMode.AllowDownload, options);
         /// <summary>
@@ -303,6 +302,14 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => ChannelHelper.GetWebhooksAsync(this, Discord, options);
+
+        //Invites
+        /// <inheritdoc />
+        public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+            => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        public async Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
+            => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
 
         private string DebuggerDisplay => $"{Name} ({Id}, Text)";
         internal new SocketTextChannel Clone() => MemberwiseClone() as SocketTextChannel;
