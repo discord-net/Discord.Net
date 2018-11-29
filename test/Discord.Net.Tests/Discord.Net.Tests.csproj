@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <DebugType>portable</DebugType>
     <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81</PackageTargetFallback>
+    <NoWarn>IDISP001,IDISP002,IDISP004,IDISP005</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="xunit.runner.json">

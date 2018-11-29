@@ -1,15 +1,21 @@
+using System;
 using System.IO;
+
 namespace Discord
 {
     /// <summary>
     ///     An image that will be uploaded to Discord.
     /// </summary>
-    public struct Image
+    public struct Image : IDisposable
     {
+        private bool _isDisposed;
+
         /// <summary>
         ///     Gets the stream to be uploaded to Discord.
         /// </summary>
+#pragma warning disable IDISP008
         public Stream Stream { get; }
+#pragma warning restore IDISP008
         /// <summary>
         ///     Create the image with a <see cref="System.IO.Stream"/>.
         /// </summary>
@@ -19,6 +25,7 @@ namespace Discord
         /// </param>
         public Image(Stream stream)
         {
+            _isDisposed = false;
             Stream = stream;
         }
 
@@ -45,15 +52,28 @@ namespace Discord
         /// The specified <paramref name="path"/> is invalid, (for example, it is on an unmapped drive).
         /// </exception>
         /// <exception cref="System.UnauthorizedAccessException">
-        /// <paramref name="path" /> specified a directory.-or- The caller does not have the required permission. 
+        /// <paramref name="path" /> specified a directory.-or- The caller does not have the required permission.
         /// </exception>
-        /// <exception cref="FileNotFoundException">The file specified in <paramref name="path" /> was not found. 
+        /// <exception cref="FileNotFoundException">The file specified in <paramref name="path" /> was not found.
         /// </exception>
         /// <exception cref="IOException">An I/O error occurred while opening the file. </exception>
         public Image(string path)
         {
+            _isDisposed = false;
             Stream = File.OpenRead(path);
         }
 
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            if (!_isDisposed)
+            {
+#pragma warning disable IDISP007
+                Stream?.Dispose();
+#pragma warning restore IDISP007
+
+                _isDisposed = true;
+            }
+        }
     }
 }
