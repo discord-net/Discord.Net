@@ -8,6 +8,15 @@ namespace Discord
     public static class TokenUtils
     {
         /// <summary>
+        ///     The minimum length of a Bot token.
+        /// </summary>
+        /// <remarks>
+        ///     This value was determined by comparing against the examples in the Discord
+        ///     documentation, and pre-existing tokens.
+        /// </remarks>
+        internal const int MinBotTokenLength = 58;
+
+        /// <summary>
         ///     Checks the validity of the supplied token of a specific type.
         /// </summary>
         /// <param name="tokenType"> The type of token to validate. </param>
@@ -29,11 +38,11 @@ namespace Discord
                     // no validation is performed on Bearer tokens
                     break;
                 case TokenType.Bot:
-                    // bot tokens are assumed to be at least 59 characters in length
+                    // bot tokens are assumed to be at least 58 characters in length
                     // this value was determined by referencing examples in the discord documentation, and by comparing with
                     // pre-existing tokens
-                    if (token.Length < 59)
-                        throw new ArgumentException(message: "A Bot token must be at least 59 characters in length.", paramName: nameof(token));
+                    if (token.Length < MinBotTokenLength)
+                        throw new ArgumentException(message: $"A Bot token must be at least {MinBotTokenLength} characters in length.", paramName: nameof(token));
                     break;
                 default:
                     // All unrecognized TokenTypes (including User tokens) are considered to be invalid.
