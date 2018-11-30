@@ -69,9 +69,12 @@ namespace Discord
         /// <summary>
         ///     Tests the behavior of <see cref="TokenUtils.ValidateToken(TokenType, string)"/>
         ///     to see that valid Bot tokens do not throw Exceptions.
-        ///     Valid Bot tokens can be strings of length 59 or above.
+        ///     Valid Bot tokens can be strings of length 58 or above.
         /// </summary>
         [Theory]
+        // missing a single character from the end, 58 char. still should be valid
+        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKW")]
+        // 59 char token
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWs")]
         [InlineData("This appears to be completely invalid, however the current validation rules are not very strict.")]
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWss")]
@@ -90,12 +93,12 @@ namespace Discord
         /// </summary>
         [Theory]
         [InlineData("This is invalid")]
-        // missing a single character from the end
-        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKW")]
         // bearer token
         [InlineData("6qrZcUqja7812RVdnEKjpzOL4CvHBFG")]
         // client secret
         [InlineData("937it3ow87i4ery69876wqire")]
+        // 57 char bot token
+        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kK")]
         public void TestBotTokenInvalidThrowsArgumentException(string token)
         {
             Assert.Throws<ArgumentException>(() => TokenUtils.ValidateToken(TokenType.Bot, token));
@@ -113,6 +116,7 @@ namespace Discord
         // TokenType.User
         [InlineData(0)]
         // out of range TokenType
+        [InlineData(-1)]
         [InlineData(4)]
         [InlineData(7)]
         public void TestUnrecognizedTokenType(int type)
