@@ -17,6 +17,45 @@ namespace Discord
         internal const int MinBotTokenLength = 58;
 
         /// <summary>
+        ///     Checks the validity of a bot token by attempting to decode a ulong userid
+        ///     from the bot token.
+        /// </summary>
+        /// <param name="message">
+        ///     The bot token to validate.
+        /// </param>
+        /// <returns>
+        ///     True if the bot token was valid, false if it was not.
+        /// </returns>
+        internal static bool CheckBotTokenValidity(string message)
+        {
+            // split each component of the JWT
+            var segments = message.Split('.');
+
+            // ensure that there are three parts
+            if (segments.Length != 3)
+                return false;
+
+            try
+            {
+                // decode the first segment as base64
+                var v = Convert.FromBase64String(segments[0]);
+                BitConverter.ToUInt64(v, 0);
+                // if no exception thrown, token is valid
+                return true;
+            }
+            catch (FormatException)
+            {
+                // ignore exception, if contains invalid base64 characters return false
+                return false;
+            }
+            catch (ArgumentException)
+            {
+                // ignore exceptions thrown by BitConverter
+                return false;
+            }
+        }
+
+        /// <summary>
         ///     Checks the validity of the supplied token of a specific type.
         /// </summary>
         /// <param name="tokenType"> The type of token to validate. </param>
@@ -43,6 +82,9 @@ namespace Discord
                     // pre-existing tokens
                     if (token.Length < MinBotTokenLength)
                         throw new ArgumentException(message: $"A Bot token must be at least {MinBotTokenLength} characters in length.", paramName: nameof(token));
+                    // check the validity of the bot token by decoding the ulong userid from the jwt
+                    if (!CheckBotTokenValidity(token))
+                        throw new ArgumentException(message: "The Bot token was invalid.", paramName: nameof(token));
                     break;
                 default:
                     // All unrecognized TokenTypes (including User tokens) are considered to be invalid.
