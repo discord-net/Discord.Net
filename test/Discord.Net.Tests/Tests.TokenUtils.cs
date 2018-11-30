@@ -76,9 +76,7 @@ namespace Discord
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKW")]
         // 59 char token
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWs")]
-        [InlineData("This appears to be completely invalid, however the current validation rules are not very strict.")]
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWss")]
-        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWsMTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWs")]
         public void TestBotTokenDoesNotThrowExceptions(string token)
         {
             // This example token is pulled from the Discord Docs
@@ -99,6 +97,9 @@ namespace Discord
         [InlineData("937it3ow87i4ery69876wqire")]
         // 57 char bot token
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kK")]
+        [InlineData("This is an invalid token, but it passes the check for string length.")]
+        // valid token, but passed in twice
+        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWsMTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWs")]
         public void TestBotTokenInvalidThrowsArgumentException(string token)
         {
             Assert.Throws<ArgumentException>(() => TokenUtils.ValidateToken(TokenType.Bot, token));
