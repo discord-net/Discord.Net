@@ -85,10 +85,12 @@ namespace Discord
                     // this value was determined by referencing examples in the discord documentation, and by comparing with
                     // pre-existing tokens
                     if (token.Length < MinBotTokenLength)
-                        throw new ArgumentException(message: $"A Bot token must be at least {MinBotTokenLength} characters in length.", paramName: nameof(token));
+                        throw new ArgumentException(message: $"A Bot token must be at least {MinBotTokenLength} characters in length. " +
+                            "Ensure that the Bot Token provided is not an OAuth client secret.", paramName: nameof(token));
                     // check the validity of the bot token by decoding the ulong userid from the jwt
                     if (!CheckBotTokenValidity(token))
-                        throw new ArgumentException(message: "The Bot token was invalid.", paramName: nameof(token));
+                        throw new ArgumentException(message: "The Bot token was invalid. " +
+                            "Ensure that the Bot Token provided is not an OAuth client secret.", paramName: nameof(token));
                     break;
                 default:
                     // All unrecognized TokenTypes (including User tokens) are considered to be invalid.
