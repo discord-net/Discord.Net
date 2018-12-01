@@ -125,5 +125,25 @@ namespace Discord
             Assert.Throws<ArgumentException>(() =>
                 TokenUtils.ValidateToken((TokenType)type, "MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWs"));
         }
+
+        /// <summary>
+        ///     Checks the <see cref="TokenUtils.CheckBotTokenValidity(string)"/> method for expected output.
+        /// </summary>
+        /// <param name="token"> The Bot Token to test.</param>
+        /// <param name="expected"> The expected result. </param>
+        [Theory]
+        // this method only checks the first part of the JWT
+        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4..", true)]
+        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kK", true)]
+        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4. this part is invalid. this part is also invalid", true)]
+        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.", false)]
+        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4", false)]
+        // should not throw an unexpected exception
+        [InlineData("", false)]
+        [InlineData(null, false)]
+        public void TestCheckBotTokenValidity(string token, bool expected)
+        {
+            Assert.Equal(expected, TokenUtils.CheckBotTokenValidity(token));
+        }
     }
 }
