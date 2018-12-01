@@ -47,6 +47,11 @@ namespace Discord
                 // discard id
                 return ulong.TryParse(idStr, out var id);
             }
+            catch (DecoderFallbackException)
+            {
+                // can be thrown by GetString
+                return false;
+            }
             catch (FormatException)
             {
                 // ignore exception, if contains invalid base64 characters return false
