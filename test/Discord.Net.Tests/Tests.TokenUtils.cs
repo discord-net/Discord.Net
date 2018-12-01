@@ -146,5 +146,23 @@ namespace Discord
         {
             Assert.Equal(expected, TokenUtils.CheckBotTokenValidity(token));
         }
+
+        [Theory]
+        // cannot pass a ulong? as a param in InlineData, so have to have a separate param
+        // indicating if a value is null
+        [InlineData("NDI4NDc3OTQ0MDA5MTk1NTIw", false, 428477944009195520)]
+        // should return null w/o throwing other exceptions
+        [InlineData("", true, 0)]
+        [InlineData(" ", true, 0)]
+        [InlineData(null, true, 0)]
+        [InlineData("these chars aren't allowed @U#)*@#!)*", true, 0)]
+        public void TestDecodeBase64UserId(string encodedUserId, bool isNull, ulong expectedUserId)
+        {
+            var result = TokenUtils.DecodeBase64UserId(encodedUserId);
+            if (isNull)
+                Assert.Null(result);
+            else
+                Assert.Equal(expectedUserId, result);
+        }
     }
 }

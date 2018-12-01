@@ -18,6 +18,40 @@ namespace Discord
         internal const int MinBotTokenLength = 58;
 
         /// <summary>
+        ///     Decodes a base 64 encoded string into a ulong value.
+        /// </summary>
+        /// <param name="encoded"> A base 64 encoded string containing a User Id.</param>
+        /// <returns> A ulong containing the decoded value of the string, or null if the value was invalid. </returns>
+        internal static ulong? DecodeBase64UserId(string encoded)
+        {
+            if (string.IsNullOrWhiteSpace(encoded))
+                return null;
+
+            try
+            {
+                // decode the base64 string
+                var bytes = Convert.FromBase64String(encoded);
+                var idStr = Encoding.UTF8.GetString(bytes);
+                // try to parse a ulong from the resulting string
+                if (ulong.TryParse(idStr, out var id))
+                    return id;
+            }
+            catch (DecoderFallbackException)
+            {
+                // ignore exception, can be thrown by GetString
+            }
+            catch (FormatException)
+            {
+                // ignore exception, can be thrown if base64 string is invalid
+            }
+            catch (ArgumentException)
+            {
+                // ignore exception, can be thrown by BitConverter
+            }
+            return null;
+        }
+
+        /// <summary>
         ///     Checks the validity of a bot token by attempting to decode a ulong userid
         ///     from the bot token.
         /// </summary>
@@ -38,30 +72,8 @@ namespace Discord
             // ensure that there are three parts
             if (segments.Length != 3)
                 return false;
-
-            try
-            {
-                // decode the first segment as base64
-                var bytes = Convert.FromBase64String(segments[0]);
-                var idStr = Encoding.UTF8.GetString(bytes);
-                // discard id
-                return ulong.TryParse(idStr, out var id);
-            }
-            catch (DecoderFallbackException)
-            {
-                // can be thrown by GetString
-                return false;
-            }
-            catch (FormatException)
-            {
-                // ignore exception, if contains invalid base64 characters return false
-                return false;
-            }
-            catch (ArgumentException)
-            {
-                // ignore exceptions thrown by BitConverter
-                return false;
-            }
+            // return true if the user id could be determined
+            return DecodeBase64UserId(segments[0]).HasValue;
         }
 
         /// <summary>
