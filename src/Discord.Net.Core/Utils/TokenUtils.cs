@@ -28,6 +28,9 @@ namespace Discord
         /// </returns>
         internal static bool CheckBotTokenValidity(string message)
         {
+            if (string.IsNullOrWhiteSpace(message))
+                return false;
+
             // split each component of the JWT
             var segments = message.Split('.');
 
@@ -91,6 +94,5 @@ namespace Discord
                     throw new ArgumentException(message: "Unrecognized TokenType.", paramName: nameof(token));
             }
         }
-
     }
 }
