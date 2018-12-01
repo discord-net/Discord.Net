@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace Discord
 {
@@ -41,10 +42,10 @@ namespace Discord
             try
             {
                 // decode the first segment as base64
-                var v = Convert.FromBase64String(segments[0]);
-                BitConverter.ToUInt64(v, 0);
-                // if no exception thrown, token is valid
-                return true;
+                var bytes = Convert.FromBase64String(segments[0]);
+                var idStr = Encoding.UTF8.GetString(bytes);
+                // discard id
+                return ulong.TryParse(idStr, out var id);
             }
             catch (FormatException)
             {

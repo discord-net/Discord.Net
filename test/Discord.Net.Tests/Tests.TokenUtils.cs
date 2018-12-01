@@ -138,6 +138,7 @@ namespace Discord
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4. this part is invalid. this part is also invalid", true)]
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.", false)]
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4", false)]
+        [InlineData("NDI4NDc3OTQ0MDA5MTk1NTIw.xxxx.xxxxx", true)]
         // should not throw an unexpected exception
         [InlineData("", false)]
         [InlineData(null, false)]
