@@ -1218,16 +1218,22 @@ namespace Discord.WebSocket
                                             cachedMsg.Update(State, data);
                                             after = cachedMsg;
                                         }
-                                        else if (data.Author.IsSpecified)
+                                        else
                                         {
                                             //Edited message isnt in cache, create a detached one
                                             SocketUser author;
-                                            if (guild != null)
-                                                author = guild.GetUser(data.Author.Value.Id);
+                                            if (data.Author.IsSpecified)
+                                            {
+                                                if (guild != null)
+                                                    author = guild.GetUser(data.Author.Value.Id);
+                                                else
+                                                    author = (channel as SocketChannel).GetUser(data.Author.Value.Id);
+                                                if (author == null)
+                                                    author = SocketUnknownUser.Create(this, State, data.Author.Value);
+                                            }
                                             else
-                                                author = (channel as SocketChannel).GetUser(data.Author.Value.Id);
-                                            if (author == null)
-                                                author = SocketUnknownUser.Create(this, State, data.Author.Value);
+                                                // Message author wasn't specified in the payload, so create a completely anonymous unknown user
+                                                author = new SocketUnknownUser(this, 0);
 
                                             after = SocketMessage.Create(this, State, author, channel, data);
                                         }
