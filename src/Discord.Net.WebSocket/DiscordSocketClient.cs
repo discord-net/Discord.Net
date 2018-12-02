@@ -1233,7 +1233,7 @@ namespace Discord.WebSocket
                                             }
                                             else
                                                 // Message author wasn't specified in the payload, so create a completely anonymous unknown user
-                                                author = new SocketUnknownUser(this, 0);
+                                                author = new SocketUnknownUser(this, id: 0);
 
                                             after = SocketMessage.Create(this, State, author, channel, data);
                                         }
