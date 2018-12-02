@@ -5,6 +5,9 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains a piece of audit log data relating to an invite update.
+    /// </summary>
     public class InviteUpdateAuditLogData : IAuditLogData
     {
         private InviteUpdateAuditLogData(InviteInfo before, InviteInfo after)
@@ -23,16 +26,16 @@ namespace Discord.Rest
             var channelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "channel_id");
             var maxUsesModel = changes.FirstOrDefault(x => x.ChangedProperty == "max_uses");
 
-            int? oldMaxAge = maxAgeModel?.OldValue?.ToObject<int>(),
-                newMaxAge = maxAgeModel?.NewValue?.ToObject<int>();
-            string oldCode = codeModel?.OldValue?.ToObject<string>(),
-                newCode = codeModel?.NewValue?.ToObject<string>();
-            bool? oldTemporary = temporaryModel?.OldValue?.ToObject<bool>(),
-                newTemporary = temporaryModel?.NewValue?.ToObject<bool>();
-            ulong? oldChannelId = channelIdModel?.OldValue?.ToObject<ulong>(),
-                newChannelId = channelIdModel?.NewValue?.ToObject<ulong>();
-            int? oldMaxUses = maxUsesModel?.OldValue?.ToObject<int>(),
-                newMaxUses = maxUsesModel?.NewValue?.ToObject<int>();
+            int? oldMaxAge = maxAgeModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer),
+                newMaxAge = maxAgeModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
+            string oldCode = codeModel?.OldValue?.ToObject<string>(discord.ApiClient.Serializer),
+                newCode = codeModel?.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
+            bool? oldTemporary = temporaryModel?.OldValue?.ToObject<bool>(discord.ApiClient.Serializer),
+                newTemporary = temporaryModel?.NewValue?.ToObject<bool>(discord.ApiClient.Serializer);
+            ulong? oldChannelId = channelIdModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer),
+                newChannelId = channelIdModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            int? oldMaxUses = maxUsesModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer),
+                newMaxUses = maxUsesModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
 
             var before = new InviteInfo(oldMaxAge, oldCode, oldTemporary, oldChannelId, oldMaxUses);
             var after = new InviteInfo(newMaxAge, newCode, newTemporary, newChannelId, newMaxUses);
@@ -40,7 +43,19 @@ namespace Discord.Rest
             return new InviteUpdateAuditLogData(before, after);
         }
 
+        /// <summary>
+        ///     Gets the invite information before the changes.
+        /// </summary>
+        /// <returns>
+        ///     An information object containing the original invite information before the changes were made.
+        /// </returns>
         public InviteInfo Before { get; }
+        /// <summary>
+        ///     Gets the invite information after the changes.
+        /// </summary>
+        /// <returns>
+        ///     An information object containing the invite information after the changes were made.
+        /// </returns>
         public InviteInfo After { get; }
     }
 }

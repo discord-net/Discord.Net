@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 #if DEBUG_LIMITS
 using System.Diagnostics;
@@ -16,23 +16,24 @@ namespace Discord.Net.Queue
 
         private readonly ConcurrentDictionary<string, RequestBucket> _buckets;
         private readonly SemaphoreSlim _tokenLock;
+        private readonly CancellationTokenSource _cancelTokenSource; //Dispose token
         private CancellationTokenSource _clearToken;
         private CancellationToken _parentToken;
+        private CancellationTokenSource _requestCancelTokenSource;
         private CancellationToken _requestCancelToken; //Parent token + Clear token
-        private CancellationTokenSource _cancelToken; //Dispose token
         private DateTimeOffset _waitUntil;
 
         private Task _cleanupTask;
-        
+
         public RequestQueue()
         {
             _tokenLock = new SemaphoreSlim(1, 1);
 
             _clearToken = new CancellationTokenSource();
-            _cancelToken = new CancellationTokenSource();
+            _cancelTokenSource = new CancellationTokenSource();
             _requestCancelToken = CancellationToken.None;
             _parentToken = CancellationToken.None;
-            
+
             _buckets = new ConcurrentDictionary<string, RequestBucket>();
 
             _cleanupTask = RunCleanup();
@@ -44,7 +45,9 @@ namespace Discord.Net.Queue
             try
             {
                 _parentToken = cancelToken;
-                _requestCancelToken = CancellationTokenSource.CreateLinkedTokenSource(cancelToken, _clearToken.Token).Token;
+                _requestCancelTokenSource?.Dispose();
+                _requestCancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancelToken, _clearToken.Token);
+                _requestCancelToken = _requestCancelTokenSource.Token;
             }
             finally { _tokenLock.Release(); }
         }
@@ -54,9 +57,14 @@ namespace Discord.Net.Queue
             try
             {
                 _clearToken?.Cancel();
+                _clearToken?.Dispose();
                 _clearToken = new CancellationTokenSource();
                 if (_parentToken != null)
-                    _requestCancelToken = CancellationTokenSource.CreateLinkedTokenSource(_clearToken.Token, _parentToken).Token;
+                {
+                    _requestCancelTokenSource?.Dispose();
+                    _requestCancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_clearToken.Token, _parentToken);
+                    _requestCancelToken = _requestCancelTokenSource.Token;
+                }
                 else
                     _requestCancelToken = _clearToken.Token;
             }
@@ -65,13 +73,19 @@ namespace Discord.Net.Queue
 
         public async Task<Stream> SendAsync(RestRequest request)
         {
+            CancellationTokenSource createdTokenSource = null;
             if (request.Options.CancelToken.CanBeCanceled)
-                request.Options.CancelToken = CancellationTokenSource.CreateLinkedTokenSource(_requestCancelToken, request.Options.CancelToken).Token;
+            {
+                createdTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_requestCancelToken, request.Options.CancelToken);
+                request.Options.CancelToken = createdTokenSource.Token;
+            }
             else
                 request.Options.CancelToken = _requestCancelToken;
 
             var bucket = GetOrCreateBucket(request.Options.BucketId, request);
-            return await bucket.SendAsync(request).ConfigureAwait(false);
+            var result = await bucket.SendAsync(request).ConfigureAwait(false);
+            createdTokenSource?.Dispose();
+            return result;
         }
         public async Task SendAsync(WebSocketRequest request)
         {
@@ -109,15 +123,15 @@ namespace Discord.Net.Queue
         {
             try
             {
-                while (!_cancelToken.IsCancellationRequested)
+                while (!_cancelTokenSource.IsCancellationRequested)
                 {
                     var now = DateTimeOffset.UtcNow;
                     foreach (var bucket in _buckets.Select(x => x.Value))
                     {
                         if ((now - bucket.LastAttemptAt).TotalMinutes > 1.0)
-                            _buckets.TryRemove(bucket.Id, out RequestBucket ignored);
+                            _buckets.TryRemove(bucket.Id, out _);
                     }
-                    await Task.Delay(60000, _cancelToken.Token); //Runs each minute
+                    await Task.Delay(60000, _cancelTokenSource.Token).ConfigureAwait(false); //Runs each minute
                 }
             }
             catch (OperationCanceledException) { }
@@ -126,7 +140,10 @@ namespace Discord.Net.Queue
 
         public void Dispose()
         {
-            _cancelToken.Dispose();
+            _cancelTokenSource?.Dispose();
+            _tokenLock?.Dispose();
+            _clearToken?.Dispose();
+            _requestCancelTokenSource?.Dispose();
         }
     }
 }

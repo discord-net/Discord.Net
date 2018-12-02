@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Linq;
 using Model = Discord.API.User;
 using PresenceModel = Discord.API.Presence;
@@ -54,7 +54,8 @@ namespace Discord.WebSocket
             Presence = SocketPresence.Create(model);
             DMChannel = state.DMChannels.FirstOrDefault(x => x.Recipient.Id == Id);
         }
-        
+
+        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Global)";
         internal new SocketGlobalUser Clone() => MemberwiseClone() as SocketGlobalUser;
     }
 }

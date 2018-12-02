@@ -22,17 +22,17 @@ namespace Discord.Net.WebSockets
 
         private readonly SemaphoreSlim _lock;
         private readonly Dictionary<string, string> _headers;
+        private readonly IWebProxy _proxy;
         private ClientWebSocket _client;
-        private IWebProxy _proxy;
         private Task _task;
-        private CancellationTokenSource _cancelTokenSource;
+        private CancellationTokenSource _disconnectTokenSource, _cancelTokenSource;
         private CancellationToken _cancelToken, _parentToken;
         private bool _isDisposed, _isDisconnecting;
 
         public DefaultWebSocketClient(IWebProxy proxy = null)
         {
             _lock = new SemaphoreSlim(1, 1);
-            _cancelTokenSource = new CancellationTokenSource();
+            _disconnectTokenSource = new CancellationTokenSource();
             _cancelToken = CancellationToken.None;
             _parentToken = CancellationToken.None;
             _headers = new Dictionary<string, string>();
@@ -43,7 +43,12 @@ namespace Discord.Net.WebSockets
             if (!_isDisposed)
             {
                 if (disposing)
+                {
                     DisconnectInternalAsync(true).GetAwaiter().GetResult();
+                    _disconnectTokenSource?.Dispose();
+                    _cancelTokenSource?.Dispose();
+                    _lock?.Dispose();
+                }
                 _isDisposed = true;
             }
         }
@@ -68,9 +73,14 @@ namespace Discord.Net.WebSockets
         {
             await DisconnectInternalAsync().ConfigureAwait(false);
 
-            _cancelTokenSource = new CancellationTokenSource();
-            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
+            _disconnectTokenSource?.Dispose();
+            _cancelTokenSource?.Dispose();
 
+            _disconnectTokenSource = new CancellationTokenSource();
+            _cancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _disconnectTokenSource.Token);
+            _cancelToken = _cancelTokenSource.Token;
+
+            _client?.Dispose();
             _client = new ClientWebSocket();
             _client.Options.Proxy = _proxy;
             _client.Options.KeepAliveInterval = TimeSpan.Zero;
@@ -98,7 +108,7 @@ namespace Discord.Net.WebSockets
         }
         private async Task DisconnectInternalAsync(bool isDisposing = false)
         {
-            try { _cancelTokenSource.Cancel(false); } catch { }
+            try { _disconnectTokenSource.Cancel(false); } catch { }
 
             _isDisconnecting = true;
             try
@@ -117,7 +127,7 @@ namespace Discord.Net.WebSockets
                 }
                 try { _client.Dispose(); }
                 catch { }
-                
+
                 _client = null;
             }
         }
@@ -144,8 +154,11 @@ namespace Discord.Net.WebSockets
         }
         public void SetCancelToken(CancellationToken cancelToken)
         {
+            _cancelTokenSource?.Dispose();
+
             _parentToken = cancelToken;
-            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
+            _cancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _disconnectTokenSource.Token);
+            _cancelToken = _cancelTokenSource.Token;
         }
 
         public async Task SendAsync(byte[] data, int index, int count, bool isText)
@@ -166,7 +179,7 @@ namespace Discord.Net.WebSockets
                         frameSize = count - (i * SendChunkSize);
                     else
                         frameSize = SendChunkSize;
-                    
+
                     var type = isText ? WebSocketMessageType.Text : WebSocketMessageType.Binary;
                     await _client.SendAsync(new ArraySegment<byte>(data, index, count), type, isLast, _cancelToken).ConfigureAwait(false);
                 }
@@ -176,7 +189,7 @@ namespace Discord.Net.WebSockets
                 _lock.Release();
             }
         }
-        
+
         private async Task RunAsync(CancellationToken cancelToken)
         {
             var buffer = new ArraySegment<byte>(new byte[ReceiveChunkSize]);
@@ -188,7 +201,7 @@ namespace Discord.Net.WebSockets
                     WebSocketReceiveResult socketResult = await _client.ReceiveAsync(buffer, cancelToken).ConfigureAwait(false);
                     byte[] result;
                     int resultCount;
-                        
+
                     if (socketResult.MessageType == WebSocketMessageType.Close)
                         throw new WebSocketClosedException((int)socketResult.CloseStatus, socketResult.CloseStatusDescription);
 
@@ -219,7 +232,7 @@ namespace Discord.Net.WebSockets
                         resultCount = socketResult.Count;
                         result = buffer.Array;
                     }
-                    
+
                     if (socketResult.MessageType == WebSocketMessageType.Text)
                     {
                         string text = Encoding.UTF8.GetString(result, 0, resultCount);

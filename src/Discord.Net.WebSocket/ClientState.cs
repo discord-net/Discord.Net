@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,9 +72,9 @@ namespace Discord.WebSocket
                 switch (channel)
                 {
                     case SocketDMChannel dmChannel:
-                        _dmChannels.TryRemove(dmChannel.Recipient.Id, out var ignored);
+                        _dmChannels.TryRemove(dmChannel.Recipient.Id, out _);
                         break;
-                    case SocketGroupChannel groupChannel:
+                    case SocketGroupChannel _:
                         _groupChannels.TryRemove(id);
                         break;
                 }

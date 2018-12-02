@@ -10,9 +10,12 @@ namespace Discord.Commands
         public string Text { get; }
         public IReadOnlyList<CommandMatch> Commands { get; }
 
+        /// <inheritdoc/>
         public CommandError? Error { get; }
+        /// <inheritdoc/>
         public string ErrorReason { get; }
 
+        /// <inheritdoc/>
         public bool IsSuccess => !Error.HasValue;
 
         private SearchResult(string text, IReadOnlyList<CommandMatch> commands, CommandError? error, string errorReason)

@@ -7,28 +7,40 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    /// Represents an entry in an audit log
+    ///     Represents a generic audit log entry.
     /// </summary>
     public interface IAuditLogEntry : ISnowflakeEntity
     {
         /// <summary>
-        /// The action which occured to create this entry
+        ///     Gets the action which occurred to create this entry.
         /// </summary>
+        /// <returns>
+        ///     The type of action for this audit log entry.
+        /// </returns>
         ActionType Action { get; }
 
         /// <summary>
-        /// The data for this entry. May be <see cref="null"/> if no data was available.
+        ///     Gets the data for this entry.
         /// </summary>
+        /// <returns>
+        ///     An <see cref="IAuditLogData" /> for this audit log entry; <c>null</c> if no data is available.
+        /// </returns>
         IAuditLogData Data { get; }
 
         /// <summary>
-        /// The user responsible for causing the changes
+        ///     Gets the user responsible for causing the changes.
         /// </summary>
+        /// <returns>
+        ///     A user object.
+        /// </returns>
         IUser User { get; }
 
         /// <summary>
-        /// The reason behind the change. May be <see cref="null"/> if no reason was provided.
+        ///     Gets the reason behind the change.
         /// </summary>
+        /// <returns>
+        ///     A string containing the reason for the change; <c>null</c> if none is provided.
+        /// </returns>
         string Reason { get; }
     }
 }

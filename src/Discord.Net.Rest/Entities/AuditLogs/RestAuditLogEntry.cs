@@ -6,6 +6,9 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a REST-based audit log entry.
+    /// </summary>
     public class RestAuditLogEntry : RestEntity<ulong>, IAuditLogEntry
     {
         private RestAuditLogEntry(BaseDiscordClient discord, Model fullLog, EntryModel model, IUser user)

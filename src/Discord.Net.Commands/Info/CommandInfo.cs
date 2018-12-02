@@ -1,4 +1,4 @@
-﻿using Discord.Commands.Builders;
+using Discord.Commands.Builders;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -8,10 +8,16 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    ///     Provides the information of a command.
+    /// </summary>
+    /// <remarks>
+    ///     This object contains the information of a command. This can include the module of the command, various
+    ///     descriptions regarding the command, and its <see cref="RunMode"/>.
+    /// </remarks>
     [DebuggerDisplay("{Name,nq}")]
     public class CommandInfo
     {
@@ -21,18 +27,63 @@ namespace Discord.Commands
         private readonly CommandService _commandService;
         private readonly Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> _action;
 
+        /// <summary>
+        ///     Gets the module that the command belongs in.
+        /// </summary>
         public ModuleInfo Module { get; }
+        /// <summary>
+        ///     Gets the name of the command. If none is set, the first alias is used.
+        /// </summary>
         public string Name { get; }
+        /// <summary>
+        ///     Gets the summary of the command.
+        /// </summary>
+        /// <remarks>
+        ///     This field returns the summary of the command. <see cref="Summary"/> and <see cref="Remarks"/> can be
+        ///     useful in help commands and various implementation that fetches details of the command for the user.
+        /// </remarks>
         public string Summary { get; }
+        /// <summary>
+        ///     Gets the remarks of the command.
+        /// </summary>
+        /// <remarks>
+        ///     This field returns the summary of the command. <see cref="Summary"/> and <see cref="Remarks"/> can be
+        ///     useful in help commands and various implementation that fetches details of the command for the user.
+        /// </remarks>
         public string Remarks { get; }
+        /// <summary>
+        ///     Gets the priority of the command. This is used when there are multiple overloads of the command.
+        /// </summary>
         public int Priority { get; }
+        /// <summary>
+        ///     Indicates whether the command accepts a <see langword="params"/> <see cref="Type"/>[] for its
+        ///     parameter.
+        /// </summary>
         public bool HasVarArgs { get; }
+        /// <summary>
+        ///     Indicates whether extra arguments should be ignored for this command.
+        /// </summary>
         public bool IgnoreExtraArgs { get; }
+        /// <summary>
+        ///     Gets the <see cref="RunMode" /> that is being used for the command.
+        /// </summary>
         public RunMode RunMode { get; }
 
+        /// <summary>
+        ///     Gets a list of aliases defined by the <see cref="AliasAttribute" /> of the command.
+        /// </summary>
         public IReadOnlyList<string> Aliases { get; }
+        /// <summary>
+        ///     Gets a list of information about the parameters of the command.
+        /// </summary>
         public IReadOnlyList<ParameterInfo> Parameters { get; }
+        /// <summary>
+        ///     Gets a list of preconditions defined by the <see cref="PreconditionAttribute" /> of the command.
+        /// </summary>
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
+        /// <summary>
+        ///     Gets a list of attributes of the command.
+        /// </summary>
         public IReadOnlyList<Attribute> Attributes { get; }
 
         internal CommandInfo(CommandBuilder builder, ModuleInfo module, CommandService service)
@@ -63,7 +114,7 @@ namespace Discord.Commands
             Attributes = builder.Attributes.ToImmutableArray();
 
             Parameters = builder.Parameters.Select(x => x.Build(this)).ToImmutableArray();
-            HasVarArgs = builder.Parameters.Count > 0 ? builder.Parameters[builder.Parameters.Count - 1].IsMultiple : false;
+            HasVarArgs = builder.Parameters.Count > 0 && builder.Parameters[builder.Parameters.Count - 1].IsMultiple;
             IgnoreExtraArgs = builder.IgnoreExtraArgs;
 
             _action = builder.Callback;
@@ -100,11 +151,11 @@ namespace Discord.Commands
                 return PreconditionGroupResult.FromSuccess();
             }
 
-            var moduleResult = await CheckGroups(Module.Preconditions, "Module");
+            var moduleResult = await CheckGroups(Module.Preconditions, "Module").ConfigureAwait(false);
             if (!moduleResult.IsSuccess)
                 return moduleResult;
 
-            var commandResult = await CheckGroups(Preconditions, "Command");
+            var commandResult = await CheckGroups(Preconditions, "Command").ConfigureAwait(false);
             if (!commandResult.IsSuccess)
                 return commandResult;
 
@@ -124,7 +175,7 @@ namespace Discord.Commands
 
             return await CommandParser.ParseArgsAsync(this, context, _commandService._ignoreExtraArgs, services, input, 0, _commandService._quotationMarkAliasMap).ConfigureAwait(false);
         }
-
+        
         public Task<IResult> ExecuteAsync(ICommandContext context, ParseResult parseResult, IServiceProvider services)
         {
             if (!parseResult.IsSuccess)
@@ -221,6 +272,10 @@ namespace Discord.Commands
 
                 var wrappedEx = new CommandException(this, context, ex);
                 await Module.Service._cmdLogger.ErrorAsync(wrappedEx).ConfigureAwait(false);
+
+                var result = ExecuteResult.FromError(ex);
+                await Module.Service._commandExecutedEvent.InvokeAsync(this, context, result).ConfigureAwait(false);
+
                 if (Module.Service._throwOnError)
                 {
                     if (ex == originalEx)
@@ -229,7 +284,7 @@ namespace Discord.Commands
                         ExceptionDispatchInfo.Capture(ex).Throw();
                 }
 
-                return ExecuteResult.FromError(CommandError.Exception, ex.Message);
+                return result;
             }
             finally
             {
@@ -248,11 +303,11 @@ namespace Discord.Commands
             foreach (object arg in argList)
             {
                 if (i == argCount)
-                    throw new InvalidOperationException("Command was invoked with too many parameters");
+                    throw new InvalidOperationException("Command was invoked with too many parameters.");
                 array[i++] = arg;
             }
             if (i < argCount)
-                throw new InvalidOperationException("Command was invoked with too few parameters");
+                throw new InvalidOperationException("Command was invoked with too few parameters.");
 
             if (HasVarArgs)
             {

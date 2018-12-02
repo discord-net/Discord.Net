@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,19 +22,22 @@ namespace Discord.Audio.Streams
             _decoder = new OpusDecoder();
         }
 
+        /// <exception cref="InvalidOperationException">Header received with no payload.</exception>
         public override void WriteHeader(ushort seq, uint timestamp, bool missed)
         {
             if (_hasHeader)
-                throw new InvalidOperationException("Header received with no payload");                
+                throw new InvalidOperationException("Header received with no payload.");                
             _hasHeader = true;
 
             _nextMissed = missed;
             _next.WriteHeader(seq, timestamp, missed);
         }
+
+        /// <exception cref="InvalidOperationException">Received payload without an RTP header.</exception>
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
             if (!_hasHeader)
-                throw new InvalidOperationException("Received payload without an RTP header");
+                throw new InvalidOperationException("Received payload without an RTP header.");
             _hasHeader = false;
 
             if (!_nextMissed)

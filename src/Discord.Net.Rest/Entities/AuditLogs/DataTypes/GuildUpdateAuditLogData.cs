@@ -1,10 +1,13 @@
-﻿using System.Linq;
+using System.Linq;
 
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains a piece of audit log data related to a guild update.
+    /// </summary>
     public class GuildUpdateAuditLogData : IAuditLogData
     {
         private GuildUpdateAuditLogData(GuildInfo before, GuildInfo after)
@@ -28,26 +31,26 @@ namespace Discord.Rest
             var mfaLevelModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
             var contentFilterModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
 
-            int? oldAfkTimeout = afkTimeoutModel?.OldValue?.ToObject<int>(),
-                newAfkTimeout = afkTimeoutModel?.NewValue?.ToObject<int>();
-            DefaultMessageNotifications? oldDefaultMessageNotifications = defaultMessageNotificationsModel?.OldValue?.ToObject<DefaultMessageNotifications>(),
-                newDefaultMessageNotifications = defaultMessageNotificationsModel?.NewValue?.ToObject<DefaultMessageNotifications>();
-            ulong? oldAfkChannelId = afkChannelModel?.OldValue?.ToObject<ulong>(),
-                newAfkChannelId = afkChannelModel?.NewValue?.ToObject<ulong>();
-            string oldName = nameModel?.OldValue?.ToObject<string>(),
-                newName = nameModel?.NewValue?.ToObject<string>();
-            string oldRegionId = regionIdModel?.OldValue?.ToObject<string>(),
-                newRegionId = regionIdModel?.NewValue?.ToObject<string>();
-            string oldIconHash = iconHashModel?.OldValue?.ToObject<string>(),
-                newIconHash = iconHashModel?.NewValue?.ToObject<string>();
-            VerificationLevel? oldVerificationLevel = verificationLevelModel?.OldValue?.ToObject<VerificationLevel>(),
-                newVerificationLevel = verificationLevelModel?.NewValue?.ToObject<VerificationLevel>();
-            ulong? oldOwnerId = ownerIdModel?.OldValue?.ToObject<ulong>(),
-                newOwnerId = ownerIdModel?.NewValue?.ToObject<ulong>();
-            MfaLevel? oldMfaLevel = mfaLevelModel?.OldValue?.ToObject<MfaLevel>(),
-                newMfaLevel = mfaLevelModel?.NewValue?.ToObject<MfaLevel>();
-            int? oldContentFilter = contentFilterModel?.OldValue?.ToObject<int>(),
-                newContentFilter = contentFilterModel?.NewValue?.ToObject<int>();
+            int? oldAfkTimeout = afkTimeoutModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer),
+                newAfkTimeout = afkTimeoutModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
+            DefaultMessageNotifications? oldDefaultMessageNotifications = defaultMessageNotificationsModel?.OldValue?.ToObject<DefaultMessageNotifications>(discord.ApiClient.Serializer),
+                newDefaultMessageNotifications = defaultMessageNotificationsModel?.NewValue?.ToObject<DefaultMessageNotifications>(discord.ApiClient.Serializer);
+            ulong? oldAfkChannelId = afkChannelModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer),
+                newAfkChannelId = afkChannelModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            string oldName = nameModel?.OldValue?.ToObject<string>(discord.ApiClient.Serializer),
+                newName = nameModel?.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
+            string oldRegionId = regionIdModel?.OldValue?.ToObject<string>(discord.ApiClient.Serializer),
+                newRegionId = regionIdModel?.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
+            string oldIconHash = iconHashModel?.OldValue?.ToObject<string>(discord.ApiClient.Serializer),
+                newIconHash = iconHashModel?.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
+            VerificationLevel? oldVerificationLevel = verificationLevelModel?.OldValue?.ToObject<VerificationLevel>(discord.ApiClient.Serializer),
+                newVerificationLevel = verificationLevelModel?.NewValue?.ToObject<VerificationLevel>(discord.ApiClient.Serializer);
+            ulong? oldOwnerId = ownerIdModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer),
+                newOwnerId = ownerIdModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            MfaLevel? oldMfaLevel = mfaLevelModel?.OldValue?.ToObject<MfaLevel>(discord.ApiClient.Serializer),
+                newMfaLevel = mfaLevelModel?.NewValue?.ToObject<MfaLevel>(discord.ApiClient.Serializer);
+            int? oldContentFilter = contentFilterModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer),
+                newContentFilter = contentFilterModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
 
             IUser oldOwner = null;
             if (oldOwnerId != null)
@@ -73,7 +76,19 @@ namespace Discord.Rest
             return new GuildUpdateAuditLogData(before, after);
         }
 
+        /// <summary>
+        ///     Gets the guild information before the changes.
+        /// </summary>
+        /// <returns>
+        ///     An information object containing the original guild information before the changes were made.
+        /// </returns>
         public GuildInfo Before { get; }
+        /// <summary>
+        ///     Gets the guild information after the changes.
+        /// </summary>
+        /// <returns>
+        ///     An information object containing the guild information after the changes were made.
+        /// </returns>
         public GuildInfo After { get; }
     }
 }

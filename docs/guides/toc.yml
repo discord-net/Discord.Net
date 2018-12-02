@@ -1,27 +1,41 @@
+- name: Introduction
+  topicUid: Guides.Introduction
 - name: Getting Started
   items:
     - name: Installation
-      href: getting_started/installing.md
+      topicUid: Guides.GettingStarted.Installation
+      items:
+        - name: Nightly Builds
+          topicUid: Guides.GettingStarted.Installation.Nightlies
     - name: Your First Bot
-      href: getting_started/intro.md
+      topicUid: Guides.GettingStarted.FirstBot
     - name: Terminology
-      href: getting_started/terminology.md
+      topicUid: Guides.GettingStarted.Terminology
 - name: Basic Concepts
   items:
     - name: Logging Data
-      href: concepts/logging.md
+      topicUid: Guides.Concepts.Logging
     - name: Working with Events
-      href: concepts/events.md
+      topicUid: Guides.Concepts.Events
     - name: Managing Connections
-      href: concepts/connections.md
+      topicUid: Guides.Concepts.ManageConnections
     - name: Entities
-      href: concepts/entities.md
-- name: The Command Service
+      topicUid: Guides.Concepts.Entities
+- name: Working with Commands
   items:
-    - name: Command Guide
-      href: commands/commands.md
+    - name: Introduction
+      topicUid: Guides.Commands.Intro
+    - name: TypeReaders
+      topicUid: Guides.Commands.TypeReaders
+    - name: Preconditions
+      topicUid: Guides.Commands.Preconditions
+    - name: Dependency Injection
+      topicUid: Guides.Commands.DI
+    - name: Post-execution Handling
+      topicUid: Guides.Commands.PostExecution
+- name: Emoji
+  topicUid: Guides.Emoji
 - name: Voice
-  items:
-    - name: Voice Guide
-      href: voice/sending-voice.md
-- name: Migrating from 0.9
+  topicUid: Guides.Voice.SendingVoice
+- name: Deployment
+  topicUid: Guides.Deployment

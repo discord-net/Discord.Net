@@ -1,70 +1,75 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Discord
 {
     /// <summary>
-    /// Modify an IGuildUser with the following parameters.
+    ///     Properties that are used to modify an <see cref="IGuildUser" /> with the following parameters.
     /// </summary>
-    /// <example>
-    /// <code language="c#">
-    /// await (Context.User as IGuildUser)?.ModifyAsync(x =>
-    /// {
-    ///     x.Nickname = $"festive {Context.User.Username}";
-    /// });
-    /// </code>
-    /// </example>
-    /// <seealso cref="IGuildUser"/>
+    /// <seealso cref="IGuildUser.ModifyAsync" />
     public class GuildUserProperties
     {
         /// <summary>
-        /// Should the user be guild-muted in a voice channel?
+        ///     Gets or sets whether the user should be muted in a voice channel.
         /// </summary>
         /// <remarks>
-        /// If this value is set to true, no user will be able to hear this user speak in the guild.
+        ///     If this value is set to <c>true</c>, no user will be able to hear this user speak in the guild.
         /// </remarks>
         public Optional<bool> Mute { get; set; }
         /// <summary>
-        /// Should the user be guild-deafened in a voice channel?
+        ///     Gets or sets whether the user should be deafened in a voice channel.
         /// </summary>
         /// <remarks>
-        /// If this value is set to true, this user will not be able to hear anyone speak in the guild.
+        ///     If this value is set to <c>true</c>, this user will not be able to hear anyone speak in the guild.
         /// </remarks>
         public Optional<bool> Deaf { get; set; }
         /// <summary>
-        /// Should the user have a nickname set? 
+        ///     Gets or sets the user's nickname.
         /// </summary>
         /// <remarks>
-        /// To clear the user's nickname, this value can be set to <see langword="null" /> or <see cref="string.Empty" />.
+        ///     To clear the user's nickname, this value can be set to <c>null</c> or
+        ///     <see cref="string.Empty"/>.
         /// </remarks>
         public Optional<string> Nickname { get; set; }
         /// <summary>
-        /// What roles should the user have?
+        ///     Gets or sets the roles the user should have.
         /// </summary>
         /// <remarks>
-        /// To add a role to a user: <see cref="IGuildUser.AddRolesAsync(IEnumerable&lt;IRole&gt;, RequestOptions)"/>
-        /// To remove a role from a user: <see cref="IGuildUser.RemoveRolesAsync(IEnumerable&lt;IRole&gt;, RequestOptions)"/>
+        ///     <para>
+        ///         To add a role to a user:
+        ///         <see cref="IGuildUser.AddRolesAsync(IEnumerable{IRole},RequestOptions)" />
+        ///     </para>
+        ///     <para>
+        ///         To remove a role from a user:
+        ///         <see cref="IGuildUser.RemoveRolesAsync(IEnumerable{IRole},RequestOptions)" />
+        ///     </para>
         /// </remarks>
         public Optional<IEnumerable<IRole>> Roles { get; set; }
         /// <summary>
-        /// What roles should the user have?
+        ///     Gets or sets the roles the user should have.
         /// </summary>
         /// <remarks>
-        /// To add a role to a user: <see cref="IGuildUser.AddRolesAsync(IEnumerable&lt;IRole&gt;, RequestOptions)"/>
-        /// To remove a role from a user: <see cref="IGuildUser.RemoveRolesAsync(IEnumerable&lt;IRole&gt;, RequestOptions)"/>
+        ///     <para>
+        ///         To add a role to a user:
+        ///         <see cref="IGuildUser.AddRolesAsync(IEnumerable{IRole},RequestOptions)" />
+        ///     </para>
+        ///     <para>
+        ///         To remove a role from a user:
+        ///         <see cref="IGuildUser.RemoveRolesAsync(IEnumerable{IRole},RequestOptions)" />
+        ///     </para>
         /// </remarks>
         public Optional<IEnumerable<ulong>> RoleIds { get; set; }
         /// <summary>
-        /// Move a user to a voice channel.
+        ///     Moves a user to a voice channel.
         /// </summary>
         /// <remarks>
-        /// This user MUST already be in a Voice Channel for this to work.
+        ///     This user MUST already be in a <see cref="IVoiceChannel"/> for this to work.
         /// </remarks>
         public Optional<IVoiceChannel> Channel { get; set; }
         /// <summary>
-        /// Move a user to a voice channel.
+        ///     Moves a user to a voice channel.
         /// </summary>
         /// <remarks>
-        /// This user MUST already be in a Voice Channel for this to work.
+        ///     This user MUST already be in a <see cref="IVoiceChannel"/> for this to work.
         /// </remarks>
         public Optional<ulong> ChannelId { get; set; }
     }

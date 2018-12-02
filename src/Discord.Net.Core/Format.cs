@@ -1,9 +1,10 @@
-﻿namespace Discord
+namespace Discord
 {
+    /// <summary> A helper class for formatting characters. </summary>
     public static class Format
     {
         // Characters which need escaping
-        private static string[] SensitiveCharacters = { "\\", "*", "_", "~", "`" };
+        private static readonly string[] SensitiveCharacters = { "\\", "*", "_", "~", "`" };
 
         /// <summary> Returns a markdown-formatted string with bold formatting. </summary>
         public static string Bold(string text) => $"**{text}**";
@@ -13,6 +14,10 @@
         public static string Underline(string text) => $"__{text}__";
         /// <summary> Returns a markdown-formatted string with strikethrough formatting. </summary>
         public static string Strikethrough(string text) => $"~~{text}~~";
+        /// <summary> Returns a markdown-formatted URL. Only works in <see cref="EmbedBuilder"/> descriptions and fields. </summary>
+        public static string Url(string text, string url) => $"[{text}]({url})";
+        /// <summary> Escapes a URL so that a preview is not generated. </summary>
+        public static string EscapeUrl(string url) => $"<{url}>";
 
         /// <summary> Returns a markdown-formatted string with codeblock formatting. </summary>
         public static string Code(string text, string language = null)

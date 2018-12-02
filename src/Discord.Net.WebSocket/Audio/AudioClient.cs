@@ -16,7 +16,7 @@ using System.Collections.Generic;
 namespace Discord.Audio
 {
     //TODO: Add audio reconnecting
-    internal partial class AudioClient : IAudioClient, IDisposable
+    internal partial class AudioClient : IAudioClient
     {
         internal struct StreamPair
         {
@@ -65,13 +65,13 @@ namespace Discord.Audio
 
             ApiClient = new DiscordVoiceAPIClient(guild.Id, Discord.WebSocketProvider, Discord.UdpSocketProvider);
             ApiClient.SentGatewayMessage += async opCode => await _audioLogger.DebugAsync($"Sent {opCode}").ConfigureAwait(false);
-            ApiClient.SentDiscovery += async () => await _audioLogger.DebugAsync($"Sent Discovery").ConfigureAwait(false);
+            ApiClient.SentDiscovery += async () => await _audioLogger.DebugAsync("Sent Discovery").ConfigureAwait(false);
             //ApiClient.SentData += async bytes => await _audioLogger.DebugAsync($"Sent {bytes} Bytes").ConfigureAwait(false);
             ApiClient.ReceivedEvent += ProcessMessageAsync;
             ApiClient.ReceivedPacket += ProcessPacketAsync;
 
             _stateLock = new SemaphoreSlim(1, 1);
-            _connection = new ConnectionManager(_stateLock, _audioLogger, 30000, 
+            _connection = new ConnectionManager(_stateLock, _audioLogger, 30000,
                 OnConnectingAsync, OnDisconnectingAsync, x => ApiClient.Disconnected += x);
             _connection.Connected += () => _connectedEvent.InvokeAsync();
             _connection.Disconnected += (ex, recon) => _disconnectedEvent.InvokeAsync(ex);
@@ -79,7 +79,7 @@ namespace Discord.Audio
             _keepaliveTimes = new ConcurrentQueue<KeyValuePair<ulong, int>>();
             _ssrcMap = new ConcurrentDictionary<uint, ulong>();
             _streams = new ConcurrentDictionary<ulong, StreamPair>();
-            
+
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             _serializer.Error += (s, e) =>
             {
@@ -91,7 +91,7 @@ namespace Discord.Audio
             UdpLatencyUpdated += async (old, val) => await _audioLogger.DebugAsync($"UDP Latency = {val} ms").ConfigureAwait(false);
         }
 
-        internal async Task StartAsync(string url, ulong userId, string sessionId, string token) 
+        internal async Task StartAsync(string url, ulong userId, string sessionId, string token)
         {
             _url = url;
             _userId = userId;
@@ -100,7 +100,7 @@ namespace Discord.Audio
             await _connection.StartAsync().ConfigureAwait(false);
         }
         public async Task StopAsync()
-        { 
+        {
             await _connection.StopAsync().ConfigureAwait(false);
         }
 
@@ -131,7 +131,7 @@ namespace Discord.Audio
                 await keepaliveTask.ConfigureAwait(false);
             _keepaliveTask = null;
 
-            while (_heartbeatTimes.TryDequeue(out long time)) { }
+            while (_heartbeatTimes.TryDequeue(out _)) { }
             _lastMessageTime = 0;
 
             await ClearInputStreamsAsync().ConfigureAwait(false);
@@ -225,11 +225,11 @@ namespace Discord.Audio
 
                             if (!data.Modes.Contains(DiscordVoiceAPIClient.Mode))
                                 throw new InvalidOperationException($"Discord does not support {DiscordVoiceAPIClient.Mode}");
-                            
+
                             ApiClient.SetUdpEndpoint(data.Ip, data.Port);
                             await ApiClient.SendDiscoveryAsync(_ssrc).ConfigureAwait(false);
 
-                            
+
                             _heartbeatTask = RunHeartbeatAsync(41250, _connection.CancelToken);
                         }
                         break;
@@ -292,7 +292,7 @@ namespace Discord.Audio
                 {
                     if (packet.Length != 70)
                     {
-                        await _audioLogger.DebugAsync($"Malformed Packet").ConfigureAwait(false);
+                        await _audioLogger.DebugAsync("Malformed Packet").ConfigureAwait(false);
                         return;
                     }
                     string ip;
@@ -304,10 +304,10 @@ namespace Discord.Audio
                     }
                     catch (Exception ex)
                     {
-                        await _audioLogger.DebugAsync($"Malformed Packet", ex).ConfigureAwait(false);
-                        return; 
+                        await _audioLogger.DebugAsync("Malformed Packet", ex).ConfigureAwait(false);
+                        return;
                     }
-                    
+
                     await _audioLogger.DebugAsync("Received Discovery").ConfigureAwait(false);
                     await ApiClient.SendSelectProtocol(ip, port).ConfigureAwait(false);
                 }
@@ -317,7 +317,7 @@ namespace Discord.Audio
                     {
                         await _audioLogger.DebugAsync("Received Keepalive").ConfigureAwait(false);
 
-                        ulong value = 
+                        ulong value =
                             ((ulong)packet[0] >> 0) |
                             ((ulong)packet[1] >> 8) |
                             ((ulong)packet[2] >> 16) |
@@ -331,7 +331,7 @@ namespace Discord.Audio
                         {
                             if (pair.Key == value)
                             {
-                                int latency = (int)(Environment.TickCount - pair.Value);
+                                int latency = Environment.TickCount - pair.Value;
                                 int before = UdpLatency;
                                 UdpLatency = latency;
 
@@ -341,10 +341,10 @@ namespace Discord.Audio
                         }
                     }
                     else
-                    {                        
+                    {
                         if (!RTPReadStream.TryReadSsrc(packet, 0, out var ssrc))
                         {
-                            await _audioLogger.DebugAsync($"Malformed Frame").ConfigureAwait(false);
+                            await _audioLogger.DebugAsync("Malformed Frame").ConfigureAwait(false);
                             return;
                         }
                         if (!_ssrcMap.TryGetValue(ssrc, out var userId))
@@ -363,7 +363,7 @@ namespace Discord.Audio
                         }
                         catch (Exception ex)
                         {
-                            await _audioLogger.DebugAsync($"Malformed Frame", ex).ConfigureAwait(false);
+                            await _audioLogger.DebugAsync("Malformed Frame", ex).ConfigureAwait(false);
                             return;
                         }
                         //await _audioLogger.DebugAsync($"Received {packet.Length} bytes from user {userId}").ConfigureAwait(false);
@@ -372,7 +372,7 @@ namespace Discord.Audio
             }
             catch (Exception ex)
             {
-                await _audioLogger.WarningAsync($"Failed to process UDP packet", ex).ConfigureAwait(false);
+                await _audioLogger.WarningAsync("Failed to process UDP packet", ex).ConfigureAwait(false);
                 return;
             }
         }
@@ -388,7 +388,7 @@ namespace Discord.Audio
                     var now = Environment.TickCount;
 
                     //Did server respond to our last heartbeat?
-                    if (_heartbeatTimes.Count != 0 && (now - _lastMessageTime) > intervalMillis && 
+                    if (_heartbeatTimes.Count != 0 && (now - _lastMessageTime) > intervalMillis &&
                         ConnectionState == ConnectionState.Connected)
                     {
                         _connection.Error(new Exception("Server missed last heartbeat"));
@@ -420,7 +420,6 @@ namespace Discord.Audio
         }
         private async Task RunKeepaliveAsync(int intervalMillis, CancellationToken cancelToken)
         {
-            var packet = new byte[8];
             try
             {
                 await _audioLogger.DebugAsync("Keepalive Started").ConfigureAwait(false);
@@ -438,7 +437,7 @@ namespace Discord.Audio
                     {
                         await _audioLogger.WarningAsync("Failed to send keepalive", ex).ConfigureAwait(false);
                     }
-                    
+
                     await Task.Delay(intervalMillis, cancelToken).ConfigureAwait(false);
                 }
                 await _audioLogger.DebugAsync("Keepalive Stopped").ConfigureAwait(false);
@@ -468,6 +467,7 @@ namespace Discord.Audio
             {
                 StopAsync().GetAwaiter().GetResult();
                 ApiClient.Dispose();
+                _stateLock?.Dispose();
             }
         }
         /// <inheritdoc />

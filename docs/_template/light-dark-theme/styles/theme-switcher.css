@@ -1,0 +1,9 @@
+div.theme-switch-field {
+    padding-left: 10px;
+    padding-bottom: 15px
+}
+
+div.theme-switch-field > p{
+    font-weight: bold;
+    font-size: 1.2em;
+}

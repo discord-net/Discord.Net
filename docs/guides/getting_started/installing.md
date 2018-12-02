@@ -1,146 +1,136 @@
 ---
+uid: Guides.GettingStarted.Installation
 title: Installing Discord.Net
 ---
 
-Discord.Net is distributed through the NuGet package manager, and it
-is recommended to use NuGet to get started.
+# Discord.Net Installation
 
-Optionally, you may compile from source and install yourself.
+Discord.Net is distributed through the NuGet package manager; the most
+recommended way for you to install this library. Alternatively, you
+may also compile this library yourself should you so desire.
 
-# Supported Platforms
+## Supported Platforms
 
-Currently, Discord.Net targets [.NET Standard] 1.3 and offers support
-for .NET Standard 1.1. If your application will be targeting .NET
-Standard 1.1, please see the [additional steps].
+Discord.Net targets [.NET Standard] both 1.3 and 2.0; this also means
+that creating applications using the latest version of [.NET Core] is
+the most recommended. If you are bound by Windows-specific APIs or
+other limitations, you may also consider targeting [.NET Framework]
+4.6.1 or higher.
 
-Since Discord.Net is built on the .NET Standard, it is also
-recommended to create applications using [.NET Core], though not 
-required. When using .NET Framework, it is suggested to target
-`.NET Framework 4.6.1` or higher.
+> [!WARNING]
+> Using this library with [Mono] is not supported until further
+> notice. It is known to have issues with the library's WebSockets
+> implementation and may crash the application upon startup.
 
+[Mono]: https://www.mono-project.com/
 [.NET Standard]: https://docs.microsoft.com/en-us/dotnet/articles/standard/library
 [.NET Core]: https://docs.microsoft.com/en-us/dotnet/articles/core/
+[.NET Framework]: https://docs.microsoft.com/en-us/dotnet/framework/get-started/
 [additional steps]: #installing-on-net-standard-11
 
-# Installing with NuGet
+## Installing with NuGet
 
-Release builds of Discord.Net 1.0 will be published to the
+Release builds of Discord.Net will be published to the
 [official NuGet feed].
 
-Development builds of Discord.Net 1.0, as well as addons *(TODO)* are
-published to our development [MyGet feed].
-
-Direct feed link: `https://www.myget.org/F/discord-net/api/v3/index.json`
-
-Not sure how to add a direct feed? See how [with Visual Studio] or 
-[without Visual Studio].
+Development builds of Discord.Net, as well as add-ons, will be
+published to our [MyGet feed]. See
+@Guides.GettingStarted.Installation.Nightlies to learn more.
 
 [official NuGet feed]: https://nuget.org
 [MyGet feed]: https://www.myget.org/feed/Packages/discord-net
-[with Visual Studio]: https://docs.microsoft.com/en-us/nuget/tools/package-manager-ui#package-sources
-[without Visual Studio]: #configuring-nuget-without-visual-studio
 
-## Using Visual Studio
+### [Using Visual Studio](#tab/vs-install)
 
-> [!TIP]
->Don't forget to change your package source if you're installing from
-the developer feed.
->Also make sure to check "Enable Prereleases" if installing a dev
-build!
-
-1. Create a solution for your bot.
-2. In Solution Explorer, find the "Dependencies" element under your
-bot's project.
+1. Create a new solution for your bot.
+2. In the Solution Explorer, find the "Dependencies" element under your
+ bot's project.
 3. Right click on "Dependencies", and select "Manage NuGet packages."
-![Step 3](images/install-vs-deps.png)
+ ![Step 3](images/install-vs-deps.png)
 4. In the "Browse" tab, search for `Discord.Net`.
 5. Install the `Discord.Net` package.
-![Step 5](images/install-vs-nuget.png)
+ ![Step 5](images/install-vs-nuget.png)
 
-## Using JetBrains Rider
-
-> [!TIP]
-Make sure to check the "Prerelease" box if installing a dev build!
+### [Using JetBrains Rider](#tab/rider-install)
 
 1. Create a new solution for your bot.
 2. Open the NuGet window (Tools > NuGet > Manage NuGet packages for
-Solution).
+ Solution).
 ![Step 2](images/install-rider-nuget-manager.png)
 3. In the "Packages" tab, search for `Discord.Net`.
 ![Step 3](images/install-rider-search.png)
 4. Install by adding the package to your project.
 ![Step 4](images/install-rider-add.png)
 
-## Using Visual Studio Code
-
-> [!TIP]
-Don't forget to add the package source to a [NuGet.Config file] if
-you're installing from the developer feed.
+### [Using Visual Studio Code](#tab/vs-code)
 
 1. Create a new project for your bot.
 2. Add `Discord.Net` to your .csproj.
 
-[!code-xml[Sample .csproj](samples/project.csproj)]
+[!code[Sample .csproj](samples/project.xml)]
 
-[NuGet.Config file]: #configuring-nuget-without-visual-studio
+### [Using dotnet CLI](#tab/dotnet-cli)
 
-# Compiling from Source
+1. Open command-line and navigate to where your .csproj is located.
+2. Enter `dotnet add package Discord.Net`.
 
-In order to compile Discord.Net, you require the following:
+***
+
+## Compiling from Source
+
+In order to compile Discord.Net, you will need the following:
 
 ### Using Visual Studio
 
-- [Visual Studio 2017](https://www.visualstudio.com/)
-- [.NET Core SDK 1.0](https://www.microsoft.com/net/download/core#/sdk)
+* [Visual Studio 2017](https://www.visualstudio.com/)
+* [.NET Core SDK]
 
-The .NET Core and Docker (Preview) workload is required during Visual
-Studio installation.
+The .NET Core and Docker workload is required during Visual Studio
+installation.
 
 ### Using Command Line
 
-- [.NET Core SDK 1.0](https://www.microsoft.com/net/download/core#/sdk)
+* [.NET Core SDK]
 
-# Additional Information
+## Additional Information
 
-## Installing on .NET Standard 1.1
+### Installing on Unsupported WebSocket Platform
 
-For applications targeting a runtime corresponding with .NET Standard
-1.1 or 1.2, the builtin WebSocket and UDP provider will not work. For
-applications which utilize a WebSocket connection to Discord
-(WebSocket or RPC), third-party provider packages will need to be
-installed and configured.
+When running any Discord.Net-powered bot on an older operating system
+(e.g. Windows 7) that does not natively support WebSocket,
+you may encounter a @System.PlatformNotSupportedException upon
+connecting.
 
-First, install the following packages through NuGet, or compile
-yourself, if you prefer:
+You may resolve this by either targeting .NET Core 2.1 or later, or
+by installing one or more custom packages as listed below.
 
-- Discord.Net.Providers.WS4Net
-- Discord.Net.Providers.UDPClient
+#### [Targeting .NET Core 2.1](#tab/core2-1)
 
-Note that `Discord.Net.Providers.UDPClient` is _only_ required if your
-bot will be utilizing voice chat.
+1. Download the latest [.NET Core SDK].
+2. Create or move your existing project to use .NET Core.
+3. Modify your `<TargetFramework>` tag to at least `netcoreapp2.1`, or
+ by adding the `--framework netcoreapp2.1` switch when building.
 
-Next, you will need to configure your [DiscordSocketClient] to use
-these custom providers over the default ones.
+#### [Custom Packages](#tab/custom-pkg)
 
-To do this, set the `WebSocketProvider` and the optional
-`UdpSocketProvider` properties on the [DiscordSocketConfig] that you
-are passing into your client.
+1. Install or compile the following packages:
 
-[!code-csharp[NET Standard 1.1 Example](samples/netstd11.cs)]
+ * `Discord.Net.Providers.WS4Net`
+ * `Discord.Net.Providers.UDPClient` (Optional)
+    * This is _only_ required if your bot will be utilizing voice chat.
+
+2. Configure your [DiscordSocketClient] to use these custom providers
+over the default ones.
+
+ * To do this, set the `WebSocketProvider` and the optional 
+ `UdpSocketProvider` properties on the [DiscordSocketConfig] that you
+ are passing into your client.
+
+[!code-csharp[Example](samples/netstd11.cs)]
 
 [DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
 [DiscordSocketConfig]: xref:Discord.WebSocket.DiscordSocketConfig
 
-## Configuring NuGet without Visual Studio
+***
 
-If you plan on deploying your bot or developing outside of Visual
-Studio, you will need to create a local NuGet configuration file for
-your project.
-
-To do this, create a file named `nuget.config` alongside the root of
-your application, where the project solution is located.
-
-Paste the following snippets into this configuration file, adding any
-additional feeds as necessary.
-
-[!code-xml[NuGet Configuration](samples/nuget.config)]
+[.NET Core SDK]: https://www.microsoft.com/net/download/

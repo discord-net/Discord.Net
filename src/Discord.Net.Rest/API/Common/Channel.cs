@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 using System;
 
@@ -33,6 +33,8 @@ namespace Discord.API
         public Optional<DateTimeOffset?> LastPinTimestamp { get; set; }
         [JsonProperty("nsfw")]
         public Optional<bool> Nsfw { get; set; }
+        [JsonProperty("rate_limit_per_user")]
+        public Optional<int> SlowMode { get; set; }
 
         //VoiceChannel
         [JsonProperty("bitrate")]

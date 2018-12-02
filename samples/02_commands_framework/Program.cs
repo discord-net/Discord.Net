@@ -15,28 +15,36 @@ namespace _02_commands_framework
     //
     // You can find samples of using the command framework:
     // - Here, under the 02_commands_framework sample
-    // - https://github.com/foxbot/DiscordBotBase - a barebones bot template
+    // - https://github.com/foxbot/DiscordBotBase - a bare-bones bot template
     // - https://github.com/foxbot/patek - a more feature-filled bot, utilizing more aspects of the library
     class Program
     {
+        // There is no need to implement IDisposable like before as we are
+        // using dependency injection, which handles calling Dispose for us.
         static void Main(string[] args)
             => new Program().MainAsync().GetAwaiter().GetResult();
 
         public async Task MainAsync()
         {
-            var services = ConfigureServices();
+            // You should dispose a service provider created using ASP.NET
+            // when you are finished using it, at the end of your app's lifetime.
+            // If you use another dependency injection framework, you should inspect
+            // its documentation for the best way to do this.
+            using (var services = ConfigureServices())
+            {
+                var client = services.GetRequiredService<DiscordSocketClient>();
 
-            var client = services.GetRequiredService<DiscordSocketClient>();
+                client.Log += LogAsync;
+                services.GetRequiredService<CommandService>().Log += LogAsync;
 
-            client.Log += LogAsync;
-            services.GetRequiredService<CommandService>().Log += LogAsync;
+                // Tokens should be considered secret data, and never hard-coded.
+                await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
+                await client.StartAsync();
 
-            await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
-            await client.StartAsync();
+                await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
 
-            await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
-
-            await Task.Delay(-1);
+                await Task.Delay(-1);
+            }
         }
 
         private Task LogAsync(LogMessage log)
@@ -46,7 +54,7 @@ namespace _02_commands_framework
             return Task.CompletedTask;
         }
 
-        private IServiceProvider ConfigureServices()
+        private ServiceProvider ConfigureServices()
         {
             return new ServiceCollection()
                 .AddSingleton<DiscordSocketClient>()

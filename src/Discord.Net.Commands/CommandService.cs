@@ -11,13 +11,46 @@ using Discord.Logging;
 
 namespace Discord.Commands
 {
-    public class CommandService
+    /// <summary>
+    ///     Provides a framework for building Discord commands.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The service provides a framework for building Discord commands both dynamically via runtime builders or
+    ///         statically via compile-time modules. To create a command module at compile-time, see
+    ///         <see cref="ModuleBase" /> (most common); otherwise, see <see cref="ModuleBuilder" />.
+    ///     </para>
+    ///     <para>
+    ///         This service also provides several events for monitoring command usages; such as
+    ///         <see cref="Discord.Commands.CommandService.Log" /> for any command-related log events, and
+    ///         <see cref="Discord.Commands.CommandService.CommandExecuted" /> for information about commands that have
+    ///         been successfully executed.
+    ///     </para>
+    /// </remarks>
+    public class CommandService : IDisposable
     {
+        /// <summary>
+        ///     Occurs when a command-related information is received.
+        /// </summary>
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
 
-        public event Func<CommandInfo, ICommandContext, IResult, Task> CommandExecuted { add { _commandExecutedEvent.Add(value); } remove { _commandExecutedEvent.Remove(value); } }
-        internal readonly AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>> _commandExecutedEvent = new AsyncEvent<Func<CommandInfo, ICommandContext, IResult, Task>>();
+        /// <summary>
+        ///     Occurs when a command is successfully executed without any error.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         This event is fired when a command has been successfully executed without any of the following errors:
+        ///     </para>
+        ///         <para>* Parsing error</para>
+        ///         <para>* Precondition error</para>
+        ///         <para>* Runtime exception</para>
+        ///     <para>
+        ///         Should the command encounter any of the aforementioned error, this event will not be raised.
+        ///     </para>
+        /// </remarks>
+        public event Func<Optional<CommandInfo>, ICommandContext, IResult, Task> CommandExecuted { add { _commandExecutedEvent.Add(value); } remove { _commandExecutedEvent.Remove(value); } }
+        internal readonly AsyncEvent<Func<Optional<CommandInfo>, ICommandContext, IResult, Task>> _commandExecutedEvent = new AsyncEvent<Func<Optional<CommandInfo>, ICommandContext, IResult, Task>>();
 
         private readonly SemaphoreSlim _moduleLock;
         private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
@@ -34,11 +67,35 @@ namespace Discord.Commands
         internal readonly LogManager _logManager;
         internal readonly IReadOnlyDictionary<char, char> _quotationMarkAliasMap;
 
+        internal bool _isDisposed;
+
+        /// <summary>
+        ///     Represents all modules loaded within <see cref="CommandService"/>.
+        /// </summary>
         public IEnumerable<ModuleInfo> Modules => _moduleDefs.Select(x => x);
+
+        /// <summary>
+        ///     Represents all commands loaded within <see cref="CommandService"/>.
+        /// </summary>
         public IEnumerable<CommandInfo> Commands => _moduleDefs.SelectMany(x => x.Commands);
+
+        /// <summary>
+        ///     Represents all <see cref="TypeReader" /> loaded within <see cref="CommandService"/>.
+        /// </summary>
         public ILookup<Type, TypeReader> TypeReaders => _typeReaders.SelectMany(x => x.Value.Select(y => new { y.Key, y.Value })).ToLookup(x => x.Key, x => x.Value);
 
+        /// <summary>
+        ///     Initializes a new <see cref="CommandService"/> class.
+        /// </summary>
         public CommandService() : this(new CommandServiceConfig()) { }
+
+        /// <summary>
+        ///     Initializes a new <see cref="CommandService"/> class with the provided configuration.
+        /// </summary>
+        /// <param name="config">The configuration class.</param>
+        /// <exception cref="InvalidOperationException">
+        /// The <see cref="RunMode"/> cannot be set to <see cref="RunMode.Default"/>.
+        /// </exception>
         public CommandService(CommandServiceConfig config)
         {
             _caseSensitive = config.CaseSensitiveCommands;
@@ -102,12 +159,39 @@ namespace Discord.Commands
         }
 
         /// <summary>
-        /// Add a command module from a type
+        ///     Add a command module from a <see cref="Type" />.
         /// </summary>
-        /// <typeparam name="T">The type of module</typeparam>
-        /// <param name="services">An IServiceProvider for your dependency injection solution, if using one - otherwise, pass null</param>
-        /// <returns>A built module</returns>
+        /// <example>
+        ///     <para>The following example registers the module <c>MyModule</c> to <c>commandService</c>.</para>
+        ///     <code language="cs">
+        ///     await commandService.AddModuleAsync&lt;MyModule&gt;(serviceProvider);
+        ///     </code>
+        /// </example>
+        /// <typeparam name="T">The type of module.</typeparam>
+        /// <param name="services">The <see cref="IServiceProvider"/> for your dependency injection solution if using one; otherwise, pass <c>null</c>.</param>
+        /// <exception cref="ArgumentException">This module has already been added.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The <see cref="ModuleInfo"/> fails to be built; an invalid type may have been provided.
+        /// </exception>
+        /// <returns>
+        ///     A task that represents the asynchronous operation for adding the module. The task result contains the
+        ///     built module.
+        /// </returns>
         public Task<ModuleInfo> AddModuleAsync<T>(IServiceProvider services) => AddModuleAsync(typeof(T), services);
+
+        /// <summary>
+        ///     Adds a command module from a <see cref="Type" />.
+        /// </summary>
+        /// <param name="type">The type of module.</param>
+        /// <param name="services">The <see cref="IServiceProvider" /> for your dependency injection solution if using one; otherwise, pass <c>null</c> .</param>
+        /// <exception cref="ArgumentException">This module has already been added.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// The <see cref="ModuleInfo"/> fails to be built; an invalid type may have been provided.
+        /// </exception>
+        /// <returns>
+        ///     A task that represents the asynchronous operation for adding the module. The task result contains the
+        ///     built module.
+        /// </returns>
         public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services)
         {
             services = services ?? EmptyServiceProvider.Instance;
@@ -118,7 +202,7 @@ namespace Discord.Commands
                 var typeInfo = type.GetTypeInfo();
 
                 if (_typedModuleDefs.ContainsKey(type))
-                    throw new ArgumentException($"This module has already been added.");
+                    throw new ArgumentException("This module has already been added.");
 
                 var module = (await ModuleClassBuilder.BuildAsync(this, services, typeInfo).ConfigureAwait(false)).FirstOrDefault();
 
@@ -135,11 +219,14 @@ namespace Discord.Commands
             }
         }
         /// <summary>
-        /// Add command modules from an assembly
+        ///     Add command modules from an <see cref="Assembly"/>.
         /// </summary>
-        /// <param name="assembly">The assembly containing command modules</param>
-        /// <param name="services">An IServiceProvider for your dependency injection solution, if using one - otherwise, pass null</param>
-        /// <returns>A collection of built modules</returns>
+        /// <param name="assembly">The <see cref="Assembly"/> containing command modules.</param>
+        /// <param name="services">The <see cref="IServiceProvider"/> for your dependency injection solution if using one; otherwise, pass <c>null</c>.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous operation for adding the command modules. The task result
+        ///     contains an enumerable collection of modules added.
+        /// </returns>
         public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly, IServiceProvider services)
         {
             services = services ?? EmptyServiceProvider.Instance;
@@ -175,7 +262,14 @@ namespace Discord.Commands
 
             return module;
         }
-
+        /// <summary>
+        ///     Removes the command module.
+        /// </summary>
+        /// <param name="module">The <see cref="ModuleInfo" /> to be removed from the service.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous removal operation. The task result contains a value that
+        ///     indicates whether the <paramref name="module"/> is successfully removed.
+        /// </returns>
         public async Task<bool> RemoveModuleAsync(ModuleInfo module)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
@@ -188,7 +282,23 @@ namespace Discord.Commands
                 _moduleLock.Release();
             }
         }
+        /// <summary>
+        ///     Removes the command module.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="Type"/> of the module.</typeparam>
+        /// <returns>
+        ///     A task that represents the asynchronous removal operation. The task result contains a value that
+        ///     indicates whether the module is successfully removed.
+        /// </returns>
         public Task<bool> RemoveModuleAsync<T>() => RemoveModuleAsync(typeof(T));
+        /// <summary>
+        ///     Removes the command module.
+        /// </summary>
+        /// <param name="type">The <see cref="Type"/> of the module.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous removal operation. The task result contains a value that
+        ///     indicates whether the module is successfully removed.
+        /// </returns>
         public async Task<bool> RemoveModuleAsync(Type type)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
@@ -222,44 +332,60 @@ namespace Discord.Commands
 
         //Type Readers
         /// <summary>
-        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
-        /// If <typeparamref name="T"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> will also be added.
-        /// If a default <see cref="TypeReader"/> exists for <typeparamref name="T"/>, a warning will be logged and the default <see cref="TypeReader"/> will be replaced. 
+        ///     Adds a custom <see cref="TypeReader" /> to this <see cref="CommandService" /> for the supplied object
+        ///     type.
+        ///     If <typeparamref name="T" /> is a <see cref="ValueType" />, a nullable <see cref="TypeReader" /> will
+        ///     also be added.
+        ///     If a default <see cref="TypeReader" /> exists for <typeparamref name="T" />, a warning will be logged
+        ///     and the default <see cref="TypeReader" /> will be replaced.
         /// </summary>
         /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
-        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
+        /// <param name="reader">An instance of the <see cref="TypeReader" /> to be added.</param>
         public void AddTypeReader<T>(TypeReader reader)
             => AddTypeReader(typeof(T), reader);
         /// <summary>
-        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
-        /// If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added.
-        /// If a default <see cref="TypeReader"/> exists for <paramref name="type"/>, a warning will be logged and the default <see cref="TypeReader"/> will be replaced.
+        ///     Adds a custom <see cref="TypeReader" /> to this <see cref="CommandService" /> for the supplied object
+        ///     type.
+        ///     If <paramref name="type" /> is a <see cref="ValueType" />, a nullable <see cref="TypeReader" /> for the
+        ///     value type will also be added.
+        ///     If a default <see cref="TypeReader" /> exists for <paramref name="type" />, a warning will be logged and
+        ///     the default <see cref="TypeReader" /> will be replaced.
         /// </summary>
-        /// <param name="type">A <see cref="Type"/> instance for the type to be read.</param>
-        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
+        /// <param name="type">A <see cref="Type" /> instance for the type to be read.</param>
+        /// <param name="reader">An instance of the <see cref="TypeReader" /> to be added.</param>
         public void AddTypeReader(Type type, TypeReader reader)
         {
             if (_defaultTypeReaders.ContainsKey(type))
                 _ = _cmdLogger.WarningAsync($"The default TypeReader for {type.FullName} was replaced by {reader.GetType().FullName}." +
-                    $"To suppress this message, use AddTypeReader<T>(reader, true).");
+                    "To suppress this message, use AddTypeReader<T>(reader, true).");
             AddTypeReader(type, reader, true);
         }
         /// <summary>
-        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
-        /// If <typeparamref name="T"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> will also be added.
+        ///     Adds a custom <see cref="TypeReader" /> to this <see cref="CommandService" /> for the supplied object
+        ///     type.
+        ///     If <typeparamref name="T" /> is a <see cref="ValueType" />, a nullable <see cref="TypeReader" /> will
+        ///     also be added.
         /// </summary>
         /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
-        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
-        /// <param name="replaceDefault">If <paramref name="reader"/> should replace the default <see cref="TypeReader"/> for <typeparamref name="T"/> if one exists.</param>
+        /// <param name="reader">An instance of the <see cref="TypeReader" /> to be added.</param>
+        /// <param name="replaceDefault">
+        ///     Defines whether the <see cref="TypeReader"/> should replace the default one for
+        ///     <see cref="Type" /> if it exists.
+        /// </param>
         public void AddTypeReader<T>(TypeReader reader, bool replaceDefault)
             => AddTypeReader(typeof(T), reader, replaceDefault);
         /// <summary>
-        /// Adds a custom <see cref="TypeReader"/> to this <see cref="CommandService"/> for the supplied object type. 
-        /// If <paramref name="type"/> is a <see cref="ValueType"/>, a <see cref="NullableTypeReader{T}"/> for the value type will also be added. 
+        ///     Adds a custom <see cref="TypeReader" /> to this <see cref="CommandService" /> for the supplied object
+        ///     type.
+        ///     If <paramref name="type" /> is a <see cref="ValueType" />, a nullable <see cref="TypeReader" /> for the
+        ///     value type will also be added.
         /// </summary>
-        /// <param name="type">A <see cref="Type"/> instance for the type to be read.</param>
-        /// <param name="reader">An instance of the <see cref="TypeReader"/> to be added.</param>
-        /// <param name="replaceDefault">If <paramref name="reader"/> should replace the default <see cref="TypeReader"/> for <paramref name="type"/> if one exists.</param>
+        /// <param name="type">A <see cref="Type" /> instance for the type to be read.</param>
+        /// <param name="reader">An instance of the <see cref="TypeReader" /> to be added.</param>
+        /// <param name="replaceDefault">
+        ///     Defines whether the <see cref="TypeReader"/> should replace the default one for <see cref="Type" /> if
+        ///     it exists.
+        /// </param>
         public void AddTypeReader(Type type, TypeReader reader, bool replaceDefault)
         {
             if (replaceDefault && HasDefaultTypeReader(type))
@@ -331,8 +457,20 @@ namespace Discord.Commands
         }
 
         //Execution
+        /// <summary>
+        ///     Searches for the command.
+        /// </summary>
+        /// <param name="context">The context of the command.</param>
+        /// <param name="argPos">The position of which the command starts at.</param>
+        /// <returns>The result containing the matching commands.</returns>
         public SearchResult Search(ICommandContext context, int argPos)
             => Search(context.Message.Content.Substring(argPos));
+        /// <summary>
+        ///     Searches for the command.
+        /// </summary>
+        /// <param name="context">The context of the command.</param>
+        /// <param name="input">The command string.</param>
+        /// <returns>The result containing the matching commands.</returns>
         public SearchResult Search(ICommandContext context, string input)
             => Search(input);
         public SearchResult Search(string input)
@@ -346,15 +484,41 @@ namespace Discord.Commands
                 return SearchResult.FromError(CommandError.UnknownCommand, "Unknown command.");
         }
 
+        /// <summary>
+        ///     Executes the command.
+        /// </summary>
+        /// <param name="context">The context of the command.</param>
+        /// <param name="argPos">The position of which the command starts at.</param>
+        /// <param name="services">The service to be used in the command's dependency injection.</param>
+        /// <param name="multiMatchHandling">The handling mode when multiple command matches are found.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous execution operation. The task result contains the result of the
+        ///     command execution.
+        /// </returns>
         public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
             => ExecuteAsync(context, context.Message.Content.Substring(argPos), services, multiMatchHandling);
+        /// <summary>
+        ///     Executes the command.
+        /// </summary>
+        /// <param name="context">The context of the command.</param>
+        /// <param name="input">The command string.</param>
+        /// <param name="services">The service to be used in the command's dependency injection.</param>
+        /// <param name="multiMatchHandling">The handling mode when multiple command matches are found.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous execution operation. The task result contains the result of the
+        ///     command execution.
+        /// </returns>
         public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;
 
             var searchResult = Search(input);
             if (!searchResult.IsSuccess)
+            {
+                await _commandExecutedEvent.InvokeAsync(Optional.Create<CommandInfo>(), context, searchResult).ConfigureAwait(false);
                 return searchResult;
+            }
+                
 
             var commands = searchResult.Commands;
             var preconditionResults = new Dictionary<CommandMatch, PreconditionResult>();
@@ -374,6 +538,8 @@ namespace Discord.Commands
                 var bestCandidate = preconditionResults
                     .OrderByDescending(x => x.Key.Command.Priority)
                     .FirstOrDefault(x => !x.Value.IsSuccess);
+
+                await _commandExecutedEvent.InvokeAsync(bestCandidate.Key.Command, context, bestCandidate.Value).ConfigureAwait(false);
                 return bestCandidate.Value;
             }
 
@@ -431,12 +597,35 @@ namespace Discord.Commands
                 //All parses failed, return the one from the highest priority command, using score as a tie breaker
                 var bestMatch = parseResults
                     .FirstOrDefault(x => !x.Value.IsSuccess);
+
+                await _commandExecutedEvent.InvokeAsync(bestMatch.Key.Command, context, bestMatch.Value).ConfigureAwait(false);
                 return bestMatch.Value;
             }
 
             //If we get this far, at least one parse was successful. Execute the most likely overload.
             var chosenOverload = successfulParses[0];
-            return await chosenOverload.Key.ExecuteAsync(context, chosenOverload.Value, services).ConfigureAwait(false);
+            var result = await chosenOverload.Key.ExecuteAsync(context, chosenOverload.Value, services).ConfigureAwait(false);
+            if (!result.IsSuccess && !(result is RuntimeResult)) // succesful results raise the event in CommandInfo#ExecuteInternalAsync (have to raise it there b/c deffered execution)
+                await _commandExecutedEvent.InvokeAsync(chosenOverload.Key.Command, context, result);
+            return result;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _moduleLock?.Dispose();
+                }
+
+                _isDisposed = true;
+            }
+        }
+
+        void IDisposable.Dispose()
+        {
+            Dispose(true);
         }
     }
 }

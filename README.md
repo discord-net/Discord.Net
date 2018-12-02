@@ -16,12 +16,8 @@ Our stable builds available from NuGet through the Discord.Net metapackage:
 The individual components may also be installed from NuGet:
 - [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
 - [Discord.Net.Rest](https://www.nuget.org/packages/Discord.Net.Rest/)
-- [Discord.Net.Rpc](https://www.nuget.org/packages/Discord.Net.Rpc/)
 - [Discord.Net.WebSocket](https://www.nuget.org/packages/Discord.Net.WebSocket/)
 - [Discord.Net.Webhook](https://www.nuget.org/packages/Discord.Net.Webhook/)
-
-The following provider is available for platforms not supporting .NET Standard 1.3:
-- [Discord.Net.Providers.WS4Net](https://www.nuget.org/packages/Discord.Net.Providers.WS4Net/)
 
 ### Unstable (MyGet)
 Nightly builds are available through our MyGet feed (`https://www.myget.org/F/discord-net/api/v3/index.json`).
@@ -41,5 +37,4 @@ The .NET Core workload must be selected during Visual Studio installation.
 ## Known Issues
 
 ### WebSockets (Win7 and earlier)
-.NET Core 1.1 does not support WebSockets on Win7 and earlier. It's recommended to use the Discord.Net.Providers.WS4Net package until this is resolved.
-Track the issue [here](https://github.com/dotnet/corefx/issues/9503).
+.NET Core 1.1 does not support WebSockets on Win7 and earlier. This issue has been fixed since the release of .NET Core 2.1. It is recommended to target .NET Core 2.1 or above for your project if you wish to run your bot on legacy platforms; alternatively, you may choose to install the [Discord.Net.Providers.WS4Net](https://www.nuget.org/packages/Discord.Net.Providers.WS4Net/) package.
