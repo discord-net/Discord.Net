@@ -184,31 +184,6 @@ namespace Discord.WebSocket
             }
         }
 
-        /// <summary>
-        ///     Returns a collection of all invites to this channel.
-        /// </summary>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
-        ///     of invite metadata that are created for this channel.
-        /// </returns>
-        public async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
-            => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
-        /// <summary>
-        ///     Creates a new invite to this channel.
-        /// </summary>
-        /// <param name="maxAge">The time (in seconds) until the invite expires. Set to <c>null</c> to never expire.</param>
-        /// <param name="maxUses">The max amount of times this invite may be used. Set to <c>null</c> to have unlimited uses.</param>
-        /// <param name="isTemporary">If <c>true</c>, the user accepting this invite will be kicked from the guild after closing their client.</param>
-        /// <param name="isUnique">If <c>true</c>, don't try to reuse a similar invite (useful for creating many unique one time use invites).</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous invite creation operation. The task result contains an invite
-        ///     metadata object containing information for the created invite.
-        /// </returns>
-        public async Task<RestInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
-
         public new virtual SocketGuildUser GetUser(ulong id) => null;
 
         /// <summary>
@@ -232,13 +207,6 @@ namespace Discord.WebSocket
         IGuild IGuildChannel.Guild => Guild;
         /// <inheritdoc />
         ulong IGuildChannel.GuildId => Guild.Id;
-
-        /// <inheritdoc />
-        async Task<IReadOnlyCollection<IInviteMetadata>> IGuildChannel.GetInvitesAsync(RequestOptions options)
-            => await GetInvitesAsync(options).ConfigureAwait(false);
-        /// <inheritdoc />
-        async Task<IInviteMetadata> IGuildChannel.CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
-            => await CreateInviteAsync(maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         OverwritePermissions? IGuildChannel.GetPermissionOverwrite(IRole role)

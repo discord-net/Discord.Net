@@ -42,6 +42,7 @@ namespace Discord.WebSocket
         private int _nextAudioId;
         private DateTimeOffset? _statusSince;
         private RestApplication _applicationInfo;
+        private bool _isDisposed;
 
         /// <summary> Provides access to a REST-only client with a shared state from this client. </summary>
         public DiscordSocketRestClient Rest { get; }
@@ -65,7 +66,7 @@ namespace Discord.WebSocket
         internal WebSocketProvider WebSocketProvider { get; private set; }
         internal bool AlwaysDownloadUsers { get; private set; }
         internal int? HandlerTimeout { get; private set; }
-        
+
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
@@ -112,8 +113,10 @@ namespace Discord.WebSocket
         ///     Initializes a new REST/WebSocket-based Discord client with the provided configuration.
         /// </summary>
         /// <param name="config">The configuration to be used with the client.</param>
+#pragma warning disable IDISP004
         public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null, null) { }
         internal DiscordSocketClient(DiscordSocketConfig config, SemaphoreSlim groupLock, DiscordSocketClient parentClient) : this(config, CreateApiClient(config), groupLock, parentClient) { }
+#pragma warning restore IDISP004
         private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, SemaphoreSlim groupLock, DiscordSocketClient parentClient)
             : base(config, client)
         {
@@ -173,11 +176,18 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         internal override void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!_isDisposed)
             {
-                StopAsync().GetAwaiter().GetResult();
-                ApiClient.Dispose();
+                if (disposing)
+                {
+                    StopAsync().GetAwaiter().GetResult();
+                    ApiClient?.Dispose();
+                    _stateLock?.Dispose();
+                }
+                _isDisposed = true;
             }
+
+            base.Dispose(disposing);
         }
 
         /// <inheritdoc />
@@ -200,10 +210,10 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public override async Task StartAsync() 
+        public override async Task StartAsync()
             => await _connection.StartAsync().ConfigureAwait(false);
         /// <inheritdoc />
-        public override async Task StopAsync() 
+        public override async Task StopAsync()
             => await _connection.StopAsync().ConfigureAwait(false);
 
         private async Task OnConnectingAsync()
@@ -707,6 +717,7 @@ namespace Discord.WebSocket
                                         {
                                             await GuildUnavailableAsync(guild).ConfigureAwait(false);
                                             await TimedInvokeAsync(_leftGuildEvent, nameof(LeftGuild), guild).ConfigureAwait(false);
+                                            (guild as IDisposable).Dispose();
                                         }
                                         else
                                         {
@@ -1209,16 +1220,22 @@ namespace Discord.WebSocket
                                             cachedMsg.Update(State, data);
                                             after = cachedMsg;
                                         }
-                                        else if (data.Author.IsSpecified)
+                                        else
                                         {
                                             //Edited message isnt in cache, create a detached one
                                             SocketUser author;
-                                            if (guild != null)
-                                                author = guild.GetUser(data.Author.Value.Id);
+                                            if (data.Author.IsSpecified)
+                                            {
+                                                if (guild != null)
+                                                    author = guild.GetUser(data.Author.Value.Id);
+                                                else
+                                                    author = (channel as SocketChannel).GetUser(data.Author.Value.Id);
+                                                if (author == null)
+                                                    author = SocketUnknownUser.Create(this, State, data.Author.Value);
+                                            }
                                             else
-                                                author = (channel as SocketChannel).GetUser(data.Author.Value.Id);
-                                            if (author == null)
-                                                author = SocketUnknownUser.Create(this, State, data.Author.Value);
+                                                // Message author wasn't specified in the payload, so create a completely anonymous unknown user
+                                                author = new SocketUnknownUser(this, id: 0);
 
                                             after = SocketMessage.Create(this, State, author, channel, data);
                                         }

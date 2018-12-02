@@ -43,7 +43,10 @@ namespace Discord.Net
             if (!_isDisposed)
             {
                 if (disposing)
+                {
                     _blobCache.Dispose();
+                    _cancelTokenSource?.Dispose();
+                }
                 _isDisposed = true;
             }
         }
@@ -70,7 +73,7 @@ namespace Discord.Net
         {
             if (method != "GET")
                 throw new InvalidOperationException("This RestClient only supports GET requests.");
-                
+
             string uri = Path.Combine(_baseUrl, endpoint);
             var bytes = await _blobCache.DownloadUrl(uri, _headers);
             return new RestResponse(HttpStatusCode.OK, _headers, new MemoryStream(bytes));
@@ -84,7 +87,7 @@ namespace Discord.Net
             throw new InvalidOperationException("This RestClient does not support multipart requests.");
         }
 
-        public async Task ClearAsync() 
+        public async Task ClearAsync()
         {
             await _blobCache.InvalidateAll();
         }
@@ -93,7 +96,7 @@ namespace Discord.Net
         {
             if (Info != null)
                 return;
-                
+
             bool needsReset = false;
             try
             {

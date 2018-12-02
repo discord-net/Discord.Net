@@ -34,7 +34,7 @@ namespace Discord.Rest
         public ISelfUser CurrentUser { get; protected set; }
         /// <inheritdoc />
         public TokenType TokenType => ApiClient.AuthTokenType;
-        
+
         /// <summary> Creates a new REST-only Discord client. </summary>
         internal BaseDiscordClient(DiscordRestConfig config, API.DiscordRestApiClient client)
         {
@@ -106,9 +106,9 @@ namespace Discord.Rest
 
             await _loggedInEvent.InvokeAsync().ConfigureAwait(false);
         }
-        internal virtual Task OnLoginAsync(TokenType tokenType, string token) 
+        internal virtual Task OnLoginAsync(TokenType tokenType, string token)
             => Task.Delay(0);
-        
+
         public async Task LogoutAsync()
         {
             await _stateLock.WaitAsync().ConfigureAwait(false);
@@ -131,14 +131,17 @@ namespace Discord.Rest
 
             await _loggedOutEvent.InvokeAsync().ConfigureAwait(false);
         }
-        internal virtual Task OnLogoutAsync() 
+        internal virtual Task OnLogoutAsync()
             => Task.Delay(0);
 
         internal virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)
             {
+#pragma warning disable IDISP007
                 ApiClient.Dispose();
+#pragma warning restore IDISP007
+                _stateLock?.Dispose();
                 _isDisposed = true;
             }
         }
@@ -156,7 +159,7 @@ namespace Discord.Rest
         ISelfUser IDiscordClient.CurrentUser => CurrentUser;
 
         /// <inheritdoc />
-        Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options) 
+        Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
             => throw new NotSupportedException();
 
         /// <inheritdoc />

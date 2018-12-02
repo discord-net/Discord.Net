@@ -27,7 +27,7 @@ namespace Discord.Commands
     ///         been successfully executed.
     ///     </para>
     /// </remarks>
-    public class CommandService
+    public class CommandService : IDisposable
     {
         /// <summary>
         ///     Occurs when a command-related information is received.
@@ -66,6 +66,8 @@ namespace Discord.Commands
         internal readonly Logger _cmdLogger;
         internal readonly LogManager _logManager;
         internal readonly IReadOnlyDictionary<char, char> _quotationMarkAliasMap;
+
+        internal bool _isDisposed;
 
         /// <summary>
         ///     Represents all modules loaded within <see cref="CommandService"/>.
@@ -330,9 +332,9 @@ namespace Discord.Commands
 
         //Type Readers
         /// <summary>
-        ///     Adds a custom <see cref="TypeReader" /> to this <see cref="CommandService" /> for the supplied object 
+        ///     Adds a custom <see cref="TypeReader" /> to this <see cref="CommandService" /> for the supplied object
         ///     type.
-        ///     If <typeparamref name="T" /> is a <see cref="ValueType" />, a nullable <see cref="TypeReader" /> will 
+        ///     If <typeparamref name="T" /> is a <see cref="ValueType" />, a nullable <see cref="TypeReader" /> will
         ///     also be added.
         ///     If a default <see cref="TypeReader" /> exists for <typeparamref name="T" />, a warning will be logged
         ///     and the default <see cref="TypeReader" /> will be replaced.
@@ -606,6 +608,24 @@ namespace Discord.Commands
             if (!result.IsSuccess && !(result is RuntimeResult)) // succesful results raise the event in CommandInfo#ExecuteInternalAsync (have to raise it there b/c deffered execution)
                 await _commandExecutedEvent.InvokeAsync(chosenOverload.Key.Command, context, result);
             return result;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _moduleLock?.Dispose();
+                }
+
+                _isDisposed = true;
+            }
+        }
+
+        void IDisposable.Dispose()
+        {
+            Dispose(true);
         }
     }
 }

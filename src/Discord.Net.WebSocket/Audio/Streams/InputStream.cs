@@ -96,7 +96,17 @@ namespace Discord.Audio.Streams
 
         protected override void Dispose(bool isDisposing)
         {
-            _isDisposed = true;
+            if (!_isDisposed)
+            {
+                if (isDisposing)
+                {
+                    _signal?.Dispose();
+                }
+
+                _isDisposed = true;
+            }
+
+            base.Dispose(isDisposing);
         }
     }
 }

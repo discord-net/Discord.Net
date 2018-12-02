@@ -13,41 +13,46 @@ namespace _03_sharded_client
     // DiscordSocketClient instances (or shards) to serve a large number of guilds.
     class Program
     {
-        private DiscordShardedClient _client;
-
         static void Main(string[] args)
             => new Program().MainAsync().GetAwaiter().GetResult();
         public async Task MainAsync()
         {
             // You specify the amount of shards you'd like to have with the
-            // DiscordSocketConfig. Generally, it's recommended to 
+            // DiscordSocketConfig. Generally, it's recommended to
             // have 1 shard per 1500-2000 guilds your bot is in.
             var config = new DiscordSocketConfig
             {
                 TotalShards = 2
             };
 
-            _client = new DiscordShardedClient(config);
-            var services = ConfigureServices();
+            // You should dispose a service provider created using ASP.NET
+            // when you are finished using it, at the end of your app's lifetime.
+            // If you use another dependency injection framework, you should inspect
+            // its documentation for the best way to do this.
+            using (var services = ConfigureServices(config))
+            {
+                var client = services.GetRequiredService<DiscordShardedClient>();
 
-            // The Sharded Client does not have a Ready event.
-            // The ShardReady event is used instead, allowing for individual
-            // control per shard.
-            _client.ShardReady += ReadyAsync;
-            _client.Log += LogAsync;
+                // The Sharded Client does not have a Ready event.
+                // The ShardReady event is used instead, allowing for individual
+                // control per shard.
+                client.ShardReady += ReadyAsync;
+                client.Log += LogAsync;
 
-            await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
+                await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
 
-            await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
-            await _client.StartAsync();
+                // Tokens should be considered secret data, and never hard-coded.
+                await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
+                await client.StartAsync();
 
-            await Task.Delay(-1);
+                await Task.Delay(-1);
+            }
         }
 
-        private IServiceProvider ConfigureServices()
+        private ServiceProvider ConfigureServices(DiscordSocketConfig config)
         {
             return new ServiceCollection()
-                .AddSingleton(_client)
+                .AddSingleton(new DiscordShardedClient(config))
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandlingService>()
                 .BuildServiceProvider();

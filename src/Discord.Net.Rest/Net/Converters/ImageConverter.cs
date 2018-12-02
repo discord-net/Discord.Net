@@ -34,12 +34,14 @@ namespace Discord.Net.Converters
                 }
                 else
                 {
-                    var cloneStream = new MemoryStream();
-                    image.Stream.CopyTo(cloneStream);
-                    bytes = new byte[cloneStream.Length];
-                    cloneStream.Position = 0;
-                    cloneStream.Read(bytes, 0, bytes.Length);
-                    length = (int)cloneStream.Length;
+                    using (var cloneStream = new MemoryStream())
+                    {
+                        image.Stream.CopyTo(cloneStream);
+                        bytes = new byte[cloneStream.Length];
+                        cloneStream.Position = 0;
+                        cloneStream.Read(bytes, 0, bytes.Length);
+                        length = (int)cloneStream.Length;
+                    }
                 }
 
                 string base64 = Convert.ToBase64String(bytes, 0, length);
