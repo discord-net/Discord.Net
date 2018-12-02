@@ -24,6 +24,8 @@ namespace Discord.Rest
         /// </summary>
         /// <param name="config">The configuration to be used with the client.</param>
         public DiscordRestClient(DiscordRestConfig config) : base(config, CreateApiClient(config)) { }
+        // used for socket client rest access
+        internal DiscordRestClient(DiscordRestConfig config, API.DiscordRestApiClient api) : base(config, api) { }
 
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
             => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent);

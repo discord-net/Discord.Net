@@ -42,9 +42,10 @@ namespace Discord.WebSocket
         private int _nextAudioId;
         private DateTimeOffset? _statusSince;
         private RestApplication _applicationInfo;
-
         private bool _isDisposed;
 
+        /// <summary> Provides access to a REST-only client with a shared state from this client. </summary>
+        public DiscordSocketRestClient Rest { get; }
         /// <summary> Gets the shard of of this client. </summary>
         public int ShardId { get; }
         /// <summary> Gets the current connection state of this client. </summary>
@@ -128,6 +129,7 @@ namespace Discord.WebSocket
             AlwaysDownloadUsers = config.AlwaysDownloadUsers;
             HandlerTimeout = config.HandlerTimeout;
             State = new ClientState(0, 0);
+            Rest = new DiscordSocketRestClient(config, ApiClient);
             _heartbeatTimes = new ConcurrentQueue<long>();
 
             _stateLock = new SemaphoreSlim(1, 1);
