@@ -76,9 +76,7 @@ namespace Discord
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKW")]
         // 59 char token
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWs")]
-        [InlineData("This appears to be completely invalid, however the current validation rules are not very strict.")]
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWss")]
-        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWsMTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWs")]
         public void TestBotTokenDoesNotThrowExceptions(string token)
         {
             // This example token is pulled from the Discord Docs
@@ -99,6 +97,9 @@ namespace Discord
         [InlineData("937it3ow87i4ery69876wqire")]
         // 57 char bot token
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kK")]
+        [InlineData("This is an invalid token, but it passes the check for string length.")]
+        // valid token, but passed in twice
+        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWsMTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWs")]
         public void TestBotTokenInvalidThrowsArgumentException(string token)
         {
             Assert.Throws<ArgumentException>(() => TokenUtils.ValidateToken(TokenType.Bot, token));
@@ -123,6 +124,45 @@ namespace Discord
         {
             Assert.Throws<ArgumentException>(() =>
                 TokenUtils.ValidateToken((TokenType)type, "MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWs"));
+        }
+
+        /// <summary>
+        ///     Checks the <see cref="TokenUtils.CheckBotTokenValidity(string)"/> method for expected output.
+        /// </summary>
+        /// <param name="token"> The Bot Token to test.</param>
+        /// <param name="expected"> The expected result. </param>
+        [Theory]
+        // this method only checks the first part of the JWT
+        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4..", true)]
+        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kK", true)]
+        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4. this part is invalid. this part is also invalid", true)]
+        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.", false)]
+        [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4", false)]
+        [InlineData("NDI4NDc3OTQ0MDA5MTk1NTIw.xxxx.xxxxx", true)]
+        // should not throw an unexpected exception
+        [InlineData("", false)]
+        [InlineData(null, false)]
+        public void TestCheckBotTokenValidity(string token, bool expected)
+        {
+            Assert.Equal(expected, TokenUtils.CheckBotTokenValidity(token));
+        }
+
+        [Theory]
+        // cannot pass a ulong? as a param in InlineData, so have to have a separate param
+        // indicating if a value is null
+        [InlineData("NDI4NDc3OTQ0MDA5MTk1NTIw", false, 428477944009195520)]
+        // should return null w/o throwing other exceptions
+        [InlineData("", true, 0)]
+        [InlineData(" ", true, 0)]
+        [InlineData(null, true, 0)]
+        [InlineData("these chars aren't allowed @U#)*@#!)*", true, 0)]
+        public void TestDecodeBase64UserId(string encodedUserId, bool isNull, ulong expectedUserId)
+        {
+            var result = TokenUtils.DecodeBase64UserId(encodedUserId);
+            if (isNull)
+                Assert.Null(result);
+            else
+                Assert.Equal(expectedUserId, result);
         }
     }
 }
