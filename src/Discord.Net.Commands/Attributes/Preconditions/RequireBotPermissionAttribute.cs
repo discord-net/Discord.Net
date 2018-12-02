@@ -17,6 +17,8 @@ namespace Discord.Commands
         ///     Gets the specified <see cref="Discord.ChannelPermission" /> of the precondition.
         /// </summary>
         public ChannelPermission? ChannelPermission { get; }
+        public override string ErrorMessage { get; set; }
+        public string NotAGuildErrorMessage { get; set; }
 
         /// <summary>
         ///     Requires the bot account to have a specific <see cref="Discord.GuildPermission"/>.
@@ -56,9 +58,9 @@ namespace Discord.Commands
             if (GuildPermission.HasValue)
             {
                 if (guildUser == null)
-                    return PreconditionResult.FromError("Command must be used in a guild channel.");
+                    return PreconditionResult.FromError(NotAGuildErrorMessage ?? "Command must be used in a guild channel.");
                 if (!guildUser.GuildPermissions.Has(GuildPermission.Value))
-                    return PreconditionResult.FromError($"Bot requires guild permission {GuildPermission.Value}.");
+                    return PreconditionResult.FromError(ErrorMessage ?? $"Bot requires guild permission {GuildPermission.Value}.");
             }
 
             if (ChannelPermission.HasValue)
@@ -70,7 +72,7 @@ namespace Discord.Commands
                     perms = ChannelPermissions.All(context.Channel);
 
                 if (!perms.Has(ChannelPermission.Value))
-                    return PreconditionResult.FromError($"Bot requires channel permission {ChannelPermission.Value}.");
+                    return PreconditionResult.FromError(ErrorMessage ?? $"Bot requires channel permission {ChannelPermission.Value}.");
             }
 
             return PreconditionResult.FromSuccess();

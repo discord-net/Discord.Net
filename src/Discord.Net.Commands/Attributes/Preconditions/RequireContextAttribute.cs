@@ -33,6 +33,7 @@ namespace Discord.Commands
         ///     Gets the context required to execute the command.
         /// </summary>
         public ContextType Contexts { get; }
+        public override string ErrorMessage { get; set; }
 
         /// <summary> Requires the command to be invoked in the specified context. </summary>
         /// <param name="contexts">The type of context the command can be invoked in. Multiple contexts can be specified by ORing the contexts together.</param>
@@ -66,7 +67,7 @@ namespace Discord.Commands
             if (isValid)
                 return Task.FromResult(PreconditionResult.FromSuccess());
             else
-                return Task.FromResult(PreconditionResult.FromError($"Invalid context for command; accepted contexts: {Contexts}."));
+                return Task.FromResult(PreconditionResult.FromError(ErrorMessage ?? $"Invalid context for command; accepted contexts: {Contexts}."));
         }
     }
 }

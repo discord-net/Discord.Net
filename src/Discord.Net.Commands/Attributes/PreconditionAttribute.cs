@@ -21,6 +21,14 @@ namespace Discord.Commands
         public string Group { get; set; } = null;
 
         /// <summary>
+        /// When overridden in a derived class, uses the supplied string
+        /// as the error message if the precondition doesn't pass.
+        /// Setting this for a class that doesn't override
+        /// this property is a no-op.
+        /// </summary>
+        public virtual string ErrorMessage { get { return null; } set { } }
+
+        /// <summary>
         ///     Checks if the <paramref name="command"/> has the sufficient permission to be executed.
         /// </summary>
         /// <param name="context">The context of the command.</param>
