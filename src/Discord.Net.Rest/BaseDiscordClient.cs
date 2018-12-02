@@ -65,7 +65,7 @@ namespace Discord.Rest
             }
             finally { _stateLock.Release(); }
         }
-        private async Task LoginInternalAsync(TokenType tokenType, string token, bool validateToken)
+        internal virtual async Task LoginInternalAsync(TokenType tokenType, string token, bool validateToken)
         {
             if (_isFirstLogin)
             {
@@ -118,7 +118,7 @@ namespace Discord.Rest
             }
             finally { _stateLock.Release(); }
         }
-        private async Task LogoutInternalAsync()
+        internal virtual async Task LogoutInternalAsync()
         {
             if (LoginState == LoginState.LoggedOut) return;
             LoginState = LoginState.LoggingOut;
