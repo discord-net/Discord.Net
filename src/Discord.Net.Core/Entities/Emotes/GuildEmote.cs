@@ -31,14 +31,15 @@ namespace Discord
         /// </returns>
         public IReadOnlyList<ulong> RoleIds { get; }
         /// <summary>
-        ///     Gets the User that created this emoji.
+        ///     Gets the cached User that created this emoji.
         /// </summary>
         /// <returns>
-        ///     An optional <see cref="IUser"/> who created this emoji. An unspecified value only indicates that the creator was not supplied as part of the API response.
+        ///     An optional <see cref="Cacheable{TEntity, TId}"/> <see cref="IUser"/> who created this emoji.
+        ///     An unspecified value only indicates that the creator was not supplied as part of the API response.
         /// </returns>        
-        public Optional<IUser> Creator { get; }
+        public Optional<Cacheable<IUser, ulong>> Creator { get; }
 
-        internal GuildEmote(ulong id, string name, bool animated, bool isManaged, bool requireColons, IReadOnlyList<ulong> roleIds, Optional<IUser> creator) : base(id, name, animated)
+        internal GuildEmote(ulong id, string name, bool animated, bool isManaged, bool requireColons, IReadOnlyList<ulong> roleIds, Optional<Cacheable<IUser, ulong>> creator) : base(id, name, animated)
         {
             IsManaged = isManaged;
             RequireColons = requireColons;

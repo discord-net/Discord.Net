@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Discord.Rest
 {
@@ -7,14 +8,19 @@ namespace Discord.Rest
     {
         public static GuildEmote ToEntity(this API.Emoji model, IGuild guild)
         {
-            return new GuildEmote(model.Id.Value, model.Name, model.Animated.GetValueOrDefault(), model.Managed, model.RequireColons, ImmutableArray.Create(model.Roles), GetEmoteAuthor(model, guild));
+            return new GuildEmote(model.Id.Value, model.Name, model.Animated.GetValueOrDefault(), model.Managed, model.RequireColons, ImmutableArray.Create(model.Roles), GetEmoteAuthorAsync(model, guild).Result);
         }
 
-        internal static Optional<IUser> GetEmoteAuthor(API.Emoji model, IGuild guild)
+        internal static async Task<Optional<Cacheable<IUser, ulong>>> GetEmoteAuthorAsync(API.Emoji model, IGuild guild)
         {
             if (!model.User.IsSpecified || guild == null)
-                return new Optional<IUser>();
-            return new Optional<IUser>(guild.GetUserAsync(model.User.Value.Id).Result);
+                // api did not provide the user, or guild provided was null
+                return new Optional<Cacheable<IUser, ulong>>();
+            // get the cached user, if exists in cache
+            var cachedUser = await guild.GetUserAsync(model.User.Value.Id, CacheMode.CacheOnly).ConfigureAwait(false);
+            var isCached = cachedUser != null;
+            var cacheable = new Cacheable<IUser, ulong>(cachedUser, model.User.Value.Id, isCached, async () => await guild.GetUserAsync(model.User.Value.Id).ConfigureAwait(false));
+            return new Optional<Cacheable<IUser, ulong>>(cacheable);
         }
 
         public static Embed ToEntity(this API.Embed model)
