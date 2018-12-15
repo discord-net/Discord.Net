@@ -393,7 +393,7 @@ namespace Discord.Rest
         public static async Task<GuildEmote> GetEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
         {
             var emote = await client.ApiClient.GetGuildEmoteAsync(guild.Id, id, options).ConfigureAwait(false);
-            return emote.ToEntity();
+            return emote.ToEntity(guild);
         }
         public static async Task<GuildEmote> CreateEmoteAsync(IGuild guild, BaseDiscordClient client, string name, Image image, Optional<IEnumerable<IRole>> roles, 
             RequestOptions options)
@@ -407,7 +407,7 @@ namespace Discord.Rest
                 apiargs.RoleIds = roles.Value?.Select(xr => xr.Id).ToArray();
 
             var emote = await client.ApiClient.CreateGuildEmoteAsync(guild.Id, apiargs, options).ConfigureAwait(false);
-            return emote.ToEntity();
+            return emote.ToEntity(guild);
         }
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
         public static async Task<GuildEmote> ModifyEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, Action<EmoteProperties> func, 
@@ -426,7 +426,7 @@ namespace Discord.Rest
                 apiargs.RoleIds = props.Roles.Value?.Select(xr => xr.Id).ToArray();
 
             var emote = await client.ApiClient.ModifyGuildEmoteAsync(guild.Id, id, apiargs, options).ConfigureAwait(false);
-            return emote.ToEntity();
+            return emote.ToEntity(guild);
         }
         public static Task DeleteEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options) 
             => client.ApiClient.DeleteGuildEmoteAsync(guild.Id, id, options);

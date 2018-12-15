@@ -31,19 +31,19 @@ namespace Discord
         /// </returns>
         public IReadOnlyList<ulong> RoleIds { get; }
         /// <summary>
-        ///     Gets the user Id that created this emoji.
+        ///     Gets the User that created this emoji.
         /// </summary>
         /// <returns>
-        ///     A user Id of the user who created this emoji, which may be null. A null value only indicates that the creator was not supplied as part of the API response.
-        /// </returns>
-        public ulong? CreatorId { get; }
+        ///     An optional <see cref="IUser"/> who created this emoji. An unspecified value only indicates that the creator was not supplied as part of the API response.
+        /// </returns>        
+        public Optional<IUser> Creator { get; }
 
-        internal GuildEmote(ulong id, string name, bool animated, bool isManaged, bool requireColons, IReadOnlyList<ulong> roleIds, ulong? userId) : base(id, name, animated)
+        internal GuildEmote(ulong id, string name, bool animated, bool isManaged, bool requireColons, IReadOnlyList<ulong> roleIds, Optional<IUser> creator) : base(id, name, animated)
         {
             IsManaged = isManaged;
             RequireColons = requireColons;
             RoleIds = roleIds;
-            CreatorId = userId;
+            Creator = creator;
         }
 
         private string DebuggerDisplay => $"{Name} ({Id})";

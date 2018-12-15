@@ -359,7 +359,7 @@ namespace Discord.WebSocket
             {
                 var emojis = ImmutableArray.CreateBuilder<GuildEmote>(model.Emojis.Length);
                 for (int i = 0; i < model.Emojis.Length; i++)
-                    emojis.Add(model.Emojis[i].ToEntity());
+                    emojis.Add(model.Emojis[i].ToEntity(this));
                 _emotes = emojis.ToImmutable();
             }
             else
@@ -409,7 +409,7 @@ namespace Discord.WebSocket
         {
             var emotes = ImmutableArray.CreateBuilder<GuildEmote>(model.Emojis.Length);
             for (int i = 0; i < model.Emojis.Length; i++)
-                emotes.Add(model.Emojis[i].ToEntity());
+                emotes.Add(model.Emojis[i].ToEntity(this));
             _emotes = emotes.ToImmutable();
         }
 

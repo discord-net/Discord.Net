@@ -5,9 +5,16 @@ namespace Discord.Rest
 {
     internal static class EntityExtensions
     {
-        public static GuildEmote ToEntity(this API.Emoji model)
+        public static GuildEmote ToEntity(this API.Emoji model, IGuild guild)
         {
-            return new GuildEmote(model.Id.Value, model.Name, model.Animated.GetValueOrDefault(), model.Managed, model.RequireColons, ImmutableArray.Create(model.Roles), model.User.IsSpecified ? model.User.Value.Id : (ulong?)null);
+            return new GuildEmote(model.Id.Value, model.Name, model.Animated.GetValueOrDefault(), model.Managed, model.RequireColons, ImmutableArray.Create(model.Roles), GetEmoteAuthor(model, guild));
+        }
+
+        internal static Optional<IUser> GetEmoteAuthor(API.Emoji model, IGuild guild)
+        {
+            if (!model.User.IsSpecified || guild == null)
+                return new Optional<IUser>();
+            return new Optional<IUser>(guild.GetUserAsync(model.User.Value.Id).Result);
         }
 
         public static Embed ToEntity(this API.Embed model)
