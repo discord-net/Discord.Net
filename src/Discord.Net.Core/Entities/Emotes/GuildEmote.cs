@@ -34,7 +34,7 @@ namespace Discord
         ///     Gets the user Id that created this emoji.
         /// </summary>
         /// <returns>
-        ///     A User Id who created this emoji, which may be null.
+        ///     A user Id of the user who created this emoji, which may be null. A null value only indicates that the creator was not supplied as part of the API response.
         /// </returns>
         public ulong? CreatorId { get; }
 
