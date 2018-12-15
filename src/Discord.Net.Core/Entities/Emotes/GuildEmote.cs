@@ -30,12 +30,20 @@ namespace Discord
         ///     A read-only list containing snowflake identifiers for roles that are allowed to use this emoji.
         /// </returns>
         public IReadOnlyList<ulong> RoleIds { get; }
+        /// <summary>
+        ///     Gets the user Id that created this emoji.
+        /// </summary>
+        /// <returns>
+        ///     A User Id who created this emoji, which may be null.
+        /// </returns>
+        public ulong? CreatorId { get; }
 
-        internal GuildEmote(ulong id, string name, bool animated, bool isManaged, bool requireColons, IReadOnlyList<ulong> roleIds) : base(id, name, animated)
+        internal GuildEmote(ulong id, string name, bool animated, bool isManaged, bool requireColons, IReadOnlyList<ulong> roleIds, ulong? userId) : base(id, name, animated)
         {
             IsManaged = isManaged;
             RequireColons = requireColons;
             RoleIds = roleIds;
+            CreatorId = userId;
         }
 
         private string DebuggerDisplay => $"{Name} ({Id})";
