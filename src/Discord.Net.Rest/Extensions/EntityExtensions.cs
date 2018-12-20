@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace Discord.Rest
@@ -6,9 +6,13 @@ namespace Discord.Rest
     internal static class EntityExtensions
     {
         public static GuildEmote ToEntity(this API.Emoji model)
-        {
-            return new GuildEmote(model.Id.Value, model.Name, model.Animated.GetValueOrDefault(), model.Managed, model.RequireColons, ImmutableArray.Create(model.Roles));
-        }
+            => new GuildEmote(model.Id.Value,
+                model.Name,
+                model.Animated.GetValueOrDefault(),
+                model.Managed,
+                model.RequireColons,
+                ImmutableArray.Create(model.Roles),
+                model.User.IsSpecified ? model.User.Value.Id : (ulong?)null);
 
         public static Embed ToEntity(this API.Embed model)
         {
