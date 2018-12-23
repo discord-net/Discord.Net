@@ -75,7 +75,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <remarks>
         ///     <para>
-        ///         By default, Discord gateway will only send offline members if a guild has less than a certain number
+        ///         By default, the Discord gateway will only send offline members if a guild has less than a certain number
         ///         of members (determined by <see cref="LargeThreshold"/> in this library). This behaviour is why
         ///         sometimes a user may be missing from the WebSocket cache for collections such as 
         ///         <see cref="Discord.WebSocket.SocketGuild.Users"/>.
