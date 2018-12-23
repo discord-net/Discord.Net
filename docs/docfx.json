@@ -27,14 +27,15 @@
       },
       {
         "src": "../",
-        "files": ["CHANGELOG.md"]
+        "files": [ "CHANGELOG.md" ]
       }
     ],
     "resource": [{
       "files": [
         "**/images/**",
         "**/samples/**",
-        "langwordMapping.yml"
+        "langwordMapping.yml",
+        "marketing/logo/SVG/**.svg"
       ]
     }],
     "dest": "_site",
@@ -49,7 +50,8 @@
     "globalMetadata": {
       "_appTitle": "Discord.Net Documentation",
       "_appFooter": "Discord.Net (c) 2015-2018 2.0.0-beta",
-      "_enableSearch": true
+      "_enableSearch": true,
+      "_appLogoPath":  "marketing/logo/SVG/Logomark White.svg"
     },
     "xrefService": [
       "https://xref.docs.microsoft.com/query?uid={uid}"
