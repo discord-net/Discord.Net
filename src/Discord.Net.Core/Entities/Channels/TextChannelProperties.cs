@@ -21,15 +21,15 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     Setting this value to <c>true</c> will mark the channel as NSFW (Not Safe For Work) and will prompt the
-        ///     user about its maturity nature before they may view the channel; setting this value to <c>false</c> will
-        ///     mark this channel as SFW (Safe For Work).
+        ///     user about its possibly mature nature before they may view the channel; setting this value to <c>false</c> will
+        ///     remove the NSFW indicator.
         /// </remarks>
         public Optional<bool> IsNsfw { get; set; }
         /// <summary>
         ///     Gets or sets the slow-mode ratelimit in seconds for this channel.
         /// </summary>
         /// <remarks>
-        ///     Setting this value to anything above zero will require each user to wait X amount of second before
+        ///     Setting this value to anything above zero will require each user to wait X seconds before
         ///     sending another message; setting this value to <c>0</c> will disable slow-mode for this channel.
         ///     <note>
         ///         Users with <see cref="Discord.ChannelPermission.ManageMessages"/> or 

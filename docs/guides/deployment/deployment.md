@@ -59,7 +59,7 @@ When redistributing the application - whether for deployment on a
 remote machine or for sharing with another user - you may want to
 publish the application; in other words, to create a
 self-contained package without installing the dependencies
-and the runtime on the target machine.
+and the runtime on the target platform.
 
 ### Framework-dependent Deployment
 
@@ -76,7 +76,8 @@ program.
 
 > [!TIP]
 > Do not know how to run a .NET Core application with 
-> the `dotnet` runtime? Navigate to the folder of the program and 
+> the `dotnet` runtime? Navigate to the folder of the program 
+> (typically under `$projFolder/bin/Release`) and 
 > enter `dotnet program.dll` where `program.dll` is your compiled
 > binaries.
 
@@ -89,9 +90,8 @@ machine without the `dotnet` runtime), publish with a specific
 This will create a package with dependencies compiled for the target
 platform, meaning that all the required dependencies will be included
 with the program. This will result in **larger package size**; 
-however, not only is the portabilitiy greatly increased, but also the
-it will include a copy of the executable that can be run
-natively on the target runtime.
+however, that means the copy of the runtime that can be run
+natively on the target platform.
 
 For example, the following command will create a Windows 
 executable (`.exe`) that is ready to be executed on any
