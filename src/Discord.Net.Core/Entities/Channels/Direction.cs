@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    ///     Specifies the direction of where message(s) should be gotten from.
+     ///     Specifies the direction of where message(s) should be retrieved from.
     /// </summary>
     /// <remarks>
     ///     This enum is used to specify the direction for retrieving messages.
