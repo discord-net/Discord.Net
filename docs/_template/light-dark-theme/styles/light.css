@@ -111,3 +111,7 @@ span.arrow-d{
 span.arrow-r{
     border-left: 5px solid black
 }
+
+.logo-switcher {
+    background: url("/marketing/logo/SVG/Combinationmark.svg") no-repeat;
+}

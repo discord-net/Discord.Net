@@ -32,6 +32,15 @@ img {
     margin-bottom: 15px;
 }
 
+.big-logo {
+    display: block;
+    box-shadow: none !important;
+    /* Width value was taken from the original size of the combomark svg */
+    width: 951pt;
+    /* Height was arbitrarily determined */
+    min-height: 100pt;
+}
+
 article.content p{
     -webkit-transition: all .75s ease-in-out;
     transition: all .75s ease-in-out;
