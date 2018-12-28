@@ -6,7 +6,7 @@ public async Task SetupAsync()
     // Hook the command handler
     _client.MessageReceived += HandleCommandAsync;
 }
-public async Task OnCommandExecutedAsync(CommandInfo command, ICommandContext context, IResult result)
+public async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
 {
     // We have access to the information of the command executed,
     // the context of the command, and the result returned from the
@@ -20,19 +20,19 @@ public async Task OnCommandExecutedAsync(CommandInfo command, ICommandContext co
 
     // ...or even log the result (the method used should fit into
     // your existing log handler)
-    await _log.LogAsync(new LogMessage(LogSeverity.Info, "CommandExecution", $"{command?.Name} was executed at {DateTime.UtcNow}."));
+    var commandName = command.IsSpecified ? command.Value.Name : "A command";
+    await _log.LogAsync(new LogMessage(LogSeverity.Info, 
+        "CommandExecution", 
+        $"{commandName} was executed at {DateTime.UtcNow}."));
 }
 public async Task HandleCommandAsync(SocketMessage msg)
 {
     var message = messageParam as SocketUserMessage;
     if (message == null) return;
     int argPos = 0;
-    if (!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos)) || message.Author.IsBot) return;
+    if (!(message.HasCharPrefix('!', ref argPos) || 
+        message.HasMentionPrefix(_client.CurrentUser, ref argPos)) || 
+        message.Author.IsBot) return;
     var context = new SocketCommandContext(_client, message);
-    var result = await _commands.ExecuteAsync(context, argPos, _services);
-    // Optionally, you may pass the result manually into your
-    // CommandExecuted event handler if you wish to handle parsing or
-    // precondition failures in the same method.
-
-    // await OnCommandExecutedAsync(null, context, result);
+    await _commands.ExecuteAsync(context, argPos, _services);
 }

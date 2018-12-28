@@ -12,10 +12,15 @@ namespace Discord
         /// <summary>
         ///     Modifies this message.
         /// </summary>
+        /// <remarks>
+        ///     This method modifies this message with the specified properties. To see an example of this
+        ///     method and what properties are available, please refer to <see cref="MessageProperties"/>.
+        /// </remarks>
         /// <example>
-        /// <code language="cs">
-        /// await msg.ModifyAsync(x =&gt; x.Content = "Hello World!");
-        /// </code>
+        ///     The following example replaces the content of the message with <c>Hello World!</c>.
+        ///     <code language="cs">
+        ///     await msg.ModifyAsync(x =&gt; x.Content = "Hello World!");
+        ///     </code>
         /// </example>
         /// <param name="func">A delegate containing the properties to modify the message with.</param>
         /// <param name="options">The options to be used when sending the request.</param>
@@ -49,9 +54,10 @@ namespace Discord
         ///     Adds a reaction to this message.
         /// </summary>
         /// <example>
-        /// <code language="cs">
-        /// await msg.AddReactionAsync(new Emoji("\U0001f495"));
-        /// </code>
+        ///     The following example adds the reaction, <c>💕</c>, to the message.
+        ///     <code language="cs">
+        ///     await msg.AddReactionAsync(new Emoji("\U0001f495"));
+        ///     </code>
         /// </example>
         /// <param name="emote">The emoji used to react to this message.</param>
         /// <param name="options">The options to be used when sending the request.</param>
@@ -64,9 +70,10 @@ namespace Discord
         ///     Removes a reaction from message.
         /// </summary>
         /// <example>
-        /// <code language="cs">
-        /// await msg.RemoveReactionAsync(new Emoji("\U0001f495"), msg.Author);
-        /// </code>
+        ///     The following example removes the reaction, <c>💕</c>, added by the message author from the message.
+        ///     <code language="cs">
+        ///     await msg.RemoveReactionAsync(new Emoji("\U0001f495"), msg.Author);
+        ///     </code>
         /// </example>
         /// <param name="emote">The emoji used to react to this message.</param>
         /// <param name="user">The user that added the emoji.</param>
@@ -89,6 +96,7 @@ namespace Discord
         ///     Gets all users that reacted to a message with a given emote.
         /// </summary>
         /// <example>
+        ///     The following example gets the users that have reacted with the emoji <c>💕</c> to the message.
         ///     <code language="cs">
         ///     var emoji = new Emoji("\U0001f495");
         ///     var reactedUsers = await message.GetReactionUsersAsync(emoji, 100).FlattenAsync();

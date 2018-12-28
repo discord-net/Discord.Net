@@ -16,6 +16,7 @@ namespace Discord.Rest
     {
         /// <inheritdoc />
         public string Topic { get; private set; }
+        /// <inheritdoc />
         public int SlowModeInterval { get; private set; } 
         /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
@@ -201,6 +202,7 @@ namespace Discord.Rest
         /// </returns>
         public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
             => ChannelHelper.GetCategoryAsync(this, Discord, options);
+        /// <inheritdoc />
         public Task SyncPermissionsAsync(RequestOptions options = null)
             => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
 

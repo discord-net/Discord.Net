@@ -49,7 +49,7 @@ public class CommandHandler
         
         // Keep in mind that result does not indicate a return value
         // rather an object stating if the command executed successfully.
-        var result = await _command.ExecuteAsync(
+        var result = await _commands.ExecuteAsync(
             context: context, 
             argPos: argPos,
             services: null);

@@ -68,6 +68,10 @@ namespace Discord
             return builder;
         }
 
+        /// <summary>
+        ///     Adds the specified fields into this <see cref="EmbedBuilder"/>.
+        /// </summary>
+        /// <exception cref="ArgumentException">Field count exceeds <see cref="EmbedBuilder.MaxFieldCount"/>.</exception>
         public static EmbedBuilder WithFields(this EmbedBuilder builder, IEnumerable<EmbedFieldBuilder> fields)
         {
             foreach (var field in fields)
@@ -75,6 +79,9 @@ namespace Discord
 
             return builder;
         }
+        /// <summary>
+        ///     Adds the specified fields into this <see cref="EmbedBuilder"/>.
+        /// </summary>
         public static EmbedBuilder WithFields(this EmbedBuilder builder, params EmbedFieldBuilder[] fields)
             => WithFields(builder, fields.AsEnumerable());
     }

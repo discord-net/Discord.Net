@@ -27,7 +27,9 @@ namespace Discord
         ///     A generic channel that the invite points to.
         /// </returns>
         IChannel Channel { get; }
-        /// <summary> Gets the type of the channel this invite is linked to. </summary>
+        /// <summary>
+        ///     Gets the type of the channel this invite is linked to.
+        /// </summary>
         ChannelType ChannelType { get; }
         /// <summary>
         ///     Gets the ID of the channel this invite is linked to.

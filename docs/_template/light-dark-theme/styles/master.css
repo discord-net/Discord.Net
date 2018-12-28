@@ -9,6 +9,15 @@ body {
     scroll-behavior: smooth;
 }
 
+#logo
+{
+    max-width: 100px;
+    max-height: 100px;
+    width: 38pt;
+    height: 38pt;
+    padding: 8pt;
+}
+
 p,
 li,
 .toc {
@@ -21,6 +30,15 @@ img {
     max-width: 95% !important;
     margin-top: 15px;
     margin-bottom: 15px;
+}
+
+.big-logo {
+    display: block;
+    box-shadow: none !important;
+    /* Width value was taken from the original size of the combomark svg */
+    width: 951pt;
+    /* Height was arbitrarily determined */
+    min-height: 100pt;
 }
 
 article.content p{

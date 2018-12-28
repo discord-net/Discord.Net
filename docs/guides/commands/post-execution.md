@@ -31,17 +31,15 @@ be a violation of the SRP (Single Responsibility Principle).
 Another major issue is if your command is marked with
 `RunMode.Async`, [ExecuteAsync] will **always** return a successful
 [ExecuteResult] instead of the actual result. You can learn more
-about the impact in the [FAQ](xref:FAQ.Commands.General).
+about the impact in @FAQ.Commands.General.
 
 ## CommandExecuted Event
 
 Enter [CommandExecuted], an event that was introduced in
 Discord.Net 2.0. This event is raised whenever a command is
-successfully executed **without any run-time exceptions** or **any
-parsing or precondition failure**. This means this event can be
-used to streamline your post-execution design, and the best thing
-about this event is that it is not prone to `RunMode.Async`'s
-[ExecuteAsync] drawbacks.
+executed regardless of its execution status. This means this 
+event can be used to streamline your post-execution design,
+is not prone to `RunMode.Async`'s [ExecuteAsync] drawbacks.
 
 Thus, we can begin working on code such as:
 

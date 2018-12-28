@@ -119,24 +119,29 @@ The following are the known caveats with `RunMode.Async`,
 3. [ExecuteAsync] will immediately return [ExecuteResult] instead of
  other result types (this is particularly important for those who wish
  to utilize [RuntimeResult] in 2.0).
-4. Exceptions are swallowed.
+4. Exceptions are swallowed in the `ExecuteAsync` result.
 
 However, there are ways to remedy some of these.
 
 For #3, in Discord.Net 2.0, the library introduces a new event called
-[CommandExecuted], which is raised whenever the command is
-**successfully executed**. This event will be raised regardless of
-the `RunMode` type and will return the appropriate execution result.
+[CommandService.CommandExecuted], which is raised whenever the command is executed. 
+This event will be raised regardless of
+the `RunMode` type and will return the appropriate execution result
+and the associated @Discord.Commands.CommandInfo if applicable.
 
 For #4, exceptions are caught in [CommandService.Log] event under
-[LogMessage.Exception] as [CommandException].
+[LogMessage.Exception] as [CommandException] and in the 
+[CommandService.CommandExecuted] event under the [IResult] as 
+[ExecuteResult.Exception].
 
 [Task.Run]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task.run
 [async state machine]: https://www.red-gate.com/simple-talk/dotnet/net-tools/c-async-what-is-it-and-how-does-it-work/
 [ExecuteAsync]: xref:Discord.Commands.CommandService.ExecuteAsync*
 [ExecuteResult]: xref:Discord.Commands.ExecuteResult
 [RuntimeResult]: xref:Discord.Commands.RuntimeResult
-[CommandExecuted]: xref:Discord.Commands.CommandService.CommandExecuted
+[CommandService.CommandExecuted]: xref:Discord.Commands.CommandService.CommandExecuted
 [CommandService.Log]: xref:Discord.Commands.CommandService.Log
 [LogMessage.Exception]: xref:Discord.LogMessage.Exception*
+[ExecuteResult.Exception]: xref:Discord.Commands.ExecuteResult.Exception*
 [CommandException]: xref:Discord.Commands.CommandException
+[IResult]: xref:Discord.Commands.IResult

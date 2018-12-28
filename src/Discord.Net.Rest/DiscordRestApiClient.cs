@@ -348,6 +348,16 @@ namespace Discord.API
             var ids = new BucketIds(channelId: channelId);
             return await SendAsync<Channel>("DELETE", () => $"channels/{channelId}", ids, options: options).ConfigureAwait(false);
         }
+        /// <exception cref="ArgumentException">
+        /// <paramref name="channelId"/> must not be equal to zero.
+        /// -and-
+        /// <paramref name="args.Position"/> must be greater than zero.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="args"/> must not be <see langword="null"/>.
+        /// -and-
+        /// <paramref name="args.Name"/> must not be <see langword="null"/> or empty.
+        /// </exception>
         public async Task<Channel> ModifyGuildChannelAsync(ulong channelId, Rest.ModifyGuildChannelParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
@@ -836,6 +846,12 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             return await SendAsync<Ban>("GET", () => $"guilds/{guildId}/bans/{userId}", ids, options: options).ConfigureAwait(false);
         }
+        /// <exception cref="ArgumentException">
+        /// <paramref name="guildId"/> and <paramref name="userId"/> must not be equal to zero.
+        /// -and-
+        /// <paramref name="args.DeleteMessageDays"/> must be between 0 to 7.
+        /// </exception>
+        /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
         public async Task CreateGuildBanAsync(ulong guildId, ulong userId, CreateGuildBanParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
@@ -849,6 +865,7 @@ namespace Discord.API
             string reason = string.IsNullOrWhiteSpace(args.Reason) ? "" : $"&reason={Uri.EscapeDataString(args.Reason)}";
             await SendAsync("PUT", () => $"guilds/{guildId}/bans/{userId}?delete-message-days={args.DeleteMessageDays}{reason}", ids, options: options).ConfigureAwait(false);
         }
+        /// <exception cref="ArgumentException"><paramref name="guildId"/> and <paramref name="userId"/> must not be equal to zero.</exception>
         public async Task RemoveGuildBanAsync(ulong guildId, ulong userId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
@@ -860,6 +877,7 @@ namespace Discord.API
         }
 
         //Guild Embeds
+        /// <exception cref="ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
         public async Task<GuildEmbed> GetGuildEmbedAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
@@ -872,6 +890,8 @@ namespace Discord.API
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
+        /// <exception cref="ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
         public async Task<GuildEmbed> ModifyGuildEmbedAsync(ulong guildId, Rest.ModifyGuildEmbedParams args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
@@ -883,6 +903,7 @@ namespace Discord.API
         }
 
         //Guild Integrations
+        /// <exception cref="ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
         public async Task<IReadOnlyCollection<Integration>> GetGuildIntegrationsAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
@@ -891,6 +912,8 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<Integration>>("GET", () => $"guilds/{guildId}/integrations", ids, options: options).ConfigureAwait(false);
         }
+        /// <exception cref="ArgumentException"><paramref name="guildId"/> and <paramref name="args.Id"/> must not be equal to zero.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
         public async Task<Integration> CreateGuildIntegrationAsync(ulong guildId, CreateGuildIntegrationParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
@@ -933,6 +956,8 @@ namespace Discord.API
         }
 
         //Guild Invites
+        /// <exception cref="ArgumentException"><paramref name="inviteId"/> cannot be blank.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="inviteId"/> must not be <see langword="null"/>.</exception>
         public async Task<InviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null)
         {
             Preconditions.NotNullOrEmpty(inviteId, nameof(inviteId));
@@ -952,6 +977,7 @@ namespace Discord.API
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
+        /// <exception cref="ArgumentException"><paramref name="guildId"/> may not be equal to zero.</exception>
         public async Task<InviteVanity> GetVanityInviteAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
@@ -960,6 +986,7 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             return await SendAsync<InviteVanity>("GET", () => $"guilds/{guildId}/vanity-url", ids, options: options).ConfigureAwait(false);
         }
+        /// <exception cref="ArgumentException"><paramref name="guildId"/> may not be equal to zero.</exception>
         public async Task<IReadOnlyCollection<InviteMetadata>> GetGuildInvitesAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
@@ -968,6 +995,7 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<InviteMetadata>>("GET", () => $"guilds/{guildId}/invites", ids, options: options).ConfigureAwait(false);
         }
+        /// <exception cref="ArgumentException"><paramref name="channelId"/> may not be equal to zero.</exception>
         public async Task<IReadOnlyCollection<InviteMetadata>> GetChannelInvitesAsync(ulong channelId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
@@ -976,6 +1004,14 @@ namespace Discord.API
             var ids = new BucketIds(channelId: channelId);
             return await SendAsync<IReadOnlyCollection<InviteMetadata>>("GET", () => $"channels/{channelId}/invites", ids, options: options).ConfigureAwait(false);
         }
+        /// <exception cref="ArgumentException">
+        /// <paramref name="channelId"/> may not be equal to zero.
+        /// -and-
+        /// <paramref name="args.MaxAge"/> and <paramref name="args.MaxUses"/> must be greater than zero.
+        /// -and-
+        /// <paramref name="args.MaxAge"/> must be lesser than 86400.
+        /// </exception>
+        /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
         public async Task<InviteMetadata> CreateChannelInviteAsync(ulong channelId, CreateChannelInviteParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));

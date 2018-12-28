@@ -15,10 +15,10 @@ namespace Discord
 
         internal Game() { }
         /// <summary>
-        ///     Creates a <see cref="Game"/> with the provided <paramref name="name"/> and <see cref="ActivityType"/>.
+        ///     Creates a <see cref="Game"/> with the provided name and <see cref="ActivityType"/>.
         /// </summary>
         /// <param name="name">The name of the game.</param>
-        /// <param name="type">The type of activity. Default is <see cref="Discord.ActivityType.Playing"/>.</param>
+        /// <param name="type">The type of activity.</param>
         public Game(string name, ActivityType type = ActivityType.Playing)
         {
             Name = name;

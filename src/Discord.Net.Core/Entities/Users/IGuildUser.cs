@@ -50,15 +50,28 @@ namespace Discord
         /// <summary>
         ///     Gets a collection of IDs for the roles that this user currently possesses in the guild.
         /// </summary>
+        /// <remarks>
+        ///     This property returns a read-only collection of the identifiers of the roles that this user possesses.
+        ///     For WebSocket users, a Roles property can be found in place of this property. Due to the REST
+        ///     implementation, only a collection of identifiers can be retrieved instead of the full role objects.
+        /// </remarks>
         /// <returns>
         ///     A read-only collection of <see cref="ulong"/>, each representing a snowflake identifier for a role that
-        ///     this user posesses.
+        ///     this user possesses.
         /// </returns>
         IReadOnlyCollection<ulong> RoleIds { get; }
 
         /// <summary>
         ///     Gets the level permissions granted to this user to a given channel.
         /// </summary>
+        /// <example>
+        ///     The following example checks if the current user has the ability to send a message with attachment in
+        ///     this channel; if so, uploads a file via <see cref="IMessageChannel.SendFileAsync"/>.
+        ///     <code language="cs">
+        ///     if (currentUser?.GetPermissions(targetChannel)?.AttachFiles)
+        ///         await targetChannel.SendFileAsync("fortnite.png");
+        ///     </code>
+        /// </example>
         /// <param name="channel">The channel to get the permission from.</param>
         /// <returns>
         ///     A <see cref="Discord.ChannelPermissions"/> structure representing the permissions that a user has in the
@@ -78,16 +91,19 @@ namespace Discord
         /// <summary>
         ///     Modifies this user's properties in this guild.
         /// </summary>
+        /// <remarks>
+        ///     This method modifies the current guild user with the specified properties. To see an example of this
+        ///     method and what properties are available, please refer to <see cref="GuildUserProperties"/>.
+        /// </remarks>
         /// <param name="func">The delegate containing the properties to modify the user with.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
-        /// <seealso cref="Discord.GuildUserProperties"/>
         Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null);
 
         /// <summary>
-        ///     Adds the specified <paramref name="role"/> to this user in this guild.
+        ///     Adds the specified role to this user in the guild.
         /// </summary>
         /// <param name="role">The role to be added to the user.</param>
         /// <param name="options">The options to be used when sending the request.</param>
@@ -96,7 +112,7 @@ namespace Discord
         /// </returns>
         Task AddRoleAsync(IRole role, RequestOptions options = null);
         /// <summary>
-        ///     Adds the specified <paramref name="roles"/> to this user in this guild.
+        ///     Adds the specified <paramref name="roles"/> to this user in the guild.
         /// </summary>
         /// <param name="roles">The roles to be added to the user.</param>
         /// <param name="options">The options to be used when sending the request.</param>
@@ -105,7 +121,7 @@ namespace Discord
         /// </returns>
         Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null);
         /// <summary>
-        ///     Removes the specified <paramref name="role"/> from this user in this guild.
+        ///     Removes the specified <paramref name="role"/> from this user in the guild.
         /// </summary>
         /// <param name="role">The role to be removed from the user.</param>
         /// <param name="options">The options to be used when sending the request.</param>
@@ -114,7 +130,7 @@ namespace Discord
         /// </returns>
         Task RemoveRoleAsync(IRole role, RequestOptions options = null);
         /// <summary>
-        ///     Removes the specified <paramref name="roles"/> from this user in this guild.
+        ///     Removes the specified <paramref name="roles"/> from this user in the guild.
         /// </summary>
         /// <param name="roles">The roles to be removed from the user.</param>
         /// <param name="options">The options to be used when sending the request.</param>

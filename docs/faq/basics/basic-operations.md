@@ -27,7 +27,7 @@ A good and safe casting example:
 [!code-csharp[Casting](samples/cast.cs)]
 
 [InvalidCastException]: https://docs.microsoft.com/en-us/dotnet/api/system.invalidcastexception
-[this post]: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/types/how-to-safely-cast-by-using-as-and-is-operators
+[this post]: https://docs.microsoft.com/en-us/dotnet/csharp/how-to/safely-cast-using-pattern-matching-is-and-as-operators
 
 ## How do I send a message?
 

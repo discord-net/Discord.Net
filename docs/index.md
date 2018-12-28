@@ -5,6 +5,8 @@ title: Home
 
 # Discord.Net Documentation
 
+<img class="big-logo logo-switcher" />
+
 ## What is Discord.Net?
 
 Discord.Net is an asynchronous, multi-platform .NET Library used to

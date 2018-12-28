@@ -48,7 +48,7 @@ namespace Discord
         ///     Gets the time of this message's last edit.
         /// </summary>
         /// <returns>
-        ///     Time of when the message was last edited; <c>null</c> when the message is never edited.
+        ///     Time of when the message was last edited; <c>null</c> if the message is never edited.
         /// </returns>
         DateTimeOffset? EditedTimestamp { get; }
         
@@ -62,56 +62,67 @@ namespace Discord
         IUser Author { get; }
 
         /// <summary>
-        ///     Returns all attachments included in this message.
+        ///     Gets all attachments included in this message.
         /// </summary>
+        /// <remarks>
+        ///     This property gets a read-only collection of attachments associated with this message. Depending on the
+        ///     user's end-client, a sent message may contain one or more attachments. For example, mobile users may
+        ///     attach more than one file in their message, while the desktop client only allows for one.
+        /// </remarks>
         /// <returns>
         ///     A read-only collection of attachments.
         /// </returns>
         IReadOnlyCollection<IAttachment> Attachments { get; }
         /// <summary>
-        ///     Returns all embeds included in this message.
+        ///     Gets all embeds included in this message.
         /// </summary>
+        /// <remarks>
+        /// </remarks>
+        ///     This property gets a read-only collection of embeds associated with this message. Depending on the
+        ///     message, a sent message may contain one or more embeds. This is usually true when multiple link previews
+        ///     are generated; however, only one <see cref="EmbedType.Rich"/> <see cref="Embed"/> can be featured.
         /// <returns>
         ///     A read-only collection of embed objects.
         /// </returns>
         IReadOnlyCollection<IEmbed> Embeds { get; }
         /// <summary>
-        ///     Returns all tags included in this message's content.
+        ///     Gets all tags included in this message's content.
         /// </summary>
         IReadOnlyCollection<ITag> Tags { get; }
         /// <summary>
-        ///     Returns the IDs of channels mentioned in this message.
+        ///     Gets the IDs of channels mentioned in this message.
         /// </summary>
         /// <returns>
         ///     A read-only collection of channel IDs.
         /// </returns>
         IReadOnlyCollection<ulong> MentionedChannelIds { get; }
         /// <summary>
-        ///     Returns the IDs of roles mentioned in this message.
+        ///     Gets the IDs of roles mentioned in this message.
         /// </summary>
         /// <returns>
         ///     A read-only collection of role IDs.
         /// </returns>
         IReadOnlyCollection<ulong> MentionedRoleIds { get; }
         /// <summary>
-        ///     Returns the IDs of users mentioned in this message.
+        ///     Gets the IDs of users mentioned in this message.
         /// </summary>
         /// <returns>
         ///     A read-only collection of user IDs.
         /// </returns>
         IReadOnlyCollection<ulong> MentionedUserIds { get; }
         /// <summary>
-        ///     Returns the Activity associated with a message.
+        ///     Gets the activity associated with a message.
         /// </summary>
         /// <remarks>
-        ///     Sent with Rich Presence-related chat embeds.
+        ///     Sent with Rich Presence-related chat embeds. This often refers to activity that requires end-user's
+        ///     interaction, such as a Spotify Invite activity.
         /// </remarks>
         /// <returns>
         ///     A message's activity, if any is associated.
         /// </returns>
         MessageActivity Activity { get; }
         /// <summary>
-        ///     Returns the Application associated with a messsage.
+        ///     Gets the application associated with a message.
         /// </summary>
         /// <remarks>
         ///     Sent with Rich-Presence-related chat embeds.

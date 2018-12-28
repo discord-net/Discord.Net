@@ -7,3 +7,5 @@
 - name: API Documentation
   href: api/
   topicUid: API.Docs
+- name: Changelog
+  topicHref: ../CHANGELOG.md

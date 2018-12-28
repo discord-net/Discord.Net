@@ -31,10 +31,11 @@ namespace Discord
         /// </returns>
         public IReadOnlyList<ulong> RoleIds { get; }
         /// <summary>
-        ///     Gets the user Id that created this emoji.
+        ///     Gets the user ID associated with the creation of this emoji.
         /// </summary>
         /// <returns>
-        ///     A user Id of the user who created this emoji, which may be null. A null value only indicates that the creator was not supplied as part of the API response.
+        ///     An <see cref="ulong"/> snowflake identifier representing the user who created this emoji; 
+        ///     <c>null</c> if unknown.
         /// </returns>
         public ulong? CreatorId { get; }
 

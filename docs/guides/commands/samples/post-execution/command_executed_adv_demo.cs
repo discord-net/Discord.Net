@@ -1,4 +1,4 @@
-public async Task OnCommandExecutedAsync(CommandInfo command, ICommandContext context, IResult result)
+public async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
 {
     switch(result)
     {

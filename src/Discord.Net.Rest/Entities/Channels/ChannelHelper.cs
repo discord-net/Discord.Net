@@ -73,6 +73,13 @@ namespace Discord.Rest
             var models = await client.ApiClient.GetChannelInvitesAsync(channel.Id, options).ConfigureAwait(false);
             return models.Select(x => RestInviteMetadata.Create(client, null, channel, x)).ToImmutableArray();
         }
+        /// <exception cref="ArgumentException">
+        /// <paramref name="channel.Id"/> may not be equal to zero.
+        /// -and-
+        /// <paramref name="maxAge"/> and <paramref name="maxUses"/> must be greater than zero.
+        /// -and-
+        /// <paramref name="maxAge"/> must be lesser than 86400.
+        /// </exception>
         public static async Task<RestInviteMetadata> CreateInviteAsync(IGuildChannel channel, BaseDiscordClient client,
             int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
         {
@@ -352,6 +359,7 @@ namespace Discord.Rest
             var model = await client.ApiClient.GetChannelAsync(channel.CategoryId.Value, options).ConfigureAwait(false);
             return RestCategoryChannel.Create(client, model) as ICategoryChannel;
         }
+        /// <exception cref="InvalidOperationException">This channel does not have a parent channel.</exception>
         public static async Task SyncPermissionsAsync(INestedChannel channel, BaseDiscordClient client, RequestOptions options)
         {
             var category = await GetCategoryAsync(channel, client, options).ConfigureAwait(false);
