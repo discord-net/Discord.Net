@@ -56,12 +56,5 @@ namespace _02_commands_framework.Services
             // the command failed, let's notify the user that something happened.
             await context.Channel.SendMessageAsync($"error: {result.ToString()}");
         }
-
-        private Task LogAsync(LogMessage log)
-        {
-            Console.WriteLine(log.ToString());
-
-            return Task.CompletedTask;
-        }
     }
 }
