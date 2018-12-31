@@ -21,7 +21,6 @@ namespace _02_commands_framework.Services
             _services = services;
 
             _commands.CommandExecuted += CommandExecutedAsync;
-            _commands.Log += LogAsync;
             _discord.MessageReceived += MessageReceivedAsync;
         }
 
