@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+### Fixed
+- Commands with async RunModes will now propagate exceptions up to CommandExecuted (497918e)
 
 ## [2.0.0] - 2018-12-28
 ### Added
