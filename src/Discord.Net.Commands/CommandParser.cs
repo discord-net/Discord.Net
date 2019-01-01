@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
@@ -58,6 +58,15 @@ namespace Discord.Commands
                 {
                     if (curPos != endPos)
                     {
+                        // if this character matches the quotation mark of the end of the string
+                        // means that it should be escaped
+                        // but if is not, then there is no reason to escape it then
+                        if (c != matchQuote)
+                        {
+                            // if no reason to escape the next character, then re-add \ to the arg
+                            argBuilder.Append('\\');
+                        }
+
                         argBuilder.Append(c);
                         isEscaping = false;
                         continue;
