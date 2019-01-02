@@ -39,6 +39,7 @@ img {
     width: 951pt;
     /* Height was arbitrarily determined */
     min-height: 100pt;
+    max-width: 90%;
 }
 
 article.content p{
