@@ -24,7 +24,7 @@ public class RequireRoleAttribute : PreconditionAttribute
                 return Task.FromResult(PreconditionResult.FromSuccess());
             // Since it wasn't, fail
             else
-                return Task.FromResult(PreconditionResult.FromError($"You must a role named {_name} to run this command."));
+                return Task.FromResult(PreconditionResult.FromError($"You must have a role named {_name} to run this command."));
         }
         else
             return Task.FromResult(PreconditionResult.FromError("You must be in a guild to run this command."));
