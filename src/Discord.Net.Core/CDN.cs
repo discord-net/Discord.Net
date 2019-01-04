@@ -56,10 +56,13 @@ namespace Discord
         /// <returns>
         ///     A URL pointing to the guild's icon in the specified size.
         /// </returns>
-        public static string GetGuildIconUrl(ulong guildId, string iconId, ushort size, ImageFormat format)
+        public static string GetGuildIconUrl(ulong guildId, string iconId, ImageFormat format, ushort size)
         {
             if (string.IsNullOrWhiteSpace(iconId))
                 return null;
+            if (format == ImageFormat.Gif)
+                throw new ArgumentException("Requested image format mustn't be a gif.");
+
             string extension = FormatToExtension(format, iconId);
             return $"{DiscordConfig.CDNUrl}icons/{guildId}/{iconId}.{extension}?size={size}";
         }

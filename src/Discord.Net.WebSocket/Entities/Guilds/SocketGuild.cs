@@ -98,7 +98,7 @@ namespace Discord.WebSocket
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-            => CDN.GetGuildIconUrl(Id, IconId, size, format);
+            => CDN.GetGuildIconUrl(Id, IconId, format, size);
         /// <inheritdoc />
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
         /// <summary> Indicates whether the client has all the members downloaded to the local guild cache. </summary>

@@ -60,7 +60,7 @@ namespace Discord.Rest
         public ulong DefaultChannelId => Id;
         /// <inheritdoc />
         public string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-            => CDN.GetGuildIconUrl(Id, IconId, size, format);
+            => CDN.GetGuildIconUrl(Id, IconId, format, size);
         /// <inheritdoc />
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
 
