@@ -59,7 +59,8 @@ namespace Discord.Rest
         [Obsolete("DefaultChannelId is deprecated, use GetDefaultChannelAsync")]
         public ulong DefaultChannelId => Id;
         /// <inheritdoc />
-        public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
+        public string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildIconUrl(Id, IconId, size, format);
         /// <inheritdoc />
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
 

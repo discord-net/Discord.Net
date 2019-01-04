@@ -72,7 +72,7 @@ namespace Discord
         /// <returns>
         ///     A URL pointing to the guild's icon; <c>null</c> if none is set.
         /// </returns>
-        string IconUrl { get; }
+        string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
         /// <summary>
         ///     Gets the ID of this guild's splash image.
         /// </summary>
