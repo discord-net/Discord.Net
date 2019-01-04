@@ -9,7 +9,7 @@ namespace Discord
         /// <summary>
         ///     Gets the icon URL associated with this guild, or <c>null</c> if one is not set.
         /// </summary>
-        string IconUrl { get; }
+        string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
         /// <summary>
         ///     Returns <c>true</c> if the current user owns this guild.
         /// </summary>

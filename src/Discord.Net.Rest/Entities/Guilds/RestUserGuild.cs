@@ -21,7 +21,7 @@ namespace Discord.Rest
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-            => CDN.GetGuildIconUrl(Id, IconId, size, format);
+            => CDN.GetGuildIconUrl(Id, _iconId, size, format);
 
         internal RestUserGuild(BaseDiscordClient discord, ulong id)
             : base(discord, id)
