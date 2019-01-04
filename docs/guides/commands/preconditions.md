@@ -76,7 +76,7 @@ necessary.
 
 ### Example - Creating a Custom Precondition
 
-[!code-csharp[Custom Precondition](samples/preconditions/require_owner.cs)]
+[!code-csharp[Custom Precondition](samples/preconditions/require_role.cs)]
 
 [CheckPermissionsAsync]: xref:Discord.Commands.PreconditionAttribute.CheckPermissionsAsync*
 [PreconditionResult.FromSuccess]: xref:Discord.Commands.PreconditionResult.FromSuccess*
