@@ -1,8 +1,14 @@
 # Changelog
 
-## [Unreleased]
+## [2.0.1] - 2019-01-04
 ### Fixed
+- #1226: Only escape the closing quotation mark of non-remainder strings (65b8c09)
 - Commands with async RunModes will now propagate exceptions up to CommandExecuted (497918e)
+
+### Misc
+- #1225: Commands sample no longer hooks the log event twice (552f34c)
+- #1227: The logo on the docs index page should scale responsively (d39bf6e)
+- #1230: Replaced precondition sample on docs (feed4fd)
 
 ## [2.0.0] - 2018-12-28
 ### Added
