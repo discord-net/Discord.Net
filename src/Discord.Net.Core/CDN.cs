@@ -58,7 +58,7 @@ namespace Discord
         /// </returns>
         public static string GetGuildIconUrl(ulong guildId, string iconId, ushort size, ImageFormat format)
         {
-            if (iconId == null)
+            if (string.IsNullOrWhiteSpace(iconId))
                 return null;
             string extension = FormatToExtension(format, iconId);
             return $"{DiscordConfig.CDNUrl}icons/{guildId}/{iconId}.{extension}?size={size}";
