@@ -100,7 +100,8 @@ namespace Discord.WebSocket
         public string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetGuildIconUrl(Id, IconId, format, size);
         /// <inheritdoc />
-        public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
+        public string GetSplashUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128) =>
+            CDN.GetGuildSplashUrl(Id, SplashId, format, size);
         /// <summary> Indicates whether the client has all the members downloaded to the local guild cache. </summary>
         public bool HasAllMembers => MemberCount == DownloadedMemberCount;// _downloaderPromise.Task.IsCompleted;
         /// <summary> Indicates whether the guild cache is synced to this guild. </summary>

@@ -69,6 +69,8 @@ namespace Discord
         /// <summary>
         ///     Gets the URL of this guild's icon.
         /// </summary>
+        /// <param name="format">The format to return. Mustn't be a gif.</param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.</param>
         /// <returns>
         ///     A URL pointing to the guild's icon; <c>null</c> if none is set.
         /// </returns>
@@ -83,10 +85,12 @@ namespace Discord
         /// <summary>
         ///     Gets the URL of this guild's splash image.
         /// </summary>
+        /// <param name="format">The format to return. Mustn't be a gif.</param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.</param>
         /// <returns>
         ///     A URL pointing to the guild's splash image; <c>null</c> if none is set.
         /// </returns>
-        string SplashUrl { get; }
+        string GetSplashUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
         /// <summary>
         ///     Determines if this guild is currently connected and ready to be used.
         /// </summary>

@@ -62,7 +62,8 @@ namespace Discord.Rest
         public string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetGuildIconUrl(Id, IconId, format, size);
         /// <inheritdoc />
-        public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
+        public string GetSplashUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildSplashUrl(Id, SplashId, format, size);
 
         /// <summary>
         ///     Gets the built-in role containing all users in this guild.

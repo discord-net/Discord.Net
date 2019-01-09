@@ -75,7 +75,7 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-           => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
+           => CDN.GetUserAvatarUrl(Id, AvatarId, format, size);
 
         public async Task ModifyAsync(Action<WebhookProperties> func, RequestOptions options = null)
         {

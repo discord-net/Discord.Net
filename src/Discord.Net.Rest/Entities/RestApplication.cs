@@ -28,7 +28,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
-        public string IconUrl => CDN.GetApplicationIconUrl(Id, _iconId);
+        public string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetApplicationIconUrl(Id, _iconId, format, size);
 
         internal RestApplication(BaseDiscordClient discord, ulong id)
             : base(discord, id)

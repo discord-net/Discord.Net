@@ -21,7 +21,9 @@ namespace Discord
         /// <summary>
         ///     Gets the icon URL of the application.
         /// </summary>
-        string IconUrl  { get; }
+        /// <param name="format">The format to return. Mustn't be a gif.</param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.</param>
+        string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
 
         /// <summary>
         ///     Gets the partial user object containing info on the owner of the application.

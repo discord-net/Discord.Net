@@ -26,10 +26,11 @@ namespace Discord
         /// <summary>
         ///     Gets the image URL of this emote.
         /// </summary>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.</param>
         /// <returns>
         ///     A string that points to the URL of this emote.
         /// </returns>
-        public string Url => CDN.GetEmojiUrl(Id, Animated);
+        public string GetUrl(ushort size = 128) => CDN.GetEmojiUrl(Id, Animated, size);
 
         internal Emote(ulong id, string name, bool animated)
         {

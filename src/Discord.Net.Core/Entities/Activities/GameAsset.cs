@@ -33,6 +33,6 @@ namespace Discord
         ///     A string pointing to the image URL of the asset; <c>null</c> when the application ID does not exist.
         /// </returns>
         public string GetImageUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
-            => ApplicationId.HasValue ? CDN.GetRichAssetUrl(ApplicationId.Value, ImageId, size, format) : null;
+            => ApplicationId.HasValue ? CDN.GetRichAssetUrl(ApplicationId.Value, ImageId, format, size) : null;
     }
 }

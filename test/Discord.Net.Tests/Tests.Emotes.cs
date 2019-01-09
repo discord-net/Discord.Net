@@ -14,7 +14,7 @@ namespace Discord
             Assert.Equal(394207658351263745UL, emote.Id);
             Assert.False(emote.Animated);
             Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1514056829775), emote.CreatedAt);
-            Assert.EndsWith("png", emote.Url);
+            Assert.EndsWith("png", emote.GetUrl());
         }
         [Fact]
         public void Test_Invalid_Emote_Parse()
@@ -32,7 +32,7 @@ namespace Discord
             Assert.Equal(394207658351263745UL, emote.Id);
             Assert.True(emote.Animated);
             Assert.Equal(DateTimeOffset.FromUnixTimeMilliseconds(1514056829775), emote.CreatedAt);
-            Assert.EndsWith("gif", emote.Url);
+            Assert.EndsWith("gif", emote.GetUrl());
         }
         [Fact]
         public void Test_Invalid_Amimated_Emote_Parse()
