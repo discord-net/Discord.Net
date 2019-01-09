@@ -64,7 +64,7 @@ after_build:
       if ($Env:APPVEYOR_REPO_TAG -eq "true") {
         nuget pack src/Discord.Net/Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix=""
       } else {
-        nuget pack src/Discord.Net/Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix="-build$Env:BUILD"
+        nuget pack src/Discord.Net/Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix="-build-$Env:BUILD"
       }
     }
 - ps: if ($isWindows) { Get-ChildItem artifacts/*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name } }
