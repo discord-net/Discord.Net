@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord.WebSocket
@@ -107,6 +108,35 @@ namespace Discord.WebSocket
             remove { _messageDeletedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task>> _messageDeletedEvent = new AsyncEvent<Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task>>();
+        /// <summary> Fired when multiple messages are bulk deleted. </summary>
+        /// <remarks>
+        ///     <para>
+        ///         This event is fired when multiple messages are bulk deleted. The event handler must return a
+        ///         <see cref="Task"/> and accept a <see cref="IReadOnlyCollection{Cacheable{TEntity,TId}}"/> and 
+        ///         <see cref="ISocketMessageChannel"/> as its parameters.
+        ///     </para>
+        ///     <para>
+        ///         <note type="important">
+        ///             It is not possible to retrieve the message via
+        ///             <see cref="Cacheable{TEntity,TId}.DownloadAsync"/>; the message cannot be retrieved by Discord
+        ///             after the message has been deleted.
+        ///         </note>
+        ///         If caching is enabled via <see cref="DiscordSocketConfig"/>, the
+        ///         <see cref="Cacheable{TEntity,TId}"/> entity will contain the deleted message; otherwise, in event
+        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the 
+        ///         <see cref="ulong"/>.
+        ///     </para>
+        ///     <para>
+        ///         The source channel of the removed message will be passed into the 
+        ///         <see cref="ISocketMessageChannel"/> parameter.
+        ///     </para>
+        /// </remarks>
+        public event Func<IReadOnlyCollection<Cacheable<IMessage, ulong>>, ISocketMessageChannel, Task> MessagesBulkDeleted
+        {
+            add { _messagesBulkDeletedEvent.Add(value); }
+            remove { _messagesBulkDeletedEvent.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<IReadOnlyCollection<Cacheable<IMessage, ulong>>, ISocketMessageChannel, Task>> _messagesBulkDeletedEvent = new AsyncEvent<Func<IReadOnlyCollection<Cacheable<IMessage, ulong>>, ISocketMessageChannel, Task>>();
         /// <summary> Fired when a message is updated. </summary>
         /// <remarks>
         ///     <para>
