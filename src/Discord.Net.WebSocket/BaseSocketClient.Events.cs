@@ -110,9 +110,12 @@ namespace Discord.WebSocket
         internal readonly AsyncEvent<Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task>> _messageDeletedEvent = new AsyncEvent<Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task>>();
         /// <summary> Fired when multiple messages are bulk deleted. </summary>
         /// <remarks>
+        ///     <note>
+        ///         The <see cref="MessageDeleted"/> event will not be fired for individual messages contained in this event.
+        ///     </note>
         ///     <para>
         ///         This event is fired when multiple messages are bulk deleted. The event handler must return a
-        ///         <see cref="Task"/> and accept a <see cref="IReadOnlyCollection{Cacheable{TEntity,TId}}"/> and 
+        ///         <see cref="Task"/> and accept an <see cref="IReadOnlyCollection{Cacheable{TEntity,TId}}"/> and 
         ///         <see cref="ISocketMessageChannel"/> as its parameters.
         ///     </para>
         ///     <para>
