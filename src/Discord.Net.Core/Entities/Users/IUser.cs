@@ -112,5 +112,15 @@ namespace Discord
         ///     contains the DM channel associated with this user.
         /// </returns>
         Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     The flags on a user's account
+        ///     TODO we could probably have extension methods for determining these
+        /// </summary>
+        int Flags { get; }
+        /// <summary>
+        ///     The type of Nitro subscription
+        /// </summary>
+        PremiumType? PremiumType { get; }
     }
 }
