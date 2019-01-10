@@ -33,6 +33,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         public virtual bool IsWebhook => false;
 
+        // TODO clean this up
+        public int Flags { get; private set; }
+        public PremiumType? PremiumType { get; private set; }
+
         internal RestUser(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {

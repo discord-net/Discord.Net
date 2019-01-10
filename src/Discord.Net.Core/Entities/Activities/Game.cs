@@ -13,6 +13,20 @@ namespace Discord
         /// <inheritdoc/>
         public ActivityType Type { get; internal set; }
 
+        public string Url { get; internal set; }
+
+        public GameTimestamps Timestamps { get; internal set; }
+
+        public ulong ApplicationId { get; internal set; }
+
+        public string Details { get; internal set; }
+        public string State { get; internal set; }
+        public GameParty Party { get; internal set; }
+        public GameAsset Assets { get; internal set; }
+        public GameSecrets Secrets { get; internal set; }
+        public bool Instance { get; internal set; }
+        public int Flags { get; internal set; }
+
         internal Game() { }
         /// <summary>
         ///     Creates a <see cref="Game"/> with the provided name and <see cref="ActivityType"/>.
