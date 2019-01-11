@@ -160,5 +160,8 @@ namespace Discord
         /// </returns>
         public static Task BanAsync(this IGuildUser user, int pruneDays = 0, string reason = null, RequestOptions options = null)
             => user.Guild.AddBanAsync(user, pruneDays, reason, options);
+
+        public static bool CheckUserFlag(this IUser user, UserFlag flag)
+            => (user.Flags & (int)flag) >= (int)flag;
     }
 }

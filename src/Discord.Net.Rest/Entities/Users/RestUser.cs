@@ -63,6 +63,10 @@ namespace Discord.Rest
                 IsBot = model.Bot.Value;
             if (model.Username.IsSpecified)
                 Username = model.Username.Value;
+            if (model.Flags.IsSpecified)
+                Flags = model.Flags.Value;
+            if (model.PremiumType.IsSpecified)
+                PremiumType = model.PremiumType.Value;
         }
 
         /// <inheritdoc />
