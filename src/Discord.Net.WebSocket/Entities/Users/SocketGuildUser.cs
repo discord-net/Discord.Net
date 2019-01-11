@@ -194,6 +194,5 @@ namespace Discord.WebSocket
         //IVoiceState
         /// <inheritdoc />
         IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;
-
     }
 }

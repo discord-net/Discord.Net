@@ -112,11 +112,16 @@ namespace Discord
         ///     contains the DM channel associated with this user.
         /// </returns>
         Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null);
-
         /// <summary>
-        ///     The flags on a user's account
-        ///     TODO we could probably have extension methods for determining these
+        ///     The flags that are applied to a user's account.
         /// </summary>
+        /// <remarks>
+        ///     This value is determined by bitwise OR-ing <see cref="UserFlag"/> values together.
+        ///     Each flag's value can be checked using <see cref="UserExtensions.CheckUserFlag(IUser, UserFlag)"/>
+        /// </remarks>
+        /// <returns>
+        ///     The value of flags for this user.
+        /// </returns>
         int Flags { get; }
         /// <summary>
         ///     The type of Nitro subscription

@@ -42,7 +42,6 @@ namespace Discord.WebSocket
         public int Flags { get; internal set; }
         /// <inheritdoc />
         public PremiumType? PremiumType { get; internal set; }
-
         /// <summary>
         ///     Gets mutual guilds shared with this user.
         /// </summary>

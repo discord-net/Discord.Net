@@ -1,13 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord
 {
     public enum PremiumType
     {
+        None = 0,
         /// <summary>
         ///     Includes app perks like animated emojis and avatars, but not games.
         /// </summary>

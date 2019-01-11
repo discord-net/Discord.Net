@@ -32,9 +32,9 @@ namespace Discord.Rest
         public virtual UserStatus Status => UserStatus.Offline;
         /// <inheritdoc />
         public virtual bool IsWebhook => false;
-
-        // TODO clean this up
+        /// <inheritdoc />
         public int Flags { get; private set; }
+        /// <inheritdoc />
         public PremiumType? PremiumType { get; private set; }
 
         internal RestUser(BaseDiscordClient discord, ulong id)

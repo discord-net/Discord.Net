@@ -20,36 +20,15 @@ namespace Discord
         /// </returns>
         ActivityType Type { get; }
         /// <summary>
-        ///     Gets the Stream URL. Only used when <see cref="Type"/> is <see cref="ActivityType.Streaming"/>.
+        ///     The flags that are relevant to this activity.
         /// </summary>
+        /// <remarks>
+        ///     This value is determined by bitwise OR-ing <see cref="ActivityFlag"/> values together.
+        ///     Each flag's value can be checked using <see cref="ActivityExtensions.CheckActivityFlag(IActivity, ActivityFlag)"/>
+        /// </remarks>
         /// <returns>
-        ///     A string containing the URL to the stream.
+        ///     The value of flags for this activity.
         /// </returns>
-        string Url { get; }
-        /// <summary>
-        ///     Gets the unix timestamps for the start and/or end of the activity.
-        /// </summary>
-        /// <returns>
-        ///     A <see cref="GameTimestamps"/> containing the start and end times, if specified.
-        /// </returns>
-        GameTimestamps Timestamps { get; }
-        /// <summary>
-        ///     Gets the application Id for the game.
-        /// </summary>
-        ulong ApplicationId { get; }
-        /// <summary>
-        ///     Gets what the user is currently doing.
-        /// </summary>
-        string Details { get; }
-        /// <summary>
-        ///     Gets the user's current party status.
-        /// </summary>
-        string State { get; }
-        //TODO finish docs
-        GameParty Party { get; }
-        GameAsset Assets { get; }
-        GameSecrets Secrets { get; }
-        bool Instance { get; }
         int Flags { get; }
     }
 }
