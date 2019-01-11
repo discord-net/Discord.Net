@@ -124,8 +124,15 @@ namespace Discord
         /// </returns>
         int Flags { get; }
         /// <summary>
-        ///     The type of Nitro subscription
+        ///     The type of Nitro subscription that is active on this user's account.
         /// </summary>
+        /// <remarks>
+        ///     This information may only be available with the identify OAuth scope,
+        ///     meaning that users and bots will not have access to this information.
+        /// </remarks>
+        /// <returns>
+        ///     The type of Nitro subscription the user subscribes to, or null if this value could not be determined.
+        /// </returns>
         PremiumType? PremiumType { get; }
     }
 }
