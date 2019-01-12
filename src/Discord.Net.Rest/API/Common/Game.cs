@@ -34,7 +34,7 @@ namespace Discord.API
         [JsonProperty("session_id")]
         public Optional<string> SessionId { get; set; }
         [JsonProperty("Flags")]
-        public Optional<int> Flags { get; set; }
+        public Optional<ActivityFlag> Flags { get; set; }
 
         [OnError]
         internal void OnError(StreamingContext context, ErrorContext errorContext)

@@ -33,7 +33,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public virtual bool IsWebhook => false;
         /// <inheritdoc />
-        public int Flags { get; private set; }
+        public UserFlag Flags { get; private set; }
         /// <inheritdoc />
         public PremiumType? PremiumType { get; private set; }
         /// <inheritdoc />

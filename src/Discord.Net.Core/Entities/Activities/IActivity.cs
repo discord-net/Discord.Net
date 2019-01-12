@@ -24,11 +24,10 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     This value is determined by bitwise OR-ing <see cref="ActivityFlag"/> values together.
-        ///     Each flag's value can be checked using <see cref="ActivityExtensions.CheckActivityFlag(IActivity, ActivityFlag)"/>
         /// </remarks>
         /// <returns>
         ///     The value of flags for this activity.
         /// </returns>
-        int Flags { get; }
+        ActivityFlag Flags { get; }
     }
 }

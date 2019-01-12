@@ -160,16 +160,5 @@ namespace Discord
         /// </returns>
         public static Task BanAsync(this IGuildUser user, int pruneDays = 0, string reason = null, RequestOptions options = null)
             => user.Guild.AddBanAsync(user, pruneDays, reason, options);
-
-        /// <summary>
-        ///     Determines if the user has a given flag applied to their account.
-        /// </summary>
-        /// <param name="user">The user to check.</param>
-        /// <param name="flag">The <see cref="UserFlag"/> to check for.</param>
-        /// <returns>
-        ///     True if the user has the given flag on their account, otherwise false.
-        /// </returns>
-        public static bool CheckUserFlag(this IUser user, UserFlag flag)
-            => (user.Flags & (int)flag) >= (int)flag;
     }
 }

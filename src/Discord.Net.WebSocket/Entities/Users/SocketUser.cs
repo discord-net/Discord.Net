@@ -39,7 +39,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public UserStatus Status => Presence.Status;
         /// <inheritdoc />
-        public int Flags { get; internal set; }
+        public UserFlag Flags { get; internal set; }
         /// <inheritdoc />
         public PremiumType? PremiumType { get; internal set; }
         /// <inheritdoc />

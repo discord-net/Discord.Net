@@ -117,12 +117,11 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     This value is determined by bitwise OR-ing <see cref="UserFlag"/> values together.
-        ///     Each flag's value can be checked using <see cref="UserExtensions.CheckUserFlag(IUser, UserFlag)"/>
         /// </remarks>
         /// <returns>
         ///     The value of flags for this user.
         /// </returns>
-        int Flags { get; }
+        UserFlag Flags { get; }
         /// <summary>
         ///     The type of Nitro subscription that is active on this user's account.
         /// </summary>
