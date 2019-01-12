@@ -130,7 +130,7 @@ namespace Discord
         ///     meaning that users and bots will not have access to this information.
         /// </remarks>
         /// <returns>
-        ///     The type of Nitro subscription the user subscribes to, or null if this value could not be determined.
+        ///     The type of Nitro subscription the user subscribes to, or <c>null</c> if this value could not be determined.
         /// </returns>
         PremiumType? PremiumType { get; }
         /// <summary>
