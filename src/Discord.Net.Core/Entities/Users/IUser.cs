@@ -134,5 +134,12 @@ namespace Discord
         ///     The type of Nitro subscription the user subscribes to, or null if this value could not be determined.
         /// </returns>
         PremiumType? PremiumType { get; }
+        /// <summary>
+        ///     The user's chosen language option.
+        /// </summary>
+        /// <returns>
+        ///     The value of the user's chosen language option, if provided.
+        /// </returns>
+        string Locale { get; }
     }
 }

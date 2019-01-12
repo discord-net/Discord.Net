@@ -36,6 +36,8 @@ namespace Discord.Rest
         public int Flags { get; private set; }
         /// <inheritdoc />
         public PremiumType? PremiumType { get; private set; }
+        /// <inheritdoc />
+        public string Locale { get; private set; }
 
         internal RestUser(BaseDiscordClient discord, ulong id)
             : base(discord, id)
@@ -67,6 +69,8 @@ namespace Discord.Rest
                 Flags = model.Flags.Value;
             if (model.PremiumType.IsSpecified)
                 PremiumType = model.PremiumType.Value;
+            if (model.Locale.IsSpecified)
+                Locale = model.Locale.Value;
         }
 
         /// <inheritdoc />

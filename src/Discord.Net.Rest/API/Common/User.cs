@@ -27,5 +27,7 @@ namespace Discord.API
         public Optional<int> Flags { get; set; }
         [JsonProperty("premium_type")]
         public Optional<PremiumType> PremiumType { get; set; }
+        [JsonProperty("locale")]
+        public Optional<string> Locale { get; set; }
     }
 }

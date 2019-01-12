@@ -42,6 +42,8 @@ namespace Discord.WebSocket
         public int Flags { get; internal set; }
         /// <inheritdoc />
         public PremiumType? PremiumType { get; internal set; }
+        /// <inheritdoc />
+        public string Locale { get; internal set; }
         /// <summary>
         ///     Gets mutual guilds shared with this user.
         /// </summary>
@@ -87,6 +89,11 @@ namespace Discord.WebSocket
             if (model.PremiumType.IsSpecified && model.PremiumType.Value != PremiumType)
             {
                 PremiumType = model.PremiumType.Value;
+                hasChanges = true;
+            }
+            if (model.Locale.IsSpecified && model.Locale.Value != Locale)
+            {
+                Locale = model.Locale.Value;
                 hasChanges = true;
             }
             return hasChanges;
