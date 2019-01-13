@@ -18,6 +18,9 @@ namespace Discord
         ///     Indicates that this activity can be spectated.
         /// </summary>
         Spectate = 0b100,
+        /// <summary>
+        ///     Indicates that a user may request to join an activity.
+        /// </summary>
         JoinRequest = 0b1000,
         /// <summary>
         ///     Indicates that a user can listen along in Spotify.
