@@ -9,6 +9,10 @@ namespace Discord
     [Flags]
     public enum ActivityFlag
     {
+        /// <summary>
+        ///     Indicates that no actions on this activity can be taken.
+        /// </summary>
+        None = 0,
         Instance = 1,
         /// <summary>
         ///     Indicates that this activity can be joined.
