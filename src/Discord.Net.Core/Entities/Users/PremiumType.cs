@@ -1,14 +1,20 @@
 namespace Discord
 {
+    /// <summary>
+    ///     Specifies the type of subscription a user is subscribed to.
+    /// </summary>
     public enum PremiumType
     {
+        /// <summary>
+        ///     No subscription.
+        /// </summary>
         None = 0,
         /// <summary>
-        ///     Includes app perks like animated emojis and avatars, but not games.
+        ///     Nitro Classic subscription. Includes app perks like animated emojis and avatars, but not games.
         /// </summary>
         NitroClassic = 1,
         /// <summary>
-        ///     Includes app perks as wel as the games subscription service.
+        ///     Nitro subscription. Includes app perks as well as the games subscription service.
         /// </summary>
         Nitro = 2
     }
