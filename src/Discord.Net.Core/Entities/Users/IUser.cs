@@ -113,7 +113,7 @@ namespace Discord
         /// </returns>
         Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null);
         /// <summary>
-        ///     The flags that are applied to a user's account.
+        ///     Gets the flags that are applied to a user's account.
         /// </summary>
         /// <remarks>
         ///     This value is determined by bitwise OR-ing <see cref="UserFlag"/> values together.
@@ -123,7 +123,7 @@ namespace Discord
         /// </returns>
         UserFlag Flags { get; }
         /// <summary>
-        ///     The type of Nitro subscription that is active on this user's account.
+        ///     Gets the type of Nitro subscription that is active on this user's account.
         /// </summary>
         /// <remarks>
         ///     This information may only be available with the identify OAuth scope,
@@ -134,10 +134,11 @@ namespace Discord
         /// </returns>
         PremiumType? PremiumType { get; }
         /// <summary>
-        ///     The user's chosen language option.
+        ///     Gets the user's chosen language option.
         /// </summary>
         /// <returns>
-        ///     The value of the user's chosen language option, if provided.
+        ///     The IETF language tag of the user's chosen region, if provided.
+        ///     For example, a locale of "English, US" is "en-US", "Chinese (Taiwan)" is "zh-TW", etc.
         /// </returns>
         string Locale { get; }
     }

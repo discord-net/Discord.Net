@@ -20,7 +20,7 @@ namespace Discord
         /// </returns>
         ActivityType Type { get; }
         /// <summary>
-        ///     The flags that are relevant to this activity.
+        ///     Gets the flags that are relevant to this activity.
         /// </summary>
         /// <remarks>
         ///     This value is determined by bitwise OR-ing <see cref="ActivityFlag"/> values together.
