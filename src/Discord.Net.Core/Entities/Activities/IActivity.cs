@@ -23,11 +23,11 @@ namespace Discord
         ///     Gets the flags that are relevant to this activity.
         /// </summary>
         /// <remarks>
-        ///     This value is determined by bitwise OR-ing <see cref="ActivityFlag"/> values together.
+        ///     This value is determined by bitwise OR-ing <see cref="ActivityProperties"/> values together.
         /// </remarks>
         /// <returns>
         ///     The value of flags for this activity.
         /// </returns>
-        ActivityFlag Flags { get; }
+        ActivityProperties Flags { get; }
     }
 }

@@ -24,7 +24,7 @@ namespace Discord.API
         [JsonProperty("mfa_enabled")]
         public Optional<bool> MfaEnabled { get; set; }
         [JsonProperty("flags")]
-        public Optional<UserFlag> Flags { get; set; }
+        public Optional<int> Flags { get; set; }
         [JsonProperty("premium_type")]
         public Optional<PremiumType> PremiumType { get; set; }
         [JsonProperty("locale")]

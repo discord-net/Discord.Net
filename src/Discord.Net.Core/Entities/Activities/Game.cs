@@ -13,7 +13,7 @@ namespace Discord
         /// <inheritdoc/>
         public ActivityType Type { get; internal set; }
         /// <inheritdoc/>
-        public ActivityFlag Flags { get; internal set; }
+        public ActivityProperties Flags { get; internal set; }
 
         internal Game() { }
         /// <summary>

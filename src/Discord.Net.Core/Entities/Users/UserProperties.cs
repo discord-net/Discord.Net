@@ -3,7 +3,7 @@ using System;
 namespace Discord
 {
     [Flags]
-    public enum UserFlag
+    public enum UserProperties
     {
         /// <summary>
         ///     Default value for flags, when none are given to an account.

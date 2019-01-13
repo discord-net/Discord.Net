@@ -116,12 +116,12 @@ namespace Discord
         ///     Gets the flags that are applied to a user's account.
         /// </summary>
         /// <remarks>
-        ///     This value is determined by bitwise OR-ing <see cref="UserFlag"/> values together.
+        ///     This value is determined by bitwise OR-ing <see cref="UserProperties"/> values together.
         /// </remarks>
         /// <returns>
         ///     The value of flags for this user.
         /// </returns>
-        UserFlag Flags { get; }
+        UserProperties Flags { get; }
         /// <summary>
         ///     Gets the type of Nitro subscription that is active on this user's account.
         /// </summary>

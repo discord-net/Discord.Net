@@ -33,7 +33,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public virtual bool IsWebhook => false;
         /// <inheritdoc />
-        public UserFlag Flags { get; private set; }
+        public UserProperties Flags { get; private set; }
         /// <inheritdoc />
         public PremiumType? PremiumType { get; private set; }
         /// <inheritdoc />
@@ -66,7 +66,7 @@ namespace Discord.Rest
             if (model.Username.IsSpecified)
                 Username = model.Username.Value;
             if (model.Flags.IsSpecified)
-                Flags = model.Flags.Value;
+                Flags = (UserProperties) model.Flags.Value;
             if (model.PremiumType.IsSpecified)
                 PremiumType = model.PremiumType.Value;
             if (model.Locale.IsSpecified)

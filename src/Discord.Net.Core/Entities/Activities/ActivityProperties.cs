@@ -7,7 +7,7 @@ namespace Discord
     ///     These describe what the activity payload includes.
     /// </summary>
     [Flags]
-    public enum ActivityFlag
+    public enum ActivityProperties
     {
         /// <summary>
         ///     Indicates that no actions on this activity can be taken.

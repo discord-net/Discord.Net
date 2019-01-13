@@ -39,7 +39,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public UserStatus Status => Presence.Status;
         /// <inheritdoc />
-        public UserFlag Flags { get; internal set; }
+        public UserProperties Flags { get; internal set; }
         /// <inheritdoc />
         public PremiumType? PremiumType { get; internal set; }
         /// <inheritdoc />
@@ -81,9 +81,9 @@ namespace Discord.WebSocket
                 Username = model.Username.Value;
                 hasChanges = true;
             }
-            if (model.Flags.IsSpecified && model.Flags.Value != Flags)
+            if (model.Flags.IsSpecified ) // && model.Flags.Value != Flags)
             {
-                Flags = model.Flags.Value;
+                Flags = (UserProperties) model.Flags.Value;
                 hasChanges = true;
             }
             if (model.PremiumType.IsSpecified && model.PremiumType.Value != PremiumType)
