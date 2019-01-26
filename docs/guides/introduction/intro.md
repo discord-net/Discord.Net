@@ -16,17 +16,14 @@ understand these topics to some extent before proceeding. With all
 that being said, feel free to visit us on Discord at the link below
 if you have any questions!
 
-Here are some examples:
-
-1. [Official samples]
-2. [Official template]
+An official collection of samples can be found
+in [our GitHub repository].
 
 > [!NOTE]
 > Please note that you should *not* try to blindly copy paste
 > the code. The examples are meant to be a template or a guide.
 
-[Official template]: https://github.com/foxbot/DiscordBotBase/tree/csharp/src/DiscordBot
-[Official samples]: https://github.com/RogueException/Discord.Net/tree/dev/samples
+[our GitHub repository]: https://github.com/RogueException/Discord.Net/tree/dev/samples
 [Task-based Asynchronous Pattern]: https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap
 [polymorphism]: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/polymorphism
 [interface]: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/interfaces/
