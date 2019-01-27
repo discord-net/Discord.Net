@@ -26,7 +26,7 @@ namespace Discord.WebSocket
                     Duration = timestamps?.End - timestamps?.Start,
                     AlbumArtUrl = albumArtId != null ? CDN.GetSpotifyAlbumArtUrl(albumArtId) : null,
                     Type = ActivityType.Listening,
-                    Flags = model.Flags.GetValueOrDefault()
+                    Flags = model.Flags.GetValueOrDefault(),
                 };
             }
 
@@ -54,10 +54,16 @@ namespace Discord.WebSocket
             {
                 return new StreamingGame(
                     model.Name,
-                    model.StreamUrl.Value);
+                    model.StreamUrl.Value)
+                {
+                    Flags = model.Flags.GetValueOrDefault(),
+                    Details = model.Details.GetValueOrDefault()
+                };
             }
             // Normal Game
-            return new Game(model.Name, model.Type.GetValueOrDefault() ?? ActivityType.Playing);
+            return new Game(model.Name, model.Type.GetValueOrDefault() ?? ActivityType.Playing,
+                model.Flags.IsSpecified ? model.Flags.Value : ActivityProperties.None,
+                model.Details.GetValueOrDefault());
         }
 
         // (Small, Large)
