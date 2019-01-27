@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
@@ -30,6 +31,8 @@ namespace Discord.Rest
         public virtual IActivity Activity => null;
         /// <inheritdoc />
         public virtual UserStatus Status => UserStatus.Offline;
+        /// <inheritdoc />
+        public virtual IImmutableSet<ClientType> ActiveClients => ImmutableHashSet<ClientType>.Empty;
         /// <inheritdoc />
         public virtual bool IsWebhook => false;
 

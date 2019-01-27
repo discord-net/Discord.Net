@@ -1,3 +1,6 @@
+
+using System.Collections.Immutable;
+
 namespace Discord
 {
     /// <summary>
@@ -13,5 +16,9 @@ namespace Discord
         ///     Gets the current status of this user.
         /// </summary>
         UserStatus Status { get; }
+        /// <summary>
+        ///     Gets the set of clients where this user is currently active.
+        /// </summary>
+        IImmutableSet<ClientType> ActiveClients { get; }
     }
 }
