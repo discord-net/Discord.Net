@@ -29,5 +29,12 @@ namespace Discord
         ///     The value of flags for this activity.
         /// </returns>
         ActivityProperties Flags { get; }
+        /// <summary>
+        ///     Gets the details on what the player is currently doing.
+        /// </summary>
+        /// <returns>
+        ///     A string describing what the player is doing.
+        /// </returns>
+        string Details { get; }
     }
 }
