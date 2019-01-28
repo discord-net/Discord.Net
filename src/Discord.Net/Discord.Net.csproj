@@ -4,4 +4,13 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Wumpus.Net.Gateway" Version="0.2.2-build-00031" />
+    <PackageReference Include="Wumpus.Net.Rest" Version="0.2.2-build-00031" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\Guilds\" />
+  </ItemGroup>
+
 </Project>
