@@ -54,7 +54,7 @@ namespace _02_commands_framework
             return Task.CompletedTask;
         }
 
-        private ServiceProvider ConfigureServices()
+        private IServiceProvider ConfigureServices()
         {
             return new ServiceCollection()
                 .AddSingleton<DiscordSocketClient>()
