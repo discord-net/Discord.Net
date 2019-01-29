@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Discord
 {
-    public interface IEmote
+    public interface IEmote : IMentionable // TODO: Is `Mention` the correct verbage here?
     {
         string Name { get; }
     }
