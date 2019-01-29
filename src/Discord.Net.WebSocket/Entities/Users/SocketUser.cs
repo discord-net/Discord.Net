@@ -81,7 +81,7 @@ namespace Discord.WebSocket
                 Username = model.Username.Value;
                 hasChanges = true;
             }
-            if (model.Flags.IsSpecified ) // && model.Flags.Value != Flags)
+            if (model.Flags.IsSpecified && model.Flags.Value != Flags)
             {
                 Flags = (UserProperties) model.Flags.Value;
                 hasChanges = true;
