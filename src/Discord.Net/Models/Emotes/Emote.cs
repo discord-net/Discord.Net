@@ -13,6 +13,6 @@ namespace Discord
         public ulong Id { get; set; }
         public string Name { get; set; }
 
-        public string Mention => throw new System.NotImplementedException(); // TODO: EmojiUtils
+        public string Mention => EmoteUtilities.FormatGuildEmote(Id, Name);
     }
 }

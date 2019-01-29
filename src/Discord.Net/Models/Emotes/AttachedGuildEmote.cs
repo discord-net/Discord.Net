@@ -30,7 +30,7 @@ namespace Discord
         public IGuild Guild { get; set; }
 
         // IMentionable
-        public string Mention => throw new System.NotImplementedException();
+        public string Mention => EmoteUtilities.FormatGuildEmote(Id, Name);
 
         public Task DeleteAsync()
             => Discord.Rest.DeleteGuildEmojiAsync(Guild.Id, Id);
