@@ -142,5 +142,40 @@ namespace Discord
         ///     A string containing the identifier for the voice region that this guild uses (e.g. <c>eu-central</c>).
         /// </returns>
         string VoiceRegionId { get; }
+        /// <summary>
+        ///     Gets the <see cref="IAudioClient"/> currently associated with this guild.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="IAudioClient"/> currently associated with this guild.
+        /// </returns>
+        //IAudioClient AudioClient { get; } // TODO: how do we want to handle audio?
+        /// <summary>
+        ///     Gets the built-in role containing all users in this guild.
+        /// </summary>
+        /// <returns>
+        ///     A role object that represents an <c>@everyone</c> role in this guild.
+        /// </returns>
+        IRole EveryoneRole { get; }
+        /// <summary>
+        ///     Gets a collection of all custom emotes for this guild.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection of all custom emotes for this guild.
+        /// </returns>
+        IReadOnlyCollection<IGuildEmote> Emotes { get; }
+        /// <summary>
+        ///     Gets a collection of all extra features added to this guild.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection of enabled features in this guild.
+        /// </returns>
+        IReadOnlyCollection<string> Features { get; }
+        /// <summary>
+        ///     Gets a collection of all roles in this guild.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection of roles found within this guild.
+        /// </returns>
+        IReadOnlyCollection<IRole> Roles { get; }
     }
 }

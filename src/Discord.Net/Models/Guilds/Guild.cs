@@ -9,7 +9,7 @@ namespace Discord
 {
     internal class Guild : SnowflakeEntity, IGuild
     {
-        public Guild(Model model, IDiscordClient client) : base(client)
+        public Guild(Model model, IDiscordClient discord) : base(discord)
         {
             Name = model.Name.ToString();
             AFKTimeout = model.AfkTimeout;
@@ -35,6 +35,23 @@ namespace Discord
             OwnerId = model.OwnerId;
             ApplicationId = model.ApplicationId;
             VoiceRegionId = null; // TODO?
+
+            Role[] roles = new Role[model.Roles.Length];
+            Role role;
+            for (int i = 0; i < model.Roles.Length; i++)
+            {
+                role = new Role(model.Roles[i], this, Discord);
+                if (role.Id == Id) // EveryoneRole has the same ID as the guild
+                    EveryoneRole = role;
+                roles[i] = role;
+            }
+            Roles = roles;
+
+            // TODO: emotes
+            string[] features = new string[model.Features.Length];
+            for (int i = 0; i < model.Features.Length; i++)
+                features[i] = model.Features[i].ToString();
+            Features = features;
         }
 
         public string Name { get; set; }
@@ -61,6 +78,12 @@ namespace Discord
         public ulong? ApplicationId { get; set; }
         public string VoiceRegionId { get; set; }
 
-        public Task DeleteAsync() => throw new NotImplementedException();
+        public IRole EveryoneRole { get; set; }
+        public IReadOnlyCollection<IGuildEmote> Emotes { get; set; }
+        public IReadOnlyCollection<string> Features { get; set; }
+        public IReadOnlyCollection<IRole> Roles { get; set; }
+
+        public Task DeleteAsync()
+            => Discord.Rest.DeleteGuildAsync(Id);
     }
 }
