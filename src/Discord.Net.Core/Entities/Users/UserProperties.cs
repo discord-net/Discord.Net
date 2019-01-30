@@ -17,7 +17,6 @@ namespace Discord
         ///     Flag given to Discord partners.
         /// </summary>
         Partner = 0b10,
-        HypeSquadEvents = 0b100,
         /// <summary>
         ///     Flag given to users who have participated in the bug report program.
         /// </summary>
