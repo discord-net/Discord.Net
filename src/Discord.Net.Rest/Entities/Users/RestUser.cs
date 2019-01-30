@@ -32,12 +32,6 @@ namespace Discord.Rest
         public virtual UserStatus Status => UserStatus.Offline;
         /// <inheritdoc />
         public virtual bool IsWebhook => false;
-        /// <inheritdoc />
-        public UserProperties Flags { get; private set; }
-        /// <inheritdoc />
-        public PremiumType? PremiumType { get; private set; }
-        /// <inheritdoc />
-        public string Locale { get; private set; }
 
         internal RestUser(BaseDiscordClient discord, ulong id)
             : base(discord, id)
@@ -65,12 +59,6 @@ namespace Discord.Rest
                 IsBot = model.Bot.Value;
             if (model.Username.IsSpecified)
                 Username = model.Username.Value;
-            if (model.Flags.IsSpecified)
-                Flags = (UserProperties) model.Flags.Value;
-            if (model.PremiumType.IsSpecified)
-                PremiumType = model.PremiumType.Value;
-            if (model.Locale.IsSpecified)
-                Locale = model.Locale.Value;
         }
 
         /// <inheritdoc />

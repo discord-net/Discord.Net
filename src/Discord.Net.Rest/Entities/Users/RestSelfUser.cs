@@ -17,6 +17,12 @@ namespace Discord.Rest
         public bool IsVerified { get; private set; }
         /// <inheritdoc />
         public bool IsMfaEnabled { get; private set; }
+        /// <inheritdoc />
+        public UserProperties Flags { get; private set; }
+        /// <inheritdoc />
+        public PremiumType PremiumType { get; private set; }
+        /// <inheritdoc />
+        public string Locale { get; private set; }
 
         internal RestSelfUser(BaseDiscordClient discord, ulong id)
             : base(discord, id)
@@ -39,6 +45,12 @@ namespace Discord.Rest
                 IsVerified = model.Verified.Value;
             if (model.MfaEnabled.IsSpecified)
                 IsMfaEnabled = model.MfaEnabled.Value;
+            if (model.Flags.IsSpecified)
+                Flags = (UserProperties)model.Flags.Value;
+            if (model.PremiumType.IsSpecified)
+                PremiumType = model.PremiumType.Value;
+            if (model.Locale.IsSpecified)
+                Locale = model.Locale.Value;
         }
 
         /// <inheritdoc />

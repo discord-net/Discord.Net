@@ -38,12 +38,6 @@ namespace Discord.WebSocket
         public IActivity Activity => Presence.Activity;
         /// <inheritdoc />
         public UserStatus Status => Presence.Status;
-        /// <inheritdoc />
-        public UserProperties Flags { get; internal set; }
-        /// <inheritdoc />
-        public PremiumType? PremiumType { get; internal set; }
-        /// <inheritdoc />
-        public string Locale { get; internal set; }
         /// <summary>
         ///     Gets mutual guilds shared with this user.
         /// </summary>
@@ -79,21 +73,6 @@ namespace Discord.WebSocket
             if (model.Username.IsSpecified && model.Username.Value != Username)
             {
                 Username = model.Username.Value;
-                hasChanges = true;
-            }
-            if (model.Flags.IsSpecified && model.Flags.Value != (int) Flags)
-            {
-                Flags = (UserProperties) model.Flags.Value;
-                hasChanges = true;
-            }
-            if (model.PremiumType.IsSpecified && model.PremiumType.Value != PremiumType)
-            {
-                PremiumType = model.PremiumType.Value;
-                hasChanges = true;
-            }
-            if (model.Locale.IsSpecified && model.Locale.Value != Locale)
-            {
-                Locale = model.Locale.Value;
                 hasChanges = true;
             }
             return hasChanges;
