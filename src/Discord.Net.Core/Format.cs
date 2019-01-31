@@ -4,7 +4,7 @@ namespace Discord
     public static class Format
     {
         // Characters which need escaping
-        private static readonly string[] SensitiveCharacters = { "\\", "*", "_", "~", "`" };
+        private static readonly string[] SensitiveCharacters = { "\\", "*", "_", "~", "`", "|" };
 
         /// <summary> Returns a markdown-formatted string with bold formatting. </summary>
         public static string Bold(string text) => $"**{text}**";
@@ -14,6 +14,8 @@ namespace Discord
         public static string Underline(string text) => $"__{text}__";
         /// <summary> Returns a markdown-formatted string with strikethrough formatting. </summary>
         public static string Strikethrough(string text) => $"~~{text}~~";
+        /// <summary> Returns a string with spoiler formatting. </summary>
+        public static string Spoiler(string text) => $"||{text}||";
         /// <summary> Returns a markdown-formatted URL. Only works in <see cref="EmbedBuilder"/> descriptions and fields. </summary>
         public static string Url(string text, string url) => $"[{text}]({url})";
         /// <summary> Escapes a URL so that a preview is not generated. </summary>
