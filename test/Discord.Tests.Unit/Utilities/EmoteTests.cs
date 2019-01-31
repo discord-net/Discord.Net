@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace Discord.Tests.Unit
@@ -14,11 +12,16 @@ namespace Discord.Tests.Unit
             var (resultId, resultName) = EmoteUtilities.ParseGuildEmote(input);
             Assert.Equal(243902586946715658UL, resultId);
             Assert.Equal("gopher", resultName);
+        }
 
-            Assert.Throws<ArgumentException>(() => EmoteUtilities.ParseGuildEmote("foo"));
-            Assert.Throws<ArgumentException>(() => EmoteUtilities.ParseGuildEmote("<foo"));
-            Assert.Throws<ArgumentException>(() => EmoteUtilities.ParseGuildEmote("<:foo"));
-            Assert.Throws<ArgumentException>(() => EmoteUtilities.ParseGuildEmote("<:foo>"));
+        [Theory]
+        [InlineData("foo")]
+        [InlineData("<foo")]
+        [InlineData("<:foo")]
+        [InlineData("<:foo>")]
+        public void Parse_Fail(string data)
+        {
+            Assert.Throws<ArgumentException>(() => EmoteUtilities.ParseGuildEmote(data));
         }
 
         [Fact]
