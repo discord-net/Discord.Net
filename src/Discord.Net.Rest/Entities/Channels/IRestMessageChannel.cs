@@ -42,12 +42,12 @@ namespace Discord.Rest
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
+        new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false);
         /// <summary>
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
         /// <remarks>
-        ///     This method follows the same behavior as described in <see cref="IMessageChannel.SendFileAsync(Stream, string, string, bool, Embed, RequestOptions)"/>.
+        ///     This method follows the same behavior as described in <see cref="IMessageChannel.SendFileAsync(Stream, string, string, bool, Embed, RequestOptions, bool)"/>.
         ///     Please visit its documentation for more details on this method.
         /// </remarks>
         /// <param name="stream">The <see cref="Stream" /> of the file to be sent.</param>
@@ -60,7 +60,7 @@ namespace Discord.Rest
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
+        new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false);
 
         /// <summary>
         ///     Gets a message from this message channel.
