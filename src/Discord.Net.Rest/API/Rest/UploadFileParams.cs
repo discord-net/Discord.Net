@@ -19,7 +19,7 @@ namespace Discord.API.Rest
         public Optional<string> Nonce { get; set; }
         public Optional<bool> IsTTS { get; set; }
         public Optional<Embed> Embed { get; set; }
-        public bool HasSpoiler { get; set; } = false;
+        public bool IsSpoiler { get; set; } = false;
 
         public UploadFileParams(Stream file)
         {
@@ -30,7 +30,7 @@ namespace Discord.API.Rest
         {
             var d = new Dictionary<string, object>();
             var filename = Filename.GetValueOrDefault("unknown.dat");
-            if (HasSpoiler && !filename.StartsWith("SPOILER_"))
+            if (IsSpoiler && !filename.StartsWith("SPOILER_"))
                 filename = filename.Insert(0, "SPOILER_");
             d["file"] = new MultipartFile(File, filename);
 
@@ -43,8 +43,8 @@ namespace Discord.API.Rest
                 payload["nonce"] = Nonce.Value;
             if (Embed.IsSpecified)
                 payload["embed"] = Embed.Value;
-            if (HasSpoiler)
-                payload["hasSpoiler"] = HasSpoiler.ToString();
+            if (IsSpoiler)
+                payload["hasSpoiler"] = IsSpoiler.ToString();
 
             var json = new StringBuilder();
             using (var text = new StringWriter(json))
