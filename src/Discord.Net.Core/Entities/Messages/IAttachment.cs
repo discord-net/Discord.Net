@@ -6,11 +6,6 @@ namespace Discord
     public interface IAttachment
     {
         /// <summary>
-        ///     The prefix applied to files to indicate that it is a spoiler.
-        /// </summary>
-        public const string SpoilerPrefix = "SPOILER_";
-
-        /// <summary>
         ///     Gets the ID of this attachment.
         /// </summary>
         /// <returns>

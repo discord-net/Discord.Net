@@ -30,8 +30,8 @@ namespace Discord.API.Rest
         {
             var d = new Dictionary<string, object>();
             var filename = Filename.GetValueOrDefault("unknown.dat");
-            if (IsSpoiler && !filename.StartsWith(IAttachment.SpoilerPrefix))
-                filename = filename.Insert(0, IAttachment.SpoilerPrefix);
+            if (IsSpoiler && !filename.StartsWith(AttachmentExtensions.SpoilerPrefix))
+                filename = filename.Insert(0, AttachmentExtensions.SpoilerPrefix);
             d["file"] = new MultipartFile(File, filename);
 
             var payload = new Dictionary<string, object>();
