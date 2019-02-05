@@ -47,6 +47,8 @@ namespace Discord.Rest
         /// </returns>
         public IWebhook Webhook { get; }
 
+        // Doc Note: Corresponds to the *audit log* data
+
         /// <summary>
         ///     Gets the webhook id.
         /// </summary>
@@ -54,8 +56,6 @@ namespace Discord.Rest
         ///     The webhook identifier.
         /// </returns>
         public ulong WebhookId { get; }
-
-        // Doc Note: Corresponds to the *audit log* data
 
         /// <summary>
         ///     Gets the type of webhook that was created.
