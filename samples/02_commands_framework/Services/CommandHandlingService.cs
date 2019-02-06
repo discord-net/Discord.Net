@@ -42,7 +42,7 @@ namespace _02_commands_framework.Services
             // This value holds the offset where the prefix ends
             var argPos = 0;
             // Perform prefix check. You may want to replace this with
-            // (!message.HasCharPrefix(_prefix, ref argPos))
+            // (!message.HasCharPrefix('!', ref argPos))
             // for a more traditional command format like !help.
             if (!message.HasMentionPrefix(_discord.CurrentUser, ref argPos)) return;
 
