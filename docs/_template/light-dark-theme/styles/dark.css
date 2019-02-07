@@ -7,6 +7,15 @@ body {
     color: #C0C0C0;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #E0E0E0;
+}
+
 button,
 a {
     color: #64B5F6;

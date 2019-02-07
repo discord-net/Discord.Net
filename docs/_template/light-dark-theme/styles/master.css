@@ -1,12 +1,35 @@
-@import url('https://fonts.googleapis.com/css?family=Titillium+Web|Noto+Sans');
+@import url('https://fonts.googleapis.com/css?family=Roboto|Muli|Fira+Mono');
 
 html,
 body {
-    font-family: 'Titillium Web', 'Segoe UI', Tahoma, Helvetica, sans-serif;
+    font-family: 'Roboto', 'Segoe UI', Tahoma, Helvetica, sans-serif;
     font-display: optional;
     height: 100%;
     font-size: 15px;
     scroll-behavior: smooth;
+}
+
+code{
+    font-family: 'Fira Mono', 'Courier New', Courier, monospace
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Muli', Verdana, Geneva, Tahoma, sans-serif;
+    line-height: 130%;
+}
+
+h1,
+.h1,
+h2,
+.h2,
+h3,
+.h3 {
+  font-weight: 600;
 }
 
 #logo
@@ -55,16 +78,6 @@ article.content h5,
 article.content h6{
     -webkit-transition: all .25s ease-in-out;
     transition: all .25s ease-in-out;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-family: 'Noto Sans', Verdana, Geneva, Tahoma, sans-serif;
-    line-height: 130%;
 }
 
 .sideaffix {
@@ -172,4 +185,13 @@ span.arrow-d{
 
 span.arrow-r{
     top: 6px; position: relative;
+}
+
+/* widen viewport */
+
+@media (min-width: 1085px) {
+    .container {
+        width: calc(100% - 15vw);
+        max-width: calc(100% - 15vw);
+    }
 }
