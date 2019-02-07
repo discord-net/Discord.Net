@@ -10,6 +10,11 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets the ID of the user who added the reaction.
         /// </summary>
+        /// <remarks>
+        ///     This property retrieves the snowflake identifier of the user responsible for this reaction. This
+        ///     property will always contain the user identifier in event that
+        ///     <see cref="Discord.WebSocket.SocketReaction.User" /> cannot be retrieved.
+        /// </remarks>
         /// <returns>
         ///     A user snowflake identifier associated with the user.
         /// </returns>
@@ -17,6 +22,18 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets the user who added the reaction if possible.
         /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         This property attempts to retrieve a WebSocket-cached user that is responsible for this reaction from
+        ///         the client. In other words, when the user is not in the WebSocket cache, this property may not
+        ///         contain a value, leaving the only identifiable information to be
+        ///         <see cref="Discord.WebSocket.SocketReaction.UserId" />.
+        ///     </para>
+        ///     <para>
+        ///         If you wish to obtain an identifiable user object, consider utilizing
+        ///         <see cref="Discord.Rest.DiscordRestClient" /> which will attempt to retrieve the user from REST.
+        ///     </para>
+        /// </remarks>
         /// <returns>
         ///     A user object where possible; a value is not always returned.
         /// </returns>
