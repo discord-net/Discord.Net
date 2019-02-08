@@ -98,12 +98,14 @@ namespace Discord.WebSocket
         ///     This method gets the user present in the WebSocket cache with the given condition.
         ///     <note type="warning">
         ///         Sometimes a user may return <c>null</c> due to Discord not sending offline users in large
-        ///         guilds (i.e. guild with 100+ members) actively. To download users on startup, consider enabling 
-        ///         <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/>.
+        ///         guilds (i.e. guild with 100+ members) actively. To download users on startup and to see 
+        ///          more information about this subject, see <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/>.
         ///     </note>
         ///     <note>
         ///         This method does not attempt to fetch users that the logged-in user does not have access to (i.e.
-        ///         users who don't share mutual guild(s) with the current user).
+        ///         users who don't share mutual guild(s) with the current user). If you wish to get a user that
+        ///         you do not have access to, consider using the REST implementation of
+        ///         <see cref="DiscordSocketRestClient.GetUserAsync"/>.
         ///     </note>
         /// </remarks>
         /// <returns>
@@ -120,12 +122,14 @@ namespace Discord.WebSocket
         ///     This method gets the user present in the WebSocket cache with the given condition.
         ///     <note type="warning">
         ///         Sometimes a user may return <c>null</c> due to Discord not sending offline users in large
-        ///         guilds (i.e. guild with 100+ members) actively. To download users on startup, consider enabling 
-        ///         <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/>.
+        ///         guilds (i.e. guild with 100+ members) actively. To download users on startup and to see 
+        ///          more information about this subject, see <see cref="DiscordSocketConfig.AlwaysDownloadUsers"/>.
         ///     </note>
         ///     <note>
         ///         This method does not attempt to fetch users that the logged-in user does not have access to (i.e.
-        ///         users who don't share mutual guild(s) with the current user).
+        ///         users who don't share mutual guild(s) with the current user). If you wish to get a user that
+        ///         you do not have access to, consider using the REST implementation of
+        ///         <see cref="DiscordSocketRestClient.GetUserAsync"/>.
         ///     </note>
         /// </remarks>
         /// <returns>

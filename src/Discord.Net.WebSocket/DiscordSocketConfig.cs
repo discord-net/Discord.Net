@@ -94,7 +94,8 @@ namespace Discord.WebSocket
         ///         Please note that it can be difficult to fill the cache completely on large guilds depending on the
         ///         traffic. If you are using the command system, the default user TypeReader may fail to find the user
         ///         due to this issue. This may be resolved at v3 of the library. Until then, you may want to consider
-        ///         overriding the TypeReader and use <see cref="DiscordRestClient.GetGuildUserAsync"/> as a backup.
+        ///         overriding the TypeReader and use <see cref="DiscordSocketRestClient.GetUserAsync"/> 
+        ///         or <see cref="DiscordSocketRestClient.GetGuildUserAsync"/> as a backup.
         ///     </note>
         /// </remarks>
         public bool AlwaysDownloadUsers { get; set; } = false;
