@@ -32,7 +32,7 @@ namespace Discord.Webhook
             : this(webhookUrl, new DiscordRestConfig()) { }
 
         // regex pattern to match webhook urls
-        private static Regex WebhookUrlRegex = new Regex(@"^.+.com\/api\/webhooks\/([\d]+)\/([a-z0-9_-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static Regex WebhookUrlRegex = new Regex(@"^.*discordapp\.com\/api\/webhooks\/([\d]+)\/([a-z0-9_-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <summary> Creates a new Webhook Discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken, DiscordRestConfig config)

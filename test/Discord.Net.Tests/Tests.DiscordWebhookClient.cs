@@ -19,7 +19,7 @@ namespace Discord
         // don't care about https
         [InlineData("http://canary.discordapp.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK")]
         // this is the minimum that the regex cares about
-        [InlineData("p.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK")]
+        [InlineData("discordapp.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK")]
         public void TestWebhook_Valid(string webhookurl)
         {
             try
