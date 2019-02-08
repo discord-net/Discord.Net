@@ -32,7 +32,7 @@ namespace Discord.Webhook
             : this(webhookUrl, new DiscordRestConfig()) { }
 
         // regex pattern to match webhook urls
-        private const string WebhookUrlRegex = @"^.+.com\/api\/webhooks\/([\d]+)\/([A-Za-z0-9_-]+)$";
+        private static Regex WebhookUrlRegex = new Regex(@"^.+.com\/api\/webhooks\/([\d]+)\/([a-z0-9_-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <summary> Creates a new Webhook Discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken, DiscordRestConfig config)
@@ -66,8 +66,7 @@ namespace Discord.Webhook
             // thrown when groups are not populated/valid, or when there is no match
             ArgumentException ex()
                 => new ArgumentException(paramName: nameof(webhookUrl), message: "The given webhook Url was not in a valid format.");
-            var re = new Regex(WebhookUrlRegex);
-            var match = re.Match(webhookUrl);
+            var match = WebhookUrlRegex.Match(webhookUrl);
             if (match != null)
             {
                 // ensure that the first group is a ulong, set the _webhookId
