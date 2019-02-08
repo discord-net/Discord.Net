@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.Logging;
 using Discord.Rest;
@@ -26,6 +27,12 @@ namespace Discord.Webhook
         /// <summary> Creates a new Webhook Discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken)
             : this(webhookId, webhookToken, new DiscordRestConfig()) { }
+        /// <summary> Creates a new Webhook Discord client. </summary>
+        public DiscordWebhookClient(string webhookUrl)
+            : this(webhookUrl, new DiscordRestConfig()) { }
+
+        // regex pattern to match webhook urls
+        private const string WebhookUrlRegex = @"^.+.com\/api\/webhooks\/([\d]+)\/([A-Za-z0-9_-]+)$";
 
         /// <summary> Creates a new Webhook Discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken, DiscordRestConfig config)
@@ -41,6 +48,36 @@ namespace Discord.Webhook
         {
             Webhook = webhook;
             _webhookId = Webhook.Id;
+        }
+
+        /// <summary>
+        ///     Creates a new Webhook Discord client.
+        /// </summary>
+        /// <param name="webhookUrl">The url of the webhook.</param>
+        /// <param name="config">The configuration options to use for this client.</param>
+        /// <exception cref="ArgumentException">Thrown if the <paramref name="webhookUrl"/> is an invalid format.</exception>
+        public DiscordWebhookClient(string webhookUrl, DiscordRestConfig config) : this(config)
+        {
+            // thrown when groups are not populated/valid, or when there is no match
+            ArgumentException ex()
+                => new ArgumentException(paramName: nameof(webhookUrl), message: "The given webhook Url was not in a valid format.");
+            var re = new Regex(WebhookUrlRegex);
+            var match = re.Match(webhookUrl);
+            if (match != null)
+            {
+                // ensure that the first group is a ulong, set the _webhookId
+                // 0th group is always the entire match, so start at index 1
+                if (!(match.Groups[1].Success && ulong.TryParse(match.Groups[1].Value, out _webhookId)))
+                    throw ex();
+
+                if (!match.Groups[2].Success)
+                    throw ex();
+
+                ApiClient.LoginAsync(TokenType.Webhook, match.Groups[2].Value).GetAwaiter().GetResult();
+                Webhook = WebhookClientHelper.GetWebhookAsync(this, _webhookId).GetAwaiter().GetResult();
+            }
+            else
+                throw ex();
         }
 
         private DiscordWebhookClient(DiscordRestConfig config)
