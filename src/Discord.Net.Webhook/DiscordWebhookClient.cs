@@ -64,18 +64,19 @@ namespace Discord.Webhook
                     "The given webhook Url cannot be null or whitespace.");
 
             // thrown when groups are not populated/valid, or when there is no match
-            ArgumentException ex()
-                => new ArgumentException(paramName: nameof(webhookUrl), message: "The given webhook Url was not in a valid format.");
+            ArgumentException ex(string reason = null)
+                => new ArgumentException(paramName: nameof(webhookUrl), message:
+                $"The given webhook Url was not in a valid format. {reason}");
             var match = WebhookUrlRegex.Match(webhookUrl);
             if (match != null)
             {
                 // ensure that the first group is a ulong, set the _webhookId
                 // 0th group is always the entire match, so start at index 1
                 if (!(match.Groups[1].Success && ulong.TryParse(match.Groups[1].Value, out _webhookId)))
-                    throw ex();
+                    throw ex("The webhook Id could not be parsed.");
 
                 if (!match.Groups[2].Success)
-                    throw ex();
+                    throw ex("The webhook token could not be parsed.");
 
                 ApiClient.LoginAsync(TokenType.Webhook, match.Groups[2].Value).GetAwaiter().GetResult();
                 Webhook = WebhookClientHelper.GetWebhookAsync(this, _webhookId).GetAwaiter().GetResult();
