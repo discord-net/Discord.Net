@@ -7,32 +7,30 @@ using Xunit;
 namespace Discord
 {
     /// <summary>
-    ///     Tests that the <see cref=""/>
+    ///     Tests the <see cref="DiscordWebhookClient.ParseWebhookUrl(string, out ulong, out string)"/> function.
     /// </summary>
     public class DiscordWebhookClientTests
     {
         [Theory]
-        [InlineData("https://discordapp.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK")]
+        [InlineData("https://discordapp.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK",
+            123412347732897802, "_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK")]
         // ptb, canary, etc will have slightly different urls
-        [InlineData("https://ptb.discordapp.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK")]
-        [InlineData("https://canary.discordapp.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK")]
+        [InlineData("https://ptb.discordapp.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK",
+            123412347732897802, "_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK")]
+        [InlineData("https://canary.discordapp.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK",
+            123412347732897802, "_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK")]
         // don't care about https
-        [InlineData("http://canary.discordapp.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK")]
+        [InlineData("http://canary.discordapp.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK",
+            123412347732897802, "_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK")]
         // this is the minimum that the regex cares about
-        [InlineData("discordapp.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK")]
-        public void TestWebhook_Valid(string webhookurl)
+        [InlineData("discordapp.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK",
+            123412347732897802, "_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK")]
+        public void TestWebhook_Valid(string webhookurl, ulong expectedId, string expectedToken)
         {
-            try
-            {
-                _ = new DiscordWebhookClient(webhookurl);
-            }
-            catch (InvalidOperationException)
-            {
-                // ignore, thrown because webhook urls are invalid
-            }
-            
-            // pass if no exception thrown
-            Assert.True(true);
+            DiscordWebhookClient.ParseWebhookUrl(webhookurl, out ulong id, out string token);
+
+            Assert.Equal(expectedId, id);
+            Assert.Equal(expectedToken, token);
         }
 
         [Theory]
@@ -43,7 +41,7 @@ namespace Discord
         {
             Assert.Throws<ArgumentNullException>(() =>
             {
-                _ = new DiscordWebhookClient(webhookurl);
+                DiscordWebhookClient.ParseWebhookUrl(webhookurl, out ulong id, out string token);
             });
         }
 
@@ -55,7 +53,7 @@ namespace Discord
         {
             Assert.Throws<ArgumentException>(() =>
             {
-                _ = new DiscordWebhookClient(webhookurl);
+                DiscordWebhookClient.ParseWebhookUrl(webhookurl, out ulong id, out string token);
             });
         }
     }
