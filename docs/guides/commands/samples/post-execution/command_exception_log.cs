@@ -1,6 +1,5 @@
 public async Task LogAsync(LogMessage logMessage)
 {
-    // This casting type requries C#7
     if (logMessage.Exception is CommandException cmdException)
     {
         // We can tell the user that something unexpected has happened
