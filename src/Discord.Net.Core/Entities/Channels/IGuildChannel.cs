@@ -101,22 +101,9 @@ namespace Discord
         ///     <see cref="IGuild.GetChannelAsync"/>. Next, it checks if an overwrite had already been set via 
         ///     <see cref="GetPermissionOverwrite(Discord.IRole)"/>; if not, it denies the role from sending any
         ///     messages to the channel.
-        ///     <code lang="cs">
-        ///     // Fetches the role and channels
-        ///     var role = guild.GetRole(339805618376540160);
-        ///     var channel = await guild.GetChannelAsync(233937283911385098);
-        /// 
-        ///     // If either the of the object does not exist, bail
-        ///     if (role == null || channel == null) return;
-        ///
-        ///     // Fetches the previous overwrite and bail if one is found
-        ///     var previousOverwrite = channel.GetPermissionOverwrite(role);
-        ///     if (previousOverwrite.HasValue) return;
-        /// 
-        ///     // Creates a new OverwritePermissions with send message set to deny and pass it into the method
-        ///     await channel.AddPermissionOverwriteAsync(role,
-        ///         new OverwritePermissions(sendMessage: PermValue.Deny));
-        ///     </code>
+        ///     <code lang="cs" 
+        ///           source="../Discord.Net.Examples/Core/Entities/Channels/IGuildChannel.Examples.cs" 
+        ///           region="AddPermissionOverwriteAsyncRole"/>
         /// </example>
         /// <param name="role">The role to add the overwrite to.</param>
         /// <param name="permissions">The overwrite to add to the role.</param>
@@ -134,22 +121,9 @@ namespace Discord
         ///     <see cref="IGuild.GetChannelAsync"/>. Next, it checks if an overwrite had already been set via 
         ///     <see cref="GetPermissionOverwrite(Discord.IUser)"/>; if not, it denies the user from sending any
         ///     messages to the channel.
-        ///     <code lang="cs">
-        ///     // Fetches the role and channels
-        ///     var user = await guild.GetUserAsync(168693960628371456);
-        ///     var channel = await guild.GetChannelAsync(233937283911385098);
-        /// 
-        ///     // If either the of the object does not exist, bail
-        ///     if (user == null || channel == null) return;
-        ///
-        ///     // Fetches the previous overwrite and bail if one is found
-        ///     var previousOverwrite = channel.GetPermissionOverwrite(user);
-        ///     if (previousOverwrite.HasValue) return;
-        /// 
-        ///     // Creates a new OverwritePermissions with send message set to deny and pass it into the method
-        ///     await channel.AddPermissionOverwriteAsync(role,
-        ///         new OverwritePermissions(sendMessage: PermValue.Deny));
-        ///     </code>
+        ///     <code lang="cs" 
+        ///           source="../Discord.Net.Examples/Core/Entities/Channels/IGuildChannel.Examples.cs" 
+        ///           region="AddPermissionOverwriteAsyncUser"/>
         /// </example>
         /// <param name="user">The user to add the overwrite to.</param>
         /// <param name="permissions">The overwrite to add to the user.</param>
