@@ -56,8 +56,13 @@ namespace Discord.Webhook
         /// <param name="webhookUrl">The url of the webhook.</param>
         /// <param name="config">The configuration options to use for this client.</param>
         /// <exception cref="ArgumentException">Thrown if the <paramref name="webhookUrl"/> is an invalid format.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="webhookUrl"/> is null or whitespace.</exception>
         public DiscordWebhookClient(string webhookUrl, DiscordRestConfig config) : this(config)
         {
+            if (string.IsNullOrWhiteSpace(webhookUrl))
+                throw new ArgumentNullException(paramName: nameof(webhookUrl), message:
+                    "The given webhook Url cannot be null or whitespace.");
+
             // thrown when groups are not populated/valid, or when there is no match
             ArgumentException ex()
                 => new ArgumentException(paramName: nameof(webhookUrl), message: "The given webhook Url was not in a valid format.");
