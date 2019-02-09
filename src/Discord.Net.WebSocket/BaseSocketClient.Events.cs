@@ -19,7 +19,8 @@ namespace Discord.WebSocket
         ///     </para>
         /// </remarks>
         /// <example>
-        ///     <code source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs" region="ChannelCreated"></code>
+        ///     <code language="cs" region="ChannelCreated"
+        ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
         /// </example>
         public event Func<SocketChannel, Task> ChannelCreated 
         {
@@ -40,7 +41,8 @@ namespace Discord.WebSocket
         ///     </para>
         /// </remarks>
         /// <example>
-        ///     <code source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs" region="ChannelDestroyed"></code>
+        ///     <code language="cs" region="ChannelDestroyed"
+        ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
         /// </example>
         public event Func<SocketChannel, Task> ChannelDestroyed {
             add { _channelDestroyedEvent.Add(value); }
@@ -61,7 +63,8 @@ namespace Discord.WebSocket
         ///     </para>
         /// </remarks>
         /// <example>
-        ///     <code source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs" region="ChannelUpdated"></code>
+        ///     <code language="cs" region="ChannelUpdated"
+        ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
         /// </example>
         public event Func<SocketChannel, SocketChannel, Task> ChannelUpdated {
             add { _channelUpdatedEvent.Add(value); }
@@ -84,8 +87,9 @@ namespace Discord.WebSocket
         ///     </para>
         /// </remarks>
         /// <example>
-        ///     The example below checks if the newly received message contains the target user.
-        ///     <code source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs" region="MessageReceived"></code>
+        ///     <para>The example below checks if the newly received message contains the target user.</para>
+        ///     <code language="cs" region="MessageReceived"
+        ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
         /// </example>
         public event Func<SocketMessage, Task> MessageReceived {
             add { _messageReceivedEvent.Add(value); }
@@ -116,7 +120,8 @@ namespace Discord.WebSocket
         ///     </para>
         /// </remarks>
         /// <example>
-        ///     <code source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs" region="MessageDeleted"></code>
+        ///     <code language="cs" region="MessageDeleted"
+        ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs" />
         /// </example>
         public event Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task> MessageDeleted {
             add { _messageDeletedEvent.Add(value); }
@@ -176,7 +181,8 @@ namespace Discord.WebSocket
         ///     </note>
         /// </remarks>
         /// <example>
-        ///     <code source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs" region="ReactionAdded"></code>
+        ///     <code language="cs" region="ReactionAdded"
+        ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
         /// </example>
         public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> ReactionAdded {
             add { _reactionAddedEvent.Add(value); }

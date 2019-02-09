@@ -440,16 +440,8 @@ namespace Discord
         /// </summary>
         /// <example>
         ///     The following example creates a new text channel under an existing category named <c>Wumpus</c> with a set topic.
-        ///     <code lang="cs">
-        ///     var categories = await guild.GetCategoriesAsync();
-        ///     var targetCategory = categories.FirstOrDefault(x => x.Name == "wumpus");
-        ///     if (targetCategory == null) return;
-        ///     await Context.Guild.CreateTextChannelAsync(name, x =>
-        ///     {
-        ///         x.CategoryId = targetCategory.Id;
-        ///         x.Topic = $"This channel was created at {DateTimeOffset.UtcNow} by {user}.";
-        ///     });
-        ///     </code>
+        ///     <code language="cs" region="CreateTextChannelAsync"
+        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Guilds\IGuild.Examples.cs"/>
         /// </example>
         /// <param name="name">The new name for the text channel.</param>
         /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>

@@ -40,7 +40,7 @@ namespace Discord
         /// </summary>
         /// <example>
         ///     The following example gets 250 messages from the channel and deletes them.
-        ///     <code lang="cs">
+        ///     <code language="cs">
         ///     var messages = await textChannel.GetMessagesAsync(250).FlattenAsync();
         ///     await textChannel.DeleteMessagesAsync(messages);
         ///     </code>

@@ -16,11 +16,8 @@ namespace Discord
         /// <example>
         ///     The following example sends a message with the current system time in RFC 1123 format to the channel and
         ///     deletes itself after 5 seconds.
-        ///     <code language="cs">
-        ///     var message = await channel.SendMessageAsync(DateTimeOffset.UtcNow.ToString("R"));
-        ///     await Task.Delay(TimeSpan.FromSeconds(5))
-        ///         .ContinueWith(x => message.DeleteAsync());
-        ///     </code>
+        ///     <code language="cs" region="SendMessageAsync"
+        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
         /// </example>
         /// <param name="text">The message to be sent.</param>
         /// <param name="isTTS">Determines whether the message should be read aloud by Discord or not.</param>
@@ -35,18 +32,14 @@ namespace Discord
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
         /// <example>
-        ///     The following example uploads a local file called <c>wumpus.txt</c> along with the text 
-        ///     <c>good discord boi</c> to the channel.
-        ///     <code language="cs">
-        ///     await channel.SendFileAsync("wumpus.txt", "good discord boi");
-        ///     </code>
-        /// 
-        ///     The following example uploads a local image called <c>b1nzy.jpg</c> embedded inside a rich embed to the
-        ///     channel.
-        ///     <code language="cs">
-        ///     await channel.SendFileAsync("b1nzy.jpg",
-        ///         embed: new EmbedBuilder {ImageUrl = "attachment://b1nzy.jpg"}.Build());
-        ///     </code>
+        ///     <para>The following example uploads a local file called <c>wumpus.txt</c> along with the text 
+        ///     <c>good discord boi</c> to the channel.</para>
+        ///     <code language="cs" region="SendFileAsync.FilePath"
+        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
+        ///     <para>The following example uploads a local image called <c>b1nzy.jpg</c> embedded inside a rich embed to the
+        ///     channel.</para>
+        ///     <code language="cs" region="SendFileAsync.FilePath.EmbeddedImage"
+        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
         /// </example>
         /// <remarks>
         ///     This method sends a file as if you are uploading an attachment directly from your Discord client.
@@ -72,10 +65,8 @@ namespace Discord
         /// <example>
         ///     The following example uploads a streamed image that will be called <c>b1nzy.jpg</c> embedded inside a
         ///     rich embed to the channel.
-        ///     <code language="cs">
-        ///     await channel.SendFileAsync(b1nzyStream, "b1nzy.jpg",
-        ///         embed: new EmbedBuilder {ImageUrl = "attachment://b1nzy.jpg"}.Build());
-        ///     </code>
+        ///     <code language="cs" region="SendFileAsync.FileStream.EmbeddedImage"
+        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
         /// </example>
         /// <remarks>
         ///     This method sends a file as if you are uploading an attachment directly from your Discord client.
@@ -132,10 +123,8 @@ namespace Discord
         /// <example>
         ///     The following example downloads 300 messages and gets messages that belong to the user 
         ///     <c>53905483156684800</c>.
-        ///     <code lang="cs">
-        ///     var messages = await messageChannel.GetMessagesAsync(300).FlattenAsync();
-        ///     var userMessages = messages.Where(x =&gt; x.Author.Id == 53905483156684800);
-        ///     </code>
+        ///     <code language="cs" region="GetMessagesAsync.FromLimit.Standard"
+        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
         /// </example>
         /// <param name="limit">The numbers of message to be gotten from.</param>
         /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from
@@ -168,10 +157,13 @@ namespace Discord
         ///     of flattening.
         /// </remarks>
         /// <example>
-        ///     The following example gets 5 message prior to the message identifier <c>442012544660537354</c>.
-        ///     <code lang="cs">
-        ///     var messages = await channel.GetMessagesAsync(442012544660537354, Direction.Before, 5).FlattenAsync();
-        ///     </code>
+        ///     <para>The following example gets 5 message prior to the message identifier <c>442012544660537354</c>.</para>
+        ///     <code language="cs" region="GetMessagesAsync.FromId.FromMessage"
+        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
+        ///     <para>The following example attempts to retrieve <c>messageCount</c> number of messages from the 
+        ///     beginning of the channel and prints them to the console.</para>
+        ///     <code language="cs" region="GetMessagesAsync.FromId.BeginningMessages"
+        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
         /// </example>
         /// <param name="fromMessageId">The ID of the starting message to get the messages from.</param>
         /// <param name="dir">The direction of the messages to be gotten from.</param>
@@ -207,9 +199,8 @@ namespace Discord
         /// </remarks>
         /// <example>
         ///     The following example gets 5 message prior to a specific message, <c>oldMessage</c>.
-        ///     <code lang="cs">
-        ///     var messages = await channel.GetMessagesAsync(oldMessage, Direction.Before, 5).FlattenAsync();
-        ///     </code>
+        ///     <code language="cs" region="GetMessagesAsync.FromMessage"
+        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
         /// </example>
         /// <param name="fromMessage">The starting message to get the messages from.</param>
         /// <param name="dir">The direction of the messages to be gotten from.</param>
@@ -263,12 +254,8 @@ namespace Discord
         /// </summary>
         /// <example>
         ///     The following example keeps the client in the typing state until <c>LongRunningAsync</c> has finished.
-        ///     <code lang="cs">
-        ///     using (messageChannel.EnterTypingState())
-        ///     {
-        ///         await LongRunningAsync();
-        ///     }
-        ///     </code>
+        ///     <code language="cs" region="EnterTypingState"
+        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
         /// </example>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
