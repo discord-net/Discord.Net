@@ -32,6 +32,10 @@ namespace Discord
         /// <summary>
         ///     The message when another message is pinned.
         /// </summary>
-        ChannelPinnedMessage = 6
+        ChannelPinnedMessage = 6,
+        /// <summary>
+        ///     The message when a new member joined.
+        /// </summary>
+        GuildMemberJoin = 7
     }
 }
