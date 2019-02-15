@@ -1,29 +1,24 @@
 using Discord;
 using Discord.WebSocket;
 
-public class Program
+public class LoggingService
 {
-	private DiscordSocketClient _client;
-	static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
-	
-	public async Task MainAsync()
+	public LoggingService(DiscordSocketClient client, CommandService command)
 	{
-		_client = new DiscordSocketClient(new DiscordSocketConfig
-		{
-			LogLevel = LogSeverity.Info
-		});
-
-		_client.Log += Log;
-
-		await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DiscordToken"));
-		await _client.StartAsync();
-		
-		await Task.Delay(-1);
+		client.Log += LogAsync;
+		command.Log += LogAsync;
 	}
-
-	private Task Log(LogMessage message)
+	private Task LogAsync(LogMessage message)
 	{
-		Console.WriteLine(message.ToString());
+		if (message.Exception is CommandException cmdException)
+		{
+			Console.WriteLine($"[Command/{message.Severity}] {cmdException.Command.Aliases.First()}"
+				+ $" failed to execute in {cmdException.Context.Channel}.");
+			Console.WriteLine(cmdException);
+		}
+		else 
+			Console.WriteLine($"[General/{message.Severity}] {message}");
+
 		return Task.CompletedTask;
 	}
 }
