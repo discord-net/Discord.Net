@@ -267,6 +267,11 @@ tbody>tr {
     border-top: 2px solid rgb(173, 173, 173)
 }
 
+/* top navbar */
+.navbar-inverse[role="navigation"] {
+    background-color: #2C2F33;
+}
+
 /* select */
 
 select {
