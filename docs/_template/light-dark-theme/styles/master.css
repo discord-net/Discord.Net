@@ -52,6 +52,10 @@ li,
     background: inherit !important;
 }
 
+.affix ul>li.active>ul, .affix ul>li.active>a:before, .affix ul>li>a:hover:before{
+    white-space: normal;
+}
+
 img {
     box-shadow: 0px 0px 3px 0px rgb(66, 66, 66);
     max-width: 95% !important;
