@@ -199,3 +199,14 @@ span.arrow-r{
         max-width: calc(100% - 15vw);
     }
 }
+
+/* fix level indentation */
+
+.level2 {
+    padding: 0 5px;
+}
+
+.level3 {
+    padding: 0 5px;
+    font-size: 90%;
+}
