@@ -210,3 +210,18 @@ span.arrow-r{
     padding: 0 5px;
     font-size: 90%;
 }
+
+.level4 {
+    padding: 0 5px;
+    font-size: 85%;
+}
+
+.level5 {
+    padding: 0 5px;
+    font-size: 80%;
+}
+
+.level6 {
+    padding: 0 5px;
+    font-size: 75%;
+}
