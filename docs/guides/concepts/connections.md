@@ -35,10 +35,6 @@ sync and has a completed guild cache.
 
 [DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
 
-### Samples
-
-[!code-csharp[Connection Sample](samples/events.cs)]
-
 ## Reconnection
 
 > [!TIP]
