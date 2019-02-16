@@ -79,7 +79,7 @@ article h4 {
 .navbar-inverse .navbar-nav>li>a:focus,
 .navbar-inverse .navbar-nav>li>a:hover {
     color: #fff;
-    background-color: #0d47a1;
+    background-color: #1157c0;
     border-bottom: 3px solid white;
 }
 
@@ -87,7 +87,7 @@ article h4 {
 .navbar-inverse .navbar-nav>.active>a:focus,
 .navbar-inverse .navbar-nav>.active>a:hover {
     color: #fff;
-    background-color: #0d47a1;
+    background-color: #1157c0;
     border-bottom: 3px solid white;
 }
 

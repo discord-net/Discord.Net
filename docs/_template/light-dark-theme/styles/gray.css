@@ -48,13 +48,13 @@ hr {
 }
 
 /* top navbar */
-.navbar-inverse[role="navigation"] {
+/*.navbar-inverse[role="navigation"] {
     background-color: #2C2F33;
-}
+}*/
 
 /* sub navbar (below top) */
 .subnav {
-    background: #282B2F
+    background: rgb(69, 75, 82)
 }
 
 
