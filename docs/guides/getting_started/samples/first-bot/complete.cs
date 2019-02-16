@@ -9,7 +9,6 @@ public class Program
 	{
 		_client = new DiscordSocketClient();
 		_client.Log += Log;
-		_client.MessageReceived += MessageReceivedAsync;
 		await _client.LoginAsync(TokenType.Bot, 
 			Environment.GetEnvironmentVariable("DiscordToken"));
 		await _client.StartAsync();
@@ -17,15 +16,6 @@ public class Program
 		// Block this task until the program is closed.
 		await Task.Delay(-1);
 	}
-
-	private async Task MessageReceivedAsync(SocketMessage message)
-	{
-		if (message.Content == "!ping")
-		{
-			await message.Channel.SendMessageAsync("Pong!");
-		}
-	}
-
 	private Task Log(LogMessage msg)
 	{
 		Console.WriteLine(msg.ToString());

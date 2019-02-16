@@ -182,80 +182,34 @@ The following lines can now be added:
 At this point, feel free to start your program and see your bot come
 online in Discord.
 
-> [!TIP]
+> [!WARNING]
 > Getting a warning about `A supplied token was invalid.` and/or
 > having trouble logging in? Double-check whether you have put in
 > the correct credentials and make sure that it is _not_ a client
 > secret, which is different from a token.
 
-> [!TIP]
+> [!WARNING]
 > Encountering a `PlatformNotSupportedException` when starting your bot?
 > This means that you are targeting a platform where .NET's default
 > WebSocket client is not supported. Refer to the [installation guide]
 > for how to fix this.
 
+> [!NOTE]
+> For your reference, you may view the [completed program].
+
 [DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
 [LoginAsync]: xref:Discord.Rest.BaseDiscordClient.LoginAsync*
 [StartAsync]: xref:Discord.WebSocket.DiscordSocketClient.StartAsync*
 [installation guide]: xref:Guides.GettingStarted.Installation
-
-### Handling a 'ping'
-
-> [!WARNING]
-> Please note that this is *not* a proper way to create a command.
->
-> Consider using a command framework instead. One is provided to you
-> in `Discord.Net.Commands`; see @Guides.Commands.Intro for more
-> information.
-
-Now that we have learned to open a connection to Discord, we can
-begin handling messages that the users are sending.
-
-To start out, our bot will listen for any message whose content
-is equal to `!ping` and will respond back with "Pong!". Since we want
-to listen for new messages, the event to hook into is [MessageReceived].
-
-In your program, add a method that matches the signature of the
-`MessageReceived` event - it must be a method (`Func`) that returns
-the type `Task` and takes a single parameter, a [SocketMessage]. Also,
-since we will be sending data to Discord in this method, we will flag
-it as `async`.
-In this method, we will add an `if` block to
-determine if the message content fits the rules of our scenario -
-recall that it must be equal to `!ping`.
-Inside the branch of this condition, we will want to send a message,
-`Pong!`, back to the channel from which the message comes from. To
-find the channel, look for the `Channel` property on the message
-parameter.
-
-Next, we will want to send a message to this channel. Since the
-channel object is of type [ISocketMessageChannel], we can invoke the
-[SendMessageAsync] instance method. For the message content, send back
-a string, "Pong!".
-
-You should have now added the following lines,
-
-[!code-csharp[Message](samples/first-bot/message.cs)]
-
-Now that your first bot is complete. You may continue to add on to this
-if you desire, but for any bots that will be carrying out multiple
-commands, it is strongly recommended to use the command framework as
-shown below.
-
-> [!NOTE]
-> For your reference, you may view the [completed program].
-
-[MessageReceived]: xref:Discord.WebSocket.BaseSocketClient.MessageReceived
-[SocketMessage]: xref:Discord.WebSocket.SocketMessage
-[ISocketMessageChannel]: xref:Discord.WebSocket.ISocketMessageChannel
-[SendMessageAsync]: xref:Discord.WebSocket.ISocketMessageChannel.SendMessageAsync*
 [completed program]: samples/first-bot/complete.cs
 
 # Building a bot with commands
 
-@Guides.Commands.Intro will guide you through how to setup a program
-that is ready for [CommandService], a service that is ready for
-advanced command usage.
+To create commands for your bot, you may choose from a variety of
+command processors available. Throughout the guides, we will be using
+the one that Discord.Net ships with. @Guides.Commands.Intro will
+guide you through how to setup a program that is ready for
+[CommandService].
 
 For reference, view an [annotated example] of this structure.
 
