@@ -39,8 +39,7 @@ namespace Discord.Rest
         ///     Gets the author of the messages that were deleted.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identifier for the user that the messages were
-        ///     created by.
+        ///     A <see cref="ulong"/> representing the snowflake identifier for the user that created the deleted messages.
         /// </returns>
         public ulong AuthorId { get; }
     }
