@@ -23,13 +23,14 @@ namespace Discord
         ///     Pads a base64-encoded string with 0, 1, or 2 '=' characters,
         ///     if the string is not a valid multiple of 4.
         ///     Does not ensure that the provided string contains only valid base64 characters.
+        ///     Strings that already contain padding will not have any more padding applied.
         /// </summary>
         /// <remarks>
         ///     A string that would require 3 padding characters is considered to be already corrupt.
         ///     Some older bot tokens may require padding, as the format provided by Discord
         ///     does not include this padding in the token.
         /// </remarks>
-        /// <param name="encodedBase64">The base64 encoded string to pad with characters. </param>
+        /// <param name="encodedBase64">The base64 encoded string to pad with characters.</param>
         /// <returns>A string containing the base64 padding.</returns>
         /// <exception cref="FormatException">
         ///     Thrown if <paramref name="encodedBase64"/> would require an invalid number of padding characters.
@@ -37,18 +38,15 @@ namespace Discord
         /// <exception cref="ArgumentNullException">
         ///     Thrown if <paramref name="encodedBase64"/> is null, empty, or whitespace.
         /// </exception>
-        /// <exception cref="ArgumentException">
-        ///     Thrown if the given input string already contains padding characters.
-        /// </exception>
         internal static string PadBase64String(string encodedBase64)
         {
             if (string.IsNullOrWhiteSpace(encodedBase64))
                 throw new ArgumentNullException(paramName: encodedBase64,
                     message: "The supplied base64-encoded string was null or whitespace.");
 
+            // do not pad if already contains padding characters
             if (encodedBase64.IndexOf(Base64Padding) != -1)
-                throw new ArgumentException(paramName: encodedBase64,
-                    message: "The supplied base64-encoded string already contains padding characters.");
+                return encodedBase64;
 
             // based from https://stackoverflow.com/a/1228744
             var padding = (4 - (encodedBase64.Length % 4)) % 4;
