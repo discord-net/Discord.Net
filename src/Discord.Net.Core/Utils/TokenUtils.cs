@@ -17,6 +17,49 @@ namespace Discord
         /// </remarks>
         internal const int MinBotTokenLength = 58;
 
+        internal const char Base64Padding = '=';
+
+        /// <summary>
+        ///     Pads a base64-encoded string with 0, 1, or 2 '=' characters,
+        ///     if the string is not a valid multiple of 4.
+        ///     Does not ensure that the provided string contains only valid base64 characters.
+        /// </summary>
+        /// <remarks>
+        ///     A string that would require 3 padding characters is considered to be already corrupt.
+        ///     Some older bot tokens may require padding, as the format provided by Discord
+        ///     does not include this padding in the token.
+        /// </remarks>
+        /// <param name="encodedBase64">The base64 encoded string to pad with characters. </param>
+        /// <returns>A string containing the base64 padding.</returns>
+        /// <exception cref="FormatException">
+        ///     Thrown if <paramref name="encodedBase64"/> would require an invalid number of padding characters.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///     Thrown if <paramref name="encodedBase64"/> is null, empty, or whitespace.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        ///     Thrown if the given input string already contains padding characters.
+        /// </exception>
+        internal static string PadBase64String(string encodedBase64)
+        {
+            if (string.IsNullOrWhiteSpace(encodedBase64))
+                throw new ArgumentNullException(paramName: encodedBase64,
+                    message: "The supplied base64-encoded string was null or whitespace.");
+
+            if (encodedBase64.IndexOf(Base64Padding) != -1)
+                throw new ArgumentException(paramName: encodedBase64,
+                    message: "The supplied base64-encoded string already contains padding characters.");
+
+            // based from https://stackoverflow.com/a/1228744
+            var padding = (4 - (encodedBase64.Length % 4)) % 4;
+            if (padding == 3)
+                // can never have 3 characters of padding
+                throw new FormatException("The provided base64 string is corrupt, as it requires an invalid amount of padding.");
+            else if (padding == 0)
+                return encodedBase64;
+            return encodedBase64.PadRight(encodedBase64.Length + padding, Base64Padding);
+        }
+
         /// <summary>
         ///     Decodes a base 64 encoded string into a ulong value.
         /// </summary>
@@ -29,6 +72,8 @@ namespace Discord
 
             try
             {
+                // re-add base64 padding if missing
+                encoded = PadBase64String(encoded);
                 // decode the base64 string
                 var bytes = Convert.FromBase64String(encoded);
                 var idStr = Encoding.UTF8.GetString(bytes);
@@ -46,7 +91,7 @@ namespace Discord
             }
             catch (ArgumentException)
             {
-                // ignore exception, can be thrown by BitConverter
+                // ignore exception, can be thrown by BitConverter, or by PadBase64String
             }
             return null;
         }
