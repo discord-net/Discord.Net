@@ -58,7 +58,6 @@ namespace Discord.WebSocket
                 case ChannelType.Category:
                     return SocketCategoryChannel.Create(guild, state, model);
                 default:
-                    // TODO: Proper implementation for channel categories
                     return new SocketGuildChannel(guild.Discord, model.Id, guild);
             }
         }
