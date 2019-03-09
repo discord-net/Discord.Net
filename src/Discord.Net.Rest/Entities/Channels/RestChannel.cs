@@ -23,6 +23,7 @@ namespace Discord.Rest
         {
             switch (model.Type)
             {
+                case ChannelType.News:
                 case ChannelType.Text:
                 case ChannelType.Voice:
                     return RestGuildChannel.Create(discord, new RestGuild(discord, model.GuildId.Value), model);

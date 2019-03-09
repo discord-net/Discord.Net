@@ -48,6 +48,9 @@ namespace Discord.WebSocket
         {
             switch (model.Type)
             {
+                case ChannelType.News:
+                    // TODO: create new SocketNewsChannel
+                    throw new NotImplementedException();
                 case ChannelType.Text:
                     return SocketTextChannel.Create(guild, state, model);
                 case ChannelType.Voice:
