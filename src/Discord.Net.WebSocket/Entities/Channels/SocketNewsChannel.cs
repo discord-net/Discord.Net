@@ -19,5 +19,6 @@ namespace Discord.WebSocket
             entity.Update(state, model);
             return entity;
         }
+        //TODO: Need to set custom channel properties for this type, as apparently it does not support slow mode or overwrites.
     }
 }

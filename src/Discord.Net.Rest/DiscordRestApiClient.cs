@@ -377,6 +377,15 @@ namespace Discord.API
             Preconditions.NotNullOrEmpty(args.Name, nameof(args.Name));
             Preconditions.AtLeast(args.SlowModeInterval, 0, nameof(args.SlowModeInterval));
             Preconditions.AtMost(args.SlowModeInterval, 120, nameof(args.SlowModeInterval));
+            if (args.Type.IsSpecified)
+            {
+                // can only change Text/NewsChannel into a Text or News
+                var warn = "You may not change a Text or News channel into a Voice, Group, DM, or Category channel.";
+                Preconditions.NotEqual((uint)args.Type.Value, (uint)ChannelType.Voice, nameof(args.Type), warn);
+                Preconditions.NotEqual((uint)args.Type.Value, (uint)ChannelType.Group, nameof(args.Type), warn);
+                Preconditions.NotEqual((uint)args.Type.Value, (uint)ChannelType.DM, nameof(args.Type), warn);
+                Preconditions.NotEqual((uint)args.Type.Value, (uint)ChannelType.Category, nameof(args.Type), warn);
+            }
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
