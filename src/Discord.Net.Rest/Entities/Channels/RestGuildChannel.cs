@@ -35,8 +35,7 @@ namespace Discord.Rest
             switch (model.Type)
             {
                 case ChannelType.News:
-                    // TODO: create new RestNewsChannel
-                    throw new NotImplementedException();
+                    return RestNewsChannel.Create(discord, guild, model);
                 case ChannelType.Text:
                     return RestTextChannel.Create(discord, guild, model);
                 case ChannelType.Voice:
