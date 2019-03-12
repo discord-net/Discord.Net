@@ -14,8 +14,8 @@ namespace Discord
         ///     Sends a message to this message channel.
         /// </summary>
         /// <example>
-        ///     The following example sends a message with the current system time in RFC 1123 format to the channel and
-        ///     deletes itself after 5 seconds.
+        ///     <para>The following example sends a message with the current system time in RFC 1123 format to the channel and
+        ///     deletes itself after 5 seconds.</para>
         ///     <code language="cs" region="SendMessageAsync"
         ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
         /// </example>
@@ -63,8 +63,8 @@ namespace Discord
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
         /// <example>
-        ///     The following example uploads a streamed image that will be called <c>b1nzy.jpg</c> embedded inside a
-        ///     rich embed to the channel.
+        ///     <para>The following example uploads a streamed image that will be called <c>b1nzy.jpg</c> embedded inside a
+        ///     rich embed to the channel.</para>
         ///     <code language="cs" region="SendFileAsync.FileStream.EmbeddedImage"
         ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
         /// </example>
@@ -121,8 +121,8 @@ namespace Discord
         ///     of flattening.
         /// </remarks>
         /// <example>
-        ///     The following example downloads 300 messages and gets messages that belong to the user 
-        ///     <c>53905483156684800</c>.
+        ///     <para>The following example downloads 300 messages and gets messages that belong to the user 
+        ///     <c>53905483156684800</c>.</para>
         ///     <code language="cs" region="GetMessagesAsync.FromLimit.Standard"
         ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
         /// </example>
@@ -198,7 +198,7 @@ namespace Discord
         ///     of flattening.
         /// </remarks>
         /// <example>
-        ///     The following example gets 5 message prior to a specific message, <c>oldMessage</c>.
+        ///     <para>The following example gets 5 message prior to a specific message, <c>oldMessage</c>.</para>
         ///     <code language="cs" region="GetMessagesAsync.FromMessage"
         ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
         /// </example>
@@ -253,7 +253,7 @@ namespace Discord
         ///     object is disposed.
         /// </summary>
         /// <example>
-        ///     The following example keeps the client in the typing state until <c>LongRunningAsync</c> has finished.
+        ///     <para>The following example keeps the client in the typing state until <c>LongRunningAsync</c> has finished.</para>
         ///     <code language="cs" region="EnterTypingState"
         ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
         /// </example>
