@@ -1,10 +1,10 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    internal class ModifyVoiceChannelParams : ModifyGuildChannelParams
+    internal class ModifyVoiceChannelParams : ModifyNestedChannelParams
     {
         [JsonProperty("bitrate")]
         public Optional<int> Bitrate { get; set; }

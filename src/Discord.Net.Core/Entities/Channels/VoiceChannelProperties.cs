@@ -3,7 +3,7 @@ namespace Discord
     /// <summary>
     ///     Provides properties that are used to modify an <see cref="IVoiceChannel" /> with the specified changes.
     /// </summary>
-    public class VoiceChannelProperties : GuildChannelProperties
+    public class VoiceChannelProperties : NestedChannelProperties
     {
         /// <summary>
         ///     Gets or sets the bitrate of the voice connections in this channel. Must be greater than 8000.
