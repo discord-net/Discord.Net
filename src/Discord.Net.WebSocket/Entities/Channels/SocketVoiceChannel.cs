@@ -32,7 +32,7 @@ namespace Discord.WebSocket
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
         /// <inheritdoc />
         public Task SyncPermissionsAsync(RequestOptions options = null)
-            => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
+            => ChannelHelper.SyncPermissionsAsync(this, Client, options);
 
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuildUser> Users
@@ -44,7 +44,7 @@ namespace Discord.WebSocket
         }
         internal new static SocketVoiceChannel Create(SocketGuild guild, ClientState state, Model model)
         {
-            var entity = new SocketVoiceChannel(guild.Discord, model.Id, guild);
+            var entity = new SocketVoiceChannel(guild.Client, model.Id, guild);
             entity.Update(state, model);
             return entity;
         }
@@ -59,7 +59,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
-            => ChannelHelper.ModifyAsync(this, Discord, func, options);
+            => ChannelHelper.ModifyAsync(this, Client, func, options);
 
         /// <inheritdoc />
         public async Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false)
@@ -83,10 +83,10 @@ namespace Discord.WebSocket
         //Invites
         /// <inheritdoc />
         public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
+            => await ChannelHelper.CreateInviteAsync(this, Client, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
         /// <inheritdoc />
         public async Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
-            => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
+            => await ChannelHelper.GetInvitesAsync(this, Client, options).ConfigureAwait(false);
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
         internal new SocketVoiceChannel Clone() => MemberwiseClone() as SocketVoiceChannel;

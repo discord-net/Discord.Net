@@ -35,7 +35,7 @@ namespace Discord.WebSocket
             throw new NotSupportedException();
 
         internal SocketWebhookUser(SocketGuild guild, ulong id, ulong webhookId)
-            : base(guild.Discord, id)
+            : base(guild.Client, id)
         {
             Guild = guild;
             WebhookId = webhookId;

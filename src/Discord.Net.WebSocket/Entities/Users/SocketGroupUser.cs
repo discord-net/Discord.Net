@@ -31,14 +31,14 @@ namespace Discord.WebSocket
         public override bool IsWebhook => false;
 
         internal SocketGroupUser(SocketGroupChannel channel, SocketGlobalUser globalUser)
-            : base(channel.Discord, globalUser.Id)
+            : base(channel.Client, globalUser.Id)
         {
             Channel = channel;
             GlobalUser = globalUser;
         }
         internal static SocketGroupUser Create(SocketGroupChannel channel, ClientState state, Model model)
         {
-            var entity = new SocketGroupUser(channel, channel.Discord.GetOrCreateUser(state, model));
+            var entity = new SocketGroupUser(channel, channel.Client.GetOrCreateUser(state, model));
             entity.Update(state, model);
             return entity;
         }

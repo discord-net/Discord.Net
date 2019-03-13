@@ -42,7 +42,7 @@ namespace Discord.WebSocket
         ///     Gets mutual guilds shared with this user.
         /// </summary>
         public IReadOnlyCollection<SocketGuild> MutualGuilds
-            => Discord.Guilds.Where(g => g.Users.Any(u => u.Id == Id)).ToImmutableArray();
+            => Client.Guilds.Where(g => g.Users.Any(u => u.Id == Id)).ToImmutableArray();
 
         internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
@@ -80,7 +80,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public async Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
-            => GlobalUser.DMChannel ?? await UserHelper.CreateDMChannelAsync(this, Discord, options).ConfigureAwait(false) as IDMChannel;
+            => GlobalUser.DMChannel ?? await UserHelper.CreateDMChannelAsync(this, Client, options).ConfigureAwait(false) as IDMChannel;
 
         /// <inheritdoc />
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)

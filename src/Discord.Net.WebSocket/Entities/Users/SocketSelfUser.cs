@@ -68,7 +68,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public Task ModifyAsync(Action<SelfUserProperties> func, RequestOptions options = null)
-            => UserHelper.ModifyAsync(this, Discord, func, options);
+            => UserHelper.ModifyAsync(this, Client, func, options);
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Self)";
         internal new SocketSelfUser Clone() => MemberwiseClone() as SocketSelfUser;

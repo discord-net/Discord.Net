@@ -139,7 +139,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
-            => MessageHelper.DeleteAsync(this, Discord, options);
+            => MessageHelper.DeleteAsync(this, Client, options);
 
         /// <summary>
         ///     Gets the content of the message.

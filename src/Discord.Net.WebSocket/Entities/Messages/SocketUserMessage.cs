@@ -41,7 +41,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketUser> MentionedUsers => MessageHelper.FilterTagsByValue<SocketUser>(TagType.UserMention, _tags);
         /// <inheritdoc />
-        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emote).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
+        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emote).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Client.CurrentUser.Id) });
 
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author, MessageSource source)
             : base(discord, id, channel, author, source)
@@ -106,7 +106,7 @@ namespace Discord.WebSocket
                     {
                         var val = value[i];
                         if (val.Object != null)
-                            newMentions.Add(SocketUnknownUser.Create(Discord, state, val.Object));
+                            newMentions.Add(SocketUnknownUser.Create(Client, state, val.Object));
                     }
                     mentions = newMentions.ToImmutable();
                 }
@@ -138,27 +138,27 @@ namespace Discord.WebSocket
         /// <exception cref="InvalidOperationException">Only the author of a message may modify the message.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
-            => MessageHelper.ModifyAsync(this, Discord, func, options);
+            => MessageHelper.ModifyAsync(this, Client, func, options);
 
         /// <inheritdoc />
         public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
-            => MessageHelper.AddReactionAsync(this, emote, Discord, options);
+            => MessageHelper.AddReactionAsync(this, emote, Client, options);
         /// <inheritdoc />
         public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null)
-            => MessageHelper.RemoveReactionAsync(this, user, emote, Discord, options);
+            => MessageHelper.RemoveReactionAsync(this, user, emote, Client, options);
         /// <inheritdoc />
         public Task RemoveAllReactionsAsync(RequestOptions options = null)
-            => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
+            => MessageHelper.RemoveAllReactionsAsync(this, Client, options);
         /// <inheritdoc />
         public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit, RequestOptions options = null)
-            => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, options);
+            => MessageHelper.GetReactionUsersAsync(this, emote, limit, Client, options);
 
         /// <inheritdoc />
         public Task PinAsync(RequestOptions options = null)
-            => MessageHelper.PinAsync(this, Discord, options);
+            => MessageHelper.PinAsync(this, Client, options);
         /// <inheritdoc />
         public Task UnpinAsync(RequestOptions options = null)
-            => MessageHelper.UnpinAsync(this, Discord, options);
+            => MessageHelper.UnpinAsync(this, Client, options);
 
         public string Resolve(int startIndex, TagHandling userHandling = TagHandling.Name, TagHandling channelHandling = TagHandling.Name,
             TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)

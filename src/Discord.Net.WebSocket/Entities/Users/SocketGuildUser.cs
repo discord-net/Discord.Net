@@ -102,27 +102,27 @@ namespace Discord.WebSocket
         }
 
         internal SocketGuildUser(SocketGuild guild, SocketGlobalUser globalUser)
-            : base(guild.Discord, globalUser.Id)
+            : base(guild.Client, globalUser.Id)
         {
             Guild = guild;
             GlobalUser = globalUser;
         }
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, UserModel model)
         {
-            var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model));
+            var entity = new SocketGuildUser(guild, guild.Client.GetOrCreateUser(state, model));
             entity.Update(state, model);
             entity.UpdateRoles(new ulong[0]);
             return entity;
         }
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, MemberModel model)
         {
-            var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
+            var entity = new SocketGuildUser(guild, guild.Client.GetOrCreateUser(state, model.User));
             entity.Update(state, model);
             return entity;
         }
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, PresenceModel model)
         {
-            var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
+            var entity = new SocketGuildUser(guild, guild.Client.GetOrCreateUser(state, model.User));
             entity.Update(state, model, false);
             return entity;
         }
@@ -159,22 +159,22 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null)
-            => UserHelper.ModifyAsync(this, Discord, func, options);
+            => UserHelper.ModifyAsync(this, Client, func, options);
         /// <inheritdoc />
         public Task KickAsync(string reason = null, RequestOptions options = null)
-            => UserHelper.KickAsync(this, Discord, reason, options);
+            => UserHelper.KickAsync(this, Client, reason, options);
         /// <inheritdoc />
         public Task AddRoleAsync(IRole role, RequestOptions options = null)
             => AddRolesAsync(new[] { role }, options);
         /// <inheritdoc />
         public Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
-            => UserHelper.AddRolesAsync(this, Discord, roles, options);
+            => UserHelper.AddRolesAsync(this, Client, roles, options);
         /// <inheritdoc />
         public Task RemoveRoleAsync(IRole role, RequestOptions options = null)
             => RemoveRolesAsync(new[] { role }, options);
         /// <inheritdoc />
         public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
-            => UserHelper.RemoveRolesAsync(this, Discord, roles, options);
+            => UserHelper.RemoveRolesAsync(this, Client, roles, options);
 
         /// <inheritdoc />
         public ChannelPermissions GetPermissions(IGuildChannel channel)

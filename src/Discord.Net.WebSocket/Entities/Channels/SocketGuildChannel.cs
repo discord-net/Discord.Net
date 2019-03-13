@@ -56,7 +56,7 @@ namespace Discord.WebSocket
                     return SocketCategoryChannel.Create(guild, state, model);
                 default:
                     // TODO: Proper implementation for channel categories
-                    return new SocketGuildChannel(guild.Discord, model.Id, guild);
+                    return new SocketGuildChannel(guild.Client, model.Id, guild);
             }
         }
         /// <inheritdoc />
@@ -74,10 +74,10 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null)
-            => ChannelHelper.ModifyAsync(this, Discord, func, options);
+            => ChannelHelper.ModifyAsync(this, Client, func, options);
         /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
-            => ChannelHelper.DeleteAsync(this, Discord, options);
+            => ChannelHelper.DeleteAsync(this, Client, options);
 
         /// <summary>
         ///     Gets the permission overwrite for a specific user.
@@ -123,7 +123,7 @@ namespace Discord.WebSocket
         /// </returns>
         public async Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null)
         {
-            await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, user, permissions, options).ConfigureAwait(false);
+            await ChannelHelper.AddPermissionOverwriteAsync(this, Client, user, permissions, options).ConfigureAwait(false);
             _overwrites = _overwrites.Add(new Overwrite(user.Id, PermissionTarget.User, new OverwritePermissions(permissions.AllowValue, permissions.DenyValue)));
         }
 
@@ -138,7 +138,7 @@ namespace Discord.WebSocket
         /// </returns>
         public async Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null)
         {
-            await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, role, permissions, options).ConfigureAwait(false);
+            await ChannelHelper.AddPermissionOverwriteAsync(this, Client, role, permissions, options).ConfigureAwait(false);
             _overwrites = _overwrites.Add(new Overwrite(role.Id, PermissionTarget.Role, new OverwritePermissions(permissions.AllowValue, permissions.DenyValue)));
         }
         /// <summary>
@@ -151,7 +151,7 @@ namespace Discord.WebSocket
         /// </returns>
         public async Task RemovePermissionOverwriteAsync(IUser user, RequestOptions options = null)
         {
-            await ChannelHelper.RemovePermissionOverwriteAsync(this, Discord, user, options).ConfigureAwait(false);
+            await ChannelHelper.RemovePermissionOverwriteAsync(this, Client, user, options).ConfigureAwait(false);
 
             for (int i = 0; i < _overwrites.Length; i++)
             {
@@ -172,7 +172,7 @@ namespace Discord.WebSocket
         /// </returns>
         public async Task RemovePermissionOverwriteAsync(IRole role, RequestOptions options = null)
         {
-            await ChannelHelper.RemovePermissionOverwriteAsync(this, Discord, role, options).ConfigureAwait(false);
+            await ChannelHelper.RemovePermissionOverwriteAsync(this, Client, role, options).ConfigureAwait(false);
 
             for (int i = 0; i < _overwrites.Length; i++)
             {

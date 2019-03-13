@@ -5,13 +5,13 @@ namespace Discord.WebSocket
     public abstract class SocketEntity<T> : IEntity<T>
         where T : IEquatable<T>
     {
-        internal DiscordSocketClient Discord { get; }
+        public DiscordSocketClient Client { get; }
         /// <inheritdoc />
         public T Id { get; }
 
         internal SocketEntity(DiscordSocketClient discord, T id)
         {
-            Discord = discord;
+            Client = discord;
             Id = id;
         }
     }

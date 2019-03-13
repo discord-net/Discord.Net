@@ -53,7 +53,7 @@ namespace Discord.Audio
         public ulong ChannelId { get; internal set; }
         internal byte[] SecretKey { get; private set; }
 
-        private DiscordSocketClient Discord => Guild.Discord;
+        private DiscordSocketClient Discord => Guild.Client;
         public ConnectionState ConnectionState => _connection.State;
 
         /// <summary> Creates a new REST/WebSocket discord client. </summary>

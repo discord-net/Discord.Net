@@ -52,7 +52,7 @@ namespace Discord.WebSocket
             => Guild.Users.Where(x => x.Roles.Any(r => r.Id == Id));
 
         internal SocketRole(SocketGuild guild, ulong id)
-            : base(guild.Discord, id)
+            : base(guild.Client, id)
         {
             Guild = guild;
         }
@@ -75,10 +75,10 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
-            => RoleHelper.ModifyAsync(this, Discord, func, options);
+            => RoleHelper.ModifyAsync(this, Client, func, options);
         /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
-            => RoleHelper.DeleteAsync(this, Discord, options);
+            => RoleHelper.DeleteAsync(this, Client, options);
 
         /// <summary>
         ///     Gets the name of the role.
