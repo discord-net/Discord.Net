@@ -1,19 +1,19 @@
 steps:
-- task: DotNetCoreCLI@2
-  inputs:
-    command: restore
-    projects: 'Discord.Net.sln'
+- script: dotnet restore -v minimal Discord.Net.sln
+  displayName: Restore packages
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: build
-    projects: 'Discord.Net.sln'
-    configuration: $(buildConfiguration)
-    arguments: '/p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)'
+- script: dotnet build "Discord.Net.sln" --no-restore -v minimal -c $(buildConfiguration) /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
+  displayName: Build projects
+  condition: succeeded()
 
-- task: DotNetCoreCLI@2
+- script: dotnet test "test/Discord.Net.Tests/Discord.Net.Tests.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) --logger trx 
+  # TODO: update this to support multiple tests
+  displayName: Test projects
+  condition: succeeded()
+
+- task: PublishTestResults@2
+  displayName: Publish test results
+  condition: succeededOrFailed()
   inputs:
-    command: test
-    projects: './test/**/*.csproj'
-    configuration: $(buildConfiguration)
-    nobuild: True
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'

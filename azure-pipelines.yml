@@ -11,15 +11,20 @@ jobs:
   steps:
   - template: azure/build.yml
 
-- job: Windows
+- job: Windows (Non-deploy)
   pool:
     vmImage: 'vs2017-win2016'
   steps:
   - template: azure/build.yml
-  - script: echo deploy
-    # TODO: condition check for dev branch
-    condition: |
+
+- job: Windows (Deploy)
+  pool:
+    vmImage: 'vs2017-win2016'
+  condition: |
       and (
         succeeded(),
         eq(variables['Build.SourceBranch'], 'refs/heads/ci/azure')
       )
+  steps:
+  - template: azure/build.yml
+  - template: azure/deploy.yml
