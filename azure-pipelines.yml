@@ -1,7 +1,7 @@
 variables:
   buildConfiguration: Release
   buildTag: $[ startsWith(variables['Build.SourceBranch'], 'refs/tags') ]
-  buildNumber: $[ variables('Build.BuildNumber') ]
+  buildNumber: $[ variables['Build.BuildNumber'] ]
 
 
 jobs:
