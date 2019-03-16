@@ -16,4 +16,10 @@ jobs:
     vmImage: 'vs2017-win2016'
   steps:
   - template: azure/build.yml
-  - template: azure/deploy.yml
+  - script: echo deploy
+    # TODO: condition check for dev branch
+    condition: |
+      and (
+        succeeded(),
+        eq(variables['Build.SourceBranch'], 'refs/heads/ci/azure')
+      )
