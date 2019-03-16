@@ -5,6 +5,9 @@ using Xunit;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Tests for the <see cref="Discord.TokenUtils"/> methods.
+    /// </summary>
     public class TokenUtilsTests
     {
         /// <summary>
@@ -18,14 +21,14 @@ namespace Discord
         [InlineData(" ")]
         [InlineData("    ")]
         [InlineData("\t")]
-        public void TestNullOrWhitespaceToken(string token)
+        public void NullOrWhitespaceToken(string token)
         {
             // an ArgumentNullException should be thrown, regardless of the TokenType
             Assert.Throws<ArgumentNullException>(() => TokenUtils.ValidateToken(TokenType.Bearer, token));
             Assert.Throws<ArgumentNullException>(() => TokenUtils.ValidateToken(TokenType.Bot, token));
             Assert.Throws<ArgumentNullException>(() => TokenUtils.ValidateToken(TokenType.Webhook, token));
         }
-        
+
         /// <summary>
         ///     Tests the behavior of <see cref="TokenUtils.ValidateToken(TokenType, string)"/>
         ///     to see that valid Webhook tokens do not throw Exceptions.
@@ -39,7 +42,7 @@ namespace Discord
         [InlineData("6qrZcUqja7812RVdnEKjpzOL4CvHBFG")]
         // client secret
         [InlineData("937it3ow87i4ery69876wqire")]
-        public void TestWebhookTokenDoesNotThrowExceptions(string token)
+        public void WebhookTokenDoesNotThrowExceptions(string token)
         {
             TokenUtils.ValidateToken(TokenType.Webhook, token);
         }
@@ -59,7 +62,7 @@ namespace Discord
         [InlineData("6qrZcUqja7812RVdnEKjpzOL4CvHBFG")]
         // client secret
         [InlineData("937it3ow87i4ery69876wqire")]
-        public void TestBearerTokenDoesNotThrowExceptions(string token)
+        public void BearerTokenDoesNotThrowExceptions(string token)
         {
             TokenUtils.ValidateToken(TokenType.Bearer, token);
         }
@@ -77,9 +80,7 @@ namespace Discord
         // 59 char token
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWs")]
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWss")]
-        // simulated token with a very old user id
-        [InlineData("ODIzNjQ4MDEzNTAxMDcxMzY=.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKW")]
-        public void TestBotTokenDoesNotThrowExceptions(string token)
+        public void BotTokenDoesNotThrowExceptions(string token)
         {
             // This example token is pulled from the Discord Docs
             // https://discordapp.com/developers/docs/reference#authentication-example-bot-token-authorization-header
@@ -102,7 +103,7 @@ namespace Discord
         [InlineData("This is an invalid token, but it passes the check for string length.")]
         // valid token, but passed in twice
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWsMTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWs")]
-        public void TestBotTokenInvalidThrowsArgumentException(string token)
+        public void BotTokenInvalidThrowsArgumentException(string token)
         {
             Assert.Throws<ArgumentException>(() => TokenUtils.ValidateToken(TokenType.Bot, token));
         }
@@ -122,7 +123,7 @@ namespace Discord
         [InlineData(-1)]
         [InlineData(4)]
         [InlineData(7)]
-        public void TestUnrecognizedTokenType(int type)
+        public void UnrecognizedTokenType(int type)
         {
             Assert.Throws<ArgumentException>(() =>
                 TokenUtils.ValidateToken((TokenType)type, "MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWs"));
@@ -144,7 +145,7 @@ namespace Discord
         // should not throw an unexpected exception
         [InlineData("", false)]
         [InlineData(null, false)]
-        public void TestCheckBotTokenValidity(string token, bool expected)
+        public void CheckBotTokenValidity(string token, bool expected)
         {
             Assert.Equal(expected, TokenUtils.CheckBotTokenValidity(token));
         }
@@ -153,54 +154,18 @@ namespace Discord
         // cannot pass a ulong? as a param in InlineData, so have to have a separate param
         // indicating if a value is null
         [InlineData("NDI4NDc3OTQ0MDA5MTk1NTIw", false, 428477944009195520)]
-        // user id that has base 64 '=' padding
-        [InlineData("ODIzNjQ4MDEzNTAxMDcxMzY=", false, 82364801350107136)]
-        // user id that does not have '=' padding, and needs it
-        [InlineData("ODIzNjQ4MDEzNTAxMDcxMzY", false, 82364801350107136)]
         // should return null w/o throwing other exceptions
         [InlineData("", true, 0)]
         [InlineData(" ", true, 0)]
         [InlineData(null, true, 0)]
         [InlineData("these chars aren't allowed @U#)*@#!)*", true, 0)]
-        public void TestDecodeBase64UserId(string encodedUserId, bool isNull, ulong expectedUserId)
+        public void DecodeBase64UserId(string encodedUserId, bool isNull, ulong expectedUserId)
         {
             var result = TokenUtils.DecodeBase64UserId(encodedUserId);
             if (isNull)
                 Assert.Null(result);
             else
                 Assert.Equal(expectedUserId, result);
-        }
-
-        [Theory]
-        [InlineData("QQ", "QQ==")] // "A" encoded
-        [InlineData("QUE", "QUE=")] // "AA"
-        [InlineData("QUFB", "QUFB")] // "AAA"
-        [InlineData("QUFBQQ", "QUFBQQ==")] // "AAAA"
-        [InlineData("QUFBQUFB", "QUFBQUFB")] // "AAAAAA"
-        // strings that already contain padding will be returned, even if invalid
-        [InlineData("QUFBQQ==", "QUFBQQ==")]
-        [InlineData("QUFBQQ=", "QUFBQQ=")]
-        [InlineData("=", "=")]
-        public void TestPadBase64String(string input, string expected)
-        {
-            Assert.Equal(expected, TokenUtils.PadBase64String(input));
-        }
-
-        [Theory]
-        // no null, empty, or whitespace
-        [InlineData("", typeof(ArgumentNullException))]
-        [InlineData(" ", typeof(ArgumentNullException))]
-        [InlineData("\t", typeof(ArgumentNullException))]
-        [InlineData(null, typeof(ArgumentNullException))]
-        // cannot require 3 padding chars
-        [InlineData("A", typeof(FormatException))]
-        [InlineData("QUFBQ", typeof(FormatException))]
-        public void TestPadBase64StringException(string input, Type type)
-        {
-            Assert.Throws(type, () =>
-            {
-                TokenUtils.PadBase64String(input);
-            });
         }
     }
 }
