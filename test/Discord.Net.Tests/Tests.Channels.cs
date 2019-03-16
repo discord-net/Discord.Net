@@ -2,7 +2,7 @@ using Discord.Rest;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-
+#if IXTEST
 namespace Discord
 {
     public partial class Tests
@@ -215,3 +215,4 @@ namespace Discord
         }
     }
 }
+#endif
