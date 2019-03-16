@@ -17,7 +17,6 @@ jobs:
   steps:
   - template: azure/build.yml
   - template: azure/deploy.yml
-    # TODO: condition check for dev branch
     condition: |
       and (
         succeeded(),
