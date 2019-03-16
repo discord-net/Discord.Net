@@ -1,0 +1,12 @@
+steps:
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'pack'
+    projects: 'Discord.Net.sln'
+    configuration: $(buildConfiguration)
+    nobuild: True
+    arguments: '/p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)'
+
+    # TODO: build nuspec
+
+- task: PublishBuildArtifacts@1

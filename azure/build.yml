@@ -1,0 +1,19 @@
+steps:
+- task: DotNetCoreCLI@2
+  inputs:
+    command: restore
+    projects: 'Discord.Net.sln'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: build
+    projects: 'Discord.Net.sln'
+    configuration: $(buildConfiguration)
+    arguments: '/p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: test
+    projects: './test/**/*.csproj'
+    configuration: $(buildConfiguration)
+    nobuild: True
