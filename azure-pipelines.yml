@@ -11,13 +11,13 @@ jobs:
   steps:
   - template: azure/build.yml
 
-- job: Windows (Non-deploy)
+- job: Windows without deploy
   pool:
     vmImage: 'vs2017-win2016'
   steps:
   - template: azure/build.yml
 
-- job: Windows (Deploy)
+- job: Windows with deploy
   pool:
     vmImage: 'vs2017-win2016'
   condition: |
