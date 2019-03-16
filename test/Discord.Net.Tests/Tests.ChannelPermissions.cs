@@ -75,7 +75,8 @@ namespace Discord
                 | ChannelPermission.DeafenMembers
                 | ChannelPermission.MoveMembers
                 | ChannelPermission.UseVAD
-                | ChannelPermission.ManageRoles);
+                | ChannelPermission.ManageRoles
+                | ChannelPermission.PrioritySpeaker);
 
             Assert.Equal(voiceChannel, ChannelPermissions.Voice.RawValue);
 
