@@ -17,8 +17,3 @@ jobs:
   steps:
   - template: azure/build.yml
   - template: azure/deploy.yml
-    condition: |
-      and (
-        succeeded(),
-        eq(variables['Build.SourceBranch'], 'refs/heads/ci/azure')
-      )

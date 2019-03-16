@@ -10,3 +10,9 @@ steps:
     # TODO: build nuspec
 
 - task: PublishBuildArtifacts@1
+
+condition: |
+  and (
+    succeeded(),
+    eq(variables['Build.SourceBranch'], 'refs/heads/ci/azure')
+  )
