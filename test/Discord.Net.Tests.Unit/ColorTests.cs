@@ -1,8 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Text;
 using Xunit;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Tests for the <see cref="Discord.Color"/> type.
+    /// </summary>
     public class ColorTests
     {
         [Fact]
