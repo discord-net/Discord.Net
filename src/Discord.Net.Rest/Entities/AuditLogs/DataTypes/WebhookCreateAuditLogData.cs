@@ -10,9 +10,10 @@ namespace Discord.Rest
     /// </summary>
     public class WebhookCreateAuditLogData : IAuditLogData
     {
-        private WebhookCreateAuditLogData(IWebhook webhook, WebhookType type, string name, ulong channelId)
+        private WebhookCreateAuditLogData(IWebhook webhook, ulong webhookId, WebhookType type, string name, ulong channelId)
         {
             Webhook = webhook;
+            WebhookId = webhookId;
             Name = name;
             Type = type;
             ChannelId = channelId;
@@ -31,22 +32,30 @@ namespace Discord.Rest
             var name = nameModel.NewValue.ToObject<string>(discord.ApiClient.Serializer);
 
             var webhookInfo = log.Webhooks?.FirstOrDefault(x => x.Id == entry.TargetId);
-            var webhook = RestWebhook.Create(discord, (IGuild)null, webhookInfo);
+            var webhook = webhookInfo == null ? null : RestWebhook.Create(discord, (IGuild)null, webhookInfo);
 
-            return new WebhookCreateAuditLogData(webhook, type, name, channelId);
+            return new WebhookCreateAuditLogData(webhook, entry.TargetId.Value, type, name, channelId);
         }
 
         // Doc Note: Corresponds to the *current* data
 
         /// <summary>
-        ///     Gets the webhook that was created.
+        ///     Gets the webhook that was created if it still exists.
         /// </summary>
         /// <returns>
-        ///     A webhook object representing the webhook that was created.
+        ///     A webhook object representing the webhook that was created if it still exists, otherwise returns <c>null</c>.
         /// </returns>
         public IWebhook Webhook { get; }
 
         // Doc Note: Corresponds to the *audit log* data
+
+        /// <summary>
+        ///     Gets the webhook id.
+        /// </summary>
+        /// <returns>
+        ///     The webhook identifier.
+        /// </returns>
+        public ulong WebhookId { get; }
 
         /// <summary>
         ///     Gets the type of webhook that was created.
