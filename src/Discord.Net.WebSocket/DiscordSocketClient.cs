@@ -83,7 +83,7 @@ namespace Discord.WebSocket
         ///     </note>
         /// </remarks>
         /// <returns>
-        ///     An collection of DM channels that have been opened in this session.
+        ///     A collection of DM channels that have been opened in this session.
         /// </returns>
         public IReadOnlyCollection<SocketDMChannel> DMChannels
             => State.PrivateChannels.OfType<SocketDMChannel>().ToImmutableArray();
@@ -98,7 +98,7 @@ namespace Discord.WebSocket
         ///     </note>
         /// </remarks>
         /// <returns>
-        ///     An collection of group channels that have been opened in this session.
+        ///     A collection of group channels that have been opened in this session.
         /// </returns>
         public IReadOnlyCollection<SocketGroupChannel> GroupChannels
             => State.PrivateChannels.OfType<SocketGroupChannel>().ToImmutableArray();
