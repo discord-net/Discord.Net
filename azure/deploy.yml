@@ -9,7 +9,13 @@ steps:
     dotnet pack "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "../../artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
   displayName: Pack projects
 
-  # TODO: build nuspec
+- script: nuget pack src/Discord.Net/Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix=""
+  displayName: Pack metapackage (release mode)
+  condition: eq(variables['buildTag'], True)
+
+- script: nuget pack src/Discord.Net/Discord.Net.nuspec -OutputDirectory "artifacts" -properties suffix="-$(buildNumber)"
+  displayName: Pack metapackage
+  condition: eq(variables['buildTag'], False)
 
 - task: NuGetCommand@2
   displayName: Push to NuGet
