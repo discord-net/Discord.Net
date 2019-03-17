@@ -17,5 +17,4 @@ steps:
     command: push
     nuGetFeedType: external
     packagesToPush: 'artifacts/*.nupkg'
-    vstsFeed: $(mygetFeedUri)
-    publishFeedCredentials: $(mygetFeedAuth)
+    vstsFeed: myget-foxbot
