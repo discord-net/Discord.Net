@@ -1,12 +1,12 @@
 steps:
 - script: |
-    dotnet pack "src\Discord.Net.Core\Discord.Net.Core.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
-    dotnet pack "src\Discord.Net.Rest\Discord.Net.Rest.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
-    dotnet pack "src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
-    dotnet pack "src\Discord.Net.Commands\Discord.Net.Commands.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
-    dotnet pack "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
-    dotnet pack "src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
-    dotnet pack "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
+    dotnet pack "src\Discord.Net.Core\Discord.Net.Core.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "../../artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
+    dotnet pack "src\Discord.Net.Rest\Discord.Net.Rest.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "../../artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
+    dotnet pack "src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "../../artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
+    dotnet pack "src\Discord.Net.Commands\Discord.Net.Commands.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "../../artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
+    dotnet pack "src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "../../artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
+    dotnet pack "src\Discord.Net.Providers.WS4Net\Discord.Net.Providers.WS4Net.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "../../artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
+    dotnet pack "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "../../artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
   displayName: Pack projects
 
   # TODO: build nuspec
@@ -17,3 +17,5 @@ steps:
     command: push
     nuGetFeedType: external
     packagesToPush: 'artifacts/*.nupkg'
+    vstsFeed: $(mygetFeedUri)
+    publishFeedCredentials: $(mygetFeedAuth)
