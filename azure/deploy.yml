@@ -29,4 +29,4 @@ steps:
     command: push
     nuGetFeedType: external
     packagesToPush: 'artifacts/*.nupkg'
-    publishFeedCredentials: myget-foxbot
+    publishFeedCredentials: myget-discord

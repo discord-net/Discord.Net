@@ -14,7 +14,7 @@ jobs:
 - job: Windows_build
   pool:
     vmImage: 'vs2017-win2016'
-  condition: ne(variables['Build.SourceBranch'], 'refs/heads/ci/azure')
+  condition: ne(variables['Build.SourceBranch'], 'refs/heads/dev')
   steps:
   - template: azure/build.yml
 
@@ -24,7 +24,7 @@ jobs:
   condition: |
       and (
         succeeded(),
-        eq(variables['Build.SourceBranch'], 'refs/heads/ci/azure')
+        eq(variables['Build.SourceBranch'], 'refs/heads/dev')
       )
   steps:
   - template: azure/build.yml
