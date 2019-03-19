@@ -22,6 +22,7 @@ namespace Discord
             Guild = guild;
         }
 
+        // IGuildEmote
         public bool IsManaged { get; set; }
         public bool RequireColons { get; set; }
         public IReadOnlyList<IRole> Roles { get; set; }
@@ -29,12 +30,14 @@ namespace Discord
         public string Name { get; set; }
         public IGuild Guild { get; set; }
 
-        // IMentionable
-        public string Mention => EmoteUtilities.FormatGuildEmote(Id, Name);
+        // ITaggable
+        public string Tag => EmoteUtilities.FormatGuildEmote(Id, Name);
 
+        // IDeleteable
         public Task DeleteAsync()
             => Discord.Rest.DeleteGuildEmojiAsync(Guild.Id, Id);
 
+        // IGuildEmote
         public Task ModifyAsync() // TODO
         {
             throw new System.NotImplementedException();

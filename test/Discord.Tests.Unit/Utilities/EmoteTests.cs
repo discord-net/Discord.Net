@@ -1,4 +1,3 @@
-using System;
 using Xunit;
 
 namespace Discord.Tests.Unit
@@ -9,9 +8,10 @@ namespace Discord.Tests.Unit
         public void Parse()
         {
             string input = "<:gopher:243902586946715658>";
-            var (resultId, resultName) = EmoteUtilities.ParseGuildEmote(input);
-            Assert.Equal(243902586946715658UL, resultId);
-            Assert.Equal("gopher", resultName);
+            var success = EmoteUtilities.TryParseGuildEmote(input, out var result);
+            var (id, name) = result;
+            Assert.Equal(243902586946715658UL, id);
+            Assert.Equal("gopher", name);
         }
 
         [Theory]
@@ -21,7 +21,8 @@ namespace Discord.Tests.Unit
         [InlineData("<:foo>")]
         public void Parse_Fail(string data)
         {
-            Assert.Throws<ArgumentException>(() => EmoteUtilities.ParseGuildEmote(data));
+            var success = EmoteUtilities.TryParseGuildEmote(data, out _);
+            Assert.False(success);
         }
 
         [Fact]

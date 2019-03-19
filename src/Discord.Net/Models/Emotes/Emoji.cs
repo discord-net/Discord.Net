@@ -9,6 +9,6 @@ namespace Discord
         }
 
         public string Name { get; set; }
-        public string Mention => Name;
+        public string Tag => Name;
     }
 }

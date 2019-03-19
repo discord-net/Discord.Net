@@ -7,21 +7,28 @@ namespace Discord
         public static string FormatGuildEmote(ulong id, string name)
             => $"<:{name}:{id}>";
 
-        public static (ulong, string) ParseGuildEmote(string formatted)
+        // TODO: perf: bench whether this should be passed by ref (in)
+        public static bool TryParseGuildEmote(ReadOnlySpan<char> formatted, out (ulong, string) result)
         {
-            if (formatted.IndexOf('<') != 0 || formatted.IndexOf(':') != 1 || formatted.IndexOf('>') != formatted.Length-1)
-                throw new ArgumentException("passed string does not match a guild emote format", nameof(formatted)); // TODO: grammar
+            result = default;
 
-            int closingIndex = formatted.IndexOf(':', 2);
+            if (formatted.IndexOf('<') != 0 || formatted.IndexOf(':') != 1 || formatted.IndexOf('>') != formatted.Length - 1)
+                return false;
+
+            int closingIndex = formatted.LastIndexOf(':');
             if (closingIndex < 0)
-                throw new ArgumentException("passed string does not match a guild emote format", nameof(formatted));
+                return false;
 
-            string name = formatted.Substring(2, closingIndex-2);
-            string idStr = formatted.Substring(closingIndex + 1);
-            idStr = idStr.Substring(0, idStr.Length - 1); // ignore closing >
-            ulong id = ulong.Parse(idStr); // TODO: TryParse here?
+            ReadOnlySpan<char> name = formatted.Slice(2, closingIndex-2);
+            ReadOnlySpan<char> idStr = formatted.Slice(closingIndex + 1, formatted.Length - (name.Length + 4));
+            idStr = idStr.Slice(0, idStr.Length - 1); // ignore closing >
 
-            return (id, name);
+            if (!ulong.TryParse(idStr.ToString(), out ulong id))
+                return false;
+
+            result = (id, name.ToString());
+
+            return true;
         }
     }
 }

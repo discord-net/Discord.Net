@@ -31,7 +31,7 @@ namespace Discord
         public string Name { get; set; }
         public GuildPermissions Permissions { get; set; }
         public int Position { get; set; }
-        public string Mention => throw new NotImplementedException(); // TODO: MentionUtils
+        public string Tag => throw new NotImplementedException(); // TODO: MentionUtils
 
         public Task DeleteAsync()
             => Discord.Rest.DeleteGuildRoleAsync(Guild.Id, Id);

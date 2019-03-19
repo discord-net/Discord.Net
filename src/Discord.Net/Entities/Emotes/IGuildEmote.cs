@@ -3,13 +3,17 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary>
+    ///     An emote attached to a guild. This differs from an <see cref="IEmote"/> in that it contains
+    ///     information relevant to the source guild.
+    /// </summary>
     public interface IGuildEmote : IEmote, ISnowflakeEntity, IDeletable
     {
         /// <summary>
         ///     Gets whether this emoji is managed by an integration.
         /// </summary>
         /// <returns>
-        ///     A boolean that determines whether or not this emote is managed by a Twitch integration.
+        ///     A boolean that determines whether or not this emote is managed by an external integration, such as Twitch.
         /// </returns>
         bool IsManaged { get; }
         /// <summary>
