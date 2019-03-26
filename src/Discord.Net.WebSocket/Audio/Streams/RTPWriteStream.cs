@@ -15,7 +15,7 @@ namespace Discord.Audio.Streams
         private uint _nextTimestamp;
         private bool _hasHeader;
 
-        public RTPWriteStream(AudioStream next, uint ssrc, int bufferSize = 4000)
+        internal RTPWriteStream(AudioStream next, uint ssrc, int bufferSize = 4000)
         {
             _next = next;
             _ssrc = ssrc;
@@ -28,12 +28,20 @@ namespace Discord.Audio.Streams
             _header[10] = (byte)(_ssrc >> 8);
             _header[11] = (byte)(_ssrc >> 0);
         }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _next?.Dispose();
+            }
+            base.Dispose(disposing);
+        }
 
         public override void WriteHeader(ushort seq, uint timestamp, bool missed)
         {
             if (_hasHeader)
                 throw new InvalidOperationException("Header received with no payload");
-                
+
             _hasHeader = true;
             _nextSeq = seq;
             _nextTimestamp = timestamp;

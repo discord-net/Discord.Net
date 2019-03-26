@@ -15,12 +15,21 @@ namespace Discord.Audio.Streams
         private int _partialFramePos;
         private ushort _seq;
         private uint _timestamp;
-        
-        public OpusEncodeStream(AudioStream next, int bitrate, AudioApplication application, int packetLoss)
+
+        internal OpusEncodeStream(AudioStream next, int bitrate, AudioApplication application, int packetLoss)
         {
             _next = next;
             _encoder = new OpusEncoder(bitrate, application, packetLoss);
             _buffer = new byte[OpusConverter.FrameBytes];
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _encoder.Dispose();
+                _next.Dispose();
+            }
+            base.Dispose(disposing);
         }
 
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
@@ -85,14 +94,6 @@ namespace Discord.Audio.Streams
         public override async Task ClearAsync(CancellationToken cancelToken)
         {
             await _next.ClearAsync(cancelToken).ConfigureAwait(false);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            if (disposing)
-                _encoder.Dispose();
         }
     }
 }

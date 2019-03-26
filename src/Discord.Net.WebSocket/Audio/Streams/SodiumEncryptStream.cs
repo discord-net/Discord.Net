@@ -16,11 +16,19 @@ namespace Discord.Audio.Streams
         private ushort _nextSeq;
         private uint _nextTimestamp;
 
-        public SodiumEncryptStream(AudioStream next, IAudioClient client)
+        internal SodiumEncryptStream(AudioStream next, IAudioClient client)
         {
             _next = next;
             _client = (AudioClient)client;
             _nonce = new byte[24];
+        }
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _next?.Dispose();
+            }
+            base.Dispose(disposing);
         }
 
         /// <exception cref="InvalidOperationException">Header received with no payload.</exception>
@@ -45,7 +53,7 @@ namespace Discord.Audio.Streams
 
             if (_client.SecretKey == null)
                 return;
-                
+
             Buffer.BlockCopy(buffer, offset, _nonce, 0, 12); //Copy nonce from RTP header
             count = SecretBox.Encrypt(buffer, offset + 12, count - 12, buffer, 12, _nonce, _client.SecretKey);
             _next.WriteHeader(_nextSeq, _nextTimestamp, false);

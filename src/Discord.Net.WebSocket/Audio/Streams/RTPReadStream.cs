@@ -14,7 +14,7 @@ namespace Discord.Audio.Streams
         public override bool CanSeek => false;
         public override bool CanWrite => true;
 
-        public RTPReadStream(AudioStream next, int bufferSize = 4000)
+        internal RTPReadStream(AudioStream next, int bufferSize = 4000)
         {
             _next = next;
             _buffer = new byte[bufferSize];
@@ -46,7 +46,7 @@ namespace Discord.Audio.Streams
             ssrc = 0;
             if (buffer.Length - offset < 12)
                 return false;
-                
+
             int version = (buffer[offset + 0] & 0b1100_0000) >> 6;
             if (version != 2)
                 return false;
@@ -71,8 +71,8 @@ namespace Discord.Audio.Streams
                 return 12 + csics * 4;
 
             int extensionOffset = offset + 12 + (csics * 4);
-            int extensionLength = 
-                (buffer[extensionOffset + 2] << 8) | 
+            int extensionLength =
+                (buffer[extensionOffset + 2] << 8) |
                 (buffer[extensionOffset + 3]);
             return extensionOffset + 4 + (extensionLength * 4);
         }

@@ -23,7 +23,7 @@ namespace Discord.Audio.Streams
         public override bool CanWrite => false;
         public override int AvailableFrames => _signal.CurrentCount;
 
-        public InputStream()
+        internal InputStream()
         {
             _frames = new ConcurrentQueue<RTPFrame>();
             _signal = new SemaphoreSlim(0, MaxFrames);

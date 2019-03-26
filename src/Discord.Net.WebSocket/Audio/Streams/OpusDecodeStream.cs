@@ -15,7 +15,7 @@ namespace Discord.Audio.Streams
         private bool _nextMissed;
         private bool _hasHeader;
 
-        public OpusDecodeStream(AudioStream next)
+        internal OpusDecodeStream(AudioStream next)
         {
             _next = next;
             _buffer = new byte[OpusConverter.FrameBytes];
@@ -26,7 +26,7 @@ namespace Discord.Audio.Streams
         public override void WriteHeader(ushort seq, uint timestamp, bool missed)
         {
             if (_hasHeader)
-                throw new InvalidOperationException("Header received with no payload.");                
+                throw new InvalidOperationException("Header received with no payload.");
             _hasHeader = true;
 
             _nextMissed = missed;

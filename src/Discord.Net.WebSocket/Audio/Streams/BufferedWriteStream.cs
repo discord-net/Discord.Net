@@ -38,7 +38,7 @@ namespace Discord.Audio.Streams
         private bool _isPreloaded;
         private int _silenceFrames;
 
-        public BufferedWriteStream(AudioStream next, IAudioClient client, int bufferMillis, CancellationToken cancelToken, int maxFrameSize = 1500)
+        internal BufferedWriteStream(AudioStream next, IAudioClient client, int bufferMillis, CancellationToken cancelToken, int maxFrameSize = 1500)
             : this(next, client as AudioClient, bufferMillis, cancelToken, null, maxFrameSize) { }
         internal BufferedWriteStream(AudioStream next, AudioClient client, int bufferMillis, CancellationToken cancelToken, Logger logger, int maxFrameSize = 1500)
         {
@@ -69,6 +69,13 @@ namespace Discord.Audio.Streams
                 _disposeTokenSource?.Dispose();
                 _cancelTokenSource?.Dispose();
                 _queueLock?.Dispose();
+                try
+                {
+                    _task.GetAwaiter().GetResult();
+                }
+                catch (OperationCanceledException)
+                { /* no-op */ }
+                _next?.Dispose();
             }
             base.Dispose(disposing);
         }

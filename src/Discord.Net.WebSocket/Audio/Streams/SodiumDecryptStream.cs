@@ -17,7 +17,7 @@ namespace Discord.Audio.Streams
         public override bool CanSeek => false;
         public override bool CanWrite => true;
 
-        public SodiumDecryptStream(AudioStream next, IAudioClient client)
+        internal SodiumDecryptStream(AudioStream next, IAudioClient client)
         {
             _next = next;
             _client = (AudioClient)client;
