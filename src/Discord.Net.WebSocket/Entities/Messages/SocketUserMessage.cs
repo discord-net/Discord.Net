@@ -18,9 +18,9 @@ namespace Discord.WebSocket
         private readonly List<SocketReaction> _reactions = new List<SocketReaction>();
         private bool _isMentioningEveryone, _isTTS, _isPinned;
         private long? _editedTimestampTicks;
-        private ImmutableArray<Attachment> _attachments;
-        private ImmutableArray<Embed> _embeds;
-        private ImmutableArray<ITag> _tags;
+        private ImmutableArray<Attachment> _attachments = ImmutableArray.Create<Attachment>();
+        private ImmutableArray<Embed> _embeds = ImmutableArray.Create<Embed>();
+        private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
         
         /// <inheritdoc />
         public override bool IsTTS => _isTTS;
