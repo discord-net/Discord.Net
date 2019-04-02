@@ -46,7 +46,6 @@ namespace Discord.Rest
                 Topic = args.Topic,
                 IsNsfw = args.IsNsfw,
                 SlowModeInterval = args.SlowModeInterval,
-                Type = args.Type
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }

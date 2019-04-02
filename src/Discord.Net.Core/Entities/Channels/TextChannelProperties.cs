@@ -38,15 +38,5 @@ namespace Discord
         /// </remarks>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the value does not fall within [0, 120].</exception>
         public Optional<int> SlowModeInterval { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the type of channel.
-        ///     Only setting to a <see cref="ChannelType.News"/> is supported.
-        /// </summary>
-        /// <remarks>
-        ///     Setting this value to a different type will change the type of channel that is associated with this Id.
-        /// </remarks>
-        /// <exception cref="ArgumentException">Thrown if the type of channel that is being set is not valid.</exception>
-        public Optional<ChannelType> Type { get; set; }
     }
 }
