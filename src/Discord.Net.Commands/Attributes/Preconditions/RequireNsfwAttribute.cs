@@ -30,6 +30,7 @@ namespace Discord.Commands
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RequireNsfwAttribute : PreconditionAttribute
     {
+        /// <inheritdoc />
         public override string ErrorMessage { get; set; }
 
         /// <inheritdoc />
