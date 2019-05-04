@@ -40,9 +40,10 @@ public async Task SendRichEmbedAsync()
         .WithTitle("I overwrote \"Hello world!\"")
         .WithDescription("I am a description.")
         .WithUrl("https://example.com")
-        .WithCurrentTimestamp()
-        .Build();
-    await ReplyAsync(embed: embed);
+        .WithCurrentTimestamp();
+        
+    //Your embed needs to be built before it is able to be sent
+    await ReplyAsync(embed: embed.Build());
 }
 ```
 
