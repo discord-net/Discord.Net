@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.Logging;
 using Discord.Rest;
@@ -26,6 +27,12 @@ namespace Discord.Webhook
         /// <summary> Creates a new Webhook Discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken)
             : this(webhookId, webhookToken, new DiscordRestConfig()) { }
+        /// <summary> Creates a new Webhook Discord client. </summary>
+        public DiscordWebhookClient(string webhookUrl)
+            : this(webhookUrl, new DiscordRestConfig()) { }
+
+        // regex pattern to match webhook urls
+        private static Regex WebhookUrlRegex = new Regex(@"^.*discordapp\.com\/api\/webhooks\/([\d]+)\/([a-z0-9_-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <summary> Creates a new Webhook Discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken, DiscordRestConfig config)
@@ -41,6 +48,21 @@ namespace Discord.Webhook
         {
             Webhook = webhook;
             _webhookId = Webhook.Id;
+        }
+
+        /// <summary>
+        ///     Creates a new Webhook Discord client.
+        /// </summary>
+        /// <param name="webhookUrl">The url of the webhook.</param>
+        /// <param name="config">The configuration options to use for this client.</param>
+        /// <exception cref="ArgumentException">Thrown if the <paramref name="webhookUrl"/> is an invalid format.</exception>
+        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="webhookUrl"/> is null or whitespace.</exception>
+        public DiscordWebhookClient(string webhookUrl, DiscordRestConfig config) : this(config)
+        {
+            string token;
+            ParseWebhookUrl(webhookUrl, out _webhookId, out token);
+            ApiClient.LoginAsync(TokenType.Webhook, token).GetAwaiter().GetResult();
+            Webhook = WebhookClientHelper.GetWebhookAsync(this, _webhookId).GetAwaiter().GetResult();
         }
 
         private DiscordWebhookClient(DiscordRestConfig config)
@@ -93,6 +115,32 @@ namespace Discord.Webhook
         public void Dispose()
         {
             ApiClient?.Dispose();
+        }
+
+        internal static void ParseWebhookUrl(string webhookUrl, out ulong webhookId, out string webhookToken)
+        {
+            if (string.IsNullOrWhiteSpace(webhookUrl))
+                throw new ArgumentNullException(paramName: nameof(webhookUrl), message:
+                    "The given webhook Url cannot be null or whitespace.");
+
+            // thrown when groups are not populated/valid, or when there is no match
+            ArgumentException ex(string reason = null)
+                => new ArgumentException(paramName: nameof(webhookUrl), message:
+                $"The given webhook Url was not in a valid format. {reason}");
+            var match = WebhookUrlRegex.Match(webhookUrl);
+            if (match != null)
+            {
+                // ensure that the first group is a ulong, set the _webhookId
+                // 0th group is always the entire match, so start at index 1
+                if (!(match.Groups[1].Success && ulong.TryParse(match.Groups[1].Value, out webhookId)))
+                    throw ex("The webhook Id could not be parsed.");
+
+                if (!match.Groups[2].Success)
+                    throw ex("The webhook token could not be parsed.");
+                webhookToken = match.Groups[2].Value;
+            }
+            else
+                throw ex();
         }
     }
 }

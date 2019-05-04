@@ -19,6 +19,7 @@
     <ProjectReference Include="../../src/Discord.Net.Core/Discord.Net.Core.csproj" />
     <ProjectReference Include="../../src/Discord.Net.Rest/Discord.Net.Rest.csproj" />
     <ProjectReference Include="../../src/Discord.Net.Analyzers/Discord.Net.Analyzers.csproj" />
+    <ProjectReference Include="..\..\src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Akavache" Version="6.0.31" />
