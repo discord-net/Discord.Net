@@ -21,7 +21,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string Topic { get; private set; }
         /// <inheritdoc />
-        public int SlowModeInterval { get; private set; }
+        public virtual int SlowModeInterval { get; private set; }
         /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
         /// <summary>
@@ -33,7 +33,7 @@ namespace Discord.WebSocket
         public ICategoryChannel Category
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
         /// <inheritdoc />
-        public Task SyncPermissionsAsync(RequestOptions options = null)
+        public virtual Task SyncPermissionsAsync(RequestOptions options = null)
             => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
 
         private bool _nsfw;

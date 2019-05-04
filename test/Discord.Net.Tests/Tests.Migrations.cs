@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Discord.Rest;
-
+#if IXTEST
 namespace Discord
 {
     public partial class TestsFixture
@@ -70,3 +70,4 @@ namespace Discord
         }
     }
 }
+#endif

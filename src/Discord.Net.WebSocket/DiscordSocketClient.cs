@@ -83,7 +83,7 @@ namespace Discord.WebSocket
         ///     </note>
         /// </remarks>
         /// <returns>
-        ///     An collection of DM channels that have been opened in this session.
+        ///     A collection of DM channels that have been opened in this session.
         /// </returns>
         public IReadOnlyCollection<SocketDMChannel> DMChannels
             => State.PrivateChannels.OfType<SocketDMChannel>().ToImmutableArray();
@@ -98,7 +98,7 @@ namespace Discord.WebSocket
         ///     </note>
         /// </remarks>
         /// <returns>
-        ///     An collection of group channels that have been opened in this session.
+        ///     A collection of group channels that have been opened in this session.
         /// </returns>
         public IReadOnlyCollection<SocketGroupChannel> GroupChannels
             => State.PrivateChannels.OfType<SocketGroupChannel>().ToImmutableArray();
@@ -1173,9 +1173,13 @@ namespace Discord.WebSocket
                                         {
                                             if (guild != null)
                                             {
-                                                author = data.Member.IsSpecified // member isn't always included, but use it when we can
-                                                    ? guild.AddOrUpdateUser(data.Member.Value)
-                                                    : guild.AddOrUpdateUser(data.Author.Value); // user has no guild-specific data
+                                                if (data.Member.IsSpecified) // member isn't always included, but use it when we can
+                                                {
+                                                    data.Member.Value.User = data.Author.Value;
+                                                    author = guild.AddOrUpdateUser(data.Member.Value);
+                                                }
+                                                else
+                                                    author = guild.AddOrUpdateUser(data.Author.Value); // user has no guild-specific data
                                             }
                                             else if (channel is SocketGroupChannel)
                                                 author = (channel as SocketGroupChannel).GetOrAddUser(data.Author.Value);

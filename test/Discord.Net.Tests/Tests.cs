@@ -2,7 +2,8 @@ using System;
 using Discord.Net;
 using Discord.Rest;
 using Xunit;
-
+// TODO: re-enable ix testing at a later date
+#if IXTEST
 namespace Discord
 {
     public partial class TestsFixture : IDisposable
@@ -51,3 +52,4 @@ namespace Discord
         }
     }
 }
+#endif
