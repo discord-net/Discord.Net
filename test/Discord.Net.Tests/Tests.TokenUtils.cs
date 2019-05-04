@@ -77,6 +77,8 @@ namespace Discord
         // 59 char token
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWs")]
         [InlineData("MTk4NjIyNDgzNDcxOTI1MjQ4.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKWss")]
+        // simulated token with a very old user id
+        [InlineData("ODIzNjQ4MDEzNTAxMDcxMzY=.Cl2FMQ.ZnCjm1XVW7vRze4b7Cq4se7kKW")]
         public void TestBotTokenDoesNotThrowExceptions(string token)
         {
             // This example token is pulled from the Discord Docs
@@ -151,6 +153,10 @@ namespace Discord
         // cannot pass a ulong? as a param in InlineData, so have to have a separate param
         // indicating if a value is null
         [InlineData("NDI4NDc3OTQ0MDA5MTk1NTIw", false, 428477944009195520)]
+        // user id that has base 64 '=' padding
+        [InlineData("ODIzNjQ4MDEzNTAxMDcxMzY=", false, 82364801350107136)]
+        // user id that does not have '=' padding, and needs it
+        [InlineData("ODIzNjQ4MDEzNTAxMDcxMzY", false, 82364801350107136)]
         // should return null w/o throwing other exceptions
         [InlineData("", true, 0)]
         [InlineData(" ", true, 0)]
@@ -163,6 +169,38 @@ namespace Discord
                 Assert.Null(result);
             else
                 Assert.Equal(expectedUserId, result);
+        }
+
+        [Theory]
+        [InlineData("QQ", "QQ==")] // "A" encoded
+        [InlineData("QUE", "QUE=")] // "AA"
+        [InlineData("QUFB", "QUFB")] // "AAA"
+        [InlineData("QUFBQQ", "QUFBQQ==")] // "AAAA"
+        [InlineData("QUFBQUFB", "QUFBQUFB")] // "AAAAAA"
+        // strings that already contain padding will be returned, even if invalid
+        [InlineData("QUFBQQ==", "QUFBQQ==")]
+        [InlineData("QUFBQQ=", "QUFBQQ=")]
+        [InlineData("=", "=")]
+        public void TestPadBase64String(string input, string expected)
+        {
+            Assert.Equal(expected, TokenUtils.PadBase64String(input));
+        }
+
+        [Theory]
+        // no null, empty, or whitespace
+        [InlineData("", typeof(ArgumentNullException))]
+        [InlineData(" ", typeof(ArgumentNullException))]
+        [InlineData("\t", typeof(ArgumentNullException))]
+        [InlineData(null, typeof(ArgumentNullException))]
+        // cannot require 3 padding chars
+        [InlineData("A", typeof(FormatException))]
+        [InlineData("QUFBQ", typeof(FormatException))]
+        public void TestPadBase64StringException(string input, Type type)
+        {
+            Assert.Throws(type, () =>
+            {
+                TokenUtils.PadBase64String(input);
+            });
         }
     }
 }

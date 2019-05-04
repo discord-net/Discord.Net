@@ -12,6 +12,8 @@ namespace Discord
         /// <summary> The channel is a group channel. </summary>
         Group = 3,
         /// <summary> The channel is a category channel. </summary>
-        Category = 4
+        Category = 4,
+        /// <summary> The channel is a news channel. </summary>
+        News = 5
     }
 }
