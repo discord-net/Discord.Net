@@ -128,7 +128,7 @@ namespace Discord.API
                 RestClient.SetCancelToken(_loginCancelToken.Token);
 
                 AuthTokenType = tokenType;
-                AuthToken = token;
+                AuthToken = token.Trim();
                 if (tokenType != TokenType.Webhook)
                     RestClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, AuthToken));
 
