@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Text;
 
 namespace Discord
@@ -120,6 +122,25 @@ namespace Discord
         }
 
         /// <summary>
+        ///     The set of all characters that are not allowed inside of a token.
+        /// </summary>
+        internal static char[] IllegalTokenCharacters = new char[]
+        {
+            ' ', '\t', '\r', '\n'
+        };
+
+        /// <summary>
+        ///     Checks if the given token contains a whitespace or newline character
+        ///     that would fail to log in.
+        /// </summary>
+        /// <param name="token"> The token to validate. </param>
+        /// <returns>
+        ///     True if the token contains a whitespace or newline character.
+        /// </returns>
+        internal static bool CheckContainsIllegalCharacters(string token)
+            => token.IndexOfAny(IllegalTokenCharacters) != -1;
+
+        /// <summary>
         ///     Checks the validity of the supplied token of a specific type.
         /// </summary>
         /// <param name="tokenType"> The type of token to validate. </param>
@@ -131,6 +152,9 @@ namespace Discord
             // A Null or WhiteSpace token of any type is invalid.
             if (string.IsNullOrWhiteSpace(token))
                 throw new ArgumentNullException(paramName: nameof(token), message: "A token cannot be null, empty, or contain only whitespace.");
+            // ensure that there are no whitespace or newline characters
+            if (CheckContainsIllegalCharacters(token))
+                throw new ArgumentException(message: "The token contains a whitespace or newline character. Ensure that the token has been properly trimmed.", paramName: nameof(token));
 
             switch (tokenType)
             {
