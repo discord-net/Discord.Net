@@ -17,7 +17,12 @@ namespace Discord.Commands
         ///     Gets the specified <see cref="Discord.ChannelPermission" /> of the precondition.
         /// </summary>
         public ChannelPermission? ChannelPermission { get; }
+        /// <inheritdoc />
         public override string ErrorMessage { get; set; }
+        /// <summary>
+        ///     Gets or sets the error message if the precondition
+        ///     fails due to being run outside of a Guild channel.
+        /// </summary>
         public string NotAGuildErrorMessage { get; set; }
 
         /// <summary>
