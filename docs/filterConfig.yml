@@ -5,3 +5,6 @@ apiRules:
 - exclude:
     uidRegex: ^Discord\.Analyzers$
     type: Namespace
+- exclude:
+    uidRegex: ^Discord\.API$
+    type: Namespace

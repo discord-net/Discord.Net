@@ -31,22 +31,33 @@ The following is the feed link of Discord.Net,
 Depending on which IDE you use, there are many different ways of
 adding the feed to your package source.
 
-### [Visual Studio](#tab/vs)
+### [Using Visual Studio](#tab/vs)
 
 1. Go to `Tools` > `NuGet Package Manager` > `Package Manager Settings`
+
     ![VS](images/nightlies-vs-step1.png)
+
 2. Go to `Package Sources`
+
     ![Package Sources](images/nightlies-vs-step2.png)
+
 3. Click on the add icon
 4. Fill in the desired name and source as shown below and hit `Update`
+
     ![Add Source](images/nightlies-vs-step4.png)
 
 > [!NOTE]
-> Remember to tick the `Include prerelease` checkbox to see the
+> Remember to tick the `Include pre-release` checkbox to see the
 > nightly builds!
 > ![Checkbox](images/nightlies-vs-note.png)
 
-### [Local NuGet.Config](#tab/local-nuget-config)
+### [Using dotnet CLI](#tab/cli)
+
+1. Launch your terminal
+2. Navigate to where your `*.csproj` is located
+3. Type `dotnet add package Discord.Net --source https://www.myget.org/F/discord-net/api/v3/index.json`
+
+### [Using Local NuGet.Config](#tab/local-nuget-config)
 
 If you plan on deploying your bot or developing outside of Visual
 Studio, you will need to create a local NuGet configuration file for

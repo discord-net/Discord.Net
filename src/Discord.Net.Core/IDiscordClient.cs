@@ -63,7 +63,7 @@ namespace Discord
         ///     Gets a generic channel.
         /// </summary>
         /// <example>
-        ///     <code lang="cs" title="Example method">
+        ///     <code language="cs" title="Example method">
         ///     var channel = await _client.GetChannelAsync(381889909113225237);
         ///     if (channel != null &amp;&amp; channel is IMessageChannel msgChannel)
         ///     {
@@ -194,7 +194,7 @@ namespace Discord
         ///     Gets a user.
         /// </summary>
         /// <example>
-        ///     <code lang="cs" title="Example method">
+        ///     <code language="cs" title="Example method">
         ///     var user = await _client.GetUserAsync(168693960628371456);
         ///     if (user != null)
         ///         Console.WriteLine($"{user} is created at {user.CreatedAt}.";
@@ -212,7 +212,7 @@ namespace Discord
         ///     Gets a user.
         /// </summary>
         /// <example>
-        ///     <code lang="cs" title="Example method">
+        ///     <code language="cs" title="Example method">
         ///    var user = await _client.GetUserAsync("Still", "2876");
         ///    if (user != null)
         ///        Console.WriteLine($"{user} is created at {user.CreatedAt}.";
@@ -232,7 +232,7 @@ namespace Discord
         /// </summary>
         /// <example>
         ///     The following example gets the most optimal voice region from the collection.
-        ///     <code lang="cs">
+        ///     <code language="cs">
         ///         var regions = await client.GetVoiceRegionsAsync();
         ///         var optimalRegion = regions.FirstOrDefault(x =&gt; x.IsOptimal);
         ///     </code>

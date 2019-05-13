@@ -535,7 +535,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <example>
         ///     The following example creates a new text channel under an existing category named <c>Wumpus</c> with a set topic.
-        ///     <code lang="cs">
+        ///     <code language="cs">
         ///     var categories = await guild.GetCategoriesAsync();
         ///     var targetCategory = categories.FirstOrDefault(x => x.Name == "wumpus");
         ///     if (targetCategory == null) return;

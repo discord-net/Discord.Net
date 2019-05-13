@@ -39,15 +39,8 @@ namespace Discord.Commands
         ///     Occurs when a command is successfully executed without any error.
         /// </summary>
         /// <remarks>
-        ///     <para>
-        ///         This event is fired when a command has been successfully executed without any of the following errors:
-        ///     </para>
-        ///         <para>* Parsing error</para>
-        ///         <para>* Precondition error</para>
-        ///         <para>* Runtime exception</para>
-        ///     <para>
-        ///         Should the command encounter any of the aforementioned error, this event will not be raised.
-        ///     </para>
+        ///     This event is fired when a command has been executed, successfully or not. When a command fails to
+        ///     execute during parsing or precondition stage, the CommandInfo may not be returned.
         /// </remarks>
         public event Func<Optional<CommandInfo>, ICommandContext, IResult, Task> CommandExecuted { add { _commandExecutedEvent.Add(value); } remove { _commandExecutedEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<Optional<CommandInfo>, ICommandContext, IResult, Task>> _commandExecutedEvent = new AsyncEvent<Func<Optional<CommandInfo>, ICommandContext, IResult, Task>>();
