@@ -109,6 +109,7 @@ namespace Discord
         public virtual Task StopAsync()
         {
             Cancel();
+            _task?.ConfigureAwait(false).GetAwaiter().GetResult();
             return Task.CompletedTask;
         }
 
