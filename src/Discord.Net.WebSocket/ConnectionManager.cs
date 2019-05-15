@@ -106,11 +106,13 @@ namespace Discord
                 finally { _stateLock.Release(); }
             });
         }
-        public virtual Task StopAsync()
+
+        public virtual async Task StopAsync()
         {
             Cancel();
-            _task?.ConfigureAwait(false).GetAwaiter().GetResult();
-            return Task.CompletedTask;
+
+            if (_task != null)
+                await _task.ConfigureAwait(false);
         }
 
         private async Task ConnectAsync(CancellationTokenSource reconnectCancelToken)
