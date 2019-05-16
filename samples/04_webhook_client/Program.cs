@@ -16,8 +16,8 @@ namespace _04_webhook_client
         {
             // The webhook url follows the format https://discordapp.com/api/webhooks/{id}/{token}
             // Because anyone with the webhook URL can use your webhook
-            // you should NOT hard code the URL or ID + token into your application.
-            using (var client = new DiscordWebhookClient(webhookId: 0, webhookToken: ""))
+            // you should NOT hard code the URL or ID + token into your application. 
+            using (var client = new DiscordWebhookClient("https://discordapp.com/api/webhooks/123/abc123"))
             {
                 var embed = new EmbedBuilder
                 {
