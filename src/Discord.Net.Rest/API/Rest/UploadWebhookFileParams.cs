@@ -22,6 +22,8 @@ namespace Discord.API.Rest
         public Optional<string> AvatarUrl { get; set; }
         public Optional<Embed[]> Embeds { get; set; }
 
+        public bool IsSpoiler { get; set; } = false;
+
         public UploadWebhookFileParams(Stream file)
         {
             File = file;
@@ -30,7 +32,11 @@ namespace Discord.API.Rest
         public IReadOnlyDictionary<string, object> ToDictionary()
         {
             var d = new Dictionary<string, object>();
-            d["file"] = new MultipartFile(File, Filename.GetValueOrDefault("unknown.dat"));
+            var filename = Filename.GetValueOrDefault("unknown.dat");
+            if (IsSpoiler && !filename.StartsWith(AttachmentExtensions.SpoilerPrefix))
+                filename = filename.Insert(0, AttachmentExtensions.SpoilerPrefix);
+
+            d["file"] = new MultipartFile(File, filename);
 
             var payload = new Dictionary<string, object>();
             if (Content.IsSpecified)
