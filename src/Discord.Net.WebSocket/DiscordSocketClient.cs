@@ -1375,13 +1375,13 @@ namespace Discord.WebSocket
                                             return;
                                         }
 
-                                        var cacheableList = ImmutableArray<Cacheable<IMessage, ulong>>.Empty;
+                                        var cacheableList = new List<Cacheable<IMessage, ulong>>(data.Ids.Length);
                                         foreach (ulong id in data.Ids)
                                         {
                                             var msg = SocketChannelHelper.RemoveMessage(channel, this, id);
                                             bool isCached = msg != null;
                                             var cacheable = new Cacheable<IMessage, ulong>(msg, id, isCached, async () => await channel.GetMessageAsync(id).ConfigureAwait(false));
-                                            cacheableList = cacheableList.Add(cacheable);
+                                            cacheableList.Add(cacheable);
 
                                             if (!ExclusiveBulkDelete ?? false) // this shouldn't happen, but we'll play it safe anyways
                                                 await TimedInvokeAsync(_messageDeletedEvent, nameof(MessageDeleted), cacheable, channel).ConfigureAwait(false);
