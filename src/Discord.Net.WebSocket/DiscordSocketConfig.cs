@@ -114,7 +114,7 @@ namespace Discord.WebSocket
         ///
         ///     If false, both events will be raised.
         ///
-        ///     If unset, both events will be raised, but a warning will be logged when hooking into the bulk delete event.
+        ///     If unset, both events will be raised, but a warning will be raised the first time a bulk delete event is received.
         /// </summary>
         public bool? ExclusiveBulkDelete { get; set; } = null;
 
