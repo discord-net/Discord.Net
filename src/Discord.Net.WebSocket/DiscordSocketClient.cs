@@ -66,7 +66,7 @@ namespace Discord.WebSocket
         internal WebSocketProvider WebSocketProvider { get; private set; }
         internal bool AlwaysDownloadUsers { get; private set; }
         internal int? HandlerTimeout { get; private set; }
-        internal bool UseMessagesBulkDeletedOnly { get; private set; }
+        internal bool? ExclusiveBulkDelete { get; private set; }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         /// <inheritdoc />
@@ -129,7 +129,7 @@ namespace Discord.WebSocket
             WebSocketProvider = config.WebSocketProvider;
             AlwaysDownloadUsers = config.AlwaysDownloadUsers;
             HandlerTimeout = config.HandlerTimeout;
-            UseMessagesBulkDeletedOnly = config.UseMessagesBulkDeletedOnly;
+            ExclusiveBulkDelete = config.ExclusiveBulkDelete;
             State = new ClientState(0, 0);
             Rest = new DiscordSocketRestClient(config, ApiClient);
             _heartbeatTimes = new ConcurrentQueue<long>();
@@ -1357,6 +1357,14 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE_BULK)").ConfigureAwait(false);
 
+                                    if (!ExclusiveBulkDelete.HasValue)
+                                    {
+                                        await _gatewayLogger.WarningAsync("A bulk delete event has been received, but the event handling behavior has not been set. " +
+                                            "To supress this message, set the ExclusiveBulkDelete configuration property. " +
+                                            "This message will appear only once.");
+                                        ExclusiveBulkDelete = false;
+                                    }
+
                                     var data = (payload as JToken).ToObject<MessageDeleteBulkEvent>(_serializer);
                                     if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
                                     {
@@ -1375,7 +1383,7 @@ namespace Discord.WebSocket
                                             var cacheable = new Cacheable<IMessage, ulong>(msg, id, isCached, async () => await channel.GetMessageAsync(id).ConfigureAwait(false));
                                             cacheableList = cacheableList.Add(cacheable);
 
-                                            if (!UseMessagesBulkDeletedOnly)
+                                            if (!ExclusiveBulkDelete ?? false) // this shouldn't happen, but we'll play it safe anyways
                                                 await TimedInvokeAsync(_messageDeletedEvent, nameof(MessageDeleted), cacheable, channel).ConfigureAwait(false);
                                         }
 
