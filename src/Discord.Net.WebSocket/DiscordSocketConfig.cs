@@ -107,6 +107,11 @@ namespace Discord.WebSocket
         public int? HandlerTimeout { get; set; } = 3000;
 
         /// <summary>
+        ///     Gets or sets whether or not <see cref="Discord.WebSocket.BaseSocketClient.MessageDeleted"/> is fired for each message on bulk delete.
+        /// </summary>
+        public bool UseMessagesBulkDeletedOnly { get; set; } = false;
+
+        /// <summary>
         ///     Initializes a default configuration.
         /// </summary>
         public DiscordSocketConfig()
