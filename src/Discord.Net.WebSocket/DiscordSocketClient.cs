@@ -1861,8 +1861,8 @@ namespace Discord.WebSocket
                 if (await Task.WhenAny(timeoutTask, handlersTask).ConfigureAwait(false) == timeoutTask)
                 {
                     await _gatewayLogger.WarningAsync($"A {name} handler is blocking the gateway task.").ConfigureAwait(false);
-                    await handlersTask.ConfigureAwait(false); //Ensure the handler completes
                 }
+                await handlersTask.ConfigureAwait(false); //Ensure the handler completes
             }
             catch (Exception ex)
             {
