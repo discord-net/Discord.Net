@@ -132,6 +132,10 @@ namespace Discord.WebSocket
             ExclusiveBulkDelete = config.ExclusiveBulkDelete;
             State = new ClientState(0, 0);
             Rest = new DiscordSocketRestClient(config, ApiClient);
+            Rest.Log += (log) =>
+            {
+                return _restLogger.LogAsync(log.Severity, log.Message, log.Exception);
+            };
             _heartbeatTimes = new ConcurrentQueue<long>();
 
             _stateLock = new SemaphoreSlim(1, 1);
@@ -202,6 +206,7 @@ namespace Discord.WebSocket
             }
             else
                 _voiceRegions = _parentClient._voiceRegions;
+            await Rest.OnLoginAsync(tokenType, token);
         }
         /// <inheritdoc />
         internal override async Task OnLogoutAsync()
@@ -209,6 +214,7 @@ namespace Discord.WebSocket
             await StopAsync().ConfigureAwait(false);
             _applicationInfo = null;
             _voiceRegions = ImmutableDictionary.Create<string, RestVoiceRegion>();
+            await Rest.OnLogoutAsync();
         }
 
         /// <inheritdoc />
