@@ -7,6 +7,15 @@ body {
     color: #dddddd;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #EEEEEE;
+}
+
 button,
 a {
     color: #64B5F6;
@@ -39,13 +48,13 @@ hr {
 }
 
 /* top navbar */
-.navbar-inverse[role="navigation"] {
+/*.navbar-inverse[role="navigation"] {
     background-color: #2C2F33;
-}
+}*/
 
 /* sub navbar (below top) */
 .subnav {
-    background: #282B2F
+    background: rgb(69, 75, 82)
 }
 
 
@@ -311,5 +320,5 @@ span.arrow-r{
 }
 
 .logo-switcher {
-    background: url("/marketing/logo/SVG/Combinationmark White.svg") no-repeat;
+    background: url("../marketing/logo/SVG/Combinationmark White.svg") no-repeat;
 }

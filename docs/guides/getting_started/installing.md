@@ -42,37 +42,45 @@ published to our [MyGet feed]. See
 
 ### [Using Visual Studio](#tab/vs-install)
 
-1. Create a new solution for your bot.
+1. Create a new solution for your bot
 2. In the Solution Explorer, find the "Dependencies" element under your
- bot's project.
-3. Right click on "Dependencies", and select "Manage NuGet packages."
- ![Step 3](images/install-vs-deps.png)
-4. In the "Browse" tab, search for `Discord.Net`.
-5. Install the `Discord.Net` package.
- ![Step 5](images/install-vs-nuget.png)
+ bot's project
+3. Right click on "Dependencies", and select "Manage NuGet packages"
+
+    ![Step 3](images/install-vs-deps.png)
+
+4. In the "Browse" tab, search for `Discord.Net`
+5. Install the `Discord.Net` package
+
+    ![Step 5](images/install-vs-nuget.png)
 
 ### [Using JetBrains Rider](#tab/rider-install)
 
-1. Create a new solution for your bot.
-2. Open the NuGet window (Tools > NuGet > Manage NuGet packages for
- Solution).
-![Step 2](images/install-rider-nuget-manager.png)
-3. In the "Packages" tab, search for `Discord.Net`.
-![Step 3](images/install-rider-search.png)
-4. Install by adding the package to your project.
-![Step 4](images/install-rider-add.png)
+1. Create a new solution for your bot
+2. Open the NuGet window (Tools > NuGet > Manage NuGet packages for Solution)
+
+    ![Step 2](images/install-rider-nuget-manager.png)
+
+3. In the "Packages" tab, search for `Discord.Net`
+
+    ![Step 3](images/install-rider-search.png)
+
+4. Install by adding the package to your project
+
+    ![Step 4](images/install-rider-add.png)
 
 ### [Using Visual Studio Code](#tab/vs-code)
 
-1. Create a new project for your bot.
-2. Add `Discord.Net` to your .csproj.
+1. Create a new project for your bot
+2. Add `Discord.Net` to your `*.csproj`
 
 [!code[Sample .csproj](samples/project.xml)]
 
 ### [Using dotnet CLI](#tab/dotnet-cli)
 
-1. Open command-line and navigate to where your .csproj is located.
-2. Enter `dotnet add package Discord.Net`.
+1. Launch your terminal
+2. Navigate to where your `*.csproj` is located
+3. Enter `dotnet add package Discord.Net`
 
 ***
 
@@ -115,16 +123,16 @@ by installing one or more custom packages as listed below.
 
 1. Install or compile the following packages:
 
- * `Discord.Net.Providers.WS4Net`
- * `Discord.Net.Providers.UDPClient` (Optional)
-    * This is _only_ required if your bot will be utilizing voice chat.
+    * `Discord.Net.Providers.WS4Net`
+    * `Discord.Net.Providers.UDPClient` (Optional)
+        * This is _only_ required if your bot will be utilizing voice chat.
 
 2. Configure your [DiscordSocketClient] to use these custom providers
 over the default ones.
 
- * To do this, set the `WebSocketProvider` and the optional 
- `UdpSocketProvider` properties on the [DiscordSocketConfig] that you
- are passing into your client.
+    * To do this, set the `WebSocketProvider` and the optional 
+    `UdpSocketProvider` properties on the [DiscordSocketConfig] that you
+    are passing into your client.
 
 [!code-csharp[Example](samples/netstd11.cs)]
 

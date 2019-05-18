@@ -1,5 +1,6 @@
-// Note: This example is obsolete, a boolean type reader is bundled 
-// with Discord.Commands
+// Please note that the library already supports type reading
+// primitive types such as bool. This example is merely used
+// to demonstrate how one could write a simple TypeReader.
 using Discord;
 using Discord.Commands;
 

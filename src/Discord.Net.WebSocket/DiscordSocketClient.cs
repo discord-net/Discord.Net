@@ -66,6 +66,7 @@ namespace Discord.WebSocket
         internal WebSocketProvider WebSocketProvider { get; private set; }
         internal bool AlwaysDownloadUsers { get; private set; }
         internal int? HandlerTimeout { get; private set; }
+        internal bool? ExclusiveBulkDelete { get; private set; }
 
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         /// <inheritdoc />
@@ -83,7 +84,7 @@ namespace Discord.WebSocket
         ///     </note>
         /// </remarks>
         /// <returns>
-        ///     An collection of DM channels that have been opened in this session.
+        ///     A collection of DM channels that have been opened in this session.
         /// </returns>
         public IReadOnlyCollection<SocketDMChannel> DMChannels
             => State.PrivateChannels.OfType<SocketDMChannel>().ToImmutableArray();
@@ -98,7 +99,7 @@ namespace Discord.WebSocket
         ///     </note>
         /// </remarks>
         /// <returns>
-        ///     An collection of group channels that have been opened in this session.
+        ///     A collection of group channels that have been opened in this session.
         /// </returns>
         public IReadOnlyCollection<SocketGroupChannel> GroupChannels
             => State.PrivateChannels.OfType<SocketGroupChannel>().ToImmutableArray();
@@ -128,8 +129,13 @@ namespace Discord.WebSocket
             WebSocketProvider = config.WebSocketProvider;
             AlwaysDownloadUsers = config.AlwaysDownloadUsers;
             HandlerTimeout = config.HandlerTimeout;
+            ExclusiveBulkDelete = config.ExclusiveBulkDelete;
             State = new ClientState(0, 0);
             Rest = new DiscordSocketRestClient(config, ApiClient);
+            Rest.Log += (log) =>
+            {
+                return _restLogger.LogAsync(log.Severity, log.Message, log.Exception);
+            };
             _heartbeatTimes = new ConcurrentQueue<long>();
 
             _stateLock = new SemaphoreSlim(1, 1);
@@ -200,6 +206,7 @@ namespace Discord.WebSocket
             }
             else
                 _voiceRegions = _parentClient._voiceRegions;
+            await Rest.OnLoginAsync(tokenType, token);
         }
         /// <inheritdoc />
         internal override async Task OnLogoutAsync()
@@ -207,6 +214,7 @@ namespace Discord.WebSocket
             await StopAsync().ConfigureAwait(false);
             _applicationInfo = null;
             _voiceRegions = ImmutableDictionary.Create<string, RestVoiceRegion>();
+            await Rest.OnLogoutAsync();
         }
 
         /// <inheritdoc />
@@ -1173,9 +1181,13 @@ namespace Discord.WebSocket
                                         {
                                             if (guild != null)
                                             {
-                                                author = data.Member.IsSpecified // member isn't always included, but use it when we can
-                                                    ? guild.AddOrUpdateUser(data.Member.Value)
-                                                    : guild.AddOrUpdateUser(data.Author.Value); // user has no guild-specific data
+                                                if (data.Member.IsSpecified) // member isn't always included, but use it when we can
+                                                {
+                                                    data.Member.Value.User = data.Author.Value;
+                                                    author = guild.AddOrUpdateUser(data.Member.Value);
+                                                }
+                                                else
+                                                    author = guild.AddOrUpdateUser(data.Author.Value); // user has no guild-specific data
                                             }
                                             else if (channel is SocketGroupChannel)
                                                 author = (channel as SocketGroupChannel).GetOrAddUser(data.Author.Value);
@@ -1351,6 +1363,14 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE_BULK)").ConfigureAwait(false);
 
+                                    if (!ExclusiveBulkDelete.HasValue)
+                                    {
+                                        await _gatewayLogger.WarningAsync("A bulk delete event has been received, but the event handling behavior has not been set. " +
+                                            "To supress this message, set the ExclusiveBulkDelete configuration property. " +
+                                            "This message will appear only once.");
+                                        ExclusiveBulkDelete = false;
+                                    }
+
                                     var data = (payload as JToken).ToObject<MessageDeleteBulkEvent>(_serializer);
                                     if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
                                     {
@@ -1361,13 +1381,19 @@ namespace Discord.WebSocket
                                             return;
                                         }
 
+                                        var cacheableList = new List<Cacheable<IMessage, ulong>>(data.Ids.Length);
                                         foreach (ulong id in data.Ids)
                                         {
                                             var msg = SocketChannelHelper.RemoveMessage(channel, this, id);
                                             bool isCached = msg != null;
                                             var cacheable = new Cacheable<IMessage, ulong>(msg, id, isCached, async () => await channel.GetMessageAsync(id).ConfigureAwait(false));
-                                            await TimedInvokeAsync(_messageDeletedEvent, nameof(MessageDeleted), cacheable, channel).ConfigureAwait(false);
+                                            cacheableList.Add(cacheable);
+
+                                            if (!ExclusiveBulkDelete ?? false) // this shouldn't happen, but we'll play it safe anyways
+                                                await TimedInvokeAsync(_messageDeletedEvent, nameof(MessageDeleted), cacheable, channel).ConfigureAwait(false);
                                         }
+
+                                        await TimedInvokeAsync(_messagesBulkDeletedEvent, nameof(MessagesBulkDeleted), cacheableList, channel).ConfigureAwait(false);
                                     }
                                     else
                                     {
@@ -1835,8 +1861,8 @@ namespace Discord.WebSocket
                 if (await Task.WhenAny(timeoutTask, handlersTask).ConfigureAwait(false) == timeoutTask)
                 {
                     await _gatewayLogger.WarningAsync($"A {name} handler is blocking the gateway task.").ConfigureAwait(false);
-                    await handlersTask.ConfigureAwait(false); //Ensure the handler completes
                 }
+                await handlersTask.ConfigureAwait(false); //Ensure the handler completes
             }
             catch (Exception ex)
             {

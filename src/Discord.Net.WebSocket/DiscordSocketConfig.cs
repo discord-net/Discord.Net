@@ -94,7 +94,9 @@ namespace Discord.WebSocket
         ///         Please note that it can be difficult to fill the cache completely on large guilds depending on the
         ///         traffic. If you are using the command system, the default user TypeReader may fail to find the user
         ///         due to this issue. This may be resolved at v3 of the library. Until then, you may want to consider
-        ///         overriding the TypeReader and use <see cref="DiscordRestClient.GetGuildUserAsync"/> as a backup.
+        ///         overriding the TypeReader and use
+        ///         <see cref="DiscordRestClient.GetUserAsync(System.UInt64,Discord.RequestOptions)"/> 
+        ///         or <see cref="DiscordSocketRestClient.GetGuildUserAsync(ulong, ulong, RequestOptions)"/> as a backup.
         ///     </note>
         /// </remarks>
         public bool AlwaysDownloadUsers { get; set; } = false;
@@ -103,6 +105,18 @@ namespace Discord.WebSocket
         ///     disables this check.
         /// </summary>
         public int? HandlerTimeout { get; set; } = 3000;
+
+        /// <summary>
+        ///     Gets or sets the behavior for <see cref="BaseSocketClient.MessageDeleted"/> on bulk deletes.
+        ///
+        ///     If true, the <see cref="BaseSocketClient.MessageDeleted"/> event will not be raised for bulk deletes, and
+        ///     only the <see cref="BaseSocketClient.MessagesBulkDeleted"/> will be raised.
+        ///
+        ///     If false, both events will be raised.
+        ///
+        ///     If unset, both events will be raised, but a warning will be raised the first time a bulk delete event is received.
+        /// </summary>
+        public bool? ExclusiveBulkDelete { get; set; } = null;
 
         /// <summary>
         ///     Initializes a default configuration.

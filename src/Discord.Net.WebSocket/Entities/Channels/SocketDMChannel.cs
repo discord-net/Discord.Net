@@ -139,12 +139,12 @@ namespace Discord.WebSocket
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, options);
 
         /// <inheritdoc />
-        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, options);
+        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false)
+            => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, options, isSpoiler);
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null)
-            => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options);
+        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false)
+            => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options, isSpoiler);
         /// <inheritdoc />
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
             => ChannelHelper.DeleteMessageAsync(this, messageId, Discord, options);
@@ -229,11 +229,11 @@ namespace Discord.WebSocket
         async Task<IReadOnlyCollection<IMessage>> IMessageChannel.GetPinnedMessagesAsync(RequestOptions options)
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed, RequestOptions options)
-            => await SendFileAsync(filePath, text, isTTS, embed, options).ConfigureAwait(false);
+        async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler)
+            => await SendFileAsync(filePath, text, isTTS, embed, options, isSpoiler).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options)
-            => await SendFileAsync(stream, filename, text, isTTS, embed, options).ConfigureAwait(false);
+        async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler)
+            => await SendFileAsync(stream, filename, text, isTTS, embed, options, isSpoiler).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options)
             => await SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);

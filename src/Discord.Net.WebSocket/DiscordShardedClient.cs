@@ -302,6 +302,7 @@ namespace Discord.WebSocket
 
             client.MessageReceived += (msg) => _messageReceivedEvent.InvokeAsync(msg);
             client.MessageDeleted += (cache, channel) => _messageDeletedEvent.InvokeAsync(cache, channel);
+            client.MessagesBulkDeleted += (cache, channel) => _messagesBulkDeletedEvent.InvokeAsync(cache, channel);
             client.MessageUpdated += (oldMsg, newMsg, channel) => _messageUpdatedEvent.InvokeAsync(oldMsg, newMsg, channel);
             client.ReactionAdded += (cache, channel, reaction) => _reactionAddedEvent.InvokeAsync(cache, channel, reaction);
             client.ReactionRemoved += (cache, channel, reaction) => _reactionRemovedEvent.InvokeAsync(cache, channel, reaction);

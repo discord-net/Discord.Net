@@ -23,10 +23,8 @@ namespace Discord
         /// <example>
         ///     The following example attempts to retrieve the user's current avatar and send it to a channel; if one is
         ///     not set, a default avatar for this user will be returned instead.
-        ///     <code language="cs">
-        ///     var userAvatarUrl = user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl();
-        ///     await textChannel.SendMessageAsync(userAvatarUrl);
-        ///     </code>
+        ///     <code language="cs" region="GetAvatarUrl"
+        ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Users\IUser.Examples.cs"/>
         /// </example>
         /// <param name="format">The format to return.</param>
         /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
@@ -84,27 +82,18 @@ namespace Discord
         /// <remarks>
         ///     This method is used to obtain or create a channel used to send a direct message.
         ///     <note type="warning">
-        ///     In event that the current user cannot send a message to the target user, a channel can and will still be
-        ///     created by Discord. However, attempting to send a message will yield a 
-        ///     <see cref="Discord.Net.HttpException"/> with a 403 as its 
-        ///     <see cref="Discord.Net.HttpException.HttpCode"/>. There are currently no official workarounds by
-        ///     Discord.
+        ///          In event that the current user cannot send a message to the target user, a channel can and will
+        ///          still be created by Discord. However, attempting to send a message will yield a 
+        ///          <see cref="Discord.Net.HttpException"/> with a 403 as its 
+        ///          <see cref="Discord.Net.HttpException.HttpCode"/>. There are currently no official workarounds by
+        ///          Discord.
         ///     </note>
         /// </remarks>
         /// <example>
         ///     The following example attempts to send a direct message to the target user and logs the incident should
         ///     it fail.
-        ///     <code language="cs">
-        ///     var channel = await user.GetOrCreateDMChannelAsync();
-        ///     try
-        ///     {
-        ///         await channel.SendMessageAsync("Awesome stuff!");
-        ///     }
-        ///     catch (Discord.Net.HttpException ex) when (ex.HttpCode == 403)
-        ///     {
-        ///         Console.WriteLine($"Boo, I cannot message {user}");
-        ///     }
-        ///     </code>
+        ///     <code region="GetOrCreateDMChannelAsync" language="cs"
+        ///           source="../../../Discord.Net.Examples/Core/Entities/Users/IUser.Examples.cs"/>
         /// </example>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>

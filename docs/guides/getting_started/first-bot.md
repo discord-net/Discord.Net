@@ -128,12 +128,10 @@ Finally, we can create a new connection to Discord.
 
 Since we are writing a bot, we will be using a [DiscordSocketClient]
 along with socket entities. See @Guides.GettingStarted.Terminology
-if you are unsure of the differences.
-
-To establish a new connection, we will create an instance of
-[DiscordSocketClient] in the new async main. You may pass in an
-optional @Discord.WebSocket.DiscordSocketConfig if necessary. For most
-users, the default will work fine.
+if you are unsure of the differences. To establish a new connection,
+we will create an instance of [DiscordSocketClient] in the new async
+main. You may pass in an optional @Discord.WebSocket.DiscordSocketConfig
+if necessary. For most users, the default will work fine.
 
 Before connecting, we should hook the client's `Log` event to the
 log handler that we had just created. Events in Discord.Net work
@@ -142,22 +140,33 @@ similarly to any other events in C#.
 Next, you will need to "log in to Discord" with the [LoginAsync]
 method with the application's "token."
 
+![Token](images/intro-token.png)
+
 > [!NOTE]
 > Pay attention to what you are copying from the developer portal!
 > A token is not the same as the application's "client secret."
 
-![Token](images/intro-token.png)
-
 > [!IMPORTANT]
 > Your bot's token can be used to gain total access to your bot, so
-> **do __NOT__ share this token with anyone else!** It may behoove you
-> to store this token in an external source if you plan on distributing
+> **do not** share this token with anyone else! You should store this
+> token in an external source if you plan on distributing
 > the source code for your bot.
+>
+> In the following example, we retrieve the token from the environment
+> variable `DiscordToken`. Please note that this is *not* designed to
+> be used in a production environment, as the secrets are stored in
+> plain-text.
+>
+> For information on how to set an environment variable, please see
+> instructions below,
+>
+> * Windows: [How to Create Environment Variables Shortcut in Windows](https://www.tenforums.com/tutorials/121742-create-environment-variables-shortcut-windows.html)
+> * Linux: [How To Read and Set Environmental and Shell Variables on a Linux VPS](https://www.digitalocean.com/community/tutorials/how-to-read-and-set-environmental-and-shell-variables-on-a-linux-vps)
+> * macOS: [How do I set environment variables on OS X?](https://apple.stackexchange.com/questions/106778/how-do-i-set-environment-variables-on-os-x)
 
 We may now invoke the client's [StartAsync] method, which will
 start connection/reconnection logic. It is important to note that
 **this method will return as soon as connection logic has been started!**
-
 Any methods that rely on the client's state should go in an event
 handler. This means that you should **not** directly be interacting with
 the client before it is fully ready.
@@ -173,81 +182,34 @@ The following lines can now be added:
 At this point, feel free to start your program and see your bot come
 online in Discord.
 
-> [!TIP]
+> [!WARNING]
 > Getting a warning about `A supplied token was invalid.` and/or
 > having trouble logging in? Double-check whether you have put in
 > the correct credentials and make sure that it is _not_ a client
 > secret, which is different from a token.
 
-> [!TIP]
+> [!WARNING]
 > Encountering a `PlatformNotSupportedException` when starting your bot?
 > This means that you are targeting a platform where .NET's default
 > WebSocket client is not supported. Refer to the [installation guide]
 > for how to fix this.
 
+> [!NOTE]
+> For your reference, you may view the [completed program].
+
 [DiscordSocketClient]: xref:Discord.WebSocket.DiscordSocketClient
 [LoginAsync]: xref:Discord.Rest.BaseDiscordClient.LoginAsync*
 [StartAsync]: xref:Discord.WebSocket.DiscordSocketClient.StartAsync*
 [installation guide]: xref:Guides.GettingStarted.Installation
-
-### Handling a 'ping'
-
-> [!WARNING]
-> Please note that this is *not* a proper way to create a command.
-> Use the `CommandService` provided by the library instead, as explained
-> in the [Command Guide](xref:Guides.Commands.Intro) section.
-
-Now that we have learned to open a connection to Discord, we can
-begin handling messages that the users are sending. To start out, our
-bot will listen for any message whose content is equal to `!ping` and
-will respond back with "Pong!".
-
-Since we want to listen for new messages, the event to hook into
-is [MessageReceived].
-
-In your program, add a method that matches the signature of the
-`MessageReceived` event - it must be a method (`Func`) that returns
-the type `Task` and takes a single parameter, a [SocketMessage]. Also,
-since we will be sending data to Discord in this method, we will flag
-it as `async`.
-
-In this method, we will add an `if` block to determine if the message
-content fits the rules of our scenario - recall that it must be equal
-to `!ping`.
-
-Inside the branch of this condition, we will want to send a message,
-`Pong!`, back to the channel from which the message comes from. To
-find the channel, look for the `Channel` property on the message
-parameter.
-
-Next, we will want to send a message to this channel. Since the
-channel object is of type [ISocketMessageChannel], we can invoke the
-[SendMessageAsync] instance method. For the message content, send back
-a string, "Pong!".
-
-You should have now added the following lines,
-
-[!code-csharp[Message](samples/first-bot/message.cs)]
-
-Now that your first bot is complete. You may continue to add on to this
-if you desire, but for any bots that will be carrying out multiple
-commands, it is strongly recommended to use the command framework as
-shown below.
-
-> [!NOTE]
-> For your reference, you may view the [completed program].
-
-[MessageReceived]: xref:Discord.WebSocket.BaseSocketClient.MessageReceived
-[SocketMessage]: xref:Discord.WebSocket.SocketMessage
-[ISocketMessageChannel]: xref:Discord.WebSocket.ISocketMessageChannel
-[SendMessageAsync]: xref:Discord.WebSocket.ISocketMessageChannel.SendMessageAsync*
 [completed program]: samples/first-bot/complete.cs
 
 # Building a bot with commands
 
-@Guides.Commands.Intro will guide you through how to setup a program
-that is ready for [CommandService], a service that is ready for
-advanced command usage.
+To create commands for your bot, you may choose from a variety of
+command processors available. Throughout the guides, we will be using
+the one that Discord.Net ships with. @Guides.Commands.Intro will
+guide you through how to setup a program that is ready for
+[CommandService].
 
 For reference, view an [annotated example] of this structure.
 

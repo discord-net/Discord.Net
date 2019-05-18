@@ -34,6 +34,7 @@ namespace Discord.Commands
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class RequireOwnerAttribute : PreconditionAttribute
     {
+        /// <inheritdoc />
         public override string ErrorMessage { get; set; }
 
         /// <inheritdoc />

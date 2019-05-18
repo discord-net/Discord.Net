@@ -1,0 +1,17 @@
+steps:
+- script: dotnet restore -v minimal Discord.Net.sln
+  displayName: Restore packages
+
+- script: dotnet build "Discord.Net.sln" --no-restore -v minimal -c $(buildConfiguration) /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
+  displayName: Build projects
+
+- script: dotnet test "test/Discord.Net.Tests/Discord.Net.Tests.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) --logger trx 
+  # TODO: update this to support multiple tests
+  displayName: Test projects
+
+- task: PublishTestResults@2
+  displayName: Publish test results
+  condition: succeededOrFailed()
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'

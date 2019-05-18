@@ -3,6 +3,7 @@ public class CommandHandler
     private readonly DiscordSocketClient _client;
     private readonly CommandService _commands;
 
+    // Retrieve client and CommandService instance via ctor
     public CommandHandler(DiscordSocketClient client, CommandService commands)
     {
         _commands = commands;
@@ -46,19 +47,9 @@ public class CommandHandler
 
         // Execute the command with the command context we just
         // created, along with the service provider for precondition checks.
-        
-        // Keep in mind that result does not indicate a return value
-        // rather an object stating if the command executed successfully.
-        var result = await _commands.ExecuteAsync(
+        await _commands.ExecuteAsync(
             context: context, 
             argPos: argPos,
             services: null);
-
-        // Optionally, we may inform the user if the command fails
-        // to be executed; however, this may not always be desired,
-        // as it may clog up the request queue should a user spam a
-        // command.
-        // if (!result.IsSuccess)
-        // await context.Channel.SendMessageAsync(result.ErrorReason);
     }
 }

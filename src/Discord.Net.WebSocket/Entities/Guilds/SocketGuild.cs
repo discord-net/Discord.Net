@@ -520,13 +520,22 @@ namespace Discord.WebSocket
         /// </returns>
         public SocketVoiceChannel GetVoiceChannel(ulong id)
             => GetChannel(id) as SocketVoiceChannel;
+        /// <summary>
+        ///     Gets a category channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the category channel.</param>
+        /// <returns>
+        ///     A category channel associated with the specified <paramref name="id" />; <c>null</c> if none is found.
+        /// </returns>
+        public SocketCategoryChannel GetCategoryChannel(ulong id)
+            => GetChannel(id) as SocketCategoryChannel;
 
         /// <summary>
         ///     Creates a new text channel in this guild.
         /// </summary>
         /// <example>
         ///     The following example creates a new text channel under an existing category named <c>Wumpus</c> with a set topic.
-        ///     <code lang="cs">
+        ///     <code language="cs">
         ///     var categories = await guild.GetCategoriesAsync();
         ///     var targetCategory = categories.FirstOrDefault(x => x.Name == "wumpus");
         ///     if (targetCategory == null) return;

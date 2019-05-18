@@ -7,6 +7,15 @@ body {
     color: #C0C0C0;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #E0E0E0;
+}
+
 button,
 a {
     color: #64B5F6;
@@ -258,6 +267,11 @@ tbody>tr {
     border-top: 2px solid rgb(173, 173, 173)
 }
 
+/* top navbar */
+.navbar-inverse[role="navigation"] {
+    background-color: #2C2F33;
+}
+
 /* select */
 
 select {
@@ -304,5 +318,5 @@ span.arrow-r{
 }
 
 .logo-switcher {
-    background: url("/marketing/logo/SVG/Combinationmark White.svg") no-repeat;
+    background: url("../marketing/logo/SVG/Combinationmark White.svg") no-repeat;
 }

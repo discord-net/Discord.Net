@@ -199,18 +199,18 @@ namespace Discord.Rest
         /// <exception cref="IOException">An I/O error occurred while opening the file.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
-            string filePath, string text, bool isTTS, Embed embed, RequestOptions options)
+            string filePath, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler)
         {
             string filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
-                return await SendFileAsync(channel, client, file, filename, text, isTTS, embed, options).ConfigureAwait(false);
+                return await SendFileAsync(channel, client, file, filename, text, isTTS, embed, options, isSpoiler).ConfigureAwait(false);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
-            Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options)
+            Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler)
         {
-            var args = new UploadFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS, Embed = embed != null ? embed.ToModel() : Optional<API.Embed>.Unspecified };
+            var args = new UploadFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS, Embed = embed != null ? embed.ToModel() : Optional<API.Embed>.Unspecified, IsSpoiler = isSpoiler };
             var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }

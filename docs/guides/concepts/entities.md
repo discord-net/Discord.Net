@@ -7,7 +7,7 @@ title: Entities
 
 > [!NOTE]
 > This article is written with the Socket variants of entities in mind,
-> not the general interfaces or Rest/Rpc entities.
+> not the general interfaces or Rest entities.
 
 Discord.Net provides a versatile entity system for navigating the
 Discord API.

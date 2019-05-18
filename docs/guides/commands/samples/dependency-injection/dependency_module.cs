@@ -32,6 +32,6 @@ public class DatabaseModule : ModuleBase<SocketCommandContext>
     [Command("read")]
     public async Task ReadFromDbAsync()
     {
-        await ReplyAsync(_database.GetData());
+        await ReplyAsync(DbService.GetData());
     }
 }

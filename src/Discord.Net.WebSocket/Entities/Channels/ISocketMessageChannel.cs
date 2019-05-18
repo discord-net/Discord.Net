@@ -38,7 +38,7 @@ namespace Discord.WebSocket
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
         /// <remarks>
-        ///     This method follows the same behavior as described in <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions)"/>.
+        ///     This method follows the same behavior as described in <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool)"/>.
         ///     Please visit its documentation for more details on this method.
         /// </remarks>
         /// <param name="filePath">The file path of the file.</param>
@@ -46,11 +46,12 @@ namespace Discord.WebSocket
         /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
         /// <param name="embed">The <see cref="Discord.EmbedType.Rich" /> <see cref="Embed" /> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
+        new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false);
         /// <summary>
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
@@ -64,11 +65,12 @@ namespace Discord.WebSocket
         /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
         /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null);
+        new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false);
 
         /// <summary>
         ///     Gets a cached message from this channel.
