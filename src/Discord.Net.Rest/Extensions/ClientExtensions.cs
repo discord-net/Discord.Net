@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Discord.Rest.Extensions
+namespace Discord.Rest
 {
     public static class ClientExtensions
     {
