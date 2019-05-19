@@ -5,9 +5,11 @@ variables:
 
 trigger:
   tags:
-    include: '*'
+    include:
+    - '*'
   branches:
-    include: '*'
+    include:
+    - '*'
 
 jobs:
 - job: Linux
