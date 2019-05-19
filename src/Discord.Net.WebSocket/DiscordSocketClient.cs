@@ -132,10 +132,6 @@ namespace Discord.WebSocket
             ExclusiveBulkDelete = config.ExclusiveBulkDelete;
             State = new ClientState(0, 0);
             Rest = new DiscordSocketRestClient(config, ApiClient);
-            Rest.Log += (log) =>
-            {
-                return _restLogger.LogAsync(log.Severity, log.Message, log.Exception);
-            };
             _heartbeatTimes = new ConcurrentQueue<long>();
 
             _stateLock = new SemaphoreSlim(1, 1);
