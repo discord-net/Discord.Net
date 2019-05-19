@@ -33,7 +33,7 @@ jobs:
         succeeded(),
         or (
           eq(variables['Build.SourceBranch'], 'refs/heads/dev'),
-          eq(buildTag, True)
+          eq(variables['buildTag'], True)
         )
       )
   steps:
