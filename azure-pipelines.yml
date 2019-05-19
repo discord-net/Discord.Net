@@ -31,7 +31,10 @@ jobs:
   condition: |
       and (
         succeeded(),
-        eq(variables['Build.SourceBranch'], 'refs/heads/dev')
+        or (
+          eq(variables['Build.SourceBranch'], 'refs/heads/dev'),
+          eq(buildTag, True)
+        )
       )
   steps:
   - template: azure/build.yml
