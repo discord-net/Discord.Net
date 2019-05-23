@@ -84,6 +84,23 @@ namespace Discord
         /// <seealso cref="IEmote"/>
         Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null);
         /// <summary>
+        ///     Removes a reaction from message.
+        /// </summary>
+        /// <example>
+        ///     The following example removes the reaction, <c>💕</c>, added by the message author from the message.
+        ///     <code language="cs">
+        ///     await msg.RemoveReactionAsync(new Emoji("\U0001f495"), 84291986575613952);
+        ///     </code>
+        /// </example>
+        /// <param name="emote">The emoji used to react to this message.</param>
+        /// <param name="userId">The id of the user that added the emoji.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous operation for removing a reaction to this message.
+        /// </returns>
+        /// <seealso cref="IEmote"/>
+        Task RemoveReactionAsync(IEmote emote, ulong userId, RequestOptions options = null);
+        /// <summary>
         ///     Removes all reactions from this message.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>

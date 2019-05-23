@@ -40,9 +40,9 @@ namespace Discord.Rest
             await client.ApiClient.AddReactionAsync(msg.Channel.Id, msg.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
         }
 
-        public static async Task RemoveReactionAsync(IMessage msg, IUser user, IEmote emote, BaseDiscordClient client, RequestOptions options)
+        public static async Task RemoveReactionAsync(IMessage msg, ulong userId, IEmote emote, BaseDiscordClient client, RequestOptions options)
         {
-            await client.ApiClient.RemoveReactionAsync(msg.Channel.Id, msg.Id, user.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
+            await client.ApiClient.RemoveReactionAsync(msg.Channel.Id, msg.Id, userId, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
         }
 
         public static async Task RemoveAllReactionsAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
