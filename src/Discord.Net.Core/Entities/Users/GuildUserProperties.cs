@@ -59,7 +59,7 @@ namespace Discord
         /// </remarks>
         public Optional<IEnumerable<ulong>> RoleIds { get; set; }
         /// <summary>
-        ///     Moves a user to a voice channel. If <c>null</c>, this user will be disconnected from voice.
+        ///     Moves a user to a voice channel. If <c>null</c>, this user will be disconnected from their current voice channel.
         /// </summary>
         /// <remarks>
         ///     This user MUST already be in a <see cref="IVoiceChannel"/> for this to work.
@@ -67,7 +67,7 @@ namespace Discord
         /// </remarks>
         public Optional<IVoiceChannel> Channel { get; set; }
         /// <summary>
-        ///     Moves a user to a voice channel. If <c>null</c>, this user will be disconnected from voice.
+        ///     Moves a user to a voice channel. If <c>null</c>, this user will be disconnected from their current voice channel.
         /// </summary>
         /// <remarks>
         ///     This user MUST already be in a <see cref="IVoiceChannel"/> for this to work.
