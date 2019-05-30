@@ -67,11 +67,11 @@ namespace Discord
         /// </remarks>
         public Optional<IVoiceChannel> Channel { get; set; }
         /// <summary>
-        ///     Moves a user to a voice channel. If <c>null</c>, this user will be disconnected from their current voice channel.
+        ///     Moves a user to a voice channel. Set <see cref="Channel"/> to <c>null</c> to disconnect this user from their current voice channel.
         /// </summary>
         /// <remarks>
         ///     This user MUST already be in a <see cref="IVoiceChannel"/> for this to work.
         /// </remarks>
-        public Optional<ulong?> ChannelId { get; set; }
+        public Optional<ulong> ChannelId { get; set; } // TODO: v3 breaking change, change ChannelId to ulong? to allow for kicking users from voice
     }
 }
