@@ -8,9 +8,9 @@ namespace Discord
     public class RequestOptions
     {
         /// <summary>
-        ///     Creates a new <see cref="RequestOptions" /> class with its default settings.
+        ///     Gets or sets the default <see cref="RequestOptions" /> used when not specified with a request.
         /// </summary>
-        public static RequestOptions Default => new RequestOptions();
+        public static RequestOptions Default { get; set; } = new RequestOptions();
 
         /// <summary>
         ///     Gets or sets the maximum time to wait for for this request to complete.
@@ -53,7 +53,7 @@ namespace Discord
         internal static RequestOptions CreateOrClone(RequestOptions options)
         {            
             if (options == null)
-                return new RequestOptions();
+                return Default.Clone();
             else
                 return options.Clone();
         }
@@ -68,5 +68,49 @@ namespace Discord
         }
         
         public RequestOptions Clone() => MemberwiseClone() as RequestOptions;
+        
+        /// <summary>
+        ///     Creates a copy of the current <see cref="RequestOptions" /> instance and sets the 
+        ///     <see cref="AuditLogReason"/> property.
+        /// </summary>
+        public RequestOptions WithAuditLogReason (string reason)
+        {
+            var clone = Clone();
+            clone.AuditLogReason = reason;
+            return clone;
+        }
+        
+        /// <summary>
+        ///     Creates a copy of the current <see cref="RequestOptions" /> instance and sets the 
+        ///     <see cref="RetryMode"/> property.
+        /// </summary>
+        public RequestOptions WithRetryMode (RetryMode retryMode)
+        {
+            var clone = Clone();
+            clone.RetryMode = retryMode;
+            return clone;
+        }
+        
+        /// <summary>
+        ///     Creates a copy of the current <see cref="RequestOptions" /> instance and sets the 
+        ///     <see cref="CancelToken"/> property.
+        /// </summary>
+        public RequestOptions WithCancellationToken (CancellationToken cancelToken)
+        {
+            var clone = Clone();
+            clone.CancelToken = cancelToken;
+            return clone;
+        }
+        
+        /// <summary>
+        ///     Creates a copy of the current <see cref="RequestOptions" /> instance and sets the 
+        ///     <see cref="Timeout"/> property.
+        /// </summary>
+        public RequestOptions WithTimeout (int? timeout)
+        {
+            var clone = Clone();
+            clone.Timeout = timeout;
+            return clone;
+        }
     }
 }
