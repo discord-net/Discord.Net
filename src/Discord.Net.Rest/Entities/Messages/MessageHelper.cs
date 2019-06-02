@@ -152,10 +152,13 @@ namespace Discord.Rest
             {
                 index = text.IndexOf("@everyone", index);
                 if (index == -1) break;
+                IRole mentionedRole = null;
+                if (guild != null)
+                    mentionedRole = guild.GetRole(guild.Id);
 
                 var tagIndex = FindIndex(tags, index);
                 if (tagIndex.HasValue)
-                    tags.Insert(tagIndex.Value, new Tag<object>(TagType.EveryoneMention, index, "@everyone".Length, 0, null));
+                    tags.Insert(tagIndex.Value, new Tag<IRole>(TagType.EveryoneMention, index, "@everyone".Length, 0, mentionedRole));
                 index++;
             }
 
@@ -164,10 +167,13 @@ namespace Discord.Rest
             {
                 index = text.IndexOf("@here", index);
                 if (index == -1) break;
+                IRole mentionedRole = null;
+                if (guild != null)
+                    mentionedRole = guild.GetRole(guild.Id);
 
                 var tagIndex = FindIndex(tags, index);
                 if (tagIndex.HasValue)
-                    tags.Insert(tagIndex.Value, new Tag<object>(TagType.HereMention, index, "@here".Length, 0, null));
+                    tags.Insert(tagIndex.Value, new Tag<IRole>(TagType.HereMention, index, "@here".Length, 0, mentionedRole));
                 index++;
             }
 
