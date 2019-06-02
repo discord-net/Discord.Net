@@ -154,7 +154,7 @@ namespace Discord.Rest
                 if (index == -1) break;
                 IRole mentionedRole = null;
                 if (guild != null)
-                    mentionedRole = guild.GetRole(guild.Id);
+                    mentionedRole = guild.EveryoneRole;
 
                 var tagIndex = FindIndex(tags, index);
                 if (tagIndex.HasValue)
@@ -169,7 +169,7 @@ namespace Discord.Rest
                 if (index == -1) break;
                 IRole mentionedRole = null;
                 if (guild != null)
-                    mentionedRole = guild.GetRole(guild.Id);
+                    mentionedRole = guild.EveryoneRole;
 
                 var tagIndex = FindIndex(tags, index);
                 if (tagIndex.HasValue)
