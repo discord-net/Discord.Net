@@ -50,7 +50,7 @@ namespace Discord
             var otherEmote = other as Emote;
             if (otherEmote == null) return false;
 
-            return string.Equals(Name, otherEmote.Name) && Id == otherEmote.Id;
+            return Id == otherEmote.Id;
         }
 
         /// <inheritdoc />
