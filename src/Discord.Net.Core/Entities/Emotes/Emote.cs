@@ -54,13 +54,7 @@ namespace Discord
         }
 
         /// <inheritdoc />
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (Name.GetHashCode() * 397) ^ Id.GetHashCode();
-            }
-        }
+        public override int GetHashCode() => Id.GetHashCode();
 
         /// <summary> Parses an <see cref="Emote"/> from its raw format. </summary>
         /// <param name="text">The raw encoding of an emote (e.g. <c>&lt;:dab:277855270321782784&gt;</c>).</param>
