@@ -98,14 +98,56 @@ namespace Discord.Rest
         public static ImmutableArray<ITag> ParseTags(string text, IMessageChannel channel, IGuild guild, IReadOnlyCollection<IUser> userMentions)
         {
             var tags = ImmutableArray.CreateBuilder<ITag>();
+
+            // gets the next index of a codeblock stop/start
+            int IndexOfCode(int startIndex)
+            {
+                // code block has precedence over inline code
+                var codeIndex = text.IndexOf("```", startIndex);
+                if (codeIndex != -1)
+                    return codeIndex + 3;
+                codeIndex = text.IndexOf('`', startIndex);
+                if (codeIndex != -1)
+                    return codeIndex + 1;
+                return -1;
+            }
             
             int index = 0;
+            int codeBlockIndex = 0;
             while (true)
             {
                 index = text.IndexOf('<', index);
                 if (index == -1) break;
                 int endIndex = text.IndexOf('>', index + 1);
                 if (endIndex == -1) break;
+
+                int closeIndex = 0;
+                bool CheckCloseIndex()
+                    => closeIndex != -1 && closeIndex < index;
+
+                // check for code blocks before the start index, of either type
+                codeBlockIndex = IndexOfCode(codeBlockIndex);
+                while (codeBlockIndex != -1)
+                {
+                    // code block opens before this tag
+                    closeIndex = IndexOfCode(codeBlockIndex);
+                    // not closed at all
+                    if (closeIndex == -1)
+                        break;
+                    // closed somewhere after the start index
+                    if (closeIndex > index)
+                        break;
+                    // advance codeblock start index
+                    codeBlockIndex = IndexOfCode(closeIndex);
+                }
+                // unclosed code block
+                if (closeIndex == -1)
+                    break;
+                // closed somewhere after the start index
+                if (closeIndex > index)
+                    break;
+
+
                 string content = text.Substring(index, endIndex - index + 1);
 
                 if (MentionUtils.TryParseUser(content, out ulong id))
@@ -148,8 +190,35 @@ namespace Discord.Rest
             }
 
             index = 0;
+            codeBlockIndex = 0;
             while (true)
             {
+                int closeIndex = 0;
+                bool CheckCloseIndex()
+                    => closeIndex != -1 && closeIndex < index;
+
+                // check for code blocks before the start index, of either type
+                codeBlockIndex = IndexOfCode(codeBlockIndex);
+                while (codeBlockIndex != -1)
+                {
+                    // code block opens before this tag
+                    closeIndex = IndexOfCode(codeBlockIndex);
+                    // not closed at all
+                    if (closeIndex == -1)
+                        break;
+                    // closed somewhere after the start index
+                    if (closeIndex > index)
+                        break;
+                    // advance codeblock start index
+                    codeBlockIndex = IndexOfCode(closeIndex);
+                }
+                // unclosed code block
+                if (closeIndex == -1)
+                    break;
+                // closed somewhere after the start index
+                if (closeIndex > index)
+                    break;
+
                 index = text.IndexOf("@everyone", index);
                 if (index == -1) break;
                 var tagIndex = FindIndex(tags, index);
