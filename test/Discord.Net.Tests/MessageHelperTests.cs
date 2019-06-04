@@ -22,6 +22,8 @@ namespace Discord
         [InlineData("`<:test:537920404019216384>`")]
         [InlineData("``` @everyone  `")] // discord client handles these weirdly
         [InlineData("``` @everyone  ``")]
+        [InlineData("` @here `")]
+        [InlineData("` @everyone @here <@163184946742034432> <@&163184946742034432> <#163184946742034432> <:test:537920404019216384> `")]
         public void ParseTagsInCode(string testData)
         {
             // don't care that I'm passing in null channels/guilds/users
