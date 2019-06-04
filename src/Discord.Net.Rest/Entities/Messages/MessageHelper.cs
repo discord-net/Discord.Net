@@ -194,6 +194,8 @@ namespace Discord.Rest
             }
 
             index = 0;
+            codeBlockIndex = 0;
+            closeIndex = 0;
             while (true)
             {
                 index = text.IndexOf("@here", index);
