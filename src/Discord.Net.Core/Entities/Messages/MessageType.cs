@@ -36,6 +36,22 @@ namespace Discord
         /// <summary>
         ///     The message when a new member joined.
         /// </summary>
-        GuildMemberJoin = 7
+        GuildMemberJoin = 7,
+        /// <summary>
+        ///     The message for when a user boosts a guild.
+        /// </summary>
+        UserPremiumGuildSubscription = 8,
+        /// <summary>
+        ///     The message for when a guild reaches Tier 1 of Nitro boosts.
+        /// </summary>
+        UserPremiumGuildSubscriptionTier1 = 9,
+        /// <summary>
+        ///     The message for when a guild reaches Tier 2 of Nitro boosts.
+        /// </summary>
+        UserPremiumGuildSubscriptionTier2 = 10,
+        /// <summary>
+        ///     The message for when a guild reaches Tier 3 of Nitro boosts.
+        /// </summary>
+        UserPremiumGuildSubscriptionTier3 = 11
     }
 }
