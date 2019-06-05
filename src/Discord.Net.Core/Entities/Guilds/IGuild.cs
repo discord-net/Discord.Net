@@ -196,6 +196,41 @@ namespace Discord
         ///     A read-only collection of roles found within this guild.
         /// </returns>
         IReadOnlyCollection<IRole> Roles { get; }
+        /// <summary>
+        ///     Gets the tier of guild boosting in this guild.
+        /// </summary>
+        /// <returns>
+        ///     The tier of guild boosting in this guild.
+        /// </returns>
+        PremiumTier PremiumTier { get; }
+        /// <summary>
+        ///     Gets the identifier for this guilds vanity image.
+        /// </summary>
+        /// <remarks>
+        ///     An identifier for the vanity image; <c>null</c> if none is set.
+        /// </remarks>
+        string VanityId { get; }
+        /// <summary>
+        ///     Gets the URL of this guild's vanity image.
+        /// </summary>
+        /// <returns>
+        ///     A URL pointing to the guild's vanity image; <c>null</c> if none is set.
+        /// </returns>
+        string VanityUrl { get; }
+        /// <summary>
+        ///     Gets the flags for the types of system channels that are disabled.
+        /// </summary>
+        /// <returns>
+        ///     The flags for the types of system channel flags that are disabled.
+        /// </returns>
+        SystemChannelMessageDeny SystemChannelFlags { get; }
+        /// <summary>
+        ///     Gets the description for the guild.
+        /// </summary>
+        /// <returns>
+        ///     The description for the guild; <c>null</c> if none is set.
+        /// </returns>
+        string Description { get; }
 
         /// <summary>
         ///     Modifies this guild.

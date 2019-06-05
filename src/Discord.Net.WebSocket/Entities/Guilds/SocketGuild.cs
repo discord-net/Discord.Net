@@ -93,6 +93,14 @@ namespace Discord.WebSocket
         public string IconId { get; private set; }
         /// <inheritdoc />
         public string SplashId { get; private set; }
+        /// <inheritdoc />
+        public PremiumTier PremiumTier { get; private set; }
+        /// <inheritdoc />
+        public string VanityId { get; private set; }
+        /// <inheritdoc />
+        public SystemChannelMessageDeny SystemChannelFlags { get; private set; }
+        /// <inheritdoc />
+        public string Description { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -100,6 +108,8 @@ namespace Discord.WebSocket
         public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
         /// <inheritdoc />
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
+        /// <inheritdoc />
+        public string VanityUrl => CDN.GetGuildVanityUrl(Id, VanityId);
         /// <summary> Indicates whether the client has all the members downloaded to the local guild cache. </summary>
         public bool HasAllMembers => MemberCount == DownloadedMemberCount;// _downloaderPromise.Task.IsCompleted;
         /// <summary> Indicates whether the guild cache is synced to this guild. </summary>
@@ -354,6 +364,10 @@ namespace Discord.WebSocket
             DefaultMessageNotifications = model.DefaultMessageNotifications;
             ExplicitContentFilter = model.ExplicitContentFilter;
             ApplicationId = model.ApplicationId;
+            PremiumTier = model.PremiumTier;
+            VanityId = model.VanityURLCode;
+            SystemChannelFlags = model.SystemChannelFlags;
+            Description = model.Description;
 
             if (model.Emojis != null)
             {
