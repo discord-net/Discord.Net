@@ -86,8 +86,13 @@ namespace Discord
         /// <returns>
         ///     A URL pointing to the guild's vanity image.
         /// </returns>
-        public static string GetGuildVanityUrl(ulong guildId, string vanityId, ushort size)
-            => vanityId != null ? $"{DiscordConfig.CDNUrl}banners/{guildId}/{vanityId}.jpg?size={size}" : null;
+        public static string GetGuildVanityUrl(ulong guildId, string vanityId, ushort? size = null)
+        {
+            if (!string.IsNullOrEmpty(vanityId))
+                return $"{DiscordConfig.CDNUrl}banners/{guildId}/{vanityId}.jpg" + (size.HasValue ? $"?size={size}" : string.Empty);
+            return null;
+        }
+        //    => vanityId != null ? $"{DiscordConfig.CDNUrl}banners/{guildId}/{vanityId}.jpg?size={size}" : null;
         /// <summary>
         ///     Returns an emoji URL.
         /// </summary>
