@@ -53,6 +53,13 @@ namespace Discord.Commands
                 else
                     c = '\0';
 
+                //If we're processing an remainder parameter, ignore all other logic
+                if (curParam != null && curParam.IsRemainder && curPos != endPos)
+                {
+                    argBuilder.Append(c);
+                    continue;
+                }
+
                 //If this character is escaped, skip it
                 if (isEscaping)
                 {
@@ -76,13 +83,6 @@ namespace Discord.Commands
                 if (c == '\\' && (curParam == null || !curParam.IsRemainder))
                 {
                     isEscaping = true;
-                    continue;
-                }
-
-                //If we're processing an remainder parameter, ignore all other logic
-                if (curParam != null && curParam.IsRemainder && curPos != endPos)
-                {
-                    argBuilder.Append(c);
                     continue;
                 }
 
