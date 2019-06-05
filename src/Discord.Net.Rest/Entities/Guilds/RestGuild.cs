@@ -60,6 +60,8 @@ namespace Discord.Rest
         public SystemChannelMessageDeny SystemChannelFlags { get; private set; }
         /// <inheritdoc />
         public string Description { get; private set; }
+        /// <inheritdoc />
+        public int PremiumSubscriptionCount { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -118,6 +120,7 @@ namespace Discord.Rest
             VanityId = model.VanityURLCode;
             SystemChannelFlags = model.SystemChannelFlags;
             Description = model.Description;
+            PremiumSubscriptionCount = model.PremiumSubscriptionCount.GetValueOrDefault();
 
             if (model.Emojis != null)
             {

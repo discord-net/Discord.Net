@@ -231,6 +231,13 @@ namespace Discord
         ///     The description for the guild; <c>null</c> if none is set.
         /// </returns>
         string Description { get; }
+        /// <summary>
+        ///     Gets the number of premium subscribers of this guild.
+        /// </summary>
+        /// <returns>
+        ///     The number of premium subscribers of this guild.
+        /// </returns>
+        int PremiumSubscriptionCount { get; }
 
         /// <summary>
         ///     Modifies this guild.

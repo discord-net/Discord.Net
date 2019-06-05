@@ -54,5 +54,7 @@ namespace Discord.API
         // this value is inverted, flags set will turn OFF features
         [JsonProperty("system_channel_flags")]
         public SystemChannelMessageDeny SystemChannelFlags { get; set; }
+        [JsonProperty("premium_subscription_count")]
+        public Optional<int> PremiumSubscriptionCount { get; set; }
     }
 }
