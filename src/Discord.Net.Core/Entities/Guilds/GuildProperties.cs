@@ -70,5 +70,10 @@ namespace Discord
         ///     Gets or sets the explicit content filter level of this guild.
         /// </summary>
         public Optional<ExplicitContentFilterLevel> ExplicitContentFilter { get; set; }
+        /// <summary>
+        ///     Gets or sets the flags that DISABLE types of system channels.
+        ///     This logic is inverted!
+        /// </summary>
+        public Optional<SystemChannelMessageDeny> SystemChannelFlags { get; set; }
     }
 }
