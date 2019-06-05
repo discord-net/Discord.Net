@@ -92,7 +92,6 @@ namespace Discord
                 return $"{DiscordConfig.CDNUrl}banners/{guildId}/{vanityId}.jpg" + (size.HasValue ? $"?size={size}" : string.Empty);
             return null;
         }
-        //    => vanityId != null ? $"{DiscordConfig.CDNUrl}banners/{guildId}/{vanityId}.jpg?size={size}" : null;
         /// <summary>
         ///     Returns an emoji URL.
         /// </summary>
