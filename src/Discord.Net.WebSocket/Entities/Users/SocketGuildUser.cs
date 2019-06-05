@@ -76,6 +76,9 @@ namespace Discord.WebSocket
         public SocketVoiceState? VoiceState => Guild.GetVoiceState(Id);
         public AudioInStream AudioStream => Guild.GetAudioStream(Id);
 
+        /// <inheritdoc />
+        public DateTime? PremiumSince { get; private set; }
+
         /// <summary>
         ///     Returns the position of the user within the role hierarchy.
         /// </summary>

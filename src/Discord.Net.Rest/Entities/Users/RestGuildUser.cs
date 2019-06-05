@@ -24,7 +24,8 @@ namespace Discord.Rest
         public bool IsDeafened { get; private set; }
         /// <inheritdoc />
         public bool IsMuted { get; private set; }
-
+        /// <inheritdoc />
+        public DateTime? PremiumSince { get; private set; }
         /// <inheritdoc />
         public ulong GuildId => Guild.Id;
 
@@ -69,6 +70,8 @@ namespace Discord.Rest
                 IsMuted = model.Mute.Value;
             if (model.Roles.IsSpecified)
                 UpdateRoles(model.Roles.Value);
+            if (model.PremiumSince.IsSpecified)
+                PremiumSince = model.PremiumSince.Value;
         }
         private void UpdateRoles(ulong[] roleIds)
         {
