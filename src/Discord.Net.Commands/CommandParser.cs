@@ -53,6 +53,13 @@ namespace Discord.Commands
                 else
                     c = '\0';
 
+                //If we're processing a remainder parameter, ignore all other logic
+                if (curParam != null && curParam.IsRemainder && curPos != endPos)
+                {
+                    argBuilder.Append(c);
+                    continue;
+                }
+
                 //If this character is escaped, skip it
                 if (isEscaping)
                 {
@@ -76,13 +83,6 @@ namespace Discord.Commands
                 if (c == '\\' && (curParam == null || !curParam.IsRemainder))
                 {
                     isEscaping = true;
-                    continue;
-                }
-
-                //If we're processing an remainder parameter, ignore all other logic
-                if (curParam != null && curParam.IsRemainder && curPos != endPos)
-                {
-                    argBuilder.Append(c);
                     continue;
                 }
 
@@ -112,6 +112,23 @@ namespace Discord.Commands
                         }
                         curPart = ParserPart.Parameter;
                     }
+                }
+
+                //If this character is escaped, skip it
+                if (isEscaping)
+                {
+                    if (curPos != endPos)
+                    {
+                        argBuilder.Append(c);
+                        isEscaping = false;
+                        continue;
+                    }
+                }
+                //Are we escaping the next character?
+                if (c == '\\' && (curParam == null || !curParam.IsRemainder))
+                {
+                    isEscaping = true;
+                    continue;
                 }
 
                 //Has this parameter ended yet?
