@@ -45,5 +45,12 @@ namespace Discord.API
         public ulong? ApplicationId { get; set; }
         [JsonProperty("system_channel_id")]
         public ulong? SystemChannelId { get; set; }
+        [JsonProperty("premium_tier")]
+        public int PremiumTier { get; set; }
+        [JsonProperty("vanity_url_code")]
+        public string VanityURLCode { get; set; }
+        // this value is inverted, flags set will turn OFF features
+        [JsonProperty("system_channel_flags")]
+        public int SystemChannelFlags { get; set; }
     }
 }

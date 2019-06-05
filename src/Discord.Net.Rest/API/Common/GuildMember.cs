@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 using System;
 
@@ -18,5 +18,7 @@ namespace Discord.API
         public Optional<bool> Deaf { get; set; }
         [JsonProperty("mute")]
         public Optional<bool> Mute { get; set; }
+        [JsonProperty("premium_guild_since")]
+        public Optional<DateTime> PremiumSince { get; set; }
     }
 }
