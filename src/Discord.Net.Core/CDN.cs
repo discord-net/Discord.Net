@@ -76,6 +76,18 @@ namespace Discord
         /// </returns>
         public static string GetChannelIconUrl(ulong channelId, string iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}channel-icons/{channelId}/{iconId}.jpg" : null;
+
+        /// <summary>
+        ///     Returns a guild vanity URL.
+        /// </summary>
+        /// <param name="guildId">The guild snowflake identifier.</param>
+        /// <param name="vanityId">The vanity image identifier.</param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.</param>
+        /// <returns>
+        ///     A URL pointing to the guild's vanity image.
+        /// </returns>
+        public static string GetGuildVanityUrl(ulong guildId, string vanityId, ushort size)
+            => vanityId != null ? $"{DiscordConfig.CDNUrl}banners/{guildId}/{vanityId}.jpg?size={size}" : null;
         /// <summary>
         ///     Returns an emoji URL.
         /// </summary>
