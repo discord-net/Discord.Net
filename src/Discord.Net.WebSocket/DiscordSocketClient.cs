@@ -1296,7 +1296,7 @@ namespace Discord.WebSocket
                                         bool isCached = cachedMsg != null;
                                         var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly).ConfigureAwait(false);
 
-                                        var optionalMsg = cachedMsg is null
+                                        var optionalMsg = !isCached
                                             ? Optional.Create<SocketUserMessage>()
                                             : Optional.Create(cachedMsg);
 
@@ -1329,7 +1329,7 @@ namespace Discord.WebSocket
                                         bool isCached = cachedMsg != null;
                                         var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly).ConfigureAwait(false);
 
-                                        var optionalMsg = cachedMsg is null
+                                        var optionalMsg = !isCached
                                             ? Optional.Create<SocketUserMessage>()
                                             : Optional.Create(cachedMsg);
 
