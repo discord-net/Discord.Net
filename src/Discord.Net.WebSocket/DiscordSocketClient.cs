@@ -1295,7 +1295,16 @@ namespace Discord.WebSocket
                                         var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
                                         bool isCached = cachedMsg != null;
                                         var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly).ConfigureAwait(false);
-                                        var reaction = SocketReaction.Create(data, channel, cachedMsg, Optional.Create(user));
+
+                                        var optionalMsg = !isCached
+                                            ? Optional.Create<SocketUserMessage>()
+                                            : Optional.Create(cachedMsg);
+
+                                        var optionalUser = user is null
+                                            ? Optional.Create<IUser>()
+                                            : Optional.Create(user);
+
+                                        var reaction = SocketReaction.Create(data, channel, optionalMsg, optionalUser);
                                         var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId).ConfigureAwait(false) as IUserMessage);
 
                                         cachedMsg?.AddReaction(reaction);
@@ -1319,7 +1328,16 @@ namespace Discord.WebSocket
                                         var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
                                         bool isCached = cachedMsg != null;
                                         var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly).ConfigureAwait(false);
-                                        var reaction = SocketReaction.Create(data, channel, cachedMsg, Optional.Create(user));
+
+                                        var optionalMsg = !isCached
+                                            ? Optional.Create<SocketUserMessage>()
+                                            : Optional.Create(cachedMsg);
+
+                                        var optionalUser = user is null
+                                            ? Optional.Create<IUser>()
+                                            : Optional.Create(user);
+
+                                        var reaction = SocketReaction.Create(data, channel, optionalMsg, optionalUser);
                                         var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId).ConfigureAwait(false) as IUserMessage);
 
                                         cachedMsg?.RemoveReaction(reaction);
