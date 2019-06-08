@@ -77,6 +77,8 @@ namespace Discord.Net.Converters
                 return PermissionTargetConverter.Instance;
             if (type == typeof(UserStatus))
                 return UserStatusConverter.Instance;
+            if (type == typeof(EmbedType))
+                return EmbedTypeConverter.Instance;
 
             //Special
             if (type == typeof(API.Image))
