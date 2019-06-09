@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.1.1] - 2019-06-08
+### Fixed
+- #994: Remainder parameters now ignore character escaping, as there is no reason to escape characters here (2e95c49)
+- #1316: `Emote.Equals` now pays no respect to the Name property, since Discord's API does not care about an emote's name (abf3e90)
+- #1317: `Emote.GetHashCode` now pays no respect to the Name property, see above (1b54883)
+- #1323: Optionals will no longer claim to be specified when a reaction message was not cached (1cc5d73)
+- Log messages sourcing from REST events will no longer be raised twice (c78a679)
+- News embeds will be processed as `EmbedType.Unknown`, rather than throwing an error and dropping the message (d287ed1)
+
+### Changed
+- #1311: Members may now be disconnected from voice channels by passing `null` as `GuildUserProperties.Channel` (fc48c66)
+- #1313: `IMessage.Tags` now includes the EveryoneRole on @everyone and @here mentions (1f55f01)
+- #1320: The maximum value for setting slow-mode has been updated to 6 hours, per the new API limit (4433ca7)
+
+### Misc
+- This library's compatibility with Semantic Versioning has been clarified. Please see the README (4d7de17)
+- The depency on System.Interactive.Async has been bumped to `3.2.0` (3e65e03)
+
 ## [2.1.0] - 2019-05-18
 ### Added
 - #1236: Bulk deletes (for messages) may now be accessed via the `MessagesBulkDeleted` event (dec353e)
