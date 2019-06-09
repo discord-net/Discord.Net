@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
 
@@ -101,34 +102,55 @@ namespace Discord.Rest
             int index = 0;
             int codeBlockIndex = 0;
             int closeIndex;
+            bool isBlock = false;
 
-            // gets the next index of a codeblock stop/start
-            int IndexOfCode(int startIndex)
-            {
-                if (startIndex == -1)
-                    return -1;
-                // code block has precedence over inline code
-                var codeIndex = text.IndexOf("```", startIndex);
-                if (codeIndex != -1)
-                    return codeIndex + 3;
-                codeIndex = text.IndexOf('`', startIndex);
-                if (codeIndex != -1)
-                    return codeIndex + 1;
-                return -1;
-            }
+            //var codeBlockRegex = new Regex(@"((?!\\)`){3}", RegexOptions.Compiled);
+            ////var codeInlineRegex = new Regex(@"[^\\]`", RegexOptions.Compiled);
+            //var codeInlineRegex = new Regex(@"((?!\\)`)", RegexOptions.Compiled);
+
+            var inlineRegex = new Regex(@"[^\\]?(`).+?[^\\](`)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline);
+            var blockRegex = new Regex(@"[^\\]?(```).+?[^\\](```)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline);
+
             // checks if the tag being parsed is wrapped in code blocks
             bool CheckWrappedCode()
             {
-                closeIndex = 0;
-                codeBlockIndex = IndexOfCode(codeBlockIndex);
-                // loop through all code blocks, before the starting index
-                while (codeBlockIndex != -1 && closeIndex != -1 && closeIndex < index)
+                // util to check if the index of a tag is within the bounds of the codeblock
+                bool EnclosedInBlock(Match m)
+                    => codeBlockIndex + m.Groups[1].Index < index && index < codeBlockIndex + m.Groups[2].Index;
+
+                // need to check if the upper bound is beyond the end of the regex
+                int upperBound = -1;
+                while (upperBound < index)
                 {
-                    closeIndex = IndexOfCode(codeBlockIndex);
-                    codeBlockIndex = IndexOfCode(closeIndex);
+                    var blockMatch = blockRegex.Match(text, codeBlockIndex);
+                    if (blockMatch.Success)
+                    {
+                        upperBound = blockMatch.Groups[2].Index + codeBlockIndex;
+                        if (upperBound < index)
+                            break;
+                        if (EnclosedInBlock(blockMatch))
+                        {
+                            codeBlockIndex = blockMatch.Groups[2].Index + blockMatch.Groups[2].Length;
+                            return true;
+                        }
+                        return false;
+                    }
+                    var inlineMatch = inlineRegex.Match(text, codeBlockIndex);
+                    if (inlineMatch.Success)
+                    {
+                        upperBound = inlineMatch.Groups[2].Index + codeBlockIndex;
+                        if (upperBound < index)
+                            break;
+                        if (EnclosedInBlock(inlineMatch))
+                        {
+                            codeBlockIndex = inlineMatch.Groups[2].Index + inlineMatch.Groups[2].Length;
+                            return true;
+                        }
+                        return false;
+                    }
+                    return false;
                 }
-                // break if unclosed code block, or code block beyond starting index
-                return closeIndex == -1 || closeIndex > index;
+                return false;
             }
 
             while (true)

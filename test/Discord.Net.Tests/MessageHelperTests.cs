@@ -38,10 +38,22 @@ namespace Discord
         [InlineData("``` code block 1 ``` ``` code block 2 ``` <@&163184946742034432>")]
         [InlineData("` code block 1 ``` ` code block 2 ``` <@&163184946742034432>")]
         [InlineData("<@&163184946742034432> ``` code block 1 ```")]
+        [InlineData("``` code ``` ``` code ``` @here ``` code ``` ``` more ```")]
+        [InlineData("``` code ``` @here ``` more ```")]
         public void ParseTagsAroundCode(string testData)
         {
             // don't care that I'm passing in null channels/guilds/users
             // as they shouldn't be required
+            var result = MessageHelper.ParseTags(testData, null, null, null);
+            Assert.NotEmpty(result);
+        }
+
+        [Theory]
+        [InlineData(@"\` @everyone \`")]
+        [InlineData(@"\`\`\` @everyone \`\`\`")]
+        [InlineData(@"hey\`\`\`@everyone\`\`\`!!")]
+        public void IgnoreEscapedCodeBlocks(string testData)
+        {
             var result = MessageHelper.ParseTags(testData, null, null, null);
             Assert.NotEmpty(result);
         }
