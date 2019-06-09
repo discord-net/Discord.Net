@@ -114,7 +114,5 @@ namespace Discord
             var result = MessageHelper.ParseTags(here, null, null, null);
             Assert.Contains(result, x => x.Type == TagType.HereMention);
         }
-
     }
 }
-
