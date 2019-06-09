@@ -116,36 +116,33 @@ namespace Discord.Rest
             {
                 // util to check if the index of a tag is within the bounds of the codeblock
                 bool EnclosedInBlock(Match m)
-                    => codeBlockIndex + m.Groups[1].Index < index && index < codeBlockIndex + m.Groups[2].Index;
+                    => m.Groups[1].Index < index && index < m.Groups[2].Index;
 
                 // need to check if the upper bound is beyond the end of the regex
-                int upperBound = -1;
-                while (upperBound < index)
+                while (codeBlockIndex < index)
                 {
                     var blockMatch = blockRegex.Match(text, codeBlockIndex);
                     if (blockMatch.Success)
                     {
-                        upperBound = blockMatch.Groups[2].Index + codeBlockIndex;
-                        if (upperBound < index)
-                            break;
                         if (EnclosedInBlock(blockMatch))
                         {
-                            codeBlockIndex = blockMatch.Groups[2].Index + blockMatch.Groups[2].Length;
                             return true;
                         }
+                        codeBlockIndex += blockMatch.Groups[2].Index + blockMatch.Groups[2].Length;
+                        if (codeBlockIndex < index)
+                            continue;
                         return false;
                     }
                     var inlineMatch = inlineRegex.Match(text, codeBlockIndex);
                     if (inlineMatch.Success)
                     {
-                        upperBound = inlineMatch.Groups[2].Index + codeBlockIndex;
-                        if (upperBound < index)
-                            break;
                         if (EnclosedInBlock(inlineMatch))
                         {
-                            codeBlockIndex = inlineMatch.Groups[2].Index + inlineMatch.Groups[2].Length;
                             return true;
                         }
+                        codeBlockIndex += inlineMatch.Groups[2].Index + inlineMatch.Groups[2].Length;
+                        if (codeBlockIndex < index)
+                            continue;
                         return false;
                     }
                     return false;
