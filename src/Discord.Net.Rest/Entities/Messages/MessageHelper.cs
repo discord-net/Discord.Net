@@ -119,9 +119,7 @@ namespace Discord.Rest
                     if (blockMatch.Success)
                     {
                         if (EnclosedInBlock(blockMatch))
-                        {
                             return true;
-                        }
                         // continue if the end of the current code was before the start of the tag
                         codeIndex += blockMatch.Groups[2].Index + blockMatch.Groups[2].Length;
                         if (codeIndex < index)
@@ -132,9 +130,7 @@ namespace Discord.Rest
                     if (inlineMatch.Success)
                     {
                         if (EnclosedInBlock(inlineMatch))
-                        {
                             return true;
-                        }
                         // continue if the end of the current code was before the start of the tag
                         codeIndex += inlineMatch.Groups[2].Index + inlineMatch.Groups[2].Length;
                         if (codeIndex < index)
