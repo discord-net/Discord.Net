@@ -100,13 +100,7 @@ namespace Discord.Rest
         {
             var tags = ImmutableArray.CreateBuilder<ITag>();
             int index = 0;
-            int codeBlockIndex = 0;
-            int closeIndex;
-            bool isBlock = false;
-
-            //var codeBlockRegex = new Regex(@"((?!\\)`){3}", RegexOptions.Compiled);
-            ////var codeInlineRegex = new Regex(@"[^\\]`", RegexOptions.Compiled);
-            //var codeInlineRegex = new Regex(@"((?!\\)`)", RegexOptions.Compiled);
+            var codeIndex = 0;
 
             var inlineRegex = new Regex(@"[^\\]?(`).+?[^\\](`)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline);
             var blockRegex = new Regex(@"[^\\]?(```).+?[^\\](```)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline);
@@ -118,30 +112,32 @@ namespace Discord.Rest
                 bool EnclosedInBlock(Match m)
                     => m.Groups[1].Index < index && index < m.Groups[2].Index;
 
-                // need to check if the upper bound is beyond the end of the regex
-                while (codeBlockIndex < index)
+                // loop through all code blocks that are before the start of the tag
+                while (codeIndex < index)
                 {
-                    var blockMatch = blockRegex.Match(text, codeBlockIndex);
+                    var blockMatch = blockRegex.Match(text, codeIndex);
                     if (blockMatch.Success)
                     {
                         if (EnclosedInBlock(blockMatch))
                         {
                             return true;
                         }
-                        codeBlockIndex += blockMatch.Groups[2].Index + blockMatch.Groups[2].Length;
-                        if (codeBlockIndex < index)
+                        // continue if the end of the current code was before the start of the tag
+                        codeIndex += blockMatch.Groups[2].Index + blockMatch.Groups[2].Length;
+                        if (codeIndex < index)
                             continue;
                         return false;
                     }
-                    var inlineMatch = inlineRegex.Match(text, codeBlockIndex);
+                    var inlineMatch = inlineRegex.Match(text, codeIndex);
                     if (inlineMatch.Success)
                     {
                         if (EnclosedInBlock(inlineMatch))
                         {
                             return true;
                         }
-                        codeBlockIndex += inlineMatch.Groups[2].Index + inlineMatch.Groups[2].Length;
-                        if (codeBlockIndex < index)
+                        // continue if the end of the current code was before the start of the tag
+                        codeIndex += inlineMatch.Groups[2].Index + inlineMatch.Groups[2].Length;
+                        if (codeIndex < index)
                             continue;
                         return false;
                     }
@@ -199,8 +195,7 @@ namespace Discord.Rest
             }
 
             index = 0;
-            codeBlockIndex = 0;
-            closeIndex = 0;
+            codeIndex = 0;
             while (true)
             {
                 index = text.IndexOf("@everyone", index);
@@ -213,8 +208,7 @@ namespace Discord.Rest
             }
 
             index = 0;
-            codeBlockIndex = 0;
-            closeIndex = 0;
+            codeIndex = 0;
             while (true)
             {
                 index = text.IndexOf("@here", index);
