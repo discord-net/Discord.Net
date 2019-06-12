@@ -33,6 +33,8 @@ namespace Discord.API
         public Optional<string> SyncId { get; set; }
         [JsonProperty("session_id")]
         public Optional<string> SessionId { get; set; }
+        [JsonProperty("Flags")]
+        public Optional<ActivityProperties> Flags { get; set; }
 
         [OnError]
         internal void OnError(StreamingContext context, ErrorContext errorContext)
