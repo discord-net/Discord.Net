@@ -57,6 +57,6 @@ namespace Discord.API
         [JsonProperty("system_channel_flags")]
         public SystemChannelMessageDeny SystemChannelFlags { get; set; }
         [JsonProperty("premium_subscription_count")]
-        public Optional<int> PremiumSubscriptionCount { get; set; }
+        public int? PremiumSubscriptionCount { get; set; }
     }
 }

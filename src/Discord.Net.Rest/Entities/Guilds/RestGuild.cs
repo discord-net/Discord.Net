@@ -123,8 +123,7 @@ namespace Discord.Rest
             BannerId = model.Banner;
             SystemChannelFlags = model.SystemChannelFlags;
             Description = model.Description;
-            if (model.PremiumSubscriptionCount.IsSpecified)
-                PremiumSubscriptionCount = model.PremiumSubscriptionCount.Value;
+            PremiumSubscriptionCount = model.PremiumSubscriptionCount.GetValueOrDefault();
 
             if (model.Emojis != null)
             {
