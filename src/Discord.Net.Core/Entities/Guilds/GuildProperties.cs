@@ -77,8 +77,11 @@ namespace Discord
         ///     These flags are inverted. Setting a flag will disable that system channel message from being sent.
         ///     A value of <see cref="SystemChannelMessageDeny.None"/> will allow all system channel message types to be sent,
         ///     given that the <see cref="SystemChannelId"/> has also been sent.
-        ///     Refer to the extension methods <see cref="GuildExtensions.GetGuildBoostMessagesEnabled(IGuild)"/> and <see cref="GuildExtensions.GetWelcomeMessagesEnabled(IGuild)"/>
-        ///     to check if these system channel messages are enabled, without the need to manipulate the flags.
+        ///     A value of <see cref="SystemChannelMessageDeny.GuildBoost"/> will deny guild boost messages from being sent, and allow all
+        ///     other types of messages.
+        ///     Refer to the extension methods <see cref="GuildExtensions.GetGuildBoostMessagesEnabled(IGuild)"/> and
+        ///     <see cref="GuildExtensions.GetWelcomeMessagesEnabled(IGuild)"/> to check if these system channel messages
+        ///     are enabled, without the need to manipulate the flags.
         /// </remarks>
         public Optional<SystemChannelMessageDeny> SystemChannelFlags { get; set; }
     }
