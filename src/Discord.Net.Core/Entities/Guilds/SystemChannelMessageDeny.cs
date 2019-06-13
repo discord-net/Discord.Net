@@ -11,11 +11,11 @@ namespace Discord
         /// </summary>
         None = 0,
         /// <summary>
-        ///     The messages that are sent when a user joins the guild.
+        ///     Deny the messages that are sent when a user joins the guild.
         /// </summary>
         WelcomeMessage = 0b1,
         /// <summary>
-        ///     The messages that are sent when a user boosts the guild.
+        ///     Deny the messages that are sent when a user boosts the guild.
         /// </summary>
         GuildBoost = 0b10
     }

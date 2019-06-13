@@ -6,7 +6,7 @@ namespace Discord
     public static class GuildExtensions
     {
         /// <summary>
-        ///     Gets if welcome message system messages are enabled.
+        ///     Gets if welcome system messages are enabled.
         /// </summary>
         /// <param name="guild"> The guild to check. </param>
         /// <returns> A <c>bool</c> indicating if the welcome messages are enabled in the system channel. </returns>

@@ -213,9 +213,6 @@ namespace Discord
         /// <summary>
         ///     Gets the URL of this guild's banner image.
         /// </summary>
-        /// <remarks>
-        ///     This is referred to as the vanity image in the API.
-        /// </remarks>
         /// <returns>
         ///     A URL pointing to the guild's banner image; <c>null</c> if none is set.
         /// </returns>
@@ -228,10 +225,10 @@ namespace Discord
         /// </returns>
         string VanityURLCode { get; }
         /// <summary>
-        ///     Gets the flags for the types of system channels that are disabled.
+        ///     Gets the flags for the types of system channel messages that are disabled.
         /// </summary>
         /// <returns>
-        ///     The flags for the types of system channel flags that are disabled.
+        ///     The flags for the types of system channel messages that are disabled.
         /// </returns>
         SystemChannelMessageDeny SystemChannelFlags { get; }
         /// <summary>
@@ -244,6 +241,9 @@ namespace Discord
         /// <summary>
         ///     Gets the number of premium subscribers of this guild.
         /// </summary>
+        /// <remarks>
+        ///     This is the number of users who have boosted this guild.
+        /// </remarks>
         /// <returns>
         ///     The number of premium subscribers of this guild.
         /// </returns>
