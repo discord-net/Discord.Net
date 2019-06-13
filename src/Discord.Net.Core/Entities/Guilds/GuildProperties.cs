@@ -72,8 +72,14 @@ namespace Discord
         public Optional<ExplicitContentFilterLevel> ExplicitContentFilter { get; set; }
         /// <summary>
         ///     Gets or sets the flags that DISABLE types of system channels.
-        ///     This logic is inverted!
         /// </summary>
+        /// <remarks>
+        ///     These flags are inverted. Setting a flag will disable that system channel message from being sent.
+        ///     A value of <see cref="SystemChannelMessageDeny.None"/> will allow all system channel message types to be sent,
+        ///     given that the <see cref="SystemChannelId"/> has also been sent.
+        ///     Refer to the extension methods <see cref="GuildExtensions.GetGuildBoostMessagesEnabled(IGuild)"/> and <see cref="GuildExtensions.GetWelcomeMessagesEnabled(IGuild)"/>
+        ///     to check if these system channel messages are enabled, without the need to manipulate the flags.
+        /// </remarks>
         public Optional<SystemChannelMessageDeny> SystemChannelFlags { get; set; }
     }
 }
