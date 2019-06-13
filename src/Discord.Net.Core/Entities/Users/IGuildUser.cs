@@ -51,9 +51,9 @@ namespace Discord
         ///     Gets the date and time for when this user's guild boost began.
         /// </summary>
         /// <returns>
-        ///     A <see cref="DateTime"/> for when the user began boosting this guild; <c>null</c> if they are not boosting the guild.
+        ///     A <see cref="DateTimeOffset"/> for when the user began boosting this guild; <c>null</c> if they are not boosting the guild.
         /// </returns>
-        DateTime? PremiumSince { get; }
+        DateTimeOffset? PremiumSince { get; }
         /// <summary>
         ///     Gets a collection of IDs for the roles that this user currently possesses in the guild.
         /// </summary>

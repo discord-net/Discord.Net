@@ -14,7 +14,7 @@ namespace Discord.Rest
         public ulong WebhookId { get; }
         internal IGuild Guild { get; }
         /// <inheritdoc />
-        public DateTime? PremiumSince { get; private set; }
+        public DateTimeOffset? PremiumSince { get; private set; }
 
         /// <inheritdoc />
         public override bool IsWebhook => true;
