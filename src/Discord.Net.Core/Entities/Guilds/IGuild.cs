@@ -204,19 +204,29 @@ namespace Discord
         /// </returns>
         PremiumTier PremiumTier { get; }
         /// <summary>
-        ///     Gets the identifier for this guilds vanity image.
-        /// </summary>
-        /// <remarks>
-        ///     An identifier for the vanity image; <c>null</c> if none is set.
-        /// </remarks>
-        string VanityId { get; }
-        /// <summary>
-        ///     Gets the URL of this guild's vanity image.
+        ///     Gets the identifier for this guilds banner image.
         /// </summary>
         /// <returns>
-        ///     A URL pointing to the guild's vanity image; <c>null</c> if none is set.
+        ///     An identifier for the banner image; <c>null</c> if none is set.
         /// </returns>
-        string VanityUrl { get; }
+        string BannerId { get; }
+        /// <summary>
+        ///     Gets the URL of this guild's banner image.
+        /// </summary>
+        /// <remarks>
+        ///     This is referred to as the vanity image in the API.
+        /// </remarks>
+        /// <returns>
+        ///     A URL pointing to the guild's banner image; <c>null</c> if none is set.
+        /// </returns>
+        string BannerUrl { get; }
+        /// <summary>
+        ///     Gets the code for this guild's vanity invite URL.
+        /// </summary>
+        /// <returns>
+        ///     A string containing the vanity invite code for this guild; <c>null</c> if none is set.
+        /// </returns>
+        string VanityURLCode { get; }
         /// <summary>
         ///     Gets the flags for the types of system channels that are disabled.
         /// </summary>

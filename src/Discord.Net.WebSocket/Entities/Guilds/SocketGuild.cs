@@ -96,7 +96,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public PremiumTier PremiumTier { get; private set; }
         /// <inheritdoc />
-        public string VanityId { get; private set; }
+        public string BannerId { get; private set; }
+        /// <inheritdoc />
+        public string VanityURLCode { get; private set; }
         /// <inheritdoc />
         public SystemChannelMessageDeny SystemChannelFlags { get; private set; }
         /// <inheritdoc />
@@ -111,7 +113,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
         /// <inheritdoc />
-        public string VanityUrl => CDN.GetGuildVanityUrl(Id, VanityId);
+        public string BannerUrl => CDN.GetGuildBannerUrl(Id, BannerId);
         /// <summary> Indicates whether the client has all the members downloaded to the local guild cache. </summary>
         public bool HasAllMembers => MemberCount == DownloadedMemberCount;// _downloaderPromise.Task.IsCompleted;
         /// <summary> Indicates whether the guild cache is synced to this guild. </summary>
@@ -367,7 +369,8 @@ namespace Discord.WebSocket
             ExplicitContentFilter = model.ExplicitContentFilter;
             ApplicationId = model.ApplicationId;
             PremiumTier = model.PremiumTier;
-            VanityId = model.VanityURLCode;
+            VanityURLCode = model.VanityURLCode;
+            BannerId = model.Banner;
             SystemChannelFlags = model.SystemChannelFlags;
             Description = model.Description;
             PremiumSubscriptionCount = model.PremiumSubscriptionCount.GetValueOrDefault();

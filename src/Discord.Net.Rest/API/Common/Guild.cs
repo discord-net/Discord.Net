@@ -49,6 +49,8 @@ namespace Discord.API
         public PremiumTier PremiumTier { get; set; }
         [JsonProperty("vanity_url_code")]
         public string VanityURLCode { get; set; }
+        [JsonProperty("banner")]
+        public string Banner { get; set; }
         [JsonProperty("description")]
         public string Description { get; set; }
         // this value is inverted, flags set will turn OFF features

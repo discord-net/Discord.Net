@@ -55,7 +55,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         public PremiumTier PremiumTier { get; private set; }
         /// <inheritdoc />
-        public string VanityId { get; private set; }
+        public string BannerId { get; private set; }
+        /// <inheritdoc />
+        public string VanityURLCode { get; private set; }
         /// <inheritdoc />
         public SystemChannelMessageDeny SystemChannelFlags { get; private set; }
         /// <inheritdoc />
@@ -73,7 +75,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
         /// <inheritdoc />
-        public string VanityUrl => CDN.GetGuildVanityUrl(Id, VanityId);
+        public string BannerUrl => CDN.GetGuildBannerUrl(Id, BannerId);
 
         /// <summary>
         ///     Gets the built-in role containing all users in this guild.
@@ -117,10 +119,12 @@ namespace Discord.Rest
             ExplicitContentFilter = model.ExplicitContentFilter;
             ApplicationId = model.ApplicationId;
             PremiumTier = model.PremiumTier;
-            VanityId = model.VanityURLCode;
+            VanityURLCode = model.VanityURLCode;
+            BannerId = model.Banner;
             SystemChannelFlags = model.SystemChannelFlags;
             Description = model.Description;
-            PremiumSubscriptionCount = model.PremiumSubscriptionCount.GetValueOrDefault();
+            if (model.PremiumSubscriptionCount.IsSpecified)
+                PremiumSubscriptionCount = model.PremiumSubscriptionCount.Value;
 
             if (model.Emojis != null)
             {
