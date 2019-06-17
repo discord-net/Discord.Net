@@ -25,7 +25,8 @@ namespace Discord.WebSocket
                     Artists = model.State.GetValueOrDefault()?.Split(';').Select(x=>x?.Trim()).ToImmutableArray(),
                     Duration = timestamps?.End - timestamps?.Start,
                     AlbumArtUrl = albumArtId != null ? CDN.GetSpotifyAlbumArtUrl(albumArtId) : null,
-                    Type = ActivityType.Listening
+                    Type = ActivityType.Listening,
+                    Flags = model.Flags.GetValueOrDefault(),
                 };
             }
 
@@ -44,18 +45,25 @@ namespace Discord.WebSocket
                     LargeAsset = assets?[1],
                     Party = model.Party.IsSpecified ? model.Party.Value.ToEntity() : null,
                     Secrets = model.Secrets.IsSpecified ? model.Secrets.Value.ToEntity() : null,
-                    Timestamps = model.Timestamps.IsSpecified ? model.Timestamps.Value.ToEntity() : null
+                    Timestamps = model.Timestamps.IsSpecified ? model.Timestamps.Value.ToEntity() : null,
+                    Flags = model.Flags.GetValueOrDefault()
                 };
             }
             // Stream Game
             if (model.StreamUrl.IsSpecified)
             {
                 return new StreamingGame(
-                    model.Name, 
-                    model.StreamUrl.Value);
+                    model.Name,
+                    model.StreamUrl.Value)
+                {
+                    Flags = model.Flags.GetValueOrDefault(),
+                    Details = model.Details.GetValueOrDefault()
+                };
             }
             // Normal Game
-            return new Game(model.Name, model.Type.GetValueOrDefault() ?? ActivityType.Playing);
+            return new Game(model.Name, model.Type.GetValueOrDefault() ?? ActivityType.Playing,
+                model.Flags.IsSpecified ? model.Flags.Value : ActivityProperties.None,
+                model.Details.GetValueOrDefault());
         }
 
         // (Small, Large)

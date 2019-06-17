@@ -30,6 +30,12 @@ namespace Discord.WebSocket
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
         /// <inheritdoc />
         internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
+        /// <inheritdoc />
+        public UserProperties Flags { get; internal set; }
+        /// <inheritdoc />
+        public PremiumType PremiumType { get; internal set; }
+        /// <inheritdoc />
+        public string Locale { get; internal set; }
 
         /// <inheritdoc />
         public override bool IsWebhook => false;
@@ -61,6 +67,21 @@ namespace Discord.WebSocket
             if (model.MfaEnabled.IsSpecified)
             {
                 IsMfaEnabled = model.MfaEnabled.Value;
+                hasGlobalChanges = true;
+            }
+            if (model.Flags.IsSpecified && model.Flags.Value != Flags)
+            {
+                Flags = (UserProperties)model.Flags.Value;
+                hasGlobalChanges = true;
+            }
+            if (model.PremiumType.IsSpecified && model.PremiumType.Value != PremiumType)
+            {
+                PremiumType = model.PremiumType.Value;
+                hasGlobalChanges = true;
+            }
+            if (model.Locale.IsSpecified && model.Locale.Value != Locale)
+            {
+                Locale = model.Locale.Value;
                 hasGlobalChanges = true;
             }
             return hasGlobalChanges;

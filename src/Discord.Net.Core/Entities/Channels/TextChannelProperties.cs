@@ -36,7 +36,7 @@ namespace Discord
         ///         <see cref="ChannelPermission.ManageChannels"/> will be exempt from slow-mode.
         ///     </note>
         /// </remarks>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if the value does not fall within [0, 120].</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the value does not fall within [0, 21600].</exception>
         public Optional<int> SlowModeInterval { get; set; }
     }
 }

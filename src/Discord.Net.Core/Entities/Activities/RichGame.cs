@@ -11,10 +11,6 @@ namespace Discord
         internal RichGame() { }
 
         /// <summary>
-        ///     Gets what the player is currently doing.
-        /// </summary>
-        public string Details { get; internal set; }
-        /// <summary>
         ///     Gets the user's current party status.
         /// </summary>
         public string State { get; internal set; }
