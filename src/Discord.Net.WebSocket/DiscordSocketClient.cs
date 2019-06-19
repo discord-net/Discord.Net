@@ -264,7 +264,9 @@ namespace Discord.WebSocket
                 await heartbeatTask.ConfigureAwait(false);
             _heartbeatTask = null;
 
-            while (_heartbeatTimes.TryDequeue(out _)) { }
+            // Check if heartbeatTimes still contains something. Prevent infinite-looping.
+            if (_heartbeatTimes.Count > 0) 
+                while (_heartbeatTimes.TryDequeue(out _)) { }
             _lastMessageTime = 0;
 
             await _gatewayLogger.DebugAsync("Waiting for guild downloader").ConfigureAwait(false);
