@@ -36,6 +36,11 @@ namespace Discord.WebSocket
         /// </returns>
         public abstract IActivity Activity { get; protected set; }
 
+        /// <summary>
+        ///     Provides access to a REST-only client with a shared state from this client.
+        /// </summary>
+        public abstract DiscordSocketRestClient Rest { get; }
+
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
 
         /// <summary>
