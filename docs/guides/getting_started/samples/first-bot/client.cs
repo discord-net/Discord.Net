@@ -5,15 +5,17 @@ public async Task MainAsync()
 	_client = new DiscordSocketClient();
 
 	_client.Log += Log;
+    
+    // You can assign your bot token to a string, and pass that in to connect.
+    // This however is insecure, particularly if you plan to have your code hosted in a repository.
+    var token = "token";
+    
+    // Some alternative  options would be to keep your token in an Environment Variable or a standalone file.
+    // var token = Environment.GetEnvironmentVariable("NameOfYourEnvironmentVariable");
+    // var token = File.ReadAllText("token.txt");
+    // var token = JsonConvert.DeserializeObject<AConfigurationClass>(File.ReadAllText("config.json")).Token;
 
-	// Remember to keep token private or to read it from an 
-	// external source! In this case, we are reading the token 
-	// from an environment variable. If you do not know how to set-up
-	// environment variables, you may find more information on the 
-	// Internet or by using other methods such as reading from 
-	// a configuration.
-	await _client.LoginAsync(TokenType.Bot, 
-		Environment.GetEnvironmentVariable("DiscordToken"));
+	await _client.LoginAsync(TokenType.Bot, token);
 	await _client.StartAsync();
 
 	// Block this task until the program is closed.
