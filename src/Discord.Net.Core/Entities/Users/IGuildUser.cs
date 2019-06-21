@@ -48,6 +48,13 @@ namespace Discord
         /// </returns>
         ulong GuildId { get; }
         /// <summary>
+        ///     Gets the date and time for when this user's guild boost began.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="DateTimeOffset"/> for when the user began boosting this guild; <c>null</c> if they are not boosting the guild.
+        /// </returns>
+        DateTimeOffset? PremiumSince { get; }
+        /// <summary>
         ///     Gets a collection of IDs for the roles that this user currently possesses in the guild.
         /// </summary>
         /// <remarks>

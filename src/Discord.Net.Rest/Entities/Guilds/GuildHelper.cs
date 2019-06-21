@@ -33,7 +33,8 @@ namespace Discord.Rest
                 Name = args.Name,
                 Splash = args.Splash.IsSpecified ? args.Splash.Value?.ToModel() : Optional.Create<ImageModel?>(),
                 VerificationLevel = args.VerificationLevel,
-                ExplicitContentFilter = args.ExplicitContentFilter
+                ExplicitContentFilter = args.ExplicitContentFilter,
+                SystemChannelFlags = args.SystemChannelFlags
             };
 
             if (args.AfkChannel.IsSpecified)
@@ -63,6 +64,9 @@ namespace Discord.Rest
 
             if (args.ExplicitContentFilter.IsSpecified)
                 apiArgs.ExplicitContentFilter = args.ExplicitContentFilter.Value;
+
+            if (args.SystemChannelFlags.IsSpecified)
+                apiArgs.SystemChannelFlags = args.SystemChannelFlags.Value;
 
             return await client.ApiClient.ModifyGuildAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }

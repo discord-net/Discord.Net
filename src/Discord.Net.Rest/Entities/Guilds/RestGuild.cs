@@ -52,6 +52,18 @@ namespace Discord.Rest
         internal bool Available { get; private set; }
         /// <inheritdoc />
         public ulong? ApplicationId { get; private set; }
+        /// <inheritdoc />
+        public PremiumTier PremiumTier { get; private set; }
+        /// <inheritdoc />
+        public string BannerId { get; private set; }
+        /// <inheritdoc />
+        public string VanityURLCode { get; private set; }
+        /// <inheritdoc />
+        public SystemChannelMessageDeny SystemChannelFlags { get; private set; }
+        /// <inheritdoc />
+        public string Description { get; private set; }
+        /// <inheritdoc />
+        public int PremiumSubscriptionCount { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -62,6 +74,8 @@ namespace Discord.Rest
         public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
         /// <inheritdoc />
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
+        /// <inheritdoc />
+        public string BannerUrl => CDN.GetGuildBannerUrl(Id, BannerId);
 
         /// <summary>
         ///     Gets the built-in role containing all users in this guild.
@@ -104,6 +118,12 @@ namespace Discord.Rest
             DefaultMessageNotifications = model.DefaultMessageNotifications;
             ExplicitContentFilter = model.ExplicitContentFilter;
             ApplicationId = model.ApplicationId;
+            PremiumTier = model.PremiumTier;
+            VanityURLCode = model.VanityURLCode;
+            BannerId = model.Banner;
+            SystemChannelFlags = model.SystemChannelFlags;
+            Description = model.Description;
+            PremiumSubscriptionCount = model.PremiumSubscriptionCount.GetValueOrDefault();
 
             if (model.Emojis != null)
             {

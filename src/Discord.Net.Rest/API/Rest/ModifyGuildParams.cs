@@ -30,5 +30,7 @@ namespace Discord.API.Rest
         public Optional<ulong> OwnerId { get; set; }
         [JsonProperty("explicit_content_filter")]
         public Optional<ExplicitContentFilterLevel> ExplicitContentFilter { get; set; }
+        [JsonProperty("system_channel_flags")]
+        public Optional<SystemChannelMessageDeny> SystemChannelFlags { get; set; }
     }
 }

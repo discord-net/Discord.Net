@@ -196,6 +196,58 @@ namespace Discord
         ///     A read-only collection of roles found within this guild.
         /// </returns>
         IReadOnlyCollection<IRole> Roles { get; }
+        /// <summary>
+        ///     Gets the tier of guild boosting in this guild.
+        /// </summary>
+        /// <returns>
+        ///     The tier of guild boosting in this guild.
+        /// </returns>
+        PremiumTier PremiumTier { get; }
+        /// <summary>
+        ///     Gets the identifier for this guilds banner image.
+        /// </summary>
+        /// <returns>
+        ///     An identifier for the banner image; <c>null</c> if none is set.
+        /// </returns>
+        string BannerId { get; }
+        /// <summary>
+        ///     Gets the URL of this guild's banner image.
+        /// </summary>
+        /// <returns>
+        ///     A URL pointing to the guild's banner image; <c>null</c> if none is set.
+        /// </returns>
+        string BannerUrl { get; }
+        /// <summary>
+        ///     Gets the code for this guild's vanity invite URL.
+        /// </summary>
+        /// <returns>
+        ///     A string containing the vanity invite code for this guild; <c>null</c> if none is set.
+        /// </returns>
+        string VanityURLCode { get; }
+        /// <summary>
+        ///     Gets the flags for the types of system channel messages that are disabled.
+        /// </summary>
+        /// <returns>
+        ///     The flags for the types of system channel messages that are disabled.
+        /// </returns>
+        SystemChannelMessageDeny SystemChannelFlags { get; }
+        /// <summary>
+        ///     Gets the description for the guild.
+        /// </summary>
+        /// <returns>
+        ///     The description for the guild; <c>null</c> if none is set.
+        /// </returns>
+        string Description { get; }
+        /// <summary>
+        ///     Gets the number of premium subscribers of this guild.
+        /// </summary>
+        /// <remarks>
+        ///     This is the number of users who have boosted this guild.
+        /// </remarks>
+        /// <returns>
+        ///     The number of premium subscribers of this guild.
+        /// </returns>
+        int PremiumSubscriptionCount { get; }
 
         /// <summary>
         ///     Modifies this guild.

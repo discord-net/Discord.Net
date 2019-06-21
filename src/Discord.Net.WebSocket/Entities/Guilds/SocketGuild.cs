@@ -93,6 +93,18 @@ namespace Discord.WebSocket
         public string IconId { get; private set; }
         /// <inheritdoc />
         public string SplashId { get; private set; }
+        /// <inheritdoc />
+        public PremiumTier PremiumTier { get; private set; }
+        /// <inheritdoc />
+        public string BannerId { get; private set; }
+        /// <inheritdoc />
+        public string VanityURLCode { get; private set; }
+        /// <inheritdoc />
+        public SystemChannelMessageDeny SystemChannelFlags { get; private set; }
+        /// <inheritdoc />
+        public string Description { get; private set; }
+        /// <inheritdoc />
+        public int PremiumSubscriptionCount { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -100,6 +112,8 @@ namespace Discord.WebSocket
         public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
         /// <inheritdoc />
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
+        /// <inheritdoc />
+        public string BannerUrl => CDN.GetGuildBannerUrl(Id, BannerId);
         /// <summary> Indicates whether the client has all the members downloaded to the local guild cache. </summary>
         public bool HasAllMembers => MemberCount == DownloadedMemberCount;// _downloaderPromise.Task.IsCompleted;
         /// <summary> Indicates whether the guild cache is synced to this guild. </summary>
@@ -354,6 +368,12 @@ namespace Discord.WebSocket
             DefaultMessageNotifications = model.DefaultMessageNotifications;
             ExplicitContentFilter = model.ExplicitContentFilter;
             ApplicationId = model.ApplicationId;
+            PremiumTier = model.PremiumTier;
+            VanityURLCode = model.VanityURLCode;
+            BannerId = model.Banner;
+            SystemChannelFlags = model.SystemChannelFlags;
+            Description = model.Description;
+            PremiumSubscriptionCount = model.PremiumSubscriptionCount.GetValueOrDefault();
 
             if (model.Emojis != null)
             {

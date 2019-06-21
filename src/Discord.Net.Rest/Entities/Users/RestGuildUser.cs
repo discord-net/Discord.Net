@@ -14,6 +14,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestGuildUser : RestUser, IGuildUser
     {
+        private long? _premiumSinceTicks;
         private long? _joinedAtTicks;
         private ImmutableArray<ulong> _roleIds;
 
@@ -24,7 +25,8 @@ namespace Discord.Rest
         public bool IsDeafened { get; private set; }
         /// <inheritdoc />
         public bool IsMuted { get; private set; }
-
+        /// <inheritdoc />
+        public DateTimeOffset? PremiumSince => DateTimeUtils.FromTicks(_premiumSinceTicks);
         /// <inheritdoc />
         public ulong GuildId => Guild.Id;
 
@@ -69,6 +71,8 @@ namespace Discord.Rest
                 IsMuted = model.Mute.Value;
             if (model.Roles.IsSpecified)
                 UpdateRoles(model.Roles.Value);
+            if (model.PremiumSince.IsSpecified)
+                _premiumSinceTicks = model.PremiumSince.Value?.UtcTicks;
         }
         private void UpdateRoles(ulong[] roleIds)
         {
