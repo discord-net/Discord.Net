@@ -31,6 +31,13 @@ namespace Discord
         /// </returns>
         bool IsPinned { get; }
         /// <summary>
+        ///     Gets the value that indicates whether or not this message's embeds are suppressed.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if the embeds in this message have been suppressed (made invisible); otherwise <c>false</c>.
+        /// </returns>
+        bool IsSuppressed { get; }
+        /// <summary>
         ///     Gets the content for this message.
         /// </summary>
         /// <returns>

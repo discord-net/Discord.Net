@@ -14,7 +14,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestUserMessage : RestMessage, IUserMessage
     {
-        private bool _isMentioningEveryone, _isTTS, _isPinned;
+        private bool _isMentioningEveryone, _isTTS, _isPinned, _isSuppressed;
         private long? _editedTimestampTicks;
         private ImmutableArray<Attachment> _attachments = ImmutableArray.Create<Attachment>();
         private ImmutableArray<Embed> _embeds = ImmutableArray.Create<Embed>();
@@ -25,6 +25,8 @@ namespace Discord.Rest
         public override bool IsTTS => _isTTS;
         /// <inheritdoc />
         public override bool IsPinned => _isPinned;
+        /// <inheritdoc />
+        public override bool IsSuppressed => _isSuppressed;
         /// <inheritdoc />
         public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
         /// <inheritdoc />
@@ -65,6 +67,10 @@ namespace Discord.Rest
                 _editedTimestampTicks = model.EditedTimestamp.Value?.UtcTicks;
             if (model.MentionEveryone.IsSpecified)
                 _isMentioningEveryone = model.MentionEveryone.Value;
+            if (model.Flags.IsSpecified)
+            {
+                _isSuppressed = model.Flags.Value.HasFlag(API.MessageFlags.Suppressed);
+            }
 
             if (model.Attachments.IsSpecified)
             {
@@ -163,6 +169,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task UnpinAsync(RequestOptions options = null)
             => MessageHelper.UnpinAsync(this, Discord, options);
+        /// <inheritdoc />
+        public Task ModifySuppressionAsync(bool suppressEmbeds, RequestOptions options = null)
+            => MessageHelper.SuppressEmbedsAsync(this, Discord, suppressEmbeds, options);
 
         public string Resolve(int startIndex, TagHandling userHandling = TagHandling.Name, TagHandling channelHandling = TagHandling.Name,
             TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)

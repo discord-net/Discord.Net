@@ -20,6 +20,7 @@ namespace Discord.Rest
 
             var args = new MessageProperties();
             func(args);
+
             var apiArgs = new API.Rest.ModifyMessageParams
             {
                 Content = args.Content,
@@ -33,6 +34,15 @@ namespace Discord.Rest
             RequestOptions options)
         {
             await client.ApiClient.DeleteMessageAsync(channelId, msgId, options).ConfigureAwait(false);
+        }
+
+        public static async Task SuppressEmbedsAsync(IMessage msg, BaseDiscordClient client, bool suppress, RequestOptions options)
+        {
+            var apiArgs = new API.Rest.SuppressEmbedParams
+            {
+                Suppressed = suppress
+            };
+            await client.ApiClient.SuppressEmbedAsync(msg.Channel.Id, msg.Id, apiArgs, options).ConfigureAwait(false);
         }
 
         public static async Task AddReactionAsync(IMessage msg, IEmote emote, BaseDiscordClient client, RequestOptions options)

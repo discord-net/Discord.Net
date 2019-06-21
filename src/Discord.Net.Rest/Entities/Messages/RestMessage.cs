@@ -33,6 +33,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         public virtual bool IsPinned => false;
         /// <inheritdoc />
+        public virtual bool IsSuppressed => false;
+        /// <inheritdoc />
         public virtual DateTimeOffset? EditedTimestamp => null;
         /// <summary>
         ///     Gets a collection of the <see cref="Attachment"/>'s on the message.

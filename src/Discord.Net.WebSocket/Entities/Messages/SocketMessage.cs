@@ -42,6 +42,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public virtual bool IsPinned => false;
         /// <inheritdoc />
+        public virtual bool IsSuppressed => false;
+        /// <inheritdoc />
         public virtual DateTimeOffset? EditedTimestamp => null;
 
         /// <inheritdoc />
