@@ -204,8 +204,8 @@ namespace Discord
         ///     A hexadecimal string of the color.
         /// </returns>
         public override string ToString() =>
-            $"#{Convert.ToString(RawValue, 16)}";
+            string.Format("#{0:X6}", RawValue);
         private string DebuggerDisplay =>
-            $"#{Convert.ToString(RawValue, 16)} ({RawValue})";
+            string.Format("#{0:X6} ({0})", RawValue);
     }
 }
