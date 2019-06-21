@@ -1380,7 +1380,7 @@ namespace Discord.WebSocket
                                     if (!ExclusiveBulkDelete.HasValue)
                                     {
                                         await _gatewayLogger.WarningAsync("A bulk delete event has been received, but the event handling behavior has not been set. " +
-                                            "To supress this message, set the ExclusiveBulkDelete configuration property. " +
+                                            "To suppress this message, set the ExclusiveBulkDelete configuration property. " +
                                             "This message will appear only once.");
                                         ExclusiveBulkDelete = false;
                                     }
