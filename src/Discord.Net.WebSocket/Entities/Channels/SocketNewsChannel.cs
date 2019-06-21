@@ -7,7 +7,7 @@ using Model = Discord.API.Channel;
 namespace Discord.WebSocket
 {
     /// <summary>
-    ///     Represents a WebSocket-based news channel in a guild that has the same properties as a <see cref="RestTextChannel"/>.
+    ///     Represents a WebSocket-based news channel in a guild that has the same properties as a <see cref="SocketTextChannel"/>.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketNewsChannel : SocketTextChannel

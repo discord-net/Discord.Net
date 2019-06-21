@@ -30,7 +30,7 @@ namespace Discord.Rest
         /// </summary>
         /// <remarks>
         ///     This method follows the same behavior as described in 
-        ///     <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions)"/>. Please visit
+        ///     <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool)"/>. Please visit
         ///     its documentation for more details on this method.
         /// </remarks>
         /// <param name="filePath">The file path of the file.</param>

@@ -136,7 +136,7 @@ namespace Discord.WebSocket
         ///     </note>
         ///     <para>
         ///         This event is fired when multiple messages are bulk deleted. The event handler must return a
-        ///         <see cref="Task"/> and accept an <see cref="IReadOnlyCollection{Cacheable{TEntity,TId}}"/> and 
+        ///         <see cref="Task"/> and accept an <see cref="IReadOnlyCollection{Cacheable}"/> and 
         ///         <see cref="ISocketMessageChannel"/> as its parameters.
         ///     </para>
         ///     <para>

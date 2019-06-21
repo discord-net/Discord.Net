@@ -96,7 +96,8 @@ namespace Discord.WebSocket
         ///         due to this issue. This may be resolved at v3 of the library. Until then, you may want to consider
         ///         overriding the TypeReader and use
         ///         <see cref="DiscordRestClient.GetUserAsync(System.UInt64,Discord.RequestOptions)"/> 
-        ///         or <see cref="DiscordSocketRestClient.GetGuildUserAsync(ulong, ulong, RequestOptions)"/> as a backup.
+        ///         or <see cref="DiscordRestClient.GetGuildUserAsync"/>
+        ///         as a backup.
         ///     </note>
         /// </remarks>
         public bool AlwaysDownloadUsers { get; set; } = false;
