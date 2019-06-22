@@ -749,10 +749,16 @@ namespace Discord.WebSocket
             else
             {
                 member = SocketGuildUser.Create(this, Discord.State, model);
+                if (member == null)
+                    throw new InvalidOperationException("SocketGuildUser.Create failed to produce a member"); // TODO 2.2rel: delete this
+                if (member.GlobalUser == null)
+                    throw new InvalidOperationException("Member was created without global user"); // TODO 2.2rel: delete this
                 member.GlobalUser.AddRef();
                 _members[member.Id] = member;
                 DownloadedMemberCount++;
             }
+            if (member == null)
+                throw new InvalidOperationException("AddOrUpdateUser failed to produce a user"); // TODO 2.2rel: delete this
             return member;
         }
         internal SocketGuildUser AddOrUpdateUser(PresenceModel model)
