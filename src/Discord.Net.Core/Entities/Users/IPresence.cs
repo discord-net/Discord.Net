@@ -18,7 +18,6 @@ namespace Discord
         /// <summary>
         ///     Gets the set of clients where this user is currently active.
         /// </summary>
-        // TODO: Un-comment ActiveClients definition in IPresence for next breaking update
-        // IImmutableSet<ClientType> ActiveClients { get; }
+        IImmutableSet<ClientType> ActiveClients { get; }
     }
 }
