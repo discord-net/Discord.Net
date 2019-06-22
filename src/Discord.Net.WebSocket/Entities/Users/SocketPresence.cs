@@ -47,8 +47,7 @@ namespace Discord.WebSocket
             var set = new HashSet<ClientType>();
             foreach (var key in clientTypesDict.Keys)
             {
-                ClientType type;
-                if (Enum.TryParse(key, true, out type))
+                if (Enum.TryParse(key, true, out ClientType type))
                     set.Add(type);
                 // quietly discard ClientTypes that do not match
             }
