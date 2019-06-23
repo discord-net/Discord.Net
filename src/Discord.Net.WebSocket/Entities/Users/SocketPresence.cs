@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using Model = Discord.API.Presence;
 
@@ -13,15 +16,42 @@ namespace Discord.WebSocket
         public UserStatus Status { get; }
         /// <inheritdoc />
         public IActivity Activity { get; }
-
-        internal SocketPresence(UserStatus status, IActivity activity)
+        /// <inheritdoc />
+        public IImmutableSet<ClientType> ActiveClients { get; }
+        internal SocketPresence(UserStatus status, IActivity activity, IImmutableSet<ClientType> activeClients)
         {
             Status = status;
             Activity= activity;
+            ActiveClients = activeClients;
         }
         internal static SocketPresence Create(Model model)
         {
-            return new SocketPresence(model.Status, model.Game?.ToEntity());
+            var clients = ConvertClientTypesDict(model.ClientStatus.GetValueOrDefault());
+            return new SocketPresence(model.Status, model.Game?.ToEntity(), clients);
+        }
+        /// <summary>
+        ///     Creates a new <see cref="IReadOnlyCollection{T}"/> containing all of the client types
+        ///     where a user is active from the data supplied in the Presence update frame.
+        /// </summary>
+        /// <param name="clientTypesDict">
+        ///     A dictionary keyed by the <see cref="ClientType"/>
+        ///     and where the value is the <see cref="UserStatus"/>.
+        /// </param>
+        /// <returns>
+        ///     A collection of all <see cref="ClientType"/>s that this user is active.
+        /// </returns>
+        private static IImmutableSet<ClientType> ConvertClientTypesDict(IDictionary<string, string> clientTypesDict)
+        {
+            if (clientTypesDict == null || clientTypesDict.Count == 0)
+                return ImmutableHashSet<ClientType>.Empty;
+            var set = new HashSet<ClientType>();
+            foreach (var key in clientTypesDict.Keys)
+            {
+                if (Enum.TryParse(key, true, out ClientType type))
+                    set.Add(type);
+                // quietly discard ClientTypes that do not match
+            }
+            return set.ToImmutableHashSet();
         }
 
         /// <summary>

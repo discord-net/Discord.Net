@@ -1,5 +1,6 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Discord.API
 {
@@ -18,5 +19,12 @@ namespace Discord.API
         public Optional<ulong[]> Roles { get; set; }
         [JsonProperty("nick")]
         public Optional<string> Nick { get; set; }
+        // This property is a Dictionary where each key is the ClientType
+        // and the values are the current client status.
+        // The client status values are all the same.
+        // Example:
+        //   "client_status": { "desktop": "dnd", "mobile": "dnd" }
+        [JsonProperty("client_status")]
+        public Optional<Dictionary<string, string>> ClientStatus { get; set; }
     }
 }
