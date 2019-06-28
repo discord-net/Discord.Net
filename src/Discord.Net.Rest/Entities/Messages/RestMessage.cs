@@ -103,7 +103,7 @@ namespace Discord.Rest
                 Activity = new MessageActivity()
                 {
                     Type = model.Activity.Value.Type.Value,
-                    PartyId = model.Activity.Value.PartyId.Value
+                    PartyId = model.Activity.Value.PartyId.GetValueOrDefault()
                 };
             }
         }
