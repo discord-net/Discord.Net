@@ -44,7 +44,7 @@ namespace Discord
                     IconUrl = embed.Author?.IconUrl,
                     Url = embed.Author?.Url
                 },
-                Color = embed.Color ?? Color.Default,
+                Color = embed.Color,
                 Description = embed.Description,
                 Footer = new EmbedFooterBuilder
                 {
