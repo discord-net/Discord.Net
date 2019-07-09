@@ -18,7 +18,7 @@ namespace Discord
         /// </summary>
         Listening = 2,
         /// <summary>
-        ///     The user is watching a media.
+        ///     The user is watching some form of media.
         /// </summary>
         Watching = 3
     }
