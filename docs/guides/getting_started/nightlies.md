@@ -53,7 +53,7 @@ adding the feed to your package source.
 
 ### [Using dotnet CLI](#tab/cli)
 
-1. Launch your terminal
+1. Launch a terminal of your choice
 2. Navigate to where your `*.csproj` is located
 3. Type `dotnet add package Discord.Net --source https://www.myget.org/F/discord-net/api/v3/index.json`
 
