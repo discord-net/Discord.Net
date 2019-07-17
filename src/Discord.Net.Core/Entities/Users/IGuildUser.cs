@@ -73,7 +73,7 @@ namespace Discord
         /// </summary>
         /// <example>
         ///     The following example checks if the current user has the ability to send a message with attachment in
-        ///     this channel; if so, uploads a file via <see cref="IMessageChannel.SendFileAsync"/>.
+        ///     this channel; if so, uploads a file via <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool)"/>.
         ///     <code language="cs">
         ///     if (currentUser?.GetPermissions(targetChannel)?.AttachFiles)
         ///         await targetChannel.SendFileAsync("fortnite.png");

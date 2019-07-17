@@ -294,7 +294,6 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets a collection of all text channels in this guild.
         /// </summary>
-        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
