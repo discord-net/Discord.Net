@@ -6,7 +6,6 @@ body {
     font-display: optional;
     height: 100%;
     font-size: 15px;
-    scroll-behavior: smooth;
 }
 
 code{
