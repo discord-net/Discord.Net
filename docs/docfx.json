@@ -35,7 +35,8 @@
         "**/images/**",
         "**/samples/**",
         "langwordMapping.yml",
-        "marketing/logo/SVG/**.svg",
+        "marketing/logo/**.svg",
+        "marketing/logo/**.png",
         "favicon.ico"
       ]
     }],
