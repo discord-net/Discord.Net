@@ -91,6 +91,10 @@ article.content h6{
     line-height: 140%;
 }
 
+.sideaffix > div.contribution {
+    margin-bottom: 0;
+}
+
 header .navbar {
     border-width: 0 0 0px;
     border-radius: 0;
