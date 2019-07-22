@@ -1,11 +1,10 @@
 ECHO clone docs-static
-git clone https://github.com/discord-net/docs-static.git || EXIT /B 1
+git clone git@github.com:discord-net/docs-static.git || EXIT /B 1
 
 ECHO remove old 'latest'
 ECHO Y | RMDIR /S docs-static\latest || EXIT /B 1
 
 ECHO build docs
-DIR
 docfx.console\tools\docfx.exe docs/docfx.json -o docs-static/latest/ || EXIT /B 1
 
 ECHO commit and deploy
