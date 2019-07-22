@@ -1,4 +1,4 @@
-.steps:
+steps:
 - script: |
     dotnet pack "src\Discord.Net.Core\Discord.Net.Core.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "../../artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
     dotnet pack "src\Discord.Net.Rest\Discord.Net.Rest.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "../../artifacts/" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
