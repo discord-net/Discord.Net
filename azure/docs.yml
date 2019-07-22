@@ -5,4 +5,9 @@ steps:
       sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDN1oXiGqKblqfO+vr3cMLSiV6paD5BT+2RXfeCpVkRWSFCB7dfP2m1osJSBqqoCHvJGfbX1brGa+3fnmBgbqQ9vl1NkAmdjHYz4yfTKAt6KShYKXmPpTWBfbAqO2DUzTfTJ18XxNutK931vbWRtOjAMt7Aohw0FYm541QPr2IHIabTvVTPujVExHnMTB9cyKa8xzMD9W3zRLXJbhwOi0LtpgxX6OC/HpwdWod6TfxKdnkPMmVCOo7GTJITyd1GEFg+eNShBIaAZ557nAr8rm2ybEqYvhqFQI0cYMXbfr934yPoNN5yONE1PxDarr1T3GE3ZCWQw2Rc9CAKxrMTez7h
       sshKeySecureFile: docs-static_rsa
 
+  - task: NuGetCommand@2
+    inputs:
+      command: custom
+      arguments: install docfx.console
+
   - script: azure/docs.bat
