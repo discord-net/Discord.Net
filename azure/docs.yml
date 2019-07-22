@@ -8,6 +8,6 @@ steps:
   - task: NuGetCommand@2
     inputs:
       command: custom
-      arguments: install docfx.console
+      arguments: install docfx.console -ExcludeVersion
 
   - script: azure/docs.bat
