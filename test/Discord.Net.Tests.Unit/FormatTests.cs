@@ -14,6 +14,7 @@ namespace Discord
         [InlineData(@"~text~", @"\~text\~")]
         [InlineData(@"`text`", @"\`text\`")]
         [InlineData(@"_text_", @"\_text\_")]
+        [InlineData(@"> text", @"\> text")]
         public void Sanitize(string input, string expected)
         {
             Assert.Equal(expected, Format.Sanitize(input));
