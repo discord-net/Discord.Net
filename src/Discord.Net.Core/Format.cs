@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Discord
 {
     /// <summary> A helper class for formatting characters. </summary>
@@ -36,6 +38,42 @@ namespace Discord
             foreach (string unsafeChar in SensitiveCharacters)
                 text = text.Replace(unsafeChar, $"\\{unsafeChar}");
             return text;
+        }
+
+        /// <summary>
+        ///     Formats a string as a quote.
+        /// </summary>
+        /// <param name="text">The text to format.</param>
+        /// <returns>Gets the formatted quote text.</returns> // TODO: better xmldoc
+        public static string Quote(string text)
+        {
+            if (text == null)
+                return null;
+
+            StringBuilder result = new StringBuilder();
+
+            int startIndex = 0;
+            int newLineIndex;
+            do
+            {
+                newLineIndex = text.IndexOf('\n', startIndex);
+                if (newLineIndex == -1)
+                {
+                    // read the rest of the string
+                    var str = text.Substring(startIndex);
+                    result.Append($"> {str}");
+                }
+                else
+                {
+                    // read until the next newline
+                    var str = text.Substring(startIndex, newLineIndex - startIndex);
+                    result.Append($"> {str}\n");
+                }
+                startIndex = newLineIndex + 1;
+            }
+            while (newLineIndex != -1 && startIndex != text.Length);
+
+            return result.ToString();
         }
     }
 }

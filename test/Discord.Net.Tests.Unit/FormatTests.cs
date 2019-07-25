@@ -28,5 +28,22 @@ namespace Discord
             Assert.Equal("```cs\ntest\n```", Format.Code("test", "cs"));
             Assert.Equal("```cs\nanother\none\n```", Format.Code("another\none", "cs"));
         }
+        [Fact]
+        public void QuoteNullString()
+        {
+            Assert.Null(Format.Quote(null));
+        }
+        [Theory]
+        [InlineData("", "> ")]
+        [InlineData("\n", "> \n")]
+        [InlineData("\n ", "> \n>  ")]
+        [InlineData("input", "> input")] // single line
+        // should work with CR or CRLF
+        [InlineData("inb4\ngreentext", "> inb4\n> greentext")]
+        [InlineData("inb4\r\ngreentext", "> inb4\r\n> greentext")]
+        public void Quote(string input, string expected)
+        {
+            Assert.Equal(expected, Format.Quote(input));
+        }
     }
 }
