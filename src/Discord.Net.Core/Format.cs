@@ -47,8 +47,10 @@ namespace Discord
         /// <returns>Gets the formatted quote text.</returns> // TODO: better xmldoc
         public static string Quote(string text)
         {
-            if (text == null)
-                return null;
+            // do not modify null or whitespace text
+            // whitespace does not get quoted properly
+            if (string.IsNullOrWhiteSpace(text))
+                return text;
 
             StringBuilder result = new StringBuilder();
 

@@ -35,9 +35,9 @@ namespace Discord
             Assert.Null(Format.Quote(null));
         }
         [Theory]
-        [InlineData("", "> ")]
-        [InlineData("\n", "> \n")]
-        [InlineData("\n ", "> \n>  ")]
+        [InlineData("", "")]
+        [InlineData("\n", "\n")]
+        [InlineData("foo\n\nbar", "> foo\n> \n> bar")]
         [InlineData("input", "> input")] // single line
         // should work with CR or CRLF
         [InlineData("inb4\ngreentext", "> inb4\n> greentext")]
