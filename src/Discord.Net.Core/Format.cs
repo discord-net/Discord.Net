@@ -44,7 +44,7 @@ namespace Discord
         ///     Formats a string as a quote.
         /// </summary>
         /// <param name="text">The text to format.</param>
-        /// <returns>Gets the formatted quote text.</returns> // TODO: better xmldoc
+        /// <returns>Gets the formatted quote text.</returns>
         public static string Quote(string text)
         {
             // do not modify null or whitespace text
@@ -76,6 +76,20 @@ namespace Discord
             while (newLineIndex != -1 && startIndex != text.Length);
 
             return result.ToString();
+        }
+        
+        /// <summary>
+        ///     Formats a string as a block quote.
+        /// </summary>
+        /// <param name="text">The text to format.</param>
+        /// <returns>Gets the formatted block quote text.</returns>
+        public static string BlockQuote(string text)
+        {
+            // do not modify null or whitespace
+            if (string.IsNullOrWhiteSpace(text))
+                return text;
+
+            return $">>> {text}";
         }
     }
 }

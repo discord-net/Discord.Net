@@ -46,5 +46,18 @@ namespace Discord
         {
             Assert.Equal(expected, Format.Quote(input));
         }
+        [Theory]
+        [InlineData(null, null)]
+        [InlineData("", "")]
+        [InlineData("\n", "\n")]
+        [InlineData("foo\n\nbar", ">>> foo\n\nbar")]
+        [InlineData("input", ">>> input")] // single line
+        // should work with CR or CRLF
+        [InlineData("inb4\ngreentext", ">>> inb4\ngreentext")]
+        [InlineData("inb4\r\ngreentext", ">>> inb4\r\ngreentext")]
+        public void BlockQuote(string input, string expected)
+        {
+            Assert.Equal(expected, Format.BlockQuote(input));
+        }
     }
 }
