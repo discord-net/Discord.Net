@@ -21,7 +21,7 @@ namespace Discord.Net
             Remaining = headers.TryGetValue("X-RateLimit-Remaining", out temp) && 
                 int.TryParse(temp, out var remaining) ? remaining : (int?)null;
             Reset = headers.TryGetValue("X-RateLimit-Reset", out temp) && 
-                int.TryParse(temp, out var reset) ? DateTimeOffset.FromUnixTimeSeconds(reset) : (DateTimeOffset?)null;
+                float.TryParse(temp, out var reset) ? DateTimeOffset.FromUnixTimeMilliseconds((long)(reset * 1000)) : (DateTimeOffset?)null;
             RetryAfter = headers.TryGetValue("Retry-After", out temp) &&
                 int.TryParse(temp, out var retryAfter) ? retryAfter : (int?)null;
             Lag = headers.TryGetValue("Date", out temp) &&
