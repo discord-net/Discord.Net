@@ -36,7 +36,7 @@ namespace Discord
             typeof(DiscordConfig).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ??
             typeof(DiscordConfig).GetTypeInfo().Assembly.GetName().Version.ToString(3) ??
             "Unknown";
-        
+
         /// <summary>
         ///     Gets the user agent that Discord.Net uses in its clients.
         /// </summary>
@@ -123,7 +123,7 @@ namespace Discord
         ///     The currently set <see cref="RetryMode"/>.
         /// </returns>
         public RetryMode DefaultRetryMode { get; set; } = RetryMode.AlwaysRetry;
-        
+
         /// <summary>
         ///     Gets or sets the minimum log level severity that will be sent to the Log event.
         /// </summary>
@@ -140,5 +140,17 @@ namespace Discord
         ///     the API version it uses on startup.
         /// </remarks>
         internal bool DisplayInitialLog { get; set; } = true;
+
+        /// <summary>
+        ///     Gets or sets the level of precision of the rate limit reset response.
+        /// </summary>
+        /// <remarks>
+        ///     If set to <see cref="RateLimitPrecision.Second"/>, this value will be rounded up to the
+        ///     nearest second.
+        /// </remarks>
+        /// <returns>
+        ///     The currently set <see cref="RateLimitPrecision"/>.
+        /// </returns>
+        public RateLimitPrecision RateLimitPrecision { get; set; } = RateLimitPrecision.Second;
     }
 }
