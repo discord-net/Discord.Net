@@ -126,6 +126,10 @@ namespace Discord
         /// </summary>
         UseVAD              = 0x02_00_00_00,
         PrioritySpeaker     = 0x00_00_01_00,
+        /// <summary>
+        ///     Allows video streaming in a voice channel.
+        /// </summary>
+        Stream              = 0x00_00_02_00,
 
         // General 2
         /// <summary>
