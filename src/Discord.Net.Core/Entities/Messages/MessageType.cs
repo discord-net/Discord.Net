@@ -52,6 +52,10 @@ namespace Discord
         /// <summary>
         ///     The message for when a guild reaches Tier 3 of Nitro boosts.
         /// </summary>
-        UserPremiumGuildSubscriptionTier3 = 11
+        UserPremiumGuildSubscriptionTier3 = 11,
+        /// <summary>
+        ///     The message for when a news channel subscription is added to a text channel.
+        /// </summary>
+        ChannelFollowAdd = 12,
     }
 }
