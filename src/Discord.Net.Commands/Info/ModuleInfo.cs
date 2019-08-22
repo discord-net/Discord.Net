@@ -57,6 +57,10 @@ namespace Discord.Commands
         /// </summary>
         public ModuleInfo Parent { get; }
         /// <summary>
+        ///		The Type of the module represented by this instance.
+        /// </summary>
+        public Type ModuleType { get; }
+        /// <summary>
         ///     Gets a value that indicates whether this module is a submodule or not.
         /// </summary>
         public bool IsSubmodule => Parent != null;
@@ -70,6 +74,7 @@ namespace Discord.Commands
             Remarks = builder.Remarks;
             Group = builder.Group;
             Parent = parent;
+            ModuleType = builder.TypeInfo.AsType();
 
             Aliases = BuildAliases(builder, service).ToImmutableArray();
             Commands = builder.Commands.Select(x => x.Build(this, service)).ToImmutableArray();
