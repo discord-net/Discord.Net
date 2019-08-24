@@ -1284,15 +1284,18 @@ namespace Discord.WebSocket
                                     var data = (payload as JToken).ToObject<API.Gateway.Reaction>(_serializer);
                                     if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
                                     {
-                                        var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
-                                        bool isCached = cachedMsg != null;
+                                        var msg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
+
                                         var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly).ConfigureAwait(false);
-                                        var reaction = SocketReaction.Create(data, channel, cachedMsg, Optional.Create(user));
-                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId).ConfigureAwait(false) as IUserMessage);
 
-                                        cachedMsg?.AddReaction(reaction);
+                                        var cUser = new Cacheable<IUser, ulong>(user, data.UserId, user != null, async () => await Rest.GetUserAsync(data.UserId).ConfigureAwait(false));
+                                        var cMsg = new Cacheable<IUserMessage, ulong>(msg, data.MessageId, msg != null, async () => await channel.GetMessageAsync(data.MessageId).ConfigureAwait(false) as IUserMessage);
 
-                                        await TimedInvokeAsync(_reactionAddedEvent, nameof(ReactionAdded), cacheable, channel, reaction).ConfigureAwait(false);
+                                        var reaction = SocketReaction.Create(data, channel, cMsg, cUser);
+
+                                        msg?.AddReaction(reaction);
+
+                                        await TimedInvokeAsync(_reactionAddedEvent, nameof(ReactionAdded), cMsg, channel, reaction).ConfigureAwait(false);
                                     }
                                     else
                                     {
@@ -1308,15 +1311,18 @@ namespace Discord.WebSocket
                                     var data = (payload as JToken).ToObject<API.Gateway.Reaction>(_serializer);
                                     if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
                                     {
-                                        var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
-                                        bool isCached = cachedMsg != null;
+                                        var msg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
+
                                         var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly).ConfigureAwait(false);
-                                        var reaction = SocketReaction.Create(data, channel, cachedMsg, Optional.Create(user));
-                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId).ConfigureAwait(false) as IUserMessage);
 
-                                        cachedMsg?.RemoveReaction(reaction);
+                                        var cUser = new Cacheable<IUser, ulong>(user, data.UserId, user != null, async () => await Rest.GetUserAsync(data.UserId).ConfigureAwait(false));
+                                        var cMsg = new Cacheable<IUserMessage, ulong>(msg, data.MessageId, msg != null, async () => await channel.GetMessageAsync(data.MessageId).ConfigureAwait(false) as IUserMessage);
 
-                                        await TimedInvokeAsync(_reactionRemovedEvent, nameof(ReactionRemoved), cacheable, channel, reaction).ConfigureAwait(false);
+                                        var reaction = SocketReaction.Create(data, channel, cMsg, cUser);
+
+                                        msg?.RemoveReaction(reaction);
+
+                                        await TimedInvokeAsync(_reactionRemovedEvent, nameof(ReactionRemoved), cMsg, channel, reaction).ConfigureAwait(false);
                                     }
                                     else
                                     {

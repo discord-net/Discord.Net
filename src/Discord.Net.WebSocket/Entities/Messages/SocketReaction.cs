@@ -15,13 +15,13 @@ namespace Discord.WebSocket
         /// </returns>
         public ulong UserId { get; }
         /// <summary>
-        ///     Gets the user who added the reaction if possible.
+        ///     Gets the user who added the reaction.
         /// </summary>
         /// <returns>
-        ///     A user object where possible; a value is not always returned.
+        ///     A socket-based user object where possible, otherwise a REST-based user.
         /// </returns>
-        /// <seealso cref="Optional{T}"/>
-        public Optional<IUser> User { get; }
+        /// <seealso cref="Cacheable{TEntity, TId}"/>
+        public Cacheable<IUser, ulong> User { get; }
         /// <summary>
         ///     Gets the ID of the message that has been reacted to.
         /// </summary>
@@ -30,13 +30,13 @@ namespace Discord.WebSocket
         /// </returns>
         public ulong MessageId { get; }
         /// <summary>
-        ///     Gets the message that has been reacted to if possible.
+        ///     Gets the message that has been reacted to.
         /// </summary>
         /// <returns>
-        ///     A WebSocket-based message where possible; a value is not always returned.
+        ///     A WebSocket-based message where possible, otherwise a REST-based message.
         /// </returns>
-        /// <seealso cref="Optional{T}"/>
-        public Optional<SocketUserMessage> Message { get; }
+        /// <seealso cref="Cacheable{TEntity, TId}"/>
+        public Cacheable<IUserMessage, ulong> Message { get; }
         /// <summary>
         ///     Gets the channel where the reaction takes place in.
         /// </summary>
@@ -47,7 +47,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public IEmote Emote { get; }
 
-        internal SocketReaction(ISocketMessageChannel channel, ulong messageId, Optional<SocketUserMessage> message, ulong userId, Optional<IUser> user, IEmote emoji)
+        internal SocketReaction(ISocketMessageChannel channel, ulong messageId, Cacheable<IUserMessage, ulong> message, ulong userId, Cacheable<IUser, ulong> user, IEmote emoji)
         {
             Channel = channel;
             MessageId = messageId;
@@ -56,7 +56,7 @@ namespace Discord.WebSocket
             User = user;
             Emote = emoji;
         }
-        internal static SocketReaction Create(Model model, ISocketMessageChannel channel, Optional<SocketUserMessage> message, Optional<IUser> user)
+        internal static SocketReaction Create(Model model, ISocketMessageChannel channel, Cacheable<IUserMessage, ulong> message, Cacheable<IUser, ulong> user)
         {
             IEmote emote;
             if (model.Emoji.Id.HasValue)
