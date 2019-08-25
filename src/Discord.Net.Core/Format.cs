@@ -1,10 +1,12 @@
+using System.Text;
+
 namespace Discord
 {
     /// <summary> A helper class for formatting characters. </summary>
     public static class Format
     {
         // Characters which need escaping
-        private static readonly string[] SensitiveCharacters = { "\\", "*", "_", "~", "`", "|" };
+        private static readonly string[] SensitiveCharacters = { "\\", "*", "_", "~", "`", "|", ">" };
 
         /// <summary> Returns a markdown-formatted string with bold formatting. </summary>
         public static string Bold(string text) => $"**{text}**";
@@ -36,6 +38,58 @@ namespace Discord
             foreach (string unsafeChar in SensitiveCharacters)
                 text = text.Replace(unsafeChar, $"\\{unsafeChar}");
             return text;
+        }
+
+        /// <summary>
+        ///     Formats a string as a quote.
+        /// </summary>
+        /// <param name="text">The text to format.</param>
+        /// <returns>Gets the formatted quote text.</returns>
+        public static string Quote(string text)
+        {
+            // do not modify null or whitespace text
+            // whitespace does not get quoted properly
+            if (string.IsNullOrWhiteSpace(text))
+                return text;
+
+            StringBuilder result = new StringBuilder();
+
+            int startIndex = 0;
+            int newLineIndex;
+            do
+            {
+                newLineIndex = text.IndexOf('\n', startIndex);
+                if (newLineIndex == -1)
+                {
+                    // read the rest of the string
+                    var str = text.Substring(startIndex);
+                    result.Append($"> {str}");
+                }
+                else
+                {
+                    // read until the next newline
+                    var str = text.Substring(startIndex, newLineIndex - startIndex);
+                    result.Append($"> {str}\n");
+                }
+                startIndex = newLineIndex + 1;
+            }
+            while (newLineIndex != -1 && startIndex != text.Length);
+
+            return result.ToString();
+        }
+        
+        /// <summary>
+        ///     Formats a string as a block quote.
+        /// </summary>
+        /// <param name="text">The text to format.</param>
+        /// <returns>Gets the formatted block quote text.</returns>
+        public static string BlockQuote(string text)
+        {
+            // do not modify null or whitespace
+            if (string.IsNullOrWhiteSpace(text))
+                return text;
+
+            return $">>> {text}";
         }
     }
 }
