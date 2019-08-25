@@ -26,7 +26,7 @@ namespace Discord.WebSocket
     public class DiscordSocketConfig : DiscordRestConfig
     {
         /// <summary>
-        ///     Gets or sets the encoding gateway should use.
+        ///    Returns the encoding gateway should use.
         /// </summary>
         public const string GatewayEncoding = "json";
 
