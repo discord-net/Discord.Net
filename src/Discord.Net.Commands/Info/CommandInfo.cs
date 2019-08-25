@@ -213,7 +213,10 @@ namespace Discord.Commands
                     object argument = args[position];
                     var result = await parameter.CheckPreconditionsAsync(context, argument, services).ConfigureAwait(false);
                     if (!result.IsSuccess)
+                    {
+                        await Module.Service._commandExecutedEvent.InvokeAsync(this, context, result).ConfigureAwait(false);
                         return ExecuteResult.FromError(result);
+                    }
                 }
 
                 switch (RunMode)
