@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("Discord.Net.Webhook")]
 [assembly: InternalsVisibleTo("Discord.Net.Commands")]
 [assembly: InternalsVisibleTo("Discord.Net.Tests")]
+[assembly: InternalsVisibleTo("Discord.Net.Tests.Unit")]
 
 [assembly: TypeForwardedTo(typeof(Discord.Embed))]
 [assembly: TypeForwardedTo(typeof(Discord.EmbedBuilder))]
