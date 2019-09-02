@@ -26,5 +26,7 @@ namespace Discord.API
         public bool SelfMute { get; set; }
         [JsonProperty("suppress")]
         public bool Suppress { get; set; }
+        [JsonProperty("self_stream")]
+        public bool SelfStream { get; set; }
     }
 }

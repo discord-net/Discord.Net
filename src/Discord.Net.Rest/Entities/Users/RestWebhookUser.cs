@@ -95,5 +95,7 @@ namespace Discord.Rest
         IVoiceChannel IVoiceState.VoiceChannel => null;
         /// <inheritdoc />
         string IVoiceState.VoiceSessionId => null;
+        /// <inheritdoc />
+        bool IVoiceState.IsStream => false;
     }
 }

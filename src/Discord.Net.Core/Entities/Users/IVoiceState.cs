@@ -55,5 +55,12 @@ namespace Discord
         ///     Gets the unique identifier for this user's voice session.
         /// </summary>
         string VoiceSessionId { get; }
+        /// <summary>
+        ///     Gets a value that indicates if this user is streaming in a voice channel.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if the user is streaming; otherwise <c>false</c>.
+        /// </returns>
+        bool IsStream { get; }
     }
 }
