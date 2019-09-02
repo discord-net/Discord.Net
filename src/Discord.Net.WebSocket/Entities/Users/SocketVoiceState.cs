@@ -24,6 +24,7 @@ namespace Discord.WebSocket
             Deafened = 0x04,
             SelfMuted = 0x08,
             SelfDeafened = 0x10,
+            SelfStream = 0x20,
         }
 
         private readonly Flags _voiceStates;
@@ -46,7 +47,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public bool IsSelfDeafened => (_voiceStates & Flags.SelfDeafened) != 0;
         /// <inheritdoc />
-        public bool IsStream { get; }
+        public bool IsStream => (_voiceStates & Flags.SelfStream) != 0;
 
         internal SocketVoiceState(SocketVoiceChannel voiceChannel, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed, bool isStream)
         {
@@ -64,9 +65,9 @@ namespace Discord.WebSocket
                 voiceStates |= Flags.Deafened;
             if (isSuppressed)
                 voiceStates |= Flags.Suppressed;
+            if (isStream)
+                voiceStates |= Flags.SelfStream;
             _voiceStates = voiceStates;
-
-            IsStream = isStream;
         }
         internal static SocketVoiceState Create(SocketVoiceChannel voiceChannel, Model model)
         {
