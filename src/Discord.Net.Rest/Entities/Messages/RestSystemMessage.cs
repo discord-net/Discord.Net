@@ -7,7 +7,7 @@ namespace Discord.Rest
     ///     Represents a REST-based system message.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestSystemMessage : RestMessage, ISystemMessage
+    public class RestSystemMessage : RestReactionMessage, ISystemMessage
     {
         /// <inheritdoc />
         public MessageType Type { get; private set; }
