@@ -14,6 +14,7 @@ namespace Discord.WebSocket
     public abstract class SocketMessage : SocketEntity<ulong>, IMessage
     {
         private long _timestampTicks;
+        private readonly List<SocketReaction> _reactions = new List<SocketReaction>();
 
         /// <summary>
         ///     Gets the author of this message.
@@ -89,6 +90,8 @@ namespace Discord.WebSocket
         public virtual IReadOnlyCollection<SocketUser> MentionedUsers => ImmutableArray.Create<SocketUser>();
         /// <inheritdoc />
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
+        /// <inheritdoc />
+        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emote).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
 
         /// <inheritdoc />
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
@@ -169,5 +172,35 @@ namespace Discord.WebSocket
         IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoles.Select(x => x.Id).ToImmutableArray();
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
+
+        internal void AddReaction(SocketReaction reaction)
+        {
+            _reactions.Add(reaction);
+        }
+        internal void RemoveReaction(SocketReaction reaction)
+        {
+            if (_reactions.Contains(reaction))
+                _reactions.Remove(reaction);
+        }
+        internal void ClearReactions()
+        {
+            _reactions.Clear();
+        }
+
+        /// <inheritdoc />
+        public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
+            => MessageHelper.AddReactionAsync(this, emote, Discord, options);
+        /// <inheritdoc />
+        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null)
+            => MessageHelper.RemoveReactionAsync(this, user.Id, emote, Discord, options);
+        /// <inheritdoc />
+        public Task RemoveReactionAsync(IEmote emote, ulong userId, RequestOptions options = null)
+            => MessageHelper.RemoveReactionAsync(this, userId, emote, Discord, options);
+        /// <inheritdoc />
+        public Task RemoveAllReactionsAsync(RequestOptions options = null)
+            => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
+        /// <inheritdoc />
+        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit, RequestOptions options = null)
+            => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, options);
     }
 }

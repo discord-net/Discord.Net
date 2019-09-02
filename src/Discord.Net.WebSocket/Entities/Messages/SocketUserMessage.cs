@@ -13,7 +13,7 @@ namespace Discord.WebSocket
     ///     Represents a WebSocket-based message sent by a user.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class SocketUserMessage : SocketReactionMessage, IUserMessage
+    public class SocketUserMessage : SocketMessage, IUserMessage
     {
         private bool _isMentioningEveryone, _isTTS, _isPinned, _isSuppressed;
         private long? _editedTimestampTicks;

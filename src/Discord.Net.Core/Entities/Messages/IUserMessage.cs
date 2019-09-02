@@ -7,7 +7,7 @@ namespace Discord
     /// <summary>
     ///     Represents a generic message sent by a user.
     /// </summary>
-    public interface IUserMessage : IReactionMessage
+    public interface IUserMessage : IMessage
     {
         /// <summary>
         ///     Modifies this message.
