@@ -7,7 +7,7 @@ namespace Discord.WebSocket
     ///     Represents a WebSocket-based message sent by the system.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class SocketSystemMessage : SocketMessage, ISystemMessage
+    public class SocketSystemMessage : SocketReactionMessage, ISystemMessage
     {
         /// <inheritdoc />
         public MessageType Type { get; private set; }
