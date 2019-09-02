@@ -8,7 +8,7 @@ using Model = Discord.API.Message;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a REST-based mesage that reactions can be added to.
+    ///     Represents a REST-based mesage where reactions can be added or removed.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class RestReactionMessage : RestMessage, IReactionMessage

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Discord.WebSocket
 {
     /// <summary>
-    ///     Represents a WebSocket-based message that reactions can be added to.
+    ///     Represents a WebSocket-based message where reactions can be added or removed.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class SocketReactionMessage : SocketMessage, IReactionMessage

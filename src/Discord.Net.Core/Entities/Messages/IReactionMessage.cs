@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a message that can be reacted to.
+    ///     Represents a message where reactions can be added or removed.
     /// </summary>
     public interface IReactionMessage : IMessage
     {
