@@ -61,6 +61,6 @@ namespace Discord
         /// <returns>
         ///     <c>true</c> if the user is streaming; otherwise <c>false</c>.
         /// </returns>
-        bool IsStream { get; }
+        bool IsStreaming { get; }
     }
 }

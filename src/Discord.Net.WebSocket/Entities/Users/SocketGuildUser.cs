@@ -55,7 +55,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public bool IsMuted => VoiceState?.IsMuted ?? false;
         /// <inheritdoc />
-        public bool IsStream => VoiceState?.IsStream ?? false;
+        public bool IsStreaming => VoiceState?.IsStreaming ?? false;
         /// <inheritdoc />
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
         /// <summary>

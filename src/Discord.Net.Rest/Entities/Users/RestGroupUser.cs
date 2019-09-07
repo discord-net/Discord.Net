@@ -36,6 +36,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         string IVoiceState.VoiceSessionId => null;
         /// <inheritdoc />
-        bool IVoiceState.IsStream => false;
+        bool IVoiceState.IsStreaming => false;
     }
 }
