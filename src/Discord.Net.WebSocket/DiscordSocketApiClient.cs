@@ -39,8 +39,9 @@ namespace Discord.API
 
         public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent,
             string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null,
-            RateLimitPrecision rateLimitPrecision = RateLimitPrecision.Second)
-            : base(restClientProvider, userAgent, defaultRetryMode, serializer, rateLimitPrecision)
+            RateLimitPrecision rateLimitPrecision = RateLimitPrecision.Second,
+			bool useSystemClock = true)
+            : base(restClientProvider, userAgent, defaultRetryMode, serializer, rateLimitPrecision, useSystemClock)
         {
             _gatewayUrl = url;
             if (url != null)

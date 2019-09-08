@@ -52,13 +52,14 @@ namespace Discord.API
 
         /// <exception cref="ArgumentException">Unknown OAuth token type.</exception>
         public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry,
-            JsonSerializer serializer = null, RateLimitPrecision rateLimitPrecision = RateLimitPrecision.Second, bool useSystemClock = false)
+            JsonSerializer serializer = null, RateLimitPrecision rateLimitPrecision = RateLimitPrecision.Second, bool useSystemClock = true)
         {
             _restClientProvider = restClientProvider;
             UserAgent = userAgent;
             DefaultRetryMode = defaultRetryMode;
             _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             RateLimitPrecision = rateLimitPrecision;
+			UseSystemClock = useSystemClock;
 
             RequestQueue = new RequestQueue();
             _stateLock = new SemaphoreSlim(1, 1);
