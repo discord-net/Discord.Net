@@ -38,8 +38,9 @@ namespace Discord.API
         public ConnectionState ConnectionState { get; private set; }
 
         public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent,
-            string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null)
-            : base(restClientProvider, userAgent, defaultRetryMode, serializer)
+            string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null,
+            RateLimitPrecision rateLimitPrecision = RateLimitPrecision.Second)
+            : base(restClientProvider, userAgent, defaultRetryMode, serializer, rateLimitPrecision)
         {
             _gatewayUrl = url;
             if (url != null)
