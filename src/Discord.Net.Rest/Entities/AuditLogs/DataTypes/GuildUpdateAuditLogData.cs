@@ -21,15 +21,15 @@ namespace Discord.Rest
             var changes = entry.Changes;
 
             var afkTimeoutModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
-            var defaultMessageNotificationsModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
-            var afkChannelModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
-            var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
-            var regionIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
-            var iconHashModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
-            var verificationLevelModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
-            var ownerIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
-            var mfaLevelModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
-            var contentFilterModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_timeout");
+            var defaultMessageNotificationsModel = changes.FirstOrDefault(x => x.ChangedProperty == "default_message_notifications");
+            var afkChannelModel = changes.FirstOrDefault(x => x.ChangedProperty == "afk_channel_id");
+            var nameModel = changes.FirstOrDefault(x => x.ChangedProperty == "name");
+            var regionIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "region");
+            var iconHashModel = changes.FirstOrDefault(x => x.ChangedProperty == "icon_hash");
+            var verificationLevelModel = changes.FirstOrDefault(x => x.ChangedProperty == "verification_level");
+            var ownerIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "owner_id");
+            var mfaLevelModel = changes.FirstOrDefault(x => x.ChangedProperty == "mfa_level");
+            var contentFilterModel = changes.FirstOrDefault(x => x.ChangedProperty == "explicit_content_filter");
 
             int? oldAfkTimeout = afkTimeoutModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer),
                 newAfkTimeout = afkTimeoutModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
