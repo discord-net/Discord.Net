@@ -14,7 +14,7 @@ namespace Discord
 
         public DiscordRestClientFixture()
         {
-            var token = Environment.GetEnvironmentVariable("DNET_TEST_TOKEN", EnvironmentVariableTarget.Machine);
+            var token = Environment.GetEnvironmentVariable("DNET_TEST_TOKEN", EnvironmentVariableTarget.Process);
             if (string.IsNullOrWhiteSpace(token))
                 throw new Exception("The DNET_TEST_TOKEN environment variable was not provided.");
             Client = new DiscordRestClient(new DiscordRestConfig()
