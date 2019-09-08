@@ -12,7 +12,7 @@ namespace Discord
         /// <summary> Gets a <see cref="GuildPermissions"/> that grants all guild permissions for webhook users. </summary>
         public static readonly GuildPermissions Webhook = new GuildPermissions(0b00000_0000000_0001101100000_000000);
         /// <summary> Gets a <see cref="GuildPermissions"/> that grants all guild permissions. </summary>
-        public static readonly GuildPermissions All = new GuildPermissions(0b11111_1111110_1111111110111_111111);
+        public static readonly GuildPermissions All = new GuildPermissions(0b11111_1111110_1111111111111_111111);
 
         /// <summary> Gets a packed value representing all the permissions in this <see cref="GuildPermissions"/>. </summary>
         public ulong RawValue { get; }
@@ -70,7 +70,9 @@ namespace Discord
         /// <summary> If <c>true</c>, a user may use voice-activity-detection rather than push-to-talk. </summary>
         public bool UseVAD => Permissions.GetValue(RawValue, GuildPermission.UseVAD);
         /// <summary> If True, a user may use priority speaker in a voice channel. </summary>
-        public bool PrioritySpeaker => Permissions.GetValue(RawValue, ChannelPermission.PrioritySpeaker);
+        public bool PrioritySpeaker => Permissions.GetValue(RawValue, GuildPermission.PrioritySpeaker);
+        /// <summary> If True, a user may stream video in a voice channel. </summary>
+        public bool Stream => Permissions.GetValue(RawValue, GuildPermission.Stream);
 
         /// <summary> If <c>true</c>, a user may change their own nickname. </summary>
         public bool ChangeNickname => Permissions.GetValue(RawValue, GuildPermission.ChangeNickname);
@@ -111,6 +113,7 @@ namespace Discord
             bool? moveMembers = null,
             bool? useVoiceActivation = null,
             bool? prioritySpeaker = null,
+            bool? stream = null,
             bool? changeNickname = null,
             bool? manageNicknames = null,
             bool? manageRoles = null,
@@ -143,6 +146,7 @@ namespace Discord
             Permissions.SetValue(ref value, moveMembers, GuildPermission.MoveMembers);
             Permissions.SetValue(ref value, useVoiceActivation, GuildPermission.UseVAD);
             Permissions.SetValue(ref value, prioritySpeaker, GuildPermission.PrioritySpeaker);
+            Permissions.SetValue(ref value, stream, GuildPermission.Stream);
             Permissions.SetValue(ref value, changeNickname, GuildPermission.ChangeNickname);
             Permissions.SetValue(ref value, manageNicknames, GuildPermission.ManageNicknames);
             Permissions.SetValue(ref value, manageRoles, GuildPermission.ManageRoles);
@@ -178,6 +182,7 @@ namespace Discord
             bool moveMembers = false,
             bool useVoiceActivation = false,
             bool prioritySpeaker = false,
+            bool stream = false,
             bool changeNickname = false,
             bool manageNicknames = false,
             bool manageRoles = false,
@@ -209,6 +214,7 @@ namespace Discord
                 moveMembers: moveMembers,
                 useVoiceActivation: useVoiceActivation,
                 prioritySpeaker: prioritySpeaker,
+                stream: stream,
                 changeNickname: changeNickname,
                 manageNicknames: manageNicknames,
                 manageWebhooks: manageWebhooks,
@@ -241,6 +247,7 @@ namespace Discord
             bool? moveMembers = null,
             bool? useVoiceActivation = null,
             bool? prioritySpeaker = null,
+            bool? stream = null,
             bool? changeNickname = null,
             bool? manageNicknames = null,
             bool? manageRoles = null,
@@ -249,7 +256,7 @@ namespace Discord
             => new GuildPermissions(RawValue, createInstantInvite, kickMembers, banMembers, administrator, manageChannels, manageGuild, addReactions,
                 viewAuditLog, viewChannel, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
-                useVoiceActivation, prioritySpeaker, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojis);
+                useVoiceActivation, prioritySpeaker, stream, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojis);
 
         /// <summary>
         ///     Returns a value that indicates if a specific <see cref="GuildPermission"/> is enabled

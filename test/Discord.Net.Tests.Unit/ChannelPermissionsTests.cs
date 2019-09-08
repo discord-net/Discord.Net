@@ -82,6 +82,7 @@ namespace Discord
             AssertFlag(() => new ChannelPermissions(moveMembers: true), ChannelPermission.MoveMembers);
             AssertFlag(() => new ChannelPermissions(useVoiceActivation: true), ChannelPermission.UseVAD);
             AssertFlag(() => new ChannelPermissions(prioritySpeaker: true), ChannelPermission.PrioritySpeaker);
+            AssertFlag(() => new ChannelPermissions(stream: true), ChannelPermission.Stream);
             AssertFlag(() => new ChannelPermissions(manageRoles: true), ChannelPermission.ManageRoles);
             AssertFlag(() => new ChannelPermissions(manageWebhooks: true), ChannelPermission.ManageWebhooks);
         }
@@ -147,6 +148,7 @@ namespace Discord
             AssertUtil(ChannelPermission.ManageRoles, x => x.ManageRoles, (p, enable) => p.Modify(manageRoles: enable));
             AssertUtil(ChannelPermission.ManageWebhooks, x => x.ManageWebhooks, (p, enable) => p.Modify(manageWebhooks: enable));
             AssertUtil(ChannelPermission.PrioritySpeaker, x => x.PrioritySpeaker, (p, enable) => p.Modify(prioritySpeaker: enable));
+            AssertUtil(ChannelPermission.Stream, x => x.Stream, (p, enable) => p.Modify(stream: enable));
         }
 
         /// <summary>
