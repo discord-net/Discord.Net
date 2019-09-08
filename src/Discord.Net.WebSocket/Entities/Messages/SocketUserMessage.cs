@@ -15,7 +15,6 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketUserMessage : SocketMessage, IUserMessage
     {
-        private readonly List<SocketReaction> _reactions = new List<SocketReaction>();
         private bool _isMentioningEveryone, _isTTS, _isPinned, _isSuppressed;
         private long? _editedTimestampTicks;
         private ImmutableArray<Attachment> _attachments = ImmutableArray.Create<Attachment>();
@@ -42,8 +41,6 @@ namespace Discord.WebSocket
         public override IReadOnlyCollection<SocketRole> MentionedRoles => MessageHelper.FilterTagsByValue<SocketRole>(TagType.RoleMention, _tags);
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketUser> MentionedUsers => MessageHelper.FilterTagsByValue<SocketUser>(TagType.UserMention, _tags);
-        /// <inheritdoc />
-        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emote).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
 
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author, MessageSource source)
             : base(discord, id, channel, author, source)
@@ -126,41 +123,12 @@ namespace Discord.WebSocket
                 model.Content = text;
             }
         }
-        internal void AddReaction(SocketReaction reaction)
-        {
-            _reactions.Add(reaction);
-        }
-        internal void RemoveReaction(SocketReaction reaction)
-        {
-            if (_reactions.Contains(reaction))
-                _reactions.Remove(reaction);
-        }
-        internal void ClearReactions()
-        {
-            _reactions.Clear();
-        }
-
+        
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Only the author of a message may modify the message.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
             => MessageHelper.ModifyAsync(this, Discord, func, options);
-
-        /// <inheritdoc />
-        public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
-            => MessageHelper.AddReactionAsync(this, emote, Discord, options);
-        /// <inheritdoc />
-        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null)
-            => MessageHelper.RemoveReactionAsync(this, user.Id, emote, Discord, options);
-        /// <inheritdoc />
-        public Task RemoveReactionAsync(IEmote emote, ulong userId, RequestOptions options = null)
-            => MessageHelper.RemoveReactionAsync(this, userId, emote, Discord, options);
-        /// <inheritdoc />
-        public Task RemoveAllReactionsAsync(RequestOptions options = null)
-            => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
-        /// <inheritdoc />
-        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit, RequestOptions options = null)
-            => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, options);
 
         /// <inheritdoc />
         public Task PinAsync(RequestOptions options = null)
