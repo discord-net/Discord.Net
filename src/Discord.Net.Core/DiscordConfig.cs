@@ -151,6 +151,6 @@ namespace Discord
         /// <returns>
         ///     The currently set <see cref="RateLimitPrecision"/>.
         /// </returns>
-        public RateLimitPrecision RateLimitPrecision { get; set; } = RateLimitPrecision.Second;
+        public RateLimitPrecision RateLimitPrecision { get; set; } = RateLimitPrecision.Millisecond;
     }
 }
