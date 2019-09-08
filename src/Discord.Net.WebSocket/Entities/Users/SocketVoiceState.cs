@@ -13,7 +13,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Initializes a default <see cref="SocketVoiceState"/> with everything set to <c>null</c> or <c>false</c>.
         /// </summary>
-        public static readonly SocketVoiceState Default = new SocketVoiceState(null, null, false, false, false, false, false);
+        public static readonly SocketVoiceState Default = new SocketVoiceState(null, null, false, false, false, false, false, false);
 
         [Flags]
         private enum Flags : byte
@@ -24,6 +24,7 @@ namespace Discord.WebSocket
             Deafened = 0x04,
             SelfMuted = 0x08,
             SelfDeafened = 0x10,
+            SelfStream = 0x20,
         }
 
         private readonly Flags _voiceStates;
@@ -45,8 +46,10 @@ namespace Discord.WebSocket
         public bool IsSelfMuted => (_voiceStates & Flags.SelfMuted) != 0;
         /// <inheritdoc />
         public bool IsSelfDeafened => (_voiceStates & Flags.SelfDeafened) != 0;
+        /// <inheritdoc />
+        public bool IsStream => (_voiceStates & Flags.SelfStream) != 0;
 
-        internal SocketVoiceState(SocketVoiceChannel voiceChannel, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed)
+        internal SocketVoiceState(SocketVoiceChannel voiceChannel, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed, bool isStream)
         {
             VoiceChannel = voiceChannel;
             VoiceSessionId = sessionId;
@@ -62,11 +65,13 @@ namespace Discord.WebSocket
                 voiceStates |= Flags.Deafened;
             if (isSuppressed)
                 voiceStates |= Flags.Suppressed;
+            if (isStream)
+                voiceStates |= Flags.SelfStream;
             _voiceStates = voiceStates;
         }
         internal static SocketVoiceState Create(SocketVoiceChannel voiceChannel, Model model)
         {
-            return new SocketVoiceState(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Mute, model.Deaf, model.Suppress);
+            return new SocketVoiceState(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Mute, model.Deaf, model.Suppress, model.SelfStream);
         }
 
         /// <summary>
