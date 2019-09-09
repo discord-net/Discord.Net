@@ -28,7 +28,7 @@ namespace Discord.Rest
             var beforeAllow = allowModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer);
             var afterAllow = allowModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
             var beforeDeny = denyModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer);
-            var afterDeny = denyModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            var afterDeny = denyModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
 
             var beforePermissions = new OverwritePermissions(beforeAllow ?? 0, beforeDeny ?? 0);
             var afterPermissions = new OverwritePermissions(afterAllow ?? 0, afterDeny ?? 0);

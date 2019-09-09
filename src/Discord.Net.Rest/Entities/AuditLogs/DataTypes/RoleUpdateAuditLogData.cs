@@ -36,7 +36,7 @@ namespace Discord.Rest
             string oldName = nameModel?.OldValue?.ToObject<string>(discord.ApiClient.Serializer),
                 newName = nameModel?.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
             ulong? oldPermissionsRaw = permissionsModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer),
-                newPermissionsRaw = permissionsModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+                newPermissionsRaw = permissionsModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
 
             Color? oldColor = null,
                 newColor = null;
