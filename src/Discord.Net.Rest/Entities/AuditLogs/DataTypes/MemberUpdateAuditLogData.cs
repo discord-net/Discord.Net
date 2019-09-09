@@ -48,7 +48,19 @@ namespace Discord.Rest
         ///     A user object representing the user who the changes were performed on.
         /// </returns>
         public IUser Target { get; }
+        /// <summary>
+        ///     Gets the member information before the changes.
+        /// </summary>
+        /// <returns>
+        ///     An information object containing the original member information before the changes were made.
+        /// </returns>
         public MemberInfo Before { get; }
+        /// <summary>
+        ///     Gets the member information after the changes.
+        /// </summary>
+        /// <returns>
+        ///     An information object containing the member information after the changes were made.
+        /// </returns>
         public MemberInfo After { get; }
     }
 }
