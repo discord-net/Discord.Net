@@ -7,7 +7,8 @@ namespace Discord.Rest
     {
         internal GuildInfo(int? afkTimeout, DefaultMessageNotifications? defaultNotifs,
             ulong? afkChannel, string name, string region, string icon,
-            VerificationLevel? verification, IUser owner, MfaLevel? mfa, int? filter)
+            VerificationLevel? verification, IUser owner, MfaLevel? mfa, ExplicitContentFilterLevel? filter,
+            ulong? systemChannel, ulong? widgetChannel, bool? widget)
         {
             AfkTimeout = afkTimeout;
             DefaultMessageNotifications = defaultNotifs;
@@ -18,7 +19,10 @@ namespace Discord.Rest
             VerificationLevel = verification;
             Owner = owner;
             MfaLevel = mfa;
-            ContentFilterLevel = filter;
+            ExplicitContentFilter = filter;
+            SystemChannelId = systemChannel;
+            EmbedChannelId = widgetChannel;
+            IsEmbeddable = widget;
         }
 
         /// <summary>
@@ -82,6 +86,35 @@ namespace Discord.Rest
         ///     The level of MFA requirement.
         /// </returns>
         public MfaLevel? MfaLevel { get; }
-        public int? ContentFilterLevel { get; }
+        /// <summary>
+        ///     Gets the level of content filtering applied to user's content in a Guild.
+        /// </summary>
+        /// <returns>
+        ///     The level of explicit content filtering.
+        /// </returns>
+        ExplicitContentFilterLevel? ExplicitContentFilter { get; }
+        /// <summary>
+        ///     Gets the ID of the channel where randomized welcome messages are sent.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the system channel where randomized
+        ///     welcome messages are sent; <c>null</c> if none is set.
+        /// </returns>
+        public ulong? SystemChannelId { get; }
+        /// <summary>
+        ///     Gets the ID of the widget embed channel of this guild.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the embedded channel found within the
+        ///     widget settings of this guild; <c>null</c> if none is set.
+        /// </returns>
+        public ulong? EmbedChannelId { get; }
+        /// <summary>
+        ///     Gets a value that indicates whether this guild is embeddable (i.e. can use widget).
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if this guild can be embedded via widgets; otherwise <c>false</c>.
+        /// </returns>
+        public bool? IsEmbeddable { get; }
     }
 }
