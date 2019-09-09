@@ -92,7 +92,7 @@ namespace Discord.Rest
         /// <returns>
         ///     The level of explicit content filtering.
         /// </returns>
-        ExplicitContentFilterLevel? ExplicitContentFilter { get; }
+        public ExplicitContentFilterLevel? ExplicitContentFilter { get; }
         /// <summary>
         ///     Gets the ID of the channel where randomized welcome messages are sent.
         /// </summary>
