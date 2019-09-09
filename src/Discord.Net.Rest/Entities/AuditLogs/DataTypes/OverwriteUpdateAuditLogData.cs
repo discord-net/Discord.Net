@@ -10,8 +10,9 @@ namespace Discord.Rest
     /// </summary>
     public class OverwriteUpdateAuditLogData : IAuditLogData
     {
-        private OverwriteUpdateAuditLogData(OverwritePermissions before, OverwritePermissions after, ulong targetId, PermissionTarget targetType)
+        private OverwriteUpdateAuditLogData(ulong channelId, OverwritePermissions before, OverwritePermissions after, ulong targetId, PermissionTarget targetType)
         {
+            ChannelId = channelId;
             OldPermissions = before;
             NewPermissions = after;
             OverwriteTargetId = targetId;
@@ -35,9 +36,17 @@ namespace Discord.Rest
 
             var type = entry.Options.OverwriteType;
 
-            return new OverwriteUpdateAuditLogData(beforePermissions, afterPermissions, entry.Options.OverwriteTargetId.Value, type);
+            return new OverwriteUpdateAuditLogData(entry.TargetId.Value, beforePermissions, afterPermissions, entry.Options.OverwriteTargetId.Value, type);
         }
 
+        /// <summary>
+        ///     Gets the ID of the channel that the overwrite was updated from.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identifier for the channel that the overwrite was
+        ///     updated from.
+        /// </returns>
+        public ulong ChannelId { get; }
         /// <summary>
         ///     Gets the overwrite permissions before the changes.
         /// </summary>
