@@ -80,6 +80,7 @@ namespace Discord.Rest
         /// <returns>
         ///     An <see cref="Int32"/> representing the time in seconds required before the user can send another
         ///     message; <c>0</c> if disabled.
+        ///     <c>null</c> if this is not mentioned in this entry.
         /// </returns>
         public int? SlowModeInterval { get; }
         /// <summary>
@@ -87,6 +88,7 @@ namespace Discord.Rest
         /// </summary>
         /// <returns>
         ///     <c>true</c> if the created channel has the NSFW flag enabled; otherwise <c>false</c>.
+        ///     <c>null</c> if this is not mentioned in this entry.
         /// </returns>
         public bool? IsNsfw { get; }
         /// <summary>
@@ -95,6 +97,7 @@ namespace Discord.Rest
         /// <returns>
         ///     An <see cref="Int32"/> representing the bit-rate (bps) that the created voice channel defines and requests the
         ///     client(s) to use.
+        ///     <c>null</c> if this is not mentioned in this entry.
         /// </returns>
         public int? Bitrate { get; }
         /// <summary>

@@ -25,6 +25,7 @@ namespace Discord.Rest
         /// <returns>
         ///     <c>true</c> if the updated member is deafened (i.e. not permitted to listen to or speak to others) by the guild;
         ///     otherwise <c>false</c>.
+        ///     <c>null</c> if this is not mentioned in this entry.
         /// </returns>
         public bool? Deaf { get; }
         /// <summary>
@@ -33,6 +34,7 @@ namespace Discord.Rest
         /// </summary>
         /// <returns>
         ///     <c>true</c> if the updated member is muted by the guild; otherwise <c>false</c>.
+        ///     <c>null</c> if this is not mentioned in this entry.
         /// </returns>
         public bool? Mute { get; }
     }
