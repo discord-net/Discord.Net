@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Rest;
@@ -60,10 +61,10 @@ namespace Discord.WebSocket
             }
             if (model.Discriminator.IsSpecified)
             {
-                var newVal = ushort.Parse(model.Discriminator.Value);
+                var newVal = ushort.Parse(model.Discriminator.Value, NumberStyles.None, CultureInfo.InvariantCulture);
                 if (newVal != DiscriminatorValue)
                 {
-                    DiscriminatorValue = ushort.Parse(model.Discriminator.Value);
+                    DiscriminatorValue = ushort.Parse(model.Discriminator.Value, NumberStyles.None, CultureInfo.InvariantCulture);
                     hasChanges = true;
                 }
             }

@@ -1,6 +1,7 @@
-﻿using Discord.API;
+using Discord.API;
 using Newtonsoft.Json;
 using System;
+using System.Globalization;
 
 namespace Discord.Net.Converters
 {
@@ -23,7 +24,7 @@ namespace Discord.Net.Converters
             {
                 case JsonToken.String:
                 case JsonToken.Integer:
-                    return new EntityOrId<T>(ulong.Parse(reader.ReadAsString()));
+                    return new EntityOrId<T>(ulong.Parse(reader.ReadAsString(), NumberStyles.None, CultureInfo.InvariantCulture));
                 default:
                     T obj;
                     if (_innerConverter != null)
