@@ -47,7 +47,7 @@ namespace Discord.Commands
             if (index >= 0)
             {
                 string username = input.Substring(0, index);
-                if (ushort.TryParse(input.Substring(index + 1), NumberStyles.None, CultureInfo.InvariantCulture, out ushort discriminator))
+                if (ushort.TryParse(input.Substring(index + 1), out ushort discriminator))
                 {
                     var channelUser = await channelUsers.FirstOrDefault(x => x.DiscriminatorValue == discriminator &&
                         string.Equals(username, x.Username, StringComparison.OrdinalIgnoreCase)).ConfigureAwait(false);
