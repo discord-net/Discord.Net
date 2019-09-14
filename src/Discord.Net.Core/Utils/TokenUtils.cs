@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text;
 
 namespace Discord
@@ -76,7 +77,7 @@ namespace Discord
                 var bytes = Convert.FromBase64String(encoded);
                 var idStr = Encoding.UTF8.GetString(bytes);
                 // try to parse a ulong from the resulting string
-                if (ulong.TryParse(idStr, out var id))
+                if (ulong.TryParse(idStr, NumberStyles.None, CultureInfo.InvariantCulture, out var id))
                     return id;
             }
             catch (DecoderFallbackException)
