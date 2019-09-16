@@ -1321,15 +1321,25 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             Expression<Func<string>> endpoint;
 
-            var query = new StringBuilder();
+            var queryArgs = new StringBuilder();
             if (args.BeforeEntryId.IsSpecified)
-                query.Append($"&before={args.BeforeEntryId.Value}");
+            {
+                queryArgs.Append("&before=")
+                    .Append(args.BeforeEntryId);
+            }
             if (args.UserId.IsSpecified)
-                query.Append($"&user_id={args.UserId.Value}");
+            {
+                queryArgs.Append("&user_id=")
+                    .Append(args.UserId.Value);
+            }
             if (args.ActionType.IsSpecified)
-                query.Append($"&action_type={args.ActionType.Value}");
+            {
+                queryArgs.Append("&action_type=")
+                    .Append(args.ActionType.Value);
+            }
 
-            endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}{query.ToString()}";
+            // still use string interp for the query w/o params, as this is necessary for CreateBucketId
+            endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}{queryArgs.ToString()}";
             return await SendAsync<AuditLog>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
 
