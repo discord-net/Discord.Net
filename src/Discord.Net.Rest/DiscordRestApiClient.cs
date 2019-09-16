@@ -1321,11 +1321,15 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             Expression<Func<string>> endpoint;
 
+            var query = new StringBuilder();
             if (args.BeforeEntryId.IsSpecified)
-                endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}&before={args.BeforeEntryId.Value}";
-            else
-                endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}";
+                query.Append($"&before={args.BeforeEntryId.Value}");
+            if (args.UserId.IsSpecified)
+                query.Append($"&user_id={args.UserId.Value}");
+            if (args.ActionType.IsSpecified)
+                query.Append($"&action_type={args.ActionType.Value}");
 
+            endpoint = () => $"guilds/{guildId}/audit-logs?limit={limit}{query.ToString()}";
             return await SendAsync<AuditLog>("GET", endpoint, ids, options: options).ConfigureAwait(false);
         }
 

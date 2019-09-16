@@ -680,12 +680,16 @@ namespace Discord
         /// <param name="limit">The number of audit log entries to fetch.</param>
         /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="beforeId">The audit log entry ID to get entries before.</param>
+        /// <param name="actionType">The type of actions to filter.</param>
+        /// <param name="userId">The user ID to filter entries for.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of the requested audit log entries.
         /// </returns>
         Task<IReadOnlyCollection<IAuditLogEntry>> GetAuditLogsAsync(int limit = DiscordConfig.MaxAuditLogEntriesPerBatch,
-            CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+            CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null, ulong? beforeId = null, ulong? userId = null,
+            ActionType? actionType = null);
 
         /// <summary>
         ///     Gets a webhook found within this guild.
