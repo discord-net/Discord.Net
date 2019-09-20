@@ -380,7 +380,7 @@ namespace Discord.Rest
 
         // Audit logs
         public static IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(IGuild guild, BaseDiscordClient client,
-            ulong? from, int? limit, RequestOptions options)
+            ulong? from, int? limit, RequestOptions options, ulong? userId = null, ActionType? actionType = null)
         {
             return new PagedAsyncEnumerable<RestAuditLogEntry>(
                 DiscordConfig.MaxAuditLogEntriesPerBatch,
@@ -392,6 +392,10 @@ namespace Discord.Rest
                     };
                     if (info.Position != null)
                         args.BeforeEntryId = info.Position.Value;
+                    if (userId.HasValue)
+                        args.UserId = userId.Value;
+                    if (actionType.HasValue)
+                        args.ActionType = (int)actionType.Value;
                     var model = await client.ApiClient.GetAuditLogsAsync(guild.Id, args, options);
                     return model.Entries.Select((x) => RestAuditLogEntry.Create(client, model, x)).ToImmutableArray();
                 },
