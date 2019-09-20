@@ -30,6 +30,9 @@ namespace Discord.Rest
             var ownerIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "owner_id");
             var mfaLevelModel = changes.FirstOrDefault(x => x.ChangedProperty == "mfa_level");
             var contentFilterModel = changes.FirstOrDefault(x => x.ChangedProperty == "explicit_content_filter");
+            var systemChannelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "system_channel_id");
+            var widgetChannelIdModel = changes.FirstOrDefault(x => x.ChangedProperty == "widget_channel_id");
+            var widgetEnabledModel = changes.FirstOrDefault(x => x.ChangedProperty == "widget_enabled");
 
             int? oldAfkTimeout = afkTimeoutModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer),
                 newAfkTimeout = afkTimeoutModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
@@ -49,8 +52,14 @@ namespace Discord.Rest
                 newOwnerId = ownerIdModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
             MfaLevel? oldMfaLevel = mfaLevelModel?.OldValue?.ToObject<MfaLevel>(discord.ApiClient.Serializer),
                 newMfaLevel = mfaLevelModel?.NewValue?.ToObject<MfaLevel>(discord.ApiClient.Serializer);
-            int? oldContentFilter = contentFilterModel?.OldValue?.ToObject<int>(discord.ApiClient.Serializer),
-                newContentFilter = contentFilterModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
+            ExplicitContentFilterLevel? oldContentFilter = contentFilterModel?.OldValue?.ToObject<ExplicitContentFilterLevel>(discord.ApiClient.Serializer),
+                newContentFilter = contentFilterModel?.NewValue?.ToObject<ExplicitContentFilterLevel>(discord.ApiClient.Serializer);
+            ulong? oldSystemChannelId = systemChannelIdModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer),
+                newSystemChannelId = systemChannelIdModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            ulong? oldWidgetChannelId = widgetChannelIdModel?.OldValue?.ToObject<ulong>(discord.ApiClient.Serializer),
+                newWidgetChannelId = widgetChannelIdModel?.NewValue?.ToObject<ulong>(discord.ApiClient.Serializer);
+            bool? oldWidgetEnabled = widgetEnabledModel?.OldValue?.ToObject<bool>(discord.ApiClient.Serializer),
+                newWidgetEnabled = widgetEnabledModel?.NewValue?.ToObject<bool>(discord.ApiClient.Serializer);
 
             IUser oldOwner = null;
             if (oldOwnerId != null)
@@ -68,10 +77,10 @@ namespace Discord.Rest
 
             var before = new GuildInfo(oldAfkTimeout, oldDefaultMessageNotifications,
                 oldAfkChannelId, oldName, oldRegionId, oldIconHash, oldVerificationLevel, oldOwner,
-                oldMfaLevel, oldContentFilter);
+                oldMfaLevel, oldContentFilter, oldSystemChannelId, oldWidgetChannelId, oldWidgetEnabled);
             var after = new GuildInfo(newAfkTimeout, newDefaultMessageNotifications,
                 newAfkChannelId, newName, newRegionId, newIconHash, newVerificationLevel, newOwner,
-                newMfaLevel, newContentFilter);
+                newMfaLevel, newContentFilter, newSystemChannelId, newWidgetChannelId, newWidgetEnabled);
 
             return new GuildUpdateAuditLogData(before, after);
         }

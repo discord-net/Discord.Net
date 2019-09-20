@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Globalization;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
 
@@ -57,7 +58,7 @@ namespace Discord.Rest
             if (model.Avatar.IsSpecified)
                 AvatarId = model.Avatar.Value;
             if (model.Discriminator.IsSpecified)
-                DiscriminatorValue = ushort.Parse(model.Discriminator.Value);
+                DiscriminatorValue = ushort.Parse(model.Discriminator.Value, NumberStyles.None, CultureInfo.InvariantCulture);
             if (model.Bot.IsSpecified)
                 IsBot = model.Bot.Value;
             if (model.Username.IsSpecified)

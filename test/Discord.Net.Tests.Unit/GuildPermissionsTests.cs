@@ -85,6 +85,7 @@ namespace Discord
             AssertFlag(() => new GuildPermissions(moveMembers: true), GuildPermission.MoveMembers);
             AssertFlag(() => new GuildPermissions(useVoiceActivation: true), GuildPermission.UseVAD);
             AssertFlag(() => new GuildPermissions(prioritySpeaker: true), GuildPermission.PrioritySpeaker);
+            AssertFlag(() => new GuildPermissions(stream: true), GuildPermission.Stream);
             AssertFlag(() => new GuildPermissions(changeNickname: true), GuildPermission.ChangeNickname);
             AssertFlag(() => new GuildPermissions(manageNicknames: true), GuildPermission.ManageNicknames);
             AssertFlag(() => new GuildPermissions(manageRoles: true), GuildPermission.ManageRoles);

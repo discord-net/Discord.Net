@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -132,7 +133,7 @@ namespace Discord.Webhook
             {
                 // ensure that the first group is a ulong, set the _webhookId
                 // 0th group is always the entire match, so start at index 1
-                if (!(match.Groups[1].Success && ulong.TryParse(match.Groups[1].Value, out webhookId)))
+                if (!(match.Groups[1].Success && ulong.TryParse(match.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out webhookId)))
                     throw ex("The webhook Id could not be parsed.");
 
                 if (!match.Groups[2].Success)
