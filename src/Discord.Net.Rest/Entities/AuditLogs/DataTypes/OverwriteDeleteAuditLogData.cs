@@ -10,8 +10,9 @@ namespace Discord.Rest
     /// </summary>
     public class OverwriteDeleteAuditLogData : IAuditLogData
     {
-        private OverwriteDeleteAuditLogData(Overwrite deletedOverwrite)
+        private OverwriteDeleteAuditLogData(ulong channelId, Overwrite deletedOverwrite)
         {
+            ChannelId = channelId;
             Overwrite = deletedOverwrite;
         }
 
@@ -29,9 +30,17 @@ namespace Discord.Rest
             var id = idModel.OldValue.ToObject<ulong>(discord.ApiClient.Serializer);
             var allow = allowModel.OldValue.ToObject<ulong>(discord.ApiClient.Serializer);
 
-            return new OverwriteDeleteAuditLogData(new Overwrite(id, type, new OverwritePermissions(allow, deny)));
+            return new OverwriteDeleteAuditLogData(entry.TargetId.Value, new Overwrite(id, type, new OverwritePermissions(allow, deny)));
         }
 
+        /// <summary>
+        ///     Gets the ID of the channel that the overwrite was deleted from.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identifier for the channel that the overwrite was
+        ///     deleted from.
+        /// </returns>
+        public ulong ChannelId { get; }
         /// <summary>
         ///     Gets the permission overwrite object that was deleted.
         /// </summary>

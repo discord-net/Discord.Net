@@ -5,12 +5,13 @@ namespace Discord.Rest
     /// </summary>
     public struct ChannelInfo
     {
-        internal ChannelInfo(string name, string topic, int? bitrate, int? limit)
+        internal ChannelInfo(string name, string topic, int? rateLimit, bool? nsfw, int? bitrate)
         {
             Name = name;
             Topic = topic;
+            SlowModeInterval = rateLimit;
+            IsNsfw = nsfw;
             Bitrate = bitrate;
-            UserLimit = limit;
         }
 
         /// <summary>
@@ -28,20 +29,29 @@ namespace Discord.Rest
         /// </returns>
         public string Topic { get; }
         /// <summary>
+        ///     Gets the current slow-mode delay of this channel.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="Int32"/> representing the time in seconds required before the user can send another
+        ///     message; <c>0</c> if disabled.
+        ///     <c>null</c> if this is not mentioned in this entry.
+        /// </returns>
+        public int? SlowModeInterval { get; }
+        /// <summary>
+        ///     Gets the value that indicates whether this channel is NSFW.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if this channel has the NSFW flag enabled; otherwise <c>false</c>.
+        ///     <c>null</c> if this is not mentioned in this entry.
+        /// </returns>
+        public bool? IsNsfw { get; }
+        /// <summary>
         ///     Gets the bit-rate of this channel if applicable.
         /// </summary>
         /// <returns>
-        ///     An <see cref="System.Int32"/> representing the bit-rate set for the voice channel; <c>null</c> if not
-        ///     applicable.
+        ///     An <see cref="Int32"/> representing the bit-rate set for the voice channel;
+        ///     <c>null</c> if this is not mentioned in this entry.
         /// </returns>
         public int? Bitrate { get; }
-        /// <summary>
-        ///     Gets the number of users allowed to be in this channel if applicable.
-        /// </summary>
-        /// <returns>
-        ///     An <see cref="System.Int32" /> representing the number of users allowed to be in this voice channel; 
-        ///     <c>null</c> if not applicable.
-        /// </returns>
-        public int? UserLimit { get; }
     }
 }

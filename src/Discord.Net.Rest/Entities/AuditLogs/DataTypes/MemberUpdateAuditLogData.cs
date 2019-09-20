@@ -24,7 +24,6 @@ namespace Discord.Rest
             var nickModel = changes.FirstOrDefault(x => x.ChangedProperty == "nick");
             var deafModel = changes.FirstOrDefault(x => x.ChangedProperty == "deaf");
             var muteModel = changes.FirstOrDefault(x => x.ChangedProperty == "mute");
-            var avatarModel = changes.FirstOrDefault(x => x.ChangedProperty == "avatar_hash");
 
             string oldNick = nickModel?.OldValue?.ToObject<string>(discord.ApiClient.Serializer),
                 newNick = nickModel?.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
@@ -32,14 +31,12 @@ namespace Discord.Rest
                 newDeaf = deafModel?.NewValue?.ToObject<bool>(discord.ApiClient.Serializer);
             bool? oldMute = muteModel?.OldValue?.ToObject<bool>(discord.ApiClient.Serializer),
                 newMute = muteModel?.NewValue?.ToObject<bool>(discord.ApiClient.Serializer);
-            string oldAvatar = avatarModel?.OldValue?.ToObject<string>(discord.ApiClient.Serializer),
-                newAvatar = avatarModel?.NewValue?.ToObject<string>(discord.ApiClient.Serializer);
 
             var targetInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
             var user = RestUser.Create(discord, targetInfo);
 
-            var before = new MemberInfo(oldNick, oldDeaf, oldMute, oldAvatar);
-            var after = new MemberInfo(newNick, newDeaf, newMute, newAvatar);
+            var before = new MemberInfo(oldNick, oldDeaf, oldMute);
+            var after = new MemberInfo(newNick, newDeaf, newMute);
 
             return new MemberUpdateAuditLogData(user, before, after);
         }
@@ -51,7 +48,19 @@ namespace Discord.Rest
         ///     A user object representing the user who the changes were performed on.
         /// </returns>
         public IUser Target { get; }
+        /// <summary>
+        ///     Gets the member information before the changes.
+        /// </summary>
+        /// <returns>
+        ///     An information object containing the original member information before the changes were made.
+        /// </returns>
         public MemberInfo Before { get; }
+        /// <summary>
+        ///     Gets the member information after the changes.
+        /// </summary>
+        /// <returns>
+        ///     An information object containing the member information after the changes were made.
+        /// </returns>
         public MemberInfo After { get; }
     }
 }
