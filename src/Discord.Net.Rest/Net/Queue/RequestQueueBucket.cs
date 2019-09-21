@@ -247,12 +247,19 @@ namespace Discord.Net.Queue
                     Debug.WriteLine($"[{id}] Retry-After: {info.RetryAfter.Value} ({info.RetryAfter.Value} ms)");
 #endif
                 }
+				else if (info.ResetAfter.HasValue && (request.Options.UseSystemClock.HasValue ? !request.Options.UseSystemClock.Value : false))
+				{
+					resetTick = DateTimeOffset.Now.Add(info.ResetAfter.Value);
+				}
                 else if (info.Reset.HasValue)
                 {
                     resetTick = info.Reset.Value.AddSeconds(info.Lag?.TotalSeconds ?? 1.0);
 
+					/* millisecond precision makes this unnecessary, retaining in case of regression
+
                     if (request.Options.IsReactionBucket)
                         resetTick = DateTimeOffset.Now.AddMilliseconds(250);
+					*/
 
                     int diff = (int)(resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds;
 #if DEBUG_LIMITS

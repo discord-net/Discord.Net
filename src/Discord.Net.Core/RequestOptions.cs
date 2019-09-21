@@ -44,6 +44,18 @@ namespace Discord
         ///     to all actions.
         /// </remarks>
         public string AuditLogReason { get; set; }
+		/// <summary>
+		///		Gets or sets whether or not this request should use the system
+		///		clock for rate-limiting. Defaults to <c>true</c>.
+		/// </summary>
+		/// <remarks>
+		///		This property can also be set in <see cref="DiscordConfig">.
+		///
+		///		On a per-request basis, the system clock should only be disabled 
+		///		when millisecond precision is especially important, and the
+		///		hosting system is known to have a desynced clock.
+		/// </remarks>
+		public bool? UseSystemClock { get; set; }
 
         internal bool IgnoreState { get; set; }
         internal string BucketId { get; set; }
