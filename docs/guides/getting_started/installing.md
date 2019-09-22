@@ -78,7 +78,7 @@ published to our [MyGet feed]. See
 
 ### [Using dotnet CLI](#tab/dotnet-cli)
 
-1. Launch your terminal
+1. Launch a terminal of your choice
 2. Navigate to where your `*.csproj` is located
 3. Enter `dotnet add package Discord.Net`
 
@@ -90,7 +90,7 @@ In order to compile Discord.Net, you will need the following:
 
 ### Using Visual Studio
 
-* [Visual Studio 2017](https://www.visualstudio.com/)
+* [Visual Studio 2019](https://visualstudio.microsoft.com/)
 * [.NET Core SDK]
 
 The .NET Core and Docker workload is required during Visual Studio
@@ -109,7 +109,7 @@ When running any Discord.Net-powered bot on an older operating system
 you may encounter a @System.PlatformNotSupportedException upon
 connecting.
 
-You may resolve this by either targeting .NET Core 2.1 or later, or
+You may resolve this by either targeting .NET Core 2.1 or higher, or
 by installing one or more custom packages as listed below.
 
 #### [Targeting .NET Core 2.1](#tab/core2-1)
@@ -141,4 +141,4 @@ over the default ones.
 
 ***
 
-[.NET Core SDK]: https://www.microsoft.com/net/download/
+[.NET Core SDK]: https://dotnet.microsoft.com/download

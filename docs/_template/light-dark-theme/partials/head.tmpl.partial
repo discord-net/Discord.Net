@@ -5,9 +5,18 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <title>{{#title}}{{title}}{{/title}}{{^title}}{{>partials/title}}{{/title}} {{#_appTitle}}| {{_appTitle}} {{/_appTitle}}</title>
   <meta name="viewport" content="width=device-width">
-  <meta name="title" content="{{#title}}{{title}}{{/title}}{{^title}}{{>partials/title}}{{/title}} {{#_appTitle}}| {{_appTitle}} {{/_appTitle}}">
+  <meta property="og:title" content="{{#title}}{{title}}{{/title}}{{^title}}{{>partials/title}}{{/title}} {{#_appTitle}}| {{_appTitle}} {{/_appTitle}}">
+  {{#_description}}<meta property="og:description" content="{{_description}}">{{/_description}}
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Discord.Net Docs">
+  <meta property="og:image" content="https://cdn.jsdelivr.net/gh/discord-net/Discord.Net/docs/marketing/logo/PackageLogo.png">
+  <meta property="og:image:alt" content="Discord.Net Logo">
+  <meta name="theme-color" content="#995EA7"/>
   <meta name="generator" content="docfx {{_docfxVersion}}">
-  {{#_description}}<meta name="description" content="{{_description}}">{{/_description}}
+  <meta property="docfx:navrel" content="{{_navRel}}">
+  <meta property="docfx:tocrel" content="{{_tocRel}}">
+  <meta id="docfx-style:rel" content="{{_rel}}">
   <link rel="preload" href="{{_rel}}styles/search-worker.js" as="script">
   <link rel="preload" href="{{_rel}}fonts/glyphicons-halflings-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
   <link rel="shortcut icon" href="{{_rel}}{{{_appFaviconPath}}}{{^_appFaviconPath}}favicon.ico{{/_appFaviconPath}}">
@@ -18,10 +27,6 @@
   <link rel="stylesheet" href="{{_rel}}styles/material.css">
   <link rel="stylesheet" href="{{_rel}}styles/theme-switcher.css">
   <link href="https://cdn.rawgit.com/noelboss/featherlight/1.7.6/release/featherlight.min.css" type="text/css" rel="stylesheet" />
-  <meta name="theme-color" content="#99AAB5"/>
-  <meta property="docfx:navrel" content="{{_navRel}}">
-  <meta property="docfx:tocrel" content="{{_tocRel}}">
-  <meta id="docfx-style:rel" content="{{_rel}}">
   {{#_noindex}}<meta name="searchOption" content="noindex">{{/_noindex}}
   {{#_enableSearch}}<meta property="docfx:rel" content="{{_rel}}">{{/_enableSearch}}
   {{#_enableNewTab}}<meta property="docfx:newtab" content="true">{{/_enableNewTab}}

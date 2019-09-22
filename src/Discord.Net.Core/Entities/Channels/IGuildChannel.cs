@@ -132,14 +132,16 @@ namespace Discord
         Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null);
 
         /// <summary>
-        ///     Gets a collection of users that are able to view the channel.
+        ///     Gets a collection of users that are able to view the channel or are currently in this channel.
         /// </summary>
+        /// <remarks>
+        ///     This method follows the same behavior as described in <see cref="IChannel.GetUsersAsync"/>.
+        ///     Please visit its documentation for more details on this method.
+        /// </remarks>
         /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A paged collection containing a collection of guild users that can access this channel. Flattening the
-        ///     paginated response into a collection of users with 
-        ///     <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> is required if you wish to access the users.
+        ///     Paged collection of users.
         /// </returns>
         new IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> GetUsersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>

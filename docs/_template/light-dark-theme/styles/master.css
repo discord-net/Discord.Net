@@ -6,7 +6,6 @@ body {
     font-display: optional;
     height: 100%;
     font-size: 15px;
-    scroll-behavior: smooth;
 }
 
 code{
@@ -90,6 +89,10 @@ article.content h6{
 
 .sideaffix {
     line-height: 140%;
+}
+
+.sideaffix > div.contribution {
+    margin-bottom: 0;
 }
 
 header .navbar {

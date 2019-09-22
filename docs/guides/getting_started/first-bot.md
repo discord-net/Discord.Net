@@ -146,23 +146,6 @@ method with the application's "token."
 > Pay attention to what you are copying from the developer portal!
 > A token is not the same as the application's "client secret."
 
-> [!IMPORTANT]
-> Your bot's token can be used to gain total access to your bot, so
-> **do not** share this token with anyone else! You should store this
-> token in an external source if you plan on distributing
-> the source code for your bot.
->
-> In the following example, we retrieve the token from the environment
-> variable `DiscordToken`. Please note that this is *not* designed to
-> be used in a production environment, as the secrets are stored in
-> plain-text.
->
-> For information on how to set an environment variable, please see
-> instructions below,
->
-> * Windows: [How to Create Environment Variables Shortcut in Windows](https://www.tenforums.com/tutorials/121742-create-environment-variables-shortcut-windows.html)
-> * Linux: [How To Read and Set Environmental and Shell Variables on a Linux VPS](https://www.digitalocean.com/community/tutorials/how-to-read-and-set-environmental-and-shell-variables-on-a-linux-vps)
-> * macOS: [How do I set environment variables on OS X?](https://apple.stackexchange.com/questions/106778/how-do-i-set-environment-variables-on-os-x)
 
 We may now invoke the client's [StartAsync] method, which will
 start connection/reconnection logic. It is important to note that
@@ -174,6 +157,22 @@ the client before it is fully ready.
 Finally, we will want to block the async main method from returning
 when running the application. To do this, we can await an infinite delay
 or any other blocking method, such as reading from the console.
+
+> [!IMPORTANT]
+> Your bot's token can be used to gain total access to your bot, so
+> **do not** share this token with anyone else! You should store this
+> token in an external source if you plan on distributing
+> the source code for your bot.
+>
+> In the following example, we retrieve the token from a pre-defined
+> variable, which is **NOT** secure, especially if you plan on 
+> distributing the application in any shape or form.
+>
+> We recommend alternative storage such as 
+> [Environment Variables], an external configuration file, or a 
+> secrets manager for safe-handling of secrets.
+>
+> [Environment Variables]: https://en.wikipedia.org/wiki/Environment_variable
 
 The following lines can now be added:
 
