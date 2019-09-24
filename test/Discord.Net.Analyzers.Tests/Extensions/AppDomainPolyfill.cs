@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Reflection;
 using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.DependencyModel;
@@ -24,7 +24,7 @@ namespace System
             var rid = RuntimeEnvironment.GetRuntimeIdentifier();
             var ass = DependencyContext.Default.GetRuntimeAssemblyNames(rid);
 
-            return ass.Select(xan => Assembly.Load(xan)).ToArray();
+            return ass.Select(Assembly.Load).ToArray();
         }
     }
 }

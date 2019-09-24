@@ -1,9 +1,11 @@
-﻿using Discord.Net.WebSockets;
+using System;
+using Discord.Net.WebSockets;
 
 namespace Discord.Net.Providers.WS4Net
 {
     public static class WS4NetProvider
     {
+        [Obsolete("Please target .NET Core 2.1 or above")]
         public static readonly WebSocketProvider Instance = () => new WS4NetClient();
     }
 }
