@@ -18,7 +18,7 @@ namespace Discord.Rest
         {
             var args = new RoleProperties();
             func(args);
-            var apiArgs = new API.Rest.ModifyGuildRoleParams
+            var apiArgs = new API.Rest.GuildRoleParams
             {
                 Color = args.Color.IsSpecified ? args.Color.Value.RawValue : Optional.Create<uint>(),
                 Hoist = args.Hoist,

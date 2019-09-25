@@ -569,16 +569,13 @@ namespace Discord
         /// <summary>
         ///     Creates a new role with the provided name.
         /// </summary>
-        /// <param name="name">The new name for the role.</param>
-        /// <param name="permissions">The guild permission that the role should possess.</param>
-        /// <param name="color">The color of the role.</param>
-        /// <param name="isHoisted">Whether the role is separated from others on the sidebar.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the role upon creation.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     role.
         /// </returns>
-        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, RequestOptions options = null);
+        Task<IRole> CreateRoleAsync(Action<RoleProperties> func, RequestOptions options = null);
 
         /// <summary>
         ///     Adds a user to this guild.

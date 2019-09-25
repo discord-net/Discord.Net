@@ -250,21 +250,21 @@ namespace Discord.Rest
 
         //Roles
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
-        public static async Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client,
-            string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options)
+        public static async Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client, Action<RoleProperties> func, RequestOptions options)
         {
-            if (name == null) throw new ArgumentNullException(paramName: nameof(name));
-
-            var model = await client.ApiClient.CreateGuildRoleAsync(guild.Id, options).ConfigureAwait(false);
-            var role = RestRole.Create(client, guild, model);
-
-            await role.ModifyAsync(x =>
+            var args = new RoleProperties();
+            func(args);
+            var apiArgs = new API.Rest.GuildRoleParams
             {
-                x.Name = name;
-                x.Permissions = (permissions ?? role.Permissions);
-                x.Color = (color ?? Color.Default);
-                x.Hoist = isHoisted;
-            }, options).ConfigureAwait(false);
+                Color = args.Color.IsSpecified ? args.Color.Value.RawValue : Optional.Create<uint>(),
+                Hoist = args.Hoist,
+                Mentionable = args.Mentionable,
+                Name = args.Name,
+                Permissions = args.Permissions.IsSpecified ? args.Permissions.Value.RawValue : Optional.Create<ulong>()
+            };
+
+            var model = await client.ApiClient.CreateGuildRoleAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
+            var role = RestRole.Create(client, guild, model);
 
             return role;
         }

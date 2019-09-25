@@ -1142,13 +1142,13 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<Role>>("GET", () => $"guilds/{guildId}/roles", ids, options: options).ConfigureAwait(false);
         }
-        public async Task<Role> CreateGuildRoleAsync(ulong guildId, RequestOptions options = null)
+        public async Task<Role> CreateGuildRoleAsync(ulong guildId, GuildRoleParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<Role>("POST", () => $"guilds/{guildId}/roles", ids, options: options).ConfigureAwait(false);
+            return await SendJsonAsync<Role>("POST", () => $"guilds/{guildId}/roles", args, ids, options: options).ConfigureAwait(false);
         }
         public async Task DeleteGuildRoleAsync(ulong guildId, ulong roleId, RequestOptions options = null)
         {
@@ -1159,7 +1159,7 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             await SendAsync("DELETE", () => $"guilds/{guildId}/roles/{roleId}", ids, options: options).ConfigureAwait(false);
         }
-        public async Task<Role> ModifyGuildRoleAsync(ulong guildId, ulong roleId, Rest.ModifyGuildRoleParams args, RequestOptions options = null)
+        public async Task<Role> ModifyGuildRoleAsync(ulong guildId, ulong roleId, Rest.GuildRoleParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(roleId, 0, nameof(roleId));

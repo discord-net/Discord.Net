@@ -1,10 +1,10 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    internal class ModifyGuildRoleParams
+    internal class GuildRoleParams
     {
         [JsonProperty("name")]
         public Optional<string> Name { get; set; }

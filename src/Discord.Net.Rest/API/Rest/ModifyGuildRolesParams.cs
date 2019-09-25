@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    internal class ModifyGuildRolesParams : ModifyGuildRoleParams
+    internal class ModifyGuildRolesParams : GuildRoleParams
     {
         [JsonProperty("id")]
         public ulong Id { get; }
