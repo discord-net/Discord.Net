@@ -217,8 +217,12 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public override async Task StartAsync()
-            => await _connection.StartAsync().ConfigureAwait(false);
+        public override async Task StartAsync(IActivity activity = null, UserStatus status = UserStatus.Online)
+        {
+            Activity = activity;
+            Status = status;
+            await _connection.StartAsync().ConfigureAwait(false);
+        }
         /// <inheritdoc />
         public override async Task StopAsync()
             => await _connection.StopAsync().ConfigureAwait(false);
@@ -240,14 +244,14 @@ namespace Discord.WebSocket
                 else
                 {
                     await _gatewayLogger.DebugAsync("Identifying").ConfigureAwait(false);
-                    await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
+                    await ApiClient.SendIdentifyAsync(Activity, Status, shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
                 }
 
                 //Wait for READY
                 await _connection.WaitAsync().ConfigureAwait(false);
 
-                await _gatewayLogger.DebugAsync("Sending Status").ConfigureAwait(false);
-                await SendStatusAsync().ConfigureAwait(false);
+                //await _gatewayLogger.DebugAsync("Sending Status").ConfigureAwait(false);
+                //await SendStatusAsync().ConfigureAwait(false);
             }
             finally
             {
@@ -503,7 +507,7 @@ namespace Discord.WebSocket
                             _sessionId = null;
                             _lastSeq = 0;
 
-                            await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
+                            await ApiClient.SendIdentifyAsync(Activity, Status, shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
                         }
                         break;
                     case GatewayOpCode.Reconnect:

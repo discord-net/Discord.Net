@@ -171,7 +171,7 @@ namespace Discord.WebSocket
         /// </returns>
         public abstract RestVoiceRegion GetVoiceRegion(string id);
         /// <inheritdoc />
-        public abstract Task StartAsync();
+        public abstract Task StartAsync(IActivity activity = null, UserStatus status = UserStatus.Online);
         /// <inheritdoc />
         public abstract Task StopAsync();
         /// <summary>

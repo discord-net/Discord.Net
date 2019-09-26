@@ -215,8 +215,25 @@ namespace Discord.API
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
-        public async Task SendIdentifyAsync(int largeThreshold = 100, int shardID = 0, int totalShards = 1, RequestOptions options = null)
+        public async Task SendIdentifyAsync(IActivity activity = null, UserStatus status = UserStatus.Online, int largeThreshold = 100, int shardID = 0, int totalShards = 1, RequestOptions options = null)
         {
+            var gameModel = new Game();
+            // Discord only accepts rich presence over RPC, don't even bother building a payload
+            if (activity is RichGame)
+                throw new NotSupportedException("Outgoing Rich Presences are not supported via WebSocket.");
+
+            if (activity != null)
+            {
+                gameModel.Name = activity.Name;
+                gameModel.Type = activity.Type;
+                if (activity is StreamingGame streamGame)
+                    gameModel.StreamUrl = streamGame.Url;
+            }
+            var args = new StatusUpdateParams
+            {
+                Status = status,
+                Game = gameModel
+            };
             options = RequestOptions.CreateOrClone(options);
             var props = new Dictionary<string, string>
             {
@@ -226,13 +243,15 @@ namespace Discord.API
             {
                 Token = AuthToken,
                 Properties = props,
-                LargeThreshold = largeThreshold
+                LargeThreshold = largeThreshold,
+                Presence = args
             };
             if (totalShards > 1)
                 msg.ShardingParams = new int[] { shardID, totalShards };
 
             await SendGatewayAsync(GatewayOpCode.Identify, msg, options: options).ConfigureAwait(false);
         }
+
         public async Task SendResumeAsync(string sessionId, int lastSeq, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
