@@ -133,9 +133,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override async Task StartAsync(IActivity activity = null, UserStatus status = UserStatus.Online)
         {
-            Activity = activity;
-            Status = status;
-            await Task.WhenAll(_shards.Select(x => x.StartAsync())).ConfigureAwait(false);
+            await Task.WhenAll(_shards.Select(x => x.StartAsync(activity, status))).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
