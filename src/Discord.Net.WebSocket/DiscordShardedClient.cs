@@ -18,6 +18,7 @@ namespace Discord.WebSocket
         private int[] _shardIds;
         private DiscordSocketClient[] _shards;
         private int _totalShards;
+        private int _shardsReady;
 
         private bool _isDisposed;
 
@@ -290,16 +291,26 @@ namespace Discord.WebSocket
             };
             if (isPrimary)
             {
-                client.Ready += () =>
+                client.Ready += async () =>
                 {
                     CurrentUser = client.CurrentUser;
-                    return Task.Delay(0);
+                    if (_totalShards >= _shardsReady++) //to account for re-identifies, don't see a better way to handle this
+                    {
+                        await _readyEvent.InvokeAsync();
+                    }
                 };
             }
 
             client.Connected += () => _shardConnectedEvent.InvokeAsync(client);
             client.Disconnected += (exception) => _shardDisconnectedEvent.InvokeAsync(exception, client);
-            client.Ready += () => _shardReadyEvent.InvokeAsync(client);
+            client.Ready += async () =>
+            {
+                await _shardReadyEvent.InvokeAsync(client);
+                if (_totalShards >= _shardsReady++) //to account for re-identifies, don't see a better way to handle this
+                {
+                    await _readyEvent.InvokeAsync();
+                }
+            };
             client.LatencyUpdated += (oldLatency, newLatency) => _shardLatencyUpdatedEvent.InvokeAsync(oldLatency, newLatency, client);
 
             client.ChannelCreated += (channel) => _channelCreatedEvent.InvokeAsync(channel);
