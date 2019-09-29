@@ -294,7 +294,7 @@ namespace Discord.WebSocket
                 client.Ready += async () =>
                 {
                     CurrentUser = client.CurrentUser;
-                    if (_totalShards >= _shardsReady++) //to account for re-identifies, don't see a better way to handle this
+                    if (_shardsReady++ >= _totalShards) //to account for re-identifies, don't see a better way to handle this
                     {
                         await _readyEvent.InvokeAsync();
                     }
@@ -306,7 +306,7 @@ namespace Discord.WebSocket
             client.Ready += async () =>
             {
                 await _shardReadyEvent.InvokeAsync(client);
-                if (_totalShards >= _shardsReady++) //to account for re-identifies, don't see a better way to handle this
+                if (_shardsReady++ >= _totalShards) //to account for re-identifies, don't see a better way to handle this
                 {
                     await _readyEvent.InvokeAsync();
                 }
