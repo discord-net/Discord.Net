@@ -20,14 +20,14 @@ jobs:
 
 - job: Windows_build
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-2019'
   condition: ne(variables['Build.SourceBranch'], 'refs/heads/dev')
   steps:
   - template: azure/build.yml
 
 - job: Windows_deploy
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-2019'
   condition: |
       and (
         succeeded(),
