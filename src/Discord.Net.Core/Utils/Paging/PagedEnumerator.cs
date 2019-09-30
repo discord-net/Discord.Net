@@ -25,26 +25,28 @@ namespace Discord
             _nextPage = nextPage;
         }
 
-        public IAsyncEnumerator<IReadOnlyCollection<T>> GetEnumerator() => new Enumerator(this);
+        public IAsyncEnumerator<IReadOnlyCollection<T>> GetAsyncEnumerator(CancellationToken cancellationToken = new CancellationToken()) => new Enumerator(this, cancellationToken);
         internal class Enumerator : IAsyncEnumerator<IReadOnlyCollection<T>>
         {
             private readonly PagedAsyncEnumerable<T> _source;
+            private readonly CancellationToken _token;
             private readonly PageInfo _info;
 
             public IReadOnlyCollection<T> Current { get; private set; }
 
-            public Enumerator(PagedAsyncEnumerable<T> source)
+            public Enumerator(PagedAsyncEnumerable<T> source, CancellationToken token)
             {
                 _source = source;
+                _token = token;
                 _info = new PageInfo(source._start, source._count, source.PageSize);
             }
 
-            public async Task<bool> MoveNext(CancellationToken cancelToken)
+            public async ValueTask<bool> MoveNextAsync()
             {
                 if (_info.Remaining == 0)
                     return false;
 
-                var data = await _source._getPage(_info, cancelToken).ConfigureAwait(false);
+                var data = await _source._getPage(_info, _token).ConfigureAwait(false);
                 Current = new Page<T>(_info, data);
 
                 _info.Page++;
@@ -71,7 +73,11 @@ namespace Discord
                 return true;
             }
             
-            public void Dispose() { Current = null; }
+            public ValueTask DisposeAsync()
+            {
+                Current = null;
+                return default;
+            }
         }
     }
 }
