@@ -250,7 +250,7 @@ namespace Discord
                 .WithFooter("This is the footer", url)
                 .WithImageUrl(url)
                 .WithThumbnailUrl(url)
-                .WithTimestamp(DateTimeOffset.MinValue)
+                .WithTimestamp(DateTime.MinValue)
                 .WithTitle("This is the title")
                 .WithUrl(url)
                 .AddField("Field 1", "Inline", true)
