@@ -250,6 +250,16 @@ namespace Discord
         int PremiumSubscriptionCount { get; }
 
         /// <summary>
+        ///     Gets the preferred locale of this guild in IETF BCP 47
+        ///     language tag format.
+        /// </summary>
+        /// <returns>
+        ///     The preferred locale of the guild in IETF BCP 47
+        ///     language tag format.
+        /// </returns>
+        string PreferredLocale { get; }
+
+        /// <summary>
         ///     Modifies this guild.
         /// </summary>
         /// <param name="func">The delegate containing the properties to modify the guild with.</param>

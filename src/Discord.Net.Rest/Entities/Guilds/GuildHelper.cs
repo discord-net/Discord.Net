@@ -68,6 +68,12 @@ namespace Discord.Rest
             if (args.SystemChannelFlags.IsSpecified)
                 apiArgs.SystemChannelFlags = args.SystemChannelFlags.Value;
 
+            // PreferredLocale takes precedence over PreferredCulture
+            if (args.PreferredLocale.IsSpecified)
+                apiArgs.PreferredLocale = args.PreferredLocale.Value;
+            else if (args.PreferredCulture.IsSpecified)
+                apiArgs.PreferredLocale = args.PreferredCulture.Value.Name;
+
             return await client.ApiClient.ModifyGuildAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
