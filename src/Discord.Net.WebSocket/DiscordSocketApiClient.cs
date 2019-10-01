@@ -215,7 +215,7 @@ namespace Discord.API
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
-        public async Task SendIdentifyAsync(IActivity activity = null, UserStatus status = UserStatus.Online, int largeThreshold = 100, int shardID = 0, int totalShards = 1, RequestOptions options = null)
+        public async Task SendIdentifyAsync(bool guildSubscriptions, IActivity activity = null, UserStatus status = UserStatus.Online, int largeThreshold = 100, int shardID = 0, int totalShards = 1, RequestOptions options = null)
         {
             var gameModel = new Game();
             // Discord only accepts rich presence over RPC, don't even bother building a payload
@@ -244,7 +244,7 @@ namespace Discord.API
                 Token = AuthToken,
                 Properties = props,
                 LargeThreshold = largeThreshold,
-                Presence = args
+                Presence = args,
                 GuildSubscriptions = guildSubscriptions
             };
             if (totalShards > 1)

@@ -246,7 +246,7 @@ namespace Discord.WebSocket
                 else
                 {
                     await _gatewayLogger.DebugAsync("Identifying").ConfigureAwait(false);
-                    await ApiClient.SendIdentifyAsync(Activity, Status, shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
+                    await ApiClient.SendIdentifyAsync(_guildSubscriptions, Activity, Status, shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
                 }
 
                 //Wait for READY
@@ -509,7 +509,7 @@ namespace Discord.WebSocket
                             _sessionId = null;
                             _lastSeq = 0;
 
-                            await ApiClient.SendIdentifyAsync(Activity, Status, shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
+                            await ApiClient.SendIdentifyAsync(_guildSubscriptions, Activity, Status, shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
                         }
                         break;
                     case GatewayOpCode.Reconnect:
