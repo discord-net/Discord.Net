@@ -43,6 +43,7 @@ namespace Discord.WebSocket
         private DateTimeOffset? _statusSince;
         private RestApplication _applicationInfo;
         private bool _isDisposed;
+        private bool _guildSubscriptions;
 
         /// <summary>
         ///     Provides access to a REST-only client with a shared state from this client.
@@ -135,6 +136,7 @@ namespace Discord.WebSocket
             State = new ClientState(0, 0);
             Rest = new DiscordSocketRestClient(config, ApiClient);
             _heartbeatTimes = new ConcurrentQueue<long>();
+            _guildSubscriptions = config.GuildSubscriptions;
 
             _stateLock = new SemaphoreSlim(1, 1);
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : $"Shard #{ShardId}");

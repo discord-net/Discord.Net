@@ -245,6 +245,7 @@ namespace Discord.API
                 Properties = props,
                 LargeThreshold = largeThreshold,
                 Presence = args
+                GuildSubscriptions = guildSubscriptions
             };
             if (totalShards > 1)
                 msg.ShardingParams = new int[] { shardID, totalShards };

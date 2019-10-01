@@ -77,7 +77,7 @@ namespace Discord.WebSocket
         ///     <para>
         ///         By default, the Discord gateway will only send offline members if a guild has less than a certain number
         ///         of members (determined by <see cref="LargeThreshold"/> in this library). This behaviour is why
-        ///         sometimes a user may be missing from the WebSocket cache for collections such as 
+        ///         sometimes a user may be missing from the WebSocket cache for collections such as
         ///         <see cref="Discord.WebSocket.SocketGuild.Users"/>.
         ///     </para>
         ///     <para>
@@ -86,7 +86,7 @@ namespace Discord.WebSocket
         ///         downloaded to the WebSocket cache.
         ///     </para>
         ///     <para>
-        ///         For more information, please see 
+        ///         For more information, please see
         ///         <see href="https://discordapp.com/developers/docs/topics/gateway#request-guild-members">Request Guild Members</see>
         ///         on the official Discord API documentation.
         ///     </para>
@@ -95,7 +95,7 @@ namespace Discord.WebSocket
         ///         traffic. If you are using the command system, the default user TypeReader may fail to find the user
         ///         due to this issue. This may be resolved at v3 of the library. Until then, you may want to consider
         ///         overriding the TypeReader and use
-        ///         <see cref="DiscordRestClient.GetUserAsync(System.UInt64,Discord.RequestOptions)"/> 
+        ///         <see cref="DiscordRestClient.GetUserAsync(System.UInt64,Discord.RequestOptions)"/>
         ///         or <see cref="DiscordRestClient.GetGuildUserAsync"/>
         ///         as a backup.
         ///     </note>
@@ -118,6 +118,11 @@ namespace Discord.WebSocket
         ///     If unset, both events will be raised, but a warning will be raised the first time a bulk delete event is received.
         /// </summary>
         public bool? ExclusiveBulkDelete { get; set; } = null;
+
+        /// <summary>
+        ///     Gets or sets enabling dispatching of guild subscription events e.g. presence and typing events.
+        /// </summary>
+        public bool GuildSubscriptions { get; set; } = true;
 
         /// <summary>
         ///     Initializes a default configuration.

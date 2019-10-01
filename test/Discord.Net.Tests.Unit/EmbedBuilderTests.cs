@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace Discord
@@ -250,7 +249,7 @@ namespace Discord
                 .WithFooter("This is the footer", url)
                 .WithImageUrl(url)
                 .WithThumbnailUrl(url)
-                .WithTimestamp(DateTime.MinValue)
+                .WithTimestamp(DateTimeOffset.MinValue)
                 .WithTitle("This is the title")
                 .WithUrl(url)
                 .AddField("Field 1", "Inline", true)
