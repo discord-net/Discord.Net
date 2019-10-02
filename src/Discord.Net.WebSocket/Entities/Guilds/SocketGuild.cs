@@ -674,15 +674,22 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Creates a new role with the provided name.
         /// </summary>
-        /// <param name="func">The delegate containing the properties to be applied to the role upon creation.</param>
+        /// <param name="name">The new name for the role.</param>
+        /// <param name="permissions">The guild permission that the role should possess.</param>
+        /// <param name="color">The color of the role.</param>
+        /// <param name="isHoisted">Whether the role is separated from others on the sidebar.</param>
+        /// <param name="isMentionable">Whether the role is mentionable or not.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     role.
         /// </returns>
-        public Task<RestRole> CreateRoleAsync(Action<RoleProperties> func, RequestOptions options = null)
-            => GuildHelper.CreateRoleAsync(this, Discord, func, options);
+        public async Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?),
+                                                    bool isHoisted = false, bool isMentionable = false, RequestOptions options = null)
+        {
+            return await GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, isMentionable, options).ConfigureAwait(false);
+        }
         internal SocketRole AddRole(RoleModel model)
         {
             var role = SocketRole.Create(this, Discord.State, model);
@@ -1138,8 +1145,8 @@ namespace Discord.WebSocket
         IRole IGuild.GetRole(ulong id)
             => GetRole(id);
         /// <inheritdoc />
-        async Task<IRole> IGuild.CreateRoleAsync(Action<RoleProperties> func, RequestOptions options)
-            => await CreateRoleAsync(func, options).ConfigureAwait(false);
+        async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options)
+            => await CreateRoleAsync(name, permissions, color, isHoisted, isMentionable, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         Task<IReadOnlyCollection<IGuildUser>> IGuild.GetUsersAsync(CacheMode mode, RequestOptions options)
