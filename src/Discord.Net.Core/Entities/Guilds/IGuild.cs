@@ -1,6 +1,7 @@
 using Discord.Audio;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -258,6 +259,14 @@ namespace Discord
         ///     language tag format.
         /// </returns>
         string PreferredLocale { get; }
+
+        /// <summary>
+        ///     Gets the preferred culture of this guild.
+        /// </summary>
+        /// <returns>
+        ///     The preferred culture information of this guild.
+        /// </returns>
+        CultureInfo PreferredCulture { get; }
 
         /// <summary>
         ///     Modifies this guild.

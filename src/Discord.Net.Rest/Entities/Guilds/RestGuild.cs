@@ -68,12 +68,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string PreferredLocale { get; private set; }
 
-        /// <summary>
-        ///     Gets the preferred culture of this guild.
-        /// </summary>
-        /// <returns>
-        ///     The preferred culture information of this guild.
-        /// </returns>
+        /// <inheritdoc />
         public CultureInfo PreferredCulture { get; private set; }
 
         /// <inheritdoc />
