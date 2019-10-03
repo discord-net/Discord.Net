@@ -41,8 +41,7 @@ namespace Discord.Commands
                 }
                 catch (Exception ex)
                 {
-                    //TODO: use the Exception overload after a rebase on latest
-                    return TypeReaderResult.FromError(CommandError.Exception, ex.Message);
+                    return TypeReaderResult.FromError(ex);
                 }
             }
 
