@@ -3,6 +3,7 @@
         <VersionPrefix>2.2.0</VersionPrefix>
         <VersionSuffix>dev</VersionSuffix>
         <Authors>RogueException</Authors>
+        <LangVersion>8.0</LangVersion>
         <PackageTags>discord;discordapp</PackageTags>
         <PackageProjectUrl>https://github.com/RogueException/Discord.Net</PackageProjectUrl>
         <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
