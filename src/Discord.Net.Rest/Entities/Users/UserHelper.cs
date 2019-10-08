@@ -10,11 +10,13 @@ namespace Discord.Rest
 {
     internal static class UserHelper
     {
-        public static async Task<Model> ModifyAsync(ISelfUser user, BaseDiscordClient client, Action<SelfUserProperties> func,
+        public static async Task<Model> ModifyAsync<TState>(ISelfUser user, BaseDiscordClient client,
+            Action<SelfUserProperties, TState> func,
+            TState state,
             RequestOptions options)
         {
             var args = new SelfUserProperties();
-            func(args);
+            func(args, state);
             var apiArgs = new API.Rest.ModifyCurrentUserParams
             {
                 Avatar = args.Avatar.IsSpecified ? args.Avatar.Value?.ToModel() : Optional.Create<ImageModel?>(),
@@ -26,11 +28,13 @@ namespace Discord.Rest
 
             return await client.ApiClient.ModifySelfAsync(apiArgs, options).ConfigureAwait(false);
         }
-        public static async Task<GuildUserProperties> ModifyAsync(IGuildUser user, BaseDiscordClient client, Action<GuildUserProperties> func,
+        public static async Task<GuildUserProperties> ModifyAsync<TState>(IGuildUser user, BaseDiscordClient client,
+            Action<GuildUserProperties, TState> func,
+            TState state,
             RequestOptions options)
         {
             var args = new GuildUserProperties();
-            func(args);
+            func(args, state);
             var apiArgs = new API.Rest.ModifyGuildMemberParams
             {
                 Deaf = args.Deaf,

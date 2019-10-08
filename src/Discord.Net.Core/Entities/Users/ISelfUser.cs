@@ -59,5 +59,9 @@ namespace Discord
         ///     Modifies the user's properties.
         /// </summary>
         Task ModifyAsync(Action<SelfUserProperties> func, RequestOptions options = null);
+        /// <summary>
+        ///     Modifies the user's properties.
+        /// </summary>
+        Task ModifyAsync<TState>(Action<SelfUserProperties, TState> func, TState state, RequestOptions options = null);
     }
 }

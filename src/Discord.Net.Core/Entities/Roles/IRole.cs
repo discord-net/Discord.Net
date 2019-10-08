@@ -79,5 +79,19 @@ namespace Discord
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
         Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null);
+        /// <summary>
+        ///     Modifies this role.
+        /// </summary>
+        /// <remarks>
+        ///     This method modifies this role with the specified properties. To see an example of this
+        ///     method and what properties are available, please refer to <see cref="RoleProperties"/>.
+        /// </remarks>
+        /// <param name="func">A delegate containing the properties to modify the role with.</param>
+        /// <param name="state">An object to carry state into the delegate to prevent closures.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        Task ModifyAsync<TState>(Action<RoleProperties, TState> func, TState state, RequestOptions options = null);
     }
 }

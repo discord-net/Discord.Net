@@ -57,11 +57,13 @@ namespace Discord.Rest
             Color = new Color(model.Color);
             Permissions = new GuildPermissions(model.Permissions);
         }
-
         /// <inheritdoc />
-        public async Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
+            => ModifyAsync((props, f) => f(props), func, options);
+        /// <inheritdoc />
+        public async Task ModifyAsync<TState>(Action<RoleProperties, TState> func, TState state, RequestOptions options = null)
         { 
-            var model = await RoleHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
+            var model = await RoleHelper.ModifyAsync(this, Discord, func, state, options).ConfigureAwait(false);
             Update(model);
         }
         /// <inheritdoc />

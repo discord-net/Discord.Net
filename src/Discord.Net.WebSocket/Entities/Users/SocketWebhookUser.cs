@@ -78,6 +78,10 @@ namespace Discord.WebSocket
         /// <exception cref="NotSupportedException">Webhook users cannot be modified.</exception>
         Task IGuildUser.ModifyAsync(Action<GuildUserProperties> func, RequestOptions options) => 
             throw new NotSupportedException("Webhook users cannot be modified.");
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Webhook users cannot be modified.</exception>
+        Task IGuildUser.ModifyAsync<TState>(Action<GuildUserProperties, TState> func, TState state, RequestOptions options) =>
+            throw new NotSupportedException("Webhook users cannot be modified.");
 
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Roles are not supported on webhook users.</exception>

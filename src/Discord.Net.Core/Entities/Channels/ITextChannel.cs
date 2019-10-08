@@ -83,7 +83,18 @@ namespace Discord
         /// </returns>
         /// <seealso cref="TextChannelProperties"/>
         Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null);
-        
+        /// <summary>
+        ///     Modifies this text channel.
+        /// </summary>
+        /// <param name="func">The delegate containing the properties to modify the channel with.</param>
+        /// <param name="state">An object to carry state into the delegate to prevent closures.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        /// <seealso cref="TextChannelProperties"/>
+        Task ModifyAsync<TState>(Action<TextChannelProperties, TState> func, TState state, RequestOptions options = null);
+
         /// <summary>
         ///     Creates a webhook in this text channel.
         /// </summary>

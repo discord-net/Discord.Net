@@ -18,12 +18,13 @@ namespace Discord.Rest
         {
             await client.ApiClient.DeleteChannelAsync(channel.Id, options).ConfigureAwait(false);
         }
-        public static async Task<Model> ModifyAsync(IGuildChannel channel, BaseDiscordClient client,
-            Action<GuildChannelProperties> func,
+        public static async Task<Model> ModifyAsync<TState>(IGuildChannel channel, BaseDiscordClient client,
+            Action<GuildChannelProperties, TState> func,
+            TState state,
             RequestOptions options)
         {
             var args = new GuildChannelProperties();
-            func(args);
+            func(args, state);
             var apiArgs = new API.Rest.ModifyGuildChannelParams
             {
                 Name = args.Name,
@@ -32,12 +33,13 @@ namespace Discord.Rest
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
-        public static async Task<Model> ModifyAsync(ITextChannel channel, BaseDiscordClient client,
-            Action<TextChannelProperties> func,
+        public static async Task<Model> ModifyAsync<TState>(ITextChannel channel, BaseDiscordClient client,
+            Action<TextChannelProperties, TState> func,
+            TState state,
             RequestOptions options)
         {
             var args = new TextChannelProperties();
-            func(args);
+            func(args, state);
             var apiArgs = new API.Rest.ModifyTextChannelParams
             {
                 Name = args.Name,
@@ -49,12 +51,13 @@ namespace Discord.Rest
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
-        public static async Task<Model> ModifyAsync(IVoiceChannel channel, BaseDiscordClient client,
-            Action<VoiceChannelProperties> func,
+        public static async Task<Model> ModifyAsync<TState>(IVoiceChannel channel, BaseDiscordClient client,
+            Action<VoiceChannelProperties, TState> func,
+            TState state,
             RequestOptions options)
         {
             var args = new VoiceChannelProperties();
-            func(args);
+            func(args, state);
             var apiArgs = new API.Rest.ModifyVoiceChannelParams
             {
                 Bitrate = args.Bitrate,

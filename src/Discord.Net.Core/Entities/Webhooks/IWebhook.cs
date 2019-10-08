@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -53,5 +53,9 @@ namespace Discord
         ///     Modifies this webhook.
         /// </summary>
         Task ModifyAsync(Action<WebhookProperties> func, RequestOptions options = null);
+        /// <summary>
+        ///     Modifies this webhook.
+        /// </summary>
+        Task ModifyAsync<TState>(Action<WebhookProperties, TState> func, TState state, RequestOptions options = null);
     }
 }

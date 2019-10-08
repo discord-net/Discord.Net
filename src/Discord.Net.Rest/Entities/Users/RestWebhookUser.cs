@@ -63,6 +63,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         Task IGuildUser.ModifyAsync(Action<GuildUserProperties> func, RequestOptions options) => 
             throw new NotSupportedException("Webhook users cannot be modified.");
+        /// <inheritdoc />
+        Task IGuildUser.ModifyAsync<TState>(Action<GuildUserProperties, TState> func, TState state, RequestOptions options) =>
+            throw new NotSupportedException("Webhook users cannot be modified.");
 
         /// <inheritdoc />
         Task IGuildUser.AddRoleAsync(IRole role, RequestOptions options) => 

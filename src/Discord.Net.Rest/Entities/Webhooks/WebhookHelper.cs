@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Discord.API.Rest;
 using ImageModel = Discord.API.Image;
@@ -8,11 +8,11 @@ namespace Discord.Rest
 {
     internal static class WebhookHelper
     {
-        public static async Task<Model> ModifyAsync(IWebhook webhook, BaseDiscordClient client,
-            Action<WebhookProperties> func, RequestOptions options)
+        public static async Task<Model> ModifyAsync<TState>(IWebhook webhook, BaseDiscordClient client,
+            Action<WebhookProperties, TState> func, TState state, RequestOptions options)
         {
             var args = new WebhookProperties();
-            func(args);
+            func(args, state);
             var apiArgs = new ModifyWebhookParams
             {
                 Avatar = args.Image.IsSpecified ? args.Image.Value?.ToModel() : Optional.Create<ImageModel?>(),

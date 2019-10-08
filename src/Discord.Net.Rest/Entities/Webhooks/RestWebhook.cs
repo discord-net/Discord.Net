@@ -77,9 +77,11 @@ namespace Discord.Rest
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
            => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
 
-        public async Task ModifyAsync(Action<WebhookProperties> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<WebhookProperties> func, RequestOptions options = null)
+            => ModifyAsync((props, f) => f(props), func, options);
+        public async Task ModifyAsync<TState>(Action<WebhookProperties, TState> func, TState state, RequestOptions options = null)
         {
-            var model = await WebhookHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
+            var model = await WebhookHelper.ModifyAsync(this, Discord, func, state, options).ConfigureAwait(false);
             Update(model);
         }
 

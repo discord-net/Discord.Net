@@ -55,11 +55,11 @@ namespace Discord.Webhook
             return msg.Id;
         }
 
-        public static async Task<WebhookModel> ModifyAsync(DiscordWebhookClient client,
-            Action<WebhookProperties> func, RequestOptions options)
+        public static async Task<WebhookModel> ModifyAsync<TState>(DiscordWebhookClient client,
+            Action<WebhookProperties, TState> func, TState state, RequestOptions options)
         {
             var args = new WebhookProperties();
-            func(args);
+            func(args, state);
             var apiArgs = new ModifyWebhookParams
             {
                 Avatar = args.Image.IsSpecified ? args.Image.Value?.ToModel() : Optional.Create<ImageModel?>(),
