@@ -228,15 +228,26 @@ namespace Discord.Commands
             try
             {
                 var types = await ModuleClassBuilder.SearchAsync(assembly, this).ConfigureAwait(false);
-                var moduleDefs = await ModuleClassBuilder.BuildAsync(types, this, services).ConfigureAwait(false);
+                var standardModuleDefs = await ModuleClassBuilder.BuildAsync(types.Item1, this, services).ConfigureAwait(false);
 
-                foreach (var info in moduleDefs)
+                foreach (var info in standardModuleDefs)
                 {
                     _typedModuleDefs[info.Key] = info.Value;
                     LoadModuleInternal(info.Value);
                 }
 
-                return moduleDefs.Select(x => x.Value).ToImmutableArray();
+                var outsideParentGroupModuleDefs = await ModuleClassBuilder.BuildAsync(types.Item2.Keys, this, services, standardModuleDefs).ConfigureAwait(false);
+
+                foreach (var info in outsideParentGroupModuleDefs)
+                {
+                    _typedModuleDefs[info.Key] = info.Value;
+                    LoadModuleInternal(info.Value);
+                }
+
+                var moduleDefs = new List<ModuleInfo>(standardModuleDefs.Values);
+                moduleDefs.AddRange(outsideParentGroupModuleDefs.Values);
+
+                return moduleDefs.ToImmutableArray();
             }
             finally
             {
