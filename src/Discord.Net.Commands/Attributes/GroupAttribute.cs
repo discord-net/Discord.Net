@@ -13,6 +13,11 @@ namespace Discord.Commands
         /// </summary>
         public string Prefix { get; }
 
+        /// <summary>
+        ///     Uses this module as parent instead. Allows creation of group modules outside of parent class.
+        /// </summary>
+        public Type ParentModule { get; set; }
+
         /// <inheritdoc />
         public GroupAttribute()
         {
