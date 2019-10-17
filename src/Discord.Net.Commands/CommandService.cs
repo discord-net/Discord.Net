@@ -236,7 +236,7 @@ namespace Discord.Commands
                     LoadModuleInternal(info.Value);
                 }
 
-                var outsideParentGroupModuleDefs = await ModuleClassBuilder.BuildAsync(types.Item2.Keys, this, services, standardModuleDefs).ConfigureAwait(false);
+                var outsideParentGroupModuleDefs = await ModuleClassBuilder.BuildAsync(types.Item2, this, services, standardModuleDefs).ConfigureAwait(false);
 
                 foreach (var info in outsideParentGroupModuleDefs)
                 {

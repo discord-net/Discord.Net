@@ -13,27 +13,29 @@ namespace Discord.Commands
         private static readonly TypeInfo ModuleTypeInfo = typeof(IModuleBase).GetTypeInfo();
 
         ///<summary>Value1 - ready types, Value2 - types dependant on Value1.</summary>
-        /// <param name="assembly"></param>
-        /// <param name="service"></param>
-        /// <returns></returns>
-        public static async Task<Tuple<IReadOnlyList<TypeInfo>, IReadOnlyDictionary<TypeInfo, TypeInfo>>> SearchAsync(Assembly assembly, CommandService service)
+        public static async Task<Tuple<IReadOnlyList<TypeInfo>, IReadOnlyList<TypeInfo>>> SearchAsync(Assembly assembly, CommandService service)
         {
+            //store bad parent modules to avoid duplicate error logs.
+            var badModules = new List<TypeInfo>();
             var standardModules = new List<TypeInfo>();
-            var queuedModules = new Dictionary<TypeInfo, TypeInfo>();
+            var queuedModules = new List<TypeInfo>();
 
             foreach (var typeInfo in assembly.DefinedTypes)
             {
-                //SubTypes outside of parent class. Require
+                if (badModules.Contains(typeInfo))
+                    continue;
+
+                //Find SubTypes outside of parent class.
                 var groupAttr = typeInfo.GetCustomAttribute<GroupAttribute>();
                 if (groupAttr != null)
                 {
                     if (groupAttr.ParentModule != null)
                     {
                         var parentTypeInfo = groupAttr.ParentModule.GetTypeInfo();
-                        bool subTypeIsValid = await ConfirmTypeInfoAsync(service, parentTypeInfo);
+                        bool subTypeIsValid = await ConfirmOuterSubTypeInfoAsync(service, typeInfo, parentTypeInfo, badModules);
                         if(subTypeIsValid)
                         {
-                            queuedModules.Add(typeInfo, parentTypeInfo);
+                            queuedModules.Add(typeInfo);
                         }
                         continue;
                     }
@@ -46,9 +48,8 @@ namespace Discord.Commands
                 }
             }
 
-            return Tuple.Create<IReadOnlyList<TypeInfo>, IReadOnlyDictionary<TypeInfo, TypeInfo>>(standardModules, queuedModules);
+            return Tuple.Create<IReadOnlyList<TypeInfo>, IReadOnlyList<TypeInfo>>(standardModules, queuedModules);
         }
-
 
         private static bool IsLoadableModule(TypeInfo info)
         {
@@ -57,7 +58,10 @@ namespace Discord.Commands
                     info.GetCustomAttribute<DontAutoLoadAttribute>() == null;
         }
 
-        ///<summary>Confirm if type is valid. If so, add it to the specified modules list.</summary>
+        ///<summary>Checks whether <paramref name="typeInfo"/> is valid to be loaded.</summary>
+        ///<param name="service">CommandService object.</param>
+        ///<param name="typeInfo">Target type to check against.</param>
+        ///<param name="subTypeInfo">Checks parent type validity. Used with outer group modules.</param>
         private static async Task<bool> ConfirmTypeInfoAsync(CommandService service, TypeInfo typeInfo)
         {
             if (typeInfo.IsPublic || typeInfo.IsNestedPublic)
@@ -76,6 +80,24 @@ namespace Discord.Commands
             return false;
         }
 
+        ///<summary>Checks whether <paramref name="typeInfo"/> is valid to be loaded.</summary>
+        ///<param name="service">CommandService object.</param>
+        ///<param name="typeInfo">Target type to check against.</param>
+        private static async Task<bool> ConfirmOuterSubTypeInfoAsync(CommandService service, TypeInfo typeInfo, TypeInfo parentTypeInfo, List<TypeInfo> badModules)
+        {
+            bool targetValid = await ConfirmTypeInfoAsync(service, typeInfo);
+            if(targetValid)
+            {
+                bool parentValid = await ConfirmTypeInfoAsync(service, parentTypeInfo);
+                if (!parentValid)
+                {
+                    await service._cmdLogger.WarningAsync($"Parent Class {parentTypeInfo.FullName} is not a module. Group module {typeInfo.FullName} was not loaded.").ConfigureAwait(false);
+                    badModules.Add(parentTypeInfo);
+                    return false;
+                }
+            }
+            return targetValid;
+        }
 
         public static Task<Dictionary<Type, ModuleInfo>> BuildAsync(CommandService service, IServiceProvider services, params TypeInfo[] validTypes) => BuildAsync(validTypes, service, services);
         public static async Task<Dictionary<Type, ModuleInfo>> BuildAsync(IEnumerable<TypeInfo> validTypes, CommandService service, IServiceProvider services, Dictionary<Type, ModuleInfo> moduleDefs = null)
@@ -104,7 +126,8 @@ namespace Discord.Commands
                 result[typeInfo.AsType()] = module.Build(service, services);
             }
 
-            await service._cmdLogger.DebugAsync($"Successfully built {builtTypes.Count} modules.").ConfigureAwait(false);
+            string entriesName = moduleDefs == null ? "modules" : "submodules";
+            await service._cmdLogger.DebugAsync($"Successfully built {builtTypes.Count} {entriesName}.").ConfigureAwait(false);
 
             return result;
         }
