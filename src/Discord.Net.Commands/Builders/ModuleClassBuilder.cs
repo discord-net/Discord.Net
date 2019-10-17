@@ -10,7 +10,7 @@ namespace Discord.Commands
 {
     internal static class ModuleClassBuilder
     {
-        private static readonly TypeInfo ModuleTypeInfo = typeof(IModuleBase).GetTypeInfo();
+        public static readonly TypeInfo ModuleTypeInfo = typeof(IModuleBase).GetTypeInfo();
 
         ///<summary>Value1 - ready types, Value2 - types dependant on Value1.</summary>
         public static async Task<Tuple<IReadOnlyList<TypeInfo>, IReadOnlyList<TypeInfo>>> SearchAsync(Assembly assembly, CommandService service)
@@ -25,23 +25,25 @@ namespace Discord.Commands
                 if (badModules.Contains(typeInfo))
                     continue;
 
-                //Find SubTypes outside of parent class.
-                var groupAttr = typeInfo.GetCustomAttribute<GroupAttribute>();
-                if (groupAttr != null)
+                if(typeInfo.IsOuterSubTypeCandidate(out Type parentType))
                 {
-                    if (groupAttr.ParentModule != null)
+                    bool subTypeIsValid = await typeInfo.IsValidOuterSubTypeAsync(
+                            parentType,
+                            autoLoadable: true,
+                            logger: service._cmdLogger);
+
+                    if (subTypeIsValid)
                     {
-                        var parentTypeInfo = groupAttr.ParentModule.GetTypeInfo();
-                        bool subTypeIsValid = await ConfirmOuterSubTypeInfoAsync(service, typeInfo, parentTypeInfo, badModules);
-                        if(subTypeIsValid)
-                        {
-                            queuedModules.Add(typeInfo);
-                        }
-                        continue;
+                        queuedModules.Add(typeInfo);
                     }
+                    else
+                    {
+                        badModules.Add(typeInfo);
+                    }
+                    continue;
                 }
 
-                bool typeInfoIsValid = await ConfirmTypeInfoAsync(service, typeInfo);
+                bool typeInfoIsValid = await typeInfo.IsValidModuleType(autoLoadable: true, logger: service._cmdLogger);
                 if(typeInfoIsValid)
                 {
                     standardModules.Add(typeInfo);
@@ -51,61 +53,16 @@ namespace Discord.Commands
             return Tuple.Create<IReadOnlyList<TypeInfo>, IReadOnlyList<TypeInfo>>(standardModules, queuedModules);
         }
 
-        private static bool IsLoadableModule(TypeInfo info)
-        {
-            return info.DeclaredMethods.Any(
-                x => x.GetCustomAttribute<CommandAttribute>() != null) &&
-                    info.GetCustomAttribute<DontAutoLoadAttribute>() == null;
-        }
+        public static Task<Dictionary<Type, ModuleInfo>> BuildAsync(CommandService service, IServiceProvider services, IDictionary<Type, ModuleInfo> moduleDefs, params TypeInfo[] validTypes) =>
+            BuildAsync(validTypes, service, services, moduleDefs);
 
-        ///<summary>Checks whether <paramref name="typeInfo"/> is valid to be loaded.</summary>
-        ///<param name="service">CommandService object.</param>
-        ///<param name="typeInfo">Target type to check against.</param>
-        ///<param name="subTypeInfo">Checks parent type validity. Used with outer group modules.</param>
-        private static async Task<bool> ConfirmTypeInfoAsync(CommandService service, TypeInfo typeInfo)
-        {
-            if (typeInfo.IsPublic || typeInfo.IsNestedPublic)
-            {
-                if (IsValidModuleDefinition(typeInfo) &&
-                    !typeInfo.IsDefined(typeof(DontAutoLoadAttribute)))
-                {
-                    return true;
-                }
-            }
-            else if (IsLoadableModule(typeInfo))
-            {
-                await service._cmdLogger.WarningAsync($"Class {typeInfo.FullName} is not public and cannot be loaded. To suppress this message, mark the class with {nameof(DontAutoLoadAttribute)}.").ConfigureAwait(false);
-            }
-
-            return false;
-        }
-
-        ///<summary>Checks whether <paramref name="typeInfo"/> is valid to be loaded.</summary>
-        ///<param name="service">CommandService object.</param>
-        ///<param name="typeInfo">Target type to check against.</param>
-        private static async Task<bool> ConfirmOuterSubTypeInfoAsync(CommandService service, TypeInfo typeInfo, TypeInfo parentTypeInfo, List<TypeInfo> badModules)
-        {
-            bool targetValid = await ConfirmTypeInfoAsync(service, typeInfo);
-            if(targetValid)
-            {
-                bool parentValid = await ConfirmTypeInfoAsync(service, parentTypeInfo);
-                if (!parentValid)
-                {
-                    await service._cmdLogger.WarningAsync($"Parent Class {parentTypeInfo.FullName} is not a module. Group module {typeInfo.FullName} was not loaded.").ConfigureAwait(false);
-                    badModules.Add(parentTypeInfo);
-                    return false;
-                }
-            }
-            return targetValid;
-        }
-
-        public static Task<Dictionary<Type, ModuleInfo>> BuildAsync(CommandService service, IServiceProvider services, params TypeInfo[] validTypes) => BuildAsync(validTypes, service, services);
-        public static async Task<Dictionary<Type, ModuleInfo>> BuildAsync(IEnumerable<TypeInfo> validTypes, CommandService service, IServiceProvider services, Dictionary<Type, ModuleInfo> moduleDefs = null)
+        public static async Task<Dictionary<Type, ModuleInfo>> BuildAsync(IEnumerable<TypeInfo> validTypes, CommandService service, IServiceProvider services, IDictionary<Type, ModuleInfo> moduleDefs = null)
         {
             /*if (!validTypes.Any())
                 throw new InvalidOperationException("Could not find any valid modules from the given selection");*/
 
-            var topLevelGroups = validTypes.Where(x => x.DeclaringType == null || !IsValidModuleDefinition(x.DeclaringType.GetTypeInfo()));
+            var topLevelGroups = validTypes
+                .Where(x => x.DeclaringType == null || !x.DeclaringType.GetTypeInfo().IsValidModuleDefinition());
 
             var builtTypes = new List<TypeInfo>();
 
@@ -123,6 +80,7 @@ namespace Discord.Commands
                 BuildSubTypes(module, typeInfo.DeclaredNestedTypes, builtTypes, service, services, moduleDefs);
                 builtTypes.Add(typeInfo);
 
+                //dont build yet, return as a module dictonary?
                 result[typeInfo.AsType()] = module.Build(service, services);
             }
 
@@ -132,11 +90,11 @@ namespace Discord.Commands
             return result;
         }
 
-        private static void BuildSubTypes(ModuleBuilder builder, IEnumerable<TypeInfo> subTypes, List<TypeInfo> builtTypes, CommandService service, IServiceProvider services, Dictionary<Type, ModuleInfo> moduleDefs)
+        private static void BuildSubTypes(ModuleBuilder builder, IEnumerable<TypeInfo> subTypes, List<TypeInfo> builtTypes, CommandService service, IServiceProvider services, IDictionary<Type, ModuleInfo> moduleDefs)
         {
             foreach (var typeInfo in subTypes)
             {
-                if (!IsValidModuleDefinition(typeInfo))
+                if (!typeInfo.IsValidModuleDefinition())
                     continue;
                 
                 if (builtTypes.Contains(typeInfo))
@@ -152,7 +110,7 @@ namespace Discord.Commands
             }
         }
 
-        private static void BuildModule(ModuleBuilder builder, TypeInfo typeInfo, CommandService service, IServiceProvider services, Dictionary<Type, ModuleInfo> moduleDefs)
+        private static void BuildModule(ModuleBuilder builder, TypeInfo typeInfo, CommandService service, IServiceProvider services, IDictionary<Type, ModuleInfo> moduleDefs)
         {
             var attributes = typeInfo.GetCustomAttributes();
             builder.TypeInfo = typeInfo;
@@ -178,9 +136,16 @@ namespace Discord.Commands
                         builder.Group = group.Prefix;
                         if(group.ParentModule != null)
                         {
-                            foreach (string parentAlias in moduleDefs[group.ParentModule].Aliases)
+                            if(moduleDefs.ContainsKey(group.ParentModule))
                             {
-                                builder.AddAliases(parentAlias);
+                                foreach (string parentAlias in moduleDefs[group.ParentModule].Aliases)
+                                {
+                                    builder.AddAliases(parentAlias);
+                                }
+                            }
+                            else
+                            {
+                                throw new ArgumentNullException($"Parent module was not defined for outer sub type: {typeInfo.FullName}.");
                             }
                         }
                         builder.AddAliases(group.Prefix);
@@ -360,13 +325,6 @@ namespace Discord.Commands
             service.AddTypeReader(paramType, reader, false);
 
             return reader;
-        }
-
-        private static bool IsValidModuleDefinition(TypeInfo typeInfo)
-        {
-            return ModuleTypeInfo.IsAssignableFrom(typeInfo) &&
-                   !typeInfo.IsAbstract &&
-                   !typeInfo.ContainsGenericParameters;
         }
 
         private static bool IsValidCommandDefinition(MethodInfo methodInfo)
