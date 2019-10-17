@@ -197,7 +197,13 @@ namespace Discord.Commands
                 if (_typedModuleDefs.ContainsKey(type))
                     throw new ArgumentException("This module has already been added.");
 
-                var module = (await ModuleClassBuilder.BuildAsync(this, services, typeInfo).ConfigureAwait(false)).FirstOrDefault();
+                bool isModuleType = await typeInfo.IsValidModuleType(logger: _cmdLogger);
+                if(!isModuleType)
+                {
+                    throw new InvalidOperationException($"Type {typeInfo.FullName} cannot be transformed into a module. Look at the logs for more details.");
+                }
+
+                var module = (await ModuleClassBuilder.BuildAsync(this, services, _typedModuleDefs, typeInfo).ConfigureAwait(false)).FirstOrDefault();
 
                 if (module.Value == default(ModuleInfo))
                     throw new InvalidOperationException($"Could not build the module {type.FullName}, did you pass an invalid type?");
