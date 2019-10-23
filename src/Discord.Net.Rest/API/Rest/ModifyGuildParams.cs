@@ -32,5 +32,7 @@ namespace Discord.API.Rest
         public Optional<ExplicitContentFilterLevel> ExplicitContentFilter { get; set; }
         [JsonProperty("system_channel_flags")]
         public Optional<SystemChannelMessageDeny> SystemChannelFlags { get; set; }
+        [JsonProperty("preferred_locale")]
+        public string PreferredLocale { get; set; }
     }
 }
