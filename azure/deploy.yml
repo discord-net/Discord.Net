@@ -14,18 +14,14 @@ steps:
   condition: eq(variables['buildTag'], True)
   inputs:
     command: 'pack'
-    packagesToPack: 'src/Discord.Net/Discord.Net.nuspec'
-    versioningScheme: 'off'
-    buildProperties: 'suffix=""'
+    arguments: src/Discord.Net/Discord.Net.nuspec -OutputDirectory "$(Build.ArtifactStagingDirectory}" -properties suffix=""
 
 - task: NuGetCommand@2
   displayName: Pack metapackage
   condition: eq(variables['buildTag'], False)
   inputs:
     command: 'pack'
-    packagesToPack: 'src/Discord.Net/Discord.Net.nuspec'
-    versioningScheme: 'off'
-    buildProperties: 'suffix="-$(buildNumber)"'
+    arguments: src/Discord.Net/Discord.Net.nuspec -OutputDirectory "$(Build.ArtifactStagingDirectory}" -properties suffix="-$(buildNumber)"
 
 - task: NuGetCommand@2
   displayName: Push to NuGet
