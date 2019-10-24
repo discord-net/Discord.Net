@@ -6,7 +6,7 @@ ECHO Y | RMDIR /S docs-static\latest || EXIT /B 1
 
 ECHO build docs
 docfx.console\tools\docfx.exe docs/docfx.json -o docs-staging || EXIT /B 1
-ROBOCOPY docs-staging\_site docs-static\latest /MIR /TEE || EXIT /B 1
+ROBOCOPY docs-staging\_site docs-static\latest /MIR
 
 ECHO commit and deploy
 git config --global user.name "Discord.Net CI Robot" && git config --global user.email "robot@foxbot.me"
