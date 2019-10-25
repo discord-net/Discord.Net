@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics;
-#if NETSTANDARD2_0 || NET45
+#if NETSTANDARD2_1 || NETSTANDARD2_0 || NET45
 using StandardColor = System.Drawing.Color;
 #endif
 
@@ -190,7 +190,7 @@ namespace Discord
 
         public override int GetHashCode() => RawValue.GetHashCode();
 
-#if NETSTANDARD2_0 || NET45
+#if NETSTANDARD2_1 || NETSTANDARD2_0 || NET45
         public static implicit operator StandardColor(Color color) =>
             StandardColor.FromArgb((int)color.RawValue);
         public static explicit operator Color(StandardColor color) =>
