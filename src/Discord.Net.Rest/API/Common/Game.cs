@@ -1,7 +1,6 @@
 #pragma warning disable CS1591
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System;
 using System.Runtime.Serialization;
 
 namespace Discord.API
