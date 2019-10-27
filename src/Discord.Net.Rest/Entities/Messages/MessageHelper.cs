@@ -11,6 +11,16 @@ namespace Discord.Rest
 {
     internal static class MessageHelper
     {
+        /// <summary>
+        /// Regex used to check if some text is formatted as inline code.
+        /// </summary>
+        private static readonly Regex InlineCodeRegex = new Regex(@"[^\\]?(`).+?[^\\](`)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline);
+
+        /// <summary>
+        /// Regex used to check if some text is formatted as a code block.
+        /// </summary>
+        private static readonly Regex BlockCodeRegex = new Regex(@"[^\\]?(```).+?[^\\](```)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline);
+
         /// <exception cref="InvalidOperationException">Only the author of a message may modify the message.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public static async Task<Model> ModifyAsync(IMessage msg, BaseDiscordClient client, Action<MessageProperties> func,
@@ -112,9 +122,6 @@ namespace Discord.Rest
             int index = 0;
             var codeIndex = 0;
 
-            var inlineRegex = new Regex(@"[^\\]?(`).+?[^\\](`)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline);
-            var blockRegex = new Regex(@"[^\\]?(```).+?[^\\](```)", RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline);
-
             // checks if the tag being parsed is wrapped in code blocks
             bool CheckWrappedCode()
             {
@@ -125,7 +132,7 @@ namespace Discord.Rest
                 // loop through all code blocks that are before the start of the tag
                 while (codeIndex < index)
                 {
-                    var blockMatch = blockRegex.Match(text, codeIndex);
+                    var blockMatch = BlockCodeRegex.Match(text, codeIndex);
                     if (blockMatch.Success)
                     {
                         if (EnclosedInBlock(blockMatch))
@@ -136,7 +143,7 @@ namespace Discord.Rest
                             continue;
                         return false;
                     }
-                    var inlineMatch = inlineRegex.Match(text, codeIndex);
+                    var inlineMatch = InlineCodeRegex.Match(text, codeIndex);
                     if (inlineMatch.Success)
                     {
                         if (EnclosedInBlock(inlineMatch))

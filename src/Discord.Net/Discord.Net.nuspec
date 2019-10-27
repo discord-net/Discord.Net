@@ -13,21 +13,21 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <iconUrl>https://github.com/RogueException/Discord.Net/raw/dev/docs/marketing/logo/PackageLogo.png</iconUrl>
     <dependencies>
-        <group targetFramework="net46">
+        <group targetFramework="net461">
             <dependency id="Discord.Net.Core" version="2.2.0-dev$suffix$" />
             <dependency id="Discord.Net.Rest" version="2.2.0-dev$suffix$" />
             <dependency id="Discord.Net.WebSocket" version="2.2.0-dev$suffix$" />
             <dependency id="Discord.Net.Commands" version="2.2.0-dev$suffix$" />
             <dependency id="Discord.Net.Webhook" version="2.2.0-dev$suffix$" />
-        </group>
-        <group targetFramework="netstandard1.3">
-            <dependency id="Discord.Net.Core" version="2.2.0-dev$suffix$" />
-            <dependency id="Discord.Net.Rest" version="2.2.0-dev$suffix$" />
-            <dependency id="Discord.Net.WebSocket" version="2.2.0-dev$suffix$" />
-            <dependency id="Discord.Net.Commands" version="2.2.0-dev$suffix$" />
-            <dependency id="Discord.Net.Webhook" version="2.2.0-dev$suffix$" />
-        </group>
+        </group>       
         <group targetFramework="netstandard2.0">
+            <dependency id="Discord.Net.Core" version="2.2.0-dev$suffix$" />
+            <dependency id="Discord.Net.Rest" version="2.2.0-dev$suffix$" />
+            <dependency id="Discord.Net.WebSocket" version="2.2.0-dev$suffix$" />
+            <dependency id="Discord.Net.Commands" version="2.2.0-dev$suffix$" />
+            <dependency id="Discord.Net.Webhook" version="2.2.0-dev$suffix$" />
+        </group>
+		<group targetFramework="netstandard2.1">
             <dependency id="Discord.Net.Core" version="2.2.0-dev$suffix$" />
             <dependency id="Discord.Net.Rest" version="2.2.0-dev$suffix$" />
             <dependency id="Discord.Net.WebSocket" version="2.2.0-dev$suffix$" />

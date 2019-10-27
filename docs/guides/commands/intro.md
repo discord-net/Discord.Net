@@ -111,7 +111,7 @@ optional, give it a default value (i.e., `int num = 0`).
 
 #### Parameters with Spaces
 
-To accept a comma-separated list, set the parameter to `params Type[]`.
+To accept a space-separated list, set the parameter to `params Type[]`.
 
 Should a parameter include spaces, the parameter **must** be
 wrapped in quotes. For example, for a command with a parameter
