@@ -203,7 +203,7 @@ namespace Discord.Commands
                     throw new InvalidOperationException($"Type {typeInfo.FullName} cannot be transformed into a module. Look at the logs for more details.");
                 }
 
-                var module = (await ModuleClassBuilder.BuildAsync(this, services, _typedModuleDefs, typeInfo).ConfigureAwait(false)).FirstOrDefault();
+                var module = (await ModuleClassBuilder.BuildAsync(this, services, typeInfo).ConfigureAwait(false)).FirstOrDefault();
 
                 if (module.Value == default(ModuleInfo))
                     throw new InvalidOperationException($"Could not build the module {type.FullName}, did you pass an invalid type?");
@@ -233,8 +233,8 @@ namespace Discord.Commands
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                var types = await ModuleClassBuilder.SearchAsync(assembly, this).ConfigureAwait(false);
-                var standardModuleDefs = await ModuleClassBuilder.BuildAsync(types.Item1, this, services).ConfigureAwait(false);
+                (var types, var dependencies) = await ModuleClassBuilder.SearchAsync(assembly, this).ConfigureAwait(false);
+                var standardModuleDefs = await ModuleClassBuilder.BuildAsync(types, this, services, dependencies).ConfigureAwait(false);
 
                 foreach (var info in standardModuleDefs)
                 {
@@ -242,17 +242,7 @@ namespace Discord.Commands
                     LoadModuleInternal(info.Value);
                 }
 
-                var outsideParentGroupModuleDefs = await ModuleClassBuilder.BuildAsync(types.Item2, this, services, standardModuleDefs).ConfigureAwait(false);
-
-                foreach (var info in outsideParentGroupModuleDefs)
-                {
-                    _typedModuleDefs[info.Key] = info.Value;
-                    LoadModuleInternal(info.Value);
-                }
-
                 var moduleDefs = new List<ModuleInfo>(standardModuleDefs.Values);
-                moduleDefs.AddRange(outsideParentGroupModuleDefs.Values);
-
                 return moduleDefs.ToImmutableArray();
             }
             finally

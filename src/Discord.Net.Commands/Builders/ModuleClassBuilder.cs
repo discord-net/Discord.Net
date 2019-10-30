@@ -13,28 +13,38 @@ namespace Discord.Commands
         public static readonly TypeInfo ModuleTypeInfo = typeof(IModuleBase).GetTypeInfo();
 
         ///<summary>Value1 - ready types, Value2 - types dependant on Value1.</summary>
-        public static async Task<Tuple<IReadOnlyList<TypeInfo>, IReadOnlyList<TypeInfo>>> SearchAsync(Assembly assembly, CommandService service)
+        public static async Task<(IReadOnlyList<TypeInfo>, IReadOnlyDictionary<TypeInfo, List<TypeInfo>>)> SearchAsync(Assembly assembly, CommandService service)
         {
             //store bad parent modules to avoid duplicate error logs.
             var badModules = new List<TypeInfo>();
             var standardModules = new List<TypeInfo>();
-            var queuedModules = new List<TypeInfo>();
+            var queuedModules = new Dictionary<TypeInfo, List<TypeInfo>>();
 
             foreach (var typeInfo in assembly.DefinedTypes)
             {
                 if (badModules.Contains(typeInfo))
                     continue;
 
-                if(typeInfo.IsOuterSubTypeCandidate(out Type parentType))
+                if (typeInfo.IsOuterSubTypeCandidate(out var parentType))
                 {
                     bool subTypeIsValid = await typeInfo.IsValidOuterSubTypeAsync(
                             parentType,
                             autoLoadable: true,
                             logger: service._cmdLogger);
 
+                    var parentTypeInfo = parentType.GetTypeInfo();
+
                     if (subTypeIsValid)
                     {
-                        queuedModules.Add(typeInfo);
+                        //add outer subtypes to a dependency container.
+                        if(queuedModules.TryGetValue(parentTypeInfo, out var dependencyContainer))
+                        {
+                            dependencyContainer.Add(typeInfo);
+                        }
+                        else
+                        {
+                            queuedModules.Add(parentTypeInfo, new List<TypeInfo> { typeInfo });
+                        }
                     }
                     else
                     {
@@ -44,31 +54,31 @@ namespace Discord.Commands
                 }
 
                 bool typeInfoIsValid = await typeInfo.IsValidModuleType(autoLoadable: true, logger: service._cmdLogger);
-                if(typeInfoIsValid)
+                if (typeInfoIsValid)
                 {
                     standardModules.Add(typeInfo);
                 }
             }
 
-            return Tuple.Create<IReadOnlyList<TypeInfo>, IReadOnlyList<TypeInfo>>(standardModules, queuedModules);
+            return (standardModules, queuedModules);
         }
 
-        public static Task<Dictionary<Type, ModuleInfo>> BuildAsync(CommandService service, IServiceProvider services, IDictionary<Type, ModuleInfo> moduleDefs, params TypeInfo[] validTypes) =>
-            BuildAsync(validTypes, service, services, moduleDefs);
+        public static Task<Dictionary<Type, ModuleInfo>> BuildAsync(CommandService service, IServiceProvider services, params TypeInfo[] validTypes) =>
+            BuildAsync(validTypes, service, services);
 
-        public static async Task<Dictionary<Type, ModuleInfo>> BuildAsync(IEnumerable<TypeInfo> validTypes, CommandService service, IServiceProvider services, IDictionary<Type, ModuleInfo> moduleDefs = null)
+        public static async Task<Dictionary<Type, ModuleInfo>> BuildAsync(
+            IEnumerable<TypeInfo> topLevelTypes,
+            CommandService service,
+            IServiceProvider services,
+            IReadOnlyDictionary<TypeInfo, List<TypeInfo>> dependencies = null)
         {
-            /*if (!validTypes.Any())
-                throw new InvalidOperationException("Could not find any valid modules from the given selection");*/
-
-            var topLevelGroups = validTypes
-                .Where(x => x.DeclaringType == null || !x.DeclaringType.GetTypeInfo().IsValidModuleDefinition());
-
-            var builtTypes = new List<TypeInfo>();
+            if (!topLevelTypes.Any())
+                throw new InvalidOperationException("Could not find any valid modules from the given selection");
 
             var result = new Dictionary<Type, ModuleInfo>();
+            var builtTypes = new List<TypeInfo>();
 
-            foreach (var typeInfo in topLevelGroups)
+            foreach (var typeInfo in topLevelTypes)
             {
                 // TODO: This shouldn't be the case; may be safe to remove?
                 if (result.ContainsKey(typeInfo.AsType()))
@@ -76,41 +86,62 @@ namespace Discord.Commands
 
                 var module = new ModuleBuilder(service, null);
 
-                BuildModule(module, typeInfo, service, services, moduleDefs);
-                BuildSubTypes(module, typeInfo.DeclaredNestedTypes, builtTypes, service, services, moduleDefs);
+                BuildModule(module, typeInfo, service, services);
+                BuildSubTypes(module, ResolveDependencies(typeInfo, dependencies), builtTypes, service, services, dependencies);
                 builtTypes.Add(typeInfo);
 
                 //dont build yet, return as a module dictonary?
                 result[typeInfo.AsType()] = module.Build(service, services);
             }
 
-            string entriesName = moduleDefs == null ? "modules" : "submodules";
-            await service._cmdLogger.DebugAsync($"Successfully built {builtTypes.Count} {entriesName}.").ConfigureAwait(false);
+            await service._cmdLogger.DebugAsync($"Successfully built {result.Count} modules.").ConfigureAwait(false);
 
             return result;
         }
 
-        private static void BuildSubTypes(ModuleBuilder builder, IEnumerable<TypeInfo> subTypes, List<TypeInfo> builtTypes, CommandService service, IServiceProvider services, IDictionary<Type, ModuleInfo> moduleDefs)
+        private static void BuildSubTypes(ModuleBuilder builder, IEnumerable<TypeInfo> subTypes, List<TypeInfo> builtTypes, CommandService service, IServiceProvider services, IReadOnlyDictionary<TypeInfo, List<TypeInfo>> dependencies = null)
         {
             foreach (var typeInfo in subTypes)
             {
                 if (!typeInfo.IsValidModuleDefinition())
                     continue;
-                
+
                 if (builtTypes.Contains(typeInfo))
                     continue;
-                
-                builder.AddModule((module) => 
+
+                builder.AddModule((module) =>
                 {
-                    BuildModule(module, typeInfo, service, services, moduleDefs);
-                    BuildSubTypes(module, typeInfo.DeclaredNestedTypes, builtTypes, service, services, moduleDefs);
+                    BuildModule(module, typeInfo, service, services);
+                    BuildSubTypes(module, ResolveDependencies(typeInfo, dependencies), builtTypes, service, services);
                 });
 
                 builtTypes.Add(typeInfo);
             }
         }
 
-        private static void BuildModule(ModuleBuilder builder, TypeInfo typeInfo, CommandService service, IServiceProvider services, IDictionary<Type, ModuleInfo> moduleDefs)
+        ///<summary>Just a helper method to avoid duplicate code</summary>
+        private static IEnumerable<TypeInfo> ResolveDependencies(TypeInfo typeInfo, IReadOnlyDictionary<TypeInfo, List<TypeInfo>> dependencies)
+        {
+            IEnumerable<TypeInfo> childTypes = null;
+
+            if (dependencies != null)
+            {
+                if (dependencies.TryGetValue(typeInfo, out var linkedChildTypes))
+                {
+                    childTypes = linkedChildTypes;
+                }
+            }
+
+            //??= pls when 8.0
+            if (childTypes == null)
+            {
+                childTypes = typeInfo.DeclaredNestedTypes;
+            }
+
+            return childTypes;
+        }
+
+        private static void BuildModule(ModuleBuilder builder, TypeInfo typeInfo, CommandService service, IServiceProvider services)
         {
             var attributes = typeInfo.GetCustomAttributes();
             builder.TypeInfo = typeInfo;
@@ -134,20 +165,6 @@ namespace Discord.Commands
                     case GroupAttribute group:
                         builder.Name = builder.Name ?? group.Prefix;
                         builder.Group = group.Prefix;
-                        if(group.ParentModule != null)
-                        {
-                            if(moduleDefs.TryGetValue(group.ParentModule, out var mInfo))
-                            {
-                                foreach (string parentAlias in mInfo.Aliases)
-                                {
-                                    builder.AddAliases(parentAlias);
-                                }
-                            }
-                            else
-                            {
-                                throw new ArgumentNullException($"Parent module was not defined for outer sub type: {typeInfo.FullName}.");
-                            }
-                        }
                         builder.AddAliases(group.Prefix);
                         break;
                     case PreconditionAttribute precondition:
@@ -169,7 +186,7 @@ namespace Discord.Commands
 
             foreach (var method in validCommands)
             {
-                builder.AddCommand((command) => 
+                builder.AddCommand((command) =>
                 {
                     BuildCommand(command, typeInfo, method, service, services);
                 });
@@ -179,7 +196,7 @@ namespace Discord.Commands
         private static void BuildCommand(CommandBuilder builder, TypeInfo typeInfo, MethodInfo method, CommandService service, IServiceProvider serviceprovider)
         {
             var attributes = method.GetCustomAttributes();
-            
+
             foreach (var attribute in attributes)
             {
                 switch (attribute)
@@ -221,7 +238,7 @@ namespace Discord.Commands
             int pos = 0, count = parameters.Length;
             foreach (var paramInfo in parameters)
             {
-                builder.AddParameter((parameter) => 
+                builder.AddParameter((parameter) =>
                 {
                     BuildParameter(parameter, paramInfo, pos++, count, service, serviceprovider);
                 });
