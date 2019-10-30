@@ -136,9 +136,9 @@ namespace Discord.Commands
                         builder.Group = group.Prefix;
                         if(group.ParentModule != null)
                         {
-                            if(moduleDefs.ContainsKey(group.ParentModule))
+                            if(moduleDefs.TryGetValue(group.ParentModule, out var mInfo))
                             {
-                                foreach (string parentAlias in moduleDefs[group.ParentModule].Aliases)
+                                foreach (string parentAlias in mInfo.Aliases)
                                 {
                                     builder.AddAliases(parentAlias);
                                 }
