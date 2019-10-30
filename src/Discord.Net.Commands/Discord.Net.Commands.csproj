@@ -4,16 +4,11 @@
     <AssemblyName>Discord.Net.Commands</AssemblyName>
     <RootNamespace>Discord.Commands</RootNamespace>
     <Description>A Discord.Net extension adding support for bot commands.</Description>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net46;netstandard1.3;netstandard2.0</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net461;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard2.0;netstandard2.1</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.1" />
-  </ItemGroup>
+
 </Project>

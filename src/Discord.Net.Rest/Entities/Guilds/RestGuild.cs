@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using EmbedModel = Discord.API.GuildEmbed;
@@ -64,6 +65,11 @@ namespace Discord.Rest
         public string Description { get; private set; }
         /// <inheritdoc />
         public int PremiumSubscriptionCount { get; private set; }
+        /// <inheritdoc />
+        public string PreferredLocale { get; private set; }
+
+        /// <inheritdoc />
+        public CultureInfo PreferredCulture { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -124,6 +130,8 @@ namespace Discord.Rest
             SystemChannelFlags = model.SystemChannelFlags;
             Description = model.Description;
             PremiumSubscriptionCount = model.PremiumSubscriptionCount.GetValueOrDefault();
+            PreferredLocale = model.PreferredLocale;
+            PreferredCulture = new CultureInfo(PreferredLocale);
 
             if (model.Emojis != null)
             {
