@@ -122,20 +122,14 @@ namespace Discord.Commands
         ///<summary>Just a helper method to avoid duplicate code</summary>
         private static IEnumerable<TypeInfo> ResolveDependencies(TypeInfo typeInfo, IReadOnlyDictionary<TypeInfo, List<TypeInfo>> dependencies)
         {
-            IEnumerable<TypeInfo> childTypes = null;
+            var childTypes = new List<TypeInfo>(typeInfo.DeclaredNestedTypes);
 
             if (dependencies != null)
             {
                 if (dependencies.TryGetValue(typeInfo, out var linkedChildTypes))
                 {
-                    childTypes = linkedChildTypes;
+                    childTypes.AddRange(linkedChildTypes);
                 }
-            }
-
-            //??= pls when 8.0
-            if (childTypes == null)
-            {
-                childTypes = typeInfo.DeclaredNestedTypes;
             }
 
             return childTypes;
