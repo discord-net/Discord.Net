@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -28,7 +23,11 @@ namespace Discord
         /// </summary>
         public ulong? GuildId { get; internal set; }
 
+        private string DebuggerDisplay
+            => $"Channel ID: ({ChannelId}){(GuildId.HasValue ? $", Guild ID: ({GuildId.Value})" : "")}" +
+            $"{(MessageId.HasValue ? $", Message ID: ({MessageId.Value})" : "")}";
+
         public override string ToString()
-            => $"Guild: {GuildId}, Channel: {ChannelId}, Message: {MessageId}";
+            => DebuggerDisplay;
     }
 }
