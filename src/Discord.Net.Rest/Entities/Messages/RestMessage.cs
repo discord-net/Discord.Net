@@ -62,6 +62,8 @@ namespace Discord.Rest
         public MessageActivity Activity { get; private set; }
         /// <inheritdoc />
         public MessageApplication Application { get; private set; }
+        /// <inheritdoc />
+        public MessageReference Reference { get; private set; }
 
         internal RestMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
             : base(discord, id)
@@ -105,6 +107,17 @@ namespace Discord.Rest
                 {
                     Type = model.Activity.Value.Type.Value,
                     PartyId = model.Activity.Value.PartyId.GetValueOrDefault()
+                };
+            }
+
+            if(model.Reference.IsSpecified)
+            {
+                // Creates a new Reference from the API model
+                Reference = new MessageReference
+                {
+                    GuildId = model.Reference.Value.GuildId,
+                    ChannelId = model.Reference.Value.ChannelId,
+                    MessageId = model.Reference.Value.MessageId
                 };
             }
 

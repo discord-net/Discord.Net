@@ -141,6 +141,18 @@ namespace Discord
         MessageApplication Application { get; }
 
         /// <summary>
+        ///     Gets the reference to the original message if it was crossposted.
+        /// </summary>
+        /// <remarks>
+        ///     Sent with Cross-posted messages, meaning they were published from news channels
+        ///     and received by subscriber channels.
+        /// </remarks>
+        /// <returns>
+        ///     A message's reference, if any is associated.
+        /// </returns>
+        MessageReference Reference { get; }
+
+        /// <summary>
         ///     Gets all reactions included in this message.
         /// </summary>
         IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions { get; }
