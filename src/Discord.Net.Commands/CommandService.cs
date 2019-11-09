@@ -49,7 +49,7 @@ namespace Discord.Commands
         private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
         private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>> _typeReaders;
         private readonly ConcurrentDictionary<Type, TypeReader> _defaultTypeReaders;
-        private readonly ImmutableList<Tuple<Type, Type>> _entityTypeReaders; //TODO: Candidate for C#7 Tuple
+        private readonly ImmutableList<(Type EntityType, Type TypeReaderType)> _entityTypeReaders;
         private readonly HashSet<ModuleInfo> _moduleDefs;
         private readonly CommandMap _map;
 
@@ -124,11 +124,11 @@ namespace Discord.Commands
             _defaultTypeReaders[typeof(string)] =
                 new PrimitiveTypeReader<string>((string x, out string y) => { y = x; return true; }, 0);
 
-            var entityTypeReaders = ImmutableList.CreateBuilder<Tuple<Type, Type>>();
-            entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IMessage), typeof(MessageTypeReader<>)));
-            entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IChannel), typeof(ChannelTypeReader<>)));
-            entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IRole), typeof(RoleTypeReader<>)));
-            entityTypeReaders.Add(new Tuple<Type, Type>(typeof(IUser), typeof(UserTypeReader<>)));
+            var entityTypeReaders = ImmutableList.CreateBuilder<(Type, Type)>();
+            entityTypeReaders.Add((typeof(IMessage), typeof(MessageTypeReader<>)));
+            entityTypeReaders.Add((typeof(IChannel), typeof(ChannelTypeReader<>)));
+            entityTypeReaders.Add((typeof(IRole), typeof(RoleTypeReader<>)));
+            entityTypeReaders.Add((typeof(IUser), typeof(UserTypeReader<>)));
             _entityTypeReaders = entityTypeReaders.ToImmutable();
         }
 
@@ -408,7 +408,7 @@ namespace Discord.Commands
             var typeInfo = type.GetTypeInfo();
             if (typeInfo.IsEnum)
                 return true;
-            return _entityTypeReaders.Any(x => type == x.Item1 || typeInfo.ImplementedInterfaces.Contains(x.Item2));
+            return _entityTypeReaders.Any(x => type == x.EntityType || typeInfo.ImplementedInterfaces.Contains(x.TypeReaderType));
         }
         internal void AddNullableTypeReader(Type valueType, TypeReader valueTypeReader)
         {
@@ -439,9 +439,9 @@ namespace Discord.Commands
             //Is this an entity?
             for (int i = 0; i < _entityTypeReaders.Count; i++)
             {
-                if (type == _entityTypeReaders[i].Item1 || typeInfo.ImplementedInterfaces.Contains(_entityTypeReaders[i].Item1))
+                if (type == _entityTypeReaders[i].EntityType || typeInfo.ImplementedInterfaces.Contains(_entityTypeReaders[i].EntityType))
                 {
-                    reader = Activator.CreateInstance(_entityTypeReaders[i].Item2.MakeGenericType(type)) as TypeReader;
+                    reader = Activator.CreateInstance(_entityTypeReaders[i].TypeReaderType.MakeGenericType(type)) as TypeReader;
                     _defaultTypeReaders[type] = reader;
                     return reader;
                 }
