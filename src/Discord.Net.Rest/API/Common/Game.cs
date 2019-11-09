@@ -35,6 +35,12 @@ namespace Discord.API
         public Optional<string> SessionId { get; set; }
         [JsonProperty("Flags")]
         public Optional<ActivityProperties> Flags { get; set; }
+        [JsonProperty("id")]
+        public Optional<string> Id { get; set; }
+        [JsonProperty("emoji")]
+        public Optional<Emoji> Emoji { get; set; }
+        [JsonProperty("created_at")]
+        public Optional<long> CreatedAt { get; set; }
 
         [OnError]
         internal void OnError(StreamingContext context, ErrorContext errorContext)
