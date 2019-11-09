@@ -349,7 +349,7 @@ namespace Discord.Rest
             ulong? fromUserId, int? limit, RequestOptions options)
         {
             return new PagedAsyncEnumerable<RestGuildUser>(
-                DiscordConfig.MaxMessagesPerBatch,
+                DiscordConfig.MaxUsersPerBatch,
                 async (info, ct) =>
                 {
                     var args = new GetGuildMembersParams
@@ -363,7 +363,7 @@ namespace Discord.Rest
                 },
                 nextPage: (info, lastPage) =>
                 {
-                    if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
+                    if (lastPage.Count != DiscordConfig.MaxUsersPerBatch)
                         return false;
                     info.Position = lastPage.Max(x => x.Id);
                     return true;
