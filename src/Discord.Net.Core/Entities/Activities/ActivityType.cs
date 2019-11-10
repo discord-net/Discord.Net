@@ -20,6 +20,10 @@ namespace Discord
         /// <summary>
         ///     The user is watching some form of media.
         /// </summary>
-        Watching = 3
+        Watching = 3,
+        /// <summary>
+        ///     The user has set a custom status.
+        /// </summary>
+        CustomStatus = 4,
     }
 }

@@ -50,6 +50,8 @@ namespace Discord.API
         // sent with Rich Presence-related chat embeds
         [JsonProperty("application")]
         public Optional<MessageApplication> Application { get; set; }
+        [JsonProperty("message_reference")]
+        public Optional<MessageReference> Reference { get; set; }
         [JsonProperty("flags")]
         public Optional<MessageFlags> Flags { get; set; }
     }

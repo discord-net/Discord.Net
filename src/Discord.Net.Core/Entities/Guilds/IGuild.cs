@@ -1,6 +1,7 @@
 using Discord.Audio;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -248,6 +249,24 @@ namespace Discord
         ///     The number of premium subscribers of this guild.
         /// </returns>
         int PremiumSubscriptionCount { get; }
+
+        /// <summary>
+        ///     Gets the preferred locale of this guild in IETF BCP 47
+        ///     language tag format.
+        /// </summary>
+        /// <returns>
+        ///     The preferred locale of the guild in IETF BCP 47
+        ///     language tag format.
+        /// </returns>
+        string PreferredLocale { get; }
+
+        /// <summary>
+        ///     Gets the preferred culture of this guild.
+        /// </summary>
+        /// <returns>
+        ///     The preferred culture information of this guild.
+        /// </returns>
+        CultureInfo PreferredCulture { get; }
 
         /// <summary>
         ///     Modifies this guild.

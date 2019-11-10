@@ -4,7 +4,7 @@
     <AssemblyName>Discord.Net.Webhook</AssemblyName>
     <RootNamespace>Discord.Webhook</RootNamespace>
     <Description>A core Discord.Net library containing the Webhook client and models.</Description>
-    <TargetFrameworks>netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
