@@ -54,7 +54,7 @@ namespace Discord
         /// <returns>
         ///     A <see cref="TimeSpan"/> containing the duration of the song.
         /// </returns>
-        public TimeSpan? Duration => EndsAt - StartedAt;
+        public TimeSpan? Duration { get; internal set; }
 
         /// <summary>
         ///     Gets the elapsed duration of the song.

@@ -40,6 +40,7 @@ namespace Discord.WebSocket
                     Artists = model.State.GetValueOrDefault()?.Split(';').Select(x=>x?.Trim()).ToImmutableArray(),
                     StartedAt = timestamps?.Start,
                     EndsAt = timestamps?.End,
+                    Duration = timestamps?.End - timestamps?.Start,
                     AlbumArtUrl = albumArtId != null ? CDN.GetSpotifyAlbumArtUrl(albumArtId) : null,
                     Type = ActivityType.Listening,
                     Flags = model.Flags.GetValueOrDefault(),
