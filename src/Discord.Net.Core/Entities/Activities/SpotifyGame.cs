@@ -33,7 +33,7 @@ namespace Discord
         public string TrackTitle { get; internal set; }
 
         /// <summary>
-        ///     Gets the date the track began playing at.
+        ///     Gets the date when the track started playing.
         /// </summary>
         /// <returns>
         ///     A <see cref="DateTimeOffset"/> containing the start timestamp of the song.
@@ -41,7 +41,7 @@ namespace Discord
         public DateTimeOffset? StartedAt { get; internal set; }
 
         /// <summary>
-        ///     Gets the date the track will stop playing at.
+        ///     Gets the date when the track ends.
         /// </summary>
         /// <returns>
         ///     A <see cref="DateTimeOffset"/> containing the finish timestamp of the song.
