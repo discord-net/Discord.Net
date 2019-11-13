@@ -538,14 +538,15 @@ namespace Discord.Rest
         /// <param name="color">The color of the role.</param>
         /// <param name="isHoisted">Whether the role is separated from others on the sidebar.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="isMentionable">Whether the role can be mentioned.</param>
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     role.
         /// </returns>
         public async Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?),
-            bool isHoisted = false, RequestOptions options = null)
+            bool isHoisted = false, RequestOptions options = null, bool isMentionable = false)
         {
-            var role = await GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, options).ConfigureAwait(false);
+            var role = await GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, isMentionable, options).ConfigureAwait(false);
             _roles = _roles.Add(role.Id, role);
             return role;
         }
@@ -832,8 +833,8 @@ namespace Discord.Rest
         IRole IGuild.GetRole(ulong id)
             => GetRole(id);
         /// <inheritdoc />
-        async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options)
-            => await CreateRoleAsync(name, permissions, color, isHoisted, options).ConfigureAwait(false);
+        async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options, bool isMentionable)
+            => await CreateRoleAsync(name, permissions, color, isHoisted, options, isMentionable).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IGuildUser> IGuild.AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func, RequestOptions options)
