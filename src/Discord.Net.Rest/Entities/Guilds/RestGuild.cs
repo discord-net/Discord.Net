@@ -530,6 +530,11 @@ namespace Discord.Rest
             return null;
         }
 
+        /// <inheritdoc />
+        public Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?),
+            bool isHoisted = false, RequestOptions options = null)
+            => CreateRoleAsync(name, permissions, color, isHoisted, false, options);
+
         /// <summary>
         ///     Creates a new role with the provided name.
         /// </summary>
@@ -544,7 +549,7 @@ namespace Discord.Rest
         ///     role.
         /// </returns>
         public async Task<RestRole> CreateRoleAsync(string name, GuildPermissions? permissions = default(GuildPermissions?), Color? color = default(Color?),
-            bool isHoisted = false, RequestOptions options = null, bool isMentionable = false)
+            bool isHoisted = false, bool isMentionable = false, RequestOptions options = null)
         {
             var role = await GuildHelper.CreateRoleAsync(this, Discord, name, permissions, color, isHoisted, isMentionable, options).ConfigureAwait(false);
             _roles = _roles.Add(role.Id, role);
@@ -833,8 +838,11 @@ namespace Discord.Rest
         IRole IGuild.GetRole(ulong id)
             => GetRole(id);
         /// <inheritdoc />
-        async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options, bool isMentionable)
-            => await CreateRoleAsync(name, permissions, color, isHoisted, options, isMentionable).ConfigureAwait(false);
+        async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options)
+            => await CreateRoleAsync(name, permissions, color, isHoisted, false, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IRole> IGuild.CreateRoleAsync(string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options)
+            => await CreateRoleAsync(name, permissions, color, isHoisted, isMentionable, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IGuildUser> IGuild.AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func, RequestOptions options)
