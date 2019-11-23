@@ -27,6 +27,8 @@
       topicUid: Guides.Commands.Intro
     - name: TypeReaders
       topicUid: Guides.Commands.TypeReaders
+    - name: Named Arguments
+      topicUid: Guides.Commands.NamedArguments
     - name: Preconditions
       topicUid: Guides.Commands.Preconditions
     - name: Dependency Injection
