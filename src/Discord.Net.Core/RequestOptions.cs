@@ -49,8 +49,7 @@ namespace Discord
 		///		clock for rate-limiting. Defaults to <c>true</c>.
 		/// </summary>
 		/// <remarks>
-		///		This property can also be set in <see cref="DiscordConfig">.
-		///
+		///		This property can also be set in <see cref="DiscordConfig"/>.
 		///		On a per-request basis, the system clock should only be disabled 
 		///		when millisecond precision is especially important, and the
 		///		hosting system is known to have a desynced clock.
