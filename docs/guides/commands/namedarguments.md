@@ -7,7 +7,7 @@ title: Named Arguments
 
 By default, arguments for commands are parsed positionally, meaning
 that the order matters. But sometimes you may want to define a command
-with many optional parameters, and it'd be easier for developers
+with many optional parameters, and it'd be easier for end-users
 to only specify what they want to set, instead of needing them
 to specify everything by hand.
 
