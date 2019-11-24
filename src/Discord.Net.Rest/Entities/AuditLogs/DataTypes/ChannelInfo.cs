@@ -32,7 +32,7 @@ namespace Discord.Rest
         ///     Gets the current slow-mode delay of this channel.
         /// </summary>
         /// <returns>
-        ///     An <see cref="Int32"/> representing the time in seconds required before the user can send another
+        ///     An <see cref="int"/> representing the time in seconds required before the user can send another
         ///     message; <c>0</c> if disabled.
         ///     <c>null</c> if this is not mentioned in this entry.
         /// </returns>
@@ -49,7 +49,7 @@ namespace Discord.Rest
         ///     Gets the bit-rate of this channel if applicable.
         /// </summary>
         /// <returns>
-        ///     An <see cref="Int32"/> representing the bit-rate set for the voice channel;
+        ///     An <see cref="int"/> representing the bit-rate set for the voice channel;
         ///     <c>null</c> if this is not mentioned in this entry.
         /// </returns>
         public int? Bitrate { get; }

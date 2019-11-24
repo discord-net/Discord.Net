@@ -30,7 +30,7 @@ namespace Discord
         ///     Gets the current slow-mode delay for this channel.
         /// </summary>
         /// <returns>
-        ///     An <see cref="Int32"/> representing the time in seconds required before the user can send another
+        ///     An <see cref="int"/> representing the time in seconds required before the user can send another
         ///     message; <c>0</c> if disabled.
         /// </returns>
         int SlowModeInterval { get; }
