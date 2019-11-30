@@ -25,29 +25,5 @@ namespace Discord.Rest
             return entity;
         }
         public override int SlowModeInterval => throw new NotSupportedException("News channels do not support Slow Mode.");
-        public override Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null)
-        {
-            throw new NotSupportedException("News channels do not support Overwrite Permissions.");
-        }
-        public override Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null)
-        {
-            throw new NotSupportedException("News channels do not support Overwrite Permissions.");
-        }
-        public override OverwritePermissions? GetPermissionOverwrite(IRole role)
-        {
-            throw new NotSupportedException("News channels do not support Overwrite Permissions.");
-        }
-        public override OverwritePermissions? GetPermissionOverwrite(IUser user)
-        {
-            throw new NotSupportedException("News channels do not support Overwrite Permissions.");
-        }
-        public override Task RemovePermissionOverwriteAsync(IRole role, RequestOptions options = null)
-        {
-            throw new NotSupportedException("News channels do not support Overwrite Permissions.");
-        }
-        public override Task RemovePermissionOverwriteAsync(IUser user, RequestOptions options = null)
-        {
-            throw new NotSupportedException("News channels do not support Overwrite Permissions.");
-        }
     }
 }

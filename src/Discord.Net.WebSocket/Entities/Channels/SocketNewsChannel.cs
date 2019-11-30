@@ -11,7 +11,7 @@ namespace Discord.WebSocket
     /// </summary>
     /// <remarks>
     ///     <note type="warning">
-    ///         Most of the properties and methods featured may not be supported due to the nature of the channel.
+    ///         The <see cref="SlowModeInterval"/> property is not supported for news channels.
     ///     </note>
     /// </remarks>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
@@ -35,53 +35,5 @@ namespace Discord.WebSocket
         /// </remarks>
         public override int SlowModeInterval
             => throw new NotSupportedException("News channels do not support Slow Mode.");
-        /// <inheritdoc />
-        /// <remarks>
-        ///     <note type="important">
-        ///     This method is not supported by this type. Attempting to use this method will result in a <see cref="NotSupportedException"/>.
-        ///     </note>
-        /// </remarks>
-        public override Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null)
-            => throw new NotSupportedException("News channels do not support Overwrite Permissions.");
-        /// <inheritdoc />
-        /// <remarks>
-        ///     <note type="important">
-        ///     This method is not supported by this type. Attempting to use this method will result in a <see cref="NotSupportedException"/>.
-        ///     </note>
-        /// </remarks>
-        public override Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null)
-            => throw new NotSupportedException("News channels do not support Overwrite Permissions.");
-        /// <inheritdoc />
-        /// <remarks>
-        ///     <note type="important">
-        ///     This property is not supported by this type. Attempting to use this property will result in a <see cref="NotSupportedException"/>.
-        ///     </note>
-        /// </remarks>
-        public override IReadOnlyCollection<Overwrite> PermissionOverwrites
-            => throw new NotSupportedException("News channels do not support Overwrite Permissions.");
-        /// <inheritdoc />
-        /// <remarks>
-        ///     <note type="important">
-        ///     This method is not supported by this type. Attempting to use this method will result in a <see cref="NotSupportedException"/>.
-        ///     </note>
-        /// </remarks>
-        public override Task SyncPermissionsAsync(RequestOptions options = null)
-            => throw new NotSupportedException("News channels do not support Overwrite Permissions.");
-        /// <inheritdoc />
-        /// <remarks>
-        ///     <note type="important">
-        ///     This method is not supported by this type. Attempting to use this method will result in a <see cref="NotSupportedException"/>.
-        ///     </note>
-        /// </remarks>
-        public override Task RemovePermissionOverwriteAsync(IRole role, RequestOptions options = null)
-            => throw new NotSupportedException("News channels do not support Overwrite Permissions.");
-        /// <inheritdoc />
-        /// <remarks>
-        ///     <note type="important">
-        ///     This method is not supported by this type. Attempting to use this method will result in a <see cref="NotSupportedException"/>.
-        ///     </note>
-        /// </remarks>
-        public override Task RemovePermissionOverwriteAsync(IUser user, RequestOptions options = null)
-            => throw new NotSupportedException("News channels do not support Overwrite Permissions.");
     }
 }
