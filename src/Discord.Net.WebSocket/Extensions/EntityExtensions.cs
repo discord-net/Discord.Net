@@ -10,7 +10,7 @@ namespace Discord.WebSocket
         public static IActivity ToEntity(this API.Game model)
         {
             // Custom Status Game
-            if (model.Id.IsSpecified)
+            if (model.Id.IsSpecified && model.Id.Value == "custom")
             {
                 return new CustomStatusGame()
                 {
