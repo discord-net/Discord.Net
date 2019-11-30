@@ -31,6 +31,23 @@ namespace Discord
         ///     A string containing the name of the song (e.g. <c>Lonely Together (feat. Rita Ora)</c>).
         /// </returns>
         public string TrackTitle { get; internal set; }
+
+        /// <summary>
+        ///     Gets the date when the track started playing.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="DateTimeOffset"/> containing the start timestamp of the song.
+        /// </returns>
+        public DateTimeOffset? StartedAt { get; internal set; }
+
+        /// <summary>
+        ///     Gets the date when the track ends.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="DateTimeOffset"/> containing the finish timestamp of the song.
+        /// </returns>
+        public DateTimeOffset? EndsAt { get; internal set; }
+
         /// <summary>
         ///     Gets the duration of the song.
         /// </summary>
@@ -38,6 +55,22 @@ namespace Discord
         ///     A <see cref="TimeSpan"/> containing the duration of the song.
         /// </returns>
         public TimeSpan? Duration { get; internal set; }
+
+        /// <summary>
+        ///     Gets the elapsed duration of the song.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="TimeSpan"/> containing the elapsed duration of the song.
+        /// </returns>
+        public TimeSpan? Elapsed => DateTimeOffset.UtcNow - StartedAt;
+
+        /// <summary>
+        ///     Gets the remaining duration of the song.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="TimeSpan"/> containing the remaining duration of the song.
+        /// </returns>
+        public TimeSpan? Remaining => EndsAt - DateTimeOffset.UtcNow;
 
         /// <summary>
         ///     Gets the track ID of the song.
