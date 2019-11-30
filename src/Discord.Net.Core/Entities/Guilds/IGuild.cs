@@ -598,6 +598,21 @@ namespace Discord
         ///     role.
         /// </returns>
         Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, RequestOptions options = null);
+        // TODO remove CreateRoleAsync overload that does not have isMentionable when breaking change is acceptable
+        /// <summary>
+        ///     Creates a new role with the provided name.
+        /// </summary>
+        /// <param name="name">The new name for the role.</param>
+        /// <param name="permissions">The guild permission that the role should possess.</param>
+        /// <param name="color">The color of the role.</param>
+        /// <param name="isHoisted">Whether the role is separated from others on the sidebar.</param>
+        /// <param name="isMentionable">Whether the role can be mentioned.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     role.
+        /// </returns>
+        Task<IRole> CreateRoleAsync(string name, GuildPermissions? permissions = null, Color? color = null, bool isHoisted = false, bool isMentionable = false, RequestOptions options = null);
 
         /// <summary>
         ///     Adds a user to this guild.

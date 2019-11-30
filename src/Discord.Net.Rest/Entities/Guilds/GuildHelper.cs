@@ -257,7 +257,7 @@ namespace Discord.Rest
         //Roles
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
         public static async Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client,
-            string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options)
+            string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options)
         {
             if (name == null) throw new ArgumentNullException(paramName: nameof(name));
 
@@ -270,6 +270,7 @@ namespace Discord.Rest
                 x.Permissions = (permissions ?? role.Permissions);
                 x.Color = (color ?? Color.Default);
                 x.Hoist = isHoisted;
+                x.Mentionable = isMentionable;
             }, options).ConfigureAwait(false);
 
             return role;
