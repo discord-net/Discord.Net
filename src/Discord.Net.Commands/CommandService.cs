@@ -36,7 +36,7 @@ namespace Discord.Commands
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
 
         /// <summary>
-        ///     Occurs when a command is successfully executed without any error.
+        ///     Occurs when a command is executed.
         /// </summary>
         /// <remarks>
         ///     This event is fired when a command has been executed, successfully or not. When a command fails to
