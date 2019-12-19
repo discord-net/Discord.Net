@@ -32,6 +32,7 @@ namespace Discord.Rest
                 Icon = args.Icon.IsSpecified ? args.Icon.Value?.ToModel() : Optional.Create<ImageModel?>(),
                 Name = args.Name,
                 Splash = args.Splash.IsSpecified ? args.Splash.Value?.ToModel() : Optional.Create<ImageModel?>(),
+                Banner = args.Banner.IsSpecified ? args.Banner.Value?.ToModel() : Optional.Create<ImageModel?>(),
                 VerificationLevel = args.VerificationLevel,
                 ExplicitContentFilter = args.ExplicitContentFilter,
                 SystemChannelFlags = args.SystemChannelFlags
@@ -57,6 +58,8 @@ namespace Discord.Rest
             else if (args.RegionId.IsSpecified)
                 apiArgs.RegionId = args.RegionId.Value;
 
+            if (!apiArgs.Banner.IsSpecified && guild.BannerId != null)
+                apiArgs.Banner = new ImageModel(guild.BannerId);
             if (!apiArgs.Splash.IsSpecified && guild.SplashId != null)
                 apiArgs.Splash = new ImageModel(guild.SplashId);
             if (!apiArgs.Icon.IsSpecified && guild.IconId != null)

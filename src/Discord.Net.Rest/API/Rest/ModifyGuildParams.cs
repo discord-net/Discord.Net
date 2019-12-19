@@ -22,6 +22,8 @@ namespace Discord.API.Rest
         public Optional<ulong?> SystemChannelId { get; set; }
         [JsonProperty("icon")]
         public Optional<Image?> Icon { get; set; }
+        [JsonProperty("banner")]
+        public Optional<Image?> Banner { get; set; }
         [JsonProperty("splash")]
         public Optional<Image?> Splash { get; set; }
         [JsonProperty("afk_channel_id")]
