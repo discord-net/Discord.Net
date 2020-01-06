@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Socket
 {
-    public class DiscordGatewayApi
+    public class DiscordGatewayApi : IDisposable
     {
         private readonly DiscordConfig _config;
         private readonly string _token;
@@ -32,6 +32,11 @@ namespace Discord.Socket
         public async Task OnPacket(object packet)
         {
             await Task.CompletedTask;
+        }
+
+        public void Dispose()
+        {
+            Socket.Dispose();
         }
     }
 }

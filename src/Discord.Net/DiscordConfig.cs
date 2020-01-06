@@ -20,9 +20,13 @@ namespace Discord
         /// </summary>
         public static readonly Uri DefaultGatewayUri = new Uri("wss://gateway.discord.gg");
         /// <summary>
-        /// The base URL for the Rest API.
+        /// The default REST URI.
         /// </summary>
-        public string RestApiUrl { get; set; } = "https://discordapp.com/api/v6/";
+        public static readonly Uri DefaultRestUri = new Uri("https://discordapp.com/api/v6/");
+        /// <summary>
+        /// The URI to use when making HTTP requests. If specified, this will override the default.
+        /// </summary>
+        public Uri? RestUri = null;
         /// <summary>
         /// The URI to use when connecting to the gateway. If specified, this will override the URI Discord instructs us to use.
         /// </summary>

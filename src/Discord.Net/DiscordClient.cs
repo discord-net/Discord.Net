@@ -16,5 +16,11 @@ namespace Discord
             Rest = restApi;
             Gateway = gatewayApi;
         }
+
+        public void Dispose()
+        {
+            Rest.Dispose();
+            Gateway.Dispose();
+        }
     }
 }

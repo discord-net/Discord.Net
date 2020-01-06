@@ -15,6 +15,7 @@
   <ItemGroup>
     <Folder Include="Entities\" />
     <Folder Include="..\..\..\..\..\%2540discord\%2540next\Discord.Net\src\Discord.Net\Rest\Requests\" />
+    <Folder Include="Rest\Requests\" />
   </ItemGroup>
 
 </Project>

@@ -1,12 +1,13 @@
+using System;
 using System.Net.Http.Headers;
 using Discord.Rest;
 using Discord.Socket;
 
 namespace Discord
 {
-    internal interface IDiscordClient
+    public interface IDiscordClient : IDisposable
     {
-        static IDiscordClient Create(string token, DiscordConfig? config = default)
+        public static IDiscordClient Create(string token, DiscordConfig? config = default)
         {
             config = config ?? new DiscordConfig();
 
