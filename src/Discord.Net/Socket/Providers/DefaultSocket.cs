@@ -88,6 +88,8 @@ namespace Discord.Socket.Providers
             }
             State = SocketState.Open;
 
+            _receiveTask = ReceiveAsync();
+
             // TODO: this should not be expected to fail
             _stateLock.Release();
             openLock.Dispose();

@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Refit;
 using Discord.Rest.Models;
+using System.Net.Http.Headers;
 
 // This is essentially a reimplementation of Wumpus.Net.Rest
 namespace Discord.Rest
@@ -10,7 +11,7 @@ namespace Discord.Rest
     {
         private readonly IDiscordRestApi _api;
 
-        public DiscordRestApi(DiscordConfig config)
+        public DiscordRestApi(DiscordConfig config, AuthenticationHeaderValue token)
         {
             var jsonOptions = new JsonSerializerOptions();
             var refitSettings = new RefitSettings

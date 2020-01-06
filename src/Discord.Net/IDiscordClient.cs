@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net.Http.Headers;
 using Discord.Rest;
 using Discord.Socket;
 
@@ -9,10 +6,15 @@ namespace Discord
 {
     internal interface IDiscordClient
     {
-        static IDiscordClient Create(DiscordConfig config)
+        static IDiscordClient Create(string token, DiscordConfig? config = default)
         {
-            var rest = new DiscordRestApi(config);
-            var gateway = new DiscordGatewayApi(config);
+            config = config ?? new DiscordConfig();
+
+            // todo: validate token
+            var tokenHeader = AuthenticationHeaderValue.Parse(token);
+
+            var rest = new DiscordRestApi(config, tokenHeader);
+            var gateway = new DiscordGatewayApi(config, token);
 
             return new DiscordClient(config, rest, gateway);
         }

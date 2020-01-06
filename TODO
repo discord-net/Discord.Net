@@ -9,10 +9,12 @@
 	- User
 	- Voice
 	- Webhook
+    - Ratelimiter with refit
 - Gateway
     - Models
     - Client
 	- Socket
+	    - use token
 	    * Receive
 	    * Compression
     - Voice (long)
@@ -24,8 +26,11 @@
 	- Emoji
 	- Guild
 	- User
+    - Utilities
+	- Token Validation (port from @ChrisJ)
 - Tests
     - Unit test Gateway stability / deadlockability?
+    - Port ChrisJ's token validator tests
 - Extensions
     - Commands
 	? design - use finite's or quahu's

@@ -27,7 +27,9 @@ namespace Discord
         /// The URI to use when connecting to the gateway. If specified, this will override the URI Discord instructs us to use.
         /// </summary>
         public Uri? GatewayUri = null;
-
+        /// <summary>
+        /// SocketFactory gets or sets how a WebSocket will be created.
+        /// </summary>
         public SocketFactory SocketFactory { get; set; } = DefaultSocketFactory.Create;
     }
 }

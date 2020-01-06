@@ -6,18 +6,23 @@ namespace Discord.Socket
 {
     public class DiscordGatewayApi
     {
-        static readonly Uri DefaultGatewayUri = new Uri("wss://gateway.discord.gg");
+        private readonly DiscordConfig _config;
+        private readonly string _token;
 
-        ISocket Socket { get; set; }
+        public ISocket Socket { get; set; }
 
-        public DiscordGatewayApi(DiscordConfig config)
+        public DiscordGatewayApi(DiscordConfig config, string token)
         {
+            _config = config;
+            _token = token;
+
             Socket = config.SocketFactory(OnAborted, OnPacket);
         }
 
         public async Task ConnectAsync(Uri? gatewayUri)
         {
-            await Socket.ConnectAsync(gatewayUri ?? DefaultGatewayUri, CancellationToken.None).ConfigureAwait(false);
+            var baseUri = _config.GatewayUri ?? (gatewayUri ?? DiscordConfig.DefaultGatewayUri);
+            await Socket.ConnectAsync(baseUri, CancellationToken.None).ConfigureAwait(false);
         }
 
         public void OnAborted(Exception error)
