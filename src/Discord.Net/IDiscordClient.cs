@@ -22,5 +22,7 @@ namespace Discord
 
         DiscordRestApi Rest { get; }
         DiscordGatewayApi Gateway { get; }
+
+        event Action<LogMessage> Log;
     }
 }

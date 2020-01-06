@@ -9,10 +9,13 @@ namespace Discord.Socket
         private readonly DiscordConfig _config;
         private readonly string _token;
 
+        internal Logger Logger { get; private set; }
         public ISocket Socket { get; set; }
 
         public DiscordGatewayApi(DiscordConfig config, string token)
         {
+            Logger = new Logger("Gateway", config.MinGatewaySeverity);
+
             _config = config;
             _token = token;
 

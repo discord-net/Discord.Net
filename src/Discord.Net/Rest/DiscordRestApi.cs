@@ -14,8 +14,12 @@ namespace Discord.Rest
         private readonly IDiscordRestApi _api;
         private readonly HttpClient _http;
 
+        internal Logger Logger { get; private set; }
+
         public DiscordRestApi(DiscordConfig config, AuthenticationHeaderValue token)
         {
+            Logger = new Logger("Rest", config.MinRestSeverity);
+
             _http = new HttpClient(new DiscordHttpClientHandler(token), true)
             {
                 BaseAddress = config.RestUri ?? DiscordConfig.DefaultRestUri,

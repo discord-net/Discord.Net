@@ -35,5 +35,17 @@ namespace Discord
         /// SocketFactory gets or sets how a WebSocket will be created.
         /// </summary>
         public SocketFactory SocketFactory { get; set; } = DefaultSocketFactory.Create;
+        /// <summary>
+        /// Minimum Log Severity for the Rest API.
+        /// </summary>
+        public LogSeverity MinRestSeverity { get; set; } = LogSeverity.Info;
+        /// <summary>
+        /// Minimum Log Severity for the Gateway API.
+        /// </summary>
+        public LogSeverity MinGatewaySeverity { get; set; } = LogSeverity.Info;
+        /// <summary>
+        /// Minimum Log Severity for the Client.
+        /// </summary>
+        public LogSeverity MinClientSeverity { get; set; } = LogSeverity.Info;
     }
 }
