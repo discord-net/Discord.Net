@@ -3,7 +3,7 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net.Socket.Providers
+namespace Discord.Socket.Providers
 {
     public static class DefaultSocketFactory
     {

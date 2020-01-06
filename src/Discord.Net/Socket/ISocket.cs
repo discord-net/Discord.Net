@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net.Socket
+namespace Discord.Socket
 {
     public delegate ISocket SocketFactory(OnAbortionHandler abortionHandler, OnPacketHandler packetHandler);
 

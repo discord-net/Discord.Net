@@ -1,0 +1,32 @@
+- REST
+    - Models
+    - Preconditions
+    - Endpoints
+	- Channel
+	- Emoji
+	- Guild
+	- Invite
+	- User
+	- Voice
+	- Webhook
+- Gateway
+    - Models
+    - Client
+	- Socket
+	    * Receive
+	    * Compression
+    - Voice (long)
+- Core
+    - CDN
+    - Datastore
+    - Entities
+	- Channel
+	- Emoji
+	- Guild
+	- User
+- Tests
+    - Unit test Gateway stability / deadlockability?
+- Extensions
+    - Commands
+	? design - use finite's or quahu's
+    - Interactivity

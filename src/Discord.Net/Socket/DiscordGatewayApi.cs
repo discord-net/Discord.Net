@@ -2,17 +2,17 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Net.Socket
+namespace Discord.Socket
 {
-    public class Gateway
+    public class DiscordGatewayApi
     {
         static readonly Uri DefaultGatewayUri = new Uri("wss://gateway.discord.gg");
 
         ISocket Socket { get; set; }
 
-        public Gateway(SocketFactory socketFactory)
+        public DiscordGatewayApi(DiscordConfig config)
         {
-            Socket = socketFactory(OnAborted, OnPacket);
+            Socket = config.SocketFactory(OnAborted, OnPacket);
         }
 
         public async Task ConnectAsync(Uri? gatewayUri)
