@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Threading.Tasks;
 using Refit;
-using Discord.Rest.Models;
+using Discord.Models;
 using System.Net.Http.Headers;
 using System;
 using System.Net.Http;
@@ -32,11 +32,11 @@ namespace Discord.Rest
             };
             _api = RestService.For<IDiscordRestApi>(_http, refitSettings);
         }
-
+        
         public Task<GatewayInfo> GetGatewayInfoAsync()
-        {
-            return _api.GetGatewayInfoAsync();
-        }
+            => _api.GetGatewayInfoAsync();
+        public Task<GatewayInfo> GetBotGatewayInfoAsync()
+            => _api.GetBotGatewayInfoAsync();
 
         public void Dispose()
         {

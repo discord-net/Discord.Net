@@ -8,7 +8,7 @@ using Refit;
 
 // https://blog.martincostello.com/refit-and-system-text-json/
 
-namespace Discord.Rest
+namespace Discord
 {
     public class JsonContentSerializer : IContentSerializer
     {

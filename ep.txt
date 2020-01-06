@@ -1,0 +1,106 @@
+https://gist.github.com/SinisterRectus/9518f3e7d0d1ccb4335b2a0d389c30b0
+
+Sorted By Route
+--------------------------------------------------------------------------------------------------------------------
+Get Entitlements                       GET          /applications/{application.id}/entitlements
+Get Entitlement                        GET          /applications/{application.id}/entitlements/{entitlement.id}
+Delete Test Entitlement                DELETE       /applications/{application.id}/entitlements/{entitlement.id}/
+Consume SKU                            POST         /applications/{application.id}/entitlements/{entitlement.id}/consume
+Get SKUs                               GET          /applications/{application.id}/skus
+Delete/Close Channel                   DELETE       /channels/{channel.id}
+Get Channel                            GET          /channels/{channel.id}
+Modify Channel                         PUT/PATCH    /channels/{channel.id}
+Get Channel Invites                    GET          /channels/{channel.id}/invites
+Create Channel Invite                  POST         /channels/{channel.id}/invites
+Get Channel Messages                   GET          /channels/{channel.id}/messages
+Create Message                         POST         /channels/{channel.id}/messages
+Bulk Delete Messages                   POST         /channels/{channel.id}/messages/bulk-delete
+Bulk Delete Messages (deprecated)      POST         /channels/{channel.id}/messages/bulk_delete
+Delete Message                         DELETE       /channels/{channel.id}/messages/{message.id}
+Get Channel Message                    GET          /channels/{channel.id}/messages/{message.id}
+Edit Message                           PATCH        /channels/{channel.id}/messages/{message.id}
+Delete All Reactions                   DELETE       /channels/{channel.id}/messages/{message.id}/reactions
+Get Reactions                          GET          /channels/{channel.id}/messages/{message.id}/reactions/{emoji}
+Delete Own Reaction                    DELETE       /channels/{channel.id}/messages/{message.id}/reactions/{emoji}/@me
+Create Reaction                        PUT          /channels/{channel.id}/messages/{message.id}/reactions/{emoji}/@me
+Delete User Reaction                   DELETE       /channels/{channel.id}/messages/{message.id}/reactions/{emoji}/{user.id}
+Delete Channel Permission              DELETE       /channels/{channel.id}/permissions/{overwrite.id}
+Edit Channel Permissions               PUT          /channels/{channel.id}/permissions/{overwrite.id}
+Get Pinned Messages                    GET          /channels/{channel.id}/pins
+Delete Pinned Channel Message          DELETE       /channels/{channel.id}/pins/{message.id}
+Add Pinned Channel Message             PUT          /channels/{channel.id}/pins/{message.id}
+Group DM Remove Recipient              DELETE       /channels/{channel.id}/recipients/{user.id}
+Group DM Add Recipient                 PUT          /channels/{channel.id}/recipients/{user.id}
+Trigger Typing Indicator               POST         /channels/{channel.id}/typing
+Get Channel Webhooks                   GET          /channels/{channel.id}/webhooks
+Create Webhook                         POST         /channels/{channel.id}/webhooks
+Get Gateway                            GET          /gateway
+Get Gateway Bot                        GET          /gateway/bot
+Create Guild                           POST         /guilds
+Delete Guild                           DELETE       /guilds/{guild.id}
+Get Guild                              GET          /guilds/{guild.id}
+Modify Guild                           PATCH        /guilds/{guild.id}
+Get Guild Audit Log                    GET          /guilds/{guild.id}/audit-logs
+Get Guild Bans                         GET          /guilds/{guild.id}/bans
+Remove Guild Ban                       DELETE       /guilds/{guild.id}/bans/{user.id}
+Get Guild Ban                          GET          /guilds/{guild.id}/bans/{user.id}
+Create Guild Ban                       PUT          /guilds/{guild.id}/bans/{user.id}
+Get Guild Channels                     GET          /guilds/{guild.id}/channels
+Modify Guild Channel Positions         PATCH        /guilds/{guild.id}/channels
+Create Guild Channel                   POST         /guilds/{guild.id}/channels
+Get Guild Embed                        GET          /guilds/{guild.id}/embed
+Modify Guild Embed                     PATCH        /guilds/{guild.id}/embed
+List Guild Emojis                      GET          /guilds/{guild.id}/emojis
+Create Guild Emoji                     POST         /guilds/{guild.id}/emojis
+Delete Guild Emoji                     DELETE       /guilds/{guild.id}/emojis/{emoji.id}
+Get Guild Emoji                        GET          /guilds/{guild.id}/emojis/{emoji.id}
+Modify Guild Emoji                     PATCH        /guilds/{guild.id}/emojis/{emoji.id}
+Get Guild Integrations                 GET          /guilds/{guild.id}/integrations
+Create Guild Integration               POST         /guilds/{guild.id}/integrations
+Delete Guild Integration               DELETE       /guilds/{guild.id}/integrations/{integration.id}
+Modify Guild Integration               PATCH        /guilds/{guild.id}/integrations/{integration.id}
+Sync Guild Integration                 POST         /guilds/{guild.id}/integrations/{integration.id}/sync
+Get Guild Invites                      GET          /guilds/{guild.id}/invites
+List Guild Members                     GET          /guilds/{guild.id}/members
+Modify Current User Nick               PATCH        /guilds/{guild.id}/members/@me/nick
+Remove Guild Member                    DELETE       /guilds/{guild.id}/members/{user.id}
+Get Guild Member                       GET          /guilds/{guild.id}/members/{user.id}
+Modify Guild Member                    PATCH        /guilds/{guild.id}/members/{user.id}
+Add Guild Member                       PUT          /guilds/{guild.id}/members/{user.id}
+Remove Guild Member Role               DELETE       /guilds/{guild.id}/members/{user.id}/roles/{role.id}
+Add Guild Member Role                  PUT          /guilds/{guild.id}/members/{user.id}/roles/{role.id}
+Get Guild Prune Count                  GET          /guilds/{guild.id}/prune
+Begin Guild Prune                      POST         /guilds/{guild.id}/prune
+Get Guild Voice Regions                GET          /guilds/{guild.id}/regions
+Get Guild Roles                        GET          /guilds/{guild.id}/roles
+Modify Guild Role Positions            PATCH        /guilds/{guild.id}/roles
+Create Guild Role                      POST         /guilds/{guild.id}/roles
+Delete Guild Role                      DELETE       /guilds/{guild.id}/roles/{role.id}
+Modify Guild Role                      PATCH        /guilds/{guild.id}/roles/{role.id}
+Get Guild Vanity URL                   GET          /guilds/{guild.id}/vanity-url
+Get Guild Webhooks                     GET          /guilds/{guild.id}/webhooks
+Get Guild Widget Image                 GET          /guilds/{guild.id}/widget.png
+Delete Invite                          DELETE       /invites/{invite.code}
+Get Invite                             GET          /invites/{invite.code}
+Get Current Application Information    GET          /oauth2/applications/@me
+Delete Purchase Discount               DELETE       /store/skus/{sku.id}/discounts/{user.id}/
+Create Purchase Discount               PUT          /store/skus/{sku.id}/discounts/{user.id}/
+Get Current User                       GET          /users/@me
+Modify Current User                    PATCH        /users/@me
+Get User DMs                           GET          /users/@me/channels
+Create DM                              POST         /users/@me/channels
+Create Group DM                        POST         /users/@me/channels
+Get User Connections                   GET          /users/@me/connections
+Get Current User Guilds                GET          /users/@me/guilds
+Leave Guild                            DELETE       /users/@me/guilds/{guild.id}
+Get User                               GET          /users/{user.id}
+List Voice Regions                     GET          /voice/regions
+Delete Webhook                         DELETE       /webhooks/{webhook.id}
+Get Webhook                            GET          /webhooks/{webhook.id}
+Modify Webhook                         PATCH        /webhooks/{webhook.id}
+Delete Webhook with Token              DELETE       /webhooks/{webhook.id}/{webhook.token}
+Get Webhook with Token                 GET          /webhooks/{webhook.id}/{webhook.token}
+Modify Webhook with Token              PATCH        /webhooks/{webhook.id}/{webhook.token}
+Execute Webhook                        POST         /webhooks/{webhook.id}/{webhook.token}
+Execute GitHub-Compatible Webhook      POST         /webhooks/{webhook.id}/{webhook.token}/github
+Execute Slack-Compatible Webhook       POST         /webhooks/{webhook.id}/{webhook.token}/slack

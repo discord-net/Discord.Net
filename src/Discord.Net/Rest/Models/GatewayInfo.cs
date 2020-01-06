@@ -1,16 +1,16 @@
 #pragma warning disable CS8618 // Uninitialized NRT expected in models
 using System.Text.Json.Serialization;
 
-namespace Discord.Rest.Models
+namespace Discord.Models
 {
     public class GatewayInfo
     {
         [JsonPropertyName("url")]
         public string Url { get; set; }
         [JsonPropertyName("shards")]
-        public int Shards { get; set; }
+        public int? Shards { get; set; }
         [JsonPropertyName("session_start_limit")]
-        public GatewaySessionStartInfo SessionStartInfo { get; set; }
+        public GatewaySessionStartInfo? SessionStartInfo { get; set; }
     }
 
     public class GatewaySessionStartInfo
