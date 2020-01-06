@@ -72,8 +72,8 @@ namespace Discord
         ///     Gets the level permissions granted to this user to a given channel.
         /// </summary>
         /// <example>
-        ///     The following example checks if the current user has the ability to send a message with attachment in
-        ///     this channel; if so, uploads a file via <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool)"/>.
+        ///     <para>The following example checks if the current user has the ability to send a message with attachment in
+        ///     this channel; if so, uploads a file via <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool)"/>.</para>
         ///     <code language="cs">
         ///     if (currentUser?.GetPermissions(targetChannel)?.AttachFiles)
         ///         await targetChannel.SendFileAsync("fortnite.png");

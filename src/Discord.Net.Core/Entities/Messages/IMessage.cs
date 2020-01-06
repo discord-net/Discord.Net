@@ -161,7 +161,7 @@ namespace Discord
         ///     Adds a reaction to this message.
         /// </summary>
         /// <example>
-        ///     The following example adds the reaction, <c>💕</c>, to the message.
+        ///     <para>The following example adds the reaction, <c>💕</c>, to the message.</para>
         ///     <code language="cs">
         ///     await msg.AddReactionAsync(new Emoji("\U0001f495"));
         ///     </code>
@@ -177,7 +177,7 @@ namespace Discord
         ///     Removes a reaction from message.
         /// </summary>
         /// <example>
-        ///     The following example removes the reaction, <c>💕</c>, added by the message author from the message.
+        ///     <para>The following example removes the reaction, <c>💕</c>, added by the message author from the message.</para>
         ///     <code language="cs">
         ///     await msg.RemoveReactionAsync(new Emoji("\U0001f495"), msg.Author);
         ///     </code>
@@ -194,7 +194,7 @@ namespace Discord
         ///     Removes a reaction from message.
         /// </summary>
         /// <example>
-        ///     The following example removes the reaction, <c>💕</c>, added by the user with ID 84291986575613952 from the message.
+        ///     <para>The following example removes the reaction, <c>💕</c>, added by the user with ID 84291986575613952 from the message.</para>
         ///     <code language="cs">
         ///     await msg.RemoveReactionAsync(new Emoji("\U0001f495"), 84291986575613952);
         ///     </code>
@@ -220,7 +220,7 @@ namespace Discord
         ///     Gets all users that reacted to a message with a given emote.
         /// </summary>
         /// <example>
-        ///     The following example gets the users that have reacted with the emoji <c>💕</c> to the message.
+        ///     <para>The following example gets the users that have reacted with the emoji <c>💕</c> to the message.</para>
         ///     <code language="cs">
         ///     var emoji = new Emoji("\U0001f495");
         ///     var reactedUsers = await message.GetReactionUsersAsync(emoji, 100).FlattenAsync();
