@@ -21,8 +21,8 @@ namespace Discord
         ///     example).
         /// </remarks>
         /// <example>
-        ///     The following example attempts to retrieve the user's current avatar and send it to a channel; if one is
-        ///     not set, a default avatar for this user will be returned instead.
+        ///     <para>The following example attempts to retrieve the user's current avatar and send it to a channel; if one is
+        ///     not set, a default avatar for this user will be returned instead.</para>
         ///     <code language="cs" region="GetAvatarUrl"
         ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Users\IUser.Examples.cs"/>
         /// </example>
@@ -90,8 +90,8 @@ namespace Discord
         ///     </note>
         /// </remarks>
         /// <example>
-        ///     The following example attempts to send a direct message to the target user and logs the incident should
-        ///     it fail.
+        ///     <para>The following example attempts to send a direct message to the target user and logs the incident should
+        ///     it fail.</para>
         ///     <code region="GetOrCreateDMChannelAsync" language="cs"
         ///           source="../../../Discord.Net.Examples/Core/Entities/Users/IUser.Examples.cs"/>
         /// </example>

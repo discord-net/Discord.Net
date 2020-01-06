@@ -17,7 +17,7 @@ namespace Discord
         ///     method and what properties are available, please refer to <see cref="MessageProperties"/>.
         /// </remarks>
         /// <example>
-        ///     The following example replaces the content of the message with <c>Hello World!</c>.
+        ///     <para>The following example replaces the content of the message with <c>Hello World!</c>.</para>
         ///     <code language="cs">
         ///     await msg.ModifyAsync(x =&gt; x.Content = "Hello World!");
         ///     </code>
