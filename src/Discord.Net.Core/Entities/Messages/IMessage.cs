@@ -219,6 +219,23 @@ namespace Discord
         /// <summary>
         ///     Gets all users that reacted to a message with a given emote.
         /// </summary>
+        /// <remarks>
+        ///     <note type="important">
+        ///         The returned collection is an asynchronous enumerable object; one must call 
+        ///         <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> to access the users as a
+        ///         collection.
+        ///     </note>
+        ///     <note type="warning">
+        ///         Do not fetch too many users at once! This may cause unwanted preemptive rate limit or even actual
+        ///         rate limit, causing your bot to freeze!
+        ///     </note>
+        ///     This method will attempt to fetch the number of reactions specified under <paramref name="limit"/>. 
+        ///     The library will attempt to split up the requests according to your <paramref name="limit"/> and 
+        ///     <see cref="DiscordConfig.MaxUserReactionsPerBatch"/>. In other words, should the user request 500 reactions,
+        ///     and the <see cref="Discord.DiscordConfig.MaxUserReactionsPerBatch"/> constant is <c>100</c>, the request will
+        ///     be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
+        ///     of flattening.
+        /// </remarks>
         /// <example>
         ///     <para>The following example gets the users that have reacted with the emoji <c>💕</c> to the message.</para>
         ///     <code language="cs">
@@ -230,9 +247,7 @@ namespace Discord
         /// <param name="limit">The number of users to request.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A paged collection containing a read-only collection of users that has reacted to this message.
-        ///     Flattening the paginated response into a collection of users with 
-        ///     <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> is required if you wish to access the users.
+        ///      Paged collection of users.
         /// </returns>
         IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emoji, int limit, RequestOptions options = null);
     }
