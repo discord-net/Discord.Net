@@ -1,6 +1,6 @@
 namespace Discord.Models
 {
-    public static class GuildFeatures
+    public class GuildFeatures
     {
         public const string InviteSplash = "INVITE_SPLASH";
         public const string VIPRegions = "VIP_REGIONS";
