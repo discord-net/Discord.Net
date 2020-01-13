@@ -1,10 +1,10 @@
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Net.Http.Headers;
+using System.Net.Http;
 using Refit;
 using Discord.Models;
-using System.Net.Http.Headers;
-using System;
-using System.Net.Http;
+using Discord.Serialization;
 
 // This is essentially a reimplementation of Wumpus.Net.Rest
 namespace Discord.Rest
@@ -26,6 +26,7 @@ namespace Discord.Rest
             };
 
             var jsonOptions = new JsonSerializerOptions();
+            jsonOptions.Converters.Add(new OptionalConverter());
             var refitSettings = new RefitSettings
             {
                 ContentSerializer = new JsonContentSerializer(jsonOptions),
