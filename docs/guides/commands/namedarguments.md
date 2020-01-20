@@ -68,7 +68,7 @@ Named Argument Type has the following field,
 ```cs
 public IEnumerable<int> Numbers { get; set; }
 ```
-then the command can be invoked as
+then the command can be invoked with
 `.cmd numbers: "1, 2, 4, 8, 16, 32"`
 
 ## Additional Notes

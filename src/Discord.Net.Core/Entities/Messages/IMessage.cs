@@ -226,7 +226,7 @@ namespace Discord
         ///         collection.
         ///     </note>
         ///     <note type="warning">
-        ///         Do not fetch too many users at once! This may cause unwanted preemptive rate limit or even actual
+        ///         Do not fetch too many users at once! This may cause an unwanted preemptive rate limit or even an actual
         ///         rate limit, causing your bot to freeze!
         ///     </note>
         ///     This method will attempt to fetch the number of reactions specified under <paramref name="limit"/>. 
@@ -234,7 +234,7 @@ namespace Discord
         ///     <see cref="DiscordConfig.MaxUserReactionsPerBatch"/>. In other words, should the user request 500 reactions,
         ///     and the <see cref="Discord.DiscordConfig.MaxUserReactionsPerBatch"/> constant is <c>100</c>, the request will
         ///     be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
-        ///     of flattening.
+        ///     for flattening.
         /// </remarks>
         /// <example>
         ///     <para>The following example gets the users that have reacted with the emoji <c>💕</c> to the message.</para>
