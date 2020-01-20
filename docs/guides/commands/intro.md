@@ -72,7 +72,7 @@ By now, your module should look like this:
 > [!WARNING]
 > **Avoid using long-running code** in your modules wherever possible.
 > Long-running code, by default, within a command module
-> can cause gateway thread to be blocked; therefore, interrupting
+> can cause the gateway thread to be blocked; therefore, interrupting
 > the bot's connection to Discord.
 >
 > You may read more about it in @FAQ.Commands.General .
