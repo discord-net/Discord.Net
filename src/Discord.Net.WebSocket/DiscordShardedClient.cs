@@ -313,6 +313,7 @@ namespace Discord.WebSocket
             client.ReactionAdded += (cache, channel, reaction) => _reactionAddedEvent.InvokeAsync(cache, channel, reaction);
             client.ReactionRemoved += (cache, channel, reaction) => _reactionRemovedEvent.InvokeAsync(cache, channel, reaction);
             client.ReactionsCleared += (cache, channel) => _reactionsClearedEvent.InvokeAsync(cache, channel);
+            client.ReactionsClearedEmoji += (cache, channel, reaction) => _reactionsClearedEmojiEvent.InvokeAsync(cache, channel, reaction);
 
             client.RoleCreated += (role) => _roleCreatedEvent.InvokeAsync(role);
             client.RoleDeleted += (role) => _roleDeletedEvent.InvokeAsync(role);
@@ -324,6 +325,9 @@ namespace Discord.WebSocket
             client.GuildUnavailable += (guild) => _guildUnavailableEvent.InvokeAsync(guild);
             client.GuildMembersDownloaded += (guild) => _guildMembersDownloadedEvent.InvokeAsync(guild);
             client.GuildUpdated += (oldGuild, newGuild) => _guildUpdatedEvent.InvokeAsync(oldGuild, newGuild);
+
+            client.InviteCreated += (invite) => _inviteCreatedEvent.InvokeAsync(invite);
+            client.InviteDeleted += (invite) => _inviteDeletedEvent.InvokeAsync(invite);
 
             client.UserJoined += (user) => _userJoinedEvent.InvokeAsync(user);
             client.UserLeft += (user) => _userLeftEvent.InvokeAsync(user);

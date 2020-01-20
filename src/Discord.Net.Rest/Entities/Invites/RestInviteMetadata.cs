@@ -36,6 +36,7 @@ namespace Discord.Rest
             entity.Update(model);
             return entity;
         }
+
         internal void Update(Model model)
         {
             base.Update(model);

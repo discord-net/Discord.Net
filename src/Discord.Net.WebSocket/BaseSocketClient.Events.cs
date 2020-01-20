@@ -235,6 +235,14 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task>> _reactionsClearedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task>>();
 
+        /// <summary> Fired when all reactions of a specific reaction are removed.</summary>
+        public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> ReactionsClearedEmoji { 
+            add { _reactionsClearedEmojiEvent.Add(value); }
+            remove { _reactionsClearedEmojiEvent.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>> _reactionsClearedEmojiEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>>();
+
+
         //Roles
         /// <summary> Fired when a role is created. </summary>
         public event Func<SocketRole, Task> RoleCreated {
@@ -292,6 +300,21 @@ namespace Discord.WebSocket
             remove { _guildUpdatedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketGuild, SocketGuild, Task>> _guildUpdatedEvent = new AsyncEvent<Func<SocketGuild, SocketGuild, Task>>();
+
+        //Invites
+        /// <summary> Fired when an invite is created.</summary
+        public event Func<SocketInvite, Task> InviteCreated {
+            add { _inviteCreatedEvent.Add(value); }
+            remove { _inviteCreatedEvent.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<SocketInvite, Task>> _inviteCreatedEvent = new AsyncEvent<Func<SocketInvite, Task>>();
+        /// <summary>Fired when an invite is deleted.</summary>
+        public event Func<SocketInvite, Task> InviteDeleted
+        {
+            add { _inviteDeletedEvent.Add(value); }
+            remove { _inviteDeletedEvent.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<SocketInvite, Task>> _inviteDeletedEvent = new AsyncEvent<Func<SocketInvite, Task>>();
 
         //Users
         /// <summary> Fired when a user joins a guild. </summary>

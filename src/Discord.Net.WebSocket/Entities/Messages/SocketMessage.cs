@@ -197,9 +197,10 @@ namespace Discord.WebSocket
                 _reactions.Remove(reaction);
         }
         internal void ClearReactions()
-        {
-            _reactions.Clear();
-        }
+            => _reactions.Clear();
+
+        internal void ClearReactionsEmoji(SocketReaction reaction)
+            => _reactions.RemoveAll(r => r.Emote.Equals(reaction));
 
         /// <inheritdoc />
         public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
