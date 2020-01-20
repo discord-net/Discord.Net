@@ -7,29 +7,65 @@ using Model = Discord.API.InviteEvent;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a WebSocket-based invite.
+    /// </summary>
     public class SocketInvite : SocketEntity<string>
     {
+        /// <summary>
+        ///     Gets the channel in which this invite was created.
+        /// </summary>
         public ISocketMessageChannel Channel { get; private set; }
 
+        /// <summary>
+        ///     Gets the channel ID in which this invite was created.
+        /// </summary>
         public ulong ChannelId { get; private set; }
 
+        /// <summary>
+        ///     Gets the guild in which this invite was created.
+        /// </summary>
         public IGuild Guild { get; private set; }
 
+        /// <summary>
+        ///     Gets the guild ID in which this invite was created.
+        /// </summary>
         public ulong GuildId { get; private set; }
 
+        /// <summary>
+        ///     Gets the unique identifier for this invite.
+        /// </summary>
         public string Code { get; private set; }
 
-        public SocketUser Inviter { get; private set; }
+        /// <summary>
+        ///     Gets the user who created this invite.
+        /// </summary>
+        public Optional<SocketUser> Inviter { get; private set; }
 
-        public DateTimeOffset CreatedAt { get; private set; }
+        /// <summary>
+        ///     Gets when this invite was created.
+        /// </summary>
+        public Optional<DateTimeOffset> CreatedAt { get; private set; }
 
-        public int MaxAge { get; private set; }
+        /// <summary>
+        ///     Gets the time (in seconds) until the invite expires.
+        /// </summary>
+        public Optional<int> MaxAge { get; private set; }
 
-        public int MaxUses { get; private set; }
+        /// <summary>
+        ///     Gets the max number of uses this invite may have.
+        /// </summary>
+        public Optional<int> MaxUses { get; private set; }
 
-        public int Uses { get; set; }
+        /// <summary>
+        ///     Gets the number of times this invite has been used.
+        /// </summary>
+        public Optional<int> Uses { get; set; }
 
-        public bool Temporary { get; private set; }
+        /// <summary>
+        ///     Gets a value that indicates whether the invite is a temporary one.
+        /// </summary>
+        public Optional<bool> IsTemporary { get; private set; }
 
         internal SocketInvite(DiscordSocketClient discord, Model model)
             : base(discord, model.Code)
@@ -62,7 +98,7 @@ namespace Discord.WebSocket
             MaxAge = model.MaxAge.Value;
             MaxUses = model.MaxUses.Value;
             Uses = model.Uses.Value;
-            Temporary = model.Temporary;
+            IsTemporary = model.Temporary;
         }
 
         internal void Update(string code, IGuild guild, ISocketMessageChannel channel)

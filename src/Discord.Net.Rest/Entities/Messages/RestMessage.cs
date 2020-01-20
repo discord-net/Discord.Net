@@ -182,6 +182,9 @@ namespace Discord.Rest
         public Task RemoveAllReactionsAsync(RequestOptions options = null)
             => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
         /// <inheritdoc />
+        public Task RemoveEmojiReactionsAsync(IEmote emote, RequestOptions options = null)
+            => MessageHelper.RemoveEmojiReactionsAsync(this, emote, Discord, options);
+        /// <inheritdoc />
         public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit, RequestOptions options = null)
             => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, options);
     }

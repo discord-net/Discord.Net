@@ -71,6 +71,11 @@ namespace Discord.Rest
             await client.ApiClient.RemoveAllReactionsAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
         }
 
+        public static async Task RemoveEmojiReactionsAsync(IMessage msg, IEmote emote, BaseDiscordClient client, RequestOptions options)
+        {
+            await client.ApiClient.RemoveEmojiReactionsAsync(msg.Channel.Id, msg.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
+        }
+
         public static IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, IEmote emote,
             int? limit, BaseDiscordClient client, RequestOptions options)
         {

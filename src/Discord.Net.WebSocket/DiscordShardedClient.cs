@@ -313,7 +313,7 @@ namespace Discord.WebSocket
             client.ReactionAdded += (cache, channel, reaction) => _reactionAddedEvent.InvokeAsync(cache, channel, reaction);
             client.ReactionRemoved += (cache, channel, reaction) => _reactionRemovedEvent.InvokeAsync(cache, channel, reaction);
             client.ReactionsCleared += (cache, channel) => _reactionsClearedEvent.InvokeAsync(cache, channel);
-            client.ReactionsClearedEmoji += (cache, channel, reaction) => _reactionsClearedEmojiEvent.InvokeAsync(cache, channel, reaction);
+            client.RemovedEmojiReactions += (cache, channel, reaction) => _removedEmojiReactionsEvent.InvokeAsync(cache, channel, reaction);
 
             client.RoleCreated += (role) => _roleCreatedEvent.InvokeAsync(role);
             client.RoleDeleted += (role) => _roleDeletedEvent.InvokeAsync(role);

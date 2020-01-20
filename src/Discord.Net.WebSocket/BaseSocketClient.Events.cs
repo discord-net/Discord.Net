@@ -236,11 +236,11 @@ namespace Discord.WebSocket
         internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task>> _reactionsClearedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task>>();
 
         /// <summary> Fired when all reactions of a specific reaction are removed.</summary>
-        public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> ReactionsClearedEmoji { 
-            add { _reactionsClearedEmojiEvent.Add(value); }
-            remove { _reactionsClearedEmojiEvent.Remove(value); }
+        public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> RemovedEmojiReactions { 
+            add { _removedEmojiReactionsEvent.Add(value); }
+            remove { _removedEmojiReactionsEvent.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>> _reactionsClearedEmojiEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>>();
+        internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>> _removedEmojiReactionsEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>>();
 
 
         //Roles

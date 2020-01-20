@@ -1401,7 +1401,7 @@ namespace Discord.WebSocket
 
                                         cachedMsg?.ClearReactionsEmoji(reaction);
 
-                                        await TimedInvokeAsync(_reactionsClearedEmojiEvent, nameof(ReactionsClearedEmoji), cacheable, channel, reaction).ConfigureAwait(false);
+                                        await TimedInvokeAsync(_removedEmojiReactionsEvent, nameof(RemovedEmojiReactions), cacheable, channel, reaction).ConfigureAwait(false);
                                     }
                                     else
                                     {
