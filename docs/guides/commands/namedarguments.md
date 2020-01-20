@@ -39,7 +39,7 @@ The command where you want to use these values can be declared like so:
 public async Task Act(int requiredArg, NamableArguments namedArgs)
 ```
 
-The command can now be invoked as
+The command can now be invoked with
 `.act 42 first: Hello fourth: "A string with spaces must be wrapped in quotes" second: World`.
 
 A TypeReader for the named arguments container type is
