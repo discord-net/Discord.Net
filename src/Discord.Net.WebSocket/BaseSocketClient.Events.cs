@@ -302,7 +302,7 @@ namespace Discord.WebSocket
         internal readonly AsyncEvent<Func<SocketGuild, SocketGuild, Task>> _guildUpdatedEvent = new AsyncEvent<Func<SocketGuild, SocketGuild, Task>>();
 
         //Invites
-        /// <summary> Fired when an invite is created.</summary
+        /// <summary> Fired when an invite is created.</summary>
         public event Func<SocketInvite, Task> InviteCreated {
             add { _inviteCreatedEvent.Add(value); }
             remove { _inviteCreatedEvent.Remove(value); }

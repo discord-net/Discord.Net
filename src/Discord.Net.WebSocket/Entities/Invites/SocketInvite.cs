@@ -13,22 +13,22 @@ namespace Discord.WebSocket
     public class SocketInvite : SocketEntity<string>
     {
         /// <summary>
-        ///     Gets the channel in which this invite was created.
+        ///     Gets the channel where this invite was created.
         /// </summary>
         public ISocketMessageChannel Channel { get; private set; }
 
         /// <summary>
-        ///     Gets the channel ID in which this invite was created.
+        ///     Gets the channel ID where this invite was created.
         /// </summary>
         public ulong ChannelId { get; private set; }
 
         /// <summary>
-        ///     Gets the guild in which this invite was created.
+        ///     Gets the guild where this invite was created.
         /// </summary>
         public IGuild Guild { get; private set; }
 
         /// <summary>
-        ///     Gets the guild ID in which this invite was created.
+        ///     Gets the guild ID where this invite was created.
         /// </summary>
         public ulong GuildId { get; private set; }
 
