@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Discord;
@@ -45,7 +46,7 @@ namespace _02_commands_framework
                 // Here we initialize the logic required to register our commands.
                 await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
 
-                await Task.Delay(-1);
+                await Task.Delay(Timeout.Infinite);
             }
         }
 
