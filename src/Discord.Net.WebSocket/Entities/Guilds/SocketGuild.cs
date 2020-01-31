@@ -581,8 +581,8 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     text channel.
         /// </returns>
-        public Task<RestTextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null)
-            => GuildHelper.CreateTextChannelAsync(this, Discord, name, options, func);
+        public Task<RestTextChannel> CreateTextChannelAsync(string name, Action<TextChannelProperties> func = null, RequestOptions options = null, IEnumerable<Overwrite> overwritePermissions = null)
+            => GuildHelper.CreateTextChannelAsync(this, Discord, name, options, func, overwritePermissions);
         /// <summary>
         ///     Creates a new voice channel in this guild.
         /// </summary>
@@ -594,8 +594,8 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     voice channel.
         /// </returns>
-        public Task<RestVoiceChannel> CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null)
-            => GuildHelper.CreateVoiceChannelAsync(this, Discord, name, options, func);
+        public Task<RestVoiceChannel> CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null, IEnumerable<Overwrite> overwritePermissions = null)
+            => GuildHelper.CreateVoiceChannelAsync(this, Discord, name, options, func, overwritePermissions);
         /// <summary>
         ///     Creates a new channel category in this guild.
         /// </summary>
@@ -607,8 +607,8 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     category channel.
         /// </returns>
-        public Task<RestCategoryChannel> CreateCategoryChannelAsync(string name, Action<GuildChannelProperties> func = null, RequestOptions options = null)
-            => GuildHelper.CreateCategoryChannelAsync(this, Discord, name, options, func);
+        public Task<RestCategoryChannel> CreateCategoryChannelAsync(string name, Action<GuildChannelProperties> func = null, RequestOptions options = null, IEnumerable<Overwrite> overwritePermissions = null)
+            => GuildHelper.CreateCategoryChannelAsync(this, Discord, name, options, func, overwritePermissions);
 
         internal SocketGuildChannel AddChannel(ClientState state, ChannelModel model)
         {

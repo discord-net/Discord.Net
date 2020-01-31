@@ -164,54 +164,63 @@ namespace Discord.Rest
         }
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
         public static async Task<RestTextChannel> CreateTextChannelAsync(IGuild guild, BaseDiscordClient client,
-            string name, RequestOptions options, Action<TextChannelProperties> func = null)
+            string name, RequestOptions options, Action<TextChannelProperties> func = null, IEnumerable<Overwrite> overwrites = null)
         {
             if (name == null) throw new ArgumentNullException(paramName: nameof(name));
 
             var props = new TextChannelProperties();
             func?.Invoke(props);
 
+            var perms = overwrites?.Select(perm => new CreateChannelPermissionsParams(perm.TargetId, perm.TargetType == PermissionTarget.Role ? "role" : "member", perm.Permissions.AllowValue, perm.Permissions.DenyValue));
+
             var args = new CreateGuildChannelParams(name, ChannelType.Text)
             {
                 CategoryId = props.CategoryId,
                 Topic = props.Topic,
                 IsNsfw = props.IsNsfw,
-                Position = props.Position
+                Position = props.Position,
+                PermissionOverwrite = new Optional<IEnumerable<CreateChannelPermissionsParams>>(perms)
             };
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestTextChannel.Create(client, guild, model);
         }
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
         public static async Task<RestVoiceChannel> CreateVoiceChannelAsync(IGuild guild, BaseDiscordClient client,
-            string name, RequestOptions options, Action<VoiceChannelProperties> func = null)
+            string name, RequestOptions options, Action<VoiceChannelProperties> func = null, IEnumerable<Overwrite> overwrites = null)
         {
             if (name == null) throw new ArgumentNullException(paramName: nameof(name));
 
             var props = new VoiceChannelProperties();
             func?.Invoke(props);
 
+            var perms = overwrites?.Select(perm => new CreateChannelPermissionsParams(perm.TargetId, perm.TargetType == PermissionTarget.Role ? "role" : "member", perm.Permissions.AllowValue, perm.Permissions.DenyValue));
+
             var args = new CreateGuildChannelParams(name, ChannelType.Voice)
             {
                 CategoryId = props.CategoryId,
                 Bitrate = props.Bitrate,
                 UserLimit = props.UserLimit,
-                Position = props.Position
+                Position = props.Position,
+                PermissionOverwrite = new Optional<IEnumerable<CreateChannelPermissionsParams>>(perms)
             };
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestVoiceChannel.Create(client, guild, model);
         }
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
         public static async Task<RestCategoryChannel> CreateCategoryChannelAsync(IGuild guild, BaseDiscordClient client,
-            string name, RequestOptions options, Action<GuildChannelProperties> func = null)
+            string name, RequestOptions options, Action<GuildChannelProperties> func = null, IEnumerable<Overwrite> overwrites = null)
         {
             if (name == null) throw new ArgumentNullException(paramName: nameof(name));
 
             var props = new GuildChannelProperties();
             func?.Invoke(props);
 
+            var perms = overwrites?.Select(perm => new CreateChannelPermissionsParams(perm.TargetId, perm.TargetType == PermissionTarget.Role ? "role" : "member", perm.Permissions.AllowValue, perm.Permissions.DenyValue));
+
             var args = new CreateGuildChannelParams(name, ChannelType.Category)
             {
-                Position = props.Position
+                Position = props.Position,
+                PermissionOverwrite = new Optional<IEnumerable<CreateChannelPermissionsParams>>(perms)
             };
 
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);

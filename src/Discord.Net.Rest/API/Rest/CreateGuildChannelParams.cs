@@ -1,5 +1,6 @@
 #pragma warning disable CS1591
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Discord.API.Rest
 {
@@ -14,6 +15,8 @@ namespace Discord.API.Rest
         public Optional<ulong?> CategoryId { get; set; }
         [JsonProperty("position")]
         public Optional<int> Position { get; set; }
+        [JsonProperty("permission_overwrite")]
+        public Optional<IEnumerable<CreateChannelPermissionsParams>> PermissionOverwrite {get;set;}
 
         //Text channels
         [JsonProperty("topic")]
