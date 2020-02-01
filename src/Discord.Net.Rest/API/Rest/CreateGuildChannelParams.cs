@@ -15,7 +15,7 @@ namespace Discord.API.Rest
         public Optional<ulong?> CategoryId { get; set; }
         [JsonProperty("position")]
         public Optional<int> Position { get; set; }
-        [JsonProperty("permission_overwrite")]
+        [JsonProperty("permission_overwrites")]
         public Optional<IEnumerable<CreateChannelPermissionsParams>> PermissionOverwrite {get;set;}
 
         //Text channels
