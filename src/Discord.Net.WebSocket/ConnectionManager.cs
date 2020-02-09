@@ -3,6 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord.Net;
+using Discord.WebSocket;
 
 namespace Discord
 {
@@ -53,7 +54,7 @@ namespace Discord
             });
         }
 
-        public virtual async Task StartAsync()
+        public virtual async Task StartAsync(SocketPresence? presence = null)
         {
             await AcquireConnectionLock().ConfigureAwait(false);
             var reconnectCancelToken = new CancellationTokenSource();

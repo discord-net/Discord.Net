@@ -1,4 +1,5 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
+using Discord.WebSocket;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
@@ -17,5 +18,7 @@ namespace Discord.API.Gateway
         public Optional<int[]> ShardingParams { get; set; }
         [JsonProperty("guild_subscriptions")]
         public Optional<bool> GuildSubscriptions { get; set; }
+        [JsonProperty("presence")]
+        public Optional<StatusUpdateParams> Presence { get; set; }
     }
 }
