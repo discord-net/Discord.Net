@@ -23,7 +23,7 @@ namespace Discord
         /// <param name="isTTS">Determines whether the message should be read aloud by Discord or not.</param>
         /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <param name="allowedMentions">The types of mentions that will be send with this message.</param>
+        /// <param name="allowedMentions">The types of mention notifications that will be sent with this message.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
