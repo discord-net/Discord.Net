@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Discord
 {
     /// <summary>
-    ///     Defines which mentions and types of mentions will notify users from the message text.
+    ///     Defines which mentions and types of mentions that will notify users from the message text.
     /// </summary>
     public class AllowedMentions
     {
