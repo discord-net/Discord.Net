@@ -235,8 +235,6 @@ namespace Discord.WebSocket
         async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler)
             => await SendFileAsync(stream, filename, text, isTTS, embed, options, isSpoiler).ConfigureAwait(false);
         /// <inheritdoc />
-        //async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options)
-        //    => await SendMessageAsync(text, isTTS, embed, null, options).ConfigureAwait(false);
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, RequestOptions options)
             => await SendMessageAsync(text, isTTS, embed, allowedMentions, options).ConfigureAwait(false);
 
