@@ -3,23 +3,24 @@ using System.Collections.Generic;
 namespace Discord
 {
     /// <summary>
-    ///     Defines which types of mentions will be parsed from a created message's content.
+    ///     Defines which mentions and types of mentions will notify users from the message text.
     /// </summary>
     public class AllowedMentions
     {
         /// <summary>
-        ///     Gets or sets the allowed mention types to parse from the message content.
-        ///     If <c>null</c>, no users will be notified.
+        ///     Gets or sets the type of mentions that will notify users.
+        ///     If <c>null</c>, only the role and user Ids specified in <see cref="RoleIds"/>
+        ///     and <see cref="UserIds"/> respectively will be notified.
         /// </summary>
         public AllowedMentionTypes? AllowedTypes { get; set; }
 
         /// <summary>
-        ///     Gets or sets the list of all role Ids that can be mentioned.
+        ///     Gets or sets the list of all role Ids that will be mentioned.
         /// </summary>
         public List<ulong> RoleIds { get; set; }
 
         /// <summary>
-        ///     Gets or sets the list of all user Ids that can be mentioned.
+        ///     Gets or sets the list of all user Ids that will be mentioned.
         /// </summary>
         public List<ulong> UserIds { get; set; }
     }
