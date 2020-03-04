@@ -3,7 +3,7 @@ using System;
 namespace Discord
 {
     /// <summary>
-    ///     Specifies the type of mentions that will be parsed from the message content.
+    ///     Specifies the type of mentions that will be notified from the message content.
     /// </summary>
     [Flags]
     public enum AllowedMentionTypes
