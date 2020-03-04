@@ -27,6 +27,7 @@ namespace Discord
         /// <param name="text">The message to be sent.</param>
         /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
         /// <param name="embed">The <see cref="EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
+        /// <param name="allowedMentions">The types of mentions that will be send with this message.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous send operation. The task result contains the sent message.
@@ -35,9 +36,10 @@ namespace Discord
             string text = null,
             bool isTTS = false,
             Embed embed = null,
+            AllowedMentions allowedMentions = null,
             RequestOptions options = null)
         {
-            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendMessageAsync(text, isTTS, embed, options).ConfigureAwait(false);
+            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendMessageAsync(text, isTTS, embed, allowedMentions, options).ConfigureAwait(false);
         }
 
         /// <summary>

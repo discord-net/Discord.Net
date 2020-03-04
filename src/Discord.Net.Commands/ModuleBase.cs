@@ -31,9 +31,10 @@ namespace Discord.Commands
         /// </param>
         /// <param name="isTTS">Specifies if Discord should read this <paramref name="message"/> aloud using text-to-speech.</param>
         /// <param name="embed">An embed to be displayed alongside the <paramref name="message"/>.</param>
-        protected virtual async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null)
+        /// <param name="allowedMentions">The types of mentions that will be send with this message.</param>
+        protected virtual async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, AllowedMentions allowedMentions = null, RequestOptions options = null)
         {
-            return await Context.Channel.SendMessageAsync(message, isTTS, embed, options).ConfigureAwait(false);
+            return await Context.Channel.SendMessageAsync(message, isTTS, embed, allowedMentions, options).ConfigureAwait(false);
         }
         /// <summary>
         ///     The method to execute before executing the command.
