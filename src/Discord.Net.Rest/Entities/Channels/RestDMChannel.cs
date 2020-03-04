@@ -206,7 +206,7 @@ namespace Discord.Rest
         async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler)
             => await SendFileAsync(stream, filename, text, isTTS, embed, options, isSpoiler).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, RequestOptions options)
+        async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options, AllowedMentions allowedMentions)
             => await SendMessageAsync(text, isTTS, embed, allowedMentions, options).ConfigureAwait(false);
 
         //IChannel
