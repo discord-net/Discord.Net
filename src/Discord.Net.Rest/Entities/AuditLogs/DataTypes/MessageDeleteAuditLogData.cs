@@ -17,7 +17,7 @@ namespace Discord.Rest
 
         internal static MessageDeleteAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            return new MessageDeleteAuditLogData(entry.Options.MessageDeleteChannelId.Value, entry.Options.MessageDeleteCount.Value, entry.TargetId.Value);
+            return new MessageDeleteAuditLogData(entry.Options.ChannelId.Value, entry.Options.Count.Value, entry.TargetId.Value);
         }
 
         /// <summary>

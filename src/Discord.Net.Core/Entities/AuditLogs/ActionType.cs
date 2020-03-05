@@ -61,6 +61,18 @@ namespace Discord
         ///     A guild member's role collection was updated.
         /// </summary>
         MemberRoleUpdated = 25,
+        /// <summary>
+        ///     A guild member moved to a voice channel.
+        /// </summary>
+        MemberMoved = 26,
+        /// <summary>
+        ///     A guild member disconnected from a voice channel.
+        /// </summary>
+        MemberDisconnected = 27,
+        /// <summary>
+        ///     A bot was added to this guild.
+        /// </summary>
+        BotAdded = 28,
 
         /// <summary>
         ///     A role was created in this guild.
@@ -117,6 +129,18 @@ namespace Discord
         /// <summary>
         ///     A message was deleted from this guild.
         /// </summary>
-        MessageDeleted = 72
+        MessageDeleted = 72,
+        /// <summary>
+        ///     Multiple messages were deleted from this guild.
+        /// </summary>
+        MessageBulkDeleted = 73,
+        /// <summary>
+        ///     A message was pinned from this guild.
+        /// </summary>
+        MessagePinned = 74,
+        /// <summary>
+        ///     A message was unpinned from this guild.
+        /// </summary>
+        MessageUnpinned = 75,
     }
 }
