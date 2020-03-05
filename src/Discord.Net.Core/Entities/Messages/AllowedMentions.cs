@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Discord
@@ -7,11 +8,26 @@ namespace Discord
     /// </summary>
     public class AllowedMentions
     {
+        private static readonly Lazy<AllowedMentions> none = new Lazy<AllowedMentions>(() => new AllowedMentions());
+        private static readonly Lazy<AllowedMentions> all = new Lazy<AllowedMentions>(() =>
+            new AllowedMentions(AllowedMentionTypes.Everyone | AllowedMentionTypes.Users | AllowedMentionTypes.Roles));
+
+        /// <summary>
+        ///     Gets a value which indicates that no mentions in the message content should notify users.
+        /// </summary>
+        public static AllowedMentions None => none.Value;
+
+        /// <summary>
+        ///     Gets a value which indicates that all mentions in the message content should notify users.
+        /// </summary>
+        public static AllowedMentions All => all.Value;
+
         /// <summary>
         ///     Gets or sets the type of mentions that will be parsed from the message content.
         ///     The <see cref="AllowedMentionTypes.Users"/> flag is mutually exclusive with the <see cref="UserIds"/>
         ///     property, and the <see cref="AllowedMentionTypes.Roles"/> flag is mutually exclusive with the
         ///     <see cref="RoleIds"/> property.
+        ///     If <c>null</c>, only the Ids specified in <see cref="UserIds"/> and <see cref="RoleIds"/> will be mentioned.
         /// </summary>
         public AllowedMentionTypes? AllowedTypes { get; set; }
 
@@ -30,5 +46,17 @@ namespace Discord
         ///     must be <c>null</c> or empty.
         /// </summary>
         public List<ulong> UserIds { get; set; }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="AllowedMentions"/> class.
+        /// </summary>
+        /// <param name="allowedTypes">
+        ///     The types of mentions to parse from the message content.
+        ///     If <c>null</c>, only the Ids specified in <see cref="UserIds"/> and <see cref="RoleIds"/> will be mentioned.
+        /// </param>
+        public AllowedMentions(AllowedMentionTypes? allowedTypes = null)
+        {
+            AllowedTypes = allowedTypes;
+        }
     }
 }
