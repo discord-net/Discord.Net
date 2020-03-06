@@ -1,3 +1,5 @@
+using System.Linq;
+
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -8,16 +10,17 @@ namespace Discord.Rest
     /// </summary>
     public class MessageUnpinAuditLogData : IAuditLogData
     {
-        private MessageUnpinAuditLogData(ulong messageId, ulong channelId, ulong authorId)
+        private MessageUnpinAuditLogData(ulong messageId, ulong channelId, IUser user)
         {
             MessageId = messageId;
             ChannelId = channelId;
-            AuthorId = authorId;
+            Target = user;
         }
 
         internal static MessageUnpinAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            return new MessageUnpinAuditLogData(entry.Options.MessageId.Value, entry.Options.ChannelId.Value, entry.TargetId.Value);
+            var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
+            return new MessageUnpinAuditLogData(entry.Options.MessageId.Value, entry.Options.ChannelId.Value, RestUser.Create(discord, userInfo));
         }
 
         /// <summary>
@@ -35,11 +38,11 @@ namespace Discord.Rest
         /// </returns>
         public ulong ChannelId { get; }
         /// <summary>
-        ///     Gets the author of the message that was unpinned.
+        ///     Gets the user of the message that was unpinned.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identifier for the user whose message was unpinned.
+        ///     A user object representing the user that created the unpinned message.
         /// </returns>
-        public ulong AuthorId { get; }
+        public IUser Target { get; }
     }
 }

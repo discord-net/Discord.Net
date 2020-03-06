@@ -1,3 +1,5 @@
+using System.Linq;
+
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -8,22 +10,23 @@ namespace Discord.Rest
     /// </summary>
     public class BotAddAuditLogData : IAuditLogData
     {
-        private BotAddAuditLogData(ulong botId)
+        private BotAddAuditLogData(IUser bot)
         {
-            BotId = botId;
+            Target = bot;
         }
 
         internal static BotAddAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            return new BotAddAuditLogData(entry.TargetId.Value);
+            var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
+            return new BotAddAuditLogData(RestUser.Create(discord, userInfo));
         }
 
         /// <summary>
-        ///     Gets the ID of the bot that was added.
+        ///     Gets the bot that was added.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identifier for the bot that was added.
+        ///     A user object representing the bot.
         /// </returns>
-        public ulong BotId { get; }
+        public IUser Target { get; }
     }
 }

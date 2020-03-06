@@ -1,3 +1,5 @@
+using System.Linq;
+
 using Model = Discord.API.AuditLog;
 using EntryModel = Discord.API.AuditLogEntry;
 
@@ -8,16 +10,17 @@ namespace Discord.Rest
     /// </summary>
     public class MessagePinAuditLogData : IAuditLogData
     {
-        private MessagePinAuditLogData(ulong messageId, ulong channelId, ulong authorId)
+        private MessagePinAuditLogData(ulong messageId, ulong channelId, IUser user)
         {
             MessageId = messageId;
             ChannelId = channelId;
-            AuthorId = authorId;
+            Target = user;
         }
 
         internal static MessagePinAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            return new MessagePinAuditLogData(entry.Options.MessageId.Value, entry.Options.ChannelId.Value, entry.TargetId.Value);
+            var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
+            return new MessagePinAuditLogData(entry.Options.MessageId.Value, entry.Options.ChannelId.Value, RestUser.Create(discord, userInfo));
         }
 
         /// <summary>
@@ -35,11 +38,11 @@ namespace Discord.Rest
         /// </returns>
         public ulong ChannelId { get; }
         /// <summary>
-        ///     Gets the author of the message that was pinned.
+        ///     Gets the user of the message that was pinned.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identifier for the user whose message was pinned.
+        ///     A user object representing the user that created the pinned message.
         /// </returns>
-        public ulong AuthorId { get; }
+        public IUser Target { get; }
     }
 }
