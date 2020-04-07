@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Based on https://github.com/terrafx/terrafx/blob/master/Directory.Build.props -->
+<!-- Copyright © Tanner Gooding and Contributors -->
+<Project>
+
+  <!--
+    Directory.Build.props is automatically picked up and imported by
+    Microsoft.Common.props. This file needs to exist, even if empty so that
+    files in the parent directory tree, with the same name, are not imported
+    instead. The import fairly early and only Sdk.props will have been imported
+    beforehand. We also don't need to add ourselves to MSBuildAllProjects, as
+    that is done by the file that imports us.
+  -->
+
+  <!-- Default settings that are used by other settings -->
+  <PropertyGroup>
+    <BaseArtifactsPath>$(MSBuildThisFileDirectory)artifacts/</BaseArtifactsPath>
+    <BaseArtifactsPathSuffix>$(DiscordNetProjectCategory)/$(MSBuildProjectName)</BaseArtifactsPathSuffix>
+    <RepositoryUrl>https://github.com/discord-net/Discord.Net</RepositoryUrl>
+  </PropertyGroup>
+
+  <!-- Default settings that explicitly differ from the Sdk.props defaults  -->
+  <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <BaseIntermediateOutputPath>$(BaseArtifactsPath)obj/$(BaseArtifactsPathSuffix)/</BaseIntermediateOutputPath>
+    <DebugType>embedded</DebugType>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+    <Nullable>enable</Nullable>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+  </PropertyGroup>
+
+  <!-- Default settings that explicitly differ from the Sdk.targets defaults-->
+  <PropertyGroup>
+    <Authors>RogueException;FiniteReality;</Authors>
+    <BaseOutputPath>$(BaseArtifactsPath)bin/$(BaseArtifactsPathSuffix)/</BaseOutputPath>
+    <Company>Discord-Net</Company>
+    <PackageOutputPath Condition="'$(PlatformName)' == 'AnyCPU'">$(BaseArtifactsPath)pkg/$(Configuration)</PackageOutputPath>
+    <PackageOutputPath Condition="'$(PlatformName)' != 'AnyCPU'">$(BaseArtifactsPath)pkg/$(Configuration)</PackageOutputPath>
+    <Product>Discord.Net</Product>
+    <VersionPrefix>3.0.0</VersionPrefix>
+    <VersionSuffix>alpha</VersionSuffix>
+    <VersionSuffix Condition="'$(SYSTEM_PULLREQUEST_PULLREQUESTNUMBER)' != ''">pr$(SYSTEM_PULLREQUEST_PULLREQUESTNUMBER)</VersionSuffix>
+  </PropertyGroup>
+
+  <!-- Default settings that are otherwise undefined -->
+  <PropertyGroup>
+    <Copyright>Copyright © Discord.Net Contributors.</Copyright>
+    <Description>An asynchronous API wrapper for Discord.</Description>
+    <Features>strict</Features>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <HighEntropyVA>true</HighEntropyVA>
+    <LangVersion>preview</LangVersion>
+    <MinClientVersion>4.3</MinClientVersion>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <OverwriteReadOnlyFiles>true</OverwriteReadOnlyFiles>
+    <PackageIconUrl>https://github.com/Discord-Net/Discord.Net/raw/dev/docs/marketing/logo/PackageLogo.png</PackageIconUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RestoreSources>
+      https://api.nuget.org/v3/index.json
+    </RestoreSources>
+    <UseSharedCompilation>true</UseSharedCompilation>
+  </PropertyGroup>
+
+  <!-- Default settings for .NET projects that are otherwise undefined -->
+  <PropertyGroup Condition="'$(TargetRuntime)' != 'Native'">
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+  </PropertyGroup>
+
+  <!-- Package references which are consumed by all .NET projects -->
+  <ItemGroup Condition="'$(TargetRuntime)' != 'Native'">
+    <PackageReference Include="Microsoft.Net.Compilers.Toolset" IsImplicitlyDefined="true" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>
