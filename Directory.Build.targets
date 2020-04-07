@@ -16,7 +16,7 @@
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);$(OS)</DefineConstants>
     <NoWarn>$(NoWarn);NU5105</NoWarn>
-    <PackageVersion Condition="'$(BUILD_BUILDNUMBER)' != ''">$(Version).$(BUILD_BUILDNUMBER)</PackageVersion>
+    <PackageVersion Condition="'$(GITHUB_RUN_ID)' != ''">$(Version).$(GITHUB_RUN_ID)</PackageVersion>
   </PropertyGroup>
 
   <!-- Package versions for package references across all projects -->

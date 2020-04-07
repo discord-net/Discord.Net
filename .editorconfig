@@ -8,7 +8,7 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
-[*.{cmd,config,csproj,cxxproj,json,props,ps1,resx,sh,targets}]
+[*.{cmd,config,csproj,cxxproj,json,props,ps1,resx,sh,targets,yml}]
 indent_size = 2
 
 [*.sln]

@@ -12,6 +12,11 @@
     that is done by the file that imports us.
   -->
 
+  <!-- Settings used for versioning -->
+  <PropertyGroup>
+    <PullRequestNumber Condition="$(GITHUB_REF.StartsWith('refs/pull'))">$([System.String]::Copy('$(GITHUB_REF)').Replace('refs/pull/', '').Replace('/merge', ''))</PullRequestNumber>
+  </PropertyGroup>
+
   <!-- Default settings that are used by other settings -->
   <PropertyGroup>
     <BaseArtifactsPath>$(MSBuildThisFileDirectory)artifacts/</BaseArtifactsPath>
@@ -45,7 +50,7 @@
     <Product>Discord.Net</Product>
     <VersionPrefix>3.0.0</VersionPrefix>
     <VersionSuffix>alpha</VersionSuffix>
-    <VersionSuffix Condition="'$(SYSTEM_PULLREQUEST_PULLREQUESTNUMBER)' != ''">pr$(SYSTEM_PULLREQUEST_PULLREQUESTNUMBER)</VersionSuffix>
+    <VersionSuffix Condition="'$(PullRequestNumber)' != ''">pr$(PullRequestNumber)</VersionSuffix>
   </PropertyGroup>
 
   <!-- Default settings that are otherwise undefined -->
@@ -59,7 +64,7 @@
     <MinClientVersion>4.3</MinClientVersion>
     <NeutralLanguage>en-US</NeutralLanguage>
     <OverwriteReadOnlyFiles>true</OverwriteReadOnlyFiles>
-    <PackageIconUrl>https://github.com/Discord-Net/Discord.Net/raw/dev/docs/marketing/logo/PackageLogo.png</PackageIconUrl>
+    <PackageIcon>PackageLogo.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
@@ -68,6 +73,11 @@
     </RestoreSources>
     <UseSharedCompilation>true</UseSharedCompilation>
   </PropertyGroup>
+
+  <!-- Package icons -->
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)/docs/marketing/logo/PackageLogo.png" Pack="True" PackagePath="" />
+  </ItemGroup>
 
   <!-- Default settings for .NET projects that are otherwise undefined -->
   <PropertyGroup Condition="'$(TargetRuntime)' != 'Native'">
