@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{381B0F15-BA2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Core", "src\Core\Discord.Net.Core.csproj", "{57A52C6A-337D-4165-A42D-94FAC87B2807}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B960E106-DC21-4A28-9C28-6AA0B49346BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Core.UnitTests", "test\Discord.Net.Core.UnitTests\Discord.Net.Core.UnitTests.csproj", "{1A1D1A6F-F9DD-4A14-9F93-9B4C88F0B534}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,8 +36,21 @@ Global
 		{57A52C6A-337D-4165-A42D-94FAC87B2807}.Release|x64.Build.0 = Release|Any CPU
 		{57A52C6A-337D-4165-A42D-94FAC87B2807}.Release|x86.ActiveCfg = Release|Any CPU
 		{57A52C6A-337D-4165-A42D-94FAC87B2807}.Release|x86.Build.0 = Release|Any CPU
+		{1A1D1A6F-F9DD-4A14-9F93-9B4C88F0B534}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A1D1A6F-F9DD-4A14-9F93-9B4C88F0B534}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A1D1A6F-F9DD-4A14-9F93-9B4C88F0B534}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1A1D1A6F-F9DD-4A14-9F93-9B4C88F0B534}.Debug|x64.Build.0 = Debug|Any CPU
+		{1A1D1A6F-F9DD-4A14-9F93-9B4C88F0B534}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1A1D1A6F-F9DD-4A14-9F93-9B4C88F0B534}.Debug|x86.Build.0 = Debug|Any CPU
+		{1A1D1A6F-F9DD-4A14-9F93-9B4C88F0B534}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A1D1A6F-F9DD-4A14-9F93-9B4C88F0B534}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A1D1A6F-F9DD-4A14-9F93-9B4C88F0B534}.Release|x64.ActiveCfg = Release|Any CPU
+		{1A1D1A6F-F9DD-4A14-9F93-9B4C88F0B534}.Release|x64.Build.0 = Release|Any CPU
+		{1A1D1A6F-F9DD-4A14-9F93-9B4C88F0B534}.Release|x86.ActiveCfg = Release|Any CPU
+		{1A1D1A6F-F9DD-4A14-9F93-9B4C88F0B534}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{57A52C6A-337D-4165-A42D-94FAC87B2807} = {381B0F15-BA2C-4E23-BE68-015462861AF0}
+		{1A1D1A6F-F9DD-4A14-9F93-9B4C88F0B534} = {B960E106-DC21-4A28-9C28-6AA0B49346BB}
 	EndGlobalSection
 EndGlobal
