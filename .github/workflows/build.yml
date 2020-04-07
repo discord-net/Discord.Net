@@ -21,16 +21,16 @@ jobs:
         run: dotnet restore
 
       - name: Build Discord.Net
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --no-restore --configuration Release
 
       - name: Run Unit Tests
-        run: dotnet test --no-restore --verbosity normal
+        run: dotnet test --no-build --verbosity normal
 
       - name: Pack Discord.Net
-        run: dotnet pack --configuration Release
+        run: dotnet pack --no-build --configuration Release
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v1.0.0
         with:
           name: nupkgs
-          path: $GITHUB_WORKSPACE/artifacts/pkg/
+          path: ${{ github.workspace }}/artifacts/pkg/
