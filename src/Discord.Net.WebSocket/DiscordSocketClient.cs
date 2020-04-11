@@ -306,6 +306,14 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override SocketChannel GetChannel(ulong id)
             => State.GetChannel(id);
+        /// <summary>
+        ///     Clears all cached channels from the client.
+        /// </summary>
+        public void PurgeChannelCache() => State.PurgeAllChannels();
+        /// <summary>
+        ///     Clears cached DM channels from the client.
+        /// </summary>
+        public void PurgeDMChannelCache() => State.PurgeDMChannels();
 
         /// <inheritdoc />
         public override SocketUser GetUser(ulong id)
@@ -313,6 +321,10 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override SocketUser GetUser(string username, string discriminator)
             => State.Users.FirstOrDefault(x => x.Discriminator == discriminator && x.Username == username);
+        /// <summary>
+        ///     Clears cached users from the client.
+        /// </summary>
+        public void PurgeUserCache() => State.PurgeUsers();
         internal SocketGlobalUser GetOrCreateUser(ClientState state, Discord.API.User model)
         {
             return state.GetOrAddUser(model.Id, x =>
