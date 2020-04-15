@@ -1,5 +1,8 @@
 # Changelog
 
+## [2.2.0] - 2020-04-14
+TODO: write changelog
+
 ## [2.1.1] - 2019-06-08
 ### Fixed
 - #994: Remainder parameters now ignore character escaping, as there is no reason to escape characters here (2e95c49)
