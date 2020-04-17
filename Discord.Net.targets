@@ -1,8 +1,8 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <VersionPrefix>2.2.0</VersionPrefix>
-        <VersionSuffix></VersionSuffix>
-        <Authors>RogueException</Authors>
+        <VersionPrefix>2.3.0</VersionPrefix>
+        <VersionSuffix>dev</VersionSuffix>
+        <Authors>Discord.Net Contributors</Authors>
         <PackageTags>discord;discordapp</PackageTags>
         <PackageProjectUrl>https://github.com/RogueException/Discord.Net</PackageProjectUrl>
         <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>

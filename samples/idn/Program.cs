@@ -37,18 +37,22 @@ namespace idn
             var client = new DiscordSocketClient(new DiscordSocketConfig { LogLevel = LogSeverity.Debug });
             var logQueue = new ConcurrentQueue<LogMessage>();
             var logCancelToken = new CancellationTokenSource();
+            int presenceUpdates = 0;
 
             client.Log += msg =>
             {
                 logQueue.Enqueue(msg);
                 return Task.CompletedTask;
             };
+            Console.CancelKeyPress += (_ev, _s) =>
+            {
+                logCancelToken.Cancel();
+            };
 
             var logTask = Task.Run(async () =>
             {
                 var fs = new FileStream("idn.log", FileMode.Append);
-                //var f = File.Open("idn.log", FileMode.Append);
-                StringBuilder logStringBuilder = new StringBuilder(200);
+                var logStringBuilder = new StringBuilder(200);
                 string logString = "";
 
                 byte[] helloBytes = Encoding.UTF8.GetBytes($"### new log session: {DateTime.Now} ###\n\n");
@@ -58,15 +62,25 @@ namespace idn
                 {
                     if (logQueue.TryDequeue(out var msg))
                     {
+                        if (msg.Message?.IndexOf("PRESENCE_UPDATE)") > 0)
+                        {
+                            presenceUpdates++;
+                            continue;
+                        }
+
                         _ = msg.ToString(builder: logStringBuilder);
                         logStringBuilder.AppendLine();
                         logString = logStringBuilder.ToString();
 
                         Debug.Write(logString, "DNET");
-                        await fs.WriteAsync(Encoding.UTF8.GetBytes(logString), logCancelToken.Token);
+                        await fs.WriteAsync(Encoding.UTF8.GetBytes(logString));
                     }
                     await fs.FlushAsync();
-                    await Task.Delay(100, logCancelToken.Token);
+                    try
+                    {
+                        await Task.Delay(100, logCancelToken.Token);
+                    }
+                    finally { }
                 }
 
                 byte[] goodbyeBytes = Encoding.UTF8.GetBytes($"#!! end log session: {DateTime.Now} !!#\n\n\n");
@@ -84,6 +98,7 @@ namespace idn
             var globals = new ScriptGlobals
             {
                 Client = client,
+                PUCount = -1,
             };
 
             while (true)
@@ -99,6 +114,7 @@ namespace idn
                 object eval;
                 try
                 {
+                    globals.PUCount = presenceUpdates;
                     eval = await CSharpScript.EvaluateAsync(input, options, globals);
                 }
                 catch (Exception e)
@@ -130,6 +146,7 @@ namespace idn
         public class ScriptGlobals
         {
             public DiscordSocketClient Client { get; set; }
+            public int PUCount { get; set; }
         }
     }
 }
