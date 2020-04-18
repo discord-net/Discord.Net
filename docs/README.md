@@ -1,4 +1,5 @@
 # Discord.Net #
+
 [![Discord](https://discordapp.com/api/guilds/81384788765712384/widget.png)](https://discord.gg/discord-api)
 
 An unofficial .NET library for the [Discord API](https://discordapp.com/).
@@ -11,10 +12,9 @@ Our stable builds available from NuGet through the Discord.Net metapackage:
 Unstable "nightly" builds are available through our MyGet feed:
 `https://www.myget.org/F/discord-net/api/v3/index.json`
 
-
 ## Building ##
 
-At the minimum, .NET Core 2.1 is required to successfully build Discord.Net,
+At minimum, .NET Core 2.1 is required to successfully build Discord.Net,
 but .NET Core 3.1 is recommended. You should install the appropriate tools and
 components for your editor to open the Discord.Net solution file:
 
