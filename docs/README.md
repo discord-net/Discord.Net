@@ -1,7 +1,7 @@
 # Discord.Net #
 [![Discord](https://discordapp.com/api/guilds/81384788765712384/widget.png)](https://discord.gg/discord-api)
 
-An unofficial .NET library for the Discord API. (https://discordapp.com/)
+An unofficial .NET library for the [Discord API](https://discordapp.com/).
 
 ## Installation ##
 
@@ -14,9 +14,10 @@ Unstable "nightly" builds are available through our MyGet feed:
 
 ## Building ##
 
-At minimum, .NET Core 2.1 is required to successfully build Discord.Net, but
-.NET core 3.1 is recommended. You should install the appropriate tools and
+At the minimum, .NET Core 2.1 is required to successfully build Discord.Net,
+but .NET Core 3.1 is recommended. You should install the appropriate tools and
 components for your editor to open the Discord.Net solution file:
+
 - The .NET Core workload for Visual Studio
 - The C# build tools for Visual Studio Code
 - The .NET Core SDK for command line
@@ -28,15 +29,15 @@ As a rule, Discord.Net attempts to follow
 versioning.
 
 However, as Discord evolves and adds or changes existing endpoints, we may need
-to add code to support these. To do this, we will increment the minor version
-when adding new API surface to the library. To counter the inevitable breaking
+to add code to support these changes. To do this, we increment the minor version
+when adding new API surfaces to the library. To counter any inevitable breaking
 changes, we have decided that our public interfaces should be for
 *consumption only* - bot developers should not need to implement these
 interfaces for normal code.
 
-Additionally, as the Discord API changes, we may need to add, remove or change
+Additionally, as the Discord API changes, we may need to add, remove, or change
 parameters to certain methods. To ensure this breaks as little code as
-possible, we will use the following approach to deprecate old APIs and redirect
+possible, we use the following approach to deprecate old APIs and redirect
 users to new APIs, while retaining binary compatibility:
 
 ```cs
