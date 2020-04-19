@@ -408,7 +408,7 @@ namespace Discord.Commands
             var typeInfo = type.GetTypeInfo();
             if (typeInfo.IsEnum)
                 return true;
-            return _entityTypeReaders.Any(x => type == x.EntityType || typeInfo.ImplementedInterfaces.Contains(x.TypeReaderType));
+            return _entityTypeReaders.Any(x => type == x.EntityType || typeInfo.ImplementedInterfaces.Contains(x.EntityType));
         }
         internal void AddNullableTypeReader(Type valueType, TypeReader valueTypeReader)
         {
@@ -511,7 +511,7 @@ namespace Discord.Commands
                 await _commandExecutedEvent.InvokeAsync(Optional.Create<CommandInfo>(), context, searchResult).ConfigureAwait(false);
                 return searchResult;
             }
-                
+
 
             var commands = searchResult.Commands;
             var preconditionResults = new Dictionary<CommandMatch, PreconditionResult>();
