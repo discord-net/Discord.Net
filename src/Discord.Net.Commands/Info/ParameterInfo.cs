@@ -90,7 +90,10 @@ namespace Discord.Commands
         public async Task<TypeReaderResult> ParseAsync(ICommandContext context, string input, IServiceProvider services = null)
         {
             services = services ?? EmptyServiceProvider.Instance;
-            return await _reader.ReadAsync(context, input, services).ConfigureAwait(false);
+            var readerResult = await _reader.ReadAsync(context, input, services).ConfigureAwait(false);
+            return (!readerResult.IsSuccess && IsOptional)
+                ? TypeReaderResult.FromSuccess(DefaultValue)
+                : readerResult;
         }
 
         public override string ToString() => Name;
