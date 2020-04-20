@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Discord.Commands
@@ -36,6 +37,7 @@ namespace Discord.Commands
         /// </summary>
         public bool IsRemainder { get; }
         public bool IsMultiple { get; }
+        public bool UseDefaultOnFail { get; }
         /// <summary>
         ///     Gets the type of the parameter.
         /// </summary>
@@ -63,6 +65,7 @@ namespace Discord.Commands
             IsOptional = builder.IsOptional;
             IsRemainder = builder.IsRemainder;
             IsMultiple = builder.IsMultiple;
+            UseDefaultOnFail = (IsOptional && builder.Attributes.Any(attr => attr is FallbackToDefaultAttribute));
 
             Type = builder.ParameterType;
             DefaultValue = builder.DefaultValue;
@@ -91,7 +94,7 @@ namespace Discord.Commands
         {
             services = services ?? EmptyServiceProvider.Instance;
             var readerResult = await _reader.ReadAsync(context, input, services).ConfigureAwait(false);
-            return (!readerResult.IsSuccess && IsOptional)
+            return (!readerResult.IsSuccess && UseDefaultOnFail)
                 ? TypeReaderResult.FromSuccess(DefaultValue)
                 : readerResult;
         }
