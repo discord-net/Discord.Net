@@ -275,8 +275,8 @@ namespace Discord.Commands
 
             if (builder.TypeReader == null)
             {
-                builder.TypeReader = service.GetDefaultTypeReader(paramType)
-                    ?? service.GetTypeReaders(paramType)?.FirstOrDefault().Value;
+                builder.TypeReader = service.GetTypeReaders(paramType)?.FirstOrDefault().Value
+                    ?? service.GetDefaultTypeReader(paramType);
             }
         }
 
@@ -290,9 +290,13 @@ namespace Discord.Commands
                     return reader;
             }
 
+            var overrideTypeReader = service.GetOverrideTypeReader(paramType);
+            if (overrideTypeReader != null)
+                return overrideTypeReader;
+
             //We dont have a cached type reader, create one
             reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, services);
-            service.AddTypeReader(paramType, reader, false);
+            service.AddOverrideTypeReader(paramType, reader);
 
             return reader;
         }

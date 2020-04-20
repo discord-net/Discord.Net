@@ -49,6 +49,7 @@ namespace Discord.Commands
         private readonly ConcurrentDictionary<Type, ModuleInfo> _typedModuleDefs;
         private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>> _typeReaders;
         private readonly ConcurrentDictionary<Type, TypeReader> _defaultTypeReaders;
+        private readonly ConcurrentDictionary<Type, TypeReader> _overrideTypeReaders;
         private readonly ImmutableList<(Type EntityType, Type TypeReaderType)> _entityTypeReaders;
         private readonly HashSet<ModuleInfo> _moduleDefs;
         private readonly CommandMap _map;
@@ -109,6 +110,7 @@ namespace Discord.Commands
             _moduleDefs = new HashSet<ModuleInfo>();
             _map = new CommandMap(this);
             _typeReaders = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>>();
+            _overrideTypeReaders = new ConcurrentDictionary<Type, TypeReader>();
 
             _defaultTypeReaders = new ConcurrentDictionary<Type, TypeReader>();
             foreach (var type in PrimitiveParsers.SupportedTypes)
@@ -348,10 +350,11 @@ namespace Discord.Commands
         /// <param name="reader">An instance of the <see cref="TypeReader" /> to be added.</param>
         public void AddTypeReader(Type type, TypeReader reader)
         {
-            if (_defaultTypeReaders.ContainsKey(type))
-                _ = _cmdLogger.WarningAsync($"The default TypeReader for {type.FullName} was replaced by {reader.GetType().FullName}." +
-                    "To suppress this message, use AddTypeReader<T>(reader, true).");
-            AddTypeReader(type, reader, true);
+            var readers = _typeReaders.GetOrAdd(type, x => new ConcurrentDictionary<Type, TypeReader>());
+            readers[reader.GetType()] = reader;
+
+            if (type.GetTypeInfo().IsValueType)
+                AddNullableTypeReader(type, reader);
         }
         /// <summary>
         ///     Adds a custom <see cref="TypeReader" /> to this <see cref="CommandService" /> for the supplied object
@@ -365,8 +368,9 @@ namespace Discord.Commands
         ///     Defines whether the <see cref="TypeReader"/> should replace the default one for
         ///     <see cref="Type" /> if it exists.
         /// </param>
+        [Obsolete("This method is deprecated. Use the method without the replaceDefault argument.")]
         public void AddTypeReader<T>(TypeReader reader, bool replaceDefault)
-            => AddTypeReader(typeof(T), reader, replaceDefault);
+            => AddTypeReader(typeof(T), reader);
         /// <summary>
         ///     Adds a custom <see cref="TypeReader" /> to this <see cref="CommandService" /> for the supplied object
         ///     type.
@@ -379,27 +383,10 @@ namespace Discord.Commands
         ///     Defines whether the <see cref="TypeReader"/> should replace the default one for <see cref="Type" /> if
         ///     it exists.
         /// </param>
+        [Obsolete("This method is deprecated. Use the method without the replaceDefault argument.")]
         public void AddTypeReader(Type type, TypeReader reader, bool replaceDefault)
-        {
-            if (replaceDefault && HasDefaultTypeReader(type))
-            {
-                _defaultTypeReaders.AddOrUpdate(type, reader, (k, v) => reader);
-                if (type.GetTypeInfo().IsValueType)
-                {
-                    var nullableType = typeof(Nullable<>).MakeGenericType(type);
-                    var nullableReader = NullableTypeReader.Create(type, reader);
-                    _defaultTypeReaders.AddOrUpdate(nullableType, nullableReader, (k, v) => nullableReader);
-                }
-            }
-            else
-            {
-                var readers = _typeReaders.GetOrAdd(type, x => new ConcurrentDictionary<Type, TypeReader>());
-                readers[reader.GetType()] = reader;
+            => AddTypeReader(type, reader);
 
-                if (type.GetTypeInfo().IsValueType)
-                    AddNullableTypeReader(type, reader);
-            }
-        }
         internal bool HasDefaultTypeReader(Type type)
         {
             if (_defaultTypeReaders.ContainsKey(type))
@@ -408,7 +395,7 @@ namespace Discord.Commands
             var typeInfo = type.GetTypeInfo();
             if (typeInfo.IsEnum)
                 return true;
-            return _entityTypeReaders.Any(x => type == x.EntityType || typeInfo.ImplementedInterfaces.Contains(x.TypeReaderType));
+            return _entityTypeReaders.Any(x => type == x.EntityType || typeInfo.ImplementedInterfaces.Contains(x.EntityType));
         }
         internal void AddNullableTypeReader(Type valueType, TypeReader valueTypeReader)
         {
@@ -416,11 +403,43 @@ namespace Discord.Commands
             var nullableReader = NullableTypeReader.Create(valueType, valueTypeReader);
             readers[nullableReader.GetType()] = nullableReader;
         }
+        internal void AddOverrideTypeReader(Type valueType, TypeReader valueTypeReader)
+        {
+            _overrideTypeReaders[valueType] = valueTypeReader;
+        }
+        internal TypeReader GetOverrideTypeReader(Type type)
+        {
+            if (_overrideTypeReaders.TryGetValue(type, out var definedTypeReader))
+                return definedTypeReader;
+            return null;
+        }
         internal IDictionary<Type, TypeReader> GetTypeReaders(Type type)
         {
             if (_typeReaders.TryGetValue(type, out var definedTypeReaders))
                 return definedTypeReaders;
-            return null;
+
+            var entityReaders = _typeReaders.Where(x => x.Key.IsAssignableFrom(type));
+
+            int assignableTo = -1;
+            KeyValuePair<Type, ConcurrentDictionary<Type, TypeReader>>? typeReader = null;
+            foreach (var entityReader in entityReaders)
+            {
+                int assignables = entityReaders.Sum(x => !x.Equals(entityReader) && x.Key.IsAssignableFrom(entityReader.Key) ? 1 : 0);
+                if (assignableTo == -1)
+                {
+                    // First time
+                    assignableTo = assignables;
+                    typeReader = entityReader;
+                }
+                // Try to get the "higher" interface. IMessageChannel is assignable to IChannel, but not the inverse
+                else if (assignables > assignableTo)
+                {
+                    assignableTo = assignables;
+                    typeReader = entityReader;
+                }
+            }
+
+            return typeReader?.Value;
         }
         internal TypeReader GetDefaultTypeReader(Type type)
         {
@@ -511,7 +530,7 @@ namespace Discord.Commands
                 await _commandExecutedEvent.InvokeAsync(Optional.Create<CommandInfo>(), context, searchResult).ConfigureAwait(false);
                 return searchResult;
             }
-                
+
 
             var commands = searchResult.Commands;
             var preconditionResults = new Dictionary<CommandMatch, PreconditionResult>();
