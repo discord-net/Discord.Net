@@ -9,7 +9,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketInvite : SocketEntity<string>, IInviteMetadata
     {
-         private long _createdAtTicks;
+        private long _createdAtTicks;
 
         /// <inheritdoc />
         public ulong ChannelId { get; private set; }
@@ -24,11 +24,26 @@ namespace Discord.WebSocket
         /// </summary>
         public SocketGuild Guild { get; private set; }
         /// <inheritdoc />
-        ChannelType IInvite.ChannelType => throw new NotImplementedException();
+        ChannelType IInvite.ChannelType
+        {
+            get
+            {
+                switch (Channel)
+                {
+                    case IVoiceChannel voiceChannel: return ChannelType.Voice;
+                    case ICategoryChannel categoryChannel: return ChannelType.Category;
+                    case IDMChannel dmChannel: return ChannelType.DM;
+                    case IGroupChannel groupChannel: return ChannelType.Group;
+                    case SocketNewsChannel socketNewsChannel: return ChannelType.News;
+                    case ITextChannel textChannel: return ChannelType.Text;
+                    default: throw new InvalidOperationException("Invalid channel type.");
+                }
+            }
+        }
         /// <inheritdoc />
-        string IInvite.ChannelName => throw new NotImplementedException();
+        string IInvite.ChannelName => Channel.Name;
         /// <inheritdoc />
-        string IInvite.GuildName => throw new NotImplementedException();
+        string IInvite.GuildName => Guild.Name;
         /// <inheritdoc />
         int? IInvite.PresenceCount => throw new NotImplementedException();
         /// <inheritdoc />
@@ -109,28 +124,9 @@ namespace Discord.WebSocket
         private string DebuggerDisplay => $"{Url} ({Guild?.Name} / {Channel.Name})";
 
         /// <inheritdoc />
-        IGuild IInvite.Guild
-        {
-            get
-            {
-                if (Guild != null)
-                    return Guild;
-                if (Channel is IGuildChannel guildChannel)
-                    return guildChannel.Guild; //If it fails, it'll still return this exception
-                throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
-            }
-        }
+        IGuild IInvite.Guild => Guild;
         /// <inheritdoc />
-        IChannel IInvite.Channel
-        {
-            get
-            {
-                if (Channel != null)
-                    return Channel;
-                throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
-            }
-        }
-
+        IChannel IInvite.Channel => Channel;
         /// <inheritdoc />
         IUser IInviteMetadata.Inviter => Inviter;
     }
