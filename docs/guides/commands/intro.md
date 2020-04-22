@@ -71,11 +71,11 @@ By now, your module should look like this:
 
 > [!WARNING]
 > **Avoid using long-running code** in your modules wherever possible.
-> You should **not** be implementing very much logic into your
-> modules, instead, outsource to a service for that.
+> Long-running code, by default, within a command module
+> can cause gateway thread to be blocked; therefore, interrupting
+> the bot's connection to Discord.
 >
-> If you are unfamiliar with Inversion of Control, it is recommended
-> to read the MSDN article on [IoC] and [Dependency Injection].
+> You may read more about it in @FAQ.Commands.General .
 
 The next step to creating commands is actually creating the commands.
 

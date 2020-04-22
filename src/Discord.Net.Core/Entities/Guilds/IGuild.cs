@@ -510,7 +510,7 @@ namespace Discord
         ///     Creates a new text channel in this guild.
         /// </summary>
         /// <example>
-        ///     The following example creates a new text channel under an existing category named <c>Wumpus</c> with a set topic.
+        ///     <para>The following example creates a new text channel under an existing category named <c>Wumpus</c> with a set topic.</para>
         ///     <code language="cs" region="CreateTextChannelAsync"
         ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Guilds\IGuild.Examples.cs"/>
         /// </example>

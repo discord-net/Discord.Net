@@ -270,7 +270,7 @@ namespace Discord
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains an <see cref="Int32"/>
+        ///     A task that represents the asynchronous get operation. The task result contains an <see cref="int"/>
         ///     that represents the number of shards that should be used with this account.
         /// </returns>
         Task<int> GetRecommendedShardCountAsync(RequestOptions options = null);

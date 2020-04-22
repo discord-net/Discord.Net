@@ -40,8 +40,8 @@ namespace Discord
         ///     Creates a new invite to this channel.
         /// </summary>
         /// <example>
-        ///     The following example creates a new invite to this channel; the invite lasts for 12 hours and can only
-        ///     be used 3 times throughout its lifespan.
+        ///     <para>The following example creates a new invite to this channel; the invite lasts for 12 hours and can only
+        ///     be used 3 times throughout its lifespan.</para>
         ///     <code language="cs">
         ///     await guildChannel.CreateInviteAsync(maxAge: 43200, maxUses: 3);
         ///     </code>
@@ -60,8 +60,8 @@ namespace Discord
         ///     Gets a collection of all invites to this channel.
         /// </summary>B
         /// <example>
-        ///     The following example gets all of the invites that have been created in this channel and selects the
-        ///     most used invite.
+        ///     <para>The following example gets all of the invites that have been created in this channel and selects the
+        ///     most used invite.</para>
         ///     <code language="cs">
         ///     var invites = await channel.GetInvitesAsync();
         ///     if (invites.Count == 0) return;
