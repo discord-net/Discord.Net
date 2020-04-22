@@ -19,6 +19,10 @@ namespace Discord.API.Gateway
         public int MaxAge { get; set; }
         [JsonProperty("max_uses")]
         public int MaxUses { get; set; }
+        [JsonProperty("target_user")]
+        public Optional<User> TargetUser { get; set; }
+        [JsonProperty("target_user_type")]
+        public Optional<TargetUserType> TargetUserType { get; set; }
         [JsonProperty("temporary")]
         public bool Temporary { get; set; }
         [JsonProperty("uses")]

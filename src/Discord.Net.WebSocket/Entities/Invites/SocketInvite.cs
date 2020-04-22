@@ -80,22 +80,31 @@ namespace Discord.WebSocket
         ///     Gets when this invite was created.
         /// </summary>
         public DateTimeOffset CreatedAt => DateTimeUtils.FromTicks(_createdAtTicks);
+        /// <summary>
+        ///     Gets the user targeted by this invite if available.
+        /// </summary>
+        public SocketUser TargetUser { get; private set; }
+        /// <summary>
+        ///     Gets the type of the user targeted by this invite if available.
+        /// </summary>
+        public TargetUserType? TargetUserType { get; private set; }
 
         /// <inheritdoc />
         public string Code => Id;
         /// <inheritdoc />
         public string Url => $"{DiscordConfig.InviteUrl}{Code}";
 
-        internal SocketInvite(DiscordSocketClient discord, SocketGuild guild, SocketGuildChannel channel, SocketGuildUser inviter, string id)
+        internal SocketInvite(DiscordSocketClient discord, SocketGuild guild, SocketGuildChannel channel, SocketGuildUser inviter, SocketUser target, string id)
             : base(discord, id)
         {
             Guild = guild;
             Channel = channel;
             Inviter = inviter;
+            TargetUser = target;
         }
-        internal static SocketInvite Create(DiscordSocketClient discord, SocketGuild guild, SocketGuildChannel channel, SocketGuildUser inviter, Model model)
+        internal static SocketInvite Create(DiscordSocketClient discord, SocketGuild guild, SocketGuildChannel channel, SocketGuildUser inviter, SocketUser target, Model model)
         {
-            var entity = new SocketInvite(discord, guild, channel, inviter, model.Code);
+            var entity = new SocketInvite(discord, guild, channel, inviter, target, model.Code);
             entity.Update(model);
             return entity;
         }
@@ -108,6 +117,7 @@ namespace Discord.WebSocket
             MaxUses = model.MaxUses;
             Uses = model.Uses;
             _createdAtTicks = model.CreatedAt.UtcTicks;
+            TargetUserType = model.TargetUserType.IsSpecified ? model.TargetUserType.Value : default(TargetUserType?);
         }
 
         /// <inheritdoc />
