@@ -1658,13 +1658,9 @@ namespace Discord.WebSocket
                                                 inviter = guild.AddOrUpdateUser(data.Inviter.Value);
                                         }
 
-                                        SocketUser target = null;
-                                        if (data.TargetUser.IsSpecified)
-                                        {
-                                            target = guild.GetUser(data.TargetUser.Value.Id);
-                                            if (target == null)
-                                                target = SocketUnknownUser.Create(this, State, data.TargetUser.Value);
-                                        }
+                                        SocketUser target =  data.TargetUser.IsSpecified
+                                            ? (guild.GetUser(data.TargetUser.Value.Id) ?? SocketUnknownUser.Create(this, State, data.TargetUser.Value))
+                                            : null;
 
                                         var invite = SocketInvite.Create(this, guild, channel, inviter, target, data);
 
