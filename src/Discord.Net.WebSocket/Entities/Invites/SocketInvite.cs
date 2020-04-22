@@ -117,7 +117,7 @@ namespace Discord.WebSocket
             MaxUses = model.MaxUses;
             Uses = model.Uses;
             _createdAtTicks = model.CreatedAt.UtcTicks;
-            TargetUserType = model.TargetUserType.IsSpecified ? model.TargetUserType.Value : TargetUserType.NotDefined;
+            TargetUserType = model.TargetUserType.IsSpecified ? model.TargetUserType.Value : TargetUserType.Undefined;
         }
 
         /// <inheritdoc />
