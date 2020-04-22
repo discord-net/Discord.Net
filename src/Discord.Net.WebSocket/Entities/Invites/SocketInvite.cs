@@ -85,9 +85,9 @@ namespace Discord.WebSocket
         /// </summary>
         public SocketUser TargetUser { get; private set; }
         /// <summary>
-        ///     Gets the type of the user targeted by this invite if available.
+        ///     Gets the type of the user targeted by this invite.
         /// </summary>
-        public TargetUserType? TargetUserType { get; private set; }
+        public TargetUserType TargetUserType { get; private set; }
 
         /// <inheritdoc />
         public string Code => Id;
@@ -117,7 +117,7 @@ namespace Discord.WebSocket
             MaxUses = model.MaxUses;
             Uses = model.Uses;
             _createdAtTicks = model.CreatedAt.UtcTicks;
-            TargetUserType = model.TargetUserType.IsSpecified ? model.TargetUserType.Value : default(TargetUserType?);
+            TargetUserType = model.TargetUserType.IsSpecified ? model.TargetUserType.Value : TargetUserType.NotDefined;
         }
 
         /// <inheritdoc />
