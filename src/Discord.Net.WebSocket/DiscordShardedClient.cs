@@ -389,8 +389,11 @@ namespace Discord.WebSocket
             {
                 if (disposing)
                 {
-                    foreach (var client in _shards)
-                        client?.Dispose();
+                    if (_shards != null)
+                    {
+                        foreach (var client in _shards)
+                            client?.Dispose();
+                    }
                     _connectionGroupLock?.Dispose();
                 }
 
