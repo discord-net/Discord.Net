@@ -44,7 +44,7 @@ namespace Discord.Commands
         /// </summary>
         /// <example>
         /// <code language="cs">
-        /// QuotationMarkAliasMap = new Dictionary&lt;char, char%gt;()
+        /// QuotationMarkAliasMap = new Dictionary&lt;char, char&gt;()
         /// {
         ///     {'\"', '\"' },
         ///     {'“', '”' },
