@@ -370,6 +370,15 @@ namespace Discord.WebSocket
 
         //Invites
         /// <summary> Fired when an invite is created. </summary>
+        /// <remarks>
+        ///     <para>
+        ///         This event is fired when an invite is created. The event handler must return a
+        ///         <see cref="Task"/> and accept a <see cref="SocketInvite"/> as its parameters.
+        ///     </para>
+        ///     <para>
+        ///         The invite created will be passed into the <see cref="SocketInvite"/> parameter.
+        ///     </para>
+        /// </remarks>
         public event Func<SocketInvite, Task> InviteCreated
         {
             add { _inviteCreatedEvent.Add(value); }
@@ -377,7 +386,19 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<SocketInvite, Task>> _inviteCreatedEvent = new AsyncEvent<Func<SocketInvite, Task>>();
         /// <summary> Fired when an invite is deleted. </summary>
-        /// <remarks> The string is the invite code. </remarks>
+        /// <remarks>
+        ///     <para>
+        ///         This event is fired when an invite is deleted. The event handler must return
+        ///         a <see cref="Task"/> and accept a <see cref="SocketGuildChannel"/> and
+        ///         <see cref="string"> as its parameters.
+        ///     </para>
+        ///     <para>
+        ///         The channel where this invite was will be passed into the <see cref="SocketGuildChannel"/> parameter.
+        ///     </para>
+        ///     <para>
+        ///         The code of the deleted invite will be passed into the <see cref="string"/> parameter.
+        ///     </para>
+        /// </remarks>
         public event Func<SocketGuildChannel, string, Task> InviteDeleted
         {
             add { _inviteDeletedEvent.Add(value); }
