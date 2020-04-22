@@ -88,7 +88,7 @@ implement [IEmote] and are valid options.
 
 ***
 
-[AddReactionAsync]: xref:Discord.IUserMessage.AddReactionAsync*
+[AddReactionAsync]: xref:Discord.IMessage.AddReactionAsync*
 
 ## What is a "preemptive rate limit?"
 

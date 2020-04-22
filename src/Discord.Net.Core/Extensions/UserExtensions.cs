@@ -44,8 +44,8 @@ namespace Discord
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
         /// <example>
-        ///     The following example uploads a streamed image that will be called <c>b1nzy.jpg</c> embedded inside a
-        ///     rich embed to the channel.
+        ///     <para>The following example uploads a streamed image that will be called <c>b1nzy.jpg</c> embedded inside a
+        ///     rich embed to the channel.</para>
         ///     <code language="cs">
         ///     await channel.SendFileAsync(b1nzyStream, "b1nzy.jpg",
         ///         embed: new EmbedBuilder {ImageUrl = "attachment://b1nzy.jpg"}.Build());
