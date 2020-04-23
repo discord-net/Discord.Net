@@ -25,7 +25,7 @@ Nightly builds are available through our MyGet feed (https://www.myget.org/F/dis
 
 ## Compiling
 In order to compile Discord.Net, you require the following:
-- [Visual Studio 2017](https://www.microsoft.com/net/core#windowsvs2017)
+- [Visual Studio 2017] (https://www.microsoft.com/net/core#windowsvs2017) (or higher)
 - [.NET Core SDK](https://www.microsoft.com/net/download/core)
 
 Notice: The .NET Core workload must be selected during Visual Studio installation.
