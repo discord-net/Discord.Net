@@ -10,7 +10,7 @@ An unofficial .NET API Wrapper for the [Discord Client](http://discordapp.com).
 Check out the [documentation](https://discord.foxbot.me/) or join the [Discord API Chat](https://discord.gg/jkrBmQR).
 
 ## Installation
-### Stable (NuGet)
+### Stable Build (via NuGet)
 Our stable builds available from NuGet through the Discord.Net metapackage:
 - [Discord.Net](https://www.nuget.org/packages/Discord.Net/)
 
@@ -20,7 +20,7 @@ The individual components may also be installed from NuGet:
 - [Discord.Net.WebSocket](https://www.nuget.org/packages/Discord.Net.WebSocket/)
 - [Discord.Net.Webhook](https://www.nuget.org/packages/Discord.Net.Webhook/)
 
-### Unstable (MyGet)
+### Unstable / Nightly Build (via MyGet)
 Nightly builds are available through our [MyGet Feed](https://www.myget.org/F/discord-net/api/v3/index.json).
 
 ## Compiling
