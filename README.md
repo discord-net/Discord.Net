@@ -5,7 +5,7 @@
 [![Build Status](https://dev.azure.com/discord-net/Discord.Net/_apis/build/status/discord-net.Discord.Net?branchName=dev)](https://dev.azure.com/discord-net/Discord.Net/_build/latest?definitionId=1&branchName=dev)
 [![Discord](https://discordapp.com/api/guilds/81384788765712384/widget.png)](https://discord.gg/jkrBmQR)
 
-An unofficial .NET API Wrapper for the Discord client (http://discordapp.com).
+An unofficial .NET API Wrapper for the [Discord Client](http://discordapp.com).
 
 Check out the [documentation](https://discord.foxbot.me/) or join the [Discord API Chat](https://discord.gg/jkrBmQR).
 
@@ -21,11 +21,11 @@ The individual components may also be installed from NuGet:
 - [Discord.Net.Webhook](https://www.nuget.org/packages/Discord.Net.Webhook/)
 
 ### Unstable (MyGet)
-Nightly builds are available through our MyGet feed (https://www.myget.org/F/discord-net/api/v3/index.json).
+Nightly builds are available through our [MyGet Feed](https://www.myget.org/F/discord-net/api/v3/index.json).
 
 ## Compiling
 In order to compile Discord.Net, you require the following:
-- [Visual Studio 2017 or higher](https://www.microsoft.com/net/core#windowsvs2017) 
+- [Visual Studio 2017+](https://www.microsoft.com/net/core#windowsvs2017) 
 - [.NET Core SDK](https://www.microsoft.com/net/download/core)
 
 Notice: The .NET Core workload must be selected during Visual Studio installation.
