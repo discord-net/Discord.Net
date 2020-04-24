@@ -627,11 +627,8 @@ namespace Discord.WebSocket
                                         var guild = AddGuild(data, State);
                                         if (guild != null)
                                         {
-                                            if (_unavailableGuildCount != 0)
-                                                _unavailableGuildCount--;
-                                                
-                                            await GuildAvailableAsync(guild).ConfigureAwait(false);
                                             await TimedInvokeAsync(_joinedGuildEvent, nameof(JoinedGuild), guild).ConfigureAwait(false);
+                                            await GuildAvailableAsync(guild).ConfigureAwait(false);
                                         }
                                         else
                                         {
