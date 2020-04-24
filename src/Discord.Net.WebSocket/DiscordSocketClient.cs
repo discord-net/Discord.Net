@@ -511,7 +511,7 @@ namespace Discord.WebSocket
                     case GatewayOpCode.Reconnect:
                         {
                             await _gatewayLogger.DebugAsync("Received Reconnect").ConfigureAwait(false);
-                            _connection.Error(new GatewayReconnectException());
+                            _connection.Error(new GatewayReconnectException("Server requested a reconnect"));
                         }
                         break;
                     case GatewayOpCode.Dispatch:
@@ -1689,7 +1689,7 @@ namespace Discord.WebSocket
                     {
                         if (ConnectionState == ConnectionState.Connected && (_guildDownloadTask?.IsCompleted ?? true))
                         {
-                            _connection.Error(new Exception("Server missed last heartbeat"));
+                            _connection.Error(new GatewayReconnectException("Server missed last heartbeat"));
                             return;
                         }
                     }
