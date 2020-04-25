@@ -264,7 +264,7 @@ namespace Discord.WebSocket
         {
 
             await _gatewayLogger.DebugAsync("Disconnecting ApiClient").ConfigureAwait(false);
-            await ApiClient.DisconnectAsync().ConfigureAwait(false);
+            await ApiClient.DisconnectAsync(ex).ConfigureAwait(false);
 
             //Wait for tasks to complete
             await _gatewayLogger.DebugAsync("Waiting for heartbeater").ConfigureAwait(false);
@@ -511,7 +511,7 @@ namespace Discord.WebSocket
                     case GatewayOpCode.Reconnect:
                         {
                             await _gatewayLogger.DebugAsync("Received Reconnect").ConfigureAwait(false);
-                            _connection.Error(new Exception("Server requested a reconnect"));
+                            _connection.Error(new GatewayReconnectException("Server requested a reconnect"));
                         }
                         break;
                     case GatewayOpCode.Dispatch:
@@ -1689,7 +1689,7 @@ namespace Discord.WebSocket
                     {
                         if (ConnectionState == ConnectionState.Connected && (_guildDownloadTask?.IsCompleted ?? true))
                         {
-                            _connection.Error(new Exception("Server missed last heartbeat"));
+                            _connection.Error(new GatewayReconnectException("Server missed last heartbeat"));
                             return;
                         }
                     }

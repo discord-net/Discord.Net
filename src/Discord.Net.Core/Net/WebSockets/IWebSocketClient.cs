@@ -14,7 +14,7 @@ namespace Discord.Net.WebSockets
         void SetCancelToken(CancellationToken cancelToken);
 
         Task ConnectAsync(string host);
-        Task DisconnectAsync();
+        Task DisconnectAsync(int closeCode = 1000);
 
         Task SendAsync(byte[] data, int index, int count, bool isText);
     }
