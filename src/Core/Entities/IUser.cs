@@ -1,7 +1,7 @@
 namespace Discord.Core
 {
     /// <summary>
-    /// An interface representing the collection of operations that can be
+    /// An interface representing the collection of operations which can be
     /// performed on a user.
     /// </summary>
     public interface IUser
