@@ -164,26 +164,17 @@ namespace Discord.API
             }
         }
 
-        public async Task DisconnectAsync()
+        public async Task DisconnectAsync(Exception ex = null)
         {
             await _stateLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await DisconnectInternalAsync().ConfigureAwait(false);
-            }
-            finally { _stateLock.Release(); }
-        }
-        public async Task DisconnectAsync(Exception ex)
-        {
-            await _stateLock.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                await DisconnectInternalAsync().ConfigureAwait(false);
+                await DisconnectInternalAsync(ex).ConfigureAwait(false);
             }
             finally { _stateLock.Release(); }
         }
         /// <exception cref="NotSupportedException">This client is not configured with WebSocket support.</exception>
-        internal override async Task DisconnectInternalAsync()
+        internal override async Task DisconnectInternalAsync(Exception ex = null)
         {
             if (WebSocketClient == null)
                 throw new NotSupportedException("This client is not configured with WebSocket support.");
@@ -194,6 +185,9 @@ namespace Discord.API
             try { _connectCancelToken?.Cancel(false); }
             catch { }
 
+            if (ex is GatewayReconnectException)
+                await WebSocketClient.DisconnectAsync(4000);
+            else
             await WebSocketClient.DisconnectAsync().ConfigureAwait(false);
 
             ConnectionState = ConnectionState.Disconnected;

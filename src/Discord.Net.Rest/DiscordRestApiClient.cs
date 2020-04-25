@@ -47,7 +47,7 @@ namespace Discord.API
         internal ulong? CurrentUserId { get; set; }
         public RateLimitPrecision RateLimitPrecision { get; private set; }
 		internal bool UseSystemClock { get; set; }
-        
+
         internal JsonSerializer Serializer => _serializer;
 
         /// <exception cref="ArgumentException">Unknown OAuth token type.</exception>
@@ -164,7 +164,7 @@ namespace Discord.API
             try { _loginCancelToken?.Cancel(false); }
             catch { }
 
-            await DisconnectInternalAsync().ConfigureAwait(false);
+            await DisconnectInternalAsync(null).ConfigureAwait(false);
             await RequestQueue.ClearAsync().ConfigureAwait(false);
 
             await RequestQueue.SetCancelTokenAsync(CancellationToken.None).ConfigureAwait(false);
@@ -175,7 +175,7 @@ namespace Discord.API
         }
 
         internal virtual Task ConnectInternalAsync() => Task.Delay(0);
-        internal virtual Task DisconnectInternalAsync() => Task.Delay(0);
+        internal virtual Task DisconnectInternalAsync(Exception ex = null) => Task.Delay(0);
 
         //Core
         internal Task SendAsync(string method, Expression<Func<string>> endpointExpr, BucketIds ids,
@@ -1062,7 +1062,7 @@ namespace Discord.API
             {
                 foreach (var roleId in args.RoleIds.Value)
                     Preconditions.NotEqual(roleId, 0, nameof(roleId));
-            }                
+            }
 
             options = RequestOptions.CreateOrClone(options);
 
