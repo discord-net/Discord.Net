@@ -8,7 +8,7 @@ such, don't expect them to be comprehensive or up to date.
 Usually, it's better to design types in terms of the fields they have, rather
 than using a discriminated union like the current `IChannel` interface.
 
-However, the design chosen in 1.0 led to [traits](wiki-traits), which in C# was
+However, the design chosen in 1.0 led to [traits][wiki-traits], which in C# was
 *notoriously* hard to work with, debug and expand. Most notably, in
 `1.0.0-beta2`, the internal implementation details were exposed in form of
 `SocketUserMessage`, `SocketTextChannel` etc. simply to make consumption
@@ -17,8 +17,8 @@ very hard, and has also caused us to be much slower when implementing updates
 from Discord.
 
 To simplify this, the current design has gone back to a centralised `IChannel`
-type, a la [D#+'s DiscordChannel](dsharpplus-channel) implementation. However,
-we are going to be using [Nullable Reference Types](nrts) to help reduce some
+type, a la [D#+'s DiscordChannel][dsharpplus-channel] implementation. However,
+we are going to be using [Nullable Reference Types][nrts] to help reduce some
 of the inevitable errors which will come around with a discriminated union
 approach. Furthermore, this design allows in the future a traits-like system to
 be implemented on top of it, once the design flaws have been worked out.
