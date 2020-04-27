@@ -373,7 +373,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     <para>
         ///         This event is fired when an invite is created. The event handler must return a
-        ///         <see cref="Task"/> and accept a <see cref="SocketInvite"/> as its parameters.
+        ///         <see cref="Task"/> and accept a <see cref="SocketInvite"/> as its parameter.
         ///     </para>
         ///     <para>
         ///         The invite created will be passed into the <see cref="SocketInvite"/> parameter.
@@ -390,10 +390,10 @@ namespace Discord.WebSocket
         ///     <para>
         ///         This event is fired when an invite is deleted. The event handler must return
         ///         a <see cref="Task"/> and accept a <see cref="SocketGuildChannel"/> and
-        ///         <see cref="string"> as its parameters.
+        ///         <see cref="string"/> as its parameter.
         ///     </para>
         ///     <para>
-        ///         The channel where this invite was will be passed into the <see cref="SocketGuildChannel"/> parameter.
+        ///         The channel where this invite was created will be passed into the <see cref="SocketGuildChannel"/> parameter.
         ///     </para>
         ///     <para>
         ///         The code of the deleted invite will be passed into the <see cref="string"/> parameter.
