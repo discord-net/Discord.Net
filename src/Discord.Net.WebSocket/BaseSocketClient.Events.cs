@@ -369,7 +369,9 @@ namespace Discord.WebSocket
         internal readonly AsyncEvent<Func<SocketGroupUser, Task>> _recipientRemovedEvent = new AsyncEvent<Func<SocketGroupUser, Task>>();
 
         //Invites
-        /// <summary> Fired when an invite is created. </summary>
+        /// <summary>
+        ///     Fired when an invite is created.
+        /// </summary>
         /// <remarks>
         ///     <para>
         ///         This event is fired when an invite is created. The event handler must return a
@@ -385,7 +387,9 @@ namespace Discord.WebSocket
             remove { _inviteCreatedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketInvite, Task>> _inviteCreatedEvent = new AsyncEvent<Func<SocketInvite, Task>>();
-        /// <summary> Fired when an invite is deleted. </summary>
+        /// <summary>
+        ///     Fired when an invite is deleted.
+        /// </summary>
         /// <remarks>
         ///     <para>
         ///         This event is fired when an invite is deleted. The event handler must return
