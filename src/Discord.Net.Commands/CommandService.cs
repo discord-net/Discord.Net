@@ -151,6 +151,20 @@ namespace Discord.Commands
             }
         }
 
+        internal Func<IServiceProvider, IModuleBase> GetModuleFactory(TypeInfo typeInfo, IServiceProvider services, IModuleFactory factory = null)
+        {
+            factory ??= (IModuleFactory)services.GetService(typeof(IModuleFactory));
+
+            if (factory != null)
+            {
+                return _ => (IModuleBase)factory.CreateBuilder(typeInfo, this)();
+            }
+            else
+            {
+                return ReflectionUtils.CreateBuilder<IModuleBase>(typeInfo, this);
+            }
+        }
+
         /// <summary>
         ///     Add a command module from a <see cref="Type" />.
         /// </summary>

@@ -197,7 +197,7 @@ namespace Discord.Commands
                 });
             }
 
-            var createInstance = ReflectionUtils.CreateBuilder<IModuleBase>(typeInfo, service);
+            var createInstance = service.GetModuleFactory(typeInfo, serviceprovider);
 
             async Task<IResult> ExecuteCallback(ICommandContext context, object[] args, IServiceProvider services, CommandInfo cmd)
             {
