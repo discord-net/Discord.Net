@@ -24,7 +24,7 @@ namespace Discord
         /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <param name="allowedMentions">
-        ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>. If <c>null</c>, all mentioned roles and users will be notified. If <c>null</c>, all mentioned roles and users will be notified.Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
+        ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
         ///     If <c>null</c>, all mentioned roles and users will be notified.
         /// </param>
         /// <returns>
