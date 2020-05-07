@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +15,7 @@ namespace Discord
         //public static IReadOnlyCollection<TValue> ToReadOnlyCollection<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> source)
         //    => new CollectionWrapper<TValue>(source.Select(x => x.Value), () => source.Count);
         public static IReadOnlyCollection<TValue> ToReadOnlyCollection<TKey, TValue>(this IDictionary<TKey, TValue> source)
-            => new CollectionWrapper<TValue>(source.Select(x => x.Value), () => source.Count);
+            => new CollectionWrapper<TValue>(source.Values, () => source.Count);
         public static IReadOnlyCollection<TValue> ToReadOnlyCollection<TValue, TSource>(this IEnumerable<TValue> query, IReadOnlyCollection<TSource> source)
             => new CollectionWrapper<TValue>(query, () => source.Count);
         public static IReadOnlyCollection<TValue> ToReadOnlyCollection<TValue>(this IEnumerable<TValue> query, Func<int> countFunc)
