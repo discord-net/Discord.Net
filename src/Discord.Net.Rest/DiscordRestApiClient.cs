@@ -602,13 +602,8 @@ namespace Discord.API
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
             Preconditions.NotNull(args, nameof(args));
-            if (args.Content.IsSpecified)
-            {
-                if (!args.Embed.IsSpecified)
-                    Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
-                if (args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
-                    throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
-            }
+            if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
+                throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(channelId: channelId);
