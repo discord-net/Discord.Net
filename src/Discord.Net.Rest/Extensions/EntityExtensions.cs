@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -59,6 +60,24 @@ namespace Discord.Rest
             if (entity.Video != null)
                 model.Video = entity.Video.Value.ToModel();
             return model;
+        }
+        public static API.AllowedMentions ToModel(this AllowedMentions entity)
+        {
+            return new API.AllowedMentions()
+            {
+                Parse = entity.AllowedTypes?.EnumerateMentionTypes().ToArray(),
+                Roles = entity.RoleIds?.ToArray(),
+                Users = entity.UserIds?.ToArray(),
+            };
+        }
+        public static IEnumerable<string> EnumerateMentionTypes(this AllowedMentionTypes mentionTypes)
+        {
+            if (mentionTypes.HasFlag(AllowedMentionTypes.Everyone))
+                yield return "everyone";
+            if (mentionTypes.HasFlag(AllowedMentionTypes.Roles))
+                yield return "roles";
+            if (mentionTypes.HasFlag(AllowedMentionTypes.Users))
+                yield return "users";
         }
         public static EmbedAuthor ToEntity(this API.EmbedAuthor model)
         {
