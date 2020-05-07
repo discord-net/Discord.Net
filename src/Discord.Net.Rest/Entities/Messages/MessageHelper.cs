@@ -32,6 +32,11 @@ namespace Discord.Rest
             var args = new MessageProperties();
             func(args);
 
+            bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(msg.Content);
+            bool hasEmbed = args.Embed.IsSpecified ? args.Embed.Value != null : msg.Embeds.Any();
+            if (!hasText && !hasEmbed)
+                Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
+
             var apiArgs = new API.Rest.ModifyMessageParams
             {
                 Content = args.Content,
