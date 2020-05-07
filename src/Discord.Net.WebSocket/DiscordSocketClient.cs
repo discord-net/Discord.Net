@@ -640,6 +640,7 @@ namespace Discord.WebSocket
                                         if (guild != null)
                                         {
                                             await TimedInvokeAsync(_joinedGuildEvent, nameof(JoinedGuild), guild).ConfigureAwait(false);
+                                            await GuildAvailableAsync(guild).ConfigureAwait(false);
                                         }
                                         else
                                         {
