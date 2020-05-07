@@ -4,11 +4,12 @@ namespace Discord.API
 {
     internal class AuditLogOptions
     {
-        //Message delete
         [JsonProperty("count")]
-        public int? MessageDeleteCount { get; set; }
+        public int? Count { get; set; }
         [JsonProperty("channel_id")]
-        public ulong? MessageDeleteChannelId { get; set; }
+        public ulong? ChannelId { get; set; }
+        [JsonProperty("message_id")]
+        public ulong? MessageId { get; set; }
 
         //Prune
         [JsonProperty("delete_member_days")]
