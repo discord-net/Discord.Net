@@ -2,6 +2,7 @@
     <PropertyGroup>
         <VersionPrefix>2.3.0</VersionPrefix>
         <VersionSuffix>dev</VersionSuffix>
+        <LangVersion>latest</LangVersion>
         <Authors>Discord.Net Contributors</Authors>
         <PackageTags>discord;discordapp</PackageTags>
         <PackageProjectUrl>https://github.com/RogueException/Discord.Net</PackageProjectUrl>
