@@ -44,7 +44,7 @@ namespace Discord.Net.WebSockets
             {
                 if (disposing)
                 {
-                    DisconnectInternalAsync(true).GetAwaiter().GetResult();
+                    DisconnectInternalAsync(isDisposing: true).GetAwaiter().GetResult();
                     _disconnectTokenSource?.Dispose();
                     _cancelTokenSource?.Dispose();
                     _lock?.Dispose();
@@ -94,19 +94,19 @@ namespace Discord.Net.WebSockets
             _task = RunAsync(_cancelToken);
         }
 
-        public async Task DisconnectAsync()
+        public async Task DisconnectAsync(int closeCode = 1000)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await DisconnectInternalAsync().ConfigureAwait(false);
+                await DisconnectInternalAsync(closeCode: closeCode).ConfigureAwait(false);
             }
             finally
             {
                 _lock.Release();
             }
         }
-        private async Task DisconnectInternalAsync(bool isDisposing = false)
+        private async Task DisconnectInternalAsync(int closeCode = 1000, bool isDisposing = false)
         {
             try { _disconnectTokenSource.Cancel(false); }
             catch { }
@@ -117,7 +117,8 @@ namespace Discord.Net.WebSockets
             {
                 if (!isDisposing)
                 {
-                    try { await _client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", new CancellationToken()); }
+                    var status = (WebSocketCloseStatus)closeCode;
+                    try { await _client.CloseOutputAsync(status, "", new CancellationToken()); }
                     catch { }
                 }
                 try { _client.Dispose(); }
@@ -141,7 +142,7 @@ namespace Discord.Net.WebSockets
             await _lock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await DisconnectInternalAsync(false);
+                await DisconnectInternalAsync(isDisposing: false);
             }
             finally
             {

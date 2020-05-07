@@ -39,7 +39,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous operation for adding a reaction to this message.
         /// </returns>
-        /// <seealso cref="IUserMessage.AddReactionAsync(IEmote, RequestOptions)"/>
+        /// <seealso cref="IMessage.AddReactionAsync(IEmote, RequestOptions)"/>
         /// <seealso cref="IEmote"/>
         public static async Task AddReactionsAsync(this IUserMessage msg, IEmote[] reactions, RequestOptions options = null)
         {
@@ -51,7 +51,7 @@ namespace Discord
         /// </summary>
         /// <remarks>
         ///     This method does not bulk remove reactions! If you want to clear reactions from a message,
-        ///     <see cref="IUserMessage.RemoveAllReactionsAsync(RequestOptions)"/>
+        ///     <see cref="IMessage.RemoveAllReactionsAsync(RequestOptions)"/>
         /// </remarks>
         /// <example>
         /// <code language="cs">
@@ -64,7 +64,7 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous operation for removing a reaction to this message.
         /// </returns>
-        /// <seealso cref="IUserMessage.RemoveReactionAsync(IEmote, IUser, RequestOptions)"/>
+        /// <seealso cref="IMessage.RemoveReactionAsync(IEmote, IUser, RequestOptions)"/>
         /// <seealso cref="IEmote"/>
         public static async Task RemoveReactionsAsync(this IUserMessage msg, IUser user, IEmote[] reactions, RequestOptions options = null)
         {

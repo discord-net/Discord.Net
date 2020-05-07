@@ -32,6 +32,7 @@ namespace Discord.Rest
                 Icon = args.Icon.IsSpecified ? args.Icon.Value?.ToModel() : Optional.Create<ImageModel?>(),
                 Name = args.Name,
                 Splash = args.Splash.IsSpecified ? args.Splash.Value?.ToModel() : Optional.Create<ImageModel?>(),
+                Banner = args.Banner.IsSpecified ? args.Banner.Value?.ToModel() : Optional.Create<ImageModel?>(),
                 VerificationLevel = args.VerificationLevel,
                 ExplicitContentFilter = args.ExplicitContentFilter,
                 SystemChannelFlags = args.SystemChannelFlags
@@ -57,6 +58,8 @@ namespace Discord.Rest
             else if (args.RegionId.IsSpecified)
                 apiArgs.RegionId = args.RegionId.Value;
 
+            if (!apiArgs.Banner.IsSpecified && guild.BannerId != null)
+                apiArgs.Banner = new ImageModel(guild.BannerId);
             if (!apiArgs.Splash.IsSpecified && guild.SplashId != null)
                 apiArgs.Splash = new ImageModel(guild.SplashId);
             if (!apiArgs.Icon.IsSpecified && guild.IconId != null)
@@ -257,7 +260,7 @@ namespace Discord.Rest
         //Roles
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
         public static async Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client,
-            string name, GuildPermissions? permissions, Color? color, bool isHoisted, RequestOptions options)
+            string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options)
         {
             if (name == null) throw new ArgumentNullException(paramName: nameof(name));
 
@@ -270,6 +273,7 @@ namespace Discord.Rest
                 x.Permissions = (permissions ?? role.Permissions);
                 x.Color = (color ?? Color.Default);
                 x.Hoist = isHoisted;
+                x.Mentionable = isMentionable;
             }, options).ConfigureAwait(false);
 
             return role;
@@ -349,7 +353,7 @@ namespace Discord.Rest
             ulong? fromUserId, int? limit, RequestOptions options)
         {
             return new PagedAsyncEnumerable<RestGuildUser>(
-                DiscordConfig.MaxMessagesPerBatch,
+                DiscordConfig.MaxUsersPerBatch,
                 async (info, ct) =>
                 {
                     var args = new GetGuildMembersParams
@@ -363,7 +367,7 @@ namespace Discord.Rest
                 },
                 nextPage: (info, lastPage) =>
                 {
-                    if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
+                    if (lastPage.Count != DiscordConfig.MaxUsersPerBatch)
                         return false;
                     info.Position = lastPage.Max(x => x.Id);
                     return true;

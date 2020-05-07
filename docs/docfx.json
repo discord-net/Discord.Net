@@ -9,7 +9,7 @@
     "dest": "api",
     "filter": "filterConfig.yml",
     "properties": {
-      "TargetFramework": "netstandard1.3"
+      "TargetFramework": "netstandard2.0"
     }
   }],
   "build": {
@@ -51,7 +51,7 @@
     "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
       "_appTitle": "Discord.Net Documentation",
-      "_appFooter": "Discord.Net (c) 2015-2019 2.1.1",
+      "_appFooter": "Discord.Net (c) 2015-2020 2.2.0",
       "_enableSearch": true,
       "_appLogoPath": "marketing/logo/SVG/Logomark Purple.svg",
       "_appFaviconPath":  "favicon.ico"

@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -43,7 +44,7 @@ namespace _01_basic_ping_bot
             await _client.StartAsync();
 
             // Block the program until it is closed.
-            await Task.Delay(-1);
+            await Task.Delay(Timeout.Infinite);
         }
 
         private Task LogAsync(LogMessage log)

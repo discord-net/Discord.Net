@@ -53,6 +53,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public MessageApplication Application { get; private set; }
 
+        /// <inheritdoc />
+        public MessageReference Reference { get; private set; }
+
         /// <summary>
         ///     Returns all attachments included in this message.
         /// </summary>
@@ -138,6 +141,17 @@ namespace Discord.WebSocket
                 {
                     Type = model.Activity.Value.Type.Value,
                     PartyId = model.Activity.Value.PartyId.Value
+                };
+            }
+
+            if (model.Reference.IsSpecified)
+            {
+                // Creates a new Reference from the API model
+                Reference = new MessageReference
+                {
+                    GuildId = model.Reference.Value.GuildId,
+                    ChannelId = model.Reference.Value.ChannelId,
+                    MessageId = model.Reference.Value.MessageId
                 };
             }
         }

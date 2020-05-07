@@ -1,3 +1,5 @@
+using Discord.Rest;
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -7,6 +9,19 @@ namespace Discord.WebSocket
     {
         public static IActivity ToEntity(this API.Game model)
         {
+            // Custom Status Game
+            if (model.Id.IsSpecified && model.Id.Value == "custom")
+            {
+                return new CustomStatusGame()
+                {
+                    Type = ActivityType.CustomStatus,
+                    Name = model.Name,
+                    State = model.State.IsSpecified ? model.State.Value : null,
+                    Emote = model.Emoji.IsSpecified ? model.Emoji.Value.ToIEmote() : null,
+                    CreatedAt = DateTimeOffset.FromUnixTimeMilliseconds(model.CreatedAt.Value),
+                };
+            }
+
             // Spotify Game
             if (model.SyncId.IsSpecified)
             {
@@ -23,6 +38,8 @@ namespace Discord.WebSocket
                     AlbumTitle = albumText,
                     TrackTitle = model.Details.GetValueOrDefault(),
                     Artists = model.State.GetValueOrDefault()?.Split(';').Select(x=>x?.Trim()).ToImmutableArray(),
+                    StartedAt = timestamps?.Start,
+                    EndsAt = timestamps?.End,
                     Duration = timestamps?.End - timestamps?.Start,
                     AlbumArtUrl = albumArtId != null ? CDN.GetSpotifyAlbumArtUrl(albumArtId) : null,
                     Type = ActivityType.Listening,

@@ -264,7 +264,7 @@ namespace Discord.WebSocket
         {
 
             await _gatewayLogger.DebugAsync("Disconnecting ApiClient").ConfigureAwait(false);
-            await ApiClient.DisconnectAsync().ConfigureAwait(false);
+            await ApiClient.DisconnectAsync(ex).ConfigureAwait(false);
 
             //Wait for tasks to complete
             await _gatewayLogger.DebugAsync("Waiting for heartbeater").ConfigureAwait(false);
@@ -306,6 +306,14 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override SocketChannel GetChannel(ulong id)
             => State.GetChannel(id);
+        /// <summary>
+        ///     Clears all cached channels from the client.
+        /// </summary>
+        public void PurgeChannelCache() => State.PurgeAllChannels();
+        /// <summary>
+        ///     Clears cached DM channels from the client.
+        /// </summary>
+        public void PurgeDMChannelCache() => State.PurgeDMChannels();
 
         /// <inheritdoc />
         public override SocketUser GetUser(ulong id)
@@ -313,6 +321,10 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override SocketUser GetUser(string username, string discriminator)
             => State.Users.FirstOrDefault(x => x.Discriminator == discriminator && x.Username == username);
+        /// <summary>
+        ///     Clears cached users from the client.
+        /// </summary>
+        public void PurgeUserCache() => State.PurgeUsers();
         internal SocketGlobalUser GetOrCreateUser(ClientState state, Discord.API.User model)
         {
             return state.GetOrAddUser(model.Id, x =>
@@ -511,7 +523,7 @@ namespace Discord.WebSocket
                     case GatewayOpCode.Reconnect:
                         {
                             await _gatewayLogger.DebugAsync("Received Reconnect").ConfigureAwait(false);
-                            _connection.Error(new Exception("Server requested a reconnect"));
+                            _connection.Error(new GatewayReconnectException("Server requested a reconnect"));
                         }
                         break;
                     case GatewayOpCode.Dispatch:
@@ -628,6 +640,7 @@ namespace Discord.WebSocket
                                         if (guild != null)
                                         {
                                             await TimedInvokeAsync(_joinedGuildEvent, nameof(JoinedGuild), guild).ConfigureAwait(false);
+                                            await GuildAvailableAsync(guild).ConfigureAwait(false);
                                         }
                                         else
                                         {
@@ -1689,7 +1702,7 @@ namespace Discord.WebSocket
                     {
                         if (ConnectionState == ConnectionState.Connected && (_guildDownloadTask?.IsCompleted ?? true))
                         {
-                            _connection.Error(new Exception("Server missed last heartbeat"));
+                            _connection.Error(new GatewayReconnectException("Server missed last heartbeat"));
                             return;
                         }
                     }

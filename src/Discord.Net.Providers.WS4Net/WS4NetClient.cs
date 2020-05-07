@@ -40,7 +40,7 @@ namespace Discord.Net.Providers.WS4Net
             {
                 if (disposing)
                 {
-                    DisconnectInternalAsync(true).GetAwaiter().GetResult();
+                    DisconnectInternalAsync(isDisposing: true).GetAwaiter().GetResult();
                     _lock?.Dispose();
                     _cancelTokenSource?.Dispose();
                 }
@@ -92,19 +92,19 @@ namespace Discord.Net.Providers.WS4Net
             _waitUntilConnect.Wait(_cancelToken);
         }
 
-        public async Task DisconnectAsync()
+        public async Task DisconnectAsync(int closeCode = 1000)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await DisconnectInternalAsync().ConfigureAwait(false);
+                await DisconnectInternalAsync(closeCode: closeCode).ConfigureAwait(false);
             }
             finally
             {
                 _lock.Release();
             }
         }
-        private Task DisconnectInternalAsync(bool isDisposing = false)
+        private Task DisconnectInternalAsync(int closeCode = 1000, bool isDisposing = false)
         {
             _disconnectCancelTokenSource.Cancel();
             if (_client == null)
@@ -112,7 +112,7 @@ namespace Discord.Net.Providers.WS4Net
 
             if (_client.State == WebSocketState.Open)
             {
-                try { _client.Close(1000, ""); }
+                try { _client.Close(closeCode, ""); }
                 catch { }
             }
 

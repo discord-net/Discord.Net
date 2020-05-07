@@ -38,6 +38,10 @@ namespace Discord
         /// </summary>
         public Optional<Image?> Icon { get; set; }
         /// <summary>
+        ///     Gets or sets the banner of the guild.
+        /// </summary>
+        public Optional<Image?> Banner { get; set; }
+        /// <summary>
         ///     Gets or sets the guild's splash image.
         /// </summary>
         /// <remarks>

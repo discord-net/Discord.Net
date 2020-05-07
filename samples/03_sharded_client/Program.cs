@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using _03_sharded_client.Services;
 using Discord;
@@ -45,7 +46,7 @@ namespace _03_sharded_client
                 await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
                 await client.StartAsync();
 
-                await Task.Delay(-1);
+                await Task.Delay(Timeout.Infinite);
             }
         }
 
