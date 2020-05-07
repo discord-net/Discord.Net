@@ -25,7 +25,6 @@ namespace Discord.Rest
         internal static ChannelCreateAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
             var changes = entry.Changes;
-            var overwrites = new List<Overwrite>();
 
             var overwritesModel = changes.FirstOrDefault(x => x.ChangedProperty == "permission_overwrites");
             var typeModel = changes.FirstOrDefault(x => x.ChangedProperty == "type");
@@ -34,23 +33,17 @@ namespace Discord.Rest
             var nsfwModel = changes.FirstOrDefault(x => x.ChangedProperty == "nsfw");
             var bitrateModel = changes.FirstOrDefault(x => x.ChangedProperty == "bitrate");
 
+            var overwrites = overwritesModel.NewValue.ToObject<API.Overwrite[]>(discord.ApiClient.Serializer)
+                .Select(x => new Overwrite(x.TargetId, x.TargetType, new OverwritePermissions(x.Allow, x.Deny)))
+                .ToList();
             var type = typeModel.NewValue.ToObject<ChannelType>(discord.ApiClient.Serializer);
             var name = nameModel.NewValue.ToObject<string>(discord.ApiClient.Serializer);
             int? rateLimitPerUser = rateLimitPerUserModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
             bool? nsfw = nsfwModel?.NewValue?.ToObject<bool>(discord.ApiClient.Serializer);
             int? bitrate = bitrateModel?.NewValue?.ToObject<int>(discord.ApiClient.Serializer);
+            var id = entry.TargetId.Value;
 
-            foreach (var overwrite in overwritesModel.NewValue)
-            {
-                var deny = overwrite["deny"].ToObject<ulong>(discord.ApiClient.Serializer);
-                var permType = overwrite["type"].ToObject<PermissionTarget>(discord.ApiClient.Serializer);
-                var id = overwrite["id"].ToObject<ulong>(discord.ApiClient.Serializer);
-                var allow = overwrite["allow"].ToObject<ulong>(discord.ApiClient.Serializer);
-
-                overwrites.Add(new Overwrite(id, permType, new OverwritePermissions(allow, deny)));
-            }
-
-            return new ChannelCreateAuditLogData(entry.TargetId.Value, name, type, rateLimitPerUser, nsfw, bitrate, overwrites.ToReadOnlyCollection());
+            return new ChannelCreateAuditLogData(id, name, type, rateLimitPerUser, nsfw, bitrate, overwrites.ToReadOnlyCollection());
         }
 
         /// <summary>
