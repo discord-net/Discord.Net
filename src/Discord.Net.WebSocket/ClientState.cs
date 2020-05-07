@@ -82,6 +82,20 @@ namespace Discord.WebSocket
             }
             return null;
         }
+        internal void PurgeAllChannels()
+        {
+            foreach (var guild in _guilds.Values)
+                guild.PurgeChannelCache(this);
+
+            PurgeDMChannels();
+        }
+        internal void PurgeDMChannels()
+        {
+            foreach (var channel in _dmChannels.Values)
+                _channels.TryRemove(channel.Id, out _);
+
+            _dmChannels.Clear();
+        }
 
         internal SocketGuild GetGuild(ulong id)
         {
@@ -96,7 +110,11 @@ namespace Discord.WebSocket
         internal SocketGuild RemoveGuild(ulong id)
         {
             if (_guilds.TryRemove(id, out SocketGuild guild))
+            {
+                guild.PurgeChannelCache(this);
+                guild.PurgeGuildUserCache();
                 return guild;
+            }
             return null;
         }
 
@@ -115,6 +133,11 @@ namespace Discord.WebSocket
             if (_users.TryRemove(id, out SocketGlobalUser user))
                 return user;
             return null;
+        }
+        internal void PurgeUsers()
+        {
+            foreach (var guild in _guilds.Values)
+                guild.PurgeGuildUserCache();
         }
     }
 }
