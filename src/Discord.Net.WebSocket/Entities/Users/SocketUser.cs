@@ -41,6 +41,8 @@ namespace Discord.WebSocket
         public UserStatus Status => Presence.Status;
         /// <inheritdoc />
         public IImmutableSet<ClientType> ActiveClients => Presence.ActiveClients ?? ImmutableHashSet<ClientType>.Empty;
+        /// <inheritdoc />
+        public IImmutableList<IActivity> Activities => Presence.Activities ?? ImmutableList<IActivity>.Empty;
         /// <summary>
         ///     Gets mutual guilds shared with this user.
         /// </summary>

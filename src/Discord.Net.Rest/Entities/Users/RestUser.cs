@@ -35,6 +35,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         public virtual IImmutableSet<ClientType> ActiveClients => ImmutableHashSet<ClientType>.Empty;
         /// <inheritdoc />
+        public virtual IImmutableList<IActivity> Activities => ImmutableList<IActivity>.Empty;
+        /// <inheritdoc />
         public virtual bool IsWebhook => false;
 
         internal RestUser(BaseDiscordClient discord, ulong id)
