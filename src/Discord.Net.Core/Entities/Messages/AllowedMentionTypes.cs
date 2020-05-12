@@ -11,14 +11,14 @@ namespace Discord
         /// <summary>
         ///     Controls role mentions.
         /// </summary>
-        Roles,
+        Roles       = 1,
         /// <summary>
         ///     Controls user mentions.
         /// </summary>
-        Users,
+        Users       = 2,
         /// <summary>
         ///     Controls <code>@everyone</code> and <code>@here</code> mentions.
         /// </summary>
-        Everyone,
+        Everyone    = 4,
     }
 }
