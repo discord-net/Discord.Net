@@ -9,6 +9,13 @@ namespace Discord
     public enum AllowedMentionTypes
     {
         /// <summary>
+        ///     No flag was set.
+        /// </summary>
+        /// <remarks>
+        ///     It is not used to control mentions and does not mean no mentions will be allowed.
+        /// </remarks>
+        None        = 0,
+        /// <summary>
         ///     Controls role mentions.
         /// </summary>
         Roles       = 1,
