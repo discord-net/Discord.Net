@@ -64,9 +64,9 @@ namespace Discord.WebSocket
                     return ImmutableArray<SocketMessage>.Empty;
                 int around = limit / 2;
                 var before = GetMany(fromMessageId, Direction.Before, around);
-                var after = GetMany(fromMessageId, Direction.After, around);
+                var after = GetMany(fromMessageId, Direction.After, around).Reverse();
 
-                return before.Concat(new SocketMessage[] { msg }).Concat(after).ToImmutableArray();
+                return after.Concat(new SocketMessage[] { msg }).Concat(before).ToImmutableArray();
             }
 
             if (dir == Direction.Before)
