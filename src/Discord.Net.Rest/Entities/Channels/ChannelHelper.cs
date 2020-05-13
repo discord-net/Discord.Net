@@ -109,11 +109,80 @@ namespace Discord.Rest
         public static IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessageChannel channel, BaseDiscordClient client,
             ulong? fromMessageId, Direction dir, int limit, RequestOptions options)
         {
-            if (dir == Direction.Around)
-                throw new NotImplementedException(); //TODO: Impl
-
             var guildId = (channel as IGuildChannel)?.GuildId;
             var guild = guildId != null ? (client as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
+
+            if (dir == Direction.Around && limit > DiscordConfig.MaxMessagesPerBatch)
+            {
+                int around = limit / 2;
+                return new PagedAsyncEnumerable<RestMessage>(
+                    DiscordConfig.MaxMessagesPerBatch,
+                    async (info, ct) =>
+                    {
+                        var args = new GetChannelMessagesParams
+                        {
+                            RelativeDirection = Direction.Before,
+                            Limit = info.PageSize
+                        };
+                        if (info.Position != null)
+                            args.RelativeMessageId = info.Position.Value;
+
+                        var models = await client.ApiClient.GetChannelMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
+                        var builder = ImmutableArray.CreateBuilder<RestMessage>();
+                        foreach (var model in models)
+                        {
+                            var author = GetAuthor(client, guild, model.Author.Value, model.WebhookId.ToNullable());
+                            builder.Add(RestMessage.Create(client, channel, author, model));
+                        }
+                        return builder.ToImmutable();
+                    },
+                    nextPage: (info, lastPage) =>
+                    {
+                        if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
+                            return false;
+                        if (dir == Direction.Before)
+                            info.Position = lastPage.Min(x => x.Id);
+                        else
+                            info.Position = lastPage.Max(x => x.Id);
+                        return true;
+                    },
+                    start: fromMessageId + 1, //Needs to include the message itself
+                    count: around + 1
+                ).Concat(new PagedAsyncEnumerable<RestMessage>(
+                    DiscordConfig.MaxMessagesPerBatch,
+                    async (info, ct) =>
+                    {
+                        var args = new GetChannelMessagesParams
+                        {
+                            RelativeDirection = Direction.After,
+                            Limit = info.PageSize
+                        };
+                        if (info.Position != null)
+                            args.RelativeMessageId = info.Position.Value;
+
+                        var models = await client.ApiClient.GetChannelMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
+                        var builder = ImmutableArray.CreateBuilder<RestMessage>();
+                        foreach (var model in models)
+                        {
+                            var author = GetAuthor(client, guild, model.Author.Value, model.WebhookId.ToNullable());
+                            builder.Add(RestMessage.Create(client, channel, author, model));
+                        }
+                        return builder.ToImmutable();
+                    },
+                    nextPage: (info, lastPage) =>
+                    {
+                        if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
+                            return false;
+                        if (dir == Direction.Before)
+                            info.Position = lastPage.Min(x => x.Id);
+                        else
+                            info.Position = lastPage.Max(x => x.Id);
+                        return true;
+                    },
+                    start: fromMessageId,
+                    count: around
+                ));
+            }
 
             return new PagedAsyncEnumerable<RestMessage>(
                 DiscordConfig.MaxMessagesPerBatch,
