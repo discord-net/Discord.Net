@@ -71,8 +71,8 @@ namespace Discord.WebSocket
 
             if (dir == Direction.Before)
                 cachedMessageIds = cachedMessageIds.Reverse();
-            if (dir == Direction.Around)
-                limit /= 2;
+            if (dir == Direction.Around) //Only happens if fromMessageId is null, should only get "around" and itself (+1)
+                limit = limit / 2 + 1;
 
             return cachedMessageIds
                 .Select(x =>
