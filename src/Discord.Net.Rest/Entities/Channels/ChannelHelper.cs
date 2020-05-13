@@ -115,73 +115,11 @@ namespace Discord.Rest
             if (dir == Direction.Around && limit > DiscordConfig.MaxMessagesPerBatch)
             {
                 int around = limit / 2;
-                return new PagedAsyncEnumerable<RestMessage>(
-                    DiscordConfig.MaxMessagesPerBatch,
-                    async (info, ct) =>
-                    {
-                        var args = new GetChannelMessagesParams
-                        {
-                            RelativeDirection = Direction.Before,
-                            Limit = info.PageSize
-                        };
-                        if (info.Position != null)
-                            args.RelativeMessageId = info.Position.Value;
-
-                        var models = await client.ApiClient.GetChannelMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
-                        var builder = ImmutableArray.CreateBuilder<RestMessage>();
-                        foreach (var model in models)
-                        {
-                            var author = GetAuthor(client, guild, model.Author.Value, model.WebhookId.ToNullable());
-                            builder.Add(RestMessage.Create(client, channel, author, model));
-                        }
-                        return builder.ToImmutable();
-                    },
-                    nextPage: (info, lastPage) =>
-                    {
-                        if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
-                            return false;
-                        if (dir == Direction.Before)
-                            info.Position = lastPage.Min(x => x.Id);
-                        else
-                            info.Position = lastPage.Max(x => x.Id);
-                        return true;
-                    },
-                    start: fromMessageId + 1, //Needs to include the message itself
-                    count: around + 1
-                ).Concat(new PagedAsyncEnumerable<RestMessage>(
-                    DiscordConfig.MaxMessagesPerBatch,
-                    async (info, ct) =>
-                    {
-                        var args = new GetChannelMessagesParams
-                        {
-                            RelativeDirection = Direction.After,
-                            Limit = info.PageSize
-                        };
-                        if (info.Position != null)
-                            args.RelativeMessageId = info.Position.Value;
-
-                        var models = await client.ApiClient.GetChannelMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
-                        var builder = ImmutableArray.CreateBuilder<RestMessage>();
-                        foreach (var model in models)
-                        {
-                            var author = GetAuthor(client, guild, model.Author.Value, model.WebhookId.ToNullable());
-                            builder.Add(RestMessage.Create(client, channel, author, model));
-                        }
-                        return builder.ToImmutable();
-                    },
-                    nextPage: (info, lastPage) =>
-                    {
-                        if (lastPage.Count != DiscordConfig.MaxMessagesPerBatch)
-                            return false;
-                        if (dir == Direction.Before)
-                            info.Position = lastPage.Min(x => x.Id);
-                        else
-                            info.Position = lastPage.Max(x => x.Id);
-                        return true;
-                    },
-                    start: fromMessageId,
-                    count: around
-                ));
+                if (fromMessageId.HasValue)
+                    return GetMessagesAsync(channel, client, fromMessageId.Value + 1, Direction.Before, around + 1, options) //Need to include the message itself
+                        .Concat(GetMessagesAsync(channel, client, fromMessageId, Direction.After, around, options));
+                else //Shouldn't happen since there's no public overload for ulong? and Direction
+                    return GetMessagesAsync(channel, client, null, Direction.Before, around, options);
             }
 
             return new PagedAsyncEnumerable<RestMessage>(
