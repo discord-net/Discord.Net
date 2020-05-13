@@ -58,6 +58,15 @@ namespace Discord
         Task UnpinAsync(RequestOptions options = null);
 
         /// <summary>
+        ///     Publish this message when executed in a News Channel.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous operation for publishing this message.
+        /// </returns>
+        Task PublishAsync(RequestOptions options = null);
+
+        /// <summary>
         ///     Transforms this message's text into a human-readable form by resolving its tags.
         /// </summary>
         /// <param name="userHandling">Determines how the user tag should be handled.</param>

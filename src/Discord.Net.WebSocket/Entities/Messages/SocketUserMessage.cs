@@ -123,7 +123,7 @@ namespace Discord.WebSocket
                 model.Content = text;
             }
         }
-        
+
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Only the author of a message may modify the message.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
@@ -150,5 +150,13 @@ namespace Discord.WebSocket
         
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")})";
         internal new SocketUserMessage Clone() => MemberwiseClone() as SocketUserMessage;
+
+        public async Task PublishAsync(RequestOptions options = null)
+        {
+            if (Channel.GetType() == typeof(SocketNewsChannel))
+            {
+                await MessageHelper.PublishAsync(this, Discord, options);
+            }
+        }
     }
 }

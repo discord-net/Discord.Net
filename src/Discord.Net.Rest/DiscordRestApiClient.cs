@@ -695,6 +695,15 @@ namespace Discord.API
             var ids = new BucketIds(channelId: channelId);
             await SendAsync("POST", () => $"channels/{channelId}/typing", ids, options: options).ConfigureAwait(false);
         }
+        public async Task PublishAsync(ulong channelId, ulong messageId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(messageId, 0, nameof(messageId));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(channelId: channelId);
+            await SendAsync("POST", () => $"channels/{channelId}/messages/{messageId}/crosspost", ids, options: options).ConfigureAwait(false);
+        }
 
         //Channel Permissions
         public async Task ModifyChannelPermissionsAsync(ulong channelId, ulong targetId, ModifyChannelPermissionsParams args, RequestOptions options = null)
