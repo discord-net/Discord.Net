@@ -119,7 +119,7 @@ namespace Discord.Rest
                     return GetMessagesAsync(channel, client, fromMessageId.Value + 1, Direction.Before, around + 1, options) //Need to include the message itself
                         .Concat(GetMessagesAsync(channel, client, fromMessageId, Direction.After, around, options));
                 else //Shouldn't happen since there's no public overload for ulong? and Direction
-                    return GetMessagesAsync(channel, client, null, Direction.Before, around, options);
+                    return GetMessagesAsync(channel, client, null, Direction.Before, around + 1, options);
             }
 
             return new PagedAsyncEnumerable<RestMessage>(
