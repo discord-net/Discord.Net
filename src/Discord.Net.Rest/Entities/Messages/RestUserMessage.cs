@@ -148,6 +148,14 @@ namespace Discord.Rest
             TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)
             => MentionUtils.Resolve(this, 0, userHandling, channelHandling, roleHandling, everyoneHandling, emojiHandling);
 
+        public async Task PublishAsync(RequestOptions options = null)
+        {
+            if (Channel.GetType() == typeof(RestNewsChannel))
+            {
+                await MessageHelper.PublishAsync(this, Discord, options);
+            }
+        }
+
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")})";
     }
 }
