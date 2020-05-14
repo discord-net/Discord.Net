@@ -148,12 +148,15 @@ namespace Discord.Rest
             TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)
             => MentionUtils.Resolve(this, 0, userHandling, channelHandling, roleHandling, everyoneHandling, emojiHandling);
 
-        public async Task PublishAsync(RequestOptions options = null)
+        /// <inheritdoc />
+        public async Task CrosspostAsync(RequestOptions options = null)
         {
-            if (Channel.GetType() == typeof(RestNewsChannel))
+            if (!(Channel is RestNewsChannel))
             {
-                await MessageHelper.PublishAsync(this, Discord, options);
+                throw new InvalidOperationException("Publishing (crossposting) is only valid in news channels.");
             }
+
+            await MessageHelper.CrosspostAsync(this, Discord, options);
         }
 
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")})";

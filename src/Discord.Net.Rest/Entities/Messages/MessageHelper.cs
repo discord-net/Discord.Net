@@ -286,13 +286,13 @@ namespace Discord.Rest
             return MessageSource.User;
         }
 
-        public static Task PublishAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
-            => PublishAsync(msg.Channel.Id, msg.Id, client, options);
+        public static Task CrosspostAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
+            => CrosspostAsync(msg.Channel.Id, msg.Id, client, options);
 
-        public static async Task PublishAsync(ulong channelId, ulong msgId, BaseDiscordClient client,
+        public static async Task CrosspostAsync(ulong channelId, ulong msgId, BaseDiscordClient client,
             RequestOptions options)
         {
-            await client.ApiClient.PublishAsync(channelId, msgId, options).ConfigureAwait(false);
+            await client.ApiClient.CrosspostAsync(channelId, msgId, options).ConfigureAwait(false);
         }
     }
 }

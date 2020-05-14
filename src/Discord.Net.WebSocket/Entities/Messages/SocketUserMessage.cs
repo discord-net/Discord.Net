@@ -147,16 +147,19 @@ namespace Discord.WebSocket
         public string Resolve(TagHandling userHandling = TagHandling.Name, TagHandling channelHandling = TagHandling.Name,
             TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)
             => MentionUtils.Resolve(this, 0, userHandling, channelHandling, roleHandling, everyoneHandling, emojiHandling);
-        
+
+        /// <inheritdoc />
+        public async Task CrosspostAsync(RequestOptions options = null)
+        {
+            if (!(Channel is SocketNewsChannel))
+            {
+                throw new InvalidOperationException("Publishing (crossposting) is only valid in news channels.");
+            }
+
+            await MessageHelper.CrosspostAsync(this, Discord, options);
+        }
+
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")})";
         internal new SocketUserMessage Clone() => MemberwiseClone() as SocketUserMessage;
-
-        public async Task PublishAsync(RequestOptions options = null)
-        {
-            if (Channel.GetType() == typeof(SocketNewsChannel))
-            {
-                await MessageHelper.PublishAsync(this, Discord, options);
-            }
-        }
     }
 }

@@ -695,7 +695,7 @@ namespace Discord.API
             var ids = new BucketIds(channelId: channelId);
             await SendAsync("POST", () => $"channels/{channelId}/typing", ids, options: options).ConfigureAwait(false);
         }
-        public async Task PublishAsync(ulong channelId, ulong messageId, RequestOptions options = null)
+        public async Task CrosspostAsync(ulong channelId, ulong messageId, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
