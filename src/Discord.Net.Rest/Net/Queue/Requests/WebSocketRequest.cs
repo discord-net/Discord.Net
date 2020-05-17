@@ -9,7 +9,6 @@ namespace Discord.Net.Queue
     public class WebSocketRequest : IRequest
     {
         public IWebSocketClient Client { get; }
-        public string BucketId { get; }
         public byte[] Data { get; }
         public bool IsText { get; }
         public DateTimeOffset? TimeoutAt { get; }
@@ -17,12 +16,11 @@ namespace Discord.Net.Queue
         public RequestOptions Options { get; }
         public CancellationToken CancelToken { get; internal set; }
 
-        public WebSocketRequest(IWebSocketClient client, string bucketId, byte[] data, bool isText, RequestOptions options)
+        public WebSocketRequest(IWebSocketClient client, byte[] data, bool isText, RequestOptions options)
         {
             Preconditions.NotNull(options, nameof(options));
 
             Client = client;
-            BucketId = bucketId;
             Data = data;
             IsText = isText;
             Options = options;

@@ -22,7 +22,7 @@ namespace Discord.Net.Queue
         public int WindowCount { get; private set; }
         public DateTimeOffset LastAttemptAt { get; private set; }
 
-        public RequestBucket(RequestQueue queue, RestRequest request, string id)
+        public RequestBucket(RequestQueue queue, IRequest request, string id)
         {
             _queue = queue;
             Id = id;
@@ -31,13 +31,15 @@ namespace Discord.Net.Queue
 
             if (request.Options.IsClientBucket)
                 WindowCount = ClientBucket.Get(request.Options.BucketId).WindowCount;
+            else if (request.Options.IsGatewayBucket)
+                WindowCount = GatewayBucket.Get(request.Options.BucketId).WindowCount;
             else
                 WindowCount = 1; //Only allow one request until we get a header back
             _semaphore = WindowCount;
             _resetTick = null;
             LastAttemptAt = DateTimeOffset.UtcNow;
         }
-        
+
         static int nextId = 0;
         public async Task<Stream> SendAsync(RestRequest request)
         {
@@ -149,8 +151,59 @@ namespace Discord.Net.Queue
                 }
             }
         }
+        public async Task SendAsync(WebSocketRequest request)
+        {
+            int id = Interlocked.Increment(ref nextId);
+#if DEBUG_LIMITS
+            Debug.WriteLine($"[{id}] Start");
+#endif
+            LastAttemptAt = DateTimeOffset.UtcNow;
+            while (true)
+            {
+                await _queue.EnterGlobalAsync(id, request).ConfigureAwait(false);
+                await EnterAsync(id, request).ConfigureAwait(false);
 
-        private async Task EnterAsync(int id, RestRequest request)
+#if DEBUG_LIMITS
+                Debug.WriteLine($"[{id}] Sending...");
+#endif
+                try
+                {
+                    await request.SendAsync().ConfigureAwait(false);
+                    return;
+                }
+                catch (TimeoutException)
+                {
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Timeout");
+#endif
+                    if ((request.Options.RetryMode & RetryMode.RetryTimeouts) == 0)
+                        throw;
+
+                    await Task.Delay(500).ConfigureAwait(false);
+                    continue; //Retry
+                }
+                /*catch (Exception)
+                {
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Error");
+#endif
+                    if ((request.Options.RetryMode & RetryMode.RetryErrors) == 0)
+                        throw;
+
+                    await Task.Delay(500);
+                    continue; //Retry
+                }*/
+                finally
+                {
+                    UpdateRateLimit(id, request, default(RateLimitInfo), false);
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Stop");
+#endif
+                }
+            }
+        }
+
+        private async Task EnterAsync(int id, IRequest request)
         {
             int windowCount;
             DateTimeOffset? resetAt;
@@ -213,7 +266,7 @@ namespace Discord.Net.Queue
             }
         }
 
-        private void UpdateRateLimit(int id, RestRequest request, RateLimitInfo info, bool is429)
+        private void UpdateRateLimit(int id, IRequest request, RateLimitInfo info, bool is429)
         {
             if (WindowCount == 0)
                 return;
@@ -273,6 +326,13 @@ namespace Discord.Net.Queue
                     Debug.WriteLine($"[{id}] Client Bucket ({ClientBucket.Get(request.Options.BucketId).WindowSeconds * 1000} ms)");
 #endif
                 }
+                else if (request.Options.IsGatewayBucket && request.Options.BucketId != null)
+                {
+                    resetTick = DateTimeOffset.UtcNow.AddSeconds(GatewayBucket.Get(request.Options.BucketId).WindowSeconds);
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Gateway Bucket ({GatewayBucket.Get(request.Options.BucketId).WindowSeconds * 1000} ms)");
+#endif
+                }
 
                 if (resetTick == null)
                 {
@@ -320,7 +380,7 @@ namespace Discord.Net.Queue
             }
         }
 
-        private void ThrowRetryLimit(RestRequest request)
+        private void ThrowRetryLimit(IRequest request)
         {
             if ((request.Options.RetryMode & RetryMode.RetryRatelimit) == 0)
                 throw new RateLimitedException(request);

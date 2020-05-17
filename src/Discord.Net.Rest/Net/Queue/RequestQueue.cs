@@ -89,12 +89,23 @@ namespace Discord.Net.Queue
         }
         public async Task SendAsync(WebSocketRequest request)
         {
-            //TODO: Re-impl websocket buckets
-            request.CancelToken = _requestCancelToken;
-            await request.SendAsync().ConfigureAwait(false);
+            CancellationTokenSource createdTokenSource = null;
+            if (request.Options.CancelToken.CanBeCanceled)
+            {
+                createdTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_requestCancelToken, request.Options.CancelToken);
+                request.Options.CancelToken = createdTokenSource.Token;
+            }
+            else
+                request.Options.CancelToken = _requestCancelToken;
+
+            var bucket = GetOrCreateBucket(request.Options.BucketId, request);
+            await bucket.SendAsync(request).ConfigureAwait(false);
+            createdTokenSource?.Dispose();
+            //request.CancelToken = _requestCancelToken;
+            //await request.SendAsync().ConfigureAwait(false);
         }
 
-        internal async Task EnterGlobalAsync(int id, RestRequest request)
+        internal async Task EnterGlobalAsync(int id, IRequest request)
         {
             int millis = (int)Math.Ceiling((_waitUntil - DateTimeOffset.UtcNow).TotalMilliseconds);
             if (millis > 0)
@@ -110,7 +121,7 @@ namespace Discord.Net.Queue
             _waitUntil = DateTimeOffset.UtcNow.AddMilliseconds(info.RetryAfter.Value + (info.Lag?.TotalMilliseconds ?? 0.0));
         }
 
-        private RequestBucket GetOrCreateBucket(string id, RestRequest request)
+        private RequestBucket GetOrCreateBucket(string id, IRequest request)
         {
             return _buckets.GetOrAdd(id, x => new RequestBucket(this, request, x));
         }
