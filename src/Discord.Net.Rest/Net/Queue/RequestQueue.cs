@@ -101,8 +101,6 @@ namespace Discord.Net.Queue
             var bucket = GetOrCreateBucket(request.Options.BucketId, request);
             await bucket.SendAsync(request).ConfigureAwait(false);
             createdTokenSource?.Dispose();
-            //request.CancelToken = _requestCancelToken;
-            //await request.SendAsync().ConfigureAwait(false);
         }
 
         internal async Task EnterGlobalAsync(int id, IRequest request)
