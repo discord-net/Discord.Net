@@ -13,6 +13,8 @@ namespace Discord.Net.Queue
 {
     internal class RequestBucket
     {
+        private const int MinimumSleepTimeMs = 750;
+
         private readonly object _lock;
         private readonly RequestQueue _queue;
         private int _semaphore;
@@ -183,10 +185,11 @@ namespace Discord.Net.Queue
 
                     ThrowRetryLimit(request);
 
-                    if (resetAt.HasValue)
+                    if (resetAt.HasValue && resetAt > DateTimeOffset.UtcNow)
                     {
                         if (resetAt > timeoutAt)
                             ThrowRetryLimit(request);
+
                         int millis = (int)Math.Ceiling((resetAt.Value - DateTimeOffset.UtcNow).TotalMilliseconds);
 #if DEBUG_LIMITS
                         Debug.WriteLine($"[{id}] Sleeping {millis} ms (Pre-emptive)");
@@ -196,12 +199,12 @@ namespace Discord.Net.Queue
                     }
                     else
                     {
-                        if ((timeoutAt.Value - DateTimeOffset.UtcNow).TotalMilliseconds < 500.0)
+                        if ((timeoutAt.Value - DateTimeOffset.UtcNow).TotalMilliseconds < MinimumSleepTimeMs)
                             ThrowRetryLimit(request);
 #if DEBUG_LIMITS
-                        Debug.WriteLine($"[{id}] Sleeping 500* ms (Pre-emptive)");
+                        Debug.WriteLine($"[{id}] Sleeping {MinimumSleepTimeMs}* ms (Pre-emptive)");
 #endif
-                        await Task.Delay(500, request.Options.CancelToken).ConfigureAwait(false);
+                        await Task.Delay(MinimumSleepTimeMs, request.Options.CancelToken).ConfigureAwait(false);
                     }
                     continue;
                 }
