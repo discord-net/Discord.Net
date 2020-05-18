@@ -2,6 +2,7 @@ using Discord.API;
 using Discord.API.Gateway;
 using Discord.Logging;
 using Discord.Net.Converters;
+using Discord.Net.Queue;
 using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
@@ -120,6 +121,8 @@ namespace Discord.WebSocket
 #pragma warning disable IDISP004
         public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null, null)
         {
+            GatewayBucket.SetLimits(GatewayLimits.GetOrCreate(config.GatewayLimits));
+
             ApiClient.WebSocketRequestQueue.RateLimitTriggered += async (id, info) =>
             {
                 if (info == null)

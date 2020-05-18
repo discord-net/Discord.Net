@@ -125,6 +125,14 @@ namespace Discord.WebSocket
         /// </summary>
         public bool GuildSubscriptions { get; set; } = true;
 
+        /// <summary>
+        ///     Gets or sets the gateway limits.
+        ///     <note type="warning">
+        ///     It should only be changed for bots that have special limits provided by Discord.
+        ///     </note>
+        /// </summary>
+        public GatewayLimits GatewayLimits { get; set; } = new GatewayLimits();
+
         internal RequestQueue _websocketRequestQueue;
 
         /// <summary>

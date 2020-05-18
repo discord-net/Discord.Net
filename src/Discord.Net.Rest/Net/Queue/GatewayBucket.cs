@@ -1,3 +1,4 @@
+using Discord.Rest;
 using System.Collections.Immutable;
 
 namespace Discord.Net.Queue
@@ -9,15 +10,29 @@ namespace Discord.Net.Queue
     }
     internal struct GatewayBucket
     {
-        private static readonly ImmutableDictionary<GatewayBucketType, GatewayBucket> DefsByType;
-        private static readonly ImmutableDictionary<string, GatewayBucket> DefsById;
+        private static ImmutableDictionary<GatewayBucketType, GatewayBucket> DefsByType;
+        private static ImmutableDictionary<string, GatewayBucket> DefsById;
 
         static GatewayBucket()
         {
+            SetLimits(GatewayLimits.GetOrCreate(null));
+        }
+
+        public static GatewayBucket Get(GatewayBucketType type) => DefsByType[type];
+        public static GatewayBucket Get(string id) => DefsById[id];
+
+        public static void SetLimits(GatewayLimits limits)
+        {
+            limits = GatewayLimits.GetOrCreate(limits);
+            Preconditions.GreaterThan(limits.Global.Count, 0, nameof(limits.Global.Count), "Global count must be greater than zero.");
+            Preconditions.GreaterThan(limits.Global.Seconds, 0, nameof(limits.Global.Seconds), "Global seconds must be greater than zero.");
+            Preconditions.GreaterThan(limits.Identify.Count, 0, nameof(limits.Identify.Count), "Identify count must be greater than zero.");
+            Preconditions.GreaterThan(limits.Identify.Seconds, 0, nameof(limits.Identify.Seconds), "Identify seconds must be greater than zero.");
+
             var buckets = new[]
             {
-                new GatewayBucket(GatewayBucketType.Unbucketed, "<gateway-unbucketed>", 120, 60),
-                new GatewayBucket(GatewayBucketType.Identify, "<gateway-identify>", 1, 5)
+                new GatewayBucket(GatewayBucketType.Unbucketed, "<gateway-unbucketed>", limits.Global.Count, limits.Global.Seconds),
+                new GatewayBucket(GatewayBucketType.Identify, "<gateway-identify>", limits.Identify.Count, limits.Identify.Seconds)
             };
 
             var builder = ImmutableDictionary.CreateBuilder<GatewayBucketType, GatewayBucket>();
@@ -31,13 +46,10 @@ namespace Discord.Net.Queue
             DefsById = builder2.ToImmutable();
         }
 
-        public static GatewayBucket Get(GatewayBucketType type) => DefsByType[type];
-        public static GatewayBucket Get(string id) => DefsById[id];
-
         public GatewayBucketType Type { get; }
         public string Id { get; }
-        public int WindowCount { get; }
-        public int WindowSeconds { get; }
+        public int WindowCount { get; set; }
+        public int WindowSeconds { get; set; }
 
         public GatewayBucket(GatewayBucketType type, string id, int count, int seconds)
         {

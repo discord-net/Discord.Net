@@ -103,7 +103,7 @@ namespace Discord.Net.Queue
             createdTokenSource?.Dispose();
         }
 
-        internal async Task EnterGlobalAsync(int id, IRequest request)
+        internal async Task EnterGlobalAsync(int id, RestRequest request)
         {
             int millis = (int)Math.Ceiling((_waitUntil - DateTimeOffset.UtcNow).TotalMilliseconds);
             if (millis > 0)
@@ -117,6 +117,19 @@ namespace Discord.Net.Queue
         internal void PauseGlobal(RateLimitInfo info)
         {
             _waitUntil = DateTimeOffset.UtcNow.AddMilliseconds(info.RetryAfter.Value + (info.Lag?.TotalMilliseconds ?? 0.0));
+        }
+        internal async Task EnterGlobalAsync(int id, WebSocketRequest request)
+        {
+            var requestBucket = GatewayBucket.Get(request.Options.BucketId);
+            if (requestBucket.Type == GatewayBucketType.Unbucketed)
+                return;
+
+            var globalBucketType = GatewayBucket.Get(GatewayBucketType.Unbucketed);
+            var options = RequestOptions.CreateOrClone(request.Options);
+            options.BucketId = globalBucketType.Id;
+            var globalRequest = new WebSocketRequest(null, null, false, options);
+            var globalBucket = GetOrCreateBucket(globalBucketType.Id, globalRequest);
+            await globalBucket.TriggerAsync(id, globalRequest);
         }
 
         private RequestBucket GetOrCreateBucket(string id, IRequest request)

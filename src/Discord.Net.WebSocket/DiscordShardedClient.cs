@@ -67,6 +67,7 @@ namespace Discord.WebSocket
             config.DisplayInitialLog = false;
             _baseConfig = config;
             _connectionGroupLock = new SemaphoreSlim(1, 1);
+            GatewayBucket.SetLimits(GatewayLimits.GetOrCreate(config.GatewayLimits));
 
             if (config.TotalShards == null)
                 _automaticShards = true;

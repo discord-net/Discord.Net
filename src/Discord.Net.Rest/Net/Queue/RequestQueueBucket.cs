@@ -203,6 +203,15 @@ namespace Discord.Net.Queue
             }
         }
 
+        internal async Task TriggerAsync(int id, IRequest request)
+        {
+#if DEBUG_LIMITS
+            Debug.WriteLine($"[{id}] Trigger Bucket");
+#endif
+            await EnterAsync(id, request).ConfigureAwait(false);
+            UpdateRateLimit(id, request, default(RateLimitInfo), false);
+        }
+
         private async Task EnterAsync(int id, IRequest request)
         {
             int windowCount;
