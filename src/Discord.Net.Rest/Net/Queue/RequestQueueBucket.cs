@@ -37,7 +37,7 @@ namespace Discord.Net.Queue
             _resetTick = null;
             LastAttemptAt = DateTimeOffset.UtcNow;
         }
-        
+
         static int nextId = 0;
         public async Task<Stream> SendAsync(RestRequest request)
         {
@@ -249,7 +249,7 @@ namespace Discord.Net.Queue
                 }
 				else if (info.ResetAfter.HasValue && (request.Options.UseSystemClock.HasValue ? !request.Options.UseSystemClock.Value : false))
 				{
-					resetTick = DateTimeOffset.Now.Add(info.ResetAfter.Value);
+					resetTick = DateTimeOffset.UtcNow.Add(info.ResetAfter.Value);
 				}
                 else if (info.Reset.HasValue)
                 {
