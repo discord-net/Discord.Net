@@ -16,8 +16,8 @@ namespace Discord.Net.Queue
         {
             var buckets = new[]
             {
-                new GatewayBucket(GatewayBucketType.Unbucketed, "<unbucketed>", 120, 60),
-                new GatewayBucket(GatewayBucketType.Identify, "<identify>", 1, 5)
+                new GatewayBucket(GatewayBucketType.Unbucketed, "<gateway-unbucketed>", 120, 60),
+                new GatewayBucket(GatewayBucketType.Identify, "<gateway-identify>", 1, 5)
             };
 
             var builder = ImmutableDictionary.CreateBuilder<GatewayBucketType, GatewayBucket>();

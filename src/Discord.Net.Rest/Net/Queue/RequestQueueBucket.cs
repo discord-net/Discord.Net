@@ -332,6 +332,16 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Gateway Bucket ({GatewayBucket.Get(request.Options.BucketId).WindowSeconds * 1000} ms)");
 #endif
+                    if (!hasQueuedReset)
+                    {
+                        _resetTick = resetTick;
+                        LastAttemptAt = resetTick.Value;
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Reset in {(int)Math.Ceiling((resetTick - DateTimeOffset.UtcNow).Value.TotalMilliseconds)} ms");
+#endif
+                        var _ = QueueReset(id, (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds));
+                    }
+                    return;
                 }
 
                 if (resetTick == null)

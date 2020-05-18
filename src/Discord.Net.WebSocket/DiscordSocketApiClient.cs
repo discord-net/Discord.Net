@@ -37,7 +37,17 @@ namespace Discord.API
 
         public ConnectionState ConnectionState { get; private set; }
 
+        internal RequestQueue WebSocketRequestQueue { get; }
+
         public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent,
+            string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null,
+            RateLimitPrecision rateLimitPrecision = RateLimitPrecision.Second,
+            bool useSystemClock = true)
+            : this(restClientProvider, webSocketProvider, userAgent, null, url, defaultRetryMode, serializer, rateLimitPrecision, useSystemClock)
+        {
+        }
+
+        internal DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent, RequestQueue websocketRequestQueue,
             string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null,
             RateLimitPrecision rateLimitPrecision = RateLimitPrecision.Second,
 			bool useSystemClock = true)
@@ -48,6 +58,7 @@ namespace Discord.API
                 _isExplicitUrl = true;
             WebSocketClient = webSocketProvider();
             //WebSocketClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .NET Framework 4.6+)
+            WebSocketRequestQueue = websocketRequestQueue ?? new RequestQueue();
 
             WebSocketClient.BinaryMessage += async (data, index, count) =>
             {
@@ -208,7 +219,7 @@ namespace Discord.API
 
             options.IsGatewayBucket = true;
             options.BucketId = GatewayBucket.Get(opCode == GatewayOpCode.Identify ? GatewayBucketType.Identify : GatewayBucketType.Unbucketed).Id;
-            await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, bytes, true, options)).ConfigureAwait(false);
+            await WebSocketRequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, bytes, true, options)).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 

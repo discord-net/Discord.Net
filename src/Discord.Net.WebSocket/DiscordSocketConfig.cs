@@ -1,3 +1,4 @@
+using Discord.Net.Queue;
 using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
@@ -124,6 +125,8 @@ namespace Discord.WebSocket
         /// </summary>
         public bool GuildSubscriptions { get; set; } = true;
 
+        internal RequestQueue _websocketRequestQueue;
+
         /// <summary>
         ///     Initializes a default configuration.
         /// </summary>
@@ -131,6 +134,7 @@ namespace Discord.WebSocket
         {
             WebSocketProvider = DefaultWebSocketProvider.Instance;
             UdpSocketProvider = DefaultUdpSocketProvider.Instance;
+            _websocketRequestQueue = new RequestQueue();
         }
 
         internal DiscordSocketConfig Clone() => MemberwiseClone() as DiscordSocketConfig;

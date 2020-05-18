@@ -118,7 +118,16 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="config">The configuration to be used with the client.</param>
 #pragma warning disable IDISP004
-        public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null, null) { }
+        public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null, null)
+        {
+            ApiClient.WebSocketRequestQueue.RateLimitTriggered += async (id, info) =>
+            {
+                if (info == null)
+                    await _restLogger.VerboseAsync($"Preemptive Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
+                else
+                    await _restLogger.WarningAsync($"Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
+            };
+        }
         internal DiscordSocketClient(DiscordSocketConfig config, SemaphoreSlim groupLock, DiscordSocketClient parentClient) : this(config, CreateApiClient(config), groupLock, parentClient) { }
 #pragma warning restore IDISP004
         private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, SemaphoreSlim groupLock, DiscordSocketClient parentClient)
@@ -178,7 +187,7 @@ namespace Discord.WebSocket
             _largeGuilds = new ConcurrentQueue<ulong>();
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
-            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.GatewayHost,
+            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config._websocketRequestQueue, config.GatewayHost,
                 rateLimitPrecision: config.RateLimitPrecision);
         /// <inheritdoc />
         internal override void Dispose(bool disposing)
@@ -254,10 +263,7 @@ namespace Discord.WebSocket
             finally
             {
                 if (_connectionGroupLock != null)
-                {
-                    await Task.Delay(5000).ConfigureAwait(false);
                     _connectionGroupLock.Release();
-                }
             }
         }
         private async Task OnDisconnectingAsync(Exception ex)
