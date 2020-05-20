@@ -123,7 +123,7 @@ namespace Discord.WebSocket
                 model.Content = text;
             }
         }
-        
+
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Only the author of a message may modify the message.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
@@ -147,7 +147,19 @@ namespace Discord.WebSocket
         public string Resolve(TagHandling userHandling = TagHandling.Name, TagHandling channelHandling = TagHandling.Name,
             TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)
             => MentionUtils.Resolve(this, 0, userHandling, channelHandling, roleHandling, everyoneHandling, emojiHandling);
-        
+
+        /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">This operation may only be called on a <see cref="SocketNewsChannel"/> channel.</exception>
+        public async Task CrosspostAsync(RequestOptions options = null)
+        {
+            if (!(Channel is SocketNewsChannel))
+            {
+                throw new InvalidOperationException("Publishing (crossposting) is only valid in news channels.");
+            }
+
+            await MessageHelper.CrosspostAsync(this, Discord, options);
+        }
+
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")})";
         internal new SocketUserMessage Clone() => MemberwiseClone() as SocketUserMessage;
     }
