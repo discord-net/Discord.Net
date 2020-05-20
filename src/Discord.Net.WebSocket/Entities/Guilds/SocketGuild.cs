@@ -809,13 +809,14 @@ namespace Discord.WebSocket
             var members = Users;
             var self = CurrentUser;
             _members.Clear();
-            _members.TryAdd(self.Id, self);
+            if (self != null)
+                _members.TryAdd(self.Id, self);
 
             DownloadedMemberCount = _members.Count;
 
             foreach (var member in members)
             {
-                if (member.Id != self.Id)
+                if (member.Id != self?.Id)
                     member.GlobalUser.RemoveRef(Discord);
             }
         }
