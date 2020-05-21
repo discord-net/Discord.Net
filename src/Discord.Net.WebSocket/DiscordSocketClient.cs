@@ -190,7 +190,7 @@ namespace Discord.WebSocket
             _largeGuilds = new ConcurrentQueue<ulong>();
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
-            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config._websocketRequestQueue, config.GatewayHost,
+            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.WebsocketRequestQueue, config.GatewayHost,
                 rateLimitPrecision: config.RateLimitPrecision);
         /// <inheritdoc />
         internal override void Dispose(bool disposing)

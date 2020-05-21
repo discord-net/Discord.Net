@@ -133,7 +133,7 @@ namespace Discord.WebSocket
         /// </summary>
         public GatewayLimits GatewayLimits { get; set; } = new GatewayLimits();
 
-        internal RequestQueue _websocketRequestQueue;
+        internal RequestQueue WebsocketRequestQueue { get; } = new RequestQueue();
 
         /// <summary>
         ///     Initializes a default configuration.
@@ -142,7 +142,6 @@ namespace Discord.WebSocket
         {
             WebSocketProvider = DefaultWebSocketProvider.Instance;
             UdpSocketProvider = DefaultUdpSocketProvider.Instance;
-            _websocketRequestQueue = new RequestQueue();
         }
 
         internal DiscordSocketConfig Clone() => MemberwiseClone() as DiscordSocketConfig;

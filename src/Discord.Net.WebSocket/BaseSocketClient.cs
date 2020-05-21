@@ -80,7 +80,7 @@ namespace Discord.WebSocket
         internal BaseSocketClient(DiscordSocketConfig config, DiscordRestApiClient client)
             : base(config, client) => BaseConfig = config;
         private static DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
-            => new DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config._websocketRequestQueue,
+            => new DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.WebsocketRequestQueue,
                 rateLimitPrecision: config.RateLimitPrecision,
 				useSystemClock: config.UseSystemClock);
 
