@@ -127,10 +127,12 @@ namespace Discord.WebSocket
 
         /// <summary>
         ///     Gets or sets the gateway limits.
+        /// </summary>
+        /// <remarks>
         ///     <note type="warning">
         ///     This property should only be changed for bots that have special limits provided by Discord.
         ///     </note>
-        /// </summary>
+        /// </remarks>
         public GatewayLimits GatewayLimits { get; set; } = new GatewayLimits();
 
         internal RequestQueue WebsocketRequestQueue { get; } = new RequestQueue();
