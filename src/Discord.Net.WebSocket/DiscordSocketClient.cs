@@ -1391,6 +1391,39 @@ namespace Discord.WebSocket
                                     }
                                 }
                                 break;
+                            case "MESSAGE_REACTION_REMOVE_EMOJI":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_REMOVE_EMOJI)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<API.Gateway.RemoveAllReactionsForEmoteEvent>(_serializer);
+                                    if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
+                                    {
+                                        var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
+                                        bool isCached = cachedMsg != null;
+
+                                        var optionalMsg = !isCached
+                                            ? Optional.Create<SocketUserMessage>()
+                                            : Optional.Create(cachedMsg);
+
+                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId).ConfigureAwait(false) as IUserMessage);
+
+                                        IEmote emote;
+                                        if (data.Emoji.Id.HasValue)
+                                            emote = new Emote(data.Emoji.Id.Value, data.Emoji.Name, data.Emoji.Animated.GetValueOrDefault());
+                                        else
+                                            emote = new Emoji(data.Emoji.Name);
+
+                                        cachedMsg?.RemoveAllReactionsForEmoteAsync(emote);
+
+                                        await TimedInvokeAsync(_reactionsRemovedForEmoteEvent, nameof(ReactionsRemovedForEmote), cacheable, channel, emote).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
                             case "MESSAGE_DELETE_BULK":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE_BULK)").ConfigureAwait(false);
