@@ -44,6 +44,9 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets mutual guilds shared with this user.
         /// </summary>
+        /// <remarks>
+        ///     This property will only include guilds in the same <see cref="DiscordSocketClient"/>.
+        /// </remarks>
         public IReadOnlyCollection<SocketGuild> MutualGuilds
             => Discord.Guilds.Where(g => g.GetUser(Id) != null).ToImmutableArray();
 
