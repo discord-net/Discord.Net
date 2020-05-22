@@ -45,7 +45,7 @@ namespace Discord.WebSocket
         ///     Gets mutual guilds shared with this user.
         /// </summary>
         public IReadOnlyCollection<SocketGuild> MutualGuilds
-            => Discord.Guilds.Where(g => g.Users.Any(u => u.Id == Id)).ToImmutableArray();
+            => Discord.Guilds.Where(g => g.GetUser(Id) != null).ToImmutableArray();
 
         internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
