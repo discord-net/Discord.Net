@@ -6,11 +6,11 @@ namespace Discord.Rest
     public struct GatewayLimit
     {
         /// <summary>
-        ///     The maximum amount of this type of request in a time window, that is set by <see cref="Seconds"/>.
+        ///     Gets or sets the maximum amount of this type of request in a time window, that is set by <see cref="Seconds"/>.
         /// </summary>
         public int Count { get; set; }
         /// <summary>
-        ///     The amount of seconds until the rate limiter resets the remaining requests <see cref="Count"/>.
+        ///     Gets or sets the amount of seconds until the rate limiter resets the remaining requests <see cref="Count"/>.
         /// </summary>
         public int Seconds { get; set; }
 

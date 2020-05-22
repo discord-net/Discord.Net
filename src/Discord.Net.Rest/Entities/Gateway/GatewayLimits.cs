@@ -9,7 +9,7 @@ namespace Discord.Rest
         ///     Gets or sets the global limits for the gateway rate limiter.
         /// </summary>
         /// <remarks>
-        ///     It includes all the other limits, like Identify.
+        ///     This property includes all the other limits, like Identify.
         /// </remarks>
         public GatewayLimit Global { get; set; }
         /// <summary>
@@ -17,6 +17,9 @@ namespace Discord.Rest
         /// </summary>
         public GatewayLimit Identify { get; set; }
 
+        /// <summary>
+        ///     Initializes a new <see cref="GatewayLimits"/> with the default values.
+        /// </summary>
         public GatewayLimits()
         {
             Global = new GatewayLimit(120, 60);
