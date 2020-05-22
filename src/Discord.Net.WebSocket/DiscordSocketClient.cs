@@ -1406,12 +1406,7 @@ namespace Discord.WebSocket
                                             : Optional.Create(cachedMsg);
 
                                         var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId).ConfigureAwait(false) as IUserMessage);
-
-                                        IEmote emote;
-                                        if (data.Emoji.Id.HasValue)
-                                            emote = new Emote(data.Emoji.Id.Value, data.Emoji.Name, data.Emoji.Animated.GetValueOrDefault());
-                                        else
-                                            emote = new Emoji(data.Emoji.Name);
+                                        var emote = data.Emoji.ToIEmote();
 
                                         cachedMsg?.RemoveAllReactionsForEmoteAsync(emote);
 
