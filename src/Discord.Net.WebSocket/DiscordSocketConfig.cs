@@ -102,8 +102,8 @@ namespace Discord.WebSocket
         /// </remarks>
         public bool AlwaysDownloadUsers { get; set; } = false;
         /// <summary>
-        ///     Gets or sets the timeout for event handlers, in milliseconds, after which a warning will be logged. Null
-        ///     disables this check.
+        ///     Gets or sets the timeout for event handlers, in milliseconds, after which a warning will be logged. 
+        ///     <c>null</c>disables this check.
         /// </summary>
         public int? HandlerTimeout { get; set; } = 3000;
 
