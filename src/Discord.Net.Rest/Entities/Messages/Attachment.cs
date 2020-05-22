@@ -3,7 +3,7 @@ using Model = Discord.API.Attachment;
 
 namespace Discord
 {
-    /// <inheritdoc/>
+    /// <inheritdoc cref="IAttachment"/>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class Attachment : IAttachment
     {
