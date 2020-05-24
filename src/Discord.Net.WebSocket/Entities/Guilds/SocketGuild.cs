@@ -834,7 +834,11 @@ namespace Discord.WebSocket
         ///     users found within this guild.
         /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> GetUsersAsync(RequestOptions options = null)
-            => GuildHelper.GetUsersAsync(this, Discord, null, null, options);
+        {
+            if (HasAllMembers)
+                return ImmutableArray.Create(Users).ToAsyncEnumerable<IReadOnlyCollection<IGuildUser>>();
+            return GuildHelper.GetUsersAsync(this, Discord, null, null, options);
+        }
 
         /// <inheritdoc />
         public async Task DownloadUsersAsync()
@@ -1202,7 +1206,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IGuildUser>> IGuild.GetUsersAsync(CacheMode mode, RequestOptions options)
         {
-            if (mode == CacheMode.AllowDownload)
+            if (mode == CacheMode.AllowDownload && !HasAllMembers)
                 return (await GetUsersAsync(options).FlattenAsync().ConfigureAwait(false)).ToImmutableArray();
             else
                 return Users;
