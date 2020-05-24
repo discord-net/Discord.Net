@@ -167,7 +167,7 @@ namespace Discord.WebSocket
 
             GuildAvailable += g =>
             {
-                if (ConnectionState == ConnectionState.Connected && AlwaysDownloadUsers && !g.HasAllMembers)
+                if (_guildDownloadTask?.IsCompleted == true && ConnectionState == ConnectionState.Connected && AlwaysDownloadUsers && !g.HasAllMembers)
                 {
                     var _ = g.DownloadUsersAsync();
                 }
@@ -368,7 +368,7 @@ namespace Discord.WebSocket
         {
             var cachedGuilds = guilds.ToImmutableArray();
 
-            const short batchSize = 50;
+            const short batchSize = 1000; //TODO: Gateway Intents will limit to a maximum of 1 guild_id
             ulong[] batchIds = new ulong[Math.Min(batchSize, cachedGuilds.Length)];
             Task[] batchTasks = new Task[batchIds.Length];
             int batchCount = (cachedGuilds.Length + (batchSize - 1)) / batchSize;
@@ -576,6 +576,9 @@ namespace Discord.WebSocket
                                             }
                                             else if (_connection.CancelToken.IsCancellationRequested)
                                                 return;
+                                            
+                                            if (BaseConfig.AlwaysDownloadUsers)
+                                                _ = DownloadUsersAsync(Guilds.Where(x => x.IsAvailable && !x.HasAllMembers));
 
                                             await TimedInvokeAsync(_readyEvent, nameof(Ready)).ConfigureAwait(false);
                                             await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);
@@ -1742,7 +1745,7 @@ namespace Discord.WebSocket
             try
             {
                 await logger.DebugAsync("GuildDownloader Started").ConfigureAwait(false);
-                while ((_unavailableGuildCount != 0) && (Environment.TickCount - _lastGuildAvailableTime < 2000))
+                while ((_unavailableGuildCount != 0) && (Environment.TickCount - _lastGuildAvailableTime < BaseConfig.MaxWaitBetweenGuildAvailablesBeforeReady))
                     await Task.Delay(500, cancelToken).ConfigureAwait(false);
                 await logger.DebugAsync("GuildDownloader Stopped").ConfigureAwait(false);
             }
