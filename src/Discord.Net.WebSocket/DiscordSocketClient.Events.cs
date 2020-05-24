@@ -25,7 +25,7 @@ namespace Discord.WebSocket
         ///     Fired when guild data has finished downloading.
         /// </summary>
         /// <remarks>
-        ///     It is possible that some guilds might be unsynced if <see cref="DiscordSocketConfig.MaxWaitBetweenGuildAvailablesBeforeReady" /> was not long enough to receive all GUILD_AVAILABLES before READY.
+        ///     It is possible that some guilds might be unsynced if <see cref="DiscordSocketConfig.MaxWaitBetweenGuildAvailablesBeforeReady" /> was not long enough to receive all GUILD_AVAILABLEs before READY.
         /// </remarks>
         public event Func<Task> Ready
         {
