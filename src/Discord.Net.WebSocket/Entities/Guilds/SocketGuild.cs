@@ -1205,7 +1205,7 @@ namespace Discord.WebSocket
             if (mode == CacheMode.AllowDownload)
                 return (await GetUsersAsync(options).FlattenAsync().ConfigureAwait(false)).ToImmutableArray();
             else
-                return ImmutableArray.Create<IGuildUser>();
+                return Users;
         }
 
         /// <inheritdoc />
