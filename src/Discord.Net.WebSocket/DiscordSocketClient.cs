@@ -368,7 +368,7 @@ namespace Discord.WebSocket
         {
             var cachedGuilds = guilds.ToImmutableArray();
 
-            const short batchSize = 1000; //TODO: Gateway Intents will limit to a maximum of 1 guild_id
+            const short batchSize = 100; //TODO: Gateway Intents will limit to a maximum of 1 guild_id
             ulong[] batchIds = new ulong[Math.Min(batchSize, cachedGuilds.Length)];
             Task[] batchTasks = new Task[batchIds.Length];
             int batchCount = (cachedGuilds.Length + (batchSize - 1)) / batchSize;
@@ -376,7 +376,7 @@ namespace Discord.WebSocket
             for (int i = 0, k = 0; i < batchCount; i++)
             {
                 bool isLast = i == batchCount - 1;
-                int count = isLast ? (batchIds.Length - (batchCount - 1) * batchSize) : batchSize;
+                int count = isLast ? (cachedGuilds.Length - (batchCount - 1) * batchSize) : batchSize;
 
                 for (int j = 0; j < count; j++, k++)
                 {
