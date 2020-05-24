@@ -683,6 +683,9 @@ namespace Discord
         /// <summary>
         ///     Downloads all users for this guild if the current list is incomplete.
         /// </summary>
+        /// <remarks>
+        ///     This method downloads all users found within this guild throught the Gateway and caches them.
+        /// </remarks>
         /// <returns>
         ///     A task that represents the asynchronous download operation.
         /// </returns>
