@@ -37,17 +37,7 @@ namespace Discord.API
 
         public ConnectionState ConnectionState { get; private set; }
 
-        internal RequestQueue WebSocketRequestQueue { get; }
-
         public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent,
-            string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null,
-            RateLimitPrecision rateLimitPrecision = RateLimitPrecision.Second,
-            bool useSystemClock = true)
-            : this(restClientProvider, webSocketProvider, userAgent, null, url, defaultRetryMode, serializer, rateLimitPrecision, useSystemClock)
-        {
-        }
-
-        internal DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent, RequestQueue websocketRequestQueue,
             string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null,
             RateLimitPrecision rateLimitPrecision = RateLimitPrecision.Second,
 			bool useSystemClock = true)
@@ -58,7 +48,6 @@ namespace Discord.API
                 _isExplicitUrl = true;
             WebSocketClient = webSocketProvider();
             //WebSocketClient.SetHeader("user-agent", DiscordConfig.UserAgent); (Causes issues in .NET Framework 4.6+)
-            WebSocketRequestQueue = websocketRequestQueue ?? new RequestQueue();
 
             WebSocketClient.BinaryMessage += async (data, index, count) =>
             {
@@ -218,8 +207,9 @@ namespace Discord.API
                 bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
 
             options.IsGatewayBucket = true;
-            options.BucketId = GatewayBucket.Get(opCode == GatewayOpCode.Identify ? GatewayBucketType.Identify : GatewayBucketType.Unbucketed).Id;
-            await WebSocketRequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, bytes, true, options)).ConfigureAwait(false);
+            if (string.IsNullOrEmpty(options.BucketId))
+                options.BucketId = GatewayBucket.Get(GatewayBucketType.Unbucketed).Id;
+            await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, bytes, true, options)).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
@@ -240,6 +230,7 @@ namespace Discord.API
             if (totalShards > 1)
                 msg.ShardingParams = new int[] { shardID, totalShards };
 
+            options.BucketId = GatewayBucket.Get(GatewayBucketType.Identify).Id;
             await SendGatewayAsync(GatewayOpCode.Identify, msg, options: options).ConfigureAwait(false);
         }
         public async Task SendResumeAsync(string sessionId, int lastSeq, RequestOptions options = null)
@@ -268,6 +259,7 @@ namespace Discord.API
                 IsAFK = isAFK,
                 Game = game
             };
+            options.BucketId = GatewayBucket.Get(GatewayBucketType.PresenceUpdate).Id;
             await SendGatewayAsync(GatewayOpCode.StatusUpdate, args, options: options).ConfigureAwait(false);
         }
         public async Task SendRequestMembersAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)

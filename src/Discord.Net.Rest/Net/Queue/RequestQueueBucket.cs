@@ -348,7 +348,7 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Reset in {(int)Math.Ceiling((resetTick - DateTimeOffset.UtcNow).Value.TotalMilliseconds)} ms");
 #endif
-                        var _ = QueueReset(id, (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds));
+                        var _ = QueueReset(id, (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds), request);
                     }
                     return;
                 }
@@ -372,12 +372,12 @@ namespace Discord.Net.Queue
 
                     if (!hasQueuedReset)
                     {
-                        var _ = QueueReset(id, (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds));
+                        var _ = QueueReset(id, (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds), request);
                     }
                 }
             }
         }
-        private async Task QueueReset(int id, int millis)
+        private async Task QueueReset(int id, int millis, IRequest request)
         {
             while (true)
             {
@@ -391,6 +391,8 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                         Debug.WriteLine($"[{id}] * Reset *");
 #endif
+                        if (request is WebSocketRequest webSocketRequest && webSocketRequest.Options.BucketId == GatewayBucket.Get(GatewayBucketType.Identify).Id)
+                            _queue.ReleaseIdentifySemaphore(id);
                         _semaphore = WindowCount;
                         _resetTick = null;
                         return;

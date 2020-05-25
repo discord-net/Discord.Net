@@ -122,14 +122,6 @@ namespace Discord.WebSocket
         public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null, null)
         {
             GatewayBucket.SetLimits(GatewayLimits.GetOrCreate(config.GatewayLimits));
-
-            ApiClient.WebSocketRequestQueue.RateLimitTriggered += async (id, info) =>
-            {
-                if (info == null)
-                    await _restLogger.VerboseAsync($"Preemptive Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
-                else
-                    await _restLogger.WarningAsync($"Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
-            };
         }
         internal DiscordSocketClient(DiscordSocketConfig config, SemaphoreSlim groupLock, DiscordSocketClient parentClient) : this(config, CreateApiClient(config), groupLock, parentClient) { }
 #pragma warning restore IDISP004
@@ -190,7 +182,7 @@ namespace Discord.WebSocket
             _largeGuilds = new ConcurrentQueue<ulong>();
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
-            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.WebsocketRequestQueue, config.GatewayHost,
+            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.GatewayHost,
                 rateLimitPrecision: config.RateLimitPrecision);
         /// <inheritdoc />
         internal override void Dispose(bool disposing)

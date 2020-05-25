@@ -135,8 +135,6 @@ namespace Discord.WebSocket
         /// </remarks>
         public GatewayLimits GatewayLimits { get; set; } = new GatewayLimits();
 
-        internal RequestQueue WebsocketRequestQueue { get; } = new RequestQueue();
-
         /// <summary>
         ///     Initializes a default configuration.
         /// </summary>

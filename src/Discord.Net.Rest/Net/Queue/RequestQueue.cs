@@ -1,3 +1,4 @@
+using Discord.Rest;
 using System;
 using System.Collections.Concurrent;
 #if DEBUG_LIMITS
@@ -22,12 +23,15 @@ namespace Discord.Net.Queue
         private CancellationTokenSource _requestCancelTokenSource;
         private CancellationToken _requestCancelToken; //Parent token + Clear token
         private DateTimeOffset _waitUntil;
+        private Semaphore _identifySemaphore;
 
         private Task _cleanupTask;
 
         public RequestQueue()
         {
             _tokenLock = new SemaphoreSlim(1, 1);
+            int semaphoreCount = GatewayBucket.Get(GatewayBucketType.Identify).WindowCount;
+            _identifySemaphore = new Semaphore(semaphoreCount, semaphoreCount, GatewayBucket.GetIdentifySemaphoreName());
 
             _clearToken = new CancellationTokenSource();
             _cancelTokenSource = new CancellationTokenSource();
@@ -120,16 +124,35 @@ namespace Discord.Net.Queue
         }
         internal async Task EnterGlobalAsync(int id, WebSocketRequest request)
         {
+            //If this is a global request (unbucketed), it'll be dealt in EnterAsync
             var requestBucket = GatewayBucket.Get(request.Options.BucketId);
             if (requestBucket.Type == GatewayBucketType.Unbucketed)
                 return;
 
+            //Identify is per-account so we won't trigger global until we can actually go for it
+            if (requestBucket.Type == GatewayBucketType.Identify)
+            {
+                while (!_identifySemaphore.WaitOne(0)) //To not block the thread
+                    await Task.Delay(100, request.CancelToken);
+#if DEBUG_LIMITS
+                Debug.WriteLine($"[{id}] Acquired identify ticket");
+#endif
+            }
+
+            //It's not a global request, so need to remove one from global (per-session)
             var globalBucketType = GatewayBucket.Get(GatewayBucketType.Unbucketed);
             var options = RequestOptions.CreateOrClone(request.Options);
             options.BucketId = globalBucketType.Id;
             var globalRequest = new WebSocketRequest(null, null, false, options);
             var globalBucket = GetOrCreateBucket(globalBucketType.Id, globalRequest);
             await globalBucket.TriggerAsync(id, globalRequest);
+        }
+        internal void ReleaseIdentifySemaphore(int id)
+        {
+            _identifySemaphore.Release();
+#if DEBUG_LIMITS
+                Debug.WriteLine($"[{id}] Released identify ticket");
+#endif
         }
 
         private RequestBucket GetOrCreateBucket(string id, IRequest request)
