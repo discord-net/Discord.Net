@@ -31,7 +31,9 @@ namespace Discord.Rest
         ///     and status (online, idle, etc)
         /// </remarks>
         public GatewayLimit PresenceUpdate { get; set; }
-
+        /// <summary>
+        ///     Gets or sets the name of the <see cref="System.Threading.Semaphore"/> used by identify.
+        /// </summary>
         public string IdentifySemaphoreName { get; set; }
 
         /// <summary>
