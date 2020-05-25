@@ -821,6 +821,25 @@ namespace Discord.WebSocket
             }
         }
 
+        /// <summary>
+        ///     Gets a collection of all users in this guild.
+        /// </summary>
+        /// <remarks>
+        ///     <para>This method retrieves all users found within this guild throught REST.</para>
+        ///     <para>Users returned by this method are not cached.</para>
+        /// </remarks>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a collection of guild
+        ///     users found within this guild.
+        /// </returns>
+        public IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> GetUsersAsync(RequestOptions options = null)
+        {
+            if (HasAllMembers)
+                return ImmutableArray.Create(Users).ToAsyncEnumerable<IReadOnlyCollection<IGuildUser>>();
+            return GuildHelper.GetUsersAsync(this, Discord, null, null, options);
+        }
+
         /// <inheritdoc />
         public async Task DownloadUsersAsync()
         {
@@ -1185,8 +1204,13 @@ namespace Discord.WebSocket
             => await CreateRoleAsync(name, permissions, color, isHoisted, isMentionable, options).ConfigureAwait(false);
 
         /// <inheritdoc />
-        Task<IReadOnlyCollection<IGuildUser>> IGuild.GetUsersAsync(CacheMode mode, RequestOptions options)
-            => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Users);
+        async Task<IReadOnlyCollection<IGuildUser>> IGuild.GetUsersAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload && !HasAllMembers)
+                return (await GetUsersAsync(options).FlattenAsync().ConfigureAwait(false)).ToImmutableArray();
+            else
+                return Users;
+        }
 
         /// <inheritdoc />
         async Task<IGuildUser> IGuild.AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func, RequestOptions options)
