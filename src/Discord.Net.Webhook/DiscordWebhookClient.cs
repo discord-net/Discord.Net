@@ -44,7 +44,7 @@ namespace Discord.Webhook
             Webhook = WebhookClientHelper.GetWebhookAsync(this, webhookId).GetAwaiter().GetResult();
         }
         /// <summary> Creates a new Webhook Discord client. </summary>
-        public DiscordWebhookClient(IWebhook webhook, DiscordRestConfig config)
+        public DiscordWebhookClient(IWebhook webhook, DiscordRestConfig config) 
             : this(config)
         {
             Webhook = webhook;
@@ -132,7 +132,7 @@ namespace Discord.Webhook
             if (match != null)
             {
                 // ensure that the first group is a ulong, set the _webhookId
-                // 0th group is always the entire match, so start at index 1
+                // 0th group is always the entire match, and 1 is the domain; so start at index 2
                 if (!(match.Groups[2].Success && ulong.TryParse(match.Groups[2].Value, NumberStyles.None, CultureInfo.InvariantCulture, out webhookId)))
                     throw ex("The webhook Id could not be parsed.");
 
