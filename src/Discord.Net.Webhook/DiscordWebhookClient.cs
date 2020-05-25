@@ -44,7 +44,7 @@ namespace Discord.Webhook
             Webhook = WebhookClientHelper.GetWebhookAsync(this, webhookId).GetAwaiter().GetResult();
         }
         /// <summary> Creates a new Webhook Discord client. </summary>
-        public DiscordWebhookClient(IWebhook webhook, DiscordRestConfig config) 
+        public DiscordWebhookClient(IWebhook webhook, DiscordRestConfig config)
             : this(config)
         {
             Webhook = webhook;
