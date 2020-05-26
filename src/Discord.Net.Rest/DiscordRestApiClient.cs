@@ -180,7 +180,7 @@ namespace Discord.API
         //Core
         internal Task SendAsync(string method, Expression<Func<string>> endpointExpr, BucketIds ids,
              ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
-            => SendAsync(method, GetEndpoint(endpointExpr), GetBucketId(ids, endpointExpr, funcName), clientBucket, options);
+            => SendAsync(method, GetEndpoint(endpointExpr), GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
         public async Task SendAsync(string method, string endpoint,
             string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
@@ -194,7 +194,7 @@ namespace Discord.API
 
         internal Task SendJsonAsync(string method, Expression<Func<string>> endpointExpr, object payload, BucketIds ids,
              ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
-            => SendJsonAsync(method, GetEndpoint(endpointExpr), payload, GetBucketId(ids, endpointExpr, funcName), clientBucket, options);
+            => SendJsonAsync(method, GetEndpoint(endpointExpr), payload, GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
         public async Task SendJsonAsync(string method, string endpoint, object payload,
             string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
@@ -209,7 +209,7 @@ namespace Discord.API
 
         internal Task SendMultipartAsync(string method, Expression<Func<string>> endpointExpr, IReadOnlyDictionary<string, object> multipartArgs, BucketIds ids,
              ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
-            => SendMultipartAsync(method, GetEndpoint(endpointExpr), multipartArgs, GetBucketId(ids, endpointExpr, funcName), clientBucket, options);
+            => SendMultipartAsync(method, GetEndpoint(endpointExpr), multipartArgs, GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
         public async Task SendMultipartAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
             string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
@@ -223,7 +223,7 @@ namespace Discord.API
 
         internal Task<TResponse> SendAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, BucketIds ids,
              ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class
-            => SendAsync<TResponse>(method, GetEndpoint(endpointExpr), GetBucketId(ids, endpointExpr, funcName), clientBucket, options);
+            => SendAsync<TResponse>(method, GetEndpoint(endpointExpr), GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
         public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint,
             string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
         {
@@ -236,7 +236,7 @@ namespace Discord.API
 
         internal Task<TResponse> SendJsonAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, object payload, BucketIds ids,
              ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null) where TResponse : class
-            => SendJsonAsync<TResponse>(method, GetEndpoint(endpointExpr), payload, GetBucketId(ids, endpointExpr, funcName), clientBucket, options);
+            => SendJsonAsync<TResponse>(method, GetEndpoint(endpointExpr), payload, GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
         public async Task<TResponse> SendJsonAsync<TResponse>(string method, string endpoint, object payload,
             string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
         {
@@ -250,7 +250,7 @@ namespace Discord.API
 
         internal Task<TResponse> SendMultipartAsync<TResponse>(string method, Expression<Func<string>> endpointExpr, IReadOnlyDictionary<string, object> multipartArgs, BucketIds ids,
              ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null, [CallerMemberName] string funcName = null)
-            => SendMultipartAsync<TResponse>(method, GetEndpoint(endpointExpr), multipartArgs, GetBucketId(ids, endpointExpr, funcName), clientBucket, options);
+            => SendMultipartAsync<TResponse>(method, GetEndpoint(endpointExpr), multipartArgs, GetBucketId(method, ids, endpointExpr, funcName), clientBucket, options);
         public async Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
             string bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
@@ -1442,6 +1442,7 @@ namespace Discord.API
         {
             public ulong GuildId { get; internal set; }
             public ulong ChannelId { get; internal set; }
+            public string HttpMethod { get; internal set; }
 
             internal BucketIds(ulong guildId = 0, ulong channelId = 0)
             {
@@ -1449,14 +1450,15 @@ namespace Discord.API
                 ChannelId = channelId;
             }
             internal object[] ToArray()
-                => new object[] { GuildId, ChannelId };
+                => new object[] { HttpMethod, GuildId, ChannelId };
 
             internal static int? GetIndex(string name)
             {
                 switch (name)
                 {
-                    case "guildId": return 0;
-                    case "channelId": return 1;
+                    case "httpMethod": return 0;
+                    case "guildId": return 1;
+                    case "channelId": return 2;
                     default:
                         return null;
                 }
@@ -1467,8 +1469,9 @@ namespace Discord.API
         {
             return endpointExpr.Compile()();
         }
-        private static string GetBucketId(BucketIds ids, Expression<Func<string>> endpointExpr, string callingMethod)
+        private static string GetBucketId(string httpMethod, BucketIds ids, Expression<Func<string>> endpointExpr, string callingMethod)
         {
+            ids.HttpMethod ??= httpMethod;
             return _bucketIdGenerators.GetOrAdd(callingMethod, x => CreateBucketId(endpointExpr))(ids);
         }
 
@@ -1478,7 +1481,7 @@ namespace Discord.API
             {
                 //Is this a constant string?
                 if (endpoint.Body.NodeType == ExpressionType.Constant)
-                    return x => (endpoint.Body as ConstantExpression).Value.ToString();
+                    return x => string.Format($"{{0}} {(endpoint.Body as ConstantExpression).Value}", x.ToArray());
 
                 var builder = new StringBuilder();
                 var methodCall = endpoint.Body as MethodCallExpression;
@@ -1528,7 +1531,7 @@ namespace Discord.API
 
                 format = builder.ToString();
 
-                return x => string.Format(format, x.ToArray());
+                return x => string.Format($"{{0}} {format}", x.ToArray());
             }
             catch (Exception ex)
             {
