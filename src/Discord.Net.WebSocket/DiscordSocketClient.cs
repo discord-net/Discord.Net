@@ -1771,17 +1771,7 @@ namespace Discord.WebSocket
             return guild;
         }
         internal SocketGuild RemoveGuild(ulong id)
-        {
-            var guild = State.RemoveGuild(id);
-            if (guild != null)
-            {
-                foreach (var _ in guild.Channels)
-                    State.RemoveChannel(id);
-                foreach (var user in guild.Users)
-                    user.GlobalUser.RemoveRef(this);
-            }
-            return guild;
-        }
+            => State.RemoveGuild(id);
 
         /// <exception cref="InvalidOperationException">Unexpected channel type is created.</exception>
         internal ISocketPrivateChannel AddPrivateChannel(API.Channel model, ClientState state)
