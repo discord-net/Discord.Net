@@ -151,7 +151,7 @@ namespace Discord.Net.Queue
         {
             _identifySemaphore.Release();
 #if DEBUG_LIMITS
-                Debug.WriteLine($"[{id}] Released identify ticket");
+            Debug.WriteLine($"[{id}] Released identify ticket");
 #endif
         }
 
