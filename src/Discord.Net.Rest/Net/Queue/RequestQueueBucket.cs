@@ -277,16 +277,16 @@ namespace Discord.Net.Queue
 #endif
                 }
 
-                /*if (resetTick == null)
+                if (resetTick == null)
                 {
-                    WindowCount = 0; //No rate limit info, disable limits on this bucket (should only ever happen with a user token)
+                    WindowCount = 0; //No rate limit info, disable limits on this bucket
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Disabled Semaphore");
 #endif
                     return;
-                }*/
+                }
 
-                if (resetTick != null && (!hasQueuedReset || resetTick > _resetTick))
+                if (!hasQueuedReset || resetTick > _resetTick)
                 {
                     _resetTick = resetTick;
                     LastAttemptAt = resetTick.Value; //Make sure we dont destroy this until after its been reset
@@ -299,8 +299,6 @@ namespace Discord.Net.Queue
                         var _ = QueueReset(id, (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds));
                     }
                 }
-                else if (!hasQueuedReset && _semaphore == 0)
-                    _semaphore = WindowCount; //Prevent getting locked at 0/1 if Discord doesn't send the ratelimit headers
             }
         }
         private async Task QueueReset(int id, int millis)
