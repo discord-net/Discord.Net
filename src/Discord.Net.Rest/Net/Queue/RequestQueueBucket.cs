@@ -20,11 +20,11 @@ namespace Discord.Net.Queue
         private int _semaphore;
         private DateTimeOffset? _resetTick;
 
-        public string Id { get; private set; }
+        public BucketId Id { get; private set; }
         public int WindowCount { get; private set; }
         public DateTimeOffset LastAttemptAt { get; private set; }
 
-        public RequestBucket(RequestQueue queue, RestRequest request, string id)
+        public RequestBucket(RequestQueue queue, RestRequest request, BucketId id)
         {
             _queue = queue;
             Id = id;
@@ -234,7 +234,7 @@ namespace Discord.Net.Queue
                 }
 
                 if (info.Bucket != null)
-                    _queue.UpdateBucketHash(request.Options.BucketId, info.Bucket);
+                    Id = _queue.UpdateBucketHash(request.Options.BucketId, info.Bucket) ?? Id;
 
                 var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                 DateTimeOffset? resetTick = null;
