@@ -233,6 +233,9 @@ namespace Discord.Net.Queue
 #endif
                 }
 
+                if (info.Bucket != null)
+                    _queue.UpdateBucketHash(request.Options.BucketId, info.Bucket);
+
                 var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                 DateTimeOffset? resetTick = null;
 
