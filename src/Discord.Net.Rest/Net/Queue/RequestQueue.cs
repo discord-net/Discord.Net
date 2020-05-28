@@ -125,16 +125,16 @@ namespace Discord.Net.Queue
         {
             await RateLimitTriggered(bucketId, info).ConfigureAwait(false);
         }
-        internal BucketId UpdateBucketHash(BucketId id, string discordHash)
+        internal (RequestBucket, BucketId) UpdateBucketHash(BucketId id, string discordHash)
         {
             if (!id.IsHashBucket)
             {
                 var bucket = BucketId.Create(discordHash, id);
-                _buckets.GetOrAdd(bucket, _buckets[id]);
+                var hashReqQueue = (RequestBucket)_buckets.GetOrAdd(bucket, _buckets[id]);
                 _buckets.AddOrUpdate(id, bucket, (oldBucket, oldObj) => bucket);
-                return bucket;
+                return (hashReqQueue, bucket);
             }
-            return null;
+            return (null, null);
         }
 
         private async Task RunCleanup()
