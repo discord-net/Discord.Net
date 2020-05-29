@@ -1490,7 +1490,6 @@ namespace Discord.API
         private static BucketId GetBucketId(string httpMethod, BucketIds ids, Expression<Func<string>> endpointExpr, string callingMethod)
         {
             ids.HttpMethod ??= httpMethod;
-            Debug.WriteLine("GetBucketId: " + CreateBucketId(endpointExpr)(ids));
             return _bucketIdGenerators.GetOrAdd(callingMethod, x => CreateBucketId(endpointExpr))(ids);
         }
 

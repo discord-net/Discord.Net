@@ -33,7 +33,7 @@ namespace Discord.Net.Queue
             _lock = new object();
 
             if (request.Options.IsClientBucket)
-                WindowCount = ClientBucket.Get(request.Options.BucketId).WindowCount;
+                WindowCount = ClientBucket.Get(Id).WindowCount;
             else
                 WindowCount = 1; //Only allow one request until we get a header back
             _semaphore = WindowCount;
@@ -181,7 +181,8 @@ namespace Discord.Net.Queue
                 }
 
                 DateTimeOffset? timeoutAt = request.TimeoutAt;
-                if (windowCount > 0 && Interlocked.Decrement(ref _semaphore) < 0)
+                int semaphore = 0;
+                if (windowCount > 0 && (semaphore = Interlocked.Decrement(ref _semaphore)) < 0)
                 {
                     if (!isRateLimited)
                     {
@@ -216,7 +217,7 @@ namespace Discord.Net.Queue
                 }
 #if DEBUG_LIMITS
                 else
-                    Debug.WriteLine($"[{id}] Entered Semaphore ({_semaphore}/{WindowCount} remaining)");
+                    Debug.WriteLine($"[{id}] Entered Semaphore ({semaphore}/{WindowCount} remaining)");
 #endif
                 break;
             }
@@ -230,8 +231,38 @@ namespace Discord.Net.Queue
             lock (_lock)
             {
                 if (redirected)
+                {
                     Interlocked.Decrement(ref _semaphore); //we might still hit a real ratelimit if all tickets were already taken, can't do much about it since we didn't know they were the same
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Decrease Semaphore");
+#endif
+                }
                 bool hasQueuedReset = _resetTick != null;
+
+                if (info.Bucket != null && !redirected)
+                {
+                    (RequestBucket, BucketId) hashBucket = _queue.UpdateBucketHash(Id, info.Bucket);
+                    if (!(hashBucket.Item1 is null) && !(hashBucket.Item2 is null))
+                    {
+                        if (hashBucket.Item1 == this) //this bucket got promoted to a hash queue
+                        {
+                            Id = hashBucket.Item2;
+#if DEBUG_LIMITS
+                            Debug.WriteLine($"[{id}] Promoted to Hash Bucket ({hashBucket.Item2})");
+#endif
+                        }
+                        else
+                        {
+                            _redirectBucket = hashBucket.Item1; //this request should be part of another bucket, this bucket will be disabled, redirect everything
+                            _redirectBucket.UpdateRateLimit(id, request, info, is429, redirected: true); //update the hash bucket ratelimit
+#if DEBUG_LIMITS
+                            Debug.WriteLine($"[{id}] Redirected to {_redirectBucket.Id}");
+#endif
+                            return;
+                        }
+                    }
+                }
+
                 if (info.Limit.HasValue && WindowCount != info.Limit.Value)
                 {
                     WindowCount = info.Limit.Value;
@@ -239,20 +270,6 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Upgraded Semaphore to {info.Remaining.Value}/{WindowCount}");
 #endif
-                }
-
-                if (info.Bucket != null && !redirected)
-                {
-                    (RequestBucket, BucketId) hashBucket = _queue.UpdateBucketHash(request.Options.BucketId, info.Bucket);
-                    if (hashBucket.Item1 is null || hashBucket.Item2 is null)
-                        return;
-                    if (hashBucket.Item1 == this) //this bucket got promoted to a hash queue
-                        Id = hashBucket.Item2;
-                    else
-                    {
-                        _redirectBucket = hashBucket.Item1; //this request should be part of another bucket, this bucket will be disabled, redirect everything
-                        _redirectBucket.UpdateRateLimit(id, request, info, is429, redirected: true); //update the hash bucket ratelimit
-                    }
                 }
 
                 DateTimeOffset? resetTick = null;
@@ -289,11 +306,11 @@ namespace Discord.Net.Queue
                     Debug.WriteLine($"[{id}] X-RateLimit-Reset: {info.Reset.Value.ToUnixTimeSeconds()} ({diff} ms, {info.Lag?.TotalMilliseconds} ms lag)");
 #endif
                 }
-                else if (request.Options.IsClientBucket && request.Options.BucketId != null)
+                else if (request.Options.IsClientBucket && Id != null)
                 {
-                    resetTick = DateTimeOffset.UtcNow.AddSeconds(ClientBucket.Get(request.Options.BucketId).WindowSeconds);
+                    resetTick = DateTimeOffset.UtcNow.AddSeconds(ClientBucket.Get(Id).WindowSeconds);
 #if DEBUG_LIMITS
-                    Debug.WriteLine($"[{id}] Client Bucket ({ClientBucket.Get(request.Options.BucketId).WindowSeconds * 1000} ms)");
+                    Debug.WriteLine($"[{id}] Client Bucket ({ClientBucket.Get(Id).WindowSeconds * 1000} ms)");
 #endif
                 }
 

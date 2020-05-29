@@ -51,7 +51,7 @@ namespace Discord.Net
         /// <param name="majorParams">Major parameters of the route of this endpoint.</param>
         /// <returns>
         ///     A <see cref="BucketId"/> based on the <see cref="HttpMethod"/>
-        ///     and the <see cref="Endpoint"> with the provided data.
+        ///     and the <see cref="Endpoint"/> with the provided data.
         /// </returns>
         public static BucketId Create(string httpMethod, string endpoint, Dictionary<string, string> majorParams)
         {
