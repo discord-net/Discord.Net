@@ -11,7 +11,7 @@ namespace Discord.Net
         public int? Remaining { get; }
         public int? RetryAfter { get; }
         public DateTimeOffset? Reset { get; }
-		    public TimeSpan? ResetAfter { get; }
+        public TimeSpan? ResetAfter { get; }
         public string Bucket { get; }
         public TimeSpan? Lag { get; }
 
@@ -27,8 +27,8 @@ namespace Discord.Net
                 double.TryParse(temp, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var reset) ? DateTimeOffset.FromUnixTimeMilliseconds((long)(reset * 1000)) : (DateTimeOffset?)null;
             RetryAfter = headers.TryGetValue("Retry-After", out temp) &&
                 int.TryParse(temp, NumberStyles.None, CultureInfo.InvariantCulture, out var retryAfter) ? retryAfter : (int?)null;
-			      ResetAfter = headers.TryGetValue("X-RateLimit-Reset-After", out temp) && 
-				        float.TryParse(temp, out var resetAfter) ? TimeSpan.FromMilliseconds((long)(resetAfter * 1000)) : (TimeSpan?)null;
+			ResetAfter = headers.TryGetValue("X-RateLimit-Reset-After", out temp) &&
+                double.TryParse(temp, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var resetAfter) ? TimeSpan.FromMilliseconds((long)(resetAfter * 1000)) : (TimeSpan?)null;
             Bucket = headers.TryGetValue("X-RateLimit-Bucket", out temp) ? temp : null;
             Lag = headers.TryGetValue("Date", out temp) &&
                 DateTimeOffset.TryParse(temp, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date) ? DateTimeOffset.UtcNow - date : (TimeSpan?)null;

@@ -181,8 +181,8 @@ namespace Discord.Net.Queue
                 }
 
                 DateTimeOffset? timeoutAt = request.TimeoutAt;
-                int semaphore = 0;
-                if (windowCount > 0 && (semaphore = Interlocked.Decrement(ref _semaphore)) < 0)
+                int semaphore = Interlocked.Decrement(ref _semaphore);
+                if (windowCount > 0 && semaphore < 0)
                 {
                     if (!isRateLimited)
                     {
@@ -291,6 +291,9 @@ namespace Discord.Net.Queue
                 else if (info.ResetAfter.HasValue && (request.Options.UseSystemClock.HasValue ? !request.Options.UseSystemClock.Value : false))
                 {
                     resetTick = DateTimeOffset.UtcNow.Add(info.ResetAfter.Value);
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Reset-After: {info.ResetAfter.Value} ({info.ResetAfter?.TotalMilliseconds} ms)");
+#endif
                 }
                 else if (info.Reset.HasValue)
                 {
