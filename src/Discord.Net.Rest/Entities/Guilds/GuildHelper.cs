@@ -387,6 +387,17 @@ namespace Discord.Rest
                 model = await client.ApiClient.BeginGuildPruneAsync(guild.Id, args, options).ConfigureAwait(false);
             return model.Pruned;
         }
+        public static async Task<IReadOnlyCollection<RestGuildUser>> SearchUsersAsync(IGuild guild, BaseDiscordClient client,
+            string query, int? limit, RequestOptions options)
+        {
+            var apiArgs = new SearchGuildMembersParams
+            {
+                Query = query,
+                Limit = limit ?? Optional.Create<int>()
+            };
+            var models = await client.ApiClient.SearchGuildMembersAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
+            return models.Select(x => RestGuildUser.Create(client, guild, x)).ToImmutableArray();
+        }
 
         // Audit logs
         public static IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(IGuild guild, BaseDiscordClient client,
