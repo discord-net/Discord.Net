@@ -264,19 +264,18 @@ namespace Discord.Rest
         {
             if (name == null) throw new ArgumentNullException(paramName: nameof(name));
 
-            var model = await client.ApiClient.CreateGuildRoleAsync(guild.Id, options).ConfigureAwait(false);
-            var role = RestRole.Create(client, guild, model);
-
-            await role.ModifyAsync(x =>
+            var createGuildRoleParams = new API.Rest.CreateGuildRoleParams
             {
-                x.Name = name;
-                x.Permissions = (permissions ?? role.Permissions);
-                x.Color = (color ?? Color.Default);
-                x.Hoist = isHoisted;
-                x.Mentionable = isMentionable;
-            }, options).ConfigureAwait(false);
+                Color = color?.RawValue ?? Optional.Create<uint>(),
+                Hoist = isHoisted,
+                Mentionable = isMentionable,
+                Name = name,
+                Permissions = permissions?.RawValue ?? Optional.Create<ulong>()
+            };
 
-            return role;
+            var model = await client.ApiClient.CreateGuildRoleAsync(guild.Id, createGuildRoleParams, options).ConfigureAwait(false);
+
+            return RestRole.Create(client, guild, model);
         }
 
         //Users
