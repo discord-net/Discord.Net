@@ -1,17 +1,21 @@
 namespace Discord
 {
+    /// <summary>
+    ///     Stores the gateway information related to the current bot.
+    /// </summary>
     public class BotGateway
     {
         /// <summary>
-        ///     The WSS URL that can be used for connecting to the gateway.
+        ///     Gets the WSS URL that can be used for connecting to the gateway.
         /// </summary>
         public string Url { get; internal set; }
         /// <summary>
-        ///     The recommended number of shards to use when connecting.
+        ///     Gets the recommended number of shards to use when connecting.
         /// </summary>
         public int Shards { get; internal set; }
         /// <summary>
-        ///     Information on the current session start limit.
+        ///     Gets the <see cref="SessionStartLimit"/> that contains the information
+        ///     about the current session start limit.
         /// </summary>
         public SessionStartLimit SessionStartLimit { get; internal set; }
     }
