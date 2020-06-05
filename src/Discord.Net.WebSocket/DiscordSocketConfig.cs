@@ -1,7 +1,7 @@
-using Discord.Net.Queue;
 using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
+using System;
 
 namespace Discord.WebSocket
 {
@@ -126,14 +126,32 @@ namespace Discord.WebSocket
         public bool GuildSubscriptions { get; set; } = true;
 
         /// <summary>
-        ///     Gets or sets the gateway limits.
+        ///     Gets or sets the name of the master <see cref="System.Threading.Semaphore"/>
+        ///     used by identify.
         /// </summary>
         /// <remarks>
-        ///     <note type="warning">
-        ///     This property should only be changed for bots that have special limits provided by Discord.
-        ///     </note>
+        ///     It is used to define what slave <see cref="System.Threading.Semaphore"/>
+        ///     is free to run for concurrent identify requests.
         /// </remarks>
-        public GatewayLimits GatewayLimits { get; set; } = GatewayLimits.Default;
+        public string IdentifyMasterSemaphoreName { get; set; } = Guid.NewGuid().ToString();
+
+        /// <summary>
+        ///      Gets or sets the name of the slave <see cref="System.Threading.Semaphore"/>
+        ///     used by identify.
+        /// </summary>
+        /// <remarks>
+        ///     If the maximum concurrency is higher than one and you are using the sharded client,
+        ///     it will be dinamilly renamed to fit the necessary needs.
+        /// </remarks>
+        public string IdentifySemaphoreName { get; set; } = Guid.NewGuid().ToString();
+
+        /// <summary>
+        ///     Gets or sets the maximum identify concurrency.
+        /// </summary>
+        /// <remarks>
+        ///     This information is provided by Discord.
+        /// </remarks>
+        public int IdentifyMaxConcurrency { get; set; } = 1;
 
         /// <summary>
         ///     Initializes a default configuration.
@@ -144,11 +162,6 @@ namespace Discord.WebSocket
             UdpSocketProvider = DefaultUdpSocketProvider.Instance;
         }
 
-        internal DiscordSocketConfig Clone()
-        {
-            var clone = MemberwiseClone() as DiscordSocketConfig;
-            clone.GatewayLimits = GatewayLimits.Clone();
-            return clone;
-        }
+        internal DiscordSocketConfig Clone() => MemberwiseClone() as DiscordSocketConfig;
     }
 }

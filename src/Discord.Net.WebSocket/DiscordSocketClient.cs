@@ -119,10 +119,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="config">The configuration to be used with the client.</param>
 #pragma warning disable IDISP004
-        public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null, null)
-        {
-            GatewayBucket.SetLimits(GatewayLimits.GetOrCreate(config.GatewayLimits));
-        }
+        public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null, null) { }
         internal DiscordSocketClient(DiscordSocketConfig config, SemaphoreSlim groupLock, DiscordSocketClient parentClient) : this(config, CreateApiClient(config), groupLock, parentClient) { }
 #pragma warning restore IDISP004
         private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, SemaphoreSlim groupLock, DiscordSocketClient parentClient)
@@ -182,7 +179,7 @@ namespace Discord.WebSocket
             _largeGuilds = new ConcurrentQueue<ulong>();
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
-            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.GatewayLimits, config.GatewayHost,
+            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config, config.GatewayHost,
                 rateLimitPrecision: config.RateLimitPrecision);
         /// <inheritdoc />
         internal override void Dispose(bool disposing)
