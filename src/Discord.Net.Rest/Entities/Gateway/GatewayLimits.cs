@@ -91,7 +91,7 @@ namespace Discord.Rest
         }
         
 
-        internal static GatewayLimits GetOrCreate(GatewayLimits? limits)
+        internal static GatewayLimits GetOrCreate(GatewayLimits limits)
             => limits ?? Default;
 
         public GatewayLimits Clone()
