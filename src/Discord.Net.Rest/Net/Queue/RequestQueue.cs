@@ -1,4 +1,3 @@
-using Discord.Rest;
 using System;
 using System.Collections.Concurrent;
 #if DEBUG_LIMITS
@@ -171,7 +170,7 @@ namespace Discord.Net.Queue
             { }
             _masterIdentifySemaphore.Release();
 #if DEBUG_LIMITS
-            Debug.WriteLine($"[{id}] Released identify ticket");
+            Debug.WriteLine($"[{id}] Released identify master semaphore");
 #endif
         }
 
