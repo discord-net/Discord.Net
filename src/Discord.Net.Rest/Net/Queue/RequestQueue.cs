@@ -23,15 +23,16 @@ namespace Discord.Net.Queue
         private CancellationTokenSource _requestCancelTokenSource;
         private CancellationToken _requestCancelToken; //Parent token + Clear token
         private DateTimeOffset _waitUntil;
-        private Semaphore _identifySemaphore;
+
+        private readonly Semaphore _masterIdentifySemaphore;
+        private readonly Semaphore _identifySemaphore;
+        private readonly int _identifySemaphoreMaxConcurrency;
 
         private Task _cleanupTask;
 
         public RequestQueue()
         {
             _tokenLock = new SemaphoreSlim(1, 1);
-            int semaphoreCount = GatewayBucket.Get(GatewayBucketType.Identify).WindowCount;
-            _identifySemaphore = new Semaphore(semaphoreCount, semaphoreCount, GatewayBucket.GetIdentifySemaphoreName());
 
             _clearToken = new CancellationTokenSource();
             _cancelTokenSource = new CancellationTokenSource();
@@ -41,6 +42,14 @@ namespace Discord.Net.Queue
             _buckets = new ConcurrentDictionary<string, RequestBucket>();
 
             _cleanupTask = RunCleanup();
+        }
+
+        public RequestQueue(string masterIdentifySemaphoreName, string slaveIdentifySemaphoreName, int slaveIdentifySemaphoreMaxConcurrency)
+            : this ()
+        {
+            _masterIdentifySemaphore = new Semaphore(1, 1, masterIdentifySemaphoreName);
+            _identifySemaphore = new Semaphore(0, GatewayBucket.Get(GatewayBucketType.Identify).WindowCount, slaveIdentifySemaphoreName);
+            _identifySemaphoreMaxConcurrency = slaveIdentifySemaphoreMaxConcurrency;
         }
 
         public async Task SetCancelTokenAsync(CancellationToken cancelToken)
@@ -132,8 +141,14 @@ namespace Discord.Net.Queue
             //Identify is per-account so we won't trigger global until we can actually go for it
             if (requestBucket.Type == GatewayBucketType.Identify)
             {
-                while (!_identifySemaphore.WaitOne(0)) //To not block the thread
+                if (_masterIdentifySemaphore == null || _identifySemaphore == null)
+                    throw new InvalidOperationException("Not a RequestQueue with WebSocket data.");
+
+                bool master;
+                while (!(master = _masterIdentifySemaphore.WaitOne(0)) && !_identifySemaphore.WaitOne(0)) //To not block the thread
                     await Task.Delay(100, request.CancelToken);
+                if (master && _identifySemaphoreMaxConcurrency > 1)
+                    _identifySemaphore.Release(_identifySemaphoreMaxConcurrency - 1);
 #if DEBUG_LIMITS
                 Debug.WriteLine($"[{id}] Acquired identify ticket");
 #endif
@@ -149,7 +164,12 @@ namespace Discord.Net.Queue
         }
         internal void ReleaseIdentifySemaphore(int id)
         {
-            _identifySemaphore.Release();
+            if (_masterIdentifySemaphore == null || _identifySemaphore == null)
+                throw new InvalidOperationException("Not a RequestQueue with WebSocket data.");
+
+            while (_identifySemaphore.WaitOne(0)) //exhaust all tickets before releasing master
+            { }
+            _masterIdentifySemaphore.Release();
 #if DEBUG_LIMITS
             Debug.WriteLine($"[{id}] Released identify ticket");
 #endif

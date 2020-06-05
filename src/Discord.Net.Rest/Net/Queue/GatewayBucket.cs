@@ -13,7 +13,6 @@ namespace Discord.Net.Queue
     {
         private static ImmutableDictionary<GatewayBucketType, GatewayBucket> DefsByType;
         private static ImmutableDictionary<string, GatewayBucket> DefsById;
-        private static string IdentifySemaphoreName;
 
         static GatewayBucket()
         {
@@ -22,7 +21,6 @@ namespace Discord.Net.Queue
 
         public static GatewayBucket Get(GatewayBucketType type) => DefsByType[type];
         public static GatewayBucket Get(string id) => DefsById[id];
-        public static string GetIdentifySemaphoreName() => IdentifySemaphoreName;
 
         public static void SetLimits(GatewayLimits limits)
         {
@@ -50,8 +48,6 @@ namespace Discord.Net.Queue
             foreach (var bucket in buckets)
                 builder2.Add(bucket.Id, bucket);
             DefsById = builder2.ToImmutable();
-
-            IdentifySemaphoreName = limits.IdentifySemaphoreName;
         }
 
         public GatewayBucketType Type { get; }

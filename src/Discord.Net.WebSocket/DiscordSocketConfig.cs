@@ -133,7 +133,7 @@ namespace Discord.WebSocket
         ///     This property should only be changed for bots that have special limits provided by Discord.
         ///     </note>
         /// </remarks>
-        public GatewayLimits GatewayLimits { get; set; } = new GatewayLimits();
+        public GatewayLimits GatewayLimits { get; set; } = GatewayLimits.Default;
 
         /// <summary>
         ///     Initializes a default configuration.
@@ -144,6 +144,11 @@ namespace Discord.WebSocket
             UdpSocketProvider = DefaultUdpSocketProvider.Instance;
         }
 
-        internal DiscordSocketConfig Clone() => MemberwiseClone() as DiscordSocketConfig;
+        internal DiscordSocketConfig Clone()
+        {
+            var clone = MemberwiseClone() as DiscordSocketConfig;
+            clone.GatewayLimits = GatewayLimits.Clone();
+            return clone;
+        }
     }
 }

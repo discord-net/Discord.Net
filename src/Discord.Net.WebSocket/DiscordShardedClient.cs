@@ -81,29 +81,35 @@ namespace Discord.WebSocket
                     _shardIdsToIndex.Add(_shardIds[i], i);
                     var newConfig = config.Clone();
                     newConfig.ShardId = _shardIds[i];
+                    if (config.GatewayLimits.IdentifyMaxConcurrency != 1)
+                        newConfig.GatewayLimits.IdentifySemaphoreName += $"_{i / config.GatewayLimits.IdentifyMaxConcurrency}";
                     _shards[i] = new DiscordSocketClient(newConfig, _connectionGroupLock, i != 0 ? _shards[0] : null);
                     RegisterEvents(_shards[i], i == 0);
                 }
             }
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
-            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent,
+            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.GatewayLimits,
                 rateLimitPrecision: config.RateLimitPrecision);
 
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
             if (_automaticShards)
             {
-                var shardCount = await GetRecommendedShardCountAsync().ConfigureAwait(false);
-                _shardIds = Enumerable.Range(0, shardCount).ToArray();
+                var botGateway = await GetBotGatewayAsync().ConfigureAwait(false);
+                _shardIds = Enumerable.Range(0, botGateway.Shards).ToArray();
                 _totalShards = _shardIds.Length;
                 _shards = new DiscordSocketClient[_shardIds.Length];
+                int maxConcurrency = botGateway.SessionStartLimit.MaxConcurrency;
+                _baseConfig.GatewayLimits.IdentifyMaxConcurrency = maxConcurrency;
                 for (int i = 0; i < _shardIds.Length; i++)
                 {
                     _shardIdsToIndex.Add(_shardIds[i], i);
                     var newConfig = _baseConfig.Clone();
                     newConfig.ShardId = _shardIds[i];
                     newConfig.TotalShards = _totalShards;
+                    if (maxConcurrency != 1)
+                        newConfig.GatewayLimits.IdentifySemaphoreName += $"_{i / maxConcurrency}";
                     _shards[i] = new DiscordSocketClient(newConfig, _connectionGroupLock, i != 0 ? _shards[0] : null);
                     RegisterEvents(_shards[i], i == 0);
                 }
