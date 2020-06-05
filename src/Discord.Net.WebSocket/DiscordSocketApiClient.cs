@@ -3,7 +3,6 @@ using Discord.API.Gateway;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
 using Discord.Net.WebSockets;
-using Discord.Rest;
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using System;

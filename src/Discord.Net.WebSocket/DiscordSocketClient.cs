@@ -2,7 +2,6 @@ using Discord.API;
 using Discord.API.Gateway;
 using Discord.Logging;
 using Discord.Net.Converters;
-using Discord.Net.Queue;
 using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
