@@ -118,8 +118,8 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="config">The configuration to be used with the client.</param>
 #pragma warning disable IDISP004
-        public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null, null) { }
-        internal DiscordSocketClient(DiscordSocketConfig config, SemaphoreSlim groupLock, DiscordSocketClient parentClient) : this(config, CreateApiClient(config), groupLock, parentClient) { }
+        public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config, new SemaphoreSlim(1, 1), null, 1), null, null) { }
+        internal DiscordSocketClient(DiscordSocketConfig config, SemaphoreSlim groupLock, DiscordSocketClient parentClient, SemaphoreSlim identifyMasterSemaphore, SemaphoreSlim identifySemaphore, int identifyMaxConcurrency) : this(config, CreateApiClient(config, identifyMasterSemaphore, identifySemaphore, identifyMaxConcurrency), groupLock, parentClient) { }
 #pragma warning restore IDISP004
         private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, SemaphoreSlim groupLock, DiscordSocketClient parentClient)
             : base(config, client)
@@ -177,8 +177,9 @@ namespace Discord.WebSocket
             _voiceRegions = ImmutableDictionary.Create<string, RestVoiceRegion>();
             _largeGuilds = new ConcurrentQueue<ulong>();
         }
-        private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
-            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config, config.GatewayHost,
+        private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config, SemaphoreSlim identifyMasterSemaphore, SemaphoreSlim identifySemaphore, int identifyMaxConcurrency)
+            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent,
+                identifyMasterSemaphore, identifySemaphore, identifyMaxConcurrency, config.GatewayHost,
                 rateLimitPrecision: config.RateLimitPrecision);
         /// <inheritdoc />
         internal override void Dispose(bool disposing)

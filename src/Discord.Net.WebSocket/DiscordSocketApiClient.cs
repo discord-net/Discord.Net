@@ -37,11 +37,12 @@ namespace Discord.API
 
         public ConnectionState ConnectionState { get; private set; }
 
-        public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent, DiscordSocketConfig config,
+        public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent,
+            SemaphoreSlim identifyMasterSemaphore, SemaphoreSlim identifySemaphore, int identifyMaxConcurrency,
             string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null,
             RateLimitPrecision rateLimitPrecision = RateLimitPrecision.Second,
 			bool useSystemClock = true)
-            : base(restClientProvider, userAgent, new RequestQueue(config.IdentifyMasterSemaphoreName, config.IdentifySemaphoreName, config.IdentifyMaxConcurrency), defaultRetryMode, serializer, rateLimitPrecision, useSystemClock)
+            : base(restClientProvider, userAgent, new RequestQueue(identifyMasterSemaphore, identifySemaphore, identifyMaxConcurrency), defaultRetryMode, serializer, rateLimitPrecision, useSystemClock)
         {
             _gatewayUrl = url;
             if (url != null)

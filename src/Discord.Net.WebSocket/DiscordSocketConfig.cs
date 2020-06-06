@@ -126,26 +126,6 @@ namespace Discord.WebSocket
         public bool GuildSubscriptions { get; set; } = true;
 
         /// <summary>
-        ///     Gets or sets the name of the master <see cref="System.Threading.Semaphore"/>
-        ///     used by identify.
-        /// </summary>
-        /// <remarks>
-        ///     It is used to define what slave <see cref="System.Threading.Semaphore"/>
-        ///     is free to run for concurrent identify requests.
-        /// </remarks>
-        public string IdentifyMasterSemaphoreName { get; set; } = Guid.NewGuid().ToString();
-
-        /// <summary>
-        ///      Gets or sets the name of the slave <see cref="System.Threading.Semaphore"/>
-        ///     used by identify.
-        /// </summary>
-        /// <remarks>
-        ///     If the maximum concurrency is higher than one and you are using the sharded client,
-        ///     it will be dinamilly renamed to fit the necessary needs.
-        /// </remarks>
-        public string IdentifySemaphoreName { get; set; } = Guid.NewGuid().ToString();
-
-        /// <summary>
         ///     Gets or sets the maximum identify concurrency.
         /// </summary>
         /// <remarks>
