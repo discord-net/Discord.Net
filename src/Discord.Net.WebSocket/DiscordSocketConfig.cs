@@ -1,7 +1,6 @@
 using Discord.Net.Udp;
 using Discord.Net.WebSockets;
 using Discord.Rest;
-using System;
 
 namespace Discord.WebSocket
 {
