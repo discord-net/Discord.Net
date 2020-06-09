@@ -108,7 +108,6 @@ namespace Discord.API
                     _decompressor?.Dispose();
                     _compressed?.Dispose();
                 }
-                _isDisposed = true;
             }
 
             base.Dispose(disposing);
@@ -133,7 +132,6 @@ namespace Discord.API
                     _decompressor?.Dispose();
 #endif
                 }
-                _isDisposed = true;
             }
 
 #if NETSTANDARD2_1
