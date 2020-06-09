@@ -135,7 +135,7 @@ namespace Discord.Net.Queue
                     await Task.Delay(60000, _cancelTokenSource.Token).ConfigureAwait(false); //Runs each minute
                 }
             }
-            catch (OperationCanceledException) { }
+            catch (TaskCanceledException) { }
             catch (ObjectDisposedException) { }
         }
 
