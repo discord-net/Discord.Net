@@ -140,7 +140,12 @@ namespace Discord.Net.Queue
 
         public void Dispose()
         {
-            _cancelTokenSource?.Dispose();
+            if (!(_cancelTokenSource is null))
+            {
+                _cancelTokenSource.Cancel();
+                _cancelTokenSource?.Dispose();
+                _cleanupTask.GetAwaiter().GetResult();
+            }
             _tokenLock?.Dispose();
             _clearToken?.Dispose();
             _requestCancelTokenSource?.Dispose();
