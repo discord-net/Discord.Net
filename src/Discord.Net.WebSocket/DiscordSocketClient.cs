@@ -197,6 +197,25 @@ namespace Discord.WebSocket
             base.Dispose(disposing);
         }
 
+        internal override async ValueTask DisposeAsync(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    await StopAsync().ConfigureAwait(false);
+
+                    if (!(ApiClient is null))
+                        await ApiClient.DisposeAsync().ConfigureAwait(false);
+
+                    _stateLock?.Dispose();
+                }
+                _isDisposed = true;
+            }
+
+            await base.DisposeAsync(disposing).ConfigureAwait(false);
+        }
+
         /// <inheritdoc />
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {

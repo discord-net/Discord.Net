@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Bson;
 using System;
 using System.Collections.Concurrent;
 #if DEBUG_LIMITS
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Queue
 {
-    internal class RequestQueue : IDisposable
+    internal class RequestQueue : IDisposable, IAsyncDisposable
     {
         public event Func<string, RateLimitInfo?, Task> RateLimitTriggered;
 
@@ -143,8 +144,21 @@ namespace Discord.Net.Queue
             if (!(_cancelTokenSource is null))
             {
                 _cancelTokenSource.Cancel();
-                _cancelTokenSource?.Dispose();
+                _cancelTokenSource.Dispose();
                 _cleanupTask.GetAwaiter().GetResult();
+            }
+            _tokenLock?.Dispose();
+            _clearToken?.Dispose();
+            _requestCancelTokenSource?.Dispose();
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (!(_cancelTokenSource is null))
+            {
+                _cancelTokenSource.Cancel();
+                _cancelTokenSource.Dispose();
+                await _cleanupTask.ConfigureAwait(false);
             }
             _tokenLock?.Dispose();
             _clearToken?.Dispose();

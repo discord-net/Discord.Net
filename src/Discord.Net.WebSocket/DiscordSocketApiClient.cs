@@ -114,6 +114,35 @@ namespace Discord.API
             base.Dispose(disposing);
         }
 
+#if NETSTANDARD2_1
+        internal override async ValueTask DisposeAsync(bool disposing)
+#else
+        internal override ValueTask DisposeAsync(bool disposing)
+#endif
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _connectCancelToken?.Dispose();
+                    (WebSocketClient as IDisposable)?.Dispose();
+#if NETSTANDARD2_1
+                    if (!(_decompressor is null))
+                        await _decompressor.DisposeAsync().ConfigureAwait(false);
+#else
+                    _decompressor?.Dispose();
+#endif
+                }
+                _isDisposed = true;
+            }
+
+#if NETSTANDARD2_1
+            await base.DisposeAsync(disposing).ConfigureAwait(false);
+#else
+            return base.DisposeAsync(disposing);
+#endif
+        }
+
         public async Task ConnectAsync()
         {
             await _stateLock.WaitAsync().ConfigureAwait(false);
