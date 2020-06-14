@@ -125,6 +125,16 @@ namespace Discord.WebSocket
         public bool GuildSubscriptions { get; set; } = true;
 
         /// <summary>
+        ///    Gets or sets gateway intents to limit what events are sent from Discord. Allows for more granular control than the 'GuildSubscriptions' property.
+        /// </summary>
+        /// <remarks>
+        ///     For more information, please see
+        ///     <see href="https://discord.com/developers/docs/topics/gateway#gateway-intents">GatewayIntents</see>
+        ///     on the official Discord API documentation.
+        /// </remarks>
+        public GatewayIntents? GatewayIntents { get; set; }
+
+        /// <summary>
         ///     Initializes a default configuration.
         /// </summary>
         public DiscordSocketConfig()
