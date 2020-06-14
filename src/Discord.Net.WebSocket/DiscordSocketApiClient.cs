@@ -226,7 +226,7 @@ namespace Discord.API
                 msg.ShardingParams = new int[] { shardID, totalShards };
 
             if (gatewayIntents.HasValue)
-                msg.Intents = Convert.ToInt32(gatewayIntents);
+                msg.Intents = (int)gatewayIntents.Value;
             else
                 msg.GuildSubscriptions = guildSubscriptions;
 

@@ -5,6 +5,8 @@ namespace Discord
     [Flags]
     public enum GatewayIntents
     {
+        /// <summary> This intent includes no events </summary>
+        None = 0,
         /// <summary> This intent includes GUILD_CREATE, GUILD_UPDATE, GUILD_DELETE, GUILD_ROLE_CREATE, GUILD_ROLE_UPDATE, GUILD_ROLE_DELETE, CHANNEL_CREATE, CHANNEL_UPDATE, CHANNEL_DELETE, CHANNEL_PINS_UPDATE </summary>
         Guilds = 1 << 0,
         /// <summary> This intent includes GUILD_MEMBER_ADD, GUILD_MEMBER_UPDATE, GUILD_MEMBER_REMOVE </summary>
