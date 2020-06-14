@@ -121,6 +121,7 @@ namespace Discord.WebSocket
 
         /// <summary>
         ///     Gets or sets enabling dispatching of guild subscription events e.g. presence and typing events.
+        ///     This is not used if <see cref="GatewayIntents"/> are provided.
         /// </summary>
         public bool GuildSubscriptions { get; set; } = true;
 
