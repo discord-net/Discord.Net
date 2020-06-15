@@ -1174,7 +1174,7 @@ namespace Discord.API
             var ids = new BucketIds(guildId: guildId);
             return await SendAsync<IReadOnlyCollection<Role>>("GET", () => $"guilds/{guildId}/roles", ids, options: options).ConfigureAwait(false);
         }
-        public async Task<Role> CreateGuildRoleAsync(ulong guildId, Rest.CreateGuildRoleParams args, RequestOptions options = null)
+        public async Task<Role> CreateGuildRoleAsync(ulong guildId, Rest.ModifyGuildRoleParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);

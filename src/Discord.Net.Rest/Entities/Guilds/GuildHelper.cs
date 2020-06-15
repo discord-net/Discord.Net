@@ -264,7 +264,7 @@ namespace Discord.Rest
         {
             if (name == null) throw new ArgumentNullException(paramName: nameof(name));
 
-            var createGuildRoleParams = new API.Rest.CreateGuildRoleParams
+            var createGuildRoleParams = new API.Rest.ModifyGuildRoleParams
             {
                 Color = color?.RawValue ?? Optional.Create<uint>(),
                 Hoist = isHoisted,
