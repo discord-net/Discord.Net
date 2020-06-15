@@ -215,6 +215,15 @@ namespace Discord
         ///     A task that represents the asynchronous removal operation.
         /// </returns>
         Task RemoveAllReactionsAsync(RequestOptions options = null);
+        /// <summary>
+        ///     Removes all reactions with a specific emoji from this message.
+        /// </summary>
+        /// <param name="emote">The emoji used to react to this message.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous removal operation.
+        /// </returns>
+        Task RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions options = null);
 
         /// <summary>
         ///     Gets all users that reacted to a message with a given emote.

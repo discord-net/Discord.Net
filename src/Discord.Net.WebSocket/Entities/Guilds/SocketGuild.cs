@@ -830,6 +830,23 @@ namespace Discord.WebSocket
             _downloaderPromise.TrySetResultAsync(true);
         }
 
+        /// <summary>
+        ///     Gets a collection of users in this guild that the name or nickname starts with the
+        ///     provided <see cref="string"/> at <paramref name="query"/>.
+        /// </summary>
+        /// <remarks>
+        ///     The <paramref name="limit"/> can not be higher than <see cref="DiscordConfig.MaxUsersPerBatch"/>.
+        /// </remarks>
+        /// <param name="query">The partial name or nickname to search.</param>
+        /// <param name="limit">The maximum number of users to be gotten.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a collection of guild
+        ///     users that the name or nickname starts with the provided <see cref="string"/> at <paramref name="query"/>.
+        /// </returns>
+        public Task<IReadOnlyCollection<RestGuildUser>> SearchUsersAsync(string query, int limit = DiscordConfig.MaxUsersPerBatch, RequestOptions options = null)
+            => GuildHelper.SearchUsersAsync(this, Discord, query, limit, options);
+
         //Audit logs
         /// <summary>
         ///     Gets the specified number of audit log entries for this guild.
@@ -1199,6 +1216,14 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         Task<IGuildUser> IGuild.GetOwnerAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(Owner);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IGuildUser>> IGuild.SearchUsersAsync(string query, int limit, CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await SearchUsersAsync(query, limit, options).ConfigureAwait(false);
+            else
+                return ImmutableArray.Create<IGuildUser>();
+        }
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IAuditLogEntry>> IGuild.GetAuditLogsAsync(int limit, CacheMode cacheMode, RequestOptions options,
