@@ -660,6 +660,18 @@ namespace Discord.API
 
             await SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}/reactions", ids, options: options).ConfigureAwait(false);
         }
+        public async Task RemoveAllReactionsForEmoteAsync(ulong channelId, ulong messageId, string emoji, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(messageId, 0, nameof(messageId));
+            Preconditions.NotNullOrWhitespace(emoji, nameof(emoji));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(channelId: channelId);
+
+            await SendAsync("DELETE", () => $"channels/{channelId}/messages/{messageId}/reactions/{emoji}", ids, options: options).ConfigureAwait(false);
+        }
         public async Task<IReadOnlyCollection<User>> GetReactionUsersAsync(ulong channelId, ulong messageId, string emoji, GetReactionUsersParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
