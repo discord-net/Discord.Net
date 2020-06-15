@@ -1136,6 +1136,22 @@ namespace Discord.API
                 await SendJsonAsync("PATCH", () => $"guilds/{guildId}/members/{userId}", args, ids, options: options).ConfigureAwait(false);
             }
         }
+        public async Task<IReadOnlyCollection<GuildMember>> SearchGuildMembersAsync(ulong guildId, SearchGuildMembersParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.GreaterThan(args.Limit, 0, nameof(args.Limit));
+            Preconditions.AtMost(args.Limit, DiscordConfig.MaxUsersPerBatch, nameof(args.Limit));
+            Preconditions.NotNullOrEmpty(args.Query, nameof(args.Query));
+            options = RequestOptions.CreateOrClone(options);
+
+            int limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxUsersPerBatch);
+            string query = args.Query;
+
+            var ids = new BucketIds(guildId: guildId);
+            Expression<Func<string>> endpoint = () => $"guilds/{guildId}/members/search?limit={limit}&query={query}";
+            return await SendAsync<IReadOnlyCollection<GuildMember>>("GET", endpoint, ids, options: options).ConfigureAwait(false);
+        }
 
         //Guild Roles
         public async Task<IReadOnlyCollection<Role>> GetGuildRolesAsync(ulong guildId, RequestOptions options = null)

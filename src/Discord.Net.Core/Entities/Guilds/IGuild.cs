@@ -710,6 +710,22 @@ namespace Discord
         ///     be or has been removed from this guild.
         /// </returns>
         Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a collection of users in this guild that the name or nickname starts with the
+        ///     provided <see cref="string"/> at <paramref name="query"/>.
+        /// </summary>
+        /// <remarks>
+        ///     The <paramref name="limit"/> can not be higher than <see cref="DiscordConfig.MaxUsersPerBatch"/>.
+        /// </remarks>
+        /// <param name="query">The partial name or nickname to search.</param>
+        /// <param name="limit">The maximum number of users to be gotten.</param>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a collection of guild
+        ///     users that the name or nickname starts with the provided <see cref="string"/> at <paramref name="query"/>.
+        /// </returns>
+        Task<IReadOnlyCollection<IGuildUser>> SearchUsersAsync(string query, int limit = DiscordConfig.MaxUsersPerBatch, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 
         /// <summary>
         ///     Gets the specified number of audit log entries for this guild.
