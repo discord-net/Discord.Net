@@ -56,11 +56,23 @@ namespace Discord.WebSocket
                 cachedMessageIds = _orderedMessages;
             else if (dir == Direction.Before)
                 cachedMessageIds = _orderedMessages.Where(x => x < fromMessageId.Value);
-            else
+            else if (dir == Direction.After)
                 cachedMessageIds = _orderedMessages.Where(x => x > fromMessageId.Value);
+            else //Direction.Around
+            {
+                if (!_messages.TryGetValue(fromMessageId.Value, out SocketMessage msg))
+                    return ImmutableArray<SocketMessage>.Empty;
+                int around = limit / 2;
+                var before = GetMany(fromMessageId, Direction.Before, around);
+                var after = GetMany(fromMessageId, Direction.After, around).Reverse();
+
+                return after.Concat(new SocketMessage[] { msg }).Concat(before).ToImmutableArray();
+            }
 
             if (dir == Direction.Before)
                 cachedMessageIds = cachedMessageIds.Reverse();
+            if (dir == Direction.Around) //Only happens if fromMessageId is null, should only get "around" and itself (+1)
+                limit = limit / 2 + 1;
 
             return cachedMessageIds
                 .Select(x =>

@@ -109,11 +109,18 @@ namespace Discord.Rest
         public static IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessageChannel channel, BaseDiscordClient client,
             ulong? fromMessageId, Direction dir, int limit, RequestOptions options)
         {
-            if (dir == Direction.Around)
-                throw new NotImplementedException(); //TODO: Impl
-
             var guildId = (channel as IGuildChannel)?.GuildId;
             var guild = guildId != null ? (client as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
+
+            if (dir == Direction.Around && limit > DiscordConfig.MaxMessagesPerBatch)
+            {
+                int around = limit / 2;
+                if (fromMessageId.HasValue)
+                    return GetMessagesAsync(channel, client, fromMessageId.Value + 1, Direction.Before, around + 1, options) //Need to include the message itself
+                        .Concat(GetMessagesAsync(channel, client, fromMessageId, Direction.After, around, options));
+                else //Shouldn't happen since there's no public overload for ulong? and Direction
+                    return GetMessagesAsync(channel, client, null, Direction.Before, around + 1, options);
+            }
 
             return new PagedAsyncEnumerable<RestMessage>(
                 DiscordConfig.MaxMessagesPerBatch,
