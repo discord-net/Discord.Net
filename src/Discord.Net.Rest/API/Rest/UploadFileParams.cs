@@ -19,6 +19,7 @@ namespace Discord.API.Rest
         public Optional<string> Nonce { get; set; }
         public Optional<bool> IsTTS { get; set; }
         public Optional<Embed> Embed { get; set; }
+        public Optional<AllowedMentions> AllowedMentions { get; set; }
         public bool IsSpoiler { get; set; } = false;
 
         public UploadFileParams(Stream file)
@@ -43,6 +44,8 @@ namespace Discord.API.Rest
                 payload["nonce"] = Nonce.Value;
             if (Embed.IsSpecified)
                 payload["embed"] = Embed.Value;
+            if (AllowedMentions.IsSpecified)
+                payload["allowed_mentions"] = AllowedMentions.Value;
             if (IsSpoiler)
                 payload["hasSpoiler"] = IsSpoiler.ToString();
 
