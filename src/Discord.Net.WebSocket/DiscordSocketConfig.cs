@@ -126,6 +126,31 @@ namespace Discord.WebSocket
         public bool GuildSubscriptions { get; set; } = true;
 
         /// <summary>
+        ///     Gets or sets the maximum wait time in milliseconds between GUILD_AVAILABLE events before firing READY.
+        ///
+        ///     If zero, READY will fire as soon as it is received and all guilds will be unavailable.
+        /// </summary>
+        /// <remarks>
+        ///     <para>This property is measured in milliseconds, negative values will throw an exception.</para>
+        ///     <para>If a guild is not received before READY, it will be unavailable.</para>
+        /// </remarks>
+        /// <returns>
+        ///     The maximum wait time in milliseconds between GUILD_AVAILABLE events before firing READY.
+        /// </returns>
+        /// <exception cref="System.ArgumentException">Value must be at least 0.</exception>
+        public int MaxWaitBetweenGuildAvailablesBeforeReady {
+            get
+            {
+                return _maxWaitForGuildAvailable;
+            }
+            set
+            {
+                Preconditions.AtLeast(value, 0, nameof(MaxWaitBetweenGuildAvailablesBeforeReady));
+                _maxWaitForGuildAvailable = value;
+            }
+        }
+        private int _maxWaitForGuildAvailable = 10000;
+        
         ///    Gets or sets gateway intents to limit what events are sent from Discord. Allows for more granular control than the <see cref="GuildSubscriptions"/> property.
         /// </summary>
         /// <remarks>
