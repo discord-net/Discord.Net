@@ -121,6 +121,7 @@ namespace Discord.WebSocket
 
         /// <summary>
         ///     Gets or sets enabling dispatching of guild subscription events e.g. presence and typing events.
+        ///     This is not used if <see cref="GatewayIntents"/> are provided.
         /// </summary>
         public bool GuildSubscriptions { get; set; } = true;
 
@@ -149,6 +150,15 @@ namespace Discord.WebSocket
             }
         }
         private int _maxWaitForGuildAvailable = 10000;
+        
+        ///    Gets or sets gateway intents to limit what events are sent from Discord. Allows for more granular control than the <see cref="GuildSubscriptions"/> property.
+        /// </summary>
+        /// <remarks>
+        ///     For more information, please see
+        ///     <see href="https://discord.com/developers/docs/topics/gateway#gateway-intents">GatewayIntents</see>
+        ///     on the official Discord API documentation.
+        /// </remarks>
+        public GatewayIntents? GatewayIntents { get; set; }
 
         /// <summary>
         ///     Initializes a default configuration.

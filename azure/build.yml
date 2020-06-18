@@ -1,5 +1,5 @@
 steps:
-- script: dotnet restore -v minimal Discord.Net.sln
+- script: dotnet restore --no-cache Discord.Net.sln
   displayName: Restore packages
 
 - script: dotnet build "Discord.Net.sln" --no-restore -v minimal -c $(buildConfiguration) /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
