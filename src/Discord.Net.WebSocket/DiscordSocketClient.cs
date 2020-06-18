@@ -44,6 +44,7 @@ namespace Discord.WebSocket
         private RestApplication _applicationInfo;
         private bool _isDisposed;
         private bool _guildSubscriptions;
+        private GatewayIntents? _gatewayIntents;
 
         /// <summary>
         ///     Provides access to a REST-only client with a shared state from this client.
@@ -137,6 +138,7 @@ namespace Discord.WebSocket
             Rest = new DiscordSocketRestClient(config, ApiClient);
             _heartbeatTimes = new ConcurrentQueue<long>();
             _guildSubscriptions = config.GuildSubscriptions;
+            _gatewayIntents = config.GatewayIntents;
 
             _stateLock = new SemaphoreSlim(1, 1);
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : $"Shard #{ShardId}");
@@ -242,7 +244,7 @@ namespace Discord.WebSocket
                 else
                 {
                     await _gatewayLogger.DebugAsync("Identifying").ConfigureAwait(false);
-                    await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions).ConfigureAwait(false);
+                    await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents).ConfigureAwait(false);
                 }
 
                 //Wait for READY
@@ -517,7 +519,7 @@ namespace Discord.WebSocket
                             _sessionId = null;
                             _lastSeq = 0;
 
-                            await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
+                            await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents).ConfigureAwait(false);
                         }
                         break;
                     case GatewayOpCode.Reconnect:
