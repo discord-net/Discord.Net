@@ -102,6 +102,17 @@ namespace Discord.Webhook
             IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null, bool isSpoiler = false)
             => WebhookClientHelper.SendFileAsync(this, stream, filename, text, isTTS, embeds, username, avatarUrl, options, isSpoiler);
 
+        /// <summary> Sends a message to the channel for this webhook with multiple attachments. </summary>
+        /// <returns> Returns the ID of the created message. </returns>
+        public Task<ulong> SendFileAsync(IEnumerable<string> filePaths, string text, bool isTTS = false,
+            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null, bool isSpoiler = false)
+            => WebhookClientHelper.SendFileAsync(this, filePaths, text, isTTS, embeds, username, avatarUrl, options, isSpoiler);
+        /// <summary> Sends a message to the channel for this webhook with multiple attachments. </summary>
+        /// <returns> Returns the ID of the created message. </returns>
+        public Task<ulong> SendFileAsync(IEnumerable<KeyValuePair<string, Stream>> streams, string text, bool isTTS = false,
+            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null, bool isSpoiler = false)
+            => WebhookClientHelper.SendFileAsync(this, streams, text, isTTS, embeds, username, avatarUrl, options, isSpoiler);
+
         /// <summary> Modifies the properties of this webhook. </summary>
         public Task ModifyWebhookAsync(Action<WebhookProperties> func, RequestOptions options = null)
             => Webhook.ModifyAsync(func, options);
