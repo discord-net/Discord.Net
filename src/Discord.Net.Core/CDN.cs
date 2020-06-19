@@ -62,10 +62,20 @@ namespace Discord
         /// <param name="guildId">The guild snowflake identifier.</param>
         /// <param name="splashId">The splash icon identifier.</param>
         /// <returns>
-        ///     A URL pointing to the guild's icon.
+        ///     A URL pointing to the guild's splash.
         /// </returns>
         public static string GetGuildSplashUrl(ulong guildId, string splashId)
             => splashId != null ? $"{DiscordConfig.CDNUrl}splashes/{guildId}/{splashId}.jpg" : null;
+        /// <summary>
+        ///     Returns a guild discovery splash URL.
+        /// </summary>
+        /// <param name="guildId">The guild snowflake identifier.</param>
+        /// <param name="discoverySplashId">The discovery splash icon identifier.</param>
+        /// <returns>
+        ///     A URL pointing to the guild's discovery splash.
+        /// </returns>
+        public static string GetGuildDiscoverySplashUrl(ulong guildId, string discoverySplashId)
+            => discoverySplashId != null ? $"{DiscordConfig.CDNUrl}discovery-splashes/{guildId}/{discoverySplashId}.jpg" : null;
         /// <summary>
         ///     Returns a channel icon URL.
         /// </summary>

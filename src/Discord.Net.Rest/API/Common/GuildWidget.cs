@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API
 {
-    internal class GuildEmbed
+    internal class GuildWidget
     {
         [JsonProperty("enabled")]
         public bool Enabled { get; set; }

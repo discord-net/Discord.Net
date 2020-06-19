@@ -48,6 +48,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public bool IsEmbeddable { get; private set; }
         /// <inheritdoc />
+        public bool IsWidgetEnabled { get; private set; }
+        /// <inheritdoc />
         public VerificationLevel VerificationLevel { get; private set; }
         /// <inheritdoc />
         public MfaLevel MfaLevel { get; private set; }
@@ -83,7 +85,10 @@ namespace Discord.WebSocket
 
         internal ulong? AFKChannelId { get; private set; }
         internal ulong? EmbedChannelId { get; private set; }
+        internal ulong? WidgetChannelId { get; private set; }
         internal ulong? SystemChannelId { get; private set; }
+        internal ulong? RulesChannelId { get; private set; }
+        internal ulong? PublicUpdatesChannelId { get; private set; }
         /// <inheritdoc />
         public ulong OwnerId { get; private set; }
         /// <summary> Gets the user that owns this guild. </summary>
@@ -94,6 +99,8 @@ namespace Discord.WebSocket
         public string IconId { get; private set; }
         /// <inheritdoc />
         public string SplashId { get; private set; }
+        /// <inheritdoc />
+        public string DiscoverySplashId { get; private set; }
         /// <inheritdoc />
         public PremiumTier PremiumTier { get; private set; }
         /// <inheritdoc />
@@ -108,6 +115,12 @@ namespace Discord.WebSocket
         public int PremiumSubscriptionCount { get; private set; }
         /// <inheritdoc />
         public string PreferredLocale { get; private set; }
+        /// <inheritdoc />
+        public int? MaxPresences { get; private set; }
+        /// <inheritdoc />
+        public int? MaxMembers { get; private set; }
+        /// <inheritdoc />
+        public int? MaxVideoChannelUsers { get; private set; }
 
         /// <inheritdoc />
         public CultureInfo PreferredCulture { get; private set; }
@@ -118,6 +131,8 @@ namespace Discord.WebSocket
         public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
         /// <inheritdoc />
         public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
+        /// <inheritdoc />
+        public string DiscoverySplashUrl => CDN.GetGuildDiscoverySplashUrl(Id, DiscoverySplashId);
         /// <inheritdoc />
         public string BannerUrl => CDN.GetGuildBannerUrl(Id, BannerId);
         /// <summary> Indicates whether the client has all the members downloaded to the local guild cache. </summary>
@@ -168,11 +183,26 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A channel set within the server's widget settings; <c>null</c> if none is set.
         /// </returns>
+        [Obsolete("This property is deprecated, use WidgetChannel instead.")]
         public SocketGuildChannel EmbedChannel
         {
             get
             {
                 var id = EmbedChannelId;
+                return id.HasValue ? GetChannel(id.Value) : null;
+            }
+        }
+        /// <summary>
+        ///     Gets the widget channel (i.e. the channel set in the guild's widget settings) in this guild.
+        /// </summary>
+        /// <returns>
+        ///     A channel set within the server's widget settings; <c>null</c> if none is set.
+        /// </returns>
+        public SocketGuildChannel WidgetChannel
+        {
+            get
+            {
+                var id = WidgetChannelId;
                 return id.HasValue ? GetChannel(id.Value) : null;
             }
         }
@@ -187,6 +217,36 @@ namespace Discord.WebSocket
             get
             {
                 var id = SystemChannelId;
+                return id.HasValue ? GetTextChannel(id.Value) : null;
+            }
+        }
+        /// <summary>
+        ///     Gets the channel with the guild rules.
+        /// </summary>
+        /// <returns>
+        ///     A text channel with the guild rules; <c>null</c> if none is set.
+        /// </returns>
+        public SocketTextChannel RulesChannel
+        {
+            get
+            {
+                var id = RulesChannelId;
+                return id.HasValue ? GetTextChannel(id.Value) : null;
+            }
+        }
+        /// <summary>
+        ///     Gets the channel where admins and moderators of guilds with the "PUBLIC"
+        ///     feature receive notices from Discord.
+        /// </summary>
+        /// <returns>
+        ///     A text channel where admins and moderators of guilds with the "PUBLIC"
+        ///     feature receive notices from Discord; <c>null</c> if none is set.
+        /// </returns>
+        public SocketTextChannel PublicUpdatesChannel
+        {
+            get
+            {
+                var id = PublicUpdatesChannelId;
                 return id.HasValue ? GetTextChannel(id.Value) : null;
             }
         }
@@ -360,15 +420,24 @@ namespace Discord.WebSocket
         internal void Update(ClientState state, Model model)
         {
             AFKChannelId = model.AFKChannelId;
-            EmbedChannelId = model.EmbedChannelId;
+            if (model.EmbedChannelId.IsSpecified)
+                EmbedChannelId = model.EmbedChannelId.Value;
+            if (model.WidgetChannelId.IsSpecified)
+                WidgetChannelId = model.WidgetChannelId.Value;
             SystemChannelId = model.SystemChannelId;
+            RulesChannelId = model.RulesChannelId;
+            PublicUpdatesChannelId = model.PublicUpdatesChannelId;
             AFKTimeout = model.AFKTimeout;
-            IsEmbeddable = model.EmbedEnabled;
+            if (model.EmbedEnabled.IsSpecified)
+                IsEmbeddable = model.EmbedEnabled.Value;
+            if (model.WidgetEnabled.IsSpecified)
+                IsWidgetEnabled = model.WidgetEnabled.Value;
             IconId = model.Icon;
             Name = model.Name;
             OwnerId = model.OwnerId;
             VoiceRegionId = model.Region;
             SplashId = model.Splash;
+            DiscoverySplashId = model.DiscoverySplash;
             VerificationLevel = model.VerificationLevel;
             MfaLevel = model.MfaLevel;
             DefaultMessageNotifications = model.DefaultMessageNotifications;
@@ -380,6 +449,12 @@ namespace Discord.WebSocket
             SystemChannelFlags = model.SystemChannelFlags;
             Description = model.Description;
             PremiumSubscriptionCount = model.PremiumSubscriptionCount.GetValueOrDefault();
+            if (model.MaxPresences.IsSpecified)
+                MaxPresences = model.MaxPresences.Value ?? 25000;
+            if (model.MaxMembers.IsSpecified)
+                MaxMembers = model.MaxMembers.Value;
+            if (model.MaxVideoChannelUsers.IsSpecified)
+                MaxVideoChannelUsers = model.MaxVideoChannelUsers.Value;
             PreferredLocale = model.PreferredLocale;
             PreferredCulture = new CultureInfo(PreferredLocale);
 
@@ -453,8 +528,13 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
+        [Obsolete("This endpoint is deprecated, use ModifyWidgetAsync instead.")]
         public Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyEmbedAsync(this, Discord, func, options);
+        /// <inheritdoc />
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
+        public Task ModifyWidgetAsync(Action<GuildWidgetProperties> func, RequestOptions options = null)
+            => GuildHelper.ModifyWidgetAsync(this, Discord, func, options);
         /// <inheritdoc />
         public Task ReorderChannelsAsync(IEnumerable<ReorderChannelProperties> args, RequestOptions options = null)
             => GuildHelper.ReorderChannelsAsync(this, Discord, args, options);
@@ -1133,11 +1213,21 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         ulong? IGuild.EmbedChannelId => EmbedChannelId;
         /// <inheritdoc />
+        ulong? IGuild.WidgetChannelId => WidgetChannelId;
+        /// <inheritdoc />
         ulong? IGuild.SystemChannelId => SystemChannelId;
+        /// <inheritdoc />
+        ulong? IGuild.RulesChannelId => RulesChannelId;
+        /// <inheritdoc />
+        ulong? IGuild.PublicUpdatesChannelId => PublicUpdatesChannelId;
         /// <inheritdoc />
         IRole IGuild.EveryoneRole => EveryoneRole;
         /// <inheritdoc />
         IReadOnlyCollection<IRole> IGuild.Roles => Roles;
+        /// <inheritdoc />
+        int? IGuild.ApproximateMemberCount => null;
+        /// <inheritdoc />
+        int? IGuild.ApproximatePresenceCount => null;
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(RequestOptions options)
@@ -1177,11 +1267,21 @@ namespace Discord.WebSocket
         Task<ITextChannel> IGuild.GetDefaultChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<ITextChannel>(DefaultChannel);
         /// <inheritdoc />
+        [Obsolete("This method is deprecated, use GetWidgetChannelAsync instead.")]
         Task<IGuildChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildChannel>(EmbedChannel);
         /// <inheritdoc />
+        Task<IGuildChannel> IGuild.GetWidgetChannelAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult<IGuildChannel>(WidgetChannel);
+        /// <inheritdoc />
         Task<ITextChannel> IGuild.GetSystemChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<ITextChannel>(SystemChannel);
+        /// <inheritdoc />
+        Task<ITextChannel> IGuild.GetRulesChannelAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult<ITextChannel>(RulesChannel);
+        /// <inheritdoc />
+        Task<ITextChannel> IGuild.GetPublicUpdatesChannelAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult<ITextChannel>(PublicUpdatesChannel);
         /// <inheritdoc />
         async Task<ITextChannel> IGuild.CreateTextChannelAsync(string name, Action<TextChannelProperties> func, RequestOptions options)
             => await CreateTextChannelAsync(name, func, options).ConfigureAwait(false);

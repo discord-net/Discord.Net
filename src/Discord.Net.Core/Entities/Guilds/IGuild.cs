@@ -35,6 +35,13 @@ namespace Discord
         /// </returns>
         bool IsEmbeddable { get; }
         /// <summary>
+        ///     Gets a value that indicates whether this guild has the widget enabled.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if this guild has a widget enabled; otherwise <c>false</c>.
+        /// </returns>
+        bool IsWidgetEnabled { get; }
+        /// <summary>
         ///     Gets the default message notifications for users who haven't explicitly set their notification settings.
         /// </summary>
         DefaultMessageNotifications DefaultMessageNotifications { get; }
@@ -89,6 +96,20 @@ namespace Discord
         /// </returns>
         string SplashUrl { get; }
         /// <summary>
+        ///     Gets the ID of this guild's discovery splash image.
+        /// </summary>
+        /// <returns>
+        ///     An identifier for the discovery splash image; <c>null</c> if none is set.
+        /// </returns>
+        string DiscoverySplashId { get; }
+        /// <summary>
+        ///     Gets the URL of this guild's discovery splash image.
+        /// </summary>
+        /// <returns>
+        ///     A URL pointing to the guild's discovery splash image; <c>null</c> if none is set.
+        /// </returns>
+        string DiscoverySplashUrl { get; }
+        /// <summary>
         ///     Determines if this guild is currently connected and ready to be used.
         /// </summary>
         /// <remarks>
@@ -134,6 +155,14 @@ namespace Discord
         /// </returns>
         ulong? EmbedChannelId { get; }
         /// <summary>
+        ///     Gets the ID of the channel assigned to the widget of this guild.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the channel assigned to the widget found
+        ///     within the widget settings of this guild; <c>null</c> if none is set.
+        /// </returns>
+        ulong? WidgetChannelId { get; }
+        /// <summary>
         ///     Gets the ID of the channel where randomized welcome messages are sent.
         /// </summary>
         /// <returns>
@@ -141,6 +170,23 @@ namespace Discord
         ///     welcome messages are sent; <c>null</c> if none is set.
         /// </returns>
         ulong? SystemChannelId { get; }
+        /// <summary>
+        ///     Gets the ID of the channel with the rules.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the channel that contains the rules;
+        ///     <c>null</c> if none is set.
+        /// </returns>
+        ulong? RulesChannelId { get; }
+        /// <summary>
+        ///     Gets the ID of the channel where admins and moderators of guilds with the "PUBLIC" feature
+        ///     receive notices from Discord.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identifier of the channel where admins and moderators
+        ///     of guilds with the "PUBLIC" feature receive notices from Discord; <c>null</c> if none is set.
+        /// </returns>
+        ulong? PublicUpdatesChannelId { get; }
         /// <summary>
         ///     Gets the ID of the user that owns this guild.
         /// </summary>
@@ -249,6 +295,47 @@ namespace Discord
         ///     The number of premium subscribers of this guild.
         /// </returns>
         int PremiumSubscriptionCount { get; }
+        /// <summary>
+        ///     Gets the maximum number of presences for the guild.
+        /// </summary>
+        /// <returns>
+        ///     The maximum number of presences for the guild.
+        /// </returns>
+        int? MaxPresences { get; }
+        /// <summary>
+        ///     Gets the maximum number of members for the guild.
+        /// </summary>
+        /// <returns>
+        ///     The maximum number of members for the guild.
+        /// </returns>
+        int? MaxMembers { get; }
+        /// <summary>
+        ///     Gets the maximum amount of users in a video channel.
+        /// </summary>
+        /// <returns>
+        ///     The maximum amount of users in a video channel.
+        /// </returns>
+        int? MaxVideoChannelUsers { get; }
+        /// <summary>
+        ///     Gets the approximate number of members in this guild.
+        /// </summary>
+        /// <remarks>
+        ///     Only available when getting a guild via REST when `with_counts` is true.
+        /// </remarks>
+        /// <returns>
+        ///     The approximate number of members in this guild.
+        /// </returns>
+        int? ApproximateMemberCount { get; }
+        /// <summary>
+        ///     Gets the approximate number of non-offline members in this guild.
+        /// </summary>
+        /// <remarks>
+        ///     Only available when getting a guild via REST when `with_counts` is true.
+        /// </remarks>
+        /// <returns>
+        ///     The approximate number of non-offline members in this guild.
+        /// </returns>
+        int? ApproximatePresenceCount { get; }
 
         /// <summary>
         ///     Gets the preferred locale of this guild in IETF BCP 47
@@ -285,7 +372,17 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
+        [Obsolete("This endpoint is deprecated, use ModifyWidgetAsync instead.")]
         Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null);
+        /// <summary>
+        ///     Modifies this guild's widget.
+        /// </summary>
+        /// <param name="func">The delegate containing the properties to modify the guild widget with.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        Task ModifyWidgetAsync(Action<GuildWidgetProperties> func, RequestOptions options = null);
         /// <summary>
         ///     Bulk-modifies the order of channels in this guild.
         /// </summary>
@@ -504,7 +601,38 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains the embed channel set
         ///     within the server's widget settings; <c>null</c> if none is set.
         /// </returns>
+        [Obsolete("This endpoint is deprecated, use GetWidgetChannelAsync instead.")]
         Task<IGuildChannel> GetEmbedChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets the widget channel (i.e. the channel set in the guild's widget settings) in this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the widget channel set
+        ///     within the server's widget settings; <c>null</c> if none is set.
+        /// </returns>
+        Task<IGuildChannel> GetWidgetChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets the text channel where guilds with the "PUBLIC" feature can display rules and/or guidelines.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the text channel
+        ///     where guilds with the "PUBLIC" feature can display rules and/or guidelines; <c>null</c> if none is set.
+        /// </returns>
+        Task<ITextChannel> GetRulesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets the text channel channel where admins and moderators of guilds with the "PUBLIC" feature receive notices from Discord.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the text channel channel where
+        ///     admins and moderators of guilds with the "PUBLIC" feature receive notices from Discord; <c>null</c> if none is set.
+        /// </returns>
+        Task<ITextChannel> GetPublicUpdatesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 
         /// <summary>
         ///     Creates a new text channel in this guild.

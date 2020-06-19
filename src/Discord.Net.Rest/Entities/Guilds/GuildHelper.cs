@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using EmbedModel = Discord.API.GuildEmbed;
+using WidgetModel = Discord.API.GuildWidget;
 using Model = Discord.API.Guild;
 using RoleModel = Discord.API.Role;
 using ImageModel = Discord.API.Image;
@@ -98,6 +99,27 @@ namespace Discord.Rest
                 apiArgs.ChannelId = args.ChannelId.Value;
 
             return await client.ApiClient.ModifyGuildEmbedAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
+        }
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
+        public static async Task<WidgetModel> ModifyWidgetAsync(IGuild guild, BaseDiscordClient client,
+            Action<GuildWidgetProperties> func, RequestOptions options)
+        {
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
+            var args = new GuildWidgetProperties();
+            func(args);
+            var apiArgs = new API.Rest.ModifyGuildWidgetParams
+            {
+                Enabled = args.Enabled
+            };
+
+            if (args.Channel.IsSpecified)
+                apiArgs.ChannelId = args.Channel.Value?.Id;
+            else if (args.ChannelId.IsSpecified)
+                apiArgs.ChannelId = args.ChannelId.Value;
+
+            return await client.ApiClient.ModifyGuildWidgetAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
         public static async Task ReorderChannelsAsync(IGuild guild, BaseDiscordClient client,
             IEnumerable<ReorderChannelProperties> args, RequestOptions options)
