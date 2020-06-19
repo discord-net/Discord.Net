@@ -12,7 +12,7 @@ namespace Discord
     public class DiscordWebhookClientTests
     {
         [Theory]
-        [InlineData("https://discordapp.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK",
+        [InlineData("https://discord.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK",
             123412347732897802, "_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK")]
         // ptb, canary, etc will have slightly different urls
         [InlineData("https://ptb.discordapp.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK",
@@ -48,7 +48,7 @@ namespace Discord
         [Theory]
         [InlineData("123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK")]
         // trailing slash
-        [InlineData("https://discordapp.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK/")]
+        [InlineData("https://discord.com/api/webhooks/123412347732897802/_abcde123456789-ABCDEFGHIJKLMNOP12345678-abcdefghijklmnopABCDEFGHIJK/")]
         public void TestWebhook_Invalid(string webhookurl)
         {
             Assert.Throws<ArgumentException>(() =>
