@@ -87,7 +87,7 @@ namespace Discord.WebSocket
         ///     </para>
         ///     <para>
         ///         For more information, please see
-        ///         <see href="https://discordapp.com/developers/docs/topics/gateway#request-guild-members">Request Guild Members</see>
+        ///         <see href="https://discord.com/developers/docs/topics/gateway#request-guild-members">Request Guild Members</see>
         ///         on the official Discord API documentation.
         ///     </para>
         ///     <note>
