@@ -31,7 +31,7 @@ the Discord Applications Portal first.
 
     ![Step 7](images/intro-public-bot.png)
 
-[Discord Applications Portal]: https://discordapp.com/developers/applications/
+[Discord Applications Portal]: https://discord.com/developers/applications/
 
 ## Adding your bot to a server
 
@@ -165,11 +165,11 @@ or any other blocking method, such as reading from the console.
 > the source code for your bot.
 >
 > In the following example, we retrieve the token from a pre-defined
-> variable, which is **NOT** secure, especially if you plan on 
+> variable, which is **NOT** secure, especially if you plan on
 > distributing the application in any shape or form.
 >
-> We recommend alternative storage such as 
-> [Environment Variables], an external configuration file, or a 
+> We recommend alternative storage such as
+> [Environment Variables], an external configuration file, or a
 > secrets manager for safe-handling of secrets.
 >
 > [Environment Variables]: https://en.wikipedia.org/wiki/Environment_variable
