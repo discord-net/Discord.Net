@@ -9,7 +9,7 @@ namespace Discord
         None = 0,
         /// <summary> This intent includes GUILD_CREATE, GUILD_UPDATE, GUILD_DELETE, GUILD_ROLE_CREATE, GUILD_ROLE_UPDATE, GUILD_ROLE_DELETE, CHANNEL_CREATE, CHANNEL_UPDATE, CHANNEL_DELETE, CHANNEL_PINS_UPDATE </summary>
         Guilds = 1 << 0,
-        /// <summary> This intent includes GUILD_MEMBER_ADD, GUILD_MEMBER_UPDATE, GUILD_MEMBER_REMOVE </summary>
+        /// <summary> This intent includes GUILD_MEMBER_ADD, GUILD_MEMBER_UPDATE, GUILD_MEMBER_REMOVE. This is a privileged intent and must be enabled in the Developer Portal. </summary>
         GuildMembers = 1 << 1,
         /// <summary> This intent includes GUILD_BAN_ADD, GUILD_BAN_REMOVE </summary>
         GuildBans = 1 << 2,
@@ -23,7 +23,7 @@ namespace Discord
         GuildInvites = 1 << 6,
         /// <summary> This intent includes VOICE_STATE_UPDATE </summary>
         GuildVoiceStates = 1 << 7,
-        /// <summary> This intent includes PRESENCE_UPDATE </summary>
+        /// <summary> This intent includes PRESENCE_UPDATE. This is a privileged intent and must be enabled in the Developer Portal. </summary>
         GuildPresences = 1 << 8,
         /// <summary> This intent includes MESSAGE_CREATE, MESSAGE_UPDATE, MESSAGE_DELETE, MESSAGE_DELETE_BULK </summary>
         GuildMessages = 1 << 9,
