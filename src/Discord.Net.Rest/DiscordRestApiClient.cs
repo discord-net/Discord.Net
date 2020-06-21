@@ -82,9 +82,9 @@ namespace Discord.API
         {
             return tokenType switch
             {
-                default(TokenType) => token?.TrimEnd(),
-                TokenType.Bot => $"Bot {token?.TrimEnd()}",
-                TokenType.Bearer => $"Bearer {token?.TrimEnd()}",
+                default(TokenType) => token,
+                TokenType.Bot => $"Bot {token}",
+                TokenType.Bearer => $"Bearer {token}",
                 _ => throw new ArgumentException(message: "Unknown OAuth token type.", paramName: nameof(tokenType)),
             };
         }
@@ -129,7 +129,7 @@ namespace Discord.API
                 RestClient.SetCancelToken(_loginCancelToken.Token);
 
                 AuthTokenType = tokenType;
-                AuthToken = token;
+                AuthToken = token?.TrimEnd();
                 if (tokenType != TokenType.Webhook)
                     RestClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, AuthToken));
 
