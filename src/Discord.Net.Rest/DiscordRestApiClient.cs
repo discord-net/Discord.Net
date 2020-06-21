@@ -80,17 +80,13 @@ namespace Discord.API
         /// <exception cref="ArgumentException">Unknown OAuth token type.</exception>
         internal static string GetPrefixedToken(TokenType tokenType, string token)
         {
-            switch (tokenType)
+            return tokenType switch
             {
-                case default(TokenType):
-                    return token;
-                case TokenType.Bot:
-                    return $"Bot {token}";
-                case TokenType.Bearer:
-                    return $"Bearer {token}";
-                default:
-                    throw new ArgumentException(message: "Unknown OAuth token type.", paramName: nameof(tokenType));
-            }
+                default(TokenType) => token?.TrimEnd(),
+                TokenType.Bot => $"Bot {token?.TrimEnd()}",
+                TokenType.Bearer => $"Bearer {token?.TrimEnd()}",
+                _ => throw new ArgumentException(message: "Unknown OAuth token type.", paramName: nameof(tokenType)),
+            };
         }
         internal virtual void Dispose(bool disposing)
         {
