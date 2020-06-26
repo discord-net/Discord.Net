@@ -50,7 +50,6 @@ namespace Discord.Commands
         private readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>> _typeReaders;
         private readonly ConcurrentDictionary<Type, ConcurrentQueue<Type>> _userEntityTypeReaders;
         private readonly ConcurrentDictionary<Type, TypeReader> _defaultTypeReaders;
-        private readonly ConcurrentDictionary<Type, TypeReader> _overrideTypeReaders;
         private readonly ImmutableList<(Type EntityType, Type TypeReaderType)> _entityTypeReaders;
         private readonly HashSet<ModuleInfo> _moduleDefs;
         private readonly CommandMap _map;
@@ -121,7 +120,6 @@ namespace Discord.Commands
             _map = new CommandMap(this);
             _typeReaders = new ConcurrentDictionary<Type, ConcurrentDictionary<Type, TypeReader>>();
             _userEntityTypeReaders = new ConcurrentDictionary<Type, ConcurrentQueue<Type>>();
-            _overrideTypeReaders = new ConcurrentDictionary<Type, TypeReader>();
 
             _defaultTypeReaders = new ConcurrentDictionary<Type, TypeReader>();
             foreach (var type in PrimitiveParsers.SupportedTypes)
@@ -449,20 +447,10 @@ namespace Discord.Commands
             var nullableReader = NullableTypeReader.Create(valueType, valueTypeReader);
             readers[nullableReader.GetType()] = nullableReader;
         }
-        internal void AddOverrideTypeReader(Type valueType, TypeReader valueTypeReader)
-        {
-            _overrideTypeReaders[valueType] = valueTypeReader;
-        }
-        internal TypeReader GetOverrideTypeReader(Type type)
-        {
-            if (_overrideTypeReaders.TryGetValue(type, out var definedTypeReader))
-                return definedTypeReader;
-            return null;
-        }
-        internal IDictionary<Type, TypeReader> GetTypeReaders(Type type)
+        internal IEnumerable<KeyValuePair<Type, TypeReader>> GetTypeReaders(Type type, bool includeOverride)
         {
             if (_typeReaders.TryGetValue(type, out var definedTypeReaders))
-                return definedTypeReaders;
+                return includeOverride ? definedTypeReaders : definedTypeReaders.Where(x => !x.Value.IsOverride);
 
             var assignableEntityReaders = _userEntityTypeReaders.Where(x => x.Key.IsAssignableFrom(type));
 
@@ -490,7 +478,7 @@ namespace Discord.Commands
                 var entityTypeReaderType = entityReaders.Value.Value.First();
                 TypeReader reader = Activator.CreateInstance(entityTypeReaderType.MakeGenericType(type)) as TypeReader;
                 AddTypeReader(type, reader);
-                return GetTypeReaders(type);
+                return GetTypeReaders(type, false);
             }
             return null;
         }
