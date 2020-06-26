@@ -1,6 +1,7 @@
 using Discord.Audio;
 using Discord.Rest;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -746,8 +747,8 @@ namespace Discord.WebSocket
             return null;
         }
         /// <inheritdoc />
-        public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null)
-            => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options);
+        public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null, IEnumerable<ulong> includeRoleIds = null)
+            => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options, includeRoleIds);
 
         internal SocketGuildUser AddOrUpdateUser(UserModel model)
         {

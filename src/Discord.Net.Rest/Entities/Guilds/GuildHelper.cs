@@ -376,9 +376,9 @@ namespace Discord.Rest
             );
         }
         public static async Task<int> PruneUsersAsync(IGuild guild, BaseDiscordClient client,
-            int days, bool simulate, RequestOptions options)
+            int days, bool simulate, RequestOptions options, IEnumerable<ulong> includeRoleIds)
         {
-            var args = new GuildPruneParams(days);
+            var args = new GuildPruneParams(days, includeRoleIds?.ToArray());
             GetGuildPruneCountResponse model;
             if (simulate)
                 model = await client.ApiClient.GetGuildPruneCountAsync(guild.Id, args, options).ConfigureAwait(false);
@@ -451,7 +451,7 @@ namespace Discord.Rest
             var emote = await client.ApiClient.GetGuildEmoteAsync(guild.Id, id, options).ConfigureAwait(false);
             return emote.ToEntity();
         }
-        public static async Task<GuildEmote> CreateEmoteAsync(IGuild guild, BaseDiscordClient client, string name, Image image, Optional<IEnumerable<IRole>> roles, 
+        public static async Task<GuildEmote> CreateEmoteAsync(IGuild guild, BaseDiscordClient client, string name, Image image, Optional<IEnumerable<IRole>> roles,
             RequestOptions options)
         {
             var apiargs = new CreateGuildEmoteParams
@@ -466,7 +466,7 @@ namespace Discord.Rest
             return emote.ToEntity();
         }
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
-        public static async Task<GuildEmote> ModifyEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, Action<EmoteProperties> func, 
+        public static async Task<GuildEmote> ModifyEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, Action<EmoteProperties> func,
             RequestOptions options)
         {
             if (func == null) throw new ArgumentNullException(paramName: nameof(func));
@@ -484,7 +484,7 @@ namespace Discord.Rest
             var emote = await client.ApiClient.ModifyGuildEmoteAsync(guild.Id, id, apiargs, options).ConfigureAwait(false);
             return emote.ToEntity();
         }
-        public static Task DeleteEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options) 
+        public static Task DeleteEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
             => client.ApiClient.DeleteGuildEmoteAsync(guild.Id, id, options);
     }
 }

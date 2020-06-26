@@ -205,7 +205,7 @@ namespace Discord.Rest
                 role?.Update(model);
             }
         }
-        
+
         /// <inheritdoc />
         public Task LeaveAsync(RequestOptions options = null)
             => GuildHelper.LeaveAsync(this, Discord, options);
@@ -631,8 +631,8 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous prune operation. The task result contains the number of users to
         ///     be or has been removed from this guild.
         /// </returns>
-        public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null)
-            => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options);
+        public Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null, IEnumerable<ulong> includeRoleIds = null)
+            => GuildHelper.PruneUsersAsync(this, Discord, days, simulate, options, includeRoleIds);
 
         /// <summary>
         ///     Gets a collection of users in this guild that the name or nickname starts with the
