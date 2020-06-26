@@ -367,8 +367,13 @@ namespace Discord.Commands
         ///     Adds a custom entity <see cref="TypeReader" /> to this <see cref="CommandService" /> for the supplied
         ///     object type.
         /// </summary>
+        /// <example>
+        ///     <para>The following example adds a custom entity reader to this <see cref="CommandService"/>.</para>
+        ///     <code language="cs" region="AddEntityTypeReader"
+        ///           source="..\..\..\Discord.Net.Examples\Commands\CommandService.Examples.cs" />
+        /// </example>
         /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
-        /// <param name="typeReaderType">
+        /// <param name="typeReaderGenericType">
         ///     A <see cref="Type" /> that is a generic type definition with a single open argument
         ///     of the <see cref="TypeReader" /> to be added.
         /// </param>
@@ -379,7 +384,7 @@ namespace Discord.Commands
         ///     object type.
         /// </summary>
         /// <param name="type">A <see cref="Type" /> instance for the type to be read.</param>
-        /// <param name="typeReaderType">
+        /// <param name="typeReaderGenericType">
         ///     A <see cref="Type" /> that is a generic type definition with a single open argument
         ///     of the <see cref="TypeReader" /> to be added.
         /// </param>
