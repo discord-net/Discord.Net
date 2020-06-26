@@ -26,6 +26,7 @@ namespace Discord.Net.Examples.Commands
                         : TypeReaderResult.FromError(CommandError.ObjectNotFound, "User not found.");
                 return TypeReaderResult.FromError(CommandError.ParseFailed, "Couldn't parse input to ulong.");
             }
+        }
 
         #endregion
     }
