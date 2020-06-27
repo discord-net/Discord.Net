@@ -1,5 +1,10 @@
 steps:
-- script: dotnet restore --no-cache Discord.Net.sln
+- task: DotNetCoreCLI@2
+  inputs:
+     command: 'restore'
+     projects: 'Discord.Net.sln'
+     feedsToUse: 'select'
+     verbosityRestore: 'Minimal'
   displayName: Restore packages
 
 - script: dotnet build "Discord.Net.sln" --no-restore -v minimal -c $(buildConfiguration) /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
