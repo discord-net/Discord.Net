@@ -82,8 +82,8 @@ namespace Discord.Commands
         ///     Represents all entity type reader <see cref="Type" />s loaded within <see cref="CommandService"/>.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ILookup{TKey, TElement}"/> that the key is the object type to be read by the <see cref="TypeReader"/>
-        ///     and the element is the type of the <see cref="TypeReader"/> generic definition.
+        ///     A <see cref="ILookup{TKey, TElement}"/>; the key is the object type to be read by the <see cref="TypeReader"/>,
+        ///     while the element is the type of the <see cref="TypeReader"/> generic definition.
         /// </returns>
         public ILookup<Type, Type> EntityTypeReaders => _userEntityTypeReaders.SelectMany(x => x.Value.Select(y => new { x.Key, TypeReaderType = y })).ToLookup(x => x.Key, y => y.TypeReaderType);
 
@@ -368,13 +368,10 @@ namespace Discord.Commands
         /// <example>
         ///     <para>The following example adds a custom entity reader to this <see cref="CommandService"/>.</para>
         ///     <code language="cs" region="AddEntityTypeReader"
-        ///           source="..\..\..\Discord.Net.Examples\Commands\CommandService.Examples.cs" />
+        ///           source="..\Discord.Net.Examples\Commands\CommandService.Examples.cs" />
         /// </example>
         /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
-        /// <param name="typeReaderGenericType">
-        ///     A <see cref="Type" /> that is a generic type definition with a single open argument
-        ///     of the <see cref="TypeReader" /> to be added.
-        /// </param>
+        /// <param name="typeReaderGenericType">A generic type definition (with one open argument) of the <see cref="TypeReader" />.</param>
         public void AddEntityTypeReader<T>(Type typeReaderGenericType)
             => AddEntityTypeReader(typeof(T), typeReaderGenericType);
         /// <summary>
@@ -382,10 +379,7 @@ namespace Discord.Commands
         ///     object type.
         /// </summary>
         /// <param name="type">A <see cref="Type" /> instance for the type to be read.</param>
-        /// <param name="typeReaderGenericType">
-        ///     A <see cref="Type" /> that is a generic type definition with a single open argument
-        ///     of the <see cref="TypeReader" /> to be added.
-        /// </param>
+        /// <param name="typeReaderGenericType">A generic type definition (with one open argument) of the <see cref="TypeReader" />.</param>
         public void AddEntityTypeReader(Type type, Type typeReaderGenericType)
         {
             if (!typeReaderGenericType.IsGenericTypeDefinition)
@@ -406,6 +400,11 @@ namespace Discord.Commands
         ///     If <typeparamref name="T" /> is a <see cref="ValueType" />, a nullable <see cref="TypeReader" /> will
         ///     also be added.
         /// </summary>
+        /// <example>
+        ///     <para>The following example adds a custom entity reader to this <see cref="CommandService"/>.</para>
+        ///     <code language="cs" region="AddEntityTypeReader2"
+        ///           source="..\Discord.Net.Examples\Commands\CommandService.Examples.cs" />
+        /// </example>
         /// <typeparam name="T">The object type to be read by the <see cref="TypeReader"/>.</typeparam>
         /// <param name="reader">An instance of the <see cref="TypeReader" /> to be added.</param>
         /// <param name="replaceDefault">
