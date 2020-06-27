@@ -14,25 +14,20 @@ trigger:
 jobs:
 - job: Linux
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-latest'
   steps:
-  - task: UseDotNet@2
-    displayName: 'Use .NET Core sdk'
-    inputs:
-      packageType: 'sdk'
-      version: '3.x'
   - template: azure/build.yml
 
 - job: Windows_build
   pool:
-    vmImage: 'windows-2019'
+    vmImage: 'windows-latest'
   condition: ne(variables['Build.SourceBranch'], 'refs/heads/dev')
   steps:
   - template: azure/build.yml
 
 - job: Windows_deploy
   pool:
-    vmImage: 'windows-2019'
+    vmImage: 'windows-latest'
   condition: |
       and (
         succeeded(),
