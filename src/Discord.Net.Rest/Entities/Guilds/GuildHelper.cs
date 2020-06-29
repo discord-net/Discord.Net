@@ -264,19 +264,18 @@ namespace Discord.Rest
         {
             if (name == null) throw new ArgumentNullException(paramName: nameof(name));
 
-            var model = await client.ApiClient.CreateGuildRoleAsync(guild.Id, options).ConfigureAwait(false);
-            var role = RestRole.Create(client, guild, model);
-
-            await role.ModifyAsync(x =>
+            var createGuildRoleParams = new API.Rest.ModifyGuildRoleParams
             {
-                x.Name = name;
-                x.Permissions = (permissions ?? role.Permissions);
-                x.Color = (color ?? Color.Default);
-                x.Hoist = isHoisted;
-                x.Mentionable = isMentionable;
-            }, options).ConfigureAwait(false);
+                Color = color?.RawValue ?? Optional.Create<uint>(),
+                Hoist = isHoisted,
+                Mentionable = isMentionable,
+                Name = name,
+                Permissions = permissions?.RawValue ?? Optional.Create<ulong>()
+            };
 
-            return role;
+            var model = await client.ApiClient.CreateGuildRoleAsync(guild.Id, createGuildRoleParams, options).ConfigureAwait(false);
+
+            return RestRole.Create(client, guild, model);
         }
 
         //Users
@@ -386,6 +385,17 @@ namespace Discord.Rest
             else
                 model = await client.ApiClient.BeginGuildPruneAsync(guild.Id, args, options).ConfigureAwait(false);
             return model.Pruned;
+        }
+        public static async Task<IReadOnlyCollection<RestGuildUser>> SearchUsersAsync(IGuild guild, BaseDiscordClient client,
+            string query, int? limit, RequestOptions options)
+        {
+            var apiArgs = new SearchGuildMembersParams
+            {
+                Query = query,
+                Limit = limit ?? Optional.Create<int>()
+            };
+            var models = await client.ApiClient.SearchGuildMembersAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
+            return models.Select(x => RestGuildUser.Create(client, guild, x)).ToImmutableArray();
         }
 
         // Audit logs

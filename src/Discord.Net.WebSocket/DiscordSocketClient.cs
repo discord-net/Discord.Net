@@ -44,6 +44,7 @@ namespace Discord.WebSocket
         private RestApplication _applicationInfo;
         private bool _isDisposed;
         private bool _guildSubscriptions;
+        private GatewayIntents? _gatewayIntents;
 
         /// <summary>
         ///     Provides access to a REST-only client with a shared state from this client.
@@ -137,6 +138,7 @@ namespace Discord.WebSocket
             Rest = new DiscordSocketRestClient(config, ApiClient);
             _heartbeatTimes = new ConcurrentQueue<long>();
             _guildSubscriptions = config.GuildSubscriptions;
+            _gatewayIntents = config.GatewayIntents;
 
             _stateLock = new SemaphoreSlim(1, 1);
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : $"Shard #{ShardId}");
@@ -167,7 +169,7 @@ namespace Discord.WebSocket
 
             GuildAvailable += g =>
             {
-                if (ConnectionState == ConnectionState.Connected && AlwaysDownloadUsers && !g.HasAllMembers)
+                if (_guildDownloadTask?.IsCompleted == true && ConnectionState == ConnectionState.Connected && AlwaysDownloadUsers && !g.HasAllMembers)
                 {
                     var _ = g.DownloadUsersAsync();
                 }
@@ -242,7 +244,7 @@ namespace Discord.WebSocket
                 else
                 {
                     await _gatewayLogger.DebugAsync("Identifying").ConfigureAwait(false);
-                    await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions).ConfigureAwait(false);
+                    await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents).ConfigureAwait(false);
                 }
 
                 //Wait for READY
@@ -368,7 +370,7 @@ namespace Discord.WebSocket
         {
             var cachedGuilds = guilds.ToImmutableArray();
 
-            const short batchSize = 50;
+            const short batchSize = 100; //TODO: Gateway Intents will limit to a maximum of 1 guild_id
             ulong[] batchIds = new ulong[Math.Min(batchSize, cachedGuilds.Length)];
             Task[] batchTasks = new Task[batchIds.Length];
             int batchCount = (cachedGuilds.Length + (batchSize - 1)) / batchSize;
@@ -376,7 +378,7 @@ namespace Discord.WebSocket
             for (int i = 0, k = 0; i < batchCount; i++)
             {
                 bool isLast = i == batchCount - 1;
-                int count = isLast ? (batchIds.Length - (batchCount - 1) * batchSize) : batchSize;
+                int count = isLast ? (cachedGuilds.Length - (batchCount - 1) * batchSize) : batchSize;
 
                 for (int j = 0; j < count; j++, k++)
                 {
@@ -517,7 +519,7 @@ namespace Discord.WebSocket
                             _sessionId = null;
                             _lastSeq = 0;
 
-                            await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
+                            await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents).ConfigureAwait(false);
                         }
                         break;
                     case GatewayOpCode.Reconnect:
@@ -576,6 +578,9 @@ namespace Discord.WebSocket
                                             }
                                             else if (_connection.CancelToken.IsCancellationRequested)
                                                 return;
+                                            
+                                            if (BaseConfig.AlwaysDownloadUsers)
+                                                _ = DownloadUsersAsync(Guilds.Where(x => x.IsAvailable && !x.HasAllMembers));
 
                                             await TimedInvokeAsync(_readyEvent, nameof(Ready)).ConfigureAwait(false);
                                             await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);
@@ -1391,6 +1396,34 @@ namespace Discord.WebSocket
                                     }
                                 }
                                 break;
+                            case "MESSAGE_REACTION_REMOVE_EMOJI":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_REACTION_REMOVE_EMOJI)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<API.Gateway.RemoveAllReactionsForEmoteEvent>(_serializer);
+                                    if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
+                                    {
+                                        var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
+                                        bool isCached = cachedMsg != null;
+
+                                        var optionalMsg = !isCached
+                                            ? Optional.Create<SocketUserMessage>()
+                                            : Optional.Create(cachedMsg);
+
+                                        var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId).ConfigureAwait(false) as IUserMessage);
+                                        var emote = data.Emoji.ToIEmote();
+
+                                        cachedMsg?.RemoveAllReactionsForEmoteAsync(emote);
+
+                                        await TimedInvokeAsync(_reactionsRemovedForEmoteEvent, nameof(ReactionsRemovedForEmote), cacheable, channel, emote).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
                             case "MESSAGE_DELETE_BULK":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_DELETE_BULK)").ConfigureAwait(false);
@@ -1742,7 +1775,7 @@ namespace Discord.WebSocket
             try
             {
                 await logger.DebugAsync("GuildDownloader Started").ConfigureAwait(false);
-                while ((_unavailableGuildCount != 0) && (Environment.TickCount - _lastGuildAvailableTime < 2000))
+                while ((_unavailableGuildCount != 0) && (Environment.TickCount - _lastGuildAvailableTime < BaseConfig.MaxWaitBetweenGuildAvailablesBeforeReady))
                     await Task.Delay(500, cancelToken).ConfigureAwait(false);
                 await logger.DebugAsync("GuildDownloader Stopped").ConfigureAwait(false);
             }
@@ -1771,17 +1804,7 @@ namespace Discord.WebSocket
             return guild;
         }
         internal SocketGuild RemoveGuild(ulong id)
-        {
-            var guild = State.RemoveGuild(id);
-            if (guild != null)
-            {
-                foreach (var _ in guild.Channels)
-                    State.RemoveChannel(id);
-                foreach (var user in guild.Users)
-                    user.GlobalUser.RemoveRef(this);
-            }
-            return guild;
-        }
+            => State.RemoveGuild(id);
 
         /// <exception cref="InvalidOperationException">Unexpected channel type is created.</exception>
         internal ISocketPrivateChannel AddPrivateChannel(API.Channel model, ClientState state)
