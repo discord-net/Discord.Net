@@ -16,7 +16,7 @@ namespace Discord.WebSocket
         public InviteCache(DiscordSocketClient client)
         {
             //NOTE:
-            //This should be an option in the client config. 
+            //This should be an option in the client config. default for now is 20 invites per guild
             _size = client.Guilds.Count * 20;
 
             _invites = new ConcurrentDictionary<string, SocketGuildInvite>();
