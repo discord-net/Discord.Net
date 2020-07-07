@@ -275,8 +275,7 @@ namespace Discord.WebSocket
                 await heartbeatTask.ConfigureAwait(false);
             _heartbeatTask = null;
 
-            while (_heartbeatTimes.TryDequeue(out _))
-            { }
+            while (_heartbeatTimes.TryDequeue(out _)) { }
             _lastMessageTime = 0;
 
             await _gatewayLogger.DebugAsync("Waiting for guild downloader").ConfigureAwait(false);
@@ -287,8 +286,7 @@ namespace Discord.WebSocket
 
             //Clear large guild queue
             await _gatewayLogger.DebugAsync("Clearing large guild queue").ConfigureAwait(false);
-            while (_largeGuilds.TryDequeue(out _))
-            { }
+            while (_largeGuilds.TryDequeue(out _)) { }
 
             //Raise virtual GUILD_UNAVAILABLEs
             await _gatewayLogger.DebugAsync("Raising virtual GuildUnavailables").ConfigureAwait(false);
@@ -1706,12 +1704,7 @@ namespace Discord.WebSocket
                                                 await TimedInvokeAsync(_inviteCreatedEvent, nameof(InviteCreated), invite).ConfigureAwait(false);
                                             }
                                         }
-                                        else
-                                        {
-                                            //add else
-                                        }
                                     }
-
                                 }
                                 break;
                             case "INVITE_DELETE":
@@ -1737,10 +1730,6 @@ namespace Discord.WebSocket
                                                 var cache = new Cacheable<SocketGuildInvite, string>(null, data.Code, invite != null, async () => await guild.GetSocketInviteAsync(data.Code));
                                                 await TimedInvokeAsync(_inviteDeletedEvent, nameof(InviteDeleted), cache).ConfigureAwait(false);
                                             }
-                                        }
-                                        else
-                                        {
-                                            //add else
                                         }
                                     }
 

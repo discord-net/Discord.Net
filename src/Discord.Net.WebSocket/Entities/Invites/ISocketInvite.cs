@@ -16,7 +16,7 @@ namespace Discord.WebSocket
         /// </returns>
         string Code { get; }
         /// <summary>
-        ///     Gets the URL used to accept this invite using <see cref="Code"/>.
+        ///     Gets the URL used to accept this invite
         /// </summary>
         /// <returns>
         ///     A string containing the full invite URL (e.g. <c>https://discord.gg/FTqNnyS</c>).
