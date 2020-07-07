@@ -27,8 +27,7 @@ namespace Discord.Rest
             var apiArgs = new API.Rest.ModifyGuildChannelParams
             {
                 Name = args.Name,
-                Position = args.Position,
-                CategoryId = args.CategoryId
+                Position = args.Position
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }

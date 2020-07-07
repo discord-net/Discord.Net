@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    internal class ModifyTextChannelParams : ModifyGuildChannelParams
+    internal class ModifyTextChannelParams : ModifyNestedChannelParams
     {
         [JsonProperty("topic")]
         public Optional<string> Topic { get; set; }

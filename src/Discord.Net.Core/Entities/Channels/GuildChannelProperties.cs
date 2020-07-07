@@ -21,14 +21,5 @@ namespace Discord
         ///     Moves the channel to the following position. This property is zero-based.
         /// </summary>
         public Optional<int> Position { get; set; }
-        /// <summary>
-        ///     Gets or sets the category ID for this channel.
-        /// </summary>
-        /// <remarks>
-        ///     Setting this value to a category's snowflake identifier will change or set this channel's parent to the
-        ///     specified channel; setting this value to <c>0</c> will detach this channel from its parent if one
-        ///     is set.
-        /// </remarks>
-        public Optional<ulong?> CategoryId { get; set; }
     }
 }
