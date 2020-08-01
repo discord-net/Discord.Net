@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Discord
 {
     /// <summary>
@@ -30,5 +32,9 @@ namespace Discord
         ///     is set.
         /// </remarks>
         public Optional<ulong?> CategoryId { get; set; }
+        /// <summary>
+        ///     Gets or sets the permission overwrites for this channel.
+        /// </summary>
+        public Optional<IEnumerable<Overwrite>> PermissionOverwrites { get; set; }
     }
 }
