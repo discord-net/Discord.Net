@@ -171,12 +171,32 @@ namespace Discord.Rest
             var props = new TextChannelProperties();
             func?.Invoke(props);
 
+            var overwrites = new List<API.Overwrite>();
+            if (props.UserOverwrites.IsSpecified)
+                overwrites.AddRange(props.UserOverwrites.Value.Select(x => new API.Overwrite()
+                {
+                    TargetId = x.Key,
+                    TargetType = PermissionTarget.User,
+                    Allow = x.Value.AllowValue,
+                    Deny = x.Value.DenyValue,
+                }));
+            if (props.RoleOverwrites.IsSpecified)
+                overwrites.AddRange(props.RoleOverwrites.Value.Select(x => new API.Overwrite()
+                {
+                    TargetId = x.Key,
+                    TargetType = PermissionTarget.Role,
+                    Allow = x.Value.AllowValue,
+                    Deny = x.Value.DenyValue,
+                }));
+
             var args = new CreateGuildChannelParams(name, ChannelType.Text)
             {
                 CategoryId = props.CategoryId,
                 Topic = props.Topic,
                 IsNsfw = props.IsNsfw,
-                Position = props.Position
+                Position = props.Position,
+                SlowModeInterval = props.SlowModeInterval,
+                Overwrites = overwrites.Count != 0 ? Optional.Create(overwrites.ToArray()) : Optional.Create<API.Overwrite[]>(),
             };
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestTextChannel.Create(client, guild, model);
@@ -190,12 +210,31 @@ namespace Discord.Rest
             var props = new VoiceChannelProperties();
             func?.Invoke(props);
 
+            var overwrites = new List<API.Overwrite>();
+            if (props.UserOverwrites.IsSpecified)
+                overwrites.AddRange(props.UserOverwrites.Value.Select(x => new API.Overwrite()
+                {
+                    TargetId = x.Key,
+                    TargetType = PermissionTarget.User,
+                    Allow = x.Value.AllowValue,
+                    Deny = x.Value.DenyValue,
+                }));
+            if (props.RoleOverwrites.IsSpecified)
+                overwrites.AddRange(props.RoleOverwrites.Value.Select(x => new API.Overwrite()
+                {
+                    TargetId = x.Key,
+                    TargetType = PermissionTarget.Role,
+                    Allow = x.Value.AllowValue,
+                    Deny = x.Value.DenyValue,
+                }));
+
             var args = new CreateGuildChannelParams(name, ChannelType.Voice)
             {
                 CategoryId = props.CategoryId,
                 Bitrate = props.Bitrate,
                 UserLimit = props.UserLimit,
-                Position = props.Position
+                Position = props.Position,
+                Overwrites = overwrites.Count != 0 ? Optional.Create(overwrites.ToArray()) : Optional.Create<API.Overwrite[]>(),
             };
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestVoiceChannel.Create(client, guild, model);
@@ -209,9 +248,28 @@ namespace Discord.Rest
             var props = new GuildChannelProperties();
             func?.Invoke(props);
 
+            var overwrites = new List<API.Overwrite>();
+            if (props.UserOverwrites.IsSpecified)
+                overwrites.AddRange(props.UserOverwrites.Value.Select(x => new API.Overwrite()
+                {
+                    TargetId = x.Key,
+                    TargetType = PermissionTarget.User,
+                    Allow = x.Value.AllowValue,
+                    Deny = x.Value.DenyValue,
+                }));
+            if (props.RoleOverwrites.IsSpecified)
+                overwrites.AddRange(props.RoleOverwrites.Value.Select(x => new API.Overwrite()
+                {
+                    TargetId = x.Key,
+                    TargetType = PermissionTarget.Role,
+                    Allow = x.Value.AllowValue,
+                    Deny = x.Value.DenyValue,
+                }));
+
             var args = new CreateGuildChannelParams(name, ChannelType.Category)
             {
-                Position = props.Position
+                Position = props.Position,
+                Overwrites = overwrites.Count != 0 ? Optional.Create(overwrites.ToArray()) : Optional.Create<API.Overwrite[]>(),
             };
 
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
@@ -451,7 +509,7 @@ namespace Discord.Rest
             var emote = await client.ApiClient.GetGuildEmoteAsync(guild.Id, id, options).ConfigureAwait(false);
             return emote.ToEntity();
         }
-        public static async Task<GuildEmote> CreateEmoteAsync(IGuild guild, BaseDiscordClient client, string name, Image image, Optional<IEnumerable<IRole>> roles, 
+        public static async Task<GuildEmote> CreateEmoteAsync(IGuild guild, BaseDiscordClient client, string name, Image image, Optional<IEnumerable<IRole>> roles,
             RequestOptions options)
         {
             var apiargs = new CreateGuildEmoteParams
@@ -466,7 +524,7 @@ namespace Discord.Rest
             return emote.ToEntity();
         }
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
-        public static async Task<GuildEmote> ModifyEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, Action<EmoteProperties> func, 
+        public static async Task<GuildEmote> ModifyEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, Action<EmoteProperties> func,
             RequestOptions options)
         {
             if (func == null) throw new ArgumentNullException(paramName: nameof(func));
@@ -484,7 +542,7 @@ namespace Discord.Rest
             var emote = await client.ApiClient.ModifyGuildEmoteAsync(guild.Id, id, apiargs, options).ConfigureAwait(false);
             return emote.ToEntity();
         }
-        public static Task DeleteEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options) 
+        public static Task DeleteEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
             => client.ApiClient.DeleteGuildEmoteAsync(guild.Id, id, options);
     }
 }

@@ -38,6 +38,25 @@ namespace Discord.Rest
         {
             var args = new TextChannelProperties();
             func(args);
+
+            var overwrites = new List<API.Overwrite>();
+            if (args.UserOverwrites.IsSpecified)
+                overwrites.AddRange(args.UserOverwrites.Value.Select(x => new API.Overwrite()
+                {
+                    TargetId = x.Key,
+                    TargetType = PermissionTarget.User,
+                    Allow = x.Value.AllowValue,
+                    Deny = x.Value.DenyValue,
+                }));
+            if (args.RoleOverwrites.IsSpecified)
+                overwrites.AddRange(args.RoleOverwrites.Value.Select(x => new API.Overwrite()
+                {
+                    TargetId = x.Key,
+                    TargetType = PermissionTarget.Role,
+                    Allow = x.Value.AllowValue,
+                    Deny = x.Value.DenyValue,
+                }));
+
             var apiArgs = new API.Rest.ModifyTextChannelParams
             {
                 Name = args.Name,
@@ -46,6 +65,7 @@ namespace Discord.Rest
                 Topic = args.Topic,
                 IsNsfw = args.IsNsfw,
                 SlowModeInterval = args.SlowModeInterval,
+                Overwrites = overwrites.Count != 0 ? Optional.Create(overwrites.ToArray()) : Optional.Create<API.Overwrite[]>(),
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
@@ -413,7 +433,8 @@ namespace Discord.Rest
             var apiArgs = new ModifyGuildChannelParams
             {
                 Overwrites = category.PermissionOverwrites
-                    .Select(overwrite => new API.Overwrite{
+                    .Select(overwrite => new API.Overwrite
+                    {
                         TargetId = overwrite.TargetId,
                         TargetType = overwrite.TargetType,
                         Allow = overwrite.Permissions.AllowValue,
