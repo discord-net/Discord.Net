@@ -1,5 +1,6 @@
 #pragma warning disable CS1591
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace Discord.API
@@ -26,5 +27,9 @@ namespace Discord.API
         //   "client_status": { "desktop": "dnd", "mobile": "dnd" }
         [JsonProperty("client_status")]
         public Optional<Dictionary<string, string>> ClientStatus { get; set; }
+        [JsonProperty("activities")]
+        public List<Game> Activities { get; set; }
+        [JsonProperty("premium_since")]
+        public Optional<DateTimeOffset?> PremiumSince { get; set; }
     }
 }
