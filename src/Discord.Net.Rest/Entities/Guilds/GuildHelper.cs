@@ -176,7 +176,17 @@ namespace Discord.Rest
                 CategoryId = props.CategoryId,
                 Topic = props.Topic,
                 IsNsfw = props.IsNsfw,
-                Position = props.Position
+                Position = props.Position,
+                SlowModeInterval = props.SlowModeInterval,
+                Overwrites = props.PermissionOverwrites.IsSpecified
+                    ? props.PermissionOverwrites.Value.Select(overwrite => new API.Overwrite
+                    {
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue,
+                        Deny = overwrite.Permissions.DenyValue
+                    }).ToArray()
+                    : Optional.Create<API.Overwrite[]>(),
             };
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestTextChannel.Create(client, guild, model);
@@ -195,7 +205,16 @@ namespace Discord.Rest
                 CategoryId = props.CategoryId,
                 Bitrate = props.Bitrate,
                 UserLimit = props.UserLimit,
-                Position = props.Position
+                Position = props.Position,
+                Overwrites = props.PermissionOverwrites.IsSpecified
+                    ? props.PermissionOverwrites.Value.Select(overwrite => new API.Overwrite
+                    {
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue,
+                        Deny = overwrite.Permissions.DenyValue
+                    }).ToArray()
+                    : Optional.Create<API.Overwrite[]>(),
             };
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestVoiceChannel.Create(client, guild, model);
@@ -211,7 +230,16 @@ namespace Discord.Rest
 
             var args = new CreateGuildChannelParams(name, ChannelType.Category)
             {
-                Position = props.Position
+                Position = props.Position,
+                Overwrites = props.PermissionOverwrites.IsSpecified
+                    ? props.PermissionOverwrites.Value.Select(overwrite => new API.Overwrite
+                    {
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue,
+                        Deny = overwrite.Permissions.DenyValue
+                    }).ToArray()
+                    : Optional.Create<API.Overwrite[]>(),
             };
 
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
