@@ -33,18 +33,8 @@ namespace Discord
         /// </remarks>
         public Optional<ulong?> CategoryId { get; set; }
         /// <summary>
-        ///     Gets or sets the user permission overwrites for this channel.
+        ///     Gets or sets the permission overwrites for this channel.
         /// </summary>
-        /// <remarks>
-        ///     The <see cref="ulong"/> key needs to be a user snowflake identifier.
-        /// </remarks>
-        public Optional<IEnumerable<KeyValuePair<ulong, OverwritePermissions>>> UserOverwrites { get; set; }
-        /// <summary>
-        ///     Gets or sets the role permission overwrites for this channel.
-        /// </summary>
-        /// <remarks>
-        ///     The <see cref="ulong"/> key needs to be a role snowflake identifier.
-        /// </remarks>
-        public Optional<IEnumerable<KeyValuePair<ulong, OverwritePermissions>>> RoleOverwrites { get; set; }
+        public Optional<IEnumerable<Overwrite>> PermissionOverwrites { get; set; }
     }
 }

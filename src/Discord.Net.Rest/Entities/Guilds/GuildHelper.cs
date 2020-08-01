@@ -171,24 +171,6 @@ namespace Discord.Rest
             var props = new TextChannelProperties();
             func?.Invoke(props);
 
-            var overwrites = new List<API.Overwrite>();
-            if (props.UserOverwrites.IsSpecified)
-                overwrites.AddRange(props.UserOverwrites.Value.Select(x => new API.Overwrite()
-                {
-                    TargetId = x.Key,
-                    TargetType = PermissionTarget.User,
-                    Allow = x.Value.AllowValue,
-                    Deny = x.Value.DenyValue,
-                }));
-            if (props.RoleOverwrites.IsSpecified)
-                overwrites.AddRange(props.RoleOverwrites.Value.Select(x => new API.Overwrite()
-                {
-                    TargetId = x.Key,
-                    TargetType = PermissionTarget.Role,
-                    Allow = x.Value.AllowValue,
-                    Deny = x.Value.DenyValue,
-                }));
-
             var args = new CreateGuildChannelParams(name, ChannelType.Text)
             {
                 CategoryId = props.CategoryId,
@@ -196,7 +178,15 @@ namespace Discord.Rest
                 IsNsfw = props.IsNsfw,
                 Position = props.Position,
                 SlowModeInterval = props.SlowModeInterval,
-                Overwrites = overwrites.Count != 0 ? Optional.Create(overwrites.ToArray()) : Optional.Create<API.Overwrite[]>(),
+                Overwrites = props.PermissionOverwrites.IsSpecified
+                    ? props.PermissionOverwrites.Value.Select(overwrite => new API.Overwrite
+                    {
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue,
+                        Deny = overwrite.Permissions.DenyValue
+                    }).ToArray()
+                    : Optional.Create<API.Overwrite[]>(),
             };
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestTextChannel.Create(client, guild, model);
@@ -210,31 +200,21 @@ namespace Discord.Rest
             var props = new VoiceChannelProperties();
             func?.Invoke(props);
 
-            var overwrites = new List<API.Overwrite>();
-            if (props.UserOverwrites.IsSpecified)
-                overwrites.AddRange(props.UserOverwrites.Value.Select(x => new API.Overwrite()
-                {
-                    TargetId = x.Key,
-                    TargetType = PermissionTarget.User,
-                    Allow = x.Value.AllowValue,
-                    Deny = x.Value.DenyValue,
-                }));
-            if (props.RoleOverwrites.IsSpecified)
-                overwrites.AddRange(props.RoleOverwrites.Value.Select(x => new API.Overwrite()
-                {
-                    TargetId = x.Key,
-                    TargetType = PermissionTarget.Role,
-                    Allow = x.Value.AllowValue,
-                    Deny = x.Value.DenyValue,
-                }));
-
             var args = new CreateGuildChannelParams(name, ChannelType.Voice)
             {
                 CategoryId = props.CategoryId,
                 Bitrate = props.Bitrate,
                 UserLimit = props.UserLimit,
                 Position = props.Position,
-                Overwrites = overwrites.Count != 0 ? Optional.Create(overwrites.ToArray()) : Optional.Create<API.Overwrite[]>(),
+                Overwrites = props.PermissionOverwrites.IsSpecified
+                    ? props.PermissionOverwrites.Value.Select(overwrite => new API.Overwrite
+                    {
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue,
+                        Deny = overwrite.Permissions.DenyValue
+                    }).ToArray()
+                    : Optional.Create<API.Overwrite[]>(),
             };
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestVoiceChannel.Create(client, guild, model);
@@ -248,28 +228,18 @@ namespace Discord.Rest
             var props = new GuildChannelProperties();
             func?.Invoke(props);
 
-            var overwrites = new List<API.Overwrite>();
-            if (props.UserOverwrites.IsSpecified)
-                overwrites.AddRange(props.UserOverwrites.Value.Select(x => new API.Overwrite()
-                {
-                    TargetId = x.Key,
-                    TargetType = PermissionTarget.User,
-                    Allow = x.Value.AllowValue,
-                    Deny = x.Value.DenyValue,
-                }));
-            if (props.RoleOverwrites.IsSpecified)
-                overwrites.AddRange(props.RoleOverwrites.Value.Select(x => new API.Overwrite()
-                {
-                    TargetId = x.Key,
-                    TargetType = PermissionTarget.Role,
-                    Allow = x.Value.AllowValue,
-                    Deny = x.Value.DenyValue,
-                }));
-
             var args = new CreateGuildChannelParams(name, ChannelType.Category)
             {
                 Position = props.Position,
-                Overwrites = overwrites.Count != 0 ? Optional.Create(overwrites.ToArray()) : Optional.Create<API.Overwrite[]>(),
+                Overwrites = props.PermissionOverwrites.IsSpecified
+                    ? props.PermissionOverwrites.Value.Select(overwrite => new API.Overwrite
+                    {
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue,
+                        Deny = overwrite.Permissions.DenyValue
+                    }).ToArray()
+                    : Optional.Create<API.Overwrite[]>(),
             };
 
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
