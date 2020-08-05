@@ -74,10 +74,10 @@ namespace Discord.Rest
         /// </returns>
         public bool Temporary { get; }
         /// <summary>
-        ///     Gets the user that created this invite.
+        ///     Gets the user that created this invite if available.
         /// </summary>
         /// <returns>
-        ///     A user that created this invite.
+        ///     A user that created this invite or <see langword="null"/>.
         /// </returns>
         public IUser Creator { get; }
         /// <summary>
