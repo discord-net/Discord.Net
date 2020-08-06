@@ -88,19 +88,21 @@ namespace Discord.Webhook
         /// <summary> Sends a message to the channel for this webhook. </summary>
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendMessageAsync(string text = null, bool isTTS = false, IEnumerable<Embed> embeds = null,
-            string username = null, string avatarUrl = null, RequestOptions options = null)
-            => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, options);
+            string username = null, string avatarUrl = null, RequestOptions options = null, AllowedMentions allowedMentions = null)
+            => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, allowedMentions, options);
 
         /// <summary> Sends a message to the channel for this webhook with an attachment. </summary>
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendFileAsync(string filePath, string text, bool isTTS = false,
-            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null, bool isSpoiler = false)
-            => WebhookClientHelper.SendFileAsync(this, filePath, text, isTTS, embeds, username, avatarUrl, options, isSpoiler);
+            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null,
+            RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
+            => WebhookClientHelper.SendFileAsync(this, filePath, text, isTTS, embeds, username, avatarUrl, allowedMentions, options, isSpoiler);
         /// <summary> Sends a message to the channel for this webhook with an attachment. </summary>
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false,
-            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null, bool isSpoiler = false)
-            => WebhookClientHelper.SendFileAsync(this, stream, filename, text, isTTS, embeds, username, avatarUrl, options, isSpoiler);
+            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null,
+            RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
+            => WebhookClientHelper.SendFileAsync(this, stream, filename, text, isTTS, embeds, username, avatarUrl, allowedMentions, options, isSpoiler);
 
         /// <summary> Modifies the properties of this webhook. </summary>
         public Task ModifyWebhookAsync(Action<WebhookProperties> func, RequestOptions options = null)
