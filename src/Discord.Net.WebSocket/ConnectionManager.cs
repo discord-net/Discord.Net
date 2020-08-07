@@ -44,6 +44,8 @@ namespace Discord
                     var ex2 = ex as WebSocketClosedException;
                     if (ex2?.CloseCode == 4006)
                         CriticalError(new Exception("WebSocket session expired", ex));
+                    if (ex2?.CloseCode == 4014)
+                        CriticalError(new Exception("WebSocket connection was closed", ex));
                     else
                         Error(new Exception("WebSocket connection was closed", ex));
                 }
