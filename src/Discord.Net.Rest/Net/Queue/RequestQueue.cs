@@ -136,7 +136,7 @@ namespace Discord.Net.Queue
             var requestBucket = GatewayBucket.Get(request.Options.BucketId);
             if (requestBucket.Type == GatewayBucketType.Unbucketed)
                 return;
-
+            
             //Identify is per-account so we won't trigger global until we can actually go for it
             if (requestBucket.Type == GatewayBucketType.Identify)
             {
