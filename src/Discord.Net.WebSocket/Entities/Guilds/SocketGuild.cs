@@ -809,15 +809,35 @@ namespace Discord.WebSocket
             var members = Users;
             var self = CurrentUser;
             _members.Clear();
-            _members.TryAdd(self.Id, self);
+            if (self != null)
+                _members.TryAdd(self.Id, self);
 
             DownloadedMemberCount = _members.Count;
 
             foreach (var member in members)
             {
-                if (member.Id != self.Id)
+                if (member.Id != self?.Id)
                     member.GlobalUser.RemoveRef(Discord);
             }
+        }
+
+        /// <summary>
+        ///     Gets a collection of all users in this guild.
+        /// </summary>
+        /// <remarks>
+        ///     <para>This method retrieves all users found within this guild throught REST.</para>
+        ///     <para>Users returned by this method are not cached.</para>
+        /// </remarks>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a collection of guild
+        ///     users found within this guild.
+        /// </returns>
+        public IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> GetUsersAsync(RequestOptions options = null)
+        {
+            if (HasAllMembers)
+                return ImmutableArray.Create(Users).ToAsyncEnumerable<IReadOnlyCollection<IGuildUser>>();
+            return GuildHelper.GetUsersAsync(this, Discord, null, null, options);
         }
 
         /// <inheritdoc />
@@ -829,6 +849,23 @@ namespace Discord.WebSocket
         {
             _downloaderPromise.TrySetResultAsync(true);
         }
+
+        /// <summary>
+        ///     Gets a collection of users in this guild that the name or nickname starts with the
+        ///     provided <see cref="string"/> at <paramref name="query"/>.
+        /// </summary>
+        /// <remarks>
+        ///     The <paramref name="limit"/> can not be higher than <see cref="DiscordConfig.MaxUsersPerBatch"/>.
+        /// </remarks>
+        /// <param name="query">The partial name or nickname to search.</param>
+        /// <param name="limit">The maximum number of users to be gotten.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a collection of guild
+        ///     users that the name or nickname starts with the provided <see cref="string"/> at <paramref name="query"/>.
+        /// </returns>
+        public Task<IReadOnlyCollection<RestGuildUser>> SearchUsersAsync(string query, int limit = DiscordConfig.MaxUsersPerBatch, RequestOptions options = null)
+            => GuildHelper.SearchUsersAsync(this, Discord, query, limit, options);
 
         //Audit logs
         /// <summary>
@@ -1184,8 +1221,13 @@ namespace Discord.WebSocket
             => await CreateRoleAsync(name, permissions, color, isHoisted, isMentionable, options).ConfigureAwait(false);
 
         /// <inheritdoc />
-        Task<IReadOnlyCollection<IGuildUser>> IGuild.GetUsersAsync(CacheMode mode, RequestOptions options)
-            => Task.FromResult<IReadOnlyCollection<IGuildUser>>(Users);
+        async Task<IReadOnlyCollection<IGuildUser>> IGuild.GetUsersAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload && !HasAllMembers)
+                return (await GetUsersAsync(options).FlattenAsync().ConfigureAwait(false)).ToImmutableArray();
+            else
+                return Users;
+        }
 
         /// <inheritdoc />
         async Task<IGuildUser> IGuild.AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func, RequestOptions options)
@@ -1199,6 +1241,14 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         Task<IGuildUser> IGuild.GetOwnerAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(Owner);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IGuildUser>> IGuild.SearchUsersAsync(string query, int limit, CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await SearchUsersAsync(query, limit, options).ConfigureAwait(false);
+            else
+                return ImmutableArray.Create<IGuildUser>();
+        }
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IAuditLogEntry>> IGuild.GetAuditLogsAsync(int limit, CacheMode cacheMode, RequestOptions options,

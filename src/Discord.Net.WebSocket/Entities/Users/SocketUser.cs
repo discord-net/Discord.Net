@@ -41,11 +41,16 @@ namespace Discord.WebSocket
         public UserStatus Status => Presence.Status;
         /// <inheritdoc />
         public IImmutableSet<ClientType> ActiveClients => Presence.ActiveClients ?? ImmutableHashSet<ClientType>.Empty;
+        /// <inheritdoc />
+        public IImmutableList<IActivity> Activities => Presence.Activities ?? ImmutableList<IActivity>.Empty;
         /// <summary>
         ///     Gets mutual guilds shared with this user.
         /// </summary>
+        /// <remarks>
+        ///     This property will only include guilds in the same <see cref="DiscordSocketClient"/>.
+        /// </remarks>
         public IReadOnlyCollection<SocketGuild> MutualGuilds
-            => Discord.Guilds.Where(g => g.Users.Any(u => u.Id == Id)).ToImmutableArray();
+            => Discord.Guilds.Where(g => g.GetUser(Id) != null).ToImmutableArray();
 
         internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)

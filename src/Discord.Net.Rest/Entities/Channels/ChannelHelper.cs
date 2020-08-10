@@ -46,6 +46,15 @@ namespace Discord.Rest
                 Topic = args.Topic,
                 IsNsfw = args.IsNsfw,
                 SlowModeInterval = args.SlowModeInterval,
+                Overwrites = args.PermissionOverwrites.IsSpecified
+                    ? args.PermissionOverwrites.Value.Select(overwrite => new API.Overwrite
+                    {
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue,
+                        Deny = overwrite.Permissions.DenyValue
+                    }).ToArray()
+                    : Optional.Create<API.Overwrite[]>(),
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
@@ -109,11 +118,18 @@ namespace Discord.Rest
         public static IAsyncEnumerable<IReadOnlyCollection<RestMessage>> GetMessagesAsync(IMessageChannel channel, BaseDiscordClient client,
             ulong? fromMessageId, Direction dir, int limit, RequestOptions options)
         {
-            if (dir == Direction.Around)
-                throw new NotImplementedException(); //TODO: Impl
-
             var guildId = (channel as IGuildChannel)?.GuildId;
             var guild = guildId != null ? (client as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
+
+            if (dir == Direction.Around && limit > DiscordConfig.MaxMessagesPerBatch)
+            {
+                int around = limit / 2;
+                if (fromMessageId.HasValue)
+                    return GetMessagesAsync(channel, client, fromMessageId.Value + 1, Direction.Before, around + 1, options) //Need to include the message itself
+                        .Concat(GetMessagesAsync(channel, client, fromMessageId, Direction.After, around, options));
+                else //Shouldn't happen since there's no public overload for ulong? and Direction
+                    return GetMessagesAsync(channel, client, null, Direction.Before, around + 1, options);
+            }
 
             return new PagedAsyncEnumerable<RestMessage>(
                 DiscordConfig.MaxMessagesPerBatch,
@@ -218,18 +234,37 @@ namespace Discord.Rest
         /// <exception cref="IOException">An I/O error occurred while opening the file.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
-            string filePath, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler)
+            string filePath, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, RequestOptions options, bool isSpoiler)
         {
             string filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
-                return await SendFileAsync(channel, client, file, filename, text, isTTS, embed, options, isSpoiler).ConfigureAwait(false);
+                return await SendFileAsync(channel, client, file, filename, text, isTTS, embed, allowedMentions, options, isSpoiler).ConfigureAwait(false);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
-            Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler)
+            Stream stream, string filename, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, RequestOptions options, bool isSpoiler)
         {
-            var args = new UploadFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS, Embed = embed != null ? embed.ToModel() : Optional<API.Embed>.Unspecified, IsSpoiler = isSpoiler };
+            Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
+            Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
+
+            // check that user flag and user Id list are exclusive, same with role flag and role Id list
+            if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
+            {
+                if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Users) &&
+                    allowedMentions.UserIds != null && allowedMentions.UserIds.Count > 0)
+                {
+                    throw new ArgumentException("The Users flag is mutually exclusive with the list of User Ids.", nameof(allowedMentions));
+                }
+
+                if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Roles) &&
+                    allowedMentions.RoleIds != null && allowedMentions.RoleIds.Count > 0)
+                {
+                    throw new ArgumentException("The Roles flag is mutually exclusive with the list of Role Ids.", nameof(allowedMentions));
+                }
+            }
+
+            var args = new UploadFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS, Embed = embed?.ToModel() ?? Optional<API.Embed>.Unspecified, AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified, IsSpoiler = isSpoiler };
             var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }
@@ -387,7 +422,8 @@ namespace Discord.Rest
             var apiArgs = new ModifyGuildChannelParams
             {
                 Overwrites = category.PermissionOverwrites
-                    .Select(overwrite => new API.Overwrite{
+                    .Select(overwrite => new API.Overwrite
+                    {
                         TargetId = overwrite.TargetId,
                         TargetType = overwrite.TargetType,
                         Allow = overwrite.Permissions.AllowValue,

@@ -58,6 +58,21 @@ namespace Discord
         Task UnpinAsync(RequestOptions options = null);
 
         /// <summary>
+        ///     Publishes (crossposts) this message.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous operation for publishing this message.
+        /// </returns>
+        /// <remarks>
+        ///     <note type="warning">
+        ///         This call will throw an <see cref="InvalidOperationException"/> if attempted in a non-news channel.
+        ///     </note>
+        ///     This method will publish (crosspost) the message. Please note, publishing (crossposting), is only available in news channels.
+        /// </remarks>
+        Task CrosspostAsync(RequestOptions options = null);
+
+        /// <summary>
         ///     Transforms this message's text into a human-readable form by resolving its tags.
         /// </summary>
         /// <param name="userHandling">Determines how the user tag should be handled.</param>

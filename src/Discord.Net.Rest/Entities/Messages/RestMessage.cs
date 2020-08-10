@@ -165,7 +165,7 @@ namespace Discord.Rest
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
-       
+
         /// <inheritdoc />
         public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.ToDictionary(x => x.Emote, x => new ReactionMetadata { ReactionCount = x.Count, IsMe = x.Me });
 
@@ -181,6 +181,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task RemoveAllReactionsAsync(RequestOptions options = null)
             => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
+        /// <inheritdoc />
+        public Task RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions options = null)
+            => MessageHelper.RemoveAllReactionsForEmoteAsync(this, emote, Discord, options);
         /// <inheritdoc />
         public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit, RequestOptions options = null)
             => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, options);

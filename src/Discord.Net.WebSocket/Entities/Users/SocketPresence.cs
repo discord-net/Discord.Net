@@ -18,16 +18,20 @@ namespace Discord.WebSocket
         public IActivity Activity { get; }
         /// <inheritdoc />
         public IImmutableSet<ClientType> ActiveClients { get; }
-        internal SocketPresence(UserStatus status, IActivity activity, IImmutableSet<ClientType> activeClients)
+        /// <inheritdoc />
+        public IImmutableList<IActivity> Activities { get; }
+        internal SocketPresence(UserStatus status, IActivity activity, IImmutableSet<ClientType> activeClients, IImmutableList<IActivity> activities)
         {
             Status = status;
-            Activity= activity;
-            ActiveClients = activeClients;
+            Activity = activity;
+            ActiveClients = activeClients ?? ImmutableHashSet<ClientType>.Empty;
+            Activities = activities ?? ImmutableList<IActivity>.Empty;
         }
         internal static SocketPresence Create(Model model)
         {
             var clients = ConvertClientTypesDict(model.ClientStatus.GetValueOrDefault());
-            return new SocketPresence(model.Status, model.Game?.ToEntity(), clients);
+            var activities = ConvertActivitiesList(model.Activities);
+            return new SocketPresence(model.Status, model.Game?.ToEntity(), clients, activities);
         }
         /// <summary>
         ///     Creates a new <see cref="IReadOnlyCollection{T}"/> containing all of the client types
@@ -52,6 +56,25 @@ namespace Discord.WebSocket
                 // quietly discard ClientTypes that do not match
             }
             return set.ToImmutableHashSet();
+        }
+        /// <summary>
+        ///     Creates a new <see cref="IReadOnlyCollection{T}"/> containing all the activities
+        ///     that a user has from the data supplied in the Presence update frame.
+        /// </summary>
+        /// <param name="activities">
+        ///     A list of <see cref="API.Game"/>.
+        /// </param>
+        /// <returns>
+        ///     A list of all <see cref="IActivity"/> that this user currently has available.
+        /// </returns>
+        private static IImmutableList<IActivity> ConvertActivitiesList(IList<API.Game> activities)
+        {
+            if (activities == null || activities.Count == 0)
+                return ImmutableList<IActivity>.Empty;
+            var list = new List<IActivity>();
+            foreach (var activity in activities)
+                list.Add(activity.ToEntity());
+            return list.ToImmutableList();
         }
 
         /// <summary>

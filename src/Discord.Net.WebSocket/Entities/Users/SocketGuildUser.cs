@@ -154,6 +154,8 @@ namespace Discord.WebSocket
                 Nickname = model.Nick.Value;
             if (model.Roles.IsSpecified)
                 UpdateRoles(model.Roles.Value);
+            if (model.PremiumSince.IsSpecified)
+                _premiumSinceTicks = model.PremiumSince.Value?.UtcTicks;
         }
         private void UpdateRoles(ulong[] roleIds)
         {

@@ -214,7 +214,7 @@ namespace Discord.API
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
-        public async Task SendIdentifyAsync(int largeThreshold = 100, int shardID = 0, int totalShards = 1, bool guildSubscriptions = true, RequestOptions options = null)
+        public async Task SendIdentifyAsync(int largeThreshold = 100, int shardID = 0, int totalShards = 1, bool guildSubscriptions = true, GatewayIntents? gatewayIntents = null, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
             var props = new Dictionary<string, string>
@@ -225,13 +225,18 @@ namespace Discord.API
             {
                 Token = AuthToken,
                 Properties = props,
-                LargeThreshold = largeThreshold,
-                GuildSubscriptions = guildSubscriptions
+                LargeThreshold = largeThreshold
             };
             if (totalShards > 1)
                 msg.ShardingParams = new int[] { shardID, totalShards };
 
             options.BucketId = GatewayBucket.Get(GatewayBucketType.Identify).Id;
+
+            if (gatewayIntents.HasValue)
+                msg.Intents = (int)gatewayIntents.Value;
+            else
+                msg.GuildSubscriptions = guildSubscriptions;
+
             await SendGatewayAsync(GatewayOpCode.Identify, msg, options: options).ConfigureAwait(false);
         }
         public async Task SendResumeAsync(string sessionId, int lastSeq, RequestOptions options = null)

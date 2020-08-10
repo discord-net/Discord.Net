@@ -33,7 +33,7 @@ namespace Discord.Webhook
             : this(webhookUrl, new DiscordRestConfig()) { }
 
         // regex pattern to match webhook urls
-        private static Regex WebhookUrlRegex = new Regex(@"^.*discordapp\.com\/api\/webhooks\/([\d]+)\/([a-z0-9_-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static Regex WebhookUrlRegex = new Regex(@"^.*(discord|discordapp)\.com\/api\/webhooks\/([\d]+)\/([a-z0-9_-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <summary> Creates a new Webhook Discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken, DiscordRestConfig config)
@@ -77,9 +77,9 @@ namespace Discord.Webhook
             ApiClient.RequestQueue.RateLimitTriggered += async (id, info) =>
             {
                 if (info == null)
-                    await _restLogger.VerboseAsync($"Preemptive Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
+                    await _restLogger.VerboseAsync($"Preemptive Rate limit triggered: {id?.ToString() ?? "null"}").ConfigureAwait(false);
                 else
-                    await _restLogger.WarningAsync($"Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
+                    await _restLogger.WarningAsync($"Rate limit triggered: {id?.ToString() ?? "null"}").ConfigureAwait(false);
             };
             ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
@@ -132,13 +132,13 @@ namespace Discord.Webhook
             if (match != null)
             {
                 // ensure that the first group is a ulong, set the _webhookId
-                // 0th group is always the entire match, so start at index 1
-                if (!(match.Groups[1].Success && ulong.TryParse(match.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out webhookId)))
+                // 0th group is always the entire match, and 1 is the domain; so start at index 2
+                if (!(match.Groups[2].Success && ulong.TryParse(match.Groups[2].Value, NumberStyles.None, CultureInfo.InvariantCulture, out webhookId)))
                     throw ex("The webhook Id could not be parsed.");
 
-                if (!match.Groups[2].Success)
+                if (!match.Groups[3].Success)
                     throw ex("The webhook token could not be parsed.");
-                webhookToken = match.Groups[2].Value;
+                webhookToken = match.Groups[3].Value;
             }
             else
                 throw ex();

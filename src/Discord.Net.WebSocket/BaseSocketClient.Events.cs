@@ -234,6 +234,28 @@ namespace Discord.WebSocket
             remove { _reactionsClearedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task>> _reactionsClearedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task>>();
+        /// <summary>
+        ///     Fired when all reactions to a message with a specific emote are removed.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         This event is fired when all reactions to a message with a specific emote are removed.
+        ///         The event handler must return a <see cref="Task"/> and accept a <see cref="ISocketMessageChannel"/> and
+        ///         a <see cref="IEmote"/> as its parameters.
+        ///     </para>
+        ///     <para>
+        ///         The channel where this message was sent will be passed into the <see cref="ISocketMessageChannel"/> parameter.
+        ///     </para>
+        ///     <para>
+        ///         The emoji that all reactions had and were removed will be passed into the <see cref="IEmote"/> parameter.
+        ///     </para>
+        /// </remarks>
+        public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, IEmote, Task> ReactionsRemovedForEmote
+        {
+            add { _reactionsRemovedForEmoteEvent.Add(value); }
+            remove { _reactionsRemovedForEmoteEvent.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, IEmote, Task>> _reactionsRemovedForEmoteEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, IEmote, Task>>();
 
         //Roles
         /// <summary> Fired when a role is created. </summary>

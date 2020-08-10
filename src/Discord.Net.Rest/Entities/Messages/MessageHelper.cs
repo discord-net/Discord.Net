@@ -44,8 +44,10 @@ namespace Discord.Rest
             };
             return await client.ApiClient.ModifyMessageAsync(msg.Channel.Id, msg.Id, apiArgs, options).ConfigureAwait(false);
         }
+
         public static Task DeleteAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
             => DeleteAsync(msg.Channel.Id, msg.Id, client, options);
+
         public static async Task DeleteAsync(ulong channelId, ulong msgId, BaseDiscordClient client,
             RequestOptions options)
         {
@@ -74,6 +76,11 @@ namespace Discord.Rest
         public static async Task RemoveAllReactionsAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
         {
             await client.ApiClient.RemoveAllReactionsAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
+        }
+
+        public static async Task RemoveAllReactionsForEmoteAsync(IMessage msg, IEmote emote, BaseDiscordClient client, RequestOptions options)
+        {
+            await client.ApiClient.RemoveAllReactionsForEmoteAsync(msg.Channel.Id, msg.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
         }
 
         public static IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, IEmote emote,
@@ -115,6 +122,7 @@ namespace Discord.Rest
         {
             await client.ApiClient.AddPinAsync(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
         }
+
         public static async Task UnpinAsync(IMessage msg, BaseDiscordClient client,
             RequestOptions options)
         {
@@ -240,6 +248,7 @@ namespace Discord.Rest
 
             return tags.ToImmutable();
         }
+
         private static int? FindIndex(IReadOnlyList<ITag> tags, int index)
         {
             int i = 0;
@@ -253,6 +262,7 @@ namespace Discord.Rest
                 return null; //Overlaps tag before this
             return i;
         }
+
         public static ImmutableArray<ulong> FilterTagsByKey(TagType type, ImmutableArray<ITag> tags)
         {
             return tags
@@ -260,6 +270,7 @@ namespace Discord.Rest
                 .Select(x => x.Key)
                 .ToImmutableArray();
         }
+
         public static ImmutableArray<T> FilterTagsByValue<T>(TagType type, ImmutableArray<ITag> tags)
         {
             return tags
@@ -278,6 +289,15 @@ namespace Discord.Rest
             else if (msg.Author.GetValueOrDefault()?.Bot.GetValueOrDefault(false) == true)
                 return MessageSource.Bot;
             return MessageSource.User;
+        }
+
+        public static Task CrosspostAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
+            => CrosspostAsync(msg.Channel.Id, msg.Id, client, options);
+
+        public static async Task CrosspostAsync(ulong channelId, ulong msgId, BaseDiscordClient client,
+            RequestOptions options)
+        {
+            await client.ApiClient.CrosspostAsync(channelId, msgId, options).ConfigureAwait(false);
         }
     }
 }

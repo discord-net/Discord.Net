@@ -12,9 +12,9 @@ namespace Discord.Net.Queue
 {
     internal class RequestQueue : IDisposable
     {
-        public event Func<string, RateLimitInfo?, Task> RateLimitTriggered;
+        public event Func<BucketId, RateLimitInfo?, Task> RateLimitTriggered;
 
-        private readonly ConcurrentDictionary<string, RequestBucket> _buckets;
+        private readonly ConcurrentDictionary<BucketId, object> _buckets;
         private readonly SemaphoreSlim _tokenLock;
         private readonly CancellationTokenSource _cancelTokenSource; //Dispose token
         private CancellationTokenSource _clearToken;
@@ -38,7 +38,7 @@ namespace Discord.Net.Queue
             _requestCancelToken = CancellationToken.None;
             _parentToken = CancellationToken.None;
 
-            _buckets = new ConcurrentDictionary<string, RequestBucket>();
+            _buckets = new ConcurrentDictionary<BucketId, object>();
 
             _cleanupTask = RunCleanup();
         }
@@ -94,7 +94,7 @@ namespace Discord.Net.Queue
             else
                 request.Options.CancelToken = _requestCancelToken;
 
-            var bucket = GetOrCreateBucket(request.Options.BucketId, request);
+            var bucket = GetOrCreateBucket(request.Options, request);
             var result = await bucket.SendAsync(request).ConfigureAwait(false);
             createdTokenSource?.Dispose();
             return result;
@@ -181,11 +181,29 @@ namespace Discord.Net.Queue
 
         private RequestBucket GetOrCreateBucket(string id, IRequest request)
         {
-            return _buckets.GetOrAdd(id, x => new RequestBucket(this, request, x));
+            var bucketId = options.BucketId;
+            object obj = _buckets.GetOrAdd(bucketId, x => new RequestBucket(this, request, x));
+            if (obj is BucketId hashBucket)
+            {
+                options.BucketId = hashBucket;
+                return (RequestBucket)_buckets.GetOrAdd(hashBucket, x => new RequestBucket(this, request, x));
+            }
+            return (RequestBucket)obj;
         }
-        internal async Task RaiseRateLimitTriggered(string bucketId, RateLimitInfo? info)
+        internal async Task RaiseRateLimitTriggered(BucketId bucketId, RateLimitInfo? info)
         {
             await RateLimitTriggered(bucketId, info).ConfigureAwait(false);
+        }
+        internal (RequestBucket, BucketId) UpdateBucketHash(BucketId id, string discordHash)
+        {
+            if (!id.IsHashBucket)
+            {
+                var bucket = BucketId.Create(discordHash, id);
+                var hashReqQueue = (RequestBucket)_buckets.GetOrAdd(bucket, _buckets[id]);
+                _buckets.AddOrUpdate(id, bucket, (oldBucket, oldObj) => bucket);
+                return (hashReqQueue, bucket);
+            }
+            return (null, null);
         }
 
         private async Task RunCleanup()
@@ -195,10 +213,15 @@ namespace Discord.Net.Queue
                 while (!_cancelTokenSource.IsCancellationRequested)
                 {
                     var now = DateTimeOffset.UtcNow;
-                    foreach (var bucket in _buckets.Select(x => x.Value))
+                    foreach (var bucket in _buckets.Where(x => x.Value is RequestBucket).Select(x => (RequestBucket)x.Value))
                     {
                         if ((now - bucket.LastAttemptAt).TotalMinutes > 1.0)
+                        {
+                            if (bucket.Id.IsHashBucket)
+                                foreach (var redirectBucket in _buckets.Where(x => x.Value == bucket.Id).Select(x => (BucketId)x.Value))
+                                    _buckets.TryRemove(redirectBucket, out _); //remove redirections if hash bucket
                             _buckets.TryRemove(bucket.Id, out _);
+                        }
                     }
                     await Task.Delay(60000, _cancelTokenSource.Token).ConfigureAwait(false); //Runs each minute
                 }

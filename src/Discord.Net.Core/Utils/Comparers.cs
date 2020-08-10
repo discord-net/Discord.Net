@@ -41,16 +41,13 @@ namespace Discord
         {
             public override bool Equals(TEntity x, TEntity y)
             {
-                bool xNull = x == null;
-                bool yNull = y == null;
-
-                if (xNull && yNull)
-                    return true;
-
-                if (xNull ^ yNull)
-                    return false;
-
-                return x.Id.Equals(y.Id);
+                return (x, y) switch
+                {
+                    (null, null) => true,
+                    (null, _)    => false,
+                    (_, null)    => false,
+                    var (l, r)   => l.Id.Equals(r.Id)
+                };
             }
 
             public override int GetHashCode(TEntity obj)
