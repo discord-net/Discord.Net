@@ -208,7 +208,7 @@ namespace Discord.API
                 bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
 
             options.IsGatewayBucket = true;
-            if (string.IsNullOrEmpty(options.BucketId))
+            if (options.BucketId == null)
                 options.BucketId = GatewayBucket.Get(GatewayBucketType.Unbucketed).Id;
             await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, bytes, true, options)).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);

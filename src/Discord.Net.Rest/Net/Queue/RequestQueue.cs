@@ -110,7 +110,7 @@ namespace Discord.Net.Queue
             else
                 request.Options.CancelToken = _requestCancelToken;
 
-            var bucket = GetOrCreateBucket(request.Options.BucketId, request);
+            var bucket = GetOrCreateBucket(request.Options, request);
             await bucket.SendAsync(request).ConfigureAwait(false);
             createdTokenSource?.Dispose();
         }
@@ -163,7 +163,7 @@ namespace Discord.Net.Queue
             var options = RequestOptions.CreateOrClone(request.Options);
             options.BucketId = globalBucketType.Id;
             var globalRequest = new WebSocketRequest(null, null, false, options);
-            var globalBucket = GetOrCreateBucket(globalBucketType.Id, globalRequest);
+            var globalBucket = GetOrCreateBucket(options, globalRequest);
             await globalBucket.TriggerAsync(id, globalRequest);
         }
         internal void ReleaseIdentifySemaphore(int id)
@@ -179,7 +179,7 @@ namespace Discord.Net.Queue
 #endif
         }
 
-        private RequestBucket GetOrCreateBucket(string id, IRequest request)
+        private RequestBucket GetOrCreateBucket(RequestOptions options, IRequest request)
         {
             var bucketId = options.BucketId;
             object obj = _buckets.GetOrAdd(bucketId, x => new RequestBucket(this, request, x));

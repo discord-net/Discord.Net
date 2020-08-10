@@ -25,7 +25,7 @@ namespace Discord.Net.Queue
         public int WindowCount { get; private set; }
         public DateTimeOffset LastAttemptAt { get; private set; }
 
-        public RequestBucket(RequestQueue queue, IRequest request, string id)
+        public RequestBucket(RequestQueue queue, IRequest request, BucketId id)
         {
             _queue = queue;
             Id = id;
@@ -285,7 +285,7 @@ namespace Discord.Net.Queue
             }
         }
 
-        private void UpdateRateLimit(int id, IRequest request, RateLimitInfo info, bool is429)
+        private void UpdateRateLimit(int id, IRequest request, RateLimitInfo info, bool is429, bool redirected = false)
         {
             if (WindowCount == 0)
                 return;
