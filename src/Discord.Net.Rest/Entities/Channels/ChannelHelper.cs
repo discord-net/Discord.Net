@@ -28,7 +28,16 @@ namespace Discord.Rest
             {
                 Name = args.Name,
                 Position = args.Position,
-                CategoryId = args.CategoryId
+                CategoryId = args.CategoryId,
+                Overwrites = args.PermissionOverwrites.IsSpecified
+                    ? args.PermissionOverwrites.Value.Select(overwrite => new API.Overwrite
+                    {
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue,
+                        Deny = overwrite.Permissions.DenyValue
+                    }).ToArray()
+                    : Optional.Create<API.Overwrite[]>(),
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
