@@ -11,7 +11,7 @@ namespace Discord.Net
         /// </summary>
         /// <returns>
         ///     A 
-        ///     <see href="https://discordapp.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes">close code</see>
+        ///     <see href="https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes">close code</see>
         ///     from Discord.
         /// </returns>
         public int CloseCode { get; }

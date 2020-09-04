@@ -13,7 +13,7 @@ namespace Discord.Net
         /// </summary>
         /// <returns>
         ///     An 
-        ///     <see href="https://discordapp.com/developers/docs/topics/opcodes-and-status-codes#http">HTTP status code</see>
+        ///     <see href="https://discord.com/developers/docs/topics/opcodes-and-status-codes#http">HTTP status code</see>
         ///     from Discord.
         /// </returns>
         public HttpStatusCode HttpCode { get; }
@@ -22,7 +22,7 @@ namespace Discord.Net
         /// </summary>
         /// <returns>
         ///     A 
-        ///     <see href="https://discordapp.com/developers/docs/topics/opcodes-and-status-codes#json">JSON error code</see>
+        ///     <see href="https://discord.com/developers/docs/topics/opcodes-and-status-codes#json">JSON error code</see>
         ///     from Discord, or <c>null</c> if none.
         /// </returns>
         public int? DiscordCode { get; }
