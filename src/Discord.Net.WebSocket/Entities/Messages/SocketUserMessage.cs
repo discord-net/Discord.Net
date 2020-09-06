@@ -20,7 +20,9 @@ namespace Discord.WebSocket
         private ImmutableArray<Attachment> _attachments = ImmutableArray.Create<Attachment>();
         private ImmutableArray<Embed> _embeds = ImmutableArray.Create<Embed>();
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
-        
+        private ImmutableArray<SocketRole> _roleMentions = ImmutableArray.Create<SocketRole>();
+        private ImmutableArray<SocketUser> _userMentions = ImmutableArray.Create<SocketUser>();
+
         /// <inheritdoc />
         public override bool IsTTS => _isTTS;
         /// <inheritdoc />
@@ -30,6 +32,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
         /// <inheritdoc />
+        public override bool MentionedEveryone => _isMentioningEveryone;
+        /// <inheritdoc />
         public override IReadOnlyCollection<Attachment> Attachments => _attachments;
         /// <inheritdoc />
         public override IReadOnlyCollection<Embed> Embeds => _embeds;
@@ -38,9 +42,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuildChannel> MentionedChannels => MessageHelper.FilterTagsByValue<SocketGuildChannel>(TagType.ChannelMention, _tags);
         /// <inheritdoc />
-        public override IReadOnlyCollection<SocketRole> MentionedRoles => MessageHelper.FilterTagsByValue<SocketRole>(TagType.RoleMention, _tags);
+        public override IReadOnlyCollection<SocketRole> MentionedRoles => _roleMentions;
         /// <inheritdoc />
-        public override IReadOnlyCollection<SocketUser> MentionedUsers => MessageHelper.FilterTagsByValue<SocketUser>(TagType.UserMention, _tags);
+        public override IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions;
 
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author, MessageSource source)
             : base(discord, id, channel, author, source)
@@ -57,6 +61,8 @@ namespace Discord.WebSocket
         {
             base.Update(state, model);
 
+            SocketGuild guild = (Channel as SocketGuildChannel)?.Guild;
+
             if (model.IsTextToSpeech.IsSpecified)
                 _isTTS = model.IsTextToSpeech.Value;
             if (model.Pinned.IsSpecified)
@@ -69,6 +75,8 @@ namespace Discord.WebSocket
             {
                 _isSuppressed = model.Flags.Value.HasFlag(API.MessageFlags.Suppressed);
             }
+            if (model.RoleMentions.IsSpecified)
+                _roleMentions = model.RoleMentions.Value.Select(x => guild.GetRole(x)).ToImmutableArray();
 
             if (model.Attachments.IsSpecified)
             {
@@ -98,28 +106,29 @@ namespace Discord.WebSocket
                     _embeds = ImmutableArray.Create<Embed>();
             }
 
-            IReadOnlyCollection<IUser> mentions = ImmutableArray.Create<SocketUnknownUser>(); //Is passed to ParseTags to get real mention collection
             if (model.UserMentions.IsSpecified)
             {
                 var value = model.UserMentions.Value;
                 if (value.Length > 0)
                 {
-                    var newMentions = ImmutableArray.CreateBuilder<SocketUnknownUser>(value.Length);
+                    var newMentions = ImmutableArray.CreateBuilder<SocketUser>(value.Length);
                     for (int i = 0; i < value.Length; i++)
                     {
                         var val = value[i];
-                        if (val.Object != null)
+                        var guildUser = guild.GetUser(val.Id);
+                        if (guildUser != null)
+                            newMentions.Add(guildUser);
+                        else if (val.Object != null)
                             newMentions.Add(SocketUnknownUser.Create(Discord, state, val.Object));
                     }
-                    mentions = newMentions.ToImmutable();
+                    _userMentions = newMentions.ToImmutable();
                 }
             }
 
             if (model.Content.IsSpecified)
             {
                 var text = model.Content.Value;
-                var guild = (Channel as SocketGuildChannel)?.Guild;
-                _tags = MessageHelper.ParseTags(text, Channel, guild, mentions);
+                _tags = MessageHelper.ParseTags(text, Channel, guild, _userMentions);
                 model.Content = text;
             }
         }
