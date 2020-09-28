@@ -60,7 +60,7 @@ another voice channel in the guild.
 
 ### With FFmpeg
 
-[FFmpeg] is an open source, highly versatile AV-muxing tool. This is
+[FFmpeg] is an open source, highly versatile AV-mixing tool. This is
 the recommended method of transmitting audio.
 
 Before you begin, you will need to have a version of FFmpeg downloaded
