@@ -381,7 +381,7 @@ namespace Discord.WebSocket
             Description = model.Description;
             PremiumSubscriptionCount = model.PremiumSubscriptionCount.GetValueOrDefault();
             PreferredLocale = model.PreferredLocale;
-            PreferredCulture = new CultureInfo(PreferredLocale);
+            PreferredCulture = PreferredLocale == null ? null : new CultureInfo(PreferredLocale);
 
             if (model.Emojis != null)
             {
