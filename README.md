@@ -4,7 +4,7 @@
 [![Build Status](https://dev.azure.com/discord-net/Discord.Net/_apis/build/status/discord-net.Discord.Net?branchName=dev)](https://dev.azure.com/discord-net/Discord.Net/_build/latest?definitionId=1&branchName=dev)
 [![Discord](https://discord.com/api/guilds/81384788765712384/widget.png)](https://discord.gg/jkrBmQR)
 
-An unofficial .NET API Wrapper for the Discord client (http://discordapp.com).
+An unofficial .NET API Wrapper for the Discord client (https://discord.com).
 
 Check out the [documentation](https://discord.foxbot.me/) or join the [Discord API Chat](https://discord.gg/jkrBmQR).
 
