@@ -874,8 +874,12 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<Ban>("GET", () => $"guilds/{guildId}/bans/{userId}", ids, options: options).ConfigureAwait(false);
+            try
+            {
+                var ids = new BucketIds(guildId: guildId);
+                return await SendAsync<Ban>("GET", () => $"guilds/{guildId}/bans/{userId}", ids, options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
         /// <exception cref="ArgumentException">
         /// <paramref name="guildId"/> and <paramref name="userId"/> must not be equal to zero.
