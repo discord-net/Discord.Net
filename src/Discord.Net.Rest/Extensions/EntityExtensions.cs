@@ -68,6 +68,16 @@ namespace Discord.Rest
                 Parse = entity.AllowedTypes?.EnumerateMentionTypes().ToArray(),
                 Roles = entity.RoleIds?.ToArray(),
                 Users = entity.UserIds?.ToArray(),
+                RepliedUser = entity.MentionRepliedUser ?? Optional.Create<bool>(),
+            };
+        }
+        public static API.MessageReference ToModel(this MessageReference entity)
+        {
+            return new API.MessageReference()
+            {
+                ChannelId = entity.ChannelId == default(ulong) ? Optional.Create<ulong>() : entity.ChannelId,
+                GuildId = entity.GuildId,
+                MessageId = entity.MessageId,
             };
         }
         public static IEnumerable<string> EnumerateMentionTypes(this AllowedMentionTypes mentionTypes)

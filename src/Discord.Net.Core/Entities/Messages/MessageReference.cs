@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace Discord
 {
     /// <summary>
-    ///     Contains the IDs sent from a crossposted message.
+    ///     Contains the IDs sent from a crossposted message or inline reply.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class MessageReference
@@ -16,12 +16,34 @@ namespace Discord
         /// <summary>
         ///     Gets the Channel ID of the original message.
         /// </summary>
+        /// <remarks>
+        ///     If there is no referenced channel id, it will be the default value (zero).
+        /// </remarks>
         public ulong ChannelId { get; internal set; }
 
         /// <summary>
         ///     Gets the Guild ID of the original message.
         /// </summary>
         public Optional<ulong> GuildId { get; internal set; }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MessageReference"/> class.
+        /// </summary>
+        /// <param name="messageId">
+        ///     The ID of the message that will be referenced. Used to reply to specific messages and the only parameter required for it.
+        /// </param>
+        /// <param name="channelId">
+        ///     The ID of the channel that will be referenced. It will be validated if sent.
+        /// </param>
+        /// <param name="guildId">
+        ///     The ID of the guild that will be referenced. It will be validated if sent.
+        /// </param>
+        public MessageReference(ulong? messageId = null, ulong? channelId = null, ulong? guildId = null)
+        {
+            MessageId = messageId ?? Optional.Create<ulong>();
+            ChannelId = channelId ?? default(ulong);
+            GuildId = guildId ?? Optional.Create<ulong>();
+        }
 
         private string DebuggerDisplay
             => $"Channel ID: ({ChannelId}){(GuildId.IsSpecified ? $", Guild ID: ({GuildId.Value})" : "")}" +

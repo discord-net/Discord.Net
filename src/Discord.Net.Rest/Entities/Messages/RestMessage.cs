@@ -119,7 +119,7 @@ namespace Discord.Rest
                 Reference = new MessageReference
                 {
                     GuildId = model.Reference.Value.GuildId,
-                    ChannelId = model.Reference.Value.ChannelId,
+                    ChannelId = model.Reference.Value.ChannelId.GetValueOrDefault(),
                     MessageId = model.Reference.Value.MessageId
                 };
             }
