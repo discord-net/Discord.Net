@@ -167,10 +167,10 @@ namespace Discord.WebSocket
             => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, allowedMentions, options);
 
         /// <inheritdoc />
-        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
+        public Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
             => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, allowedMentions, options, isSpoiler);
         /// <inheritdoc />
-        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
+        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
             => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, allowedMentions, options, isSpoiler);
 
         /// <inheritdoc />
