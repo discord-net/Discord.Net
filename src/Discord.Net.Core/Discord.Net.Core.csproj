@@ -4,6 +4,7 @@
     <AssemblyName>Discord.Net.Core</AssemblyName>
     <RootNamespace>Discord</RootNamespace>
     <Description>The core components for the Discord.Net library.</Description>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net461;netstandard2.0;netstandard2.1</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard2.0;netstandard2.1</TargetFrameworks>
   </PropertyGroup>

@@ -4,6 +4,7 @@
     <AssemblyName>Discord.Net.Analyzers</AssemblyName>
     <RootNamespace>Discord.Analyzers</RootNamespace>
     <Description>A Discord.Net extension adding support for design-time analysis of the API usage.</Description>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>

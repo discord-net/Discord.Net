@@ -4,6 +4,7 @@
     <AssemblyName>Discord.Net.DebugTools</AssemblyName>
     <RootNamespace>Discord</RootNamespace>
     <Description>A Discord.Net extension adding some helper classes for diagnosing issues.</Description>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net45;netstandard1.3</TargetFrameworks>
     <TargetFramework Condition=" '$(OS)' != 'Windows_NT' ">netstandard1.3</TargetFramework>
   </PropertyGroup>

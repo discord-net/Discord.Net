@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
 

@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>_04_webhook_client</RootNamespace>
   </PropertyGroup>
