@@ -14,10 +14,10 @@ namespace _04_webhook_client
 
         public async Task MainAsync()
         {
-            // The webhook url follows the format https://discordapp.com/api/webhooks/{id}/{token}
+            // The webhook url follows the format https://discord.com/api/webhooks/{id}/{token}
             // Because anyone with the webhook URL can use your webhook
-            // you should NOT hard code the URL or ID + token into your application. 
-            using (var client = new DiscordWebhookClient("https://discordapp.com/api/webhooks/123/abc123"))
+            // you should NOT hard code the URL or ID + token into your application.
+            using (var client = new DiscordWebhookClient("https://discord.com/api/webhooks/123/abc123"))
             {
                 var embed = new EmbedBuilder
                 {
@@ -26,7 +26,7 @@ namespace _04_webhook_client
                 };
 
                 // Webhooks are able to send multiple embeds per message
-                // As such, your embeds must be passed as a collection. 
+                // As such, your embeds must be passed as a collection.
                 await client.SendMessageAsync(text: "Send a message to this webhook!", embeds: new[] { embed.Build() });
             }
         }

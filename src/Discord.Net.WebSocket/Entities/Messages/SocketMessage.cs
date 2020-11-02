@@ -46,6 +46,8 @@ namespace Discord.WebSocket
         public virtual bool IsSuppressed => false;
         /// <inheritdoc />
         public virtual DateTimeOffset? EditedTimestamp => null;
+        /// <inheritdoc />
+        public virtual bool MentionedEveryone => false;
 
         /// <inheritdoc />
         public MessageActivity Activity { get; private set; }

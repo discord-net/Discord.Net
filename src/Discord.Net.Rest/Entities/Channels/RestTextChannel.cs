@@ -42,7 +42,8 @@ namespace Discord.Rest
             base.Update(model);
             CategoryId = model.CategoryId;
             Topic = model.Topic.Value;
-            SlowModeInterval = model.SlowMode.Value;
+            if (model.SlowMode.IsSpecified)
+                SlowModeInterval = model.SlowMode.Value;
             IsNsfw = model.Nsfw.GetValueOrDefault();
         }
 
@@ -129,13 +130,13 @@ namespace Discord.Rest
         /// <exception cref="NotSupportedException"><paramref name="filePath" /> is in an invalid format.</exception>
         /// <exception cref="IOException">An I/O error occurred while opening the file.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false)
-            => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, options, isSpoiler);
+        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
+            => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, allowedMentions, options, isSpoiler);
 
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false)
-            => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, options, isSpoiler);
+        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
+            => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, allowedMentions, options, isSpoiler);
 
         /// <inheritdoc />
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
@@ -266,12 +267,12 @@ namespace Discord.Rest
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler)
-            => await SendFileAsync(filePath, text, isTTS, embed, options, isSpoiler).ConfigureAwait(false);
+        async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions)
+            => await SendFileAsync(filePath, text, isTTS, embed, options, isSpoiler, allowedMentions).ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler)
-            => await SendFileAsync(stream, filename, text, isTTS, embed, options, isSpoiler).ConfigureAwait(false);
+        async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions)
+            => await SendFileAsync(stream, filename, text, isTTS, embed, options, isSpoiler, allowedMentions).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options, AllowedMentions allowedMentions)
             => await SendMessageAsync(text, isTTS, embed, options, allowedMentions).ConfigureAwait(false);

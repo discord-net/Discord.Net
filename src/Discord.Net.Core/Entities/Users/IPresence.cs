@@ -19,5 +19,9 @@ namespace Discord
         ///     Gets the set of clients where this user is currently active.
         /// </summary>
         IImmutableSet<ClientType> ActiveClients { get; }
+        /// <summary>
+        ///     Gets the list of activities that this user currently has available.
+        /// </summary>
+        IImmutableList<IActivity> Activities { get; }
     }
 }

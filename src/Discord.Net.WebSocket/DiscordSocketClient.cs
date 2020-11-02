@@ -44,6 +44,7 @@ namespace Discord.WebSocket
         private RestApplication _applicationInfo;
         private bool _isDisposed;
         private bool _guildSubscriptions;
+        private GatewayIntents? _gatewayIntents;
 
         /// <summary>
         ///     Provides access to a REST-only client with a shared state from this client.
@@ -137,6 +138,7 @@ namespace Discord.WebSocket
             Rest = new DiscordSocketRestClient(config, ApiClient);
             _heartbeatTimes = new ConcurrentQueue<long>();
             _guildSubscriptions = config.GuildSubscriptions;
+            _gatewayIntents = config.GatewayIntents;
 
             _stateLock = new SemaphoreSlim(1, 1);
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : $"Shard #{ShardId}");
@@ -167,7 +169,7 @@ namespace Discord.WebSocket
 
             GuildAvailable += g =>
             {
-                if (ConnectionState == ConnectionState.Connected && AlwaysDownloadUsers && !g.HasAllMembers)
+                if (_guildDownloadTask?.IsCompleted == true && ConnectionState == ConnectionState.Connected && AlwaysDownloadUsers && !g.HasAllMembers)
                 {
                     var _ = g.DownloadUsersAsync();
                 }
@@ -242,7 +244,7 @@ namespace Discord.WebSocket
                 else
                 {
                     await _gatewayLogger.DebugAsync("Identifying").ConfigureAwait(false);
-                    await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions).ConfigureAwait(false);
+                    await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents).ConfigureAwait(false);
                 }
 
                 //Wait for READY
@@ -340,7 +342,7 @@ namespace Discord.WebSocket
             {
                 var user = SocketGlobalUser.Create(this, state, model);
                 user.GlobalUser.AddRef();
-                user.Presence = new SocketPresence(UserStatus.Online, null, null);
+                user.Presence = new SocketPresence(UserStatus.Online, null, null, null);
                 return user;
             });
         }
@@ -368,7 +370,7 @@ namespace Discord.WebSocket
         {
             var cachedGuilds = guilds.ToImmutableArray();
 
-            const short batchSize = 50;
+            int batchSize = _gatewayIntents.HasValue ? 1 : 100;
             ulong[] batchIds = new ulong[Math.Min(batchSize, cachedGuilds.Length)];
             Task[] batchTasks = new Task[batchIds.Length];
             int batchCount = (cachedGuilds.Length + (batchSize - 1)) / batchSize;
@@ -376,7 +378,7 @@ namespace Discord.WebSocket
             for (int i = 0, k = 0; i < batchCount; i++)
             {
                 bool isLast = i == batchCount - 1;
-                int count = isLast ? (batchIds.Length - (batchCount - 1) * batchSize) : batchSize;
+                int count = isLast ? (cachedGuilds.Length - (batchCount - 1) * batchSize) : batchSize;
 
                 for (int j = 0; j < count; j++, k++)
                 {
@@ -448,7 +450,7 @@ namespace Discord.WebSocket
                 return;
             var status = Status;
             var statusSince = _statusSince;
-            CurrentUser.Presence = new SocketPresence(status, Activity, null);
+            CurrentUser.Presence = new SocketPresence(status, Activity, null, null);
 
             var gameModel = new GameModel();
             // Discord only accepts rich presence over RPC, don't even bother building a payload
@@ -517,7 +519,7 @@ namespace Discord.WebSocket
                             _sessionId = null;
                             _lastSeq = 0;
 
-                            await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards).ConfigureAwait(false);
+                            await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents).ConfigureAwait(false);
                         }
                         break;
                     case GatewayOpCode.Reconnect:
@@ -576,6 +578,9 @@ namespace Discord.WebSocket
                                             }
                                             else if (_connection.CancelToken.IsCancellationRequested)
                                                 return;
+                                            
+                                            if (BaseConfig.AlwaysDownloadUsers)
+                                                _ = DownloadUsersAsync(Guilds.Where(x => x.IsAvailable && !x.HasAllMembers));
 
                                             await TimedInvokeAsync(_readyEvent, nameof(Ready)).ConfigureAwait(false);
                                             await _gatewayLogger.InfoAsync("Ready").ConfigureAwait(false);
@@ -898,6 +903,13 @@ namespace Discord.WebSocket
 
                                         if (user != null)
                                         {
+                                            var globalBefore = user.GlobalUser.Clone();
+                                            if (user.GlobalUser.Update(State, data.User))
+                                            {
+                                                //Global data was updated, trigger UserUpdated
+                                                await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), globalBefore, user).ConfigureAwait(false);
+                                            }
+
                                             var before = user.Clone();
                                             user.Update(State, data);
                                             await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), before, user).ConfigureAwait(false);
@@ -1770,7 +1782,7 @@ namespace Discord.WebSocket
             try
             {
                 await logger.DebugAsync("GuildDownloader Started").ConfigureAwait(false);
-                while ((_unavailableGuildCount != 0) && (Environment.TickCount - _lastGuildAvailableTime < 2000))
+                while ((_unavailableGuildCount != 0) && (Environment.TickCount - _lastGuildAvailableTime < BaseConfig.MaxWaitBetweenGuildAvailablesBeforeReady))
                     await Task.Delay(500, cancelToken).ConfigureAwait(false);
                 await logger.DebugAsync("GuildDownloader Stopped").ConfigureAwait(false);
             }

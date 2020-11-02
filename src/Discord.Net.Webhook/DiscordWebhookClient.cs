@@ -33,7 +33,7 @@ namespace Discord.Webhook
             : this(webhookUrl, new DiscordRestConfig()) { }
 
         // regex pattern to match webhook urls
-        private static Regex WebhookUrlRegex = new Regex(@"^.*(discord|discordapp)\.com\/api\/webhooks\/([\d]+)\/([a-z0-9_-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static Regex WebhookUrlRegex = new Regex(@"^.*(discord|discordapp)\.com\/api\/webhooks\/([\d]+)\/([a-z0-9_-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
         /// <summary> Creates a new Webhook Discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken, DiscordRestConfig config)
@@ -77,9 +77,9 @@ namespace Discord.Webhook
             ApiClient.RequestQueue.RateLimitTriggered += async (id, info) =>
             {
                 if (info == null)
-                    await _restLogger.VerboseAsync($"Preemptive Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
+                    await _restLogger.VerboseAsync($"Preemptive Rate limit triggered: {id?.ToString() ?? "null"}").ConfigureAwait(false);
                 else
-                    await _restLogger.WarningAsync($"Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
+                    await _restLogger.WarningAsync($"Rate limit triggered: {id?.ToString() ?? "null"}").ConfigureAwait(false);
             };
             ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
@@ -88,19 +88,21 @@ namespace Discord.Webhook
         /// <summary> Sends a message to the channel for this webhook. </summary>
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendMessageAsync(string text = null, bool isTTS = false, IEnumerable<Embed> embeds = null,
-            string username = null, string avatarUrl = null, RequestOptions options = null)
-            => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, options);
+            string username = null, string avatarUrl = null, RequestOptions options = null, AllowedMentions allowedMentions = null)
+            => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, allowedMentions, options);
 
         /// <summary> Sends a message to the channel for this webhook with an attachment. </summary>
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendFileAsync(string filePath, string text, bool isTTS = false,
-            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null, bool isSpoiler = false)
-            => WebhookClientHelper.SendFileAsync(this, filePath, text, isTTS, embeds, username, avatarUrl, options, isSpoiler);
+            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null,
+            RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
+            => WebhookClientHelper.SendFileAsync(this, filePath, text, isTTS, embeds, username, avatarUrl, allowedMentions, options, isSpoiler);
         /// <summary> Sends a message to the channel for this webhook with an attachment. </summary>
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false,
-            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null, RequestOptions options = null, bool isSpoiler = false)
-            => WebhookClientHelper.SendFileAsync(this, stream, filename, text, isTTS, embeds, username, avatarUrl, options, isSpoiler);
+            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null,
+            RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
+            => WebhookClientHelper.SendFileAsync(this, stream, filename, text, isTTS, embeds, username, avatarUrl, allowedMentions, options, isSpoiler);
 
         /// <summary> Modifies the properties of this webhook. </summary>
         public Task ModifyWebhookAsync(Action<WebhookProperties> func, RequestOptions options = null)

@@ -76,6 +76,10 @@ namespace Discord
         public PermValue MoveMembers => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.MoveMembers);
         /// <summary> If Allowed, a user may use voice-activity-detection rather than push-to-talk. </summary>
         public PermValue UseVAD => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.UseVAD);
+        /// <summary> If Allowed, a user may use priority speaker in a voice channel. </summary>
+        public PermValue PrioritySpeaker => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.PrioritySpeaker);
+        /// <summary> If Allowed, a user may go live in a voice channel. </summary>
+        public PermValue Stream => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.Stream);
 
         /// <summary> If Allowed, a user may adjust role permissions. This also implicitly grants all other permissions. </summary>
         public PermValue ManageRoles => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ManageRoles);
@@ -109,7 +113,9 @@ namespace Discord
             PermValue? moveMembers = null,
             PermValue? useVoiceActivation = null,
             PermValue? manageRoles = null, 
-            PermValue? manageWebhooks = null)
+            PermValue? manageWebhooks = null,
+            PermValue? prioritySpeaker = null,
+            PermValue? stream = null)
         {
             Permissions.SetValue(ref allowValue, ref denyValue, createInstantInvite, ChannelPermission.CreateInstantInvite);
             Permissions.SetValue(ref allowValue, ref denyValue, manageChannel, ChannelPermission.ManageChannels);
@@ -129,6 +135,8 @@ namespace Discord
             Permissions.SetValue(ref allowValue, ref denyValue, deafenMembers, ChannelPermission.DeafenMembers);
             Permissions.SetValue(ref allowValue, ref denyValue, moveMembers, ChannelPermission.MoveMembers);
             Permissions.SetValue(ref allowValue, ref denyValue, useVoiceActivation, ChannelPermission.UseVAD);
+            Permissions.SetValue(ref allowValue, ref denyValue, prioritySpeaker, ChannelPermission.PrioritySpeaker);
+            Permissions.SetValue(ref allowValue, ref denyValue, stream, ChannelPermission.Stream);
             Permissions.SetValue(ref allowValue, ref denyValue, manageRoles, ChannelPermission.ManageRoles);
             Permissions.SetValue(ref allowValue, ref denyValue, manageWebhooks, ChannelPermission.ManageWebhooks);
 
@@ -159,10 +167,12 @@ namespace Discord
             PermValue moveMembers = PermValue.Inherit,
             PermValue useVoiceActivation = PermValue.Inherit,
             PermValue manageRoles = PermValue.Inherit,
-            PermValue manageWebhooks = PermValue.Inherit)
+            PermValue manageWebhooks = PermValue.Inherit,
+            PermValue prioritySpeaker = PermValue.Inherit,
+            PermValue stream = PermValue.Inherit)
             : this(0, 0, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages, 
                   embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, 
-                  moveMembers, useVoiceActivation, manageRoles, manageWebhooks) { }
+                  moveMembers, useVoiceActivation, manageRoles, manageWebhooks, prioritySpeaker, stream) { }
 
         /// <summary>
         ///     Initializes a new <see cref="OverwritePermissions" /> from the current one, changing the provided
@@ -188,10 +198,12 @@ namespace Discord
             PermValue? moveMembers = null,
             PermValue? useVoiceActivation = null,
             PermValue? manageRoles = null,
-            PermValue? manageWebhooks = null)
+            PermValue? manageWebhooks = null,
+            PermValue? prioritySpeaker = null,
+            PermValue? stream = null)
             => new OverwritePermissions(AllowValue, DenyValue, createInstantInvite, manageChannel, addReactions, viewChannel, sendMessages, sendTTSMessages, manageMessages, 
                 embedLinks, attachFiles, readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, 
-                moveMembers, useVoiceActivation, manageRoles, manageWebhooks);
+                moveMembers, useVoiceActivation, manageRoles, manageWebhooks, prioritySpeaker, stream);
 
         /// <summary>
         ///     Creates a <see cref="List{T}"/> of all the <see cref="ChannelPermission"/> values that are allowed.

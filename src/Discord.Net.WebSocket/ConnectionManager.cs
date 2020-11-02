@@ -44,6 +44,8 @@ namespace Discord
                     var ex2 = ex as WebSocketClosedException;
                     if (ex2?.CloseCode == 4006)
                         CriticalError(new Exception("WebSocket session expired", ex));
+                    else if (ex2?.CloseCode == 4014)
+                        CriticalError(new Exception("WebSocket connection was closed", ex));
                     else
                         Error(new Exception("WebSocket connection was closed", ex));
                 }
@@ -141,7 +143,16 @@ namespace Discord
                     catch (OperationCanceledException) { }
                 });
 
-                await _onConnecting().ConfigureAwait(false);
+                try
+                {
+                    await _onConnecting().ConfigureAwait(false);
+                }
+                catch (TaskCanceledException ex)
+                {
+                    Exception innerEx = ex.InnerException ?? new OperationCanceledException("Failed to connect.");
+                    Error(innerEx);
+                    throw innerEx;
+                }
 
                 await _logger.InfoAsync("Connected").ConfigureAwait(false);
                 State = ConnectionState.Connected;

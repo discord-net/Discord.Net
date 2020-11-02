@@ -135,7 +135,8 @@ namespace Discord.Commands
             if (builder.Name == null)
                 builder.Name = typeInfo.Name;
 
-            var validCommands = typeInfo.DeclaredMethods.Where(IsValidCommandDefinition);
+            // Get all methods (including from inherited members), that are valid commands
+            var validCommands = typeInfo.GetMethods().Where(IsValidCommandDefinition);
 
             foreach (var method in validCommands)
             {
