@@ -11,7 +11,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
     <PackageReference Include="System.Interactive.Async" Version="4.1.1" />
-    <PackageReference Include="IDisposableAnalyzers" Version="3.4.1">
+    <PackageReference Include="IDisposableAnalyzers" Version="3.4.3">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
