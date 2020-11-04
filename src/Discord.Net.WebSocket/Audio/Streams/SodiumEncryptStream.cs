@@ -60,5 +60,12 @@ namespace Discord.Audio.Streams
         {
             await _next.ClearAsync(cancelToken).ConfigureAwait(false);
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                _next.Dispose();
+            base.Dispose(disposing);
+        }
     }
 }
