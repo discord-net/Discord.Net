@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -68,6 +68,13 @@ namespace Discord.Audio.Streams
         public override async Task ClearAsync(CancellationToken cancelToken)
         {
             await _next.ClearAsync(cancelToken).ConfigureAwait(false);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                _next.Dispose();
+            base.Dispose(disposing);
         }
     }
 }
