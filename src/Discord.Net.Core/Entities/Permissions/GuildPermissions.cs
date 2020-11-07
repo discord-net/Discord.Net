@@ -34,7 +34,7 @@ namespace Discord
         public bool AddReactions => Permissions.GetValue(RawValue, GuildPermission.AddReactions);
         /// <summary> If <c>true</c>, a user may view the audit log. </summary>
         public bool ViewAuditLog => Permissions.GetValue(RawValue, GuildPermission.ViewAuditLog);
-
+        /// <summary> If <c>true</c>, a user may view the guild insights. </summary>
         public bool ViewGuildInsights => Permissions.GetValue(RawValue, GuildPermission.ViewGuildInsights);
 
         /// <summary> If True, a user may join channels. </summary>
