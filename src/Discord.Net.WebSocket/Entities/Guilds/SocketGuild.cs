@@ -1,7 +1,6 @@
 using Discord.Audio;
 using Discord.Rest;
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
