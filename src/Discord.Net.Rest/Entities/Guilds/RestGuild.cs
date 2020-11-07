@@ -174,17 +174,25 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
-        public async Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null)
+            => ModifyAsync((props, f) => f(props), func, options);
+        /// <inheritdoc />
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
+        public async Task ModifyAsync<TState>(Action<GuildProperties, TState> func, TState state, RequestOptions options = null)
         {
-            var model = await GuildHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
+            var model = await GuildHelper.ModifyAsync(this, Discord, func, state, options).ConfigureAwait(false);
             Update(model);
         }
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
-        public async Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
+        public Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
+            => ModifyEmbedAsync((props, f) => f(props), func, options);
+        /// <inheritdoc />
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
+        public async Task ModifyEmbedAsync<TState>(Action<GuildEmbedProperties, TState> func, TState state, RequestOptions options = null)
         {
-            var model = await GuildHelper.ModifyEmbedAsync(this, Discord, func, options).ConfigureAwait(false);
+            var model = await GuildHelper.ModifyEmbedAsync(this, Discord, func, state, options).ConfigureAwait(false);
             Update(model);
         }
 

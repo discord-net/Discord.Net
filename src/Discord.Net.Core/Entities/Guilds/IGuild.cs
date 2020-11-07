@@ -278,6 +278,16 @@ namespace Discord
         /// </returns>
         Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null);
         /// <summary>
+        ///     Modifies this guild.
+        /// </summary>
+        /// <param name="func">The delegate containing the properties to modify the guild with.</param>
+        /// <param name="state">An object to carry state into the delegate to prevent closures.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        Task ModifyAsync<TState>(Action<GuildProperties, TState> func, TState state, RequestOptions options = null);
+        /// <summary>
         ///     Modifies this guild's embed channel.
         /// </summary>
         /// <param name="func">The delegate containing the properties to modify the guild widget with.</param>
@@ -286,6 +296,16 @@ namespace Discord
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
         Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null);
+        /// <summary>
+        ///     Modifies this guild's embed channel.
+        /// </summary>
+        /// <param name="func">The delegate containing the properties to modify the guild widget with.</param>
+        /// <param name="state">An object to carry state into the delegate to prevent closures.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        Task ModifyEmbedAsync<TState>(Action<GuildEmbedProperties, TState> func, TState state, RequestOptions options = null);
         /// <summary>
         ///     Bulk-modifies the order of channels in this guild.
         /// </summary>

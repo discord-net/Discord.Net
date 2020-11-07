@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Model = Discord.API.Role;
 using BulkParams = Discord.API.Rest.ModifyGuildRolesParams;
@@ -13,11 +13,11 @@ namespace Discord.Rest
         {
             await client.ApiClient.DeleteGuildRoleAsync(role.Guild.Id, role.Id, options).ConfigureAwait(false);
         }
-        public static async Task<Model> ModifyAsync(IRole role, BaseDiscordClient client, 
-            Action<RoleProperties> func, RequestOptions options)
+        public static async Task<Model> ModifyAsync<TState>(IRole role, BaseDiscordClient client, 
+            Action<RoleProperties, TState> func, TState state, RequestOptions options)
         {
             var args = new RoleProperties();
-            func(args);
+            func(args, state);
             var apiArgs = new API.Rest.ModifyGuildRoleParams
             {
                 Color = args.Color.IsSpecified ? args.Color.Value.RawValue : Optional.Create<uint>(),

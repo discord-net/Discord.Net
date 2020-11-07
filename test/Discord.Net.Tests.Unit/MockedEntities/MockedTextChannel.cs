@@ -152,7 +152,17 @@ namespace Discord
             throw new NotImplementedException();
         }
 
+        public Task ModifyAsync<TState>(Action<TextChannelProperties, TState> func, TState state, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ModifyAsync<TState>(Action<GuildChannelProperties, TState> func, TState state, RequestOptions options = null)
         {
             throw new NotImplementedException();
         }

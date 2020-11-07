@@ -59,7 +59,10 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null)
-            => ChannelHelper.ModifyAsync(this, Discord, func, options);
+            => ModifyAsync((props, f) => f(props), func, options);
+        /// <inheritdoc />
+        public Task ModifyAsync<TState>(Action<VoiceChannelProperties, TState> func, TState state, RequestOptions options = null)
+            => ChannelHelper.ModifyAsync(this, Discord, func, state, options);
 
         /// <inheritdoc />
         public async Task<IAudioClient> ConnectAsync(bool selfDeaf = false, bool selfMute = false, bool external = false)

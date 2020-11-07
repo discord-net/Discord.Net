@@ -449,12 +449,20 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
         public Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null)
-            => GuildHelper.ModifyAsync(this, Discord, func, options);
+            => ModifyAsync((props, f) => f(props), func, options);
+        /// <inheritdoc />
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
+        public Task ModifyAsync<TState>(Action<GuildProperties, TState> func, TState state, RequestOptions options = null)
+            => GuildHelper.ModifyAsync(this, Discord, func, state, options);
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
         public Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
-            => GuildHelper.ModifyEmbedAsync(this, Discord, func, options);
+            => ModifyEmbedAsync((props, f) => f(props), func, options);
+        /// <inheritdoc />
+        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
+        public Task ModifyEmbedAsync<TState>(Action<GuildEmbedProperties, TState> func, TState state, RequestOptions options = null)
+            => GuildHelper.ModifyEmbedAsync(this, Discord, func, state, options);
         /// <inheritdoc />
         public Task ReorderChannelsAsync(IEnumerable<ReorderChannelProperties> args, RequestOptions options = null)
             => GuildHelper.ReorderChannelsAsync(this, Discord, args, options);

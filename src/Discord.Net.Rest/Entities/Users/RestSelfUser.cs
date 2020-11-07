@@ -65,11 +65,15 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Unable to modify this object using a different token.</exception>
-        public async Task ModifyAsync(Action<SelfUserProperties> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<SelfUserProperties> func, RequestOptions options = null)
+            => ModifyAsync((props, f) => f(props), func, options);
+        /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">Unable to modify this object using a different token.</exception>
+        public async Task ModifyAsync<TState>(Action<SelfUserProperties, TState> func, TState state, RequestOptions options = null)
         {
             if (Id != Discord.CurrentUser.Id)
                 throw new InvalidOperationException("Unable to modify this object using a different token.");
-            var model = await UserHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
+            var model = await UserHelper.ModifyAsync(this, Discord, func, state, options).ConfigureAwait(false);
             Update(model);
         }
     }

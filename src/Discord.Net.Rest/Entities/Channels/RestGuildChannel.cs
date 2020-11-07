@@ -65,9 +65,12 @@ namespace Discord.Rest
             Update(model);
         }
         /// <inheritdoc />
-        public async Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null)
+            => ModifyAsync((props, f) => f(props), func, options);
+        /// <inheritdoc />
+        public async Task ModifyAsync<TState>(Action<GuildChannelProperties, TState> func, TState state, RequestOptions options = null)
         {
-            var model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
+            var model = await ChannelHelper.ModifyAsync(this, Discord, func, state, options).ConfigureAwait(false);
             Update(model);
         }
         /// <inheritdoc />

@@ -75,7 +75,10 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
-            => RoleHelper.ModifyAsync(this, Discord, func, options);
+            => ModifyAsync((props, f) => f(props), func, options);
+        /// <inheritdoc />
+        public Task ModifyAsync<TState>(Action<RoleProperties, TState> func, TState state, RequestOptions options = null)
+            => RoleHelper.ModifyAsync(this, Discord, func, state, options);
         /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
             => RoleHelper.DeleteAsync(this, Discord, options);

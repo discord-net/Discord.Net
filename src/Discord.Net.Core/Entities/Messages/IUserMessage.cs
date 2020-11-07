@@ -29,6 +29,26 @@ namespace Discord
         /// </returns>
         Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null);
         /// <summary>
+        ///     Modifies this message.
+        /// </summary>
+        /// <remarks>
+        ///     This method modifies this message with the specified properties. To see an example of this
+        ///     method and what properties are available, please refer to <see cref="MessageProperties"/>.
+        /// </remarks>
+        /// <example>
+        ///     The following example replaces the content of the message with <c>Hello World!</c>.
+        ///     <code language="cs">
+        ///     await msg.ModifyAsync((x, s) =&gt; x.Content = s, "Hello World!");
+        ///     </code>
+        /// </example>
+        /// <param name="func">A delegate containing the properties to modify the message with.</param>
+        /// <param name="state">An object to carry state into the delegate to prevent closures.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        Task ModifyAsync<TState>(Action<MessageProperties, TState> func, TState state, RequestOptions options = null);
+        /// <summary>
         ///     Modifies the suppression of this message.
         /// </summary>
         /// <remarks>

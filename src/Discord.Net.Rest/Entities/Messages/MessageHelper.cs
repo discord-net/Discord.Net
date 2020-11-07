@@ -23,14 +23,16 @@ namespace Discord.Rest
 
         /// <exception cref="InvalidOperationException">Only the author of a message may modify the message.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        public static async Task<Model> ModifyAsync(IMessage msg, BaseDiscordClient client, Action<MessageProperties> func,
+        public static async Task<Model> ModifyAsync<TState>(IMessage msg, BaseDiscordClient client,
+            Action<MessageProperties, TState> func,
+            TState state,
             RequestOptions options)
         {
             if (msg.Author.Id != client.CurrentUser.Id)
                 throw new InvalidOperationException("Only the author of a message may modify the message.");
 
             var args = new MessageProperties();
-            func(args);
+            func(args, state);
 
             bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(msg.Content);
             bool hasEmbed = args.Embed.IsSpecified ? args.Embed.Value != null : msg.Embeds.Any();

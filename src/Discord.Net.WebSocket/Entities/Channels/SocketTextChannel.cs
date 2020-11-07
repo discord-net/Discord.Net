@@ -73,7 +73,10 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
-            => ChannelHelper.ModifyAsync(this, Discord, func, options);
+            => ModifyAsync((props, f) => f(props), func, options);
+        /// <inheritdoc />
+        public Task ModifyAsync<TState>(Action<TextChannelProperties, TState> func, TState state, RequestOptions options = null)
+            => ChannelHelper.ModifyAsync(this, Discord, func, state, options);
 
         //Messages
         /// <inheritdoc />

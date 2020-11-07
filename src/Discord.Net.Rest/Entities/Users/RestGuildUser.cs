@@ -90,9 +90,12 @@ namespace Discord.Rest
             Update(model);
         }
         /// <inheritdoc />
-        public async Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null)
+        public Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null)
+            => ModifyAsync((props, f) => f(props), func, options);
+        /// <inheritdoc />
+        public async Task ModifyAsync<TState>(Action<GuildUserProperties, TState> func, TState state, RequestOptions options = null)
         {
-            var args = await UserHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
+            var args = await UserHelper.ModifyAsync(this, Discord, func, state, options).ConfigureAwait(false);
             if (args.Deaf.IsSpecified)
                 IsDeafened = args.Deaf.Value;
             if (args.Mute.IsSpecified)

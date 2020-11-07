@@ -88,8 +88,12 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">Unable to modify this object using a different token.</exception>
         public Task ModifyAsync(Action<SelfUserProperties> func, RequestOptions options = null)
-            => UserHelper.ModifyAsync(this, Discord, func, options);
+            => ModifyAsync((props, f) => f(props), func, options);
+        /// <inheritdoc />
+        public Task ModifyAsync<TState>(Action<SelfUserProperties, TState> func, TState state, RequestOptions options = null)
+            => UserHelper.ModifyAsync(this, Discord, func, state, options);
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Self)";
         internal new SocketSelfUser Clone() => MemberwiseClone() as SocketSelfUser;

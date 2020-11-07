@@ -15,13 +15,13 @@ namespace Discord.Rest
     {
         //General
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
-        public static async Task<Model> ModifyAsync(IGuild guild, BaseDiscordClient client,
-            Action<GuildProperties> func, RequestOptions options)
+        public static async Task<Model> ModifyAsync<TState>(IGuild guild, BaseDiscordClient client,
+            Action<GuildProperties, TState> func, TState state, RequestOptions options)
         {
             if (func == null) throw new ArgumentNullException(nameof(func));
 
             var args = new GuildProperties();
-            func(args);
+            func(args, state);
 
             var apiArgs = new API.Rest.ModifyGuildParams
             {
@@ -80,13 +80,13 @@ namespace Discord.Rest
             return await client.ApiClient.ModifyGuildAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
-        public static async Task<EmbedModel> ModifyEmbedAsync(IGuild guild, BaseDiscordClient client,
-            Action<GuildEmbedProperties> func, RequestOptions options)
+        public static async Task<EmbedModel> ModifyEmbedAsync<TState>(IGuild guild, BaseDiscordClient client,
+            Action<GuildEmbedProperties, TState> func, TState state, RequestOptions options)
         {
             if (func == null) throw new ArgumentNullException(nameof(func));
 
             var args = new GuildEmbedProperties();
-            func(args);
+            func(args, state);
             var apiArgs = new API.Rest.ModifyGuildEmbedParams
             {
                 Enabled = args.Enabled

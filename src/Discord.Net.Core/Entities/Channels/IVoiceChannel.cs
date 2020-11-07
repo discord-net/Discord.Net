@@ -35,5 +35,16 @@ namespace Discord
         /// </returns>
         /// <seealso cref="VoiceChannelProperties"/>
         Task ModifyAsync(Action<VoiceChannelProperties> func, RequestOptions options = null);
+        /// <summary>
+        ///     Modifies this voice channel.
+        /// </summary>
+        /// <param name="func">The properties to modify the channel with.</param>
+        /// <param name="state">An object to carry state into the delegate to prevent closures.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        /// <seealso cref="VoiceChannelProperties"/>
+        Task ModifyAsync<TState>(Action<VoiceChannelProperties, TState> func, TState state, RequestOptions options = null);
     }
 }

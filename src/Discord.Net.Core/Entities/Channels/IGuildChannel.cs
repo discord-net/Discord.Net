@@ -57,6 +57,20 @@ namespace Discord
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
         Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null);
+        /// <summary>
+        ///     Modifies this guild channel.
+        /// </summary>
+        /// <remarks>
+        ///     This method modifies the current guild channel with the specified properties. To see an example of this
+        ///     method and what properties are available, please refer to <see cref="GuildChannelProperties"/>.
+        /// </remarks>
+        /// <param name="func">The delegate containing the properties to modify the channel with.</param>
+        /// <param name="state">An object to carry state into the delegate to prevent closures.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        Task ModifyAsync<TState>(Action<GuildChannelProperties, TState> func, TState state, RequestOptions options = null);
 
         /// <summary>
         ///     Gets the permission overwrite for a specific role.
