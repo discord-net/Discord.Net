@@ -34,7 +34,7 @@ namespace Discord.WebSocket
                     case ICategoryChannel categoryChannel: return ChannelType.Category;
                     case IDMChannel dmChannel: return ChannelType.DM;
                     case IGroupChannel groupChannel: return ChannelType.Group;
-                    case SocketNewsChannel socketNewsChannel: return ChannelType.News;
+                    case INewsChannel socketNewsChannel: return ChannelType.News;
                     case ITextChannel textChannel: return ChannelType.Text;
                     default: throw new InvalidOperationException("Invalid channel type.");
                 }
