@@ -100,7 +100,7 @@ namespace Discord.Audio
             await _connection.StartAsync().ConfigureAwait(false);
         }
 
-        public Dictionary<ulong, AudioInStream> GetStreams()
+        public IReadOnlyDictionary<ulong, AudioInStream> GetStreams()
         {
             return _streams.ToDictionary(pair => pair.Key, pair => pair.Value.Reader);
         }
@@ -109,6 +109,7 @@ namespace Discord.Audio
         {
             await _connection.StopAsync().ConfigureAwait(false);
         }
+
         private async Task OnConnectingAsync()
         {
             await _audioLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
