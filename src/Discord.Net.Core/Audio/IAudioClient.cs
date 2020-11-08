@@ -22,7 +22,7 @@ namespace Discord.Audio
         int UdpLatency { get; }
 
         /// <summary>Gets the current audio streams.</summary>
-        Dictionary<ulong, AudioInStream> GetStreams();
+        IReadOnlyDictionary<ulong, AudioInStream> GetStreams();
 
         Task StopAsync();
         Task SetSpeakingAsync(bool value);
