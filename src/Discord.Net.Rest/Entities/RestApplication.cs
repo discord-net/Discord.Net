@@ -59,7 +59,7 @@ namespace Discord.Rest
                 Flags = model.Flags.Value; //TODO: Do we still need this?
             if (model.Owner.IsSpecified)
                 Owner = RestUser.Create(Discord, model.Owner.Value);
-            if (model.Team.IsSpecified)
+            if (model.Team.IsSpecified && model.Team.Value != null)
                 Team = RestTeam.Create(Discord, model.Team.Value);
         }
 
