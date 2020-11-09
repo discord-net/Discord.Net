@@ -20,7 +20,7 @@ namespace Discord.API
         [JsonProperty("bot_require_code_grant")]
         public bool BotRequiresCodeGrant { get; set; }
         [JsonProperty("team")]
-        public Optional<Team> Team { get; set; }
+        public Team Team { get; set; }
 
         [JsonProperty("flags"), Int53]
         public Optional<ulong> Flags { get; set; }
