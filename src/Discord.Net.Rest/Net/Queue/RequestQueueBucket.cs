@@ -84,7 +84,7 @@ namespace Discord.Net.Queue
 #endif
                                     UpdateRateLimit(id, request, info, true);
                                 }
-                                await _queue.RaiseRateLimitTriggered(Id, info).ConfigureAwait(false);
+                                await _queue.RaiseRateLimitTriggered(Id, info, $"{request.Method} {request.Endpoint}").ConfigureAwait(false);
                                 continue; //Retry
                             case HttpStatusCode.BadGateway: //502
 #if DEBUG_LIMITS
@@ -187,7 +187,7 @@ namespace Discord.Net.Queue
                     if (!isRateLimited)
                     {
                         isRateLimited = true;
-                        await _queue.RaiseRateLimitTriggered(Id, null).ConfigureAwait(false);
+                        await _queue.RaiseRateLimitTriggered(Id, null, $"{request.Method} {request.Endpoint}").ConfigureAwait(false);
                     }
 
                     ThrowRetryLimit(request);
