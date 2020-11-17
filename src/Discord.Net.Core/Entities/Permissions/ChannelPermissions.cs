@@ -17,7 +17,7 @@ namespace Discord
         /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for category channels. </summary>
         public static readonly ChannelPermissions Category = new ChannelPermissions(0b01100_1111110_1111111110001_010001);
         /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for direct message channels. </summary>
-        public static readonly ChannelPermissions DM = new ChannelPermissions(0b00000_1000110_1011100110000_000000);
+        public static readonly ChannelPermissions DM = new ChannelPermissions(0b00000_1000110_1011100110001_000000);
         /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for group channels. </summary>
         public static readonly ChannelPermissions Group = new ChannelPermissions(0b00000_1000110_0001101100000_000000);
         /// <summary> Gets a <see cref="ChannelPermissions"/> that grants all permissions for a given channel type. </summary>

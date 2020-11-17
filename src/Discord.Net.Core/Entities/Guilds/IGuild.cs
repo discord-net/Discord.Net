@@ -705,11 +705,12 @@ namespace Discord
         /// <param name="days">The number of days required for the users to be kicked.</param>
         /// <param name="simulate">Whether this prune action is a simulation.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="includeRoleIds">An array of role IDs to be included in the prune of users who do not have any additional roles.</param>
         /// <returns>
         ///     A task that represents the asynchronous prune operation. The task result contains the number of users to
         ///     be or has been removed from this guild.
         /// </returns>
-        Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null);
+        Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null, IEnumerable<ulong> includeRoleIds = null);
         /// <summary>
         ///     Gets a collection of users in this guild that the name or nickname starts with the
         ///     provided <see cref="string"/> at <paramref name="query"/>.

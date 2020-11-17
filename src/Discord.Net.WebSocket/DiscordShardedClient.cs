@@ -338,6 +338,9 @@ namespace Discord.WebSocket
             client.UserIsTyping += (oldUser, newUser) => _userIsTypingEvent.InvokeAsync(oldUser, newUser);
             client.RecipientAdded += (user) => _recipientAddedEvent.InvokeAsync(user);
             client.RecipientRemoved += (user) => _recipientRemovedEvent.InvokeAsync(user);
+
+            client.InviteCreated += (invite) => _inviteCreatedEvent.InvokeAsync(invite);
+            client.InviteDeleted += (channel, invite) => _inviteDeletedEvent.InvokeAsync(channel, invite);
         }
 
         //IDiscordClient

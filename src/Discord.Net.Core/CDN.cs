@@ -8,6 +8,17 @@ namespace Discord
     public static class CDN
     {
         /// <summary>
+        ///     Returns a team icon URL.
+        /// </summary>
+        /// <param name="teamId">The team identifier.</param>
+        /// <param name="iconId">The icon identifier.</param>
+        /// <returns>
+        ///     A URL pointing to the team's icon.
+        /// </returns>
+        public static string GetTeamIconUrl(ulong teamId, string iconId)
+            => iconId != null ? $"{DiscordConfig.CDNUrl}team-icons/{teamId}/{iconId}.jpg" : null;
+
+        /// <summary>
         ///     Returns an application icon URL.
         /// </summary>
         /// <param name="appId">The application identifier.</param>

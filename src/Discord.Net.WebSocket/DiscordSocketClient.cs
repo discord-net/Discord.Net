@@ -370,7 +370,7 @@ namespace Discord.WebSocket
         {
             var cachedGuilds = guilds.ToImmutableArray();
 
-            int batchSize = _gatewayIntents.HasValue ? 1 : 100;
+            const short batchSize = 1;
             ulong[] batchIds = new ulong[Math.Min(batchSize, cachedGuilds.Length)];
             Task[] batchTasks = new Task[batchIds.Length];
             int batchCount = (cachedGuilds.Length + (batchSize - 1)) / batchSize;
@@ -1685,6 +1685,64 @@ namespace Discord.WebSocket
                                         await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
                                     }
 
+                                }
+                                break;
+
+                            //Invites
+                            case "INVITE_CREATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (INVITE_CREATE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<API.Gateway.InviteCreateEvent>(_serializer);
+                                    if (State.GetChannel(data.ChannelId) is SocketGuildChannel channel)
+                                    {
+                                        var guild = channel.Guild;
+                                        if (!guild.IsSynced)
+                                        {
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                            return;
+                                        }
+
+                                        SocketGuildUser inviter = data.Inviter.IsSpecified
+                                            ? (guild.GetUser(data.Inviter.Value.Id) ?? guild.AddOrUpdateUser(data.Inviter.Value))
+                                            : null;
+
+                                        SocketUser target = data.TargetUser.IsSpecified
+                                            ? (guild.GetUser(data.TargetUser.Value.Id) ?? (SocketUser)SocketUnknownUser.Create(this, State, data.TargetUser.Value))
+                                            : null;
+
+                                        var invite = SocketInvite.Create(this, guild, channel, inviter, target, data);
+
+                                        await TimedInvokeAsync(_inviteCreatedEvent, nameof(InviteCreated), invite).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
+                            case "INVITE_DELETE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (INVITE_DELETE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<API.Gateway.InviteDeleteEvent>(_serializer);
+                                    if (State.GetChannel(data.ChannelId) is SocketGuildChannel channel)
+                                    {
+                                        var guild = channel.Guild;
+                                        if (!guild.IsSynced)
+                                        {
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                            return;
+                                        }
+
+                                        await TimedInvokeAsync(_inviteDeletedEvent, nameof(InviteDeleted), channel, data.Code).ConfigureAwait(false);
+                                    }
+                                    else
+                                    {
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
+                                        return;
+                                    }
                                 }
                                 break;
 

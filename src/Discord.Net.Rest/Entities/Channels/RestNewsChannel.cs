@@ -12,7 +12,7 @@ namespace Discord.Rest
     ///     Represents a REST-based news channel in a guild that has the same properties as a <see cref="RestTextChannel"/>.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class RestNewsChannel : RestTextChannel
+    public class RestNewsChannel : RestTextChannel, INewsChannel
     {
         internal RestNewsChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             :base(discord, guild, id)
