@@ -62,9 +62,9 @@ namespace Discord.Rest
         }
         
         public static async Task<RestGuild> GetGuildAsync(BaseDiscordClient client,
-            ulong id, RequestOptions options)
+            ulong id, bool withCounts, RequestOptions options)
         {
-            var model = await client.ApiClient.GetGuildAsync(id, options).ConfigureAwait(false);
+            var model = await client.ApiClient.GetGuildAsync(id, withCounts, options).ConfigureAwait(false);
             if (model != null)
                 return RestGuild.Create(client, model);
             return null;
@@ -75,6 +75,14 @@ namespace Discord.Rest
             var model = await client.ApiClient.GetGuildEmbedAsync(id, options).ConfigureAwait(false);
             if (model != null)
                 return RestGuildEmbed.Create(model);
+            return null;
+        }
+        public static async Task<RestGuildWidget?> GetGuildWidgetAsync(BaseDiscordClient client,
+            ulong id, RequestOptions options)
+        {
+            var model = await client.ApiClient.GetGuildWidgetAsync(id, options).ConfigureAwait(false);
+            if (model != null)
+                return RestGuildWidget.Create(model);
             return null;
         }
         public static IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(BaseDiscordClient client, 
@@ -106,13 +114,13 @@ namespace Discord.Rest
                 count: limit
             );
         }
-        public static async Task<IReadOnlyCollection<RestGuild>> GetGuildsAsync(BaseDiscordClient client, RequestOptions options)
+        public static async Task<IReadOnlyCollection<RestGuild>> GetGuildsAsync(BaseDiscordClient client, bool withCounts, RequestOptions options)
         {
             var summaryModels = await GetGuildSummariesAsync(client, null, null, options).FlattenAsync().ConfigureAwait(false);
             var guilds = ImmutableArray.CreateBuilder<RestGuild>();
             foreach (var summaryModel in summaryModels)
             {
-                var guildModel = await client.ApiClient.GetGuildAsync(summaryModel.Id).ConfigureAwait(false);
+                var guildModel = await client.ApiClient.GetGuildAsync(summaryModel.Id, withCounts).ConfigureAwait(false);
                 if (guildModel != null)
                     guilds.Add(RestGuild.Create(client, guildModel));
             }
@@ -140,7 +148,7 @@ namespace Discord.Rest
         public static async Task<RestGuildUser> GetGuildUserAsync(BaseDiscordClient client,
             ulong guildId, ulong id, RequestOptions options)
         {
-            var guild = await GetGuildAsync(client, guildId, options).ConfigureAwait(false);
+            var guild = await GetGuildAsync(client, guildId, false, options).ConfigureAwait(false);
             if (guild == null)
                 return null;
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -76,15 +77,22 @@ namespace Discord.Rest
             => ClientHelper.GetInviteAsync(this, inviteId, options);
 
         public Task<RestGuild> GetGuildAsync(ulong id, RequestOptions options = null)
-            => ClientHelper.GetGuildAsync(this, id, options);
+            => ClientHelper.GetGuildAsync(this, id, false, options);
+        public Task<RestGuild> GetGuildAsync(ulong id, bool withCounts, RequestOptions options = null)
+            => ClientHelper.GetGuildAsync(this, id, withCounts, options);
+        [Obsolete("This endpoint is deprecated, use GetGuildWidgetAsync instead.")]
         public Task<RestGuildEmbed?> GetGuildEmbedAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildEmbedAsync(this, id, options);
+        public Task<RestGuildWidget?> GetGuildWidgetAsync(ulong id, RequestOptions options = null)
+            => ClientHelper.GetGuildWidgetAsync(this, id, options);
         public IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(RequestOptions options = null)
             => ClientHelper.GetGuildSummariesAsync(this, null, null, options);
         public IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(ulong fromGuildId, int limit, RequestOptions options = null)
             => ClientHelper.GetGuildSummariesAsync(this, fromGuildId, limit, options);
         public Task<IReadOnlyCollection<RestGuild>> GetGuildsAsync(RequestOptions options = null)
-            => ClientHelper.GetGuildsAsync(this, options);
+            => ClientHelper.GetGuildsAsync(this, false, options);
+        public Task<IReadOnlyCollection<RestGuild>> GetGuildsAsync(bool withCounts, RequestOptions options = null)
+            => ClientHelper.GetGuildsAsync(this, withCounts, options);
         public Task<RestGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null, RequestOptions options = null)
             => ClientHelper.CreateGuildAsync(this, name, region, jpegIcon, options);
 
