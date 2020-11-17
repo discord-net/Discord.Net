@@ -8,6 +8,17 @@ namespace Discord
     public static class CDN
     {
         /// <summary>
+        ///     Returns a team icon URL.
+        /// </summary>
+        /// <param name="teamId">The team identifier.</param>
+        /// <param name="iconId">The icon identifier.</param>
+        /// <returns>
+        ///     A URL pointing to the team's icon.
+        /// </returns>
+        public static string GetTeamIconUrl(ulong teamId, string iconId)
+            => iconId != null ? $"{DiscordConfig.CDNUrl}team-icons/{teamId}/{iconId}.jpg" : null;
+
+        /// <summary>
         ///     Returns an application icon URL.
         /// </summary>
         /// <param name="appId">The application identifier.</param>
@@ -62,10 +73,20 @@ namespace Discord
         /// <param name="guildId">The guild snowflake identifier.</param>
         /// <param name="splashId">The splash icon identifier.</param>
         /// <returns>
-        ///     A URL pointing to the guild's icon.
+        ///     A URL pointing to the guild's splash.
         /// </returns>
         public static string GetGuildSplashUrl(ulong guildId, string splashId)
             => splashId != null ? $"{DiscordConfig.CDNUrl}splashes/{guildId}/{splashId}.jpg" : null;
+        /// <summary>
+        ///     Returns a guild discovery splash URL.
+        /// </summary>
+        /// <param name="guildId">The guild snowflake identifier.</param>
+        /// <param name="discoverySplashId">The discovery splash icon identifier.</param>
+        /// <returns>
+        ///     A URL pointing to the guild's discovery splash.
+        /// </returns>
+        public static string GetGuildDiscoverySplashUrl(ulong guildId, string discoverySplashId)
+            => discoverySplashId != null ? $"{DiscordConfig.CDNUrl}discovery-splashes/{guildId}/{discoverySplashId}.jpg" : null;
         /// <summary>
         ///     Returns a channel icon URL.
         /// </summary>

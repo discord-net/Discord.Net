@@ -787,7 +787,7 @@ namespace Discord.API
         }
 
         //Guilds
-        public async Task<Guild> GetGuildAsync(ulong guildId, RequestOptions options = null)
+        public async Task<Guild> GetGuildAsync(ulong guildId, bool withCounts, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
@@ -795,7 +795,7 @@ namespace Discord.API
             try
             {
                 var ids = new BucketIds(guildId: guildId);
-                return await SendAsync<Guild>("GET", () => $"guilds/{guildId}", ids, options: options).ConfigureAwait(false);
+                return await SendAsync<Guild>("GET", () => $"guilds/{guildId}?with_counts={(withCounts ? "true" : "false")}", ids, options: options).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
@@ -853,10 +853,11 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(args, nameof(args));
             Preconditions.AtLeast(args.Days, 1, nameof(args.Days));
+            string endpointRoleIds = args.IncludeRoleIds?.Length > 0 ? $"&include_roles={string.Join(",", args.IncludeRoleIds)}" : "";
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<GetGuildPruneCountResponse>("GET", () => $"guilds/{guildId}/prune?days={args.Days}", ids, options: options).ConfigureAwait(false);
+            return await SendAsync<GetGuildPruneCountResponse>("GET", () => $"guilds/{guildId}/prune?days={args.Days}{endpointRoleIds}", ids, options: options).ConfigureAwait(false);
         }
 
         //Guild Bans
@@ -874,8 +875,12 @@ namespace Discord.API
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             options = RequestOptions.CreateOrClone(options);
 
-            var ids = new BucketIds(guildId: guildId);
-            return await SendAsync<Ban>("GET", () => $"guilds/{guildId}/bans/{userId}", ids, options: options).ConfigureAwait(false);
+            try
+            {
+                var ids = new BucketIds(guildId: guildId);
+                return await SendAsync<Ban>("GET", () => $"guilds/{guildId}/bans/{userId}", ids, options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
         /// <exception cref="ArgumentException">
         /// <paramref name="guildId"/> and <paramref name="userId"/> must not be equal to zero.
@@ -931,6 +936,32 @@ namespace Discord.API
 
             var ids = new BucketIds(guildId: guildId);
             return await SendJsonAsync<GuildEmbed>("PATCH", () => $"guilds/{guildId}/embed", args, ids, options: options).ConfigureAwait(false);
+        }
+
+        //Guild Widget
+        /// <exception cref="ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
+        public async Task<GuildWidget> GetGuildWidgetAsync(ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            options = RequestOptions.CreateOrClone(options);
+
+            try
+            {
+                var ids = new BucketIds(guildId: guildId);
+                return await SendAsync<GuildWidget>("GET", () => $"guilds/{guildId}/widget", ids, options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
+        }
+        /// <exception cref="ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
+        public async Task<GuildWidget> ModifyGuildWidgetAsync(ulong guildId, Rest.ModifyGuildWidgetParams args, RequestOptions options = null)
+        {
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(guildId: guildId);
+            return await SendJsonAsync<GuildWidget>("PATCH", () => $"guilds/{guildId}/widget", args, ids, options: options).ConfigureAwait(false);
         }
 
         //Guild Integrations

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -89,10 +89,12 @@ namespace Discord.Audio.Streams
 
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
-
             if (disposing)
+            {
                 _encoder.Dispose();
+                _next.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

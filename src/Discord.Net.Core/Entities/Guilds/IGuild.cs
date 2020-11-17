@@ -23,7 +23,7 @@ namespace Discord
         ///     automatically moved to the AFK voice channel.
         /// </summary>
         /// <returns>
-        ///     An <see cref="int"/> representing the amount of time in seconds for a user to be marked as inactive
+        ///     An <see langword="int"/> representing the amount of time in seconds for a user to be marked as inactive
         ///     and moved into the AFK voice channel.
         /// </returns>
         int AFKTimeout { get; }
@@ -31,9 +31,16 @@ namespace Discord
         ///     Gets a value that indicates whether this guild is embeddable (i.e. can use widget).
         /// </summary>
         /// <returns>
-        ///     <c>true</c> if this guild can be embedded via widgets; otherwise <c>false</c>.
+        ///     <see langword="true" /> if this guild has a widget enabled; otherwise <see langword="false" />.
         /// </returns>
         bool IsEmbeddable { get; }
+        /// <summary>
+        ///     Gets a value that indicates whether this guild has the widget enabled.
+        /// </summary>
+        /// <returns>
+        ///     <see langword="true" /> if this guild has a widget enabled; otherwise <see langword="false" />.
+        /// </returns>
+        bool IsWidgetEnabled { get; }
         /// <summary>
         ///     Gets the default message notifications for users who haven't explicitly set their notification settings.
         /// </summary>
@@ -64,30 +71,44 @@ namespace Discord
         ///     Gets the ID of this guild's icon.
         /// </summary>
         /// <returns>
-        ///     An identifier for the splash image; <c>null</c> if none is set.
+        ///     An identifier for the splash image; <see langword="null" /> if none is set.
         /// </returns>
         string IconId { get; }
         /// <summary>
         ///     Gets the URL of this guild's icon.
         /// </summary>
         /// <returns>
-        ///     A URL pointing to the guild's icon; <c>null</c> if none is set.
+        ///     A URL pointing to the guild's icon; <see langword="null" /> if none is set.
         /// </returns>
         string IconUrl { get; }
         /// <summary>
         ///     Gets the ID of this guild's splash image.
         /// </summary>
         /// <returns>
-        ///     An identifier for the splash image; <c>null</c> if none is set.
+        ///     An identifier for the splash image; <see langword="null" /> if none is set.
         /// </returns>
         string SplashId { get; }
         /// <summary>
         ///     Gets the URL of this guild's splash image.
         /// </summary>
         /// <returns>
-        ///     A URL pointing to the guild's splash image; <c>null</c> if none is set.
+        ///     A URL pointing to the guild's splash image; <see langword="null" /> if none is set.
         /// </returns>
         string SplashUrl { get; }
+        /// <summary>
+        ///     Gets the ID of this guild's discovery splash image.
+        /// </summary>
+        /// <returns>
+        ///     An identifier for the discovery splash image; <see langword="null" /> if none is set.
+        /// </returns>
+        string DiscoverySplashId { get; }
+        /// <summary>
+        ///     Gets the URL of this guild's discovery splash image.
+        /// </summary>
+        /// <returns>
+        ///     A URL pointing to the guild's discovery splash image; <see langword="null" /> if none is set.
+        /// </returns>
+        string DiscoverySplashUrl { get; }
         /// <summary>
         ///     Determines if this guild is currently connected and ready to be used.
         /// </summary>
@@ -98,7 +119,7 @@ namespace Discord
         ///     This boolean is used to determine if the guild is currently connected to the WebSocket and is ready to be used/accessed.
         /// </remarks>
         /// <returns>
-        ///     <c>true</c> if this guild is currently connected and ready to be used; otherwise <c>false</c>.
+        ///     <c>true</c> if this guild is currently connected and ready to be used; otherwise <see langword="false"/>.
         /// </returns>
         bool Available { get; }
 
@@ -106,7 +127,7 @@ namespace Discord
         ///     Gets the ID of the AFK voice channel for this guild.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identifier of the AFK voice channel; <c>null</c> if
+        ///     A <see langword="ulong"/> representing the snowflake identifier of the AFK voice channel; <see langword="null" /> if
         ///     none is set.
         /// </returns>
         ulong? AFKChannelId { get; }
@@ -121,7 +142,7 @@ namespace Discord
         ///     </note>
         /// </remarks>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identifier of the default text channel; <c>0</c> if
+        ///     A <see langword="ulong"/> representing the snowflake identifier of the default text channel; <c>0</c> if
         ///     none can be found.
         /// </returns>
         ulong DefaultChannelId { get; }
@@ -129,30 +150,54 @@ namespace Discord
         ///     Gets the ID of the widget embed channel of this guild.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identifier of the embedded channel found within the
-        ///     widget settings of this guild; <c>null</c> if none is set.
+        ///     A <see langword="ulong"/> representing the snowflake identifier of the embedded channel found within the
+        ///     widget settings of this guild; <see langword="null" /> if none is set.
         /// </returns>
         ulong? EmbedChannelId { get; }
+        /// <summary>
+        ///     Gets the ID of the channel assigned to the widget of this guild.
+        /// </summary>
+        /// <returns>
+        ///     A <see langword="ulong"/> representing the snowflake identifier of the channel assigned to the widget found
+        ///     within the widget settings of this guild; <see langword="null" /> if none is set.
+        /// </returns>
+        ulong? WidgetChannelId { get; }
         /// <summary>
         ///     Gets the ID of the channel where randomized welcome messages are sent.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identifier of the system channel where randomized
-        ///     welcome messages are sent; <c>null</c> if none is set.
+        ///     A <see langword="ulong"/> representing the snowflake identifier of the system channel where randomized
+        ///     welcome messages are sent; <see langword="null" /> if none is set.
         /// </returns>
         ulong? SystemChannelId { get; }
+        /// <summary>
+        ///     Gets the ID of the channel with the rules.
+        /// </summary>
+        /// <returns>
+        ///     A <see langword="ulong"/> representing the snowflake identifier of the channel that contains the rules;
+        ///     <see langword="null" /> if none is set.
+        /// </returns>
+        ulong? RulesChannelId { get; }
+        /// <summary>
+        ///     Gets the ID of the channel where admins and moderators of Community guilds receive notices from Discord.
+        /// </summary>
+        /// <returns>
+        ///     A <see langword="ulong"/> representing the snowflake identifier of the channel where admins and moderators
+        ///     of Community guilds  receive notices from Discord; <see langword="null" /> if none is set.
+        /// </returns>
+        ulong? PublicUpdatesChannelId { get; }
         /// <summary>
         ///     Gets the ID of the user that owns this guild.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identifier of the user that owns this guild.
+        ///     A <see langword="ulong"/> representing the snowflake identifier of the user that owns this guild.
         /// </returns>
         ulong OwnerId { get; }
         /// <summary>
         ///     Gets the application ID of the guild creator if it is bot-created.
         /// </summary>
         /// <returns>
-        ///     A <see cref="ulong"/> representing the snowflake identifier of the application ID that created this guild, or <c>null</c> if it was not bot-created.
+        ///     A <see langword="ulong"/> representing the snowflake identifier of the application ID that created this guild, or <see langword="null" /> if it was not bot-created.
         /// </returns>
         ulong? ApplicationId { get; }
         /// <summary>
@@ -208,21 +253,21 @@ namespace Discord
         ///     Gets the identifier for this guilds banner image.
         /// </summary>
         /// <returns>
-        ///     An identifier for the banner image; <c>null</c> if none is set.
+        ///     An identifier for the banner image; <see langword="null" /> if none is set.
         /// </returns>
         string BannerId { get; }
         /// <summary>
         ///     Gets the URL of this guild's banner image.
         /// </summary>
         /// <returns>
-        ///     A URL pointing to the guild's banner image; <c>null</c> if none is set.
+        ///     A URL pointing to the guild's banner image; <see langword="null" /> if none is set.
         /// </returns>
         string BannerUrl { get; }
         /// <summary>
         ///     Gets the code for this guild's vanity invite URL.
         /// </summary>
         /// <returns>
-        ///     A string containing the vanity invite code for this guild; <c>null</c> if none is set.
+        ///     A string containing the vanity invite code for this guild; <see langword="null" /> if none is set.
         /// </returns>
         string VanityURLCode { get; }
         /// <summary>
@@ -236,7 +281,7 @@ namespace Discord
         ///     Gets the description for the guild.
         /// </summary>
         /// <returns>
-        ///     The description for the guild; <c>null</c> if none is set.
+        ///     The description for the guild; <see langword="null" /> if none is set.
         /// </returns>
         string Description { get; }
         /// <summary>
@@ -246,9 +291,50 @@ namespace Discord
         ///     This is the number of users who have boosted this guild.
         /// </remarks>
         /// <returns>
-        ///     The number of premium subscribers of this guild.
+        ///     The number of premium subscribers of this guild; <see langword="null" /> if not available.
         /// </returns>
         int PremiumSubscriptionCount { get; }
+        /// <summary>
+        ///     Gets the maximum number of presences for the guild.
+        /// </summary>
+        /// <returns>
+        ///     The maximum number of presences for the guild.
+        /// </returns>
+        int? MaxPresences { get; }
+        /// <summary>
+        ///     Gets the maximum number of members for the guild.
+        /// </summary>
+        /// <returns>
+        ///     The maximum number of members for the guild.
+        /// </returns>
+        int? MaxMembers { get; }
+        /// <summary>
+        ///     Gets the maximum amount of users in a video channel.
+        /// </summary>
+        /// <returns>
+        ///     The maximum amount of users in a video channel.
+        /// </returns>
+        int? MaxVideoChannelUsers { get; }
+        /// <summary>
+        ///     Gets the approximate number of members in this guild.
+        /// </summary>
+        /// <remarks>
+        ///     Only available when getting a guild via REST when `with_counts` is true.
+        /// </remarks>
+        /// <returns>
+        ///     The approximate number of members in this guild.
+        /// </returns>
+        int? ApproximateMemberCount { get; }
+        /// <summary>
+        ///     Gets the approximate number of non-offline members in this guild.
+        /// </summary>
+        /// <remarks>
+        ///     Only available when getting a guild via REST when `with_counts` is true.
+        /// </remarks>
+        /// <returns>
+        ///     The approximate number of non-offline members in this guild.
+        /// </returns>
+        int? ApproximatePresenceCount { get; }
 
         /// <summary>
         ///     Gets the preferred locale of this guild in IETF BCP 47
@@ -285,7 +371,17 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
+        [Obsolete("This endpoint is deprecated, use ModifyWidgetAsync instead.")]
         Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null);
+        /// <summary>
+        ///     Modifies this guild's widget.
+        /// </summary>
+        /// <param name="func">The delegate containing the properties to modify the guild widget with.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        Task ModifyWidgetAsync(Action<GuildWidgetProperties> func, RequestOptions options = null);
         /// <summary>
         ///     Bulk-modifies the order of channels in this guild.
         /// </summary>
@@ -336,7 +432,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a ban object, which
-        ///     contains the user information and the reason for the ban; <c>null</c> if the ban entry cannot be found.
+        ///     contains the user information and the reason for the ban; <see langword="null" /> if the ban entry cannot be found.
         /// </returns>
         Task<IBan> GetBanAsync(IUser user, RequestOptions options = null);
         /// <summary>
@@ -346,7 +442,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a ban object, which
-        ///     contains the user information and the reason for the ban; <c>null</c> if the ban entry cannot be found.
+        ///     contains the user information and the reason for the ban; <see langword="null" /> if the ban entry cannot be found.
         /// </returns>
         Task<IBan> GetBanAsync(ulong userId, RequestOptions options = null);
         /// <summary>
@@ -410,7 +506,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the generic channel
-        ///     associated with the specified <paramref name="id"/>; <c>null</c> if none is found.
+        ///     associated with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
         Task<IGuildChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -431,7 +527,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the text channel
-        ///     associated with the specified <paramref name="id"/>; <c>null</c> if none is found.
+        ///     associated with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
         Task<ITextChannel> GetTextChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -462,7 +558,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the voice channel associated
-        ///     with the specified <paramref name="id"/>; <c>null</c> if none is found.
+        ///     with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
         Task<IVoiceChannel> GetVoiceChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -472,7 +568,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the voice channel that the
-        ///     AFK users will be moved to after they have idled for too long; <c>null</c> if none is set.
+        ///     AFK users will be moved to after they have idled for too long; <see langword="null" /> if none is set.
         /// </returns>
         Task<IVoiceChannel> GetAFKChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -482,7 +578,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the text channel where
-        ///     randomized welcome messages will be sent to; <c>null</c> if none is set.
+        ///     randomized welcome messages will be sent to; <see langword="null" /> if none is set.
         /// </returns>
         Task<ITextChannel> GetSystemChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -492,7 +588,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the first viewable text
-        ///     channel in this guild; <c>null</c> if none is found.
+        ///     channel in this guild; <see langword="null" /> if none is found.
         /// </returns>
         Task<ITextChannel> GetDefaultChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -502,9 +598,40 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the embed channel set
-        ///     within the server's widget settings; <c>null</c> if none is set.
+        ///     within the server's widget settings; <see langword="null" /> if none is set.
         /// </returns>
+        [Obsolete("This endpoint is deprecated, use GetWidgetChannelAsync instead.")]
         Task<IGuildChannel> GetEmbedChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets the widget channel (i.e. the channel set in the guild's widget settings) in this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the widget channel set
+        ///     within the server's widget settings; <see langword="null" /> if none is set.
+        /// </returns>
+        Task<IGuildChannel> GetWidgetChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets the text channel where Community guilds can display rules and/or guidelines.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the text channel
+        ///     where Community guilds can display rules and/or guidelines; <see langword="null" /> if none is set.
+        /// </returns>
+        Task<ITextChannel> GetRulesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets the text channel channel where admins and moderators of Community guilds receive notices from Discord.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the text channel channel where
+        ///     admins and moderators of Community guilds receive notices from Discord; <see langword="null" /> if none is set.
+        /// </returns>
+        Task<ITextChannel> GetPublicUpdatesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 
         /// <summary>
         ///     Creates a new text channel in this guild.
@@ -573,7 +700,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the partial metadata of
-        ///     the vanity invite found within this guild; <c>null</c> if none is found.
+        ///     the vanity invite found within this guild; <see langword="null" /> if none is found.
         /// </returns>
         Task<IInviteMetadata> GetVanityInviteAsync(RequestOptions options = null);
 
@@ -582,7 +709,7 @@ namespace Discord
         /// </summary>
         /// <param name="id">The snowflake identifier for the role.</param>
         /// <returns>
-        ///     A role that is associated with the specified <paramref name="id"/>; <c>null</c> if none is found.
+        ///     A role that is associated with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
         IRole GetRole(ulong id);
         /// <summary>
@@ -624,7 +751,7 @@ namespace Discord
         /// <param name="accessToken">The OAuth2 access token for the user, requested with the guilds.join scope.</param>
         /// <param name="func">The delegate containing the properties to be applied to the user upon being added to the guild.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>A guild user associated with the specified <paramref name="userId" />; <c>null</c> if the user is already in the guild.</returns>
+        /// <returns>A guild user associated with the specified <paramref name="userId" />; <see langword="null" /> if the user is already in the guild.</returns>
         Task<IGuildUser> AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func = null, RequestOptions options = null);
         /// <summary>
         ///     Gets a collection of all users in this guild.
@@ -649,7 +776,7 @@ namespace Discord
         /// <remarks>
         ///     This method retrieves a user found within this guild.
         ///     <note>
-        ///         This may return <c>null</c> in the WebSocket implementation due to incomplete user collection in
+        ///         This may return <see langword="null" /> in the WebSocket implementation due to incomplete user collection in
         ///         large guilds.
         ///     </note>
         /// </remarks>
@@ -658,7 +785,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the guild user
-        ///     associated with the specified <paramref name="id"/>; <c>null</c> if none is found.
+        ///     associated with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
         Task<IGuildUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
@@ -705,11 +832,12 @@ namespace Discord
         /// <param name="days">The number of days required for the users to be kicked.</param>
         /// <param name="simulate">Whether this prune action is a simulation.</param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="includeRoleIds">An array of role IDs to be included in the prune of users who do not have any additional roles.</param>
         /// <returns>
         ///     A task that represents the asynchronous prune operation. The task result contains the number of users to
         ///     be or has been removed from this guild.
         /// </returns>
-        Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null);
+        Task<int> PruneUsersAsync(int days = 30, bool simulate = false, RequestOptions options = null, IEnumerable<ulong> includeRoleIds = null);
         /// <summary>
         ///     Gets a collection of users in this guild that the name or nickname starts with the
         ///     provided <see cref="string"/> at <paramref name="query"/>.
@@ -751,7 +879,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the webhook with the
-        ///     specified <paramref name="id"/>; <c>null</c> if none is found.
+        ///     specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
         Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null);
         /// <summary>
@@ -771,7 +899,7 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the emote found with the
-        ///     specified <paramref name="id"/>; <c>null</c> if none is found.
+        ///     specified <paramref name="id"/>; <see langword="null" /> if none is found.
         /// </returns>
         Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null);
         /// <summary>

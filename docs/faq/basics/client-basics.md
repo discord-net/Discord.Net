@@ -30,7 +30,7 @@ There are few possible reasons why this may occur.
 [TokenType]: xref:Discord.TokenType
 [827]: https://github.com/RogueException/Discord.Net/issues/827
 [958]: https://github.com/RogueException/Discord.Net/issues/958
-[Discord API Terms of Service]: https://discordapp.com/developers/docs/legal
+[Discord API Terms of Service]: https://discord.com/developers/docs/legal
 
 ## How do I do X, Y, Z when my bot connects/logs on? Why do I get a `NullReferenceException` upon calling any client methods after connect?
 

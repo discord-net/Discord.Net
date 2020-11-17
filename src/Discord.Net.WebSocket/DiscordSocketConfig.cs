@@ -87,7 +87,7 @@ namespace Discord.WebSocket
         ///     </para>
         ///     <para>
         ///         For more information, please see
-        ///         <see href="https://discordapp.com/developers/docs/topics/gateway#request-guild-members">Request Guild Members</see>
+        ///         <see href="https://discord.com/developers/docs/topics/gateway#request-guild-members">Request Guild Members</see>
         ///         on the official Discord API documentation.
         ///     </para>
         ///     <note>
@@ -158,6 +158,7 @@ namespace Discord.WebSocket
         }
         private int _maxWaitForGuildAvailable = 10000;
         
+        /// <summary>
         ///    Gets or sets gateway intents to limit what events are sent from Discord. Allows for more granular control than the <see cref="GuildSubscriptions"/> property.
         /// </summary>
         /// <remarks>

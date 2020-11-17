@@ -65,12 +65,12 @@ namespace Discord.Rest
 
         public static async Task AddReactionAsync(IMessage msg, IEmote emote, BaseDiscordClient client, RequestOptions options)
         {
-            await client.ApiClient.AddReactionAsync(msg.Channel.Id, msg.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
+            await client.ApiClient.AddReactionAsync(msg.Channel.Id, msg.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : UrlEncode(emote.Name), options).ConfigureAwait(false);
         }
 
         public static async Task RemoveReactionAsync(IMessage msg, ulong userId, IEmote emote, BaseDiscordClient client, RequestOptions options)
         {
-            await client.ApiClient.RemoveReactionAsync(msg.Channel.Id, msg.Id, userId, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
+            await client.ApiClient.RemoveReactionAsync(msg.Channel.Id, msg.Id, userId, emote is Emote e ? $"{e.Name}:{e.Id}" : UrlEncode(emote.Name), options).ConfigureAwait(false);
         }
 
         public static async Task RemoveAllReactionsAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
@@ -80,14 +80,14 @@ namespace Discord.Rest
 
         public static async Task RemoveAllReactionsForEmoteAsync(IMessage msg, IEmote emote, BaseDiscordClient client, RequestOptions options)
         {
-            await client.ApiClient.RemoveAllReactionsForEmoteAsync(msg.Channel.Id, msg.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
+            await client.ApiClient.RemoveAllReactionsForEmoteAsync(msg.Channel.Id, msg.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : UrlEncode(emote.Name), options).ConfigureAwait(false);
         }
 
         public static IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, IEmote emote,
             int? limit, BaseDiscordClient client, RequestOptions options)
         {
             Preconditions.NotNull(emote, nameof(emote));
-            var emoji = (emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name);
+            var emoji = (emote is Emote e ? $"{e.Name}:{e.Id}" : UrlEncode(emote.Name));
 
             return new PagedAsyncEnumerable<IUser>(
                 DiscordConfig.MaxUserReactionsPerBatch,
@@ -114,7 +114,15 @@ namespace Discord.Rest
                 },
                 count: limit
             );
+        }
 
+        private static string UrlEncode(string text)
+        {
+#if NET461
+            return System.Net.WebUtility.UrlEncode(text);
+#else
+            return System.Web.HttpUtility.UrlEncode(text);
+#endif
         }
 
         public static async Task PinAsync(IMessage msg, BaseDiscordClient client,
