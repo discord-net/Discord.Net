@@ -10,11 +10,11 @@ namespace Discord
         /// </summary>
         public Optional<bool> Enabled { get; set; }
         /// <summary>
-        ///     Sets the channel that the invite should place its users in, if not <c>null</c>.
+        ///     Sets the channel that the invite should place its users in, if not <see langword="null" />.
         /// </summary>
         public Optional<IChannel> Channel { get; set; }
         /// <summary>
-        ///     Sets the channel the invite should place its users in, if not <c>null</c>.
+        ///     Sets the channel that the invite should place its users in, if not <see langword="null" />.
         /// </summary>
         public Optional<ulong?> ChannelId { get; set; }
     }
