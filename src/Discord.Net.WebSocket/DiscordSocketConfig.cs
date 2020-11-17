@@ -151,6 +151,7 @@ namespace Discord.WebSocket
         }
         private int _maxWaitForGuildAvailable = 10000;
         
+        /// <summary>
         ///    Gets or sets gateway intents to limit what events are sent from Discord. Allows for more granular control than the <see cref="GuildSubscriptions"/> property.
         /// </summary>
         /// <remarks>
