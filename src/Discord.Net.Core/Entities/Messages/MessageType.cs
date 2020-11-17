@@ -63,6 +63,6 @@ namespace Discord
         /// <remarks>
         ///     Only available in API v8.
         /// </remarks>
-        InlineReply = 19,
+        Reply = 19,
     }
 }

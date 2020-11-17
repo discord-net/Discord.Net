@@ -17,9 +17,10 @@ namespace Discord
         ///     Gets the Channel ID of the original message.
         /// </summary>
         /// <remarks>
-        ///     If there is no referenced channel id, it will be the default value (zero).
+        ///     It only will be the default value (zero) if it was instantiated with a <see langword="null"/> in the constructor.
         /// </remarks>
-        public ulong ChannelId { get; internal set; }
+        public ulong ChannelId { get => InternalChannelId.GetValueOrDefault(); }
+        internal Optional<ulong> InternalChannelId;
 
         /// <summary>
         ///     Gets the Guild ID of the original message.
@@ -41,7 +42,7 @@ namespace Discord
         public MessageReference(ulong? messageId = null, ulong? channelId = null, ulong? guildId = null)
         {
             MessageId = messageId ?? Optional.Create<ulong>();
-            ChannelId = channelId ?? default(ulong);
+            InternalChannelId = channelId ?? Optional.Create<ulong>();
             GuildId = guildId ?? Optional.Create<ulong>();
         }
 

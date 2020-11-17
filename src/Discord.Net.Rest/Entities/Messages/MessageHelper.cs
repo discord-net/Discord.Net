@@ -282,7 +282,7 @@ namespace Discord.Rest
 
         public static MessageSource GetSource(Model msg)
         {
-            if (msg.Type != MessageType.Default)
+            if (msg.Type != MessageType.Default && msg.Type != MessageType.Reply)
                 return MessageSource.System;
             else if (msg.WebhookId.IsSpecified)
                 return MessageSource.Webhook;

@@ -17,6 +17,7 @@ namespace Discord.WebSocket
     {
         private bool _isMentioningEveryone, _isTTS, _isPinned, _isSuppressed;
         private long? _editedTimestampTicks;
+        private IUserMessage _referencedMessage;
         private ImmutableArray<Attachment> _attachments = ImmutableArray.Create<Attachment>();
         private ImmutableArray<Embed> _embeds = ImmutableArray.Create<Embed>();
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
@@ -45,6 +46,8 @@ namespace Discord.WebSocket
         public override IReadOnlyCollection<SocketRole> MentionedRoles => _roleMentions;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions;
+        /// <inheritdoc />
+        public IUserMessage ReferencedMessage => _referencedMessage;
 
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author, MessageSource source)
             : base(discord, id, channel, author, source)
@@ -131,6 +134,9 @@ namespace Discord.WebSocket
                 _tags = MessageHelper.ParseTags(text, Channel, guild, _userMentions);
                 model.Content = text;
             }
+
+            if (model.ReferencedMessage.IsSpecified && model.ReferencedMessage.Value != null)
+                _referencedMessage = RestUserMessage.Create(Discord, Channel, Author, model.ReferencedMessage.Value);
         }
 
         /// <inheritdoc />

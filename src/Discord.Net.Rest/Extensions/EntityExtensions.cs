@@ -75,7 +75,7 @@ namespace Discord.Rest
         {
             return new API.MessageReference()
             {
-                ChannelId = entity.ChannelId == default(ulong) ? Optional.Create<ulong>() : entity.ChannelId,
+                ChannelId = entity.InternalChannelId,
                 GuildId = entity.GuildId,
                 MessageId = entity.MessageId,
             };
