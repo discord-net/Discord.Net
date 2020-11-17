@@ -152,7 +152,7 @@ namespace Discord.WebSocket
                 Reference = new MessageReference
                 {
                     GuildId = model.Reference.Value.GuildId,
-                    ChannelId = model.Reference.Value.ChannelId.GetValueOrDefault(),
+                    InternalChannelId = model.Reference.Value.ChannelId,
                     MessageId = model.Reference.Value.MessageId
                 };
             }
