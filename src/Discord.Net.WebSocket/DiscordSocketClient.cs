@@ -228,6 +228,8 @@ namespace Discord.WebSocket
 
         private async Task OnConnectingAsync()
         {
+            await ApiClient.RequestQueue.AcquireIdentifyTicket(_connection.CancelToken);
+
             await _gatewayLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
             await ApiClient.ConnectAsync().ConfigureAwait(false);
 

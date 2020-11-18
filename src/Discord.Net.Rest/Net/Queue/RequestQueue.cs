@@ -136,27 +136,6 @@ namespace Discord.Net.Queue
             var requestBucket = GatewayBucket.Get(request.Options.BucketId);
             if (requestBucket.Type == GatewayBucketType.Unbucketed)
                 return;
-            
-            //Identify is per-account so we won't trigger global until we can actually go for it
-            if (requestBucket.Type == GatewayBucketType.Identify)
-            {
-                if (_masterIdentifySemaphore == null)
-                    throw new InvalidOperationException("Not a RequestQueue with WebSocket data.");
-
-                if (_identifySemaphore == null)
-                    await _masterIdentifySemaphore.WaitAsync(request.CancelToken);
-                else
-                {
-                    bool master;
-                    while (!(master = _masterIdentifySemaphore.Wait(0)) && !_identifySemaphore.Wait(0)) //To not block the thread
-                        await Task.Delay(100, request.CancelToken);
-                    if (master && _identifySemaphoreMaxConcurrency > 1)
-                        _identifySemaphore.Release(_identifySemaphoreMaxConcurrency - 1);
-                }
-#if DEBUG_LIMITS
-                Debug.WriteLine($"[{id}] Acquired identify ticket");
-#endif
-            }
 
             //It's not a global request, so need to remove one from global (per-session)
             var globalBucketType = GatewayBucket.Get(GatewayBucketType.Unbucketed);
@@ -177,6 +156,30 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
             Debug.WriteLine($"[{id}] Released identify master semaphore");
 #endif
+        }
+
+        public async Task AcquireIdentifyTicket(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if (_masterIdentifySemaphore == null)
+                    throw new InvalidOperationException("Not a RequestQueue with WebSocket data.");
+
+                if (_identifySemaphore == null)
+                    await _masterIdentifySemaphore.WaitAsync(cancellationToken);
+                else
+                {
+                    bool master;
+                    while (!(master = _masterIdentifySemaphore.Wait(0)) && !_identifySemaphore.Wait(0)) //To not block the thread
+                        await Task.Delay(100, cancellationToken);
+                    if (master && _identifySemaphoreMaxConcurrency > 1)
+                        _identifySemaphore.Release(_identifySemaphoreMaxConcurrency - 1);
+                }
+#if DEBUG_LIMITS
+                Debug.WriteLine($"[{id}] Acquired identify ticket");
+#endif
+            }
+            catch(OperationCanceledException) { }
         }
 
         private RequestBucket GetOrCreateBucket(RequestOptions options, IRequest request)
