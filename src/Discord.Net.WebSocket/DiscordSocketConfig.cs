@@ -130,6 +130,7 @@ namespace Discord.WebSocket
         /// </summary>
         /// <remarks>
         ///     This information is provided by Discord.
+        ///     It should only be used when auto-sharding is disabled.
         /// </remarks>
         public int IdentifyMaxConcurrency { get; set; } = 1;
 

@@ -162,7 +162,7 @@ namespace Discord.Net.Queue
             var globalBucketType = GatewayBucket.Get(GatewayBucketType.Unbucketed);
             var options = RequestOptions.CreateOrClone(request.Options);
             options.BucketId = globalBucketType.Id;
-            var globalRequest = new WebSocketRequest(null, null, false, options);
+            var globalRequest = new WebSocketRequest(null, null, false, false, options);
             var globalBucket = GetOrCreateBucket(options, globalRequest);
             await globalBucket.TriggerAsync(id, globalRequest);
         }
