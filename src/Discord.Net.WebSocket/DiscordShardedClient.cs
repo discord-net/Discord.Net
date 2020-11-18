@@ -12,7 +12,6 @@ namespace Discord.WebSocket
     public partial class DiscordShardedClient : BaseSocketClient, IDiscordClient
     {
         private readonly DiscordSocketConfig _baseConfig;
-        private readonly SemaphoreSlim _connectionGroupLock;
         private readonly Dictionary<int, int> _shardIdsToIndex;
         private readonly bool _automaticShards;
         private int[] _shardIds;
@@ -65,7 +64,6 @@ namespace Discord.WebSocket
             _shardIdsToIndex = new Dictionary<int, int>();
             config.DisplayInitialLog = false;
             _baseConfig = config;
-            _connectionGroupLock = new SemaphoreSlim(1, 1);
 
             if (config.TotalShards == null)
                 _automaticShards = true;
@@ -88,7 +86,7 @@ namespace Discord.WebSocket
                     _shardIdsToIndex.Add(_shardIds[i], i);
                     var newConfig = config.Clone();
                     newConfig.ShardId = _shardIds[i];
-                    _shards[i] = new DiscordSocketClient(newConfig, _connectionGroupLock, i != 0 ? _shards[0] : null, masterIdentifySemaphore, config.IdentifyMaxConcurrency > 1 ? null : identifySemaphores[i / config.IdentifyMaxConcurrency], config.IdentifyMaxConcurrency);
+                    _shards[i] = new DiscordSocketClient(newConfig, i != 0 ? _shards[0] : null, masterIdentifySemaphore, config.IdentifyMaxConcurrency > 1 ? null : identifySemaphores[i / config.IdentifyMaxConcurrency], config.IdentifyMaxConcurrency);
                     RegisterEvents(_shards[i], i == 0);
                 }
             }
@@ -122,7 +120,7 @@ namespace Discord.WebSocket
                     var newConfig = _baseConfig.Clone();
                     newConfig.ShardId = _shardIds[i];
                     newConfig.TotalShards = _totalShards;
-                    _shards[i] = new DiscordSocketClient(newConfig, _connectionGroupLock, i != 0 ? _shards[0] : null, masterIdentifySemaphore, maxConcurrency > 1 ? null : identifySemaphores[i / maxConcurrency], maxConcurrency);
+                    _shards[i] = new DiscordSocketClient(newConfig, i != 0 ? _shards[0] : null, masterIdentifySemaphore, maxConcurrency > 1 ? null : identifySemaphores[i / maxConcurrency], maxConcurrency);
                     RegisterEvents(_shards[i], i == 0);
                 }
             }
@@ -418,7 +416,6 @@ namespace Discord.WebSocket
                         foreach (var client in _shards)
                             client?.Dispose();
                     }
-                    _connectionGroupLock?.Dispose();
                 }
 
                 _isDisposed = true;

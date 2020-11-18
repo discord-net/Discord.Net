@@ -1,4 +1,3 @@
-using Discord.Rest;
 using System.Collections.Immutable;
 
 namespace Discord.Net.Queue
@@ -18,7 +17,8 @@ namespace Discord.Net.Queue
         {
             var buckets = new[]
             {
-                new GatewayBucket(GatewayBucketType.Unbucketed, BucketId.Create(null, "<gateway-unbucketed>", null), 120, 60),
+                // Limit is 120/60s, but 3 will be reserved for heartbeats (2 for possible heartbeats in the same timeframe and a possible failure)
+                new GatewayBucket(GatewayBucketType.Unbucketed, BucketId.Create(null, "<gateway-unbucketed>", null), 117, 60),
                 new GatewayBucket(GatewayBucketType.Identify, BucketId.Create(null, "<gateway-identify>", null), 1, 5),
                 new GatewayBucket(GatewayBucketType.PresenceUpdate, BucketId.Create(null, "<gateway-presenceupdate>", null), 5, 60),
             };

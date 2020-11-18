@@ -206,6 +206,12 @@ namespace Discord.Net.Queue
             return (null, null);
         }
 
+        public void ClearGatewayBuckets()
+        {
+            foreach (var gwBucket in (GatewayBucketType[])Enum.GetValues(typeof(GatewayBucketType)))
+                _buckets.TryRemove(GatewayBucket.Get(gwBucket).Id, out _);
+        }
+
         private async Task RunCleanup()
         {
             try
@@ -236,6 +242,8 @@ namespace Discord.Net.Queue
             _tokenLock?.Dispose();
             _clearToken?.Dispose();
             _requestCancelTokenSource?.Dispose();
+            _masterIdentifySemaphore?.Dispose();
+            _identifySemaphore?.Dispose();
         }
     }
 }

@@ -133,6 +133,8 @@ namespace Discord.API
             if (WebSocketClient == null)
                 throw new NotSupportedException("This client is not configured with WebSocket support.");
 
+            RequestQueue.ClearGatewayBuckets();
+
             //Re-create streams to reset the zlib state
             _compressed?.Dispose();
             _decompressor?.Dispose();
@@ -210,7 +212,7 @@ namespace Discord.API
             options.IsGatewayBucket = true;
             if (options.BucketId == null)
                 options.BucketId = GatewayBucket.Get(GatewayBucketType.Unbucketed).Id;
-            await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, bytes, true, options)).ConfigureAwait(false);
+            await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, bytes, true, opCode == GatewayOpCode.Heartbeat, options)).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
