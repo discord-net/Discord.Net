@@ -51,7 +51,7 @@ namespace Discord.API
         internal JsonSerializer Serializer => _serializer;
 
         /// <exception cref="ArgumentException">Unknown OAuth token type.</exception>
-        public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RequestQueue requestQueue, RetryMode defaultRetryMode = RetryMode.AlwaysRetry,
+        public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry,
             JsonSerializer serializer = null, RateLimitPrecision rateLimitPrecision = RateLimitPrecision.Second, bool useSystemClock = true)
         {
             _restClientProvider = restClientProvider;
@@ -61,7 +61,7 @@ namespace Discord.API
             RateLimitPrecision = rateLimitPrecision;
 			UseSystemClock = useSystemClock;
 
-            RequestQueue = requestQueue ?? new RequestQueue();
+            RequestQueue = new RequestQueue();
             _stateLock = new SemaphoreSlim(1, 1);
 
             SetBaseUrl(DiscordConfig.APIUrl);

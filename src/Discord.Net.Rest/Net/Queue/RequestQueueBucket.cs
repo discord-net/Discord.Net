@@ -457,8 +457,6 @@ namespace Discord.Net.Queue
 #if DEBUG_LIMITS
                         Debug.WriteLine($"[{id}] * Reset *");
 #endif
-                        if (request is WebSocketRequest webSocketRequest && webSocketRequest.Options.BucketId == GatewayBucket.Get(GatewayBucketType.Identify).Id)
-                            _queue.ReleaseIdentifySemaphore(id);
                         _semaphore = WindowCount;
                         _resetTick = null;
                         return;

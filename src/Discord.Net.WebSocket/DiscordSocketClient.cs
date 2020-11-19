@@ -26,6 +26,7 @@ namespace Discord.WebSocket
     {
         private readonly ConcurrentQueue<ulong> _largeGuilds;
         private readonly JsonSerializer _serializer;
+        private readonly DiscordShardedClient _shardedClient;
         private readonly DiscordSocketClient _parentClient;
         private readonly ConcurrentQueue<long> _heartbeatTimes;
         private readonly ConnectionManager _connection;
@@ -118,10 +119,10 @@ namespace Discord.WebSocket
         /// </summary>
         /// <param name="config">The configuration to be used with the client.</param>
 #pragma warning disable IDISP004
-        public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config, new SemaphoreSlim(1, 1), null, 1), null) { }
-        internal DiscordSocketClient(DiscordSocketConfig config, DiscordSocketClient parentClient, SemaphoreSlim identifyMasterSemaphore, SemaphoreSlim identifySemaphore, int identifyMaxConcurrency) : this(config, CreateApiClient(config, identifyMasterSemaphore, identifySemaphore, identifyMaxConcurrency), parentClient) { }
+        public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null, null) { }
+        internal DiscordSocketClient(DiscordSocketConfig config, DiscordShardedClient shardedClient, DiscordSocketClient parentClient) : this(config, CreateApiClient(config), shardedClient, parentClient) { }
 #pragma warning restore IDISP004
-        private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, DiscordSocketClient parentClient)
+        private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, DiscordShardedClient shardedClient, DiscordSocketClient parentClient)
             : base(config, client)
         {
             ShardId = config.ShardId ?? 0;
@@ -147,6 +148,7 @@ namespace Discord.WebSocket
             _connection.Disconnected += (ex, recon) => TimedInvokeAsync(_disconnectedEvent, nameof(Disconnected), ex);
 
             _nextAudioId = 1;
+            _shardedClient = shardedClient;
             _parentClient = parentClient;
 
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
@@ -177,9 +179,8 @@ namespace Discord.WebSocket
             _voiceRegions = ImmutableDictionary.Create<string, RestVoiceRegion>();
             _largeGuilds = new ConcurrentQueue<ulong>();
         }
-        private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config, SemaphoreSlim identifyMasterSemaphore, SemaphoreSlim identifySemaphore, int identifyMaxConcurrency)
-            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent,
-                identifyMasterSemaphore, identifySemaphore, identifyMaxConcurrency, config.GatewayHost,
+        private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
+            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent, config.GatewayHost,
                 rateLimitPrecision: config.RateLimitPrecision);
         /// <inheritdoc />
         internal override void Dispose(bool disposing)
@@ -228,28 +229,39 @@ namespace Discord.WebSocket
 
         private async Task OnConnectingAsync()
         {
-            if (_sessionId == null)
-                await ApiClient.RequestQueue.AcquireIdentifyTicket(_connection.CancelToken);
-
-            await _gatewayLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
-            await ApiClient.ConnectAsync().ConfigureAwait(false);
-
-            if (_sessionId != null)
+            bool locked = false;
+            if (_shardedClient != null && _sessionId == null)
             {
-                await _gatewayLogger.DebugAsync("Resuming").ConfigureAwait(false);
-                await ApiClient.SendResumeAsync(_sessionId, _lastSeq).ConfigureAwait(false);
+                await _shardedClient.AcquireIdentifyLockAsync(ShardId, _connection.CancelToken).ConfigureAwait(false);
+                locked = true;
             }
-            else
+            try
             {
-                await _gatewayLogger.DebugAsync("Identifying").ConfigureAwait(false);
-                await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents).ConfigureAwait(false);
+                await _gatewayLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
+                await ApiClient.ConnectAsync().ConfigureAwait(false);
+
+                if (_sessionId != null)
+                {
+                    await _gatewayLogger.DebugAsync("Resuming").ConfigureAwait(false);
+                    await ApiClient.SendResumeAsync(_sessionId, _lastSeq).ConfigureAwait(false);
+                }
+                else
+                {
+                    await _gatewayLogger.DebugAsync("Identifying").ConfigureAwait(false);
+                    await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents).ConfigureAwait(false);
+                }
+
+                //Wait for READY
+                await _connection.WaitAsync().ConfigureAwait(false);
+
+                await _gatewayLogger.DebugAsync("Sending Status").ConfigureAwait(false);
+                await SendStatusAsync().ConfigureAwait(false);
             }
-
-            //Wait for READY
-            await _connection.WaitAsync().ConfigureAwait(false);
-
-            await _gatewayLogger.DebugAsync("Sending Status").ConfigureAwait(false);
-            await SendStatusAsync().ConfigureAwait(false);
+            finally
+            {
+                if (locked)
+                    _shardedClient.ReleaseIdentifyLock();
+            }
         }
         private async Task OnDisconnectingAsync(Exception ex)
         {

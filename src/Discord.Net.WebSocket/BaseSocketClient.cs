@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using Discord.API;
 using Discord.Rest;
@@ -80,9 +79,8 @@ namespace Discord.WebSocket
 
         internal BaseSocketClient(DiscordSocketConfig config, DiscordRestApiClient client)
             : base(config, client) => BaseConfig = config;
-        private static DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config, SemaphoreSlim identifyMasterSemaphore, SemaphoreSlim identifySemaphore, int identifyMaxConcurrency)
+        private static DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
             => new DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent,
-                identifyMasterSemaphore, identifySemaphore, identifyMaxConcurrency,
                 rateLimitPrecision: config.RateLimitPrecision,
 				useSystemClock: config.UseSystemClock);
 

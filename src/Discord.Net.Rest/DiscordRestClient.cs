@@ -31,7 +31,6 @@ namespace Discord.Rest
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
             => new API.DiscordRestApiClient(config.RestClientProvider,
                 DiscordRestConfig.UserAgent,
-                null,
                 rateLimitPrecision: config.RateLimitPrecision,
                 useSystemClock: config.UseSystemClock);
 

@@ -23,10 +23,6 @@ namespace Discord.Net.Queue
         private CancellationToken _requestCancelToken; //Parent token + Clear token
         private DateTimeOffset _waitUntil;
 
-        private readonly SemaphoreSlim _masterIdentifySemaphore;
-        private readonly SemaphoreSlim _identifySemaphore;
-        private readonly int _identifySemaphoreMaxConcurrency;
-
         private Task _cleanupTask;
 
         public RequestQueue()
@@ -41,14 +37,6 @@ namespace Discord.Net.Queue
             _buckets = new ConcurrentDictionary<BucketId, object>();
 
             _cleanupTask = RunCleanup();
-        }
-
-        public RequestQueue(SemaphoreSlim masterIdentifySemaphore, SemaphoreSlim slaveIdentifySemaphore, int slaveIdentifySemaphoreMaxConcurrency)
-            : this ()
-        {
-            _masterIdentifySemaphore = masterIdentifySemaphore;
-            _identifySemaphore = slaveIdentifySemaphore;
-            _identifySemaphoreMaxConcurrency = slaveIdentifySemaphoreMaxConcurrency;
         }
 
         public async Task SetCancelTokenAsync(CancellationToken cancelToken)
@@ -145,42 +133,6 @@ namespace Discord.Net.Queue
             var globalBucket = GetOrCreateBucket(options, globalRequest);
             await globalBucket.TriggerAsync(id, globalRequest);
         }
-        internal void ReleaseIdentifySemaphore(int id)
-        {
-            if (_masterIdentifySemaphore == null)
-                throw new InvalidOperationException("Not a RequestQueue with WebSocket data.");
-
-            while (_identifySemaphore?.Wait(0) == true) //exhaust all tickets before releasing master
-            { }
-            _masterIdentifySemaphore.Release();
-#if DEBUG_LIMITS
-            Debug.WriteLine($"[{id}] Released identify master semaphore");
-#endif
-        }
-
-        public async Task AcquireIdentifyTicket(CancellationToken cancellationToken)
-        {
-            try
-            {
-                if (_masterIdentifySemaphore == null)
-                    throw new InvalidOperationException("Not a RequestQueue with WebSocket data.");
-
-                if (_identifySemaphore == null)
-                    await _masterIdentifySemaphore.WaitAsync(cancellationToken);
-                else
-                {
-                    bool master;
-                    while (!(master = _masterIdentifySemaphore.Wait(0)) && !_identifySemaphore.Wait(0)) //To not block the thread
-                        await Task.Delay(100, cancellationToken);
-                    if (master && _identifySemaphoreMaxConcurrency > 1)
-                        _identifySemaphore.Release(_identifySemaphoreMaxConcurrency - 1);
-                }
-#if DEBUG_LIMITS
-                Debug.WriteLine($"[{id}] Acquired identify ticket");
-#endif
-            }
-            catch(OperationCanceledException) { }
-        }
 
         private RequestBucket GetOrCreateBucket(RequestOptions options, IRequest request)
         {
@@ -245,8 +197,6 @@ namespace Discord.Net.Queue
             _tokenLock?.Dispose();
             _clearToken?.Dispose();
             _requestCancelTokenSource?.Dispose();
-            _masterIdentifySemaphore?.Dispose();
-            _identifySemaphore?.Dispose();
         }
     }
 }
