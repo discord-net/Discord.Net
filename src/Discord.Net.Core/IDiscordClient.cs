@@ -274,5 +274,15 @@ namespace Discord
         ///     that represents the number of shards that should be used with this account.
         /// </returns>
         Task<int> GetRecommendedShardCountAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets the gateway information related to the bot.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a <see cref="BotGateway"/>
+        ///     that represents the gateway information related to the bot.
+        /// </returns>
+        Task<BotGateway> GetBotGatewayAsync(RequestOptions options = null);
     }
 }

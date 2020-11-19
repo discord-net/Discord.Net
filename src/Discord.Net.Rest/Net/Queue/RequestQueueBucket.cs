@@ -25,7 +25,7 @@ namespace Discord.Net.Queue
         public int WindowCount { get; private set; }
         public DateTimeOffset LastAttemptAt { get; private set; }
 
-        public RequestBucket(RequestQueue queue, RestRequest request, BucketId id)
+        public RequestBucket(RequestQueue queue, IRequest request, BucketId id)
         {
             _queue = queue;
             Id = id;
@@ -33,7 +33,9 @@ namespace Discord.Net.Queue
             _lock = new object();
 
             if (request.Options.IsClientBucket)
-                WindowCount = ClientBucket.Get(Id).WindowCount;
+                WindowCount = ClientBucket.Get(request.Options.BucketId).WindowCount;
+            else if (request.Options.IsGatewayBucket)
+                WindowCount = GatewayBucket.Get(request.Options.BucketId).WindowCount;
             else
                 WindowCount = 1; //Only allow one request until we get a header back
             _semaphore = WindowCount;
@@ -154,8 +156,68 @@ namespace Discord.Net.Queue
                 }
             }
         }
+        public async Task SendAsync(WebSocketRequest request)
+        {
+            int id = Interlocked.Increment(ref nextId);
+#if DEBUG_LIMITS
+            Debug.WriteLine($"[{id}] Start");
+#endif
+            LastAttemptAt = DateTimeOffset.UtcNow;
+            while (true)
+            {
+                await _queue.EnterGlobalAsync(id, request).ConfigureAwait(false);
+                await EnterAsync(id, request).ConfigureAwait(false);
 
-        private async Task EnterAsync(int id, RestRequest request)
+#if DEBUG_LIMITS
+                Debug.WriteLine($"[{id}] Sending...");
+#endif
+                try
+                {
+                    await request.SendAsync().ConfigureAwait(false);
+                    return;
+                }
+                catch (TimeoutException)
+                {
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Timeout");
+#endif
+                    if ((request.Options.RetryMode & RetryMode.RetryTimeouts) == 0)
+                        throw;
+
+                    await Task.Delay(500).ConfigureAwait(false);
+                    continue; //Retry
+                }
+                /*catch (Exception)
+                {
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Error");
+#endif
+                    if ((request.Options.RetryMode & RetryMode.RetryErrors) == 0)
+                        throw;
+
+                    await Task.Delay(500);
+                    continue; //Retry
+                }*/
+                finally
+                {
+                    UpdateRateLimit(id, request, default(RateLimitInfo), false);
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Stop");
+#endif
+                }
+            }
+        }
+
+        internal async Task TriggerAsync(int id, IRequest request)
+        {
+#if DEBUG_LIMITS
+            Debug.WriteLine($"[{id}] Trigger Bucket");
+#endif
+            await EnterAsync(id, request).ConfigureAwait(false);
+            UpdateRateLimit(id, request, default(RateLimitInfo), false);
+        }
+
+        private async Task EnterAsync(int id, IRequest request)
         {
             int windowCount;
             DateTimeOffset? resetAt;
@@ -186,8 +248,31 @@ namespace Discord.Net.Queue
                 {
                     if (!isRateLimited)
                     {
+                        bool ignoreRatelimit = false;
                         isRateLimited = true;
-                        await _queue.RaiseRateLimitTriggered(Id, null, $"{request.Method} {request.Endpoint}").ConfigureAwait(false);
+                        switch (request)
+                        {
+                            case RestRequest restRequest:
+                                await _queue.RaiseRateLimitTriggered(Id, null, $"{restRequest.Method} {restRequest.Endpoint}").ConfigureAwait(false);
+                                break;
+                            case WebSocketRequest webSocketRequest:
+                                if (webSocketRequest.IgnoreLimit)
+                                {
+                                    ignoreRatelimit = true;
+                                    break;
+                                }
+                                await _queue.RaiseRateLimitTriggered(Id, null, Id.Endpoint).ConfigureAwait(false);
+                                break;
+                            default:
+                                throw new InvalidOperationException("Unknown request type");
+                        }
+                        if (ignoreRatelimit)
+                        {
+#if DEBUG_LIMITS
+                            Debug.WriteLine($"[{id}] Ignoring ratelimit");
+#endif
+                            break;
+                        }
                     }
 
                     ThrowRetryLimit(request);
@@ -223,7 +308,7 @@ namespace Discord.Net.Queue
             }
         }
 
-        private void UpdateRateLimit(int id, RestRequest request, RateLimitInfo info, bool is429, bool redirected = false)
+        private void UpdateRateLimit(int id, IRequest request, RateLimitInfo info, bool is429, bool redirected = false)
         {
             if (WindowCount == 0)
                 return;
@@ -316,6 +401,23 @@ namespace Discord.Net.Queue
                     Debug.WriteLine($"[{id}] Client Bucket ({ClientBucket.Get(Id).WindowSeconds * 1000} ms)");
 #endif
                 }
+                else if (request.Options.IsGatewayBucket && request.Options.BucketId != null)
+                {
+                    resetTick = DateTimeOffset.UtcNow.AddSeconds(GatewayBucket.Get(request.Options.BucketId).WindowSeconds);
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Gateway Bucket ({GatewayBucket.Get(request.Options.BucketId).WindowSeconds * 1000} ms)");
+#endif
+                    if (!hasQueuedReset)
+                    {
+                        _resetTick = resetTick;
+                        LastAttemptAt = resetTick.Value;
+#if DEBUG_LIMITS
+                    Debug.WriteLine($"[{id}] Reset in {(int)Math.Ceiling((resetTick - DateTimeOffset.UtcNow).Value.TotalMilliseconds)} ms");
+#endif
+                        var _ = QueueReset(id, (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds), request);
+                    }
+                    return;
+                }
 
                 if (resetTick == null)
                 {
@@ -336,12 +438,12 @@ namespace Discord.Net.Queue
 
                     if (!hasQueuedReset)
                     {
-                        var _ = QueueReset(id, (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds));
+                        var _ = QueueReset(id, (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds), request);
                     }
                 }
             }
         }
-        private async Task QueueReset(int id, int millis)
+        private async Task QueueReset(int id, int millis, IRequest request)
         {
             while (true)
             {
@@ -363,7 +465,7 @@ namespace Discord.Net.Queue
             }
         }
 
-        private void ThrowRetryLimit(RestRequest request)
+        private void ThrowRetryLimit(IRequest request)
         {
             if ((request.Options.RetryMode & RetryMode.RetryRatelimit) == 0)
                 throw new RateLimitedException(request);

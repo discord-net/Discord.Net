@@ -26,7 +26,7 @@ namespace Discord.WebSocket
     {
         private readonly ConcurrentQueue<ulong> _largeGuilds;
         private readonly JsonSerializer _serializer;
-        private readonly SemaphoreSlim _connectionGroupLock;
+        private readonly DiscordShardedClient _shardedClient;
         private readonly DiscordSocketClient _parentClient;
         private readonly ConcurrentQueue<long> _heartbeatTimes;
         private readonly ConnectionManager _connection;
@@ -120,9 +120,9 @@ namespace Discord.WebSocket
         /// <param name="config">The configuration to be used with the client.</param>
 #pragma warning disable IDISP004
         public DiscordSocketClient(DiscordSocketConfig config) : this(config, CreateApiClient(config), null, null) { }
-        internal DiscordSocketClient(DiscordSocketConfig config, SemaphoreSlim groupLock, DiscordSocketClient parentClient) : this(config, CreateApiClient(config), groupLock, parentClient) { }
+        internal DiscordSocketClient(DiscordSocketConfig config, DiscordShardedClient shardedClient, DiscordSocketClient parentClient) : this(config, CreateApiClient(config), shardedClient, parentClient) { }
 #pragma warning restore IDISP004
-        private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, SemaphoreSlim groupLock, DiscordSocketClient parentClient)
+        private DiscordSocketClient(DiscordSocketConfig config, API.DiscordSocketApiClient client, DiscordShardedClient shardedClient, DiscordSocketClient parentClient)
             : base(config, client)
         {
             ShardId = config.ShardId ?? 0;
@@ -148,7 +148,7 @@ namespace Discord.WebSocket
             _connection.Disconnected += (ex, recon) => TimedInvokeAsync(_disconnectedEvent, nameof(Disconnected), ex);
 
             _nextAudioId = 1;
-            _connectionGroupLock = groupLock;
+            _shardedClient = shardedClient;
             _parentClient = parentClient;
 
             _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
@@ -229,8 +229,12 @@ namespace Discord.WebSocket
 
         private async Task OnConnectingAsync()
         {
-            if (_connectionGroupLock != null)
-                await _connectionGroupLock.WaitAsync(_connection.CancelToken).ConfigureAwait(false);
+            bool locked = false;
+            if (_shardedClient != null && _sessionId == null)
+            {
+                await _shardedClient.AcquireIdentifyLockAsync(ShardId, _connection.CancelToken).ConfigureAwait(false);
+                locked = true;
+            }
             try
             {
                 await _gatewayLogger.DebugAsync("Connecting ApiClient").ConfigureAwait(false);
@@ -255,11 +259,8 @@ namespace Discord.WebSocket
             }
             finally
             {
-                if (_connectionGroupLock != null)
-                {
-                    await Task.Delay(5000).ConfigureAwait(false);
-                    _connectionGroupLock.Release();
-                }
+                if (locked)
+                    _shardedClient.ReleaseIdentifyLock();
             }
         }
         private async Task OnDisconnectingAsync(Exception ex)
@@ -519,7 +520,15 @@ namespace Discord.WebSocket
                             _sessionId = null;
                             _lastSeq = 0;
 
-                            await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents).ConfigureAwait(false);
+                            await _shardedClient.AcquireIdentifyLockAsync(ShardId, _connection.CancelToken).ConfigureAwait(false);
+                            try
+                            {
+                                await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents).ConfigureAwait(false);
+                            }
+                            finally
+                            {
+                                _shardedClient.ReleaseIdentifyLock();
+                            }
                         }
                         break;
                     case GatewayOpCode.Reconnect:

@@ -12,12 +12,14 @@ namespace Discord.WebSocket
     public partial class DiscordShardedClient : BaseSocketClient, IDiscordClient
     {
         private readonly DiscordSocketConfig _baseConfig;
-        private readonly SemaphoreSlim _connectionGroupLock;
         private readonly Dictionary<int, int> _shardIdsToIndex;
         private readonly bool _automaticShards;
         private int[] _shardIds;
         private DiscordSocketClient[] _shards;
         private int _totalShards;
+        private SemaphoreSlim[] _identifySemaphores;
+        private object _semaphoreResetLock;
+        private Task _semaphoreResetTask;
 
         private bool _isDisposed;
 
@@ -62,10 +64,10 @@ namespace Discord.WebSocket
             if (ids != null && config.TotalShards == null)
                 throw new ArgumentException($"Custom ids are not supported when {nameof(config.TotalShards)} is not specified.");
 
+            _semaphoreResetLock = new object();
             _shardIdsToIndex = new Dictionary<int, int>();
             config.DisplayInitialLog = false;
             _baseConfig = config;
-            _connectionGroupLock = new SemaphoreSlim(1, 1);
 
             if (config.TotalShards == null)
                 _automaticShards = true;
@@ -74,12 +76,15 @@ namespace Discord.WebSocket
                 _totalShards = config.TotalShards.Value;
                 _shardIds = ids ?? Enumerable.Range(0, _totalShards).ToArray();
                 _shards = new DiscordSocketClient[_shardIds.Length];
+                _identifySemaphores = new SemaphoreSlim[config.IdentifyMaxConcurrency];
+                for (int i = 0; i < config.IdentifyMaxConcurrency; i++)
+                    _identifySemaphores[i] = new SemaphoreSlim(1, 1);
                 for (int i = 0; i < _shardIds.Length; i++)
                 {
                     _shardIdsToIndex.Add(_shardIds[i], i);
                     var newConfig = config.Clone();
                     newConfig.ShardId = _shardIds[i];
-                    _shards[i] = new DiscordSocketClient(newConfig, _connectionGroupLock, i != 0 ? _shards[0] : null);
+                    _shards[i] = new DiscordSocketClient(newConfig, this, i != 0 ? _shards[0] : null);
                     RegisterEvents(_shards[i], i == 0);
                 }
             }
@@ -88,21 +93,53 @@ namespace Discord.WebSocket
             => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent,
                 rateLimitPrecision: config.RateLimitPrecision);
 
+        internal async Task AcquireIdentifyLockAsync(int shardId, CancellationToken token)
+        {
+            int semaphoreIdx = shardId % _baseConfig.IdentifyMaxConcurrency;
+            await _identifySemaphores[semaphoreIdx].WaitAsync(token).ConfigureAwait(false);
+        }
+
+        internal void ReleaseIdentifyLock()
+        {
+            lock (_semaphoreResetLock)
+            {
+                if (_semaphoreResetTask == null)
+                    _semaphoreResetTask = ResetSemaphoresAsync();
+            }
+        }
+
+        private async Task ResetSemaphoresAsync()
+        {
+            await Task.Delay(5000).ConfigureAwait(false);
+            lock (_semaphoreResetLock)
+            {
+                foreach (var semaphore in _identifySemaphores)
+                    if (semaphore.CurrentCount == 0)
+                        semaphore.Release();
+                _semaphoreResetTask = null;
+            }
+        }
+
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
             if (_automaticShards)
             {
-                var shardCount = await GetRecommendedShardCountAsync().ConfigureAwait(false);
-                _shardIds = Enumerable.Range(0, shardCount).ToArray();
+                var botGateway = await GetBotGatewayAsync().ConfigureAwait(false);
+                _shardIds = Enumerable.Range(0, botGateway.Shards).ToArray();
                 _totalShards = _shardIds.Length;
                 _shards = new DiscordSocketClient[_shardIds.Length];
+                int maxConcurrency = botGateway.SessionStartLimit.MaxConcurrency;
+                _baseConfig.IdentifyMaxConcurrency = maxConcurrency;
+                _identifySemaphores = new SemaphoreSlim[maxConcurrency];
+                for (int i = 0; i < maxConcurrency; i++)
+                    _identifySemaphores[i] = new SemaphoreSlim(1, 1);
                 for (int i = 0; i < _shardIds.Length; i++)
                 {
                     _shardIdsToIndex.Add(_shardIds[i], i);
                     var newConfig = _baseConfig.Clone();
                     newConfig.ShardId = _shardIds[i];
                     newConfig.TotalShards = _totalShards;
-                    _shards[i] = new DiscordSocketClient(newConfig, _connectionGroupLock, i != 0 ? _shards[0] : null);
+                    _shards[i] = new DiscordSocketClient(newConfig, this, i != 0 ? _shards[0] : null);
                     RegisterEvents(_shards[i], i == 0);
                 }
             }
@@ -398,7 +435,6 @@ namespace Discord.WebSocket
                         foreach (var client in _shards)
                             client?.Dispose();
                     }
-                    _connectionGroupLock?.Dispose();
                 }
 
                 _isDisposed = true;

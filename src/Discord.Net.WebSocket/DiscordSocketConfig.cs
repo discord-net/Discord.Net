@@ -126,6 +126,14 @@ namespace Discord.WebSocket
         public bool GuildSubscriptions { get; set; } = true;
 
         /// <summary>
+        ///     Gets or sets the maximum identify concurrency.
+        /// </summary>
+        /// <remarks>
+        ///     This information is provided by Discord.
+        ///     It is only used when using a <see cref="DiscordShardedClient"/> and auto-sharding is disabled.
+        /// </remarks>
+        public int IdentifyMaxConcurrency { get; set; } = 1;
+
         ///     Gets or sets the maximum wait time in milliseconds between GUILD_AVAILABLE events before firing READY.
         ///
         ///     If zero, READY will fire as soon as it is received and all guilds will be unavailable.
