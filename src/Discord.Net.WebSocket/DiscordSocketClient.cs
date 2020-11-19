@@ -565,6 +565,7 @@ namespace Discord.WebSocket
                                         var state = new ClientState(data.Guilds.Length, data.PrivateChannels.Length);
 
                                         var currentUser = SocketSelfUser.Create(this, state, data.User);
+                                        currentUser.Presence = new SocketPresence(Status, Activity, null, null);
                                         ApiClient.CurrentUserId = currentUser.Id;
                                         int unavailableGuilds = 0;
                                         for (int i = 0; i < data.Guilds.Length; i++)
