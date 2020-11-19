@@ -89,9 +89,18 @@ namespace Discord.Net.Queue
         }
         public async Task SendAsync(WebSocketRequest request)
         {
-            //TODO: Re-impl websocket buckets
-            request.CancelToken = _requestCancelToken;
-            await request.SendAsync().ConfigureAwait(false);
+            CancellationTokenSource createdTokenSource = null;
+            if (request.Options.CancelToken.CanBeCanceled)
+            {
+                createdTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_requestCancelToken, request.Options.CancelToken);
+                request.Options.CancelToken = createdTokenSource.Token;
+            }
+            else
+                request.Options.CancelToken = _requestCancelToken;
+
+            var bucket = GetOrCreateBucket(request.Options, request);
+            await bucket.SendAsync(request).ConfigureAwait(false);
+            createdTokenSource?.Dispose();
         }
 
         internal async Task EnterGlobalAsync(int id, RestRequest request)
@@ -109,8 +118,23 @@ namespace Discord.Net.Queue
         {
             _waitUntil = DateTimeOffset.UtcNow.AddMilliseconds(info.RetryAfter.Value + (info.Lag?.TotalMilliseconds ?? 0.0));
         }
+        internal async Task EnterGlobalAsync(int id, WebSocketRequest request)
+        {
+            //If this is a global request (unbucketed), it'll be dealt in EnterAsync
+            var requestBucket = GatewayBucket.Get(request.Options.BucketId);
+            if (requestBucket.Type == GatewayBucketType.Unbucketed)
+                return;
 
-        private RequestBucket GetOrCreateBucket(RequestOptions options, RestRequest request)
+            //It's not a global request, so need to remove one from global (per-session)
+            var globalBucketType = GatewayBucket.Get(GatewayBucketType.Unbucketed);
+            var options = RequestOptions.CreateOrClone(request.Options);
+            options.BucketId = globalBucketType.Id;
+            var globalRequest = new WebSocketRequest(null, null, false, false, options);
+            var globalBucket = GetOrCreateBucket(options, globalRequest);
+            await globalBucket.TriggerAsync(id, globalRequest);
+        }
+
+        private RequestBucket GetOrCreateBucket(RequestOptions options, IRequest request)
         {
             var bucketId = options.BucketId;
             object obj = _buckets.GetOrAdd(bucketId, x => new RequestBucket(this, request, x));
@@ -135,6 +159,12 @@ namespace Discord.Net.Queue
                 return (hashReqQueue, bucket);
             }
             return (null, null);
+        }
+
+        public void ClearGatewayBuckets()
+        {
+            foreach (var gwBucket in (GatewayBucketType[])Enum.GetValues(typeof(GatewayBucketType)))
+                _buckets.TryRemove(GatewayBucket.Get(gwBucket).Id, out _);
         }
 
         private async Task RunCleanup()

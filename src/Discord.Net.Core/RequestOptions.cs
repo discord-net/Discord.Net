@@ -61,6 +61,7 @@ namespace Discord
         internal BucketId BucketId { get; set; }
         internal bool IsClientBucket { get; set; }
         internal bool IsReactionBucket { get; set; }
+        internal bool IsGatewayBucket { get; set; }
 
         internal static RequestOptions CreateOrClone(RequestOptions options)
         {            

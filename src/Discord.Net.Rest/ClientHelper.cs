@@ -184,5 +184,22 @@ namespace Discord.Rest
             var response = await client.ApiClient.GetBotGatewayAsync(options).ConfigureAwait(false);
             return response.Shards;
         }
+
+        public static async Task<BotGateway> GetBotGatewayAsync(BaseDiscordClient client, RequestOptions options)
+        {
+            var response = await client.ApiClient.GetBotGatewayAsync(options).ConfigureAwait(false);
+            return new BotGateway
+            {
+                Url = response.Url,
+                Shards = response.Shards,
+                SessionStartLimit = new SessionStartLimit
+                {
+                    Total = response.SessionStartLimit.Total,
+                    Remaining = response.SessionStartLimit.Remaining,
+                    ResetAfter = response.SessionStartLimit.ResetAfter,
+                    MaxConcurrency = response.SessionStartLimit.MaxConcurrency
+                }
+            };
+        }
     }
 }

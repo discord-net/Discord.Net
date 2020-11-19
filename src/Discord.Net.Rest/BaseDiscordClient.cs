@@ -152,6 +152,10 @@ namespace Discord.Rest
         public Task<int> GetRecommendedShardCountAsync(RequestOptions options = null)
             => ClientHelper.GetRecommendShardCountAsync(this, options);
 
+        /// <inheritdoc />
+        public Task<BotGateway> GetBotGatewayAsync(RequestOptions options = null)
+            => ClientHelper.GetBotGatewayAsync(this, options);
+
         //IDiscordClient
         /// <inheritdoc />
         ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;
