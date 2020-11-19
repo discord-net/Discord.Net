@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API.Gateway
@@ -12,7 +12,7 @@ namespace Discord.API.Gateway
         public long? IdleSince { get; set; }
         [JsonProperty("afk")]
         public bool IsAFK { get; set; }
-        [JsonProperty("game")]
-        public Game Game { get; set; }
+        [JsonProperty("activities")]
+        public Game[] Activities { get; set; }
     }
 }
