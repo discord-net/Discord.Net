@@ -37,6 +37,9 @@ namespace Discord.Rest
         public virtual bool IsSuppressed => false;
         /// <inheritdoc />
         public virtual DateTimeOffset? EditedTimestamp => null;
+        /// <inheritdoc />
+        public virtual bool MentionedEveryone => false;
+
         /// <summary>
         ///     Gets a collection of the <see cref="Attachment"/>'s on the message.
         /// </summary>

@@ -1,3 +1,4 @@
+using Discord.Net;
 using System.Threading;
 
 namespace Discord
@@ -57,9 +58,10 @@ namespace Discord
 		public bool? UseSystemClock { get; set; }
 
         internal bool IgnoreState { get; set; }
-        internal string BucketId { get; set; }
+        internal BucketId BucketId { get; set; }
         internal bool IsClientBucket { get; set; }
         internal bool IsReactionBucket { get; set; }
+        internal bool IsGatewayBucket { get; set; }
 
         internal static RequestOptions CreateOrClone(RequestOptions options)
         {            

@@ -10,6 +10,7 @@ namespace Discord
         /// <summary>
         ///     Updates this object's properties with its current state.
         /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
         Task UpdateAsync(RequestOptions options = null);
     }
 }

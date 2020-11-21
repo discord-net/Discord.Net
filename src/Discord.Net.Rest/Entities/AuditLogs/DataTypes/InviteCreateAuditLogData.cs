@@ -36,13 +36,17 @@ namespace Discord.Rest
             var maxAge = maxAgeModel.NewValue.ToObject<int>(discord.ApiClient.Serializer);
             var code = codeModel.NewValue.ToObject<string>(discord.ApiClient.Serializer);
             var temporary = temporaryModel.NewValue.ToObject<bool>(discord.ApiClient.Serializer);
-            var inviterId = inviterIdModel.NewValue.ToObject<ulong>(discord.ApiClient.Serializer);
             var channelId = channelIdModel.NewValue.ToObject<ulong>(discord.ApiClient.Serializer);
             var uses = usesModel.NewValue.ToObject<int>(discord.ApiClient.Serializer);
             var maxUses = maxUsesModel.NewValue.ToObject<int>(discord.ApiClient.Serializer);
 
-            var inviterInfo = log.Users.FirstOrDefault(x => x.Id == inviterId);
-            var inviter = RestUser.Create(discord, inviterInfo);
+            RestUser inviter = null;
+            if (inviterIdModel != null)
+            {
+                var inviterId = inviterIdModel.NewValue.ToObject<ulong>(discord.ApiClient.Serializer);
+                var inviterInfo = log.Users.FirstOrDefault(x => x.Id == inviterId);
+                inviter = RestUser.Create(discord, inviterInfo);
+            }
 
             return new InviteCreateAuditLogData(maxAge, code, temporary, inviter, channelId, uses, maxUses);
         }
@@ -70,10 +74,10 @@ namespace Discord.Rest
         /// </returns>
         public bool Temporary { get; }
         /// <summary>
-        ///     Gets the user that created this invite.
+        ///     Gets the user that created this invite if available.
         /// </summary>
         /// <returns>
-        ///     A user that created this invite.
+        ///     A user that created this invite or <see langword="null"/>.
         /// </returns>
         public IUser Creator { get; }
         /// <summary>

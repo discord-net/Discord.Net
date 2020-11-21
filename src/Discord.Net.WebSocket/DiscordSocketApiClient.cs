@@ -132,6 +132,8 @@ namespace Discord.API
             if (WebSocketClient == null)
                 throw new NotSupportedException("This client is not configured with WebSocket support.");
 
+            RequestQueue.ClearGatewayBuckets();
+
             //Re-create streams to reset the zlib state
             _compressed?.Dispose();
             _decompressor?.Dispose();
@@ -205,7 +207,11 @@ namespace Discord.API
             payload = new SocketFrame { Operation = (int)opCode, Payload = payload };
             if (payload != null)
                 bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
-            await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, null, bytes, true, options)).ConfigureAwait(false);
+
+            options.IsGatewayBucket = true;
+            if (options.BucketId == null)
+                options.BucketId = GatewayBucket.Get(GatewayBucketType.Unbucketed).Id;
+            await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, bytes, true, opCode == GatewayOpCode.Heartbeat, options)).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
@@ -224,6 +230,8 @@ namespace Discord.API
             };
             if (totalShards > 1)
                 msg.ShardingParams = new int[] { shardID, totalShards };
+
+            options.BucketId = GatewayBucket.Get(GatewayBucketType.Identify).Id;
 
             if (gatewayIntents.HasValue)
                 msg.Intents = (int)gatewayIntents.Value;
@@ -258,6 +266,7 @@ namespace Discord.API
                 IsAFK = isAFK,
                 Game = game
             };
+            options.BucketId = GatewayBucket.Get(GatewayBucketType.PresenceUpdate).Id;
             await SendGatewayAsync(GatewayOpCode.StatusUpdate, args, options: options).ConfigureAwait(false);
         }
         public async Task SendRequestMembersAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)

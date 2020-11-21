@@ -83,7 +83,7 @@ namespace Discord
         public void BotTokenDoesNotThrowExceptions(string token)
         {
             // This example token is pulled from the Discord Docs
-            // https://discordapp.com/developers/docs/reference#authentication-example-bot-token-authorization-header
+            // https://discord.com/developers/docs/reference#authentication-example-bot-token-authorization-header
             // should not throw any exception
             TokenUtils.ValidateToken(TokenType.Bot, token);
         }

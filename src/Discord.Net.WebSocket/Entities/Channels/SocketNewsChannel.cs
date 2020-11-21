@@ -15,7 +15,7 @@ namespace Discord.WebSocket
     ///     </note>
     /// </remarks>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class SocketNewsChannel : SocketTextChannel
+    public class SocketNewsChannel : SocketTextChannel, INewsChannel
     {
         internal SocketNewsChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
             :base(discord, id, guild)

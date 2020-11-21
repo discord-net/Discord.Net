@@ -39,6 +39,13 @@ namespace Discord
         /// </returns>
         bool IsSuppressed { get; }
         /// <summary>
+        ///     Gets the value that indicates whether this message mentioned everyone.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if this message mentioned everyone; otherwise <c>false</c>.
+        /// </returns>
+        bool MentionedEveryone { get; }
+        /// <summary>
         ///     Gets the content for this message.
         /// </summary>
         /// <returns>

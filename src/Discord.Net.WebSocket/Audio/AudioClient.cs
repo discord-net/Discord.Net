@@ -99,6 +99,12 @@ namespace Discord.Audio
             _token = token;
             await _connection.StartAsync().ConfigureAwait(false);
         }
+
+        public IReadOnlyDictionary<ulong, AudioInStream> GetStreams()
+        {
+            return _streams.ToDictionary(pair => pair.Key, pair => pair.Value.Reader);
+        }
+
         public async Task StopAsync()
         {
             await _connection.StopAsync().ConfigureAwait(false);
@@ -379,7 +385,7 @@ namespace Discord.Audio
 
         private async Task RunHeartbeatAsync(int intervalMillis, CancellationToken cancelToken)
         {
-            //TODO: Clean this up when Discord's session patch is live
+            // TODO: Clean this up when Discord's session patch is live
             try
             {
                 await _audioLogger.DebugAsync("Heartbeat Started").ConfigureAwait(false);
