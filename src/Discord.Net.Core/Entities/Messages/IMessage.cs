@@ -148,11 +148,11 @@ namespace Discord
         MessageApplication Application { get; }
 
         /// <summary>
-        ///     Gets the reference to the original message if it was crossposted.
+        ///     Gets the reference to the original message if it is a crosspost, channel follow add, pin, or reply message.
         /// </summary>
         /// <remarks>
-        ///     Sent with Cross-posted messages, meaning they were published from news channels
-        ///     and received by subscriber channels.
+        ///     Sent with cross-posted messages, meaning they were published from news channels
+        ///     and received by subscriber channels, channel follow adds, pins, and message replies.
         /// </remarks>
         /// <returns>
         ///     A message's reference, if any is associated.

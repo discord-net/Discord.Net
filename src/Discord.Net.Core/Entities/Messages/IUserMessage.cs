@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -9,6 +8,14 @@ namespace Discord
     /// </summary>
     public interface IUserMessage : IMessage
     {
+        /// <summary>
+        ///     Gets the referenced message if it is a crosspost, channel follow add, pin, or reply message.
+        /// </summary>
+        /// <returns>
+        ///     The referenced message, if any is associated and still exists.
+        /// </returns>
+        IUserMessage ReferencedMessage { get; }
+
         /// <summary>
         ///     Modifies this message.
         /// </summary>

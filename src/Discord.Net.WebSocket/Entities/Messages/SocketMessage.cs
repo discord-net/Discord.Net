@@ -110,7 +110,7 @@ namespace Discord.WebSocket
         }
         internal static SocketMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
-            if (model.Type == MessageType.Default)
+            if (model.Type == MessageType.Default || model.Type == MessageType.Reply)
                 return SocketUserMessage.Create(discord, state, author, channel, model);
             else
                 return SocketSystemMessage.Create(discord, state, author, channel, model);
@@ -152,7 +152,7 @@ namespace Discord.WebSocket
                 Reference = new MessageReference
                 {
                     GuildId = model.Reference.Value.GuildId,
-                    ChannelId = model.Reference.Value.ChannelId,
+                    InternalChannelId = model.Reference.Value.ChannelId,
                     MessageId = model.Reference.Value.MessageId
                 };
             }
