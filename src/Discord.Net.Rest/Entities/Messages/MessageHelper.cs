@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
+using UserModel = Discord.API.User;
 
 namespace Discord.Rest
 {
@@ -298,6 +299,16 @@ namespace Discord.Rest
             RequestOptions options)
         {
             await client.ApiClient.CrosspostAsync(channelId, msgId, options).ConfigureAwait(false);
+        }
+
+        public static IUser GetAuthor(BaseDiscordClient client, IGuild guild, UserModel model, ulong? webhookId)
+        {
+            IUser author = null;
+            if (guild != null)
+                author = guild.GetUserAsync(model.Id, CacheMode.CacheOnly).Result;
+            if (author == null)
+                author = RestUser.Create(client, guild, model, webhookId);
+            return author;
         }
     }
 }

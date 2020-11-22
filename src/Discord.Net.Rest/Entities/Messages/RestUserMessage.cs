@@ -121,17 +121,21 @@ namespace Discord.Rest
                 }
             }
 
+            var guildId = (Channel as IGuildChannel)?.GuildId;
+            var guild = guildId != null ? (Discord as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
             if (model.Content.IsSpecified)
             {
                 var text = model.Content.Value;
-                var guildId = (Channel as IGuildChannel)?.GuildId;
-                var guild = guildId != null ? (Discord as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
                 _tags = MessageHelper.ParseTags(text, null, guild, _userMentions);
                 model.Content = text;
             }
 
             if (model.ReferencedMessage.IsSpecified && model.ReferencedMessage.Value != null)
-                _referencedMessage = RestUserMessage.Create(Discord, Channel, Author, model.ReferencedMessage.Value);
+            {
+                var refMsg = model.ReferencedMessage.Value;
+                IUser refMsgAuthor = MessageHelper.GetAuthor(Discord, guild, refMsg.Author.Value, refMsg.WebhookId.ToNullable());
+                _referencedMessage = RestUserMessage.Create(Discord, Channel, refMsgAuthor, refMsg);
+            }
         }
 
         /// <inheritdoc />
