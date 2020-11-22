@@ -15,6 +15,7 @@ namespace Discord.Rest
     {
         private bool _isMentioningEveryone, _isTTS, _isPinned, _isSuppressed;
         private long? _editedTimestampTicks;
+        private IUserMessage _referencedMessage;
         private ImmutableArray<Attachment> _attachments = ImmutableArray.Create<Attachment>();
         private ImmutableArray<Embed> _embeds = ImmutableArray.Create<Embed>();
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
@@ -43,6 +44,8 @@ namespace Discord.Rest
         public override IReadOnlyCollection<RestUser> MentionedUsers => _userMentions;
         /// <inheritdoc />
         public override IReadOnlyCollection<ITag> Tags => _tags;
+        /// <inheritdoc />
+        public IUserMessage ReferencedMessage => _referencedMessage;
 
         internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
             : base(discord, id, channel, author, source)
@@ -118,13 +121,20 @@ namespace Discord.Rest
                 }
             }
 
+            var guildId = (Channel as IGuildChannel)?.GuildId;
+            var guild = guildId != null ? (Discord as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
             if (model.Content.IsSpecified)
             {
                 var text = model.Content.Value;
-                var guildId = (Channel as IGuildChannel)?.GuildId;
-                var guild = guildId != null ? (Discord as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
                 _tags = MessageHelper.ParseTags(text, null, guild, _userMentions);
                 model.Content = text;
+            }
+
+            if (model.ReferencedMessage.IsSpecified && model.ReferencedMessage.Value != null)
+            {
+                var refMsg = model.ReferencedMessage.Value;
+                IUser refMsgAuthor = MessageHelper.GetAuthor(Discord, guild, refMsg.Author.Value, refMsg.WebhookId.ToNullable());
+                _referencedMessage = RestUserMessage.Create(Discord, Channel, refMsgAuthor, refMsg);
             }
         }
 

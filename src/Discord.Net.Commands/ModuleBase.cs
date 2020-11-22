@@ -35,9 +35,10 @@ namespace Discord.Commands
         ///     Specifies if notifications are sent for mentioned users and roles in the <paramref name="message"/>.
         ///     If <c>null</c>, all mentioned roles and users will be notified.
         /// </param>
-        protected virtual async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null)
+        /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
+        protected virtual async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null)
         {
-            return await Context.Channel.SendMessageAsync(message, isTTS, embed, options, allowedMentions).ConfigureAwait(false);
+            return await Context.Channel.SendMessageAsync(message, isTTS, embed, options, allowedMentions, messageReference).ConfigureAwait(false);
         }
         /// <summary>
         ///     The method to execute before executing the command.
