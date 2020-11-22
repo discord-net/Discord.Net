@@ -59,7 +59,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override UserStatus Status { get; protected set; } = UserStatus.Online;
         /// <inheritdoc />
-        public override IActivity Activity { get; protected set; }
+        public override IActivity Activity { get => _activity.GetValueOrDefault(); protected set => _activity = Optional.Create(value); }
+        private Optional<IActivity> _activity;
 
         //From DiscordSocketConfig
         internal int TotalShards { get; private set; }
@@ -248,14 +249,11 @@ namespace Discord.WebSocket
                 else
                 {
                     await _gatewayLogger.DebugAsync("Identifying").ConfigureAwait(false);
-                    await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents).ConfigureAwait(false);
+                    await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents, presence: BuildCurrentStatus()).ConfigureAwait(false);
                 }
 
                 //Wait for READY
                 await _connection.WaitAsync().ConfigureAwait(false);
-
-                await _gatewayLogger.DebugAsync("Sending Status").ConfigureAwait(false);
-                await SendStatusAsync().ConfigureAwait(false);
             }
             finally
             {
@@ -449,28 +447,44 @@ namespace Discord.WebSocket
         {
             if (CurrentUser == null)
                 return;
+            CurrentUser.Presence = new SocketPresence(Status, Activity, null, null);
+
+            var presence = BuildCurrentStatus();
+
+            await ApiClient.SendStatusUpdateAsync(
+                presence.Item1,
+                presence.Item2,
+                presence.Item3,
+                presence.Item4).ConfigureAwait(false);
+        }
+
+        private (UserStatus, bool, long?, GameModel[]) BuildCurrentStatus()
+        {
             var status = Status;
             var statusSince = _statusSince;
-            CurrentUser.Presence = new SocketPresence(status, Activity, null, null);
+            var activity = _activity;
 
-            var gameModel = new GameModel();
+            GameModel[] gameModels = null;
             // Discord only accepts rich presence over RPC, don't even bother building a payload
-            if (Activity is RichGame)
-                throw new NotSupportedException("Outgoing Rich Presences are not supported via WebSocket.");
 
-            if (Activity != null)
+            if (activity.GetValueOrDefault() != null)
             {
+                var gameModel = new GameModel();
+                if (activity.Value is RichGame)
+                    throw new NotSupportedException("Outgoing Rich Presences are not supported via WebSocket.");
                 gameModel.Name = Activity.Name;
                 gameModel.Type = Activity.Type;
                 if (Activity is StreamingGame streamGame)
                     gameModel.StreamUrl = streamGame.Url;
+                gameModels = new[] { gameModel };
             }
+            else if (activity.IsSpecified)
+                gameModels = new GameModel[0];
 
-            await ApiClient.SendStatusUpdateAsync(
-                status,
-                status == UserStatus.AFK,
-                statusSince != null ? _statusSince.Value.ToUnixTimeMilliseconds() : (long?)null,
-                gameModel).ConfigureAwait(false);
+            return (status,
+                    status == UserStatus.AFK,
+                    statusSince != null ? _statusSince.Value.ToUnixTimeMilliseconds() : (long?)null,
+                    gameModels);
         }
 
         private async Task ProcessMessageAsync(GatewayOpCode opCode, int? seq, string type, object payload)
@@ -523,7 +537,7 @@ namespace Discord.WebSocket
                             await _shardedClient.AcquireIdentifyLockAsync(ShardId, _connection.CancelToken).ConfigureAwait(false);
                             try
                             {
-                                await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents).ConfigureAwait(false);
+                                await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents, presence: BuildCurrentStatus()).ConfigureAwait(false);
                             }
                             finally
                             {
@@ -551,6 +565,7 @@ namespace Discord.WebSocket
                                         var state = new ClientState(data.Guilds.Length, data.PrivateChannels.Length);
 
                                         var currentUser = SocketSelfUser.Create(this, state, data.User);
+                                        currentUser.Presence = new SocketPresence(Status, Activity, null, null);
                                         ApiClient.CurrentUserId = currentUser.Id;
                                         int unavailableGuilds = 0;
                                         for (int i = 0; i < data.Guilds.Length; i++)
