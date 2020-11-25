@@ -534,15 +534,20 @@ namespace Discord.WebSocket
                             _sessionId = null;
                             _lastSeq = 0;
 
-                            await _shardedClient.AcquireIdentifyLockAsync(ShardId, _connection.CancelToken).ConfigureAwait(false);
-                            try
+                            if (_shardedClient != null)
                             {
+                                await _shardedClient.AcquireIdentifyLockAsync(ShardId, _connection.CancelToken).ConfigureAwait(false);
+                                try
+                                {
+                                    await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents, presence: BuildCurrentStatus()).ConfigureAwait(false);
+                                }
+                                finally
+                                {
+                                    _shardedClient.ReleaseIdentifyLock();
+                                }
+                            }
+                            else
                                 await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents, presence: BuildCurrentStatus()).ConfigureAwait(false);
-                            }
-                            finally
-                            {
-                                _shardedClient.ReleaseIdentifyLock();
-                            }
                         }
                         break;
                     case GatewayOpCode.Reconnect:
