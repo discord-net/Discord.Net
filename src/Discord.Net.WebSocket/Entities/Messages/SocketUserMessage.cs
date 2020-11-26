@@ -118,11 +118,14 @@ namespace Discord.WebSocket
                     for (int i = 0; i < value.Length; i++)
                     {
                         var val = value[i];
-                        var guildUser = guild.GetUser(val.Id);
-                        if (guildUser != null)
-                            newMentions.Add(guildUser);
-                        else if (val.Object != null)
-                            newMentions.Add(SocketUnknownUser.Create(Discord, state, val.Object));
+                        if (val.Object != null)
+                        {
+                            var user = Channel.GetUserAsync(val.Object.Id, CacheMode.CacheOnly).GetAwaiter().GetResult() as SocketUser;
+                            if (user != null)
+                                newMentions.Add(user);
+                            else
+                                newMentions.Add(SocketUnknownUser.Create(Discord, state, val.Object));
+                        }
                     }
                     _userMentions = newMentions.ToImmutable();
                 }
