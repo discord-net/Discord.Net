@@ -511,7 +511,6 @@ namespace Discord.Commands
                 await _commandExecutedEvent.InvokeAsync(Optional.Create<CommandInfo>(), context, searchResult).ConfigureAwait(false);
                 return searchResult;
             }
-                
 
             var commands = searchResult.Commands;
             var preconditionResults = new Dictionary<CommandMatch, PreconditionResult>();
@@ -559,24 +558,6 @@ namespace Discord.Commands
                 parseResultsDict[pair.Key] = parseResult;
             }
 
-            // Calculates the 'score' of a command given a parse result
-            float CalculateScore(CommandMatch match, ParseResult parseResult)
-            {
-                float argValuesScore = 0, paramValuesScore = 0;
-
-                if (match.Command.Parameters.Count > 0)
-                {
-                    var argValuesSum = parseResult.ArgValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
-                    var paramValuesSum = parseResult.ParamValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
-
-                    argValuesScore = argValuesSum / match.Command.Parameters.Count;
-                    paramValuesScore = paramValuesSum / match.Command.Parameters.Count;
-                }
-
-                var totalArgsScore = (argValuesScore + paramValuesScore) / 2;
-                return match.Command.Priority + totalArgsScore * 0.99f;
-            }
-
             //Order the parse results by their score so that we choose the most likely result to execute
             var parseResults = parseResultsDict
                 .OrderByDescending(x => CalculateScore(x.Key, x.Value));
@@ -601,6 +582,24 @@ namespace Discord.Commands
             if (!result.IsSuccess && !(result is RuntimeResult || result is ExecuteResult)) // succesful results raise the event in CommandInfo#ExecuteInternalAsync (have to raise it there b/c deffered execution)
                 await _commandExecutedEvent.InvokeAsync(chosenOverload.Key.Command, context, result);
             return result;
+        }
+
+        // Calculates the 'score' of a command given a parse result
+        float CalculateScore(CommandMatch match, ParseResult parseResult)
+        {
+            float argValuesScore = 0, paramValuesScore = 0;
+
+            if (match.Command.Parameters.Count > 0)
+            {
+                var argValuesSum = parseResult.ArgValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
+                var paramValuesSum = parseResult.ParamValues?.Sum(x => x.Values.OrderByDescending(y => y.Score).FirstOrDefault().Score) ?? 0;
+
+                argValuesScore = argValuesSum / match.Command.Parameters.Count;
+                paramValuesScore = paramValuesSum / match.Command.Parameters.Count;
+            }
+
+            var totalArgsScore = (argValuesScore + paramValuesScore) / 2;
+            return match.Command.Priority + totalArgsScore * 0.99f;
         }
 
         protected virtual void Dispose(bool disposing)
