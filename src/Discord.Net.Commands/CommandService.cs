@@ -602,6 +602,83 @@ namespace Discord.Commands
             return match.Command.Priority + totalArgsScore * 0.99f;
         }
 
+        /// <summary>
+        /// Validates and gets the best <see cref="CommandMatch"/> from a specified <see cref="SearchResult"/>
+        /// </summary>
+        /// <param name="matches">The SearchResult.</param>
+        /// <param name="context">The context of the command.</param>
+        /// <param name="provider">The service provider to be used on the command's dependency injection.</param>
+        /// <param name="multiMatchHandling">The handling mode when multiple command matches are found.</param>
+        /// <returns>A task that represents the asynchronous validation operation. The task result contains the result of the
+        ///     command validation and the command matched, if a match was found.</returns>
+        public async Task<(IResult, Optional<CommandMatch>)> ValidateAndGetBestMatch(SearchResult matches, ICommandContext context, IServiceProvider provider, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        {
+            if (!matches.IsSuccess)
+                return (matches, Optional.Create<CommandMatch>());
+
+            var commands = matches.Commands;
+            var preconditionResults = new Dictionary<CommandMatch, PreconditionResult>();
+
+            foreach (var command in commands)
+            {
+                preconditionResults[command] = await command.CheckPreconditionsAsync(context, provider);
+            }
+
+            var successfulPreconditions = preconditionResults
+                .Where(x => x.Value.IsSuccess)
+                .ToArray();
+
+            if (successfulPreconditions.Length == 0)
+            {
+                var bestCandidate = preconditionResults
+                   .OrderByDescending(x => x.Key.Command.Priority)
+                   .FirstOrDefault(x => !x.Value.IsSuccess);
+
+                return (bestCandidate.Value, bestCandidate.Key);
+            }
+
+            var parseResults = new Dictionary<CommandMatch, ParseResult>();
+
+            foreach (var pair in successfulPreconditions)
+            {
+                var parseResult = await pair.Key.ParseAsync(context, matches, pair.Value, provider).ConfigureAwait(false);
+
+                if (parseResult.Error == CommandError.MultipleMatches)
+                {
+                    IReadOnlyList<TypeReaderValue> argList, paramList;
+                    switch (multiMatchHandling)
+                    {
+                        case MultiMatchHandling.Best:
+                            argList = parseResult.ArgValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
+                            paramList = parseResult.ParamValues.Select(x => x.Values.OrderByDescending(y => y.Score).First()).ToImmutableArray();
+                            parseResult = ParseResult.FromSuccess(argList, paramList);
+                            break;
+                    }
+                }
+
+                parseResults[pair.Key] = parseResult;
+            }
+
+            var weightedParseResults = parseResults
+               .OrderByDescending(x => CalculateScore(x.Key, x.Value));
+
+            var successfulParses = weightedParseResults
+                .Where(x => x.Value.IsSuccess)
+                .ToArray();
+
+            if(successfulParses.Length == 0)
+            {
+                var bestMatch = parseResults
+                    .FirstOrDefault(x => !x.Value.IsSuccess);
+
+                return (bestMatch.Value, bestMatch.Key);
+            }
+
+            var chosenOverload = successfulParses[0];
+
+            return (chosenOverload.Value, chosenOverload.Key);
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)
