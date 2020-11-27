@@ -514,16 +514,16 @@ namespace Discord.Commands
             {
                 await _commandExecutedEvent.InvokeAsync(Optional.Create<CommandInfo>(), context, searchResult).ConfigureAwait(false);
             }
-            else if(validationResult is not ParseResult parseResult)
-            {
-                await _commandExecutedEvent.InvokeAsync(commandMatch.Value.Command,context,validationResult).ConfigureAwait(false);
-            }
-            else
+            else if(validationResult is ParseResult parseResult)
             {
                 var result = await commandMatch.Value.Command.ExecuteAsync(context, parseResult, services).ConfigureAwait(false);
                 if (!result.IsSuccess && !(result is RuntimeResult || result is ExecuteResult)) // succesful results raise the event in CommandInfo#ExecuteInternalAsync (have to raise it there b/c deffered execution)
                     await _commandExecutedEvent.InvokeAsync(commandMatch.Value.Command, context, result);
                 return result;
+            }
+            else
+            {
+                await _commandExecutedEvent.InvokeAsync(commandMatch.Value.Command, context, validationResult).ConfigureAwait(false);
             }
             return validationResult;
         }
