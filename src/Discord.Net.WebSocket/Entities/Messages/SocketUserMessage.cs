@@ -139,7 +139,29 @@ namespace Discord.WebSocket
             }
 
             if (model.ReferencedMessage.IsSpecified && model.ReferencedMessage.Value != null)
-                _referencedMessage = RestUserMessage.Create(Discord, Channel, Author, model.ReferencedMessage.Value);
+            {
+                var refMsg = model.ReferencedMessage.Value;
+                ulong? webhookId = refMsg.WebhookId.ToNullable();
+                SocketUser refMsgAuthor = null;
+                if (refMsg.Author.IsSpecified)
+                {
+                    if (guild != null)
+                    {
+                        if (webhookId != null)
+                            refMsgAuthor = SocketWebhookUser.Create(guild, state, refMsg.Author.Value, webhookId.Value);
+                        else
+                            refMsgAuthor = guild.GetUser(refMsg.Author.Value.Id);
+                    }
+                    else
+                        refMsgAuthor = (Channel as SocketChannel).GetUser(refMsg.Author.Value.Id);
+                    if (refMsgAuthor == null)
+                        refMsgAuthor = SocketUnknownUser.Create(Discord, state, refMsg.Author.Value);
+                }
+                else
+                    // Message author wasn't specified in the payload, so create a completely anonymous unknown user
+                    refMsgAuthor = new SocketUnknownUser(Discord, id: 0);
+                _referencedMessage = SocketUserMessage.Create(Discord, state, refMsgAuthor, Channel, refMsg);
+            }
         }
 
         /// <inheritdoc />
