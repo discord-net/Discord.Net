@@ -57,7 +57,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override int Latency { get; protected set; }
         /// <inheritdoc />
-        public override UserStatus Status { get; protected set; } = UserStatus.Online;
+        public override UserStatus Status { get => _status ?? UserStatus.Online; protected set => _status = value; }
+        private UserStatus? _status;
         /// <inheritdoc />
         public override IActivity Activity { get => _activity.GetValueOrDefault(); protected set => _activity = Optional.Create(value); }
         private Optional<IActivity> _activity;
@@ -449,22 +450,25 @@ namespace Discord.WebSocket
                 return;
             CurrentUser.Presence = new SocketPresence(Status, Activity, null, null);
 
-            var presence = BuildCurrentStatus();
+            var presence = BuildCurrentStatus() ?? (UserStatus.Online, false, null, null);
 
             await ApiClient.SendStatusUpdateAsync(
-                presence.Item1,
-                presence.Item2,
-                presence.Item3,
-                presence.Item4).ConfigureAwait(false);
+                status: presence.Item1,
+                isAFK: presence.Item2,
+                since: presence.Item3,
+                game: presence.Item4).ConfigureAwait(false);
         }
 
-        private (UserStatus, bool, long?, GameModel[]) BuildCurrentStatus()
+        private (UserStatus, bool, long?, GameModel)? BuildCurrentStatus()
         {
-            var status = Status;
+            var status = _status;
             var statusSince = _statusSince;
             var activity = _activity;
 
-            GameModel[] gameModels = null;
+            if (status == null && !activity.IsSpecified)
+                return null;
+
+            GameModel game = null;
             // Discord only accepts rich presence over RPC, don't even bother building a payload
 
             if (activity.GetValueOrDefault() != null)
@@ -476,15 +480,15 @@ namespace Discord.WebSocket
                 gameModel.Type = Activity.Type;
                 if (Activity is StreamingGame streamGame)
                     gameModel.StreamUrl = streamGame.Url;
-                gameModels = new[] { gameModel };
+                game = gameModel;
             }
             else if (activity.IsSpecified)
-                gameModels = new GameModel[0];
+                game = null;
 
-            return (status,
+            return (status ?? UserStatus.Online,
                     status == UserStatus.AFK,
                     statusSince != null ? _statusSince.Value.ToUnixTimeMilliseconds() : (long?)null,
-                    gameModels);
+                    game);
         }
 
         private async Task ProcessMessageAsync(GatewayOpCode opCode, int? seq, string type, object payload)
