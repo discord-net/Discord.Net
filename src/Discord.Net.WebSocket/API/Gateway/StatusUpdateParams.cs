@@ -12,7 +12,7 @@ namespace Discord.API.Gateway
         public long? IdleSince { get; set; }
         [JsonProperty("afk")]
         public bool IsAFK { get; set; }
-        [JsonProperty("activities")]
-        public Game[] Activities { get; set; }
+        [JsonProperty("game")]
+        public Game Game { get; set; }
     }
 }
