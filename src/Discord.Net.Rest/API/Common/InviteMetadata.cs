@@ -16,5 +16,7 @@ namespace Discord.API
         public bool Temporary { get; set; }
         [JsonProperty("created_at")]
         public DateTimeOffset CreatedAt { get; set; }
+        [Obsolete("This will always return false. If an invite is revoked, it will not be found and the invite will be null.")]
+        public bool Revoked { get; set; }
     }
 }

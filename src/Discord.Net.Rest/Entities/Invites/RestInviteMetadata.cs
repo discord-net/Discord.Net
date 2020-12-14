@@ -8,17 +8,19 @@ namespace Discord.Rest
     {
         private long _createdAtTicks;
 
+        [Obsolete("This will always return false. If an invite is revoked, it will not be found and the invite will be null.")]
+        public bool IsRevoked { get; private set; }
         /// <inheritdoc />
         public bool IsTemporary { get; private set; }
         /// <inheritdoc />
-        public int MaxAge { get; private set; }
+        public int? MaxAge { get; private set; }
         /// <inheritdoc />
-        public int MaxUses { get; private set; }
+        public int? MaxUses { get; private set; }
         /// <inheritdoc />
-        public int Uses { get; private set; }
+        public int? Uses { get; private set; }
 
         /// <inheritdoc />
-        public DateTimeOffset CreatedAt => DateTimeUtils.FromTicks(_createdAtTicks);
+        public DateTimeOffset? CreatedAt => DateTimeUtils.FromTicks(_createdAtTicks);
 
         internal RestInviteMetadata(BaseDiscordClient discord, IGuild guild, IChannel channel, string id)
             : base(discord, guild, channel, id)
