@@ -178,6 +178,26 @@ namespace Discord.WebSocket
             }
         }
         /// <summary>
+        ///     Gets the max bitrate for voice channels in this guild.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="int"/> representing the maximum bitrate value allowed by Discord in this guild.
+        /// </returns>
+        public int MaxBitrate
+        {
+            get
+            {
+                var maxBitrate = PremiumTier switch
+                {
+                    PremiumTier.Tier1 => 128000,
+                    PremiumTier.Tier2 => 256000,
+                    PremiumTier.Tier3 => 384000,
+                    _ => 96000,
+                };
+                return maxBitrate;
+            }
+        }
+        /// <summary>
         ///     Gets the embed channel (i.e. the channel set in the guild's widget settings) in this guild.
         /// </summary>
         /// <returns>
