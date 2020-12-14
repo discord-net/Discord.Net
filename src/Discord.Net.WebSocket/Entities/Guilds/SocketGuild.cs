@@ -181,7 +181,7 @@ namespace Discord.WebSocket
         ///     Gets the max bitrate for voice channels in this guild.
         /// </summary>
         /// <returns>
-        ///     Max bitrate value.
+        ///     A <see cref="int"/> representing the maximum bitrate value allowed by Discord in this guild.
         /// </returns>
         public int MaxBitrate
         {
