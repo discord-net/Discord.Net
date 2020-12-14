@@ -45,6 +45,7 @@ namespace Discord.WebSocket
         ///     Gets or sets the ID for this shard. Must be less than <see cref="TotalShards"/>.
         /// </summary>
         public int? ShardId { get; set; } = null;
+
         /// <summary>
         ///     Gets or sets the total number of shards for this application.
         /// </summary>
@@ -55,9 +56,10 @@ namespace Discord.WebSocket
         ///     disables the message cache entirely.
         /// </summary>
         public int MessageCacheSize { get; set; } = 0;
+
         /// <summary>
         ///     Gets or sets the max number of users a guild may have for offline users to be included in the READY
-        ///     packet. Max is 250.
+        ///     packet. The maximum value allowed is 250.
         /// </summary>
         public int LargeThreshold { get; set; } = 250;
 
@@ -65,6 +67,7 @@ namespace Discord.WebSocket
         ///     Gets or sets the provider used to generate new WebSocket connections.
         /// </summary>
         public WebSocketProvider WebSocketProvider { get; set; }
+
         /// <summary>
         ///     Gets or sets the provider used to generate new UDP sockets.
         /// </summary>
@@ -95,15 +98,16 @@ namespace Discord.WebSocket
         ///         traffic. If you are using the command system, the default user TypeReader may fail to find the user
         ///         due to this issue. This may be resolved at v3 of the library. Until then, you may want to consider
         ///         overriding the TypeReader and use
-        ///         <see cref="DiscordRestClient.GetUserAsync(System.UInt64,Discord.RequestOptions)"/>
+        ///         <see cref="DiscordRestClient.GetUserAsync(ulong,Discord.RequestOptions)"/>
         ///         or <see cref="DiscordRestClient.GetGuildUserAsync"/>
         ///         as a backup.
         ///     </note>
         /// </remarks>
         public bool AlwaysDownloadUsers { get; set; } = false;
+
         /// <summary>
         ///     Gets or sets the timeout for event handlers, in milliseconds, after which a warning will be logged.
-        ///     <c>null</c>disables this check.
+        ///     Setting this property to <c>null</c>disables this check.
         /// </summary>
         public int? HandlerTimeout { get; set; } = 3000;
 
@@ -151,18 +155,21 @@ namespace Discord.WebSocket
         ///     before firing READY.
         /// </returns>
         /// <exception cref="System.ArgumentException">Value must be at least 0.</exception>
-        public int MaxWaitBetweenGuildAvailablesBeforeReady {
+        public int MaxWaitBetweenGuildAvailablesBeforeReady
+        {
             get
             {
-                return _maxWaitForGuildAvailable;
+                return this.maxWaitForGuildAvailable;
             }
+
             set
             {
-                Preconditions.AtLeast(value, 0, nameof(MaxWaitBetweenGuildAvailablesBeforeReady));
-                _maxWaitForGuildAvailable = value;
+                Preconditions.AtLeast(value, 0, nameof(this.MaxWaitBetweenGuildAvailablesBeforeReady));
+                this.maxWaitForGuildAvailable = value;
             }
         }
-        private int _maxWaitForGuildAvailable = 10000;
+
+        private int maxWaitForGuildAvailable = 10000;
 
         /// <summary>
         ///    Gets or sets gateway intents to limit what events are sent from Discord. Allows for more granular control than the <see cref="GuildSubscriptions"/> property.
@@ -175,7 +182,7 @@ namespace Discord.WebSocket
         public GatewayIntents? GatewayIntents { get; set; }
 
         /// <summary>
-        ///     Initializes a default configuration.
+        ///     Initializes a new instance of the <see cref="DiscordSocketConfig"/> class with the default configuration.
         /// </summary>
         public DiscordSocketConfig()
         {
