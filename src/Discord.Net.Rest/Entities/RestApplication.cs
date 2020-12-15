@@ -21,6 +21,12 @@ namespace Discord.Rest
         public string[] RPCOrigins { get; private set; }
         /// <inheritdoc />
         public ulong Flags { get; private set; }
+        /// <inheritdoc />
+        public bool IsBotPublic { get; private set; }
+        /// <inheritdoc />
+        public bool BotRequiresCodeGrant { get; private set; }
+        /// <inheritdoc />
+        public ITeam Team { get; private set; }
 
         /// <inheritdoc />
         public IUser Owner { get; private set; }
@@ -46,11 +52,15 @@ namespace Discord.Rest
             RPCOrigins = model.RPCOrigins;
             Name = model.Name;
             _iconId = model.Icon;
+            IsBotPublic = model.IsBotPublic;
+            BotRequiresCodeGrant = model.BotRequiresCodeGrant;
 
             if (model.Flags.IsSpecified)
                 Flags = model.Flags.Value; //TODO: Do we still need this?
             if (model.Owner.IsSpecified)
                 Owner = RestUser.Create(Discord, model.Owner.Value);
+            if (model.Team != null)
+                Team = RestTeam.Create(Discord, model.Team);
         }
 
         /// <exception cref="InvalidOperationException">Unable to update this object from a different application token.</exception>

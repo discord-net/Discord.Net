@@ -50,6 +50,14 @@ namespace Discord
         public List<ulong> UserIds { get; set; } = new List<ulong>();
 
         /// <summary>
+        ///     Gets or sets whether to mention the author of the message you are replying to or not.
+        /// </summary>
+        /// <remarks>
+        ///     Specifically for inline replies.
+        /// </remarks>
+        public bool? MentionRepliedUser { get; set; } = null;
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="AllowedMentions"/> class.
         /// </summary>
         /// <param name="allowedTypes">

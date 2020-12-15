@@ -21,6 +21,7 @@ namespace Discord.API.Rest
         public Optional<string> Username { get; set; }
         public Optional<string> AvatarUrl { get; set; }
         public Optional<Embed[]> Embeds { get; set; }
+        public Optional<AllowedMentions> AllowedMentions { get; set; }
 
         public bool IsSpoiler { get; set; } = false;
 
@@ -51,6 +52,8 @@ namespace Discord.API.Rest
                 payload["avatar_url"] = AvatarUrl.Value;
             if (Embeds.IsSpecified)
                 payload["embeds"] = Embeds.Value;
+            if (AllowedMentions.IsSpecified)
+                payload["allowed_mentions"] = AllowedMentions.Value;
 
             var json = new StringBuilder();
             using (var text = new StringWriter(json))

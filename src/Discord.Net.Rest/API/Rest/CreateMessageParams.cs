@@ -17,6 +17,8 @@ namespace Discord.API.Rest
         public Optional<Embed> Embed { get; set; }
         [JsonProperty("allowed_mentions")]
         public Optional<AllowedMentions> AllowedMentions { get; set; }
+        [JsonProperty("message_reference")]
+        public Optional<MessageReference> MessageReference { get; set; }
 
         public CreateMessageParams(string content)
         {

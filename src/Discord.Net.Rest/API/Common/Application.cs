@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -15,6 +15,12 @@ namespace Discord.API
         public ulong Id { get; set; }
         [JsonProperty("icon")]
         public string Icon { get; set; }
+        [JsonProperty("bot_public")]
+        public bool IsBotPublic { get; set; }
+        [JsonProperty("bot_require_code_grant")]
+        public bool BotRequiresCodeGrant { get; set; }
+        [JsonProperty("team")]
+        public Team Team { get; set; }
 
         [JsonProperty("flags"), Int53]
         public Optional<ulong> Flags { get; set; }

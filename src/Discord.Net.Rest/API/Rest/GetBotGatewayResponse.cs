@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API.Rest
@@ -9,5 +9,7 @@ namespace Discord.API.Rest
         public string Url { get; set; }
         [JsonProperty("shards")]
         public int Shards { get; set; }
+        [JsonProperty("session_start_limit")]
+        public SessionStartLimit SessionStartLimit { get; set; }
     }
 }
