@@ -47,7 +47,6 @@ namespace Discord.API
         internal ulong? CurrentUserId { get; set; }
         public RateLimitPrecision RateLimitPrecision { get; private set; }
 		internal bool UseSystemClock { get; set; }
-
         internal JsonSerializer Serializer => _serializer;
 
         /// <exception cref="ArgumentException">Unknown OAuth token type.</exception>
@@ -784,6 +783,97 @@ namespace Discord.API
 
             var ids = new BucketIds(channelId: channelId);
             await SendAsync("DELETE", () => $"channels/{channelId}/recipients/{userId}", ids, options: options).ConfigureAwait(false);
+        }
+
+        //Interactions
+        public async Task<ApplicationCommand[]> GetGlobalApplicationCommandsAsync(RequestOptions options = null)
+        {
+            try
+            {
+                return await SendAsync<ApplicationCommand[]>("GET", $"applications/{this.CurrentUserId}/commands", options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) { return null; }
+        }
+
+        public async Task<ApplicationCommand> CreateGlobalApplicationCommandAsync(ApplicationCommandParams command, RequestOptions options = null)
+        {
+            Preconditions.NotNull(command, nameof(command));
+            Preconditions.AtMost(command.Name.Length, 32, nameof(command.Name));
+            Preconditions.AtLeast(command.Name.Length, 3, nameof(command.Name));
+            Preconditions.AtMost(command.Description.Length, 100, nameof(command.Description));
+            Preconditions.AtLeast(command.Description.Length, 1, nameof(command.Description));
+
+            try
+            {
+                return await SendJsonAsync<ApplicationCommand>("POST", $"applications/{this.CurrentUserId}/commands", command, options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) { return null; }
+        }
+        public async Task<ApplicationCommand> EditGlobalApplicationCommandAsync(ApplicationCommandParams command, ulong commandId,  RequestOptions options = null)
+        {
+            Preconditions.NotNull(command, nameof(command));
+            Preconditions.AtMost(command.Name.Length, 32, nameof(command.Name));
+            Preconditions.AtLeast(command.Name.Length, 3, nameof(command.Name));
+            Preconditions.AtMost(command.Description.Length, 100, nameof(command.Description));
+            Preconditions.AtLeast(command.Description.Length, 1, nameof(command.Description));
+
+            try
+            {
+                return await SendJsonAsync<ApplicationCommand>("PATCH", $"applications/{this.CurrentUserId}/commands/{commandId}", command, options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) { return null; }
+        }
+        public async Task DeleteGlobalApplicationCommandAsync(ulong commandId, RequestOptions options = null)
+        {
+            try
+            {
+                await SendAsync("DELETE", $"applications/{this.CurrentUserId}/commands/{commandId}", options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) { return; }
+        }
+        public async Task<ApplicationCommand[]> GetGuildApplicationCommandAsync(ulong guildId, RequestOptions options = null)
+        {
+            try
+            {
+                return await SendAsync<ApplicationCommand[]>("GET", $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) { return null; }
+        }
+        public async Task<ApplicationCommand> CreateGuildApplicationCommandAsync(ApplicationCommandParams command, ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotNull(command, nameof(command));
+            Preconditions.AtMost(command.Name.Length, 32, nameof(command.Name));
+            Preconditions.AtLeast(command.Name.Length, 3, nameof(command.Name));
+            Preconditions.AtMost(command.Description.Length, 100, nameof(command.Description));
+            Preconditions.AtLeast(command.Description.Length, 1, nameof(command.Description));
+
+            try
+            {
+                return await SendJsonAsync<ApplicationCommand>("POST", $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", command, options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) { return null; }
+        }
+        public async Task<ApplicationCommand> EditGuildApplicationCommandAsync(ApplicationCommandParams command, ulong guildId, ulong commandId, RequestOptions options = null)
+        {
+            Preconditions.NotNull(command, nameof(command));
+            Preconditions.AtMost(command.Name.Length, 32, nameof(command.Name));
+            Preconditions.AtLeast(command.Name.Length, 3, nameof(command.Name));
+            Preconditions.AtMost(command.Description.Length, 100, nameof(command.Description));
+            Preconditions.AtLeast(command.Description.Length, 1, nameof(command.Description));
+
+            try
+            {
+                return await SendJsonAsync<ApplicationCommand>("PATCH", $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", command, options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) { return null; }
+        }
+        public async Task DeleteGuildApplicationCommandAsync(ulong guildId, ulong commandId, RequestOptions options = null)
+        {
+            try
+            {
+                await SendAsync<ApplicationCommand>("DELETE", $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", options: options).ConfigureAwait(false);
+            }
+            catch (HttpException ex) { return; }
         }
 
         //Guilds

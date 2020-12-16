@@ -1778,7 +1778,33 @@ namespace Discord.WebSocket
                                     }
                                 }
                                 break;
+                            case "INTERACTION_CREATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (INVITE_DELETE)").ConfigureAwait(false);
 
+                                    var data = (payload as JToken).ToObject<API.Gateway.InteractionCreated>(_serializer);
+                                    if (State.GetChannel(data.ChannelId) is SocketGuildChannel channel)
+                                    {
+                                        var guild = channel.Guild;
+                                        if (!guild.IsSynced)
+                                        {
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                            return;
+                                        }
+
+                                        if(data.Type == InteractionType.ApplicationCommand)
+                                        {
+                                            // TODO: call command
+                                            
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
+                                        return;
+                                    }
+                                }
+                                break;
                             //Ignored (User only)
                             case "CHANNEL_PINS_ACK":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (CHANNEL_PINS_ACK)").ConfigureAwait(false);
