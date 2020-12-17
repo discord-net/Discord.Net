@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -75,6 +76,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A read-only collection of voice regions that the user has access to.
         /// </returns>
+        [Obsolete("This property is obsolete, use the GetVoiceRegionsAsync method instead.")]
         public abstract IReadOnlyCollection<RestVoiceRegion> VoiceRegions { get; }
 
         internal BaseSocketClient(DiscordSocketConfig config, DiscordRestApiClient client)
@@ -169,7 +171,26 @@ namespace Discord.WebSocket
         ///     A REST-based voice region associated with the identifier; <c>null</c> if the voice region is not
         ///     found.
         /// </returns>
+        [Obsolete("This method is obsolete, use GetVoiceRegionAsync instead.")]
         public abstract RestVoiceRegion GetVoiceRegion(string id);
+        /// <summary>
+        ///     Gets all voice regions.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that contains a read-only collection of REST-based voice regions.
+        /// </returns>
+        public abstract ValueTask<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null);
+        /// <summary>
+        ///     Gets a voice region.
+        /// </summary>
+        /// <param name="id">The identifier of the voice region (e.g. <c>eu-central</c> ).</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that contains a REST-based voice region associated with the identifier; <c>null</c> if the
+        ///     voice region is not found.
+        /// </returns>
+        public abstract ValueTask<RestVoiceRegion> GetVoiceRegionAsync(string id, RequestOptions options = null);
         /// <inheritdoc />
         public abstract Task StartAsync();
         /// <inheritdoc />
