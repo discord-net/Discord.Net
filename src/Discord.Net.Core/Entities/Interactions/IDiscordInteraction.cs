@@ -16,12 +16,40 @@ namespace Discord
         /// id of the interaction
         /// </summary>
         ulong Id { get; }
+
+        /// <summary>
+        /// The type of this <see cref="IDiscordInteraction"/>
+        /// </summary>
         InteractionType Type { get; }
+
+        /// <summary>
+        /// The command data payload
+        /// </summary>
         IApplicationCommandInteractionData? Data { get; }
+
+        /// <summary>
+        /// The guild it was sent from
+        /// </summary>
         ulong GuildId { get; }
+
+        /// <summary>
+        /// The channel it was sent from
+        /// </summary>
         ulong ChannelId { get; }
-        IGuildUser Member { get; }
+
+        /// <summary>
+        /// Guild member id for the invoking user
+        /// </summary>
+        ulong MemberId { get; }
+
+        /// <summary>
+        /// A continuation token for responding to the interaction
+        /// </summary>
         string Token { get; }
+
+        /// <summary>
+        /// read-only property, always 1
+        /// </summary>
         int Version { get; }
     }
 }

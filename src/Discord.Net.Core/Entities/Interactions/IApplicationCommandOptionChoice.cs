@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary>
+    /// Specifies choices for command group
+    /// </summary>
     public interface IApplicationCommandOptionChoice
     {
         /// <summary>

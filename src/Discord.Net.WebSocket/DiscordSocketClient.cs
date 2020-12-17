@@ -1780,7 +1780,7 @@ namespace Discord.WebSocket
                                 break;
                             case "INTERACTION_CREATE":
                                 {
-                                    await _gatewayLogger.DebugAsync("Received Dispatch (INVITE_DELETE)").ConfigureAwait(false);
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (INTERACTION_CREATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Gateway.InteractionCreated>(_serializer);
                                     if (State.GetChannel(data.ChannelId) is SocketGuildChannel channel)

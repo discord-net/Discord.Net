@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Provides properties that are used to modify a <see cref="IApplicationCommand" /> with the specified changes.
+    /// </summary>
+    /// <see cref="Ia"/>
     public class ApplicationCommandProperties
     {
         public string Name { get; set; }

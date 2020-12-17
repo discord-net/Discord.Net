@@ -31,6 +31,16 @@ namespace Discord
         /// </summary>
         string Description { get; }
 
+        /// <summary>
+        /// Modifies this command
+        /// </summary>
+        /// <param name="func">The delegate containing the properties to modify the command with.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        Task ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null);
+
         IEnumerable<IApplicationCommandOption>? Options { get; }
     }
 }

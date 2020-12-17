@@ -27,7 +27,7 @@ namespace Discord.Rest
                     : Optional<API.ApplicationCommandOption[]>.Unspecified,
             };
 
-            return await client.ApiClient.EditGlobalApplicationCommandAsync(apiArgs, command.Id, options);
+            return await client.ApiClient.ModifyGlobalApplicationCommandAsync(apiArgs, command.Id, options);
         }
     }
 }

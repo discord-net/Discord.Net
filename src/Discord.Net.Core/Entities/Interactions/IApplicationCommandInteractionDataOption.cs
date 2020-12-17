@@ -6,11 +6,25 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary>
+    /// Represents a option group for a command, see <see href="https://discord.com/developers/docs/interactions/slash-commands#interaction-applicationcommandinteractiondataoption"/>
+    /// </summary>
     public interface IApplicationCommandInteractionDataOption
     {
+        /// <summary>
+        /// The name of the parameter
+        /// </summary>
         string Name { get; }
-        ApplicationCommandOptionType Value { get; }
-        IEnumerable<IApplicationCommandInteractionDataOption> Options { get; }
+
+        /// <summary>
+        /// The value of the pair
+        /// </summary>
+        ApplicationCommandOptionType? Value { get; }
+
+        /// <summary>
+        /// Present if this option is a group or subcommand
+        /// </summary>
+        IReadOnlyCollection<IApplicationCommandInteractionDataOption> Options { get; }
 
     }
 }

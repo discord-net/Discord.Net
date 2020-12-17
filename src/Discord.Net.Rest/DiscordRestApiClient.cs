@@ -803,13 +803,9 @@ namespace Discord.API
             Preconditions.AtMost(command.Description.Length, 100, nameof(command.Description));
             Preconditions.AtLeast(command.Description.Length, 1, nameof(command.Description));
 
-            try
-            {
-                return await SendJsonAsync<ApplicationCommand>("POST", $"applications/{this.CurrentUserId}/commands", command, options: options).ConfigureAwait(false);
-            }
-            catch (HttpException ex) { return null; }
+            return await SendJsonAsync<ApplicationCommand>("POST", $"applications/{this.CurrentUserId}/commands", command, options: options).ConfigureAwait(false);
         }
-        public async Task<ApplicationCommand> EditGlobalApplicationCommandAsync(ApplicationCommandParams command, ulong commandId,  RequestOptions options = null)
+        public async Task<ApplicationCommand> ModifyGlobalApplicationCommandAsync(ApplicationCommandParams command, ulong commandId,  RequestOptions options = null)
         {
             Preconditions.NotNull(command, nameof(command));
             Preconditions.AtMost(command.Name.Length, 32, nameof(command.Name));
@@ -817,28 +813,13 @@ namespace Discord.API
             Preconditions.AtMost(command.Description.Length, 100, nameof(command.Description));
             Preconditions.AtLeast(command.Description.Length, 1, nameof(command.Description));
 
-            try
-            {
-                return await SendJsonAsync<ApplicationCommand>("PATCH", $"applications/{this.CurrentUserId}/commands/{commandId}", command, options: options).ConfigureAwait(false);
-            }
-            catch (HttpException ex) { return null; }
+            return await SendJsonAsync<ApplicationCommand>("PATCH", $"applications/{this.CurrentUserId}/commands/{commandId}", command, options: options).ConfigureAwait(false);
         }
         public async Task DeleteGlobalApplicationCommandAsync(ulong commandId, RequestOptions options = null)
-        {
-            try
-            {
-                await SendAsync("DELETE", $"applications/{this.CurrentUserId}/commands/{commandId}", options: options).ConfigureAwait(false);
-            }
-            catch (HttpException ex) { return; }
-        }
+            => await SendAsync("DELETE", $"applications/{this.CurrentUserId}/commands/{commandId}", options: options).ConfigureAwait(false);
+
         public async Task<ApplicationCommand[]> GetGuildApplicationCommandAsync(ulong guildId, RequestOptions options = null)
-        {
-            try
-            {
-                return await SendAsync<ApplicationCommand[]>("GET", $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", options: options).ConfigureAwait(false);
-            }
-            catch (HttpException ex) { return null; }
-        }
+            => await SendAsync<ApplicationCommand[]>("GET", $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", options: options).ConfigureAwait(false);
         public async Task<ApplicationCommand> CreateGuildApplicationCommandAsync(ApplicationCommandParams command, ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotNull(command, nameof(command));
@@ -847,13 +828,9 @@ namespace Discord.API
             Preconditions.AtMost(command.Description.Length, 100, nameof(command.Description));
             Preconditions.AtLeast(command.Description.Length, 1, nameof(command.Description));
 
-            try
-            {
-                return await SendJsonAsync<ApplicationCommand>("POST", $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", command, options: options).ConfigureAwait(false);
-            }
-            catch (HttpException ex) { return null; }
+            return await SendJsonAsync<ApplicationCommand>("POST", $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", command, options: options).ConfigureAwait(false);
         }
-        public async Task<ApplicationCommand> EditGuildApplicationCommandAsync(ApplicationCommandParams command, ulong guildId, ulong commandId, RequestOptions options = null)
+        public async Task<ApplicationCommand> ModifyGuildApplicationCommandAsync(ApplicationCommandParams command, ulong guildId, ulong commandId, RequestOptions options = null)
         {
             Preconditions.NotNull(command, nameof(command));
             Preconditions.AtMost(command.Name.Length, 32, nameof(command.Name));
@@ -861,19 +838,27 @@ namespace Discord.API
             Preconditions.AtMost(command.Description.Length, 100, nameof(command.Description));
             Preconditions.AtLeast(command.Description.Length, 1, nameof(command.Description));
 
-            try
-            {
-                return await SendJsonAsync<ApplicationCommand>("PATCH", $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", command, options: options).ConfigureAwait(false);
-            }
-            catch (HttpException ex) { return null; }
+            return await SendJsonAsync<ApplicationCommand>("PATCH", $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", command, options: options).ConfigureAwait(false);
         }
         public async Task DeleteGuildApplicationCommandAsync(ulong guildId, ulong commandId, RequestOptions options = null)
+            => await SendAsync<ApplicationCommand>("DELETE", $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", options: options).ConfigureAwait(false);
+
+        //Interaction Responses
+        public async Task CreateInteractionResponse(InteractionResponse response, string interactionId, string interactionToken, RequestOptions options = null)
         {
-            try
-            {
-                await SendAsync<ApplicationCommand>("DELETE", $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", options: options).ConfigureAwait(false);
-            }
-            catch (HttpException ex) { return; }
+            if(response.Data.IsSpecified)
+                Preconditions.AtMost(response.Data.Value.Content.Length, 2000, nameof(response.Data.Value.Content));
+            
+            await SendJsonAsync("POST", $"/interactions/{interactionId}/{interactionToken}/callback", response, options: options);
+        }
+        public async Task ModifyInteractionResponse(ModifyInteractionResponseParams args, string interactionToken, RequestOptions options = null)
+            => await SendJsonAsync("POST", $"/webhooks/{this.CurrentUserId}/{interactionToken}/messages/@original", args, options: options);
+        public async Task DeleteInteractionResponse(string interactionToken, RequestOptions options = null)
+            => await SendAsync("DELETE", $"/webhooks/{this.CurrentUserId}/{interactionToken}/messages/@original", options: options);
+
+        public async Task CreateInteractionFollowupMessage()
+        {
+
         }
 
         //Guilds
