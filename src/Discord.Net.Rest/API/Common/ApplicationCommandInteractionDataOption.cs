@@ -13,7 +13,7 @@ namespace Discord.API
         public string Name { get; set; }
 
         [JsonProperty("value")]
-        public Optional<ApplicationCommandOptionType> Value { get; set; }
+        public Optional<object> Value { get; set; }
 
         [JsonProperty("options")]
         public Optional<IEnumerable<ApplicationCommandInteractionDataOption>> Options { get; set; }

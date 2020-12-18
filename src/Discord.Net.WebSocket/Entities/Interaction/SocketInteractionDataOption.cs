@@ -6,12 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.ApplicationCommandInteractionDataOption;
 
-namespace Discord.WebSocket.Entities.Interaction
+namespace Discord.WebSocket
 {
     public class SocketInteractionDataOption : IApplicationCommandInteractionDataOption
     {
         public string Name { get; private set; }
-        public ApplicationCommandOptionType? Value { get; private set; }
+        public object? Value { get; private set; }
 
         public IReadOnlyCollection<IApplicationCommandInteractionDataOption> Options { get; private set; }
 

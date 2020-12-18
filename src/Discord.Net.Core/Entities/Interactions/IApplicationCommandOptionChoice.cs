@@ -7,17 +7,17 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    /// Specifies choices for command group
+    ///     Specifies choices for command group.
     /// </summary>
     public interface IApplicationCommandOptionChoice
     {
         /// <summary>
-        /// 1-100 character choice name
+        ///     1-100 character choice name.
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        /// value of the choice
+        ///     value of the choice.
         /// </summary>
         string Value { get; }
 

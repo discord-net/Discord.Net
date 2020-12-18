@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.ApplicationCommandInteractionData;
 
-namespace Discord.WebSocket.Entities.Interaction
+namespace Discord.WebSocket
 {
     public class SocketInteractionData : SocketEntity<ulong>, IApplicationCommandInteractionData
     {

@@ -23,7 +23,7 @@ namespace Discord.WebSocket
         ///     <code language="cs" region="ChannelCreated"
         ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
         /// </example>
-        public event Func<SocketChannel, Task> ChannelCreated 
+        public event Func<SocketChannel, Task> ChannelCreated
         {
             add { _channelCreatedEvent.Add(value); }
             remove { _channelCreatedEvent.Remove(value); }
@@ -70,7 +70,7 @@ namespace Discord.WebSocket
         public event Func<SocketChannel, SocketChannel, Task> ChannelUpdated {
             add { _channelUpdatedEvent.Add(value); }
             remove { _channelUpdatedEvent.Remove(value); }
-        }    
+        }
         internal readonly AsyncEvent<Func<SocketChannel, SocketChannel, Task>> _channelUpdatedEvent = new AsyncEvent<Func<SocketChannel, SocketChannel, Task>>();
 
         //Messages
@@ -351,7 +351,7 @@ namespace Discord.WebSocket
             add { _guildMemberUpdatedEvent.Add(value); }
             remove { _guildMemberUpdatedEvent.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<SocketGuildUser, SocketGuildUser, Task>> _guildMemberUpdatedEvent = new AsyncEvent<Func<SocketGuildUser, SocketGuildUser, Task>>();     
+        internal readonly AsyncEvent<Func<SocketGuildUser, SocketGuildUser, Task>> _guildMemberUpdatedEvent = new AsyncEvent<Func<SocketGuildUser, SocketGuildUser, Task>>();
         /// <summary> Fired when a user joins, leaves, or moves voice channels. </summary>
         public event Func<SocketUser, SocketVoiceState, SocketVoiceState, Task> UserVoiceStateUpdated {
             add { _userVoiceStateUpdatedEvent.Add(value); }
@@ -361,7 +361,7 @@ namespace Discord.WebSocket
         /// <summary> Fired when the bot connects to a Discord voice server. </summary>
         public event Func<SocketVoiceServer, Task> VoiceServerUpdated
         {
-            add { _voiceServerUpdatedEvent.Add(value);  }
+            add { _voiceServerUpdatedEvent.Add(value); }
             remove { _voiceServerUpdatedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketVoiceServer, Task>> _voiceServerUpdatedEvent = new AsyncEvent<Func<SocketVoiceServer, Task>>();
@@ -431,5 +431,26 @@ namespace Discord.WebSocket
             remove { _inviteDeletedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketGuildChannel, string, Task>> _inviteDeletedEvent = new AsyncEvent<Func<SocketGuildChannel, string, Task>>();
+
+        //Interactions
+        /// <summary>
+        ///     Fired when an Interaction is created.
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         This event is fired when an interaction is created. The event handler must return a
+        ///         <see cref="Task"/> and accept a <see cref="SocketInteraction"/> as its parameter.
+        ///     </para>
+        ///     <para>
+        ///         The interaction created will be passed into the <see cref="SocketInteraction"/> parameter.
+        ///     </para>
+        /// </remarks>
+        public event Func<SocketInteraction, Task> InteractionCreated
+        {
+            add { _interactionCreatedEvent.Add(value); }
+            remove { _interactionCreatedEvent.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<SocketInteraction, Task>> _interactionCreatedEvent = new AsyncEvent<Func<SocketInteraction, Task>>();
+
     }
 }

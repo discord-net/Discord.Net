@@ -787,13 +787,7 @@ namespace Discord.API
 
         //Interactions
         public async Task<ApplicationCommand[]> GetGlobalApplicationCommandsAsync(RequestOptions options = null)
-        {
-            try
-            {
-                return await SendAsync<ApplicationCommand[]>("GET", $"applications/{this.CurrentUserId}/commands", options: options).ConfigureAwait(false);
-            }
-            catch (HttpException ex) { return null; }
-        }
+            => await SendAsync<ApplicationCommand[]>("GET", $"applications/{this.CurrentUserId}/commands", options: options).ConfigureAwait(false);
 
         public async Task<ApplicationCommand> CreateGlobalApplicationCommandAsync(ApplicationCommandParams command, RequestOptions options = null)
         {
@@ -844,21 +838,53 @@ namespace Discord.API
             => await SendAsync<ApplicationCommand>("DELETE", $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", options: options).ConfigureAwait(false);
 
         //Interaction Responses
-        public async Task CreateInteractionResponse(InteractionResponse response, string interactionId, string interactionToken, RequestOptions options = null)
+        public async Task CreateInteractionResponse(InteractionResponse response, ulong interactionId, string interactionToken, RequestOptions options = null)
         {
-            if(response.Data.IsSpecified)
-                Preconditions.AtMost(response.Data.Value.Content.Length, 2000, nameof(response.Data.Value.Content));
-            
-            await SendJsonAsync("POST", $"/interactions/{interactionId}/{interactionToken}/callback", response, options: options);
+            if(response.Data.IsSpecified && response.Data.Value.Content.IsSpecified)
+                Preconditions.AtMost(response.Data.Value.Content.Value.Length, 2000, nameof(response.Data.Value.Content));
+
+            options = RequestOptions.CreateOrClone(options);
+
+           await SendJsonAsync("POST", () => $"interactions/{interactionId}/{interactionToken}/callback", response, new BucketIds(), options: options);
         }
         public async Task ModifyInteractionResponse(ModifyInteractionResponseParams args, string interactionToken, RequestOptions options = null)
-            => await SendJsonAsync("POST", $"/webhooks/{this.CurrentUserId}/{interactionToken}/messages/@original", args, options: options);
+            => await SendJsonAsync("POST", $"webhooks/{this.CurrentUserId}/{interactionToken}/messages/@original", args, options: options);
         public async Task DeleteInteractionResponse(string interactionToken, RequestOptions options = null)
-            => await SendAsync("DELETE", $"/webhooks/{this.CurrentUserId}/{interactionToken}/messages/@original", options: options);
+            => await SendAsync("DELETE", $"webhooks/{this.CurrentUserId}/{interactionToken}/messages/@original", options: options);
 
-        public async Task CreateInteractionFollowupMessage()
+        public async Task<Message> CreateInteractionFollowupMessage(CreateWebhookMessageParams args, string token, RequestOptions options = null)
         {
+            if (!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0)
+                Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
+            if (args.Content?.Length > DiscordConfig.MaxMessageSize)
+                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendJsonAsync<Message>("POST", $"webhooks/{CurrentUserId}/{token}?wait=true", args, options: options).ConfigureAwait(false);
+        }
+
+        public async Task<Message> ModifyInteractionFollowupMessage(CreateWebhookMessageParams args, ulong id, string token, RequestOptions options = null)
+        {
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEqual(id, 0, nameof(id));
+
+            if (args.Content?.Length > DiscordConfig.MaxMessageSize)
+                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendJsonAsync<Message>("PATCH", $"webhooks/{CurrentUserId}/{token}/messages/{id}", args, options: options).ConfigureAwait(false);
+        }
+
+        public async Task DeleteInteractionFollowupMessage(ulong id, string token, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(id, 0, nameof(id));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            await SendAsync("DELETE", $"webhooks/{CurrentUserId}/{token}/messages/{id}", options: options).ConfigureAwait(false);
         }
 
         //Guilds
