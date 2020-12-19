@@ -8,20 +8,6 @@ namespace Discord
     public interface IInviteMetadata : IInvite
     {
         /// <summary>
-        ///     Gets the user that created this invite.
-        /// </summary>
-        /// <returns>
-        ///     A user that created this invite.
-        /// </returns>
-        IUser Inviter { get; }
-        /// <summary>
-        ///     Gets a value that indicates whether the invite has been revoked.
-        /// </summary>
-        /// <returns>
-        ///     <c>true</c> if this invite was revoked; otherwise <c>false</c>.
-        /// </returns>
-        bool IsRevoked { get; }
-        /// <summary>
         ///     Gets a value that indicates whether the invite is a temporary one.
         /// </summary>
         /// <returns>
@@ -29,6 +15,14 @@ namespace Discord
         ///     <c>false</c>.
         /// </returns>
         bool IsTemporary { get; }
+        /// <summary>
+        ///     Gets a value that indicates whether the invite has been revoked.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if this invite was revoked; otherwise <c>false</c>.
+        /// </returns>
+        [Obsolete("This property doesn't exist anymore and shouldn't be used.")]
+        bool IsRevoked { get; }
         /// <summary>
         ///     Gets the time (in seconds) until the invite expires.
         /// </summary>
