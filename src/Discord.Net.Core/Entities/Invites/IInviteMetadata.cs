@@ -15,10 +15,14 @@ namespace Discord
         ///     <c>false</c>.
         /// </returns>
         bool IsTemporary { get; }
-
-        [Obsolete("This will always return false. If an invite is revoked, it will not be found and the invite will be null.")]
+        /// <summary>
+        ///     Gets a value that indicates whether the invite has been revoked.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if this invite was revoked; otherwise <c>false</c>.
+        /// </returns>
+        [Obsolete("This property doesn't exist anymore and shouldn't be used.")]
         bool IsRevoked { get; }
-
         /// <summary>
         ///     Gets the time (in seconds) until the invite expires.
         /// </summary>

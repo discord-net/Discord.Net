@@ -8,7 +8,8 @@ namespace Discord.Rest
     {
         private long _createdAtTicks;
 
-        [Obsolete("This will always return false. If an invite is revoked, it will not be found and the invite will be null.")]
+        /// <inheritdoc />
+        [Obsolete("This property doesn't exist anymore and shouldn't be used.")]
         public bool IsRevoked { get; private set; }
         /// <inheritdoc />
         public bool IsTemporary { get; private set; }

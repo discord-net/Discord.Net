@@ -48,8 +48,9 @@ namespace Discord.WebSocket
         int? IInvite.PresenceCount => throw new NotImplementedException();
         /// <inheritdoc />
         int? IInvite.MemberCount => throw new NotImplementedException();
-        [Obsolete("This will always return false. If an invite is revoked, it will not be found and the invite will be null.")]
-        bool IInviteMetadata.IsRevoked => false;
+        /// <inheritdoc />
+        [Obsolete("This property doesn't exist anymore and shouldn't be used.")]
+        bool IInviteMetadata.IsRevoked => throw new NotImplementedException();
         /// <inheritdoc />
         public bool IsTemporary { get; private set; }
         /// <inheritdoc />
