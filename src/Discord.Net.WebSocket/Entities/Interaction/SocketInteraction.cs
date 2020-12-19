@@ -95,10 +95,10 @@ namespace Discord.WebSocket
         }
 
         /// <summary>
-        /// Responds to an Interaction, eating its input
+        /// Responds to an Interaction.
         /// <para>
-        ///     If you have <see cref="DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, this method
-        ///     will be obsolete and will use <see cref="FollowupAsync(string, bool, Embed, InteractionResponseType, AllowedMentions, RequestOptions)"/>
+        ///     If you have <see cref="DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, You should use
+        ///     <see cref="FollowupAsync(string, bool, Embed, InteractionResponseType, AllowedMentions, RequestOptions)"/> instead.
         /// </para>
         /// </summary>
         /// <param name="text">The text of the message to be sent</param>
@@ -111,10 +111,11 @@ namespace Discord.WebSocket
         ///     The <see cref="IMessage"/> sent as the response. If this is the first acknowledgement, it will return null;
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
+        /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid</exception>
 
         public async Task<IMessage> RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType Type = InteractionResponseType.ChannelMessageWithSource, AllowedMentions allowedMentions = null, RequestOptions options = null)
         {
-            if (Type == InteractionResponseType.ACKWithSource || Type == InteractionResponseType.ACKWithSource || Type == InteractionResponseType.Pong)
+            if (Type == InteractionResponseType.Pong)
                 throw new InvalidOperationException($"Cannot use {Type} on a send message function");
 
             if (!IsValidToken)

@@ -39,11 +39,11 @@ namespace Discord
         /// <summary>
         ///     Choices for string and int types for the user to pick from.
         /// </summary>
-        IEnumerable<IApplicationCommandOptionChoice>? Choices { get; }
+        IReadOnlyCollection<IApplicationCommandOptionChoice>? Choices { get; }
 
         /// <summary>
         ///     if the option is a subcommand or subcommand group type, this nested options will be the parameters.
         /// </summary>
-        IEnumerable<IApplicationCommandOption>? Options { get; }
+        IReadOnlyCollection<IApplicationCommandOption>? Options { get; }
     }
 }

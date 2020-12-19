@@ -34,16 +34,13 @@ namespace Discord
         /// <summary>
         ///     If the option is a subcommand or subcommand group type, this nested options will be the parameters.
         /// </summary>
-        IEnumerable<IApplicationCommandOption>? Options { get; }
+        IReadOnlyCollection<IApplicationCommandOption> Options { get; }
 
         /// <summary>
-        ///     Modifies this command.
+        ///     Deletes this command
         /// </summary>
-        /// <param name="func">The delegate containing the properties to modify the command with.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous modification operation.
-        /// </returns>
-        Task ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null);
+        /// <returns></returns>
+        Task DeleteAsync(RequestOptions options = null);
     }
 }

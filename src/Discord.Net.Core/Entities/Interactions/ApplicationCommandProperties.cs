@@ -11,19 +11,41 @@ namespace Discord
     /// </summary>
     public class ApplicationCommandProperties
     {
+        private string _name { get; set; }
+        private string _description { get; set; }
+
         /// <summary>
         ///     Gets or sets the name of this command.
         /// </summary>
-        public string Name { get; set; }
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if(value.Length > 32)
+                    throw new ArgumentException("Name length must be less than or equal to 32");
+                _name = value;
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the discription of this command.
         /// </summary>
-        public string Description { get; set; }
+        public string Description
+        {
+            get => _description;
+            set
+            {
+                if (value.Length > 100)
+                    throw new ArgumentException("Description length must be less than or equal to 100");
+                _description = value;
+            }
+        }
+       
 
         /// <summary>
         ///     Gets or sets the options for this command.
         /// </summary>
-        public Optional<IEnumerable<IApplicationCommandOption>> Options { get; set; }
+        public Optional<List<IApplicationCommandOption>> Options { get; set; }
     }
 }
