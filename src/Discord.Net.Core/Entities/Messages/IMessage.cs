@@ -165,6 +165,14 @@ namespace Discord
         IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions { get; }
 
         /// <summary>
+        ///     Gets all stickers included in this message.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection of sticker objects.
+        /// </returns>
+        IReadOnlyCollection<ISticker> Stickers { get; }
+
+        /// <summary>
         ///     Adds a reaction to this message.
         /// </summary>
         /// <example>
