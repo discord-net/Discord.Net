@@ -92,10 +92,10 @@ namespace Discord
         ///     Gets all embeds included in this message.
         /// </summary>
         /// <remarks>
-        /// </remarks>
         ///     This property gets a read-only collection of embeds associated with this message. Depending on the
         ///     message, a sent message may contain one or more embeds. This is usually true when multiple link previews
         ///     are generated; however, only one <see cref="EmbedType.Rich"/> <see cref="Embed"/> can be featured.
+        /// </remarks>
         /// <returns>
         ///     A read-only collection of embed objects.
         /// </returns>
