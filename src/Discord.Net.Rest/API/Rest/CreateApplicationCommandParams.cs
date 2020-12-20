@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Discord.API.Rest
 {
-    internal class ApplicationCommandParams
+    internal class CreateApplicationCommandParams
     {
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -19,8 +19,8 @@ namespace Discord.API.Rest
         [JsonProperty("options")]
         public Optional<ApplicationCommandOption[]> Options { get; set; }
 
-        public ApplicationCommandParams() { }
-        public ApplicationCommandParams(string name, string description, ApplicationCommandOption[] options = null)
+        public CreateApplicationCommandParams() { }
+        public CreateApplicationCommandParams(string name, string description, ApplicationCommandOption[] options = null)
         {
             this.Name = name;
             this.Description = description;

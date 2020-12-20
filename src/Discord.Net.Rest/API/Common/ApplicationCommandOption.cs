@@ -53,5 +53,28 @@ namespace Discord.API
             this.Type = cmd.Type;
             this.Description = cmd.Description;
         }
+        public ApplicationCommandOption(Discord.ApplicationCommandOptionProperties option)
+        {
+            this.Choices = option.Choices != null
+                ? option.Choices.Select(x => new ApplicationCommandOptionChoice()
+                {
+                    Name = x.Name,
+                    Value = x.Value
+                }).ToArray()
+                : Optional<ApplicationCommandOptionChoice[]>.Unspecified;
+
+            this.Options = option.Options != null
+                ? option.Options.Select(x => new ApplicationCommandOption(x)).ToArray()
+                : Optional<ApplicationCommandOption[]>.Unspecified;
+
+            this.Required = option.Required.Value;
+            this.Default = option.Default.HasValue
+                ? option.Default.Value
+                : Optional<bool>.Unspecified;
+
+            this.Name = option.Name;
+            this.Type = option.Type;
+            this.Description = option.Description;
+        }
     }
 }

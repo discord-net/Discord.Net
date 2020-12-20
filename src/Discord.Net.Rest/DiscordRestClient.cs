@@ -107,13 +107,17 @@ namespace Discord.Rest
             => ClientHelper.GetVoiceRegionAsync(this, id, options);
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetWebhookAsync(this, id, options);
-        public Task<RestGlobalCommand> CreateGobalCommand(Action<ApplicationCommandProperties> func, RequestOptions options = null)
+        public Task<RestGlobalCommand> CreateGlobalCommand(SlashCommandCreationProperties properties, RequestOptions options = null)
+            => InteractionHelper.CreateGlobalCommand(this, properties, options);
+        public Task<RestGlobalCommand> CreateGlobalCommand(Action<SlashCommandCreationProperties> func, RequestOptions options = null)
             => InteractionHelper.CreateGlobalCommand(this, func, options);
-        public Task<RestGuildCommand> CreateGuildCommand(Action<ApplicationCommandProperties> func, ulong guildId, RequestOptions options = null)
+        public Task<RestGuildCommand> CreateGuildCommand(SlashCommandCreationProperties properties, ulong guildId, RequestOptions options = null)
+            => InteractionHelper.CreateGuildCommand(this, guildId, properties, options);
+        public Task<RestGuildCommand> CreateGuildCommand(Action<SlashCommandCreationProperties> func, ulong guildId, RequestOptions options = null)
             => InteractionHelper.CreateGuildCommand(this, guildId, func, options);
-        public Task<RestGlobalCommand[]> GetGlobalApplicationCommands(RequestOptions options = null)
+        public Task<IReadOnlyCollection<RestGlobalCommand>> GetGlobalApplicationCommands(RequestOptions options = null)
             => ClientHelper.GetGlobalApplicationCommands(this, options);
-        public Task<RestGuildCommand[]> GetGuildApplicationCommands(ulong guildId, RequestOptions options = null)
+        public Task<IReadOnlyCollection<RestGuildCommand>> GetGuildApplicationCommands(ulong guildId, RequestOptions options = null)
             => ClientHelper.GetGuildApplicationCommands(this, guildId, options);
 
         //IDiscordClient

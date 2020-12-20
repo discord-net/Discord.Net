@@ -22,7 +22,7 @@ namespace Discord
         ///         This objects type can be any one of the option types in <see cref="ApplicationCommandOptionType"/>
         ///     </note>
         /// </summary>
-        object? Value { get; }
+        object Value { get; }
 
         /// <summary>
         ///     Present if this option is a group or subcommand.

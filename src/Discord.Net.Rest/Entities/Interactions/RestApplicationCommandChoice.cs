@@ -11,7 +11,7 @@ namespace Discord.Rest
     {
         public string Name { get; }
 
-        public string Value { get; }
+        public object Value { get; }
 
         internal RestApplicationCommandChoice(Model model)
         {

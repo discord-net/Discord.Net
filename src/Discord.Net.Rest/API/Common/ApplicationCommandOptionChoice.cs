@@ -13,6 +13,6 @@ namespace Discord.API
         public string Name { get; set; }
 
         [JsonProperty("value")]
-        public string Value { get; set; }
+        public object Value { get; set; }
     }
 }

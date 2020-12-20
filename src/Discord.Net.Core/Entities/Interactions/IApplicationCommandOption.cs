@@ -42,7 +42,7 @@ namespace Discord
         IReadOnlyCollection<IApplicationCommandOptionChoice>? Choices { get; }
 
         /// <summary>
-        ///     if the option is a subcommand or subcommand group type, this nested options will be the parameters.
+        ///     If the option is a subcommand or subcommand group type, this nested options will be the parameters.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandOption>? Options { get; }
     }

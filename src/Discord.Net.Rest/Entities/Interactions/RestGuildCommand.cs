@@ -13,6 +13,7 @@ namespace Discord.Rest
         internal RestGuildCommand(BaseDiscordClient client, ulong id, ulong guildId)
             : base(client, id)
         {
+            this.CommandType = RestApplicationCommandType.GuildCommand;
             this.GuildId = guildId;
         }
 

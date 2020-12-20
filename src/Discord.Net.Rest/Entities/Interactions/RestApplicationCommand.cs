@@ -19,9 +19,9 @@ namespace Discord.Rest
 
         public string Description { get; private set; }
 
-        public IReadOnlyCollection<IApplicationCommandOption> Options { get; private set; }
+        public IReadOnlyCollection<RestApplicationCommandOption> Options { get; private set; }
 
-        public RestApplicationCommandType CommandType { get; private set; }
+        public RestApplicationCommandType CommandType { get; internal set; }
 
         public DateTimeOffset CreatedAt
             => SnowflakeUtils.FromSnowflake(this.Id);
@@ -47,11 +47,14 @@ namespace Discord.Rest
         {
             this.ApplicationId = model.ApplicationId;
             this.Name = model.Name;
+            this.Description = model.Description;
 
             this.Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => RestApplicationCommandOption.Create(x)).ToImmutableArray()
                 : null;
         }
+
+        IReadOnlyCollection<IApplicationCommandOption> IApplicationCommand.Options => Options;
 
         public virtual Task DeleteAsync(RequestOptions options = null) => throw new NotImplementedException();
     }

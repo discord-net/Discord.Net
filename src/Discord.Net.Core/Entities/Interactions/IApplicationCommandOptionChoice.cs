@@ -19,7 +19,7 @@ namespace Discord
         /// <summary>
         ///     value of the choice.
         /// </summary>
-        string Value { get; }
+        object Value { get; }
 
     }
 }

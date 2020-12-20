@@ -7,20 +7,20 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     Provides properties that are used to modify a <see cref="IApplicationCommand" /> with the specified changes.
+    ///     A class used to create slash commands
     /// </summary>
-    public class ApplicationCommandProperties
+    public class SlashCommandCreationProperties
     {
         /// <summary>
-        ///     Gets or sets the name of this command.
+        ///     The name of this command.
         /// </summary>
-        public Optional<string> Name { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
-        ///     Gets or sets the discription of this command.
+        ///    The discription of this command.
         /// </summary>
-        public Optional<string> Description { get; set; }
-       
+        public string Description { get; set; }
+
 
         /// <summary>
         ///     Gets or sets the options for this command.

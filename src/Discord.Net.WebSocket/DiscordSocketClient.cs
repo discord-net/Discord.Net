@@ -613,7 +613,7 @@ namespace Discord.WebSocket
                                             }
                                             else if (_connection.CancelToken.IsCancellationRequested)
                                                 return;
-                                            
+
                                             if (BaseConfig.AlwaysDownloadUsers)
                                                 _ = DownloadUsersAsync(Guilds.Where(x => x.IsAvailable && !x.HasAllMembers));
 
@@ -1806,6 +1806,60 @@ namespace Discord.WebSocket
                                         await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
                                         return;
                                     }
+                                }
+                                break;
+                            case "APPLICATION_COMMAND_CREATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (APPLICATION_COMMAND_CREATE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<API.Gateway.ApplicationCommandCreatedUpdatedEvent>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId);
+                                    if(guild == null)
+                                    {
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
+                                        return;
+                                    }
+
+                                    var applicationCommand = SocketApplicationCommand.Create(this, data);
+
+                                    await TimedInvokeAsync(_applicationCommandCreated, nameof(ApplicationCommandCreated), applicationCommand).ConfigureAwait(false);
+                                }
+                                break;
+                            case "APPLICATION_COMMAND_UPDATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (APPLICATION_COMMAND_UPDATE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<API.Gateway.ApplicationCommandCreatedUpdatedEvent>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId);
+                                    if (guild == null)
+                                    {
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
+                                        return;
+                                    }
+
+                                    var applicationCommand = SocketApplicationCommand.Create(this, data);
+
+                                    await TimedInvokeAsync(_applicationCommandUpdated, nameof(ApplicationCommandUpdated), applicationCommand).ConfigureAwait(false);
+                                }
+                                break;
+                            case "APPLICATION_COMMAND_DELETE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (APPLICATION_COMMAND_DELETE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<API.Gateway.ApplicationCommandCreatedUpdatedEvent>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId);
+                                    if (guild == null)
+                                    {
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
+                                        return;
+                                    }
+
+                                    var applicationCommand = SocketApplicationCommand.Create(this, data);
+
+                                    await TimedInvokeAsync(_applicationCommandDeleted, nameof(ApplicationCommandDeleted), applicationCommand).ConfigureAwait(false);
                                 }
                                 break;
                             //Ignored (User only)

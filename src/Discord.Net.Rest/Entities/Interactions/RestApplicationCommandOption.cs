@@ -20,9 +20,9 @@ namespace Discord.Rest
 
         public bool? Required { get; private set; }
 
-        public IReadOnlyCollection<IApplicationCommandOptionChoice> Choices { get; private set; }
+        public IReadOnlyCollection<RestApplicationCommandChoice> Choices { get; private set; }
 
-        public IReadOnlyCollection<IApplicationCommandOption> Options { get; private set; }
+        public IReadOnlyCollection<RestApplicationCommandOption> Options { get; private set; }
 
         internal RestApplicationCommandOption() { }
 
@@ -53,5 +53,8 @@ namespace Discord.Rest
                 ? model.Choices.Value.Select(x => new RestApplicationCommandChoice(x)).ToImmutableArray()
                 : null;
         }
+
+        IReadOnlyCollection<IApplicationCommandOption> IApplicationCommandOption.Options => Options;
+        IReadOnlyCollection<IApplicationCommandOptionChoice> IApplicationCommandOption.Choices => Choices;
     }
 }

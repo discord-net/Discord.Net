@@ -11,7 +11,7 @@ namespace Discord.WebSocket
     public class SocketInteractionData : SocketEntity<ulong>, IApplicationCommandInteractionData
     {
         public string Name { get; private set; }
-        public IReadOnlyCollection<IApplicationCommandInteractionDataOption> Options { get; private set; }
+        public IReadOnlyCollection<SocketInteractionDataOption> Options { get; private set; }
 
         internal SocketInteractionData(DiscordSocketClient client, ulong id)
             : base(client, id)
@@ -33,5 +33,7 @@ namespace Discord.WebSocket
                 : null;
 
         }
+
+        IReadOnlyCollection<IApplicationCommandInteractionDataOption> IApplicationCommandInteractionData.Options => Options;
     }
 }

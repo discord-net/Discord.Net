@@ -39,7 +39,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     The data associated with this interaction
         /// </summary>
-        public IApplicationCommandInteractionData Data { get; private set; }
+        public SocketInteractionData Data { get; private set; }
 
         /// <summary>
         /// The token used to respond to this interaction
@@ -209,5 +209,7 @@ namespace Discord.WebSocket
 
             await Discord.Rest.ApiClient.CreateInteractionResponse(response, this.Id, Token, options).ConfigureAwait(false);
         }
+
+        IApplicationCommandInteractionData IDiscordInteraction.Data => Data;
     }
 }
