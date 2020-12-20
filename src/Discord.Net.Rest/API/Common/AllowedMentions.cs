@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API
 {
-    public class AllowedMentions
+    internal class AllowedMentions
     {
         [JsonProperty("parse")]
         public Optional<string[]> Parse { get; set; }
