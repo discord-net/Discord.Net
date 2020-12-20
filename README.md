@@ -6,7 +6,12 @@
 
 An unofficial .NET API Wrapper for the Discord client (https://discord.com).
 
-Check out the [documentation](https://discord.foxbot.me/) or join the [Discord API Chat](https://discord.gg/jkrBmQR).
+## Documentation
+
+- [Stable](https://discord.foxbot.me/)
+  - Hosted by @foxbot
+- [Nightly](https://docs.stillu.cc/)
+  - [Latest CI repo](https://github.com/discord-net/docs-static)
 
 ## Installation
 ### Stable (NuGet)
