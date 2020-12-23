@@ -165,6 +165,17 @@ namespace Discord
         IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions { get; }
 
         /// <summary>
+        ///     Gets the flags related to this message.
+        /// </summary>
+        /// <remarks>
+        ///     This value is determined by bitwise OR-ing <see cref="MessageFlags"/> values together.
+        /// </remarks>
+        /// <returns>
+        ///     A message's flags, if any is associated.
+        /// </returns>
+        MessageFlags? Flags { get; }
+
+        /// <summary>
         ///     Adds a reaction to this message.
         /// </summary>
         /// <example>

@@ -21,5 +21,17 @@ namespace Discord
         ///     Gets or sets the embed the message should display.
         /// </summary>
         public Optional<Embed> Embed { get; set; }
+        /// <summary>
+        ///     Gets or sets the flags of the message.
+        /// </summary>
+        /// <remarks>
+        ///     Only <see cref="MessageFlags.SuppressEmbeds"/> can be set/unset and you need to be
+        ///     the author of the message.
+        /// </remarks>
+        public Optional<MessageFlags?> Flags { get; set; }
+        /// <summary>
+        ///     Gets or sets the allowed mentions of the message.
+        /// </summary>
+        public Optional<AllowedMentions> AllowedMentions { get; set; }
     }
 }

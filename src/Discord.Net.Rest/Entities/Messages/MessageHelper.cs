@@ -27,21 +27,46 @@ namespace Discord.Rest
         public static async Task<Model> ModifyAsync(IMessage msg, BaseDiscordClient client, Action<MessageProperties> func,
             RequestOptions options)
         {
-            if (msg.Author.Id != client.CurrentUser.Id)
-                throw new InvalidOperationException("Only the author of a message may modify the message.");
-
             var args = new MessageProperties();
             func(args);
+
+            if (msg.Author.Id != client.CurrentUser.Id && (args.Content.IsSpecified || args.Embed.IsSpecified || args.AllowedMentions.IsSpecified))
+                throw new InvalidOperationException("Only the author of a message may modify the message content, embed, or allowed mentions.");
 
             bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(msg.Content);
             bool hasEmbed = args.Embed.IsSpecified ? args.Embed.Value != null : msg.Embeds.Any();
             if (!hasText && !hasEmbed)
                 Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
 
+            if (args.AllowedMentions.IsSpecified)
+            {
+                AllowedMentions allowedMentions = args.AllowedMentions.Value;
+                Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
+                Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
+
+                // check that user flag and user Id list are exclusive, same with role flag and role Id list
+                if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
+                {
+                    if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Users) &&
+                        allowedMentions.UserIds != null && allowedMentions.UserIds.Count > 0)
+                    {
+                        throw new ArgumentException("The Users flag is mutually exclusive with the list of User Ids.", nameof(allowedMentions));
+                    }
+
+                    if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Roles) &&
+                        allowedMentions.RoleIds != null && allowedMentions.RoleIds.Count > 0)
+                    {
+                        throw new ArgumentException("The Roles flag is mutually exclusive with the list of Role Ids.", nameof(allowedMentions));
+                    }
+                }
+            }
+
             var apiArgs = new API.Rest.ModifyMessageParams
             {
                 Content = args.Content,
-                Embed = args.Embed.IsSpecified ? args.Embed.Value.ToModel() : Optional.Create<API.Embed>()
+                Embed = args.Embed.IsSpecified ? args.Embed.Value.ToModel() : Optional.Create<API.Embed>(),
+                Flags = args.Flags.IsSpecified ? args.Flags.Value : Optional.Create<MessageFlags?>(),
+                AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional.Create<API.AllowedMentions>(),
             };
             return await client.ApiClient.ModifyMessageAsync(msg.Channel.Id, msg.Id, apiArgs, options).ConfigureAwait(false);
         }

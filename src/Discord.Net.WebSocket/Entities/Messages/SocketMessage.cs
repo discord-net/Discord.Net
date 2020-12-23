@@ -58,6 +58,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public MessageReference Reference { get; private set; }
 
+        /// <inheritdoc />
+        public MessageFlags? Flags { get; private set; }
+
         /// <summary>
         ///     Returns all attachments included in this message.
         /// </summary>
@@ -156,6 +159,9 @@ namespace Discord.WebSocket
                     MessageId = model.Reference.Value.MessageId
                 };
             }
+
+            if (model.Flags.IsSpecified)
+                Flags = model.Flags.Value;
         }
 
         /// <inheritdoc />
