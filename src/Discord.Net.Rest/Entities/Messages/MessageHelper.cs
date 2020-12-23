@@ -31,7 +31,7 @@ namespace Discord.Rest
             func(args);
 
             if (msg.Author.Id != client.CurrentUser.Id && (args.Content.IsSpecified || args.Embed.IsSpecified || args.AllowedMentions.IsSpecified))
-                throw new InvalidOperationException("Only the author of a message may modify the message content or allowed mentions.");
+                throw new InvalidOperationException("Only the author of a message may modify the message content, embed, or allowed mentions.");
 
             bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(msg.Content);
             bool hasEmbed = args.Embed.IsSpecified ? args.Embed.Value != null : msg.Embeds.Any();
