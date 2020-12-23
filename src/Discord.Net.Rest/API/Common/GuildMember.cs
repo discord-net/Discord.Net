@@ -18,6 +18,8 @@ namespace Discord.API
         public Optional<bool> Deaf { get; set; }
         [JsonProperty("mute")]
         public Optional<bool> Mute { get; set; }
+        [JsonProperty("pending")]
+        public Optional<bool> Pending { get; set; }
         [JsonProperty("premium_since")]
         public Optional<DateTimeOffset?> PremiumSince { get; set; }
     }

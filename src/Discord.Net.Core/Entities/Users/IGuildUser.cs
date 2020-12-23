@@ -69,6 +69,11 @@ namespace Discord
         IReadOnlyCollection<ulong> RoleIds { get; }
 
         /// <summary>
+        ///     Whether the user has passed the guild's Membership Screening requirements.
+        /// </summary>
+        bool? IsPending { get; }
+
+        /// <summary>
         ///     Gets the level permissions granted to this user to a given channel.
         /// </summary>
         /// <example>

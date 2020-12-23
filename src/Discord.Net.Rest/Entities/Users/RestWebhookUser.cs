@@ -52,6 +52,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         string IGuildUser.Nickname => null;
         /// <inheritdoc />
+        bool? IGuildUser.IsPending => null;
+        /// <inheritdoc />
         GuildPermissions IGuildUser.GuildPermissions => GuildPermissions.Webhook;
 
         /// <inheritdoc />
