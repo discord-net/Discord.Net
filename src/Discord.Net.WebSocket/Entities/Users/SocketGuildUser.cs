@@ -56,6 +56,10 @@ namespace Discord.WebSocket
         public bool IsMuted => VoiceState?.IsMuted ?? false;
         /// <inheritdoc />
         public bool IsStreaming => VoiceState?.IsStreaming ?? false;
+        /// <summary>
+        ///     Whether the user has passed the guild's Membership Screening requirements
+        /// </summary>
+        public bool? Pending { get; private set; }
         /// <inheritdoc />
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
         /// <summary>
@@ -142,6 +146,8 @@ namespace Discord.WebSocket
                 UpdateRoles(model.Roles.Value);
             if (model.PremiumSince.IsSpecified)
                 _premiumSinceTicks = model.PremiumSince.Value?.UtcTicks;
+            if (model.Pending.IsSpecified)
+                Pending = model.Pending.Value;
         }
         internal void Update(ClientState state, PresenceModel model, bool updatePresence)
         {
@@ -156,6 +162,7 @@ namespace Discord.WebSocket
                 UpdateRoles(model.Roles.Value);
             if (model.PremiumSince.IsSpecified)
                 _premiumSinceTicks = model.PremiumSince.Value?.UtcTicks;
+            
         }
         private void UpdateRoles(ulong[] roleIds)
         {
@@ -203,5 +210,6 @@ namespace Discord.WebSocket
         //IVoiceState
         /// <inheritdoc />
         IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;
+        /// <inheritdoc />
     }
 }
