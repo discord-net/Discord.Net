@@ -13,7 +13,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestUserMessage : RestMessage, IUserMessage
     {
-        private bool _isMentioningEveryone, _isTTS, _isPinned, _isSuppressed;
+        private bool _isMentioningEveryone, _isTTS, _isPinned;
         private long? _editedTimestampTicks;
         private IUserMessage _referencedMessage;
         private ImmutableArray<Attachment> _attachments = ImmutableArray.Create<Attachment>();
@@ -27,7 +27,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public override bool IsPinned => _isPinned;
         /// <inheritdoc />
-        public override bool IsSuppressed => _isSuppressed;
+        public override bool IsSuppressed => Flags.HasValue && Flags.Value.HasFlag(MessageFlags.SuppressEmbeds);
         /// <inheritdoc />
         public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
         /// <inheritdoc />
@@ -70,10 +70,6 @@ namespace Discord.Rest
                 _editedTimestampTicks = model.EditedTimestamp.Value?.UtcTicks;
             if (model.MentionEveryone.IsSpecified)
                 _isMentioningEveryone = model.MentionEveryone.Value;
-            if (model.Flags.IsSpecified)
-            {
-                _isSuppressed = model.Flags.Value.HasFlag(API.MessageFlags.Suppressed);
-            }
             if (model.RoleMentions.IsSpecified)
                 _roleMentionIds = model.RoleMentions.Value.ToImmutableArray();
 

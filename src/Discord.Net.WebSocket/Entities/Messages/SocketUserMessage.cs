@@ -15,7 +15,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketUserMessage : SocketMessage, IUserMessage
     {
-        private bool _isMentioningEveryone, _isTTS, _isPinned, _isSuppressed;
+        private bool _isMentioningEveryone, _isTTS, _isPinned;
         private long? _editedTimestampTicks;
         private IUserMessage _referencedMessage;
         private ImmutableArray<Attachment> _attachments = ImmutableArray.Create<Attachment>();
@@ -29,7 +29,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override bool IsPinned => _isPinned;
         /// <inheritdoc />
-        public override bool IsSuppressed => _isSuppressed;
+        public override bool IsSuppressed => Flags.HasValue && Flags.Value.HasFlag(MessageFlags.SuppressEmbeds);
         /// <inheritdoc />
         public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
         /// <inheritdoc />
@@ -74,10 +74,6 @@ namespace Discord.WebSocket
                 _editedTimestampTicks = model.EditedTimestamp.Value?.UtcTicks;
             if (model.MentionEveryone.IsSpecified)
                 _isMentioningEveryone = model.MentionEveryone.Value;
-            if (model.Flags.IsSpecified)
-            {
-                _isSuppressed = model.Flags.Value.HasFlag(API.MessageFlags.Suppressed);
-            }
             if (model.RoleMentions.IsSpecified)
                 _roleMentions = model.RoleMentions.Value.Select(x => guild.GetRole(x)).ToImmutableArray();
 
