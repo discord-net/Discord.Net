@@ -10,32 +10,62 @@ namespace Discord
         /// </summary>
         None = 0,
         /// <summary>
-        ///     Flag given to Discord staff.
+        ///     Flag given to users who are a Discord employee.
         /// </summary>
-        Staff = 0b1,
+        Staff = 1 << 0,
         /// <summary>
-        ///     Flag given to Discord partners.
+        ///     Flag given to users who are owners of a partnered Discord server.
         /// </summary>
-        Partner = 0b10,
+        Partner = 1 << 1,
+        /// <summary>
+        ///     Flag given to users in HypeSquad events.
+        /// </summary>
+        HypeSquadEvents = 1 << 2,
         /// <summary>
         ///     Flag given to users who have participated in the bug report program.
+        ///     This flag is obsolete, use <see cref="BugHunterLevel1"/> instead.
         /// </summary>
-        BugHunter = 0b1000,
+        [Obsolete("Use BugHunterLevel1 instead.")]
+        BugHunter = 1 << 3,
+        /// <summary>
+        ///     Flag given to users who have participated in the bug report program and are level 1.
+        /// </summary>
+        BugHunterLevel1 = 1 << 3,
         /// <summary>
         ///     Flag given to users who are in the HypeSquad House of Bravery.
         /// </summary>
-        HypeSquadBravery = 0b100_0000,
+        HypeSquadBravery = 1 << 6,
         /// <summary>
         ///     Flag given to users who are in the HypeSquad House of Brilliance.
         /// </summary>
-        HypeSquadBrilliance = 0b1000_0000,
+        HypeSquadBrilliance = 1 << 7,
         /// <summary>
         ///     Flag given to users who are in the HypeSquad House of Balance.
         /// </summary>
-        HypeSquadBalance = 0b1_0000_0000,
+        HypeSquadBalance = 1 << 8,
         /// <summary>
         ///     Flag given to users who subscribed to Nitro before games were added.
         /// </summary>
-        EarlySupporter = 0b10_0000_0000,
+        EarlySupporter = 1 << 9,
+        /// <summary>
+        ///     Flag given to users who are part of a team.
+        /// </summary>
+        TeamUser = 1 << 10,
+        /// <summary>
+        ///     Flag given to users who represent Discord (System).
+        /// </summary>
+        System = 1 << 12,
+        /// <summary>
+        ///     Flag given to users who have participated in the bug report program and are level 2.
+        /// </summary>
+        BugHunterLevel2 = 1 << 14,
+        /// <summary>
+        ///     Flag given to users who are verified bots.
+        /// </summary>
+        VerifiedBot = 1 << 16,
+        /// <summary>
+        ///     Flag given to users that developed bots and early verified their accounts.
+        /// </summary>
+        EarlyVerifiedBotDeveloper = 1 << 17,
     }
 }
