@@ -8,20 +8,34 @@ using Model = Discord.API.ApplicationCommandOption;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a Rest-based implementation of <see cref="IApplicationCommandOption"/>.
+    /// </summary>
     public class RestApplicationCommandOption : IApplicationCommandOption
     {
+        /// <inheritdoc/>
         public ApplicationCommandOptionType Type { get; private set; }
 
+        /// <inheritdoc/>
         public string Name { get; private set; }
 
+        /// <inheritdoc/>
         public string Description { get; private set; }
 
+        /// <inheritdoc/>
         public bool? Default { get; private set; }
 
+        /// <inheritdoc/>
         public bool? Required { get; private set; }
 
+        /// <summary>
+        ///     A collection of <see cref="RestApplicationCommandChoice"/>'s for this command.
+        /// </summary>
         public IReadOnlyCollection<RestApplicationCommandChoice> Choices { get; private set; }
 
+        /// <summary>
+        ///     A collection of <see cref="RestApplicationCommandOption"/>'s for this command.
+        /// </summary>
         public IReadOnlyCollection<RestApplicationCommandOption> Options { get; private set; }
 
         internal RestApplicationCommandOption() { }

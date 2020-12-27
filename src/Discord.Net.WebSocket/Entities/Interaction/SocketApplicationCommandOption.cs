@@ -9,18 +9,23 @@ using Model = Discord.API.ApplicationCommandOption;
 namespace Discord.WebSocket
 {
     /// <summary>
-    ///     Represents an option for a <see cref="SocketApplicationCommand"/>
+    ///     Represents an option for a <see cref="SocketApplicationCommand"/>.
     /// </summary>
     public class SocketApplicationCommandOption : IApplicationCommandOption
     {
+        /// <inheritdoc/>
         public string Name { get; private set; }
 
+        /// <inheritdoc/>
         public ApplicationCommandOptionType Type { get; private set; }
 
+        /// <inheritdoc/>
         public string Description { get; private set; }
 
+        /// <inheritdoc/>
         public bool? Default { get; private set; }
 
+        /// <inheritdoc/>
         public bool? Required { get; private set; }
 
         /// <summary>

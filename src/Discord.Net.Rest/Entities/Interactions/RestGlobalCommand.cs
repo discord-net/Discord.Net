@@ -8,7 +8,7 @@ using Model = Discord.API.ApplicationCommand;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a global Slash command
+    ///     Represents a global Slash command.
     /// </summary>
     public class RestGlobalCommand : RestApplicationCommand
     {
@@ -24,6 +24,8 @@ namespace Discord.Rest
             entity.Update(model);
             return entity;
         }
+
+        /// <inheritdoc/>
         public override async Task DeleteAsync(RequestOptions options = null)
             => await InteractionHelper.DeleteGlobalCommand(Discord, this).ConfigureAwait(false);
 
@@ -33,7 +35,7 @@ namespace Discord.Rest
         /// <param name="func">The delegate containing the properties to modify the command with.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     The modified command
+        ///     The modified command.
         /// </returns>
         public async Task<RestGlobalCommand> ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null)
             => await InteractionHelper.ModifyGlobalCommand(Discord, this, func, options).ConfigureAwait(false);

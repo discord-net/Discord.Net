@@ -10,8 +10,15 @@ namespace Discord.WebSocket
 {
     public class SocketInteractionData : SocketEntity<ulong>, IApplicationCommandInteractionData
     {
+        /// <inheritdoc/>
         public string Name { get; private set; }
+
+        /// <summary>
+        ///     The <see cref="SocketInteractionDataOption"/>'s recieved with this interaction.
+        /// </summary>
         public IReadOnlyCollection<SocketInteractionDataOption> Options { get; private set; }
+
+        private ulong guildId;
 
         internal SocketInteractionData(DiscordSocketClient client, ulong id)
             : base(client, id)
@@ -19,19 +26,20 @@ namespace Discord.WebSocket
 
         }
 
-        internal static SocketInteractionData Create(DiscordSocketClient client, Model model)
+        internal static SocketInteractionData Create(DiscordSocketClient client, Model model, ulong guildId)
         {
             var entity = new SocketInteractionData(client, model.Id);
-            entity.Update(model);
+            entity.Update(model, guildId);
             return entity;
         }
-        internal void Update(Model model)
+        internal void Update(Model model, ulong guildId)
         {
             this.Name = model.Name;
-            this.Options = model.Options.IsSpecified
-                ? model.Options.Value.Select(x => new SocketInteractionDataOption(x)).ToImmutableArray()
-                : null;
+            this.guildId = guildId;
 
+            this.Options = model.Options.IsSpecified
+                ? model.Options.Value.Select(x => new SocketInteractionDataOption(x, this.Discord, guildId)).ToImmutableArray()
+                : null;
         }
 
         IReadOnlyCollection<IApplicationCommandInteractionDataOption> IApplicationCommandInteractionData.Options => Options;
