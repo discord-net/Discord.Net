@@ -10,6 +10,8 @@
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard2.0;netstandard2.1</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
+    <!-- System.ValueTuple is in .NET Framework 4.7+, older versions need the package. -->
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" Condition="'$(TargetFramework)' == 'net461'" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <!-- oddly enough supports .NET Core 2.1+ and other frameworks. -->
     <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
