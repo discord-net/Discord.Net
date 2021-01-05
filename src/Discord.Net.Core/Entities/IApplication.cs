@@ -22,6 +22,18 @@ namespace Discord
         ///     Gets the icon URL of the application.
         /// </summary>
         string IconUrl  { get; }
+        /// <summary>
+        ///     Gets if the bot is public.
+        /// </summary>
+        bool IsBotPublic { get; }
+        /// <summary>
+        ///     Gets if the bot requires code grant.
+        /// </summary>
+        bool BotRequiresCodeGrant { get; }
+        /// <summary>
+        ///     Gets the team associated with this application if there is one.
+        /// </summary>
+        ITeam Team { get; }
 
         /// <summary>
         ///     Gets the partial user object containing info on the owner of the application.

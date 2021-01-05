@@ -20,6 +20,7 @@ namespace Discord.API.Rest
         public Optional<bool> IsTTS { get; set; }
         public Optional<Embed> Embed { get; set; }
         public Optional<AllowedMentions> AllowedMentions { get; set; }
+        public Optional<MessageReference> MessageReference { get; set; }
         public bool IsSpoiler { get; set; } = false;
 
         public UploadFileParams(Stream file)

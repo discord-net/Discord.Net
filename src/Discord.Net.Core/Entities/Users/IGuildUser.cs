@@ -69,11 +69,16 @@ namespace Discord
         IReadOnlyCollection<ulong> RoleIds { get; }
 
         /// <summary>
+        ///     Whether the user has passed the guild's Membership Screening requirements.
+        /// </summary>
+        bool? IsPending { get; }
+
+        /// <summary>
         ///     Gets the level permissions granted to this user to a given channel.
         /// </summary>
         /// <example>
         ///     <para>The following example checks if the current user has the ability to send a message with attachment in
-        ///     this channel; if so, uploads a file via <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool, AllowedMentions)"/>.</para>
+        ///     this channel; if so, uploads a file via <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference)"/>.</para>
         ///     <code language="cs">
         ///     if (currentUser?.GetPermissions(targetChannel)?.AttachFiles)
         ///         await targetChannel.SendFileAsync("fortnite.png");

@@ -3,18 +3,15 @@ using System;
 namespace Discord.WebSocket
 {
     /// <summary>
-    /// An exception thrown when the gateway client has been requested to
-    /// reconnect.
+    ///     The exception thrown when the gateway client has been requested to reconnect.
     /// </summary>
     public class GatewayReconnectException : Exception
     {
         /// <summary>
-        /// Creates a new instance of the
-        /// <see cref="GatewayReconnectException"/> type.
+        ///     Initializes a new instance of the <see cref="GatewayReconnectException" /> class with the reconnection
+        ///     message.
         /// </summary>
-        /// <param name="message">
-        /// The reason why the gateway has been requested to reconnect.
-        /// </param>
+        /// <param name="message">The reason why the gateway has been requested to reconnect.</param>
         public GatewayReconnectException(string message)
             : base(message)
         { }

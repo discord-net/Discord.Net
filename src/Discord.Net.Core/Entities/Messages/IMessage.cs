@@ -92,10 +92,10 @@ namespace Discord
         ///     Gets all embeds included in this message.
         /// </summary>
         /// <remarks>
-        /// </remarks>
         ///     This property gets a read-only collection of embeds associated with this message. Depending on the
         ///     message, a sent message may contain one or more embeds. This is usually true when multiple link previews
         ///     are generated; however, only one <see cref="EmbedType.Rich"/> <see cref="Embed"/> can be featured.
+        /// </remarks>
         /// <returns>
         ///     A read-only collection of embed objects.
         /// </returns>
@@ -148,11 +148,11 @@ namespace Discord
         MessageApplication Application { get; }
 
         /// <summary>
-        ///     Gets the reference to the original message if it was crossposted.
+        ///     Gets the reference to the original message if it is a crosspost, channel follow add, pin, or reply message.
         /// </summary>
         /// <remarks>
-        ///     Sent with Cross-posted messages, meaning they were published from news channels
-        ///     and received by subscriber channels.
+        ///     Sent with cross-posted messages, meaning they were published from news channels
+        ///     and received by subscriber channels, channel follow adds, pins, and message replies.
         /// </remarks>
         /// <returns>
         ///     A message's reference, if any is associated.
@@ -163,6 +163,17 @@ namespace Discord
         ///     Gets all reactions included in this message.
         /// </summary>
         IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions { get; }
+
+        /// <summary>
+        ///     Gets the flags related to this message.
+        /// </summary>
+        /// <remarks>
+        ///     This value is determined by bitwise OR-ing <see cref="MessageFlags"/> values together.
+        /// </remarks>
+        /// <returns>
+        ///     A message's flags, if any is associated.
+        /// </returns>
+        MessageFlags? Flags { get; }
 
         /// <summary>
         ///     Adds a reaction to this message.

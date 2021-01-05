@@ -56,5 +56,7 @@ namespace Discord.API
         public Optional<MessageFlags> Flags { get; set; }
         [JsonProperty("allowed_mentions")]
         public Optional<AllowedMentions> AllowedMentions { get; set; }
+        [JsonProperty("referenced_message")]
+        public Optional<Message> ReferencedMessage { get; set; }
     }
 }

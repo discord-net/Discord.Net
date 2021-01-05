@@ -69,6 +69,7 @@ namespace Discord
             AssertFlag(() => new GuildPermissions(manageGuild: true), GuildPermission.ManageGuild);
             AssertFlag(() => new GuildPermissions(addReactions: true), GuildPermission.AddReactions);
             AssertFlag(() => new GuildPermissions(viewAuditLog: true), GuildPermission.ViewAuditLog);
+            AssertFlag(() => new GuildPermissions(viewGuildInsights: true), GuildPermission.ViewGuildInsights);
             AssertFlag(() => new GuildPermissions(viewChannel: true), GuildPermission.ViewChannel);
             AssertFlag(() => new GuildPermissions(sendMessages: true), GuildPermission.SendMessages);
             AssertFlag(() => new GuildPermissions(sendTTSMessages: true), GuildPermission.SendTTSMessages);
@@ -141,6 +142,7 @@ namespace Discord
             AssertUtil(GuildPermission.ManageGuild, x => x.ManageGuild, (p, enable) => p.Modify(manageGuild: enable));
             AssertUtil(GuildPermission.AddReactions, x => x.AddReactions, (p, enable) => p.Modify(addReactions: enable));
             AssertUtil(GuildPermission.ViewAuditLog, x => x.ViewAuditLog, (p, enable) => p.Modify(viewAuditLog: enable));
+            AssertUtil(GuildPermission.ViewGuildInsights, x => x.ViewGuildInsights, (p, enable) => p.Modify(viewGuildInsights: enable));
             AssertUtil(GuildPermission.ViewChannel, x => x.ViewChannel, (p, enable) => p.Modify(viewChannel: enable));
             AssertUtil(GuildPermission.SendMessages, x => x.SendMessages, (p, enable) => p.Modify(sendMessages: enable));
             AssertUtil(GuildPermission.SendTTSMessages, x => x.SendTTSMessages, (p, enable) => p.Modify(sendTTSMessages: enable));

@@ -68,10 +68,12 @@ namespace Discord.Audio.Streams
 
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
-
             if (disposing)
+            {
                 _decoder.Dispose();
+                _next.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

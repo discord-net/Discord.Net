@@ -57,5 +57,12 @@ namespace Discord
         ///     The message for when a news channel subscription is added to a text channel.
         /// </summary>
         ChannelFollowAdd = 12,
+        /// <summary>
+        ///     The message is an inline reply.
+        /// </summary>
+        /// <remarks>
+        ///     Only available in API v8.
+        /// </remarks>
+        Reply = 19,
     }
 }

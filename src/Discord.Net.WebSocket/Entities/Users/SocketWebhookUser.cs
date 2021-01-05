@@ -65,6 +65,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         DateTimeOffset? IGuildUser.PremiumSince => null;
         /// <inheritdoc />
+        bool? IGuildUser.IsPending => null;
+        /// <inheritdoc />
         GuildPermissions IGuildUser.GuildPermissions => GuildPermissions.Webhook;
 
         /// <inheritdoc />

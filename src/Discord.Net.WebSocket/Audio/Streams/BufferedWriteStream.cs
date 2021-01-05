@@ -61,14 +61,17 @@ namespace Discord.Audio.Streams
 
             _task = Run();
         }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
                 _disposeTokenSource?.Cancel();
                 _disposeTokenSource?.Dispose();
+                _cancelTokenSource?.Cancel();
                 _cancelTokenSource?.Dispose();
                 _queueLock?.Dispose();
+                _next.Dispose();
             }
             base.Dispose(disposing);
         }

@@ -29,6 +29,8 @@ namespace Discord.Rest
         public DateTimeOffset? PremiumSince => DateTimeUtils.FromTicks(_premiumSinceTicks);
         /// <inheritdoc />
         public ulong GuildId => Guild.Id;
+        /// <inheritdoc />
+        public bool? IsPending { get; private set; }
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException" accessor="get">Resolving permissions requires the parent guild to be downloaded.</exception>
@@ -73,6 +75,8 @@ namespace Discord.Rest
                 UpdateRoles(model.Roles.Value);
             if (model.PremiumSince.IsSpecified)
                 _premiumSinceTicks = model.PremiumSince.Value?.UtcTicks;
+            if (model.Pending.IsSpecified)
+                IsPending = model.Pending.Value;
         }
         private void UpdateRoles(ulong[] roleIds)
         {

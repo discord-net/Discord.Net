@@ -76,5 +76,12 @@ namespace Discord.Audio.Streams
                 (buffer[extensionOffset + 3]);
             return extensionOffset + 4 + (extensionLength * 4);
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                _next.Dispose();
+            base.Dispose(disposing);
+        }
     }
 }

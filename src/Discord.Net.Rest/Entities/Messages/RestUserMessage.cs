@@ -13,8 +13,9 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestUserMessage : RestMessage, IUserMessage
     {
-        private bool _isMentioningEveryone, _isTTS, _isPinned, _isSuppressed;
+        private bool _isMentioningEveryone, _isTTS, _isPinned;
         private long? _editedTimestampTicks;
+        private IUserMessage _referencedMessage;
         private ImmutableArray<Attachment> _attachments = ImmutableArray.Create<Attachment>();
         private ImmutableArray<Embed> _embeds = ImmutableArray.Create<Embed>();
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
@@ -26,7 +27,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public override bool IsPinned => _isPinned;
         /// <inheritdoc />
-        public override bool IsSuppressed => _isSuppressed;
+        public override bool IsSuppressed => Flags.HasValue && Flags.Value.HasFlag(MessageFlags.SuppressEmbeds);
         /// <inheritdoc />
         public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
         /// <inheritdoc />
@@ -43,6 +44,8 @@ namespace Discord.Rest
         public override IReadOnlyCollection<RestUser> MentionedUsers => _userMentions;
         /// <inheritdoc />
         public override IReadOnlyCollection<ITag> Tags => _tags;
+        /// <inheritdoc />
+        public IUserMessage ReferencedMessage => _referencedMessage;
 
         internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
             : base(discord, id, channel, author, source)
@@ -67,10 +70,6 @@ namespace Discord.Rest
                 _editedTimestampTicks = model.EditedTimestamp.Value?.UtcTicks;
             if (model.MentionEveryone.IsSpecified)
                 _isMentioningEveryone = model.MentionEveryone.Value;
-            if (model.Flags.IsSpecified)
-            {
-                _isSuppressed = model.Flags.Value.HasFlag(API.MessageFlags.Suppressed);
-            }
             if (model.RoleMentions.IsSpecified)
                 _roleMentionIds = model.RoleMentions.Value.ToImmutableArray();
 
@@ -118,13 +117,20 @@ namespace Discord.Rest
                 }
             }
 
+            var guildId = (Channel as IGuildChannel)?.GuildId;
+            var guild = guildId != null ? (Discord as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
             if (model.Content.IsSpecified)
             {
                 var text = model.Content.Value;
-                var guildId = (Channel as IGuildChannel)?.GuildId;
-                var guild = guildId != null ? (Discord as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
                 _tags = MessageHelper.ParseTags(text, null, guild, _userMentions);
                 model.Content = text;
+            }
+
+            if (model.ReferencedMessage.IsSpecified && model.ReferencedMessage.Value != null)
+            {
+                var refMsg = model.ReferencedMessage.Value;
+                IUser refMsgAuthor = MessageHelper.GetAuthor(Discord, guild, refMsg.Author.Value, refMsg.WebhookId.ToNullable());
+                _referencedMessage = RestUserMessage.Create(Discord, Channel, refMsgAuthor, refMsg);
             }
         }
 
@@ -154,10 +160,10 @@ namespace Discord.Rest
             => MentionUtils.Resolve(this, 0, userHandling, channelHandling, roleHandling, everyoneHandling, emojiHandling);
 
         /// <inheritdoc />
-        /// <exception cref="InvalidOperationException">This operation may only be called on a <see cref="RestNewsChannel"/> channel.</exception>
+        /// <exception cref="InvalidOperationException">This operation may only be called on a <see cref="INewsChannel"/> channel.</exception>
         public async Task CrosspostAsync(RequestOptions options = null)
         {
-            if (!(Channel is RestNewsChannel))
+            if (!(Channel is INewsChannel))
             {
                 throw new InvalidOperationException("Publishing (crossposting) is only valid in news channels.");
             }

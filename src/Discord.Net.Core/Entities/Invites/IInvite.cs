@@ -21,6 +21,13 @@ namespace Discord
         string Url { get; }
 
         /// <summary>
+        ///     Gets the user that created this invite.
+        /// </summary>
+        /// <returns>
+        ///     A user that created this invite.
+        /// </returns>
+        IUser Inviter { get; }
+        /// <summary>
         ///     Gets the channel this invite is linked to.
         /// </summary>
         /// <returns>
@@ -83,5 +90,19 @@ namespace Discord
         ///     invite points to; <c>null</c> if one cannot be obtained.
         /// </returns>
         int? MemberCount { get; }
+        /// <summary>
+        ///     Gets the user this invite is linked to via <see cref="TargetUserType"/>.
+        /// </summary>
+        /// <returns>
+        ///     A user that is linked to this invite.
+        /// </returns>
+        IUser TargetUser { get; }
+        /// <summary>
+        ///     Gets the type of the linked <see cref="TargetUser"/> for this invite.
+        /// </summary>
+        /// <returns>
+        ///     The type of the linked user that is linked to this invite.
+        /// </returns>
+        TargetUserType TargetUserType { get; }
     }
 }
