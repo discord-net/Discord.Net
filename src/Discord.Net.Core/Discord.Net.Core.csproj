@@ -15,6 +15,7 @@
     <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
     <!-- <PackageReference Include="System.Interactive.Async" Version="5.0.0" /> -->
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />
+    <PackageReference Include="System.Linq.Async" Version="5.0.0" />
     <PackageReference Include="IDisposableAnalyzers" Version="3.4.8">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
