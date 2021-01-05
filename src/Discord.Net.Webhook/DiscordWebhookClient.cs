@@ -18,7 +18,7 @@ namespace Discord.Webhook
         private readonly ulong _webhookId;
         internal IWebhook Webhook;
         internal readonly Logger _restLogger;
-        
+
         internal API.DiscordRestApiClient ApiClient { get; }
         internal LogManager LogManager { get; }
 
@@ -33,7 +33,7 @@ namespace Discord.Webhook
             : this(webhookUrl, new DiscordRestConfig()) { }
 
         // regex pattern to match webhook urls
-        private static Regex WebhookUrlRegex = new Regex(@"^.*(discord|discordapp)\.com\/api\/webhooks\/([\d]+)\/([a-z0-9_-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        private static Regex WebhookUrlRegex = new Regex(@"^.*(discord|discordapp)\.com\/api\/webhooks\/([\d]+)\/([a-zA-Z0-9_-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
         /// <summary> Creates a new Webhook Discord client. </summary>
         public DiscordWebhookClient(ulong webhookId, string webhookToken, DiscordRestConfig config)
