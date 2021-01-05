@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
     <RootNamespace>_04_webhook_client</RootNamespace>
   </PropertyGroup>
 

@@ -5,7 +5,7 @@
     <RootNamespace>Discord.Providers.WS4Net</RootNamespace>
     <Description>An optional WebSocket client provider for Discord.Net using WebSocket4Net</Description>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
