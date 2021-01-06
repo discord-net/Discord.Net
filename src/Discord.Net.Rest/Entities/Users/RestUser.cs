@@ -31,7 +31,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string Mention => MentionUtils.MentionUser(Id);
         /// <inheritdoc />
-        private virtual UserStatus Status => UserStatus.Offline;	
+        private UserStatus Status => UserStatus.Offline;	
         /// <inheritdoc />
         public virtual IActivity Activity => null;
         /// <inheritdoc />
