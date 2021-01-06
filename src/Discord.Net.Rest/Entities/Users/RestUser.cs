@@ -33,8 +33,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         public virtual IActivity Activity => null;
         /// <inheritdoc />
-        public virtual UserStatus Status => UserStatus.Offline;
-        /// <inheritdoc />
         public virtual IImmutableSet<ClientType> ActiveClients => ImmutableHashSet<ClientType>.Empty;
         /// <inheritdoc />
         public virtual IImmutableList<IActivity> Activities => ImmutableList<IActivity>.Empty;
