@@ -31,7 +31,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string Mention => MentionUtils.MentionUser(Id);
         /// <inheritdoc />
-        private UserStatus Status => UserStatus.Offline;	
+        [Obsolete("REST API doesn't return Status.\nYou could get ID from RestUser and run `GetUser` from Gateway.")]
+        public virtual UserStatus Status => UserStatus.Offline;	
         /// <inheritdoc />
         public virtual IActivity Activity => null;
         /// <inheritdoc />
