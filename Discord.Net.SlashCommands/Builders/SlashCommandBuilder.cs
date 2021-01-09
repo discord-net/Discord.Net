@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Discord.Commands.Builders
+namespace Discord.SlashCommands.Builders
 {
     /// <summary>
     ///     A class used to build slash commands.
@@ -390,7 +390,7 @@ namespace Discord.Commands.Builders
                 Default = this.Default,
                 Required = this.Required,
                 Type = this.Type,
-                Options = Options != null ? new List<ApplicationCommandOptionProperties>(this.Options.Select(x => x.Build())) : null,
+                Options = new List<ApplicationCommandOptionProperties>(this.Options.Select(x => x.Build())),
                 Choices = this.Choices
             };
         }

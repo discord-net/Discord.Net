@@ -211,5 +211,6 @@ namespace Discord.WebSocket
         }
 
         IApplicationCommandInteractionData IDiscordInteraction.Data => Data;
+        IGuild IDiscordInteraction.Guild => Guild;
     }
 }

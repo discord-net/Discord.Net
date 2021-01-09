@@ -21,6 +21,11 @@ namespace Discord
         ulong Id { get; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        IGuild Guild { get; }
+
+        /// <summary>
         ///     The type of this <see cref="IDiscordInteraction"/>.
         /// </summary>
         InteractionType Type { get; }

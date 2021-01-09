@@ -38,6 +38,7 @@ namespace Discord.WebSocket
             this.Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => new SocketInteractionDataOption(x, discord, guild)).ToImmutableArray()
                 : null;
+
         }
 
         // Converters
