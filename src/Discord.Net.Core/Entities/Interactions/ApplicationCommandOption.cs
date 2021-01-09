@@ -58,7 +58,7 @@ namespace Discord
         public bool? Required { get; set; }
 
         /// <summary>
-        ///     choices for string and int types for the user to pick from
+        ///     choices for string and int types for the user to pick from.
         /// </summary>
         public List<ApplicationCommandOptionChoiceProperties> Choices { get; set; }
 

@@ -9,52 +9,52 @@ using Model = Discord.API.Gateway.InteractionCreated;
 namespace Discord.WebSocket
 {
     /// <summary>
-    ///     Represents an Interaction recieved over the gateway
+    ///     Represents an Interaction recieved over the gateway.
     /// </summary>
     public class SocketInteraction : SocketEntity<ulong>, IDiscordInteraction
     {
         /// <summary>
-        ///     The <see cref="SocketGuild"/> this interaction was used in
+        ///     The <see cref="SocketGuild"/> this interaction was used in.
         /// </summary>
         public SocketGuild Guild
             => Discord.GetGuild(GuildId);
 
         /// <summary>
-        /// The <see cref="SocketTextChannel"/> this interaction was used in
+        ///     The <see cref="SocketTextChannel"/> this interaction was used in.
         /// </summary>
         public SocketTextChannel Channel
             => Guild.GetTextChannel(ChannelId);
 
         /// <summary>
-        /// The <see cref="SocketGuildUser"/> who triggered this interaction
+        ///     The <see cref="SocketGuildUser"/> who triggered this interaction.
         /// </summary>
         public SocketGuildUser Member
             => Guild.GetUser(MemberId);
 
         /// <summary>
-        ///     The type of this interaction
+        ///     The type of this interaction.
         /// </summary>
         public InteractionType Type { get; private set; }
 
         /// <summary>
-        ///     The data associated with this interaction
+        ///     The data associated with this interaction.
         /// </summary>
         public SocketInteractionData Data { get; private set; }
 
         /// <summary>
-        /// The token used to respond to this interaction
+        ///     The token used to respond to this interaction.
         /// </summary>
         public string Token { get; private set; }
 
         /// <summary>
-        /// The version of this interaction
+        ///     The version of this interaction.
         /// </summary>
         public int Version { get; private set; }
 
         public DateTimeOffset CreatedAt { get; }
 
         /// <summary>
-        ///     <see langword="true"/> if the token is valid for replying to, otherwise <see langword="false"/>
+        ///     <see langword="true"/> if the token is valid for replying to, otherwise <see langword="false"/>.
         /// </summary>
         public bool IsValidToken
             => CheckToken();
@@ -78,7 +78,7 @@ namespace Discord.WebSocket
         internal void Update(Model model)
         {
             this.Data = model.Data.IsSpecified
-                ? SocketInteractionData.Create(this.Discord, model.Data.Value)
+                ? SocketInteractionData.Create(this.Discord, model.Data.Value, model.GuildId)
                 : null;
 
             this.GuildId = model.GuildId;
@@ -101,17 +101,17 @@ namespace Discord.WebSocket
         ///     <see cref="FollowupAsync(string, bool, Embed, InteractionResponseType, AllowedMentions, RequestOptions)"/> instead.
         /// </para>
         /// </summary>
-        /// <param name="text">The text of the message to be sent</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/></param>
-        /// <param name="embed">A <see cref="Embed"/> to send with this response</param>
-        /// <param name="Type">The type of response to this Interaction</param>
-        /// <param name="allowedMentions">The allowed mentions for this response</param>
-        /// <param name="options">The request options for this response</param>
+        /// <param name="text">The text of the message to be sent.</param>
+        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
+        /// <param name="embed">A <see cref="Embed"/> to send with this response.</param>
+        /// <param name="Type">The type of response to this Interaction.</param>
+        /// <param name="allowedMentions">The allowed mentions for this response.</param>
+        /// <param name="options">The request options for this response.</param>
         /// <returns>
-        ///     The <see cref="IMessage"/> sent as the response. If this is the first acknowledgement, it will return null;
+        ///     The <see cref="IMessage"/> sent as the response. If this is the first acknowledgement, it will return null.
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid</exception>
+        /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
 
         public async Task<IMessage> RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType Type = InteractionResponseType.ChannelMessageWithSource, AllowedMentions allowedMentions = null, RequestOptions options = null)
         {
@@ -162,16 +162,16 @@ namespace Discord.WebSocket
         }
 
         /// <summary>
-        ///     Sends a followup message for this interaction
+        ///     Sends a followup message for this interaction.
         /// </summary>
         /// <param name="text">The text of the message to be sent</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/></param>
-        /// <param name="embed">A <see cref="Embed"/> to send with this response</param>
-        /// <param name="Type">The type of response to this Interaction</param>
-        /// <param name="allowedMentions">The allowed mentions for this response</param>
-        /// <param name="options">The request options for this response</param>
+        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
+        /// <param name="embed">A <see cref="Embed"/> to send with this response.</param>
+        /// <param name="Type">The type of response to this Interaction.</param>
+        /// <param name="allowedMentions">The allowed mentions for this response.</param>
+        /// <param name="options">The request options for this response.</param>
         /// <returns>
-        ///     The sent message
+        ///     The sent message.
         /// </returns>
         public async Task<IMessage> FollowupAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType Type = InteractionResponseType.ChannelMessageWithSource,
             AllowedMentions allowedMentions = null, RequestOptions options = null)
@@ -195,10 +195,10 @@ namespace Discord.WebSocket
         }
 
         /// <summary>
-        ///     Acknowledges this interaction with the <see cref="InteractionResponseType.ACKWithSource"/>
+        ///     Acknowledges this interaction with the <see cref="InteractionResponseType.ACKWithSource"/>.
         /// </summary>
         /// <returns>
-        ///     A task that represents the asynchronous operation of acknowledging the interaction
+        ///     A task that represents the asynchronous operation of acknowledging the interaction.
         /// </returns>
         public async Task AcknowledgeAsync(RequestOptions options = null)
         {

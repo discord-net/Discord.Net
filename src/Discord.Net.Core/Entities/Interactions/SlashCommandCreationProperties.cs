@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     A class used to create slash commands
+    ///     A class used to create slash commands.
     /// </summary>
     public class SlashCommandCreationProperties
     {

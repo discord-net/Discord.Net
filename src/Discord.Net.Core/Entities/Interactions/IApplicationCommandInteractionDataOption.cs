@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a option group for a command, see <see href="https://discord.com/developers/docs/interactions/slash-commands#interaction-applicationcommandinteractiondataoption"/>
+    ///     Represents a option group for a command, see <see href="https://discord.com/developers/docs/interactions/slash-commands#interaction-applicationcommandinteractiondataoption"/>.
     /// </summary>
     public interface IApplicationCommandInteractionDataOption
     {

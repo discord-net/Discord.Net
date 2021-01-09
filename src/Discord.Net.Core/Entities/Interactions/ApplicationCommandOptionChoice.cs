@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a choice for a <see cref="IApplicationCommandInteractionDataOption"/>. This class is used when making new commands
+    ///     Represents a choice for a <see cref="IApplicationCommandInteractionDataOption"/>. This class is used when making new commands.
     /// </summary>
     public class ApplicationCommandOptionChoiceProperties
     {
         private string _name;
         private object _value;
         /// <summary>
-        ///     The name of this choice
+        ///     The name of this choice.
         /// </summary>
         public string Name
         {
@@ -30,7 +30,7 @@ namespace Discord
         // Note: discord allows strings & ints as values. how should that be handled?
         // should we make this an object and then just type check it?
         /// <summary>
-        ///     The value of this choice
+        ///     The value of this choice.
         /// </summary>
         public object Value
         {

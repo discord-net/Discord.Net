@@ -9,20 +9,30 @@ using Model = Discord.API.ApplicationCommand;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a rest implementation of the <see cref="IApplicationCommand"/>
+    ///     Represents a Rest-based implementation of the <see cref="IApplicationCommand"/>.
     /// </summary>
     public abstract class RestApplicationCommand : RestEntity<ulong>, IApplicationCommand
     {
+        /// <inheritdoc/>
         public ulong ApplicationId { get; private set; }
 
+        /// <inheritdoc/>
         public string Name { get; private set; }
 
+        /// <inheritdoc/>
         public string Description { get; private set; }
 
+        /// <summary>
+        ///     The options of this command.
+        /// </summary>
         public IReadOnlyCollection<RestApplicationCommandOption> Options { get; private set; }
 
+        /// <summary>
+        ///     The type of this rest application command.
+        /// </summary>
         public RestApplicationCommandType CommandType { get; internal set; }
 
+        /// <inheritdoc/>
         public DateTimeOffset CreatedAt
             => SnowflakeUtils.FromSnowflake(this.Id);
 

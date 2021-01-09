@@ -7,9 +7,16 @@ using Model = Discord.API.ApplicationCommand;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a Rest-based guild command.
+    /// </summary>
     public class RestGuildCommand : RestApplicationCommand
     {
+        /// <summary>
+        ///     The guild Id where this command originates.
+        /// </summary>
         public ulong GuildId { get; set; }
+
         internal RestGuildCommand(BaseDiscordClient client, ulong id, ulong guildId)
             : base(client, id)
         {
@@ -24,6 +31,7 @@ namespace Discord.Rest
             return entity;
         }
 
+        /// <inheritdoc/>
         public override async Task DeleteAsync(RequestOptions options = null)
             => await InteractionHelper.DeleteGuildCommand(Discord, this).ConfigureAwait(false);
 

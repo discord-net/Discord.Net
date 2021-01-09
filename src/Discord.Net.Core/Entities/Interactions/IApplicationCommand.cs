@@ -40,7 +40,7 @@ namespace Discord
         ///     Deletes this command
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns></returns>
+        /// <returns>A task that represents the asynchronous delete operation.</returns>
         Task DeleteAsync(RequestOptions options = null);
     }
 }
