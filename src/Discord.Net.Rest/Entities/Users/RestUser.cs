@@ -31,10 +31,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string Mention => MentionUtils.MentionUser(Id);
         /// <inheritdoc />
+        public virtual IActivity Activity => null;
+        /// <inheritdoc />
         [Obsolete("REST API doesn't return Status.\nYou could get ID from RestUser and run `GetUser` from Gateway.")]
         public virtual UserStatus Status => UserStatus.Offline;	
-        /// <inheritdoc />
-        public virtual IActivity Activity => null;
         /// <inheritdoc />
         public virtual IImmutableSet<ClientType> ActiveClients => ImmutableHashSet<ClientType>.Empty;
         /// <inheritdoc />
