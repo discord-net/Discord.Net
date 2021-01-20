@@ -91,6 +91,15 @@ namespace Discord.Webhook
             string username = null, string avatarUrl = null, RequestOptions options = null, AllowedMentions allowedMentions = null)
             => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, allowedMentions, options);
 
+        /// <summary> Edits a message posted using this webhook. </summary>
+        public Task EditMessageAsync(ulong messageId, string text = null, IEnumerable<Embed> embeds = null,
+            AllowedMentions allowedMentions = null, RequestOptions options = null)
+            => WebhookClientHelper.EditMessageAsync(this, messageId, text, embeds, allowedMentions, options);
+
+        /// <summary> Deletes a message posted using this webhook. </summary>
+        public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
+            => WebhookClientHelper.DeleteMessageAsync(this, messageId, options);
+
         /// <summary> Sends a message to the channel for this webhook with an attachment. </summary>
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendFileAsync(string filePath, string text, bool isTTS = false,
