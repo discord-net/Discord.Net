@@ -178,28 +178,28 @@ namespace Discord.WebSocket
             => UserHelper.KickAsync(this, Discord, reason, options);
         /// <inheritdoc />
         public Task AddRoleAsync(ulong roleId, RequestOptions options = null)
-            => throw new NotImplementedException();
+            => AddRolesAsync(new[] { roleId }, options);
         /// <inheritdoc />
         public Task AddRoleAsync(IRole role, RequestOptions options = null)
-            => AddRolesAsync(new[] { role }, options);
+            => AddRoleAsync(role.Id, options);
         /// <inheritdoc />
         public Task AddRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
-            => throw new NotImplementedException();
+            => UserHelper.AddRolesAsync(this, Discord, roleIds, options);
         /// <inheritdoc />
         public Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
-            => UserHelper.AddRolesAsync(this, Discord, roles, options);
+            => AddRolesAsync(roles.Select(x => x.Id), options);
         /// <inheritdoc />
         public Task RemoveRoleAsync(ulong roleId, RequestOptions options = null)
-            => throw new NotImplementedException();
+            => RemoveRolesAsync(new[] { roleId }, options);
         /// <inheritdoc />
         public Task RemoveRoleAsync(IRole role, RequestOptions options = null)
-            => RemoveRolesAsync(new[] { role }, options);
+            => RemoveRoleAsync(role.Id, options);
         /// <inheritdoc />
         public Task RemoveRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
-            => throw new NotImplementedException();
+            => UserHelper.RemoveRolesAsync(this, Discord, roleIds, options);
         /// <inheritdoc />
         public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
-            => UserHelper.RemoveRolesAsync(this, Discord, roles, options);
+            => RemoveRolesAsync(roles.Select(x => x.Id));
 
         /// <inheritdoc />
         public ChannelPermissions GetPermissions(IGuildChannel channel)
