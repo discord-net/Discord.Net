@@ -63,7 +63,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Returns a collection of roles that the user possesses.
         /// </summary>
-        public IReadOnlyCollection<SocketRole> Roles 
+        public IReadOnlyCollection<SocketRole> Roles
             => _roleIds.Select(id => Guild.GetRole(id)).Where(x => x != null).ToReadOnlyCollection(() => _roleIds.Length);
         /// <summary>
         ///     Returns the voice channel the user is in, or <c>null</c> if none.
@@ -177,8 +177,14 @@ namespace Discord.WebSocket
         public Task KickAsync(string reason = null, RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, reason, options);
         /// <inheritdoc />
+        public Task AddRoleAsync(ulong roleId, RequestOptions options = null)
+            => throw new NotImplementedException();
+        /// <inheritdoc />
         public Task AddRoleAsync(IRole role, RequestOptions options = null)
             => AddRolesAsync(new[] { role }, options);
+        /// <inheritdoc />
+        public Task AddRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
+            => throw new NotImplementedException();
         /// <inheritdoc />
         public Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
             => UserHelper.AddRolesAsync(this, Discord, roles, options);

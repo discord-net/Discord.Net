@@ -112,14 +112,26 @@ namespace Discord.Rest
         public Task KickAsync(string reason = null, RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, reason, options);
         /// <inheritdoc />
+        public Task AddRoleAsync(ulong roleId, RequestOptions options = null)
+            => throw new NotImplementedException();
+        /// <inheritdoc />
         public Task AddRoleAsync(IRole role, RequestOptions options = null)
             => AddRolesAsync(new[] { role }, options);
+        /// <inheritdoc />
+        public Task AddRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
+            => throw new NotImplementedException();
         /// <inheritdoc />
         public Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
             => UserHelper.AddRolesAsync(this, Discord, roles, options);
         /// <inheritdoc />
+        public Task RemoveRoleAsync(ulong roleId, RequestOptions options = null)
+            => throw new NotImplementedException();
+        /// <inheritdoc />
         public Task RemoveRoleAsync(IRole role, RequestOptions options = null)
             => RemoveRolesAsync(new[] { role }, options);
+        /// <inheritdoc />
+        public Task RemoveRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
+            => throw new NotImplementedException();
         /// <inheritdoc />
         public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
             => UserHelper.RemoveRolesAsync(this, Discord, roles, options);

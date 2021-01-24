@@ -59,27 +59,35 @@ namespace Discord.Rest
         /// <inheritdoc />
         ChannelPermissions IGuildUser.GetPermissions(IGuildChannel channel) => Permissions.ToChannelPerms(channel, GuildPermissions.Webhook.RawValue);
         /// <inheritdoc />
-        Task IGuildUser.KickAsync(string reason, RequestOptions options) => 
+        Task IGuildUser.KickAsync(string reason, RequestOptions options) =>
             throw new NotSupportedException("Webhook users cannot be kicked.");
 
         /// <inheritdoc />
-        Task IGuildUser.ModifyAsync(Action<GuildUserProperties> func, RequestOptions options) => 
+        Task IGuildUser.ModifyAsync(Action<GuildUserProperties> func, RequestOptions options) =>
             throw new NotSupportedException("Webhook users cannot be modified.");
-
         /// <inheritdoc />
-        Task IGuildUser.AddRoleAsync(IRole role, RequestOptions options) => 
+        Task IGuildUser.AddRoleAsync(ulong role, RequestOptions options) =>
             throw new NotSupportedException("Roles are not supported on webhook users.");
-
         /// <inheritdoc />
-        Task IGuildUser.AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options) => 
+        Task IGuildUser.AddRoleAsync(IRole role, RequestOptions options) =>
             throw new NotSupportedException("Roles are not supported on webhook users.");
-
         /// <inheritdoc />
-        Task IGuildUser.RemoveRoleAsync(IRole role, RequestOptions options) => 
+        Task IGuildUser.AddRolesAsync(IEnumerable<ulong> roles, RequestOptions options) =>
             throw new NotSupportedException("Roles are not supported on webhook users.");
-
         /// <inheritdoc />
-        Task IGuildUser.RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options) => 
+        Task IGuildUser.AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options) =>
+            throw new NotSupportedException("Roles are not supported on webhook users.");
+        /// <inheritdoc />
+        Task IGuildUser.RemoveRoleAsync(ulong role, RequestOptions options) =>
+            throw new NotSupportedException("Roles are not supported on webhook users.");
+        /// <inheritdoc />
+        Task IGuildUser.RemoveRoleAsync(IRole role, RequestOptions options) =>
+            throw new NotSupportedException("Roles are not supported on webhook users.");
+        /// <inheritdoc />
+        Task IGuildUser.RemoveRolesAsync(IEnumerable<ulong> roles, RequestOptions options) =>
+            throw new NotSupportedException("Roles are not supported on webhook users.");
+        /// <inheritdoc />
+        Task IGuildUser.RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options) =>
             throw new NotSupportedException("Roles are not supported on webhook users.");
 
         //IVoiceState

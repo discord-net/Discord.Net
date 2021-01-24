@@ -113,7 +113,8 @@ namespace Discord
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
         Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null);
-
+        //TODO add docs
+        Task AddRoleAsync(ulong id, RequestOptions options = null);
         /// <summary>
         ///     Adds the specified role to this user in the guild.
         /// </summary>
@@ -123,6 +124,8 @@ namespace Discord
         ///     A task that represents the asynchronous role addition operation.
         /// </returns>
         Task AddRoleAsync(IRole role, RequestOptions options = null);
+        //TODO: Add docs
+        Task AddRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null);
         /// <summary>
         ///     Adds the specified <paramref name="roles"/> to this user in the guild.
         /// </summary>
@@ -132,6 +135,8 @@ namespace Discord
         ///     A task that represents the asynchronous role addition operation.
         /// </returns>
         Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null);
+        //TODO add docs
+        Task RemoveRoleAsync(ulong id, RequestOptions options = null);
         /// <summary>
         ///     Removes the specified <paramref name="role"/> from this user in the guild.
         /// </summary>
@@ -141,6 +146,8 @@ namespace Discord
         ///     A task that represents the asynchronous role removal operation.
         /// </returns>
         Task RemoveRoleAsync(IRole role, RequestOptions options = null);
+        //TODO: Add docs
+        Task RemoveRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null);
         /// <summary>
         ///     Removes the specified <paramref name="roles"/> from this user in the guild.
         /// </summary>
