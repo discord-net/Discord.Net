@@ -189,8 +189,14 @@ namespace Discord.WebSocket
         public Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
             => UserHelper.AddRolesAsync(this, Discord, roles, options);
         /// <inheritdoc />
+        public Task RemoveRoleAsync(ulong roleId, RequestOptions options = null)
+            => throw new NotImplementedException();
+        /// <inheritdoc />
         public Task RemoveRoleAsync(IRole role, RequestOptions options = null)
             => RemoveRolesAsync(new[] { role }, options);
+        /// <inheritdoc />
+        public Task RemoveRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
+            => throw new NotImplementedException();
         /// <inheritdoc />
         public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
             => UserHelper.RemoveRolesAsync(this, Discord, roles, options);
