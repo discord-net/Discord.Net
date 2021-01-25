@@ -107,6 +107,11 @@ namespace Discord.Rest
             => ClientHelper.GetVoiceRegionAsync(this, id, options);
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetWebhookAsync(this, id, options);
+        public Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId)
+            => ClientHelper.AddRoleAsync(this, guildId, userId, roleId);
+
+        public Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId)
+            => ClientHelper.AddRoleAsync(this, guildId, userId, roleId);
 
         //IDiscordClient
         /// <inheritdoc />
