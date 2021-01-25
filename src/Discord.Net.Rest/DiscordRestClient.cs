@@ -109,7 +109,6 @@ namespace Discord.Rest
             => ClientHelper.GetWebhookAsync(this, id, options);
         public Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId)
             => ClientHelper.AddRoleAsync(this, guildId, userId, roleId);
-
         public Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId)
             => ClientHelper.AddRoleAsync(this, guildId, userId, roleId);
 
