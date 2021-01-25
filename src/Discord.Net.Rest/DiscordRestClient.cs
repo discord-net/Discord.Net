@@ -110,7 +110,7 @@ namespace Discord.Rest
         public Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId)
             => ClientHelper.AddRoleAsync(this, guildId, userId, roleId);
         public Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId)
-            => ClientHelper.AddRoleAsync(this, guildId, userId, roleId);
+            => ClientHelper.RemoveRoleAsync(this, guildId, userId, roleId);
 
         //IDiscordClient
         /// <inheritdoc />
