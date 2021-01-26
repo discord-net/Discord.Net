@@ -91,7 +91,9 @@ namespace Discord.Webhook
             string username = null, string avatarUrl = null, RequestOptions options = null, AllowedMentions allowedMentions = null)
             => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, allowedMentions, options);
 
-        /// <summary> Modifies a message posted using this webhook. </summary>
+        /// <summary>
+        ///     Modifies a message posted using this webhook.
+        /// </summary>
         /// <remarks>
         ///     This method can only modify messages that were sent using the same webhook.
         /// </remarks>
@@ -110,7 +112,9 @@ namespace Discord.Webhook
             AllowedMentions allowedMentions = null, RequestOptions options = null)
             => WebhookClientHelper.ModifyMessageAsync(this, messageId, text, embeds, allowedMentions, options);
 
-        /// <summary> Deletes a message posted using this webhook. </summary>
+        /// <summary>
+        ///     Deletes a message posted using this webhook.
+        /// </summary>
         /// <remarks>
         ///     This method can only delete messages that were sent using the same webhook.
         /// </remarks>
