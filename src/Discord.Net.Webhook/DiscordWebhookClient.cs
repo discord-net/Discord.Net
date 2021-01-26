@@ -98,19 +98,13 @@ namespace Discord.Webhook
         ///     This method can only modify messages that were sent using the same webhook.
         /// </remarks>
         /// <param name="messageId">ID of the modified message.</param>
-        /// <param name="text">The message to be sent.</param>
-        /// <param name="embeds">The <see cref="Discord.EmbedType.Rich" /> <see cref="Embed" /> enumeration to be sent.</param>
-        /// <param name="allowedMentions">
-        ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
-        ///     If <c>null</c>, all mentioned roles and users will be notified.
-        /// </param>
+        /// <param name="func">A delegate containing the properties to modify the message with.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
-        public Task ModifyMessageAsync(ulong messageId, string text = null, IEnumerable<Embed> embeds = null,
-            AllowedMentions allowedMentions = null, RequestOptions options = null)
-            => WebhookClientHelper.ModifyMessageAsync(this, messageId, text, embeds, allowedMentions, options);
+        public Task ModifyMessageAsync(ulong messageId, Action<WebhookMessageProperties> func, RequestOptions options = null)
+            => WebhookClientHelper.ModifyMessageAsync(this, messageId, func, options);
 
         /// <summary>
         ///     Deletes a message posted using this webhook.
