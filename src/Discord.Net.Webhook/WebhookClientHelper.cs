@@ -36,16 +36,16 @@ namespace Discord.Webhook
             var model = await client.ApiClient.CreateWebhookMessageAsync(client.Webhook.Id, args, options: options).ConfigureAwait(false);
             return model.Id;
         }
-        public static async Task EditMessageAsync(DiscordWebhookClient client, ulong messageId, string text, IEnumerable<Embed> embeds, 
+        public static async Task ModifyMessageAsync(DiscordWebhookClient client, ulong messageId, string text, IEnumerable<Embed> embeds,
             AllowedMentions allowedMentions, RequestOptions options)
         {
-            var args = new EditWebhookMessageParams(text);
+            var args = new ModifyWebhookMessageParams { Content = text };
             if (embeds != null)
                 args.Embeds = embeds.Select(x => x.ToModel()).ToArray();
             if (allowedMentions != null)
                 args.AllowedMentions = allowedMentions.ToModel();
 
-            await client.ApiClient.EditWebhookMessageAsync(client.Webhook.Id, messageId, args, options: options).ConfigureAwait(false);
+            await client.ApiClient.ModifyWebhookMessageAsync(client.Webhook.Id, messageId, args, options: options).ConfigureAwait(false);
         }
         public static async Task DeleteMessageAsync(DiscordWebhookClient client, ulong messageId, RequestOptions options)
         {

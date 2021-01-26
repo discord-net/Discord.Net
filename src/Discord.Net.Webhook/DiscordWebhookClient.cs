@@ -91,12 +91,34 @@ namespace Discord.Webhook
             string username = null, string avatarUrl = null, RequestOptions options = null, AllowedMentions allowedMentions = null)
             => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, allowedMentions, options);
 
-        /// <summary> Edits a message posted using this webhook. </summary>
-        public Task EditMessageAsync(ulong messageId, string text = null, IEnumerable<Embed> embeds = null,
+        /// <summary> Modifies a message posted using this webhook. </summary>
+        /// <remarks>
+        ///     This method can only modify messages that were sent using the same webhook.
+        /// </remarks>
+        /// <param name="messageId">ID of the modified message.</param>
+        /// <param name="text">The message to be sent.</param>
+        /// <param name="embeds">The <see cref="Discord.EmbedType.Rich" /> <see cref="Embed" /> enumeration to be sent.</param>
+        /// <param name="allowedMentions">
+        ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
+        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        /// </param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        public Task ModifyMessageAsync(ulong messageId, string text = null, IEnumerable<Embed> embeds = null,
             AllowedMentions allowedMentions = null, RequestOptions options = null)
-            => WebhookClientHelper.EditMessageAsync(this, messageId, text, embeds, allowedMentions, options);
+            => WebhookClientHelper.ModifyMessageAsync(this, messageId, text, embeds, allowedMentions, options);
 
         /// <summary> Deletes a message posted using this webhook. </summary>
+        /// <remarks>
+        ///     This method can only delete messages that were sent using the same webhook.
+        /// </remarks>
+        /// <param name="messageId">ID of the deleted message.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous deletion operation.
+        /// </returns>
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
             => WebhookClientHelper.DeleteMessageAsync(this, messageId, options);
 

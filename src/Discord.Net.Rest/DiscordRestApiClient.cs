@@ -526,7 +526,7 @@ namespace Discord.API
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="InvalidOperationException">This operation may only be called with a <see cref="TokenType.Webhook"/> token.</exception>
-        public async Task EditWebhookMessageAsync(ulong webhookId, ulong messageId, EditWebhookMessageParams args, RequestOptions options = null)
+        public async Task ModifyWebhookMessageAsync(ulong webhookId, ulong messageId, ModifyWebhookMessageParams args, RequestOptions options = null)
         {
             if (AuthTokenType != TokenType.Webhook)
                 throw new InvalidOperationException($"This operation may only be called with a {nameof(TokenType.Webhook)} token.");
@@ -534,9 +534,9 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
             Preconditions.NotEqual(messageId, 0, nameof(messageId));
-            if (!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0)
-                Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
+            if (args.Embeds.IsSpecified)
+                Preconditions.AtMost(args.Embeds.Value.Length, 10, nameof(args.Embeds), "A max of 10 Embeds are allowed.");
             if (args.Content?.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
             options = RequestOptions.CreateOrClone(options);

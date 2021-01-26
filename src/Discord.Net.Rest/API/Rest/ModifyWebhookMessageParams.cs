@@ -4,19 +4,13 @@ using Newtonsoft.Json;
 namespace Discord.API.Rest
 {
     [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
-    internal class EditWebhookMessageParams
+    internal class ModifyWebhookMessageParams
     {
         [JsonProperty("content")]
-        public string Content { get; }
-
+        public string Content { get; set; }
         [JsonProperty("embeds")]
         public Optional<Embed[]> Embeds { get; set; }
         [JsonProperty("allowed_mentions")]
         public Optional<AllowedMentions> AllowedMentions { get; set; }
-
-        public EditWebhookMessageParams(string content)
-        {
-            Content = content;
-        }
     }
 }
