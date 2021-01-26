@@ -537,7 +537,7 @@ namespace Discord.API
 
             if (args.Embeds.IsSpecified)
                 Preconditions.AtMost(args.Embeds.Value.Length, 10, nameof(args.Embeds), "A max of 10 Embeds are allowed.");
-            if (args.Content?.Length > DiscordConfig.MaxMessageSize)
+            if (args.Content.IsSpecified && args.Content.Value.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
             options = RequestOptions.CreateOrClone(options);
 
