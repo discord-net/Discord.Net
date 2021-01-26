@@ -96,7 +96,7 @@ namespace Discord.Rest
 
         public static async Task RemoveReactionAsync(ulong channelId, ulong messageId, ulong userId, IEmote emote, BaseDiscordClient client, RequestOptions options)
         {
-            await client.ApiClient.RemoveReactionAsync(channelId, messageId, userId, emote is Emote e ? $"{e.Name}:{e.Id}" : emote.Name, options).ConfigureAwait(false);
+            await client.ApiClient.RemoveReactionAsync(channelId, messageId, userId, emote is Emote e ? $"{e.Name}:{e.Id}" : UrlEncode(emote.Name), options).ConfigureAwait(false);
         }
 
         public static async Task RemoveReactionAsync(IMessage msg, ulong userId, IEmote emote, BaseDiscordClient client, RequestOptions options)
@@ -214,10 +214,13 @@ namespace Discord.Rest
             while (true)
             {
                 index = text.IndexOf('<', index);
-                if (index == -1) break;
+                if (index == -1)
+                    break;
                 int endIndex = text.IndexOf('>', index + 1);
-                if (endIndex == -1) break;
-                if (CheckWrappedCode()) break;
+                if (endIndex == -1)
+                    break;
+                if (CheckWrappedCode())
+                    break;
                 string content = text.Substring(index, endIndex - index + 1);
 
                 if (MentionUtils.TryParseUser(content, out ulong id))
@@ -264,8 +267,10 @@ namespace Discord.Rest
             while (true)
             {
                 index = text.IndexOf("@everyone", index);
-                if (index == -1) break;
-                if (CheckWrappedCode()) break;
+                if (index == -1)
+                    break;
+                if (CheckWrappedCode())
+                    break;
                 var tagIndex = FindIndex(tags, index);
                 if (tagIndex.HasValue)
                     tags.Insert(tagIndex.Value, new Tag<IRole>(TagType.EveryoneMention, index, "@everyone".Length, 0, guild?.EveryoneRole));
@@ -277,8 +282,10 @@ namespace Discord.Rest
             while (true)
             {
                 index = text.IndexOf("@here", index);
-                if (index == -1) break;
-                if (CheckWrappedCode()) break;
+                if (index == -1)
+                    break;
+                if (CheckWrappedCode())
+                    break;
                 var tagIndex = FindIndex(tags, index);
                 if (tagIndex.HasValue)
                     tags.Insert(tagIndex.Value, new Tag<IRole>(TagType.HereMention, index, "@here".Length, 0, guild?.EveryoneRole));
