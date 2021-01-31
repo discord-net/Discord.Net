@@ -245,15 +245,15 @@ namespace Discord.WebSocket
                     await _gatewayLogger.DebugAsync("Identifying").ConfigureAwait(false);
                     await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents, presence: BuildCurrentStatus()).ConfigureAwait(false);
                 }
-
-                //Wait for READY
-                await _connection.WaitAsync().ConfigureAwait(false);
             }
             finally
             {
                 if (locked)
                     _shardedClient.ReleaseIdentifyLock();
             }
+
+            //Wait for READY
+            await _connection.WaitAsync().ConfigureAwait(false);
         }
         private async Task OnDisconnectingAsync(Exception ex)
         {
@@ -632,7 +632,7 @@ namespace Discord.WebSocket
                                             }
                                             else if (_connection.CancelToken.IsCancellationRequested)
                                                 return;
-                                            
+
                                             if (BaseConfig.AlwaysDownloadUsers)
                                                 _ = DownloadUsersAsync(Guilds.Where(x => x.IsAvailable && !x.HasAllMembers));
 
