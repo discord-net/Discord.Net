@@ -554,25 +554,36 @@ namespace Discord.WebSocket
                     case GatewayOpCode.InvalidSession:
                         {
                             await _gatewayLogger.DebugAsync("Received InvalidSession").ConfigureAwait(false);
-                            await _gatewayLogger.WarningAsync("Failed to resume previous session").ConfigureAwait(false);
 
-                            _sessionId = null;
-                            _lastSeq = 0;
-
-                            if (_shardedClient != null)
+                            if (_sessionId != null)
                             {
-                                await _shardedClient.AcquireIdentifyLockAsync(ShardId, _connection.CancelToken).ConfigureAwait(false);
-                                try
+                                // Failed to resume
+                                await _gatewayLogger.WarningAsync("Failed to resume previous session").ConfigureAwait(false);
+
+                                _sessionId = null;
+                                _lastSeq = 0;
+
+                                if (_shardedClient != null)
                                 {
+                                    await _shardedClient.AcquireIdentifyLockAsync(ShardId, _connection.CancelToken).ConfigureAwait(false);
+                                    try
+                                    {
+                                        await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents, presence: BuildCurrentStatus()).ConfigureAwait(false);
+                                    }
+                                    finally
+                                    {
+                                        _shardedClient.ReleaseIdentifyLock();
+                                    }
+                                }
+                                else
                                     await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents, presence: BuildCurrentStatus()).ConfigureAwait(false);
-                                }
-                                finally
-                                {
-                                    _shardedClient.ReleaseIdentifyLock();
-                                }
                             }
                             else
+                            {
+                                // Failed to identify
+                                await _gatewayLogger.WarningAsync("Failed to resume previous session").ConfigureAwait(false);
                                 await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents, presence: BuildCurrentStatus()).ConfigureAwait(false);
+                            }
                         }
                         break;
                     case GatewayOpCode.Reconnect:
