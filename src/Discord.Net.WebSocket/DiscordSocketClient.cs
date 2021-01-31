@@ -245,15 +245,15 @@ namespace Discord.WebSocket
                     await _gatewayLogger.DebugAsync("Identifying").ConfigureAwait(false);
                     await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents, presence: BuildCurrentStatus()).ConfigureAwait(false);
                 }
-
-                //Wait for READY
-                await _connection.WaitAsync().ConfigureAwait(false);
             }
             finally
             {
                 if (locked)
                     _shardedClient.ReleaseIdentifyLock();
             }
+
+            //Wait for READY
+            await _connection.WaitAsync().ConfigureAwait(false);
         }
         private async Task OnDisconnectingAsync(Exception ex)
         {
@@ -554,36 +554,25 @@ namespace Discord.WebSocket
                     case GatewayOpCode.InvalidSession:
                         {
                             await _gatewayLogger.DebugAsync("Received InvalidSession").ConfigureAwait(false);
+                            await _gatewayLogger.WarningAsync("Failed to resume previous session").ConfigureAwait(false);
 
-                            if (_sessionId != null)
+                            _sessionId = null;
+                            _lastSeq = 0;
+
+                            if (_shardedClient != null)
                             {
-                                // Failed to resume
-                                await _gatewayLogger.WarningAsync("Failed to resume previous session").ConfigureAwait(false);
-
-                                _sessionId = null;
-                                _lastSeq = 0;
-
-                                if (_shardedClient != null)
+                                await _shardedClient.AcquireIdentifyLockAsync(ShardId, _connection.CancelToken).ConfigureAwait(false);
+                                try
                                 {
-                                    await _shardedClient.AcquireIdentifyLockAsync(ShardId, _connection.CancelToken).ConfigureAwait(false);
-                                    try
-                                    {
-                                        await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents, presence: BuildCurrentStatus()).ConfigureAwait(false);
-                                    }
-                                    finally
-                                    {
-                                        _shardedClient.ReleaseIdentifyLock();
-                                    }
-                                }
-                                else
                                     await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents, presence: BuildCurrentStatus()).ConfigureAwait(false);
+                                }
+                                finally
+                                {
+                                    _shardedClient.ReleaseIdentifyLock();
+                                }
                             }
                             else
-                            {
-                                // Failed to identify
-                                await _gatewayLogger.WarningAsync("Failed to identify").ConfigureAwait(false);
                                 await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents, presence: BuildCurrentStatus()).ConfigureAwait(false);
-                            }
                         }
                         break;
                     case GatewayOpCode.Reconnect:
@@ -643,7 +632,7 @@ namespace Discord.WebSocket
                                             }
                                             else if (_connection.CancelToken.IsCancellationRequested)
                                                 return;
-                                            
+
                                             if (BaseConfig.AlwaysDownloadUsers)
                                                 _ = DownloadUsersAsync(Guilds.Where(x => x.IsAvailable && !x.HasAllMembers));
 
