@@ -581,7 +581,7 @@ namespace Discord.WebSocket
                             else
                             {
                                 // Failed to identify
-                                await _gatewayLogger.WarningAsync("Failed to resume previous session").ConfigureAwait(false);
+                                await _gatewayLogger.WarningAsync("Failed to identify").ConfigureAwait(false);
                                 await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents, presence: BuildCurrentStatus()).ConfigureAwait(false);
                             }
                         }
