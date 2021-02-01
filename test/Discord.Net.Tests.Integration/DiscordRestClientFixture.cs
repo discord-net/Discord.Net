@@ -19,7 +19,6 @@ namespace Discord
                 throw new Exception("The DNET_TEST_TOKEN environment variable was not provided.");
             Client = new DiscordRestClient(new DiscordRestConfig()
             {
-                LogLevel = LogSeverity.Debug,
                 DefaultRetryMode = RetryMode.AlwaysRetry
             });
             Client.LoginAsync(TokenType.Bot, token).Wait();
