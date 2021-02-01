@@ -21,9 +21,7 @@ namespace Discord.Logging
 
             lock (_lock)
             {
-                var ename = eventId.Name;
-                ename = ename?.Length > 12 ? ename?.Substring(0, 12) : ename;
-                Console.Write($"[{DateTimeOffset.Now}] [{eventId.Id,-4}/{ename,-12}] ");
+                Console.Write($"{DateTime.Now} ");
                 
                 Console.Write(logLevel switch 
                 {
@@ -32,7 +30,7 @@ namespace Discord.Logging
                     LogLevel.Information => "[Info ] ",
                     LogLevel.Warning =>     "[Warn ] ",
                     LogLevel.Error =>       "[Error] ",
-                    LogLevel.Critical =>    "[Crit ]",
+                    LogLevel.Critical =>    "[Crit ] ",
                     LogLevel.None =>        "[None ] ",
                     _ =>                    "[?????] "
                 });
