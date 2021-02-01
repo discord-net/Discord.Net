@@ -3,6 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord.Net;
+using Microsoft.Extensions.Logging;
 
 namespace Discord
 {
@@ -14,7 +15,7 @@ namespace Discord
         private readonly AsyncEvent<Func<Exception, bool, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, bool, Task>>();
 
         private readonly SemaphoreSlim _stateLock;
-        private readonly Logger _logger;
+        private readonly ILogger _logger;
         private readonly int _connectionTimeout;
         private readonly Func<Task> _onConnecting;
         private readonly Func<Exception, Task> _onDisconnecting;
@@ -28,7 +29,7 @@ namespace Discord
         public ConnectionState State { get; private set; }
         public CancellationToken CancelToken { get; private set; }
 
-        internal ConnectionManager(SemaphoreSlim stateLock, Logger logger, int connectionTimeout,
+        internal ConnectionManager(SemaphoreSlim stateLock, ILogger logger, int connectionTimeout,
             Func<Task> onConnecting, Func<Exception, Task> onDisconnecting, Action<Func<Exception, Task>> clientDisconnectHandler)
         {
             _stateLock = stateLock;
@@ -85,12 +86,12 @@ namespace Discord
                             Error(ex); //In case this exception didn't come from another Error call
                             if (!reconnectCancelToken.IsCancellationRequested)
                             {
-                                await _logger.WarningAsync(ex).ConfigureAwait(false);
+                                _logger.LogWarning(ex, ex.Message);
                                 await DisconnectAsync(ex, true).ConfigureAwait(false);
                             }
                             else
                             {
-                                await _logger.ErrorAsync(ex).ConfigureAwait(false);
+                                _logger.LogError(ex, ex.Message);
                                 await DisconnectAsync(ex, false).ConfigureAwait(false);
                             }
                         }
@@ -124,7 +125,7 @@ namespace Discord
 
             _connectionPromise = new TaskCompletionSource<bool>();
             State = ConnectionState.Connecting;
-            await _logger.InfoAsync("Connecting").ConfigureAwait(false);
+            _logger.LogInformation("Connecting");
 
             try
             {
@@ -154,9 +155,9 @@ namespace Discord
                     throw innerEx;
                 }
 
-                await _logger.InfoAsync("Connected").ConfigureAwait(false);
+                _logger.LogInformation("Connected");
                 State = ConnectionState.Connected;
-                await _logger.DebugAsync("Raising Event").ConfigureAwait(false);
+                _logger.LogDebug("Raising Event");
                 await _connectedEvent.InvokeAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -169,13 +170,13 @@ namespace Discord
         {
             if (State == ConnectionState.Disconnected) return;
             State = ConnectionState.Disconnecting;
-            await _logger.InfoAsync("Disconnecting").ConfigureAwait(false);
+            _logger.LogInformation("Disconnecting");
 
             await _onDisconnecting(ex).ConfigureAwait(false);
 
             await _disconnectedEvent.InvokeAsync(ex, isReconnecting).ConfigureAwait(false);
             State = ConnectionState.Disconnected;
-            await _logger.InfoAsync("Disconnected").ConfigureAwait(false);
+            _logger.LogInformation("Disconnected");
         }
 
         public async Task CompleteAsync()

@@ -1,4 +1,5 @@
 using Discord.Logging;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -10,20 +11,17 @@ namespace Discord.Rest
 {
     public abstract class BaseDiscordClient : IDiscordClient
     {
-        public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
-        internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
-
         public event Func<Task> LoggedIn { add { _loggedInEvent.Add(value); } remove { _loggedInEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Task>> _loggedInEvent = new AsyncEvent<Func<Task>>();
         public event Func<Task> LoggedOut { add { _loggedOutEvent.Add(value); } remove { _loggedOutEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Task>> _loggedOutEvent = new AsyncEvent<Func<Task>>();
 
-        internal readonly Logger _restLogger;
+        internal readonly ILogger _restLogger;
         private readonly SemaphoreSlim _stateLock;
         private bool _isFirstLogin, _isDisposed;
 
         internal API.DiscordRestApiClient ApiClient { get; }
-        internal LogManager LogManager { get; }
+        internal ILoggerFactory LogManager { get; }
         /// <summary>
         ///     Gets the login state of the client.
         /// </summary>
@@ -39,21 +37,32 @@ namespace Discord.Rest
         internal BaseDiscordClient(DiscordRestConfig config, API.DiscordRestApiClient client)
         {
             ApiClient = client;
-            LogManager = new LogManager(config.LogLevel);
-            LogManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
+            LogManager = config.LoggerFactory;
+
+            if (LogManager == null)
+            {
+                LogManager = new DefaultLoggerFactory();
+                LogManager.AddProvider(new DefaultLoggerProvider());
+            }
 
             _stateLock = new SemaphoreSlim(1, 1);
             _restLogger = LogManager.CreateLogger("Rest");
             _isFirstLogin = config.DisplayInitialLog;
 
-            ApiClient.RequestQueue.RateLimitTriggered += async (id, info, endpoint) =>
+            ApiClient.RequestQueue.RateLimitTriggered += (id, info, endpoint) =>
             {
                 if (info == null)
-                    await _restLogger.VerboseAsync($"Preemptive Rate limit triggered: {endpoint} {(id.IsHashBucket ? $"(Bucket: {id.BucketHash})" : "")}").ConfigureAwait(false);
+                    _restLogger.LogTrace($"Preemptive Rate limit triggered: {endpoint} {(id.IsHashBucket ? $"(Bucket: {id.BucketHash})" : "")}");
                 else
-                    await _restLogger.WarningAsync($"Rate limit triggered: {endpoint} {(id.IsHashBucket ? $"(Bucket: {id.BucketHash})" : "")}").ConfigureAwait(false);
+                    _restLogger.LogTrace($"Rate limit triggered: {endpoint} {(id.IsHashBucket ? $"(Bucket: {id.BucketHash})" : "")}");
+
+                return Task.CompletedTask;
             };
-            ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
+            ApiClient.SentRequest += (method, endpoint, millis) =>
+            {
+                _restLogger.LogTrace($"{method} {endpoint}: {millis} ms");
+                return Task.CompletedTask;
+            };
         }
 
         public async Task LoginAsync(TokenType tokenType, string token, bool validateToken = true)
@@ -70,7 +79,7 @@ namespace Discord.Rest
             if (_isFirstLogin)
             {
                 _isFirstLogin = false;
-                await LogManager.WriteInitialLog().ConfigureAwait(false);
+                _restLogger.LogInformation($"Discord.Net v{DiscordConfig.Version} (API v{DiscordConfig.APIVersion})");
             }
 
             if (LoginState != LoginState.LoggedOut)
@@ -90,7 +99,7 @@ namespace Discord.Rest
                     catch (ArgumentException ex)
                     {
                         // log these ArgumentExceptions and allow for the client to attempt to log in anyways
-                        await LogManager.WarningAsync("Discord", "A supplied token was invalid.", ex).ConfigureAwait(false);
+                        _restLogger.LogWarning(ex, "A supplied token was invalid.");
                     }
                 }
 
