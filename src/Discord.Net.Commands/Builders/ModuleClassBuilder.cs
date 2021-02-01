@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 using Discord.Commands.Builders;
+using Microsoft.Extensions.Logging;
 
 namespace Discord.Commands
 {
@@ -34,7 +35,7 @@ namespace Discord.Commands
                 }
                 else if (IsLoadableModule(typeInfo))
                 {
-                    await service._cmdLogger.WarningAsync($"Class {typeInfo.FullName} is not public and cannot be loaded. To suppress this message, mark the class with {nameof(DontAutoLoadAttribute)}.").ConfigureAwait(false);
+                    service._cmdLogger.LogWarning($"Class {typeInfo.FullName} is not public and cannot be loaded. To suppress this message, mark the class with {nameof(DontAutoLoadAttribute)}.");
                 }
             }
 
@@ -69,7 +70,7 @@ namespace Discord.Commands
                 result[typeInfo.AsType()] = module.Build(service, services);
             }
 
-            await service._cmdLogger.DebugAsync($"Successfully built {builtTypes.Count} modules.").ConfigureAwait(false);
+            service._cmdLogger.LogDebug($"Successfully built {builtTypes.Count} modules.");
 
             return result;
         }
