@@ -852,6 +852,10 @@ namespace Discord.WebSocket
         ///     Clears this guild's user cache.
         /// </summary>
         public void ClearUserCache() => PurgeGuildUserCache();
+        /// <summary>
+        ///     Clears this guild's user cache.
+        /// </summary>
+        public void ClearUserCache(Func<SocketGuildUser, bool> predicate) => PurgeGuildUserCache(predicate);
         internal SocketGuildUser AddOrUpdateUser(UserModel model)
         {
             if (_members.TryGetValue(model.Id, out SocketGuildUser member))
@@ -909,19 +913,23 @@ namespace Discord.WebSocket
         }
         internal void PurgeGuildUserCache()
         {
-            var members = Users;
+            PurgeGuildUserCache(x => true);
+        }
+        internal void PurgeGuildUserCache(Func<SocketGuildUser, bool> predicate)
+        {
+            var members = Users.Where(predicate);
             var self = CurrentUser;
-            _members.Clear();
-            if (self != null)
-                _members.TryAdd(self.Id, self);
-
-            DownloadedMemberCount = _members.Count;
 
             foreach (var member in members)
             {
                 if (member.Id != self?.Id)
+                {
+                    _members.TryRemove(member.Id, out _);
                     member.GlobalUser.RemoveRef(Discord);
+                }
             }
+
+            DownloadedMemberCount = _members.Count;
         }
 
         /// <summary>
