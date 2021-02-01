@@ -911,10 +911,7 @@ namespace Discord.WebSocket
             }
             return null;
         }
-        internal void PurgeGuildUserCache()
-        {
-            PurgeGuildUserCache(x => true);
-        }
+        internal void PurgeGuildUserCache() => PurgeGuildUserCache(x => true);
         internal void PurgeGuildUserCache(Func<SocketGuildUser, bool> predicate)
         {
             var members = Users.Where(predicate);
