@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using System.Reflection;
 
 namespace Discord
@@ -123,14 +124,8 @@ namespace Discord
         ///     The currently set <see cref="RetryMode"/>.
         /// </returns>
         public RetryMode DefaultRetryMode { get; set; } = RetryMode.AlwaysRetry;
-
-        /// <summary>
-        ///     Gets or sets the minimum log level severity that will be sent to the Log event.
-        /// </summary>
-        /// <returns>
-        ///     The currently set <see cref="LogSeverity"/> for logging level.
-        /// </returns>
-        public LogSeverity LogLevel { get; set; } = LogSeverity.Info;
+        
+        public ILoggerFactory LoggerFactory { get; set; }
 
         /// <summary>
         ///     Gets or sets whether the initial log entry should be printed.
