@@ -3,8 +3,10 @@ using Discord.WebSocket;
 
 namespace Discord
 {
-    internal interface IMessageCache
+    public interface IMessageCache
     {
+        public IMessageCache CreateMessageCache(DiscordSocketClient discord);
+
         public IReadOnlyCollection<SocketMessage> Messages { get; }
 
         public void Add(SocketMessage message);
