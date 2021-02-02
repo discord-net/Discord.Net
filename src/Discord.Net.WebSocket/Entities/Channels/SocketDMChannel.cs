@@ -16,7 +16,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketDMChannel : SocketChannel, IDMChannel, ISocketPrivateChannel, ISocketMessageChannel
     {
-        private readonly MessageCache _messages;
+        private readonly IMessageCache _messages;
 
         /// <summary>
         ///     Gets the recipient of the channel.

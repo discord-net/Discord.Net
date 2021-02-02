@@ -20,7 +20,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGroupChannel : SocketChannel, IGroupChannel, ISocketPrivateChannel, ISocketMessageChannel, ISocketAudioChannel
     {
-        private readonly MessageCache _messages;
+        private readonly IMessageCache _messages;
         private readonly ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
 
         private string _iconId;

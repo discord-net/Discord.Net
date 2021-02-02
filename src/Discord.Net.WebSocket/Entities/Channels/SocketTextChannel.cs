@@ -16,7 +16,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketTextChannel : SocketGuildChannel, ITextChannel, ISocketMessageChannel
     {
-        private readonly MessageCache _messages;
+        private readonly IMessageCache _messages;
 
         /// <inheritdoc />
         public string Topic { get; private set; }
