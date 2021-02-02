@@ -38,7 +38,7 @@ namespace Discord.WebSocket
         internal SocketGroupChannel(DiscordSocketClient discord, ulong id)
             : base(discord, id)
         {
-            _messages = discord.MessageCache.CreateMessageCache(discord);
+            _messages = discord.MessageCache.CreateMessageCache();
             _voiceStates = new ConcurrentDictionary<ulong, SocketVoiceState>(ConcurrentHashSet.DefaultConcurrencyLevel, 5);
             _users = new ConcurrentDictionary<ulong, SocketGroupUser>(ConcurrentHashSet.DefaultConcurrencyLevel, 5);
         }

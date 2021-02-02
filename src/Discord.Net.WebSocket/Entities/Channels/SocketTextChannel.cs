@@ -54,7 +54,7 @@ namespace Discord.WebSocket
             : base(discord, id, guild)
         {
             if (Discord.MessageCacheSize > 0)
-                _messages = discord.MessageCache.CreateMessageCache(discord);
+                _messages = discord.MessageCache.CreateMessageCache();
         }
         internal new static SocketTextChannel Create(SocketGuild guild, ClientState state, Model model)
         {

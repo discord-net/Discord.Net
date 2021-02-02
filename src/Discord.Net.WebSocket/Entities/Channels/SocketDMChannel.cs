@@ -36,7 +36,7 @@ namespace Discord.WebSocket
         {
             Recipient = recipient;
             recipient.GlobalUser.AddRef();
-            _messages = discord.MessageCache.CreateMessageCache(discord);
+            _messages = discord.MessageCache.CreateMessageCache();
         }
         internal static SocketDMChannel Create(DiscordSocketClient discord, ClientState state, Model model)
         {
