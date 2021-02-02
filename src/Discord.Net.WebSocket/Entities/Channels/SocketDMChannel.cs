@@ -25,7 +25,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();
-
+        public IMessageCache MessageCache => _messages;
         /// <summary>
         ///     Gets a collection that is the current logged-in user and the recipient.
         /// </summary>
@@ -36,7 +36,7 @@ namespace Discord.WebSocket
         {
             Recipient = recipient;
             recipient.GlobalUser.AddRef();
-            _messages = discord.MessageCache.CreateMessageCache();
+            _messages = discord.MessageCache.CreateMessageCache(discord.MessageCacheSize);
         }
         internal static SocketDMChannel Create(DiscordSocketClient discord, ClientState state, Model model)
         {

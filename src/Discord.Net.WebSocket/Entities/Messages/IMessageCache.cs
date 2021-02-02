@@ -5,7 +5,7 @@ namespace Discord
 {
     public interface IMessageCache
     {
-        public IMessageCache CreateMessageCache();
+        public IMessageCache CreateMessageCache(int size);
 
         public IReadOnlyCollection<SocketMessage> Messages { get; }
 

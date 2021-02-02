@@ -14,11 +14,11 @@ namespace Discord.WebSocket
 
         public IReadOnlyCollection<SocketMessage> Messages => _messages.ToReadOnlyCollection();
 
-        public IMessageCache CreateMessageCache() => new MessageCache();
+        public IMessageCache CreateMessageCache(int size) => new MessageCache(size);
 
-        public MessageCache()
+        public MessageCache(int size)
         {
-            _size = 50; // todo: get this from the existing DiscordSocketConfig value.
+            _size = size;
             _messages = new ConcurrentDictionary<ulong, SocketMessage>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(_size * 1.05));
             _orderedMessages = new ConcurrentQueue<ulong>();
         }

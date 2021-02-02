@@ -190,7 +190,7 @@ namespace Discord.WebSocket
         {
             WebSocketProvider = DefaultWebSocketProvider.Instance;
             UdpSocketProvider = DefaultUdpSocketProvider.Instance;
-            MessageCache = new MessageCache();
+            MessageCache = new MessageCache(MessageCacheSize);
         }
 
         internal DiscordSocketConfig Clone() => MemberwiseClone() as DiscordSocketConfig;

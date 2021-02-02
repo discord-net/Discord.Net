@@ -44,6 +44,7 @@ namespace Discord.WebSocket
         public string Mention => MentionUtils.MentionChannel(Id);
         /// <inheritdoc />
         public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();
+        public IMessageCache MessageCache => _messages;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuildUser> Users
             => Guild.Users.Where(x => Permissions.GetValue(
@@ -54,7 +55,7 @@ namespace Discord.WebSocket
             : base(discord, id, guild)
         {
             if (Discord.MessageCacheSize > 0)
-                _messages = discord.MessageCache.CreateMessageCache();
+                _messages = discord.MessageCache.CreateMessageCache(discord.MessageCacheSize);
         }
         internal new static SocketTextChannel Create(SocketGuild guild, ClientState state, Model model)
         {
