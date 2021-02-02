@@ -14,10 +14,7 @@ namespace Discord.WebSocket
 
         public IReadOnlyCollection<SocketMessage> Messages => _messages.ToReadOnlyCollection();
 
-        public IMessageCache CreateMessageCache(DiscordSocketClient discord)
-        {
-            return new MessageCache(discord);
-        }
+        public IMessageCache CreateMessageCache(DiscordSocketClient discord) => new MessageCache(discord);
 
         public MessageCache(DiscordSocketClient discord)
         {
