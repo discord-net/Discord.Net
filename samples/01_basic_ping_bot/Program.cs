@@ -31,8 +31,7 @@ namespace _01_basic_ping_bot
             // It is recommended to Dispose of a client when you are finished
             // using it, at the end of your app's lifetime.
             _client = new DiscordSocketClient();
-
-            _client.Log += LogAsync;
+            
             _client.Ready += ReadyAsync;
             _client.MessageReceived += MessageReceivedAsync;
         }
@@ -45,12 +44,6 @@ namespace _01_basic_ping_bot
 
             // Block the program until it is closed.
             await Task.Delay(Timeout.Infinite);
-        }
-
-        private Task LogAsync(LogMessage log)
-        {
-            Console.WriteLine(log.ToString());
-            return Task.CompletedTask;
         }
 
         // The Ready event indicates that the client has opened a
