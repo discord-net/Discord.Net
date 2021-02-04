@@ -46,6 +46,12 @@ namespace Discord.WebSocket
         private bool _guildSubscriptions;
         private GatewayIntents? _gatewayIntents;
 
+        // temporary for debugging
+        public string GetDebugOutput()
+        {
+            return $"Guilds: {State.Guilds.Count}, Channels: {State.Channels.Count}, DM Channels: {State.DMChannels.Count}, Private Channels: {State.PrivateChannels.Count}, Group Channels: {State.GroupChannels.Count}, Global Users: {State.Users.Count}, Guild Users: {Guilds.Sum(x => x.Users.Count)}";
+        }
+
         /// <summary>
         ///     Provides access to a REST-only client with a shared state from this client.
         /// </summary>

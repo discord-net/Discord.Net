@@ -44,7 +44,7 @@ namespace Discord.WebSocket
         {
             lock (_lockObj)
             {
-                if (--_references <= 0)
+                if (--_references <= 1)
                     discord.RemoveUser(Id);
             }
         }
