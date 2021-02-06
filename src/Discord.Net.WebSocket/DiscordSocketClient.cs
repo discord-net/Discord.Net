@@ -450,6 +450,8 @@ namespace Discord.WebSocket
         /// </example>
         public override async Task SetGameAsync(string name, string streamUrl = null, ActivityType type = ActivityType.Playing)
         {
+            if (type == ActivityType.CustomStatus)
+                throw new InvalidOperationException("Only user accounts can use CustomStatus as their activity.");
             if (!string.IsNullOrEmpty(streamUrl))
                 Activity = new StreamingGame(name, streamUrl);
             else if (!string.IsNullOrEmpty(name))
