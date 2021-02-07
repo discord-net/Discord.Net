@@ -855,6 +855,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Clears this guild's user cache.
         /// </summary>
+        /// <param name="predicate">The users to clear.</param>
         public void ClearUserCache(Func<SocketGuildUser, bool> predicate) => PurgeGuildUserCache(predicate);
         internal SocketGuildUser AddOrUpdateUser(UserModel model)
         {
