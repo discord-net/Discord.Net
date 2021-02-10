@@ -54,19 +54,19 @@ namespace Discord.WebSocket
 
             this.Default = model.Default.IsSpecified
                 ? model.Default.Value
-                : null;
+                : (bool?)null;
 
             this.Required = model.Required.IsSpecified
                 ? model.Required.Value
-                : null;
+                : (bool?)null;
 
             this.Choices = model.Choices.IsSpecified
-                ? model.Choices.Value.Select(x => SocketApplicationCommandChoice.Create(x)).ToImmutableArray()
-                : new ImmutableArray<SocketApplicationCommandChoice>();
+                ? model.Choices.Value.Select(x => SocketApplicationCommandChoice.Create(x)).ToImmutableArray().ToReadOnlyCollection()
+                : null;
 
             this.Options = model.Options.IsSpecified
-                ? model.Options.Value.Select(x => SocketApplicationCommandOption.Create(x)).ToImmutableArray()
-                : new ImmutableArray<SocketApplicationCommandOption>();
+                ? model.Options.Value.Select(x => SocketApplicationCommandOption.Create(x)).ToImmutableArray().ToReadOnlyCollection()
+                : null;
         }
 
         IReadOnlyCollection<IApplicationCommandOptionChoice> IApplicationCommandOption.Choices => Choices;
