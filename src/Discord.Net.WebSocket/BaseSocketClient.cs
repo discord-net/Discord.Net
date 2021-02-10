@@ -211,8 +211,8 @@ namespace Discord.WebSocket
         /// <param name="type">The type of the game.</param>
         /// <remarks>
         ///     <note type="warning">
-        ///         Bot accounts cannot use <see cref="ActivityType.CustomStatus"/> as their activity
-        ///         and it will have no effect.
+        ///         Bot accounts cannot set <see cref="ActivityType.CustomStatus"/> as their activity
+        ///         type and it will have no effect.
         ///     </note>
         /// </remarks>
         /// <returns>
@@ -228,8 +228,8 @@ namespace Discord.WebSocket
         ///         Discord will only accept setting of name and the type of activity.
         ///     </note>
         ///     <note type="warning">
-        ///         Bot accounts cannot use <see cref="ActivityType.CustomStatus"/> as their activity
-        ///         and it will have no effect.
+        ///         Bot accounts cannot set <see cref="ActivityType.CustomStatus"/> as their activity
+        ///         type and it will have no effect.
         ///     </note>
         ///     <note type="warning">
         ///         Rich Presence cannot be set via this method or client. Rich Presence is strictly limited to RPC
