@@ -15,15 +15,21 @@ namespace Discord.SlashCommands
         /// <summary>
         ///     The name of this slash command.
         /// </summary>
-        public string CommandName;
+        public string commandName;
+
+        /// <summary>
+        ///     The description of this slash command.
+        /// </summary>
+        public string description;
 
         /// <summary>
         ///     Tells the <see cref="SlashCommandService"/> that this class/function is a slash command.
         /// </summary>
-        /// <param name="CommandName">The name of this slash command.</param>
-        public SlashCommand(string CommandName)
+        /// <param name="commandName">The name of this slash command.</param>
+        public SlashCommand(string commandName, string description = "No description.")
         {
-            this.CommandName = CommandName;
+            this.commandName = commandName;
+            this.description = description;
         }
     }
 }
