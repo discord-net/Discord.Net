@@ -30,7 +30,7 @@ namespace Discord.WebSocket
         internal SocketInteractionDataOption() { }
         internal SocketInteractionDataOption(Model model, DiscordSocketClient discord, ulong guild)
         {
-            this.Name = Name;
+            this.Name = model.Name;
             this.Value = model.Value.IsSpecified ? model.Value.Value : null;
             this.discord = discord;
             this.guild = guild;
@@ -44,14 +44,17 @@ namespace Discord.WebSocket
         // Converters
         public static explicit operator bool(SocketInteractionDataOption option)
             => (bool)option.Value;
+        // The default value is of type long, so an implementaiton of of the long option is trivial
         public static explicit operator int(SocketInteractionDataOption option)
-            => (int)option.Value;
+            => unchecked(
+            (int)( (long)option.Value )
+            );
         public static explicit operator string(SocketInteractionDataOption option)
             => option.Value.ToString();
 
         public static explicit operator SocketGuildChannel(SocketInteractionDataOption option)
         {
-            if (option.Value is ulong id)
+            if (ulong.TryParse((string)option.Value, out ulong id))
             {
                 var guild = option.discord.GetGuild(option.guild);
 
@@ -66,7 +69,7 @@ namespace Discord.WebSocket
 
         public static explicit operator SocketRole(SocketInteractionDataOption option)
         {
-            if (option.Value is ulong id)
+            if (ulong.TryParse((string)option.Value, out ulong id))
             {
                 var guild = option.discord.GetGuild(option.guild);
 
@@ -81,7 +84,7 @@ namespace Discord.WebSocket
 
         public static explicit operator SocketGuildUser(SocketInteractionDataOption option)
         {
-            if(option.Value is ulong id)
+            if (ulong.TryParse((string)option.Value, out ulong id))
             {
                 var guild = option.discord.GetGuild(option.guild);
 

@@ -34,11 +34,6 @@ namespace Discord.SlashCommands
             _logger = new Logger(_logManager, "SlshCommand");
         }
 
-        public void AddAssembly()
-        {
-
-        }
-
         /// <summary>
         /// Execute a slash command.
         /// </summary>
@@ -50,19 +45,39 @@ namespace Discord.SlashCommands
             SlashCommandInfo commandInfo;
             if (commandDefs.TryGetValue(interaction.Data.Name, out commandInfo))
             {
-                // TODO: implement everything that has to do with parameters :)
-
                 // Then, set the context in which the command will be executed
                 commandInfo.Module.userCommandModule.SetContext(interaction);
-                // Then run the command (with no parameters)
-                return await commandInfo.ExecuteAsync(new object[] { }).ConfigureAwait(false);
+                // Then run the command and pass the interaction data over to the CommandInfo class
+                return await commandInfo.ExecuteAsync(interaction.Data).ConfigureAwait(false);
             }
             else
             {
                 return SearchResult.FromError(CommandError.UnknownCommand, $"There is no registered slash command with the name {interaction.Data.Name}");
             }
         }
-        
+
+        /// <summary>
+        /// Registers all previously scanned commands.
+        /// </summary>
+        public async Task RegisterCommandsAsync(DiscordSocketClient socketClient, CommandRegistrationOptions registrationOptions)
+        {
+            // First take a hold of the module lock, as to make sure we aren't editing stuff while we do our business
+            await _moduleLock.WaitAsync().ConfigureAwait(false);
+
+            try
+            {
+                await SlashCommandServiceHelper.RegisterCommands(socketClient, commandDefs, this,registrationOptions).ConfigureAwait(false);
+            }
+            finally
+            {
+                _moduleLock.Release();
+            }
+            await _logger.InfoAsync("All commands have been registered!").ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Scans the program for Attribute-based SlashCommandModules
+        /// </summary>
         public async Task AddModulesAsync(Assembly assembly, IServiceProvider services)
         {
             // First take a hold of the module lock, as to make sure we aren't editing stuff while we do our business
@@ -75,9 +90,7 @@ namespace Discord.SlashCommands
                 // Then, based on that, make an instance out of each of them, and get the resulting SlashModuleInfo s
                 moduleDefs = await SlashCommandServiceHelper.InstantiateModules(types, this).ConfigureAwait(false);
                 // After that, internally register all of the commands into SlashCommandInfo
-                commandDefs = await SlashCommandServiceHelper.PrepareAsync(types,moduleDefs,this).ConfigureAwait(false);
-                // TODO: And finally, register the commands with discord.
-                await SlashCommandServiceHelper.RegisterCommands(commandDefs, this, services).ConfigureAwait(false);
+                commandDefs = await SlashCommandServiceHelper.CreateCommandInfos(types,moduleDefs,this).ConfigureAwait(false);
             }
             finally
             {

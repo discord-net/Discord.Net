@@ -1,4 +1,6 @@
 using Discord.Commands;
+using Discord.Commands.Builders;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +23,10 @@ namespace Discord.SlashCommands
         ///     Gets the name of the command.
         /// </summary>
         public string Description { get; }
+        /// <summary>
+        /// The parameters we are expecting - an extension of SlashCommandOptionBuilder
+        /// </summary>
+        public List<SlashParameterInfo> Parameters { get; }
 
         /// <summary>
         /// The user method as a delegate. We need to use Delegate because there is an unknown number of parameters
@@ -31,11 +37,12 @@ namespace Discord.SlashCommands
         /// </summary>
         public Func<object[], Task<IResult>> callback;
 
-        public SlashCommandInfo(SlashModuleInfo module, string name, string description, Delegate userMethod)
+        public SlashCommandInfo(SlashModuleInfo module, string name, string description,List<SlashParameterInfo> parameters , Delegate userMethod)
         {
             Module = module;
             Name = name;
             Description = description;
+            Parameters = parameters;
             this.userMethod = userMethod;
             this.callback = new Func<object[], Task<IResult>>(async (args) =>
             {
@@ -56,9 +63,78 @@ namespace Discord.SlashCommands
             });
         }
 
-        public async Task<IResult> ExecuteAsync(object[] args)
+        /// <summary>
+        /// Execute the function based on the interaction data we get.
+        /// </summary>
+        /// <param name="data">Interaction data from interaction</param>
+        public async Task<IResult> ExecuteAsync(SocketInteractionData data)
         {
-            return await callback.Invoke(args).ConfigureAwait(false);
+            // List of arguments to be passed to the Delegate
+            List<object> args = new List<object>();
+            try
+            {
+                foreach (var parameter in Parameters)
+                {
+                    // For each parameter to try find its coresponding DataOption based on the name.
+
+                    // !!! names from `data` will always be lowercase regardless if we defined the command with any
+                    // number of upercase letters !!!
+                    if (TryGetInteractionDataOption(data, parameter.Name, out SocketInteractionDataOption dataOption))
+                    {
+                        // Parse the dataOption to one corresponding argument type, and then add it to the list of arguments
+                        args.Add(parameter.Parse(dataOption));
+                    }
+                    else
+                    {
+                        // There was no input from the user on this field.
+                        args.Add(null);
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                return ExecuteResult.FromError(e);
+            }
+
+            return await callback.Invoke(args.ToArray()).ConfigureAwait(false);
+        }
+        /// <summary>
+        /// Get the interaction data from the name of the parameter we want to fill in.
+        /// </summary>
+        private bool TryGetInteractionDataOption(SocketInteractionData data, string name, out SocketInteractionDataOption dataOption)
+        {
+            if (data.Options == null)
+            {
+                dataOption = null;
+                return false;
+            }
+            foreach (var option in data.Options)
+            {
+                if (option.Name == name.ToLower())
+                {
+                    dataOption = option;
+                    return true;
+                }
+            }
+            dataOption = null;
+            return false;
+        }
+
+        /// <summary>
+        ///  Build the command and put it in a state in which we can use to define it to Discord.
+        /// </summary>
+        public SlashCommandCreationProperties BuildCommand()
+        {
+            SlashCommandBuilder builder = new SlashCommandBuilder();
+            builder.WithName(Name);
+            builder.WithDescription(Description);
+            builder.Options = new List<SlashCommandOptionBuilder>();
+            foreach (var parameter in Parameters)
+            {
+                builder.AddOptions(parameter);
+            }
+
+            return builder.Build();
         }
     }
 }

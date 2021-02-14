@@ -51,6 +51,7 @@ namespace SlashCommandsExample
             await socketClient.StartAsync();
 
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+            await _commands.RegisterCommandsAsync(socketClient, CommandRegistrationOptions.Default);
 
             await Task.Delay(-1);
         }
