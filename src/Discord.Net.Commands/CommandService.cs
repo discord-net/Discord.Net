@@ -483,25 +483,27 @@ namespace Discord.Commands
         /// <param name="context">The context of the command.</param>
         /// <param name="argPos">The position of which the command starts at.</param>
         /// <param name="services">The service to be used in the command's dependency injection.</param>
+        /// <param name="enterTyping">Whether the client should enter typing state.</param>
         /// <param name="multiMatchHandling">The handling mode when multiple command matches are found.</param>
         /// <returns>
         ///     A task that represents the asynchronous execution operation. The task result contains the result of the
         ///     command execution.
         /// </returns>
-        public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
-            => ExecuteAsync(context, context.Message.Content.Substring(argPos), services, multiMatchHandling);
+        public Task<IResult> ExecuteAsync(ICommandContext context, int argPos, IServiceProvider services, bool enterTyping = false, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+            => ExecuteAsync(context, context.Message.Content.Substring(argPos), services, enterTyping, multiMatchHandling);
         /// <summary>
         ///     Executes the command.
         /// </summary>
         /// <param name="context">The context of the command.</param>
         /// <param name="input">The command string.</param>
         /// <param name="services">The service to be used in the command's dependency injection.</param>
+        /// <param name="enterTyping">Whether the client should enter typing state.</param>
         /// <param name="multiMatchHandling">The handling mode when multiple command matches are found.</param>
         /// <returns>
         ///     A task that represents the asynchronous execution operation. The task result contains the result of the
         ///     command execution.
         /// </returns>
-        public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, bool enterTyping = false, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             services = services ?? EmptyServiceProvider.Instance;
 
@@ -511,7 +513,11 @@ namespace Discord.Commands
                 await _commandExecutedEvent.InvokeAsync(Optional.Create<CommandInfo>(), context, searchResult).ConfigureAwait(false);
                 return searchResult;
             }
-                
+
+            if (enterTyping)
+            {
+                using var typing = context.Channel.EnterTypingState();
+            }
 
             var commands = searchResult.Commands;
             var preconditionResults = new Dictionary<CommandMatch, PreconditionResult>();
