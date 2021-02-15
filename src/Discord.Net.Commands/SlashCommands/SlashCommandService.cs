@@ -41,19 +41,63 @@ namespace Discord.SlashCommands
         /// <returns></returns>
         public async Task<IResult> ExecuteAsync(SocketInteraction interaction)
         {
-            // First, get the info about this command, if it exists
             SlashCommandInfo commandInfo;
-            if (commandDefs.TryGetValue(interaction.Data.Name, out commandInfo))
+            // Get the name of the actual command - be it a normal slash command or subcommand, and return the options we can give it.
+            string name = GetSearchName(interaction.Data, out var resultingOptions);
+            if (commandDefs.TryGetValue(name, out commandInfo))
             {
                 // Then, set the context in which the command will be executed
                 commandInfo.Module.userCommandModule.SetContext(interaction);
                 // Then run the command and pass the interaction data over to the CommandInfo class
-                return await commandInfo.ExecuteAsync(interaction.Data).ConfigureAwait(false);
+                return await commandInfo.ExecuteAsync(resultingOptions).ConfigureAwait(false);
             }
             else
             {
                 return SearchResult.FromError(CommandError.UnknownCommand, $"There is no registered slash command with the name {interaction.Data.Name}");
             }
+        }
+        /// <summary>
+        /// Get the name of the command we want to search for - be it a normal slash command or a sub command. Returns as out the options to be given to the method.
+        /// /// </summary>
+        /// <param name="interactionData"></param>
+        /// <param name="resultingOptions"></param>
+        /// <returns></returns>
+        private string GetSearchName(SocketInteractionData interactionData, out IReadOnlyCollection<SocketInteractionDataOption> resultingOptions)
+        {
+            string nameToSearch = SlashModuleInfo.RootCommandPrefix + interactionData.Name;
+            var options = interactionData.Options;
+            while(options != null && options.Count == 1)
+            {
+                string newName = nameToSearch + SlashModuleInfo.PathSeperator + GetFirstOption(options).Name;
+                if (AnyKeyContains(commandDefs,newName))
+                {
+                    nameToSearch = newName;
+                    options = GetFirstOption(options).Options;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            resultingOptions = options;
+            return nameToSearch;
+        }
+
+        private bool AnyKeyContains(Dictionary<string, SlashCommandInfo> commandDefs, string newName)
+        {
+            foreach (var pair in commandDefs)
+            {
+                if (pair.Key.Contains(newName))
+                    return true;
+            }
+            return false;
+        }
+
+        private SocketInteractionDataOption GetFirstOption(IReadOnlyCollection<SocketInteractionDataOption> options)
+        {
+            var it = options.GetEnumerator();
+            it.MoveNext();
+            return it.Current;
         }
 
         /// <summary>
@@ -66,7 +110,7 @@ namespace Discord.SlashCommands
 
             try
             {
-                await SlashCommandServiceHelper.RegisterCommands(socketClient, commandDefs, this,registrationOptions).ConfigureAwait(false);
+                await SlashCommandServiceHelper.RegisterCommands(socketClient, moduleDefs, commandDefs, this,registrationOptions).ConfigureAwait(false);
             }
             finally
             {

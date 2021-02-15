@@ -36,6 +36,32 @@ namespace SlashCommandsExample.Modules
             await Reply($"You gave me:\r\n {boolean}, {integer}, {myString}, <#{channel?.Id}>, {user?.Mention}, {role?.Mention}");
 
         }
+
+        [CommandGroup("root")]
+        public class DevModule_Root : SlashCommandModule<SocketInteraction>
+        {
+            [SlashCommand("rng", "Gives you a random number from this \"machine\"")]
+            public async Task RNGAsync()
+            {
+                var rand = new Random();
+                await Reply(rand.Next(0, 101).ToString());
+            }
+
+            [CommandGroup("usr")]
+            public class DevModule_Root_Usr : SlashCommandModule<SocketInteraction>
+            {
+                [SlashCommand("zero", "Gives you a file from user zero from this \"machine\"")]
+                public async Task ZeroAsync([Description("The file you want.")] string file)
+                {
+                    await Reply($"You don't have permissiont to access {file} from user \"zero\".");
+                }
+                [SlashCommand("johnny", "Gives you a file from user Johnny Test from this \"machine\"")]
+                public async Task JohnnyAsync([Description("The file you want.")] string file)
+                {
+                    await Reply($"You don't have permissiont to access {file} from user \"johnny\".");
+                }
+            }
+        }
     }
 }
 /*

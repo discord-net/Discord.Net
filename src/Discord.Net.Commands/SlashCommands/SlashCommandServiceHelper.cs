@@ -40,7 +40,8 @@ namespace Discord.SlashCommands
         {
             // See if the base type (SlashCommandInfo<T>) implements interface ISlashCommandModule
             return typeInfo.BaseType.GetInterfaces()
-                .Any(n => n == typeof(ISlashCommandModule));
+                .Any(n => n == typeof(ISlashCommandModule)) &&
+                typeInfo.GetCustomAttributes(typeof(CommandGroup)).Count() == 0;
         }
 
         /// <summary>
@@ -49,17 +50,69 @@ namespace Discord.SlashCommands
         public static async Task<Dictionary<Type, SlashModuleInfo>> InstantiateModules(IReadOnlyList<TypeInfo> types, SlashCommandService slashCommandService)
         {
             var result = new Dictionary<Type, SlashModuleInfo>();
+            // Here we get all modules thate are NOT sub command groups
             foreach (Type userModuleType in types)
             {
                 SlashModuleInfo moduleInfo = new SlashModuleInfo(slashCommandService);
+                moduleInfo.SetType(userModuleType);
 
                 // If they want a constructor with different parameters, this is the place to add them.
                 object instance = userModuleType.GetConstructor(Type.EmptyTypes).Invoke(null);
                 moduleInfo.SetCommandModule(instance);
 
+                // ,,
+                moduleInfo.SetSubCommandGroups(InstantiateSubCommands(userModuleType, moduleInfo, slashCommandService));
+
                 result.Add(userModuleType, moduleInfo);
             }
             return result;
+        }
+        public static List<SlashModuleInfo> InstantiateSubCommands(Type rootModule,SlashModuleInfo rootModuleInfo, SlashCommandService slashCommandService)
+        {
+            List<SlashModuleInfo> commandGroups = new List<SlashModuleInfo>();
+            foreach(Type commandGroupType in rootModule.GetNestedTypes())
+            {
+                if(TryGetCommandGroupAttribute(commandGroupType, out CommandGroup commandGroup))
+                {
+                    SlashModuleInfo groupInfo = new SlashModuleInfo(slashCommandService);
+                    groupInfo.SetType(commandGroupType);
+
+                    object instance = commandGroupType.GetConstructor(Type.EmptyTypes).Invoke(null);
+                    groupInfo.SetCommandModule(instance);
+
+                    groupInfo.MakeCommandGroup(commandGroup,rootModuleInfo);
+                    groupInfo.MakePath();
+
+                    groupInfo.SetSubCommandGroups(InstantiateSubCommands(commandGroupType, groupInfo, slashCommandService));
+
+                    commandGroups.Add(groupInfo);
+                }
+            }
+            return commandGroups;
+        }
+        public static bool TryGetCommandGroupAttribute(Type module, out CommandGroup commandGroup)
+        {
+            if(!module.IsPublic && !module.IsNestedPublic)
+            {
+                commandGroup = null;
+                return false;
+            }
+
+            var commandGroupAttributes = module.GetCustomAttributes(typeof(CommandGroup));
+            if( commandGroupAttributes.Count() == 0)
+            {
+                commandGroup = null;
+                return false;
+            }
+            else if(commandGroupAttributes.Count() > 1)
+            {
+                throw new Exception($"Too many CommandGroup attributes on a single class ({module.FullName}). It can only contain one!");
+            }
+            else
+            {
+                commandGroup = commandGroupAttributes.First() as CommandGroup;
+                return true;
+            }
         }
 
         /// <summary>
@@ -76,37 +129,52 @@ namespace Discord.SlashCommands
                 SlashModuleInfo moduleInfo;
                 if (moduleDefs.TryGetValue(userModule, out moduleInfo))
                 {
-                    // TODO: handle sub-command groups
-                    // And get all of its method, and check if they are valid, and if so create a new SlashCommandInfo for them.
-                    var commandMethods = userModule.GetMethods();
-                    List<SlashCommandInfo> commandInfos = new List<SlashCommandInfo>();
-                    foreach (var commandMethod in commandMethods)
-                    {
-                        SlashCommand slashCommand;
-                        if (IsValidSlashCommand(commandMethod, out slashCommand))
-                        {
-                            // Create the delegate for the method we want to call once the user interacts with the bot.
-                            // We use a delegate because of the unknown number and type of parameters we will have.
-                            Delegate delegateMethod = CreateDelegate(commandMethod, moduleInfo.userCommandModule);
-
-                            SlashCommandInfo commandInfo = new SlashCommandInfo(
-                                module: moduleInfo,
-                                name: slashCommand.commandName,
-                                description: slashCommand.description,
-                                // Generate the parameters. Due to it's complicated way the algorithm has been moved to its own function.
-                                parameters: ConstructCommandParameters(commandMethod),
-                                userMethod: delegateMethod
-                                );
-
-                            result.Add(slashCommand.commandName, commandInfo);
-                            commandInfos.Add(commandInfo);
-                        }
-                    }
+                    var commandInfos = RegisterSameLevelCommands(result, userModule, moduleInfo);
                     moduleInfo.SetCommands(commandInfos);
+                    CreateSubCommandInfos(result, moduleInfo.commandGroups, slashCommandService);
                 }
             }
             return result;
         }
+        public static void CreateSubCommandInfos(Dictionary<string, SlashCommandInfo> result, List<SlashModuleInfo> subCommandGroups, SlashCommandService slashCommandService)
+        {
+            foreach (var subCommandGroup in subCommandGroups)
+            {
+                var commandInfos = RegisterSameLevelCommands(result, subCommandGroup.moduleType.GetTypeInfo(), subCommandGroup);
+                subCommandGroup.SetCommands(commandInfos);
+                CreateSubCommandInfos(result, subCommandGroup.commandGroups, slashCommandService);
+            }
+        }
+        private static List<SlashCommandInfo> RegisterSameLevelCommands(Dictionary<string, SlashCommandInfo> result, TypeInfo userModule, SlashModuleInfo moduleInfo)
+        {
+            var commandMethods = userModule.GetMethods();
+            List<SlashCommandInfo> commandInfos = new List<SlashCommandInfo>();
+            foreach (var commandMethod in commandMethods)
+            {
+                SlashCommand slashCommand;
+                if (IsValidSlashCommand(commandMethod, out slashCommand))
+                {
+                    // Create the delegate for the method we want to call once the user interacts with the bot.
+                    // We use a delegate because of the unknown number and type of parameters we will have.
+                    Delegate delegateMethod = CreateDelegate(commandMethod, moduleInfo.userCommandModule);
+
+                    SlashCommandInfo commandInfo = new SlashCommandInfo(
+                        module: moduleInfo,
+                        name: slashCommand.commandName,
+                        description: slashCommand.description,
+                        // Generate the parameters. Due to it's complicated way the algorithm has been moved to its own function.
+                        parameters: ConstructCommandParameters(commandMethod),
+                        userMethod: delegateMethod
+                        );
+
+                    result.Add(commandInfo.Module.Path + SlashModuleInfo.PathSeperator + commandInfo.Name, commandInfo);
+                    commandInfos.Add(commandInfo);
+                }
+            }
+
+            return commandInfos;
+        }
+
         /// <summary>
         /// Determines wheater a method can be clasified as a slash command
         /// </summary>
@@ -187,7 +255,6 @@ namespace Discord.SlashCommands
 
             throw new Exception($"Got parameter type other than int, string, bool, guild, role, or user. {methodParameter.Name}");
         }
-
         /// <summary>
         /// Creae a delegate from methodInfo. Taken from
         /// https://stackoverflow.com/a/40579063/8455128
@@ -216,7 +283,7 @@ namespace Discord.SlashCommands
             return Delegate.CreateDelegate(getType(types.ToArray()), target, methodInfo.Name);
         }
 
-        public static async Task RegisterCommands(DiscordSocketClient socketClient, Dictionary<string, SlashCommandInfo> commandDefs, SlashCommandService slashCommandService, CommandRegistrationOptions options)
+        public static async Task RegisterCommands(DiscordSocketClient socketClient, Dictionary<Type, SlashModuleInfo> rootModuleInfos, Dictionary<string, SlashCommandInfo> commandDefs, SlashCommandService slashCommandService, CommandRegistrationOptions options)
         {
             // Get existing commmands
             ulong devGuild = 386658607338618891;
@@ -237,28 +304,39 @@ namespace Discord.SlashCommands
                     // or if the existing command isn't re-defined (probably code deleted by user)
                     // remove it from discord.
                     if(options.OldCommands == OldCommandOptions.WIPE ||
-                      !commandDefs.ContainsKey(existingCommand.Name))
+                      !commandDefs.ContainsKey(SlashModuleInfo.RootCommandPrefix + existingCommand.Name))
                     {
                         await existingCommand.DeleteAsync();
                     }
                 }
             }
-            foreach (var entry in commandDefs)
+            //foreach (var entry in commandDefs)
+            //{
+            //    if (existingCommandNames.Contains(entry.Value.Name) &&
+            //       options.ExistingCommands == ExistingCommandOptions.KEEP_EXISTING)
+            //    {
+            //        continue;
+            //    }
+            //    // If it's a new command or we want to overwrite an old one...
+            //    else
+            //    {
+            //        SlashCommandInfo slashCommandInfo = entry.Value;
+            //        SlashCommandCreationProperties command = slashCommandInfo.BuildCommand();
+            //        
+            //        await socketClient.Rest.CreateGuildCommand(command, devGuild).ConfigureAwait(false);
+            //    }
+            //}
+            foreach (var pair in rootModuleInfos)
             {
-                if (existingCommandNames.Contains(entry.Value.Name) &&
-                   options.ExistingCommands == ExistingCommandOptions.KEEP_EXISTING)
+                var rootModuleInfo = pair.Value;
+                List<SlashCommandCreationProperties> builtCommands = rootModuleInfo.BuildCommands();
+                foreach (var builtCommand in builtCommands)
                 {
-                    continue;
-                }
-                // If it's a new command or we want to overwrite an old one...
-                else
-                {
-                    SlashCommandInfo slashCommandInfo = entry.Value;
-                    SlashCommandCreationProperties command = slashCommandInfo.BuildCommand();
                     // TODO: Implement Global and Guild Commands.
-                    await socketClient.Rest.CreateGuildCommand(command, devGuild).ConfigureAwait(false);
+                    await socketClient.Rest.CreateGuildCommand(builtCommand, devGuild).ConfigureAwait(false);
                 }
             }
+
             return;
         }
     }

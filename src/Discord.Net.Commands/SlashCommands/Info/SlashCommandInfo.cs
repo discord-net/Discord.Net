@@ -67,7 +67,7 @@ namespace Discord.SlashCommands
         /// Execute the function based on the interaction data we get.
         /// </summary>
         /// <param name="data">Interaction data from interaction</param>
-        public async Task<IResult> ExecuteAsync(SocketInteractionData data)
+        public async Task<IResult> ExecuteAsync(IReadOnlyCollection<SocketInteractionDataOption> data)
         {
             // List of arguments to be passed to the Delegate
             List<object> args = new List<object>();
@@ -101,14 +101,14 @@ namespace Discord.SlashCommands
         /// <summary>
         /// Get the interaction data from the name of the parameter we want to fill in.
         /// </summary>
-        private bool TryGetInteractionDataOption(SocketInteractionData data, string name, out SocketInteractionDataOption dataOption)
+        private bool TryGetInteractionDataOption(IReadOnlyCollection<SocketInteractionDataOption> data, string name, out SocketInteractionDataOption dataOption)
         {
-            if (data.Options == null)
+            if (data == null)
             {
                 dataOption = null;
                 return false;
             }
-            foreach (var option in data.Options)
+            foreach (var option in data)
             {
                 if (option.Name == name.ToLower())
                 {
@@ -135,6 +135,24 @@ namespace Discord.SlashCommands
             }
 
             return builder.Build();
+        }
+
+        /// <summary>
+        ///  Build the command AS A SUBCOMMAND and put it in a state in which we can use to define it to Discord.
+        /// </summary>
+        public SlashCommandOptionBuilder BuildSubCommand()
+        {
+            SlashCommandOptionBuilder builder = new SlashCommandOptionBuilder();
+            builder.WithName(Name);
+            builder.WithDescription(Description);
+            builder.WithType(ApplicationCommandOptionType.SubCommand);
+            builder.Options = new List<SlashCommandOptionBuilder>();
+            foreach (var parameter in Parameters)
+            {
+                builder.AddOption(parameter);
+            }
+
+            return builder;
         }
     }
 }
