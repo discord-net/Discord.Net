@@ -59,10 +59,9 @@ namespace Discord.SlashCommands
                 // If they want a constructor with different parameters, this is the place to add them.
                 object instance = userModuleType.GetConstructor(Type.EmptyTypes).Invoke(null);
                 moduleInfo.SetCommandModule(instance);
+                moduleInfo.isGlobal = IsCommandModuleGlobal(userModuleType);
 
-                // ,,
                 moduleInfo.SetSubCommandGroups(InstantiateSubCommands(userModuleType, moduleInfo, slashCommandService));
-
                 result.Add(userModuleType, moduleInfo);
             }
             return result;
@@ -82,9 +81,9 @@ namespace Discord.SlashCommands
 
                     groupInfo.MakeCommandGroup(commandGroup,rootModuleInfo);
                     groupInfo.MakePath();
+                    groupInfo.isGlobal = IsCommandModuleGlobal(commandGroupType);
 
                     groupInfo.SetSubCommandGroups(InstantiateSubCommands(commandGroupType, groupInfo, slashCommandService));
-
                     commandGroups.Add(groupInfo);
                 }
             }
@@ -114,7 +113,21 @@ namespace Discord.SlashCommands
                 return true;
             }
         }
-
+        public static bool IsCommandModuleGlobal(Type userModuleType)
+        {
+            // Verify that we only have one [Global] attribute
+            IEnumerable<Attribute> slashCommandAttributes = userModuleType.GetCustomAttributes(typeof(Global));
+            if (slashCommandAttributes.Count() > 1)
+            {
+                throw new Exception("Too many Global attributes on a single method. It can only contain one!");
+            }
+            // And at least one
+            if (slashCommandAttributes.Count() == 0)
+            {
+                return false;
+            }
+            return true;
+        }
         /// <summary>
         /// Prepare all of the commands and register them internally.
         /// </summary>
@@ -129,7 +142,7 @@ namespace Discord.SlashCommands
                 SlashModuleInfo moduleInfo;
                 if (moduleDefs.TryGetValue(userModule, out moduleInfo))
                 {
-                    var commandInfos = RegisterSameLevelCommands(result, userModule, moduleInfo);
+                    var commandInfos = CreateSameLevelCommands(result, userModule, moduleInfo);
                     moduleInfo.SetCommands(commandInfos);
                     CreateSubCommandInfos(result, moduleInfo.commandGroups, slashCommandService);
                 }
@@ -140,12 +153,12 @@ namespace Discord.SlashCommands
         {
             foreach (var subCommandGroup in subCommandGroups)
             {
-                var commandInfos = RegisterSameLevelCommands(result, subCommandGroup.moduleType.GetTypeInfo(), subCommandGroup);
+                var commandInfos = CreateSameLevelCommands(result, subCommandGroup.moduleType.GetTypeInfo(), subCommandGroup);
                 subCommandGroup.SetCommands(commandInfos);
                 CreateSubCommandInfos(result, subCommandGroup.commandGroups, slashCommandService);
             }
         }
-        private static List<SlashCommandInfo> RegisterSameLevelCommands(Dictionary<string, SlashCommandInfo> result, TypeInfo userModule, SlashModuleInfo moduleInfo)
+        private static List<SlashCommandInfo> CreateSameLevelCommands(Dictionary<string, SlashCommandInfo> result, TypeInfo userModule, SlashModuleInfo moduleInfo)
         {
             var commandMethods = userModule.GetMethods();
             List<SlashCommandInfo> commandInfos = new List<SlashCommandInfo>();
@@ -164,7 +177,8 @@ namespace Discord.SlashCommands
                         description: slashCommand.description,
                         // Generate the parameters. Due to it's complicated way the algorithm has been moved to its own function.
                         parameters: ConstructCommandParameters(commandMethod),
-                        userMethod: delegateMethod
+                        userMethod: delegateMethod,
+                        isGlobal: IsCommandGlobal(commandMethod)
                         );
 
                     result.Add(commandInfo.Module.Path + SlashModuleInfo.PathSeperator + commandInfo.Name, commandInfo);
@@ -194,6 +208,21 @@ namespace Discord.SlashCommands
             }
             // And return the first (and only) attribute
             slashCommand = slashCommandAttributes.First() as SlashCommand;
+            return true;
+        }
+        private static bool IsCommandGlobal(MethodInfo method)
+        {
+            // Verify that we only have one [Global] attribute
+            IEnumerable<Attribute> slashCommandAttributes = method.GetCustomAttributes(typeof(Global));
+            if (slashCommandAttributes.Count() > 1)
+            {
+                throw new Exception("Too many Global attributes on a single method. It can only contain one!");
+            }
+            // And at least one
+            if (slashCommandAttributes.Count() == 0)
+            {
+                return false;
+            }
             return true;
         }
         private static List<SlashParameterInfo> ConstructCommandParameters(MethodInfo method)
@@ -283,57 +312,76 @@ namespace Discord.SlashCommands
             return Delegate.CreateDelegate(getType(types.ToArray()), target, methodInfo.Name);
         }
 
-        public static async Task RegisterCommands(DiscordSocketClient socketClient, Dictionary<Type, SlashModuleInfo> rootModuleInfos, Dictionary<string, SlashCommandInfo> commandDefs, SlashCommandService slashCommandService, CommandRegistrationOptions options)
+        public static async Task RegisterCommands(DiscordSocketClient socketClient, Dictionary<Type, SlashModuleInfo> rootModuleInfos, Dictionary<string, SlashCommandInfo> commandDefs, SlashCommandService slashCommandService, List<ulong> guildIDs,CommandRegistrationOptions options)
         {
-            // Get existing commmands
-            ulong devGuild = 386658607338618891;
-            var existingCommands = await socketClient.Rest.GetGuildApplicationCommands(devGuild).ConfigureAwait(false);
-            List<string> existingCommandNames = new List<string>();
-            foreach (var existingCommand in existingCommands)
+            // TODO: see how we should handle if user wants to register two commands with the same name, one global and one not.
+            List<SlashCommandCreationProperties> builtCommands = new List<SlashCommandCreationProperties>();
+            foreach (var pair in rootModuleInfos)
             {
-                existingCommandNames.Add(existingCommand.Name);
+                var rootModuleInfo = pair.Value;
+                builtCommands.AddRange(rootModuleInfo.BuildCommands());
             }
 
-            // Delete old ones that we want to re-implement
+            List<Rest.RestGuildCommand> existingGuildCommands = new List<Rest.RestGuildCommand>();
+            List<Rest.RestGlobalCommand> existingGlobalCommands = new List<Rest.RestGlobalCommand>();
+            existingGlobalCommands.AddRange(await socketClient.Rest.GetGlobalApplicationCommands().ConfigureAwait(false));
+            foreach (ulong guildID in guildIDs)
+            {
+                existingGuildCommands.AddRange(await socketClient.Rest.GetGuildApplicationCommands(guildID).ConfigureAwait(false));
+            }
+            if (options.ExistingCommands == ExistingCommandOptions.KEEP_EXISTING)
+            {
+                foreach (var existingCommand in existingGuildCommands)
+                {
+                    builtCommands.RemoveAll(x => (!x.Global && x.Name == existingCommand.Name));
+                }
+                foreach (var existingCommand in existingGlobalCommands)
+                {
+                    builtCommands.RemoveAll(x => (x.Global && x.Name == existingCommand.Name));
+                }
+            }
+
             if (options.OldCommands == OldCommandOptions.DELETE_UNUSED ||
                 options.OldCommands == OldCommandOptions.WIPE)
             {
-                foreach (var existingCommand in existingCommands)
+                foreach (var existingCommand in existingGuildCommands)
                 {
                     // If we want to wipe all commands
-                    // or if the existing command isn't re-defined (probably code deleted by user)
+                    // or if the existing command isn't re-defined and re-built
                     // remove it from discord.
-                    if(options.OldCommands == OldCommandOptions.WIPE ||
-                      !commandDefs.ContainsKey(SlashModuleInfo.RootCommandPrefix + existingCommand.Name))
+                    if (options.OldCommands == OldCommandOptions.WIPE ||
+                        // There are no commands which contain this existing command.
+                        !builtCommands.Any( x => !x.Global && x.Name.Contains(SlashModuleInfo.PathSeperator + existingCommand.Name)))
+                    {
+                        await existingCommand.DeleteAsync();
+                    }
+                }
+                foreach (var existingCommand in existingGlobalCommands)
+                {
+                    // If we want to wipe all commands
+                    // or if the existing command isn't re-defined and re-built
+                    // remove it from discord.
+                    if (options.OldCommands == OldCommandOptions.WIPE ||
+                        // There are no commands which contain this existing command.
+                        !builtCommands.Any(x => x.Global && x.Name.Contains(SlashModuleInfo.PathSeperator + existingCommand.Name)))
                     {
                         await existingCommand.DeleteAsync();
                     }
                 }
             }
-            //foreach (var entry in commandDefs)
-            //{
-            //    if (existingCommandNames.Contains(entry.Value.Name) &&
-            //       options.ExistingCommands == ExistingCommandOptions.KEEP_EXISTING)
-            //    {
-            //        continue;
-            //    }
-            //    // If it's a new command or we want to overwrite an old one...
-            //    else
-            //    {
-            //        SlashCommandInfo slashCommandInfo = entry.Value;
-            //        SlashCommandCreationProperties command = slashCommandInfo.BuildCommand();
-            //        
-            //        await socketClient.Rest.CreateGuildCommand(command, devGuild).ConfigureAwait(false);
-            //    }
-            //}
-            foreach (var pair in rootModuleInfos)
+
+            foreach (var builtCommand in builtCommands)
             {
-                var rootModuleInfo = pair.Value;
-                List<SlashCommandCreationProperties> builtCommands = rootModuleInfo.BuildCommands();
-                foreach (var builtCommand in builtCommands)
+                if (builtCommand.Global)
                 {
-                    // TODO: Implement Global and Guild Commands.
-                    await socketClient.Rest.CreateGuildCommand(builtCommand, devGuild).ConfigureAwait(false);
+                    await socketClient.Rest.CreateGlobalCommand(builtCommand).ConfigureAwait(false);
+                }
+                else
+                {
+                    foreach (ulong guildID in guildIDs)
+                    {
+                        await socketClient.Rest.CreateGuildCommand(builtCommand, guildID).ConfigureAwait(false);
+                    }
                 }
             }
 

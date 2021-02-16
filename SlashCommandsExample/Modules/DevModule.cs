@@ -9,9 +9,12 @@ using System.Threading.Tasks;
 
 namespace SlashCommandsExample.Modules
 {
+    // You can make the whole module Global
+    //[Global]
     public class DevModule : SlashCommandModule<SocketInteraction>
     {
         [SlashCommand("ping", "Ping the bot to see if it's alive!")]
+        [Global]
         public async Task PingAsync()
         {
             await Reply(":white_check_mark: **Bot Online**");
@@ -38,6 +41,7 @@ namespace SlashCommandsExample.Modules
         }
 
         [CommandGroup("root")]
+        //[Global]
         public class DevModule_Root : SlashCommandModule<SocketInteraction>
         {
             [SlashCommand("rng", "Gives you a random number from this \"machine\"")]

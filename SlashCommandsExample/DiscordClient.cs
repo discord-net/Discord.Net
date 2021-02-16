@@ -120,7 +120,11 @@ namespace SlashCommandsExample
             await socketClient.StartAsync();
 
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
-            await _commands.RegisterCommandsAsync(socketClient, CommandRegistrationOptions.Default);
+            await _commands.RegisterCommandsAsync(socketClient, new List<ulong>()
+            {
+                386658607338618891
+            },
+            new CommandRegistrationOptions(OldCommandOptions.DELETE_UNUSED,ExistingCommandOptions.OVERWRITE));
 
             await Task.Delay(-1);
         }

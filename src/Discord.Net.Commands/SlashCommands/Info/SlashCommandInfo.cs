@@ -28,6 +28,7 @@ namespace Discord.SlashCommands
         /// </summary>
         public List<SlashParameterInfo> Parameters { get; }
 
+        public bool isGlobal { get; }
         /// <summary>
         /// The user method as a delegate. We need to use Delegate because there is an unknown number of parameters
         /// </summary>
@@ -37,13 +38,14 @@ namespace Discord.SlashCommands
         /// </summary>
         public Func<object[], Task<IResult>> callback;
 
-        public SlashCommandInfo(SlashModuleInfo module, string name, string description,List<SlashParameterInfo> parameters , Delegate userMethod)
+        public SlashCommandInfo(SlashModuleInfo module, string name, string description,List<SlashParameterInfo> parameters , Delegate userMethod , bool isGlobal = false)
         {
             Module = module;
             Name = name;
             Description = description;
             Parameters = parameters;
             this.userMethod = userMethod;
+            this.isGlobal = isGlobal;
             this.callback = new Func<object[], Task<IResult>>(async (args) =>
             {
                 // Try-catch it and see what we get - error or success

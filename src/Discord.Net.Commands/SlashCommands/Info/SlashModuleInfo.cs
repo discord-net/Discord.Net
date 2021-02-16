@@ -28,6 +28,7 @@ namespace Discord.SlashCommands
         public List<SlashModuleInfo> commandGroups { get; set; }
         public string Path { get; set; } = RootModuleName;
 
+        public bool isGlobal { get; set; } = false;
         /// <summary>
         ///     Gets the command service associated with this module.
         /// </summary>
@@ -85,11 +86,21 @@ namespace Discord.SlashCommands
             List<SlashCommandCreationProperties> builtCommands = new List<SlashCommandCreationProperties>();
             foreach (var command in Commands)
             {
-                builtCommands.Add(command.BuildCommand());
+                var builtCommand = command.BuildCommand();
+                if (isGlobal || command.isGlobal)
+                {
+                    builtCommand.Global = true;
+                }
+                builtCommands.Add(builtCommand);
             }
             foreach(var commandGroup in commandGroups)
             {
-                builtCommands.Add(commandGroup.BuildTopLevelCommandGroup());
+                var builtCommand = commandGroup.BuildTopLevelCommandGroup();
+                if (isGlobal || commandGroup.isGlobal)
+                {
+                    builtCommand.Global = true;
+                }
+                builtCommands.Add(builtCommand);
             }
             return builtCommands;
         }
