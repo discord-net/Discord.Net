@@ -257,7 +257,33 @@ namespace Discord.SlashCommands
                 // And get the parameter type
                 newParameter.Type = TypeFromMethodParameter(methodParameter);
 
-                // TODO: implement more attributes, such as [Required]
+                // [Required] Parameter
+                var requiredAttributes = methodParameter.GetCustomAttributes(typeof(Required));
+                if (requiredAttributes.Count() == 1)
+                    newParameter.Required = true;
+                else if (requiredAttributes.Count() > 1)
+                    throw new Exception($"Too many Required attributes on a single parameter ({method.Name} -> {methodParameter.Name}). It can only contain one!");
+
+                // [Choice] Parameter
+                foreach (Choice choice in methodParameter.GetCustomAttributes(typeof(Choice)))
+                {
+                    if (newParameter.Type == ApplicationCommandOptionType.String)
+                    {
+                        if(String.IsNullOrEmpty(choice.choiceStringValue))
+                        {
+                            throw new Exception($"Parameter ({method.Name} -> {methodParameter.Name}) is of type string, but choice is of type int!");
+                        }
+                        newParameter.AddChoice(choice.choiceName, choice.choiceStringValue);
+                    }
+                    if (newParameter.Type == ApplicationCommandOptionType.Integer)
+                    {
+                        if (choice.choiceIntValue == null)
+                        {
+                            throw new Exception($"Parameter ({method.Name} -> {methodParameter.Name}) is of type int, but choice is of type string!");
+                        }
+                        newParameter.AddChoice(choice.choiceName, (int)choice.choiceIntValue);
+                    }
+                }
 
                 finalParameters.Add(newParameter);
             }
