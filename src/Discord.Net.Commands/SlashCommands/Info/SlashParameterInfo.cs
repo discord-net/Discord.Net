@@ -10,14 +10,22 @@ namespace Discord.SlashCommands
 {
     public class SlashParameterInfo : SlashCommandOptionBuilder
     {
+        public bool Nullable { get; internal set; }
+
         public object Parse(SocketInteractionDataOption dataOption)
         {
             switch (Type)
             {
                 case ApplicationCommandOptionType.Boolean:
-                    return (bool)dataOption;
+                    if (Nullable)
+                        return (bool?)dataOption;
+                    else
+                        return (bool)dataOption;
                 case ApplicationCommandOptionType.Integer:
-                    return (int)dataOption;
+                    if(Nullable)
+                        return (int?)dataOption;
+                    else
+                        return (int)dataOption;
                 case ApplicationCommandOptionType.String:
                     return (string)dataOption;
                 case ApplicationCommandOptionType.Channel:

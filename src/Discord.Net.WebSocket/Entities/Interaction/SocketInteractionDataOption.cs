@@ -52,6 +52,21 @@ namespace Discord.WebSocket
         public static explicit operator string(SocketInteractionDataOption option)
             => option.Value.ToString();
 
+        public static explicit operator bool?(SocketInteractionDataOption option)
+        {
+            if (option.Value == null)
+                return null;
+            else
+                return (bool)option;
+        }
+        public static explicit operator int?(SocketInteractionDataOption option)
+        {
+            if (option.Value == null)
+                return null;
+            else
+                return (int)option;
+        }
+
         public static explicit operator SocketGuildChannel(SocketInteractionDataOption option)
         {
             if (ulong.TryParse((string)option.Value, out ulong id))

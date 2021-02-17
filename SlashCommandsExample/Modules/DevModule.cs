@@ -31,8 +31,11 @@ namespace SlashCommandsExample.Modules
         
         [SlashCommand("overload","Just hit me with every type of data you got, man!")]
         public async Task OverloadAsync(
-            bool boolean,
-            int integer,
+            [ParameterName("var1")]
+            bool? boolean,
+            [ParameterName("var2")]
+            int? integer,
+            [ParameterName("var3")]
             string myString,
             SocketGuildChannel channel,
             SocketGuildUser user,

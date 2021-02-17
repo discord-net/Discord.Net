@@ -126,6 +126,15 @@ namespace SlashCommandsExample
             },
             new CommandRegistrationOptions(OldCommandOptions.DELETE_UNUSED,ExistingCommandOptions.OVERWRITE));
 
+            // If you would like to register your commands manually use:
+            //-----------------------------------------//
+            //
+            // await _commands.BuildCommands();
+            //
+            //-----------------------------------------//
+            // Though I wouldn't highly recommend it unless you want to do something very specific with them
+            // such as only registering some commands on only some guilds, or editing them manually.
+
             await Task.Delay(-1);
         }
 

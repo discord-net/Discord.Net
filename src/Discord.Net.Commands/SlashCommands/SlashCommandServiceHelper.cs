@@ -50,7 +50,7 @@ namespace Discord.SlashCommands
         public static async Task<Dictionary<Type, SlashModuleInfo>> InstantiateModules(IReadOnlyList<TypeInfo> types, SlashCommandService slashCommandService)
         {
             var result = new Dictionary<Type, SlashModuleInfo>();
-            // Here we get all modules thate are NOT sub command groups
+            // Here we get all modules thate are NOT sub command groups and instantiate them.
             foreach (Type userModuleType in types)
             {
                 SlashModuleInfo moduleInfo = new SlashModuleInfo(slashCommandService);
@@ -61,13 +61,14 @@ namespace Discord.SlashCommands
                 moduleInfo.SetCommandModule(instance);
                 moduleInfo.isGlobal = IsCommandModuleGlobal(userModuleType);
 
-                moduleInfo.SetSubCommandGroups(InstantiateSubCommands(userModuleType, moduleInfo, slashCommandService));
+                moduleInfo.SetSubCommandGroups(InstantiateSubModules(userModuleType, moduleInfo, slashCommandService));
                 result.Add(userModuleType, moduleInfo);
             }
             return result;
         }
-        public static List<SlashModuleInfo> InstantiateSubCommands(Type rootModule,SlashModuleInfo rootModuleInfo, SlashCommandService slashCommandService)
+        public static List<SlashModuleInfo> InstantiateSubModules(Type rootModule,SlashModuleInfo rootModuleInfo, SlashCommandService slashCommandService)
         {
+            // Instantiate all of the nested modules.
             List<SlashModuleInfo> commandGroups = new List<SlashModuleInfo>();
             foreach(Type commandGroupType in rootModule.GetNestedTypes())
             {
@@ -83,7 +84,7 @@ namespace Discord.SlashCommands
                     groupInfo.MakePath();
                     groupInfo.isGlobal = IsCommandModuleGlobal(commandGroupType);
 
-                    groupInfo.SetSubCommandGroups(InstantiateSubCommands(commandGroupType, groupInfo, slashCommandService));
+                    groupInfo.SetSubCommandGroups(InstantiateSubModules(commandGroupType, groupInfo, slashCommandService));
                     commandGroups.Add(groupInfo);
                 }
             }
@@ -142,8 +143,10 @@ namespace Discord.SlashCommands
                 SlashModuleInfo moduleInfo;
                 if (moduleDefs.TryGetValue(userModule, out moduleInfo))
                 {
+                    // Create the root-level commands
                     var commandInfos = CreateSameLevelCommands(result, userModule, moduleInfo);
                     moduleInfo.SetCommands(commandInfos);
+                    // Then create all of the command groups it has.
                     CreateSubCommandInfos(result, moduleInfo.commandGroups, slashCommandService);
                 }
             }
@@ -153,8 +156,11 @@ namespace Discord.SlashCommands
         {
             foreach (var subCommandGroup in subCommandGroups)
             {
+                // Create the commands that is on the same hierarchical level as this ...
                 var commandInfos = CreateSameLevelCommands(result, subCommandGroup.moduleType.GetTypeInfo(), subCommandGroup);
                 subCommandGroup.SetCommands(commandInfos);
+
+                // ... and continue with the lower sub command groups.
                 CreateSubCommandInfos(result, subCommandGroup.commandGroups, slashCommandService);
             }
         }
@@ -164,6 +170,7 @@ namespace Discord.SlashCommands
             List<SlashCommandInfo> commandInfos = new List<SlashCommandInfo>();
             foreach (var commandMethod in commandMethods)
             {
+                // Get the SlashCommand attribute
                 SlashCommand slashCommand;
                 if (IsValidSlashCommand(commandMethod, out slashCommand))
                 {
@@ -210,6 +217,9 @@ namespace Discord.SlashCommands
             slashCommand = slashCommandAttributes.First() as SlashCommand;
             return true;
         }
+        /// <summary>
+        /// Determins if the method has a [Global] Attribute.
+        /// </summary>
         private static bool IsCommandGlobal(MethodInfo method)
         {
             // Verify that we only have one [Global] attribute
@@ -225,6 +235,9 @@ namespace Discord.SlashCommands
             }
             return true;
         }
+        /// <summary>
+        /// Process the parameters of this method, including all the attributes.
+        /// </summary>
         private static List<SlashParameterInfo> ConstructCommandParameters(MethodInfo method)
         {
             // Prepare the final list of parameters
@@ -237,9 +250,15 @@ namespace Discord.SlashCommands
             {
                 SlashParameterInfo newParameter = new SlashParameterInfo();
 
-                // Set the parameter name to that of the method
-                // TODO: Implement an annotation that lets the user choose a custom name
-                newParameter.Name = methodParameter.Name;
+                // Test for the [ParameterName] Attribute. If we have it, then use that as the name,
+                // if not just use the parameter name as the option name.
+                var customNameAttributes = methodParameter.GetCustomAttributes(typeof(ParameterName));
+                if (customNameAttributes.Count() == 0)
+                    newParameter.Name = methodParameter.Name;
+                else if (customNameAttributes.Count() > 1)
+                    throw new Exception($"Too many ParameterName attributes on a single parameter ({method.Name} -> {methodParameter.Name}). It can only contain one!");
+                else
+                    newParameter.Name = (customNameAttributes.First() as ParameterName).name;
 
                 // Get to see if it has a Description Attribute.
                 // If it has
@@ -254,19 +273,26 @@ namespace Discord.SlashCommands
                 else
                     newParameter.Description = (descriptions.First() as Description).description;
 
-                // And get the parameter type
+                // Set the Type of the parameter.
+                // In the case of int and int? it returns the same type - INTEGER.
+                // Same with bool and bool?.
                 newParameter.Type = TypeFromMethodParameter(methodParameter);
 
-                // [Required] Parameter
+                // If we have a nullble type (int? or bool?) mark it as such.
+                newParameter.Nullable = GetNullableStatus(methodParameter);
+
+                // Test for the [Required] Attribute
                 var requiredAttributes = methodParameter.GetCustomAttributes(typeof(Required));
                 if (requiredAttributes.Count() == 1)
                     newParameter.Required = true;
                 else if (requiredAttributes.Count() > 1)
                     throw new Exception($"Too many Required attributes on a single parameter ({method.Name} -> {methodParameter.Name}). It can only contain one!");
 
-                // [Choice] Parameter
+                // Test for the [Choice] Attribute
+                // A parameter cna have multiple Choice attributes, and for each we're going to add it's key-value pair.
                 foreach (Choice choice in methodParameter.GetCustomAttributes(typeof(Choice)))
                 {
+                    // If the parameter expects a string but the value of the choice is of type int, then throw an error.
                     if (newParameter.Type == ApplicationCommandOptionType.String)
                     {
                         if(String.IsNullOrEmpty(choice.choiceStringValue))
@@ -275,6 +301,7 @@ namespace Discord.SlashCommands
                         }
                         newParameter.AddChoice(choice.choiceName, choice.choiceStringValue);
                     }
+                    // If the parameter expects a int but the value of the choice is of type string, then throw an error.
                     if (newParameter.Type == ApplicationCommandOptionType.Integer)
                     {
                         if (choice.choiceIntValue == null)
@@ -295,11 +322,13 @@ namespace Discord.SlashCommands
         private static ApplicationCommandOptionType TypeFromMethodParameter(ParameterInfo methodParameter)
         {
             // Can't do switch -- who knows why?
-            if (methodParameter.ParameterType == typeof(int))
+            if (methodParameter.ParameterType == typeof(int) ||
+                methodParameter.ParameterType == typeof(int?))
                 return ApplicationCommandOptionType.Integer;
             if (methodParameter.ParameterType == typeof(string))
                 return ApplicationCommandOptionType.String;
-            if (methodParameter.ParameterType == typeof(bool))
+            if (methodParameter.ParameterType == typeof(bool) ||
+                methodParameter.ParameterType == typeof(bool?))
                 return ApplicationCommandOptionType.Boolean;
             if (methodParameter.ParameterType == typeof(SocketGuildChannel))
                 return ApplicationCommandOptionType.Channel;
@@ -310,11 +339,25 @@ namespace Discord.SlashCommands
 
             throw new Exception($"Got parameter type other than int, string, bool, guild, role, or user. {methodParameter.Name}");
         }
+
+        /// <summary>
+        /// Gets whater the parameter can be set as null, in the case that parameter type usually does not allow null.
+        /// More specifically tests to see if it is a type of 'int?' or 'bool?',
+        /// </summary>
+        private static bool GetNullableStatus(ParameterInfo methodParameter)
+        {
+            if(methodParameter.ParameterType == typeof(int?) ||
+                methodParameter.ParameterType == typeof(bool?))
+            {
+                return true;
+            }
+            return false;
+        }
         /// <summary>
         /// Creae a delegate from methodInfo. Taken from
         /// https://stackoverflow.com/a/40579063/8455128
         /// </summary>
-        public static Delegate CreateDelegate(MethodInfo methodInfo, object target)
+        private static Delegate CreateDelegate(MethodInfo methodInfo, object target)
         {
             Func<Type[], Type> getType;
             var isAction = methodInfo.ReturnType.Equals((typeof(void)));
@@ -341,13 +384,10 @@ namespace Discord.SlashCommands
         public static async Task RegisterCommands(DiscordSocketClient socketClient, Dictionary<Type, SlashModuleInfo> rootModuleInfos, Dictionary<string, SlashCommandInfo> commandDefs, SlashCommandService slashCommandService, List<ulong> guildIDs,CommandRegistrationOptions options)
         {
             // TODO: see how we should handle if user wants to register two commands with the same name, one global and one not.
-            List<SlashCommandCreationProperties> builtCommands = new List<SlashCommandCreationProperties>();
-            foreach (var pair in rootModuleInfos)
-            {
-                var rootModuleInfo = pair.Value;
-                builtCommands.AddRange(rootModuleInfo.BuildCommands());
-            }
+            // Build the commands
+            List<SlashCommandCreationProperties> builtCommands = await BuildCommands(rootModuleInfos).ConfigureAwait(false);
 
+            // Scan for each existing command on discord so we know what is already there.
             List<Rest.RestGuildCommand> existingGuildCommands = new List<Rest.RestGuildCommand>();
             List<Rest.RestGlobalCommand> existingGlobalCommands = new List<Rest.RestGlobalCommand>();
             existingGlobalCommands.AddRange(await socketClient.Rest.GetGlobalApplicationCommands().ConfigureAwait(false));
@@ -355,6 +395,9 @@ namespace Discord.SlashCommands
             {
                 existingGuildCommands.AddRange(await socketClient.Rest.GetGuildApplicationCommands(guildID).ConfigureAwait(false));
             }
+
+            // If we want to keep the existing commands that are already registered
+            // remove the commands that share the same name from the builtCommands list as to not overwrite.
             if (options.ExistingCommands == ExistingCommandOptions.KEEP_EXISTING)
             {
                 foreach (var existingCommand in existingGuildCommands)
@@ -367,24 +410,26 @@ namespace Discord.SlashCommands
                 }
             }
 
+            // If we want to delete commands that are not going to be re-implemented in builtCommands
+            // or if we just want a blank slate
             if (options.OldCommands == OldCommandOptions.DELETE_UNUSED ||
                 options.OldCommands == OldCommandOptions.WIPE)
-            {
+            {                
                 foreach (var existingCommand in existingGuildCommands)
                 {
-                    // If we want to wipe all commands
+                    // If we want to wipe all GUILD commands
                     // or if the existing command isn't re-defined and re-built
                     // remove it from discord.
                     if (options.OldCommands == OldCommandOptions.WIPE ||
                         // There are no commands which contain this existing command.
-                        !builtCommands.Any( x => !x.Global && x.Name.Contains(SlashModuleInfo.PathSeperator + existingCommand.Name)))
+                        !builtCommands.Any(x => !x.Global && x.Name.Contains(SlashModuleInfo.PathSeperator + existingCommand.Name)))
                     {
                         await existingCommand.DeleteAsync();
                     }
                 }
                 foreach (var existingCommand in existingGlobalCommands)
                 {
-                    // If we want to wipe all commands
+                    // If we want to wipe all GLOBAL commands
                     // or if the existing command isn't re-defined and re-built
                     // remove it from discord.
                     if (options.OldCommands == OldCommandOptions.WIPE ||
@@ -396,6 +441,8 @@ namespace Discord.SlashCommands
                 }
             }
 
+            // And now register them. Globally if the 'Global' flag is set.
+            // If not then just register them as guild commands on all of the guilds given to us.
             foreach (var builtCommand in builtCommands)
             {
                 if (builtCommand.Global)
@@ -412,6 +459,20 @@ namespace Discord.SlashCommands
             }
 
             return;
+        }
+        /// <summary>
+        /// Build and return all of the commands this assembly contians.
+        /// </summary>
+        public static async Task<List<SlashCommandCreationProperties>> BuildCommands(Dictionary<Type, SlashModuleInfo> rootModuleInfos)
+        {
+            List<SlashCommandCreationProperties> builtCommands = new List<SlashCommandCreationProperties>();
+            foreach (var pair in rootModuleInfos)
+            {
+                var rootModuleInfo = pair.Value;
+                builtCommands.AddRange(rootModuleInfo.BuildCommands());
+            }
+
+            return builtCommands;
         }
     }
 }
