@@ -21,6 +21,10 @@ namespace Discord
         /// </summary>
         public string Description { get; set; }
 
+        /// <summary>
+        ///     If the command should be defined as a global command.
+        /// </summary>
+        public bool Global { get; set; } = false;
 
         /// <summary>
         ///     Gets or sets the options for this command.

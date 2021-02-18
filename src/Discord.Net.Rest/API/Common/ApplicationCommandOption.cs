@@ -67,7 +67,9 @@ namespace Discord.API
                 ? option.Options.Select(x => new ApplicationCommandOption(x)).ToArray()
                 : Optional<ApplicationCommandOption[]>.Unspecified;
 
-            this.Required = option.Required.Value;
+            this.Required = option.Required.HasValue
+                ? option.Required.Value
+                : Optional<bool>.Unspecified;
             this.Default = option.Default.HasValue
                 ? option.Default.Value
                 : Optional<bool>.Unspecified;
