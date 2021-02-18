@@ -38,7 +38,7 @@ namespace Discord.WebSocket
             this.guildId = guildId;
 
             this.Options = model.Options.IsSpecified
-                ? model.Options.Value.Select(x => new SocketInteractionDataOption(x, this.Discord, guildId)).ToImmutableArray()
+                ? model.Options.Value.Select(x => new SocketInteractionDataOption(x, this.Discord, guildId)).ToImmutableArray().ToReadOnlyCollection()
                 : null;
         }
 

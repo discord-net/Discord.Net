@@ -60,7 +60,7 @@ namespace Discord.Rest
             this.Description = model.Description;
 
             this.Options = model.Options.IsSpecified
-                ? model.Options.Value.Select(x => RestApplicationCommandOption.Create(x)).ToImmutableArray()
+                ? model.Options.Value.Select(x => RestApplicationCommandOption.Create(x)).ToImmutableArray().ToReadOnlyCollection()
                 : null;
         }
 

@@ -377,8 +377,8 @@ namespace Discord.Commands.Builders
         {
             bool isSubType = this.Type == ApplicationCommandOptionType.SubCommand || this.Type == ApplicationCommandOptionType.SubCommandGroup;
 
-            if (isSubType && (Options == null || !Options.Any()))
-                throw new ArgumentException(nameof(Options), "SubCommands/SubCommandGroups must have at least one option");
+            if (this.Type == ApplicationCommandOptionType.SubCommandGroup && (Options == null || !Options.Any()))
+                throw new ArgumentException(nameof(Options), "SubCommandGroups must have at least one option");
 
             if (!isSubType && (Options != null && Options.Any()))
                 throw new ArgumentException(nameof(Options), $"Cannot have options on {Type} type");
@@ -448,20 +448,9 @@ namespace Discord.Commands.Builders
             return this;
         }
 
-        public SlashCommandOptionBuilder WithName(string Name, int Value)
+        public SlashCommandOptionBuilder WithName(string Name)
         {
-            if (Choices == null)
-                Choices = new List<ApplicationCommandOptionChoiceProperties>();
-
-            if (Choices.Count >= MaxChoiceCount)
-                throw new ArgumentOutOfRangeException(nameof(Choices), $"Cannot add more than {MaxChoiceCount} choices!");
-
-            Choices.Add(new ApplicationCommandOptionChoiceProperties()
-            {
-                Name = Name,
-                Value = Value
-            });
-
+            this.Name = Name;
             return this;
         }
 
