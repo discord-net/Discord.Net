@@ -893,6 +893,15 @@ namespace Discord
         Task<IReadOnlyCollection<IWebhook>> GetWebhooksAsync(RequestOptions options = null);
 
         /// <summary>
+        ///     Gets a collection of emotes from this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of emotes found within the guild.
+        /// </returns>
+        Task<IReadOnlyCollection<GuildEmote>> GetEmotesAsync(RequestOptions options = null);
+        /// <summary>
         ///     Gets a specific emote from this guild.
         /// </summary>
         /// <param name="id">The snowflake identifier for the guild emote.</param>
