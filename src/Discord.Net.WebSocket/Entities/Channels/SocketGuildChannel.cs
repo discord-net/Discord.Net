@@ -125,7 +125,6 @@ namespace Discord.WebSocket
         public virtual async Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null)
         {
             await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, user, permissions, options).ConfigureAwait(false);
-            _overwrites = _overwrites.Add(new Overwrite(user.Id, PermissionTarget.User, new OverwritePermissions(permissions.AllowValue, permissions.DenyValue)));
         }
 
         /// <summary>
@@ -140,7 +139,6 @@ namespace Discord.WebSocket
         public virtual async Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null)
         {
             await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, role, permissions, options).ConfigureAwait(false);
-            _overwrites = _overwrites.Add(new Overwrite(role.Id, PermissionTarget.Role, new OverwritePermissions(permissions.AllowValue, permissions.DenyValue)));
         }
         /// <summary>
         ///     Removes the permission overwrite for the given user, if one exists.
@@ -153,15 +151,6 @@ namespace Discord.WebSocket
         public virtual async Task RemovePermissionOverwriteAsync(IUser user, RequestOptions options = null)
         {
             await ChannelHelper.RemovePermissionOverwriteAsync(this, Discord, user, options).ConfigureAwait(false);
-
-            for (int i = 0; i < _overwrites.Length; i++)
-            {
-                if (_overwrites[i].TargetId == user.Id)
-                {
-                    _overwrites = _overwrites.RemoveAt(i);
-                    return;
-                }
-            }
         }
         /// <summary>
         ///     Removes the permission overwrite for the given role, if one exists.
@@ -174,15 +163,6 @@ namespace Discord.WebSocket
         public virtual async Task RemovePermissionOverwriteAsync(IRole role, RequestOptions options = null)
         {
             await ChannelHelper.RemovePermissionOverwriteAsync(this, Discord, role, options).ConfigureAwait(false);
-
-            for (int i = 0; i < _overwrites.Length; i++)
-            {
-                if (_overwrites[i].TargetId == role.Id)
-                {
-                    _overwrites = _overwrites.RemoveAt(i);
-                    return;
-                }
-            }
         }
 
         public new virtual SocketGuildUser GetUser(ulong id) => null;

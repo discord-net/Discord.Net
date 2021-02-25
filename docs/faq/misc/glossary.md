@@ -19,7 +19,7 @@ channels, and are often referred to as "servers".
 * A **Channel** ([IChannel]) represents a generic channel.
 	- Example: #dotnet_discord-net
 	- See [Channel Types](#channel-types)
-	
+
 [IGuild]: xref:Discord.IGuild
 [IChannel]: xref:Discord.IChannel
 
@@ -79,4 +79,4 @@ activity for listening to a song on Spotify.
 [RichGame]: xref:Discord.RichGame
 [StreamingGame]: xref:Discord.StreamingGame
 [SpotifyGame]: xref:Discord.SpotifyGame
-[Rich Presence Intro]: https://discordapp.com/developers/docs/rich-presence/best-practices
+[Rich Presence Intro]: https://discord.com/developers/docs/rich-presence/best-practices

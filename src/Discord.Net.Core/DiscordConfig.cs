@@ -13,7 +13,7 @@ namespace Discord
         /// <returns>
         ///     An <see cref="int"/> representing the API version that Discord.Net uses to communicate with Discord.
         ///     <para>A list of available API version can be seen on the official 
-        ///     <see href="https://discordapp.com/developers/docs/reference#api-versioning">Discord API documentation</see>
+        ///     <see href="https://discord.com/developers/docs/reference#api-versioning">Discord API documentation</see>
         ///     .</para>
         /// </returns>
         public const int APIVersion = 6;
@@ -50,7 +50,7 @@ namespace Discord
         /// <returns>
         ///     The Discord API URL using <see cref="APIVersion"/>.
         /// </returns>
-        public static readonly string APIUrl = $"https://discordapp.com/api/v{APIVersion}/";
+        public static readonly string APIUrl = $"https://discord.com/api/v{APIVersion}/";
         /// <summary> 
         ///     Returns the base Discord CDN URL. 
         /// </summary>

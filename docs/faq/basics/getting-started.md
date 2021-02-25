@@ -74,6 +74,9 @@ it will return the user ID of the aforementioned user.
 
 Several common ways to do this:
 
-1. Make the role mentionable and mention the role, and escape it
+1. (Easiest) Right click on the role either in the Server Settings
+   or in the user's role list.
+   ![Roles](images/role-copy.png)
+2. Make the role mentionable and mention the role, and escape it
   using the `\` character in front.
-2. Inspect the roles collection within the guild via your debugger.
+3. Inspect the roles collection within the guild via your debugger.

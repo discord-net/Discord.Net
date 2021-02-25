@@ -46,6 +46,8 @@ namespace Discord.WebSocket
         public virtual bool IsSuppressed => false;
         /// <inheritdoc />
         public virtual DateTimeOffset? EditedTimestamp => null;
+        /// <inheritdoc />
+        public virtual bool MentionedEveryone => false;
 
         /// <inheritdoc />
         public MessageActivity Activity { get; private set; }
@@ -55,6 +57,9 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public MessageReference Reference { get; private set; }
+
+        /// <inheritdoc />
+        public MessageFlags? Flags { get; private set; }
 
         /// <summary>
         ///     Returns all attachments included in this message.
@@ -108,7 +113,7 @@ namespace Discord.WebSocket
         }
         internal static SocketMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
-            if (model.Type == MessageType.Default)
+            if (model.Type == MessageType.Default || model.Type == MessageType.Reply)
                 return SocketUserMessage.Create(discord, state, author, channel, model);
             else
                 return SocketSystemMessage.Create(discord, state, author, channel, model);
@@ -150,10 +155,13 @@ namespace Discord.WebSocket
                 Reference = new MessageReference
                 {
                     GuildId = model.Reference.Value.GuildId,
-                    ChannelId = model.Reference.Value.ChannelId,
+                    InternalChannelId = model.Reference.Value.ChannelId,
                     MessageId = model.Reference.Value.MessageId
                 };
             }
+
+            if (model.Flags.IsSpecified)
+                Flags = model.Flags.Value;
         }
 
         /// <inheritdoc />

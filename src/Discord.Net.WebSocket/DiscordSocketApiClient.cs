@@ -12,6 +12,7 @@ using System.IO.Compression;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using GameModel = Discord.API.Game;
 
 namespace Discord.API
 {
@@ -132,6 +133,8 @@ namespace Discord.API
             if (WebSocketClient == null)
                 throw new NotSupportedException("This client is not configured with WebSocket support.");
 
+            RequestQueue.ClearGatewayBuckets();
+
             //Re-create streams to reset the zlib state
             _compressed?.Dispose();
             _decompressor?.Dispose();
@@ -205,11 +208,15 @@ namespace Discord.API
             payload = new SocketFrame { Operation = (int)opCode, Payload = payload };
             if (payload != null)
                 bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
-            await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, null, bytes, true, options)).ConfigureAwait(false);
+
+            options.IsGatewayBucket = true;
+            if (options.BucketId == null)
+                options.BucketId = GatewayBucket.Get(GatewayBucketType.Unbucketed).Id;
+            await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, bytes, true, opCode == GatewayOpCode.Heartbeat, options)).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
         }
 
-        public async Task SendIdentifyAsync(int largeThreshold = 100, int shardID = 0, int totalShards = 1, bool guildSubscriptions = true, GatewayIntents? gatewayIntents = null, RequestOptions options = null)
+        public async Task SendIdentifyAsync(int largeThreshold = 100, int shardID = 0, int totalShards = 1, bool guildSubscriptions = true, GatewayIntents? gatewayIntents = null, (UserStatus, bool, long?, GameModel)? presence = null, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
             var props = new Dictionary<string, string>
@@ -225,10 +232,23 @@ namespace Discord.API
             if (totalShards > 1)
                 msg.ShardingParams = new int[] { shardID, totalShards };
 
+            options.BucketId = GatewayBucket.Get(GatewayBucketType.Identify).Id;
+
             if (gatewayIntents.HasValue)
                 msg.Intents = (int)gatewayIntents.Value;
             else
                 msg.GuildSubscriptions = guildSubscriptions;
+
+            if (presence.HasValue)
+            {
+                msg.Presence = new StatusUpdateParams
+                {
+                    Status = presence.Value.Item1,
+                    IsAFK = presence.Value.Item2,
+                    IdleSince = presence.Value.Item3,
+                    Game = presence.Value.Item4,
+                };
+            }
 
             await SendGatewayAsync(GatewayOpCode.Identify, msg, options: options).ConfigureAwait(false);
         }
@@ -248,7 +268,7 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             await SendGatewayAsync(GatewayOpCode.Heartbeat, lastSeq, options: options).ConfigureAwait(false);
         }
-        public async Task SendStatusUpdateAsync(UserStatus status, bool isAFK, long? since, Game game, RequestOptions options = null)
+        public async Task SendStatusUpdateAsync(UserStatus status, bool isAFK, long? since, GameModel game, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
             var args = new StatusUpdateParams
@@ -258,6 +278,7 @@ namespace Discord.API
                 IsAFK = isAFK,
                 Game = game
             };
+            options.BucketId = GatewayBucket.Get(GatewayBucketType.PresenceUpdate).Id;
             await SendGatewayAsync(GatewayOpCode.StatusUpdate, args, options: options).ConfigureAwait(false);
         }
         public async Task SendRequestMembersAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)

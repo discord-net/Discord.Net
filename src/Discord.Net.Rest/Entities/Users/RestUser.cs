@@ -21,6 +21,8 @@ namespace Discord.Rest
         public ushort DiscriminatorValue { get; private set; }
         /// <inheritdoc />
         public string AvatarId { get; private set; }
+        /// <inheritdoc />
+        public UserProperties? PublicFlags { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -34,6 +36,8 @@ namespace Discord.Rest
         public virtual UserStatus Status => UserStatus.Offline;
         /// <inheritdoc />
         public virtual IImmutableSet<ClientType> ActiveClients => ImmutableHashSet<ClientType>.Empty;
+        /// <inheritdoc />
+        public virtual IImmutableList<IActivity> Activities => ImmutableList<IActivity>.Empty;
         /// <inheritdoc />
         public virtual bool IsWebhook => false;
 
@@ -63,6 +67,8 @@ namespace Discord.Rest
                 IsBot = model.Bot.Value;
             if (model.Username.IsSpecified)
                 Username = model.Username.Value;
+            if (model.PublicFlags.IsSpecified)
+                PublicFlags = model.PublicFlags.Value;
         }
 
         /// <inheritdoc />

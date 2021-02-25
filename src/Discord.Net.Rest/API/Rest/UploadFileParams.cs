@@ -20,6 +20,7 @@ namespace Discord.API.Rest
         public Optional<bool> IsTTS { get; set; }
         public Optional<Embed> Embed { get; set; }
         public Optional<AllowedMentions> AllowedMentions { get; set; }
+        public Optional<MessageReference> MessageReference { get; set; }
         public bool IsSpoiler { get; set; } = false;
 
         public UploadFileParams(Stream file)
@@ -48,6 +49,8 @@ namespace Discord.API.Rest
                 payload["allowed_mentions"] = AllowedMentions.Value;
             if (IsSpoiler)
                 payload["hasSpoiler"] = IsSpoiler.ToString();
+            if (MessageReference.IsSpecified)
+                payload["message_reference"] = MessageReference.Value;
 
             var json = new StringBuilder();
             using (var text = new StringWriter(json))

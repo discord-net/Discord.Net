@@ -46,12 +46,12 @@ namespace Discord.Rest
             _restLogger = LogManager.CreateLogger("Rest");
             _isFirstLogin = config.DisplayInitialLog;
 
-            ApiClient.RequestQueue.RateLimitTriggered += async (id, info) =>
+            ApiClient.RequestQueue.RateLimitTriggered += async (id, info, endpoint) =>
             {
                 if (info == null)
-                    await _restLogger.VerboseAsync($"Preemptive Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
+                    await _restLogger.VerboseAsync($"Preemptive Rate limit triggered: {endpoint} {(id.IsHashBucket ? $"(Bucket: {id.BucketHash})" : "")}").ConfigureAwait(false);
                 else
-                    await _restLogger.WarningAsync($"Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
+                    await _restLogger.WarningAsync($"Rate limit triggered: {endpoint} {(id.IsHashBucket ? $"(Bucket: {id.BucketHash})" : "")}").ConfigureAwait(false);
             };
             ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
@@ -151,6 +151,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task<int> GetRecommendedShardCountAsync(RequestOptions options = null)
             => ClientHelper.GetRecommendShardCountAsync(this, options);
+
+        /// <inheritdoc />
+        public Task<BotGateway> GetBotGatewayAsync(RequestOptions options = null)
+            => ClientHelper.GetBotGatewayAsync(this, options);
 
         //IDiscordClient
         /// <inheritdoc />

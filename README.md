@@ -2,11 +2,16 @@
 [![NuGet](https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic)](https://www.nuget.org/packages/Discord.Net)
 [![MyGet](https://img.shields.io/myget/discord-net/vpre/Discord.Net.svg)](https://www.myget.org/feed/Packages/discord-net)
 [![Build Status](https://dev.azure.com/discord-net/Discord.Net/_apis/build/status/discord-net.Discord.Net?branchName=dev)](https://dev.azure.com/discord-net/Discord.Net/_build/latest?definitionId=1&branchName=dev)
-[![Discord](https://discordapp.com/api/guilds/81384788765712384/widget.png)](https://discord.gg/jkrBmQR)
+[![Discord](https://discord.com/api/guilds/81384788765712384/widget.png)](https://discord.gg/jkrBmQR)
 
-An unofficial .NET API Wrapper for the Discord client (http://discordapp.com).
+An unofficial .NET API Wrapper for the Discord client (https://discord.com).
 
-Check out the [documentation](https://discord.foxbot.me/) or join the [Discord API Chat](https://discord.gg/jkrBmQR).
+## Documentation
+
+- [Stable](https://discord.foxbot.me/)
+  - Hosted by @foxbot
+- [Nightly](https://docs.stillu.cc/)
+  - [Latest CI repo](https://github.com/discord-net/docs-static)
 
 ## Installation
 ### Stable (NuGet)

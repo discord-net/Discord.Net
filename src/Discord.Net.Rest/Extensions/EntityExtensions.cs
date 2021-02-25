@@ -34,6 +34,13 @@ namespace Discord.Rest
                 model.Thumbnail.IsSpecified ? model.Thumbnail.Value.ToEntity() : (EmbedThumbnail?)null,
                 model.Fields.IsSpecified ? model.Fields.Value.Select(x => x.ToEntity()).ToImmutableArray() : ImmutableArray.Create<EmbedField>());
         }
+        public static RoleTags ToEntity(this API.RoleTags model)
+        {
+            return new RoleTags(
+                model.BotId.IsSpecified ? model.BotId.Value : null,
+                model.IntegrationId.IsSpecified ? model.IntegrationId.Value : null,
+                model.IsPremiumSubscriber.IsSpecified ? true : false);
+        }
         public static API.Embed ToModel(this Embed entity)
         {
             if (entity == null) return null;
@@ -68,6 +75,16 @@ namespace Discord.Rest
                 Parse = entity.AllowedTypes?.EnumerateMentionTypes().ToArray(),
                 Roles = entity.RoleIds?.ToArray(),
                 Users = entity.UserIds?.ToArray(),
+                RepliedUser = entity.MentionRepliedUser ?? Optional.Create<bool>(),
+            };
+        }
+        public static API.MessageReference ToModel(this MessageReference entity)
+        {
+            return new API.MessageReference()
+            {
+                ChannelId = entity.InternalChannelId,
+                GuildId = entity.GuildId,
+                MessageId = entity.MessageId,
             };
         }
         public static IEnumerable<string> EnumerateMentionTypes(this AllowedMentionTypes mentionTypes)

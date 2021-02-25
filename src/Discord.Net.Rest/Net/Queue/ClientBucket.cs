@@ -10,14 +10,14 @@ namespace Discord.Net.Queue
     internal struct ClientBucket
     {
         private static readonly ImmutableDictionary<ClientBucketType, ClientBucket> DefsByType;
-        private static readonly ImmutableDictionary<string, ClientBucket> DefsById;
+        private static readonly ImmutableDictionary<BucketId, ClientBucket> DefsById;
 
         static ClientBucket()
         {
             var buckets = new[]
             {
-                new ClientBucket(ClientBucketType.Unbucketed, "<unbucketed>", 10, 10),
-                new ClientBucket(ClientBucketType.SendEdit, "<send_edit>", 10, 10)
+                new ClientBucket(ClientBucketType.Unbucketed, BucketId.Create(null, "<unbucketed>", null), 10, 10),
+                new ClientBucket(ClientBucketType.SendEdit, BucketId.Create(null, "<send_edit>", null), 10, 10)
             };
 
             var builder = ImmutableDictionary.CreateBuilder<ClientBucketType, ClientBucket>();
@@ -25,21 +25,21 @@ namespace Discord.Net.Queue
                 builder.Add(bucket.Type, bucket);
             DefsByType = builder.ToImmutable();
 
-            var builder2 = ImmutableDictionary.CreateBuilder<string, ClientBucket>();
+            var builder2 = ImmutableDictionary.CreateBuilder<BucketId, ClientBucket>();
             foreach (var bucket in buckets)
                 builder2.Add(bucket.Id, bucket);
             DefsById = builder2.ToImmutable();
         }
 
         public static ClientBucket Get(ClientBucketType type) => DefsByType[type];
-        public static ClientBucket Get(string id) => DefsById[id];
+        public static ClientBucket Get(BucketId id) => DefsById[id];
         
         public ClientBucketType Type { get; }
-        public string Id { get; }
+        public BucketId Id { get; }
         public int WindowCount { get; }
         public int WindowSeconds { get; }
 
-        public ClientBucket(ClientBucketType type, string id, int count, int seconds)
+        public ClientBucket(ClientBucketType type, BucketId id, int count, int seconds)
         {
             Type = type;
             Id = id;

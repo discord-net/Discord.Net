@@ -1,15 +1,15 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <VersionPrefix>2.3.0</VersionPrefix>
+        <VersionPrefix>2.3.1</VersionPrefix>
         <VersionSuffix>dev</VersionSuffix>
         <LangVersion>latest</LangVersion>
         <Authors>Discord.Net Contributors</Authors>
         <PackageTags>discord;discordapp</PackageTags>
-        <PackageProjectUrl>https://github.com/RogueException/Discord.Net</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/Discord-Net/Discord.Net</PackageProjectUrl>
         <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
-        <PackageIconUrl>https://github.com/RogueException/Discord.Net/raw/dev/docs/marketing/logo/PackageLogo.png</PackageIconUrl>
+        <PackageIconUrl>https://github.com/Discord-Net/Discord.Net/raw/dev/docs/marketing/logo/PackageLogo.png</PackageIconUrl>
         <RepositoryType>git</RepositoryType>
-        <RepositoryUrl>git://github.com/RogueException/Discord.Net</RepositoryUrl>
+        <RepositoryUrl>git://github.com/Discord-Net/Discord.Net</RepositoryUrl>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(BuildNumber)' == '' ">
         <VersionSuffix Condition=" '$(VersionSuffix)' != ''">$(VersionSuffix)-dev</VersionSuffix>

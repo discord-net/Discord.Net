@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Discord.API
 {
-    public class AllowedMentions
+    internal class AllowedMentions
     {
         [JsonProperty("parse")]
         public Optional<string[]> Parse { get; set; }
@@ -11,5 +11,7 @@ namespace Discord.API
         public Optional<ulong[]> Roles { get; set; }
         [JsonProperty("users")]
         public Optional<ulong[]> Users { get; set; }
+        [JsonProperty("replied_user")]
+        public Optional<bool> RepliedUser { get; set; }
     }
 }

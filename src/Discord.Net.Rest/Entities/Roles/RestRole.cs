@@ -26,6 +26,8 @@ namespace Discord.Rest
         public GuildPermissions Permissions { get; private set; }
         /// <inheritdoc />
         public int Position { get; private set; }
+        /// <inheritdoc />
+        public RoleTags Tags { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -56,6 +58,8 @@ namespace Discord.Rest
             Position = model.Position;
             Color = new Color(model.Color);
             Permissions = new GuildPermissions(model.Permissions);
+            if (model.Tags.IsSpecified)
+                Tags = model.Tags.Value.ToEntity();
         }
 
         /// <inheritdoc />
