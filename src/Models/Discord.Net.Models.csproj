@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+
+    <Description>
+      $(Description)
+      Shared models between the Discord REST API and Gateway.
+    </Description>
+  </PropertyGroup>
+
+</Project>
