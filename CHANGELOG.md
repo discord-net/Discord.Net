@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.3.1] - 2021-03-10
+### Fixed
+- #1761 Deadlock in DiscordShardedClient when Ready is never received (73e5cc2)
+- #1773 Private methods aren't added as commands (0fc713a)
+- #1780 NullReferenceException in pin/unpin audit logs (f794163)
+- #1786 Add ChannelType property to ChannelInfo audit log (6ac5ea1)
+- #1791 Update Webhook ChannelId from model change (d2518db)
+- #1794 Audit log UserId can be null (d41aeee)
+
+### Misc
+- #1774 Add remark regarding CustomStatus as the activity (51b7afe)
+
 ## [2.3.0] - 2021-01-28
 ### Added
 - #1491 Add INVITE_CREATE and INVITE_DELETE events (1ab670b)
