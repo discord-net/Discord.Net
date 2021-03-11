@@ -32,10 +32,11 @@ namespace Discord.Rest
         public string Mention => MentionUtils.MentionUser(Id);
         /// <inheritdoc />
         public virtual IActivity Activity => null;
-        /// <summary>
+        /// <inheritdoc />
+        /// <remarks>
         /// Returns <see cref="UserStatus.Offline"/> always as REST API doesn't return Status.
         /// Use Gateway <c>GetUser</c> on the ID to get the status.
-        /// </summary>
+        /// </remarks>
         public virtual UserStatus Status => UserStatus.Offline;	
         /// <inheritdoc />
         public virtual IImmutableSet<ClientType> ActiveClients => ImmutableHashSet<ClientType>.Empty;
