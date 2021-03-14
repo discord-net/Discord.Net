@@ -1,7 +1,7 @@
 public class Program
 {
-	public static void Main(string[] args)
-		=> new Program().MainAsync().GetAwaiter().GetResult();
+	public static async Task Main(string[] args)
+		=> await new Program().MainAsync();
 
 	public async Task MainAsync()
 	{
