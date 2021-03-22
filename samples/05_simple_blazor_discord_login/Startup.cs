@@ -30,7 +30,7 @@ namespace _04_simple_blazor_discord_login
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
-            services.AddScopedDiscordRestClient();
+            services.AddDiscordRestClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
