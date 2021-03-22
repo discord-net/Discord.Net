@@ -7,7 +7,6 @@ using Discord;
 using Discord.WebSocket;
 using Discord.Commands;
 using _02_commands_framework.Services;
-using Discord.Rest;
 
 namespace _02_commands_framework
 {
@@ -60,7 +59,6 @@ namespace _02_commands_framework
 
         private ServiceProvider ConfigureServices()
         {
-            //var discordrestconfig = new DiscordRestConfig { RestClientProvider = (url => new  };
             return new ServiceCollection()
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
