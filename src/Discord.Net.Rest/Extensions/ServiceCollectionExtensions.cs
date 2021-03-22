@@ -34,12 +34,12 @@ namespace Discord.Rest.Extensions
 
 
 
-            services.AddScoped<HttpClientFactoryRestClientProvider>(provider => new HttpClientFactoryRestClientProvider(provider.GetRequiredService<IHttpClientFactory>()));
+            //services.AddScoped<HttpClientFactoryRestClientProvider>(provider => new HttpClientFactoryRestClientProvider(provider.GetRequiredService<IHttpClientFactory>()));
             services.AddScoped<DiscordRestClient>(provider =>
             {
                 var config = new DiscordRestConfig
                 {
-                    RestClientProvider = provider.GetRequiredService<HttpClientFactoryRestClientProvider>().Instance
+                    RestClientProvider = url => new HttpClientFactoryRestClient(url, provider.GetRequiredService<IHttpClientFactory>().CreateClient("HttpClientFactoryRestClientProvider"), useProxy)
                 };
                 return new DiscordRestClient(config);
             });
@@ -64,12 +64,12 @@ namespace Discord.Rest.Extensions
 
 
 
-            services.AddTransient<HttpClientFactoryRestClientProvider>(provider => new HttpClientFactoryRestClientProvider(provider.GetRequiredService<IHttpClientFactory>()));
+            //services.AddTransient<HttpClientFactoryRestClientProvider>(provider => new HttpClientFactoryRestClientProvider(provider.GetRequiredService<IHttpClientFactory>()));
             services.AddTransient<DiscordRestClient>(provider =>
             {
                 var config = new DiscordRestConfig
                 {
-                    RestClientProvider = provider.GetRequiredService<HttpClientFactoryRestClientProvider>().Instance
+                    RestClientProvider = url => new HttpClientFactoryRestClient(url, provider.GetRequiredService<IHttpClientFactory>().CreateClient("HttpClientFactoryRestClientProvider"), useProxy)
                 };
                 return new DiscordRestClient(config);
             });
