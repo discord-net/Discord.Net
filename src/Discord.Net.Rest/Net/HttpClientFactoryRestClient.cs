@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Rest.Net
 {
-    internal sealed class HttpClientFactoryClient : IRestClient, IDisposable
+    internal sealed class HttpClientFactoryRestClient : IRestClient, IDisposable
     {
             private const int HR_SECURECHANNELFAILED = -2146233079;
 
@@ -24,7 +24,7 @@ namespace Discord.Rest.Net
             private CancellationToken _cancelToken;
             private bool _isDisposed;
 
-            public HttpClientFactoryClient(string baseUrl, HttpClient httpClient, bool useProxy = false)
+            public HttpClientFactoryRestClient(string baseUrl, HttpClient httpClient, bool useProxy = false)
             {
                 _baseUrl = baseUrl;
                 //this client would be given to use through DI. The advantage would be that it would be managed by DI, and no socket Exhaustation possible.

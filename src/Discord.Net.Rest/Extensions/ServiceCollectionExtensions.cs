@@ -18,7 +18,7 @@ namespace Discord.Rest.Extensions
     {
         public static IServiceCollection AddScopedDiscordRestClient(this IServiceCollection services, bool useProxy = false)
         {
-            services.AddHttpClient("HttpFactoryRestClientProvider")
+            services.AddHttpClient("HttpClientFactoryRestClientProvider")
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
                 {
                     AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
@@ -28,12 +28,12 @@ namespace Discord.Rest.Extensions
 
 
 
-            services.AddTransient<HttpFactoryRestClientProvider>(provider => new HttpFactoryRestClientProvider(provider.GetRequiredService<IHttpClientFactory>()));
+            services.AddTransient<HttpClientFactoryRestClientProvider>(provider => new HttpClientFactoryRestClientProvider(provider.GetRequiredService<IHttpClientFactory>()));
             services.AddScoped<DiscordRestClient>(provider =>
             {
                 var config = new DiscordRestConfig
                 {
-                    RestClientProvider = provider.GetRequiredService<HttpFactoryRestClientProvider>().Instance
+                    RestClientProvider = provider.GetRequiredService<HttpClientFactoryRestClientProvider>().Instance
                 };
                 return new DiscordRestClient(config);
             });
@@ -43,7 +43,7 @@ namespace Discord.Rest.Extensions
 
         public static IServiceCollection AddTransientDiscordRestClient(this IServiceCollection services, bool useProxy = false) //where should we put this useProxy options, I haven't fully understood where the original code takes this from.
         {
-            services.AddHttpClient("HttpFactoryRestClientProvider")
+            services.AddHttpClient("HttpClientFactoryRestClientProvider")
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
                 {
                     AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
@@ -53,12 +53,12 @@ namespace Discord.Rest.Extensions
 
 
 
-            services.AddTransient<HttpFactoryRestClientProvider>(provider => new HttpFactoryRestClientProvider(provider.GetRequiredService<IHttpClientFactory>()));
+            services.AddTransient<HttpClientFactoryRestClientProvider>(provider => new HttpClientFactoryRestClientProvider(provider.GetRequiredService<IHttpClientFactory>()));
             services.AddTransient<DiscordRestClient>(provider =>
             {
                 var config = new DiscordRestConfig
                 {
-                    RestClientProvider = provider.GetRequiredService<HttpFactoryRestClientProvider>().Instance
+                    RestClientProvider = provider.GetRequiredService<HttpClientFactoryRestClientProvider>().Instance
                 };
                 return new DiscordRestClient(config);
             });

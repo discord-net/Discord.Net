@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 
 namespace Discord.Rest.Net
 {
-    public class HttpFactoryRestClientProvider
+    public class HttpClientFactoryRestClientProvider
     {
         public readonly RestClientProvider Instance;
 
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public HttpFactoryRestClientProvider(IHttpClientFactory httpClientFactory)
+        public HttpClientFactoryRestClientProvider(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
 
-            Instance = url => new HttpClientFactoryClient(url, _httpClientFactory.CreateClient("HttpFactoryRestClientProvider"), useProxy: false);
+            Instance = url => new HttpClientFactoryRestClient(url, _httpClientFactory.CreateClient("HttpClientFactoryRestClientProvider"), useProxy: false);
         }
 
 
