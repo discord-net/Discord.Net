@@ -14,6 +14,9 @@ using System.Threading.Tasks;
 
 namespace Discord.Rest.Net
 {
+    /// <summary>
+    /// This HttpClientFactoryRestClient is the one used by HttpClientFactoryRestClientProvider. It accepts a preconfigured HttpClient.
+    /// </summary>
     internal sealed class HttpClientFactoryRestClient : IRestClient, IDisposable
     {
             private const int HR_SECURECHANNELFAILED = -2146233079;
@@ -29,17 +32,17 @@ namespace Discord.Rest.Net
                 _baseUrl = baseUrl;
                 //this client would be given to use through DI. The advantage would be that it would be managed by DI, and no socket Exhaustation possible.
                 _client = httpClient;
-//#pragma warning disable IDISP014
-//                _client = new HttpClient(new HttpClientHandler
-//                {
-//                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-//                    UseCookies = false,
-//                    UseProxy = useProxy,
-//                });
-//#pragma warning restore IDISP014
-                SetHeader("accept-encoding", "gzip, deflate");
+            //#pragma warning disable IDISP014
+            //                _client = new HttpClient(new HttpClientHandler
+            //                {
+            //                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+            //                    UseCookies = false,
+            //                    UseProxy = useProxy,
+            //                });
+            //#pragma warning restore IDISP014
+            SetHeader("accept-encoding", "gzip, deflate"); //I will move this to the Extension method probably in another commit.
 
-                _cancelToken = CancellationToken.None;
+            _cancelToken = CancellationToken.None;
                 _errorDeserializer = new JsonSerializer();
             }
             private void Dispose(bool disposing)
