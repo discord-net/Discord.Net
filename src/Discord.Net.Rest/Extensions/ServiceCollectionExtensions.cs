@@ -22,7 +22,7 @@ namespace Discord.Rest.Extensions
         /// <param name="services">This is the IServiceCollection where all the services are located.</param>
         /// <param name="useProxy">Set this to true to use proxies, default is false.</param>
         /// <returns></returns>
-        public static IServiceCollection AddScopedDiscordRestClient(this IServiceCollection services, bool useProxy = false)
+        public static IServiceCollection AddDiscordRestClient(this IServiceCollection services, bool useProxy = false)
         {
             services.AddHttpClient("HttpClientFactoryRestClientProvider")
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
@@ -35,37 +35,7 @@ namespace Discord.Rest.Extensions
 
 
             //services.AddScoped<HttpClientFactoryRestClientProvider>(provider => new HttpClientFactoryRestClientProvider(provider.GetRequiredService<IHttpClientFactory>()));
-            services.AddScoped<DiscordRestClient>(provider =>
-            {
-                var config = new DiscordRestConfig
-                {
-                    RestClientProvider = url => new HttpClientFactoryRestClient(url, provider.GetRequiredService<IHttpClientFactory>().CreateClient("HttpClientFactoryRestClientProvider"), useProxy)
-                };
-                return new DiscordRestClient(config);
-            });
-
-            return services;
-        }
-        /// <summary>
-        /// Adds the DiscordRestClient as a Transient Service to be able to use through DI.
-        /// </summary>
-        /// <param name="services">This is the IServiceCollection where all the services are located.</param>
-        /// <param name="useProxy">Set this to true to use proxies, default is false.</param>
-        /// <returns></returns>
-        public static IServiceCollection AddTransientDiscordRestClient(this IServiceCollection services, bool useProxy = false) //where should we put this useProxy options, I haven't fully understood where the original code takes this from.
-        {
-            services.AddHttpClient("HttpClientFactoryRestClientProvider")
-                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-                {
-                    AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip,
-                    UseCookies = false,
-                    UseProxy = useProxy,
-                });
-
-
-
-            //services.AddTransient<HttpClientFactoryRestClientProvider>(provider => new HttpClientFactoryRestClientProvider(provider.GetRequiredService<IHttpClientFactory>()));
-            services.AddTransient<DiscordRestClient>(provider =>
+            services.AddSingleton<DiscordRestClient>(provider =>
             {
                 var config = new DiscordRestConfig
                 {
