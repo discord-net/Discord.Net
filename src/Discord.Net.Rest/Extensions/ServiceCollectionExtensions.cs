@@ -28,7 +28,7 @@ namespace Discord.Rest.Extensions
 
 
 
-            services.AddTransient<HttpClientFactoryRestClientProvider>(provider => new HttpClientFactoryRestClientProvider(provider.GetRequiredService<IHttpClientFactory>()));
+            services.AddScoped<HttpClientFactoryRestClientProvider>(provider => new HttpClientFactoryRestClientProvider(provider.GetRequiredService<IHttpClientFactory>()));
             services.AddScoped<DiscordRestClient>(provider =>
             {
                 var config = new DiscordRestConfig
