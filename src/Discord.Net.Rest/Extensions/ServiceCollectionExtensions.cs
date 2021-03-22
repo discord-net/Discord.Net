@@ -16,6 +16,12 @@ namespace Discord.Rest.Extensions
     /// </summary>
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        /// Adds the DiscordRestClient as a Scoped Service to be able to use through DI.
+        /// </summary>
+        /// <param name="services">This is the IServiceCollection where all the services are located.</param>
+        /// <param name="useProxy">Set this to true to use proxies, default is false.</param>
+        /// <returns></returns>
         public static IServiceCollection AddScopedDiscordRestClient(this IServiceCollection services, bool useProxy = false)
         {
             services.AddHttpClient("HttpClientFactoryRestClientProvider")
@@ -40,7 +46,12 @@ namespace Discord.Rest.Extensions
 
             return services;
         }
-
+        /// <summary>
+        /// Adds the DiscordRestClient as a Transient Service to be able to use through DI.
+        /// </summary>
+        /// <param name="services">This is the IServiceCollection where all the services are located.</param>
+        /// <param name="useProxy">Set this to true to use proxies, default is false.</param>
+        /// <returns></returns>
         public static IServiceCollection AddTransientDiscordRestClient(this IServiceCollection services, bool useProxy = false) //where should we put this useProxy options, I haven't fully understood where the original code takes this from.
         {
             services.AddHttpClient("HttpClientFactoryRestClientProvider")
