@@ -1,9 +1,10 @@
+# Warning
+
+Slash commands and interactions are still under development and are subject to change at any time. This doccument is temporary and is only here to help those who wish to use the interaction features in the development state.
+
 # Application commands
 
 Application commands are a new feature thats still a work in progress, this guide will show you how to make the best of em.
-
-
-
 
 ## Getting started
 
@@ -64,7 +65,7 @@ private async Task RegisterCommands()
 }
 ```
 CreateGuildCommand returns a `RestGuildCommand` class which can be used to modify/delete your command on the fly, it also contains details about your command.
-CreateGlobalCOmmand returns a `RestGlobalCommand` class which can be used to modify/delete your command on the fly, it also contains details about your command.
+CreateGlobalCommand returns a `RestGlobalCommand` class which can be used to modify/delete your command on the fly, it also contains details about your command.
 
 ### Getting a list of all your commands
 You can fetch a list of all your global commands via rest:
@@ -203,14 +204,14 @@ private async Task MySlashCommandHandler(SocketInteraction arg)
     case "hug":
       // Get the user argument
       var option = arg.Data.Options.First(x => x.Name == "user");
-      // We know that the options value must be a user
-      if(option.Value is SocketGuildUser user)
-      {
-        await arg.RespondAsync($"Hugged {user.Mention}");
-      }
+      
+      // We know that the options value must be a user. Types of user, channel, and role return the snowflake id of that object. 
+      // For this case we can just mention the user with the id
+      await arg.RespondAsync($"Hugged <@{user.Value}>");
       break;
   }
 }
 ```
 
-
+# Wrapping up
+These examples are soon to change as there is currently a command service being written that will support slash commands. These examples are written for [#1717](https://github.com/discord-net/Discord.Net/pull/1717). You can see the progress of slash commands on pull [#1733](https://github.com/discord-net/Discord.Net/pull/1733)
