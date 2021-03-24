@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Discord.Rest.Net
+namespace Discord.Net.Rest
 {
     /// <summary>
     /// This HttpClientFactoryRestClient is the one used by HttpClientFactoryRestClientProvider. It accepts a preconfigured HttpClient.
