@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace _04_simple_blazor_discord_login.Data
+namespace _05_simple_blazor_discord_login.Data
 {
     public class WeatherForecastService
     {

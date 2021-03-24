@@ -1,6 +1,6 @@
 using System;
 
-namespace _04_simple_blazor_discord_login.Data
+namespace _05_simple_blazor_discord_login.Data
 {
     public class WeatherForecast
     {
