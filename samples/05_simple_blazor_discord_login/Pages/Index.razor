@@ -1,5 +1,5 @@
 @page "/"
-
+@namespace _04_simple_blazor_discord_login.Pages
 <h1>Hello!</h1>
 
 Navigate to /#access_token=real_access and test me.
@@ -20,5 +20,16 @@ Make sure you change the response_type from response_type=code to response_type=
             @User.Status
         </div>
     </div>
+    @if(RestToken != null){
+    <div class="card-body">
+        <div class="card-text">
+            Token: @RestToken.Token
+        </div>
+        <div class="card-text">
+            Refresh Token: @RestToken.RefreshToken
+        </div>
+    </div>
+}
 </div>}
+
 
