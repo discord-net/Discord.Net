@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>_04_simple_blazor_discord_login</RootNamespace>
+    <RootNamespace>_05_simple_blazor_discord_login</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

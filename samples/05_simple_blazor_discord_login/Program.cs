@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace _04_simple_blazor_discord_login
+namespace _05_simple_blazor_discord_login
 {
     public class Program
     {

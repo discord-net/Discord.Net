@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace _04_simple_blazor_discord_login.Pages
+namespace _05_simple_blazor_discord_login.Pages
 {
     public partial class Index : ComponentBase
     {
