@@ -91,9 +91,30 @@ namespace Discord.Rest.Net
                     return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
                 }
             }
+            /// <summary>
+            /// This is the new SendAsync method required for sending UrlEncoded data. This is needed for Oauth2 stuff -> refresh token, and get a new token from a code.
+            /// </summary>
+            /// <param name="method"></param>
+            /// <param name="endpoint"></param>
+            /// <param name="formDataContent"></param>
+            /// <param name="cancelToken"></param>
+            /// <param name="headerOnly"></param>
+            /// <param name="reason"></param>
+            /// <returns></returns>
+            public async Task<RestResponse> SendAsync(string method, string endpoint, IEnumerable<KeyValuePair<string?, string?>> formDataContent, CancellationToken cancelToken, bool headerOnly, string reason = null)
+            {
+                string uri = Path.Combine(_baseUrl, endpoint);
+                using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
+                {
+                    if (reason != null)
+                        restRequest.Headers.Add("X-Audit-Log-Reason", Uri.EscapeDataString(reason));
+                    restRequest.Content = new FormUrlEncodedContent(formDataContent); // json, Encoding.UTF8, "application/json");
+                    return await SendInternalAsync(restRequest, cancelToken, headerOnly).ConfigureAwait(false);
+                }
+            }
 
-            /// <exception cref="InvalidOperationException">Unsupported param type.</exception>
-            public async Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly, string reason = null)
+        /// <exception cref="InvalidOperationException">Unsupported param type.</exception>
+        public async Task<RestResponse> SendAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartParams, CancellationToken cancelToken, bool headerOnly, string reason = null)
             {
                 string uri = Path.Combine(_baseUrl, endpoint);
                 using (var restRequest = new HttpRequestMessage(GetMethod(method), uri))
@@ -149,6 +170,7 @@ namespace Discord.Rest.Net
                 {
                     cancelToken = cancelTokenSource.Token;
                     HttpResponseMessage response = await _client.SendAsync(request, cancelToken).ConfigureAwait(false);
+                    var str = await response.Content.ReadAsStringAsync();
 
                     var headers = response.Headers.ToDictionary(x => x.Key, x => x.Value.FirstOrDefault(), StringComparer.OrdinalIgnoreCase);
 
