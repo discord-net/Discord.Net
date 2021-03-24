@@ -1,4 +1,4 @@
-using _04_simple_blazor_discord_login.Data;
+using _05_simple_blazor_discord_login.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -10,10 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Rest.Extensions;
-using static Discord.Rest.Extensions.ServiceCollectionExtensions;
+using _05_simple_blazor_discord_login.Extensions;
 
-namespace _04_simple_blazor_discord_login
+namespace _05_simple_blazor_discord_login
 {
     public class Startup
     {
@@ -31,7 +30,7 @@ namespace _04_simple_blazor_discord_login
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
-            services.AddDiscordRestClient(() => new DiscordSecretOptions { ClientId = "Your Client Id", ClientSecret = "Your Client Secret here"});
+            services.AddDiscordRestClient(clientId:"Your Client Id", clientSecret: "Your Client Secret here");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
