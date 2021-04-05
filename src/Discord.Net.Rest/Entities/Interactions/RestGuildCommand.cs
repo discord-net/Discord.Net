@@ -15,7 +15,7 @@ namespace Discord.Rest
         /// <summary>
         ///     The guild Id where this command originates.
         /// </summary>
-        public ulong GuildId { get; set; }
+        public ulong GuildId { get; private set; }
 
         internal RestGuildCommand(BaseDiscordClient client, ulong id, ulong guildId)
             : base(client, id)
