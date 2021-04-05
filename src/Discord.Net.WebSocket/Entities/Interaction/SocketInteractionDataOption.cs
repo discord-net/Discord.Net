@@ -30,7 +30,7 @@ namespace Discord.WebSocket
         internal SocketInteractionDataOption() { }
         internal SocketInteractionDataOption(Model model, DiscordSocketClient discord, ulong guild)
         {
-            this.Name = Name;
+            this.Name = model.Name;
             this.Value = model.Value.IsSpecified ? model.Value.Value : null;
             this.discord = discord;
             this.guild = guild;

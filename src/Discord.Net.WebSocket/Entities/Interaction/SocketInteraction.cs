@@ -28,8 +28,8 @@ namespace Discord.WebSocket
         /// <summary>
         ///     The <see cref="SocketGuildUser"/> who triggered this interaction.
         /// </summary>
-        public SocketGuildUser Member
-            => Guild.GetUser(MemberId);
+        public SocketGuildUser User
+            => Guild.GetUser(UserId);
 
         /// <summary>
         ///     The type of this interaction.
@@ -61,7 +61,7 @@ namespace Discord.WebSocket
 
         private ulong GuildId { get; set; }
         private ulong ChannelId { get; set; }
-        private ulong MemberId { get; set; }
+        private ulong UserId { get; set; }
 
         internal SocketInteraction(DiscordSocketClient client, ulong id)
             : base(client, id)
@@ -85,7 +85,7 @@ namespace Discord.WebSocket
             this.ChannelId = model.ChannelId;
             this.Token = model.Token;
             this.Version = model.Version;
-            this.MemberId = model.Member.User.Id;
+            this.UserId = model.Member.User.Id;
             this.Type = model.Type;
         }
         private bool CheckToken()
