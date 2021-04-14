@@ -21,6 +21,10 @@ namespace Discord.API
         [JsonProperty("allowed_mentions")]
         public Optional<AllowedMentions> AllowedMentions { get; set; }
 
+        // New flags prop. this make the response "ephemeral". see https://discord.com/developers/docs/interactions/slash-commands#interaction-response-interactionapplicationcommandcallbackdata
+        [JsonProperty("flags")]
+        public Optional<int> Flags { get; set; }
+
         public InteractionApplicationCommandCallbackData() { }
         public InteractionApplicationCommandCallbackData(string text)
         {

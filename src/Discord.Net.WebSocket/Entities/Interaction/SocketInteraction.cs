@@ -104,7 +104,8 @@ namespace Discord.WebSocket
         /// <param name="text">The text of the message to be sent.</param>
         /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
         /// <param name="embed">A <see cref="Embed"/> to send with this response.</param>
-        /// <param name="Type">The type of response to this Interaction.</param>
+        /// <param name="type">The type of response to this Interaction.</param>
+        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <returns>
@@ -113,16 +114,17 @@ namespace Discord.WebSocket
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
 
-        public async Task<IMessage> RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType Type = InteractionResponseType.ChannelMessageWithSource, AllowedMentions allowedMentions = null, RequestOptions options = null)
+        public async Task<IMessage> RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
+            bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null)
         {
-            if (Type == InteractionResponseType.Pong)
+            if (type == InteractionResponseType.Pong)
                 throw new InvalidOperationException($"Cannot use {Type} on a send message function");
 
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
             if (Discord.AlwaysAcknowledgeInteractions)
-                return await FollowupAsync();
+                return await FollowupAsync(text, isTTS, embed, ephemeral, type, allowedMentions, options); // The arguments should be passed? What was i thinking...
 
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
@@ -146,16 +148,19 @@ namespace Discord.WebSocket
 
             var response = new API.InteractionResponse()
             {
-                Type = Type,
+                Type = type,
                 Data = new API.InteractionApplicationCommandCallbackData(text)
                 {
                     AllowedMentions = allowedMentions?.ToModel(),
                     Embeds = embed != null
                         ? new API.Embed[] { embed.ToModel() }
                         : Optional<API.Embed[]>.Unspecified,
-                    TTS = isTTS
+                    TTS = isTTS,
                 }
             };
+
+            if (ephemeral)
+                response.Data.Value.Flags = 64;
 
             await Discord.Rest.ApiClient.CreateInteractionResponse(response, this.Id, Token, options);
             return null;
@@ -168,15 +173,17 @@ namespace Discord.WebSocket
         /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
         /// <param name="embed">A <see cref="Embed"/> to send with this response.</param>
         /// <param name="Type">The type of response to this Interaction.</param>
+        /// /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <returns>
         ///     The sent message.
         /// </returns>
-        public async Task<IMessage> FollowupAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType Type = InteractionResponseType.ChannelMessageWithSource,
+        public async Task<IMessage> FollowupAsync(string text = null, bool isTTS = false, Embed embed = null, bool ephemeral = false,
+            InteractionResponseType Type = InteractionResponseType.ChannelMessageWithSource,
             AllowedMentions allowedMentions = null, RequestOptions options = null)
         {
-            if (Type == InteractionResponseType.ACKWithSource || Type == InteractionResponseType.ACKWithSource || Type == InteractionResponseType.Pong)
+            if (Type == InteractionResponseType.DeferredChannelMessageWithSource || Type == InteractionResponseType.DeferredChannelMessageWithSource || Type == InteractionResponseType.Pong)
                 throw new InvalidOperationException($"Cannot use {Type} on a send message function");
 
             if (!IsValidToken)
@@ -189,13 +196,15 @@ namespace Discord.WebSocket
                         ? new API.Embed[] { embed.ToModel() }
                         : Optional<API.Embed[]>.Unspecified,
             };
-            
+
+            if (ephemeral)
+                args.Flags = 64;
+
             return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
-            
         }
 
         /// <summary>
-        ///     Acknowledges this interaction with the <see cref="InteractionResponseType.ACKWithSource"/>.
+        ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredChannelMessageWithSource"/>.
         /// </summary>
         /// <returns>
         ///     A task that represents the asynchronous operation of acknowledging the interaction.
@@ -204,7 +213,7 @@ namespace Discord.WebSocket
         {
             var response = new API.InteractionResponse()
             {
-                Type = InteractionResponseType.ACKWithSource,
+                Type = InteractionResponseType.DeferredChannelMessageWithSource,
             };
 
             await Discord.Rest.ApiClient.CreateInteractionResponse(response, this.Id, Token, options).ConfigureAwait(false);
