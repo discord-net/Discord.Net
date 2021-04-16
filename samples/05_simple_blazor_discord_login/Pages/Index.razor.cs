@@ -39,14 +39,14 @@ namespace _05_simple_blazor_discord_login.Pages
                 }
                 if (QueryHelpers.ParseQuery(uri.Query.TrimStart('?')).TryGetValue("code", out var code))
                 {
-                    RestToken = await DiscordRestClient.GetTokenAsync(TokenType.Code, code, new List<string> { "identify" }); //this can give you an exception if the token is expired!
+                    RestToken = await DiscordRestClient.GetTokenAsync(TokenType.Code, code, navigationManager.BaseUri, new List<string> { "identify" }); //this can give you an exception if the token is expired!
                     await DiscordRestClient.LoginAsync(TokenType.Bearer, RestToken.Token);
                     User = DiscordRestClient.CurrentUser;
                     StateHasChanged();
                 }
                 if (QueryHelpers.ParseQuery(uri.Query.TrimStart('?')).TryGetValue("refresh_token", out var refreshToken))
                 {
-                    RestToken = await DiscordRestClient.GetTokenAsync(TokenType.Refresh, refreshToken, new List<string> { "identify" }); //this can give you an exception if the token is expired!
+                    RestToken = await DiscordRestClient.GetTokenAsync(TokenType.Refresh, refreshToken, navigationManager.BaseUri, new List<string> { "identify" }); //this can give you an exception if the token is expired!
                     await DiscordRestClient.LoginAsync(TokenType.Bearer, RestToken.Token);
                     User = DiscordRestClient.CurrentUser;
                     StateHasChanged();

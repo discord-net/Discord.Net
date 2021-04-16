@@ -318,7 +318,7 @@ namespace Discord.API
         /// <param name="scopes">The scopes requested.</param>
         /// <param name="options"></param>
         /// <returns>Returns <see cref="Token"/> with the information about the retrieved token.</returns>
-        public async Task<Token> GetTokenAsync(TokenType tokenType, string token, IEnumerable<string> scopes, RequestOptions options = null)
+        public async Task<Token> GetTokenAsync(TokenType tokenType, string token, string redirectUrl, IEnumerable<string> scopes, RequestOptions options = null)
         {
             Preconditions.NotNull(token, nameof(token));
             options = RequestOptions.CreateOrClone(options);
@@ -335,6 +335,7 @@ namespace Discord.API
                 new KeyValuePair<string, string>("client_secret", ClientSecret),
                 new KeyValuePair<string, string>("grant_type", "authorization_code"),
                 new KeyValuePair<string, string>("code", token),
+                new KeyValuePair<string, string>("redirect_uri", redirectUrl),
                 new KeyValuePair<string, string>("scope", string.Join(" ", scopes))
                 };
 
@@ -350,6 +351,7 @@ namespace Discord.API
                 new KeyValuePair<string, string>("client_secret", ClientSecret),
                 new KeyValuePair<string, string>("grant_type", "refresh_token"),
                 new KeyValuePair<string, string>("refresh_token", token),
+                new KeyValuePair<string, string>("redirect_uri", redirectUrl),
                 new KeyValuePair<string, string>("scope", string.Join(" ", scopes))
                 };
 
