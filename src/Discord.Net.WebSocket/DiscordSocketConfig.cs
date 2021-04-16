@@ -111,7 +111,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     <para>
         ///         Discord interactions will not appear in chat until the client responds to them. With this option set to 
-        ///         <see langword="true"/>, the client will automatically acknowledge the interaction with <see cref="InteractionResponseType.ACKWithSource"/>.
+        ///         <see langword="true"/>, the client will automatically acknowledge the interaction with <see cref="InteractionResponseType.DeferredChannelMessageWithSource"/>.
         ///         See <see href="https://discord.com/developers/docs/interactions/slash-commands#interaction-interactionresponsetype">the docs</see> on
         ///         responding to interactions for more info.
         ///     </para>

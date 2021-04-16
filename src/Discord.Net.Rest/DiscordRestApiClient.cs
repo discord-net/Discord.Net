@@ -804,7 +804,21 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<ApplicationCommand>("POST", () => $"applications/{this.CurrentUserId}/commands", command, new BucketIds(), options: options).ConfigureAwait(false);
+            try
+            {
+                return await SendJsonAsync<ApplicationCommand>("POST", () => $"applications/{this.CurrentUserId}/commands", command, new BucketIds(), options: options).ConfigureAwait(false);
+            }
+            catch (HttpException x)
+            {
+                if (x.HttpCode == HttpStatusCode.BadRequest)
+                {
+                    var json = (x.Request as JsonRestRequest).Json;
+                    throw new ApplicationCommandException(json, x);
+                }
+
+                // Re-throw the http exception
+                throw;
+            }
         }
         public async Task<ApplicationCommand> ModifyGlobalApplicationCommandAsync(ModifyApplicationCommandParams command, ulong commandId, RequestOptions options = null)
         {
@@ -823,7 +837,21 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{this.CurrentUserId}/commands/{commandId}", command, new BucketIds(), options: options).ConfigureAwait(false);
+            try
+            {
+                return await SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{this.CurrentUserId}/commands/{commandId}", command, new BucketIds(), options: options).ConfigureAwait(false);
+            }
+            catch (HttpException x)
+            {
+                if (x.HttpCode == HttpStatusCode.BadRequest)
+                {
+                    var json = (x.Request as JsonRestRequest).Json;
+                    throw new ApplicationCommandException(json, x);
+                }
+
+                // Re-throw the http exception
+                throw;
+            }
         }
         public async Task DeleteGlobalApplicationCommandAsync(ulong commandId, RequestOptions options = null)
         {
@@ -852,7 +880,21 @@ namespace Discord.API
 
             var bucket = new BucketIds(guildId: guildId);
 
-            return await SendJsonAsync<ApplicationCommand>("POST", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", command, bucket, options: options).ConfigureAwait(false);
+            try
+            {
+                return await SendJsonAsync<ApplicationCommand>("POST", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", command, bucket, options: options).ConfigureAwait(false);
+            }
+            catch (HttpException x)
+            {
+                if (x.HttpCode == HttpStatusCode.BadRequest)
+                {
+                    var json = (x.Request as JsonRestRequest).Json;
+                    throw new ApplicationCommandException(json, x);
+                }
+
+                // Re-throw the http exception
+                throw;
+            }
         }
         public async Task<ApplicationCommand> ModifyGuildApplicationCommandAsync(ModifyApplicationCommandParams command, ulong guildId, ulong commandId, RequestOptions options = null)
         {
@@ -873,7 +915,21 @@ namespace Discord.API
 
             var bucket = new BucketIds(guildId: guildId);
 
-            return await SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", command, bucket, options: options).ConfigureAwait(false);
+            try
+            {
+                return await SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", command, bucket, options: options).ConfigureAwait(false);
+            }
+            catch (HttpException x)
+            {
+                if (x.HttpCode == HttpStatusCode.BadRequest)
+                {
+                    var json = (x.Request as JsonRestRequest).Json;
+                    throw new ApplicationCommandException(json, x);
+                }
+
+                // Re-throw the http exception
+                throw;
+            }
         }
         public async Task DeleteGuildApplicationCommandAsync(ulong guildId, ulong commandId, RequestOptions options = null)
         {
@@ -893,6 +949,14 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             await SendJsonAsync("POST", () => $"interactions/{interactionId}/{interactionToken}/callback", response, new BucketIds(), options: options);
+        }
+        public async Task<Message> GetInteractionResponse(string interactionToken, RequestOptions options = null)
+        {
+            Preconditions.NotNullOrEmpty(interactionToken, nameof(interactionToken));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendAsync<Message>("GET", $"webhooks/{this.CurrentUserId}/{interactionToken}/messages/@original").ConfigureAwait(false);
         }
         public async Task ModifyInteractionResponse(ModifyInteractionResponseParams args, string interactionToken, RequestOptions options = null)
         {
@@ -920,13 +984,14 @@ namespace Discord.API
             return await SendJsonAsync<Message>("POST", () => $"webhooks/{CurrentUserId}/{token}?wait=true", args, new BucketIds(), options: options).ConfigureAwait(false);
         }
 
-        public async Task<Message> ModifyInteractionFollowupMessage(CreateWebhookMessageParams args, ulong id, string token, RequestOptions options = null)
+        public async Task<Message> ModifyInteractionFollowupMessage(ModifyInteractionResponseParams args, ulong id, string token, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(id, 0, nameof(id));
 
-            if (args.Content?.Length > DiscordConfig.MaxMessageSize)
-                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
+            if(args.Content.IsSpecified)
+                if (args.Content.Value.Length > DiscordConfig.MaxMessageSize)
+                    throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
 
             options = RequestOptions.CreateOrClone(options);
 
@@ -940,6 +1005,56 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
 
             await SendAsync("DELETE", () => $"webhooks/{CurrentUserId}/{token}/messages/{id}", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
+        // Application Command permissions
+        public async Task<GuildApplicationCommandPermission[]> GetGuildApplicationCommandPermissions(ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendAsync<GuildApplicationCommandPermission[]>("GET", () => $"/applications/{this.CurrentUserId}/guilds/{guildId}/commands/permissions", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
+        public async Task<GuildApplicationCommandPermission> GetGuildApplicationCommandPermission(ulong guildId, ulong commandId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(commandId, 0, nameof(commandId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendAsync<GuildApplicationCommandPermission>("GET", () => $"/applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}/permissions", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
+        public async Task ModifyApplicationCommandPermissions(ApplicationCommandPermissions[] permissions, ulong guildId, ulong commandId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(commandId, 0, nameof(commandId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            await SendJsonAsync("PUT", () => $"/applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}/permissions", permissions, new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
+        public async Task BatchModifyApplicationCommandPermissions(ModifyGuildApplicationCommandPermissions[] permissions, ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(permissions, nameof(permissions));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            await SendJsonAsync("PUT", () => $"/applications/{this.CurrentUserId}/guilds/{guildId}/commands/premissions", permissions, new BucketIds(), options: options).ConfigureAwait(false);
+        }
+
+        public async Task BulkOverrideGuildApplicationCommand(API.ApplicationCommand[] commands, ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotNull(commands, nameof(commands));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            await SendJsonAsync("PUT", () => $"/applications/{this.CurrentUserId}/guilds/{guildId}/commands", commands, new BucketIds(), options: options).ConfigureAwait(false);
         }
 
         //Guilds

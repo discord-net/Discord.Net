@@ -10,12 +10,25 @@ namespace Discord.Rest
 {
     internal static class InteractionHelper
     {
-        internal static async Task<RestUserMessage> SendFollowupAsync(BaseDiscordClient client, API.Rest.CreateWebhookMessageParams args,
+        internal static async Task<RestInteractionMessage> SendInteractionResponse(BaseDiscordClient client, IMessageChannel channel, InteractionResponse response,
+            ulong interactionId, string interactionToken, RequestOptions options = null)
+        {
+            await client.ApiClient.CreateInteractionResponse(response, interactionId, interactionToken, options).ConfigureAwait(false);
+
+            // get the original message
+            var msg = await client.ApiClient.GetInteractionResponse(interactionToken).ConfigureAwait(false);
+
+            var entity = RestInteractionMessage.Create(client, msg, interactionToken, channel);
+
+            return entity;
+        }
+
+        internal static async Task<RestFollowupMessage> SendFollowupAsync(BaseDiscordClient client, API.Rest.CreateWebhookMessageParams args,
             string token, IMessageChannel channel, RequestOptions options = null)
         {
             var model = await client.ApiClient.CreateInteractionFollowupMessage(args, token, options).ConfigureAwait(false);
 
-            var entity = RestUserMessage.Create(client, channel, client.CurrentUser, model);
+            RestFollowupMessage entity = RestFollowupMessage.Create(client, model, token, channel);
             return entity;
         }
         
@@ -44,7 +57,10 @@ namespace Discord.Rest
                 Description = args.Description,
                 Options = args.Options.IsSpecified
                     ? args.Options.Value.Select(x => new Discord.API.ApplicationCommandOption(x)).ToArray()
-                    : Optional<Discord.API.ApplicationCommandOption[]>.Unspecified
+                    : Optional<Discord.API.ApplicationCommandOption[]>.Unspecified,
+                DefaultPermission = args.DefaultPermission.IsSpecified
+                    ? args.DefaultPermission.Value
+                    : Optional<bool>.Unspecified
             };
 
             var cmd = await client.ApiClient.CreateGlobalApplicationCommandAsync(model, options).ConfigureAwait(false);
@@ -68,7 +84,10 @@ namespace Discord.Rest
                 Description = args.Description,
                 Options = args.Options.IsSpecified
                     ? args.Options.Value.Select(x => new Discord.API.ApplicationCommandOption(x)).ToArray()
-                    : Optional<Discord.API.ApplicationCommandOption[]>.Unspecified
+                    : Optional<Discord.API.ApplicationCommandOption[]>.Unspecified,
+                DefaultPermission = args.DefaultPermission.IsSpecified
+                    ? args.DefaultPermission.Value
+                    : Optional<bool>.Unspecified
             };
 
             var msg = await client.ApiClient.ModifyGlobalApplicationCommandAsync(model, command.Id, options).ConfigureAwait(false);
@@ -119,7 +138,10 @@ namespace Discord.Rest
                 Description = args.Description,
                 Options = args.Options.IsSpecified
                     ? args.Options.Value.Select(x => new Discord.API.ApplicationCommandOption(x)).ToArray()
-                    : Optional<Discord.API.ApplicationCommandOption[]>.Unspecified
+                    : Optional<Discord.API.ApplicationCommandOption[]>.Unspecified,
+                DefaultPermission = args.DefaultPermission.IsSpecified
+                    ? args.DefaultPermission.Value
+                    : Optional<bool>.Unspecified
             };
 
             var cmd = await client.ApiClient.CreateGuildApplicationCommandAsync(model, guildId, options).ConfigureAwait(false);
@@ -143,7 +165,10 @@ namespace Discord.Rest
                 Description = args.Description,
                 Options = args.Options.IsSpecified
                     ? args.Options.Value.Select(x => new Discord.API.ApplicationCommandOption(x)).ToArray()
-                    : Optional<Discord.API.ApplicationCommandOption[]>.Unspecified
+                    : Optional<Discord.API.ApplicationCommandOption[]>.Unspecified,
+                DefaultPermission = args.DefaultPermission.IsSpecified
+                    ? args.DefaultPermission.Value
+                    : Optional<bool>.Unspecified
             };
 
             var msg = await client.ApiClient.ModifyGuildApplicationCommandAsync(model, command.GuildId, command.Id, options).ConfigureAwait(false);
@@ -158,5 +183,60 @@ namespace Discord.Rest
 
             await client.ApiClient.DeleteGuildApplicationCommandAsync(command.GuildId, command.Id, options).ConfigureAwait(false);
         }
+
+        internal static async Task<Discord.API.Message> ModifyFollowupMessage(BaseDiscordClient client, RestFollowupMessage message, Action<MessageProperties> func,
+            RequestOptions options = null)
+        {
+            var args = new MessageProperties();
+            func(args);
+
+            bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(message.Content);
+            bool hasEmbed = args.Embed.IsSpecified ? args.Embed.Value != null : message.Embeds.Any();
+            if (!hasText && !hasEmbed)
+                Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
+
+            var apiArgs = new API.Rest.ModifyInteractionResponseParams
+            {
+                Content = args.Content,
+                Embeds = args.Embed.IsSpecified ? new API.Embed[] { args.Embed.Value.ToModel() } : Optional.Create<API.Embed[]>()
+            };
+
+            return await client.ApiClient.ModifyInteractionFollowupMessage(apiArgs, message.Id, message.Token, options).ConfigureAwait(false);
+        }
+
+        internal static async Task DeleteFollowupMessage(BaseDiscordClient client, RestFollowupMessage message, RequestOptions options = null)
+            => await client.ApiClient.DeleteInteractionFollowupMessage(message.Id, message.Token, options);
+
+        internal static async Task<Discord.API.Message> ModifyInteractionResponse(BaseDiscordClient client, RestInteractionMessage message, Action<MessageProperties> func,
+           RequestOptions options = null)
+        {
+            var args = new MessageProperties();
+            func(args);
+
+            bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(message.Content);
+            bool hasEmbed = args.Embed.IsSpecified ? args.Embed.Value != null : message.Embeds.Any();
+            if (!hasText && !hasEmbed)
+                Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
+
+            var apiArgs = new API.Rest.ModifyInteractionResponseParams
+            {
+                Content = args.Content,
+                Embeds = args.Embed.IsSpecified ? new API.Embed[] { args.Embed.Value.ToModel() } : Optional.Create<API.Embed[]>()
+            };
+
+            return await client.ApiClient.ModifyInteractionFollowupMessage(apiArgs, message.Id, message.Token, options).ConfigureAwait(false);
+        }
+
+        internal static async Task DeletedInteractionResponse(BaseDiscordClient client, RestInteractionMessage message, RequestOptions options = null)
+            => await client.ApiClient.DeleteInteractionFollowupMessage(message.Id, message.Token, options);
+
+        // Guild permissions
+        internal static async Task<IReadOnlyCollection<Discord.GuildApplicationCommandPermissions>> GetCommandGuildPermissions(BaseDiscordClient client,
+            RestGuildCommand command)
+        {
+            // TODO
+            return null;
+        }
+
     }
 }

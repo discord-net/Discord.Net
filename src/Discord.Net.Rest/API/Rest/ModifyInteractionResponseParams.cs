@@ -10,7 +10,7 @@ namespace Discord.API.Rest
     internal class ModifyInteractionResponseParams
     {
         [JsonProperty("content")]
-        public string Content { get; set; }
+        public Optional<string> Content { get; set; }
 
         [JsonProperty("embeds")]
         public Optional<Embed[]> Embeds { get; set; }

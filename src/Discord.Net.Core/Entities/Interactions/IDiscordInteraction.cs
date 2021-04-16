@@ -18,7 +18,7 @@ namespace Discord
         /// <summary>
         ///     The id of the interaction.
         /// </summary>
-        ulong Id { get; }
+        new ulong Id { get; }
 
         /// <summary>
         ///     The type of this <see cref="IDiscordInteraction"/>.

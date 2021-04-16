@@ -211,6 +211,7 @@ namespace Discord.Rest
 
             return response.Select(x => RestGlobalCommand.Create(client, x)).ToArray();
         }
+
         public static async Task<IReadOnlyCollection<RestGuildCommand>> GetGuildApplicationCommands(BaseDiscordClient client, ulong guildId, RequestOptions options)
         {
             var response = await client.ApiClient.GetGuildApplicationCommandAsync(guildId, options).ConfigureAwait(false);

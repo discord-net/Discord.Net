@@ -28,8 +28,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     The <see cref="SocketGuildUser"/> who triggered this interaction.
         /// </summary>
-        public SocketGuildUser User
-            => Guild.GetUser(UserId);
+        public SocketGuildUser User { get; private set; }
 
         /// <summary>
         ///     The type of this interaction.
@@ -87,6 +86,9 @@ namespace Discord.WebSocket
             this.Version = model.Version;
             this.UserId = model.Member.User.Id;
             this.Type = model.Type;
+
+            if (this.User == null)
+                this.User = SocketGuildUser.Create(this.Guild, Discord.State, model.Member); // Change from getter.
         }
         private bool CheckToken()
         {

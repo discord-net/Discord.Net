@@ -11,7 +11,7 @@ namespace Discord
     /// </summary>
     /// <remarks>
     ///     After receiving an interaction, you must respond to acknowledge it. You can choose to respond with a message immediately using <see cref="ChannelMessageWithSource"/>
-    ///     or you can choose to send a deferred response with <see cref="ACKWithSource"/>. If choosing a deferred response, the user will see a loading state for the interaction,
+    ///     or you can choose to send a deferred response with <see cref="DeferredChannelMessageWithSource"/>. If choosing a deferred response, the user will see a loading state for the interaction,
     ///     and you'll have up to 15 minutes to edit the original deferred response using Edit Original Interaction Response.
     ///     You can read more about Response types <see href="https://discord.com/developers/docs/interactions/slash-commands#interaction-response">Here</see>
     /// </remarks>
@@ -22,13 +22,13 @@ namespace Discord
         /// </summary>
         Pong = 1,
 
-        [Obsolete("This response type has been depricated by discord. Either use ChannelMessageWithSource or ACKWithSource", true)]
+        [Obsolete("This response type has been depricated by discord. Either use ChannelMessageWithSource or DeferredChannelMessageWithSource", true)]
         /// <summary>
         ///     ACK a command without sending a message, eating the user's input.
         /// </summary>
         Acknowledge = 2,
 
-        [Obsolete("This response type has been depricated by discord. Either use ChannelMessageWithSource or ACKWithSource", true)]
+        [Obsolete("This response type has been depricated by discord. Either use ChannelMessageWithSource or DeferredChannelMessageWithSource", true)]
         /// <summary>
         ///     Respond with a message, showing the user's input.
         /// </summary>

@@ -45,5 +45,8 @@ namespace Discord.Rest
         /// </returns>
         public async Task<RestGuildCommand> ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null)
             => await InteractionHelper.ModifyGuildCommand(Discord, this, func, options).ConfigureAwait(false);
+
+        public async Task<IReadOnlyCollection<Discord.GuildApplicationCommandPermissions>> GetCommandPermissions()
+            => await InteractionHelper.GetCommandGuildPermissions(Discord, this);
     }
 }
