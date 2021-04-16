@@ -16,9 +16,9 @@ namespace Discord.Rest
             var model = await client.ApiClient.GetMyApplicationAsync(options).ConfigureAwait(false);
             return RestApplication.Create(client, model);
         }
-        public static async Task<RestToken> GetTokenAsync(BaseDiscordClient client, TokenType tokenType, string token, string redirectUrl, IEnumerable<string> scopes, RequestOptions options)
+        public static async Task<RestToken> GetTokenAsync(BaseDiscordClient client, TokenType tokenType, string token, IEnumerable<string> scopes, RequestOptions options)
         {
-            var model = await client.ApiClient.GetTokenAsync(tokenType, token, redirectUrl, scopes, options).ConfigureAwait(false);
+            var model = await client.ApiClient.GetTokenAsync(tokenType, token, scopes, options).ConfigureAwait(false);
             return RestToken.Create(client, model);
         }
 

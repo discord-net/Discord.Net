@@ -62,9 +62,9 @@ namespace Discord.Rest
         {
             return _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this, options).ConfigureAwait(false));
         }
-        public async Task<RestToken> GetTokenAsync(TokenType tokenType, string token, string redirectUrl, IEnumerable<string> scopes, RequestOptions options = null)
+        public async Task<RestToken> GetTokenAsync(TokenType tokenType, string token, IEnumerable<string> scopes, RequestOptions options = null)
         {
-            return await ClientHelper.GetTokenAsync(this, tokenType, token, redirectUrl, scopes, options);
+            return await ClientHelper.GetTokenAsync(this, tokenType, token, scopes, options);
         }
 
         public Task<RestChannel> GetChannelAsync(ulong id, RequestOptions options = null)
