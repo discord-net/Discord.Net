@@ -1,25 +1,11 @@
 @page "/"
 @namespace _05_simple_blazor_discord_login.Pages
 <h1>Hello!</h1>
-<p>
-    Navigate to /#access_token=real_access and test me.
-</p>
-<p>
-    You can use https://discord.com/developers/applications/YourApplicationNumber/oauth2 to get an oauth2 url you can visit. Set the redirect URL to https://localhost:{whatever port you are using for debuging}/ or the final dev ready url.
-</p>
-<p>
-    You should see below the logged in user info.
-    Make sure you change the response_type from response_type=code to response_type=token to use the implice Oauth2 flow.
-</p>
-<p>
-    You can also use the response_type=code and in that case the page will grab the token using GetTokenAsync method of the DiscordRestClient. It will display the username, status, and the access token retrieved, and the refresh token.
-</p>
-<p>
-    You can use said refresh token to test the GetTokenAsync method with TokenType.Refresh and see how Discord.Net.Rest gets you a new set of tokens.
-    To do this enter in the address bar  https://localhost:{whatever port you are using for debuging}/?refresh_token={whatever refresh token previously acquired}.
-    You will see the application generate a new set of tokens.
-</p>
 
+Navigate to /#access_token=real_access and test me.
+You can use https://discord.com/developers/applications/YourApplicationNumber/oauth2 to get an oauth2 url you can visit. Set the redirect URL to https://localhost:{whatever port you are using for debuging}/ or the final dev ready url.
+You should see below the logged in user info.
+Make sure you change the response_type from response_type=code to response_type=token to use the implice Oauth2 flow.
 @if (User != null)
 {
 <div class="card">
