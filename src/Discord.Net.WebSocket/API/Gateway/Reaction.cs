@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace Discord.API.Gateway
 {
@@ -12,5 +12,7 @@ namespace Discord.API.Gateway
         public ulong ChannelId { get; set; }
         [JsonProperty("emoji")]
         public Emoji Emoji { get; set; }
+        [JsonProperty("member")]
+        public Optional<GuildMember> Member { get; set; }
     }
 }

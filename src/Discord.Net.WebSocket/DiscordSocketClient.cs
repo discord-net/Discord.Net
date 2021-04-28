@@ -1384,6 +1384,14 @@ namespace Discord.WebSocket
                                             ? Optional.Create<SocketUserMessage>()
                                             : Optional.Create(cachedMsg);
 
+                                        if (data.Member.IsSpecified)
+                                        {
+                                            var guild = (channel as SocketGuildChannel)?.Guild;
+                                            
+                                            if (guild != null)
+                                                user = guild.AddOrUpdateUser(data.Member.Value);
+                                        }
+
                                         var optionalUser = user is null
                                             ? Optional.Create<IUser>()
                                             : Optional.Create(user);
