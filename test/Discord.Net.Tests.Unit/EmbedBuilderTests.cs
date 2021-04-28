@@ -191,42 +191,6 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Tests that invalid urls throw an <see cref="ArgumentException"/>.
-        /// </summary>
-        /// <param name="url">The url to set.</param>
-        [Theory]
-        [InlineData(" ")]
-        [InlineData("not a url")]
-        public void Url_Invalid(string url)
-        {
-            Assert.Throws<ArgumentException>(()
-                => new EmbedBuilder()
-                .WithUrl(url));
-            Assert.Throws<ArgumentException>(()
-                => new EmbedBuilder()
-                .WithImageUrl(url));
-            Assert.Throws<ArgumentException>(()
-                => new EmbedBuilder()
-                .WithThumbnailUrl(url));
-
-            Assert.Throws<ArgumentException>(() =>
-            {
-                var b = new EmbedBuilder();
-                b.Url = url;
-            });
-            Assert.Throws<ArgumentException>(() =>
-            {
-                var b = new EmbedBuilder();
-                b.ImageUrl = url;
-            });
-            Assert.Throws<ArgumentException>(() =>
-            {
-                var b = new EmbedBuilder();
-                b.ThumbnailUrl = url;
-            });
-        }
-
-        /// <summary>
         ///     Tests the value of the <see cref="EmbedBuilder.Length"/> property when there are no fields set.
         /// </summary>
         [Fact]
@@ -341,24 +305,6 @@ namespace Discord
                 .WithText(name);
             Assert.Equal(url, footer.IconUrl);
             Assert.Equal(name, footer.Text);
-        }
-        /// <summary>
-        ///     Tests that invalid URLs throw an <see cref="ArgumentException"/>.
-        /// </summary>
-        [Fact]
-        public void EmbedFooterBuilder_InvalidURL()
-        {
-            IEnumerable<string> InvalidUrls()
-            {
-                yield return "not a url";
-            }
-            foreach (var url in InvalidUrls())
-            {
-                Assert.Throws<ArgumentException>(() =>
-                {
-                    new EmbedFooterBuilder().WithIconUrl(url);
-                });
-            }
         }
         /// <summary>
         ///     Tests that invalid text throws an <see cref="ArgumentException"/>.
