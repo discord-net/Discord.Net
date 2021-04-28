@@ -9,7 +9,7 @@ namespace _03_sharded_client.Modules
         [Command("info")]
         public async Task InfoAsync()
         {
-            var msg = $@"Hi {Context.User}! There are currently {Context.Client.Shards} shards!
+            var msg = $@"Hi {Context.User}! There are currently {Context.Client.Shards.Count} shards!
                 This guild is being served by shard number {Context.Client.GetShardFor(Context.Guild).ShardId}";
             await ReplyAsync(msg);
         }
