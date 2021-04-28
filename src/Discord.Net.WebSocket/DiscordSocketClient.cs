@@ -110,7 +110,8 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<SocketGroupChannel> GroupChannels
             => State.PrivateChannels.OfType<SocketGroupChannel>().ToImmutableArray();
         /// <inheritdoc />
-        public override IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _voiceRegions.ToReadOnlyCollection();
+        [Obsolete("This property is obsolete, use the GetVoiceRegionsAsync method instead.")]
+        public override IReadOnlyCollection<RestVoiceRegion> VoiceRegions => GetVoiceRegionsAsync().GetAwaiter().GetResult();
 
         /// <summary>
         ///     Initializes a new REST/WebSocket-based Discord client.
@@ -178,7 +179,6 @@ namespace Discord.WebSocket
                 return Task.Delay(0);
             };
 
-            _voiceRegions = ImmutableDictionary.Create<string, RestVoiceRegion>();
             _largeGuilds = new ConcurrentQueue<ulong>();
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
@@ -204,13 +204,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
-            if (_parentClient == null)
-            {
-                var voiceRegions = await ApiClient.GetVoiceRegionsAsync(new RequestOptions { IgnoreState = true, RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
-                _voiceRegions = voiceRegions.Select(x => RestVoiceRegion.Create(this, x)).ToImmutableDictionary(x => x.Id);
-            }
-            else
-                _voiceRegions = _parentClient._voiceRegions;
             await Rest.OnLoginAsync(tokenType, token);
         }
         /// <inheritdoc />
@@ -218,7 +211,7 @@ namespace Discord.WebSocket
         {
             await StopAsync().ConfigureAwait(false);
             _applicationInfo = null;
-            _voiceRegions = ImmutableDictionary.Create<string, RestVoiceRegion>();
+            _voiceRegions = null;
             await Rest.OnLogoutAsync();
         }
 
@@ -252,15 +245,15 @@ namespace Discord.WebSocket
                     await _gatewayLogger.DebugAsync("Identifying").ConfigureAwait(false);
                     await ApiClient.SendIdentifyAsync(shardID: ShardId, totalShards: TotalShards, guildSubscriptions: _guildSubscriptions, gatewayIntents: _gatewayIntents, presence: BuildCurrentStatus()).ConfigureAwait(false);
                 }
-
-                //Wait for READY
-                await _connection.WaitAsync().ConfigureAwait(false);
             }
             finally
             {
                 if (locked)
                     _shardedClient.ReleaseIdentifyLock();
             }
+
+            //Wait for READY
+            await _connection.WaitAsync().ConfigureAwait(false);
         }
         private async Task OnDisconnectingAsync(Exception ex)
         {
@@ -350,11 +343,39 @@ namespace Discord.WebSocket
             => State.RemoveUser(id);
 
         /// <inheritdoc />
+        [Obsolete("This method is obsolete, use GetVoiceRegionAsync instead.")]
         public override RestVoiceRegion GetVoiceRegion(string id)
+            => GetVoiceRegionAsync(id).GetAwaiter().GetResult();
+
+        /// <inheritdoc />
+        public override async ValueTask<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
         {
-            if (_voiceRegions.TryGetValue(id, out RestVoiceRegion region))
-                return region;
-            return null;
+            if (_parentClient == null)
+            {
+                if (_voiceRegions == null)
+                {
+                    options = RequestOptions.CreateOrClone(options);
+                    options.IgnoreState = true;
+                    var voiceRegions = await ApiClient.GetVoiceRegionsAsync(options).ConfigureAwait(false);
+                    _voiceRegions = voiceRegions.Select(x => RestVoiceRegion.Create(this, x)).ToImmutableDictionary(x => x.Id);
+                }
+                return _voiceRegions.ToReadOnlyCollection();
+            }
+            return await _parentClient.GetVoiceRegionsAsync().ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public override async ValueTask<RestVoiceRegion> GetVoiceRegionAsync(string id, RequestOptions options = null)
+        {
+            if (_parentClient == null)
+            {
+                if (_voiceRegions == null)
+                    await GetVoiceRegionsAsync().ConfigureAwait(false);
+                if (_voiceRegions.TryGetValue(id, out RestVoiceRegion region))
+                    return region;
+                return null;
+            }
+            return await _parentClient.GetVoiceRegionAsync(id, options).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -611,7 +632,7 @@ namespace Discord.WebSocket
                                             }
                                             else if (_connection.CancelToken.IsCancellationRequested)
                                                 return;
-                                            
+
                                             if (BaseConfig.AlwaysDownloadUsers)
                                                 _ = DownloadUsersAsync(Guilds.Where(x => x.IsAvailable && !x.HasAllMembers));
 
@@ -2120,11 +2141,11 @@ namespace Discord.WebSocket
             => Task.FromResult<IUser>(GetUser(username, discriminator));
 
         /// <inheritdoc />
-        Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync(RequestOptions options)
-            => Task.FromResult<IReadOnlyCollection<IVoiceRegion>>(VoiceRegions);
+        async Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync(RequestOptions options)
+            => await GetVoiceRegionsAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
-        Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
-            => Task.FromResult<IVoiceRegion>(GetVoiceRegion(id));
+        async Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
+            => await GetVoiceRegionAsync(id, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task IDiscordClient.StartAsync()

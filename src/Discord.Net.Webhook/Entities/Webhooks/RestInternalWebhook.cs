@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Webhook;
@@ -11,9 +11,9 @@ namespace Discord.Webhook
         private DiscordWebhookClient _client;
 
         public ulong Id { get; }
-        public ulong ChannelId { get; }
         public string Token { get; }
 
+        public ulong ChannelId { get; private set; }
         public string Name { get; private set; }
         public string AvatarId { get; private set; }
         public ulong? GuildId { get; private set; }
@@ -36,6 +36,8 @@ namespace Discord.Webhook
 
         internal void Update(Model model)
         {
+            if (ChannelId != model.ChannelId)
+                ChannelId = model.ChannelId;
             if (model.Avatar.IsSpecified)
                 AvatarId = model.Avatar.Value;
             if (model.GuildId.IsSpecified)

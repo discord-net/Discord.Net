@@ -57,6 +57,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public bool IsStreaming => VoiceState?.IsStreaming ?? false;
         /// <inheritdoc />
+        public bool? IsPending { get; private set; }
+        /// <inheritdoc />
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
         /// <summary>
         ///     Returns a collection of roles that the user possesses.
@@ -142,6 +144,8 @@ namespace Discord.WebSocket
                 UpdateRoles(model.Roles.Value);
             if (model.PremiumSince.IsSpecified)
                 _premiumSinceTicks = model.PremiumSince.Value?.UtcTicks;
+            if (model.Pending.IsSpecified)
+                IsPending = model.Pending.Value;
         }
         internal void Update(ClientState state, PresenceModel model, bool updatePresence)
         {

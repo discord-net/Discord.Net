@@ -37,6 +37,7 @@ namespace Discord.WebSocket
         public override IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => GetPrivateChannels().ToReadOnlyCollection(GetPrivateChannelCount);
         public IReadOnlyCollection<DiscordSocketClient> Shards => _shards;
         /// <inheritdoc />
+        [Obsolete("This property is obsolete, use the GetVoiceRegionsAsync method instead.")]
         public override IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _shards[0].VoiceRegions;
 
         /// <summary>
@@ -264,8 +265,21 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
+        [Obsolete("This method is obsolete, use GetVoiceRegionAsync instead.")]
         public override RestVoiceRegion GetVoiceRegion(string id)
             => _shards[0].GetVoiceRegion(id);
+
+        /// <inheritdoc />
+        public override async ValueTask<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
+        {
+            return await _shards[0].GetVoiceRegionsAsync().ConfigureAwait(false);
+        }
+
+        /// <inheritdoc />
+        public override async ValueTask<RestVoiceRegion> GetVoiceRegionAsync(string id, RequestOptions options = null)
+        {
+            return await _shards[0].GetVoiceRegionAsync(id, options).ConfigureAwait(false);
+        }
 
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException"><paramref name="guilds"/> is <see langword="null"/></exception>
