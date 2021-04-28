@@ -1008,6 +1008,9 @@ namespace Discord.WebSocket
 
         //Emotes
         /// <inheritdoc />
+        public Task<IReadOnlyCollection<GuildEmote>> GetEmotesAsync(RequestOptions options = null)
+            => GuildHelper.GetEmotesAsync(this, Discord, options);
+        /// <inheritdoc />
         public Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null)
             => GuildHelper.GetEmoteAsync(this, Discord, id, options);
         /// <inheritdoc />
