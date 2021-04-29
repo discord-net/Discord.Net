@@ -258,6 +258,21 @@ namespace Discord
         Task DeleteMessageAsync(IMessage message, RequestOptions options = null);
 
         /// <summary>
+        ///     Modifies a message.
+        /// </summary>
+        /// <remarks>
+        ///     This method modifies this message with the specified properties. To see an example of this
+        ///     method and what properties are available, please refer to <see cref="MessageProperties"/>.
+        /// </remarks>
+        /// <param name="messageId">The snowflake identifier of the message that would be changed.</param>
+        /// <param name="func">A delegate containing the properties to modify the message with.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        Task<IUserMessage> ModifyMessageAsync(ulong messageId, Action<MessageProperties> func, RequestOptions options = null);
+
+        /// <summary>
         ///     Broadcasts the "user is typing" message to all users in this channel, lasting 10 seconds.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>

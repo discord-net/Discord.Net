@@ -71,6 +71,48 @@ namespace Discord.Rest
             return await client.ApiClient.ModifyMessageAsync(msg.Channel.Id, msg.Id, apiArgs, options).ConfigureAwait(false);
         }
 
+        public static async Task<Model> ModifyAsync(ulong channelId, ulong msgId, BaseDiscordClient client, Action<MessageProperties> func,
+            RequestOptions options)
+        {
+            var args = new MessageProperties();
+            func(args);
+
+            if ((args.Content.IsSpecified && string.IsNullOrEmpty(args.Content.Value)) && (args.Embed.IsSpecified && args.Embed.Value == null))
+                Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
+
+            if (args.AllowedMentions.IsSpecified)
+            {
+                AllowedMentions allowedMentions = args.AllowedMentions.Value;
+                Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
+                Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
+
+                // check that user flag and user Id list are exclusive, same with role flag and role Id list
+                if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
+                {
+                    if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Users) &&
+                        allowedMentions.UserIds != null && allowedMentions.UserIds.Count > 0)
+                    {
+                        throw new ArgumentException("The Users flag is mutually exclusive with the list of User Ids.", nameof(allowedMentions));
+                    }
+
+                    if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Roles) &&
+                        allowedMentions.RoleIds != null && allowedMentions.RoleIds.Count > 0)
+                    {
+                        throw new ArgumentException("The Roles flag is mutually exclusive with the list of Role Ids.", nameof(allowedMentions));
+                    }
+                }
+            }
+
+            var apiArgs = new API.Rest.ModifyMessageParams
+            {
+                Content = args.Content,
+                Embed = args.Embed.IsSpecified ? args.Embed.Value.ToModel() : Optional.Create<API.Embed>(),
+                Flags = args.Flags.IsSpecified ? args.Flags.Value : Optional.Create<MessageFlags?>(),
+                AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional.Create<API.AllowedMentions>(),
+            };
+            return await client.ApiClient.ModifyMessageAsync(channelId, msgId, apiArgs, options).ConfigureAwait(false);
+        }
+
         public static Task DeleteAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
             => DeleteAsync(msg.Channel.Id, msg.Id, client, options);
 
