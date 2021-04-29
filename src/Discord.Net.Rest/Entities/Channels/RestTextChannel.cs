@@ -153,6 +153,10 @@ namespace Discord.Rest
             => ChannelHelper.DeleteMessagesAsync(this, Discord, messageIds, options);
 
         /// <inheritdoc />
+        public async Task<IUserMessage> ModifyMessageAsync(ulong messageId, Action<MessageProperties> func, RequestOptions options = null)
+            => await ChannelHelper.ModifyMessageAsync(this, messageId, func, Discord, options).ConfigureAwait(false);
+
+        /// <inheritdoc />
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);
         /// <inheritdoc />
