@@ -1,4 +1,5 @@
 using Discord.Commands.Builders;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -240,7 +241,7 @@ namespace Discord.Commands
 
         private async Task<IResult> ExecuteInternalAsync(ICommandContext context, object[] args, IServiceProvider services)
         {
-            await Module.Service._cmdLogger.DebugAsync($"Executing {GetLogText(context)}").ConfigureAwait(false);
+            Module.Service._cmdLogger.LogDebug($"Executing {GetLogText(context)}");
             try
             {
                 var task = _action(context, args, services, this);
@@ -274,7 +275,7 @@ namespace Discord.Commands
                     ex = ex.InnerException;
 
                 var wrappedEx = new CommandException(this, context, ex);
-                await Module.Service._cmdLogger.ErrorAsync(wrappedEx).ConfigureAwait(false);
+                Module.Service._cmdLogger.LogError(wrappedEx, wrappedEx.Message);
 
                 var result = ExecuteResult.FromError(ex);
                 await Module.Service._commandExecutedEvent.InvokeAsync(this, context, result).ConfigureAwait(false);
@@ -291,7 +292,7 @@ namespace Discord.Commands
             }
             finally
             {
-                await Module.Service._cmdLogger.VerboseAsync($"Executed {GetLogText(context)}").ConfigureAwait(false);
+                Module.Service._cmdLogger.LogTrace($"Executed {GetLogText(context)}");
             }
         }
 

@@ -34,59 +34,14 @@ namespace idn
         static async Task Main(string[] args)
         {
             var token = File.ReadAllText("token.ignore");
-            var client = new DiscordSocketClient(new DiscordSocketConfig { LogLevel = LogSeverity.Debug });
-            var logQueue = new ConcurrentQueue<LogMessage>();
+            var client = new DiscordSocketClient(new DiscordSocketConfig { });
             var logCancelToken = new CancellationTokenSource();
             int presenceUpdates = 0;
-
-            client.Log += msg =>
-            {
-                logQueue.Enqueue(msg);
-                return Task.CompletedTask;
-            };
+            
             Console.CancelKeyPress += (_ev, _s) =>
             {
                 logCancelToken.Cancel();
             };
-
-            var logTask = Task.Run(async () =>
-            {
-                var fs = new FileStream("idn.log", FileMode.Append);
-                var logStringBuilder = new StringBuilder(200);
-                string logString = "";
-
-                byte[] helloBytes = Encoding.UTF8.GetBytes($"### new log session: {DateTime.Now} ###\n\n");
-                await fs.WriteAsync(helloBytes);
-
-                while (!logCancelToken.IsCancellationRequested)
-                {
-                    if (logQueue.TryDequeue(out var msg))
-                    {
-                        if (msg.Message?.IndexOf("PRESENCE_UPDATE)") > 0)
-                        {
-                            presenceUpdates++;
-                            continue;
-                        }
-
-                        _ = msg.ToString(builder: logStringBuilder);
-                        logStringBuilder.AppendLine();
-                        logString = logStringBuilder.ToString();
-
-                        Debug.Write(logString, "DNET");
-                        await fs.WriteAsync(Encoding.UTF8.GetBytes(logString));
-                    }
-                    await fs.FlushAsync();
-                    try
-                    {
-                        await Task.Delay(100, logCancelToken.Token);
-                    }
-                    finally { }
-                }
-
-                byte[] goodbyeBytes = Encoding.UTF8.GetBytes($"#!! end log session: {DateTime.Now} !!#\n\n\n");
-                await fs.WriteAsync(goodbyeBytes);
-                await fs.DisposeAsync();
-            });
 
             await client.LoginAsync(TokenType.Bot, token);
             await client.StartAsync();
@@ -127,9 +82,9 @@ namespace idn
             await client.StopAsync();
             client.Dispose();
             logCancelToken.Cancel();
-            try
-            { await logTask; }
-            finally { Console.WriteLine("goodbye!"); }
+
+            await Task.Delay(-1, logCancelToken.Token);
+            Console.WriteLine("goodbye!");
         }
 
         static IEnumerable<Assembly> GetAssemblies()

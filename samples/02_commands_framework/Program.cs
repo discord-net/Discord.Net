@@ -35,9 +35,6 @@ namespace _02_commands_framework
             {
                 var client = services.GetRequiredService<DiscordSocketClient>();
 
-                client.Log += LogAsync;
-                services.GetRequiredService<CommandService>().Log += LogAsync;
-
                 // Tokens should be considered secret data and never hard-coded.
                 // We can read from the environment variable to avoid hardcoding.
                 await client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("token"));
@@ -48,13 +45,6 @@ namespace _02_commands_framework
 
                 await Task.Delay(Timeout.Infinite);
             }
-        }
-
-        private Task LogAsync(LogMessage log)
-        {
-            Console.WriteLine(log.ToString());
-
-            return Task.CompletedTask;
         }
 
         private ServiceProvider ConfigureServices()

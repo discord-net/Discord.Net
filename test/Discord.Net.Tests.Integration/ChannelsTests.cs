@@ -22,12 +22,6 @@ namespace Discord
             this.output = output;
             output.WriteLine($"RestGuildFixture using guild: {guild.Id}");
             // capture all console output
-            guildFixture.Client.Log += LogAsync;
-        }
-        private Task LogAsync(LogMessage message)
-        {
-            output.WriteLine(message.ToString());
-            return Task.CompletedTask;
         }
 
         /// <summary>

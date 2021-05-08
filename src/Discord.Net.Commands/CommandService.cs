@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Discord.Commands.Builders;
 using Discord.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Discord.Commands
 {
@@ -30,12 +31,6 @@ namespace Discord.Commands
     public class CommandService : IDisposable
     {
         /// <summary>
-        ///     Occurs when a command-related information is received.
-        /// </summary>
-        public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
-        internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
-
-        /// <summary>
         ///     Occurs when a command is executed.
         /// </summary>
         /// <remarks>
@@ -56,8 +51,8 @@ namespace Discord.Commands
         internal readonly bool _caseSensitive, _throwOnError, _ignoreExtraArgs;
         internal readonly char _separatorChar;
         internal readonly RunMode _defaultRunMode;
-        internal readonly Logger _cmdLogger;
-        internal readonly LogManager _logManager;
+        internal readonly ILogger _cmdLogger;
+        internal readonly ILoggerFactory _logManager;
         internal readonly IReadOnlyDictionary<char, char> _quotationMarkAliasMap;
 
         internal bool _isDisposed;
@@ -100,8 +95,14 @@ namespace Discord.Commands
             if (_defaultRunMode == RunMode.Default)
                 throw new InvalidOperationException("The default run mode cannot be set to Default.");
 
-            _logManager = new LogManager(config.LogLevel);
-            _logManager.Message += async msg => await _logEvent.InvokeAsync(msg).ConfigureAwait(false);
+            _logManager = config.LoggerFactory;
+
+            if (_logManager == null)
+            {
+                _logManager = new DefaultLoggerFactory();
+                _logManager.AddProvider(new DefaultLoggerProvider());
+            }
+            
             _cmdLogger = _logManager.CreateLogger("Command");
 
             _moduleLock = new SemaphoreSlim(1, 1);
@@ -349,7 +350,8 @@ namespace Discord.Commands
         public void AddTypeReader(Type type, TypeReader reader)
         {
             if (_defaultTypeReaders.ContainsKey(type))
-                _ = _cmdLogger.WarningAsync($"The default TypeReader for {type.FullName} was replaced by {reader.GetType().FullName}." +
+                _cmdLogger.LogWarning(
+                    $"The default TypeReader for {type.FullName} was replaced by {reader.GetType().FullName}." +
                     "To suppress this message, use AddTypeReader<T>(reader, true).");
             AddTypeReader(type, reader, true);
         }

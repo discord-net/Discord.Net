@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 
 namespace Discord.Commands
@@ -23,10 +24,7 @@ namespace Discord.Commands
         /// </summary>
         public bool CaseSensitiveCommands { get; set; } = false;
 
-        /// <summary>
-        ///     Gets or sets the minimum log level severity that will be sent to the <see cref="CommandService.Log"/> event.
-        /// </summary>
-        public LogSeverity LogLevel { get; set; } = LogSeverity.Info;
+        public ILoggerFactory LoggerFactory { get; set; }
 
         /// <summary>
         ///     Gets or sets whether <see cref="RunMode.Sync"/> commands should push exceptions up to the caller.

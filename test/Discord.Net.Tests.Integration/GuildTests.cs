@@ -20,12 +20,6 @@ namespace Discord
             guild = guildFixture.Guild;
             this.output = output;
             output.WriteLine($"RestGuildFixture using guild: {guild.Id}");
-            guildFixture.Client.Log += LogAsync;
-        }
-        private Task LogAsync(LogMessage message)
-        {
-            output.WriteLine(message.ToString());
-            return Task.CompletedTask;
         }
         /// <summary>
         ///     Ensures that the CurrentUser is the owner of the guild.

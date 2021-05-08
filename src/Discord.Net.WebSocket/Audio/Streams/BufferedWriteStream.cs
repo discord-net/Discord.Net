@@ -1,4 +1,5 @@
 using Discord.Logging;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
@@ -33,14 +34,14 @@ namespace Discord.Audio.Streams
         private readonly ConcurrentQueue<Frame> _queuedFrames;
         private readonly ConcurrentQueue<byte[]> _bufferPool;
         private readonly SemaphoreSlim _queueLock;
-        private readonly Logger _logger;
+        private readonly ILogger _logger;
         private readonly int _ticksPerFrame, _queueLength;
         private bool _isPreloaded;
         private int _silenceFrames;
 
         public BufferedWriteStream(AudioStream next, IAudioClient client, int bufferMillis, CancellationToken cancelToken, int maxFrameSize = 1500)
             : this(next, client as AudioClient, bufferMillis, cancelToken, null, maxFrameSize) { }
-        internal BufferedWriteStream(AudioStream next, AudioClient client, int bufferMillis, CancellationToken cancelToken, Logger logger, int maxFrameSize = 1500)
+        internal BufferedWriteStream(AudioStream next, AudioClient client, int bufferMillis, CancellationToken cancelToken, ILogger logger, int maxFrameSize = 1500)
         {
             //maxFrameSize = 1275 was too limiting at 128kbps,2ch,60ms
             _next = next;
@@ -106,7 +107,7 @@ namespace Discord.Audio.Streams
                                 timestamp += OpusEncoder.FrameSamplesPerChannel;
                                 _silenceFrames = 0;
 #if DEBUG
-                                var _ = _logger?.DebugAsync($"Sent {frame.Bytes} bytes ({_queuedFrames.Count} frames buffered)");
+                                _logger?.LogDebug($"Sent {frame.Bytes} bytes ({_queuedFrames.Count} frames buffered)");
 #endif
                             }
                             else
@@ -125,7 +126,7 @@ namespace Discord.Audio.Streams
                                     timestamp += OpusEncoder.FrameSamplesPerChannel;
                                 }
 #if DEBUG
-                                var _ = _logger?.DebugAsync("Buffer underrun");
+                                _logger?.LogDebug("Buffer underrun");
 #endif
                             }
                         }
@@ -153,7 +154,7 @@ namespace Discord.Audio.Streams
             if (!_bufferPool.TryDequeue(out byte[] buffer))
             {
 #if DEBUG
-                var _ = _logger?.DebugAsync("Buffer overflow"); //Should never happen because of the queueLock
+                _logger?.LogDebug("Buffer overflow"); //Should never happen because of the queueLock
 #endif
 #pragma warning disable IDISP016
                 writeCancelToken?.Dispose();
@@ -165,7 +166,7 @@ namespace Discord.Audio.Streams
             if (!_isPreloaded && _queuedFrames.Count == _queueLength)
             {
 #if DEBUG
-                var _ = _logger?.DebugAsync("Preloaded");
+                _logger?.LogDebug("Preloaded");
 #endif
                 _isPreloaded = true;
             }

@@ -21,7 +21,6 @@ namespace _03_sharded_client.Services
             _services = services;
 
             _commands.CommandExecuted += CommandExecutedAsync;
-            _commands.Log += LogAsync;
             _discord.MessageReceived += MessageReceivedAsync;
         }
 
@@ -60,13 +59,6 @@ namespace _03_sharded_client.Services
 
             // the command failed, let's notify the user that something happened.
             await context.Channel.SendMessageAsync($"error: {result.ToString()}");
-        }
-
-        private Task LogAsync(LogMessage log)
-        {
-            Console.WriteLine(log.ToString());
-
-            return Task.CompletedTask;
         }
     }
 }

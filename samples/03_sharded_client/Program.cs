@@ -38,7 +38,6 @@ namespace _03_sharded_client
                 // The ShardReady event is used instead, allowing for individual
                 // control per shard.
                 client.ShardReady += ReadyAsync;
-                client.Log += LogAsync;
 
                 await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
 
@@ -63,12 +62,6 @@ namespace _03_sharded_client
         private Task ReadyAsync(DiscordSocketClient shard)
         {
             Console.WriteLine($"Shard Number {shard.ShardId} is connected and ready!");
-            return Task.CompletedTask;
-        }
-
-        private Task LogAsync(LogMessage log)
-        {
-            Console.WriteLine(log.ToString());
             return Task.CompletedTask;
         }
     }
