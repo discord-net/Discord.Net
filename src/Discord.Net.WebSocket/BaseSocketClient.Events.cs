@@ -315,22 +315,6 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<SocketGuild, SocketGuild, Task>> _guildUpdatedEvent = new AsyncEvent<Func<SocketGuild, SocketGuild, Task>>();
 
-        //Invites
-        internal readonly AsyncEvent<Func<SocketGuildInvite, Task>> _inviteCreatedEvent = new AsyncEvent<Func<SocketGuildInvite, Task>>();
-        /// <summary> Fired when a invite is created. </summary>
-        public event Func<SocketGuildInvite, Task> InviteCreated
-        {
-            add { _inviteCreatedEvent.Add(value); }
-            remove { _inviteCreatedEvent.Remove(value); }
-        }
-        internal readonly AsyncEvent<Func<Cacheable<SocketGuildInvite, string>, Task>> _inviteDeletedEvent = new AsyncEvent<Func<Cacheable<SocketGuildInvite, string>, Task>>();
-        /// <summary> Fired when a invite is deleted. </summary>
-        public event Func<Cacheable<SocketGuildInvite, string>, Task> InviteDeleted
-        {
-            add { _inviteDeletedEvent.Add(value); }
-            remove { _inviteDeletedEvent.Remove(value); }
-        }
-
         //Users
         /// <summary> Fired when a user joins a guild. </summary>
         public event Func<SocketGuildUser, Task> UserJoined {

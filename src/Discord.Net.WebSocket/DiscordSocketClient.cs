@@ -1384,6 +1384,14 @@ namespace Discord.WebSocket
                                             ? Optional.Create<SocketUserMessage>()
                                             : Optional.Create(cachedMsg);
 
+                                        if (data.Member.IsSpecified)
+                                        {
+                                            var guild = (channel as SocketGuildChannel)?.Guild;
+                                            
+                                            if (guild != null)
+                                                user = guild.AddOrUpdateUser(data.Member.Value);
+                                        }
+
                                         var optionalUser = user is null
                                             ? Optional.Create<IUser>()
                                             : Optional.Create(user);
@@ -1474,7 +1482,7 @@ namespace Discord.WebSocket
                                         var cacheable = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isCached, async () => await channel.GetMessageAsync(data.MessageId).ConfigureAwait(false) as IUserMessage);
                                         var emote = data.Emoji.ToIEmote();
 
-                                        cachedMsg?.RemoveAllReactionsForEmoteAsync(emote);
+                                        cachedMsg?.RemoveReactionsForEmote(emote);
 
                                         await TimedInvokeAsync(_reactionsRemovedForEmoteEvent, nameof(ReactionsRemovedForEmote), cacheable, channel, emote).ConfigureAwait(false);
                                     }
@@ -1737,61 +1745,6 @@ namespace Discord.WebSocket
                                     else
                                     {
                                         await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
-                                    }
-
-                                }
-                                break;
-                            case "INVITE_CREATE":
-                                {
-                                    await _gatewayLogger.DebugAsync("Received Dispatch (INVITE_CREATE)").ConfigureAwait(false);
-                                    var data = (payload as JToken).ToObject<InviteCreatedEvent>(_serializer);
-                                    if(data.GuildID.HasValue)
-                                    {
-                                        var guild = State.GetGuild(data.GuildID.Value);
-                                        if (guild != null)
-                                        {
-                                            if (!guild.IsSynced)
-                                            {
-                                                await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
-                                                return;
-                                            }
-
-                                            var channel = guild.GetChannel(data.ChannelID);
-
-                                            if (channel != null)
-                                            {
-                                                var invite = new SocketGuildInvite(this, guild, channel, data.InviteCode, data);
-                                                guild.AddSocketInvite(invite);
-                                                await TimedInvokeAsync(_inviteCreatedEvent, nameof(InviteCreated), invite).ConfigureAwait(false);
-                                            }
-                                        }
-                                    }
-                                }
-                                break;
-                            case "INVITE_DELETE":
-                                {
-                                    await _gatewayLogger.DebugAsync("Received Dispatch (INVITE_DELETE)").ConfigureAwait(false);
-                                    var data = (payload as JToken).ToObject<InviteDeletedEvent>(_serializer);
-                                    if(data.GuildID.IsSpecified)
-                                    {
-                                        var guild = State.GetGuild(data.GuildID.Value);
-                                        if (guild != null)
-                                        {
-                                            if (!guild.IsSynced)
-                                            {
-                                                await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
-                                                return;
-                                            }
-
-                                            var channel = guild.GetChannel(data.ChannelID);
-
-                                            if (channel != null)
-                                            {
-                                                var invite = guild.RemoveSocketInvite(data.Code);
-                                                var cache = new Cacheable<SocketGuildInvite, string>(null, data.Code, invite != null, async () => await guild.GetSocketInviteAsync(data.Code));
-                                                await TimedInvokeAsync(_inviteDeletedEvent, nameof(InviteDeleted), cache).ConfigureAwait(false);
-                                            }
-                                        }
                                     }
 
                                 }

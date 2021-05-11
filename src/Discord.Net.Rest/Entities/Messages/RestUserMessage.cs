@@ -21,6 +21,7 @@ namespace Discord.Rest
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
         private ImmutableArray<ulong> _roleMentionIds = ImmutableArray.Create<ulong>();
         private ImmutableArray<RestUser> _userMentions = ImmutableArray.Create<RestUser>();
+        private ImmutableArray<Sticker> _stickers = ImmutableArray.Create<Sticker>();
 
         /// <inheritdoc />
         public override bool IsTTS => _isTTS;
@@ -44,6 +45,8 @@ namespace Discord.Rest
         public override IReadOnlyCollection<RestUser> MentionedUsers => _userMentions;
         /// <inheritdoc />
         public override IReadOnlyCollection<ITag> Tags => _tags;
+        /// <inheritdoc />
+        public override IReadOnlyCollection<Sticker> Stickers => _stickers;
         /// <inheritdoc />
         public IUserMessage ReferencedMessage => _referencedMessage;
 
@@ -131,6 +134,20 @@ namespace Discord.Rest
                 var refMsg = model.ReferencedMessage.Value;
                 IUser refMsgAuthor = MessageHelper.GetAuthor(Discord, guild, refMsg.Author.Value, refMsg.WebhookId.ToNullable());
                 _referencedMessage = RestUserMessage.Create(Discord, Channel, refMsgAuthor, refMsg);
+            }
+
+            if (model.Stickers.IsSpecified)
+            {
+                var value = model.Stickers.Value;
+                if (value.Length > 0)
+                {
+                    var stickers = ImmutableArray.CreateBuilder<Sticker>(value.Length);
+                    for (int i = 0; i < value.Length; i++)
+                        stickers.Add(Sticker.Create(value[i]));
+                    _stickers = stickers.ToImmutable();
+                }
+                else
+                    _stickers = ImmutableArray.Create<Sticker>();
             }
         }
 

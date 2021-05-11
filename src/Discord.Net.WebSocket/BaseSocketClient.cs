@@ -209,6 +209,12 @@ namespace Discord.WebSocket
         /// <param name="name">The name of the game.</param>
         /// <param name="streamUrl">If streaming, the URL of the stream. Must be a valid Twitch URL.</param>
         /// <param name="type">The type of the game.</param>
+        /// <remarks>
+        ///     <note type="warning">
+        ///         Bot accounts cannot set <see cref="ActivityType.CustomStatus"/> as their activity
+        ///         type and it will have no effect.
+        ///     </note>
+        /// </remarks>
         /// <returns>
         ///     A task that represents the asynchronous set operation.
         /// </returns>
@@ -220,6 +226,10 @@ namespace Discord.WebSocket
         ///     This method sets the <paramref name="activity"/> of the user. 
         ///     <note type="note">
         ///         Discord will only accept setting of name and the type of activity.
+        ///     </note>
+        ///     <note type="warning">
+        ///         Bot accounts cannot set <see cref="ActivityType.CustomStatus"/> as their activity
+        ///         type and it will have no effect.
         ///     </note>
         ///     <note type="warning">
         ///         Rich Presence cannot be set via this method or client. Rich Presence is strictly limited to RPC

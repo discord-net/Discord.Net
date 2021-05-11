@@ -107,7 +107,19 @@ namespace Discord.Rest
             => ClientHelper.GetVoiceRegionAsync(this, id, options);
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetWebhookAsync(this, id, options);
+        public Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId)
+            => ClientHelper.AddRoleAsync(this, guildId, userId, roleId);
+        public Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId)
+            => ClientHelper.RemoveRoleAsync(this, guildId, userId, roleId);
 
+        public Task AddReactionAsync(ulong channelId, ulong messageId, IEmote emote, RequestOptions options = null)
+            => MessageHelper.AddReactionAsync(channelId, messageId, emote, this, options);
+        public Task RemoveReactionAsync(ulong channelId, ulong messageId, ulong userId, IEmote emote, RequestOptions options = null)
+            => MessageHelper.RemoveReactionAsync(channelId, messageId, userId, emote, this, options);
+        public Task RemoveAllReactionsAsync(ulong channelId, ulong messageId, RequestOptions options = null)
+            => MessageHelper.RemoveAllReactionsAsync(channelId, messageId, this, options);
+        public Task RemoveAllReactionsForEmoteAsync(ulong channelId, ulong messageId, IEmote emote, RequestOptions options = null)
+            => MessageHelper.RemoveAllReactionsForEmoteAsync(channelId, messageId, emote, this, options);
         //IDiscordClient
         /// <inheritdoc />
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)

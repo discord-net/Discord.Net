@@ -39,7 +39,6 @@ namespace Discord.WebSocket
         private ImmutableArray<GuildEmote> _emotes;
         private ImmutableArray<string> _features;
         private AudioClient _audioClient;
-        private InviteCache _invites;
 #pragma warning restore IDISP002, IDISP006
 
         /// <inheritdoc />
@@ -361,7 +360,6 @@ namespace Discord.WebSocket
             _audioLock = new SemaphoreSlim(1, 1);
             _emotes = ImmutableArray.Create<GuildEmote>();
             _features = ImmutableArray.Create<string>();
-            _invites = new InviteCache(client);
         }
         internal static SocketGuild Create(DiscordSocketClient discord, ClientState state, ExtendedModel model)
         {
@@ -616,22 +614,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task RemoveBanAsync(ulong userId, RequestOptions options = null)
             => GuildHelper.RemoveBanAsync(this, Discord, userId, options);
-
-        //Invites
-        internal void AddSocketInvite(SocketGuildInvite invite)
-            => _invites.Add(invite);
-        internal SocketGuildInvite RemoveSocketInvite(string code)
-            => _invites.Remove(code);
-        internal async Task<SocketGuildInvite> GetSocketInviteAsync(string code)
-        {
-            var invites = await this.GetInvitesAsync();
-            RestInviteMetadata restInvite = invites.First(x => x.Code == code);
-            if (restInvite == null)
-                return null;
-            
-            var invite = new SocketGuildInvite(Discord, this, this.GetChannel(restInvite.ChannelId), code, restInvite);
-            return invite;
-        }
 
         //Channels
         /// <summary>
@@ -1025,6 +1007,9 @@ namespace Discord.WebSocket
             => GuildHelper.GetWebhooksAsync(this, Discord, options);
 
         //Emotes
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<GuildEmote>> GetEmotesAsync(RequestOptions options = null)
+            => GuildHelper.GetEmotesAsync(this, Discord, options);
         /// <inheritdoc />
         public Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null)
             => GuildHelper.GetEmoteAsync(this, Discord, id, options);
