@@ -1,10 +1,5 @@
-# Discord.Net
-[![NuGet](https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic)](https://www.nuget.org/packages/Discord.Net)
-[![MyGet](https://img.shields.io/myget/discord-net/vpre/Discord.Net.svg)](https://www.myget.org/feed/Packages/discord-net)
-[![Build Status](https://dev.azure.com/discord-net/Discord.Net/_apis/build/status/discord-net.Discord.Net?branchName=dev)](https://dev.azure.com/discord-net/Discord.Net/_build/latest?definitionId=1&branchName=dev)
-[![Discord](https://discord.com/api/guilds/81384788765712384/widget.png)](https://discord.gg/jkrBmQR)
-
-An unofficial .NET API Wrapper for the Discord client (https://discord.com).
+# Discord.Net Labs
+The development version of [Discord.Net](https://github.com/discord-net/Discord.Net). This version of the README is a placeholder for now.
 
 ## Documentation
 
@@ -13,22 +8,8 @@ An unofficial .NET API Wrapper for the Discord client (https://discord.com).
 - [Nightly](https://docs.stillu.cc/)
   - [Latest CI repo](https://github.com/discord-net/docs-static)
 
-## Installation
-### Stable (NuGet)
-Our stable builds available from NuGet through the Discord.Net metapackage:
-- [Discord.Net](https://www.nuget.org/packages/Discord.Net/)
-
-The individual components may also be installed from NuGet:
-- [Discord.Net.Commands](https://www.nuget.org/packages/Discord.Net.Commands/)
-- [Discord.Net.Rest](https://www.nuget.org/packages/Discord.Net.Rest/)
-- [Discord.Net.WebSocket](https://www.nuget.org/packages/Discord.Net.WebSocket/)
-- [Discord.Net.Webhook](https://www.nuget.org/packages/Discord.Net.Webhook/)
-
-### Unstable (MyGet)
-Nightly builds are available through our MyGet feed (`https://www.myget.org/F/discord-net/api/v3/index.json`).
-
 ## Compiling
-In order to compile Discord.Net, you require the following:
+In order to compile Discord.Net Labs, you require the following:
 
 ### Using Visual Studio
 - [Visual Studio 2017](https://www.microsoft.com/net/core#windowsvs2017)
@@ -50,7 +31,7 @@ This library generally abides by [Semantic Versioning](https://semver.org). Pack
 
 An increment of the PATCH component always indicates that an internal-only change was made, generally a bugfix. These changes will not affect the public-facing API in any way, and are always guaranteed to be forward- and backwards-compatible with your codebase, any pre-compiled dependencies of your codebase.
 
-An increment of the MINOR component indicates that some addition was made to the library, and this addition is not backwards-compatible with prior versions. However, Discord.Net **does not guarantee forward-compatibility** on minor additions. In other words, we permit a limited set of breaking changes on a minor version bump.
+An increment of the MINOR component indicates that some addition was made to the library, and this addition is not backwards-compatible with prior versions. However, Discord.Net Labs **does not guarantee forward-compatibility** on minor additions. In other words, we permit a limited set of breaking changes on a minor version bump.
 
 Due to the nature of the Discord API, we will oftentimes need to add a property to an entity to support the latest API changes. Discord.Net provides interfaces as a method of consuming entities; and as such, introducing a new field to an entity is technically a breaking change. Major version bumps generally indicate some major change to the library, and as such we are hesitant to bump the major version for every minor addition to the library. To compromise, we have decided that interfaces should be treated as **consumable only**, and your applications should typically not be implementing interfaces. (For applications where interfaces are implemented, such as in test mocks, we apologize for this inconsistency with SemVer).
 
