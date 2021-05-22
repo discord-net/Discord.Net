@@ -67,5 +67,9 @@ namespace Discord
         ///     Flag given to users that developed bots and early verified their accounts.
         /// </summary>
         EarlyVerifiedBotDeveloper = 1 << 17,
+         /// <summary>
+        ///     Flag given to users that are discord certified moderators who has give discord's exam.
+        /// </summary>
+        DiscordCertifiedModerator = 1 << 18,
     }
 }
