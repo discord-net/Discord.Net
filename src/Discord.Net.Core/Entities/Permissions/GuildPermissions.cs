@@ -37,9 +37,6 @@ namespace Discord
         /// <summary> If <c>true</c>, a user may view the guild insights. </summary>
         public bool ViewGuildInsights => Permissions.GetValue(RawValue, GuildPermission.ViewGuildInsights);
 
-        /// <summary> If True, a user may join channels. </summary>
-        [Obsolete("Use ViewChannel instead.")]
-        public bool ReadMessages => ViewChannel;
         /// <summary> If True, a user may view channels. </summary>
         public bool ViewChannel => Permissions.GetValue(RawValue, GuildPermission.ViewChannel);
         /// <summary> If True, a user may send messages. </summary>

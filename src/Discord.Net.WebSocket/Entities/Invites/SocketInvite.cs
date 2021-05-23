@@ -49,9 +49,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         int? IInvite.MemberCount => throw new NotImplementedException();
         /// <inheritdoc />
-        [Obsolete("This property doesn't exist anymore and shouldn't be used.")]
-        bool IInviteMetadata.IsRevoked => throw new NotImplementedException();
-        /// <inheritdoc />
         public bool IsTemporary { get; private set; }
         /// <inheritdoc />
         int? IInviteMetadata.MaxAge { get => MaxAge; }
