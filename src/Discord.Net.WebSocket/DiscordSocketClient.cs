@@ -1280,7 +1280,7 @@ namespace Discord.WebSocket
                                         {
                                             var dm = SocketDMChannel.Create(this, State, data.ChannelId, data.Author.Value);
                                             channel = dm;
-                                            State.AddChannel(channel as SocketChannel);
+                                            State.AddChannel(dm);
                                             dm.Recipient.GlobalUser.DMChannel = dm;
                                         }
                                         else
