@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Model = Discord.API.Role;
 using BulkParams = Discord.API.Rest.ModifyGuildRolesParams;
@@ -24,7 +24,7 @@ namespace Discord.Rest
                 Hoist = args.Hoist,
                 Mentionable = args.Mentionable,
                 Name = args.Name,
-                Permissions = args.Permissions.IsSpecified ? args.Permissions.Value.RawValue : Optional.Create<ulong>()
+                Permissions = args.Permissions.IsSpecified ? args.Permissions.Value.RawValue.ToString() : Optional.Create<string>()
             };
             var model = await client.ApiClient.ModifyGuildRoleAsync(role.Guild.Id, role.Id, apiArgs, options).ConfigureAwait(false);
 

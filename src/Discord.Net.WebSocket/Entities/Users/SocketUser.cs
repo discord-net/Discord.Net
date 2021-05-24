@@ -38,8 +38,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string Mention => MentionUtils.MentionUser(Id);
         /// <inheritdoc />
-        public IActivity Activity => Presence.Activity;
-        /// <inheritdoc />
         public UserStatus Status => Presence.Status;
         /// <inheritdoc />
         public IImmutableSet<ClientType> ActiveClients => Presence.ActiveClients ?? ImmutableHashSet<ClientType>.Empty;
