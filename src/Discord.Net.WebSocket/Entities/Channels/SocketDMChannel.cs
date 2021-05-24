@@ -49,6 +49,16 @@ namespace Discord.WebSocket
         {
             Recipient.Update(state, model.Recipients.Value[0]);
         }
+        internal static SocketDMChannel Create(DiscordSocketClient discord, ClientState state, ulong channelId, API.User recipient)
+        {
+            var entity = new SocketDMChannel(discord, channelId, discord.GetOrCreateUser(state, recipient));
+            entity.Update(state, recipient);
+            return entity;
+        }
+        internal void Update(ClientState state, API.User recipient)
+        {
+            Recipient.Update(state, recipient);
+        }
 
         /// <inheritdoc />
         public Task CloseAsync(RequestOptions options = null)
