@@ -69,14 +69,6 @@ namespace Discord.Rest
                 return RestGuild.Create(client, model);
             return null;
         }
-        public static async Task<RestGuildEmbed?> GetGuildEmbedAsync(BaseDiscordClient client,
-            ulong id, RequestOptions options)
-        {
-            var model = await client.ApiClient.GetGuildEmbedAsync(id, options).ConfigureAwait(false);
-            if (model != null)
-                return RestGuildEmbed.Create(model);
-            return null;
-        }
         public static async Task<RestGuildWidget?> GetGuildWidgetAsync(BaseDiscordClient client,
             ulong id, RequestOptions options)
         {
