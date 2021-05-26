@@ -36,18 +36,6 @@ namespace Discord
         /// </returns>
         Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null);
         /// <summary>
-        ///     Modifies the suppression of this message.
-        /// </summary>
-        /// <remarks>
-        ///     This method modifies whether or not embeds in this message are suppressed (hidden).
-        /// </remarks>
-        /// <param name="suppressEmbeds">Whether or not embeds in this message should be suppressed.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous modification operation.
-        /// </returns>
-        Task ModifySuppressionAsync(bool suppressEmbeds, RequestOptions options = null);
-        /// <summary>
         ///     Adds this message to its channel's pinned messages.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>

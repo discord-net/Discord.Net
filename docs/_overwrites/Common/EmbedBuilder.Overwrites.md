@@ -28,7 +28,7 @@ public async Task SendRichEmbedAsync()
     var embed = new EmbedBuilder
         {
             // Embed property can be set within object initializer
-            Title = "Hello world!"
+            Title = "Hello world!",
             Description = "I am a description set by initializer."
         };
         // Or with methods

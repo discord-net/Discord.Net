@@ -73,8 +73,6 @@ namespace Discord.Net.Converters
             }
 
             //Enums
-            if (type == typeof(PermissionTarget))
-                return PermissionTargetConverter.Instance;
             if (type == typeof(UserStatus))
                 return UserStatusConverter.Instance;
             if (type == typeof(EmbedType))

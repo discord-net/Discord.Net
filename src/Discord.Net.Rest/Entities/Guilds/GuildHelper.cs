@@ -184,8 +184,8 @@ namespace Discord.Rest
                     {
                         TargetId = overwrite.TargetId,
                         TargetType = overwrite.TargetType,
-                        Allow = overwrite.Permissions.AllowValue,
-                        Deny = overwrite.Permissions.DenyValue
+                        Allow = overwrite.Permissions.AllowValue.ToString(),
+                        Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
             };
@@ -212,8 +212,8 @@ namespace Discord.Rest
                     {
                         TargetId = overwrite.TargetId,
                         TargetType = overwrite.TargetType,
-                        Allow = overwrite.Permissions.AllowValue,
-                        Deny = overwrite.Permissions.DenyValue
+                        Allow = overwrite.Permissions.AllowValue.ToString(),
+                        Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
             };
@@ -237,8 +237,8 @@ namespace Discord.Rest
                     {
                         TargetId = overwrite.TargetId,
                         TargetType = overwrite.TargetType,
-                        Allow = overwrite.Permissions.AllowValue,
-                        Deny = overwrite.Permissions.DenyValue
+                        Allow = overwrite.Permissions.AllowValue.ToString(),
+                        Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
             };
@@ -299,7 +299,7 @@ namespace Discord.Rest
                 Hoist = isHoisted,
                 Mentionable = isMentionable,
                 Name = name,
-                Permissions = permissions?.RawValue ?? Optional.Create<ulong>()
+                Permissions = permissions?.RawValue.ToString() ?? Optional.Create<string>()
             };
 
             var model = await client.ApiClient.CreateGuildRoleAsync(guild.Id, createGuildRoleParams, options).ConfigureAwait(false);
