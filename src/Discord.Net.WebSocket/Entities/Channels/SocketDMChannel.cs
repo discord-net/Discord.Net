@@ -29,14 +29,14 @@ namespace Discord.WebSocket
         /// </summary>
         public new IReadOnlyCollection<SocketUser> Users => ImmutableArray.Create(Discord.CurrentUser, Recipient);
 
-        internal SocketDMChannel(DiscordSocketClient discord, ulong id, SocketGlobalUser recipient)
+        internal SocketDMChannel(DiscordSocketClient discord, ulong id, SocketUser recipient)
             : base(discord, id)
         {
             Recipient = recipient;
         }
         internal static SocketDMChannel Create(DiscordSocketClient discord, ClientState state, Model model)
         {
-            var entity = new SocketDMChannel(discord, model.Id, discord.GetOrCreateUser(state, model.Recipients.Value[0], false));
+            var entity = new SocketDMChannel(discord, model.Id, discord.GetOrCreateTemporaryUser(state, model.Recipients.Value[0]));
             entity.Update(state, model);
             return entity;
         }
@@ -46,7 +46,7 @@ namespace Discord.WebSocket
         }
         internal static SocketDMChannel Create(DiscordSocketClient discord, ClientState state, ulong channelId, API.User recipient)
         {
-            var entity = new SocketDMChannel(discord, channelId, discord.GetOrCreateUser(state, recipient, false));
+            var entity = new SocketDMChannel(discord, channelId, discord.GetOrCreateTemporaryUser(state, recipient));
             entity.Update(state, recipient);
             return entity;
         }
