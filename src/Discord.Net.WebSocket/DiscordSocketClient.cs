@@ -1234,7 +1234,7 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<API.Message>(_serializer);
                                     var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
-                                    SocketUser author;
+
                                     var guild = (channel as SocketGuildChannel)?.Guild;
                                     if (guild != null && !guild.IsSynced)
                                     {
@@ -1255,6 +1255,7 @@ namespace Discord.WebSocket
                                         }
                                     }
 
+                                    SocketUser author;
                                     if (guild != null)
                                     {
                                         if (data.WebhookId.IsSpecified)
