@@ -43,9 +43,6 @@ namespace Discord
         /// <summary> If Allowed, a user may add reactions. </summary>
         public PermValue AddReactions => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.AddReactions);
         /// <summary> If Allowed, a user may join channels. </summary>
-        [Obsolete("Use ViewChannel instead.")]
-        public PermValue ReadMessages => ViewChannel;
-        /// <summary> If Allowed, a user may join channels. </summary>
         public PermValue ViewChannel => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ViewChannel);
         /// <summary> If Allowed, a user may send messages. </summary>
         public PermValue SendMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SendMessages);

@@ -127,8 +127,6 @@ namespace Discord
         ///     The <see cref="TokenType.User"/> type is treated as an invalid <see cref="TokenType"/>.
         /// </remarks>
         [Theory]
-        // TokenType.User
-        [InlineData(0)]
         // out of range TokenType
         [InlineData(-1)]
         [InlineData(4)]

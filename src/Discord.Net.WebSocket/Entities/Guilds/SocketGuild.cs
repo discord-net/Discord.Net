@@ -1205,8 +1205,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         bool IGuild.Available => true;
         /// <inheritdoc />
-        ulong IGuild.DefaultChannelId => DefaultChannel?.Id ?? 0;
-        /// <inheritdoc />
         ulong? IGuild.WidgetChannelId => WidgetChannelId;
         /// <inheritdoc />
         ulong? IGuild.SystemChannelId => SystemChannelId;

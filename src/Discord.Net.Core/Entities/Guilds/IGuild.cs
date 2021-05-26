@@ -125,21 +125,6 @@ namespace Discord
         /// </returns>
         ulong? AFKChannelId { get; }
         /// <summary>
-        ///     Gets the ID of the default channel for this guild.
-        /// </summary>
-        /// <remarks>
-        ///     This property retrieves the snowflake identifier of the first viewable text channel for this guild.
-        ///     <note type="warning">
-        ///         This channel does not guarantee the user can send message to it, as it only looks for the first viewable
-        ///         text channel.
-        ///     </note>
-        /// </remarks>
-        /// <returns>
-        ///     A <see langword="ulong"/> representing the snowflake identifier of the default text channel; <c>0</c> if
-        ///     none can be found.
-        /// </returns>
-        ulong DefaultChannelId { get; }
-        /// <summary>
         ///     Gets the ID of the channel assigned to the widget of this guild.
         /// </summary>
         /// <returns>
