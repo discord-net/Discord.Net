@@ -108,9 +108,6 @@ namespace Discord.WebSocket
         /// </returns>
         public IReadOnlyCollection<SocketGroupChannel> GroupChannels
             => State.PrivateChannels.OfType<SocketGroupChannel>().ToImmutableArray();
-        /// <inheritdoc />
-        [Obsolete("This property is obsolete, use the GetVoiceRegionsAsync method instead.")]
-        public override IReadOnlyCollection<RestVoiceRegion> VoiceRegions => GetVoiceRegionsAsync().GetAwaiter().GetResult();
 
         /// <summary>
         ///     Initializes a new REST/WebSocket-based Discord client.
@@ -335,11 +332,6 @@ namespace Discord.WebSocket
         }
         internal void RemoveUser(ulong id)
             => State.RemoveUser(id);
-
-        /// <inheritdoc />
-        [Obsolete("This method is obsolete, use GetVoiceRegionAsync instead.")]
-        public override RestVoiceRegion GetVoiceRegion(string id)
-            => GetVoiceRegionAsync(id).GetAwaiter().GetResult();
 
         /// <inheritdoc />
         public override async ValueTask<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
