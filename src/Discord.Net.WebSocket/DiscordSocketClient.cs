@@ -1291,52 +1291,77 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (MESSAGE_UPDATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Message>(_serializer);
-                                    if (State.GetChannel(data.ChannelId) is ISocketMessageChannel channel)
-                                    {
-                                        var guild = (channel as SocketGuildChannel)?.Guild;
-                                        if (guild != null && !guild.IsSynced)
-                                        {
-                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
-                                            return;
-                                        }
+                                    var channel = State.GetChannel(data.ChannelId) as ISocketMessageChannel;
 
-                                        SocketMessage before = null, after = null;
-                                        SocketMessage cachedMsg = channel.GetCachedMessage(data.Id);
-                                        bool isCached = cachedMsg != null;
-                                        if (isCached)
+                                    var guild = (channel as SocketGuildChannel)?.Guild;
+                                    if (guild != null && !guild.IsSynced)
+                                    {
+                                        await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                        return;
+                                    }
+
+                                    if (channel == null)
+                                    {
+                                        if (!data.GuildId.IsSpecified)  // assume it is a DM
                                         {
-                                            before = cachedMsg.Clone();
-                                            cachedMsg.Update(State, data);
-                                            after = cachedMsg;
+                                            channel = CreateDMChannel(data.ChannelId, data.Author.Value, State);
                                         }
                                         else
                                         {
-                                            //Edited message isnt in cache, create a detached one
-                                            SocketUser author;
-                                            if (data.Author.IsSpecified)
-                                            {
-                                                if (guild != null)
-                                                    author = guild.GetUser(data.Author.Value.Id);
-                                                else
-                                                    author = (channel as SocketChannel).GetUser(data.Author.Value.Id);
-                                                if (author == null)
-                                                    author = SocketUnknownUser.Create(this, State, data.Author.Value);
-                                            }
-                                            else
-                                                // Message author wasn't specified in the payload, so create a completely anonymous unknown user
-                                                author = new SocketUnknownUser(this, id: 0);
-
-                                            after = SocketMessage.Create(this, State, author, channel, data);
+                                            await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
+                                            return;
                                         }
-                                        var cacheableBefore = new Cacheable<IMessage, ulong>(before, data.Id, isCached, async () => await channel.GetMessageAsync(data.Id).ConfigureAwait(false));
+                                    }
 
-                                        await TimedInvokeAsync(_messageUpdatedEvent, nameof(MessageUpdated), cacheableBefore, after, channel).ConfigureAwait(false);
+                                    SocketMessage before = null, after = null;
+                                    SocketMessage cachedMsg = channel.GetCachedMessage(data.Id);
+                                    bool isCached = cachedMsg != null;
+                                    if (isCached)
+                                    {
+                                        before = cachedMsg.Clone();
+                                        cachedMsg.Update(State, data);
+                                        after = cachedMsg;
                                     }
                                     else
                                     {
-                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
-                                        return;
+                                        //Edited message isnt in cache, create a detached one
+                                        SocketUser author;
+                                        if (guild != null)
+                                        {
+                                            if (data.WebhookId.IsSpecified)
+                                                author = SocketWebhookUser.Create(guild, State, data.Author.Value, data.WebhookId.Value);
+                                            else
+                                                author = guild.GetUser(data.Author.Value.Id);
+                                        }
+                                        else
+                                            author = (channel as SocketChannel).GetUser(data.Author.Value.Id);
+
+                                        if (author == null)
+                                        {
+                                            if (guild != null)
+                                            {
+                                                if (data.Member.IsSpecified) // member isn't always included, but use it when we can
+                                                {
+                                                    data.Member.Value.User = data.Author.Value;
+                                                    author = guild.AddOrUpdateUser(data.Member.Value);
+                                                }
+                                                else
+                                                    author = guild.AddOrUpdateUser(data.Author.Value); // user has no guild-specific data
+                                            }
+                                            else if (channel is SocketGroupChannel groupChannel)
+                                                author = groupChannel.GetOrAddUser(data.Author.Value);
+                                            else
+                                            {
+                                                await UnknownChannelUserAsync(type, data.Author.Value.Id, channel.Id).ConfigureAwait(false);
+                                                return;
+                                            }
+                                        }
+
+                                        after = SocketMessage.Create(this, State, author, channel, data);
                                     }
+                                    var cacheableBefore = new Cacheable<IMessage, ulong>(before, data.Id, isCached, async () => await channel.GetMessageAsync(data.Id).ConfigureAwait(false));
+
+                                    await TimedInvokeAsync(_messageUpdatedEvent, nameof(MessageUpdated), cacheableBefore, after, channel).ConfigureAwait(false);
                                 }
                                 break;
                             case "MESSAGE_DELETE":
