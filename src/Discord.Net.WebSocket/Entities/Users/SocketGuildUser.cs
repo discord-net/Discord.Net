@@ -116,20 +116,20 @@ namespace Discord.WebSocket
         }
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, UserModel model)
         {
-            var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model, true));
+            var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model));
             entity.Update(state, model);
             entity.UpdateRoles(new ulong[0]);
             return entity;
         }
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, MemberModel model)
         {
-            var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User, true));
+            var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
             entity.Update(state, model);
             return entity;
         }
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, PresenceModel model)
         {
-            var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User, true));
+            var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
             entity.Update(state, model, false);
             return entity;
         }

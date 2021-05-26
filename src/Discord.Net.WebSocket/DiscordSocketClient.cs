@@ -314,11 +314,13 @@ namespace Discord.WebSocket
         ///     Clears cached users from the client.
         /// </summary>
         public void PurgeUserCache() => State.PurgeUsers();
-        internal SocketGlobalUser GetOrCreateUser(ClientState state, Discord.API.User model, bool cache)
+        internal SocketGlobalUser GetOrCreateUser(ClientState state, Discord.API.User model)
         {
-            if (cache)
-                return state.GetOrAddUser(model.Id, x => SocketGlobalUser.Create(this, state, model));
-            return state.GetUser(model.Id) ?? SocketGlobalUser.Create(this, state, model);
+            return state.GetOrAddUser(model.Id, x => SocketGlobalUser.Create(this, state, model));
+        }
+        internal SocketUser GetOrCreateTemporaryUser(ClientState state, Discord.API.User model)
+        {
+            return state.GetUser(model.Id) ?? (SocketUser)SocketUnknownUser.Create(this, state, model);
         }
         internal SocketGlobalUser GetOrCreateSelfUser(ClientState state, Discord.API.User model)
         {
