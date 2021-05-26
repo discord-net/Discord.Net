@@ -960,11 +960,8 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            if (!guild.HasAllMembers)
-                                                await IncompleteGuildUserAsync(type, data.User.Id, data.GuildId).ConfigureAwait(false);
-                                            else
-                                                await UnknownGuildUserAsync(type, data.User.Id, data.GuildId).ConfigureAwait(false);
-                                            return;
+                                            user = guild.AddOrUpdateUser(data);
+                                            await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), null, user).ConfigureAwait(false);
                                         }
                                     }
                                     else
