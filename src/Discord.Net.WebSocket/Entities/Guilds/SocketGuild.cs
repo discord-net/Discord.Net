@@ -46,8 +46,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public int AFKTimeout { get; private set; }
         /// <inheritdoc />
-        public bool IsEmbeddable { get; private set; }
-        /// <inheritdoc />
         public bool IsWidgetEnabled { get; private set; }
         /// <inheritdoc />
         public VerificationLevel VerificationLevel { get; private set; }
@@ -84,7 +82,6 @@ namespace Discord.WebSocket
         public ulong? ApplicationId { get; internal set; }
 
         internal ulong? AFKChannelId { get; private set; }
-        internal ulong? EmbedChannelId { get; private set; }
         internal ulong? WidgetChannelId { get; private set; }
         internal ulong? SystemChannelId { get; private set; }
         internal ulong? RulesChannelId { get; private set; }
@@ -195,21 +192,6 @@ namespace Discord.WebSocket
                     _ => 96000,
                 };
                 return maxBitrate;
-            }
-        }
-        /// <summary>
-        ///     Gets the embed channel (i.e. the channel set in the guild's widget settings) in this guild.
-        /// </summary>
-        /// <returns>
-        ///     A channel set within the server's widget settings; <see langword="null"/> if none is set.
-        /// </returns>
-        [Obsolete("This property is deprecated, use WidgetChannel instead.")]
-        public SocketGuildChannel EmbedChannel
-        {
-            get
-            {
-                var id = EmbedChannelId;
-                return id.HasValue ? GetChannel(id.Value) : null;
             }
         }
         /// <summary>
@@ -440,16 +422,12 @@ namespace Discord.WebSocket
         internal void Update(ClientState state, Model model)
         {
             AFKChannelId = model.AFKChannelId;
-            if (model.EmbedChannelId.IsSpecified)
-                EmbedChannelId = model.EmbedChannelId.Value;
             if (model.WidgetChannelId.IsSpecified)
                 WidgetChannelId = model.WidgetChannelId.Value;
             SystemChannelId = model.SystemChannelId;
             RulesChannelId = model.RulesChannelId;
             PublicUpdatesChannelId = model.PublicUpdatesChannelId;
             AFKTimeout = model.AFKTimeout;
-            if (model.EmbedEnabled.IsSpecified)
-                IsEmbeddable = model.EmbedEnabled.Value;
             if (model.WidgetEnabled.IsSpecified)
                 IsWidgetEnabled = model.WidgetEnabled.Value;
             IconId = model.Icon;
@@ -546,11 +524,6 @@ namespace Discord.WebSocket
         public Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyAsync(this, Discord, func, options);
 
-        /// <inheritdoc />
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
-        [Obsolete("This endpoint is deprecated, use ModifyWidgetAsync instead.")]
-        public Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
-            => GuildHelper.ModifyEmbedAsync(this, Discord, func, options);
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         public Task ModifyWidgetAsync(Action<GuildWidgetProperties> func, RequestOptions options = null)
@@ -1287,10 +1260,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         Task<ITextChannel> IGuild.GetDefaultChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<ITextChannel>(DefaultChannel);
-        /// <inheritdoc />
-        [Obsolete("This method is deprecated, use GetWidgetChannelAsync instead.")]
-        Task<IGuildChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
-            => Task.FromResult<IGuildChannel>(EmbedChannel);
         /// <inheritdoc />
         Task<IGuildChannel> IGuild.GetWidgetChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildChannel>(WidgetChannel);

@@ -28,13 +28,6 @@ namespace Discord
         /// </returns>
         int AFKTimeout { get; }
         /// <summary>
-        ///     Gets a value that indicates whether this guild is embeddable (i.e. can use widget).
-        /// </summary>
-        /// <returns>
-        ///     <see langword="true" /> if this guild has a widget enabled; otherwise <see langword="false" />.
-        /// </returns>
-        bool IsEmbeddable { get; }
-        /// <summary>
         ///     Gets a value that indicates whether this guild has the widget enabled.
         /// </summary>
         /// <returns>
@@ -349,16 +342,6 @@ namespace Discord
         /// </returns>
         Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null);
         /// <summary>
-        ///     Modifies this guild's embed channel.
-        /// </summary>
-        /// <param name="func">The delegate containing the properties to modify the guild widget with.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous modification operation.
-        /// </returns>
-        [Obsolete("This endpoint is deprecated, use ModifyWidgetAsync instead.")]
-        Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null);
-        /// <summary>
         ///     Modifies this guild's widget.
         /// </summary>
         /// <param name="func">The delegate containing the properties to modify the guild widget with.</param>
@@ -576,17 +559,6 @@ namespace Discord
         ///     channel in this guild; <see langword="null" /> if none is found.
         /// </returns>
         Task<ITextChannel> GetDefaultChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
-        /// <summary>
-        ///     Gets the embed channel (i.e. the channel set in the guild's widget settings) in this guild.
-        /// </summary>
-        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains the embed channel set
-        ///     within the server's widget settings; <see langword="null" /> if none is set.
-        /// </returns>
-        [Obsolete("This endpoint is deprecated, use GetWidgetChannelAsync instead.")]
-        Task<IGuildChannel> GetEmbedChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
         ///     Gets the widget channel (i.e. the channel set in the guild's widget settings) in this guild.
         /// </summary>

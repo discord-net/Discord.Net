@@ -38,7 +38,7 @@ namespace Discord.WebSocket
         }
         internal static SocketGroupUser Create(SocketGroupChannel channel, ClientState state, Model model)
         {
-            var entity = new SocketGroupUser(channel, channel.Discord.GetOrCreateUser(state, model));
+            var entity = new SocketGroupUser(channel, channel.Discord.GetOrCreateUser(state, model, true));
             entity.Update(state, model);
             return entity;
         }

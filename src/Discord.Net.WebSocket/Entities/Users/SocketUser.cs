@@ -38,8 +38,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string Mention => MentionUtils.MentionUser(Id);
         /// <inheritdoc />
-        public IActivity Activity => Presence.Activity;
-        /// <inheritdoc />
         public UserStatus Status => Presence.Status;
         /// <inheritdoc />
         public IImmutableSet<ClientType> ActiveClients => Presence.ActiveClients ?? ImmutableHashSet<ClientType>.Empty;
@@ -94,8 +92,8 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        public async Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
-            => GlobalUser.DMChannel ?? await UserHelper.CreateDMChannelAsync(this, Discord, options).ConfigureAwait(false) as IDMChannel;
+        public async Task<IDMChannel> CreateDMChannelAsync(RequestOptions options = null)
+            => await UserHelper.CreateDMChannelAsync(this, Discord, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)

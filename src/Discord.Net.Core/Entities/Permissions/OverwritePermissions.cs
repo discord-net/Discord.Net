@@ -90,6 +90,13 @@ namespace Discord
             DenyValue = denyValue;
         }
 
+        /// <summary> Creates a new OverwritePermissions with the provided allow and deny packed values after converting to ulong. </summary>
+        public OverwritePermissions(string allowValue, string denyValue)
+        {
+            AllowValue = ulong.Parse(allowValue);
+            DenyValue = ulong.Parse(denyValue);
+        }
+
         private OverwritePermissions(ulong allowValue, ulong denyValue,
             PermValue? createInstantInvite = null,
             PermValue? manageChannel = null, 
