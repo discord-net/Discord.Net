@@ -1,14 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../../Discord.Net.targets" />
-  <Import Project="../../StyleAnalyzer.targets"/>
+  <Import Project="../../StyleAnalyzer.targets" />
   <PropertyGroup>
     <AssemblyName>Discord.Net.Webhook</AssemblyName>
     <RootNamespace>Discord.Webhook</RootNamespace>
-    <Description>A core Discord.Net library containing the Webhook client and models.</Description>
+    <Description>A core Discord.Net Labs library containing the Webhook client and models.</Description>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <Version>2.3.1</Version>
+    <PackageId>Discord.Net.Labs.Webhook</PackageId>
+    <PackageProjectUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</RepositoryUrl>
+    <PackageIcon>Temporary.png</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
     <ProjectReference Include="..\Discord.Net.Rest\Discord.Net.Rest.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\..\..\Downloads\Temporary.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 </Project>
