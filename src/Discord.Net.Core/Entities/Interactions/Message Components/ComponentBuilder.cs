@@ -247,8 +247,16 @@ namespace Discord
 
         public ButtonComponent Build()
         {
+            if (string.IsNullOrEmpty(this.Label) && this.Emote == null)
+                throw new ArgumentException("A button must have an Emote or a label!");
+
             if (!string.IsNullOrEmpty(this.Url) && !string.IsNullOrEmpty(this.CustomId))
                 throw new InvalidOperationException("A button cannot contain a URL and a CustomId");
+
+            if (this.Style == ButtonStyle.Link && !string.IsNullOrEmpty(this.CustomId))
+                this.CustomId = null;
+            else if (!string.IsNullOrEmpty(this.Url))
+                this.Url = null;
 
             return new ButtonComponent(this.Style, this.Label, this.Emote, this.CustomId, this.Url, this.Disabled);
         }
