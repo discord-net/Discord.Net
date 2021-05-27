@@ -112,22 +112,6 @@ namespace Discord.WebSocket
         public int? HandlerTimeout { get; set; } = 3000;
 
         /// <summary>
-        ///     Gets or sets the behavior for <see cref="BaseSocketClient.MessageDeleted"/> on bulk deletes.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        ///     If <c>true</c>, the <see cref="BaseSocketClient.MessageDeleted"/> event will not be raised for bulk
-        ///     deletes, and only the <see cref="BaseSocketClient.MessagesBulkDeleted"/> will be raised. If <c>false</c>
-        ///     , both events will be raised.
-        /// </para>
-        /// <para>
-        ///     If unset, both events will be raised, but a warning will be raised the first time a bulk delete event is
-        ///     received.
-        /// </para>
-        /// </remarks>
-        public bool? ExclusiveBulkDelete { get; set; } = null;
-
-        /// <summary>
         ///     Gets or sets the maximum identify concurrency.
         /// </summary>
         /// <remarks>
