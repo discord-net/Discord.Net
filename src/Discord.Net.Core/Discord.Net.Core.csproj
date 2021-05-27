@@ -8,10 +8,12 @@
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net461;netstandard2.0;netstandard2.1</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard2.0;netstandard2.1</TargetFrameworks>
     <PackageId>Discord.Net.Labs.Core</PackageId>
-    <Version>2.3.1</Version>
+    <Version>2.3.1-dev</Version>
     <Product>Discord.Net.Labs.Core</Product>
     <RepositoryUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</RepositoryUrl>
     <PackageIcon>Temporary.png</PackageIcon>
+    <AssemblyVersion>2.3.1.1</AssemblyVersion>
+    <FileVersion>2.3.1.1</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
