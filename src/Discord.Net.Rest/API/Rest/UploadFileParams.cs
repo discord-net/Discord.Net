@@ -21,6 +21,7 @@ namespace Discord.API.Rest
         public Optional<Embed> Embed { get; set; }
         public Optional<AllowedMentions> AllowedMentions { get; set; }
         public Optional<MessageReference> MessageReference { get; set; }
+        public Optional<IMessageComponent[]> MessageComponent { get; set; }
         public bool IsSpoiler { get; set; } = false;
 
         public UploadFileParams(Stream file)
@@ -47,6 +48,8 @@ namespace Discord.API.Rest
                 payload["embed"] = Embed.Value;
             if (AllowedMentions.IsSpecified)
                 payload["allowed_mentions"] = AllowedMentions.Value;
+            if (MessageComponent.IsSpecified)
+                payload["components"] = MessageComponent.Value;
             if (IsSpoiler)
                 payload["hasSpoiler"] = IsSpoiler.ToString();
 

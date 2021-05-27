@@ -11,15 +11,21 @@ namespace Discord.API.Rest
 
         [JsonProperty("nonce")]
         public Optional<string> Nonce { get; set; }
+
         [JsonProperty("tts")]
         public Optional<bool> IsTTS { get; set; }
+
         [JsonProperty("embed")]
         public Optional<Embed> Embed { get; set; }
+
         [JsonProperty("allowed_mentions")]
         public Optional<AllowedMentions> AllowedMentions { get; set; }
+
         [JsonProperty("message_reference")]
         public Optional<MessageReference> MessageReference { get; set; }
 
+        [JsonProperty("components")]
+        public Optional<IMessageComponent[]> Components { get; set; }
         public CreateMessageParams(string content)
         {
             Content = content;
