@@ -68,6 +68,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         public MessageReference Reference { get; private set; }
 
+        /// <inheritdoc/>
+        public IReadOnlyCollection<ActionRowComponent> Components { get; private set; }
+
         internal RestMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
             : base(discord, id)
         {
@@ -113,7 +116,7 @@ namespace Discord.Rest
                 };
             }
 
-            if(model.Reference.IsSpecified)
+            if (model.Reference.IsSpecified)
             {
                 // Creates a new Reference from the API model
                 Reference = new MessageReference
@@ -123,6 +126,15 @@ namespace Discord.Rest
                     MessageId = model.Reference.Value.MessageId
                 };
             }
+
+            if (model.Components.IsSpecified)
+            {
+                Components = model.Components.Value.Select(x =>
+                    (x as Newtonsoft.Json.Linq.JToken).ToObject<ActionRowComponent>()
+                ).ToList();
+            }
+            else
+                Components = new List<ActionRowComponent>();
 
             if (model.Reactions.IsSpecified)
             {
@@ -168,7 +180,8 @@ namespace Discord.Rest
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
-
+        /// <inheritdoc/>
+        IReadOnlyCollection<IMessageComponent> IMessage.Components => Components;
         /// <inheritdoc />
         public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.ToDictionary(x => x.Emote, x => new ReactionMetadata { ReactionCount = x.Count, IsMe = x.Me });
 

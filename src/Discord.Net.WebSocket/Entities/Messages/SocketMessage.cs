@@ -58,6 +58,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public MessageReference Reference { get; private set; }
 
+        /// <inheritdoc/>
+        public IReadOnlyCollection<ActionRowComponent> Components { get; private set; }
+
         /// <summary>
         ///     Returns all attachments included in this message.
         /// </summary>
@@ -156,6 +159,15 @@ namespace Discord.WebSocket
                     MessageId = model.Reference.Value.MessageId
                 };
             }
+
+            if (model.Components.IsSpecified)
+            {
+                Components = model.Components.Value.Select(x =>
+                    (x as Newtonsoft.Json.Linq.JToken).ToObject<ActionRowComponent>()
+                ).ToList();
+            }
+            else
+                Components = new List<ActionRowComponent>();
         }
 
         /// <inheritdoc />
@@ -188,7 +200,8 @@ namespace Discord.WebSocket
         IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoles.Select(x => x.Id).ToImmutableArray();
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
-
+        /// <inheritdoc/>
+        IReadOnlyCollection<IMessageComponent> IMessage.Components => Components;
         internal void AddReaction(SocketReaction reaction)
         {
             _reactions.Add(reaction);

@@ -165,6 +165,10 @@ namespace Discord
         IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions { get; }
 
         /// <summary>
+        ///     The <see cref="IMessageComponent"/>'s attached to this message
+        /// </summary>
+        IReadOnlyCollection<IMessageComponent> Components { get; }
+        /// <summary>
         ///     Adds a reaction to this message.
         /// </summary>
         /// <example>
