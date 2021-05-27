@@ -1,5 +1,5 @@
 # Discord.Net Labs
-[![NuGet](https://img.shields.io/nuget/vpre/Discord.Net.Labs.Core.svg?maxAge=2592000?style=plastic)](https://www.nuget.org/packages/Discord.Net.Labs.Core/ "Core")
+[![NuGet](https://img.shields.io/nuget/vpre/Discord.Net.Labs.svg?maxAge=2592000?style=plastic)](https://www.nuget.org/packages/Discord.Net.Labs)
 
 This repo is a custom fork of Discord.Net that introduces the newest features of discord for testing and experimenting. Nothing here is guaranteed to work but you are more than welcome to submit bugs in the issues tabs
 
