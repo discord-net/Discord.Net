@@ -58,6 +58,8 @@ namespace Discord.Rest
         public virtual IReadOnlyCollection<RestUser> MentionedUsers => ImmutableArray.Create<RestUser>();
         /// <inheritdoc />
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
+        /// <inheritdoc />
+        public virtual IReadOnlyCollection<Sticker> Stickers => ImmutableArray.Create<Sticker>();
 
         /// <inheritdoc />
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
@@ -173,6 +175,8 @@ namespace Discord.Rest
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
+        /// <inheritdoc />
+        IReadOnlyCollection<ISticker> IMessage.Stickers => Stickers;
 
         /// <inheritdoc />
         public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.ToDictionary(x => x.Emote, x => new ReactionMetadata { ReactionCount = x.Count, IsMe = x.Me });

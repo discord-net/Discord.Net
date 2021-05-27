@@ -45,20 +45,18 @@ namespace Discord.API
         internal string AuthToken { get; private set; }
         internal IRestClient RestClient { get; private set; }
         internal ulong? CurrentUserId { get; set; }
-        public RateLimitPrecision RateLimitPrecision { get; private set; }
 		internal bool UseSystemClock { get; set; }
 
         internal JsonSerializer Serializer => _serializer;
 
         /// <exception cref="ArgumentException">Unknown OAuth token type.</exception>
         public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry,
-            JsonSerializer serializer = null, RateLimitPrecision rateLimitPrecision = RateLimitPrecision.Second, bool useSystemClock = true)
+            JsonSerializer serializer = null, bool useSystemClock = true)
         {
             _restClientProvider = restClientProvider;
             UserAgent = userAgent;
             DefaultRetryMode = defaultRetryMode;
             _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
-            RateLimitPrecision = rateLimitPrecision;
 			UseSystemClock = useSystemClock;
 
             RequestQueue = new RequestQueue();
@@ -75,14 +73,12 @@ namespace Discord.API
             RestClient.SetHeader("accept", "*/*");
             RestClient.SetHeader("user-agent", UserAgent);
             RestClient.SetHeader("authorization", GetPrefixedToken(AuthTokenType, AuthToken));
-            RestClient.SetHeader("X-RateLimit-Precision", RateLimitPrecision.ToString().ToLower());
         }
         /// <exception cref="ArgumentException">Unknown OAuth token type.</exception>
         internal static string GetPrefixedToken(TokenType tokenType, string token)
         {
             return tokenType switch
             {
-                default(TokenType) => token,
                 TokenType.Bot => $"Bot {token}",
                 TokenType.Bearer => $"Bearer {token}",
                 _ => throw new ArgumentException(message: "Unknown OAuth token type.", paramName: nameof(tokenType)),
@@ -523,6 +519,43 @@ namespace Discord.API
             var ids = new BucketIds(webhookId: webhookId);
             return await SendJsonAsync<Message>("POST", () => $"webhooks/{webhookId}/{AuthToken}?wait=true", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
+
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
+        /// <exception cref="InvalidOperationException">This operation may only be called with a <see cref="TokenType.Webhook"/> token.</exception>
+        public async Task ModifyWebhookMessageAsync(ulong webhookId, ulong messageId, ModifyWebhookMessageParams args, RequestOptions options = null)
+        {
+            if (AuthTokenType != TokenType.Webhook)
+                throw new InvalidOperationException($"This operation may only be called with a {nameof(TokenType.Webhook)} token.");
+
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
+            Preconditions.NotEqual(messageId, 0, nameof(messageId));
+
+            if (args.Embeds.IsSpecified)
+                Preconditions.AtMost(args.Embeds.Value.Length, 10, nameof(args.Embeds), "A max of 10 Embeds are allowed.");
+            if (args.Content.IsSpecified && args.Content.Value.Length > DiscordConfig.MaxMessageSize)
+                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(webhookId: webhookId);
+            await SendJsonAsync<Message>("PATCH", () => $"webhooks/{webhookId}/{AuthToken}/messages/{messageId}", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+        }
+
+        /// <exception cref="InvalidOperationException">This operation may only be called with a <see cref="TokenType.Webhook"/> token.</exception>
+        public async Task DeleteWebhookMessageAsync(ulong webhookId, ulong messageId, RequestOptions options = null)
+        {
+            if (AuthTokenType != TokenType.Webhook)
+                throw new InvalidOperationException($"This operation may only be called with a {nameof(TokenType.Webhook)} token.");
+
+            Preconditions.NotEqual(webhookId, 0, nameof(webhookId));
+            Preconditions.NotEqual(messageId, 0, nameof(messageId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(webhookId: webhookId);
+            await SendAsync("DELETE", () => $"webhooks/{webhookId}/{AuthToken}/messages/{messageId}", ids, options: options).ConfigureAwait(false);
+        }
+
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public async Task<Message> UploadFileAsync(ulong channelId, UploadFileParams args, RequestOptions options = null)
         {
@@ -606,16 +639,6 @@ namespace Discord.API
 
             var ids = new BucketIds(channelId: channelId);
             return await SendJsonAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
-        }
-
-        public async Task SuppressEmbedAsync(ulong channelId, ulong messageId, Rest.SuppressEmbedParams args, RequestOptions options = null)
-        {
-            Preconditions.NotEqual(channelId, 0, nameof(channelId));
-            Preconditions.NotEqual(messageId, 0, nameof(messageId));
-            options = RequestOptions.CreateOrClone(options);
-
-            var ids = new BucketIds(channelId: channelId);
-            await SendJsonAsync("POST", () => $"channels/{channelId}/messages/{messageId}/suppress-embeds", args, ids, options: options).ConfigureAwait(false);
         }
 
         public async Task AddReactionAsync(ulong channelId, ulong messageId, string emoji, RequestOptions options = null)
@@ -899,7 +922,7 @@ namespace Discord.API
 
             var ids = new BucketIds(guildId: guildId);
             string reason = string.IsNullOrWhiteSpace(args.Reason) ? "" : $"&reason={Uri.EscapeDataString(args.Reason)}";
-            await SendAsync("PUT", () => $"guilds/{guildId}/bans/{userId}?delete-message-days={args.DeleteMessageDays}{reason}", ids, options: options).ConfigureAwait(false);
+            await SendAsync("PUT", () => $"guilds/{guildId}/bans/{userId}?delete_message_days={args.DeleteMessageDays}{reason}", ids, options: options).ConfigureAwait(false);
         }
         /// <exception cref="ArgumentException"><paramref name="guildId"/> and <paramref name="userId"/> must not be equal to zero.</exception>
         public async Task RemoveGuildBanAsync(ulong guildId, ulong userId, RequestOptions options = null)
@@ -910,32 +933,6 @@ namespace Discord.API
 
             var ids = new BucketIds(guildId: guildId);
             await SendAsync("DELETE", () => $"guilds/{guildId}/bans/{userId}", ids, options: options).ConfigureAwait(false);
-        }
-
-        //Guild Embeds
-        /// <exception cref="ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
-        public async Task<GuildEmbed> GetGuildEmbedAsync(ulong guildId, RequestOptions options = null)
-        {
-            Preconditions.NotEqual(guildId, 0, nameof(guildId));
-            options = RequestOptions.CreateOrClone(options);
-
-            try
-            {
-                var ids = new BucketIds(guildId: guildId);
-                return await SendAsync<GuildEmbed>("GET", () => $"guilds/{guildId}/embed", ids, options: options).ConfigureAwait(false);
-            }
-            catch (HttpException ex) when (ex.HttpCode == HttpStatusCode.NotFound) { return null; }
-        }
-        /// <exception cref="ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
-        public async Task<GuildEmbed> ModifyGuildEmbedAsync(ulong guildId, Rest.ModifyGuildEmbedParams args, RequestOptions options = null)
-        {
-            Preconditions.NotNull(args, nameof(args));
-            Preconditions.NotEqual(guildId, 0, nameof(guildId));
-            options = RequestOptions.CreateOrClone(options);
-
-            var ids = new BucketIds(guildId: guildId);
-            return await SendJsonAsync<GuildEmbed>("PATCH", () => $"guilds/{guildId}/embed", args, ids, options: options).ConfigureAwait(false);
         }
 
         //Guild Widget
@@ -1243,6 +1240,15 @@ namespace Discord.API
         }
 
         //Guild emoji
+        public async Task<IReadOnlyCollection<Emoji>> GetGuildEmotesAsync(ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(guildId: guildId);
+            return await SendAsync<IReadOnlyCollection<Emoji>>("GET", () => $"guilds/{guildId}/emojis", ids, options: options).ConfigureAwait(false);
+        }
+
         public async Task<Emoji> GetGuildEmoteAsync(ulong guildId, ulong emoteId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));

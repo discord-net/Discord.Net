@@ -70,20 +70,11 @@ namespace Discord.WebSocket
         ///     A read-only collection of private channels that the user currently partakes in.
         /// </returns>
         public abstract IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels { get; }
-        /// <summary>
-        ///     Gets a collection of available voice regions.
-        /// </summary>
-        /// <returns>
-        ///     A read-only collection of voice regions that the user has access to.
-        /// </returns>
-        [Obsolete("This property is obsolete, use the GetVoiceRegionsAsync method instead.")]
-        public abstract IReadOnlyCollection<RestVoiceRegion> VoiceRegions { get; }
 
         internal BaseSocketClient(DiscordSocketConfig config, DiscordRestApiClient client)
             : base(config, client) => BaseConfig = config;
         private static DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
             => new DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent,
-                rateLimitPrecision: config.RateLimitPrecision,
 				useSystemClock: config.UseSystemClock);
 
         /// <summary>
@@ -164,16 +155,6 @@ namespace Discord.WebSocket
         /// </returns>
         public abstract SocketGuild GetGuild(ulong id);
         /// <summary>
-        ///     Gets a voice region.
-        /// </summary>
-        /// <param name="id">The identifier of the voice region (e.g. <c>eu-central</c> ).</param>
-        /// <returns>
-        ///     A REST-based voice region associated with the identifier; <c>null</c> if the voice region is not
-        ///     found.
-        /// </returns>
-        [Obsolete("This method is obsolete, use GetVoiceRegionAsync instead.")]
-        public abstract RestVoiceRegion GetVoiceRegion(string id);
-        /// <summary>
         ///     Gets all voice regions.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
@@ -209,6 +190,12 @@ namespace Discord.WebSocket
         /// <param name="name">The name of the game.</param>
         /// <param name="streamUrl">If streaming, the URL of the stream. Must be a valid Twitch URL.</param>
         /// <param name="type">The type of the game.</param>
+        /// <remarks>
+        ///     <note type="warning">
+        ///         Bot accounts cannot set <see cref="ActivityType.CustomStatus"/> as their activity
+        ///         type and it will have no effect.
+        ///     </note>
+        /// </remarks>
         /// <returns>
         ///     A task that represents the asynchronous set operation.
         /// </returns>
@@ -220,6 +207,10 @@ namespace Discord.WebSocket
         ///     This method sets the <paramref name="activity"/> of the user. 
         ///     <note type="note">
         ///         Discord will only accept setting of name and the type of activity.
+        ///     </note>
+        ///     <note type="warning">
+        ///         Bot accounts cannot set <see cref="ActivityType.CustomStatus"/> as their activity
+        ///         type and it will have no effect.
         ///     </note>
         ///     <note type="warning">
         ///         Rich Presence cannot be set via this method or client. Rich Presence is strictly limited to RPC
@@ -317,10 +308,14 @@ namespace Discord.WebSocket
             => Task.FromResult<IUser>(GetUser(username, discriminator));
 
         /// <inheritdoc />
-        Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
-            => Task.FromResult<IVoiceRegion>(GetVoiceRegion(id));
+        async Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
+        {
+            return await GetVoiceRegionAsync(id).ConfigureAwait(false);
+        }
         /// <inheritdoc />
-        Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync(RequestOptions options)
-            => Task.FromResult<IReadOnlyCollection<IVoiceRegion>>(VoiceRegions);
+        async Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync(RequestOptions options)
+        {
+            return await GetVoiceRegionsAsync().ConfigureAwait(false);
+        }
     }
 }

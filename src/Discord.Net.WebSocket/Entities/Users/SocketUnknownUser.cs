@@ -25,7 +25,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override bool IsWebhook => false;
         /// <inheritdoc />
-        internal override SocketPresence Presence { get { return new SocketPresence(UserStatus.Offline, null, null, null); } set { } }
+        internal override SocketPresence Presence { get { return new SocketPresence(UserStatus.Offline, null, null); } set { } }
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">This field is not supported for an unknown user.</exception>
         internal override SocketGlobalUser GlobalUser =>

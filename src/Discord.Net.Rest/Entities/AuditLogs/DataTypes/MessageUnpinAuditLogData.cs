@@ -19,8 +19,14 @@ namespace Discord.Rest
 
         internal static MessageUnpinAuditLogData Create(BaseDiscordClient discord, Model log, EntryModel entry)
         {
-            var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
-            return new MessageUnpinAuditLogData(entry.Options.MessageId.Value, entry.Options.ChannelId.Value, RestUser.Create(discord, userInfo));
+            RestUser user = null;
+            if (entry.TargetId.HasValue)
+            {
+                var userInfo = log.Users.FirstOrDefault(x => x.Id == entry.TargetId);
+                user = RestUser.Create(discord, userInfo);
+            }
+
+            return new MessageUnpinAuditLogData(entry.Options.MessageId.Value, entry.Options.ChannelId.Value, user);
         }
 
         /// <summary>
@@ -38,10 +44,10 @@ namespace Discord.Rest
         /// </returns>
         public ulong ChannelId { get; }
         /// <summary>
-        ///     Gets the user of the message that was unpinned.
+        ///     Gets the user of the message that was unpinned if available.
         /// </summary>
         /// <returns>
-        ///     A user object representing the user that created the unpinned message.
+        ///     A user object representing the user that created the unpinned message or <see langword="null"/>.
         /// </returns>
         public IUser Target { get; }
     }

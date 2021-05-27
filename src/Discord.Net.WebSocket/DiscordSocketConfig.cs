@@ -128,12 +128,6 @@ namespace Discord.WebSocket
         public bool? ExclusiveBulkDelete { get; set; } = null;
 
         /// <summary>
-        ///     Gets or sets enabling dispatching of guild subscription events e.g. presence and typing events.
-        ///     This is not used if <see cref="GatewayIntents"/> are provided.
-        /// </summary>
-        public bool GuildSubscriptions { get; set; } = true;
-
-        /// <summary>
         ///     Gets or sets the maximum identify concurrency.
         /// </summary>
         /// <remarks>
@@ -172,14 +166,15 @@ namespace Discord.WebSocket
         private int maxWaitForGuildAvailable = 10000;
 
         /// <summary>
-        ///    Gets or sets gateway intents to limit what events are sent from Discord. Allows for more granular control than the <see cref="GuildSubscriptions"/> property.
+        ///    Gets or sets gateway intents to limit what events are sent from Discord.
+        ///    The default is <see cref="GatewayIntents.AllUnprivileged"/>.
         /// </summary>
         /// <remarks>
         ///     For more information, please see
         ///     <see href="https://discord.com/developers/docs/topics/gateway#gateway-intents">GatewayIntents</see>
         ///     on the official Discord API documentation.
         /// </remarks>
-        public GatewayIntents? GatewayIntents { get; set; }
+        public GatewayIntents GatewayIntents { get; set; } = GatewayIntents.AllUnprivileged;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="DiscordSocketConfig"/> class with the default configuration.

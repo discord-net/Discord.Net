@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
-using EmbedModel = Discord.API.GuildEmbed;
 using WidgetModel = Discord.API.GuildWidget;
 using Model = Discord.API.Guild;
 using RoleModel = Discord.API.Role;
@@ -79,26 +78,6 @@ namespace Discord.Rest
                 apiArgs.PreferredLocale = args.PreferredCulture.Value.Name;
 
             return await client.ApiClient.ModifyGuildAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
-        }
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
-        public static async Task<EmbedModel> ModifyEmbedAsync(IGuild guild, BaseDiscordClient client,
-            Action<GuildEmbedProperties> func, RequestOptions options)
-        {
-            if (func == null) throw new ArgumentNullException(nameof(func));
-
-            var args = new GuildEmbedProperties();
-            func(args);
-            var apiArgs = new API.Rest.ModifyGuildEmbedParams
-            {
-                Enabled = args.Enabled
-            };
-
-            if (args.Channel.IsSpecified)
-                apiArgs.ChannelId = args.Channel.Value?.Id;
-            else if (args.ChannelId.IsSpecified)
-                apiArgs.ChannelId = args.ChannelId.Value;
-
-            return await client.ApiClient.ModifyGuildEmbedAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
         }
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
         public static async Task<WidgetModel> ModifyWidgetAsync(IGuild guild, BaseDiscordClient client,
@@ -205,8 +184,8 @@ namespace Discord.Rest
                     {
                         TargetId = overwrite.TargetId,
                         TargetType = overwrite.TargetType,
-                        Allow = overwrite.Permissions.AllowValue,
-                        Deny = overwrite.Permissions.DenyValue
+                        Allow = overwrite.Permissions.AllowValue.ToString(),
+                        Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
             };
@@ -233,8 +212,8 @@ namespace Discord.Rest
                     {
                         TargetId = overwrite.TargetId,
                         TargetType = overwrite.TargetType,
-                        Allow = overwrite.Permissions.AllowValue,
-                        Deny = overwrite.Permissions.DenyValue
+                        Allow = overwrite.Permissions.AllowValue.ToString(),
+                        Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
             };
@@ -258,8 +237,8 @@ namespace Discord.Rest
                     {
                         TargetId = overwrite.TargetId,
                         TargetType = overwrite.TargetType,
-                        Allow = overwrite.Permissions.AllowValue,
-                        Deny = overwrite.Permissions.DenyValue
+                        Allow = overwrite.Permissions.AllowValue.ToString(),
+                        Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
             };
@@ -304,6 +283,7 @@ namespace Discord.Rest
             var vanityModel = await client.ApiClient.GetVanityInviteAsync(guild.Id, options).ConfigureAwait(false);
             if (vanityModel == null) throw new InvalidOperationException("This guild does not have a vanity URL.");
             var inviteModel = await client.ApiClient.GetInviteAsync(vanityModel.Code, options).ConfigureAwait(false);
+            inviteModel.Uses = vanityModel.Uses;
             return RestInviteMetadata.Create(client, guild, null, inviteModel);
         }
 
@@ -320,7 +300,7 @@ namespace Discord.Rest
                 Hoist = isHoisted,
                 Mentionable = isMentionable,
                 Name = name,
-                Permissions = permissions?.RawValue ?? Optional.Create<ulong>()
+                Permissions = permissions?.RawValue.ToString() ?? Optional.Create<string>()
             };
 
             var model = await client.ApiClient.CreateGuildRoleAsync(guild.Id, createGuildRoleParams, options).ConfigureAwait(false);
@@ -496,6 +476,11 @@ namespace Discord.Rest
         }
 
         //Emotes
+        public static async Task<IReadOnlyCollection<GuildEmote>> GetEmotesAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
+        {
+            var models = await client.ApiClient.GetGuildEmotesAsync(guild.Id, options).ConfigureAwait(false);
+            return models.Select(x => x.ToEntity()).ToImmutableArray();
+        }
         public static async Task<GuildEmote> GetEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
         {
             var emote = await client.ApiClient.GetGuildEmoteAsync(guild.Id, id, options).ConfigureAwait(false);

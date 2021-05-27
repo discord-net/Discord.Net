@@ -99,6 +99,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
         /// <inheritdoc />
+        public virtual IReadOnlyCollection<Sticker> Stickers => ImmutableArray.Create<Sticker>();
+        /// <inheritdoc />
         public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emote).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
 
         /// <inheritdoc />
@@ -194,6 +196,8 @@ namespace Discord.WebSocket
         IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoles.Select(x => x.Id).ToImmutableArray();
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
+        /// <inheritdoc />
+        IReadOnlyCollection<ISticker> IMessage.Stickers => Stickers;
 
         internal void AddReaction(SocketReaction reaction)
         {

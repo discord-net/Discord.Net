@@ -12,7 +12,7 @@ namespace Discord
         /// </summary>
         /// <param name="value">The snowflake identifier to resolve.</param>
         /// <returns>
-        ///     A <see cref="DateTimeOffset" /> representing the time for when the object is geenrated.
+        ///     A <see cref="DateTimeOffset" /> representing the time for when the object is generated.
         /// </returns>
         public static DateTimeOffset FromSnowflake(ulong value)
             => DateTimeOffset.FromUnixTimeMilliseconds((long)((value >> 22) + 1420070400000UL));

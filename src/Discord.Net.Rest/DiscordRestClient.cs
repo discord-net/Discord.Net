@@ -29,10 +29,7 @@ namespace Discord.Rest
         internal DiscordRestClient(DiscordRestConfig config, API.DiscordRestApiClient api) : base(config, api) { }
 
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
-            => new API.DiscordRestApiClient(config.RestClientProvider,
-                DiscordRestConfig.UserAgent,
-                rateLimitPrecision: config.RateLimitPrecision,
-                useSystemClock: config.UseSystemClock);
+            => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, useSystemClock: config.UseSystemClock);
 
         internal override void Dispose(bool disposing)
         {
@@ -80,9 +77,6 @@ namespace Discord.Rest
             => ClientHelper.GetGuildAsync(this, id, false, options);
         public Task<RestGuild> GetGuildAsync(ulong id, bool withCounts, RequestOptions options = null)
             => ClientHelper.GetGuildAsync(this, id, withCounts, options);
-        [Obsolete("This endpoint is deprecated, use GetGuildWidgetAsync instead.")]
-        public Task<RestGuildEmbed?> GetGuildEmbedAsync(ulong id, RequestOptions options = null)
-            => ClientHelper.GetGuildEmbedAsync(this, id, options);
         public Task<RestGuildWidget?> GetGuildWidgetAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetGuildWidgetAsync(this, id, options);
         public IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(RequestOptions options = null)
@@ -107,7 +101,19 @@ namespace Discord.Rest
             => ClientHelper.GetVoiceRegionAsync(this, id, options);
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetWebhookAsync(this, id, options);
+        public Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId)
+            => ClientHelper.AddRoleAsync(this, guildId, userId, roleId);
+        public Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId)
+            => ClientHelper.RemoveRoleAsync(this, guildId, userId, roleId);
 
+        public Task AddReactionAsync(ulong channelId, ulong messageId, IEmote emote, RequestOptions options = null)
+            => MessageHelper.AddReactionAsync(channelId, messageId, emote, this, options);
+        public Task RemoveReactionAsync(ulong channelId, ulong messageId, ulong userId, IEmote emote, RequestOptions options = null)
+            => MessageHelper.RemoveReactionAsync(channelId, messageId, userId, emote, this, options);
+        public Task RemoveAllReactionsAsync(ulong channelId, ulong messageId, RequestOptions options = null)
+            => MessageHelper.RemoveAllReactionsAsync(channelId, messageId, this, options);
+        public Task RemoveAllReactionsForEmoteAsync(ulong channelId, ulong messageId, IEmote emote, RequestOptions options = null)
+            => MessageHelper.RemoveAllReactionsForEmoteAsync(channelId, messageId, emote, this, options);
         //IDiscordClient
         /// <inheritdoc />
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)

@@ -5,13 +5,14 @@ namespace Discord.Rest
     /// </summary>
     public struct ChannelInfo
     {
-        internal ChannelInfo(string name, string topic, int? rateLimit, bool? nsfw, int? bitrate)
+        internal ChannelInfo(string name, string topic, int? rateLimit, bool? nsfw, int? bitrate, ChannelType? type)
         {
             Name = name;
             Topic = topic;
             SlowModeInterval = rateLimit;
             IsNsfw = nsfw;
             Bitrate = bitrate;
+            ChannelType = type;
         }
 
         /// <summary>
@@ -53,5 +54,12 @@ namespace Discord.Rest
         ///     <c>null</c> if this is not mentioned in this entry.
         /// </returns>
         public int? Bitrate { get; }
+        /// <summary>
+        ///     Gets the type of this channel.
+        /// </summary>
+        /// <returns>
+        ///     The channel type of this channel; <c>null</c> if not applicable.
+        /// </returns>
+        public ChannelType? ChannelType { get; }
     }
 }

@@ -79,13 +79,13 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        ///     Returns a direct message channel to this user, or create one if it does not already exist.
+        ///     Creates a direct message channel to this user.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains a rest DM channel where the user is the recipient.
         /// </returns>
-        public Task<RestDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
+        public Task<RestDMChannel> CreateDMChannelAsync(RequestOptions options = null)
             => UserHelper.CreateDMChannelAsync(this, Discord, options);
 
         /// <inheritdoc />
@@ -107,7 +107,7 @@ namespace Discord.Rest
 
         //IUser
         /// <inheritdoc />
-        async Task<IDMChannel> IUser.GetOrCreateDMChannelAsync(RequestOptions options)
-            => await GetOrCreateDMChannelAsync(options).ConfigureAwait(false);
+        async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
+            => await CreateDMChannelAsync(options).ConfigureAwait(false);
     }
 }
