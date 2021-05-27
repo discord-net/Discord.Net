@@ -131,7 +131,7 @@ namespace Discord
             get => _label;
             set
             {
-                if(value != null)
+                if (value != null)
                     if (value.Length > MaxLabelLength)
                         throw new ArgumentException(message: $"Button label must be {MaxLabelLength} characters or less!", paramName: nameof(Label));
 
@@ -155,10 +155,60 @@ namespace Discord
         public IEmote Emote { get; set; }
         public string Url { get; set; }
         public bool Disabled { get; set; }
-        
+
 
         private string _label;
         private string _customId;
+
+        public static ButtonBuilder CreateLinkButton(string label, string url)
+        {
+            var builder = new ButtonBuilder()
+                .WithStyle(ButtonStyle.Link)
+                .WithUrl(url)
+                .WithLabel(label);
+
+            return builder;
+        }
+
+        public static ButtonBuilder CreateDangerButton(string label, string customId)
+        {
+            var builder = new ButtonBuilder()
+                .WithStyle(ButtonStyle.Danger)
+                .WithCustomId(customId)
+                .WithLabel(label);
+
+            return builder;
+        }
+
+        public static ButtonBuilder CreatePrimaryButton(string label, string customId)
+        {
+            var builder = new ButtonBuilder()
+                .WithStyle(ButtonStyle.Primary)
+                .WithCustomId(customId)
+                .WithLabel(label);
+
+            return builder;
+        }
+
+        public static ButtonBuilder CreateSecondaryButton(string label, string customId)
+        {
+            var builder = new ButtonBuilder()
+                .WithStyle(ButtonStyle.Secondary)
+                .WithCustomId(customId)
+                .WithLabel(label);
+
+            return builder;
+        }
+
+        public static ButtonBuilder CreateSuccessButton(string label, string customId)
+        {
+            var builder = new ButtonBuilder()
+                .WithStyle(ButtonStyle.Success)
+                .WithCustomId(customId)
+                .WithLabel(label);
+
+            return builder;
+        }
 
         public ButtonBuilder WithLabel(string label)
         {
@@ -196,6 +246,11 @@ namespace Discord
         }
 
         public ButtonComponent Build()
-            => new ButtonComponent(this.Style, this.Label, this.Emote, this.CustomId, this.Url, this.Disabled);
+        {
+            if (!string.IsNullOrEmpty(this.Url) && !string.IsNullOrEmpty(this.CustomId))
+                throw new InvalidOperationException("A button cannot contain a URL and a CustomId");
+
+            return new ButtonComponent(this.Style, this.Label, this.Emote, this.CustomId, this.Url, this.Disabled);
+        }
     }
 }
