@@ -43,11 +43,11 @@ namespace Discord.WebSocket
         {
             lock (_lockObj)
             {
-                if (--_references <= 1)
+                if (--_references <= 0)
                     discord.RemoveUser(Id);
             }
         }
-        
+
         internal void Update(ClientState state, PresenceModel model)
         {
             Presence = SocketPresence.Create(model);
