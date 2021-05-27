@@ -17,7 +17,7 @@ namespace Discord.API.Gateway
         public InteractionType Type { get; set; }
 
         [JsonProperty("data")]
-        public Optional<ApplicationCommandInteractionData> Data { get; set; }
+        public Optional<object> Data { get; set; }
 
         [JsonProperty("guild_id")]
         public ulong GuildId { get; set; }

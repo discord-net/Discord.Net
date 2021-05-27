@@ -25,6 +25,9 @@ namespace Discord.API
         [JsonProperty("flags")]
         public Optional<int> Flags { get; set; }
 
+        [JsonProperty("components")]
+        public Optional<IMessageComponent[]> Components { get; set; }
+
         public InteractionApplicationCommandCallbackData() { }
         public InteractionApplicationCommandCallbackData(string text)
         {

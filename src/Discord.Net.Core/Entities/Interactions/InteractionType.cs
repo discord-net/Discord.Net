@@ -17,8 +17,13 @@ namespace Discord
         Ping = 1,
 
         /// <summary>
-        ///     An <see cref="IApplicationCommand"/> sent from discord.
+        ///     A <see cref="IApplicationCommand"/> sent from discord.
         /// </summary>
-        ApplicationCommand = 2
+        ApplicationCommand = 2,
+
+        /// <summary>
+        ///     A <see cref="IMessageComponent"/> sent from discord.
+        /// </summary>
+        MessageComponent = 3,
     }
 }

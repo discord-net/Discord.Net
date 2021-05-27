@@ -30,6 +30,9 @@ namespace Discord.API.Rest
         [JsonProperty("flags")]
         public Optional<int> Flags { get; set; }
 
+        [JsonProperty("components")]
+        public Optional<IMessageComponent[]> Components { get; set; }
+
         public CreateWebhookMessageParams(string content)
         {
             Content = content;

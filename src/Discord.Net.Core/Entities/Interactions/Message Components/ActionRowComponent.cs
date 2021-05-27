@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +9,10 @@ namespace Discord
 {
     public class ActionRowComponent : IMessageComponent
     {
+        [JsonProperty("type")]
         public ComponentType Type { get; } = ComponentType.ActionRow;
 
+        [JsonProperty("components")]
         public IReadOnlyCollection<IMessageComponent> Components { get; internal set; }
 
         internal ActionRowComponent() { }

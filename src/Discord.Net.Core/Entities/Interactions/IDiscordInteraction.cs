@@ -26,9 +26,9 @@ namespace Discord
         InteractionType Type { get; }
 
         /// <summary>
-        ///     The command data payload.
+        ///     Represents the data sent within this interaction.
         /// </summary>
-        IApplicationCommandInteractionData? Data { get; }
+        object Data { get; }
 
         /// <summary>
         ///     A continuation token for responding to the interaction.

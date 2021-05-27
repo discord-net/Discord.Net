@@ -11,7 +11,7 @@ namespace Discord.WebSocket
     /// <summary>
     ///     Represents a Websocket-based <see cref="IApplicationCommandInteractionDataOption"/> recieved by the gateway
     /// </summary>
-    public class SocketInteractionDataOption : IApplicationCommandInteractionDataOption
+    public class SocketSlashCommandDataOption : IApplicationCommandInteractionDataOption
     {
         /// <inheritdoc/>
         public string Name { get; private set; }
@@ -22,13 +22,13 @@ namespace Discord.WebSocket
         /// <summary>
         ///      The sub command options recieved for this sub command group.
         /// </summary>
-        public IReadOnlyCollection<SocketInteractionDataOption> Options { get; private set; }
+        public IReadOnlyCollection<SocketSlashCommandDataOption> Options { get; private set; }
 
         private DiscordSocketClient discord;
         private ulong guild;
 
-        internal SocketInteractionDataOption() { }
-        internal SocketInteractionDataOption(Model model, DiscordSocketClient discord, ulong guild)
+        internal SocketSlashCommandDataOption() { }
+        internal SocketSlashCommandDataOption(Model model, DiscordSocketClient discord, ulong guild)
         {
             this.Name = model.Name;
             this.Value = model.Value.IsSpecified ? model.Value.Value : null;
@@ -36,19 +36,19 @@ namespace Discord.WebSocket
             this.guild = guild;
 
             this.Options = model.Options.IsSpecified
-                ? model.Options.Value.Select(x => new SocketInteractionDataOption(x, discord, guild)).ToImmutableArray()
+                ? model.Options.Value.Select(x => new SocketSlashCommandDataOption(x, discord, guild)).ToImmutableArray()
                 : null;
         }
 
         // Converters
-        public static explicit operator bool(SocketInteractionDataOption option)
+        public static explicit operator bool(SocketSlashCommandDataOption option)
             => (bool)option.Value;
-        public static explicit operator int(SocketInteractionDataOption option)
+        public static explicit operator int(SocketSlashCommandDataOption option)
             => (int)option.Value;
-        public static explicit operator string(SocketInteractionDataOption option)
+        public static explicit operator string(SocketSlashCommandDataOption option)
             => option.Value.ToString();
 
-        public static explicit operator SocketGuildChannel(SocketInteractionDataOption option)
+        public static explicit operator SocketGuildChannel(SocketSlashCommandDataOption option)
         {
             if (option.Value is ulong id)
             {
@@ -63,7 +63,7 @@ namespace Discord.WebSocket
             return null;
         }
 
-        public static explicit operator SocketRole(SocketInteractionDataOption option)
+        public static explicit operator SocketRole(SocketSlashCommandDataOption option)
         {
             if (option.Value is ulong id)
             {
@@ -78,7 +78,7 @@ namespace Discord.WebSocket
             return null;
         }
 
-        public static explicit operator SocketGuildUser(SocketInteractionDataOption option)
+        public static explicit operator SocketGuildUser(SocketSlashCommandDataOption option)
         {
             if(option.Value is ulong id)
             {

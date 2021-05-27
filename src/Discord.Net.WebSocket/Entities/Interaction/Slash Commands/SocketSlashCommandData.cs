@@ -8,27 +8,27 @@ using Model = Discord.API.ApplicationCommandInteractionData;
 
 namespace Discord.WebSocket
 {
-    public class SocketInteractionData : SocketEntity<ulong>, IApplicationCommandInteractionData
+    public class SocketSlashCommandData : SocketEntity<ulong>, IApplicationCommandInteractionData
     {
         /// <inheritdoc/>
         public string Name { get; private set; }
 
         /// <summary>
-        ///     The <see cref="SocketInteractionDataOption"/>'s recieved with this interaction.
+        ///     The <see cref="SocketSlashCommandDataOption"/>'s recieved with this interaction.
         /// </summary>
-        public IReadOnlyCollection<SocketInteractionDataOption> Options { get; private set; }
+        public IReadOnlyCollection<SocketSlashCommandDataOption> Options { get; private set; }
 
         private ulong guildId;
 
-        internal SocketInteractionData(DiscordSocketClient client, ulong id)
+        internal SocketSlashCommandData(DiscordSocketClient client, ulong id)
             : base(client, id)
         {
 
         }
 
-        internal static SocketInteractionData Create(DiscordSocketClient client, Model model, ulong guildId)
+        internal static SocketSlashCommandData Create(DiscordSocketClient client, Model model, ulong guildId)
         {
-            var entity = new SocketInteractionData(client, model.Id);
+            var entity = new SocketSlashCommandData(client, model.Id);
             entity.Update(model, guildId);
             return entity;
         }
@@ -38,7 +38,7 @@ namespace Discord.WebSocket
             this.guildId = guildId;
 
             this.Options = model.Options.IsSpecified
-                ? model.Options.Value.Select(x => new SocketInteractionDataOption(x, this.Discord, guildId)).ToImmutableArray()
+                ? model.Options.Value.Select(x => new SocketSlashCommandDataOption(x, this.Discord, guildId)).ToImmutableArray()
                 : null;
         }
 
