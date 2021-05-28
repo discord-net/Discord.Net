@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Model = Discord.API.ApplicationCommandInteractionDataOption;
 
 namespace Discord.WebSocket
@@ -20,7 +17,7 @@ namespace Discord.WebSocket
         public object Value { get; private set; }
 
         /// <summary>
-        ///      The sub command options recieved for this sub command group.
+        ///      The sub command options received for this sub command group.
         /// </summary>
         public IReadOnlyCollection<SocketSlashCommandDataOption> Options { get; private set; }
 
@@ -35,8 +32,8 @@ namespace Discord.WebSocket
             this.discord = discord;
             this.guild = guild;
 
-            this.Options = model.Options.IsSpecified
-                ? model.Options.Value.Select(x => new SocketSlashCommandDataOption(x, discord, guild)).ToImmutableArray()
+            this.Options = model.Options.Any()
+                ? model.Options.Select(x => new SocketSlashCommandDataOption(x, discord, guild)).ToImmutableArray()
                 : null;
         }
 

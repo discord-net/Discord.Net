@@ -1,9 +1,5 @@
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord.API
 {
@@ -16,6 +12,6 @@ namespace Discord.API
         public string Name { get; set; }
 
         [JsonProperty("options")]
-        public Optional<ApplicationCommandInteractionDataOption[]> Options { get; set; } 
+        public List<ApplicationCommandInteractionDataOption> Options { get; set; } = new();
     }
 }

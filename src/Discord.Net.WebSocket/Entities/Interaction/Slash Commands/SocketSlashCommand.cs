@@ -1,12 +1,9 @@
 using Discord.Rest;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Model = Discord.API.Gateway.InteractionCreated;
 using DataModel = Discord.API.ApplicationCommandInteractionData;
+using Model = Discord.API.Gateway.InteractionCreated;
 
 namespace Discord.WebSocket
 {
@@ -40,7 +37,7 @@ namespace Discord.WebSocket
                 (model.Data.Value as JToken).ToObject<DataModel>()
                 : null;
 
-            this.Data.Update(data, this.Guild.Id);
+            this.Data.Update(data, model.GuildId);
 
             base.Update(model);
         }
