@@ -9,14 +9,12 @@ namespace Discord
 {
     public class ActionRowComponent : IMessageComponent
     {
-        [JsonProperty("type")]
         public ComponentType Type { get; } = ComponentType.ActionRow;
 
-        [JsonProperty("components")]
-        public IReadOnlyCollection<IMessageComponent> Components { get; internal set; }
+        public IReadOnlyCollection<ButtonComponent> Components { get; internal set; }
 
         internal ActionRowComponent() { }
-        internal ActionRowComponent(IReadOnlyCollection<IMessageComponent> components)
+        internal ActionRowComponent(List<ButtonComponent> components)
         {
             this.Components = components;
         }

@@ -87,7 +87,7 @@ namespace Discord
     public class ActionRowBuilder
     {
         public const int MaxChildCount = 5;
-        public List<IMessageComponent> Components
+        public List<ButtonComponent> Components
         {
             get => _components;
             set
@@ -99,18 +99,18 @@ namespace Discord
             }
         }
 
-        private List<IMessageComponent> _components { get; set; }
+        private List<ButtonComponent> _components { get; set; }
 
-        public ActionRowBuilder WithComponents(List<IMessageComponent> components)
+        public ActionRowBuilder WithComponents(List<ButtonComponent> components)
         {
             this.Components = components;
             return this;
         }
 
-        public ActionRowBuilder WithComponent(IMessageComponent component)
+        public ActionRowBuilder WithComponent(ButtonComponent component)
         {
             if (this.Components == null)
-                this.Components = new List<IMessageComponent>();
+                this.Components = new List<ButtonComponent>();
 
             this.Components.Add(component);
 
@@ -118,7 +118,15 @@ namespace Discord
         }
 
         public ActionRowComponent Build()
-            => new ActionRowComponent(this._components);
+        {
+            if (this.Components == null)
+                throw new ArgumentNullException($"{nameof(Components)} cannot be null!");
+
+            if (this.Components.Count == 0)
+                throw new ArgumentException("There must be at least 1 component in a row");
+
+            return new ActionRowComponent(this._components);
+        }
     }
 
     public class ButtonBuilder

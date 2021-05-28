@@ -8,7 +8,7 @@ namespace Discord
 {
     public class MessageComponent
     {
-        public IReadOnlyCollection<IMessageComponent> Components { get; }
+        public IReadOnlyCollection<ActionRowComponent> Components { get; }
 
         internal MessageComponent(List<ActionRowComponent> components)
         {
@@ -17,8 +17,5 @@ namespace Discord
 
         internal static MessageComponent Empty
             => new MessageComponent(new List<ActionRowComponent>());
-
-        internal IMessageComponent[] ToModel()
-            => this.Components.ToArray();
     }
 }

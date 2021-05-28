@@ -129,9 +129,16 @@ namespace Discord.Rest
 
             if (model.Components.IsSpecified)
             {
-                Components = model.Components.Value.Select(x =>
-                    (x as Newtonsoft.Json.Linq.JToken).ToObject<ActionRowComponent>()
-                ).ToList();
+                Components = model.Components.Value.Select(x => new ActionRowComponent(x.Components.Select(x =>
+                    new ButtonComponent(
+                        x.Style,
+                        x.Label,
+                        x.Emote.Id.HasValue ? new Emote(x.Emote.Id.Value, x.Emote.Name, x.Emote.Animated.GetValueOrDefault()) : new Emoji(x.Emote.Name),
+                        x.CustomId,
+                        x.Url,
+                        x.Disabled)
+                    ).ToList()
+               )).ToList();
             }
             else
                 Components = new List<ActionRowComponent>();

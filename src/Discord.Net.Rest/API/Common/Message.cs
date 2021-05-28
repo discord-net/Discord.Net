@@ -59,6 +59,6 @@ namespace Discord.API
         [JsonProperty("referenced_message")]
         public Optional<Message> ReferencedMessage { get; set; }
         [JsonProperty("components")]
-        public Optional<IMessageComponent[]> Components { get; set; }
+        public Optional<API.ActionRowComponent[]> Components { get; set; }
     }
 }

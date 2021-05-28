@@ -110,7 +110,7 @@ namespace Discord.WebSocket
                         ? new API.Embed[] { embed.ToModel() }
                         : Optional<API.Embed[]>.Unspecified,
                     TTS = isTTS,
-                    Components = component?.ToModel() ?? Optional<IMessageComponent[]>.Unspecified
+                    Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
                 }
             };
 
@@ -149,7 +149,7 @@ namespace Discord.WebSocket
                 Embeds = embed != null
                         ? new API.Embed[] { embed.ToModel() }
                         : Optional<API.Embed[]>.Unspecified,
-                Components = component?.ToModel() ?? Optional<IMessageComponent[]>.Unspecified
+                Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
             };
 
             if (ephemeral)
