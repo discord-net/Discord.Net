@@ -124,11 +124,11 @@ namespace Discord.WebSocket
         ///     <code language="cs" region="MessageDeleted"
         ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs" />
         /// </example>
-        public event Func<Cacheable<IMessage, ulong>, Cacheable<ISocketMessageChannel, ulong>, Task> MessageDeleted {
+        public event Func<Cacheable<IMessage, ulong>, Cacheable<IMessageChannel, ulong>, Task> MessageDeleted {
             add { _messageDeletedEvent.Add(value); }
             remove { _messageDeletedEvent.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<Cacheable<IMessage, ulong>, Cacheable<ISocketMessageChannel, ulong>, Task>> _messageDeletedEvent = new AsyncEvent<Func<Cacheable<IMessage, ulong>, Cacheable<ISocketMessageChannel, ulong>, Task>>();
+        internal readonly AsyncEvent<Func<Cacheable<IMessage, ulong>, Cacheable<IMessageChannel, ulong>, Task>> _messageDeletedEvent = new AsyncEvent<Func<Cacheable<IMessage, ulong>, Cacheable<IMessageChannel, ulong>, Task>>();
         /// <summary> Fired when multiple messages are bulk deleted. </summary>
         /// <remarks>
         ///     <note>
@@ -155,12 +155,12 @@ namespace Discord.WebSocket
         ///         <see cref="ISocketMessageChannel"/> parameter.
         ///     </para>
         /// </remarks>
-        public event Func<IReadOnlyCollection<Cacheable<IMessage, ulong>>, Cacheable<ISocketMessageChannel, ulong>, Task> MessagesBulkDeleted
+        public event Func<IReadOnlyCollection<Cacheable<IMessage, ulong>>, Cacheable<IMessageChannel, ulong>, Task> MessagesBulkDeleted
         {
             add { _messagesBulkDeletedEvent.Add(value); }
             remove { _messagesBulkDeletedEvent.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<IReadOnlyCollection<Cacheable<IMessage, ulong>>, Cacheable<ISocketMessageChannel, ulong>, Task>> _messagesBulkDeletedEvent = new AsyncEvent<Func<IReadOnlyCollection<Cacheable<IMessage, ulong>>, Cacheable<ISocketMessageChannel, ulong>, Task>>();
+        internal readonly AsyncEvent<Func<IReadOnlyCollection<Cacheable<IMessage, ulong>>, Cacheable<IMessageChannel, ulong>, Task>> _messagesBulkDeletedEvent = new AsyncEvent<Func<IReadOnlyCollection<Cacheable<IMessage, ulong>>, Cacheable<IMessageChannel, ulong>, Task>>();
         /// <summary> Fired when a message is updated. </summary>
         /// <remarks>
         ///     <para>
@@ -182,11 +182,11 @@ namespace Discord.WebSocket
         ///         <see cref="ISocketMessageChannel"/> parameter.
         ///     </para>
         /// </remarks>
-        public event Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task> MessageUpdated {
+        public event Func<Cacheable<IMessage, ulong>, SocketMessage, IMessageChannel, Task> MessageUpdated {
             add { _messageUpdatedEvent.Add(value); }
             remove { _messageUpdatedEvent.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task>> _messageUpdatedEvent = new AsyncEvent<Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task>>();
+        internal readonly AsyncEvent<Func<Cacheable<IMessage, ulong>, SocketMessage, IMessageChannel, Task>> _messageUpdatedEvent = new AsyncEvent<Func<Cacheable<IMessage, ulong>, SocketMessage, IMessageChannel, Task>>();
         /// <summary> Fired when a reaction is added to a message. </summary>
         /// <remarks>
         ///     <para>
@@ -217,23 +217,23 @@ namespace Discord.WebSocket
         ///     <code language="cs" region="ReactionAdded"
         ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
         /// </example>
-        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<ISocketMessageChannel, ulong>, SocketReaction, Task> ReactionAdded {
+        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task> ReactionAdded {
             add { _reactionAddedEvent.Add(value); }
             remove { _reactionAddedEvent.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<ISocketMessageChannel, ulong>, SocketReaction, Task>> _reactionAddedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<ISocketMessageChannel, ulong>, SocketReaction, Task>>();
+        internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task>> _reactionAddedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task>>();
         /// <summary> Fired when a reaction is removed from a message. </summary>
-        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<ISocketMessageChannel, ulong>, SocketReaction, Task> ReactionRemoved {
+        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task> ReactionRemoved {
             add { _reactionRemovedEvent.Add(value); }
             remove { _reactionRemovedEvent.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<ISocketMessageChannel, ulong>, SocketReaction, Task>> _reactionRemovedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<ISocketMessageChannel, ulong>, SocketReaction, Task>>();
+        internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task>> _reactionRemovedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task>>();
         /// <summary> Fired when all reactions to a message are cleared. </summary>
-        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<ISocketMessageChannel, ulong>, Task> ReactionsCleared {
+        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, Task> ReactionsCleared {
             add { _reactionsClearedEvent.Add(value); }
             remove { _reactionsClearedEvent.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<ISocketMessageChannel, ulong>, Task>> _reactionsClearedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<ISocketMessageChannel, ulong>, Task>>();
+        internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, Task>> _reactionsClearedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, Task>>();
         /// <summary>
         ///     Fired when all reactions to a message with a specific emote are removed.
         /// </summary>
@@ -250,12 +250,12 @@ namespace Discord.WebSocket
         ///         The emoji that all reactions had and were removed will be passed into the <see cref="IEmote"/> parameter.
         ///     </para>
         /// </remarks>
-        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<ISocketMessageChannel, ulong>, IEmote, Task> ReactionsRemovedForEmote
+        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, IEmote, Task> ReactionsRemovedForEmote
         {
             add { _reactionsRemovedForEmoteEvent.Add(value); }
             remove { _reactionsRemovedForEmoteEvent.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<ISocketMessageChannel, ulong>, IEmote, Task>> _reactionsRemovedForEmoteEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<ISocketMessageChannel, ulong>, IEmote, Task>>();
+        internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, IEmote, Task>> _reactionsRemovedForEmoteEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, IEmote, Task>>();
 
         //Roles
         /// <summary> Fired when a role is created. </summary>
@@ -372,11 +372,11 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<SocketSelfUser, SocketSelfUser, Task>> _selfUpdatedEvent = new AsyncEvent<Func<SocketSelfUser, SocketSelfUser, Task>>();
         /// <summary> Fired when a user starts typing. </summary>
-        public event Func<Cacheable<IUser, ulong>, Cacheable<ISocketMessageChannel, ulong>, Task> UserIsTyping {
+        public event Func<Cacheable<IUser, ulong>, Cacheable<IMessageChannel, ulong>, Task> UserIsTyping {
             add { _userIsTypingEvent.Add(value); }
             remove { _userIsTypingEvent.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<Cacheable<IUser, ulong>, Cacheable<ISocketMessageChannel, ulong>, Task>> _userIsTypingEvent = new AsyncEvent<Func<Cacheable<IUser, ulong>, Cacheable<ISocketMessageChannel, ulong>, Task>>();
+        internal readonly AsyncEvent<Func<Cacheable<IUser, ulong>, Cacheable<IMessageChannel, ulong>, Task>> _userIsTypingEvent = new AsyncEvent<Func<Cacheable<IUser, ulong>, Cacheable<IMessageChannel, ulong>, Task>>();
         /// <summary> Fired when a user joins a group channel. </summary>
         public event Func<SocketGroupUser, Task> RecipientAdded {
             add { _recipientAddedEvent.Add(value); }

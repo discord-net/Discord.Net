@@ -1418,7 +1418,7 @@ namespace Discord.WebSocket
                                     if (channel != null)
                                         msg = SocketChannelHelper.RemoveMessage(channel, this, data.Id);
                                     var cacheableMsg = new Cacheable<IMessage, ulong>(msg, data.Id, msg != null, () => Task.FromResult((IMessage)null));
-                                    var cacheableChannel = new Cacheable<ISocketMessageChannel, ulong>(channel, data.ChannelId, channel != null, async () => await GetChannelAsync(data.Id).ConfigureAwait(false) as ISocketMessageChannel);
+                                    var cacheableChannel = new Cacheable<IMessageChannel, ulong>(channel, data.ChannelId, channel != null, async () => await GetChannelAsync(data.ChannelId).ConfigureAwait(false) as IMessageChannel);
 
                                     await TimedInvokeAsync(_messageDeletedEvent, nameof(MessageDeleted), cacheableMsg, cacheableChannel).ConfigureAwait(false);
                                 }
@@ -1430,9 +1430,11 @@ namespace Discord.WebSocket
                                     var data = (payload as JToken).ToObject<API.Gateway.Reaction>(_serializer);
                                     var channel = GetChannel(data.ChannelId) as ISocketMessageChannel;
 
-                                    var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
+                                    var cachedMsg = channel?.GetCachedMessage(data.MessageId) as SocketUserMessage;
                                     bool isMsgCached = cachedMsg != null;
-                                    var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly).ConfigureAwait(false);
+                                    IUser user = null;
+                                    if (channel != null)
+                                        user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly).ConfigureAwait(false);
 
                                     var optionalMsg = !isMsgCached
                                         ? Optional.Create<SocketUserMessage>()
@@ -1445,12 +1447,14 @@ namespace Discord.WebSocket
                                         if (guild != null)
                                             user = guild.AddOrUpdateUser(data.Member.Value);
                                     }
+                                    else
+                                        user = GetUser(data.UserId);
 
                                     var optionalUser = user is null
                                         ? Optional.Create<IUser>()
                                         : Optional.Create(user);
 
-                                    var cacheableChannel = new Cacheable<ISocketMessageChannel, ulong>(channel, data.ChannelId, channel != null, async () => await GetChannelAsync(data.ChannelId).ConfigureAwait(false) as ISocketMessageChannel);
+                                    var cacheableChannel = new Cacheable<IMessageChannel, ulong>(channel, data.ChannelId, channel != null, async () => await GetChannelAsync(data.ChannelId).ConfigureAwait(false) as IMessageChannel);
                                     var cacheableMsg = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isMsgCached, async () =>
                                     {
                                         var channelObj = await cacheableChannel.GetOrDownloadAsync().ConfigureAwait(false);
@@ -1470,9 +1474,13 @@ namespace Discord.WebSocket
                                     var data = (payload as JToken).ToObject<API.Gateway.Reaction>(_serializer);
                                     var channel = GetChannel(data.ChannelId) as ISocketMessageChannel;
 
-                                    var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
+                                    var cachedMsg = channel?.GetCachedMessage(data.MessageId) as SocketUserMessage;
                                     bool isMsgCached = cachedMsg != null;
-                                    var user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly).ConfigureAwait(false);
+                                    IUser user = null;
+                                    if (channel != null)
+                                        user = await channel.GetUserAsync(data.UserId, CacheMode.CacheOnly).ConfigureAwait(false);
+                                    else if (!data.GuildId.IsSpecified)
+                                        user = GetUser(data.UserId);
 
                                     var optionalMsg = !isMsgCached
                                         ? Optional.Create<SocketUserMessage>()
@@ -1482,7 +1490,7 @@ namespace Discord.WebSocket
                                         ? Optional.Create<IUser>()
                                         : Optional.Create(user);
 
-                                    var cacheableChannel = new Cacheable<ISocketMessageChannel, ulong>(channel, data.ChannelId, channel != null, async () => await GetChannelAsync(data.ChannelId).ConfigureAwait(false) as ISocketMessageChannel);
+                                    var cacheableChannel = new Cacheable<IMessageChannel, ulong>(channel, data.ChannelId, channel != null, async () => await GetChannelAsync(data.ChannelId).ConfigureAwait(false) as IMessageChannel);
                                     var cacheableMsg = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isMsgCached, async () =>
                                     {
                                         var channelObj = await cacheableChannel.GetOrDownloadAsync().ConfigureAwait(false);
@@ -1502,8 +1510,8 @@ namespace Discord.WebSocket
                                     var data = (payload as JToken).ToObject<RemoveAllReactionsEvent>(_serializer);
                                     var channel = GetChannel(data.ChannelId) as ISocketMessageChannel;
 
-                                    var cacheableChannel = new Cacheable<ISocketMessageChannel, ulong>(channel, data.ChannelId, channel != null, async () => await GetChannelAsync(data.ChannelId).ConfigureAwait(false) as ISocketMessageChannel);
-                                    var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
+                                    var cacheableChannel = new Cacheable<IMessageChannel, ulong>(channel, data.ChannelId, channel != null, async () => await GetChannelAsync(data.ChannelId).ConfigureAwait(false) as IMessageChannel);
+                                    var cachedMsg = channel?.GetCachedMessage(data.MessageId) as SocketUserMessage;
                                     bool isMsgCached = cachedMsg != null;
                                     var cacheableMsg = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isMsgCached, async () =>
                                     {
@@ -1523,14 +1531,14 @@ namespace Discord.WebSocket
                                     var data = (payload as JToken).ToObject<API.Gateway.RemoveAllReactionsForEmoteEvent>(_serializer);
                                     var channel = GetChannel(data.ChannelId) as ISocketMessageChannel;
 
-                                    var cachedMsg = channel.GetCachedMessage(data.MessageId) as SocketUserMessage;
+                                    var cachedMsg = channel?.GetCachedMessage(data.MessageId) as SocketUserMessage;
                                     bool isMsgCached = cachedMsg != null;
 
                                     var optionalMsg = !isMsgCached
                                         ? Optional.Create<SocketUserMessage>()
                                         : Optional.Create(cachedMsg);
 
-                                    var cacheableChannel = new Cacheable<ISocketMessageChannel, ulong>(channel, data.ChannelId, channel != null, async () => await GetChannelAsync(data.ChannelId).ConfigureAwait(false) as ISocketMessageChannel);
+                                    var cacheableChannel = new Cacheable<IMessageChannel, ulong>(channel, data.ChannelId, channel != null, async () => await GetChannelAsync(data.ChannelId).ConfigureAwait(false) as IMessageChannel);
                                     var cacheableMsg = new Cacheable<IUserMessage, ulong>(cachedMsg, data.MessageId, isMsgCached, async () =>
                                     {
                                         var channelObj = await cacheableChannel.GetOrDownloadAsync().ConfigureAwait(false);
@@ -1557,7 +1565,7 @@ namespace Discord.WebSocket
                                         return;
                                     }
 
-                                    var cacheableChannel = new Cacheable<ISocketMessageChannel, ulong>(channel, data.ChannelId, channel != null, async () => await GetChannelAsync(data.ChannelId).ConfigureAwait(false) as ISocketMessageChannel);
+                                    var cacheableChannel = new Cacheable<IMessageChannel, ulong>(channel, data.ChannelId, channel != null, async () => await GetChannelAsync(data.ChannelId).ConfigureAwait(false) as IMessageChannel);
                                     var cacheableList = new List<Cacheable<IMessage, ulong>>(data.Ids.Length);
                                     foreach (ulong id in data.Ids)
                                     {
@@ -1647,7 +1655,7 @@ namespace Discord.WebSocket
                                         return;
                                     }
 
-                                    var cacheableChannel = new Cacheable<ISocketMessageChannel, ulong>(channel, data.ChannelId, channel != null, async () => await GetChannelAsync(data.ChannelId).ConfigureAwait(false) as ISocketMessageChannel);
+                                    var cacheableChannel = new Cacheable<IMessageChannel, ulong>(channel, data.ChannelId, channel != null, async () => await GetChannelAsync(data.ChannelId).ConfigureAwait(false) as IMessageChannel);
 
                                     var user = (channel as SocketChannel)?.GetUser(data.UserId);
                                     if (user == null)
