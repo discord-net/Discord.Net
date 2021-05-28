@@ -1,12 +1,10 @@
 using Discord.Rest;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Model = Discord.API.Gateway.InteractionCreated;
 using DataModel = Discord.API.ApplicationCommandInteractionData;
+using Model = Discord.API.Gateway.InteractionCreated;
 
 namespace Discord.WebSocket
 {
