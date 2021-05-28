@@ -422,7 +422,8 @@ namespace Discord
 
             if (this.Style == ButtonStyle.Link && !string.IsNullOrEmpty(this.CustomId))
                 this.CustomId = null;
-            else if (!string.IsNullOrEmpty(this.Url))
+
+            else if (this.Style != ButtonStyle.Link && !string.IsNullOrEmpty(this.Url)) // Thanks 𝑴𝒓𝑪𝒂𝒌𝒆𝑺𝒍𝒂𝒚𝒆𝒓 :D
                 this.Url = null;
 
             return new ButtonComponent(this.Style, this.Label, this.Emote, this.CustomId, this.Url, this.Disabled);
