@@ -194,10 +194,6 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        internal override async Task OnLoginAsync(TokenType tokenType, string token)
-        {
-        }
-        /// <inheritdoc />
         internal override async Task OnLogoutAsync()
         {
             await StopAsync().ConfigureAwait(false);
