@@ -10,10 +10,19 @@ using Discord.Rest;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a Websocket-based interaction type for Message Components.
+    /// </summary>
     public class SocketMessageComponent : SocketInteraction
     {
+        /// <summary>
+        ///     The data received with this interaction, contains the button that was clicked.
+        /// </summary>
         new public SocketMessageComponentData Data { get; }
 
+        /// <summary>
+        ///     The message that contained the trigger for this interaction.
+        /// </summary>
         public SocketMessage Message { get; private set; }
 
         internal SocketMessageComponent(DiscordSocketClient client, Model model)
@@ -72,7 +81,6 @@ namespace Discord.WebSocket
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
-
         public override async Task<RestUserMessage> RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
             bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
         {
