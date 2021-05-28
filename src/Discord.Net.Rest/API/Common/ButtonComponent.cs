@@ -42,23 +42,25 @@ namespace Discord.API
             this.Url = c.Url;
             this.Disabled = c.Disabled;
 
-            if (c.Emote is Emote e)
+            if (c.Emote != null)
             {
-                this.Emote = new Emoji()
+                if (c.Emote is Emote e)
                 {
-                    Name = e.Name,
-                    Animated = e.Animated,
-                    Id = e.Id,
-                };
+                    this.Emote = new Emoji()
+                    {
+                        Name = e.Name,
+                        Animated = e.Animated,
+                        Id = e.Id,
+                    };
+                }
+                else
+                {
+                    this.Emote = new Emoji()
+                    {
+                        Name = c.Emote.Name
+                    };
+                }
             }
-            else
-            {
-                this.Emote = new Emoji()
-                {
-                    Name = c.Emote.Name
-                };
-            } 
-
         }
     }
 }
