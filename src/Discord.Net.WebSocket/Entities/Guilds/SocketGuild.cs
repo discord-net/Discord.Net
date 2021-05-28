@@ -387,7 +387,8 @@ namespace Discord.WebSocket
                 for (int i = 0; i < model.Members.Length; i++)
                 {
                     var member = SocketGuildUser.Create(this, state, model.Members[i]);
-                    members.TryAdd(member.Id, member);
+                    if (members.TryAdd(member.Id, member))
+                        member.GlobalUser.AddRef();
                 }
                 DownloadedMemberCount = members.Count;
 
@@ -482,7 +483,7 @@ namespace Discord.WebSocket
             }
             _roles = roles;
         }
-        internal void Update(ClientState state, GuildSyncModel model)
+        /*internal void Update(ClientState state, GuildSyncModel model) //TODO remove? userbot related
         {
             var members = new ConcurrentDictionary<ulong, SocketGuildUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Members.Length * 1.05));
             {
@@ -502,9 +503,9 @@ namespace Discord.WebSocket
             _members = members;
 
             var _ = _syncPromise.TrySetResultAsync(true);
-            /*if (!model.Large)
-                _ = _downloaderPromise.TrySetResultAsync(true);*/
-        }
+            //if (!model.Large)
+            //    _ = _downloaderPromise.TrySetResultAsync(true);
+        }*/
 
         internal void Update(ClientState state, EmojiUpdateModel model)
         {
@@ -842,16 +843,10 @@ namespace Discord.WebSocket
             else
             {
                 member = SocketGuildUser.Create(this, Discord.State, model);
-                if (member == null)
-                    throw new InvalidOperationException("SocketGuildUser.Create failed to produce a member"); // TODO 2.2rel: delete this
-                if (member.GlobalUser == null)
-                    throw new InvalidOperationException("Member was created without global user"); // TODO 2.2rel: delete this
                 member.GlobalUser.AddRef();
                 _members[member.Id] = member;
                 DownloadedMemberCount++;
             }
-            if (member == null)
-                throw new InvalidOperationException("AddOrUpdateUser failed to produce a user"); // TODO 2.2rel: delete this
             return member;
         }
         internal SocketGuildUser AddOrUpdateUser(PresenceModel model)
@@ -885,6 +880,7 @@ namespace Discord.WebSocket
             if (self != null)
                 _members.TryAdd(self.Id, self);
 
+            _downloaderPromise = new TaskCompletionSource<bool>();
             DownloadedMemberCount = _members.Count;
 
             foreach (var member in members)
