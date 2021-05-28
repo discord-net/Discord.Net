@@ -40,7 +40,9 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Provides access to a REST-only client with a shared state from this client.
         /// </summary>
-        public override DiscordSocketRestClient Rest => _shards[0].Rest;
+        public override DiscordSocketRestClient Rest => _shards?[0].Rest;
+
+        public override SocketSelfUser CurrentUser { get => _shards?.FirstOrDefault(x => x.CurrentUser != null)?.CurrentUser; protected set => throw new InvalidOperationException(); }
 
         /// <summary> Creates a new REST/WebSocket Discord client. </summary>
         public DiscordShardedClient() : this(null, new DiscordSocketConfig()) { }
@@ -330,14 +332,6 @@ namespace Discord.WebSocket
                 }
                 return Task.Delay(0);
             };
-            if (isPrimary)
-            {
-                client.Ready += () =>
-                {
-                    CurrentUser = client.CurrentUser;
-                    return Task.Delay(0);
-                };
-            }
 
             client.Connected += () => _shardConnectedEvent.InvokeAsync(client);
             client.Disconnected += (exception) => _shardDisconnectedEvent.InvokeAsync(exception, client);

@@ -47,7 +47,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets the current logged-in user.
         /// </summary>
-        public new SocketSelfUser CurrentUser { get => base.CurrentUser as SocketSelfUser; protected set => base.CurrentUser = value; }
+        public virtual new SocketSelfUser CurrentUser { get => base.CurrentUser as SocketSelfUser; protected set => base.CurrentUser = value; }
         /// <summary>
         ///     Gets a collection of guilds that the user is currently in.
         /// </summary>
