@@ -1359,36 +1359,42 @@ namespace Discord.WebSocket
                                     {
                                         //Edited message isnt in cache, create a detached one
                                         SocketUser author;
-                                        if (guild != null)
-                                        {
-                                            if (data.WebhookId.IsSpecified)
-                                                author = SocketWebhookUser.Create(guild, State, data.Author.Value, data.WebhookId.Value);
-                                            else
-                                                author = guild.GetUser(data.Author.Value.Id);
-                                        }
-                                        else
-                                            author = (channel as SocketChannel).GetUser(data.Author.Value.Id);
-
-                                        if (author == null)
+                                        if (data.Author.IsSpecified)
                                         {
                                             if (guild != null)
                                             {
-                                                if (data.Member.IsSpecified) // member isn't always included, but use it when we can
-                                                {
-                                                    data.Member.Value.User = data.Author.Value;
-                                                    author = guild.AddOrUpdateUser(data.Member.Value);
-                                                }
+                                                if (data.WebhookId.IsSpecified)
+                                                    author = SocketWebhookUser.Create(guild, State, data.Author.Value, data.WebhookId.Value);
                                                 else
-                                                    author = guild.AddOrUpdateUser(data.Author.Value); // user has no guild-specific data
+                                                    author = guild.GetUser(data.Author.Value.Id);
                                             }
-                                            else if (channel is SocketGroupChannel groupChannel)
-                                                author = groupChannel.GetOrAddUser(data.Author.Value);
                                             else
+                                                author = (channel as SocketChannel).GetUser(data.Author.Value.Id);
+
+                                            if (author == null)
                                             {
-                                                await UnknownChannelUserAsync(type, data.Author.Value.Id, channel.Id).ConfigureAwait(false);
-                                                return;
+                                                if (guild != null)
+                                                {
+                                                    if (data.Member.IsSpecified) // member isn't always included, but use it when we can
+                                                    {
+                                                        data.Member.Value.User = data.Author.Value;
+                                                        author = guild.AddOrUpdateUser(data.Member.Value);
+                                                    }
+                                                    else
+                                                        author = guild.AddOrUpdateUser(data.Author.Value); // user has no guild-specific data
+                                                }
+                                                else if (channel is SocketGroupChannel groupChannel)
+                                                    author = groupChannel.GetOrAddUser(data.Author.Value);
+                                                else
+                                                {
+                                                    await UnknownChannelUserAsync(type, data.Author.Value.Id, channel.Id).ConfigureAwait(false);
+                                                    return;
+                                                }
                                             }
                                         }
+                                        else
+                                            // Message author wasn't specified in the payload, so create a completely anonymous unknown user
+                                            author = new SocketUnknownUser(this, id: 0);
 
                                         after = SocketMessage.Create(this, State, author, channel, data);
                                     }
