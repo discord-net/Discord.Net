@@ -14,6 +14,8 @@ namespace Discord.WebSocket
     {
         new public SocketMessageComponentData Data { get; }
 
+        public SocketMessage Message { get; private set; }
+
         internal SocketMessageComponent(DiscordSocketClient client, Model model)
             : base(client, model.Id)
         {
@@ -22,6 +24,8 @@ namespace Discord.WebSocket
                 : null;
 
             this.Data = new SocketMessageComponentData(dataModel);
+
+
         }
 
         new internal static SocketMessageComponent Create(DiscordSocketClient client, Model model)
@@ -29,6 +33,23 @@ namespace Discord.WebSocket
             var entity = new SocketMessageComponent(client, model);
             entity.Update(model);
             return entity;
+        }
+
+        internal override void Update(Model model)
+        {
+            base.Update(model);
+
+            if (model.Message.IsSpecified)
+            {
+                if (this.Message == null)
+                {
+                    this.Message = SocketMessage.Create(this.Discord, this.Discord.State, this.User, this.Channel, model.Message.Value);
+                }
+                else
+                {
+                    this.Message.Update(this.Discord.State, model.Message.Value);
+                }
+            }
         }
 
         /// <summary>

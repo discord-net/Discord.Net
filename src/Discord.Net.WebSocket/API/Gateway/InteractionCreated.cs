@@ -13,6 +13,9 @@ namespace Discord.API.Gateway
         [JsonProperty("id")]
         public ulong Id { get; set; }
 
+        [JsonProperty("application_id")]
+        public ulong ApplicationId { get; set; }
+
         [JsonProperty("type")]
         public InteractionType Type { get; set; }
 
@@ -20,18 +23,25 @@ namespace Discord.API.Gateway
         public Optional<object> Data { get; set; }
 
         [JsonProperty("guild_id")]
-        public ulong GuildId { get; set; }
+        public Optional<ulong> GuildId { get; set; }
 
         [JsonProperty("channel_id")]
-        public ulong ChannelId { get; set; }
+        public Optional<ulong> ChannelId { get; set; }
 
         [JsonProperty("member")]
-        public GuildMember Member { get; set; }
+        public Optional<GuildMember> Member { get; set; }
+
+        [JsonProperty("user")]
+        public Optional<User> User { get; set; }
 
         [JsonProperty("token")]
         public string Token { get; set; }
 
         [JsonProperty("version")]
         public int Version { get; set; }
+
+        [JsonProperty("message")]
+        public Optional<Message> Message { get; set; }
+
     }
 }

@@ -25,18 +25,16 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<SocketSlashCommandDataOption> Options { get; private set; }
 
         private DiscordSocketClient discord;
-        private ulong guild;
 
         internal SocketSlashCommandDataOption() { }
-        internal SocketSlashCommandDataOption(Model model, DiscordSocketClient discord, ulong guild)
+        internal SocketSlashCommandDataOption(Model model, DiscordSocketClient discord)
         {
             this.Name = model.Name;
             this.Value = model.Value.IsSpecified ? model.Value.Value : null;
             this.discord = discord;
-            this.guild = guild;
 
             this.Options = model.Options.IsSpecified
-                ? model.Options.Value.Select(x => new SocketSlashCommandDataOption(x, discord, guild)).ToImmutableArray()
+                ? model.Options.Value.Select(x => new SocketSlashCommandDataOption(x, discord)).ToImmutableArray()
                 : null;
         }
 
@@ -52,7 +50,7 @@ namespace Discord.WebSocket
         {
             if (option.Value is ulong id)
             {
-                var guild = option.discord.GetGuild(option.guild);
+                var guild = option.discord.GetGuild(id);
 
                 if (guild == null)
                     return null;
@@ -67,7 +65,7 @@ namespace Discord.WebSocket
         {
             if (option.Value is ulong id)
             {
-                var guild = option.discord.GetGuild(option.guild);
+                var guild = option.discord.GetGuild(id);
 
                 if (guild == null)
                     return null;
@@ -82,7 +80,7 @@ namespace Discord.WebSocket
         {
             if(option.Value is ulong id)
             {
-                var guild = option.discord.GetGuild(option.guild);
+                var guild = option.discord.GetGuild(id);
 
                 if (guild == null)
                     return null;

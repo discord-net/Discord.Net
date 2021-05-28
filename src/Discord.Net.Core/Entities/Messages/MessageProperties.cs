@@ -21,5 +21,10 @@ namespace Discord
         ///     Gets or sets the embed the message should display.
         /// </summary>
         public Optional<Embed> Embed { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the components for this message.
+        /// </summary>
+        public Optional<MessageComponent> Components { get; set; }
     }
 }

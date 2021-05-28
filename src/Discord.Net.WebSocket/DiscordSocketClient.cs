@@ -1785,26 +1785,33 @@ namespace Discord.WebSocket
                                     await _gatewayLogger.DebugAsync("Received Dispatch (INTERACTION_CREATE)").ConfigureAwait(false);
 
                                     var data = (payload as JToken).ToObject<API.Gateway.InteractionCreated>(_serializer);
-                                    if (State.GetChannel(data.ChannelId) is SocketGuildChannel channel)
+                                    if (data.Member.IsSpecified && data.ChannelId.IsSpecified)
                                     {
-                                        var guild = channel.Guild;
-                                        if (!guild.IsSynced)
+                                        if (State.GetChannel(data.ChannelId.Value) is SocketGuildChannel channel)
                                         {
-                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                            var guild = channel.Guild;
+                                            if (!guild.IsSynced)
+                                            {
+                                                await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                                return;
+                                            }
+
+                                            var interaction = SocketInteraction.Create(this, data);
+
+                                            if (this.AlwaysAcknowledgeInteractions)
+                                                await interaction.AcknowledgeAsync().ConfigureAwait(false);
+
+                                            await TimedInvokeAsync(_interactionCreatedEvent, nameof(InteractionCreated), interaction).ConfigureAwait(false);
+                                        }
+                                        else
+                                        {
+                                            await UnknownChannelAsync(type, data.ChannelId.Value).ConfigureAwait(false);
                                             return;
                                         }
-
-                                        var interaction = SocketInteraction.Create(this, data);
-
-                                        if (this.AlwaysAcknowledgeInteractions)
-                                            await interaction.AcknowledgeAsync().ConfigureAwait(false);
-
-                                        await TimedInvokeAsync(_interactionCreatedEvent, nameof(InteractionCreated), interaction).ConfigureAwait(false);
                                     }
                                     else
                                     {
-                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
-                                        return;
+                                        // DM TODO
                                     }
                                 }
                                 break;

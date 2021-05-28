@@ -24,7 +24,7 @@ namespace Discord.WebSocket
                 (model.Data.Value as JToken).ToObject<DataModel>()
                 : null;
 
-            Data = SocketSlashCommandData.Create(client, dataModel, model.GuildId);
+            Data = SocketSlashCommandData.Create(client, dataModel, model.Id);
         }
 
         new internal static SocketInteraction Create(DiscordSocketClient client, Model model)
@@ -40,7 +40,7 @@ namespace Discord.WebSocket
                 (model.Data.Value as JToken).ToObject<DataModel>()
                 : null;
 
-            this.Data.Update(data, this.Guild.Id);
+            this.Data.Update(data);
 
             base.Update(model);
         }
