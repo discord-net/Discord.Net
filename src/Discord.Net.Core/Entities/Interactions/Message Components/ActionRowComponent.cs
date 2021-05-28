@@ -7,16 +7,21 @@ using System.Threading.Tasks;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Represents a <see cref="IMessageComponent"/> Row for child components to live in. 
+    /// </summary>
     public class ActionRowComponent : IMessageComponent
     {
-        [JsonProperty("type")]
+        /// <inheritdoc/>
         public ComponentType Type { get; } = ComponentType.ActionRow;
 
-        [JsonProperty("components")]
-        public IReadOnlyCollection<IMessageComponent> Components { get; internal set; }
+        /// <summary>
+        ///     The child components in this row.
+        /// </summary>
+        public IReadOnlyCollection<ButtonComponent> Components { get; internal set; }
 
         internal ActionRowComponent() { }
-        internal ActionRowComponent(IReadOnlyCollection<IMessageComponent> components)
+        internal ActionRowComponent(List<ButtonComponent> components)
         {
             this.Components = components;
         }

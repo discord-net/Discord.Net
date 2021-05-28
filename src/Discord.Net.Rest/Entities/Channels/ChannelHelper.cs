@@ -221,7 +221,7 @@ namespace Discord.Rest
                 }
             }
 
-            var args = new CreateMessageParams(text) { IsTTS = isTTS, Embed = embed?.ToModel(), AllowedMentions = allowedMentions?.ToModel(), MessageReference = messageReference?.ToModel(), Components = component?.ToModel() };
+            var args = new CreateMessageParams(text) { IsTTS = isTTS, Embed = embed?.ToModel(), AllowedMentions = allowedMentions?.ToModel(), MessageReference = messageReference?.ToModel(), Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified };
             var model = await client.ApiClient.CreateMessageAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }
@@ -281,7 +281,7 @@ namespace Discord.Rest
                 }
             }
 
-            var args = new UploadFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS, Embed = embed?.ToModel() ?? Optional<API.Embed>.Unspecified, AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified, MessageReference = messageReference?.ToModel() ?? Optional<API.MessageReference>.Unspecified, MessageComponent = component?.ToModel() ?? Optional<IMessageComponent[]>.Unspecified, IsSpoiler = isSpoiler };
+            var args = new UploadFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS, Embed = embed?.ToModel() ?? Optional<API.Embed>.Unspecified, AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified, MessageReference = messageReference?.ToModel() ?? Optional<API.MessageReference>.Unspecified, MessageComponent = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified, IsSpoiler = isSpoiler };
             var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }

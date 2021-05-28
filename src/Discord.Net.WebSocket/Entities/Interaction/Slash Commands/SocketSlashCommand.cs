@@ -21,7 +21,7 @@ namespace Discord.WebSocket
                 (model.Data.Value as JToken).ToObject<DataModel>()
                 : null;
 
-            Data = SocketSlashCommandData.Create(client, dataModel, model.GuildId);
+            Data = SocketSlashCommandData.Create(client, dataModel, model.Id);
         }
 
         new internal static SocketInteraction Create(DiscordSocketClient client, Model model)
@@ -37,7 +37,7 @@ namespace Discord.WebSocket
                 (model.Data.Value as JToken).ToObject<DataModel>()
                 : null;
 
-            this.Data.Update(data, model.GuildId);
+            this.Data.Update(data);
 
             base.Update(model);
         }
@@ -107,7 +107,7 @@ namespace Discord.WebSocket
                         ? new API.Embed[] { embed.ToModel() }
                         : Optional<API.Embed[]>.Unspecified,
                     TTS = isTTS,
-                    Components = component?.ToModel() ?? Optional<IMessageComponent[]>.Unspecified
+                    Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
                 }
             };
 
@@ -146,7 +146,7 @@ namespace Discord.WebSocket
                 Embeds = embed != null
                         ? new API.Embed[] { embed.ToModel() }
                         : Optional<API.Embed[]>.Unspecified,
-                Components = component?.ToModel() ?? Optional<IMessageComponent[]>.Unspecified
+                Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
             };
 
             if (ephemeral)

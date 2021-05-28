@@ -10,9 +10,20 @@ using Discord.Rest;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a Websocket-based interaction type for Message Components.
+    /// </summary>
     public class SocketMessageComponent : SocketInteraction
     {
+        /// <summary>
+        ///     The data received with this interaction, contains the button that was clicked.
+        /// </summary>
         new public SocketMessageComponentData Data { get; }
+
+        /// <summary>
+        ///     The message that contained the trigger for this interaction.
+        /// </summary>
+        public SocketMessage Message { get; private set; }
 
         internal SocketMessageComponent(DiscordSocketClient client, Model model)
             : base(client, model.Id)
@@ -22,6 +33,8 @@ namespace Discord.WebSocket
                 : null;
 
             this.Data = new SocketMessageComponentData(dataModel);
+
+
         }
 
         new internal static SocketMessageComponent Create(DiscordSocketClient client, Model model)
@@ -29,6 +42,23 @@ namespace Discord.WebSocket
             var entity = new SocketMessageComponent(client, model);
             entity.Update(model);
             return entity;
+        }
+
+        internal override void Update(Model model)
+        {
+            base.Update(model);
+
+            if (model.Message.IsSpecified)
+            {
+                if (this.Message == null)
+                {
+                    this.Message = SocketMessage.Create(this.Discord, this.Discord.State, this.User, this.Channel, model.Message.Value);
+                }
+                else
+                {
+                    this.Message.Update(this.Discord.State, model.Message.Value);
+                }
+            }
         }
 
         /// <summary>
@@ -51,7 +81,6 @@ namespace Discord.WebSocket
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
-
         public override async Task<RestUserMessage> RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
             bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
         {
@@ -94,7 +123,7 @@ namespace Discord.WebSocket
                         ? new API.Embed[] { embed.ToModel() }
                         : Optional<API.Embed[]>.Unspecified,
                     TTS = isTTS,
-                    Components = component?.ToModel() ?? Optional<IMessageComponent[]>.Unspecified
+                    Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
                 }
             };
 
@@ -134,7 +163,7 @@ namespace Discord.WebSocket
                 Embeds = embed != null
                         ? new API.Embed[] { embed.ToModel() }
                         : Optional<API.Embed[]>.Unspecified,
-                Components = component?.ToModel() ?? Optional<IMessageComponent[]>.Unspecified
+                Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
             };
 
             if (ephemeral)

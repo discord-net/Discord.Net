@@ -14,21 +14,14 @@ namespace Discord.WebSocket
     public abstract class SocketInteraction : SocketEntity<ulong>, IDiscordInteraction
     {
         /// <summary>
-        ///     The <see cref="SocketGuild"/> this interaction was used in.
+        ///     The <see cref="ISocketMessageChannel"/> this interaction was used in.
         /// </summary>
-        public SocketGuild Guild
-            => Discord.GetGuild(GuildId);
+        public ISocketMessageChannel Channel { get; private set; }
 
         /// <summary>
-        ///     The <see cref="SocketTextChannel"/> this interaction was used in.
+        ///     The <see cref="SocketUser"/> who triggered this interaction.
         /// </summary>
-        public SocketTextChannel Channel
-            => Guild.GetTextChannel(ChannelId);
-
-        /// <summary>
-        ///     The <see cref="SocketGuildUser"/> who triggered this interaction.
-        /// </summary>
-        public SocketGuildUser User { get; private set; }
+        public SocketUser User { get; private set; }
 
         /// <summary>
         ///     The type of this interaction.
@@ -58,9 +51,8 @@ namespace Discord.WebSocket
         public bool IsValidToken
             => CheckToken();
 
-        private ulong GuildId { get; set; }
-        private ulong ChannelId { get; set; }
-        private ulong UserId { get; set; }
+        private ulong? GuildId { get; set; }
+        private ulong? ChannelId { get; set; }
 
         internal SocketInteraction(DiscordSocketClient client, ulong id)
             : base(client, id)
@@ -83,15 +75,35 @@ namespace Discord.WebSocket
                 ? model.Data.Value
                 : null;
 
-            this.GuildId = model.GuildId;
-            this.ChannelId = model.ChannelId;
+            this.GuildId = model.GuildId.ToNullable();
+            this.ChannelId = model.ChannelId.ToNullable();
             this.Token = model.Token;
             this.Version = model.Version;
-            this.UserId = model.Member.User.Id;
             this.Type = model.Type;
 
             if (this.User == null)
-                this.User = SocketGuildUser.Create(this.Guild, Discord.State, model.Member); // Change from getter.
+            {
+                if (model.Member.IsSpecified && model.GuildId.IsSpecified)
+                {
+                    this.User = SocketGuildUser.Create(Discord.State.GetGuild(this.GuildId.Value), Discord.State, model.Member.Value);
+                }
+                else
+                {
+                    this.User = SocketGlobalUser.Create(this.Discord, this.Discord.State, model.User.Value);
+                }
+            }
+
+            if (this.Channel == null)
+            {
+                if (model.ChannelId.IsSpecified)
+                {
+                    this.Channel = Discord.State.GetChannel(model.ChannelId.Value) as ISocketMessageChannel;
+                }
+                else
+                {
+                    this.Channel = Discord.State.GetDMChannel(this.User.Id);
+                }
+            }
         }
 
         /// <summary>

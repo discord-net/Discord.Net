@@ -15,27 +15,24 @@ namespace Discord.WebSocket
         /// </summary>
         public IReadOnlyCollection<SocketSlashCommandDataOption> Options { get; private set; }
 
-        private ulong guildId;
-
         internal SocketSlashCommandData(DiscordSocketClient client, ulong id)
             : base(client, id)
         {
 
         }
 
-        internal static SocketSlashCommandData Create(DiscordSocketClient client, Model model, ulong guildId)
+        internal static SocketSlashCommandData Create(DiscordSocketClient client, Model model, ulong id)
         {
             var entity = new SocketSlashCommandData(client, model.Id);
-            entity.Update(model, guildId);
+            entity.Update(model);
             return entity;
         }
-        internal void Update(Model model, ulong guildId)
+        internal void Update(Model model)
         {
             this.Name = model.Name;
-            this.guildId = guildId;
 
             this.Options = model.Options.Any()
-                ? model.Options.Select(x => new SocketSlashCommandDataOption(x, this.Discord, guildId)).ToImmutableArray()
+                ? model.Options.Select(x => new SocketSlashCommandDataOption(x, this.Discord)).ToImmutableArray()
                 : null;
         }
 

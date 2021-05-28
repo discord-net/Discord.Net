@@ -7,6 +7,9 @@ using Model = Discord.API.MessageComponentInteractionData;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents the data sent with a <see cref="InteractionType.MessageComponent"/>.
+    /// </summary>
     public class SocketMessageComponentData
     {
         /// <summary>

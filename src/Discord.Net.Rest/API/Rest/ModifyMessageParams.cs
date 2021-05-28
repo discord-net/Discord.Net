@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API.Rest
@@ -10,5 +10,7 @@ namespace Discord.API.Rest
         public Optional<string> Content { get; set; }
         [JsonProperty("embed")]
         public Optional<Embed> Embed { get; set; }
+        [JsonProperty("components")]
+        public Optional<API.ActionRowComponent[]> Components { get; set; }
     }
 }
