@@ -16,19 +16,19 @@ namespace Discord.API
         public ButtonStyle Style { get; set; }
 
         [JsonProperty("label")]
-        public string Label { get; set; }
+        public Optional<string> Label { get; set; }
 
         [JsonProperty("emoji")]
-        public Emoji Emote { get; set; }
+        public Optional<Emoji> Emote { get; set; }
 
         [JsonProperty("custom_id")]
-        public string CustomId { get; set; }
+        public Optional<string> CustomId { get; set; }
 
         [JsonProperty("url")]
-        public string Url { get; set; }
+        public Optional<string> Url { get; set; }
 
         [JsonProperty("disabled")]
-        public bool Disabled { get; set; }
+        public Optional<bool> Disabled { get; set; }
 
 
         public ButtonComponent() { }

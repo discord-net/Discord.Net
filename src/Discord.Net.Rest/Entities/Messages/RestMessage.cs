@@ -132,11 +132,11 @@ namespace Discord.Rest
                 Components = model.Components.Value.Select(x => new ActionRowComponent(x.Components.Select(x =>
                     new ButtonComponent(
                         x.Style,
-                        x.Label,
-                        x.Emote.Id.HasValue ? new Emote(x.Emote.Id.Value, x.Emote.Name, x.Emote.Animated.GetValueOrDefault()) : new Emoji(x.Emote.Name),
-                        x.CustomId,
-                        x.Url,
-                        x.Disabled)
+                        x.Label.GetValueOrDefault(),
+                        x.Emote.IsSpecified ? x.Emote.Value.Id.HasValue ? new Emote(x.Emote.Value.Id.Value, x.Emote.Value.Name, x.Emote.Value.Animated.GetValueOrDefault()) : new Emoji(x.Emote.Value.Name) : null,
+                        x.CustomId.GetValueOrDefault(),
+                        x.Url.GetValueOrDefault(),
+                        x.Disabled.GetValueOrDefault())
                     ).ToList()
                )).ToList();
             }
