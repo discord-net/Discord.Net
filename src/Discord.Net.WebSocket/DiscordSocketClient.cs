@@ -775,7 +775,8 @@ namespace Discord.WebSocket
                                 break;
                             case "GUILD_SYNC":
                                 {
-                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_SYNC)").ConfigureAwait(false);
+                                    await _gatewayLogger.DebugAsync("Ignored Dispatch (GUILD_SYNC)").ConfigureAwait(false);
+                                    /*await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_SYNC)").ConfigureAwait(false); //TODO remove? userbot related
                                     var data = (payload as JToken).ToObject<GuildSyncEvent>(_serializer);
                                     var guild = State.GetGuild(data.Id);
                                     if (guild != null)
@@ -792,7 +793,7 @@ namespace Discord.WebSocket
                                     {
                                         await UnknownGuildAsync(type, data.Id).ConfigureAwait(false);
                                         return;
-                                    }
+                                    }*/
                                 }
                                 break;
                             case "GUILD_DELETE":
