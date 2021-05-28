@@ -182,11 +182,11 @@ namespace Discord.WebSocket
         ///         <see cref="ISocketMessageChannel"/> parameter.
         ///     </para>
         /// </remarks>
-        public event Func<Cacheable<IMessage, ulong>, SocketMessage, IMessageChannel, Task> MessageUpdated {
+        public event Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task> MessageUpdated {
             add { _messageUpdatedEvent.Add(value); }
             remove { _messageUpdatedEvent.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<Cacheable<IMessage, ulong>, SocketMessage, IMessageChannel, Task>> _messageUpdatedEvent = new AsyncEvent<Func<Cacheable<IMessage, ulong>, SocketMessage, IMessageChannel, Task>>();
+        internal readonly AsyncEvent<Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task>> _messageUpdatedEvent = new AsyncEvent<Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task>>();
         /// <summary> Fired when a reaction is added to a message. </summary>
         /// <remarks>
         ///     <para>
