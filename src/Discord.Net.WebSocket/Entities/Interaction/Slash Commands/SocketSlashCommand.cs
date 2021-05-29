@@ -8,6 +8,9 @@ using Model = Discord.API.Gateway.InteractionCreated;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a Websocket-based slash command received over the gateway.
+    /// </summary>
     public class SocketSlashCommand : SocketInteraction
     {
         /// <summary>

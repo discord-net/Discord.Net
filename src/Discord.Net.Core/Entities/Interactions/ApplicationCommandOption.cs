@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -22,8 +23,15 @@ namespace Discord
             get => _name;
             set
             {
-                if (value?.Length > 32)
-                    throw new ArgumentException("Name length must be less than or equal to 32");
+                if (value == null)
+                    throw new ArgumentNullException($"{nameof(Name)} cannot be null!");
+
+                if (value.Length > 32)
+                    throw new ArgumentException($"{nameof(Name)} length must be less than or equal to 32");
+
+                if (!Regex.IsMatch(value, @"^[\w-]{1,32}$"))
+                    throw new ArgumentException($"{nameof(Name)} must match the regex ^[\\w-]{{1,32}}$");
+
                 _name = value;
             }
         }

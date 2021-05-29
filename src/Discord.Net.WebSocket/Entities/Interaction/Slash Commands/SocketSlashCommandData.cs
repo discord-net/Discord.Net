@@ -5,6 +5,9 @@ using Model = Discord.API.ApplicationCommandInteractionData;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents the data tied with the <see cref="SocketSlashCommand"/> interaction.
+    /// </summary>
     public class SocketSlashCommandData : SocketEntity<ulong>, IApplicationCommandInteractionData
     {
         /// <inheritdoc/>
