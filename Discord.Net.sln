@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31229.75
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Core", "src\Discord.Net.Core\Discord.Net.Core.csproj", "{4E7A2251-D582-4093-95A5-2FF450DCCD3F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Implementations", "Implementations", "{ADF3F58A-948A-4ABC-B5AA-07271B341695}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Rest", "src\Discord.Net.Rest\Discord.Net.Rest.csproj", "{009A57F3-3BF2-4B28-8A61-CEA8108EB8B8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.WebSocket", "src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj", "{857DD396-D71D-4E85-B83B-F26599B2FB76}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7EE9C2BE-991C-4CA8-9FD3-5DAE26D911E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discord.Net.Tests.Unit", "Discord.Net.Tests.Unit\Discord.Net.Tests.Unit.csproj", "{C5C8DDD7-2D52-451B-9954-AFE64F6D3196}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4E7A2251-D582-4093-95A5-2FF450DCCD3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E7A2251-D582-4093-95A5-2FF450DCCD3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E7A2251-D582-4093-95A5-2FF450DCCD3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E7A2251-D582-4093-95A5-2FF450DCCD3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{009A57F3-3BF2-4B28-8A61-CEA8108EB8B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{009A57F3-3BF2-4B28-8A61-CEA8108EB8B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{009A57F3-3BF2-4B28-8A61-CEA8108EB8B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{009A57F3-3BF2-4B28-8A61-CEA8108EB8B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{857DD396-D71D-4E85-B83B-F26599B2FB76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{857DD396-D71D-4E85-B83B-F26599B2FB76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{857DD396-D71D-4E85-B83B-F26599B2FB76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{857DD396-D71D-4E85-B83B-F26599B2FB76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5C8DDD7-2D52-451B-9954-AFE64F6D3196}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5C8DDD7-2D52-451B-9954-AFE64F6D3196}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5C8DDD7-2D52-451B-9954-AFE64F6D3196}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5C8DDD7-2D52-451B-9954-AFE64F6D3196}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{009A57F3-3BF2-4B28-8A61-CEA8108EB8B8} = {ADF3F58A-948A-4ABC-B5AA-07271B341695}
+		{857DD396-D71D-4E85-B83B-F26599B2FB76} = {ADF3F58A-948A-4ABC-B5AA-07271B341695}
+		{C5C8DDD7-2D52-451B-9954-AFE64F6D3196} = {7EE9C2BE-991C-4CA8-9FD3-5DAE26D911E2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B7EDDAFF-0E67-4853-B8BB-49134E9950D7}
+	EndGlobalSection
+EndGlobal

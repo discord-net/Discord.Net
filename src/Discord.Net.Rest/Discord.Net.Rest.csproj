@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../Discord.Net.targets" />
+  <Import Project="../../StyleAnalyzer.targets" />
+  <PropertyGroup>
+    <AssemblyName>Discord.Net.Rest</AssemblyName>
+    <RootNamespace>Discord.Rest</RootNamespace>
+    <Description>A core Discord.Net library containing the REST client and models.</Description>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
+  </ItemGroup>
+</Project>
