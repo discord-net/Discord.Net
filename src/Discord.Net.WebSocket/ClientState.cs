@@ -112,7 +112,7 @@ namespace Discord.WebSocket
             if (_guilds.TryRemove(id, out SocketGuild guild))
             {
                 guild.PurgeChannelCache(this);
-                guild.PurgeGuildUserCache();
+                guild.PurgeUserCache();
                 return guild;
             }
             return null;
@@ -137,7 +137,7 @@ namespace Discord.WebSocket
         internal void PurgeUsers()
         {
             foreach (var guild in _guilds.Values)
-                guild.PurgeGuildUserCache();
+                guild.PurgeUserCache();
         }
     }
 }
