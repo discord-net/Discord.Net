@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Model = Discord.API.ApplicationCommandInteractionData;
 
 namespace Discord.WebSocket
@@ -14,7 +11,7 @@ namespace Discord.WebSocket
         public string Name { get; private set; }
 
         /// <summary>
-        ///     The <see cref="SocketSlashCommandDataOption"/>'s recieved with this interaction.
+        ///     The <see cref="SocketSlashCommandDataOption"/>'s received with this interaction.
         /// </summary>
         public IReadOnlyCollection<SocketSlashCommandDataOption> Options { get; private set; }
 
@@ -33,8 +30,9 @@ namespace Discord.WebSocket
         internal void Update(Model model)
         {
             this.Name = model.Name;
-            this.Options = model.Options.IsSpecified
-                ? model.Options.Value.Select(x => new SocketSlashCommandDataOption(x, this.Discord)).ToImmutableArray()
+
+            this.Options = model.Options.Any()
+                ? model.Options.Select(x => new SocketSlashCommandDataOption(x, this.Discord)).ToImmutableArray()
                 : null;
         }
 
