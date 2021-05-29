@@ -38,7 +38,7 @@ private async Task RegisterCommands()
     {
       new ApplicationCommandOptionProperties()
       {
-        Name = "Example option",
+        Name = "example_option",
         Required = false,
         Description = "Option Description",
         Type = Discord.ApplicationCommandOptionType.String,
