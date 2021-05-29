@@ -897,6 +897,7 @@ namespace Discord.WebSocket
             foreach (var member in membersToKeep)
                 _members.TryAdd(member.Id, member);
 
+            _downloaderPromise = new TaskCompletionSource<bool>();
             DownloadedMemberCount = _members.Count;
         }
 
