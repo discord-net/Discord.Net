@@ -7,7 +7,7 @@
     <Description>A Discord.Net Labs extension adding support for bot commands.</Description>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net461;netstandard2.0;netstandard2.1</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard2.0;netstandard2.1</TargetFrameworks>
-    <Version>2.3.1</Version>
+    <Version>2.3.2</Version>
     <PackageId>Discord.Net.Labs.Commands</PackageId>
     <PackageProjectUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</RepositoryUrl>
