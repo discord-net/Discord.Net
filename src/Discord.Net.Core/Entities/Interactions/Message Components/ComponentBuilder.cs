@@ -90,7 +90,7 @@ namespace Discord
             }
             else
             {
-                if (_actionRows.Count + 1 == row)
+                if (_actionRows.Count == row)
                     _actionRows.Add(new ActionRowBuilder().WithComponent(builtButton));
                 else
                 {
