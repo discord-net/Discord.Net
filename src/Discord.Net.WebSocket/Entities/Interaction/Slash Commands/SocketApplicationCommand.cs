@@ -56,8 +56,8 @@ namespace Discord.WebSocket
             this.Name = model.Name;
             this.GuildId = model.GuildId;
 
-            this.Options = model.Options.Any()
-                ? model.Options.Select(x => SocketApplicationCommandOption.Create(x)).ToImmutableArray()
+            this.Options = model.Options.IsSpecified
+                ? model.Options.Value.Select(x => SocketApplicationCommandOption.Create(x)).ToImmutableArray()
                 : new ImmutableArray<SocketApplicationCommandOption>();
         }
 

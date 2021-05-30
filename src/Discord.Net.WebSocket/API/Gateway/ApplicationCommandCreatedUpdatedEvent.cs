@@ -25,6 +25,6 @@ namespace Discord.API.Gateway
         public ulong GuildId { get; set; }
 
         [JsonProperty("options")]
-        public List<Discord.API.ApplicationCommandOption> Options { get; set; }
+        public Optional<List<Discord.API.ApplicationCommandOption>> Options { get; set; }
     }
 }
