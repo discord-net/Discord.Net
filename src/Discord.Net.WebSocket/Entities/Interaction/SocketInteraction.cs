@@ -54,17 +54,18 @@ namespace Discord.WebSocket
         private ulong? GuildId { get; set; }
         private ulong? ChannelId { get; set; }
 
-        internal SocketInteraction(DiscordSocketClient client, ulong id)
+        internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel)
             : base(client, id)
         {
+            this.Channel = channel;
         }
 
-        internal static SocketInteraction Create(DiscordSocketClient client, Model model)
+        internal static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
         {
             if (model.Type == InteractionType.ApplicationCommand)
-                return SocketSlashCommand.Create(client, model);
+                return SocketSlashCommand.Create(client, model, channel);
             if (model.Type == InteractionType.MessageComponent)
-                return SocketMessageComponent.Create(client, model);
+                return SocketMessageComponent.Create(client, model, channel);
             else
                 return null;
         }
@@ -92,18 +93,6 @@ namespace Discord.WebSocket
                     this.User = SocketGlobalUser.Create(this.Discord, this.Discord.State, model.User.Value);
                 }
             }
-
-            if (this.Channel == null)
-            {
-                if (model.ChannelId.IsSpecified)
-                {
-                    this.Channel = Discord.State.GetChannel(model.ChannelId.Value) as ISocketMessageChannel;
-                }
-                else
-                {
-                    this.Channel = Discord.State.GetDMChannel(this.User.Id);
-                }
-            }
         }
 
         /// <summary>
@@ -127,9 +116,8 @@ namespace Discord.WebSocket
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
 
-        public virtual Task<RestUserMessage> RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
-            bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
-        { return null; }
+        public abstract Task<RestUserMessage> RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
+            bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null);
 
         /// <summary>
         ///     Sends a followup message for this interaction.
@@ -145,10 +133,9 @@ namespace Discord.WebSocket
         /// <returns>
         ///     The sent message.
         /// </returns>
-        public virtual Task<RestFollowupMessage> FollowupAsync(string text = null, bool isTTS = false, Embed embed = null, bool ephemeral = false,
+        public abstract Task<RestFollowupMessage> FollowupAsync(string text = null, bool isTTS = false, Embed embed = null, bool ephemeral = false,
              InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
-             AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
-        { return null; }
+             AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null);
 
         /// <summary>
         ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredChannelMessageWithSource"/>.

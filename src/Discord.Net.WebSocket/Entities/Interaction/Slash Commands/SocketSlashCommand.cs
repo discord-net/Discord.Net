@@ -18,8 +18,8 @@ namespace Discord.WebSocket
         /// </summary>
         new public SocketSlashCommandData Data { get; private set; }
 
-        internal SocketSlashCommand(DiscordSocketClient client, Model model)
-            : base(client, model.Id)
+        internal SocketSlashCommand(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
+            : base(client, model.Id, channel)
         {
             var dataModel = model.Data.IsSpecified ?
                 (model.Data.Value as JToken).ToObject<DataModel>()
@@ -28,9 +28,9 @@ namespace Discord.WebSocket
             Data = SocketSlashCommandData.Create(client, dataModel, model.Id);
         }
 
-        new internal static SocketInteraction Create(DiscordSocketClient client, Model model)
+        new internal static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
         {
-            var entity = new SocketSlashCommand(client, model);
+            var entity = new SocketSlashCommand(client, model, channel);
             entity.Update(model);
             return entity;
         }

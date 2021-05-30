@@ -25,8 +25,8 @@ namespace Discord.WebSocket
         /// </summary>
         public SocketMessage Message { get; private set; }
 
-        internal SocketMessageComponent(DiscordSocketClient client, Model model)
-            : base(client, model.Id)
+        internal SocketMessageComponent(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
+            : base(client, model.Id, channel)
         {
             var dataModel = model.Data.IsSpecified ?
                 (model.Data.Value as JToken).ToObject<DataModel>()
@@ -37,9 +37,9 @@ namespace Discord.WebSocket
 
         }
 
-        new internal static SocketMessageComponent Create(DiscordSocketClient client, Model model)
+        new internal static SocketMessageComponent Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
         {
-            var entity = new SocketMessageComponent(client, model);
+            var entity = new SocketMessageComponent(client, model, channel);
             entity.Update(model);
             return entity;
         }

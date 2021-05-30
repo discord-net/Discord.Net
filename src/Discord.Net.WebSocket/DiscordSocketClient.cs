@@ -1786,7 +1786,7 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<API.Gateway.InteractionCreated>(_serializer);
 
-                                    SocketChannel channel;
+                                    SocketChannel channel = null;
                                     if(data.ChannelId.IsSpecified)
                                     {
                                         channel = State.GetChannel(data.ChannelId.Value);
@@ -1795,7 +1795,8 @@ namespace Discord.WebSocket
                                     {
                                         channel = State.GetDMChannel(data.User.Value.Id);
                                     }
-                                    else
+
+                                    if(channel == null)
                                     {
                                         await UnknownChannelAsync(type, data.ChannelId.Value).ConfigureAwait(false);
                                         return;
@@ -1808,7 +1809,7 @@ namespace Discord.WebSocket
                                         return;
                                     }
 
-                                    var interaction = SocketInteraction.Create(this, data);
+                                    var interaction = SocketInteraction.Create(this, data, channel as ISocketMessageChannel);
 
                                     if (this.AlwaysAcknowledgeInteractions)
                                         await interaction.AcknowledgeAsync().ConfigureAwait(false);
