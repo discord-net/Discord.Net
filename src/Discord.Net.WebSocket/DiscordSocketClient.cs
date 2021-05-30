@@ -988,12 +988,15 @@ namespace Discord.WebSocket
 
                                             var before = user.Clone();
                                             user.Update(State, data);
-                                            await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), before, user).ConfigureAwait(false);
+
+                                            var cacheableBefore = new Cacheable<SocketGuildUser, ulong>(before, user.Id, true, () => Task.FromResult((SocketGuildUser)null));
+                                            await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), cacheableBefore, user).ConfigureAwait(false);
                                         }
                                         else
                                         {
                                             user = guild.AddOrUpdateUser(data);
-                                            await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), null, user).ConfigureAwait(false);
+                                            var cacheableBefore = new Cacheable<SocketGuildUser, ulong>(null, user.Id, false, () => Task.FromResult((SocketGuildUser)null));
+                                            await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), cacheableBefore, user).ConfigureAwait(false);
                                         }
                                     }
                                     else
@@ -1624,7 +1627,8 @@ namespace Discord.WebSocket
 
                                         var before = user.Clone();
                                         user.Update(State, data, true);
-                                        await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), before, user).ConfigureAwait(false);
+                                        var cacheableBefore = new Cacheable<SocketGuildUser, ulong>(before, user.Id, true, () => Task.FromResult(user));
+                                        await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), cacheableBefore, user).ConfigureAwait(false);
                                     }
                                     else
                                     {
