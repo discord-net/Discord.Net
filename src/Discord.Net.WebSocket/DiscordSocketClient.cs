@@ -1796,25 +1796,27 @@ namespace Discord.WebSocket
                                         channel = State.GetDMChannel(data.User.Value.Id);
                                     }
 
-                                    if(channel == null)
+                                    if(channel is ISocketMessageChannel textChannel)
+                                    {
+                                        var guild = (channel as SocketGuildChannel)?.Guild;
+                                        if (guild != null && !guild.IsSynced)
+                                        {
+                                            await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                            return;
+                                        }
+
+                                        var interaction = SocketInteraction.Create(this, data, channel as ISocketMessageChannel);
+
+                                        if (this.AlwaysAcknowledgeInteractions)
+                                            await interaction.AcknowledgeAsync().ConfigureAwait(false);
+
+                                        await TimedInvokeAsync(_interactionCreatedEvent, nameof(InteractionCreated), interaction).ConfigureAwait(false);
+                                    }
+                                    else
                                     {
                                         await UnknownChannelAsync(type, data.ChannelId.Value).ConfigureAwait(false);
                                         return;
                                     }
-
-                                    var guild = (channel as SocketGuildChannel)?.Guild;
-                                    if (guild != null && !guild.IsSynced)
-                                    {
-                                        await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
-                                        return;
-                                    }
-
-                                    var interaction = SocketInteraction.Create(this, data, channel as ISocketMessageChannel);
-
-                                    if (this.AlwaysAcknowledgeInteractions)
-                                        await interaction.AcknowledgeAsync().ConfigureAwait(false);
-
-                                    await TimedInvokeAsync(_interactionCreatedEvent, nameof(InteractionCreated), interaction).ConfigureAwait(false);
                                 }
                                 break;
                             case "APPLICATION_COMMAND_CREATE":
