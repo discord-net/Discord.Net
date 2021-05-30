@@ -40,9 +40,10 @@ namespace Discord
             bool isTTS = false,
             Embed embed = null,
             RequestOptions options = null,
-            AllowedMentions allowedMentions = null)
+            AllowedMentions allowedMentions = null,
+            MessageComponent component = null)
         {
-            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendMessageAsync(text, isTTS, embed, options, allowedMentions).ConfigureAwait(false);
+            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendMessageAsync(text, isTTS, embed, options, allowedMentions, component: component).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -91,10 +92,10 @@ namespace Discord
             string text = null,
             bool isTTS = false,
             Embed embed = null,
-            RequestOptions options = null
-            )
+            RequestOptions options = null,
+            MessageComponent component = null)
         {
-            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(stream, filename, text, isTTS, embed, options).ConfigureAwait(false);
+            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(stream, filename, text, isTTS, embed, options, component: component).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -147,9 +148,10 @@ namespace Discord
             string text = null,
             bool isTTS = false,
             Embed embed = null,
-            RequestOptions options = null)
+            RequestOptions options = null,
+            MessageComponent component = null)
         {
-            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(filePath, text, isTTS, embed, options).ConfigureAwait(false);
+            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(filePath, text, isTTS, embed, options, component: component).ConfigureAwait(false);
         }
 
         /// <summary>
