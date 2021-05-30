@@ -1796,7 +1796,19 @@ namespace Discord.WebSocket
                                         channel = State.GetDMChannel(data.User.Value.Id);
                                     }
 
-                                    if(channel is ISocketMessageChannel textChannel)
+                                    if (channel == null)
+                                    {
+                                        var channelModel = await this.Rest.ApiClient.GetChannelAsync(data.ChannelId.Value);
+
+                                        if (data.GuildId.IsSpecified)
+                                            channel = SocketTextChannel.Create(State.GetGuild(data.GuildId.Value), this.State, channelModel);
+                                        else
+                                            channel = (SocketChannel)SocketChannel.CreatePrivate(this, State, channelModel);
+
+                                        this.State.AddChannel(channel);
+                                    }
+
+                                    if (channel is ISocketMessageChannel textChannel)
                                     {
                                         var guild = (channel as SocketGuildChannel)?.Guild;
                                         if (guild != null && !guild.IsSynced)
