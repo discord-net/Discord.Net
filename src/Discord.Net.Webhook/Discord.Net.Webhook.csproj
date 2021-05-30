@@ -6,11 +6,14 @@
     <RootNamespace>Discord.Webhook</RootNamespace>
     <Description>A core Discord.Net Labs library containing the Webhook client and models.</Description>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-    <Version>2.3.1</Version>
+    <Version>2.3.2</Version>
     <PackageId>Discord.Net.Labs.Webhook</PackageId>
     <PackageProjectUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</RepositoryUrl>
     <PackageIcon>Temporary.png</PackageIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <DocumentationFile>C:\Users\lynch\Documents\GitHub\Discord.Net Labs\Discord.Net-Labs\src\Discord.Net.Webhook\Discord.Net.Webhook.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />

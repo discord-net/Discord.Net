@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Discord.Net.Webhook</name>
+    </assembly>
+    <members>
+        <member name="T:Discord.Webhook.DiscordWebhookClient">
+            <summary> A client responsible for connecting as a Webhook. </summary>
+        </member>
+        <member name="M:Discord.Webhook.DiscordWebhookClient.#ctor(Discord.IWebhook)">
+            <summary> Creates a new Webhook Discord client. </summary>
+        </member>
+        <member name="M:Discord.Webhook.DiscordWebhookClient.#ctor(System.UInt64,System.String)">
+            <summary> Creates a new Webhook Discord client. </summary>
+        </member>
+        <member name="M:Discord.Webhook.DiscordWebhookClient.#ctor(System.String)">
+            <summary> Creates a new Webhook Discord client. </summary>
+        </member>
+        <member name="M:Discord.Webhook.DiscordWebhookClient.#ctor(System.UInt64,System.String,Discord.Rest.DiscordRestConfig)">
+            <summary> Creates a new Webhook Discord client. </summary>
+        </member>
+        <member name="M:Discord.Webhook.DiscordWebhookClient.#ctor(Discord.IWebhook,Discord.Rest.DiscordRestConfig)">
+            <summary> Creates a new Webhook Discord client. </summary>
+        </member>
+        <member name="M:Discord.Webhook.DiscordWebhookClient.#ctor(System.String,Discord.Rest.DiscordRestConfig)">
+            <summary>
+                Creates a new Webhook Discord client.
+            </summary>
+            <param name="webhookUrl">The url of the webhook.</param>
+            <param name="config">The configuration options to use for this client.</param>
+            <exception cref="T:System.ArgumentException">Thrown if the <paramref name="webhookUrl"/> is an invalid format.</exception>
+            <exception cref="T:System.ArgumentNullException">Thrown if the <paramref name="webhookUrl"/> is null or whitespace.</exception>
+        </member>
+        <member name="M:Discord.Webhook.DiscordWebhookClient.SendMessageAsync(System.String,System.Boolean,System.Collections.Generic.IEnumerable{Discord.Embed},System.String,System.String,Discord.RequestOptions,Discord.AllowedMentions)">
+            <summary> Sends a message to the channel for this webhook. </summary>
+            <returns> Returns the ID of the created message. </returns>
+        </member>
+        <member name="M:Discord.Webhook.DiscordWebhookClient.SendFileAsync(System.String,System.String,System.Boolean,System.Collections.Generic.IEnumerable{Discord.Embed},System.String,System.String,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions)">
+            <summary> Sends a message to the channel for this webhook with an attachment. </summary>
+            <returns> Returns the ID of the created message. </returns>
+        </member>
+        <member name="M:Discord.Webhook.DiscordWebhookClient.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,System.Collections.Generic.IEnumerable{Discord.Embed},System.String,System.String,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions)">
+            <summary> Sends a message to the channel for this webhook with an attachment. </summary>
+            <returns> Returns the ID of the created message. </returns>
+        </member>
+        <member name="M:Discord.Webhook.DiscordWebhookClient.ModifyWebhookAsync(System.Action{Discord.WebhookProperties},Discord.RequestOptions)">
+            <summary> Modifies the properties of this webhook. </summary>
+        </member>
+        <member name="M:Discord.Webhook.DiscordWebhookClient.DeleteWebhookAsync(Discord.RequestOptions)">
+            <summary> Deletes this webhook from Discord and disposes the client. </summary>
+        </member>
+        <member name="M:Discord.Webhook.WebhookClientHelper.GetWebhookAsync(Discord.Webhook.DiscordWebhookClient,System.UInt64)">
+            <exception cref="T:System.InvalidOperationException">Could not find a webhook with the supplied credentials.</exception>
+        </member>
+    </members>
+</doc>
