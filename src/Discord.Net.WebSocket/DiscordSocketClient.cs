@@ -1627,7 +1627,8 @@ namespace Discord.WebSocket
 
                                         var before = user.Clone();
                                         user.Update(State, data, true);
-                                        await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), before, user).ConfigureAwait(false);
+                                        var cacheableBefore = new Cacheable<SocketGuildUser, ulong>(before, user.Id, true, () => Task.FromResult(user));
+                                        await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), cacheableBefore, user).ConfigureAwait(false);
                                     }
                                     else
                                     {
