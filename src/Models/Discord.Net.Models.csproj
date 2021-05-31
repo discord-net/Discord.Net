@@ -8,5 +8,9 @@
       Shared models between the Discord REST API and Gateway.
     </Description>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" />
+  </ItemGroup>
 
 </Project>
