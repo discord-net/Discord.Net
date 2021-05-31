@@ -7,16 +7,18 @@ namespace Discord.Net.Models
     /// </summary>
     public record AuditLog
     {
+        /*
         /// <summary>
         ///     Gets an array of <see cref="Webhook"/>s.
         /// </summary>
-        /*[JsonPropertyName("webhooks")]
+        [JsonPropertyName("webhooks")]
         public Optional<Webhook[]> Webhooks { get; init; }*/ //TODO Add Webhook
 
+        /*
         /// <summary>
         ///     Gets an array of <see cref="User"/>s.
         /// </summary>
-        /*[JsonPropertyName("users")]
+        [JsonPropertyName("users")]
         public Optional<User[]> Users { get; init; }*/ //TODO Add User
 
         /// <summary>
@@ -25,10 +27,11 @@ namespace Discord.Net.Models
         [JsonPropertyName("audit_log_entries")]
         public Optional<AuditLogEntry[]> AuditLogEntries { get; init; }
 
+        /*
         /// <summary>
         ///     Gets an array of <see cref="Integration"/>s.
         /// </summary>
-        /*[JsonPropertyName("integrations")]
+        [JsonPropertyName("integrations")]
         public Optional<Integration[]> Integrations { get; init; }*/ //TODO Add Integration
     }
 }
