@@ -14,7 +14,7 @@
     <PackageIcon>Temporary.png</PackageIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <DocumentationFile>C:\Users\lynch\Documents\GitHub\Discord.Net Labs\Discord.Net-Labs\src\Discord.Net.Commands\Discord.Net.Commands.xml</DocumentationFile>
+    <DocumentationFile>..\Discord.Net.Commands\Discord.Net.Commands.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />

@@ -15,7 +15,7 @@
     <PackageId>Discord.Net.Labs.WebSocket</PackageId>
   </PropertyGroup>
   <PropertyGroup>
-    <DocumentationFile>C:\Users\lynch\Documents\GitHub\Discord.Net Labs\Discord.Net-Labs\src\Discord.Net.WebSocket\Discord.Net.WebSocket.xml</DocumentationFile>
+    <DocumentationFile>..\Discord.Net.WebSocket\Discord.Net.WebSocket.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
