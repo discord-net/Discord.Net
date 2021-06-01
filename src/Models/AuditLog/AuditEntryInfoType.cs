@@ -1,7 +1,7 @@
 namespace Discord.Net.Models
 {
     /// <summary>
-    ///     Represents type of the overwritten entity for an audit entry info.
+    ///     Represents the type of the overwritten entity for an audit entry info.
     /// </summary>
     public enum AuditEntryInfoType
     {

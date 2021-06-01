@@ -12,5 +12,17 @@
   <ItemGroup>
     <PackageReference Include="System.Text.Json" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Emoji\" />
+    <Folder Include="Guild\" />
+    <Folder Include="GuildTemplate\" />
+    <Folder Include="Invite\" />
+    <Folder Include="Teams\" />
+    <Folder Include="Webhook\" />
+    <Folder Include="Voice\" />
+    <Folder Include="User\" />
+    <Folder Include="StageInstance\" />
+  </ItemGroup>
 
 </Project>

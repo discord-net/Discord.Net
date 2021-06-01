@@ -3,35 +3,48 @@ using System.Text.Json.Serialization;
 namespace Discord.Net.Models
 {
     /// <summary>
-    ///     Represents a discord audit log object.
+    ///     Represents an audit log object.
     /// </summary>
     public record AuditLog
     {
-        /*
         /// <summary>
-        ///     Gets an array of <see cref="Webhook"/>s.
+        ///     Creates a <see cref="AuditLog"/> with the provided parameters.
+        /// </summary>
+        /// <param name="webhooks">List of webhooks found in the audit log.</param>
+        /// <param name="users">List of users found in the audit log.</param>
+        /// <param name="auditLogEntries">List of audit log entries.</param>
+        /// <param name="integrations">List of partial integration objects.</param>
+        [JsonConstructor]
+        public AuditLog(Webhook[] webhooks, User[] users, AuditLogEntry[] auditLogEntries, Integration[] integrations)
+        {
+            Webhooks = webhooks;
+            Users = users;
+            AuditLogEntries = auditLogEntries;
+            Integrations = integrations;
+        }
+
+        /// <summary>
+        ///     List of webhooks found in the audit log.
         /// </summary>
         [JsonPropertyName("webhooks")]
-        public Optional<Webhook[]> Webhooks { get; init; }*/ //TODO Add Webhook
+        public Webhook[] Webhooks { get; }
 
-        /*
         /// <summary>
-        ///     Gets an array of <see cref="User"/>s.
+        ///     List of users found in the audit log.
         /// </summary>
         [JsonPropertyName("users")]
-        public Optional<User[]> Users { get; init; }*/ //TODO Add User
+        public User[] Users { get; }
 
         /// <summary>
-        ///     Gets an array of <see cref="AuditLogEntry"/>s.
+        ///     List of audit log entries.
         /// </summary>
         [JsonPropertyName("audit_log_entries")]
-        public Optional<AuditLogEntry[]> AuditLogEntries { get; init; }
+        public AuditLogEntry[] AuditLogEntries { get; }
 
-        /*
         /// <summary>
-        ///     Gets an array of <see cref="Integration"/>s.
+        ///     List of partial integration objects.
         /// </summary>
         [JsonPropertyName("integrations")]
-        public Optional<Integration[]> Integrations { get; init; }*/ //TODO Add Integration
+        public Integration[] Integrations { get; }
     }
 }
