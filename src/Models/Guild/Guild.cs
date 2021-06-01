@@ -61,7 +61,7 @@ namespace Discord.Net.Models
         /// <param name="nsfwLevel">Guild NSFW level.</param>
         /// <param name="stageInstances">Stage instances in the guild.</param>
         [JsonConstructor]
-        public Guild(Snowflake id, string name, string? icon, Optional<string?> iconHash, string? splash, string? discoverySplash, Optional<bool> owner, Snowflake ownerId, Optional<Permissions> permissions, string region, Snowflake? afkChannelId, int afkTimeout, Optional<bool> widgetEnabled, Optional<Snowflake?> widgetChannelId, int verificationLevel, int defaultMessageNotifications, int explicitContentFilter, Role[] roles, Emoji[] emojis, string[] features, int mfaLevel, Snowflake? applicationId, Snowflake? systemChannelId, int systemChannelFlags, Snowflake? rulesChannelId, Optional<DateTimeOffset> joinedAt, Optional<bool> large, Optional<bool> unavailable, Optional<int> memberCount, Optional<VoiceState[]> voiceStates, Optional<GuildMember[]> members, Optional<Channel[]> channels, Optional<Channel[]> threads, Optional<PresenceUpdate[]> presences, Optional<int?> maxPresences, Optional<int> maxMembers, string? vanityUrlCode, string? description, string? banner, int premiumTier, Optional<int> premiumSubscriptionCount, string preferredLocale, Snowflake? publicUpdatesChannelId, Optional<int> maxVideoChannelUsers, Optional<int> approximateMemberCount, Optional<int> approximatePresenceCount, Optional<WelcomeScreen> welcomeScreen, int nsfwLevel, Optional<StageInstance[]> stageInstances)
+        public Guild(Snowflake id, string name, string? icon, Optional<string?> iconHash, string? splash, string? discoverySplash, Optional<bool> owner, Snowflake ownerId, Optional<Permissions> permissions, string region, Snowflake? afkChannelId, int afkTimeout, Optional<bool> widgetEnabled, Optional<Snowflake?> widgetChannelId, int verificationLevel, int defaultMessageNotifications, int explicitContentFilter, Role[] roles, Emoji[] emojis, string[] features, int mfaLevel, Snowflake? applicationId, Snowflake? systemChannelId, int systemChannelFlags, Snowflake? rulesChannelId, Optional<DateTimeOffset> joinedAt, Optional<bool> large, Optional<bool> unavailable, Optional<int> memberCount, Optional<VoiceState[]> voiceStates, Optional<GuildMember[]> members, Optional<Channel[]> channels, Optional<Channel[]> threads, Optional<Presence[]> presences, Optional<int?> maxPresences, Optional<int> maxMembers, string? vanityUrlCode, string? description, string? banner, int premiumTier, Optional<int> premiumSubscriptionCount, string preferredLocale, Snowflake? publicUpdatesChannelId, Optional<int> maxVideoChannelUsers, Optional<int> approximateMemberCount, Optional<int> approximatePresenceCount, Optional<WelcomeScreen> welcomeScreen, int nsfwLevel, Optional<StageInstance[]> stageInstances)
         {
             Id = id;
             Name = name;
@@ -316,7 +316,7 @@ namespace Discord.Net.Models
         ///     Presences of the members in the guild, will only include non-offline members if the size is greater than large threshold.
         /// </summary>
         [JsonPropertyName("presences")]
-        public Optional<PresenceUpdate[]> Presences { get; }
+        public Optional<Presence[]> Presences { get; }
 
         /// <summary>
         ///     The maximum number of presences for the guild (the default value, currently 25000, is in effect when null is returned).

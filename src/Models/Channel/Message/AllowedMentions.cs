@@ -15,7 +15,7 @@ namespace Discord.Net.Models
         /// <param name="users">Array of user_ids to mention (Max size of 100).</param>
         /// <param name="repliedUser">For replies, whether to mention the author of the message being replied to (default false).</param>
         [JsonConstructor]
-        public AllowedMentions(AllowedMentionType[] parse, ListOfSnowflakes roles, ListOfSnowflakes users, bool repliedUser)
+        public AllowedMentions(string[] parse, Snowflake[] roles, Snowflake[] users, bool repliedUser)
         {
             Parse = parse;
             Roles = roles;
@@ -27,19 +27,19 @@ namespace Discord.Net.Models
         ///     An array of allowed mention types to parse from the content.
         /// </summary>
         [JsonPropertyName("parse")]
-        public AllowedMentionType[] Parse { get; }
+        public string[] Parse { get; }
 
         /// <summary>
         ///     Array of role_ids to mention (Max size of 100).
         /// </summary>
         [JsonPropertyName("roles")]
-        public ListOfSnowflakes Roles { get; }
+        public Snowflake[] Roles { get; }
 
         /// <summary>
         ///     Array of user_ids to mention (Max size of 100).
         /// </summary>
         [JsonPropertyName("users")]
-        public ListOfSnowflakes Users { get; }
+        public Snowflake[] Users { get; }
 
         /// <summary>
         ///     For replies, whether to mention the author of the message being replied to (default false).
