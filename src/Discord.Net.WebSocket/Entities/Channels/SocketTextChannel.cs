@@ -181,6 +181,10 @@ namespace Discord.WebSocket
             => ChannelHelper.DeleteMessagesAsync(this, Discord, messageIds, options);
 
         /// <inheritdoc />
+        public async Task<IUserMessage> ModifyMessageAsync(ulong messageId, Action<MessageProperties> func, RequestOptions options = null)
+            => await ChannelHelper.ModifyMessageAsync(this, messageId, func, Discord, options).ConfigureAwait(false);
+
+        /// <inheritdoc />
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
             => ChannelHelper.DeleteMessageAsync(this, messageId, Discord, options);
         /// <inheritdoc />

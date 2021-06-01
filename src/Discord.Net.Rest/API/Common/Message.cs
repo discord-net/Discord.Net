@@ -60,5 +60,7 @@ namespace Discord.API
         public Optional<Message> ReferencedMessage { get; set; }
         [JsonProperty("components")]
         public Optional<API.ActionRowComponent[]> Components { get; set; }
+        [JsonProperty("stickers")]
+        public Optional<Sticker[]> Stickers { get; set; }
     }
 }

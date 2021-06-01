@@ -12,7 +12,6 @@ namespace Discord
     {
         private string _title;
         private string _description;
-        private string _url;
         private EmbedImage? _image;
         private EmbedThumbnail? _thumbnail;
         private List<EmbedFieldBuilder> _fields;
@@ -70,26 +69,14 @@ namespace Discord
         /// <summary> Gets or sets the URL of an <see cref="Embed"/>. </summary>
         /// <exception cref="ArgumentException" accessor="set">Url is not a well-formed <see cref="Uri"/>.</exception>
         /// <returns> The URL of the embed.</returns>
-        public string Url
-        {
-            get => _url;
-            set
-            {
-                if (!value.IsNullOrUri()) throw new ArgumentException(message: "Url must be a well-formed URI.", paramName: nameof(Url));
-                _url = value;
-            }
-        }
+        public string Url { get; set; }
         /// <summary> Gets or sets the thumbnail URL of an <see cref="Embed"/>. </summary>
         /// <exception cref="ArgumentException" accessor="set">Url is not a well-formed <see cref="Uri"/>.</exception>
         /// <returns> The thumbnail URL of the embed.</returns>
         public string ThumbnailUrl
         {
             get => _thumbnail?.Url;
-            set
-            {
-                if (!value.IsNullOrUri()) throw new ArgumentException(message: "Url must be a well-formed URI.", paramName: nameof(ThumbnailUrl));
-                _thumbnail = new EmbedThumbnail(value, null, null, null);
-            }
+            set => _thumbnail = new EmbedThumbnail(value, null, null, null);
         }
         /// <summary> Gets or sets the image URL of an <see cref="Embed"/>. </summary>
         /// <exception cref="ArgumentException" accessor="set">Url is not a well-formed <see cref="Uri"/>.</exception>
@@ -97,11 +84,7 @@ namespace Discord
         public string ImageUrl
         {
             get => _image?.Url;
-            set
-            {
-                if (!value.IsNullOrUri()) throw new ArgumentException(message: "Url must be a well-formed URI.", paramName: nameof(ImageUrl));
-                _image = new EmbedImage(value, null, null, null);
-            }
+            set => _image = new EmbedImage(value, null, null, null);
         }
 
         /// <summary> Gets or sets the list of <see cref="EmbedFieldBuilder"/> of an <see cref="Embed"/>. </summary>
@@ -553,8 +536,6 @@ namespace Discord
     public class EmbedAuthorBuilder
     {
         private string _name;
-        private string _url;
-        private string _iconUrl;
         /// <summary>
         ///     Gets the maximum author name length allowed by Discord.
         /// </summary>
@@ -585,15 +566,7 @@ namespace Discord
         /// <returns>
         ///     The URL of the author field.
         /// </returns>
-        public string Url
-        {
-            get => _url;
-            set
-            {
-                if (!value.IsNullOrUri()) throw new ArgumentException(message: "Url must be a well-formed URI.", paramName: nameof(Url));
-                _url = value;
-            }
-        }
+        public string Url { get; set; }
         /// <summary>
         ///     Gets or sets the icon URL of the author field.
         /// </summary>
@@ -601,15 +574,7 @@ namespace Discord
         /// <returns>
         ///     The icon URL of the author field.
         /// </returns>
-        public string IconUrl
-        {
-            get => _iconUrl;
-            set
-            {
-                if (!value.IsNullOrUri()) throw new ArgumentException(message: "Url must be a well-formed URI.", paramName: nameof(IconUrl));
-                _iconUrl = value;
-            }
-        }
+        public string IconUrl { get; set; }
 
         /// <summary>
         ///     Sets the name of the author field.
@@ -671,7 +636,6 @@ namespace Discord
     public class EmbedFooterBuilder
     {
         private string _text;
-        private string _iconUrl;
 
         /// <summary>
         ///     Gets the maximum footer length allowed by Discord.
@@ -703,15 +667,7 @@ namespace Discord
         /// <returns>
         ///     The icon URL of the footer field.
         /// </returns>
-        public string IconUrl
-        {
-            get => _iconUrl;
-            set
-            {
-                if (!value.IsNullOrUri()) throw new ArgumentException(message: "Url must be a well-formed URI.", paramName: nameof(IconUrl));
-                _iconUrl = value;
-            }
-        }
+        public string IconUrl { get; set; }
 
         /// <summary>
         ///     Sets the name of the footer field.

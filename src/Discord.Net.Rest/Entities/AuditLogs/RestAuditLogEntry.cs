@@ -22,7 +22,7 @@ namespace Discord.Rest
 
         internal static RestAuditLogEntry Create(BaseDiscordClient discord, Model fullLog, EntryModel model)
         {
-            var userInfo = fullLog.Users.FirstOrDefault(x => x.Id == model.UserId);
+            var userInfo = model.UserId != null ? fullLog.Users.FirstOrDefault(x => x.Id == model.UserId) : null;
             IUser user = null;
             if (userInfo != null)
                 user = RestUser.Create(discord, userInfo);

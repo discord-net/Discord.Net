@@ -13,7 +13,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestUserMessage : RestMessage, IUserMessage
     {
-        private bool _isMentioningEveryone, _isTTS, _isPinned, _isSuppressed;
+        private bool _isMentioningEveryone, _isTTS, _isPinned;
         private long? _editedTimestampTicks;
         private IUserMessage _referencedMessage;
         private ImmutableArray<Attachment> _attachments = ImmutableArray.Create<Attachment>();
@@ -21,13 +21,14 @@ namespace Discord.Rest
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
         private ImmutableArray<ulong> _roleMentionIds = ImmutableArray.Create<ulong>();
         private ImmutableArray<RestUser> _userMentions = ImmutableArray.Create<RestUser>();
+        private ImmutableArray<Sticker> _stickers = ImmutableArray.Create<Sticker>();
 
         /// <inheritdoc />
         public override bool IsTTS => _isTTS;
         /// <inheritdoc />
         public override bool IsPinned => _isPinned;
         /// <inheritdoc />
-        public override bool IsSuppressed => _isSuppressed;
+        public override bool IsSuppressed => Flags.HasValue && Flags.Value.HasFlag(MessageFlags.SuppressEmbeds);
         /// <inheritdoc />
         public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
         /// <inheritdoc />
@@ -44,6 +45,8 @@ namespace Discord.Rest
         public override IReadOnlyCollection<RestUser> MentionedUsers => _userMentions;
         /// <inheritdoc />
         public override IReadOnlyCollection<ITag> Tags => _tags;
+        /// <inheritdoc />
+        public override IReadOnlyCollection<Sticker> Stickers => _stickers;
         /// <inheritdoc />
         public IUserMessage ReferencedMessage => _referencedMessage;
 
@@ -70,10 +73,6 @@ namespace Discord.Rest
                 _editedTimestampTicks = model.EditedTimestamp.Value?.UtcTicks;
             if (model.MentionEveryone.IsSpecified)
                 _isMentioningEveryone = model.MentionEveryone.Value;
-            if (model.Flags.IsSpecified)
-            {
-                _isSuppressed = model.Flags.Value.HasFlag(API.MessageFlags.Suppressed);
-            }
             if (model.RoleMentions.IsSpecified)
                 _roleMentionIds = model.RoleMentions.Value.ToImmutableArray();
 
@@ -136,6 +135,20 @@ namespace Discord.Rest
                 IUser refMsgAuthor = MessageHelper.GetAuthor(Discord, guild, refMsg.Author.Value, refMsg.WebhookId.ToNullable());
                 _referencedMessage = RestUserMessage.Create(Discord, Channel, refMsgAuthor, refMsg);
             }
+
+            if (model.Stickers.IsSpecified)
+            {
+                var value = model.Stickers.Value;
+                if (value.Length > 0)
+                {
+                    var stickers = ImmutableArray.CreateBuilder<Sticker>(value.Length);
+                    for (int i = 0; i < value.Length; i++)
+                        stickers.Add(Sticker.Create(value[i]));
+                    _stickers = stickers.ToImmutable();
+                }
+                else
+                    _stickers = ImmutableArray.Create<Sticker>();
+            }
         }
 
         /// <inheritdoc />
@@ -151,9 +164,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task UnpinAsync(RequestOptions options = null)
             => MessageHelper.UnpinAsync(this, Discord, options);
-        /// <inheritdoc />
-        public Task ModifySuppressionAsync(bool suppressEmbeds, RequestOptions options = null)
-            => MessageHelper.SuppressEmbedsAsync(this, Discord, suppressEmbeds, options);
 
         public string Resolve(int startIndex, TagHandling userHandling = TagHandling.Name, TagHandling channelHandling = TagHandling.Name,
             TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)

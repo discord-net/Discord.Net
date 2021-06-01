@@ -61,6 +61,9 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public IReadOnlyCollection<ActionRowComponent> Components { get; private set; }
 
+        /// <inheritdoc />
+        public MessageFlags? Flags { get; private set; }
+
         /// <summary>
         ///     Returns all attachments included in this message.
         /// </summary>
@@ -98,6 +101,8 @@ namespace Discord.WebSocket
         public virtual IReadOnlyCollection<SocketUser> MentionedUsers => ImmutableArray.Create<SocketUser>();
         /// <inheritdoc />
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
+        /// <inheritdoc />
+        public virtual IReadOnlyCollection<Sticker> Stickers => ImmutableArray.Create<Sticker>();
         /// <inheritdoc />
         public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emote).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
 
@@ -175,6 +180,9 @@ namespace Discord.WebSocket
             }
             else
                 Components = new List<ActionRowComponent>();
+
+            if (model.Flags.IsSpecified)
+                Flags = model.Flags.Value;
         }
 
         /// <inheritdoc />
@@ -207,8 +215,13 @@ namespace Discord.WebSocket
         IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoles.Select(x => x.Id).ToImmutableArray();
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
+        
         /// <inheritdoc/>
         IReadOnlyCollection<IMessageComponent> IMessage.Components => Components;
+
+        /// <inheritdoc />
+        IReadOnlyCollection<ISticker> IMessage.Stickers => Stickers;
+
         internal void AddReaction(SocketReaction reaction)
         {
             _reactions.Add(reaction);

@@ -92,10 +92,10 @@ namespace Discord
         ///     Gets all embeds included in this message.
         /// </summary>
         /// <remarks>
-        /// </remarks>
         ///     This property gets a read-only collection of embeds associated with this message. Depending on the
         ///     message, a sent message may contain one or more embeds. This is usually true when multiple link previews
         ///     are generated; however, only one <see cref="EmbedType.Rich"/> <see cref="Embed"/> can be featured.
+        /// </remarks>
         /// <returns>
         ///     A read-only collection of embed objects.
         /// </returns>
@@ -168,6 +168,25 @@ namespace Discord
         ///     The <see cref="IMessageComponent"/>'s attached to this message
         /// </summary>
         IReadOnlyCollection<IMessageComponent> Components { get; }
+
+        ///     Gets all stickers included in this message.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection of sticker objects.
+        /// </returns>
+        IReadOnlyCollection<ISticker> Stickers { get; }
+        
+        /// <summary>
+        ///     Gets the flags related to this message.
+        /// </summary>
+        /// <remarks>
+        ///     This value is determined by bitwise OR-ing <see cref="MessageFlags"/> values together.
+        /// </remarks>
+        /// <returns>
+        ///     A message's flags, if any is associated.
+        /// </returns>
+        MessageFlags? Flags { get; }
+        
         /// <summary>
         ///     Adds a reaction to this message.
         /// </summary>

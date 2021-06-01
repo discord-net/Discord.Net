@@ -91,6 +91,35 @@ namespace Discord.Webhook
             string username = null, string avatarUrl = null, RequestOptions options = null, AllowedMentions allowedMentions = null)
             => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, allowedMentions, options);
 
+        /// <summary>
+        ///     Modifies a message posted using this webhook.
+        /// </summary>
+        /// <remarks>
+        ///     This method can only modify messages that were sent using the same webhook.
+        /// </remarks>
+        /// <param name="messageId">ID of the modified message.</param>
+        /// <param name="func">A delegate containing the properties to modify the message with.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        public Task ModifyMessageAsync(ulong messageId, Action<WebhookMessageProperties> func, RequestOptions options = null)
+            => WebhookClientHelper.ModifyMessageAsync(this, messageId, func, options);
+
+        /// <summary>
+        ///     Deletes a message posted using this webhook.
+        /// </summary>
+        /// <remarks>
+        ///     This method can only delete messages that were sent using the same webhook.
+        /// </remarks>
+        /// <param name="messageId">ID of the deleted message.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous deletion operation.
+        /// </returns>
+        public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
+            => WebhookClientHelper.DeleteMessageAsync(this, messageId, options);
+
         /// <summary> Sends a message to the channel for this webhook with an attachment. </summary>
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendFileAsync(string filePath, string text, bool isTTS = false,

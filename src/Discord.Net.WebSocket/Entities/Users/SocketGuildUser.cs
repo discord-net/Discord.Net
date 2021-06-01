@@ -57,11 +57,13 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public bool IsStreaming => VoiceState?.IsStreaming ?? false;
         /// <inheritdoc />
+        public bool? IsPending { get; private set; }
+        /// <inheritdoc />
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
         /// <summary>
         ///     Returns a collection of roles that the user possesses.
         /// </summary>
-        public IReadOnlyCollection<SocketRole> Roles 
+        public IReadOnlyCollection<SocketRole> Roles
             => _roleIds.Select(id => Guild.GetRole(id)).Where(x => x != null).ToReadOnlyCollection(() => _roleIds.Length);
         /// <summary>
         ///     Returns the voice channel the user is in, or <c>null</c> if none.
@@ -142,6 +144,8 @@ namespace Discord.WebSocket
                 UpdateRoles(model.Roles.Value);
             if (model.PremiumSince.IsSpecified)
                 _premiumSinceTicks = model.PremiumSince.Value?.UtcTicks;
+            if (model.Pending.IsSpecified)
+                IsPending = model.Pending.Value;
         }
         internal void Update(ClientState state, PresenceModel model, bool updatePresence)
         {
@@ -173,17 +177,29 @@ namespace Discord.WebSocket
         public Task KickAsync(string reason = null, RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, reason, options);
         /// <inheritdoc />
+        public Task AddRoleAsync(ulong roleId, RequestOptions options = null)
+            => AddRolesAsync(new[] { roleId }, options);
+        /// <inheritdoc />
         public Task AddRoleAsync(IRole role, RequestOptions options = null)
-            => AddRolesAsync(new[] { role }, options);
+            => AddRoleAsync(role.Id, options);
+        /// <inheritdoc />
+        public Task AddRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
+            => UserHelper.AddRolesAsync(this, Discord, roleIds, options);
         /// <inheritdoc />
         public Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
-            => UserHelper.AddRolesAsync(this, Discord, roles, options);
+            => AddRolesAsync(roles.Select(x => x.Id), options);
+        /// <inheritdoc />
+        public Task RemoveRoleAsync(ulong roleId, RequestOptions options = null)
+            => RemoveRolesAsync(new[] { roleId }, options);
         /// <inheritdoc />
         public Task RemoveRoleAsync(IRole role, RequestOptions options = null)
-            => RemoveRolesAsync(new[] { role }, options);
+            => RemoveRoleAsync(role.Id, options);
+        /// <inheritdoc />
+        public Task RemoveRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
+            => UserHelper.RemoveRolesAsync(this, Discord, roleIds, options);
         /// <inheritdoc />
         public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
-            => UserHelper.RemoveRolesAsync(this, Discord, roles, options);
+            => RemoveRolesAsync(roles.Select(x => x.Id));
 
         /// <inheritdoc />
         public ChannelPermissions GetPermissions(IGuildChannel channel)

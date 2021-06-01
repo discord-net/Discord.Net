@@ -26,6 +26,8 @@ namespace Discord.WebSocket
         public abstract string AvatarId { get; internal set; }
         /// <inheritdoc />
         public abstract bool IsWebhook { get; }
+        /// <inheritdoc />
+        public UserProperties? PublicFlags { get; private set; }
         internal abstract SocketGlobalUser GlobalUser { get; }
         internal abstract SocketPresence Presence { get; set; }
 
@@ -35,8 +37,6 @@ namespace Discord.WebSocket
         public string Discriminator => DiscriminatorValue.ToString("D4");
         /// <inheritdoc />
         public string Mention => MentionUtils.MentionUser(Id);
-        /// <inheritdoc />
-        public IActivity Activity => Presence.Activity;
         /// <inheritdoc />
         public UserStatus Status => Presence.Status;
         /// <inheritdoc />
@@ -83,12 +83,17 @@ namespace Discord.WebSocket
                 Username = model.Username.Value;
                 hasChanges = true;
             }
+            if (model.PublicFlags.IsSpecified && model.PublicFlags.Value != PublicFlags)
+            {
+                PublicFlags = model.PublicFlags.Value;
+                hasChanges = true;
+            }
             return hasChanges;
         }
 
         /// <inheritdoc />
-        public async Task<IDMChannel> GetOrCreateDMChannelAsync(RequestOptions options = null)
-            => GlobalUser.DMChannel ?? await UserHelper.CreateDMChannelAsync(this, Discord, options).ConfigureAwait(false) as IDMChannel;
+        public async Task<IDMChannel> CreateDMChannelAsync(RequestOptions options = null)
+            => await UserHelper.CreateDMChannelAsync(this, Discord, options).ConfigureAwait(false);
 
         /// <inheritdoc />
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)

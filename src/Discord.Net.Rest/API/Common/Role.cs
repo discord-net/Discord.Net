@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591
+#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -18,8 +18,10 @@ namespace Discord.API
         [JsonProperty("position")]
         public int Position { get; set; }
         [JsonProperty("permissions"), Int53]
-        public ulong Permissions { get; set; }
+        public string Permissions { get; set; }
         [JsonProperty("managed")]
         public bool Managed { get; set; }
+        [JsonProperty("tags")]
+        public Optional<RoleTags> Tags { get; set; }
     }
 }

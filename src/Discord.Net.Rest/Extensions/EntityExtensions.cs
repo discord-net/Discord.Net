@@ -34,6 +34,13 @@ namespace Discord.Rest
                 model.Thumbnail.IsSpecified ? model.Thumbnail.Value.ToEntity() : (EmbedThumbnail?)null,
                 model.Fields.IsSpecified ? model.Fields.Value.Select(x => x.ToEntity()).ToImmutableArray() : ImmutableArray.Create<EmbedField>());
         }
+        public static RoleTags ToEntity(this API.RoleTags model)
+        {
+            return new RoleTags(
+                model.BotId.IsSpecified ? model.BotId.Value : null,
+                model.IntegrationId.IsSpecified ? model.IntegrationId.Value : null,
+                model.IsPremiumSubscriber.IsSpecified ? true : false);
+        }
         public static API.Embed ToModel(this Embed entity)
         {
             if (entity == null) return null;

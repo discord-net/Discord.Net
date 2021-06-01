@@ -21,6 +21,12 @@ namespace Discord.Rest
         public ulong ChannelId { get; private set; }
         /// <inheritdoc />
         public ulong? GuildId { get; private set; }
+        /// <inheritdoc />
+        public IUser Inviter { get; private set; }
+        /// <inheritdoc />
+        public IUser TargetUser { get; private set; }
+        /// <inheritdoc />
+        public TargetUserType TargetUserType { get; private set; }
         internal IChannel Channel { get; }
         internal IGuild Guild { get; }
 
@@ -50,6 +56,9 @@ namespace Discord.Rest
             MemberCount = model.MemberCount.IsSpecified ? model.MemberCount.Value : null;
             PresenceCount = model.PresenceCount.IsSpecified ? model.PresenceCount.Value : null;
             ChannelType = (ChannelType)model.Channel.Type;
+            Inviter = model.Inviter.IsSpecified ? RestUser.Create(Discord, model.Inviter.Value) : null;
+            TargetUser = model.TargetUser.IsSpecified ? RestUser.Create(Discord, model.TargetUser.Value) : null;
+            TargetUserType = model.TargetUserType.IsSpecified ? model.TargetUserType.Value : TargetUserType.Undefined;
         }
 
         /// <inheritdoc />

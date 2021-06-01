@@ -43,7 +43,7 @@ namespace Discord
             AllowedMentions allowedMentions = null,
             MessageComponent component = null)
         {
-            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendMessageAsync(text, isTTS, embed, options, allowedMentions, component: component).ConfigureAwait(false);
+            return await (await user.CreateDMChannelAsync().ConfigureAwait(false)).SendMessageAsync(text, isTTS, embed, options, allowedMentions, component: component).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace Discord
             RequestOptions options = null,
             MessageComponent component = null)
         {
-            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(stream, filename, text, isTTS, embed, options, component: component).ConfigureAwait(false);
+            return await (await user.CreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(stream, filename, text, isTTS, embed, options, component: component).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace Discord
             RequestOptions options = null,
             MessageComponent component = null)
         {
-            return await (await user.GetOrCreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(filePath, text, isTTS, embed, options, component: component).ConfigureAwait(false);
+            return await (await user.CreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(filePath, text, isTTS, embed, options, component: component).ConfigureAwait(false);
         }
 
         /// <summary>
