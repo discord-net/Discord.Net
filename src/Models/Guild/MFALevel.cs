@@ -5,7 +5,7 @@ namespace Discord.Net.Models
     /// <summary>
     ///     Represents the m f a level.
     /// </summary>
-    public enum MFALevel
+    public enum MfaLevel
     {
         /// <summary>
         ///     Guild has no MFA/2FA requirement for moderation actions.

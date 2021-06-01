@@ -5,25 +5,25 @@ namespace Discord.Net.Models
     /// <summary>
     ///     Represents the guild NSFW level.
     /// </summary>
-    public enum GuildNSFWLevel
+    public enum GuildNsfwLevel
     {
         /// <summary>
-        ///     Default level, don't scan any content.
+        ///     Default level.
         /// </summary>
         Default = 0,
 
         /// <summary>
-        ///     Scan content from members without roles.
+        ///     Guild contains explicit content.
         /// </summary>
         Explicit = 1,
 
         /// <summary>
-        ///     Scan content from all members.
+        ///     Guild is safe for work.
         /// </summary>
         Safe = 2,
 
         /// <summary>
-        ///     Server has an age restriction.
+        ///     Guild has an age restriction.
         /// </summary>
         AgeRestricted = 3,
     }
