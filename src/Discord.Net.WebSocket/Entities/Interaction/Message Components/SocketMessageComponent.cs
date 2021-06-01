@@ -23,7 +23,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     The message that contained the trigger for this interaction.
         /// </summary>
-        public SocketMessage Message { get; private set; }
+        public SocketUserMessage Message { get; private set; }
 
         internal SocketMessageComponent(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
             : base(client, model.Id, channel)
@@ -63,7 +63,7 @@ namespace Discord.WebSocket
                     else
                         author = (this.Channel as SocketChannel).GetUser(model.Message.Value.Author.Value.Id);
 
-                    this.Message = SocketMessage.Create(this.Discord, this.Discord.State, author, this.Channel, model.Message.Value);
+                    this.Message = SocketUserMessage.Create(this.Discord, this.Discord.State, author, this.Channel, model.Message.Value);
                 }
                 else
                 {
