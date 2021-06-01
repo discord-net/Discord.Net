@@ -16,7 +16,7 @@
     <FileVersion>2.3.4</FileVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <DocumentationFile>C:\Users\lynch\Documents\GitHub\Discord.Net Labs\Discord.Net-Labs\src\Discord.Net.Rest\Discord.Net.Rest.xml</DocumentationFile>
+    <DocumentationFile>..\Discord.Net.Rest\Discord.Net.Rest.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />

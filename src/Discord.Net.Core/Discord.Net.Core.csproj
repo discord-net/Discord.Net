@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../../Discord.Net.targets" />
   <Import Project="../../StyleAnalyzer.targets" />
   <PropertyGroup>
@@ -17,7 +17,7 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup>
-    <DocumentationFile>C:\Users\lynch\Documents\GitHub\Discord.Net Labs\Discord.Net-Labs\src\Discord.Net.Core\Discord.Net.Core.xml</DocumentationFile>
+    <DocumentationFile>..\Discord.Net.Core\Discord.Net.Core.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
