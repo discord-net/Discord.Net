@@ -134,7 +134,7 @@ If, for whatever reason, you have two commands which are ambiguous to
 each other, you may use the @Discord.Commands.PriorityAttribute to
 specify which should be tested before the other.
 
-The `Priority` attributes are sorted in ascending order; the higher
+The `Priority` attributes are sorted in descending order; the higher
 priority will be called first.
 
 ### Command Context

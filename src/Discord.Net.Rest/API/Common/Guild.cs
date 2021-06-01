@@ -23,10 +23,6 @@ namespace Discord.API
         public ulong? AFKChannelId { get; set; }
         [JsonProperty("afk_timeout")]
         public int AFKTimeout { get; set; }
-        [JsonProperty("embed_enabled")]
-        public Optional<bool> EmbedEnabled { get; set; }
-        [JsonProperty("embed_channel_id")]
-        public Optional<ulong?> EmbedChannelId { get; set; }
         [JsonProperty("verification_level")]
         public VerificationLevel VerificationLevel { get; set; }
         [JsonProperty("default_message_notifications")]

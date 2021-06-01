@@ -1,5 +1,36 @@
 # Changelog
 
+## [2.4.0] - 2021-05-22
+### Added
+- #1726 Add stickers (91a9063)
+- #1753 Webhook message edit & delete functionality (f67cd8e)
+- #1757 Add ability to add/remove roles by id (4c9910c)
+- #1781 Add GetEmotesAsync to IGuild (df23d57)
+- #1801 Add missing property to MESSAGE_REACTION_ADD event (0715d7d)
+- #1828 Add methods to interact with reactions without a message object (5b244f2)
+- #1830 Add ModifyMessageAsync to IMessageChannel (365a848)
+- #1844 Add Discord Certified Moderator user flag (4b8d444)
+
+### Fixed
+- #1486 Add type reader when entity type reader exists (c46daaa)
+- #1835 Cached message emoji cleanup at MESSAGE_REACTION_REMOVE_EMOJI (8afef82)
+
+### Misc
+- #1778 Remove URI check from EmbedBuilder (25b04c4)
+- #1800 Fix spelling in SnowflakeUtils.FromSnowflake (6aff419)
+
+## [2.3.1] - 2021-03-10
+### Fixed
+- #1761 Deadlock in DiscordShardedClient when Ready is never received (73e5cc2)
+- #1773 Private methods aren't added as commands (0fc713a)
+- #1780 NullReferenceException in pin/unpin audit logs (f794163)
+- #1786 Add ChannelType property to ChannelInfo audit log (6ac5ea1)
+- #1791 Update Webhook ChannelId from model change (d2518db)
+- #1794 Audit log UserId can be null (d41aeee)
+
+### Misc
+- #1774 Add remark regarding CustomStatus as the activity (51b7afe)
+
 ## [2.3.0] - 2021-01-28
 ### Added
 - #1491 Add INVITE_CREATE and INVITE_DELETE events (1ab670b)

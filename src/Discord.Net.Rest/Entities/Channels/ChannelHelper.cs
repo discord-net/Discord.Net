@@ -33,8 +33,8 @@ namespace Discord.Rest
                     {
                         TargetId = overwrite.TargetId,
                         TargetType = overwrite.TargetType,
-                        Allow = overwrite.Permissions.AllowValue,
-                        Deny = overwrite.Permissions.DenyValue
+                        Allow = overwrite.Permissions.AllowValue.ToString(),
+                        Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
             };
@@ -59,8 +59,8 @@ namespace Discord.Rest
                     {
                         TargetId = overwrite.TargetId,
                         TargetType = overwrite.TargetType,
-                        Allow = overwrite.Permissions.AllowValue,
-                        Deny = overwrite.Permissions.DenyValue
+                        Allow = overwrite.Permissions.AllowValue.ToString(),
+                        Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
             };
@@ -84,8 +84,8 @@ namespace Discord.Rest
                     {
                         TargetId = overwrite.TargetId,
                         TargetType = overwrite.TargetType,
-                        Allow = overwrite.Permissions.AllowValue,
-                        Deny = overwrite.Permissions.DenyValue
+                        Allow = overwrite.Permissions.AllowValue.ToString(),
+                        Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
                     : Optional.Create<API.Overwrite[]>(),
             };
@@ -328,13 +328,13 @@ namespace Discord.Rest
         public static async Task AddPermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
             IUser user, OverwritePermissions perms, RequestOptions options)
         {
-            var args = new ModifyChannelPermissionsParams("member", perms.AllowValue, perms.DenyValue);
+            var args = new ModifyChannelPermissionsParams((int)PermissionTarget.User, perms.AllowValue.ToString(), perms.DenyValue.ToString());
             await client.ApiClient.ModifyChannelPermissionsAsync(channel.Id, user.Id, args, options).ConfigureAwait(false);
         }
         public static async Task AddPermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
             IRole role, OverwritePermissions perms, RequestOptions options)
         {
-            var args = new ModifyChannelPermissionsParams("role", perms.AllowValue, perms.DenyValue);
+            var args = new ModifyChannelPermissionsParams((int)PermissionTarget.Role, perms.AllowValue.ToString(), perms.DenyValue.ToString());
             await client.ApiClient.ModifyChannelPermissionsAsync(channel.Id, role.Id, args, options).ConfigureAwait(false);
         }
         public static async Task RemovePermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
@@ -450,8 +450,8 @@ namespace Discord.Rest
                     {
                         TargetId = overwrite.TargetId,
                         TargetType = overwrite.TargetType,
-                        Allow = overwrite.Permissions.AllowValue,
-                        Deny = overwrite.Permissions.DenyValue
+                        Allow = overwrite.Permissions.AllowValue.ToString(),
+                        Deny = overwrite.Permissions.DenyValue.ToString()
                     }).ToArray()
             };
             await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);

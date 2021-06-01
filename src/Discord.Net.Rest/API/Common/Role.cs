@@ -18,7 +18,7 @@ namespace Discord.API
         [JsonProperty("position")]
         public int Position { get; set; }
         [JsonProperty("permissions"), Int53]
-        public ulong Permissions { get; set; }
+        public string Permissions { get; set; }
         [JsonProperty("managed")]
         public bool Managed { get; set; }
         [JsonProperty("tags")]

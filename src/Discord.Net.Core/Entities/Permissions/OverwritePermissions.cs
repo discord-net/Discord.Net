@@ -43,9 +43,6 @@ namespace Discord
         /// <summary> If Allowed, a user may add reactions. </summary>
         public PermValue AddReactions => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.AddReactions);
         /// <summary> If Allowed, a user may join channels. </summary>
-        [Obsolete("Use ViewChannel instead.")]
-        public PermValue ReadMessages => ViewChannel;
-        /// <summary> If Allowed, a user may join channels. </summary>
         public PermValue ViewChannel => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.ViewChannel);
         /// <summary> If Allowed, a user may send messages. </summary>
         public PermValue SendMessages => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SendMessages);
@@ -91,6 +88,13 @@ namespace Discord
         {
             AllowValue = allowValue;
             DenyValue = denyValue;
+        }
+
+        /// <summary> Creates a new OverwritePermissions with the provided allow and deny packed values after converting to ulong. </summary>
+        public OverwritePermissions(string allowValue, string denyValue)
+        {
+            AllowValue = ulong.Parse(allowValue);
+            DenyValue = ulong.Parse(denyValue);
         }
 
         private OverwritePermissions(ulong allowValue, ulong denyValue,

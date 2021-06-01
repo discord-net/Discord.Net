@@ -60,9 +60,6 @@ namespace Discord
         /// <summary>
         ///     The message is an inline reply.
         /// </summary>
-        /// <remarks>
-        ///     Only available in API v8.
-        /// </remarks>
         Reply = 19,
     }
 }

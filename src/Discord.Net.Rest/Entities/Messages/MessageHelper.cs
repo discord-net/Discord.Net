@@ -122,13 +122,9 @@ namespace Discord.Rest
             await client.ApiClient.DeleteMessageAsync(channelId, msgId, options).ConfigureAwait(false);
         }
 
-        public static async Task SuppressEmbedsAsync(IMessage msg, BaseDiscordClient client, bool suppress, RequestOptions options)
+        public static async Task AddReactionAsync(ulong channelId, ulong messageId, IEmote emote, BaseDiscordClient client, RequestOptions options)
         {
-            var apiArgs = new API.Rest.SuppressEmbedParams
-            {
-                Suppressed = suppress
-            };
-            await client.ApiClient.SuppressEmbedAsync(msg.Channel.Id, msg.Id, apiArgs, options).ConfigureAwait(false);
+            await client.ApiClient.AddReactionAsync(channelId, messageId, emote is Emote e ? $"{e.Name}:{e.Id}" : UrlEncode(emote.Name), options).ConfigureAwait(false);
         }
 
         public static async Task AddReactionAsync(ulong channelId, ulong messageId, IEmote emote, BaseDiscordClient client, RequestOptions options)
