@@ -392,18 +392,6 @@
                 the API version it uses on startup.
             </remarks>
         </member>
-        <member name="P:Discord.DiscordConfig.RateLimitPrecision">
-            <summary>
-                Gets or sets the level of precision of the rate limit reset response.
-            </summary>
-            <remarks>
-                If set to <see cref="F:Discord.RateLimitPrecision.Second"/>, this value will be rounded up to the
-                nearest second.
-            </remarks>
-            <returns>
-                The currently set <see cref="P:Discord.DiscordConfig.RateLimitPrecision"/>.
-            </returns>
-        </member>
         <member name="P:Discord.DiscordConfig.UseSystemClock">
              <summary>
              	Gets or sets whether or not rate-limits should use the system clock.
@@ -1690,6 +1678,21 @@
                 A task that represents the asynchronous removal operation.
             </returns>
         </member>
+        <member name="M:Discord.IMessageChannel.ModifyMessageAsync(System.UInt64,System.Action{Discord.MessageProperties},Discord.RequestOptions)">
+            <summary>
+                Modifies a message.
+            </summary>
+            <remarks>
+                This method modifies this message with the specified properties. To see an example of this
+                method and what properties are available, please refer to <see cref="T:Discord.MessageProperties"/>.
+            </remarks>
+            <param name="messageId">The snowflake identifier of the message that would be changed.</param>
+            <param name="func">A delegate containing the properties to modify the message with.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous modification operation.
+            </returns>
+        </member>
         <member name="M:Discord.IMessageChannel.TriggerTypingAsync(Discord.RequestOptions)">
             <summary>
                 Broadcasts the "user is typing" message to all users in this channel, lasting 10 seconds.
@@ -2282,26 +2285,6 @@
         <member name="F:Discord.ExplicitContentFilterLevel.AllMembers">
             <summary> Scan messages sent by all guild members. </summary>
         </member>
-        <member name="T:Discord.GuildEmbedProperties">
-            <summary>
-                Provides properties that are used to modify the widget of an <see cref="T:Discord.IGuild" /> with the specified changes.
-            </summary>
-        </member>
-        <member name="P:Discord.GuildEmbedProperties.Enabled">
-            <summary>
-                Sets whether the widget should be enabled.
-            </summary>
-        </member>
-        <member name="P:Discord.GuildEmbedProperties.Channel">
-            <summary>
-                Sets the channel that the invite should place its users in, if not <c>null</c>.
-            </summary>
-        </member>
-        <member name="P:Discord.GuildEmbedProperties.ChannelId">
-            <summary>
-                Sets the channel the invite should place its users in, if not <c>null</c>.
-            </summary>
-        </member>
         <member name="T:Discord.GuildIntegrationProperties">
             <summary>
                 Provides properties used to modify an <see cref="T:Discord.IGuildIntegration" /> with the specified changes.
@@ -2511,14 +2494,6 @@
                 and moved into the AFK voice channel.
             </returns>
         </member>
-        <member name="P:Discord.IGuild.IsEmbeddable">
-            <summary>
-                Gets a value that indicates whether this guild is embeddable (i.e. can use widget).
-            </summary>
-            <returns>
-                <see langword="true" /> if this guild has a widget enabled; otherwise <see langword="false" />.
-            </returns>
-        </member>
         <member name="P:Discord.IGuild.IsWidgetEnabled">
             <summary>
                 Gets a value that indicates whether this guild has the widget enabled.
@@ -2626,31 +2601,6 @@
             <returns>
                 A <see langword="ulong"/> representing the snowflake identifier of the AFK voice channel; <see langword="null" /> if
                 none is set.
-            </returns>
-        </member>
-        <member name="P:Discord.IGuild.DefaultChannelId">
-            <summary>
-                Gets the ID of the default channel for this guild.
-            </summary>
-            <remarks>
-                This property retrieves the snowflake identifier of the first viewable text channel for this guild.
-                <note type="warning">
-                    This channel does not guarantee the user can send message to it, as it only looks for the first viewable
-                    text channel.
-                </note>
-            </remarks>
-            <returns>
-                A <see langword="ulong"/> representing the snowflake identifier of the default text channel; <c>0</c> if
-                none can be found.
-            </returns>
-        </member>
-        <member name="P:Discord.IGuild.EmbedChannelId">
-            <summary>
-                Gets the ID of the widget embed channel of this guild.
-            </summary>
-            <returns>
-                A <see langword="ulong"/> representing the snowflake identifier of the embedded channel found within the
-                widget settings of this guild; <see langword="null" /> if none is set.
             </returns>
         </member>
         <member name="P:Discord.IGuild.WidgetChannelId">
@@ -2881,16 +2831,6 @@
                 Modifies this guild.
             </summary>
             <param name="func">The delegate containing the properties to modify the guild with.</param>
-            <param name="options">The options to be used when sending the request.</param>
-            <returns>
-                A task that represents the asynchronous modification operation.
-            </returns>
-        </member>
-        <member name="M:Discord.IGuild.ModifyEmbedAsync(System.Action{Discord.GuildEmbedProperties},Discord.RequestOptions)">
-            <summary>
-                Modifies this guild's embed channel.
-            </summary>
-            <param name="func">The delegate containing the properties to modify the guild widget with.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous modification operation.
@@ -3131,17 +3071,6 @@
             <returns>
                 A task that represents the asynchronous get operation. The task result contains the first viewable text
                 channel in this guild; <see langword="null" /> if none is found.
-            </returns>
-        </member>
-        <member name="M:Discord.IGuild.GetEmbedChannelAsync(Discord.CacheMode,Discord.RequestOptions)">
-            <summary>
-                Gets the embed channel (i.e. the channel set in the guild's widget settings) in this guild.
-            </summary>
-            <param name="mode">The <see cref="T:Discord.CacheMode" /> that determines whether the object should be fetched from cache.</param>
-            <param name="options">The options to be used when sending the request.</param>
-            <returns>
-                A task that represents the asynchronous get operation. The task result contains the embed channel set
-                within the server's widget settings; <see langword="null" /> if none is set.
             </returns>
         </member>
         <member name="M:Discord.IGuild.GetWidgetChannelAsync(Discord.CacheMode,Discord.RequestOptions)">
@@ -3441,6 +3370,16 @@
             <returns>
                 A task that represents the asynchronous get operation. The task result contains a read-only collection
                 of webhooks found within the guild.
+            </returns>
+        </member>
+        <member name="M:Discord.IGuild.GetEmotesAsync(Discord.RequestOptions)">
+            <summary>
+                Gets a collection of emotes from this guild.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a read-only collection
+                of emotes found within the guild.
             </returns>
         </member>
         <member name="M:Discord.IGuild.GetEmoteAsync(System.UInt64,Discord.RequestOptions)">
@@ -4829,6 +4768,14 @@
                 A string containing the full invite URL (e.g. <c>https://discord.gg/FTqNnyS</c>).
             </returns>
         </member>
+        <member name="P:Discord.IInvite.Inviter">
+            <summary>
+                Gets the user that created this invite.
+            </summary>
+            <returns>
+                A user that created this invite.
+            </returns>
+        </member>
         <member name="P:Discord.IInvite.Channel">
             <summary>
                 Gets the channel this invite is linked to.
@@ -4900,26 +4847,26 @@
                 invite points to; <c>null</c> if one cannot be obtained.
             </returns>
         </member>
+        <member name="P:Discord.IInvite.TargetUser">
+            <summary>
+                Gets the user this invite is linked to via <see cref="P:Discord.IInvite.TargetUserType"/>.
+            </summary>
+            <returns>
+                A user that is linked to this invite.
+            </returns>
+        </member>
+        <member name="P:Discord.IInvite.TargetUserType">
+            <summary>
+                Gets the type of the linked <see cref="P:Discord.IInvite.TargetUser"/> for this invite.
+            </summary>
+            <returns>
+                The type of the linked user that is linked to this invite.
+            </returns>
+        </member>
         <member name="T:Discord.IInviteMetadata">
             <summary>
                 Represents additional information regarding the generic invite object.
             </summary>
-        </member>
-        <member name="P:Discord.IInviteMetadata.Inviter">
-            <summary>
-                Gets the user that created this invite.
-            </summary>
-            <returns>
-                A user that created this invite.
-            </returns>
-        </member>
-        <member name="P:Discord.IInviteMetadata.IsRevoked">
-            <summary>
-                Gets a value that indicates whether the invite has been revoked.
-            </summary>
-            <returns>
-                <c>true</c> if this invite was revoked; otherwise <c>false</c>.
-            </returns>
         </member>
         <member name="P:Discord.IInviteMetadata.IsTemporary">
             <summary>
@@ -6211,10 +6158,10 @@
                 Gets all embeds included in this message.
             </summary>
             <remarks>
-            </remarks>
                 This property gets a read-only collection of embeds associated with this message. Depending on the
                 message, a sent message may contain one or more embeds. This is usually true when multiple link previews
                 are generated; however, only one <see cref="F:Discord.EmbedType.Rich"/> <see cref="T:Discord.Embed"/> can be featured.
+            </remarks>
             <returns>
                 A read-only collection of embed objects.
             </returns>
@@ -6292,6 +6239,18 @@
             <summary>
                 The <see cref="T:Discord.IMessageComponent"/>'s attached to this message
             </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:Discord.IMessage.Stickers" -->
+        <member name="P:Discord.IMessage.Flags">
+            <summary>
+                Gets the flags related to this message.
+            </summary>
+            <remarks>
+                This value is determined by bitwise OR-ing <see cref="T:Discord.MessageFlags"/> values together.
+            </remarks>
+            <returns>
+                A message's flags, if any is associated.
+            </returns>
         </member>
         <member name="M:Discord.IMessage.AddReactionAsync(Discord.IEmote,Discord.RequestOptions)">
             <summary>
@@ -6410,6 +6369,75 @@
                 The <see cref="T:Discord.IEmote" /> used in the reaction.
             </summary>
         </member>
+        <member name="T:Discord.ISticker">
+            <summary>
+                Represents a discord sticker.
+            </summary>
+        </member>
+        <member name="P:Discord.ISticker.Id">
+            <summary>
+                Gets the ID of this sticker.
+            </summary>
+            <returns>
+                A snowflake ID associated with this sticker.
+            </returns>
+        </member>
+        <member name="P:Discord.ISticker.PackId">
+            <summary>
+                Gets the ID of the pack of this sticker.
+            </summary>
+            <returns>
+                A snowflake ID associated with the pack of this sticker.
+            </returns>
+        </member>
+        <member name="P:Discord.ISticker.Name">
+            <summary>
+                Gets the name of this sticker.
+            </summary>
+            <returns>
+                A <see langword="string"/> with the name of this sticker.
+            </returns>
+        </member>
+        <member name="P:Discord.ISticker.Description">
+            <summary>
+                Gets the description of this sticker.
+            </summary>
+            <returns>
+                A <see langword="string"/> with the description of this sticker.
+            </returns>
+        </member>
+        <member name="P:Discord.ISticker.Tags">
+            <summary>
+                Gets the list of tags of this sticker.
+            </summary>
+            <returns>
+                A read-only list with the tags of this sticker.
+            </returns>
+        </member>
+        <member name="P:Discord.ISticker.Asset">
+            <summary>
+                Gets the asset hash of this sticker.
+            </summary>
+            <returns>
+                A <see langword="string"/> with the asset hash of this sticker.
+            </returns>
+        </member>
+        <member name="P:Discord.ISticker.PreviewAsset">
+            <summary>
+                Gets the preview asset hash of this sticker.
+            </summary>
+            <returns>
+                A <see langword="string"/> with the preview asset hash of this sticker.
+            </returns>
+        </member>
+        <member name="P:Discord.ISticker.FormatType">
+            <summary>
+                Gets the format type of this sticker.
+            </summary>
+            <returns>
+                A <see cref="T:Discord.StickerFormatType"/> with the format type of this sticker.
+            </returns>
+        </member>
         <member name="T:Discord.ISystemMessage">
             <summary>
                 Represents a generic message sent by the system.
@@ -6443,19 +6471,6 @@
                 </code>
             </example>
             <param name="func">A delegate containing the properties to modify the message with.</param>
-            <param name="options">The options to be used when sending the request.</param>
-            <returns>
-                A task that represents the asynchronous modification operation.
-            </returns>
-        </member>
-        <member name="M:Discord.IUserMessage.ModifySuppressionAsync(System.Boolean,Discord.RequestOptions)">
-            <summary>
-                Modifies the suppression of this message.
-            </summary>
-            <remarks>
-                This method modifies whether or not embeds in this message are suppressed (hidden).
-            </remarks>
-            <param name="suppressEmbeds">Whether or not embeds in this message should be suppressed.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous modification operation.
@@ -6556,6 +6571,39 @@
                 Gets the name of the application.
             </summary>
         </member>
+        <member name="F:Discord.MessageFlags.None">
+            <summary>
+                Default value for flags, when none are given to a message.
+            </summary>
+        </member>
+        <member name="F:Discord.MessageFlags.Crossposted">
+            <summary>
+                Flag given to messages that have been published to subscribed
+                channels (via Channel Following).
+            </summary>
+        </member>
+        <member name="F:Discord.MessageFlags.IsCrosspost">
+            <summary>
+                Flag given to messages that originated from a message in another
+                channel (via Channel Following).
+            </summary>
+        </member>
+        <member name="F:Discord.MessageFlags.SuppressEmbeds">
+            <summary>
+                Flag given to messages that do not display any embeds.
+            </summary>
+        </member>
+        <member name="F:Discord.MessageFlags.SourceMessageDeleted">
+            <summary>
+                Flag given to messages that the source message for this crosspost
+                has been deleted (via Channel Following).
+            </summary>
+        </member>
+        <member name="F:Discord.MessageFlags.Urgent">
+            <summary>
+                Flag given to messages that came from the urgent message system.
+            </summary>
+        </member>
         <member name="T:Discord.MessageProperties">
             <summary>
                 Properties that are used to modify an <see cref="T:Discord.IUserMessage" /> with the specified changes.
@@ -6582,6 +6630,20 @@
         <member name="P:Discord.MessageProperties.Components">
             <summary>
                 Gets or sets the components for this message.
+            </summary>
+        </member>
+        <member name="P:Discord.MessageProperties.Flags">
+            <summary>
+                Gets or sets the flags of the message.
+            </summary>
+            <remarks>
+                Only <see cref="F:Discord.MessageFlags.SuppressEmbeds"/> can be set/unset and you need to be
+                the author of the message.
+            </remarks>
+        </member>
+        <member name="P:Discord.MessageProperties.AllowedMentions">
+            <summary>
+                Gets or sets the allowed mentions of the message.
             </summary>
         </member>
         <member name="T:Discord.MessageReference">
@@ -6720,9 +6782,6 @@
             <summary>
                 The message is an inline reply.
             </summary>
-            <remarks>
-                Only available in API v8.
-            </remarks>
         </member>
         <member name="F:Discord.MessageType.ApplicationCommand">
             <summary>
@@ -6752,6 +6811,21 @@
             <returns>
                 <c>true</c> if the user has reacted to the message; otherwise <c>false</c>.
             </returns>
+        </member>
+        <member name="T:Discord.StickerFormatType">
+            <summary> Defines the types of formats for stickers. </summary>
+        </member>
+        <member name="F:Discord.StickerFormatType.None">
+            <summary> Default value for a sticker format type. </summary>
+        </member>
+        <member name="F:Discord.StickerFormatType.Png">
+            <summary> The sticker format type is png. </summary>
+        </member>
+        <member name="F:Discord.StickerFormatType.Apng">
+            <summary> The sticker format type is apng. </summary>
+        </member>
+        <member name="F:Discord.StickerFormatType.Lottie">
+            <summary> The sticker format type is lottie. </summary>
         </member>
         <member name="T:Discord.TagHandling">
             <summary>
@@ -6874,11 +6948,6 @@
         <member name="F:Discord.ChannelPermission.AddReactions">
             <summary>
                 Allows for the addition of reactions to messages.
-            </summary>
-        </member>
-        <member name="F:Discord.ChannelPermission.ReadMessages">
-            <summary>
-                Allows for reading of messages. This flag is obsolete, use <see cref = "F:Discord.ChannelPermission.ViewChannel" /> instead.
             </summary>
         </member>
         <member name="F:Discord.ChannelPermission.ViewChannel">
@@ -7006,9 +7075,6 @@
         </member>
         <member name="P:Discord.ChannelPermissions.AddReactions">
             <summary> If <c>true</c>, a user may add reactions. </summary>
-        </member>
-        <member name="P:Discord.ChannelPermissions.ReadMessages">
-            <summary> If <c>true</c>, a user may join channels. </summary>
         </member>
         <member name="P:Discord.ChannelPermissions.ViewChannel">
             <summary> If <c>true</c>, a user may view channels. </summary>
@@ -7320,9 +7386,6 @@
         <member name="P:Discord.GuildPermissions.ViewGuildInsights">
             <summary> If <c>true</c>, a user may view the guild insights. </summary>
         </member>
-        <member name="P:Discord.GuildPermissions.ReadMessages">
-            <summary> If True, a user may join channels. </summary>
-        </member>
         <member name="P:Discord.GuildPermissions.ViewChannel">
             <summary> If True, a user may view channels. </summary>
         </member>
@@ -7391,6 +7454,9 @@
         </member>
         <member name="M:Discord.GuildPermissions.#ctor(System.UInt64)">
             <summary> Creates a new <see cref="T:Discord.GuildPermissions"/> with the provided packed value. </summary>
+        </member>
+        <member name="M:Discord.GuildPermissions.#ctor(System.String)">
+            <summary> Creates a new <see cref="T:Discord.GuildPermissions"/> with the provided packed value after converting to ulong. </summary>
         </member>
         <member name="M:Discord.GuildPermissions.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
             <summary> Creates a new <see cref="T:Discord.GuildPermissions"/> structure with the provided permissions. </summary>
@@ -7479,9 +7545,6 @@
         <member name="P:Discord.OverwritePermissions.AddReactions">
             <summary> If Allowed, a user may add reactions. </summary>
         </member>
-        <member name="P:Discord.OverwritePermissions.ReadMessages">
-            <summary> If Allowed, a user may join channels. </summary>
-        </member>
         <member name="P:Discord.OverwritePermissions.ViewChannel">
             <summary> If Allowed, a user may join channels. </summary>
         </member>
@@ -7541,6 +7604,9 @@
         </member>
         <member name="M:Discord.OverwritePermissions.#ctor(System.UInt64,System.UInt64)">
             <summary> Creates a new OverwritePermissions with the provided allow and deny packed values. </summary>
+        </member>
+        <member name="M:Discord.OverwritePermissions.#ctor(System.String,System.String)">
+            <summary> Creates a new OverwritePermissions with the provided allow and deny packed values after converting to ulong. </summary>
         </member>
         <member name="M:Discord.OverwritePermissions.#ctor(Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue)">
             <summary>
@@ -7818,6 +7884,14 @@
                 An <see cref="T:System.Int32"/> representing the position of the role in the role list of the guild.
             </returns>
         </member>
+        <member name="P:Discord.IRole.Tags">
+            <summary>
+                Gets the tags related to this role.
+            </summary>
+            <returns>
+                A <see cref="T:Discord.RoleTags"/> object containing all tags related to this role.
+            </returns>
+        </member>
         <member name="M:Discord.IRole.ModifyAsync(System.Action{Discord.RoleProperties},Discord.RequestOptions)">
             <summary>
                 Modifies this role.
@@ -7922,6 +7996,38 @@
             <remarks>
                 This value may not be set if the role is an @everyone role.
             </remarks>
+        </member>
+        <member name="T:Discord.RoleTags">
+            <summary>
+                Provides tags related to a discord role.
+            </summary>
+        </member>
+        <member name="P:Discord.RoleTags.BotId">
+            <summary>
+                Gets the identifier of the bot that this role belongs to, if it does.
+            </summary>
+            <returns>
+                A <see langword="ulong"/> if this role belongs to a bot; otherwise
+                <see langword="null"/>.
+            </returns>
+        </member>
+        <member name="P:Discord.RoleTags.IntegrationId">
+            <summary>
+                Gets the identifier of the integration that this role belongs to, if it does.
+            </summary>
+            <returns>
+                A <see langword="ulong"/> if this role belongs to an integration; otherwise
+                <see langword="null"/>.
+            </returns>
+        </member>
+        <member name="P:Discord.RoleTags.IsPremiumSubscriberRole">
+            <summary>
+                Gets if this role is the guild's premium subscriber (booster) role.
+            </summary>
+            <returns>
+                <see langword="true"/> if this role is the guild's premium subscriber role;
+                otherwise <see langword="false"/>.
+            </returns>
         </member>
         <member name="T:Discord.ITeam">
             <summary>
@@ -8234,6 +8340,11 @@
                 this user possesses.
             </returns>
         </member>
+        <member name="P:Discord.IGuildUser.IsPending">
+            <summary>
+                Whether the user has passed the guild's Membership Screening requirements.
+            </summary>
+        </member>
         <member name="M:Discord.IGuildUser.GetPermissions(Discord.IGuildChannel)">
             <summary>
                 Gets the level permissions granted to this user to a given channel.
@@ -8276,11 +8387,31 @@
                 A task that represents the asynchronous modification operation.
             </returns>
         </member>
+        <member name="M:Discord.IGuildUser.AddRoleAsync(System.UInt64,Discord.RequestOptions)">
+            <summary>
+                Adds the specified role to this user in the guild.
+            </summary>
+            <param name="roleId">The role to be added to the user.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous role addition operation.
+            </returns>
+        </member>
         <member name="M:Discord.IGuildUser.AddRoleAsync(Discord.IRole,Discord.RequestOptions)">
             <summary>
                 Adds the specified role to this user in the guild.
             </summary>
             <param name="role">The role to be added to the user.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous role addition operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IGuildUser.AddRolesAsync(System.Collections.Generic.IEnumerable{System.UInt64},Discord.RequestOptions)">
+            <summary>
+                Adds the specified <paramref name="roleIds"/> to this user in the guild.
+            </summary>
+            <param name="roleIds">The roles to be added to the user.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous role addition operation.
@@ -8296,11 +8427,31 @@
                 A task that represents the asynchronous role addition operation.
             </returns>
         </member>
+        <member name="M:Discord.IGuildUser.RemoveRoleAsync(System.UInt64,Discord.RequestOptions)">
+            <summary>
+                Removes the specified <paramref name="roleId"/> from this user in the guild.
+            </summary>
+            <param name="roleId">The role to be removed from the user.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous role removal operation.
+            </returns>
+        </member>
         <member name="M:Discord.IGuildUser.RemoveRoleAsync(Discord.IRole,Discord.RequestOptions)">
             <summary>
                 Removes the specified <paramref name="role"/> from this user in the guild.
             </summary>
             <param name="role">The role to be removed from the user.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous role removal operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IGuildUser.RemoveRolesAsync(System.Collections.Generic.IEnumerable{System.UInt64},Discord.RequestOptions)">
+            <summary>
+                Removes the specified <paramref name="roleIds"/> from this user in the guild.
+            </summary>
+            <param name="roleIds">The roles to be removed from the user.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous role removal operation.
@@ -8319,11 +8470,6 @@
         <member name="T:Discord.IPresence">
             <summary>
                 Represents the user's presence status. This may include their online status and their activity.
-            </summary>
-        </member>
-        <member name="P:Discord.IPresence.Activity">
-            <summary>
-                Gets the activity this user is currently doing.
             </summary>
         </member>
         <member name="P:Discord.IPresence.Status">
@@ -8484,9 +8630,20 @@
                 Gets the username for this user.
             </summary>
         </member>
-        <member name="M:Discord.IUser.GetOrCreateDMChannelAsync(Discord.RequestOptions)">
+        <member name="P:Discord.IUser.PublicFlags">
             <summary>
-                Gets the direct message channel of this user, or create one if it does not already exist.
+                Gets the public flags that are applied to this user's account.
+            </summary>
+            <remarks>
+                This value is determined by bitwise OR-ing <see cref="T:Discord.UserProperties"/> values together.
+            </remarks>
+            <returns>
+                The value of public flags for this user.
+            </returns>
+        </member>
+        <member name="M:Discord.IUser.CreateDMChannelAsync(Discord.RequestOptions)">
+            <summary>
+                Creates the direct message channel of this user.
             </summary>
             <remarks>
                 This method is used to obtain or create a channel used to send a direct message.
@@ -8501,7 +8658,7 @@
             <example>
                 <para>The following example attempts to send a direct message to the target user and logs the incident should
                 it fail.</para>
-                <code region="GetOrCreateDMChannelAsync" language="cs"
+                <code region="CreateDMChannelAsync" language="cs"
                       source="../../../Discord.Net.Examples/Core/Entities/Users/IUser.Examples.cs"/>
             </example>
             <param name="options">The options to be used when sending the request.</param>
@@ -8629,17 +8786,22 @@
         </member>
         <member name="F:Discord.UserProperties.Staff">
             <summary>
-                Flag given to Discord staff.
+                Flag given to users who are a Discord employee.
             </summary>
         </member>
         <member name="F:Discord.UserProperties.Partner">
             <summary>
-                Flag given to Discord partners.
+                Flag given to users who are owners of a partnered Discord server.
             </summary>
         </member>
-        <member name="F:Discord.UserProperties.BugHunter">
+        <member name="F:Discord.UserProperties.HypeSquadEvents">
             <summary>
-                Flag given to users who have participated in the bug report program.
+                Flag given to users in HypeSquad events.
+            </summary>
+        </member>
+        <member name="F:Discord.UserProperties.BugHunterLevel1">
+            <summary>
+                Flag given to users who have participated in the bug report program and are level 1.
             </summary>
         </member>
         <member name="F:Discord.UserProperties.HypeSquadBravery">
@@ -8660,6 +8822,36 @@
         <member name="F:Discord.UserProperties.EarlySupporter">
             <summary>
                 Flag given to users who subscribed to Nitro before games were added.
+            </summary>
+        </member>
+        <member name="F:Discord.UserProperties.TeamUser">
+            <summary>
+                Flag given to users who are part of a team.
+            </summary>
+        </member>
+        <member name="F:Discord.UserProperties.System">
+            <summary>
+                Flag given to users who represent Discord (System).
+            </summary>
+        </member>
+        <member name="F:Discord.UserProperties.BugHunterLevel2">
+            <summary>
+                Flag given to users who have participated in the bug report program and are level 2.
+            </summary>
+        </member>
+        <member name="F:Discord.UserProperties.VerifiedBot">
+            <summary>
+                Flag given to users who are verified bots.
+            </summary>
+        </member>
+        <member name="F:Discord.UserProperties.EarlyVerifiedBotDeveloper">
+            <summary>
+                Flag given to users that developed bots and early verified their accounts.
+            </summary>
+        </member>
+        <member name="F:Discord.UserProperties.DiscordCertifiedModerator">
+            <summary>
+                Flag given to users that are discord certified moderators who has give discord's exam.
             </summary>
         </member>
         <member name="T:Discord.UserStatus">
@@ -9198,6 +9390,17 @@
         </member>
         <member name="F:Discord.GatewayIntents.DirectMessageTyping">
             <summary> This intent includes TYPING_START </summary>
+        </member>
+        <member name="F:Discord.GatewayIntents.AllUnprivileged">
+            <summary>
+                This intent includes all but <see cref="F:Discord.GatewayIntents.GuildMembers"/> and <see cref="F:Discord.GatewayIntents.GuildMembers"/>
+                that are privileged must be enabled for the application.
+            </summary>
+        </member>
+        <member name="F:Discord.GatewayIntents.All">
+            <summary>
+                This intent includes all of them, including privileged ones.
+            </summary>
         </member>
         <member name="T:Discord.IDiscordClient">
             <summary>
@@ -9838,22 +10041,6 @@
                 and an optional reason.
             </summary>
         </member>
-        <member name="T:Discord.RateLimitPrecision">
-            <summary>
-                Specifies the level of precision to request in the rate limit
-                response header.
-            </summary>
-        </member>
-        <member name="F:Discord.RateLimitPrecision.Second">
-            <summary>
-                Specifies precision rounded up to the nearest whole second
-            </summary>
-        </member>
-        <member name="F:Discord.RateLimitPrecision.Millisecond">
-            <summary>
-                Specifies precision rounded to the nearest millisecond.
-            </summary>
-        </member>
         <member name="T:Discord.RequestOptions">
             <summary>
                 Represents options that should be used when sending a request.
@@ -10456,7 +10643,7 @@
             </summary>
             <param name="value">The snowflake identifier to resolve.</param>
             <returns>
-                A <see cref="T:System.DateTimeOffset" /> representing the time for when the object is geenrated.
+                A <see cref="T:System.DateTimeOffset" /> representing the time for when the object is generated.
             </returns>
         </member>
         <member name="M:Discord.SnowflakeUtils.ToSnowflake(System.DateTimeOffset)">

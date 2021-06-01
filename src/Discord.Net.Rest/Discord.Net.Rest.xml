@@ -29,7 +29,7 @@
                 Gets the name of the application.
             </summary>
         </member>
-        <member name="M:Discord.API.DiscordRestApiClient.#ctor(Discord.Net.Rest.RestClientProvider,System.String,Discord.RetryMode,Newtonsoft.Json.JsonSerializer,Discord.RateLimitPrecision,System.Boolean)">
+        <member name="M:Discord.API.DiscordRestApiClient.#ctor(Discord.Net.Rest.RestClientProvider,System.String,Discord.RetryMode,Newtonsoft.Json.JsonSerializer,System.Boolean)">
             <exception cref="T:System.ArgumentException">Unknown OAuth token type.</exception>
         </member>
         <member name="M:Discord.API.DiscordRestApiClient.SetBaseUrl(System.String)">
@@ -57,6 +57,13 @@
             <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
             <exception cref="T:System.InvalidOperationException">This operation may only be called with a <see cref="F:Discord.TokenType.Webhook"/> token.</exception>
         </member>
+        <member name="M:Discord.API.DiscordRestApiClient.ModifyWebhookMessageAsync(System.UInt64,System.UInt64,Discord.API.Rest.ModifyWebhookMessageParams,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">This operation may only be called with a <see cref="F:Discord.TokenType.Webhook"/> token.</exception>
+        </member>
+        <member name="M:Discord.API.DiscordRestApiClient.DeleteWebhookMessageAsync(System.UInt64,System.UInt64,Discord.RequestOptions)">
+            <exception cref="T:System.InvalidOperationException">This operation may only be called with a <see cref="F:Discord.TokenType.Webhook"/> token.</exception>
+        </member>
         <member name="M:Discord.API.DiscordRestApiClient.UploadFileAsync(System.UInt64,Discord.API.Rest.UploadFileParams,Discord.RequestOptions)">
             <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
         </member>
@@ -77,13 +84,6 @@
         </member>
         <member name="M:Discord.API.DiscordRestApiClient.RemoveGuildBanAsync(System.UInt64,System.UInt64,Discord.RequestOptions)">
             <exception cref="T:System.ArgumentException"><paramref name="guildId"/> and <paramref name="userId"/> must not be equal to zero.</exception>
-        </member>
-        <member name="M:Discord.API.DiscordRestApiClient.GetGuildEmbedAsync(System.UInt64,Discord.RequestOptions)">
-            <exception cref="T:System.ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
-        </member>
-        <member name="M:Discord.API.DiscordRestApiClient.ModifyGuildEmbedAsync(System.UInt64,Discord.API.Rest.ModifyGuildEmbedParams,Discord.RequestOptions)">
-            <exception cref="T:System.ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
-            <exception cref="T:System.ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
         </member>
         <member name="M:Discord.API.DiscordRestApiClient.GetGuildWidgetAsync(System.UInt64,Discord.RequestOptions)">
             <exception cref="T:System.ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
@@ -133,12 +133,6 @@
         </member>
         <member name="M:Discord.Net.Converters.ImageConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
             <exception cref="T:System.InvalidOperationException">Cannot read from image.</exception>
-        </member>
-        <member name="M:Discord.Net.Converters.PermissionTargetConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
-            <exception cref="T:Newtonsoft.Json.JsonSerializationException">Unknown permission target.</exception>
-        </member>
-        <member name="M:Discord.Net.Converters.PermissionTargetConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
-            <exception cref="T:Newtonsoft.Json.JsonSerializationException">Invalid permission target.</exception>
         </member>
         <member name="P:Discord.Rest.BaseDiscordClient.LoginState">
             <summary>
@@ -503,6 +497,14 @@
             <returns>
                 An <see cref="T:System.Int32"/> representing the bit-rate set for the voice channel;
                 <c>null</c> if this is not mentioned in this entry.
+            </returns>
+        </member>
+        <member name="P:Discord.Rest.ChannelInfo.ChannelType">
+            <summary>
+                Gets the type of this channel.
+            </summary>
+            <returns>
+                The channel type of this channel; <c>null</c> if not applicable.
             </returns>
         </member>
         <member name="T:Discord.Rest.ChannelUpdateAuditLogData">
@@ -1174,10 +1176,10 @@
         </member>
         <member name="P:Discord.Rest.MessagePinAuditLogData.Target">
             <summary>
-                Gets the user of the message that was pinned.
+                Gets the user of the message that was pinned if available.
             </summary>
             <returns>
-                A user object representing the user that created the pinned message.
+                A user object representing the user that created the pinned message or <see langword="null"/>.
             </returns>
         </member>
         <member name="T:Discord.Rest.MessageUnpinAuditLogData">
@@ -1203,10 +1205,10 @@
         </member>
         <member name="P:Discord.Rest.MessageUnpinAuditLogData.Target">
             <summary>
-                Gets the user of the message that was unpinned.
+                Gets the user of the message that was unpinned if available.
             </summary>
             <returns>
-                A user object representing the user that created the unpinned message.
+                A user object representing the user that created the unpinned message or <see langword="null"/>.
             </returns>
         </member>
         <member name="T:Discord.Rest.OverwriteCreateAuditLogData">
@@ -1972,6 +1974,9 @@
         <member name="M:Discord.Rest.RestDMChannel.DeleteMessageAsync(Discord.IMessage,Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.Rest.RestDMChannel.ModifyMessageAsync(System.UInt64,System.Action{Discord.MessageProperties},Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.Rest.RestDMChannel.TriggerTypingAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
@@ -2061,6 +2066,9 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestGroupChannel.DeleteMessageAsync(Discord.IMessage,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestGroupChannel.ModifyMessageAsync(System.UInt64,System.Action{Discord.MessageProperties},Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestGroupChannel.SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)">
@@ -2356,6 +2364,9 @@
         <member name="M:Discord.Rest.RestTextChannel.DeleteMessagesAsync(System.Collections.Generic.IEnumerable{System.UInt64},Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.Rest.RestTextChannel.ModifyMessageAsync(System.UInt64,System.Action{Discord.MessageProperties},Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.Rest.RestTextChannel.TriggerTypingAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
@@ -2517,9 +2528,6 @@
         <member name="M:Discord.Rest.GuildHelper.ModifyAsync(Discord.IGuild,Discord.Rest.BaseDiscordClient,System.Action{Discord.GuildProperties},Discord.RequestOptions)">
             <exception cref="T:System.ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
         </member>
-        <member name="M:Discord.Rest.GuildHelper.ModifyEmbedAsync(Discord.IGuild,Discord.Rest.BaseDiscordClient,System.Action{Discord.GuildEmbedProperties},Discord.RequestOptions)">
-            <exception cref="T:System.ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
-        </member>
         <member name="M:Discord.Rest.GuildHelper.ModifyWidgetAsync(Discord.IGuild,Discord.Rest.BaseDiscordClient,System.Action{Discord.GuildWidgetProperties},Discord.RequestOptions)">
             <exception cref="T:System.ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
         </member>
@@ -2576,9 +2584,6 @@
         <member name="P:Discord.Rest.RestGuild.AFKTimeout">
             <inheritdoc />
         </member>
-        <member name="P:Discord.Rest.RestGuild.IsEmbeddable">
-            <inheritdoc />
-        </member>
         <member name="P:Discord.Rest.RestGuild.IsWidgetEnabled">
             <inheritdoc />
         </member>
@@ -2595,9 +2600,6 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestGuild.AFKChannelId">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.Rest.RestGuild.EmbedChannelId">
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestGuild.WidgetChannelId">
@@ -2721,10 +2723,6 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestGuild.ModifyAsync(System.Action{Discord.GuildProperties},Discord.RequestOptions)">
-            <inheritdoc />
-            <exception cref="T:System.ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
-        </member>
-        <member name="M:Discord.Rest.RestGuild.ModifyEmbedAsync(System.Action{Discord.GuildEmbedProperties},Discord.RequestOptions)">
             <inheritdoc />
             <exception cref="T:System.ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         </member>
@@ -2878,16 +2876,6 @@
             <returns>
                 A task that represents the asynchronous get operation. The task result contains the first viewable text
                 channel in this guild; <see langword="null"/> if none is found.
-            </returns>
-        </member>
-        <member name="M:Discord.Rest.RestGuild.GetEmbedChannelAsync(Discord.RequestOptions)">
-            <summary>
-                Gets the embed channel (i.e. the channel set in the guild's widget settings) in this guild.
-            </summary>
-            <param name="options">The options to be used when sending the request.</param>
-            <returns>
-                A task that represents the asynchronous get operation. The task result contains the embed channel set
-                within the server's widget settings; <see langword="null"/> if none is set.
             </returns>
         </member>
         <member name="M:Discord.Rest.RestGuild.GetWidgetChannelAsync(Discord.RequestOptions)">
@@ -3165,6 +3153,9 @@
                 The name of the guild.
             </returns>
         </member>
+        <member name="M:Discord.Rest.RestGuild.GetEmotesAsync(Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.Rest.RestGuild.GetEmoteAsync(System.UInt64,Discord.RequestOptions)">
             <inheritdoc />
         </member>
@@ -3224,9 +3215,6 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetDefaultChannelAsync(Discord.CacheMode,Discord.RequestOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetEmbedChannelAsync(Discord.CacheMode,Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetWidgetChannelAsync(Discord.CacheMode,Discord.RequestOptions)">
@@ -3518,6 +3506,15 @@
         <member name="P:Discord.Rest.RestInvite.GuildId">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestInvite.Inviter">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.RestInvite.TargetUser">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.RestInvite.TargetUserType">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.Rest.RestInvite.Code">
             <inheritdoc />
         </member>
@@ -3547,9 +3544,6 @@
         <member name="T:Discord.Rest.RestInviteMetadata">
             <summary> Represents additional information regarding the REST-based invite object. </summary>
         </member>
-        <member name="P:Discord.Rest.RestInviteMetadata.IsRevoked">
-            <inheritdoc />
-        </member>
         <member name="P:Discord.Rest.RestInviteMetadata.IsTemporary">
             <inheritdoc />
         </member>
@@ -3562,15 +3556,7 @@
         <member name="P:Discord.Rest.RestInviteMetadata.Uses">
             <inheritdoc />
         </member>
-        <member name="P:Discord.Rest.RestInviteMetadata.Inviter">
-            <summary>
-                Gets the user that created this invite.
-            </summary>
-        </member>
         <member name="P:Discord.Rest.RestInviteMetadata.CreatedAt">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.Rest.RestInviteMetadata.Discord#IInviteMetadata#Inviter">
             <inheritdoc />
         </member>
         <member name="F:Discord.Rest.MessageHelper.InlineCodeRegex">
@@ -3714,6 +3700,9 @@
         <member name="P:Discord.Rest.RestMessage.Tags">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestMessage.Stickers">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.Rest.RestMessage.Timestamp">
             <inheritdoc />
         </member>
@@ -3724,6 +3713,9 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestMessage.Reference">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.RestMessage.Flags">
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestMessage.Components">
@@ -3757,6 +3749,9 @@
         </member>
         <member name="P:Discord.Rest.RestMessage.Discord#IMessage#Components">
             <inheritdoc/>
+        </member>
+        <member name="P:Discord.Rest.RestMessage.Discord#IMessage#Stickers">
+            <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestMessage.Reactions">
             <inheritdoc />
@@ -3843,6 +3838,9 @@
         <member name="P:Discord.Rest.RestUserMessage.Tags">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestUserMessage.Stickers">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.Rest.RestUserMessage.ReferencedMessage">
             <inheritdoc />
         </member>
@@ -3853,9 +3851,6 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestUserMessage.UnpinAsync(Discord.RequestOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.Rest.RestUserMessage.ModifySuppressionAsync(System.Boolean,Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestUserMessage.Resolve(Discord.TagHandling,Discord.TagHandling,Discord.TagHandling,Discord.TagHandling,Discord.TagHandling)">
@@ -3935,6 +3930,9 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestRole.Position">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.RestRole.Tags">
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestRole.CreatedAt">
@@ -4061,6 +4059,9 @@
         <member name="P:Discord.Rest.RestGuildUser.GuildId">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestGuildUser.IsPending">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.Rest.RestGuildUser.GuildPermissions">
             <inheritdoc />
             <exception cref="T:System.InvalidOperationException" accessor="get">Resolving permissions requires the parent guild to be downloaded.</exception>
@@ -4080,13 +4081,25 @@
         <member name="M:Discord.Rest.RestGuildUser.KickAsync(System.String,Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.Rest.RestGuildUser.AddRoleAsync(System.UInt64,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.Rest.RestGuildUser.AddRoleAsync(Discord.IRole,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestGuildUser.AddRolesAsync(System.Collections.Generic.IEnumerable{System.UInt64},Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestGuildUser.AddRolesAsync(System.Collections.Generic.IEnumerable{Discord.IRole},Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.Rest.RestGuildUser.RemoveRoleAsync(System.UInt64,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.Rest.RestGuildUser.RemoveRoleAsync(Discord.IRole,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestGuildUser.RemoveRolesAsync(System.Collections.Generic.IEnumerable{System.UInt64},Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestGuildUser.RemoveRolesAsync(System.Collections.Generic.IEnumerable{Discord.IRole},Discord.RequestOptions)">
@@ -4168,6 +4181,9 @@
         <member name="P:Discord.Rest.RestUser.AvatarId">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestUser.PublicFlags">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.Rest.RestUser.CreatedAt">
             <inheritdoc />
         </member>
@@ -4195,9 +4211,9 @@
         <member name="M:Discord.Rest.RestUser.UpdateAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
-        <member name="M:Discord.Rest.RestUser.GetOrCreateDMChannelAsync(Discord.RequestOptions)">
+        <member name="M:Discord.Rest.RestUser.CreateDMChannelAsync(Discord.RequestOptions)">
             <summary>
-                Returns a direct message channel to this user, or create one if it does not already exist.
+                Creates a direct message channel to this user.
             </summary>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
@@ -4218,7 +4234,7 @@
                 A string that resolves to Username#Discriminator of the user.
             </returns>
         </member>
-        <member name="M:Discord.Rest.RestUser.Discord#IUser#GetOrCreateDMChannelAsync(Discord.RequestOptions)">
+        <member name="M:Discord.Rest.RestUser.Discord#IUser#CreateDMChannelAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestWebhookUser.WebhookId">
@@ -4245,6 +4261,9 @@
         <member name="P:Discord.Rest.RestWebhookUser.Discord#IGuildUser#Nickname">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestWebhookUser.Discord#IGuildUser#IsPending">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.Rest.RestWebhookUser.Discord#IGuildUser#GuildPermissions">
             <inheritdoc />
         </member>
@@ -4257,13 +4276,25 @@
         <member name="M:Discord.Rest.RestWebhookUser.Discord#IGuildUser#ModifyAsync(System.Action{Discord.GuildUserProperties},Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.Rest.RestWebhookUser.Discord#IGuildUser#AddRoleAsync(System.UInt64,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.Rest.RestWebhookUser.Discord#IGuildUser#AddRoleAsync(Discord.IRole,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestWebhookUser.Discord#IGuildUser#AddRolesAsync(System.Collections.Generic.IEnumerable{System.UInt64},Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestWebhookUser.Discord#IGuildUser#AddRolesAsync(System.Collections.Generic.IEnumerable{Discord.IRole},Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.Rest.RestWebhookUser.Discord#IGuildUser#RemoveRoleAsync(System.UInt64,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.Rest.RestWebhookUser.Discord#IGuildUser#RemoveRoleAsync(Discord.IRole,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestWebhookUser.Discord#IGuildUser#RemoveRolesAsync(System.Collections.Generic.IEnumerable{System.UInt64},Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestWebhookUser.Discord#IGuildUser#RemoveRolesAsync(System.Collections.Generic.IEnumerable{Discord.IRole},Discord.RequestOptions)">
@@ -4293,10 +4324,10 @@
         <member name="P:Discord.Rest.RestWebhookUser.Discord#IVoiceState#IsStreaming">
             <inheritdoc />
         </member>
-        <member name="P:Discord.Rest.RestWebhook.ChannelId">
+        <member name="P:Discord.Rest.RestWebhook.Token">
             <inheritdoc />
         </member>
-        <member name="P:Discord.Rest.RestWebhook.Token">
+        <member name="P:Discord.Rest.RestWebhook.ChannelId">
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestWebhook.Name">
@@ -4377,6 +4408,33 @@
             <returns>
                 A string containing the filename of this attachment.
             </returns>
+        </member>
+        <member name="T:Discord.Sticker">
+            <inheritdoc cref="T:Discord.ISticker"/>
+        </member>
+        <member name="P:Discord.Sticker.Id">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Sticker.PackId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Sticker.Name">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Sticker.Description">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Sticker.Tags">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Sticker.Asset">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Sticker.PreviewAsset">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Sticker.FormatType">
+            <inheritdoc />
         </member>
     </members>
 </doc>

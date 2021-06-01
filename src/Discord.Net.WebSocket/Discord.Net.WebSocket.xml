@@ -83,61 +83,6 @@
         <member name="M:Discord.API.DiscordSocketApiClient.DisconnectInternalAsync(System.Exception)">
             <exception cref="T:System.NotSupportedException">This client is not configured with WebSocket support.</exception>
         </member>
-        <member name="M:Discord.Audio.AudioClient.#ctor(Discord.WebSocket.SocketGuild,System.Int32,System.UInt64)">
-            <summary> Creates a new REST/WebSocket discord client. </summary>
-        </member>
-        <member name="M:Discord.Audio.AudioClient.Dispose">
-            <inheritdoc />
-        </member>
-        <member name="T:Discord.Audio.Streams.BufferedWriteStream">
-            <summary> Wraps another stream with a timed buffer. </summary>
-        </member>
-        <member name="T:Discord.Audio.Streams.InputStream">
-            <summary> Reads the payload from an RTP frame </summary>
-        </member>
-        <member name="T:Discord.Audio.Streams.OpusDecodeStream">
-            <summary> Converts Opus to PCM </summary>
-        </member>
-        <member name="M:Discord.Audio.Streams.OpusDecodeStream.WriteHeader(System.UInt16,System.UInt32,System.Boolean)">
-            <exception cref="T:System.InvalidOperationException">Header received with no payload.</exception>
-        </member>
-        <member name="M:Discord.Audio.Streams.OpusDecodeStream.WriteAsync(System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
-            <exception cref="T:System.InvalidOperationException">Received payload without an RTP header.</exception>
-        </member>
-        <member name="T:Discord.Audio.Streams.OpusEncodeStream">
-            <summary> Converts PCM to Opus </summary>
-        </member>
-        <member name="T:Discord.Audio.Streams.OutputStream">
-            <summary> Wraps an IAudioClient, sending voice data on write. </summary>
-        </member>
-        <member name="T:Discord.Audio.Streams.RTPReadStream">
-            <summary> Reads the payload from an RTP frame </summary>
-        </member>
-        <member name="M:Discord.Audio.Streams.RTPReadStream.WriteAsync(System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
-            <exception cref="T:System.OperationCanceledException">The token has had cancellation requested.</exception>
-            <exception cref="T:System.ObjectDisposedException">The associated <see cref="T:System.Threading.CancellationTokenSource" /> has been disposed.</exception>
-        </member>
-        <member name="T:Discord.Audio.Streams.RTPWriteStream">
-            <summary> Wraps data in an RTP frame </summary>
-        </member>
-        <member name="T:Discord.Audio.Streams.SodiumDecryptStream">
-            <summary>
-                Decrypts an RTP frame using libsodium.
-            </summary>
-        </member>
-        <member name="T:Discord.Audio.Streams.SodiumEncryptStream">
-            <summary>
-                Encrypts an RTP frame using libsodium.
-            </summary>
-        </member>
-        <member name="M:Discord.Audio.Streams.SodiumEncryptStream.WriteHeader(System.UInt16,System.UInt32,System.Boolean)">
-            <exception cref="T:System.InvalidOperationException">Header received with no payload.</exception>
-        </member>
-        <member name="M:Discord.Audio.Streams.SodiumEncryptStream.WriteAsync(System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
-            <exception cref="T:System.InvalidOperationException">Received payload without an RTP header.</exception>
-            <exception cref="T:System.OperationCanceledException">The token has had cancellation requested.</exception>
-            <exception cref="T:System.ObjectDisposedException">The associated <see cref="T:System.Threading.CancellationTokenSource" /> has been disposed.</exception>
-        </member>
         <member name="T:Discord.WebSocket.BaseSocketClient">
             <summary>
                 Represents the base of a WebSocket-based Discord client.
@@ -200,14 +145,6 @@
             </remarks>
             <returns>
                 A read-only collection of private channels that the user currently partakes in.
-            </returns>
-        </member>
-        <member name="P:Discord.WebSocket.BaseSocketClient.VoiceRegions">
-            <summary>
-                Gets a collection of available voice regions.
-            </summary>
-            <returns>
-                A read-only collection of voice regions that the user has access to.
             </returns>
         </member>
         <member name="M:Discord.WebSocket.BaseSocketClient.GetApplicationInfoAsync(Discord.RequestOptions)">
@@ -291,14 +228,24 @@
                 found.
             </returns>
         </member>
-        <member name="M:Discord.WebSocket.BaseSocketClient.GetVoiceRegion(System.String)">
+        <member name="M:Discord.WebSocket.BaseSocketClient.GetVoiceRegionsAsync(Discord.RequestOptions)">
+            <summary>
+                Gets all voice regions.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that contains a read-only collection of REST-based voice regions.
+            </returns>
+        </member>
+        <member name="M:Discord.WebSocket.BaseSocketClient.GetVoiceRegionAsync(System.String,Discord.RequestOptions)">
             <summary>
                 Gets a voice region.
             </summary>
             <param name="id">The identifier of the voice region (e.g. <c>eu-central</c> ).</param>
+            <param name="options">The options to be used when sending the request.</param>
             <returns>
-                A REST-based voice region associated with the identifier; <c>null</c> if the voice region is not
-                found.
+                A task that contains a REST-based voice region associated with the identifier; <c>null</c> if the
+                voice region is not found.
             </returns>
         </member>
         <member name="M:Discord.WebSocket.BaseSocketClient.StartAsync">
@@ -323,6 +270,12 @@
             <param name="name">The name of the game.</param>
             <param name="streamUrl">If streaming, the URL of the stream. Must be a valid Twitch URL.</param>
             <param name="type">The type of the game.</param>
+            <remarks>
+                <note type="warning">
+                    Bot accounts cannot set <see cref="F:Discord.ActivityType.CustomStatus"/> as their activity
+                    type and it will have no effect.
+                </note>
+            </remarks>
             <returns>
                 A task that represents the asynchronous set operation.
             </returns>
@@ -335,6 +288,10 @@
                 This method sets the <paramref name="activity"/> of the user. 
                 <note type="note">
                     Discord will only accept setting of name and the type of activity.
+                </note>
+                <note type="warning">
+                    Bot accounts cannot set <see cref="F:Discord.ActivityType.CustomStatus"/> as their activity
+                    type and it will have no effect.
                 </note>
                 <note type="warning">
                     Rich Presence cannot be set via this method or client. Rich Presence is strictly limited to RPC
@@ -814,9 +771,6 @@
         <member name="P:Discord.WebSocket.DiscordShardedClient.PrivateChannels">
             <inheritdoc />
         </member>
-        <member name="P:Discord.WebSocket.DiscordShardedClient.VoiceRegions">
-            <inheritdoc />
-        </member>
         <member name="P:Discord.WebSocket.DiscordShardedClient.Rest">
             <summary>
                 Provides access to a REST-only client with a shared state from this client.
@@ -855,7 +809,10 @@
         <member name="M:Discord.WebSocket.DiscordShardedClient.GetUser(System.String,System.String)">
             <inheritdoc />
         </member>
-        <member name="M:Discord.WebSocket.DiscordShardedClient.GetVoiceRegion(System.String)">
+        <member name="M:Discord.WebSocket.DiscordShardedClient.GetVoiceRegionsAsync(Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.DiscordShardedClient.GetVoiceRegionAsync(System.String,Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.DiscordShardedClient.DownloadUsersAsync(System.Collections.Generic.IEnumerable{Discord.IGuild})">
@@ -980,9 +937,6 @@
                 A collection of group channels that have been opened in this session.
             </returns>
         </member>
-        <member name="P:Discord.WebSocket.DiscordSocketClient.VoiceRegions">
-            <inheritdoc />
-        </member>
         <member name="M:Discord.WebSocket.DiscordSocketClient.#ctor">
             <summary>
                 Initializes a new REST/WebSocket-based Discord client.
@@ -995,9 +949,6 @@
             <param name="config">The configuration to be used with the client.</param>
         </member>
         <member name="M:Discord.WebSocket.DiscordSocketClient.Dispose(System.Boolean)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.DiscordSocketClient.OnLoginAsync(Discord.TokenType,System.String)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.DiscordSocketClient.OnLogoutAsync">
@@ -1017,6 +968,44 @@
         </member>
         <member name="M:Discord.WebSocket.DiscordSocketClient.GetChannel(System.UInt64)">
             <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.DiscordSocketClient.GetChannelAsync(System.UInt64,Discord.RequestOptions)">
+            <summary>
+                Gets a generic channel from the cache or does a rest request if unavailable.
+            </summary>
+            <example>
+                <code language="cs" title="Example method">
+                var channel = await _client.GetChannelAsync(381889909113225237);
+                if (channel != null &amp;&amp; channel is IMessageChannel msgChannel)
+                {
+                    await msgChannel.SendMessageAsync($"{msgChannel} is created at {msgChannel.CreatedAt}");
+                }
+                </code>
+            </example>
+            <param name="id">The snowflake identifier of the channel (e.g. `381889909113225237`).</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains the channel associated
+                with the snowflake identifier; <c>null</c> when the channel cannot be found.
+            </returns>
+        </member>
+        <member name="M:Discord.WebSocket.DiscordSocketClient.GetUserAsync(System.UInt64,Discord.RequestOptions)">
+            <summary>
+                Gets a user from the cache or does a rest request if unavailable.
+            </summary>
+            <example>
+                <code language="cs" title="Example method">
+                var user = await _client.GetUserAsync(168693960628371456);
+                if (user != null)
+                    Console.WriteLine($"{user} is created at {user.CreatedAt}.";
+                </code>
+            </example>
+            <param name="id">The snowflake identifier of the user (e.g. `168693960628371456`).</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains the user associated with
+                the snowflake identifier; <c>null</c> if the user is not found.
+            </returns>
         </member>
         <member name="M:Discord.WebSocket.DiscordSocketClient.PurgeChannelCache">
             <summary>
@@ -1039,7 +1028,10 @@
                 Clears cached users from the client.
             </summary>
         </member>
-        <member name="M:Discord.WebSocket.DiscordSocketClient.GetVoiceRegion(System.String)">
+        <member name="M:Discord.WebSocket.DiscordSocketClient.GetVoiceRegionsAsync(Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.DiscordSocketClient.GetVoiceRegionAsync(System.String,Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.DiscordSocketClient.DownloadUsersAsync(System.Collections.Generic.IEnumerable{Discord.IGuild})">
@@ -1273,28 +1265,6 @@
                 Setting this property to <c>null</c>disables this check.
             </summary>
         </member>
-        <member name="P:Discord.WebSocket.DiscordSocketConfig.ExclusiveBulkDelete">
-            <summary>
-                Gets or sets the behavior for <see cref="E:Discord.WebSocket.BaseSocketClient.MessageDeleted"/> on bulk deletes.
-            </summary>
-            <remarks>
-            <para>
-                If <c>true</c>, the <see cref="E:Discord.WebSocket.BaseSocketClient.MessageDeleted"/> event will not be raised for bulk
-                deletes, and only the <see cref="E:Discord.WebSocket.BaseSocketClient.MessagesBulkDeleted"/> will be raised. If <c>false</c>
-                , both events will be raised.
-            </para>
-            <para>
-                If unset, both events will be raised, but a warning will be raised the first time a bulk delete event is
-                received.
-            </para>
-            </remarks>
-        </member>
-        <member name="P:Discord.WebSocket.DiscordSocketConfig.GuildSubscriptions">
-            <summary>
-                Gets or sets enabling dispatching of guild subscription events e.g. presence and typing events.
-                This is not used if <see cref="P:Discord.WebSocket.DiscordSocketConfig.GatewayIntents"/> are provided.
-            </summary>
-        </member>
         <member name="P:Discord.WebSocket.DiscordSocketConfig.IdentifyMaxConcurrency">
             <summary>
                 Gets or sets the maximum identify concurrency.
@@ -1321,7 +1291,8 @@
         </member>
         <member name="P:Discord.WebSocket.DiscordSocketConfig.GatewayIntents">
             <summary>
-               Gets or sets gateway intents to limit what events are sent from Discord. Allows for more granular control than the <see cref="P:Discord.WebSocket.DiscordSocketConfig.GuildSubscriptions"/> property.
+               Gets or sets gateway intents to limit what events are sent from Discord.
+               The default is <see cref="F:Discord.GatewayIntents.AllUnprivileged"/>.
             </summary>
             <remarks>
                 For more information, please see
@@ -1720,6 +1691,9 @@
         <member name="M:Discord.WebSocket.SocketDMChannel.DeleteMessageAsync(Discord.IMessage,Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.WebSocket.SocketDMChannel.ModifyMessageAsync(System.UInt64,System.Action{Discord.MessageProperties},Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.WebSocket.SocketDMChannel.TriggerTypingAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
@@ -1895,6 +1869,9 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketGroupChannel.DeleteMessageAsync(Discord.IMessage,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.SocketGroupChannel.ModifyMessageAsync(System.UInt64,System.Action{Discord.MessageProperties},Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketGroupChannel.TriggerTypingAsync(Discord.RequestOptions)">
@@ -2263,6 +2240,9 @@
         <member name="M:Discord.WebSocket.SocketTextChannel.DeleteMessagesAsync(System.Collections.Generic.IEnumerable{System.UInt64},Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.WebSocket.SocketTextChannel.ModifyMessageAsync(System.UInt64,System.Action{Discord.MessageProperties},Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.WebSocket.SocketTextChannel.DeleteMessageAsync(System.UInt64,Discord.RequestOptions)">
             <inheritdoc />
         </member>
@@ -2433,9 +2413,6 @@
         <member name="P:Discord.WebSocket.SocketGuild.AFKTimeout">
             <inheritdoc />
         </member>
-        <member name="P:Discord.WebSocket.SocketGuild.IsEmbeddable">
-            <inheritdoc />
-        </member>
         <member name="P:Discord.WebSocket.SocketGuild.IsWidgetEnabled">
             <inheritdoc />
         </member>
@@ -2588,14 +2565,6 @@
                 A <see cref="T:System.Int32"/> representing the maximum bitrate value allowed by Discord in this guild.
             </returns>
         </member>
-        <member name="P:Discord.WebSocket.SocketGuild.EmbedChannel">
-            <summary>
-                Gets the embed channel (i.e. the channel set in the guild's widget settings) in this guild.
-            </summary>
-            <returns>
-                A channel set within the server's widget settings; <see langword="null"/> if none is set.
-            </returns>
-        </member>
         <member name="P:Discord.WebSocket.SocketGuild.WidgetChannel">
             <summary>
                 Gets the widget channel (i.e. the channel set in the guild's widget settings) in this guild.
@@ -2716,10 +2685,6 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketGuild.ModifyAsync(System.Action{Discord.GuildProperties},Discord.RequestOptions)">
-            <inheritdoc />
-            <exception cref="T:System.ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
-        </member>
-        <member name="M:Discord.WebSocket.SocketGuild.ModifyEmbedAsync(System.Action{Discord.GuildEmbedProperties},Discord.RequestOptions)">
             <inheritdoc />
             <exception cref="T:System.ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         </member>
@@ -3026,6 +2991,9 @@
                 of application commands found within the guild.
             </returns>
         </member>
+        <member name="M:Discord.WebSocket.SocketGuild.GetEmotesAsync(Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.WebSocket.SocketGuild.GetEmoteAsync(System.UInt64,Discord.RequestOptions)">
             <inheritdoc />
         </member>
@@ -3054,12 +3022,6 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketGuild.Discord#IGuild#Available">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.WebSocket.SocketGuild.Discord#IGuild#DefaultChannelId">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.WebSocket.SocketGuild.Discord#IGuild#EmbedChannelId">
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketGuild.Discord#IGuild#WidgetChannelId">
@@ -3120,9 +3082,6 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketGuild.Discord#IGuild#GetDefaultChannelAsync(Discord.CacheMode,Discord.RequestOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketGuild.Discord#IGuild#GetEmbedChannelAsync(Discord.CacheMode,Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketGuild.Discord#IGuild#GetWidgetChannelAsync(Discord.CacheMode,Discord.RequestOptions)">
@@ -3491,6 +3450,98 @@
                 A task that represents the asynchronous operation of acknowledging the interaction.
             </returns>
         </member>
+        <member name="P:Discord.WebSocket.ISocketInvite.Code">
+            <summary>
+                Gets the unique identifier for this invite.
+            </summary>
+            <returns>
+                A string containing the invite code (e.g. <c>FTqNnyS</c>).
+            </returns>
+        </member>
+        <member name="P:Discord.WebSocket.ISocketInvite.Url">
+            <summary>
+                Gets the URL used to accept this invite
+            </summary>
+            <returns>
+                A string containing the full invite URL (e.g. <c>https://discord.gg/FTqNnyS</c>).
+            </returns>
+        </member>
+        <member name="P:Discord.WebSocket.ISocketInvite.Channel">
+            <summary>
+                Gets the channel this invite is linked to.
+            </summary>
+            <returns>
+                A generic channel that the invite points to.
+            </returns>
+        </member>
+        <member name="P:Discord.WebSocket.ISocketInvite.Guild">
+            <summary>
+                Gets the guild this invite is linked to.
+            </summary>
+            <returns>
+                A guild object representing the guild that the invite points to.
+            </returns>
+        </member>
+        <member name="T:Discord.WebSocket.SocketGuildInvite">
+            <summary>
+            Represents a guild invite
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketGuildInvite.Id">
+            <summary>
+            Gets the unique invite code
+            <returns>
+                Returns the unique invite code
+            </returns>
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketGuildInvite.Inviter">
+            <summary>
+            Gets the user who created the invite
+            <returns>
+                Returns the user who created the invite
+            </returns>
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketGuildInvite.MaxUses">
+            <summary>
+            Gets the maximum number of times the invite can be used, if there is no limit then the value will be 0
+            <returns>
+                Returns the maximum number of times the invite can be used,  if there is no limit then the value will be 0
+            </returns>
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketGuildInvite.Temporary">
+            <summary>
+            Gets whether or not the invite is temporary (invited users will be kicked on disconnect unless they're assigned a role)
+            <returns>
+                Returns whether or not the invite is temporary (invited users will be kicked on disconnect unless they're assigned a role)
+            </returns>
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketGuildInvite.CreatedAt">
+            <summary>
+            Gets the time at which the invite was created
+            <returns>
+                Returns the time at which the invite was created
+            </returns>
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketGuildInvite.MaxAge">
+            <summary>
+            Gets how long the invite is valid for 
+            <returns>
+                Returns how long the invite is valid for (in seconds)
+            </returns>
+            </summary>
+        </member>
+        <member name="M:Discord.WebSocket.SocketGuildInvite.DeleteAsync(Discord.RequestOptions)">
+            <summary>
+            Deletes the invite
+            </summary>
+            <param name="options"></param>
+            <returns></returns>
+        </member>
         <member name="P:Discord.WebSocket.SocketInvite.ChannelId">
             <inheritdoc />
         </member>
@@ -3520,9 +3571,6 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketInvite.Discord#IInvite#MemberCount">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.WebSocket.SocketInvite.Discord#IInviteMetadata#IsRevoked">
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketInvite.IsTemporary">
@@ -3598,7 +3646,10 @@
         <member name="P:Discord.WebSocket.SocketInvite.Discord#IInvite#Channel">
             <inheritdoc />
         </member>
-        <member name="P:Discord.WebSocket.SocketInvite.Discord#IInviteMetadata#Inviter">
+        <member name="P:Discord.WebSocket.SocketInvite.Discord#IInvite#Inviter">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketInvite.Discord#IInvite#TargetUser">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.MessageCache.GetMany(System.Nullable{System.UInt64},Discord.Direction,System.Int32)">
@@ -3661,6 +3712,9 @@
         <member name="P:Discord.WebSocket.SocketMessage.Components">
             <inheritdoc/>
         </member>
+        <member name="P:Discord.WebSocket.SocketMessage.Flags">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.WebSocket.SocketMessage.Attachments">
             <summary>
                 Returns all attachments included in this message.
@@ -3702,6 +3756,9 @@
             </returns>
         </member>
         <member name="P:Discord.WebSocket.SocketMessage.Tags">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketMessage.Stickers">
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketMessage.Reactions">
@@ -3747,6 +3804,9 @@
         </member>
         <member name="P:Discord.WebSocket.SocketMessage.Discord#IMessage#Components">
             <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketMessage.Discord#IMessage#Stickers">
+            <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketMessage.AddReactionAsync(Discord.IEmote,Discord.RequestOptions)">
             <inheritdoc />
@@ -3885,6 +3945,9 @@
         <member name="P:Discord.WebSocket.SocketUserMessage.MentionedUsers">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketUserMessage.Stickers">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.WebSocket.SocketUserMessage.ReferencedMessage">
             <inheritdoc />
         </member>
@@ -3897,9 +3960,6 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketUserMessage.UnpinAsync(Discord.RequestOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketUserMessage.ModifySuppressionAsync(System.Boolean,Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketUserMessage.Resolve(Discord.TagHandling,Discord.TagHandling,Discord.TagHandling,Discord.TagHandling,Discord.TagHandling)">
@@ -3941,6 +4001,9 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketRole.Position">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketRole.Tags">
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketRole.CreatedAt">
@@ -4082,6 +4145,9 @@
         <member name="P:Discord.WebSocket.SocketGuildUser.IsStreaming">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketGuildUser.IsPending">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.WebSocket.SocketGuildUser.JoinedAt">
             <inheritdoc />
         </member>
@@ -4125,13 +4191,25 @@
         <member name="M:Discord.WebSocket.SocketGuildUser.KickAsync(System.String,Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.WebSocket.SocketGuildUser.AddRoleAsync(System.UInt64,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.WebSocket.SocketGuildUser.AddRoleAsync(Discord.IRole,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.SocketGuildUser.AddRolesAsync(System.Collections.Generic.IEnumerable{System.UInt64},Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketGuildUser.AddRolesAsync(System.Collections.Generic.IEnumerable{Discord.IRole},Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.WebSocket.SocketGuildUser.RemoveRoleAsync(System.UInt64,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.WebSocket.SocketGuildUser.RemoveRoleAsync(Discord.IRole,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.SocketGuildUser.RemoveRolesAsync(System.Collections.Generic.IEnumerable{System.UInt64},Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketGuildUser.RemoveRolesAsync(System.Collections.Generic.IEnumerable{Discord.IRole},Discord.RequestOptions)">
@@ -4158,9 +4236,6 @@
             </summary>
         </member>
         <member name="P:Discord.WebSocket.SocketPresence.Status">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.WebSocket.SocketPresence.Activity">
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketPresence.ActiveClients">
@@ -4296,6 +4371,9 @@
         <member name="P:Discord.WebSocket.SocketUser.IsWebhook">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketUser.PublicFlags">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.WebSocket.SocketUser.CreatedAt">
             <inheritdoc />
         </member>
@@ -4303,9 +4381,6 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketUser.Mention">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.WebSocket.SocketUser.Activity">
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketUser.Status">
@@ -4325,7 +4400,7 @@
                 This property will only include guilds in the same <see cref="T:Discord.WebSocket.DiscordSocketClient"/>.
             </remarks>
         </member>
-        <member name="M:Discord.WebSocket.SocketUser.GetOrCreateDMChannelAsync(Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketUser.CreateDMChannelAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketUser.GetAvatarUrl(Discord.ImageFormat,System.UInt16)">
@@ -4436,6 +4511,9 @@
         <member name="P:Discord.WebSocket.SocketWebhookUser.Discord#IGuildUser#PremiumSince">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketWebhookUser.Discord#IGuildUser#IsPending">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.WebSocket.SocketWebhookUser.Discord#IGuildUser#GuildPermissions">
             <inheritdoc />
         </member>
@@ -4450,7 +4528,15 @@
             <inheritdoc />
             <exception cref="T:System.NotSupportedException">Webhook users cannot be modified.</exception>
         </member>
+        <member name="M:Discord.WebSocket.SocketWebhookUser.Discord#IGuildUser#AddRoleAsync(System.UInt64,Discord.RequestOptions)">
+            <inheritdoc />
+            <exception cref="T:System.NotSupportedException">Roles are not supported on webhook users.</exception>
+        </member>
         <member name="M:Discord.WebSocket.SocketWebhookUser.Discord#IGuildUser#AddRoleAsync(Discord.IRole,Discord.RequestOptions)">
+            <inheritdoc />
+            <exception cref="T:System.NotSupportedException">Roles are not supported on webhook users.</exception>
+        </member>
+        <member name="M:Discord.WebSocket.SocketWebhookUser.Discord#IGuildUser#AddRolesAsync(System.Collections.Generic.IEnumerable{System.UInt64},Discord.RequestOptions)">
             <inheritdoc />
             <exception cref="T:System.NotSupportedException">Roles are not supported on webhook users.</exception>
         </member>
@@ -4458,7 +4544,15 @@
             <inheritdoc />
             <exception cref="T:System.NotSupportedException">Roles are not supported on webhook users.</exception>
         </member>
+        <member name="M:Discord.WebSocket.SocketWebhookUser.Discord#IGuildUser#RemoveRoleAsync(System.UInt64,Discord.RequestOptions)">
+            <inheritdoc />
+            <exception cref="T:System.NotSupportedException">Roles are not supported on webhook users.</exception>
+        </member>
         <member name="M:Discord.WebSocket.SocketWebhookUser.Discord#IGuildUser#RemoveRoleAsync(Discord.IRole,Discord.RequestOptions)">
+            <inheritdoc />
+            <exception cref="T:System.NotSupportedException">Roles are not supported on webhook users.</exception>
+        </member>
+        <member name="M:Discord.WebSocket.SocketWebhookUser.Discord#IGuildUser#RemoveRolesAsync(System.Collections.Generic.IEnumerable{System.UInt64},Discord.RequestOptions)">
             <inheritdoc />
             <exception cref="T:System.NotSupportedException">Roles are not supported on webhook users.</exception>
         </member>
@@ -4530,6 +4624,61 @@
                 message.
             </summary>
             <param name="message">The reason why the gateway has been requested to reconnect.</param>
+        </member>
+        <member name="M:Discord.Audio.AudioClient.#ctor(Discord.WebSocket.SocketGuild,System.Int32,System.UInt64)">
+            <summary> Creates a new REST/WebSocket discord client. </summary>
+        </member>
+        <member name="M:Discord.Audio.AudioClient.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="T:Discord.Audio.Streams.BufferedWriteStream">
+            <summary> Wraps another stream with a timed buffer. </summary>
+        </member>
+        <member name="T:Discord.Audio.Streams.InputStream">
+            <summary> Reads the payload from an RTP frame </summary>
+        </member>
+        <member name="T:Discord.Audio.Streams.OpusDecodeStream">
+            <summary> Converts Opus to PCM </summary>
+        </member>
+        <member name="M:Discord.Audio.Streams.OpusDecodeStream.WriteHeader(System.UInt16,System.UInt32,System.Boolean)">
+            <exception cref="T:System.InvalidOperationException">Header received with no payload.</exception>
+        </member>
+        <member name="M:Discord.Audio.Streams.OpusDecodeStream.WriteAsync(System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <exception cref="T:System.InvalidOperationException">Received payload without an RTP header.</exception>
+        </member>
+        <member name="T:Discord.Audio.Streams.OpusEncodeStream">
+            <summary> Converts PCM to Opus </summary>
+        </member>
+        <member name="T:Discord.Audio.Streams.OutputStream">
+            <summary> Wraps an IAudioClient, sending voice data on write. </summary>
+        </member>
+        <member name="T:Discord.Audio.Streams.RTPReadStream">
+            <summary> Reads the payload from an RTP frame </summary>
+        </member>
+        <member name="M:Discord.Audio.Streams.RTPReadStream.WriteAsync(System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <exception cref="T:System.OperationCanceledException">The token has had cancellation requested.</exception>
+            <exception cref="T:System.ObjectDisposedException">The associated <see cref="T:System.Threading.CancellationTokenSource" /> has been disposed.</exception>
+        </member>
+        <member name="T:Discord.Audio.Streams.RTPWriteStream">
+            <summary> Wraps data in an RTP frame </summary>
+        </member>
+        <member name="T:Discord.Audio.Streams.SodiumDecryptStream">
+            <summary>
+                Decrypts an RTP frame using libsodium.
+            </summary>
+        </member>
+        <member name="T:Discord.Audio.Streams.SodiumEncryptStream">
+            <summary>
+                Encrypts an RTP frame using libsodium.
+            </summary>
+        </member>
+        <member name="M:Discord.Audio.Streams.SodiumEncryptStream.WriteHeader(System.UInt16,System.UInt32,System.Boolean)">
+            <exception cref="T:System.InvalidOperationException">Header received with no payload.</exception>
+        </member>
+        <member name="M:Discord.Audio.Streams.SodiumEncryptStream.WriteAsync(System.Byte[],System.Int32,System.Int32,System.Threading.CancellationToken)">
+            <exception cref="T:System.InvalidOperationException">Received payload without an RTP header.</exception>
+            <exception cref="T:System.OperationCanceledException">The token has had cancellation requested.</exception>
+            <exception cref="T:System.ObjectDisposedException">The associated <see cref="T:System.Threading.CancellationTokenSource" /> has been disposed.</exception>
         </member>
         <member name="T:Discord.Commands.ShardedCommandContext">
             <summary> The sharded variant of <see cref="T:Discord.Commands.ICommandContext"/>, which may contain the client, user, guild, channel, and message. </summary>

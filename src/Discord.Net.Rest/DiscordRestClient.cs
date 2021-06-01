@@ -46,6 +46,11 @@ namespace Discord.Rest
             ApiClient.CurrentUserId = user.Id;
             base.CurrentUser = RestSelfUser.Create(this, user);
         }
+
+        internal void CreateRestSelfUser(API.User user)
+        {
+            base.CurrentUser = RestSelfUser.Create(this, user);
+        }
         /// <inheritdoc />
         internal override Task OnLogoutAsync()
         {
