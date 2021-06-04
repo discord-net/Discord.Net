@@ -6,7 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/Gateway/Discord.Net.Gateway.csproj" />
+    <ProjectReference Include="../../src/Models/Discord.Net.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../tools/SourceGenerators/Serialization/Discord.Net.SourceGenerators.Serialization.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
