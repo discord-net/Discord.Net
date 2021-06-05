@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+
+    <Description>
+      $(Description)
+      Serialization primitives used by Discord.Net
+    </Description>
+  </PropertyGroup>
+
+</Project>

@@ -22,12 +22,13 @@
   <!-- Package versions for package references across all projects -->
   <ItemGroup>
     <PackageReference Update="coverlet.collector" Version="3.0.3" />
-    <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.10.0-3.final" />
-    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+    <PackageReference Update="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" />
     <PackageReference Update="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
     <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Update="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Update="Microsoft.Extensions.Options" Version="5.0.0" />
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+    <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.9.0" />
     <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
     <PackageReference Update="System.IO.Pipelines" Version="5.0.1" />
     <PackageReference Update="System.Text.Json" Version="5.0.2" />
