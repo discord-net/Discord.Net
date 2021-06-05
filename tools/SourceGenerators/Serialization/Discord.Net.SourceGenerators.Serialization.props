@@ -1,0 +1,6 @@
+<Project>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="DiscordNet_SerializationGenerator_OptionsTypeNamespace" />
+    <CompilerVisibleProperty Include="DiscordNet_SerializationGenerator_SearchThroughReferencedAssemblies" />
+  </ItemGroup>
+</Project>

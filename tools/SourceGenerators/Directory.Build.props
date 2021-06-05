@@ -21,6 +21,7 @@
   <PropertyGroup>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <NoPackageAnalysis>true</NoPackageAnalysis>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
      <!-- Disable release tracking analyzers due to weird behaviour with OmniSharp -->
     <NoWarn>$(NoWarn);RS2000;RS2001;RS2002;RS2003;RS2004;RS2005;RS2006;RS2007;RS2008</NoWarn>
   </PropertyGroup>
@@ -31,6 +32,10 @@
 
   <ItemGroup>
     <None Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)\IsExternalInit.cs" Link="IsExternalInit.cs" />
   </ItemGroup>
 
 </Project>

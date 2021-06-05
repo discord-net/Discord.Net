@@ -5,20 +5,26 @@ namespace Discord.Net.SourceGenerators.Serialization
 {
     public partial class SerializationSourceGenerator
     {
-        private static string GenerateSerializerOptionsTemplateSourceCode()
+        private static string GenerateSerializerOptionsSourceCode(
+            string @namespace,
+            IEnumerable<SerializedType> converters)
         {
-return @"
-using System;
-using System.Text.Json;
+            var snippets = string.Join("\n",
+                converters.Select(
+                    x => $"            options.Converters.Add(new {@namespace}.Internal.Converters.{x.ConverterTypeName}());"));
 
-namespace Discord.Net.Serialization
-{
+return $@"using System;
+using System.Text.Json;
+using Discord.Net.Serialization.Converters;
+
+namespace {@namespace}
+{{
     /// <summary>
     /// Defines extension methods for adding Discord.Net JSON converters to a
     /// <see cref=""JsonSerializerOptions""/> instance.
     /// </summary>
-    public static partial class JsonSerializerOptionsExtensions
-    {
+    public static class JsonSerializerOptionsExtensions
+    {{
         /// <summary>
         /// Adds Discord.Net JSON converters to the passed
         /// <see cref=""JsonSerializerOptions""/>.
@@ -30,33 +36,11 @@ namespace Discord.Net.Serialization
         /// The modified <see cref=""JsonSerializerOptions""/>, so this method
         /// can be chained.
         /// </returns>
-        public static partial JsonSerializerOptions WithDiscordNetConverters(
-            this JsonSerializerOptions options);
-    }
-}";
-        }
-
-        private static string GenerateSerializerOptionsSourceCode(
-            List<string> converters)
-        {
-            var snippets = string.Join("\n",
-                converters.Select(
-                    x => $"options.Converters.Add(new {x}());"));
-
-return $@"
-using System;
-using System.Text.Json;
-using Discord.Net.Serialization.Converters;
-
-namespace Discord.Net.Serialization
-{{
-    public static partial class JsonSerializerOptionsExtensions
-    {{
-        public static partial JsonSerializerOptions WithDiscordNetConverters(
+        public static JsonSerializerOptions WithDiscordNetConverters(
             this JsonSerializerOptions options)
         {{
             options.Converters.Add(new OptionalConverterFactory());
-            {snippets}
+{snippets}
 
             return options;
         }}

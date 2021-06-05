@@ -7,10 +7,17 @@
       $(Description)
       Shared models between the Discord REST API and Gateway.
     </Description>
+
+    <DiscordNet_SerializationGenerator_OptionsTypeNamespace>Discord.Net.Serialization</DiscordNet_SerializationGenerator_OptionsTypeNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Text.Json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <CompilerVisibleProperty Include="DiscordNet_SerializationGenerator_OptionsTypeNamespace" />
+    <ProjectReference Include="../../tools/SourceGenerators/Serialization/Discord.Net.SourceGenerators.Serialization.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>

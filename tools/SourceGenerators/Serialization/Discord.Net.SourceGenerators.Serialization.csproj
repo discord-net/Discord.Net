@@ -4,4 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="Discord.Net.SourceGenerators.Serialization.props" Pack="true" PackagePath="build" Visible="false" />
+  </ItemGroup>
+
 </Project>
