@@ -3,48 +3,35 @@ using System.Text.Json.Serialization;
 namespace Discord.Net.Models
 {
     /// <summary>
-    ///     Represents a team member object.
+    /// Represents a discord team member object.
     /// </summary>
+    /// <remarks>
+    /// <see href="https://discord.com/developers/docs/topics/teams#data-models-team-members-object"/>
+    /// </remarks>
     public record TeamMember
     {
         /// <summary>
-        ///     Creates a <see cref="TeamMember"/> with the provided parameters.
-        /// </summary>
-        /// <param name="membershipState">The user's membership state on the team.</param>
-        /// <param name="permissions">Will always be ["*"].</param>
-        /// <param name="teamId">The id of the parent team of which they are a member.</param>
-        /// <param name="user">The avatar, discriminator, id, and username of the user.</param>
-        [JsonConstructor]
-        public TeamMember(MembershipState membershipState, string[] permissions, Snowflake teamId, User user)
-        {
-            MembershipState = membershipState;
-            Permissions = permissions;
-            TeamId = teamId;
-            User = user;
-        }
-
-        /// <summary>
-        ///     The user's membership state on the team.
+        /// The <see cref="User"/>'s <see cref="Models.MembershipState"/> on the <see cref="Team"/>.
         /// </summary>
         [JsonPropertyName("membership_state")]
-        public MembershipState MembershipState { get; }
+        public MembershipState MembershipState { get; init; }
 
         /// <summary>
-        ///     Will always be ["*"].
+        /// Will always be ["*"].
         /// </summary>
         [JsonPropertyName("permissions")]
-        public string[] Permissions { get; }
+        public string[]? Permissions { get; init; } // Required property candidate
 
         /// <summary>
-        ///     The id of the parent team of which they are a member.
+        /// The id of the parent <see cref="Team"/> of which they are a <see cref="TeamMember"/>.
         /// </summary>
         [JsonPropertyName("team_id")]
-        public Snowflake TeamId { get; }
+        public Snowflake TeamId { get; init; }
 
         /// <summary>
-        ///     The avatar, discriminator, id, and username of the user.
+        /// The avatar, discriminator, id, and username of the <see cref="Models.User"/>.
         /// </summary>
         [JsonPropertyName("user")]
-        public User User { get; }
+        public User? User { get; init; } // Required property candidate
     }
 }

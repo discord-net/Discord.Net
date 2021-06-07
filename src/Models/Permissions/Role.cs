@@ -3,88 +3,65 @@ using System.Text.Json.Serialization;
 namespace Discord.Net.Models
 {
     /// <summary>
-    ///     Represents a role object.
+    /// Represents a discord role object.
     /// </summary>
+    /// <remarks>
+    /// <see href="https://discord.com/developers/docs/topics/permissions#role-object-role-structure"/>
+    /// </remarks>
     public record Role
     {
         /// <summary>
-        ///     Creates a <see cref="Role"/> with the provided parameters.
-        /// </summary>
-        /// <param name="id">Role id.</param>
-        /// <param name="name">Role name.</param>
-        /// <param name="color">Integer representation of hexadecimal color code.</param>
-        /// <param name="hoist">If this role is pinned in the user listing.</param>
-        /// <param name="position">Position of this role.</param>
-        /// <param name="permissions">Permission bit set.</param>
-        /// <param name="managed">Whether this role is managed by an integration.</param>
-        /// <param name="mentionable">Whether this role is mentionable.</param>
-        /// <param name="tags">The tags this role has.</param>
-        [JsonConstructor]
-        public Role(Snowflake id, string name, int color, bool hoist, int position, Permissions permissions, bool managed, bool mentionable, Optional<RoleTags> tags)
-        {
-            Id = id;
-            Name = name;
-            Color = color;
-            Hoist = hoist;
-            Position = position;
-            Permissions = permissions;
-            Managed = managed;
-            Mentionable = mentionable;
-            Tags = tags;
-        }
-
-        /// <summary>
-        ///     Role id.
+        /// <see cref="Role"/> id.
         /// </summary>
         [JsonPropertyName("id")]
-        public Snowflake Id { get; }
+        public Snowflake Id { get; init; }
 
         /// <summary>
-        ///     Role name.
+        /// <see cref="Role"/> name.
         /// </summary>
         [JsonPropertyName("name")]
-        public string Name { get; }
+        public string? Name { get; init; } // Required property candidate
 
         /// <summary>
-        ///     Integer representation of hexadecimal color code.
+        /// <see cref="Color"/> of this <see cref="Role"/>.
         /// </summary>
         [JsonPropertyName("color")]
-        public int Color { get; }
+        public Color Color { get; init; }
 
         /// <summary>
-        ///     If this role is pinned in the user listing.
+        /// If this <see cref="Role"/> is pinned in the <see cref="User"/> listing.
         /// </summary>
         [JsonPropertyName("hoist")]
-        public bool Hoist { get; }
+        public bool Hoist { get; init; }
 
         /// <summary>
-        ///     Position of this role.
+        /// Position of this <see cref="Role"/>.
         /// </summary>
         [JsonPropertyName("position")]
-        public int Position { get; }
+        public int Position { get; init; }
 
         /// <summary>
-        ///     Permission bit set.
+        /// <see cref="Permissions"/> bit set.
         /// </summary>
         [JsonPropertyName("permissions")]
-        public Permissions Permissions { get; }
+        public Permissions Permissions { get; init; }
 
         /// <summary>
-        ///     Whether this role is managed by an integration.
+        /// Whether this <see cref="Role"/> is managed by an <see cref="Integration"/>.
         /// </summary>
         [JsonPropertyName("managed")]
-        public bool Managed { get; }
+        public bool Managed { get; init; }
 
         /// <summary>
-        ///     Whether this role is mentionable.
+        /// Whether this <see cref="Role"/> is mentionable.
         /// </summary>
         [JsonPropertyName("mentionable")]
-        public bool Mentionable { get; }
+        public bool Mentionable { get; init; }
 
         /// <summary>
-        ///     The tags this role has.
+        /// The tags this <see cref="Role"/> has.
         /// </summary>
         [JsonPropertyName("tags")]
-        public Optional<RoleTags> Tags { get; }
+        public Optional<RoleTags> Tags { get; init; }
     }
 }

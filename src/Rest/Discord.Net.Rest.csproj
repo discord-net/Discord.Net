@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+
+    <Description>
+      $(Description)
+      Rest components to enable sending requests to the discord rest api.
+    </Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Models\Discord.Net.Models.csproj" />
+  </ItemGroup>
+
+</Project>

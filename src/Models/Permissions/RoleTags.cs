@@ -3,38 +3,27 @@ using System.Text.Json.Serialization;
 namespace Discord.Net.Models
 {
     /// <summary>
-    ///     Represents a role tags object.
+    /// Represents a discord role tags object.
     /// </summary>
+    /// <remarks>
+    /// <see href="https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure"/>
+    /// </remarks>
     public record RoleTags
     {
         /// <summary>
-        ///     Creates a <see cref="RoleTags"/> with the provided parameters.
-        /// </summary>
-        /// <param name="botId">The id of the bot this role belongs to.</param>
-        /// <param name="integrationId">The id of the integration this role belongs to.</param>
-        /// <param name="premiumSubscriber">Whether this is the guild's premium subscriber role.</param>
-        [JsonConstructor]
-        public RoleTags(Optional<Snowflake> botId, Optional<Snowflake> integrationId, Optional<bool?> premiumSubscriber)
-        {
-            BotId = botId;
-            IntegrationId = integrationId;
-            PremiumSubscriber = premiumSubscriber;
-        }
-
-        /// <summary>
-        ///     The id of the bot this role belongs to.
+        /// The id of the bot this <see cref="Role"/> belongs to.
         /// </summary>
         [JsonPropertyName("bot_id")]
         public Optional<Snowflake> BotId { get; }
 
         /// <summary>
-        ///     The id of the integration this role belongs to.
+        /// The id of the <see cref="Integration"/> this role belongs to.
         /// </summary>
         [JsonPropertyName("integration_id")]
         public Optional<Snowflake> IntegrationId { get; }
 
         /// <summary>
-        ///     Whether this is the guild's premium subscriber role.
+        /// Whether this is the <see cref="Guild"/>'s premium subscriber <see cref="Role"/>.
         /// </summary>
         [JsonPropertyName("premium_subscriber")]
         public Optional<bool?> PremiumSubscriber { get; }

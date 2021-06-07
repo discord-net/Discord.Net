@@ -3,41 +3,46 @@ using System;
 namespace Discord.Net
 {
     /// <summary>
-    ///     Container to keep a type that might not be present.
+    /// Container to keep a type that might not be present.
     /// </summary>
     /// <typeparam name="T">Inner type</typeparam>
     public struct Optional<T>
     {
+        /// <summary>
+        /// Creates a default <see cref="Optional{T}"/> with no specified value.
+        /// </summary>
+        public static Optional<T> Unspecified => default;
+
         private readonly T _value;
 
         /// <summary>
-        ///     Gets the inner value of this <see cref="Optional{T}"/> if present.
+        /// Gets the inner value of this <see cref="Optional{T}"/> if present.
         /// </summary>
         /// <returns>The value inside this <see cref="Optional{T}"/>.</returns>
         /// <exception cref="InvalidOperationException">This <see cref="Optional{T}"/> has no inner value.</exception>
         public T Value => !IsSpecified ? throw new InvalidOperationException("This property has no value set.") : _value;
 
         /// <summary>
-        ///     Gets if this <see cref="Optional{T}"/> has an inner value.
+        /// Gets if this <see cref="Optional{T}"/> has an inner value.
         /// </summary>
         /// <returns>A boolean that determines if this <see cref="Optional{T}"/> has a <see cref="Value"/>.</returns>
         public bool IsSpecified { get; }
 
-        private Optional(T value)
+        internal Optional(T value)
         {
             _value = value;
             IsSpecified = true;
         }
 
         /// <summary>
-        ///     Creates a new unspecified <see cref="Optional{T}"/>.
+        /// Creates a new unspecified <see cref="Optional{T}"/>.
         /// </summary>
         /// <returns>An unspecified <see cref="Optional{T}"/>.</returns>
         public static Optional<T> Create()
             => default;
 
         /// <summary>
-        ///     Creates a new <see cref="Optional{T}"/> with the specified <paramref name="value"/>.
+        /// Creates a new <see cref="Optional{T}"/> with the specified <paramref name="value"/>.
         /// </summary>
         /// <param name="value">Value that will be specified for this <see cref="Optional{T}"/>.</param>
         /// <returns>A specified <see cref="Optional{T}"/> with the provided value inside.</returns>
@@ -45,14 +50,14 @@ namespace Discord.Net
             => new(value);
 
         /// <summary>
-        ///     Gets the <see cref="Value"/> or their <see langword="default"/> value.
+        /// Gets the <see cref="Value"/> or their <see langword="default"/> value.
         /// </summary>
         /// <returns>The value inside this <see cref="Optional{T}"/> or their <see langword="default"/> value.</returns>
         public T GetValueOrDefault()
             => _value;
 
         /// <summary>
-        ///     Gets the <see cref="Value"/> or the default value provided.
+        /// Gets the <see cref="Value"/> or the default value provided.
         /// </summary>
         /// <returns>The value inside this <see cref="Optional{T}"/> or default value provided.</returns>
         public T GetValueOrDefault(T defaultValue)
@@ -73,14 +78,14 @@ namespace Discord.Net
             => IsSpecified ? _value?.GetHashCode() ?? default : default;
 
         /// <summary>
-        ///     Returns the inner value ToString value or this type fully qualified name.
+        /// Returns the inner value ToString value or this type fully qualified name.
         /// </summary>
         /// <returns>The inner value string value or this type fully qualified name.</returns>
         public override string? ToString()
             => IsSpecified ? _value?.ToString() : default;
 
         /// <summary>
-        ///     Creates a new <see cref="Optional{T}"/> with the specified <paramref name="value"/>.
+        /// Creates a new <see cref="Optional{T}"/> with the specified <paramref name="value"/>.
         /// </summary>
         /// <param name="value">Value to convert</param>
         /// <returns>A new <see cref="Optional{T}"/> with the specified <paramref name="value"/></returns>
@@ -88,11 +93,60 @@ namespace Discord.Net
             => new(value);
 
         /// <summary>
-        ///     Gets the inner value.
+        /// Gets the inner value.
         /// </summary>
         /// <param name="value">Value to convert</param>
         /// <returns>The inner value</returns>
         public static explicit operator T(Optional<T> value)
             => value.Value;
+    }
+
+    /// <summary>
+    /// Helper class to create <see cref="Optional{T}"/>s.
+    /// </summary>
+    public static class Optional
+    {
+        /// <summary>
+        /// Creates an unspecified <see cref="Optional{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">
+        /// Inner type.
+        /// </typeparam>
+        /// <returns>
+        /// An unspecified <see cref="Optional{T}"/>.
+        /// </returns>
+        public static Optional<T> Create<T>()
+            => Optional<T>.Unspecified;
+
+        /// <summary>
+        /// Creates a specified <see cref="Optional{T}"/> with the provided value.
+        /// </summary>
+        /// <typeparam name="T">
+        /// Inner type.
+        /// </typeparam>
+        /// <param name="value">
+        /// Inner value.
+        /// </param>
+        /// <returns>
+        /// An specified <see cref="Optional{T}"/> with provided value.
+        /// </returns>
+        public static Optional<T> Create<T>(T value)
+            => new(value);
+
+        /// <summary>
+        /// Converts an <see cref="Optional{T}"/> into a <see cref="Nullable{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">
+        /// Inner type.
+        /// </typeparam>
+        /// <param name="value">
+        /// Value to be converted.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Nullable{T}"/> based on the provided value.
+        /// </returns>
+        public static T? ToNullable<T>(this Optional<T> value)
+            where T : struct
+            => value.IsSpecified ? value.Value : null;
     }
 }

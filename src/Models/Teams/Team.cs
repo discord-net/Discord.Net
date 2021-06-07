@@ -3,56 +3,41 @@ using System.Text.Json.Serialization;
 namespace Discord.Net.Models
 {
     /// <summary>
-    ///     Represents a team object.
+    /// Represents a discord team object.
     /// </summary>
+    /// <remarks>
+    /// <see href="https://discord.com/developers/docs/topics/teams#data-models-team-object"/>
+    /// </remarks>
     public record Team
     {
         /// <summary>
-        ///     Creates a <see cref="Team"/> with the provided parameters.
-        /// </summary>
-        /// <param name="icon">A hash of the image of the team's icon.</param>
-        /// <param name="id">The unique id of the team.</param>
-        /// <param name="members">The members of the team.</param>
-        /// <param name="name">The name of the team.</param>
-        /// <param name="ownerUserId">The user id of the current team owner.</param>
-        [JsonConstructor]
-        public Team(string? icon, Snowflake id, TeamMember[] members, string name, Snowflake ownerUserId)
-        {
-            Icon = icon;
-            Id = id;
-            Members = members;
-            Name = name;
-            OwnerUserId = ownerUserId;
-        }
-
-        /// <summary>
-        ///     A hash of the image of the team's icon.
+        /// A hash of the image of the <see cref="Team"/>'s icon.
         /// </summary>
         [JsonPropertyName("icon")]
-        public string? Icon { get; }
+        public string? Icon { get; init; }
 
         /// <summary>
-        ///     The unique id of the team.
+        /// The unique id of the <see cref="Team"/>.
         /// </summary>
         [JsonPropertyName("id")]
-        public Snowflake Id { get; }
+        public Snowflake Id { get; init; }
 
         /// <summary>
-        ///     The members of the team.
+        /// The members of the <see cref="Team"/>.
         /// </summary>
         [JsonPropertyName("members")]
-        public TeamMember[] Members { get; }
+        public TeamMember[]? Members { get; init; } // Required property candidate
 
         /// <summary>
-        ///     The name of the team.
+        /// The name of the <see cref="Team"/>.
         /// </summary>
         [JsonPropertyName("name")]
-        public string Name { get; }
+        public string? Name { get; init; } // Required property candidate
 
         /// <summary>
-        ///     The user id of the current team owner.
+        /// The <see cref="User"/> id of the current <see cref="Team"/> owner.
         /// </summary>
         [JsonPropertyName("owner_user_id")]
-        public Snowflake OwnerUserId { get; }
+        public Snowflake OwnerUserId { get; init; }
     }
 }
