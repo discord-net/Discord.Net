@@ -21,7 +21,7 @@ jobs:
 - job: Windows_build
   pool:
     vmImage: 'windows-latest'
-  condition: ne(variables['Build.SourceBranch'], 'refs/heads/dev')
+  condition: ne(variables['Build.SourceBranch'], 'refs/heads/2.4.1')
   steps:
   - template: azure/build.yml
 
@@ -32,11 +32,10 @@ jobs:
       and (
         succeeded(),
         or (
-          eq(variables['Build.SourceBranch'], 'refs/heads/dev'),
+          eq(variables['Build.SourceBranch'], 'refs/heads/2.4.1'),
           eq(variables['buildTag'], True)
         )
       )
   steps:
   - template: azure/build.yml
   - template: azure/deploy.yml
-  - template: azure/docs.yml
