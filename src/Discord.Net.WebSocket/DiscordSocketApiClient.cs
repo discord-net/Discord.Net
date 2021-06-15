@@ -189,9 +189,9 @@ namespace Discord.API
             catch { }
 
             if (ex is GatewayReconnectException)
-                await WebSocketClient.DisconnectAsync(4000);
+                await WebSocketClient.DisconnectAsync(4000).ConfigureAwait(false);
             else
-            await WebSocketClient.DisconnectAsync().ConfigureAwait(false);
+                await WebSocketClient.DisconnectAsync().ConfigureAwait(false);
 
             ConnectionState = ConnectionState.Disconnected;
         }
