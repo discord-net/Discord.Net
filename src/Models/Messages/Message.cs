@@ -12,6 +12,26 @@ namespace Discord.Net.Models
     public record Message
     {
         /// <summary>
+        /// Maximum length of the message content.
+        /// </summary>
+        public const int MaxContentLength = 2000;
+
+        /// <summary>
+        /// Maximum amount of embeds.
+        /// </summary>
+        public const int MaxEmbeds = 10;
+
+        /// <summary>
+        /// Minimum amount of messages to bulk delete.
+        /// </summary>
+        public const int MinBulkDeleteAmount = 2;
+
+        /// <summary>
+        /// Maximum amount of messages to bulk delete.
+        /// </summary>
+        public const int MaxBulkDeleteAmount = 100;
+
+        /// <summary>
         /// Id of the <see cref="Message"/>.
         /// </summary>
         [JsonPropertyName("id")]
@@ -182,7 +202,7 @@ namespace Discord.Net.Models
         public Optional<MessageInteraction> Interaction { get; init; }
 
         /// <summary>
-        /// The thread <see cref="Channel"/> that was started from this <see cref="Message"/>,
+        /// The <see cref="ThreadChannel"/> that was started from this <see cref="Message"/>,
         /// includes <see cref="ThreadMember"/>s.
         /// </summary>
         [JsonPropertyName("thread")]

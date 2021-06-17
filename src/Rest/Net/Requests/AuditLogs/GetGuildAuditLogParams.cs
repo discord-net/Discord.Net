@@ -8,7 +8,7 @@ namespace Discord.Net.Rest
     public record GetGuildAuditLogParams
     {
         /// <summary>
-        /// Filter the log for actions made by a user.
+        /// Filter the log for actions made by a <see cref="User"/>.
         /// </summary>
         public Optional<Snowflake> UserId { get; set; }
 
@@ -36,6 +36,7 @@ namespace Discord.Net.Rest
         public void Validate()
         {
             Preconditions.NotZero(UserId, nameof(UserId));
+            Preconditions.NotZero(Before, nameof(Before));
             Preconditions.AtLeast(Limit, AuditLog.MinimumGetEntryAmount, nameof(Limit));
             Preconditions.AtMost(Limit, AuditLog.MaximumGetEntryAmount, nameof(Limit));
         }

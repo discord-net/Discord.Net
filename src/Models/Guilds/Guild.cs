@@ -159,7 +159,7 @@ namespace Discord.Net.Models
         public int SystemChannelFlags { get; init; }
 
         /// <summary>
-        /// The id of the <see cref="Channel"/> where Community <see cref="Guild"/>s
+        /// The id of the <see cref="Channel"/> where Community <see cref="Guild"/>s.
         /// can display rules and/or guidelines.
         /// </summary>
         [JsonPropertyName("rules_channel_id")]
@@ -190,7 +190,7 @@ namespace Discord.Net.Models
         public Optional<int> MemberCount { get; init; }
 
         /// <summary>
-        /// States of <see cref="GuildMember"/>s currently in voice <see cref="Channel"/>s.
+        /// States of <see cref="GuildMember"/>s currently in <see cref="VoiceChannel"/>s.
         /// </summary>
         /// <remarks>
         /// Lacks the <see cref="VoiceState.GuildId"/>.
@@ -211,8 +211,8 @@ namespace Discord.Net.Models
         public Optional<Channel[]> Channels { get; init; }
 
         /// <summary>
-        /// All active thread <see cref="Channel"/>s in the <see cref="Guild"/> that current <see cref="User"/>
-        /// has permission to view.
+        /// All active <see cref="ThreadChannel"/>s in the <see cref="Guild"/> that the
+        /// current <see cref="User"/> has permission to view.
         /// </summary>
         [JsonPropertyName("threads")]
         public Optional<Channel[]> Threads { get; init; }

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord.Net.Rest
 {
@@ -6,8 +8,8 @@ namespace Discord.Net.Rest
     {
         // Objects
 
-        public static void NotNull<T>(T obj, string name, string? msg = null) where T : class { if (obj == null) throw CreateNotNullException(name, msg); }
-        public static void NotNull<T>(Optional<T> obj, string name, string? msg = null) where T : class { if (obj.IsSpecified && obj.Value == null) throw CreateNotNullException(name, msg); }
+        public static void NotNull<T>(T? obj, string name, string? msg = null) where T : class { if (obj == null) throw CreateNotNullException(name, msg); }
+        public static void NotNull<T>(Optional<T?> obj, string name, string? msg = null) where T : class { if (obj.IsSpecified && obj.Value == null) throw CreateNotNullException(name, msg); }
 
         private static ArgumentNullException CreateNotNullException(string name, string? msg)
         {
@@ -15,6 +17,27 @@ namespace Discord.Net.Rest
                 return new ArgumentNullException(name);
             else
                 return new ArgumentNullException(name, msg);
+        }
+
+        public static void LengthAtLeast<T>(T[]? obj, int value, string name, string? msg = null)
+        {
+            if (obj?.Length < value)
+            {
+                if (msg == null)
+                    throw new ArgumentException($"Length must be at least {value}", name);
+                else
+                    throw new ArgumentException(msg, name);
+            }
+        }
+        public static void LengthAtMost<T>(T[]? obj, int value, string name, string? msg = null)
+        {
+            if (obj?.Length > value)
+            {
+                if (msg == null)
+                    throw new ArgumentException($"Length must be at most {value}", name);
+                else
+                    throw new ArgumentException(msg, name);
+            }
         }
 
         // Optionals
@@ -36,18 +59,39 @@ namespace Discord.Net.Rest
             }
         }
 
+        public static void LengthAtLeast<T>(Optional<T[]?> obj, int value, string name, string? msg = null)
+        {
+            if (obj.IsSpecified && obj.Value?.Length < value)
+            {
+                if (msg == null)
+                    throw new ArgumentException($"Length must be at least {value}", name);
+                else
+                    throw new ArgumentException(msg, name);
+            }
+        }
+        public static void LengthAtMost<T>(Optional<T[]?> obj, int value, string name, string? msg = null)
+        {
+            if (obj.IsSpecified && obj.Value?.Length > value)
+            {
+                if (msg == null)
+                    throw new ArgumentException($"Length must be at most {value}", name);
+                else
+                    throw new ArgumentException(msg, name);
+            }
+        }
+
         // Strings
 
-        public static void NotEmpty(string obj, string name, string? msg = null) { if (obj != null && obj.Length == 0) throw CreateNotEmptyException(name, msg); }
-        public static void NotEmpty(Optional<string> obj, string name, string? msg = null) { if (obj.IsSpecified && obj.Value != null && obj.Value.Length == 0) throw CreateNotEmptyException(name, msg); }
-        public static void NotNullOrEmpty(string obj, string name, string? msg = null)
+        public static void NotEmpty(string? obj, string name, string? msg = null) { if (obj != null && obj.Length == 0) throw CreateNotEmptyException(name, msg); }
+        public static void NotEmpty(Optional<string?> obj, string name, string? msg = null) { if (obj.IsSpecified && obj.Value != null && obj.Value.Length == 0) throw CreateNotEmptyException(name, msg); }
+        public static void NotNullOrEmpty(string? obj, string name, string? msg = null)
         {
             if (obj == null)
                 throw CreateNotNullException(name, msg);
             if (obj.Length == 0)
                 throw CreateNotEmptyException(name, msg);
         }
-        public static void NotNullOrEmpty(Optional<string> obj, string name, string? msg = null)
+        public static void NotNullOrEmpty(Optional<string?> obj, string name, string? msg = null)
         {
             if (obj.IsSpecified)
             {
@@ -57,14 +101,14 @@ namespace Discord.Net.Rest
                     throw CreateNotEmptyException(name, msg);
             }
         }
-        public static void NotNullOrWhitespace(string obj, string name, string? msg = null)
+        public static void NotNullOrWhitespace(string? obj, string name, string? msg = null)
         {
             if (obj == null)
                 throw CreateNotNullException(name, msg);
             if (obj.Trim().Length == 0)
                 throw CreateNotEmptyException(name, msg);
         }
-        public static void NotNullOrWhitespace(Optional<string> obj, string name, string? msg = null)
+        public static void NotNullOrWhitespace(Optional<string?> obj, string name, string? msg = null)
         {
             if (obj.IsSpecified)
             {
@@ -75,7 +119,7 @@ namespace Discord.Net.Rest
             }
         }
 
-        public static void LengthAtLeast(string obj, int value, string name, string? msg = null)
+        public static void LengthAtLeast(string? obj, int value, string name, string? msg = null)
         {
             if (obj?.Length < value)
             {
@@ -85,7 +129,7 @@ namespace Discord.Net.Rest
                     throw new ArgumentException(msg, name);
             }
         }
-        public static void LengthAtMost(string obj, int value, string name, string? msg = null)
+        public static void LengthAtMost(string? obj, int value, string name, string? msg = null)
         {
             if (obj?.Length > value)
             {
@@ -95,7 +139,7 @@ namespace Discord.Net.Rest
                     throw new ArgumentException(msg, name);
             }
         }
-        public static void LengthGreaterThan(string obj, int value, string name, string? msg = null)
+        public static void LengthGreaterThan(string? obj, int value, string name, string? msg = null)
         {
             if (obj?.Length <= value)
             {
@@ -105,7 +149,7 @@ namespace Discord.Net.Rest
                     throw new ArgumentException(msg, name);
             }
         }
-        public static void LengthLessThan(string obj, int value, string name, string? msg = null)
+        public static void LengthLessThan(string? obj, int value, string name, string? msg = null)
         {
             if (obj?.Length >= value)
             {
@@ -115,25 +159,25 @@ namespace Discord.Net.Rest
                     throw new ArgumentException(msg, name);
             }
         }
-        public static void LengthAtLeast(Optional<string> obj, int value, string name, string? msg = null)
+        public static void LengthAtLeast(Optional<string?> obj, int value, string name, string? msg = null)
         {
             if (!obj.IsSpecified)
                 return;
             LengthAtLeast(obj.Value, value, name, msg);
         }
-        public static void LengthAtMost(Optional<string> obj, int value, string name, string? msg = null)
+        public static void LengthAtMost(Optional<string?> obj, int value, string name, string? msg = null)
         {
             if (!obj.IsSpecified)
                 return;
             LengthAtMost(obj.Value, value, name, msg);
         }
-        public static void LengthGreaterThan(Optional<string> obj, int value, string name, string? msg = null)
+        public static void LengthGreaterThan(Optional<string?> obj, int value, string name, string? msg = null)
         {
             if (!obj.IsSpecified)
                 return;
             LengthGreaterThan(obj.Value, value, name, msg);
         }
-        public static void LengthLessThan(Optional<string> obj, int value, string name, string? msg = null)
+        public static void LengthLessThan(Optional<string?> obj, int value, string name, string? msg = null)
         {
             if (!obj.IsSpecified)
                 return;
@@ -557,6 +601,32 @@ namespace Discord.Net.Rest
                 else
                     throw new ArgumentOutOfRangeException(name, msg);
             }
+        }
+
+        // Structs
+
+        public static void MustBeOneOf<T>(T value, IEnumerable<T> allowed, string name, string? msg = null)
+            where T : struct
+        {
+            if (!allowed.Contains(value))
+                throw CreateMustBeOneOfException(name, msg, allowed);
+        }
+        public static void MustBeOneOf<T>(Optional<T> value, IEnumerable<T> allowed, string name, string? msg = null)
+            where T : struct
+        {
+            if (value.IsSpecified && !allowed.Contains(value.Value))
+                throw CreateMustBeOneOfException(name, msg, allowed);
+        }
+        private static ArgumentException CreateMustBeOneOfException<T>(string name, string? msg, IEnumerable<T> value)
+            where T : struct
+        {
+            if (msg == null)
+            {
+                var options = typeof(T).IsEnum ? string.Join(", ", value.Select(x => Enum.GetName(typeof(T), x))) : string.Join(", ", value);
+                return new ArgumentException($"Value must be one of the following: {options}", name);
+            }
+            else
+                return new ArgumentException(msg, name);
         }
     }
 }

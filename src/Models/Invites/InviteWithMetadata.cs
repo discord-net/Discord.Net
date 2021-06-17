@@ -9,8 +9,28 @@ namespace Discord.Net.Models
     /// <remarks>
     /// <see href="https://discord.com/developers/docs/resources/invite#invite-metadata-object-invite-metadata-structure"/>
     /// </remarks>
-    public record InviteMetadata : Invite
+    public record InviteWithMetadata : Invite
     {
+        /// <summary>
+        /// Minimum age for an invite in seconds.
+        /// </summary>
+        public const int MinAgeTime = 0;
+
+        /// <summary>
+        /// Maximum age for an invite in seconds.
+        /// </summary>
+        public const int MaxAgeTime = 604800;
+
+        /// <summary>
+        /// Minimum amount of uses for an invite.
+        /// </summary>
+        public const int MinUseCount = 0;
+
+        /// <summary>
+        /// Maximum amount of uses for an invite.
+        /// </summary>
+        public const int MaxUseCount = 100;
+
         /// <summary>
         /// Number of times this <see cref="Invite"/> has been used.
         /// </summary>
@@ -18,7 +38,7 @@ namespace Discord.Net.Models
         public int Uses { get; init; }
 
         /// <summary>
-        /// Max number of times this <see cref="Invite"/> can be used.
+        /// Maximum number of times this <see cref="Invite"/> can be used.
         /// </summary>
         [JsonPropertyName("max_uses")]
         public int MaxUses { get; init; }

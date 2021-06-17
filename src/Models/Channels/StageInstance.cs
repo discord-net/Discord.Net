@@ -17,13 +17,13 @@ namespace Discord.Net.Models
         public Snowflake Id { get; }
 
         /// <summary>
-        /// The <see cref="Guild"/> id of the associated Stage <see cref="Channel"/>.
+        /// The <see cref="Guild"/> id of the associated <see cref="StageChannel"/>.
         /// </summary>
         [JsonPropertyName("guild_id")]
         public Snowflake GuildId { get; }
 
         /// <summary>
-        /// The id of the associated Stage <see cref="Channel"/>.
+        /// The id of the associated <see cref="StageChannel"/>.
         /// </summary>
         [JsonPropertyName("channel_id")]
         public Snowflake ChannelId { get; }

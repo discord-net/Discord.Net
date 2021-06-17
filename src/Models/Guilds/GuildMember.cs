@@ -42,13 +42,13 @@ namespace Discord.Net.Models
         public Optional<DateTimeOffset?> PremiumSince { get; init; }
 
         /// <summary>
-        /// Whether the user is deafened in voice <see cref="Channel"/>s.
+        /// Whether the user is deafened in <see cref="VoiceChannel"/>s.
         /// </summary>
         [JsonPropertyName("deaf")]
         public bool Deaf { get; init; }
 
         /// <summary>
-        /// Whether the user is muted in voice <see cref="Channel"/>s.
+        /// Whether the user is muted in <see cref="VoiceChannel"/>s.
         /// </summary>
         [JsonPropertyName("mute")]
         public bool Mute { get; init; }

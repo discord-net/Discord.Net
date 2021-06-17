@@ -147,17 +147,17 @@ namespace Discord.Net.Models
         //
 
         /// <summary>
-        /// Text or voice <see cref="Channel"/> position changed.
+        /// <see cref="GuildTextChannel"/> or <see cref="VoiceChannel"/> position changed.
         /// </summary>
         Position,
 
         /// <summary>
-        /// Text <see cref="Channel"/> topic changed.
+        /// <see cref="GuildTextChannel"/> topic changed.
         /// </summary>
         Topic,
 
         /// <summary>
-        /// Voice <see cref="Channel"/> bitrate changed.
+        /// <see cref="VoiceChannel"/> bitrate changed.
         /// </summary>
         Bitrate,
 
@@ -297,7 +297,7 @@ namespace Discord.Net.Models
         //
 
         /// <summary>
-        /// New user limit in a voice <see cref="Channel"/>.
+        /// New user limit in a <see cref="VoiceChannel"/>.
         /// </summary>
         UserLimit,
     }

@@ -12,6 +12,76 @@ namespace Discord.Net.Models
     public record Channel
     {
         /// <summary>
+        /// Minimum langth of a channel name.
+        /// </summary>
+        public const int MinChannelNameLength = 1;
+
+        /// <summary>
+        /// Maximum langth of a channel name.
+        /// </summary>
+        public const int MaxChannelNameLength = 100;
+
+        /// <summary>
+        /// Minimum langth of a channel topic.
+        /// </summary>
+        public const int MinChannelTopicLength = 0;
+
+        /// <summary>
+        /// Maximum langth of a channel topic.
+        /// </summary>
+        public const int MaxChannelTopicLength = 1024;
+
+        /// <summary>
+        /// Minimum langth of a channel topic.
+        /// </summary>
+        public const int MinRateLimitPerUserDuration = 0;
+
+        /// <summary>
+        /// Maximum langth of a channel topic.
+        /// </summary>
+        public const int MaxRateLimitPerUserDuration = 1024;
+
+        /// <summary>
+        /// Minimum amount of users in channel.
+        /// </summary>
+        public const int MinUserLimit = 0;
+
+        /// <summary>
+        /// Maximum amount of users in channel.
+        /// </summary>
+        public const int MaxUserLimit = 99;
+
+        /// <summary>
+        /// Minimum bitrate for a channel.
+        /// </summary>
+        public const int MinBitrate = 8000;
+
+        /// <summary>
+        /// Maximum bitrate for a channel.
+        /// </summary>
+        public const int MaxBitrate = 128000;
+
+        /// <summary>
+        /// Minimum afk timeout duration for a channel.
+        /// </summary>
+        public const int MinAfkTimeoutDuration = 60;
+
+        /// <summary>
+        /// Maximum afk timeout duration for a channel.
+        /// </summary>
+        public const int MaxAFkTimeoutDuration = 3600;
+
+        /// <summary>
+        /// Minimum amount of messages to requests in a channel.
+        /// </summary>
+        public const int MinGetMessagesAmount = 1;
+
+        /// <summary>
+        /// Maximum amount of messages to requests in a channel.
+        /// </summary>
+        public const int MaxGetMessagesAmount = 100;
+
+        /// <summary>
         /// The id of this <see cref="Channel"/>.
         /// </summary>
         [JsonPropertyName("id")]
@@ -73,13 +143,13 @@ namespace Discord.Net.Models
         public Optional<Snowflake?> LastMessageId { get; init; }
 
         /// <summary>
-        /// The bitrate (in bits) of the voice <see cref="Channel"/>.
+        /// The bitrate (in bits) of the <see cref="VoiceChannel"/>.
         /// </summary>
         [JsonPropertyName("bitrate")]
         public Optional<int> Bitrate { get; init; }
 
         /// <summary>
-        /// The <see cref="User"/> limit of the voice <see cref="Channel"/>.
+        /// The <see cref="User"/> limit of the <see cref="VoiceChannel"/>.
         /// </summary>
         [JsonPropertyName("user_limit")]
         public Optional<int> UserLimit { get; init; }
@@ -135,13 +205,13 @@ namespace Discord.Net.Models
         public Optional<DateTimeOffset?> LastPinTimestamp { get; init; }
 
         /// <summary>
-        /// Voice region id for the voice <see cref="Channel"/>, automatic when set to null.
+        /// Voice region id for the <see cref="VoiceChannel"/>, automatic when set to null.
         /// </summary>
         [JsonPropertyName("rtc_region")]
         public Optional<string?> RtcRegion { get; init; }
 
         /// <summary>
-        /// The camera video quality mode of the voice channel, 1 when not present.
+        /// The camera video quality mode of the <see cref="VoiceChannel"/>, 1 when not present.
         /// </summary>
         [JsonPropertyName("video_quality_mode")]
         public Optional<VideoQualityMode> VideoQualityMode { get; init; }

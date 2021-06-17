@@ -14,12 +14,12 @@ namespace Discord.Net.Models
         Default = 0,
 
         /// <summary>
-        /// Recipient was added to a group <see cref="Channel"/>.
+        /// Recipient was added to a <see cref="GroupChannel"/>.
         /// </summary>
         RecipientAdd = 1,
 
         /// <summary>
-        /// Recipient was removed from a group <see cref="Channel"/>.
+        /// Recipient was removed from a <see cref="GroupChannel"/>.
         /// </summary>
         RecipientRemove = 2,
 
@@ -29,12 +29,12 @@ namespace Discord.Net.Models
         Call = 3,
 
         /// <summary>
-        /// Group <see cref="Channel"/> name was changed.
+        /// <see cref="GroupChannel"/> name was changed.
         /// </summary>
         ChannelNameChange = 4,
 
         /// <summary>
-        /// Group <see cref="Channel"/> icon was changed.
+        /// <see cref="GroupChannel"/> icon was changed.
         /// </summary>
         ChannelIconChange = 5,
 
@@ -96,7 +96,7 @@ namespace Discord.Net.Models
         GuildDiscoveryGracePeriodFinalWarning = 17,
 
         /// <summary>
-        /// A thread <see cref="Channel"/> was created.
+        /// A <see cref="ThreadChannel"/> was created.
         /// </summary>
         ThreadCreated = 18,
 
@@ -111,7 +111,7 @@ namespace Discord.Net.Models
         ApplicationCommand = 20,
 
         /// <summary>
-        /// Starter message for a thread <see cref="Channel"/>.
+        /// Starter message for a <see cref="ThreadChannel"/>.
         /// </summary>
         ThreadStarterMessage = 21,
 

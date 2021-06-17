@@ -11,6 +11,16 @@ namespace Discord.Net.Models
     public record Reaction
     {
         /// <summary>
+        /// Minimum amount of users that reacted in a message.
+        /// </summary>
+        public const int MinGetReactionsAmount = 1;
+
+        /// <summary>
+        /// Maximum amount of users that reacted in a message.
+        /// </summary>
+        public const int MaxGetReactionsAmount = 100;
+
+        /// <summary>
         /// Times this <see cref="Models.Emoji"/> has been used to react.
         /// </summary>
         [JsonPropertyName("count")]
