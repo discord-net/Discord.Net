@@ -10,7 +10,7 @@ namespace Discord
     public interface IMessage : ISnowflakeEntity, IDeletable
     {
         /// <summary>
-        ///     Gets the type of this system message.
+        ///     Gets the type of this message.
         /// </summary>
         MessageType Type { get; }
         /// <summary>
