@@ -127,11 +127,6 @@ namespace Discord.Rest
             await client.ApiClient.AddReactionAsync(channelId, messageId, emote is Emote e ? $"{e.Name}:{e.Id}" : UrlEncode(emote.Name), options).ConfigureAwait(false);
         }
 
-        public static async Task AddReactionAsync(ulong channelId, ulong messageId, IEmote emote, BaseDiscordClient client, RequestOptions options)
-        {
-            await client.ApiClient.AddReactionAsync(channelId, messageId, emote is Emote e ? $"{e.Name}:{e.Id}" : UrlEncode(emote.Name), options).ConfigureAwait(false);
-        }
-
         public static async Task AddReactionAsync(IMessage msg, IEmote emote, BaseDiscordClient client, RequestOptions options)
         {
             await client.ApiClient.AddReactionAsync(msg.Channel.Id, msg.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : UrlEncode(emote.Name), options).ConfigureAwait(false);
