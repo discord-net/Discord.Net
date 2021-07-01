@@ -6,15 +6,15 @@ namespace Discord.API
     internal class ApplicationCommandInteractionDataResolved
     {
         [JsonProperty("users")]
-        public Optional<Dictionary<ulong, User>> Users { get; set; }
+        public Optional<Dictionary<string, User>> Users { get; set; }
 
         [JsonProperty("members")]
-        public Optional<Dictionary<ulong, GuildMember>> Members { get; set; }
+        public Optional<Dictionary<string, GuildMember>> Members { get; set; }
 
         [JsonProperty("channels")]
-        public Optional<Dictionary<ulong, Channel>> Channels { get; set; }
+        public Optional<Dictionary<string, Channel>> Channels { get; set; }
 
         [JsonProperty("roles")]
-        public Optional<Dictionary<ulong, Role>> Roles { get; set; }
+        public Optional<Dictionary<string, Role>> Roles { get; set; }
     }
 }

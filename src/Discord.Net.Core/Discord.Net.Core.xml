@@ -3932,6 +3932,11 @@
                 A <see cref="T:Discord.IRole"/>.
             </summary>
         </member>
+        <member name="F:Discord.ApplicationCommandOptionType.Mentionable">
+            <summary>
+                
+            </summary>
+        </member>
         <member name="T:Discord.ApplicationCommandProperties">
             <summary>
                 Provides properties that are used to modify a <see cref="T:Discord.IApplicationCommand" /> with the specified changes.
@@ -4030,6 +4035,11 @@
                 <note>
                     This objects type can be any one of the option types in <see cref="T:Discord.ApplicationCommandOptionType"/>
                 </note>
+            </summary>
+        </member>
+        <member name="P:Discord.IApplicationCommandInteractionDataOption.Type">
+            <summary>
+                The type of this data's option.
             </summary>
         </member>
         <member name="P:Discord.IApplicationCommandInteractionDataOption.Options">

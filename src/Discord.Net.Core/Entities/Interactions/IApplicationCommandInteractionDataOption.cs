@@ -25,6 +25,11 @@ namespace Discord
         object Value { get; }
 
         /// <summary>
+        ///     The type of this data's option.
+        /// </summary>
+        ApplicationCommandOptionType Type { get; }
+
+        /// <summary>
         ///     Present if this option is a group or subcommand.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandInteractionDataOption> Options { get; }

@@ -341,7 +341,7 @@ namespace Discord
                 Default = this.Default,
                 Required = this.Required,
                 Type = this.Type,
-                Options = new List<ApplicationCommandOptionProperties>(this.Options.Select(x => x.Build())),
+                Options = this.Options?.Count > 0 ? new List<ApplicationCommandOptionProperties>(this.Options.Select(x => x.Build())) : null,
                 Choices = this.Choices
             };
         }

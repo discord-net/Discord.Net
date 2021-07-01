@@ -49,6 +49,11 @@ namespace Discord
         /// <summary>
         ///     A <see cref="IRole"/>.
         /// </summary>
-        Role = 8
+        Role = 8,
+
+        /// <summary>
+        ///     
+        /// </summary>
+        Mentionable = 9
     }
 }

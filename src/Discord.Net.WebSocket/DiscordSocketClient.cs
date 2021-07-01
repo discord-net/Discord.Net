@@ -25,7 +25,7 @@ namespace Discord.WebSocket
     public partial class DiscordSocketClient : BaseSocketClient, IDiscordClient
     {
         private readonly ConcurrentQueue<ulong> _largeGuilds;
-        private readonly JsonSerializer _serializer;
+        internal readonly JsonSerializer _serializer;
         private readonly DiscordShardedClient _shardedClient;
         private readonly DiscordSocketClient _parentClient;
         private readonly ConcurrentQueue<long> _heartbeatTimes;

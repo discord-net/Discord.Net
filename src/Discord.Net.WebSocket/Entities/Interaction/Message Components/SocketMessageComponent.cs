@@ -92,7 +92,7 @@ namespace Discord.WebSocket
         /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
-        public override async Task<RestUserMessage> RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
+        public override async Task RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
             bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
         {
             if (type == InteractionResponseType.Pong)
@@ -102,7 +102,10 @@ namespace Discord.WebSocket
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
             if (Discord.AlwaysAcknowledgeInteractions)
-                return await FollowupAsync(text, isTTS, embed, ephemeral, type, allowedMentions, options);
+            {
+                await FollowupAsync(text, isTTS, embed, ephemeral, type, allowedMentions, options);
+                return;
+            }
 
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
@@ -141,7 +144,7 @@ namespace Discord.WebSocket
             if (ephemeral)
                 response.Data.Value.Flags = 64;
 
-            return await InteractionHelper.SendInteractionResponse(this.Discord, this.Channel, response, this.Id, Token, options);
+            await InteractionHelper.SendInteractionResponse(this.Discord, this.Channel, response, this.Id, Token, options);
         }
 
         /// <summary>

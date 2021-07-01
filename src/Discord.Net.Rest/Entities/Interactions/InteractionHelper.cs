@@ -10,20 +10,20 @@ namespace Discord.Rest
 {
     internal static class InteractionHelper
     {
-        internal static async Task<RestInteractionMessage> SendInteractionResponse(BaseDiscordClient client, IMessageChannel channel, InteractionResponse response,
+        internal static Task SendInteractionResponse(BaseDiscordClient client, IMessageChannel channel, InteractionResponse response,
             ulong interactionId, string interactionToken, RequestOptions options = null)
         {
-            await client.ApiClient.CreateInteractionResponse(response, interactionId, interactionToken, options).ConfigureAwait(false);
-
-            // get the original message
-            var msg = await client.ApiClient.GetInteractionResponse(interactionToken).ConfigureAwait(false);
-
-            var entity = RestInteractionMessage.Create(client, msg, interactionToken, channel);
-
-            return entity;
+            return client.ApiClient.CreateInteractionResponse(response, interactionId, interactionToken, options);
         }
 
-        internal static async Task<RestFollowupMessage> SendFollowupAsync(BaseDiscordClient client, API.Rest.CreateWebhookMessageParams args,
+        internal static async Task<RestInteractionMessage> GetOriginalResponseAsync(BaseDiscordClient client, IMessageChannel channel,
+            IDiscordInteraction interaction, RequestOptions options = null)
+        {
+            var model = await client.ApiClient.GetInteractionResponse(interaction.Token, options).ConfigureAwait(false);
+            return RestInteractionMessage.Create(client, model, interaction.Token, channel);
+        }
+
+        internal static async Task<RestFollowupMessage> SendFollowupAsync(BaseDiscordClient client, CreateWebhookMessageParams args,
             string token, IMessageChannel channel, RequestOptions options = null)
         {
             var model = await client.ApiClient.CreateInteractionFollowupMessage(args, token, options).ConfigureAwait(false);

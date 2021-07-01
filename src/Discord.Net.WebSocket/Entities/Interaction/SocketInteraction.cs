@@ -110,13 +110,10 @@ namespace Discord.WebSocket
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="component">A <see cref="MessageComponent"/> to be sent with this response</param>
-        /// <returns>
-        ///     The <see cref="IMessage"/> sent as the response. If this is the first acknowledgement, it will return null.
-        /// </returns>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
 
-        public abstract Task<RestUserMessage> RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
+        public abstract Task RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
             bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null);
 
         /// <summary>
@@ -136,6 +133,16 @@ namespace Discord.WebSocket
         public abstract Task<RestFollowupMessage> FollowupAsync(string text = null, bool isTTS = false, Embed embed = null, bool ephemeral = false,
              InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
              AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null);
+
+        /// <summary>
+        ///     Gets the original response for this interaction.
+        /// </summary>
+        /// <param name="options">The request options for this async request.</param>
+        /// <returns>A <see cref="RestInteractionMessage"/> that represents the intitial response, or <see langword="null"/> if there is no response.</returns>
+        public Task<RestInteractionMessage> GetOriginalResponseAsync(RequestOptions options = null)
+        {
+            return InteractionHelper.GetOriginalResponseAsync(this.Discord, this.Channel, this, options);
+        }
 
         /// <summary>
         ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredChannelMessageWithSource"/>.

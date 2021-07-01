@@ -3299,41 +3299,17 @@
                 The data associated with this interaction.
             </summary>
         </member>
-        <member name="M:Discord.WebSocket.SocketSlashCommand.RespondAsync(System.String,System.Boolean,Discord.Embed,Discord.InteractionResponseType,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
+        <member name="M:Discord.WebSocket.SocketSlashCommand.GetOriginalResponse">
             <summary>
-                Responds to an Interaction.
-            <para>
-                If you have <see cref="P:Discord.WebSocket.DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, You should use
-                <see cref="!:FollowupAsync(string, bool, Embed, InteractionResponseType, AllowedMentions, RequestOptions)"/> instead.
-            </para>
+                Gets the original response to this slash command.
             </summary>
-            <param name="text">The text of the message to be sent.</param>
-            <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-            <param name="embed">A <see cref="T:Discord.Embed"/> to send with this response.</param>
-            <param name="type">The type of response to this Interaction.</param>
-            <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
-            <param name="allowedMentions">The allowed mentions for this response.</param>
-            <param name="options">The request options for this response.</param>
-            <returns>
-                The <see cref="T:Discord.IMessage"/> sent as the response. If this is the first acknowledgement, it will return null.
-            </returns>
-            <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
-            <exception cref="T:System.InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
+            <returns>A <see cref="T:Discord.Rest.RestInteractionMessage"/> that represents the initial response to this interaction.</returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketSlashCommand.RespondAsync(System.String,System.Boolean,Discord.Embed,Discord.InteractionResponseType,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
+            <inheritdoc/>
         </member>
         <member name="M:Discord.WebSocket.SocketSlashCommand.FollowupAsync(System.String,System.Boolean,Discord.Embed,System.Boolean,Discord.InteractionResponseType,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
-            <summary>
-                Sends a followup message for this interaction.
-            </summary>
-            <param name="text">The text of the message to be sent</param>
-            <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-            <param name="embed">A <see cref="T:Discord.Embed"/> to send with this response.</param>
-            <param name="type">The type of response to this Interaction.</param>
-            /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
-            <param name="allowedMentions">The allowed mentions for this response.</param>
-            <param name="options">The request options for this response.</param>
-            <returns>
-                The sent message.
-            </returns>
+            <inheritdoc/>
         </member>
         <member name="T:Discord.WebSocket.SocketSlashCommandData">
             <summary>
@@ -3357,6 +3333,9 @@
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketSlashCommandDataOption.Value">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketSlashCommandDataOption.Type">
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketSlashCommandDataOption.Options">
@@ -3420,9 +3399,6 @@
             <param name="allowedMentions">The allowed mentions for this response.</param>
             <param name="options">The request options for this response.</param>
             <param name="component">A <see cref="T:Discord.MessageComponent"/> to be sent with this response</param>
-            <returns>
-                The <see cref="T:Discord.IMessage"/> sent as the response. If this is the first acknowledgement, it will return null.
-            </returns>
             <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
             <exception cref="T:System.InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
         </member>
@@ -3441,6 +3417,13 @@
             <returns>
                 The sent message.
             </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketInteraction.GetOriginalResponseAsync(Discord.RequestOptions)">
+            <summary>
+                Gets the original response for this interaction.
+            </summary>
+            <param name="options">The request options for this async request.</param>
+            <returns>A <see cref="T:Discord.Rest.RestInteractionMessage"/> that represents the intitial response, or <see langword="null"/> if there is no response.</returns>
         </member>
         <member name="M:Discord.WebSocket.SocketInteraction.AcknowledgeAsync(Discord.RequestOptions)">
             <summary>

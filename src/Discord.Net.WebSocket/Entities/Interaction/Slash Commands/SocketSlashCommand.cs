@@ -22,10 +22,14 @@ namespace Discord.WebSocket
             : base(client, model.Id, channel)
         {
             var dataModel = model.Data.IsSpecified ?
-                (model.Data.Value as JToken).ToObject<DataModel>()
+                (model.Data.Value as JToken).ToObject<DataModel>(client._serializer)
                 : null;
 
-            Data = SocketSlashCommandData.Create(client, dataModel, model.Id);
+            ulong? guildId = null;
+            if (this.Channel is SocketGuildChannel guildChannel)
+                guildId = guildChannel.Guild.Id;
+
+            Data = SocketSlashCommandData.Create(client, dataModel, model.Id, guildId);
         }
 
         new internal static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
@@ -38,7 +42,7 @@ namespace Discord.WebSocket
         internal override void Update(Model model)
         {
             var data = model.Data.IsSpecified ?
-                (model.Data.Value as JToken).ToObject<DataModel>()
+                (model.Data.Value as JToken).ToObject<DataModel>(Discord._serializer)
                 : null;
 
             this.Data.Update(data);
@@ -47,26 +51,21 @@ namespace Discord.WebSocket
         }
 
         /// <summary>
-        ///     Responds to an Interaction.
-        /// <para>
-        ///     If you have <see cref="DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, You should use
-        ///     <see cref="FollowupAsync(string, bool, Embed, InteractionResponseType, AllowedMentions, RequestOptions)"/> instead.
-        /// </para>
+        ///     Gets the original response to this slash command.
         /// </summary>
-        /// <param name="text">The text of the message to be sent.</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="embed">A <see cref="Embed"/> to send with this response.</param>
-        /// <param name="type">The type of response to this Interaction.</param>
-        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
-        /// <param name="allowedMentions">The allowed mentions for this response.</param>
-        /// <param name="options">The request options for this response.</param>
-        /// <returns>
-        ///     The <see cref="IMessage"/> sent as the response. If this is the first acknowledgement, it will return null.
-        /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
+        /// <returns>A <see cref="RestInteractionMessage"/> that represents the initial response to this interaction.</returns>
+        public async Task<RestInteractionMessage> GetOriginalResponse()
+        {
+            // get the original message
+            var msg = await Discord.ApiClient.GetInteractionResponse(this.Token).ConfigureAwait(false);
 
-        public override async Task<RestUserMessage> RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
+            var entity = RestInteractionMessage.Create(Discord, msg, this.Token, this.Channel);
+
+            return entity;
+        }
+
+        /// <inheritdoc/>
+        public override async Task RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
             bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
         {
             if (type == InteractionResponseType.Pong)
@@ -79,7 +78,10 @@ namespace Discord.WebSocket
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
             if (Discord.AlwaysAcknowledgeInteractions)
-                return await FollowupAsync(text, isTTS, embed, ephemeral, type, allowedMentions, options); // The arguments should be passed? What was i thinking...
+            {
+                await FollowupAsync(text, isTTS, embed, ephemeral, type, allowedMentions, options);
+                return;
+            }
 
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
@@ -118,22 +120,10 @@ namespace Discord.WebSocket
             if (ephemeral)
                 response.Data.Value.Flags = 64;
 
-            return await InteractionHelper.SendInteractionResponse(this.Discord, this.Channel, response, this.Id, Token, options);
+            await InteractionHelper.SendInteractionResponse(this.Discord, this.Channel, response, this.Id, Token, options);
         }
 
-        /// <summary>
-        ///     Sends a followup message for this interaction.
-        /// </summary>
-        /// <param name="text">The text of the message to be sent</param>
-        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="embed">A <see cref="Embed"/> to send with this response.</param>
-        /// <param name="type">The type of response to this Interaction.</param>
-        /// /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
-        /// <param name="allowedMentions">The allowed mentions for this response.</param>
-        /// <param name="options">The request options for this response.</param>
-        /// <returns>
-        ///     The sent message.
-        /// </returns>
+        /// <inheritdoc/>
         public override async Task<RestFollowupMessage> FollowupAsync(string text = null, bool isTTS = false, Embed embed = null, bool ephemeral = false,
             InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
             AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)

@@ -794,6 +794,16 @@ namespace Discord.WebSocket
             return null;
         }
 
+        internal SocketRole AddOrUpdateRole(RoleModel model)
+        {
+            if (_roles.TryGetValue(model.Id, out SocketRole role))
+                _roles[model.Id].Update(this.Discord.State, model);
+            else
+               role = AddRole(model);
+
+            return role;
+        }
+
         //Users
         /// <inheritdoc />
         public Task<RestGuildUser> AddGuildUserAsync(ulong id, string accessToken, Action<AddGuildUserProperties> func = null, RequestOptions options = null)
