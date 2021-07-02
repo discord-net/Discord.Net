@@ -81,6 +81,10 @@ namespace Discord.Net.Converters
             //Special
             if (type == typeof(API.Image))
                 return ImageConverter.Instance;
+            if (typeof(IMessageComponent).IsAssignableFrom(type))
+                return MessageComponentConverter.Instance;
+            if (type == typeof(API.Interaction))
+                return InteractionConverter.Instance;
 
             //Entities
             var typeInfo = type.GetTypeInfo();

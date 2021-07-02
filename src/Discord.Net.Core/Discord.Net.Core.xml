@@ -4132,6 +4132,11 @@
                 read-only property, always 1.
             </summary>
         </member>
+        <member name="T:Discord.IDiscordInteractionData">
+            <summary>
+                Represents an interface used to specify classes that they are a vaild dataype of a <see cref="T:Discord.IDiscordInteraction"/> class.
+            </summary>
+        </member>
         <member name="T:Discord.InteractionResponseType">
             <summary>
                 The response type for an <see cref="T:Discord.IDiscordInteraction"/>.
@@ -4277,6 +4282,16 @@
                 Represents a builder for creating a <see cref="T:Discord.MessageComponent"/>.
             </summary>
         </member>
+        <member name="F:Discord.ComponentBuilder.MaxLabelLength">
+            <summary>
+                The max length of a <see cref="P:Discord.ButtonComponent.Label"/>.
+            </summary>
+        </member>
+        <member name="F:Discord.ComponentBuilder.MaxCustomIdLength">
+            <summary>
+                The max length of a <see cref="P:Discord.ButtonComponent.CustomId"/>.
+            </summary>
+        </member>
         <member name="F:Discord.ComponentBuilder.MaxActionRowCount">
             <summary>
                 The max amount of rows a message can have.
@@ -4286,6 +4301,36 @@
             <summary>
                 Gets or sets the Action Rows for this Component Builder.
             </summary>
+        </member>
+        <member name="M:Discord.ComponentBuilder.WithSelectMenu(System.String,System.String,System.Collections.Generic.List{Discord.SelectMenuOptionBuilder},System.String,System.Int32,System.Int32,System.Int32)">
+            <summary>
+                Adds a <see cref="T:Discord.SelectMenuBuilder"/> to the first row, if the first row cannot
+                accept the component then it will add it to a row that can
+            </summary>
+            <param name="label">The label of the menu.</param>
+            <param name="customId">The custom id of the menu.</param>
+            <param name="options">The options of the menu.</param>
+            <param name="placeholder">The placeholder of the menu.</param>
+            <param name="minValues">The min values of the placeholder.</param>
+            <param name="maxValues">The max values of the placeholder.</param>
+            <param name="row">The row to add the menu to.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Discord.ComponentBuilder.WithSelectMenu(Discord.SelectMenuBuilder)">
+            <summary>
+                Adds a <see cref="T:Discord.SelectMenuBuilder"/> to the first row, if the first row cannot
+                accept the component then it will add it to a row that can
+            </summary>
+            <param name="menu">The menu to add</param>
+            <returns>The current builder.</returns>
+        </member>
+        <member name="M:Discord.ComponentBuilder.WithSelectMenu(Discord.SelectMenuBuilder,System.Int32)">
+            <summary>
+                Adds a <see cref="T:Discord.SelectMenuBuilder"/> to the current builder at the specific row.
+            </summary>
+            <param name="menu">The menu to add.</param>
+            <param name="row">The row to attempt to add this component on.</param>
+            <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.ComponentBuilder.WithButton(System.String,System.String,Discord.ButtonStyle,Discord.IEmote,System.String,System.Boolean,System.Int32)">
             <summary>
@@ -4336,14 +4381,14 @@
                 Gets or sets the components inside this row.
             </summary>
         </member>
-        <member name="M:Discord.ActionRowBuilder.WithComponents(System.Collections.Generic.List{Discord.ButtonComponent})">
+        <member name="M:Discord.ActionRowBuilder.WithComponents(System.Collections.Generic.List{Discord.IMessageComponent})">
             <summary>
                 Adds a list of components to the current row.
             </summary>
             <param name="components">The list of components to add.</param>
             <returns>The current builder.</returns>
         </member>
-        <member name="M:Discord.ActionRowBuilder.WithComponent(Discord.ButtonComponent)">
+        <member name="M:Discord.ActionRowBuilder.WithComponent(Discord.IMessageComponent)">
             <summary>
                 Adds a component at the end of the current row.
             </summary>
@@ -4361,16 +4406,6 @@
         <member name="T:Discord.ButtonBuilder">
             <summary>
                 Represents a class used to build <see cref="T:Discord.ButtonComponent"/>'s.
-            </summary>
-        </member>
-        <member name="F:Discord.ButtonBuilder.MaxLabelLength">
-            <summary>
-                The max length of a <see cref="P:Discord.ButtonComponent.Label"/>.
-            </summary>
-        </member>
-        <member name="F:Discord.ButtonBuilder.MaxCustomIdLength">
-            <summary>
-                The max length of a <see cref="P:Discord.ButtonComponent.CustomId"/>.
             </summary>
         </member>
         <member name="P:Discord.ButtonBuilder.Label">
@@ -4493,6 +4528,226 @@
             <exception cref="T:System.InvalidOperationException">A button cannot contain a URL and a CustomId.</exception>
             <exception cref="T:System.ArgumentException">A button must have an Emote or a label.</exception>
         </member>
+        <member name="T:Discord.SelectMenuBuilder">
+            <summary>
+                Represents a class used to build <see cref="T:Discord.SelectMenu"/>'s.
+            </summary>
+        </member>
+        <member name="F:Discord.SelectMenuBuilder.MaxPlaceholderLength">
+            <summary>
+                The max length of a <see cref="P:Discord.SelectMenu.Placeholder"/>.
+            </summary>
+        </member>
+        <member name="F:Discord.SelectMenuBuilder.MaxValuesCount">
+            <summary>
+                The maximum number of values for the <see cref="P:Discord.SelectMenu.MinValues"/> and <see cref="P:Discord.SelectMenu.MaxValues"/> properties.
+            </summary>
+        </member>
+        <member name="F:Discord.SelectMenuBuilder.MaxOptionCount">
+            <summary>
+                The maximum number of options a <see cref="T:Discord.SelectMenu"/> can have.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuBuilder.Label">
+            <summary>
+                Gets or sets the label of the current select menu.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuBuilder.CustomId">
+            <summary>
+                Gets or sets the custom id of the current select menu.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuBuilder.Placeholder">
+            <summary>
+                Gets or sets the placeholder text of the current select menu.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuBuilder.MinValues">
+            <summary>
+                Gets or sets the minimum values of the current select menu.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuBuilder.MaxValues">
+            <summary>
+                Gets or sets the maximum values of the current select menu.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuBuilder.Options">
+            <summary>
+                Gets or sets a collection of <see cref="T:Discord.SelectMenuOptionBuilder"/> for this current select menu.
+            </summary>
+        </member>
+        <member name="M:Discord.SelectMenuBuilder.#ctor">
+            <summary>
+                Creates a new instance of a <see cref="T:Discord.SelectMenuBuilder"/>.
+            </summary>
+        </member>
+        <member name="M:Discord.SelectMenuBuilder.#ctor(System.String,System.Collections.Generic.List{Discord.SelectMenuOptionBuilder})">
+            <summary>
+                Creates a new instance of a <see cref="T:Discord.SelectMenuBuilder"/>.
+            </summary>
+            <param name="customId">The custom id of this select menu.</param>
+            <param name="options">The options for this select menu.</param>
+        </member>
+        <member name="M:Discord.SelectMenuBuilder.WithLabel(System.String)">
+            <summary>
+                Sets the field label.
+            </summary>
+            <param name="label">The value to set the field label to.</param>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.SelectMenuBuilder.WithCustomId(System.String)">
+            <summary>
+                Sets the field CustomId.
+            </summary>
+            <param name="customId">The value to set the field CustomId to.</param>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.SelectMenuBuilder.WithPlaceholder(System.String)">
+            <summary>
+                Sets the field placeholder.
+            </summary>
+            <param name="placeholder">The value to set the field placeholder to.</param>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.SelectMenuBuilder.WithMinValues(System.Int32)">
+            <summary>
+                Sets the field minValues.
+            </summary>
+            <param name="minValues">The value to set the field minValues to.</param>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.SelectMenuBuilder.WithMaxValues(System.Int32)">
+            <summary>
+                Sets the field maxValues.
+            </summary>
+            <param name="maxValues">The value to set the field maxValues to.</param>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.SelectMenuBuilder.WithOptions(System.Collections.Generic.List{Discord.SelectMenuOptionBuilder})">
+            <summary>
+                Sets the field options.
+            </summary>
+            <param name="options">The value to set the field options to.</param>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.SelectMenuBuilder.Build">
+            <summary>
+                Builds a <see cref="T:Discord.SelectMenu"/>
+            </summary>
+            <returns>The newly built <see cref="T:Discord.SelectMenu"/></returns>
+        </member>
+        <member name="T:Discord.SelectMenuOptionBuilder">
+            <summary>
+                Represents a class used to build <see cref="T:Discord.SelectMenuOption"/>'s.
+            </summary>
+        </member>
+        <member name="F:Discord.SelectMenuOptionBuilder.MaxDescriptionLength">
+            <summary>
+                The maximum length of a <see cref="P:Discord.SelectMenuOption.Description"/>.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuOptionBuilder.Label">
+            <summary>
+                Gets or sets the label of the current select menu.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuOptionBuilder.Value">
+            <summary>
+                Gets or sets the custom id of the current select menu.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuOptionBuilder.Description">
+            <summary>
+                Gets or sets this menu options description.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuOptionBuilder.Emote">
+            <summary>
+                Gets or sets the emote of this option.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuOptionBuilder.Default">
+            <summary>
+                Gets or sets the whether or not this option will render selected by default.
+            </summary>
+        </member>
+        <member name="M:Discord.SelectMenuOptionBuilder.#ctor">
+            <summary>
+                Creates a new instance of a <see cref="T:Discord.SelectMenuOptionBuilder"/>.
+            </summary>
+        </member>
+        <member name="M:Discord.SelectMenuOptionBuilder.#ctor(System.String,System.String)">
+            <summary>
+                Creates a new instance of a <see cref="T:Discord.SelectMenuOptionBuilder"/>.
+            </summary>
+            <param name="label">The label for this option.</param>
+            <param name="value">The value of this option.</param>
+        </member>
+        <member name="M:Discord.SelectMenuOptionBuilder.WithLabel(System.String)">
+            <summary>
+                Sets the field label.
+            </summary>
+            <param name="label">The value to set the field label to.</param>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.SelectMenuOptionBuilder.WithValue(System.String)">
+            <summary>
+                Sets the field value.
+            </summary>
+            <param name="value">The value to set the field value to.</param>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.SelectMenuOptionBuilder.WithDescription(System.String)">
+            <summary>
+                Sets the field description.
+            </summary>
+            <param name="description">The value to set the field description to.</param>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.SelectMenuOptionBuilder.WithEmote(Discord.IEmote)">
+            <summary>
+                Sets the field emote.
+            </summary>
+            <param name="emote">The value to set the field emote to.</param>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.SelectMenuOptionBuilder.WithDefault(System.Boolean)">
+            <summary>
+                Sets the field default.
+            </summary>
+            <param name="defaultValue">The value to set the field default to.</param>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.SelectMenuOptionBuilder.Build">
+            <summary>
+                Builds a <see cref="T:Discord.SelectMenuOption"/>.
+            </summary>
+            <returns>The newly built <see cref="T:Discord.SelectMenuOption"/>.</returns>
+        </member>
         <member name="T:Discord.ComponentType">
             <summary>
                 Represents a type of a component
@@ -4506,6 +4761,11 @@
         <member name="F:Discord.ComponentType.Button">
             <summary>
                 A clickable button
+            </summary>
+        </member>
+        <member name="F:Discord.ComponentType.SelectMenu">
+            <summary>
+                A select menu for picking from choices
             </summary>
         </member>
         <member name="P:Discord.IMessageComponent.Type">
@@ -4526,6 +4786,69 @@
         <member name="P:Discord.MessageComponent.Empty">
             <summary>
                 Returns a empty <see cref="T:Discord.MessageComponent"/>.
+            </summary>
+        </member>
+        <member name="T:Discord.SelectMenu">
+            <summary>
+                Represents a select menu component defined at <see href="https://discord.com/developers/docs/interactions/message-components#select-menu-object"/>
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenu.Type">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.SelectMenu.CustomId">
+            <summary>
+                The custom id of this Select menu that will be sent with a <see cref="T:Discord.IDiscordInteraction"/>.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenu.Options">
+            <summary>
+                The menus options to select from.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenu.Placeholder">
+            <summary>
+                A custom placeholder text if nothing is selected, max 100 characters.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenu.MinValues">
+            <summary>
+                The minimum number of items that must be chosen; default 1, min 0, max 25
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenu.MaxValues">
+            <summary>
+                The maximum number of items that can be chosen; default 1, max 25
+            </summary>
+        </member>
+        <member name="T:Discord.SelectMenuOption">
+            <summary>
+                Represents a choice for a <see cref="T:Discord.SelectMenu"/>.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuOption.Label">
+            <summary>
+                The user-facing name of the option, max 25 characters.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuOption.Value">
+            <summary>
+                The dev-define value of the option, max 100 characters.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuOption.Description">
+            <summary>
+                An additional description of the option, max 50 characters.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuOption.Emote">
+            <summary>
+                A <see cref="T:Discord.IEmote"/> that will be displayed with this menu option.
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenuOption.Default">
+            <summary>
+                Will render this option as selected by default.
             </summary>
         </member>
         <member name="T:Discord.SlashCommandBuilder">

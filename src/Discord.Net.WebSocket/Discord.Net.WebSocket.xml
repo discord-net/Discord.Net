@@ -3224,6 +3224,11 @@
                 The type of the component clicked
             </summary>
         </member>
+        <member name="P:Discord.WebSocket.SocketMessageComponentData.Values">
+            <summary>
+                The value(s) of a <see cref="T:Discord.SelectMenu"/> interaction response.
+            </summary>
+        </member>
         <member name="T:Discord.WebSocket.SocketApplicationCommand">
             <summary>
                 Represends a Websocket-based <see cref="T:Discord.IApplicationCommand"/> recieved over the gateway.

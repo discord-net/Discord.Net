@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord.API
 {
-    internal class ButtonComponent
+    internal class ButtonComponent : IMessageComponent
     {
         [JsonProperty("type")]
         public ComponentType Type { get; set; }

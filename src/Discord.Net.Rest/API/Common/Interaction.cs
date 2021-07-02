@@ -1,4 +1,3 @@
-using Discord.API;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -6,9 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord.API.Gateway
+namespace Discord.API
 {
-    internal class InteractionCreated
+    [JsonConverter(typeof(Net.Converters.InteractionConverter))]
+    internal class Interaction
     {
         [JsonProperty("id")]
         public ulong Id { get; set; }
@@ -20,7 +20,7 @@ namespace Discord.API.Gateway
         public InteractionType Type { get; set; }
 
         [JsonProperty("data")]
-        public Optional<object> Data { get; set; }
+        public Optional<IDiscordInteractionData> Data { get; set; }
 
         [JsonProperty("guild_id")]
         public Optional<ulong> GuildId { get; set; }
@@ -42,6 +42,5 @@ namespace Discord.API.Gateway
 
         [JsonProperty("message")]
         public Optional<Message> Message { get; set; }
-
     }
 }

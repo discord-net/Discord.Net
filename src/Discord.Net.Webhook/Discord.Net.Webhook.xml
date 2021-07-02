@@ -35,6 +35,33 @@
             <summary> Sends a message to the channel for this webhook. </summary>
             <returns> Returns the ID of the created message. </returns>
         </member>
+        <member name="M:Discord.Webhook.DiscordWebhookClient.ModifyMessageAsync(System.UInt64,System.Action{Discord.Webhook.WebhookMessageProperties},Discord.RequestOptions)">
+            <summary>
+                Modifies a message posted using this webhook.
+            </summary>
+            <remarks>
+                This method can only modify messages that were sent using the same webhook.
+            </remarks>
+            <param name="messageId">ID of the modified message.</param>
+            <param name="func">A delegate containing the properties to modify the message with.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous modification operation.
+            </returns>
+        </member>
+        <member name="M:Discord.Webhook.DiscordWebhookClient.DeleteMessageAsync(System.UInt64,Discord.RequestOptions)">
+            <summary>
+                Deletes a message posted using this webhook.
+            </summary>
+            <remarks>
+                This method can only delete messages that were sent using the same webhook.
+            </remarks>
+            <param name="messageId">ID of the deleted message.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous deletion operation.
+            </returns>
+        </member>
         <member name="M:Discord.Webhook.DiscordWebhookClient.SendFileAsync(System.String,System.String,System.Boolean,System.Collections.Generic.IEnumerable{Discord.Embed},System.String,System.String,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions)">
             <summary> Sends a message to the channel for this webhook with an attachment. </summary>
             <returns> Returns the ID of the created message. </returns>
@@ -48,6 +75,29 @@
         </member>
         <member name="M:Discord.Webhook.DiscordWebhookClient.DeleteWebhookAsync(Discord.RequestOptions)">
             <summary> Deletes this webhook from Discord and disposes the client. </summary>
+        </member>
+        <member name="T:Discord.Webhook.WebhookMessageProperties">
+            <summary>
+                Properties that are used to modify an Webhook message with the specified changes.
+            </summary>
+        </member>
+        <member name="P:Discord.Webhook.WebhookMessageProperties.Content">
+            <summary>
+                Gets or sets the content of the message.
+            </summary>
+            <remarks>
+                This must be less than the constant defined by <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.
+            </remarks>
+        </member>
+        <member name="P:Discord.Webhook.WebhookMessageProperties.Embeds">
+            <summary>
+                Gets or sets the embed array that the message should display.
+            </summary>
+        </member>
+        <member name="P:Discord.Webhook.WebhookMessageProperties.AllowedMentions">
+            <summary>
+                Gets or sets the allowed mentions of the message.
+            </summary>
         </member>
         <member name="M:Discord.Webhook.WebhookClientHelper.GetWebhookAsync(Discord.Webhook.DiscordWebhookClient,System.UInt64)">
             <exception cref="T:System.InvalidOperationException">Could not find a webhook with the supplied credentials.</exception>

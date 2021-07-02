@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Model = Discord.API.Gateway.InteractionCreated;
+using Model = Discord.API.Interaction;
 using DataModel = Discord.API.MessageComponentInteractionData;
 using Newtonsoft.Json.Linq;
 using Discord.Rest;
@@ -29,12 +29,10 @@ namespace Discord.WebSocket
             : base(client, model.Id, channel)
         {
             var dataModel = model.Data.IsSpecified ?
-                (model.Data.Value as JToken).ToObject<DataModel>()
+                (DataModel)model.Data.Value
                 : null;
 
             this.Data = new SocketMessageComponentData(dataModel);
-
-
         }
 
         new internal static SocketMessageComponent Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)

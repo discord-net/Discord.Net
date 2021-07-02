@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using DataModel = Discord.API.ApplicationCommandInteractionData;
-using Model = Discord.API.Gateway.InteractionCreated;
+using Model = Discord.API.Interaction;
 
 namespace Discord.WebSocket
 {
@@ -22,7 +22,7 @@ namespace Discord.WebSocket
             : base(client, model.Id, channel)
         {
             var dataModel = model.Data.IsSpecified ?
-                (model.Data.Value as JToken).ToObject<DataModel>(client._serializer)
+                (DataModel)model.Data.Value
                 : null;
 
             ulong? guildId = null;

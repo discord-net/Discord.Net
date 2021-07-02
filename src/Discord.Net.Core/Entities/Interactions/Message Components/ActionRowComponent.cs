@@ -18,10 +18,10 @@ namespace Discord
         /// <summary>
         ///     The child components in this row.
         /// </summary>
-        public IReadOnlyCollection<ButtonComponent> Components { get; internal set; }
+        public IReadOnlyCollection<IMessageComponent> Components { get; internal set; }
 
         internal ActionRowComponent() { }
-        internal ActionRowComponent(List<ButtonComponent> components)
+        internal ActionRowComponent(List<IMessageComponent> components)
         {
             this.Components = components;
         }

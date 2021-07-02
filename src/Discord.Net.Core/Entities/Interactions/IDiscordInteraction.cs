@@ -28,7 +28,7 @@ namespace Discord
         /// <summary>
         ///     Represents the data sent within this interaction.
         /// </summary>
-        object Data { get; }
+        IDiscordInteractionData Data { get; }
 
         /// <summary>
         ///     A continuation token for responding to the interaction.

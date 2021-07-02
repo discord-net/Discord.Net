@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Model = Discord.API.Gateway.InteractionCreated;
+using Model = Discord.API.Interaction;
 
 namespace Discord.WebSocket
 {
@@ -36,7 +36,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     The data sent with this interaction.
         /// </summary>
-        public object Data { get; private set; }
+        public IDiscordInteractionData Data { get; private set; }
 
         /// <summary>
         ///     The version of this interaction.
