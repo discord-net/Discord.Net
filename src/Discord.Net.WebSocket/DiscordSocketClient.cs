@@ -1865,6 +1865,8 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (INTERACTION_CREATE)").ConfigureAwait(false);
 
+                                    // 0x546861742062696720656e6469616e20656e636f64696e67206d616b6573206d79316d687a20636c6f636b207469636b
+
                                     var data = (payload as JToken).ToObject<API.Interaction>(_serializer);
 
                                     SocketChannel channel = null;

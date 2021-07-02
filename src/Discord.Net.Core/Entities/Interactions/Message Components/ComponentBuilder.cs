@@ -243,7 +243,7 @@ namespace Discord
             }
         }
 
-        private List<IMessageComponent> _components { get; set; }
+        private List<IMessageComponent> _components { get; set; } = new List<IMessageComponent>();
 
         /// <summary>
         ///     Adds a list of components to the current row.
