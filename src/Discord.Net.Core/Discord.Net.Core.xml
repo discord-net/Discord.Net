@@ -7374,6 +7374,11 @@
                 Allows for using voice-activity-detection in a voice channel.
             </summary>
         </member>
+        <member name="F:Discord.ChannelPermission.PrioritySpeaker">
+            <summary>
+                Allows for using priority speaker in a voice channel.
+            </summary>
+        </member>
         <member name="F:Discord.ChannelPermission.Stream">
             <summary>
                 Allows video streaming in a voice channel.
@@ -7387,6 +7392,36 @@
         <member name="F:Discord.ChannelPermission.ManageWebhooks">
             <summary>
                 Allows management and editing of webhooks.
+            </summary>
+        </member>
+        <member name="F:Discord.ChannelPermission.ManageEmojis">
+            <summary>
+                Allows management and editing of emojis.
+            </summary>
+        </member>
+        <member name="F:Discord.ChannelPermission.UseSlashCommands">
+            <summary>
+                Allows members to use slash commands in text channels.
+            </summary>
+        </member>
+        <member name="F:Discord.ChannelPermission.RequesToSpeak">
+            <summary>
+                Allows for requesting to speak in stage channels. (This permission is under active development and may be changed or removed.)
+            </summary>
+        </member>
+        <member name="F:Discord.ChannelPermission.ManageThreads">
+            <summary>
+                Allows for deleting and archiving threads, and viewing all private threads
+            </summary>
+        </member>
+        <member name="F:Discord.ChannelPermission.UsePublicThreads">
+            <summary>
+                Allows for creating and participating in threads
+            </summary>
+        </member>
+        <member name="F:Discord.ChannelPermission.UsePrivateThreads">
+            <summary>
+                Allows for creating and participating in private threads
             </summary>
         </member>
         <member name="F:Discord.ChannelPermissions.None">

@@ -3248,6 +3248,9 @@
                 A collection of <see cref="T:Discord.WebSocket.SocketApplicationCommandOption"/>'s recieved over the gateway.
             </summary>
         </member>
+        <member name="P:Discord.WebSocket.SocketApplicationCommand.CreatedAt">
+            <inheritdoc/>
+        </member>
         <member name="P:Discord.WebSocket.SocketApplicationCommand.Guild">
             <summary>
                 The <see cref="T:Discord.WebSocket.SocketGuild"/> where this application was created.
