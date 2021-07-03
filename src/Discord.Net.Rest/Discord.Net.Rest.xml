@@ -3718,6 +3718,9 @@
         <member name="P:Discord.Rest.RestMessage.Flags">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestMessage.Type">
+            <inheritdoc/>
+        </member>
         <member name="P:Discord.Rest.RestMessage.Components">
             <inheritdoc/>
         </member>
@@ -3734,9 +3737,6 @@
             <returns>
                 A string that is the <see cref="P:Discord.Rest.RestMessage.Content"/> of the message.
             </returns>
-        </member>
-        <member name="P:Discord.Rest.RestMessage.Discord#IMessage#Type">
-            <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestMessage.Discord#IMessage#Attachments">
             <inheritdoc />
@@ -3796,9 +3796,6 @@
             <summary>
                 Represents a REST-based system message.
             </summary>
-        </member>
-        <member name="P:Discord.Rest.RestSystemMessage.Type">
-            <inheritdoc />
         </member>
         <member name="T:Discord.Rest.RestUserMessage">
             <summary>

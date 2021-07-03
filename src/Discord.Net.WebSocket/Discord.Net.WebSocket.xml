@@ -3441,98 +3441,6 @@
                 A task that represents the asynchronous operation of acknowledging the interaction.
             </returns>
         </member>
-        <member name="P:Discord.WebSocket.ISocketInvite.Code">
-            <summary>
-                Gets the unique identifier for this invite.
-            </summary>
-            <returns>
-                A string containing the invite code (e.g. <c>FTqNnyS</c>).
-            </returns>
-        </member>
-        <member name="P:Discord.WebSocket.ISocketInvite.Url">
-            <summary>
-                Gets the URL used to accept this invite
-            </summary>
-            <returns>
-                A string containing the full invite URL (e.g. <c>https://discord.gg/FTqNnyS</c>).
-            </returns>
-        </member>
-        <member name="P:Discord.WebSocket.ISocketInvite.Channel">
-            <summary>
-                Gets the channel this invite is linked to.
-            </summary>
-            <returns>
-                A generic channel that the invite points to.
-            </returns>
-        </member>
-        <member name="P:Discord.WebSocket.ISocketInvite.Guild">
-            <summary>
-                Gets the guild this invite is linked to.
-            </summary>
-            <returns>
-                A guild object representing the guild that the invite points to.
-            </returns>
-        </member>
-        <member name="T:Discord.WebSocket.SocketGuildInvite">
-            <summary>
-            Represents a guild invite
-            </summary>
-        </member>
-        <member name="P:Discord.WebSocket.SocketGuildInvite.Id">
-            <summary>
-            Gets the unique invite code
-            <returns>
-                Returns the unique invite code
-            </returns>
-            </summary>
-        </member>
-        <member name="P:Discord.WebSocket.SocketGuildInvite.Inviter">
-            <summary>
-            Gets the user who created the invite
-            <returns>
-                Returns the user who created the invite
-            </returns>
-            </summary>
-        </member>
-        <member name="P:Discord.WebSocket.SocketGuildInvite.MaxUses">
-            <summary>
-            Gets the maximum number of times the invite can be used, if there is no limit then the value will be 0
-            <returns>
-                Returns the maximum number of times the invite can be used,  if there is no limit then the value will be 0
-            </returns>
-            </summary>
-        </member>
-        <member name="P:Discord.WebSocket.SocketGuildInvite.Temporary">
-            <summary>
-            Gets whether or not the invite is temporary (invited users will be kicked on disconnect unless they're assigned a role)
-            <returns>
-                Returns whether or not the invite is temporary (invited users will be kicked on disconnect unless they're assigned a role)
-            </returns>
-            </summary>
-        </member>
-        <member name="P:Discord.WebSocket.SocketGuildInvite.CreatedAt">
-            <summary>
-            Gets the time at which the invite was created
-            <returns>
-                Returns the time at which the invite was created
-            </returns>
-            </summary>
-        </member>
-        <member name="P:Discord.WebSocket.SocketGuildInvite.MaxAge">
-            <summary>
-            Gets how long the invite is valid for 
-            <returns>
-                Returns how long the invite is valid for (in seconds)
-            </returns>
-            </summary>
-        </member>
-        <member name="M:Discord.WebSocket.SocketGuildInvite.DeleteAsync(Discord.RequestOptions)">
-            <summary>
-            Deletes the invite
-            </summary>
-            <param name="options"></param>
-            <returns></returns>
-        </member>
         <member name="P:Discord.WebSocket.SocketInvite.ChannelId">
             <inheritdoc />
         </member>
@@ -3706,6 +3614,9 @@
         <member name="P:Discord.WebSocket.SocketMessage.Flags">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketMessage.Type">
+            <inheritdoc/>
+        </member>
         <member name="P:Discord.WebSocket.SocketMessage.Attachments">
             <summary>
                 Returns all attachments included in this message.
@@ -3773,9 +3684,6 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketMessage.Discord#IMessage#Channel">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.WebSocket.SocketMessage.Discord#IMessage#Type">
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketMessage.Discord#IMessage#Attachments">
@@ -3894,9 +3802,6 @@
             <summary>
                 Represents a WebSocket-based message sent by the system.
             </summary>
-        </member>
-        <member name="P:Discord.WebSocket.SocketSystemMessage.Type">
-            <inheritdoc />
         </member>
         <member name="T:Discord.WebSocket.SocketUserMessage">
             <summary>

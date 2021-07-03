@@ -6414,7 +6414,7 @@
         </member>
         <member name="P:Discord.IMessage.Type">
             <summary>
-                Gets the type of this system message.
+                Gets the type of this message.
             </summary>
         </member>
         <member name="P:Discord.IMessage.Source">
