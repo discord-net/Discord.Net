@@ -5023,30 +5023,30 @@
             <summary>
                 Adds a choice to the current option.
             </summary>
-            <param name="Name">The name of the choice.</param>
-            <param name="Value">The value of the choice.</param>
+            <param name="name">The name of the choice.</param>
+            <param name="value">The value of the choice.</param>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.SlashCommandOptionBuilder.AddChoice(System.String,System.String)">
             <summary>
                 Adds a choice to the current option.
             </summary>
-            <param name="Name">The name of the choice.</param>
-            <param name="Value">The value of the choice.</param>
+            <param name="name">The name of the choice.</param>
+            <param name="value">The value of the choice.</param>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.SlashCommandOptionBuilder.WithName(System.String)">
             <summary>
                 Sets the current builders name.
             </summary>
-            <param name="Name">The name to set the current option builder.</param>
+            <param name="name">The name to set the current option builder.</param>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.SlashCommandOptionBuilder.WithDescription(System.String)">
             <summary>
                 Sets the current builders description.
             </summary>
-            <param name="Description">The description to set.</param>
+            <param name="description">The description to set.</param>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.SlashCommandOptionBuilder.WithRequired(System.Boolean)">
@@ -5067,7 +5067,7 @@
             <summary>
                 Sets the current type of this builder.
             </summary>
-            <param name="Type">The type to set.</param>
+            <param name="type">The type to set.</param>
             <returns>The current builder.</returns>
         </member>
         <member name="T:Discord.SlashCommandCreationProperties">

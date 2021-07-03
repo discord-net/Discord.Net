@@ -3383,6 +3383,9 @@
                 The version of this interaction.
             </summary>
         </member>
+        <member name="P:Discord.WebSocket.SocketInteraction.CreatedAt">
+            <inheritdoc/>
+        </member>
         <member name="P:Discord.WebSocket.SocketInteraction.IsValidToken">
             <summary>
                 <see langword="true"/> if the token is valid for replying to, otherwise <see langword="false"/>.
@@ -3393,7 +3396,7 @@
                 Responds to an Interaction.
             <para>
                 If you have <see cref="P:Discord.WebSocket.DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, You should use
-                <see cref="!:FollowupAsync(string, bool, Embed, InteractionResponseType, AllowedMentions, RequestOptions)"/> instead.
+                <see cref="M:Discord.WebSocket.SocketInteraction.FollowupAsync(System.String,System.Boolean,Discord.Embed,System.Boolean,Discord.InteractionResponseType,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)"/> instead.
             </para>
             </summary>
             <param name="text">The text of the message to be sent.</param>

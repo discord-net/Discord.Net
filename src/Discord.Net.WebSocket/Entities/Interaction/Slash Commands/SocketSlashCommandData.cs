@@ -18,10 +18,14 @@ namespace Discord.WebSocket
         /// </summary>
         public IReadOnlyCollection<SocketSlashCommandDataOption> Options { get; private set; }
 
-        internal Dictionary<ulong, SocketGuildUser> guildMembers { get; private set; } = new();
-        internal Dictionary<ulong, SocketGlobalUser> users { get; private set; } = new();
-        internal Dictionary<ulong, SocketChannel> channels { get; private set; } = new();
-        internal Dictionary<ulong, SocketRole> roles { get; private set; } = new();
+        internal Dictionary<ulong, SocketGuildUser> guildMembers { get; private set; }
+            = new Dictionary<ulong, SocketGuildUser>();
+        internal Dictionary<ulong, SocketGlobalUser> users { get; private set; }
+            = new Dictionary<ulong, SocketGlobalUser>();
+        internal Dictionary<ulong, SocketChannel> channels { get; private set; }
+            = new Dictionary<ulong, SocketChannel>();
+        internal Dictionary<ulong, SocketRole> roles { get; private set; }
+            = new Dictionary<ulong, SocketRole>();
 
         private ulong? guildId;
 

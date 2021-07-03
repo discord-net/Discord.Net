@@ -43,7 +43,9 @@ namespace Discord.WebSocket
         /// </summary>
         public int Version { get; private set; }
 
-        public DateTimeOffset CreatedAt { get; }
+        /// <inheritdoc/>
+        public DateTimeOffset CreatedAt
+            => SnowflakeUtils.FromSnowflake(this.Id);
 
         /// <summary>
         ///     <see langword="true"/> if the token is valid for replying to, otherwise <see langword="false"/>.
@@ -52,7 +54,6 @@ namespace Discord.WebSocket
             => CheckToken();
 
         private ulong? GuildId { get; set; }
-        private ulong? ChannelId { get; set; }
 
         internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel)
             : base(client, id)
@@ -77,7 +78,6 @@ namespace Discord.WebSocket
                 : null;
 
             this.GuildId = model.GuildId.ToNullable();
-            this.ChannelId = model.ChannelId.ToNullable();
             this.Token = model.Token;
             this.Version = model.Version;
             this.Type = model.Type;
@@ -99,7 +99,7 @@ namespace Discord.WebSocket
         ///     Responds to an Interaction.
         /// <para>
         ///     If you have <see cref="DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, You should use
-        ///     <see cref="FollowupAsync(string, bool, Embed, InteractionResponseType, AllowedMentions, RequestOptions)"/> instead.
+        ///     <see cref="FollowupAsync(string, bool, Embed, bool, InteractionResponseType, AllowedMentions, RequestOptions, MessageComponent)"/> instead.
         /// </para>
         /// </summary>
         /// <param name="text">The text of the message to be sent.</param>
@@ -163,7 +163,7 @@ namespace Discord.WebSocket
         private bool CheckToken()
         {
             // Tokens last for 15 minutes according to https://discord.com/developers/docs/interactions/slash-commands#responding-to-an-interaction
-            return (DateTime.UtcNow - this.CreatedAt.UtcDateTime).TotalMinutes >= 15d;
+            return (DateTime.UtcNow - this.CreatedAt.UtcDateTime).TotalMinutes <= 15d;
         }
     }
 }
