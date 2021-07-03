@@ -27,7 +27,7 @@ namespace Discord
         /// <summary> 
         ///     Returns the maximum length of description allowed by Discord. 
         /// </summary>
-        public const int MaxDescriptionLength = 2048;
+        public const int MaxDescriptionLength = 4096;
         /// <summary> 
         ///     Returns the maximum length of total characters allowed by Discord. 
         /// </summary>
