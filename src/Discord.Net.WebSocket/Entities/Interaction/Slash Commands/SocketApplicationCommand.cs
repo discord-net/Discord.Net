@@ -27,6 +27,7 @@ namespace Discord.WebSocket
         /// </summary>
         public IReadOnlyCollection<SocketApplicationCommandOption> Options { get; private set; }
 
+        /// <inheritdoc/>
         public DateTimeOffset CreatedAt
             => SnowflakeUtils.FromSnowflake(this.Id);
 
