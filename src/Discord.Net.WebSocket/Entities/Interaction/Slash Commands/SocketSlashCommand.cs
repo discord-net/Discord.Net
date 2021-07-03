@@ -42,7 +42,7 @@ namespace Discord.WebSocket
         internal override void Update(Model model)
         {
             var data = model.Data.IsSpecified ?
-                (model.Data.Value as JToken).ToObject<DataModel>(Discord._serializer)
+                (DataModel)model.Data.Value
                 : null;
 
             this.Data.Update(data);

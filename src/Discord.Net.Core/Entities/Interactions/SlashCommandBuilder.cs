@@ -86,6 +86,10 @@ namespace Discord
         private string _description { get; set; }
         private List<SlashCommandOptionBuilder> _options { get; set; }
 
+        /// <summary>
+        ///     Build the current builder into a <see cref="SlashCommandCreationProperties"/> class.
+        /// </summary>
+        /// <returns>A <see cref="SlashCommandCreationProperties"/> that can be used to create slash commands over rest.</returns>
         public SlashCommandCreationProperties Build()
         {
             SlashCommandCreationProperties props = new SlashCommandCreationProperties()
@@ -107,67 +111,75 @@ namespace Discord
 
         }
 
-        public SlashCommandBuilder WithName(string Name)
+        /// <summary>
+        ///     Sets the field name.
+        /// </summary>
+        /// <param name="name">The value to set the field name to.</param>
+        /// <returns>
+        ///     The current builder.
+        /// </returns>
+        public SlashCommandBuilder WithName(string name)
         {
-            this.Name = Name;
+            this.Name = name;
             return this;
         }
 
         /// <summary>
         ///     Sets the description of the current command.
         /// </summary>
-        /// <param name="Description">The description of this command.</param>
+        /// <param name="description">The description of this command.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandBuilder WithDescription(string Description)
+        public SlashCommandBuilder WithDescription(string description)
         {
-            this.Description = Description;
+            this.Description = description;
             return this;
         }
 
         /// <summary>
         ///     Adds an option to the current slash command.
         /// </summary>
-        /// <param name="Name">The name of the option to add.</param>
-        /// <param name="Type">The type of this option.</param>
-        /// <param name="Description">The description of this option.</param>
-        /// <param name="Required">If this option is required for this command.</param>
-        /// <param name="Default">If this option is the default option.</param>
-        /// <param name="Options">The options of the option to add.</param>
-        /// <param name="Choices">The choices of this option.</param>
+        /// <param name="name">The name of the option to add.</param>
+        /// <param name="type">The type of this option.</param>
+        /// <param name="description">The description of this option.</param>
+        /// <param name="required">If this option is required for this command.</param>
+        /// <param name="isDefault">If this option is the default option.</param>
+        /// <param name="options">The options of the option to add.</param>
+        /// <param name="choices">The choices of this option.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandBuilder AddOption(string Name, ApplicationCommandOptionType Type,
-           string Description, bool Required = true, bool Default = false, List<SlashCommandOptionBuilder> Options = null, params ApplicationCommandOptionChoiceProperties[] Choices)
+        public SlashCommandBuilder AddOption(string name, ApplicationCommandOptionType type,
+           string description, bool required = true, bool isDefault = false, List<SlashCommandOptionBuilder> options = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             // Make sure the name matches the requirements from discord
-            Preconditions.NotNullOrEmpty(Name, nameof(Name));
-            Preconditions.AtLeast(Name.Length, 3, nameof(Name));
-            Preconditions.AtMost(Name.Length, MaxNameLength, nameof(Name));
+            Preconditions.NotNullOrEmpty(name, nameof(name));
+            Preconditions.AtLeast(name.Length, 3, nameof(name));
+            Preconditions.AtMost(name.Length, MaxNameLength, nameof(name));
 
             // Discord updated the docs, this regex prevents special characters like @!$%( and s p a c e s.. etc,
             // https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
-            if (!Regex.IsMatch(Name, @"^[\w-]{3,32}$"))
-                throw new ArgumentException("Command name cannot contian any special characters or whitespaces!", nameof(Name));
+            if (!Regex.IsMatch(name, @"^[\w-]{3,32}$"))
+                throw new ArgumentException("Command name cannot contian any special characters or whitespaces!", nameof(name));
 
             // same with description
-            Preconditions.NotNullOrEmpty(Description, nameof(Description));
-            Preconditions.AtLeast(Description.Length, 3, nameof(Description));
-            Preconditions.AtMost(Description.Length, MaxDescriptionLength, nameof(Description));
+            Preconditions.NotNullOrEmpty(description, nameof(description));
+            Preconditions.AtLeast(description.Length, 3, nameof(description));
+            Preconditions.AtMost(description.Length, MaxDescriptionLength, nameof(description));
 
             // make sure theres only one option with default set to true
-            if (Default)
+            if (isDefault)
             {
                 if (this.Options != null)
-                    if (this.Options.Any(x => x.Default))
-                        throw new ArgumentException("There can only be one command option with default set to true!", nameof(Default));
+                    if (this.Options.Any(x => x.Default.HasValue && x.Default.Value))
+                        throw new ArgumentException("There can only be one command option with default set to true!", nameof(isDefault));
             }
 
             SlashCommandOptionBuilder option = new SlashCommandOptionBuilder();
-            option.Name = Name;
-            option.Description = Description;
-            option.Required = Required;
-            option.Default = Default;
-            option.Options = Options;
-            option.Choices = Choices != null ? new List<ApplicationCommandOptionChoiceProperties>(Choices) : null;
+            option.Name = name;
+            option.Description = description;
+            option.Required = required;
+            option.Default = isDefault;
+            option.Options = options;
+            option.Type = type;
+            option.Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null;
 
             return AddOption(option);
         }
@@ -175,33 +187,33 @@ namespace Discord
         /// <summary>
         ///     Adds an option to the current slash command.
         /// </summary>
-        /// <param name="Name">The name of the option to add.</param>
-        /// <param name="Type">The type of this option.</param>
-        /// <param name="Description">The description of this option.</param>
-        /// <param name="Required">If this option is required for this command.</param>
-        /// <param name="Default">If this option is the default option.</param>
-        /// <param name="Choices">The choices of this option.</param>
+        /// <param name="name">The name of the option to add.</param>
+        /// <param name="type">The type of this option.</param>
+        /// <param name="description">The description of this option.</param>
+        /// <param name="required">If this option is required for this command.</param>
+        /// <param name="isDefault">If this option is the default option.</param>
+        /// <param name="choices">The choices of this option.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandBuilder AddOption(string Name, ApplicationCommandOptionType Type,
-            string Description, bool Required = true, bool Default = false, params ApplicationCommandOptionChoiceProperties[] Choices)
-            => AddOption(Name, Type, Description, Required, Default, null, Choices);
+        public SlashCommandBuilder AddOption(string name, ApplicationCommandOptionType type,
+            string description, bool required = true, bool isDefault = false, params ApplicationCommandOptionChoiceProperties[] choices)
+            => AddOption(name, type, description, required, isDefault, null, choices);
 
         /// <summary>
         ///     Adds an option to the current slash command.
         /// </summary>
-        /// <param name="Name">The name of the option to add.</param>
-        /// <param name="Type">The type of this option.</param>
-        /// <param name="Description">The sescription of this option.</param>
+        /// <param name="name">The name of the option to add.</param>
+        /// <param name="type">The type of this option.</param>
+        /// <param name="description">The sescription of this option.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandBuilder AddOption(string Name, ApplicationCommandOptionType Type, string Description)
-            => AddOption(Name, Type, Description, Options: null, Choices: null);
+        public SlashCommandBuilder AddOption(string name, ApplicationCommandOptionType type, string description)
+            => AddOption(name, type, description, options: null, choices: null);
 
         /// <summary>
         ///     Adds an option to this slash command.
         /// </summary>
-        /// <param name="Parameter">The option to add.</param>
+        /// <param name="option">The option to add.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandBuilder AddOption(SlashCommandOptionBuilder Option)
+        public SlashCommandBuilder AddOption(SlashCommandOptionBuilder option)
         {
             if (this.Options == null)
                 this.Options = new List<SlashCommandOptionBuilder>();
@@ -209,32 +221,32 @@ namespace Discord
             if (this.Options.Count >= MaxOptionsCount)
                 throw new ArgumentOutOfRangeException(nameof(Options), $"Cannot have more than {MaxOptionsCount} options!");
 
-            if (Option == null)
-                throw new ArgumentNullException(nameof(Option), "Option cannot be null");
+            if (option == null)
+                throw new ArgumentNullException(nameof(option), "Option cannot be null");
 
-            this.Options.Add(Option);
+            this.Options.Add(option);
             return this;
         }
         /// <summary>
         ///     Adds a collection of options to the current slash command.
         /// </summary>
-        /// <param name="Parameter">The collection of options to add.</param>
+        /// <param name="options">The collection of options to add.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandBuilder AddOptions(params SlashCommandOptionBuilder[] Options)
+        public SlashCommandBuilder AddOptions(params SlashCommandOptionBuilder[] options)
         {
-            if (Options == null)
-                throw new ArgumentNullException(nameof(Options), "Options cannot be null!");
+            if (options == null)
+                throw new ArgumentNullException(nameof(options), "Options cannot be null!");
 
-            if (Options.Length == 0)
-                throw new ArgumentException(nameof(Options), "Options cannot be empty!");
+            if (options.Length == 0)
+                throw new ArgumentException(nameof(options), "Options cannot be empty!");
 
             if (this.Options == null)
                 this.Options = new List<SlashCommandOptionBuilder>();
 
-            if (this.Options.Count + Options.Length > MaxOptionsCount)
-                throw new ArgumentOutOfRangeException(nameof(Options), $"Cannot have more than {MaxOptionsCount} options!");
+            if (this.Options.Count + options.Length > MaxOptionsCount)
+                throw new ArgumentOutOfRangeException(nameof(options), $"Cannot have more than {MaxOptionsCount} options!");
 
-            this.Options.AddRange(Options);
+            this.Options.AddRange(options);
             return this;
         }
     }
@@ -303,7 +315,7 @@ namespace Discord
         /// <summary>
         ///     The first required option for the user to complete. only one option can be default.
         /// </summary>
-        public bool Default { get; set; }
+        public bool? Default { get; set; }
 
         /// <summary>
         ///     <see langword="true"/> if this option is required for this command, otherwise <see langword="false"/>.
@@ -369,10 +381,10 @@ namespace Discord
         /// <summary>
         ///     Adds a choice to the current option.
         /// </summary>
-        /// <param name="Name">The name of the choice.</param>
-        /// <param name="Value">The value of the choice.</param>
+        /// <param name="name">The name of the choice.</param>
+        /// <param name="value">The value of the choice.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandOptionBuilder AddChoice(string Name, int Value)
+        public SlashCommandOptionBuilder AddChoice(string name, int value)
         {
             if (Choices == null)
                 Choices = new List<ApplicationCommandOptionChoiceProperties>();
@@ -380,16 +392,16 @@ namespace Discord
             if (Choices.Count >= MaxChoiceCount)
                 throw new ArgumentOutOfRangeException(nameof(Choices), $"Cannot add more than {MaxChoiceCount} choices!");
 
-            if (Name == null)
-                throw new ArgumentNullException($"{nameof(Name)} cannot be null!");
+            if (name == null)
+                throw new ArgumentNullException($"{nameof(name)} cannot be null!");
 
-            Preconditions.AtLeast(Name.Length, 1, nameof(Name));
-            Preconditions.AtMost(Name.Length, 100, nameof(Name));
+            Preconditions.AtLeast(name.Length, 1, nameof(name));
+            Preconditions.AtMost(name.Length, 100, nameof(name));
 
             Choices.Add(new ApplicationCommandOptionChoiceProperties()
             {
-                Name = Name,
-                Value = Value
+                Name = name,
+                Value = value
             });
 
             return this;
@@ -398,10 +410,10 @@ namespace Discord
         /// <summary>
         ///     Adds a choice to the current option.
         /// </summary>
-        /// <param name="Name">The name of the choice.</param>
-        /// <param name="Value">The value of the choice.</param>
+        /// <param name="name">The name of the choice.</param>
+        /// <param name="value">The value of the choice.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandOptionBuilder AddChoice(string Name, string Value)
+        public SlashCommandOptionBuilder AddChoice(string name, string value)
         {
             if (Choices == null)
                 Choices = new List<ApplicationCommandOptionChoiceProperties>();
@@ -409,22 +421,22 @@ namespace Discord
             if (Choices.Count >= MaxChoiceCount)
                 throw new ArgumentOutOfRangeException(nameof(Choices), $"Cannot add more than {MaxChoiceCount} choices!");
 
-            if (Name == null)
-                throw new ArgumentNullException($"{nameof(Name)} cannot be null!");
+            if (name == null)
+                throw new ArgumentNullException($"{nameof(name)} cannot be null!");
 
-            if (Value == null)
-                throw new ArgumentNullException($"{nameof(Value)} cannot be null!");
+            if (value == null)
+                throw new ArgumentNullException($"{nameof(value)} cannot be null!");
 
-            Preconditions.AtLeast(Name.Length, 1, nameof(Name));
-            Preconditions.AtMost(Name.Length, 100, nameof(Name));
+            Preconditions.AtLeast(name.Length, 1, nameof(name));
+            Preconditions.AtMost(name.Length, 100, nameof(name));
 
-            Preconditions.AtLeast(Value.Length, 1, nameof(Value));
-            Preconditions.AtMost(Value.Length, 100, nameof(Value));
+            Preconditions.AtLeast(value.Length, 1, nameof(value));
+            Preconditions.AtMost(value.Length, 100, nameof(value));
 
             Choices.Add(new ApplicationCommandOptionChoiceProperties()
             {
-                Name = Name,
-                Value = Value
+                Name = name,
+                Value = value
             });
 
             return this;
@@ -433,11 +445,11 @@ namespace Discord
         /// <summary>
         ///     Sets the current builders name.
         /// </summary>
-        /// <param name="Name">The name to set the current option builder.</param>
+        /// <param name="name">The name to set the current option builder.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandOptionBuilder WithName(string Name)
+        public SlashCommandOptionBuilder WithName(string name)
         {
-            this.Name = Name;
+            this.Name = name;
 
             return this;
         }
@@ -445,11 +457,11 @@ namespace Discord
         /// <summary>
         ///     Sets the current builders description.
         /// </summary>
-        /// <param name="Description">The description to set.</param>
+        /// <param name="description">The description to set.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandOptionBuilder WithDescription(string Description)
+        public SlashCommandOptionBuilder WithDescription(string description)
         {
-            this.Description = Description;
+            this.Description = description;
             return this;
         }
 
@@ -478,11 +490,11 @@ namespace Discord
         /// <summary>
         ///     Sets the current type of this builder.
         /// </summary>
-        /// <param name="Type">The type to set.</param>
+        /// <param name="type">The type to set.</param>
         /// <returns>The current builder.</returns>
-        public SlashCommandOptionBuilder WithType(ApplicationCommandOptionType Type)
+        public SlashCommandOptionBuilder WithType(ApplicationCommandOptionType type)
         {
-            this.Type = Type;
+            this.Type = type;
             return this;
         }
     }

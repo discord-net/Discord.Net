@@ -102,7 +102,7 @@ namespace Discord
                 else
                 {
                     ActionRowBuilder actionRow = null;
-                    if (_actionRows.Count < row)
+                    if (_actionRows.Count > row)
                         actionRow = _actionRows.ElementAt(row);
                     else
                     {
@@ -167,7 +167,7 @@ namespace Discord
         /// <param name="button">The button to add.</param>
         /// <param name="row">The row to add the button.</param>
         /// <returns>The current builder.</returns>
-        public ComponentBuilder WithButton(ButtonBuilder button, int row)
+        public ComponentBuilder WithButton(ButtonBuilder button, int row = 0)
         {
             Preconditions.LessThan(row, 5, nameof(row));
 
@@ -185,7 +185,7 @@ namespace Discord
                 else
                 {
                     ActionRowBuilder actionRow = null;
-                    if(_actionRows.Count < row)
+                    if(_actionRows.Count > row)
                         actionRow = _actionRows.ElementAt(row);
                     else
                     {
@@ -295,7 +295,10 @@ namespace Discord
                 case ComponentType.ActionRow:
                     return false;
                 case ComponentType.Button:
-                    return this.Components.Count < 5;
+                    if (this.Components.Any(x => x.Type == ComponentType.SelectMenu))
+                        return false;
+                    else
+                        return this.Components.Count < 5;
                 case ComponentType.SelectMenu:
                     return this.Components.Count == 0;
                 default:

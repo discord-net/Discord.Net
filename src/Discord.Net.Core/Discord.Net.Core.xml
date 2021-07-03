@@ -4886,59 +4886,74 @@
                 Gets or sets the options for this command.
             </summary>
         </member>
+        <member name="M:Discord.SlashCommandBuilder.Build">
+            <summary>
+                Build the current builder into a <see cref="T:Discord.SlashCommandCreationProperties"/> class.
+            </summary>
+            <returns>A <see cref="T:Discord.SlashCommandCreationProperties"/> that can be used to create slash commands over rest.</returns>
+        </member>
+        <member name="M:Discord.SlashCommandBuilder.WithName(System.String)">
+            <summary>
+                Sets the field name.
+            </summary>
+            <param name="name">The value to set the field name to.</param>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
         <member name="M:Discord.SlashCommandBuilder.WithDescription(System.String)">
             <summary>
                 Sets the description of the current command.
             </summary>
-            <param name="Description">The description of this command.</param>
+            <param name="description">The description of this command.</param>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.SlashCommandBuilder.AddOption(System.String,Discord.ApplicationCommandOptionType,System.String,System.Boolean,System.Boolean,System.Collections.Generic.List{Discord.SlashCommandOptionBuilder},Discord.ApplicationCommandOptionChoiceProperties[])">
             <summary>
                 Adds an option to the current slash command.
             </summary>
-            <param name="Name">The name of the option to add.</param>
-            <param name="Type">The type of this option.</param>
-            <param name="Description">The description of this option.</param>
-            <param name="Required">If this option is required for this command.</param>
-            <param name="Default">If this option is the default option.</param>
-            <param name="Options">The options of the option to add.</param>
-            <param name="Choices">The choices of this option.</param>
+            <param name="name">The name of the option to add.</param>
+            <param name="type">The type of this option.</param>
+            <param name="description">The description of this option.</param>
+            <param name="required">If this option is required for this command.</param>
+            <param name="isDefault">If this option is the default option.</param>
+            <param name="options">The options of the option to add.</param>
+            <param name="choices">The choices of this option.</param>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.SlashCommandBuilder.AddOption(System.String,Discord.ApplicationCommandOptionType,System.String,System.Boolean,System.Boolean,Discord.ApplicationCommandOptionChoiceProperties[])">
             <summary>
                 Adds an option to the current slash command.
             </summary>
-            <param name="Name">The name of the option to add.</param>
-            <param name="Type">The type of this option.</param>
-            <param name="Description">The description of this option.</param>
-            <param name="Required">If this option is required for this command.</param>
-            <param name="Default">If this option is the default option.</param>
-            <param name="Choices">The choices of this option.</param>
+            <param name="name">The name of the option to add.</param>
+            <param name="type">The type of this option.</param>
+            <param name="description">The description of this option.</param>
+            <param name="required">If this option is required for this command.</param>
+            <param name="isDefault">If this option is the default option.</param>
+            <param name="choices">The choices of this option.</param>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.SlashCommandBuilder.AddOption(System.String,Discord.ApplicationCommandOptionType,System.String)">
             <summary>
                 Adds an option to the current slash command.
             </summary>
-            <param name="Name">The name of the option to add.</param>
-            <param name="Type">The type of this option.</param>
-            <param name="Description">The sescription of this option.</param>
+            <param name="name">The name of the option to add.</param>
+            <param name="type">The type of this option.</param>
+            <param name="description">The sescription of this option.</param>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.SlashCommandBuilder.AddOption(Discord.SlashCommandOptionBuilder)">
             <summary>
                 Adds an option to this slash command.
             </summary>
-            <param name="Parameter">The option to add.</param>
+            <param name="option">The option to add.</param>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.SlashCommandBuilder.AddOptions(Discord.SlashCommandOptionBuilder[])">
             <summary>
                 Adds a collection of options to the current slash command.
             </summary>
-            <param name="Parameter">The collection of options to add.</param>
+            <param name="options">The collection of options to add.</param>
             <returns>The current builder.</returns>
         </member>
         <member name="T:Discord.SlashCommandOptionBuilder">
