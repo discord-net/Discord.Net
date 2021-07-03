@@ -621,6 +621,7 @@ namespace Discord.WebSocket
                                         var activities = _activity.IsSpecified ? ImmutableList.Create(_activity.Value) : null;
                                         currentUser.Presence = new SocketPresence(Status, null, activities);
                                         ApiClient.CurrentUserId = currentUser.Id;
+                                        Rest.CurrentUser = RestSelfUser.Create(this, data.User);
                                         int unavailableGuilds = 0;
                                         for (int i = 0; i < data.Guilds.Length; i++)
                                         {

@@ -16,7 +16,7 @@ namespace Discord.Rest
         /// <summary>
         ///     Gets the logged-in user.
         /// </summary>
-        public new RestSelfUser CurrentUser => base.CurrentUser as RestSelfUser;
+        public new RestSelfUser CurrentUser { get => base.CurrentUser as RestSelfUser; internal set => base.CurrentUser = value; }
 
         /// <inheritdoc />
         public DiscordRestClient() : this(new DiscordRestConfig()) { }

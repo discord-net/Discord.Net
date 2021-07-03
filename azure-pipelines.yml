@@ -39,4 +39,3 @@ jobs:
   steps:
   - template: azure/build.yml
   - template: azure/deploy.yml
-  - template: azure/docs.yml
