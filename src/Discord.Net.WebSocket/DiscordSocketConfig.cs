@@ -118,7 +118,7 @@ namespace Discord.WebSocket
         ///     <para>
         ///         With this option set to <see langword="false"/>, you will have to acknowledge the interaction with
         ///         <see cref="SocketInteraction.RespondAsync(string, bool, Embed, InteractionResponseType, AllowedMentions, RequestOptions)"/>.
-        ///         Only after the interaction is acknowledged, the origional slash command message will be visible.
+        ///         Only after the interaction is acknowledged, the original slash command message will be visible.
         ///     </para>
         ///     <note>
         ///         Please note that manually acknowledging the interaction with a message reply will not provide any return data.
