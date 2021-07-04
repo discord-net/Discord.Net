@@ -94,8 +94,8 @@ namespace Discord.WebSocket
         {
             this.Name = model.Name;
 
-            this.Options = model.Options.Any()
-                ? model.Options.Select(x => new SocketSlashCommandDataOption(this, x)).ToImmutableArray()
+            this.Options = model.Options.IsSpecified
+                ? model.Options.Value.Select(x => new SocketSlashCommandDataOption(this, x)).ToImmutableArray()
                 : null;
         }
 
