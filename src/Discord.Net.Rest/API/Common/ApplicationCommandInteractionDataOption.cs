@@ -15,6 +15,6 @@ namespace Discord.API
         public Optional<object> Value { get; set; }
 
         [JsonProperty("options")]
-        public List<ApplicationCommandInteractionDataOption> Options { get; set; } = new();
+        public Optional<ApplicationCommandInteractionDataOption[]> Options { get; set; }
     }
 }

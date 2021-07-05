@@ -60,8 +60,8 @@ namespace Discord.WebSocket
                     this.Value = model.Value.Value;
             }
 
-            this.Options = model.Options.Any()
-                ? model.Options.Select(x => new SocketSlashCommandDataOption(data, x)).ToImmutableArray()
+            this.Options = model.Options.IsSpecified
+                ? model.Options.Value.Select(x => new SocketSlashCommandDataOption(data, x)).ToImmutableArray()
                 : null;
         }
 
