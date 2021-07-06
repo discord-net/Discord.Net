@@ -74,8 +74,14 @@ private async Task MyMessageComponentHandler(SocketInteraction arg)
     
     // You can also followup with a second message
     await parsedArg.FollowupAsync($"Clicked {parsedArg.Data.CustomId}!", type: InteractionResponseType.ChannelMessageWithSource, ephemeral: true);
+    
+    //If you are using selection dropdowns, you can get the selected label and values using these:
+    var selectedLabel = ((SelectMenu) parsedArg.Message.Components.First().Components.First()).Options.FirstOrDefault(x => x.Value == parsedArg.Data.Values.FirstOrDefault())?.Label;
+    var selectedValue = parsedArg.Data.Values.First();
 }
 ```
+
+> Note: The example above assumes that the selection dropdown is expecting only 1 returned value, if you configured your dropdown for multiple values, you'll need to modify the code slightly.
 
 ### Sending messages with buttons
 Theres a new field in all `SendMessageAsync` functions that takes in a `MessageComponent`, you can use it like so:
