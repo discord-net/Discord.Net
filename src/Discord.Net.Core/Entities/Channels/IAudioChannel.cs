@@ -27,5 +27,13 @@ namespace Discord
         ///     A task representing the asynchronous operation for disconnecting from the audio channel.
         /// </returns>
         Task DisconnectAsync();
+
+        /// <summary>
+        ///     Sends voice state update of this audio channel.
+        /// </summary>
+        /// <param name="selfDeaf">Determines whether the client should deaf itself.</param>
+        /// <param name="selfMute">Determines whether the client should mute itself.</param>
+        /// <returns></returns>
+        Task SendVoiceStateUpdateAsync(bool selfDeaf, bool selfMute);
     }
 }
