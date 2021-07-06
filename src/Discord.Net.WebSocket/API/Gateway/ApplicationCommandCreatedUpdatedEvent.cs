@@ -26,5 +26,8 @@ namespace Discord.API.Gateway
 
         [JsonProperty("options")]
         public Optional<List<Discord.API.ApplicationCommandOption>> Options { get; set; }
+
+        [JsonProperty("default_permission")]
+        public Optional<bool> DefaultPermission { get; set; }
     }
 }

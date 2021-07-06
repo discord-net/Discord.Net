@@ -106,6 +106,7 @@ namespace Discord.Rest
             => ClientHelper.GetVoiceRegionAsync(this, id, options);
         public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => ClientHelper.GetWebhookAsync(this, id, options);
+
         public Task<RestGlobalCommand> CreateGlobalCommand(SlashCommandCreationProperties properties, RequestOptions options = null)
             => InteractionHelper.CreateGlobalCommand(this, properties, options);
         public Task<RestGlobalCommand> CreateGlobalCommand(Action<SlashCommandCreationProperties> func, RequestOptions options = null)
@@ -118,6 +119,14 @@ namespace Discord.Rest
             => ClientHelper.GetGlobalApplicationCommands(this, options);
         public Task<IReadOnlyCollection<RestGuildCommand>> GetGuildApplicationCommands(ulong guildId, RequestOptions options = null)
             => ClientHelper.GetGuildApplicationCommands(this, guildId, options);
+        public Task<IReadOnlyCollection<RestGlobalCommand>> BulkOverwriteGlobalCommands(SlashCommandCreationProperties[] commandProperties, RequestOptions options = null)
+            => InteractionHelper.BulkOverwriteGlobalCommands(this, commandProperties, options);
+        public Task<IReadOnlyCollection<RestGuildCommand>> BulkOverwriteGuildCommands(SlashCommandCreationProperties[] commandProperties, ulong guildId, RequestOptions options = null)
+            => InteractionHelper.BulkOverwriteGuildCommands(this, guildId, commandProperties, options);
+        public Task<IReadOnlyCollection<GuildApplicationCommandPermission>> BatchEditGuildCommandPermissions(ulong guildId, IDictionary<ulong, ApplicationCommandPermission[]> permissions, RequestOptions options = null)
+            => InteractionHelper.BatchEditGuildCommandPermissionsAsync(this, guildId, permissions, options);
+
+
         public Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId)
             => ClientHelper.AddRoleAsync(this, guildId, userId, roleId);
         public Task RemoveRoleAsync(ulong guildId, ulong userId, ulong roleId)

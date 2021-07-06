@@ -2740,6 +2740,27 @@
         <member name="M:Discord.Rest.RestGuild.LeaveAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.Rest.RestGuild.GetSlashCommandsAsync(Discord.RequestOptions)">
+            <summary>
+                Gets a collection of slash commands created by the current user in this guild.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a read-only collection of
+                slash commands created by the current user.
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestGuild.GetSlashCommandAsync(System.UInt64,Discord.RequestOptions)">
+            <summary>
+                Gets a slash command in the current guild.
+            </summary>
+            <param name="id">The unique identifier of the slash command.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a
+                slash command created by the current user.
+            </returns>
+        </member>
         <member name="M:Discord.Rest.RestGuild.GetBansAsync(Discord.RequestOptions)">
             <summary>
                 Gets a collection of all users banned in this guild.
@@ -3378,6 +3399,9 @@
         <member name="P:Discord.Rest.RestApplicationCommand.Description">
             <inheritdoc/>
         </member>
+        <member name="P:Discord.Rest.RestApplicationCommand.DefaultPermission">
+            <inheritdoc/>
+        </member>
         <member name="P:Discord.Rest.RestApplicationCommand.Options">
             <summary>
                 The options of this command.
@@ -3389,6 +3413,9 @@
             </summary>
         </member>
         <member name="P:Discord.Rest.RestApplicationCommand.CreatedAt">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestApplicationCommand.DeleteAsync(Discord.RequestOptions)">
             <inheritdoc/>
         </member>
         <member name="T:Discord.Rest.RestApplicationCommandChoice">
@@ -3486,6 +3513,38 @@
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 The modified command
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestGuildCommand.GetCommandPermission(Discord.RequestOptions)">
+            <summary>
+                Gets this commands permissions inside of the current guild.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a
+                <see cref="T:Discord.GuildApplicationCommandPermission"/> object defining the permissions of the current slash command.
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestGuildCommand.ModifyCommandPermissions(Discord.ApplicationCommandPermission[],Discord.RequestOptions)">
+            <summary>
+                Modifies the current command permissions for this guild command.
+            </summary>
+            <param name="permissions">The permissions to overwrite.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                 A task that represents the asynchronous modification operation. The task result contains a
+                <see cref="T:Discord.GuildApplicationCommandPermission"/> object containing the modified permissions.
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestGuildCommand.GetGuild(System.Boolean,Discord.RequestOptions)">
+            <summary>
+                Gets the guild that this slash command resides in.
+            </summary>
+            <param name="withCounts"><see langword="true"/> if you want the approximate member and presence counts for the guild, otherwise <see langword="false"/>.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a
+                <see cref="T:Discord.Rest.RestGuild"/>.
             </returns>
         </member>
         <member name="P:Discord.Rest.RestInvite.ChannelName">

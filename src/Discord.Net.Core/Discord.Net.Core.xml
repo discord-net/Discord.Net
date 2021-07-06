@@ -3967,11 +3967,6 @@
                 The base command model that belongs to an application. see <see href="https://discord.com/developers/docs/interactions/slash-commands#applicationcommand"/>
             </summary>
         </member>
-        <member name="P:Discord.IApplicationCommand.Id">
-            <summary>
-                Gets the unique id of the command.
-            </summary>
-        </member>
         <member name="P:Discord.IApplicationCommand.ApplicationId">
             <summary>
                 Gets the unique id of the parent application.
@@ -3985,6 +3980,11 @@
         <member name="P:Discord.IApplicationCommand.Description">
             <summary>
                 The description of the command.
+            </summary>
+        </member>
+        <member name="P:Discord.IApplicationCommand.DefaultPermission">
+            <summary>
+                Whether the command is enabled by default when the app is added to a guild.
             </summary>
         </member>
         <member name="P:Discord.IApplicationCommand.Options">
@@ -4886,6 +4886,11 @@
                 Gets or sets the options for this command.
             </summary>
         </member>
+        <member name="P:Discord.SlashCommandBuilder.DefaultPermission">
+            <summary>
+                Whether the command is enabled by default when the app is added to a guild
+            </summary>
+        </member>
         <member name="M:Discord.SlashCommandBuilder.Build">
             <summary>
                 Build the current builder into a <see cref="T:Discord.SlashCommandCreationProperties"/> class.
@@ -4906,6 +4911,13 @@
                 Sets the description of the current command.
             </summary>
             <param name="description">The description of this command.</param>
+            <returns>The current builder.</returns>
+        </member>
+        <member name="M:Discord.SlashCommandBuilder.WithDefaultPermission(System.Boolean)">
+            <summary>
+                Sets the default permission of the current command.
+            </summary>
+            <param name="value">The default permission value to set.</param>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.SlashCommandBuilder.AddOption(System.String,Discord.ApplicationCommandOptionType,System.String,System.Boolean,System.Boolean,System.Collections.Generic.List{Discord.SlashCommandOptionBuilder},Discord.ApplicationCommandOptionChoiceProperties[])">
@@ -7243,17 +7255,17 @@
                 Application command permissions allow you to enable or disable commands for specific users or roles within a guild.
             </summary>
         </member>
-        <member name="P:Discord.ApplicationCommandPermission.Id">
+        <member name="P:Discord.ApplicationCommandPermission.TargetId">
             <summary>
                 The id of the role or user.
             </summary>
         </member>
-        <member name="P:Discord.ApplicationCommandPermission.Type">
+        <member name="P:Discord.ApplicationCommandPermission.TargetType">
             <summary>
                 The target of this permission.
             </summary>
         </member>
-        <member name="P:Discord.ApplicationCommandPermission.Value">
+        <member name="P:Discord.ApplicationCommandPermission.Permission">
             <summary>
                 <see langword="true"/> to allow, otherwise <see langword="false"/>.
             </summary>
@@ -7525,27 +7537,27 @@
         <member name="M:Discord.ChannelPermissions.Modify(System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
             <summary> Creates a new <see cref="T:Discord.ChannelPermissions"/> from this one, changing the provided non-null permissions. </summary>
         </member>
-        <member name="T:Discord.GuildApplicationCommandPermissions">
+        <member name="T:Discord.GuildApplicationCommandPermission">
             <summary>
                 Returned when fetching the permissions for a command in a guild.
             </summary>
         </member>
-        <member name="P:Discord.GuildApplicationCommandPermissions.Id">
+        <member name="P:Discord.GuildApplicationCommandPermission.CommandId">
             <summary>
                 The id of the command.
             </summary>
         </member>
-        <member name="P:Discord.GuildApplicationCommandPermissions.ApplicationId">
+        <member name="P:Discord.GuildApplicationCommandPermission.ApplicationId">
             <summary>
                 The id of the application the command belongs to.
             </summary>
         </member>
-        <member name="P:Discord.GuildApplicationCommandPermissions.GuildId">
+        <member name="P:Discord.GuildApplicationCommandPermission.GuildId">
             <summary>
                 The id of the guild.
             </summary>
         </member>
-        <member name="P:Discord.GuildApplicationCommandPermissions.Permissions">
+        <member name="P:Discord.GuildApplicationCommandPermission.Permissions">
             <summary>
                 The permissions for the command in the guild.
             </summary>

@@ -723,6 +723,30 @@ namespace Discord.WebSocket
         public Task<RestGuildIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null)
             => GuildHelper.CreateIntegrationAsync(this, Discord, id, type, options);
 
+        //Interactions
+        /// <summary>
+        ///     Gets a collection of slash commands created by the current user in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     slash commands created by the current user.
+        /// </returns>
+        public Task<IReadOnlyCollection<RestGuildCommand>> GetSlashCommandsAsync(RequestOptions options = null)
+            => GuildHelper.GetSlashCommandsAsync(this, Discord, options);
+
+        /// <summary>
+        ///     Gets a slash command in the current guild.
+        /// </summary>
+        /// <param name="id">The unique identifier of the slash command.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a
+        ///     slash command created by the current user.
+        /// </returns>
+        public Task<RestGuildCommand> GetSlashCommandAsync(ulong id, RequestOptions options = null)
+            => GuildHelper.GetSlashCommandAsync(this, id, Discord, options);
+
         //Invites
         /// <summary>
         ///     Gets a collection of all invites in this guild.

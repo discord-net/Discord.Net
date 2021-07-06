@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord.API
 {
-    public class ApplicationCommandPermissions
+    internal class ApplicationCommandPermissions
     {
         [JsonProperty("id")]
         public ulong Id { get; set; }

@@ -270,6 +270,20 @@ namespace Discord.Rest
             return RestGuildIntegration.Create(client, guild, model);
         }
 
+        //Interactions
+        public static async Task<IReadOnlyCollection<RestGuildCommand>> GetSlashCommandsAsync(IGuild guild, BaseDiscordClient client,
+            RequestOptions options)
+        {
+            var models = await client.ApiClient.GetGuildApplicationCommandsAsync(guild.Id, options);
+            return models.Select(x => RestGuildCommand.Create(client, x, guild.Id)).ToImmutableArray();
+        }
+        public static async Task<RestGuildCommand> GetSlashCommandAsync(IGuild guild, ulong id, BaseDiscordClient client,
+            RequestOptions options)
+        {
+            var model = await client.ApiClient.GetGuildApplicationCommandAsync(guild.Id, id, options);
+            return RestGuildCommand.Create(client, model, guild.Id);
+        }
+
         //Invites
         public static async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(IGuild guild, BaseDiscordClient client,
             RequestOptions options)

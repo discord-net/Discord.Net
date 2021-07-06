@@ -22,6 +22,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public string Description { get; private set; }
 
+        /// <inheritdoc/>
+        public bool DefaultPermission { get; private set; }
+
         /// <summary>
         ///     The options of this command.
         /// </summary>
@@ -58,14 +61,18 @@ namespace Discord.Rest
             this.ApplicationId = model.ApplicationId;
             this.Name = model.Name;
             this.Description = model.Description;
+            this.DefaultPermission = model.DefaultPermissions.GetValueOrDefault(true);
 
             this.Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => RestApplicationCommandOption.Create(x)).ToImmutableArray()
                 : null;
         }
 
+
+        /// <inheritdoc/>
+        public abstract Task DeleteAsync(RequestOptions options = null);
+
         IReadOnlyCollection<IApplicationCommandOption> IApplicationCommand.Options => Options;
 
-        public virtual Task DeleteAsync(RequestOptions options = null) => throw new NotImplementedException();
     }
 }

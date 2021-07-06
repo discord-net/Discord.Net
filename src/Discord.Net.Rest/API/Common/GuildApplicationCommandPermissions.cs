@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace Discord.API
 {
-    public class GuildApplicationCommandPermission
+    internal class GuildApplicationCommandPermission
     {
         [JsonProperty("id")]
-        public ulong Id { get; }
+        public ulong Id { get; set; }
 
         [JsonProperty("application_id")]
-        public ulong ApplicationId { get; }
+        public ulong ApplicationId { get; set; }
 
         [JsonProperty("guild_id")]
-        public ulong GuildId { get; }
+        public ulong GuildId { get; set; }
 
         [JsonProperty("permissions")]
         public API.ApplicationCommandPermissions[] Permissions { get; set; }

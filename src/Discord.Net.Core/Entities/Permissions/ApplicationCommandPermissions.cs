@@ -8,17 +8,17 @@ namespace Discord
         /// <summary>
         ///     The id of the role or user.
         /// </summary>
-        public ulong Id { get; }
+        public ulong TargetId { get; }
 
         /// <summary>
         ///     The target of this permission.
         /// </summary>
-        public PermissionTarget Type { get; }
+        public PermissionTarget TargetType { get; }
 
         /// <summary>
         ///     <see langword="true"/> to allow, otherwise <see langword="false"/>.
         /// </summary>
-        public bool Value { get; }
+        public bool Permission { get; }
 
         internal ApplicationCommandPermission() { }
 
@@ -30,9 +30,9 @@ namespace Discord
         /// <param name="allow">The value of this permission.</param>
         public ApplicationCommandPermission(ulong targetId, PermissionTarget targetType, bool allow)
         {
-            this.Id = targetId;
-            this.Type = targetType;
-            this.Value = allow;
+            this.TargetId = targetId;
+            this.TargetType = targetType;
+            this.Permission = allow;
         }
 
         /// <summary>
@@ -42,9 +42,9 @@ namespace Discord
         /// <param name="allow">The value of this permission.</param>
         public ApplicationCommandPermission(IUser target, bool allow)
         {
-            this.Id = target.Id;
-            this.Value = allow;
-            this.Type = PermissionTarget.User;
+            this.TargetId = target.Id;
+            this.Permission = allow;
+            this.TargetType = PermissionTarget.User;
         }
 
         /// <summary>
@@ -54,9 +54,9 @@ namespace Discord
         /// <param name="allow">The value of this permission.</param>
         public ApplicationCommandPermission(IRole target, bool allow)
         {
-            this.Id = target.Id;
-            this.Value = allow;
-            this.Type = PermissionTarget.Role;
+            this.TargetId = target.Id;
+            this.Permission = allow;
+            this.TargetType = PermissionTarget.Role;
         }
     }
 }

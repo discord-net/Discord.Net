@@ -33,7 +33,7 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         public override async Task DeleteAsync(RequestOptions options = null)
-            => await InteractionHelper.DeleteGuildCommand(Discord, this).ConfigureAwait(false);
+            => await InteractionHelper.DeleteGuildCommand(Discord, GuildId, this).ConfigureAwait(false);
 
         /// <summary>
         ///     Modifies this <see cref="RestApplicationCommand"/>.
@@ -46,7 +46,39 @@ namespace Discord.Rest
         public async Task<RestGuildCommand> ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null)
             => await InteractionHelper.ModifyGuildCommand(Discord, this, func, options).ConfigureAwait(false);
 
-        public async Task<IReadOnlyCollection<Discord.GuildApplicationCommandPermissions>> GetCommandPermissions()
-            => await InteractionHelper.GetCommandGuildPermissions(Discord, this);
+        /// <summary>
+        ///     Gets this commands permissions inside of the current guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a
+        ///     <see cref="GuildApplicationCommandPermission"/> object defining the permissions of the current slash command.
+        /// </returns>
+        public Task<GuildApplicationCommandPermission> GetCommandPermission(RequestOptions options = null)
+            => InteractionHelper.GetGuildCommandPermissionAsync(Discord, this.GuildId, this.Id, options);
+
+        /// <summary>
+        ///     Modifies the current command permissions for this guild command.
+        /// </summary>
+        /// <param name="permissions">The permissions to overwrite.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///      A task that represents the asynchronous modification operation. The task result contains a
+        ///     <see cref="GuildApplicationCommandPermission"/> object containing the modified permissions.
+        /// </returns>
+        public Task<GuildApplicationCommandPermission> ModifyCommandPermissions(ApplicationCommandPermission[] permissions, RequestOptions options = null)
+            => InteractionHelper.ModifyGuildCommandPermissionsAsync(Discord, this.GuildId, this.Id, permissions, options);
+
+        /// <summary>
+        ///     Gets the guild that this slash command resides in.
+        /// </summary>
+        /// <param name="withCounts"><see langword="true"/> if you want the approximate member and presence counts for the guild, otherwise <see langword="false"/>.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a
+        ///     <see cref="RestGuild"/>.
+        /// </returns>
+        public Task<RestGuild> GetGuild(bool withCounts = false, RequestOptions options = null)
+            => ClientHelper.GetGuildAsync(this.Discord, this.GuildId, withCounts, options);
     }
 }

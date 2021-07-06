@@ -8,10 +8,10 @@ namespace Discord
         /// <summary>
         ///     The target of the permission is a role.
         /// </summary>
-        Role = 0,
+        Role = 1,
         /// <summary>
         ///     The target of the permission is a user.
         /// </summary>
-        User = 1,
+        User = 2,
     }
 }

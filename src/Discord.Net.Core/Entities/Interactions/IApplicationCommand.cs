@@ -12,11 +12,6 @@ namespace Discord
     public interface IApplicationCommand : ISnowflakeEntity
     {
         /// <summary>
-        ///     Gets the unique id of the command.
-        /// </summary>
-        ulong Id { get; }
-
-        /// <summary>
         ///     Gets the unique id of the parent application.
         /// </summary>
         ulong ApplicationId { get; }
@@ -30,6 +25,11 @@ namespace Discord
         ///     The description of the command.
         /// </summary>
         string Description { get; }
+
+        /// <summary>
+        ///     Whether the command is enabled by default when the app is added to a guild.
+        /// </summary>
+        bool DefaultPermission { get; }
 
         /// <summary>
         ///     If the option is a subcommand or subcommand group type, this nested options will be the parameters.

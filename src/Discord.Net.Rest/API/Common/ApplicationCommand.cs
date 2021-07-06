@@ -19,5 +19,7 @@ namespace Discord.API
         public string Description { get; set; }
         [JsonProperty("options")]
         public Optional<ApplicationCommandOption[]> Options { get; set; }
+        [JsonProperty("default_permission")]
+        public Optional<bool> DefaultPermissions { get; set; }
     }
 }

@@ -82,6 +82,12 @@ namespace Discord
                 _options = value;
             }
         }
+
+        /// <summary>
+        ///     Whether the command is enabled by default when the app is added to a guild
+        /// </summary>
+        public bool DefaultPermission { get; set; } = true;
+
         private string _name { get; set; }
         private string _description { get; set; }
         private List<SlashCommandOptionBuilder> _options { get; set; }
@@ -96,6 +102,7 @@ namespace Discord
             {
                 Name = this.Name,
                 Description = this.Description,
+                DefaultPermission = this.DefaultPermission
             };
 
             if (this.Options != null && this.Options.Any())
@@ -132,6 +139,17 @@ namespace Discord
         public SlashCommandBuilder WithDescription(string description)
         {
             this.Description = description;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the default permission of the current command.
+        /// </summary>
+        /// <param name="value">The default permission value to set.</param>
+        /// <returns>The current builder.</returns>
+        public SlashCommandBuilder WithDefaultPermission(bool value)
+        {
+            this.DefaultPermission = value;
             return this;
         }
 

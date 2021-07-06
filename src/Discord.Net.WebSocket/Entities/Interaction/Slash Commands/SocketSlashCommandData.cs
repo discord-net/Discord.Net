@@ -54,9 +54,20 @@ namespace Discord.WebSocket
                 {
                     foreach (var channel in resolved.Channels.Value)
                     {
-                        SocketChannel socketChannel = channel.Value.GuildId.IsSpecified
-                            ? SocketGuildChannel.Create(Discord.GetGuild(channel.Value.GuildId.Value), Discord.State, channel.Value)
-                            : SocketDMChannel.Create(Discord, Discord.State, channel.Value);
+                        SocketChannel socketChannel = guild != null
+                            ? guild.GetChannel(channel.Value.Id)
+                            : Discord.GetChannel(channel.Value.Id);
+
+                        if (socketChannel == null)
+                        {
+                            var channelModel = guild != null
+                                ? Discord.Rest.ApiClient.GetChannelAsync(guild.Id, channel.Value.Id).ConfigureAwait(false).GetAwaiter().GetResult()
+                                : Discord.Rest.ApiClient.GetChannelAsync(channel.Value.Id).ConfigureAwait(false).GetAwaiter().GetResult();
+
+                            socketChannel = guild != null
+                                ? SocketGuildChannel.Create(guild, Discord.State, channelModel)
+                                : (SocketChannel)SocketChannel.CreatePrivate(Discord, Discord.State, channelModel);
+                        }    
 
                         Discord.State.AddChannel(socketChannel);
                         this.channels.Add(ulong.Parse(channel.Key), socketChannel);

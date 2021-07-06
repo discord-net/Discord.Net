@@ -206,13 +206,14 @@ namespace Discord.Rest
 
         public static async Task<IReadOnlyCollection<RestGuildCommand>> GetGuildApplicationCommands(BaseDiscordClient client, ulong guildId, RequestOptions options)
         {
-            var response = await client.ApiClient.GetGuildApplicationCommandAsync(guildId, options).ConfigureAwait(false);
+            var response = await client.ApiClient.GetGuildApplicationCommandsAsync(guildId, options).ConfigureAwait(false);
 
             if (!response.Any())
                 return new RestGuildCommand[0].ToImmutableArray();
 
             return response.Select(x => RestGuildCommand.Create(client, x, guildId)).ToImmutableArray();
         }
+
 
         public static Task AddRoleAsync(BaseDiscordClient client, ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
             => client.ApiClient.AddRoleAsync(guildId, userId, roleId, options);

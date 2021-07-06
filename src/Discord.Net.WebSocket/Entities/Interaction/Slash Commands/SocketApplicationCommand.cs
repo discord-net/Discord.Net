@@ -1,3 +1,4 @@
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -21,6 +22,9 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public string Description { get; private set; }
+
+        /// <inheritdoc/>
+        public bool DefaultPermission { get; private set; }
 
         /// <summary>
         ///     A collection of <see cref="SocketApplicationCommandOption"/>'s recieved over the gateway.
@@ -56,13 +60,18 @@ namespace Discord.WebSocket
             this.Description = model.Description;
             this.Name = model.Name;
             this.GuildId = model.GuildId;
+            this.DefaultPermission = model.DefaultPermission.GetValueOrDefault(true);
+
 
             this.Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => SocketApplicationCommandOption.Create(x)).ToImmutableArray()
                 : new ImmutableArray<SocketApplicationCommandOption>();
         }
 
-        public Task DeleteAsync(RequestOptions options = null) => throw new NotImplementedException();
+        /// <inheritdoc/>
+        public Task DeleteAsync(RequestOptions options = null)
+            => InteractionHelper.DeleteGuildCommand(Discord, this.GuildId, this, options);
+
         IReadOnlyCollection<IApplicationCommandOption> IApplicationCommand.Options => Options;
     }
 }
