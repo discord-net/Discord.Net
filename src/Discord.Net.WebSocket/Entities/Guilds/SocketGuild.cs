@@ -1131,12 +1131,6 @@ namespace Discord.WebSocket
                 _audioLock.Release();
             }
         }
-
-        internal async Task SendVoiceStateUpdateAsync(ulong channelId,  bool selfDeaf, bool selfMute)
-        {
-            await Discord.ApiClient.SendVoiceStateUpdateAsync(Id, channelId, selfDeaf, selfMute).ConfigureAwait(false);
-        }
-
         private async Task DisconnectAudioInternalAsync()
         {
             _audioConnectPromise?.TrySetCanceledAsync(); //Cancel any previous audio connection

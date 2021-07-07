@@ -41,11 +41,6 @@ namespace Discord
             throw new NotImplementedException();
         }
 
-        public Task SendVoiceStateUpdateAsync(bool selfDeaf, bool selfMute)
-        {
-            throw new NotImplementedException();
-        }
-
         public IDisposable EnterTypingState(RequestOptions options = null)
         {
             throw new NotImplementedException();

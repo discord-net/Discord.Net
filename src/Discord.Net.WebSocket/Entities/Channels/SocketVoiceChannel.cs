@@ -76,11 +76,6 @@ namespace Discord.WebSocket
         public async Task DisconnectAsync()
             => await Guild.DisconnectAudioAsync();
 
-        public async Task SendVoiceStateUpdateAsync(bool selfDeaf, bool selfMute)
-        {
-            await Guild.SendVoiceStateUpdateAsync(Id, selfDeaf, selfMute);
-        }
-
         /// <inheritdoc />
         public override SocketGuildUser GetUser(ulong id)
         {
