@@ -1,6 +1,6 @@
 # Subcommands
 
-Sub commands allow you to have multiple commands available in a single command. They can be useful for representing sub options for a command. for example: a settings command. Let's first look at some limitations with sub commands set by discord.
+Subcommands allow you to have multiple commands available in a single command. They can be useful for representing sub options for a command. For example: A settings command. Let's first look at some limitations with subcommands set by discord.
 
 - An app can have up to 25 subcommand groups on a top-level command
 - An app can have up to 25 subcommands within a subcommand group
@@ -132,7 +132,7 @@ public async Task Client_Ready()
 All that code generates a command that looks like this:
 ![settings](images/settings1.png)
 
-Now that we have our command made, we need to handle the multiple options with this command. so lets add this into our handler
+Now that we have our command made, we need to handle the multiple options with this command. So lets add this into our handler:
 
 ```cs
 private async Task Client_InteractionCreated(SocketInteraction arg)
@@ -157,7 +157,7 @@ private async Task HandleSettingsCommand(SocketSlashCommand command)
     // First lets extract our variables
     var fieldName = command.Data.Options.First().Name;
     var getOrSet = command.Data.Options.First().Options.First().Name;
-    // since there is no value on a get command, we use the ? operator because "Options" can be null.
+    // Since there is no value on a get command, we use the ? operator because "Options" can be null.
     var value = command.Data.Options.First().Options.First().Options?.FirstOrDefault().Value;
 
     switch (fieldName)
