@@ -116,4 +116,4 @@ await Context.Channel.SendMessageAsync("Test selection!", component: builder.Bui
 > Note: You can only have 5 buttons per row and 5 rows per message. If a row contains a selection dropdown it cannot contain any buttons.
 
 ## Slash commands
-Slash command example how to's can be found [here](https://github.com/Discord-Net-Labs/Discord.Net-Labs/blob/Interactions/docs/guides/commands/application-commands.md). If you want to read some code using slash commands, you can do that [here](https://github.com/quinchs/SwissbotCore/blob/master/SwissbotCore/Handlers/AutoMod/Censor.cs)
+Slash command example how to's can be found [here](https://github.com/Discord-Net-Labs/Discord.Net-Labs/tree/Interactions/docs/guides/slash-commands). If you want to read some code using slash commands, you can do that [here](https://github.com/quinchs/SwissbotCore/blob/master/SwissbotCore/Handlers/AutoMod/Censor.cs)
