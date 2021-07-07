@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Discord.Net.Labs</id>
-    <version>2.4.3$suffix$</version>
+    <version>2.4.4$suffix$</version>
     <title>Discord.Net Labs</title>
     <authors>Discord.Net Contributors</authors>
     <owners>quinchs</owners>
@@ -14,23 +14,23 @@
     <iconUrl>https://avatars.githubusercontent.com/u/84047264</iconUrl>
     <dependencies>
         <group targetFramework="net461">
-            <dependency id="Discord.Net.Labs.Core" version="2.4.1$suffix$" />
-            <dependency id="Discord.Net.Labs.Rest" version="2.4.2$suffix$" />
-            <dependency id="Discord.Net.Labs.WebSocket" version="2.4.3$suffix$" />
+            <dependency id="Discord.Net.Labs.Core" version="2.4.2$suffix$" />
+            <dependency id="Discord.Net.Labs.Rest" version="2.4.3$suffix$" />
+            <dependency id="Discord.Net.Labs.WebSocket" version="2.4.4$suffix$" />
             <dependency id="Discord.Net.Labs.Commands" version="2.3.5$suffix$" />
             <dependency id="Discord.Net.Labs.Webhook" version="2.3.4$suffix$" />
         </group>       
         <group targetFramework="netstandard2.0">
-            <dependency id="Discord.Net.Labs.Core" version="2.4.1$suffix$" />
-            <dependency id="Discord.Net.Labs.Rest" version="2.4.2$suffix$" />
-            <dependency id="Discord.Net.Labs.WebSocket" version="2.4.3$suffix$" />
+            <dependency id="Discord.Net.Labs.Core" version="2.4.2$suffix$" />
+            <dependency id="Discord.Net.Labs.Rest" version="2.4.3$suffix$" />
+            <dependency id="Discord.Net.Labs.WebSocket" version="2.4.4$suffix$" />
             <dependency id="Discord.Net.Labs.Commands" version="2.3.5$suffix$" />
             <dependency id="Discord.Net.Labs.Webhook" version="2.3.4$suffix$" />
         </group>
 		<group targetFramework="netstandard2.1">
-            <dependency id="Discord.Net.Labs.Core" version="2.4.1$suffix$" />
-            <dependency id="Discord.Net.Labs.Rest" version="2.4.2$suffix$" />
-            <dependency id="Discord.Net.Labs.WebSocket" version="2.4.3$suffix$" />
+            <dependency id="Discord.Net.Labs.Core" version="2.4.2$suffix$" />
+            <dependency id="Discord.Net.Labs.Rest" version="2.4.3$suffix$" />
+            <dependency id="Discord.Net.Labs.WebSocket" version="2.4.4$suffix$" />
             <dependency id="Discord.Net.Labs.Commands" version="2.3.5$suffix$" />
             <dependency id="Discord.Net.Labs.Webhook" version="2.3.4$suffix$" />
         </group>

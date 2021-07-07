@@ -50,20 +50,6 @@ namespace Discord.WebSocket
             base.Update(model);
         }
 
-        /// <summary>
-        ///     Gets the original response to this slash command.
-        /// </summary>
-        /// <returns>A <see cref="RestInteractionMessage"/> that represents the initial response to this interaction.</returns>
-        public async Task<RestInteractionMessage> GetOriginalResponse()
-        {
-            // get the original message
-            var msg = await Discord.ApiClient.GetInteractionResponse(this.Token).ConfigureAwait(false);
-
-            var entity = RestInteractionMessage.Create(Discord, msg, this.Token, this.Channel);
-
-            return entity;
-        }
-
         /// <inheritdoc/>
         public override async Task RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
             bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)

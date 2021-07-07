@@ -3334,12 +3334,6 @@
                 The data associated with this interaction.
             </summary>
         </member>
-        <member name="M:Discord.WebSocket.SocketSlashCommand.GetOriginalResponse">
-            <summary>
-                Gets the original response to this slash command.
-            </summary>
-            <returns>A <see cref="T:Discord.Rest.RestInteractionMessage"/> that represents the initial response to this interaction.</returns>
-        </member>
         <member name="M:Discord.WebSocket.SocketSlashCommand.RespondAsync(System.String,System.Boolean,Discord.Embed,Discord.InteractionResponseType,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
             <inheritdoc/>
         </member>

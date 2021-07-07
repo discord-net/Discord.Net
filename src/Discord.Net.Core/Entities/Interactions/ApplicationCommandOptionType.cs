@@ -52,7 +52,7 @@ namespace Discord
         Role = 8,
 
         /// <summary>
-        ///     
+        ///     A <see cref="IUser"/> or <see cref="IRole"/>.
         /// </summary>
         Mentionable = 9
     }

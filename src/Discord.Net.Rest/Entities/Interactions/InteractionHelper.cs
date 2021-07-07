@@ -1,5 +1,6 @@
 using Discord.API;
 using Discord.API.Rest;
+using Discord.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -341,9 +342,18 @@ namespace Discord.Rest
         public static async Task<GuildApplicationCommandPermission> GetGuildCommandPermissionAsync(BaseDiscordClient client,
             ulong guildId, ulong commandId, RequestOptions options)
         {
-            var model = await client.ApiClient.GetGuildApplicationCommandPermission(guildId, commandId, options);
-            return new GuildApplicationCommandPermission(model.Id, model.ApplicationId, guildId, model.Permissions.Select(
-                y => new ApplicationCommandPermission(y.Id, y.Type, y.Permission)).ToArray());
+            try
+            {
+                var model = await client.ApiClient.GetGuildApplicationCommandPermission(guildId, commandId, options);
+                return new GuildApplicationCommandPermission(model.Id, model.ApplicationId, guildId, model.Permissions.Select(
+                    y => new ApplicationCommandPermission(y.Id, y.Type, y.Permission)).ToArray());
+            }
+            catch(HttpException x)
+            {
+                if (x.HttpCode == System.Net.HttpStatusCode.NotFound)
+                    return null;
+                throw;
+            }
         }
 
         public static async Task<GuildApplicationCommandPermission> ModifyGuildCommandPermissionsAsync(BaseDiscordClient client, ulong guildId, ulong commandId,

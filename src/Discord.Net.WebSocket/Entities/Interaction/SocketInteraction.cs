@@ -140,9 +140,7 @@ namespace Discord.WebSocket
         /// <param name="options">The request options for this async request.</param>
         /// <returns>A <see cref="RestInteractionMessage"/> that represents the intitial response, or <see langword="null"/> if there is no response.</returns>
         public Task<RestInteractionMessage> GetOriginalResponseAsync(RequestOptions options = null)
-        {
-            return InteractionHelper.GetOriginalResponseAsync(this.Discord, this.Channel, this, options);
-        }
+            => InteractionHelper.GetOriginalResponseAsync(this.Discord, this.Channel, this, options);
 
         /// <summary>
         ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredChannelMessageWithSource"/>.

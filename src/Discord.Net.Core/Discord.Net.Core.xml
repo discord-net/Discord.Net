@@ -1081,6 +1081,21 @@
         <member name="F:Discord.ChannelType.News">
             <summary> The channel is a news channel. </summary>
         </member>
+        <member name="F:Discord.ChannelType.Store">
+            <summary> The channel is a store channel. </summary>
+        </member>
+        <member name="F:Discord.ChannelType.NewsThread">
+            <summary> The channel is a temporary thread channel under a news channel. </summary>
+        </member>
+        <member name="F:Discord.ChannelType.PublicThread">
+            <summary> The channel is a temporary thread channel under a text channel.  </summary>
+        </member>
+        <member name="F:Discord.ChannelType.PrivateThread">
+            <summary> The channel is a private temporary thread channel under a text channel.  </summary>
+        </member>
+        <member name="F:Discord.ChannelType.Stage">
+            <summary> The channel is a stage voice channel. </summary>
+        </member>
         <member name="T:Discord.Direction">
             <summary>
                 Specifies the direction of where message(s) should be retrieved from.
@@ -3934,7 +3949,7 @@
         </member>
         <member name="F:Discord.ApplicationCommandOptionType.Mentionable">
             <summary>
-                
+                A <see cref="T:Discord.IUser"/> or <see cref="T:Discord.IRole"/>.
             </summary>
         </member>
         <member name="T:Discord.ApplicationCommandProperties">
@@ -4933,18 +4948,6 @@
             <param name="choices">The choices of this option.</param>
             <returns>The current builder.</returns>
         </member>
-        <member name="M:Discord.SlashCommandBuilder.AddOption(System.String,Discord.ApplicationCommandOptionType,System.String,System.Boolean,System.Boolean,Discord.ApplicationCommandOptionChoiceProperties[])">
-            <summary>
-                Adds an option to the current slash command.
-            </summary>
-            <param name="name">The name of the option to add.</param>
-            <param name="type">The type of this option.</param>
-            <param name="description">The description of this option.</param>
-            <param name="required">If this option is required for this command.</param>
-            <param name="isDefault">If this option is the default option.</param>
-            <param name="choices">The choices of this option.</param>
-            <returns>The current builder.</returns>
-        </member>
         <member name="M:Discord.SlashCommandBuilder.AddOption(System.String,Discord.ApplicationCommandOptionType,System.String)">
             <summary>
                 Adds an option to the current slash command.
@@ -5023,6 +5026,19 @@
                 Builds the current option.
             </summary>
             <returns>The built version of this option.</returns>
+        </member>
+        <member name="M:Discord.SlashCommandOptionBuilder.AddOption(System.String,Discord.ApplicationCommandOptionType,System.String,System.Boolean,System.Boolean,System.Collections.Generic.List{Discord.SlashCommandOptionBuilder},Discord.ApplicationCommandOptionChoiceProperties[])">
+            <summary>
+                Adds an option to the current slash command.
+            </summary>
+            <param name="name">The name of the option to add.</param>
+            <param name="type">The type of this option.</param>
+            <param name="description">The description of this option.</param>
+            <param name="required">If this option is required for this command.</param>
+            <param name="isDefault">If this option is the default option.</param>
+            <param name="options">The options of the option to add.</param>
+            <param name="choices">The choices of this option.</param>
+            <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.SlashCommandOptionBuilder.AddOption(Discord.SlashCommandOptionBuilder)">
             <summary>

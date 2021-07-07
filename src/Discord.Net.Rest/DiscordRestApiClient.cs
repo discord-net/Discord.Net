@@ -1718,23 +1718,36 @@ namespace Discord.API
 
         protected async Task<T> TrySendApplicationCommand<T>(Task<T> sendTask)
         {
-            var result = await sendTask.ConfigureAwait(false);
-
-            if (sendTask.Exception != null)
+            try
             {
-                if (sendTask.Exception.InnerException is HttpException x)
+                var result = await sendTask.ConfigureAwait(false);
+
+                if (sendTask.Exception != null)
                 {
-                    if (x.HttpCode == HttpStatusCode.BadRequest)
+                    if (sendTask.Exception.InnerException is HttpException x)
                     {
-                        var json = (x.Request as JsonRestRequest).Json;
-                        throw new ApplicationCommandException(json, x);
+                        if (x.HttpCode == HttpStatusCode.BadRequest)
+                        {
+                            var json = (x.Request as JsonRestRequest).Json;
+                            throw new ApplicationCommandException(json, x);
+                        }
                     }
+
+                    throw sendTask.Exception;
+                }
+                else
+                    return result;
+            }
+            catch(HttpException x)
+            {
+                if (x.HttpCode == HttpStatusCode.BadRequest)
+                {
+                    var json = (x.Request as JsonRestRequest).Json;
+                    throw new ApplicationCommandException(json, x);
                 }
 
-                throw sendTask.Exception;
+                throw;
             }
-            else
-                return result;
         }
 
         internal class BucketIds
