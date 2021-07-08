@@ -206,7 +206,7 @@ private async Task HandleSettingsCommand(SocketSlashCommand command)
 
 ```
 
-Now, let't try this out! Running the 3 get commands seems to get the default values we set.
+Now, let's try this out! Running the 3 get commands seems to get the default values we set.
 
 ![settings get](images/settings2.png)
 
