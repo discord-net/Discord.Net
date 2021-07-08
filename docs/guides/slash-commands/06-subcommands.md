@@ -210,7 +210,7 @@ Now, let's try this out! Running the 3 get commands seems to get the default val
 
 ![settings get](images/settings2.png)
 
-Now lets try changing each to a different value.
+Now let's try changing each to a different value.
 
 ![settings set](images/settings3.png)
 
