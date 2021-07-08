@@ -59,7 +59,7 @@ command
     |__ subcommand-group
 ```
 
-Let's write a settings command that can change 2 fields in our bot.
+Let's write a settings command that can change 3 fields in our bot.
 
 ```cs
 public string FieldA { get; set; } = "test";
