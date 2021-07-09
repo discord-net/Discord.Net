@@ -17,7 +17,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string Topic { get; private set; }
         /// <inheritdoc />
-        public virtual int SlowModeInterval { get; private set; } 
+        public virtual int SlowModeInterval { get; private set; }
         /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
 
@@ -78,7 +78,7 @@ namespace Discord.Rest
         /// </exception>
         /// <returns>
         ///     A paged collection containing a collection of guild users that can access this channel. Flattening the
-        ///     paginated response into a collection of users with 
+        ///     paginated response into a collection of users with
         ///     <see cref="AsyncEnumerableExtensions.FlattenAsync{T}"/> is required if you wish to access the users.
         /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<RestGuildUser>> GetUsersAsync(RequestOptions options = null)
@@ -215,6 +215,10 @@ namespace Discord.Rest
         /// <inheritdoc />
         public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
             => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
+        public Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+            => throw new NotImplementedException();
+        public Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+            => throw new NotImplementedException();
         /// <inheritdoc />
         public async Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
             => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
