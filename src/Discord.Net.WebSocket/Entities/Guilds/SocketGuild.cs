@@ -725,6 +725,16 @@ namespace Discord.WebSocket
 
         //Interactions
         /// <summary>
+        ///     Deletes all slash commands in the current guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous delete operation.
+        /// </returns>
+        public Task DeleteSlashCommandsAsync(RequestOptions options = null)
+            => InteractionHelper.DeleteAllGuildCommandsAsync(Discord, this.Id, options);
+
+        /// <summary>
         ///     Gets a collection of slash commands created by the current user in this guild.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
@@ -823,7 +833,7 @@ namespace Discord.WebSocket
             if (_roles.TryGetValue(model.Id, out SocketRole role))
                 _roles[model.Id].Update(this.Discord.State, model);
             else
-               role = AddRole(model);
+                role = AddRole(model);
 
             return role;
         }
@@ -1289,7 +1299,7 @@ namespace Discord.WebSocket
         Task<IReadOnlyCollection<IVoiceChannel>> IGuild.GetVoiceChannelsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IVoiceChannel>>(VoiceChannels);
         /// <inheritdoc />
-        Task<IReadOnlyCollection<ICategoryChannel>> IGuild.GetCategoriesAsync(CacheMode mode , RequestOptions options)
+        Task<IReadOnlyCollection<ICategoryChannel>> IGuild.GetCategoriesAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<ICategoryChannel>>(CategoryChannels);
         /// <inheritdoc />
         Task<IVoiceChannel> IGuild.GetVoiceChannelAsync(ulong id, CacheMode mode, RequestOptions options)

@@ -11,6 +11,16 @@ namespace Discord.Rest
 {
     internal static class InteractionHelper
     {
+        public static Task DeleteAllGuildCommandsAsync(BaseDiscordClient client, ulong guildId, RequestOptions options = null)
+        {
+            return client.ApiClient.BulkOverwriteGuildApplicationCommands(guildId, new CreateApplicationCommandParams[0], options);
+        }
+
+        public static Task DeleteAllGlobalCommandsAsync(BaseDiscordClient client, RequestOptions options = null)
+        {
+            return client.ApiClient.BulkOverwriteGlobalApplicationCommands(new CreateApplicationCommandParams[0], options);
+        }
+
         public static Task SendInteractionResponse(BaseDiscordClient client, IMessageChannel channel, InteractionResponse response,
             ulong interactionId, string interactionToken, RequestOptions options = null)
         {
@@ -348,7 +358,7 @@ namespace Discord.Rest
                 return new GuildApplicationCommandPermission(model.Id, model.ApplicationId, guildId, model.Permissions.Select(
                     y => new ApplicationCommandPermission(y.Id, y.Type, y.Permission)).ToArray());
             }
-            catch(HttpException x)
+            catch (HttpException x)
             {
                 if (x.HttpCode == System.Net.HttpStatusCode.NotFound)
                     return null;
@@ -365,7 +375,7 @@ namespace Discord.Rest
 
             List<ApplicationCommandPermissions> models = new List<ApplicationCommandPermissions>();
 
-            foreach(var arg in args)
+            foreach (var arg in args)
             {
                 var model = new ApplicationCommandPermissions()
                 {
@@ -391,7 +401,7 @@ namespace Discord.Rest
 
             List<ModifyGuildApplicationCommandPermissions> models = new List<ModifyGuildApplicationCommandPermissions>();
 
-            foreach(var arg in args)
+            foreach (var arg in args)
             {
                 Preconditions.AtMost(arg.Value.Length, 10, nameof(args));
 

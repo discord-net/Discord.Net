@@ -125,7 +125,8 @@ namespace Discord.Rest
             => InteractionHelper.BulkOverwriteGuildCommands(this, guildId, commandProperties, options);
         public Task<IReadOnlyCollection<GuildApplicationCommandPermission>> BatchEditGuildCommandPermissions(ulong guildId, IDictionary<ulong, ApplicationCommandPermission[]> permissions, RequestOptions options = null)
             => InteractionHelper.BatchEditGuildCommandPermissionsAsync(this, guildId, permissions, options);
-
+        public Task DeleteAllGlobalCommandsAsync(RequestOptions options = null)
+            => InteractionHelper.DeleteAllGlobalCommandsAsync(this, options);
 
         public Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId)
             => ClientHelper.AddRoleAsync(this, guildId, userId, roleId);
