@@ -257,6 +257,16 @@ namespace Discord.Rest
 
         //Interactions
         /// <summary>
+        ///     Deletes all slash commands in the current guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous delete operation.
+        /// </returns>
+        public Task DeleteSlashCommandsAsync(RequestOptions options = null)
+            => InteractionHelper.DeleteAllGuildCommandsAsync(Discord, this.Id, options);
+
+        /// <summary>
         ///     Gets a collection of slash commands created by the current user in this guild.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>

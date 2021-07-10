@@ -5,7 +5,7 @@
 This repo is a custom fork of Discord.Net that introduces the newest features of discord for testing and experimenting. Nothing here is guaranteed to work but you are more than welcome to submit bugs in the issues tabs
 
 ## Known issues
-Labs will not work with Playwo's [InteractivityAddon](https://github.com/Playwo/Discord.InteractivityAddon). The reason is that his package depends on the base discord.net lib, you can get around this by cloning his repo and building it with discord.net labs instead of discord.net.
+Labs will not work with normal package of Playwo's [InteractivityAddon](https://www.nuget.org/packages/Discord.InteractivityAddon). The reason is that his package depends on the base discord.net lib. You can instead use the [InteractivityAddon.Labs](https://www.nuget.org/packages/Discord.InteractivityAddon.Labs) package which implements some of the features added in Discord.Net-Labs.
 
 ## How to use
 Setting up labs in your project is really simple, here's how to do it:

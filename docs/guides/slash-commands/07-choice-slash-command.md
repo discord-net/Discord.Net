@@ -1,8 +1,8 @@
 # Slash Command Choices.
 
-With slash command options you can add choices, making the user select between some set values. Lets create a command that ask how much they like our bot!
+With slash command options you can add choices, making the user select between some set values. Lets create a command that asks how much they like our bot!
 
-Lets set up our slash command:
+Let's set up our slash command:
 
 ```cs
 private async Task Client_Ready()
@@ -78,6 +78,6 @@ private async Task HandleFeedbackCommand(SocketSlashCommand command)
 }
 ```
 
-And this is the result!
+And this is the result:
 
 ![feedback working](images/feedback2.png)

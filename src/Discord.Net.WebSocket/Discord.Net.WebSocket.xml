@@ -2843,6 +2843,15 @@
                 voice regions the guild can access.
             </returns>
         </member>
+        <member name="M:Discord.WebSocket.SocketGuild.DeleteSlashCommandsAsync(Discord.RequestOptions)">
+            <summary>
+                Deletes all slash commands in the current guild.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous delete operation.
+            </returns>
+        </member>
         <member name="M:Discord.WebSocket.SocketGuild.GetSlashCommandsAsync(Discord.RequestOptions)">
             <summary>
                 Gets a collection of slash commands created by the current user in this guild.
