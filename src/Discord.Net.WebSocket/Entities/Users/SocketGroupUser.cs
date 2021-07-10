@@ -3,6 +3,9 @@ using Model = Discord.API.User;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a WebSocket-based group user.
+    /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class SocketGroupUser : SocketUser, IGroupUser
     {
