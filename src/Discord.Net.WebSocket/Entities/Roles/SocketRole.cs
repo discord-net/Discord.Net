@@ -50,6 +50,10 @@ namespace Discord.WebSocket
         public bool IsEveryone => Id == Guild.Id;
         /// <inheritdoc />
         public string Mention => IsEveryone ? "@everyone" : MentionUtils.MentionRole(Id);
+
+        /// <summary>
+        /// Returns an IEnumerable containing all <see cref="SocketGuildUser"/> that have this role.
+        /// </summary>
         public IEnumerable<SocketGuildUser> Members 
             => Guild.Users.Where(x => x.Roles.Any(r => r.Id == Id));
 
