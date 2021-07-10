@@ -126,7 +126,7 @@ namespace Discord
         {
             IEnumerable<string> GetInvalid()
             {
-                yield return new string('a', 2049);
+                yield return new string('a', 4097);
             }
             foreach (var description in GetInvalid())
             {
@@ -149,7 +149,7 @@ namespace Discord
             {
                 yield return string.Empty;
                 yield return null;
-                yield return new string('a', 2048);
+                yield return new string('a', 4096);
             }
             foreach (var description in GetValid())
             {
