@@ -935,11 +935,11 @@ namespace Discord.API
 
             return await SendAsync<Message>("GET", () => $"webhooks/{this.CurrentUserId}/{interactionToken}/messages/@original", new BucketIds(), options: options).ConfigureAwait(false);
         }
-        public async Task ModifyInteractionResponse(ModifyInteractionResponseParams args, string interactionToken, RequestOptions options = null)
+        public async Task<Message> ModifyInteractionResponse(ModifyInteractionResponseParams args, string interactionToken, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            await SendJsonAsync("POST", () => $"webhooks/{this.CurrentUserId}/{interactionToken}/messages/@original", args, new BucketIds(), options: options);
+            return await SendJsonAsync<Message>("PATCH", () => $"webhooks/{this.CurrentUserId}/{interactionToken}/messages/@original", args, new BucketIds(), options: options);
         }
         public async Task DeleteInteractionResponse(string interactionToken, RequestOptions options = null)
         {

@@ -305,7 +305,9 @@ namespace Discord.Rest
             var apiArgs = new API.Rest.ModifyInteractionResponseParams
             {
                 Content = args.Content,
-                Embeds = args.Embed.IsSpecified ? new API.Embed[] { args.Embed.Value.ToModel() } : Optional.Create<API.Embed[]>()
+                Embeds = args.Embed.IsSpecified ? new API.Embed[] { args.Embed.Value.ToModel() } : Optional.Create<API.Embed[]>(),
+                AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional<API.AllowedMentions>.Unspecified,
+                Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
             };
 
             return await client.ApiClient.ModifyInteractionFollowupMessage(apiArgs, message.Id, message.Token, options).ConfigureAwait(false);
@@ -328,10 +330,12 @@ namespace Discord.Rest
             var apiArgs = new API.Rest.ModifyInteractionResponseParams
             {
                 Content = args.Content,
-                Embeds = args.Embed.IsSpecified ? new API.Embed[] { args.Embed.Value.ToModel() } : Optional.Create<API.Embed[]>()
+                Embeds = args.Embed.IsSpecified ? new API.Embed[] { args.Embed.Value.ToModel() } : Optional.Create<API.Embed[]>(),
+                AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional<API.AllowedMentions>.Unspecified,
+                Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
             };
 
-            return await client.ApiClient.ModifyInteractionFollowupMessage(apiArgs, message.Id, message.Token, options).ConfigureAwait(false);
+            return await client.ApiClient.ModifyInteractionResponse(apiArgs, message.Token, options).ConfigureAwait(false);
         }
 
         public static async Task DeletedInteractionResponse(BaseDiscordClient client, RestInteractionMessage message, RequestOptions options = null)

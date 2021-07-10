@@ -17,5 +17,8 @@ namespace Discord.API.Rest
 
         [JsonProperty("allowed_mentions")]
         public Optional<AllowedMentions> AllowedMentions { get; set; }
+
+        [JsonProperty("components")]
+        public Optional<API.ActionRowComponent[]> Components { get; set; }
     }
 }

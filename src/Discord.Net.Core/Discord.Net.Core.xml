@@ -7266,6 +7266,78 @@
         <member name="F:Discord.TagType.Emoji">
             <summary> The object is an emoji. </summary>
         </member>
+        <member name="T:Discord.Entities.Messages.TimestampTag">
+            <summary>
+                Represents a class used to make timestamps in messages. see <see href="https://discord.com/developers/docs/reference#message-formatting-timestamp-styles"/>.
+            </summary>
+        </member>
+        <member name="P:Discord.Entities.Messages.TimestampTag.Style">
+            <summary>
+                Gets or sets the style of the timestamp tag.
+            </summary>
+        </member>
+        <member name="P:Discord.Entities.Messages.TimestampTag.Time">
+            <summary>
+                Gets or sets the time for this timestamp tag.
+            </summary>
+        </member>
+        <member name="M:Discord.Entities.Messages.TimestampTag.ToString">
+            <summary>
+                Converts the current timestamp tag to the string representation supported by discord.
+                <para>
+                    If the <see cref="P:Discord.Entities.Messages.TimestampTag.Time"/> is null then the default 0 will be used.
+                </para>
+            </summary>
+            <returns>A string thats compatable in a discord message, ex: <code>&lt;t:1625944201:f&gt;</code></returns>
+        </member>
+        <member name="M:Discord.Entities.Messages.TimestampTag.FromDateTime(System.DateTime,Discord.Entities.Messages.TimestampTagStyles)">
+            <summary>
+                Creates a new timestamp tag with the specified datetime object.
+            </summary>
+            <param name="time">The time of this timestamp tag.</param>
+            <param name="style">The style for this timestamp tag.</param>
+            <returns>The newly create timestamp tag.</returns>
+        </member>
+        <member name="T:Discord.Entities.Messages.TimestampTagStyles">
+            <summary>
+                Represents a set of styles to use with a <see cref="T:Discord.Entities.Messages.TimestampTag"/>
+            </summary>
+        </member>
+        <member name="F:Discord.Entities.Messages.TimestampTagStyles.ShortTime">
+            <summary>
+                A short time string: 16:20
+            </summary>
+        </member>
+        <member name="F:Discord.Entities.Messages.TimestampTagStyles.LongTime">
+            <summary>
+                A long time string: 16:20:30
+            </summary>
+        </member>
+        <member name="F:Discord.Entities.Messages.TimestampTagStyles.ShortDate">
+            <summary>
+                A short date string: 20/04/2021
+            </summary>
+        </member>
+        <member name="F:Discord.Entities.Messages.TimestampTagStyles.LongDate">
+            <summary>
+                A long date string: 20 April 2021
+            </summary>
+        </member>
+        <member name="F:Discord.Entities.Messages.TimestampTagStyles.ShortDateTime">
+            <summary>
+                A short datetime string: 20 April 2021 16:20
+            </summary>
+        </member>
+        <member name="F:Discord.Entities.Messages.TimestampTagStyles.LongDateTime">
+            <summary>
+                A long datetime string: Tuesday, 20 April 2021 16:20
+            </summary>
+        </member>
+        <member name="F:Discord.Entities.Messages.TimestampTagStyles.Relative">
+            <summary>
+                The relative time to the user: 2 months ago
+            </summary>
+        </member>
         <member name="T:Discord.ApplicationCommandPermission">
             <summary>
                 Application command permissions allow you to enable or disable commands for specific users or roles within a guild.
