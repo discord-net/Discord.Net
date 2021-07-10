@@ -6,6 +6,9 @@ using Model = Discord.API.Gateway.InviteCreateEvent;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    /// Represents a WebSocket-based invite to a guild.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketInvite : SocketEntity<string>, IInviteMetadata
     {
