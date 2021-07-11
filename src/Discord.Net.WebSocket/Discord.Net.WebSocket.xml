@@ -1351,7 +1351,7 @@
                 Sends a file to this message channel with an optional caption.
             </summary>
             <remarks>
-                This method follows the same behavior as described in <see cref="!:IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference)"/>.
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)"/>.
                 Please visit its documentation for more details on this method.
             </remarks>
             <param name="filePath">The file path of the file.</param>
@@ -1376,7 +1376,7 @@
                 Sends a file to this message channel with an optional caption.
             </summary>
             <remarks>
-                This method follows the same behavior as described in <see cref="!:IMessageChannel.SendFileAsync(Stream, string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference)"/>.
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)"/>.
                 Please visit its documentation for more details on this method.
             </remarks>
             <param name="stream">The <see cref="T:System.IO.Stream" /> of the file to be sent.</param>
@@ -1772,6 +1772,16 @@
         </member>
         <member name="P:Discord.WebSocket.SocketGroupChannel.CachedMessages">
             <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketGroupChannel.Users">
+            <summary>
+            Returns a collection representing all of the users in the group.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketGroupChannel.Recipients">
+            <summary>
+            Returns a collection representing all users in the group, not including the client.
+            </summary>
         </member>
         <member name="M:Discord.WebSocket.SocketGroupChannel.LeaveAsync(Discord.RequestOptions)">
             <inheritdoc />
@@ -3474,6 +3484,11 @@
                 A task that represents the asynchronous operation of acknowledging the interaction.
             </returns>
         </member>
+        <member name="T:Discord.WebSocket.SocketInvite">
+            <summary>
+            Represents a WebSocket-based invite to a guild.
+            </summary>
+        </member>
         <member name="P:Discord.WebSocket.SocketInvite.ChannelId">
             <inheritdoc />
         </member>
@@ -3949,6 +3964,11 @@
         <member name="P:Discord.WebSocket.SocketRole.Mention">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketRole.Members">
+            <summary>
+            Returns an IEnumerable containing all <see cref="T:Discord.WebSocket.SocketGuildUser"/> that have this role.
+            </summary>
+        </member>
         <member name="M:Discord.WebSocket.SocketRole.ModifyAsync(System.Action{Discord.RoleProperties},Discord.RequestOptions)">
             <inheritdoc />
         </member>
@@ -3971,6 +3991,11 @@
         </member>
         <member name="P:Discord.WebSocket.SocketEntity`1.Id">
             <inheritdoc />
+        </member>
+        <member name="T:Discord.WebSocket.SocketGroupUser">
+            <summary>
+                Represents a WebSocket-based group user.
+            </summary>
         </member>
         <member name="P:Discord.WebSocket.SocketGroupUser.Channel">
             <summary>

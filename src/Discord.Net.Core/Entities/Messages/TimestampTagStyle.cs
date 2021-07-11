@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord.Entities.Messages
+namespace Discord
 {
     /// <summary>
     ///     Represents a set of styles to use with a <see cref="TimestampTag"/>

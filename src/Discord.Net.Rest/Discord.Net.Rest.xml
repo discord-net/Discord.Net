@@ -4,6 +4,21 @@
         <name>Discord.Net.Rest</name>
     </assembly>
     <members>
+        <member name="T:Discord.API.InviteVanity">
+            <summary>
+            Represents a vanity invite.
+            </summary>
+        </member>
+        <member name="P:Discord.API.InviteVanity.Code">
+            <summary>
+            The unique code for the invite link.
+            </summary>
+        </member>
+        <member name="P:Discord.API.InviteVanity.Uses">
+            <summary>
+            The total amount of vanity invite uses.
+            </summary>
+        </member>
         <member name="P:Discord.API.MessageApplication.Id">
             <summary>
                 Gets the snowflake ID of the application.

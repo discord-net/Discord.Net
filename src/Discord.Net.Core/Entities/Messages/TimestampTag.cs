@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord.Entities.Messages
+namespace Discord
 {
     /// <summary>
     ///     Represents a class used to make timestamps in messages. see <see href="https://discord.com/developers/docs/reference#message-formatting-timestamp-styles"/>.

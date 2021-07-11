@@ -10754,12 +10754,15 @@
             <summary>
                 Parses a provided user mention string.
             </summary>
+            <param name="text">The user mention.</param>
             <exception cref="T:System.ArgumentException">Invalid mention format.</exception>
         </member>
         <member name="M:Discord.MentionUtils.TryParseUser(System.String,System.UInt64@)">
             <summary>
                 Tries to parse a provided user mention string.
             </summary>
+            <param name="text">The user mention.</param>
+            <param name="userId">The UserId of the user.</param>
         </member>
         <member name="M:Discord.MentionUtils.ParseChannel(System.String)">
             <summary>
