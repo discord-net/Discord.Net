@@ -158,6 +158,7 @@ namespace Discord.WebSocket
             return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
         }
 
+        /// <inheritdoc/>
         public override Task AcknowledgeAsync(RequestOptions options = null)
         {
             var response = new API.InteractionResponse()
