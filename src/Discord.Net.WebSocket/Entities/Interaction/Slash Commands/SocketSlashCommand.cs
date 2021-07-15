@@ -51,7 +51,7 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc/>
-        public override async Task RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
+        public override async Task RespondAsync(string text = null, bool isTTS = false, Embed[] embeds = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
             bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
         {
             if (type == InteractionResponseType.Pong)
@@ -65,12 +65,13 @@ namespace Discord.WebSocket
 
             if (Discord.AlwaysAcknowledgeInteractions)
             {
-                await FollowupAsync(text, isTTS, embed, ephemeral, type, allowedMentions, options);
+                await FollowupAsync(text, isTTS, embeds, ephemeral, type, allowedMentions, options);
                 return;
             }
 
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
+            Preconditions.AtMost(embeds?.Length ?? 0, 10, nameof(embeds), "A max of 10 embeds are allowed.");
 
             // check that user flag and user Id list are exclusive, same with role flag and role Id list
             if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
@@ -95,8 +96,8 @@ namespace Discord.WebSocket
                 Data = new API.InteractionApplicationCommandCallbackData(text)
                 {
                     AllowedMentions = allowedMentions?.ToModel(),
-                    Embeds = embed != null
-                        ? new API.Embed[] { embed.ToModel() }
+                    Embeds = embeds != null
+                        ? embeds.Select(x => x.ToModel()).ToArray()
                         : Optional<API.Embed[]>.Unspecified,
                     TTS = isTTS,
                     Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
@@ -110,7 +111,7 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc/>
-        public override async Task<RestFollowupMessage> FollowupAsync(string text = null, bool isTTS = false, Embed embed = null, bool ephemeral = false,
+        public override async Task<RestFollowupMessage> FollowupAsync(string text = null, bool isTTS = false, Embed[] embeds = null, bool ephemeral = false,
             InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
             AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
         {
@@ -120,11 +121,16 @@ namespace Discord.WebSocket
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
+            Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
+            Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
+            Preconditions.AtMost(embeds?.Length ?? 0, 10, nameof(embeds), "A max of 10 embeds are allowed.");
+
             var args = new API.Rest.CreateWebhookMessageParams(text)
             {
+                AllowedMentions = allowedMentions?.ToModel(),
                 IsTTS = isTTS,
-                Embeds = embed != null
-                        ? new API.Embed[] { embed.ToModel() }
+                Embeds = embeds != null
+                        ? embeds.Select(x => x.ToModel()).ToArray()
                         : Optional<API.Embed[]>.Unspecified,
                 Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
             };

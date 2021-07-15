@@ -99,7 +99,7 @@ namespace Discord.WebSocket
         ///     Responds to an Interaction.
         /// <para>
         ///     If you have <see cref="DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, You should use
-        ///     <see cref="FollowupAsync(string, bool, Embed, bool, InteractionResponseType, AllowedMentions, RequestOptions, MessageComponent)"/> instead.
+        ///     <see cref="FollowupAsync(string, bool, Embed[], bool, InteractionResponseType, AllowedMentions, RequestOptions, MessageComponent)"/> instead.
         /// </para>
         /// </summary>
         /// <param name="text">The text of the message to be sent.</param>
@@ -112,16 +112,16 @@ namespace Discord.WebSocket
         /// <param name="component">A <see cref="MessageComponent"/> to be sent with this response</param>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
-
-        public abstract Task RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
-            bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null);
+        public Task RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
+            bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
+            => RespondAsync(text, isTTS, new Embed[] { embed }, type, ephemeral, allowedMentions, options, component);
 
         /// <summary>
         ///     Sends a followup message for this interaction.
         /// </summary>
         /// <param name="text">The text of the message to be sent</param>
         /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
-        /// <param name="embed">A <see cref="Embed"/> to send with this response.</param>
+        /// <param name="embed">A <see cref="Embed"/> to send with this response</param>
         /// <param name="type">The type of response to this Interaction.</param>
         /// /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
@@ -130,7 +130,45 @@ namespace Discord.WebSocket
         /// <returns>
         ///     The sent message.
         /// </returns>
-        public abstract Task<RestFollowupMessage> FollowupAsync(string text = null, bool isTTS = false, Embed embed = null, bool ephemeral = false,
+        public Task FollowupAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
+            bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
+            => RespondAsync(text, isTTS, new Embed[] { embed }, type, ephemeral, allowedMentions, options, component);
+        /// <summary>
+        ///     Responds to an Interaction.
+        /// <para>
+        ///     If you have <see cref="DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, You should use
+        ///     <see cref="FollowupAsync(string, bool, Embed[], bool, InteractionResponseType, AllowedMentions, RequestOptions, MessageComponent)"/> instead.
+        /// </para>
+        /// </summary>
+        /// <param name="text">The text of the message to be sent.</param>
+        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
+        /// <param name="embeds">A array of embeds to send with this response. Max 10</param>
+        /// <param name="type">The type of response to this Interaction.</param>
+        /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="allowedMentions">The allowed mentions for this response.</param>
+        /// <param name="options">The request options for this response.</param>
+        /// <param name="component">A <see cref="MessageComponent"/> to be sent with this response</param>
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
+        /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
+
+        public abstract Task RespondAsync(string text = null, bool isTTS = false, Embed[] embeds = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
+            bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null);
+
+        /// <summary>
+        ///     Sends a followup message for this interaction.
+        /// </summary>
+        /// <param name="text">The text of the message to be sent</param>
+        /// <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
+        /// <param name="embeds">A array of embeds to send with this response. Max 10</param>
+        /// <param name="type">The type of response to this Interaction.</param>
+        /// /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+        /// <param name="allowedMentions">The allowed mentions for this response.</param>
+        /// <param name="options">The request options for this response.</param>
+        /// <param name="component">A <see cref="MessageComponent"/> to be sent with this response</param>
+        /// <returns>
+        ///     The sent message.
+        /// </returns>
+        public abstract Task<RestFollowupMessage> FollowupAsync(string text = null, bool isTTS = false, Embed[] embeds = null, bool ephemeral = false,
              InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
              AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null);
 
