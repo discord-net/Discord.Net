@@ -1743,7 +1743,7 @@
                 Gets the parent (category) ID of this channel in the guild's channel list.
             </summary>
             <returns>
-                A <see cref="T:System.UInt64"/> representing the snowflake identifier of the parent of this channel; 
+                A <see cref="T:System.UInt64"/> representing the snowflake identifier of the parent of this channel;
                 <c>null</c> if none is set.
             </returns>
         </member>
@@ -1778,6 +1778,50 @@
                 await guildChannel.CreateInviteAsync(maxAge: 43200, maxUses: 3);
                 </code>
             </example>
+            <param name="maxAge">The time (in seconds) until the invite expires. Set to <c>null</c> to never expire.</param>
+            <param name="maxUses">The max amount of times this invite may be used. Set to <c>null</c> to have unlimited uses.</param>
+            <param name="isTemporary">If <c>true</c>, the user accepting this invite will be kicked from the guild after closing their client.</param>
+            <param name="isUnique">If <c>true</c>, don't try to reuse a similar invite (useful for creating many unique one time use invites).</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous invite creation operation. The task result contains an invite
+                metadata object containing information for the created invite.
+            </returns>
+        </member>
+        <member name="M:Discord.INestedChannel.CreateInviteToApplicationAsync(System.UInt64,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
+            <summary>
+                Creates a new invite to this channel.
+            </summary>
+            <example>
+                <para>The following example creates a new invite to this channel; the invite lasts for 12 hours and can only
+                be used 3 times throughout its lifespan.</para>
+                <code language="cs">
+                await guildChannel.CreateInviteAsync(maxAge: 43200, maxUses: 3);
+                </code>
+            </example>
+            <param name="applicationId">The id of the embedded application to open for this invite</param>
+            <param name="maxAge">The time (in seconds) until the invite expires. Set to <c>null</c> to never expire.</param>
+            <param name="maxUses">The max amount of times this invite may be used. Set to <c>null</c> to have unlimited uses.</param>
+            <param name="isTemporary">If <c>true</c>, the user accepting this invite will be kicked from the guild after closing their client.</param>
+            <param name="isUnique">If <c>true</c>, don't try to reuse a similar invite (useful for creating many unique one time use invites).</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous invite creation operation. The task result contains an invite
+                metadata object containing information for the created invite.
+            </returns>
+        </member>
+        <member name="M:Discord.INestedChannel.CreateInviteToStreamAsync(Discord.IUser,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
+            <summary>
+                Creates a new invite to this channel.
+            </summary>
+            <example>
+                <para>The following example creates a new invite to this channel; the invite lasts for 12 hours and can only
+                be used 3 times throughout its lifespan.</para>
+                <code language="cs">
+                await guildChannel.CreateInviteAsync(maxAge: 43200, maxUses: 3);
+                </code>
+            </example>
+            <param name="user">The id of the user whose stream to display for this invite</param>
             <param name="maxAge">The time (in seconds) until the invite expires. Set to <c>null</c> to never expire.</param>
             <param name="maxUses">The max amount of times this invite may be used. Set to <c>null</c> to have unlimited uses.</param>
             <param name="isTemporary">If <c>true</c>, the user accepting this invite will be kicked from the guild after closing their client.</param>
@@ -5297,6 +5341,11 @@
                 The invite is for a Go Live stream.
             </summary>
         </member>
+        <member name="F:Discord.TargetUserType.EmbeddedApplication">
+            <summary>
+                The invite is for embedded application.
+            </summary>
+        </member>
         <member name="T:Discord.ISnowflakeEntity">
             <summary> Represents a Discord snowflake entity. </summary>
         </member>
@@ -8530,6 +8579,11 @@
         <member name="P:Discord.ITeam.TeamMembers">
             <summary>
                 Gets the members of this team.
+            </summary>
+        </member>
+        <member name="P:Discord.ITeam.Name">
+            <summary>
+                Gets the name of this team.
             </summary>
         </member>
         <member name="P:Discord.ITeam.OwnerUserId">

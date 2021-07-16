@@ -1656,6 +1656,24 @@
             <paramref name="maxAge"/> must be lesser than 86400.
             </exception>
         </member>
+        <member name="M:Discord.Rest.ChannelHelper.CreateInviteToStreamAsync(Discord.IGuildChannel,Discord.Rest.BaseDiscordClient,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.IUser,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentException">
+            <paramref name="channel.Id.Id"/> may not be equal to zero.
+            -and-
+            <paramref name="maxAge"/> and <paramref name="maxUses"/> must be greater than zero.
+            -and-
+            <paramref name="maxAge"/> must be lesser than 86400.
+            </exception>
+        </member>
+        <member name="M:Discord.Rest.ChannelHelper.CreateInviteToApplicationAsync(Discord.IGuildChannel,Discord.Rest.BaseDiscordClient,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.UInt64,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentException">
+            <paramref name="channel.Id.Id"/> may not be equal to zero.
+            -and-
+            <paramref name="maxAge"/> and <paramref name="maxUses"/> must be greater than zero.
+            -and-
+            <paramref name="maxAge"/> must be lesser than 86400.
+            </exception>
+        </member>
         <member name="M:Discord.Rest.ChannelHelper.SendMessageAsync(Discord.IMessageChannel,Discord.Rest.BaseDiscordClient,System.String,System.Boolean,Discord.Embed,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent,Discord.RequestOptions)">
             <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
         </member>
@@ -2313,7 +2331,7 @@
             </exception>
             <returns>
                 A paged collection containing a collection of guild users that can access this channel. Flattening the
-                paginated response into a collection of users with 
+                paginated response into a collection of users with
                 <see cref="M:Discord.AsyncEnumerableExtensions.FlattenAsync``1(System.Collections.Generic.IAsyncEnumerable{System.Collections.Generic.IEnumerable{``0}})"/> is required if you wish to access the users.
             </returns>
         </member>
@@ -2522,6 +2540,12 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestVoiceChannel.CreateInviteAsync(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestVoiceChannel.CreateInviteToApplicationAsync(System.UInt64,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestVoiceChannel.CreateInviteToStreamAsync(Discord.IUser,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestVoiceChannel.GetInvitesAsync(Discord.RequestOptions)">
@@ -4050,6 +4074,9 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestTeam.TeamMembers">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.RestTeam.Name">
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestTeam.OwnerUserId">

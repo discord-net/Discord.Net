@@ -2304,6 +2304,12 @@
         <member name="M:Discord.WebSocket.SocketTextChannel.CreateInviteAsync(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.WebSocket.SocketTextChannel.CreateInviteToApplicationAsync(System.UInt64,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.SocketTextChannel.CreateInviteToStreamAsync(Discord.IUser,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.WebSocket.SocketTextChannel.GetInvitesAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
@@ -2398,6 +2404,12 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketVoiceChannel.CreateInviteAsync(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.SocketVoiceChannel.CreateInviteToApplicationAsync(System.UInt64,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.SocketVoiceChannel.CreateInviteToStreamAsync(Discord.IUser,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketVoiceChannel.GetInvitesAsync(Discord.RequestOptions)">
