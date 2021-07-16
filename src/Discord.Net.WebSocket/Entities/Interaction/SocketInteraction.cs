@@ -99,7 +99,7 @@ namespace Discord.WebSocket
         ///     Responds to an Interaction.
         /// <para>
         ///     If you have <see cref="DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, You should use
-        ///     <see cref="FollowupAsync(string, bool, Embed[], bool, InteractionResponseType, AllowedMentions, RequestOptions, MessageComponent)"/> instead.
+        ///     <see cref="FollowupAsync(Embed[],string, bool, bool, InteractionResponseType, AllowedMentions, RequestOptions, MessageComponent)"/> instead.
         /// </para>
         /// </summary>
         /// <param name="text">The text of the message to be sent.</param>
@@ -114,7 +114,7 @@ namespace Discord.WebSocket
         /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
         public Task RespondAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
             bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
-            => RespondAsync(text, isTTS, new Embed[] { embed }, type, ephemeral, allowedMentions, options, component);
+            => RespondAsync(embed != null ? new Embed[] { embed } : null, text, isTTS, type, ephemeral, allowedMentions, options, component);
 
         /// <summary>
         ///     Sends a followup message for this interaction.
@@ -132,12 +132,12 @@ namespace Discord.WebSocket
         /// </returns>
         public Task FollowupAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
             bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
-            => RespondAsync(text, isTTS, new Embed[] { embed }, type, ephemeral, allowedMentions, options, component);
+            => RespondAsync(embed != null ? new Embed[] { embed } : null, text, isTTS, type, ephemeral, allowedMentions, options, component);
         /// <summary>
         ///     Responds to an Interaction.
         /// <para>
         ///     If you have <see cref="DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, You should use
-        ///     <see cref="FollowupAsync(string, bool, Embed[], bool, InteractionResponseType, AllowedMentions, RequestOptions, MessageComponent)"/> instead.
+        ///     <see cref="FollowupAsync( Embed[],string, bool, bool, InteractionResponseType, AllowedMentions, RequestOptions, MessageComponent)"/> instead.
         /// </para>
         /// </summary>
         /// <param name="text">The text of the message to be sent.</param>
@@ -151,7 +151,7 @@ namespace Discord.WebSocket
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
 
-        public abstract Task RespondAsync(string text = null, bool isTTS = false, Embed[] embeds = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
+        public abstract Task RespondAsync(Embed[] embeds = null, string text = null, bool isTTS = false, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
             bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null);
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     The sent message.
         /// </returns>
-        public abstract Task<RestFollowupMessage> FollowupAsync(string text = null, bool isTTS = false, Embed[] embeds = null, bool ephemeral = false,
+        public abstract Task<RestFollowupMessage> FollowupAsync(Embed[] embeds = null, string text = null, bool isTTS = false, bool ephemeral = false,
              InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
              AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null);
 
@@ -186,15 +186,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous operation of acknowledging the interaction.
         /// </returns>
-        public virtual Task AcknowledgeAsync(RequestOptions options = null)
-        {
-            var response = new API.InteractionResponse()
-            {
-                Type = InteractionResponseType.DeferredChannelMessageWithSource,
-            };
-
-            return Discord.Rest.ApiClient.CreateInteractionResponse(response, this.Id, this.Token, options);
-        }
+        public abstract Task AcknowledgeAsync(RequestOptions options = null);
 
         private bool CheckToken()
         {

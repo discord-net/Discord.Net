@@ -50,7 +50,7 @@ namespace Discord.WebSocket
             {
                 if (this.Message == null)
                 {
-                    SocketUser author = null;
+                    SocketUser author;
                     if (this.Channel is SocketGuildChannel channel)
                     {
                         if (model.Message.Value.WebhookId.IsSpecified)
@@ -71,7 +71,7 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc/>
-        public override async Task RespondAsync(string text = null, bool isTTS = false, Embed[] embeds = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
+        public override async Task RespondAsync(Embed[] embeds = null, string text = null, bool isTTS = false, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
             bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
         {
             if (type == InteractionResponseType.Pong)
@@ -82,7 +82,7 @@ namespace Discord.WebSocket
 
             if (Discord.AlwaysAcknowledgeInteractions)
             {
-                await FollowupAsync(text, isTTS, embeds, ephemeral, type, allowedMentions, options);
+                await FollowupAsync(embeds, text, isTTS, ephemeral, type, allowedMentions, options);
                 return;
             }
 
@@ -128,7 +128,7 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc/>
-        public override async Task<RestFollowupMessage> FollowupAsync(string text = null, bool isTTS = false, Embed[] embeds = null, bool ephemeral = false,
+        public override async Task<RestFollowupMessage> FollowupAsync(Embed[] embeds = null, string text = null, bool isTTS = false, bool ephemeral = false,
             InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
             AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
         {
@@ -158,7 +158,12 @@ namespace Discord.WebSocket
             return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredUpdateMessage"/>.
+        /// </summary>
+        /// <returns>
+        ///     A task that represents the asynchronous operation of acknowledging the interaction.
+        /// </returns>
         public override Task AcknowledgeAsync(RequestOptions options = null)
         {
             var response = new API.InteractionResponse()

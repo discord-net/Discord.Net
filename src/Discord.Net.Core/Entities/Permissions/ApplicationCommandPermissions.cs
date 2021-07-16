@@ -13,7 +13,7 @@ namespace Discord
         /// <summary>
         ///     The target of this permission.
         /// </summary>
-        public PermissionTarget TargetType { get; }
+        public ApplicationCommandPermissionTarget TargetType { get; }
 
         /// <summary>
         ///     <see langword="true"/> to allow, otherwise <see langword="false"/>.
@@ -28,7 +28,7 @@ namespace Discord
         /// <param name="targetId">The id you want to target this permission value for.</param>
         /// <param name="targetType">The type of the <b>targetId</b> parameter.</param>
         /// <param name="allow">The value of this permission.</param>
-        public ApplicationCommandPermission(ulong targetId, PermissionTarget targetType, bool allow)
+        public ApplicationCommandPermission(ulong targetId, ApplicationCommandPermissionTarget targetType, bool allow)
         {
             this.TargetId = targetId;
             this.TargetType = targetType;
@@ -36,7 +36,7 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Creates a new <see cref="ApplicationCommandPermission"/> targeting <see cref="PermissionTarget.User"/>.
+        ///     Creates a new <see cref="ApplicationCommandPermission"/> targeting <see cref="ApplicationCommandPermissionTarget.User"/>.
         /// </summary>
         /// <param name="target">The user you want to target this permission value for.</param>
         /// <param name="allow">The value of this permission.</param>
@@ -44,11 +44,11 @@ namespace Discord
         {
             this.TargetId = target.Id;
             this.Permission = allow;
-            this.TargetType = PermissionTarget.User;
+            this.TargetType = ApplicationCommandPermissionTarget.User;
         }
 
         /// <summary>
-        ///     Creates a new <see cref="ApplicationCommandPermission"/> targeting <see cref="PermissionTarget.Role"/>.
+        ///     Creates a new <see cref="ApplicationCommandPermission"/> targeting <see cref="ApplicationCommandPermissionTarget.Role"/>.
         /// </summary>
         /// <param name="target">The role you want to target this permission value for.</param>
         /// <param name="allow">The value of this permission.</param>
@@ -56,7 +56,7 @@ namespace Discord
         {
             this.TargetId = target.Id;
             this.Permission = allow;
-            this.TargetType = PermissionTarget.Role;
+            this.TargetType = ApplicationCommandPermissionTarget.Role;
         }
     }
 }

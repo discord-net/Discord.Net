@@ -7407,7 +7407,7 @@
                 <see langword="true"/> to allow, otherwise <see langword="false"/>.
             </summary>
         </member>
-        <member name="M:Discord.ApplicationCommandPermission.#ctor(System.UInt64,Discord.PermissionTarget,System.Boolean)">
+        <member name="M:Discord.ApplicationCommandPermission.#ctor(System.UInt64,Discord.ApplicationCommandPermissionTarget,System.Boolean)">
             <summary>
                 Creates a new <see cref="T:Discord.ApplicationCommandPermission"/>.
             </summary>
@@ -7417,17 +7417,32 @@
         </member>
         <member name="M:Discord.ApplicationCommandPermission.#ctor(Discord.IUser,System.Boolean)">
             <summary>
-                Creates a new <see cref="T:Discord.ApplicationCommandPermission"/> targeting <see cref="F:Discord.PermissionTarget.User"/>.
+                Creates a new <see cref="T:Discord.ApplicationCommandPermission"/> targeting <see cref="F:Discord.ApplicationCommandPermissionTarget.User"/>.
             </summary>
             <param name="target">The user you want to target this permission value for.</param>
             <param name="allow">The value of this permission.</param>
         </member>
         <member name="M:Discord.ApplicationCommandPermission.#ctor(Discord.IRole,System.Boolean)">
             <summary>
-                Creates a new <see cref="T:Discord.ApplicationCommandPermission"/> targeting <see cref="F:Discord.PermissionTarget.Role"/>.
+                Creates a new <see cref="T:Discord.ApplicationCommandPermission"/> targeting <see cref="F:Discord.ApplicationCommandPermissionTarget.Role"/>.
             </summary>
             <param name="target">The role you want to target this permission value for.</param>
             <param name="allow">The value of this permission.</param>
+        </member>
+        <member name="T:Discord.ApplicationCommandPermissionTarget">
+            <summary>
+                Specifies the target of the permission.
+            </summary>
+        </member>
+        <member name="F:Discord.ApplicationCommandPermissionTarget.Role">
+            <summary>
+                The target of the permission is a role.
+            </summary>
+        </member>
+        <member name="F:Discord.ApplicationCommandPermissionTarget.User">
+            <summary>
+                The target of the permission is a user.
+            </summary>
         </member>
         <member name="T:Discord.ChannelPermission">
             <summary> Defines the available permissions for a channel. </summary>

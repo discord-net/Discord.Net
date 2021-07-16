@@ -3223,14 +3223,19 @@
                 The message that contained the trigger for this interaction.
             </summary>
         </member>
-        <member name="M:Discord.WebSocket.SocketMessageComponent.RespondAsync(System.String,System.Boolean,Discord.Embed[],Discord.InteractionResponseType,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
+        <member name="M:Discord.WebSocket.SocketMessageComponent.RespondAsync(Discord.Embed[],System.String,System.Boolean,Discord.InteractionResponseType,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
             <inheritdoc/>
         </member>
-        <member name="M:Discord.WebSocket.SocketMessageComponent.FollowupAsync(System.String,System.Boolean,Discord.Embed[],System.Boolean,Discord.InteractionResponseType,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
+        <member name="M:Discord.WebSocket.SocketMessageComponent.FollowupAsync(Discord.Embed[],System.String,System.Boolean,System.Boolean,Discord.InteractionResponseType,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
             <inheritdoc/>
         </member>
         <member name="M:Discord.WebSocket.SocketMessageComponent.AcknowledgeAsync(Discord.RequestOptions)">
-            <inheritdoc/>
+            <summary>
+                Acknowledges this interaction with the <see cref="F:Discord.InteractionResponseType.DeferredUpdateMessage"/>.
+            </summary>
+            <returns>
+                A task that represents the asynchronous operation of acknowledging the interaction.
+            </returns>
         </member>
         <member name="T:Discord.WebSocket.SocketMessageComponentData">
             <summary>
@@ -3336,10 +3341,13 @@
                 The data associated with this interaction.
             </summary>
         </member>
-        <member name="M:Discord.WebSocket.SocketSlashCommand.RespondAsync(System.String,System.Boolean,Discord.Embed[],Discord.InteractionResponseType,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
+        <member name="M:Discord.WebSocket.SocketSlashCommand.RespondAsync(Discord.Embed[],System.String,System.Boolean,Discord.InteractionResponseType,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
             <inheritdoc/>
         </member>
-        <member name="M:Discord.WebSocket.SocketSlashCommand.FollowupAsync(System.String,System.Boolean,Discord.Embed[],System.Boolean,Discord.InteractionResponseType,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
+        <member name="M:Discord.WebSocket.SocketSlashCommand.FollowupAsync(Discord.Embed[],System.String,System.Boolean,System.Boolean,Discord.InteractionResponseType,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketSlashCommand.AcknowledgeAsync(Discord.RequestOptions)">
             <inheritdoc/>
         </member>
         <member name="T:Discord.WebSocket.SocketSlashCommandData">
@@ -3422,7 +3430,7 @@
                 Responds to an Interaction.
             <para>
                 If you have <see cref="P:Discord.WebSocket.DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, You should use
-                <see cref="M:Discord.WebSocket.SocketInteraction.FollowupAsync(System.String,System.Boolean,Discord.Embed[],System.Boolean,Discord.InteractionResponseType,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)"/> instead.
+                <see cref="M:Discord.WebSocket.SocketInteraction.FollowupAsync(Discord.Embed[],System.String,System.Boolean,System.Boolean,Discord.InteractionResponseType,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)"/> instead.
             </para>
             </summary>
             <param name="text">The text of the message to be sent.</param>
@@ -3452,12 +3460,12 @@
                 The sent message.
             </returns>
         </member>
-        <member name="M:Discord.WebSocket.SocketInteraction.RespondAsync(System.String,System.Boolean,Discord.Embed[],Discord.InteractionResponseType,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
+        <member name="M:Discord.WebSocket.SocketInteraction.RespondAsync(Discord.Embed[],System.String,System.Boolean,Discord.InteractionResponseType,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
             <summary>
                 Responds to an Interaction.
             <para>
                 If you have <see cref="P:Discord.WebSocket.DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, You should use
-                <see cref="M:Discord.WebSocket.SocketInteraction.FollowupAsync(System.String,System.Boolean,Discord.Embed[],System.Boolean,Discord.InteractionResponseType,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)"/> instead.
+                <see cref="M:Discord.WebSocket.SocketInteraction.FollowupAsync(Discord.Embed[],System.String,System.Boolean,System.Boolean,Discord.InteractionResponseType,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)"/> instead.
             </para>
             </summary>
             <param name="text">The text of the message to be sent.</param>
@@ -3471,7 +3479,7 @@
             <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
             <exception cref="T:System.InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
         </member>
-        <member name="M:Discord.WebSocket.SocketInteraction.FollowupAsync(System.String,System.Boolean,Discord.Embed[],System.Boolean,Discord.InteractionResponseType,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
+        <member name="M:Discord.WebSocket.SocketInteraction.FollowupAsync(Discord.Embed[],System.String,System.Boolean,System.Boolean,Discord.InteractionResponseType,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
             <summary>
                 Sends a followup message for this interaction.
             </summary>

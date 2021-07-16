@@ -13,7 +13,7 @@ namespace Discord.API
         public ulong Id { get; set; }
 
         [JsonProperty("type")]
-        public PermissionTarget Type { get; set; }
+        public ApplicationCommandPermissionTarget Type { get; set; }
 
         [JsonProperty("permission")]
         public bool Permission { get; set; }
