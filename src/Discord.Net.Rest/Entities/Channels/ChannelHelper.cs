@@ -120,6 +120,54 @@ namespace Discord.Rest
             return RestInviteMetadata.Create(client, null, channel, model);
         }
 
+        /// <exception cref="ArgumentException">
+        /// <paramref name="channel.Id"/> may not be equal to zero.
+        /// -and-
+        /// <paramref name="maxAge"/> and <paramref name="maxUses"/> must be greater than zero.
+        /// -and-
+        /// <paramref name="maxAge"/> must be lesser than 86400.
+        /// </exception>
+        public static async Task<RestInviteMetadata> CreateInviteToStreamAsync(IGuildChannel channel, BaseDiscordClient client,
+            int? maxAge, int? maxUses, bool isTemporary, bool isUnique, IUser user,
+            RequestOptions options)
+        {
+            var args = new API.Rest.CreateChannelInviteParams
+            {
+                IsTemporary = isTemporary,
+                IsUnique = isUnique,
+                MaxAge = maxAge ?? 0,
+                MaxUses = maxUses ?? 0,
+                TargetType = TargetUserType.Stream,
+                TargetUserId = user.Id
+            };
+            var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
+            return RestInviteMetadata.Create(client, null, channel, model);
+        }
+
+        /// <exception cref="ArgumentException">
+        /// <paramref name="channel.Id"/> may not be equal to zero.
+        /// -and-
+        /// <paramref name="maxAge"/> and <paramref name="maxUses"/> must be greater than zero.
+        /// -and-
+        /// <paramref name="maxAge"/> must be lesser than 86400.
+        /// </exception>
+        public static async Task<RestInviteMetadata> CreateInviteToApplicationAsync(IGuildChannel channel, BaseDiscordClient client,
+            int? maxAge, int? maxUses, bool isTemporary, bool isUnique, ulong applicationId,
+            RequestOptions options)
+        {
+            var args = new API.Rest.CreateChannelInviteParams
+            {
+                IsTemporary = isTemporary,
+                IsUnique = isUnique,
+                MaxAge = maxAge ?? 0,
+                MaxUses = maxUses ?? 0,
+                TargetType = TargetUserType.EmbeddedApplication,
+                TargetApplicationId = applicationId
+            };
+            var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
+            return RestInviteMetadata.Create(client, null, channel, model);
+        }
+
         //Messages
         public static async Task<RestMessage> GetMessageAsync(IMessageChannel channel, BaseDiscordClient client,
             ulong id, RequestOptions options)
