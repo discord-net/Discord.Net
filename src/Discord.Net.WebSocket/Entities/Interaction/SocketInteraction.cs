@@ -130,9 +130,9 @@ namespace Discord.WebSocket
         /// <returns>
         ///     The sent message.
         /// </returns>
-        public Task FollowupAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
+        public Task<RestFollowupMessage> FollowupAsync(string text = null, bool isTTS = false, Embed embed = null, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
             bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
-            => RespondAsync(embed != null ? new Embed[] { embed } : null, text, isTTS, type, ephemeral, allowedMentions, options, component);
+            => FollowupAsync(embed != null ? new Embed[] { embed } : null, text, isTTS, ephemeral, type, allowedMentions, options, component);
         /// <summary>
         ///     Responds to an Interaction.
         /// <para>
