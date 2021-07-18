@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord.Net.Models;
@@ -52,7 +49,7 @@ namespace Discord.Net.Rest
         /// A task that contains a <see cref="Channel"/> if it exists;
         /// otherwise, <see langword="null"/>.
         /// </returns>
-        Task<Channel> GetChannelAsync(Snowflake channelId, CancellationToken cancellationToken = default);
+        Task<Channel?> GetChannelAsync(Snowflake channelId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Updates a <see cref="GroupChannel"/>'s settings.
@@ -141,7 +138,7 @@ namespace Discord.Net.Rest
         Task<Channel> DeleteChannelAsync(Snowflake channelId, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Gets an array of <see cref="Message"/>s from a <see cref="Channel"/>.
+        /// Gets all specified <see cref="Message"/>s from a <see cref="Channel"/>.
         /// </summary>
         /// <remarks>
         /// <see href="https://discord.com/developers/docs/resources/channel#get-channel-messages"/>
@@ -158,7 +155,7 @@ namespace Discord.Net.Rest
         /// <returns>
         /// A task that contains an array of <see cref="Message"/>s from the <see cref="Channel"/>.
         /// </returns>
-        Task<Message[]> GetChannelMessagesAsync(Snowflake channelId, GetChannelMessagesParams args, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Message>> GetChannelMessagesAsync(Snowflake channelId, GetChannelMessagesParams args, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets a specific <see cref="Message"/> from a <see cref="Channel"/>.
@@ -178,7 +175,7 @@ namespace Discord.Net.Rest
         /// <returns>
         /// A task that contains the specified <see cref="Message"/> or <see langword="null"/>.
         /// </returns>
-        Task<Message> GetChannelMessageAsync(Snowflake channelId, Snowflake messageId, CancellationToken cancellationToken = default);
+        Task<Message?> GetChannelMessageAsync(Snowflake channelId, Snowflake messageId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Sends a <see cref="Message"/> to a <see cref="Channel"/>.
@@ -293,7 +290,7 @@ namespace Discord.Net.Rest
         Task DeleteUserReactionAsync(Snowflake channelId, Snowflake messageId, Snowflake userId, Emoji emoji, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Gets an array of <see cref="User"/>s that reacted with this <see cref="Emoji"/>.
+        /// Gets all <see cref="User"/>s that reacted with this <see cref="Emoji"/>.
         /// </summary>
         /// <remarks>
         /// <see href="https://discord.com/developers/docs/resources/channel#get-reactions"/>
@@ -317,7 +314,7 @@ namespace Discord.Net.Rest
         /// A task that contains an array of <see cref="User"/>s that reacted with
         /// the provided <see cref="Emoji"/>.
         /// </returns>
-        Task<User[]> GetReactionsAsync(Snowflake channelId, Snowflake messageId, Emoji emoji, GetReactionsParams args, CancellationToken cancellationToken = default);
+        Task<IEnumerable<User>> GetReactionsAsync(Snowflake channelId, Snowflake messageId, Emoji emoji, GetReactionsParams args, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Deletes all <see cref="Reaction"/>s on a <see cref="Message"/>.
@@ -453,7 +450,7 @@ namespace Discord.Net.Rest
         Task EditChannelPermissionsAsync(Snowflake channelId, Snowflake overwriteId, EditChannelPermissionsParams args, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Gets an array of <see cref="Invite"/>s for a <see cref="Channel"/>.
+        /// Gets all <see cref="InviteWithMetadata"/>s for a <see cref="Channel"/>.
         /// </summary>
         /// <remarks>
         /// <see href="https://discord.com/developers/docs/resources/channel#get-channel-invites"/>
@@ -467,7 +464,7 @@ namespace Discord.Net.Rest
         /// <returns>
         /// A task that contains an array of <see cref="InviteWithMetadata"/>s.
         /// </returns>
-        Task<InviteWithMetadata[]> GetChannelInvitesAsync(Snowflake channelId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<InviteWithMetadata>> GetChannelInvitesAsync(Snowflake channelId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Creates a new <see cref="Invite"/> for the <see cref="Channel"/>.
@@ -558,7 +555,7 @@ namespace Discord.Net.Rest
         /// <returns>
         /// A task that contains an array of all pinned <see cref="Message"/>s.
         /// </returns>
-        Task<Message[]> GetPinnedMessagesAsync(Snowflake channelId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Message>> GetPinnedMessagesAsync(Snowflake channelId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Pins a <see cref="Message"/> in a <see cref="Channel"/>.
@@ -767,7 +764,7 @@ namespace Discord.Net.Rest
         Task RemoveThreadMemberAsync(Snowflake channelId, Snowflake userId, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Gets an array of <see cref="ThreadMember"/>s that are part of the <see cref="ThreadChannel"/>.
+        /// Gets all <see cref="ThreadMember"/>s that are part of the <see cref="ThreadChannel"/>.
         /// </summary>
         /// <remarks>
         /// <see href="https://discord.com/developers/docs/resources/channel#list-thread-members"/>
@@ -782,7 +779,7 @@ namespace Discord.Net.Rest
         /// A task that contains an array of <see cref="ThreadMember"/>s that are part of the
         /// specified <see cref="ThreadChannel"/>.
         /// </returns>
-        Task<ThreadMember[]> ListThreadMembersAsync(Snowflake channelId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<ThreadMember>> ListThreadMembersAsync(Snowflake channelId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets all active <see cref="ThreadChannel"/>s in the <see cref="Channel"/>.
@@ -864,6 +861,902 @@ namespace Discord.Net.Rest
 
         #endregion Channel
 
+        #region Emoji
 
+        /// <summary>
+        /// Gets all <see cref="Emoji"/>s for the given <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/emoji#list-guild-emojis"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="emoji">
+        /// An <see cref="Emoji"/>.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains an array of <see cref="Emoji"/>s.
+        /// </returns>
+        Task<IEnumerable<Emoji>> ListGuildEmojisAsync(Snowflake guildId, Emoji emoji, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets an <see cref="Emoji"/> for the given <see cref="Guild"/> and <see cref="Emoji"/> IDs.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/emoji#get-guild-emoji"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="emoji">
+        /// An <see cref="Emoji"/>.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains an <see cref="Emoji"/>.
+        /// </returns>
+        Task<Emoji> GetGuildEmojiAsync(Snowflake guildId, Emoji emoji, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Creates a new <see cref="Emoji"/> for the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/emoji#create-guild-emoji"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="emoji">
+        /// An <see cref="Emoji"/>.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the created <see cref="Emoji"/>.
+        /// </returns>
+        /// <exception cref="DiscordRestException">
+        /// Thrown when invalid parameters are supplied in <paramref name="args"/>.
+        /// </exception>
+        Task<Emoji> CreateGuildEmojiAsync(Snowflake guildId, Emoji emoji, CreateGuildEmojiParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Modify the given <see cref="Emoji"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/emoji#modify-guild-emoji"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="emoji">
+        /// An <see cref="Emoji"/>.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the updated <see cref="Emoji"/>.
+        /// </returns>
+        Task<Emoji> ModifyGuildEmojiAsync(Snowflake guildId, Emoji emoji, ModifyGuildEmojiParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Delete the given <see cref="Emoji"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/emoji#delete-guild-emoji"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="emoji">
+        /// An <see cref="Emoji"/>.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task DeleteGuildEmojiAsync(Snowflake guildId, Emoji emoji, CancellationToken cancellationToken = default);
+
+        #endregion Emoji
+
+        #region Guild
+
+        /// <summary>
+        /// Creates a new <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#create-guild"/>
+        /// </remarks>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the created <see cref="Guild"/>.
+        /// </returns>
+        Task<Guild> CreateGuildAsync(CreateGuildParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a <see cref="Guild"/> for the given id.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#get-guild"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the requested <see cref="Guild"/> if it exists; or <see langword="null"/>.
+        /// </returns>
+        Task<Guild> GetGuildAsync(Snowflake guildId, GetGuildParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets the <see cref="Guild"/> preview for the given id.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#get-guild-preview"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the requested <see cref="Guild"/> preview if it exists and is
+        /// viewable; or <see langword="null"/>.
+        /// </returns>
+        Task<Guild?> GetGuildPreviewAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Modifies a <see cref="Guild"/>'s settings.
+        /// </summary>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the updated <see cref="Guild"/>.
+        /// </returns>
+        Task<Guild> ModifyGuildAsync(Snowflake guildId, ModifyGuildParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Deletes a <see cref="Guild"/> permanently.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#delete-guild"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task DeleteGuildAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets all <see cref="GuildChannel"/>s. It does not include <see cref="ThreadChannel"/>s.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#get-guild-channels"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains a collection of <see cref="GuildChannel"/>s.
+        /// </returns>
+        Task<IEnumerable<GuildChannel>> GetGuildChannelsAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Creates a new <see cref="GuildChannel"/> for the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#create-guild-channel"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the created <see cref="GuildChannel"/>.
+        /// </returns>
+        Task<GuildChannel> CreateGuildChannelAsync(Snowflake guildId, CreateGuildChannelParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Modifies the positions of a set of <see cref="GuildChannel"/>s for the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task ModifyGuildChannelPositionsAsync(Snowflake guildId, ModifyGuildChannelPositionsParams[] args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a specified <see cref="GuildMember"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#get-guild-member"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="userId">
+        /// The <see cref="User"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the requested <see cref="GuildMember"/>; or <see langword="null"/> if not found.
+        /// </returns>
+        Task<GuildMember?> GetGuildMemberAsync(Snowflake guildId, Snowflake userId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a collection of <see cref="GuildMember"/> that are members of the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#list-guild-members"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the returned collection of <see cref="GuildMember"/>s.
+        /// </returns>
+        Task<IEnumerable<GuildMember>> ListGuildMembersAsync(Snowflake guildId, ListGuildMembersParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a collection of <see cref="GuildMember"/>s whose username or nickname starts with a provided string.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#search-guild-members"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the returned collection of <see cref="GuildMember"/>s.
+        /// </returns>
+        Task<IEnumerable<GuildMember>> SearchGuildMembersAsync(Snowflake guildId, SearchGuildMembersParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Adds a <see cref="User"/> to the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#add-guild-member"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="userId">
+        /// The <see cref="User"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the <see cref="GuildMember"/> related to the provided <see cref="User"/>;
+        /// or <see langword="null"/> if they are already a part of the <see cref="Guild"/>.
+        /// </returns>
+        /// <exception cref="DiscordRestException">
+        /// Thrown when invalid parameters are supplied in <paramref name="args"/>.
+        /// </exception>
+        Task<GuildMember?> AddGuildMemberAsync(Snowflake guildId, Snowflake userId, AddGuildMemberParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Modifies attributes of a <see cref="GuildMember"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#modify-guild-member"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="userId">
+        /// The <see cref="User"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the updated <see cref="GuildMember"/>.
+        /// </returns>
+        Task<GuildMember> ModifyGuildMemberAsync(Snowflake guildId, Snowflake userId, ModifyGuildMemberParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Modifies the nickname of the current user in a <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#modify-current-user-nick"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        ///  <returns>
+        /// A task that contains the updated nickname.
+        /// </returns>
+        Task<string> ModifyCurrentUserNickAsync(Snowflake guildId, ModifyCurrentUserNickParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Adds a <see cref="Role"/> to a <see cref="GuildMember"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#add-guild-member-role"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="userId">
+        /// The <see cref="User"/> identifier.
+        /// </param>
+        /// <param name="roleId">
+        /// The <see cref="Role"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task AddGuildMemberRoleAsync(Snowflake guildId, Snowflake userId, Snowflake roleId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Removes a <see cref="Role"/> from a <see cref="GuildMember"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#remove-guild-member-role"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="userId">
+        /// The <see cref="User"/> identifier.
+        /// </param>
+        /// <param name="roleId">
+        /// The <see cref="Role"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task RemoveGuildMemberRoleAsync(Snowflake guildId, Snowflake userId, Snowflake roleId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Removes a <see cref="GuildMember"/> from a <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#remove-guild-member"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="userId">
+        /// The <see cref="User"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task RemoveGuildMemberAsync(Snowflake guildId, Snowflake userId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a collection of <see cref="Ban"/>s for the users banned from this <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#get-guild-bans"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains a collection of <see cref="Ban"/>s.
+        /// </returns>
+        Task<IEnumerable<Ban>> GetGuildBansAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a <see cref="Ban"/> for the given <see cref="User"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#get-guild-ban"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="userId">
+        /// The <see cref="User"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the <see cref="Ban"/>; or <see langword="null"/> if not found.
+        /// </returns>
+        Task<Ban?> GetGuildBanAsync(Snowflake guildId, Snowflake userId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Creates a guild <see cref="Ban"/>, and optionally delete previous messages sent by the banned <see cref="User"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#create-guild-ban"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="userId">
+        /// The <see cref="User"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task CreateGuildBanAsync(Snowflake guildId, Snowflake userId, CreateGuildBanParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Removes the <see cref="Ban"/> for a <see cref="User"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#remove-guild-ban"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="userId">
+        /// The <see cref="User"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task RemoveGuildBanAsync(Snowflake guildId, Snowflake userId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets all <see cref="Role"/>s for the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#get-guild-roles"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains a collection of <see cref="Role"/>s.
+        /// </returns>
+        Task<IEnumerable<Role>> GetGuildRolesAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Creates a new <see cref="Role"/> for the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#create-guild-role"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the created <see cref="Role"/>.
+        /// </returns>
+        Task<Role> CreateGuildRoleAsync(Snowflake guildId, CreateGuildRoleParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Modifies the positions of a set of <see cref="Role"/>s for the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#modify-guild-role-positions"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains a collection of <see cref="Role"/>s.
+        /// </returns>
+        Task<IEnumerable<Role>> ModifyGuildRolePositionsAsync(Snowflake guildId, ModifyGuildRolePositionsParams[] args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Modifies a <see cref="Guild"/> <see cref="Role"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#modify-guild-role"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="roleId">
+        /// The <see cref="Role"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the updated <see cref="Role"/>.
+        /// </returns>
+        Task<Role> ModifyGuildRoleAsync(Snowflake guildId, Snowflake roleId, ModifyGuildRoleParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Deletes a <see cref="Guild"/> <see cref="Role"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#delete-guild-role"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="roleId">
+        /// The <see cref="Role"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task DeleteGuildRoleAsync(Snowflake guildId, Snowflake roleId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a <see cref="Prune"/> with the number of members that would be removed in a prune operation.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#get-guild-prune-count"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the a <see cref="Prune"/> with the number of members that would be removed in a prune operation.
+        /// </returns>
+        Task<Prune> GetGuildPruneCountAsync(Snowflake guildId, GetGuildPruneCountParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Begins a prune operation.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#begin-guild-prune"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the a <see cref="Prune"/> with the number of members that were removed in the prune operation.
+        /// </returns>
+        Task<Prune> BeginGuildPruneAsync(Snowflake guildId, BeginGuildPruneParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets all <see cref="VoiceRegion"/>s for the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#get-guild-voice-regions"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains a collection of <see cref="VoiceRegion"/>s.
+        /// </returns>
+        Task<IEnumerable<VoiceRegion>> GetGuildVoiceRegionsAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets all <see cref="InviteWithMetadata"/> for the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#get-guild-invites"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains a collection of <see cref="InviteWithMetadata"/>s.
+        /// </returns>
+        Task<IEnumerable<InviteWithMetadata>> GetGuildInvitesAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets all <see cref="Integration"/>s for the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#get-guild-integrations"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains a collection of <see cref="Integration"/>s.
+        /// </returns>
+        Task<IEnumerable<Integration>> GetGuildIntegrationsAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Deletes the attached <see cref="Integration"/> for the <see cref="Guild"/>.
+        /// Deletes any associated <see cref="Webhook"/>s and kicks the associated bot if there is one.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#delete-guild-integration"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task DeleteGuildIntegrationAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a <see cref="GuildWidget"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#get-guild-widget-settings"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains a <see cref="GuildWidget"/>.
+        /// </returns>
+        Task<GuildWidget> GetGuildWidgetSettingsAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Modifies a <see cref="GuildWidget"/> for the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#modify-guild-widget"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the updated <see cref="GuildWidget"/>.
+        /// </returns>
+        Task<GuildWidget> ModifyGuildWidgetAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        // TODO: Create a Widget object or remove this?
+        /// <summary>
+        /// Gets the widget for the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#get-guild-widget"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the widget for the <see cref="Guild"/>.
+        /// </returns>
+        Task<object> GetGuildWidgetAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a partial <see cref="Invite"/> for <see cref="Guild"/>s with a vanity url enabled.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#get-guild-vanity-url"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains a partial <see cref="Invite"/> if the <see cref="Guild"/> has
+        /// this feature enabled; or <see langword="null"/> otherwise.
+        /// </returns>
+        Task<Invite?> GetGuildVanityURLAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets the <see cref="WelcomeScreen"/> for the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#get-guild-welcome-screen"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains a <see cref="WelcomeScreen"/>.
+        /// </returns>
+        Task<WelcomeScreen> GetGuildWelcomeScreenAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Modifies the <see cref="WelcomeScreen"/> for the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the updated <see cref="WelcomeScreen"/>.
+        /// </returns>
+        Task<WelcomeScreen> ModifyGuildWelcomeScreenAsync(Snowflake guildId, ModifyGuildWelcomeScreenParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Updates the current user's <see cref="VoiceState"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#modify-current-user-voice-state"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task ModifyCurrentUserVoiceStateAsync(Snowflake guildId, ModifyCurrentUserVoiceStateParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Updates another user's <see cref="VoiceState"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild#modify-user-voice-state"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="userId">
+        /// The <see cref="User"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task ModifyUserVoiceStateAsync(Snowflake guildId, Snowflake userId, ModifyUserVoiceStateParams args, CancellationToken cancellationToken = default);
+
+        #endregion Guild
     }
 }

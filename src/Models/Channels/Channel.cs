@@ -39,7 +39,7 @@ namespace Discord.Net.Models
         /// <summary>
         /// Maximum langth of a channel topic.
         /// </summary>
-        public const int MaxRateLimitPerUserDuration = 1024;
+        public const int MaxRateLimitPerUserDuration = 21600;
 
         /// <summary>
         /// Minimum amount of users in channel.

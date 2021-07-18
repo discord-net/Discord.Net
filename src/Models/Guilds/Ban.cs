@@ -11,6 +11,16 @@ namespace Discord.Net.Models
     public record Ban
     {
         /// <summary>
+        /// Minimum amount of days to delete messages when banning.
+        /// </summary>
+        public const int MinDaysToDeleteMessages = 0;
+
+        /// <summary>
+        /// Maximum amount of days to delete messages when banning.
+        /// </summary>
+        public const int MaxDaysToDeleteMessages = 7;
+
+        /// <summary>
         /// The reason for the ban.
         /// </summary>
         [JsonPropertyName("reason")]

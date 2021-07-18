@@ -14,8 +14,12 @@ namespace Discord.Net.Models
         /// <summary>
         /// The <see cref="Invite"/> code (unique ID).
         /// </summary>
+        /// <remarks>
+        /// Might be <see langword="null"/> if it is a vanity url invite and
+        /// it was not set for the <see cref="Guild"/>.
+        /// </remarks>
         [JsonPropertyName("code")]
-        public string? Code { get; init; } // Required property candidate
+        public string? Code { get; init; }
 
         /// <summary>
         /// The <see cref="Guild"/> this <see cref="Invite"/> is for.

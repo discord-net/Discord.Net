@@ -12,6 +12,36 @@ namespace Discord.Net.Models
     public record Guild
     {
         /// <summary>
+        /// Minimum langth of a guild name.
+        /// </summary>
+        public const int MinGuildNameLength = 2;
+
+        /// <summary>
+        /// Maximum langth of a guild name.
+        /// </summary>
+        public const int MaxGuildNameLength = 100;
+
+        /// <summary>
+        /// Minimum amount of days to prune for.
+        /// </summary>
+        public const int MinAmountOfDaysToPruneFor = 1;
+
+        /// <summary>
+        /// Maximum amount of days to prune for.
+        /// </summary>
+        public const int MaxAmountOfDaysToPruneFor = 30;
+
+        /// <summary>
+        /// Minimum limit of users to list.
+        /// </summary>
+        public const int MinUserLimitToList = 1;
+
+        /// <summary>
+        /// Maximum limit of users to list.
+        /// </summary>
+        public const int MaxUserLimitToList = 1000;
+
+        /// <summary>
         /// <see cref="Guild"/> id.
         /// </summary>
         [JsonPropertyName("id")]

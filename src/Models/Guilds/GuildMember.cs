@@ -12,13 +12,18 @@ namespace Discord.Net.Models
     public record GuildMember
     {
         /// <summary>
+        /// Maximum langth of a guild member nickname.
+        /// </summary>
+        public const int MaxNicknameLength = 32;
+
+        /// <summary>
         /// The <see cref="Models.User"/> this <see cref="GuildMember"/> represents.
         /// </summary>
         [JsonPropertyName("user")]
         public Optional<User> User { get; init; }
 
         /// <summary>
-        /// This users <see cref="Guild"/> nickname.
+        /// This user's <see cref="Guild"/> nickname.
         /// </summary>
         [JsonPropertyName("nick")]
         public Optional<string?> Nick { get; init; }

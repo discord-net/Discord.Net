@@ -11,14 +11,14 @@ namespace Discord.Net.Rest
     public record ModifyGroupChannelParams
     {
         /// <summary>
-        /// <see cref="Channel"/> name.
+        /// <see cref="GroupChannel"/> name.
         /// </summary>
         public Optional<string> Name { get; set; }
 
         /// <summary>
-        /// Base64 encoded icon.
+        /// <see cref="GroupChannel"/> icon.
         /// </summary>
-        public Optional<string> Icon { get; set; }
+        public Optional<Image> Icon { get; set; }
 
         /// <summary>
         /// Validates the data.
