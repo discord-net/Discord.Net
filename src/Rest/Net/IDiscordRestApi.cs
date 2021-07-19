@@ -153,7 +153,7 @@ namespace Discord.Net.Rest
         /// Cancellation token for the request.
         /// </param>
         /// <returns>
-        /// A task that contains an array of <see cref="Message"/>s from the <see cref="Channel"/>.
+        /// A task that contains a collection of <see cref="Message"/>s from the <see cref="Channel"/>.
         /// </returns>
         Task<IEnumerable<Message>> GetChannelMessagesAsync(Snowflake channelId, GetChannelMessagesParams args, CancellationToken cancellationToken = default);
 
@@ -193,7 +193,7 @@ namespace Discord.Net.Rest
         /// Cancellation token for the request.
         /// </param>
         /// <returns>
-        /// A task that contains the <see cref="Message"/> created.
+        /// A task that contains the created <see cref="Message"/>.
         /// </returns>
         Task<Message> CreateMessageAsync(Snowflake channelId, CreateMessageParams args, CancellationToken cancellationToken = default);
 
@@ -311,7 +311,7 @@ namespace Discord.Net.Rest
         /// Cancellation token for the request.
         /// </param>
         /// <returns>
-        /// A task that contains an array of <see cref="User"/>s that reacted with
+        /// A task that contains a collection of <see cref="User"/>s that reacted with
         /// the provided <see cref="Emoji"/>.
         /// </returns>
         Task<IEnumerable<User>> GetReactionsAsync(Snowflake channelId, Snowflake messageId, Emoji emoji, GetReactionsParams args, CancellationToken cancellationToken = default);
@@ -462,7 +462,7 @@ namespace Discord.Net.Rest
         /// Cancellation token for the request.
         /// </param>
         /// <returns>
-        /// A task that contains an array of <see cref="InviteWithMetadata"/>s.
+        /// A task that contains a collection of <see cref="InviteWithMetadata"/>s.
         /// </returns>
         Task<IEnumerable<InviteWithMetadata>> GetChannelInvitesAsync(Snowflake channelId, CancellationToken cancellationToken = default);
 
@@ -553,7 +553,7 @@ namespace Discord.Net.Rest
         /// Cancellation token for the request.
         /// </param>
         /// <returns>
-        /// A task that contains an array of all pinned <see cref="Message"/>s.
+        /// A task that contains a collection of all pinned <see cref="Message"/>s.
         /// </returns>
         Task<IEnumerable<Message>> GetPinnedMessagesAsync(Snowflake channelId, CancellationToken cancellationToken = default);
 
@@ -776,7 +776,7 @@ namespace Discord.Net.Rest
         /// Cancellation token for the request.
         /// </param>
         /// <returns>
-        /// A task that contains an array of <see cref="ThreadMember"/>s that are part of the
+        /// A task that contains a collection of <see cref="ThreadMember"/>s that are part of the
         /// specified <see cref="ThreadChannel"/>.
         /// </returns>
         Task<IEnumerable<ThreadMember>> ListThreadMembersAsync(Snowflake channelId, CancellationToken cancellationToken = default);
@@ -879,7 +879,7 @@ namespace Discord.Net.Rest
         /// Cancellation token for the request.
         /// </param>
         /// <returns>
-        /// A task that contains an array of <see cref="Emoji"/>s.
+        /// A task that contains a collection of <see cref="Emoji"/>s.
         /// </returns>
         Task<IEnumerable<Emoji>> ListGuildEmojisAsync(Snowflake guildId, Emoji emoji, CancellationToken cancellationToken = default);
 
@@ -1158,7 +1158,7 @@ namespace Discord.Net.Rest
         /// Cancellation token for the request.
         /// </param>
         /// <returns>
-        /// A task that contains the returned collection of <see cref="GuildMember"/>s.
+        /// A task that contains a collection of <see cref="GuildMember"/>s.
         /// </returns>
         Task<IEnumerable<GuildMember>> ListGuildMembersAsync(Snowflake guildId, ListGuildMembersParams args, CancellationToken cancellationToken = default);
 
@@ -1178,7 +1178,7 @@ namespace Discord.Net.Rest
         /// Cancellation token for the request.
         /// </param>
         /// <returns>
-        /// A task that contains the returned collection of <see cref="GuildMember"/>s.
+        /// A task that contains a collection of <see cref="GuildMember"/>s.
         /// </returns>
         Task<IEnumerable<GuildMember>> SearchGuildMembersAsync(Snowflake guildId, SearchGuildMembersParams args, CancellationToken cancellationToken = default);
 
@@ -1758,5 +1758,667 @@ namespace Discord.Net.Rest
         Task ModifyUserVoiceStateAsync(Snowflake guildId, Snowflake userId, ModifyUserVoiceStateParams args, CancellationToken cancellationToken = default);
 
         #endregion Guild
+
+        #region Guild Template
+
+        /// <summary>
+        /// Gets a <see cref="GuildTemplate"/> for the given code.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild-template#get-guild-template"/>
+        /// </remarks>
+        /// <param name="templateCode">
+        /// The <see cref="GuildTemplate"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the requested <see cref="GuildTemplate"/>; or <see langword="null"/> if it's not found.
+        /// </returns>
+        Task<GuildTemplate> GetGuildTemplateAsync(string templateCode, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Creates a new <see cref="Guild"/> based on a template.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild-template#create-guild-from-guild-template"/>
+        /// </remarks>
+        /// <param name="templateCode">
+        /// The <see cref="GuildTemplate"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the created <see cref="Guild"/>.
+        /// </returns>
+        Task<Guild> CreateGuildfromGuildTemplateAsync(string templateCode, CreateGuildfromGuildTemplateParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets all <see cref="GuildTemplate"/>s within a <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild-template#get-guild-templates"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains a collection of <see cref="GuildTemplate"/>s.
+        /// </returns>
+        Task<IEnumerable<GuildTemplate>> GetGuildTemplatesAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Creates a <see cref="GuildTemplate"/> for the <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild-template#create-guild-template"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the created <see cref="GuildTemplate"/>.
+        /// </returns>
+        Task<GuildTemplate> CreateGuildTemplateAsync(Snowflake guildId, CreateGuildTemplateParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Syncs the <see cref="GuildTemplate"/> to the guild's current state.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild-template#sync-guild-template"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="templateCode">
+        /// The <see cref="GuildTemplate"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the updated <see cref="GuildTemplate"/>.
+        /// </returns>
+        Task<GuildTemplate> SyncGuildTemplateAsync(Snowflake guildId, string templateCode, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Modifies the <see cref="GuildTemplate"/>'s metadata.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild-template#modify-guild-template"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="templateCode">
+        /// The <see cref="GuildTemplate"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the updated <see cref="GuildTemplate"/>.
+        /// </returns>
+        Task<GuildTemplate> ModifyGuildTemplateAsync(Snowflake guildId, string templateCode, ModifyGuildTemplateParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Deletes the <see cref="GuildTemplate"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/guild-template#delete-guild-template"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="templateCode">
+        /// The <see cref="GuildTemplate"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the deleted <see cref="GuildTemplate"/>.
+        /// </returns>
+        Task<GuildTemplate> DeleteGuildTemplateAsync(Snowflake guildId, string templateCode, CancellationToken cancellationToken = default);
+
+        #endregion Guild Template
+
+        #region Invite
+
+        /// <summary>
+        /// Gets an <see cref="Invite"/> for the given code.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/invite#get-invite"/>
+        /// </remarks>
+        /// <param name="inviteCode">
+        /// The <see cref="Invite"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains an <see cref="Invite"/>; or <see langword="null"/> if it is not found.
+        /// </returns>
+        Task<Invite> GetInviteAsync(string inviteCode, GetInviteParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Deletes an <see cref="Invite"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/invite#delete-invite"/>
+        /// </remarks>
+        /// <param name="inviteCode">
+        /// The <see cref="Invite"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the deleted <see cref="Invite"/>.
+        /// </returns>
+        Task<Invite> DeleteInviteAsync(string inviteCode, CancellationToken cancellationToken = default);
+
+        #endregion Invite
+
+        #region Stage Instance
+
+        /// <summary>
+        /// Creates a new <see cref="StageInstance"/> associated to a <see cref="StageChannel"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/stage-instance#create-stage-instance"/>
+        /// </remarks>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the created <see cref="StageInstance"/>.
+        /// </returns>
+        Task<StageInstance> CreateStageInstanceAsync(CreateStageInstanceParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets the <see cref="StageInstance"/> associated with the <see cref="StageChannel"/>, if it exists.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/stage-instance#get-stage-instance"/>
+        /// </remarks>
+        /// <param name="channelId">
+        /// The <see cref="Channel"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the created <see cref="StageInstance"/>; or <see langword="null"/> if it does not exist.
+        /// </returns>
+        Task<StageInstance> GetStageInstanceAsync(Snowflake channelId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Modifies an existing <see cref="StageInstance"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/stage-instance#modify-stage-instance"/>
+        /// </remarks>
+        /// <param name="channelId">
+        /// The <see cref="Channel"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the updated <see cref="StageInstance"/>.
+        /// </returns>
+        Task<StageInstance> ModifyStageInstanceAsync(Snowflake channelId, ModifyStageInstanceParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Deletes an <see cref="StageInstance"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/stage-instance#delete-stage-instance"/>
+        /// </remarks>
+        /// <param name="channelId">
+        /// The <see cref="Channel"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task DeleteStageInstanceAsync(Snowflake channelId, CancellationToken cancellationToken = default);
+
+        #endregion Stage Instance
+
+        #region User
+
+        /// <summary>
+        /// Gets the current <see cref="User"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/user#get-current-user"/>
+        /// </remarks>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task containing the current <see cref="User"/>.
+        /// </returns>
+        Task<User> GetCurrentUserAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a <see cref="User"/> for a given identifier.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/user#get-user"/>
+        /// </remarks>
+        /// <param name="userId">
+        /// The <see cref="User"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task containing a <see cref="User"/>; or <see langword="null"/> if not found.
+        /// </returns>
+        Task<User> GetUserAsync(Snowflake userId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Modifies the current <see cref="User"/>'s account settings.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/user#modify-current-user"/>
+        /// </remarks>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task containing the updated current <see cref="User"/>.
+        /// </returns>
+        Task<User> ModifyCurrentUserAsync(ModifyCurrentUserParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a collection of partial <see cref="Guild"/>s the current user is a member of.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/user#get-current-user-guilds"/>
+        /// </remarks>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task containing a collection of <see cref="Guild"/>s.
+        /// </returns>
+        Task<IEnumerable<Guild>> GetCurrentUserGuildsAsync(GetCurrentUserGuildsParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Leaves a guild for the current <see cref="User"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/user#leave-guild"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task LeaveGuildAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Creates a new <see cref="DMChannel"/> with a <see cref="User"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/user#create-dm"/>
+        /// </remarks>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task containing a <see cref="DMChannel"/>.
+        /// </returns>
+        Task<DMChannel> CreateDMAsync(CreateDMParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets the current <see cref="User"/>'s <see cref="Connection"/>s.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/user#get-user-connections"/>
+        /// </remarks>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task containing a collection of <see cref="Connection"/>s.
+        /// </returns>
+        Task<IEnumerable<Connection>> GetUserConnectionsAsync(CancellationToken cancellationToken = default);
+
+        #endregion User
+
+        #region Voice
+
+        /// <summary>
+        /// Gets a collection of <see cref="VoiceRegion"/>s.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/voice#list-voice-regions"/>
+        /// </remarks>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task containing a collection of <see cref="VoiceRegion"/>s.
+        /// </returns>
+        Task<IEnumerable<VoiceRegion>> ListVoiceRegionsAsync(CancellationToken cancellationToken = default);
+
+        #endregion Voice
+
+        #region Webhook
+
+        /// <summary>
+        /// Creates a new <see cref="Webhook"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/webhook#create-webhook"/>
+        /// </remarks>
+        /// <param name="channelId">
+        /// The <see cref="Channel"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task containing the created <see cref="Webhook"/>.
+        /// </returns>
+        Task<Webhook> CreateWebhookAsync(Snowflake channelId, CreateWebhookParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets all <see cref="Webhook"/>s in a <see cref="Channel"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/webhook#get-channel-webhooks"/>
+        /// </remarks>
+        /// <param name="channelId">
+        /// The <see cref="Channel"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task containing a collection of <see cref="Webhook"/>s.
+        /// </returns>
+        Task<IEnumerable<Webhook>> GetChannelWebhooksAsync(Snowflake channelId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets all <see cref="Webhook"/>s in a <see cref="Guild"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/webhook#get-guild-webhooks"/>
+        /// </remarks>
+        /// <param name="guildId">
+        /// The <see cref="Guild"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task containing a collection of <see cref="Webhook"/>s.
+        /// </returns>
+        Task<IEnumerable<Webhook>> GetGuildWebhooksAsync(Snowflake guildId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets the <see cref="Webhook"/> for the given id.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/webhook#get-webhook"/>
+        /// </remarks>
+        /// <param name="webhookId">
+        /// The <see cref="Webhook"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task containing a <see cref="Webhook"/>; or <see langword="null"/> if it does not exist.
+        /// </returns>
+        Task<Webhook> GetWebhookAsync(Snowflake webhookId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets the <see cref="Webhook"/> for the given id and token.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/webhook#get-webhook-with-token"/>
+        /// </remarks>
+        /// <param name="webhookId">
+        /// The <see cref="Webhook"/> identifier.
+        /// </param>
+        /// <param name="webhookToken">
+        /// The <see cref="Webhook"/> token.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task containing a <see cref="Webhook"/>; or <see langword="null"/> if it does not exist.
+        /// </returns>
+        Task<Webhook> GetWebhookAsync(Snowflake webhookId, string webhookToken, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Modifies a <see cref="Webhook"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/webhook#modify-webhook"/>
+        /// </remarks>
+        /// <param name="webhookId">
+        /// The <see cref="Webhook"/> identifier.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task containing the updated <see cref="Webhook"/>.
+        /// </returns>
+        Task<Webhook> ModifyWebhookAsync(Snowflake webhookId, ModifyWebhookParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Modifies a <see cref="Webhook"/> without requiring authentication.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/webhook#modify-webhook-with-token"/>
+        /// </remarks>
+        /// <param name="webhookId">
+        /// The <see cref="Webhook"/> identifier.
+        /// </param>
+        /// <param name="webhookToken">
+        /// The <see cref="Webhook"/> token.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task containing the updated <see cref="Webhook"/>.
+        /// </returns>
+        Task<Webhook> ModifyWebhookAsync(Snowflake webhookId, string webhookToken, ModifyWebhookWithTokenParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Deletes a <see cref="Webhook"/> permanently.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/webhook#delete-webhook"/>
+        /// </remarks>
+        /// <param name="webhookId">
+        /// The <see cref="Webhook"/> identifier.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task DeleteWebhookAsync(Snowflake webhookId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Deletes a <see cref="Webhook"/> permanently without requiring authentication.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/webhook#delete-webhook-with-token"/>
+        /// </remarks>
+        /// <param name="webhookId">
+        /// The <see cref="Webhook"/> identifier.
+        /// </param>
+        /// <param name="webhookToken">
+        /// The <see cref="Webhook"/> token.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task DeleteWebhookAsync(Snowflake webhookId, string webhookToken, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Sends a <see cref="Message"/> as a <see cref="Webhook"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/webhook#execute-webhook"/>
+        /// </remarks>
+        /// <param name="webhookId">
+        /// The <see cref="Webhook"/> identifier.
+        /// </param>
+        /// <param name="webhookToken">
+        /// The <see cref="Webhook"/> token.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the created <see cref="Message"/>.
+        /// </returns>
+        Task<Message> ExecuteWebhookAsync(Snowflake webhookId, string webhookToken, ExecuteWebhookParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets a previously-sent <see cref="Webhook"/> <see cref="Message"/> from the same token.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/webhook#get-webhook-message"/>
+        /// </remarks>
+        /// <param name="messageId">
+        /// The <see cref="Message"/> identifier.
+        /// </param>
+        /// <param name="webhookId">
+        /// The <see cref="Webhook"/> identifier.
+        /// </param>
+        /// <param name="webhookToken">
+        /// The <see cref="Webhook"/> token.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains a <see cref="Message"/>; or <see langword="null"/> if not found.
+        /// </returns>
+        Task<Message> GetWebhookMessageAsync(Snowflake messageId, Snowflake webhookId, string webhookToken, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Edits a previously-sent <see cref="Webhook"/> <see cref="Message"/> from the same token.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/webhook#edit-webhook-message"/>
+        /// </remarks>
+        /// <param name="messageId">
+        /// The <see cref="Message"/> identifier.
+        /// </param>
+        /// <param name="webhookId">
+        /// The <see cref="Webhook"/> identifier.
+        /// </param>
+        /// <param name="webhookToken">
+        /// The <see cref="Webhook"/> token.
+        /// </param>
+        /// <param name="args">
+        /// Parameters to include in the request.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that contains the updated <see cref="Message"/>.
+        /// </returns>
+        Task<Message> EditWebhookMessageAsync(Snowflake messageId, Snowflake webhookId, string webhookToken, EditWebhookMessageParams args, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Deletes a <see cref="Message"/> that was created by the <see cref="Webhook"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see href="https://discord.com/developers/docs/resources/webhook#delete-webhook-message"/>
+        /// </remarks>
+        /// <param name="messageId">
+        /// The <see cref="Message"/> identifier.
+        /// </param>
+        /// <param name="webhookId">
+        /// The <see cref="Webhook"/> identifier.
+        /// </param>
+        /// <param name="webhookToken">
+        /// The <see cref="Webhook"/> token.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token for the request.
+        /// </param>
+        /// <returns>
+        /// A task that represents this asynchronous operation.
+        /// </returns>
+        Task DeleteWebhookMessageAsync(Snowflake messageId, Snowflake webhookId, string webhookToken, CancellationToken cancellationToken = default);
+
+        #endregion Webhook
     }
 }

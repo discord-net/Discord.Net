@@ -11,6 +11,16 @@ namespace Discord.Net.Models
     public record Webhook
     {
         /// <summary>
+        /// Maximum langth of a webhook name.
+        /// </summary>
+        public const int MinNameLength = 1;
+
+        /// <summary>
+        /// Maximum langth of a webhook name.
+        /// </summary>
+        public const int MaxNameLength = 80;
+
+        /// <summary>
         /// The id of the <see cref="Webhook"/>.
         /// </summary>
         [JsonPropertyName("id")]

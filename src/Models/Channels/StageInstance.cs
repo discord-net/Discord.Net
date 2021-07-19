@@ -11,6 +11,16 @@ namespace Discord.Net.Models
     public record StageInstance
     {
         /// <summary>
+        /// Minimum langth of a stage channel topic.
+        /// </summary>
+        public const int MinStageChannelTopicLength = 1;
+
+        /// <summary>
+        /// Maximum langth of a stage channel topic.
+        /// </summary>
+        public const int MaxStageChannelTopicLength = 120;
+
+        /// <summary>
         /// The id of this <see cref="StageInstance"/>.
         /// </summary>
         [JsonPropertyName("id")]

@@ -42,6 +42,16 @@ namespace Discord.Net.Models
         public const int MaxUserLimitToList = 1000;
 
         /// <summary>
+        /// Minimum limit of guilds to list.
+        /// </summary>
+        public const int MinGetGuildsAmount = 1;
+
+        /// <summary>
+        /// Maximum limit of guilds to list.
+        /// </summary>
+        public const int MaxGetGuildsAmount = 200;
+
+        /// <summary>
         /// <see cref="Guild"/> id.
         /// </summary>
         [JsonPropertyName("id")]

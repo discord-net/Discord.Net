@@ -771,5 +771,300 @@ namespace Discord.Net
         }
 
         #endregion Guild
+
+        #region Guild Template
+
+        /// <inheritdoc/>
+        public Task<GuildTemplate> GetGuildTemplateAsync(string templateCode, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotNullOrEmpty(templateCode, nameof(templateCode));
+            return _api.GetGuildTemplateAsync(templateCode, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<Guild> CreateGuildfromGuildTemplateAsync(string templateCode, CreateGuildfromGuildTemplateParams args, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotNullOrEmpty(templateCode, nameof(templateCode));
+            Preconditions.NotNull(args, nameof(args));
+            args.Validate();
+            return _api.CreateGuildfromGuildTemplateAsync(templateCode, args, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<IEnumerable<GuildTemplate>> GetGuildTemplatesAsync(Snowflake guildId, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(guildId, nameof(guildId));
+            return _api.GetGuildTemplatesAsync(guildId, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<GuildTemplate> CreateGuildTemplateAsync(Snowflake guildId, CreateGuildTemplateParams args, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(guildId, nameof(guildId));
+            Preconditions.NotNull(args, nameof(args));
+            args.Validate();
+            return _api.CreateGuildTemplateAsync(guildId, args, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<GuildTemplate> SyncGuildTemplateAsync(Snowflake guildId, string templateCode, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(guildId, nameof(guildId));
+            Preconditions.NotNullOrEmpty(templateCode, nameof(templateCode));
+            return _api.SyncGuildTemplateAsync(guildId, templateCode, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<GuildTemplate> ModifyGuildTemplateAsync(Snowflake guildId, string templateCode, ModifyGuildTemplateParams args, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(guildId, nameof(guildId));
+            Preconditions.NotNullOrEmpty(templateCode, nameof(templateCode));
+            Preconditions.NotNull(args, nameof(args));
+            args.Validate();
+            return _api.ModifyGuildTemplateAsync(guildId, templateCode, args, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<GuildTemplate> DeleteGuildTemplateAsync(Snowflake guildId, string templateCode, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(guildId, nameof(guildId));
+            Preconditions.NotNullOrEmpty(templateCode, nameof(templateCode));
+            return _api.DeleteGuildTemplateAsync(guildId, templateCode, cancellationToken);
+        }
+
+        #endregion Guild Template
+
+        #region Invite
+
+        /// <inheritdoc/>
+        public Task<Invite> GetInviteAsync(string inviteCode, GetInviteParams args, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotNullOrEmpty(inviteCode, nameof(inviteCode));
+            Preconditions.NotNull(args, nameof(args));
+            args.Validate();
+            return _api.GetInviteAsync(inviteCode, args, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<Invite> DeleteInviteAsync(string inviteCode, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotNullOrEmpty(inviteCode, nameof(inviteCode));
+            return _api.DeleteInviteAsync(inviteCode, cancellationToken);
+        }
+
+        #endregion Invite
+
+        #region Stage Instance
+
+        /// <inheritdoc/>
+        public Task<StageInstance> CreateStageInstanceAsync(CreateStageInstanceParams args, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotNull(args, nameof(args));
+            args.Validate();
+            return _api.CreateStageInstanceAsync(args, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<StageInstance> GetStageInstanceAsync(Snowflake channelId, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(channelId, nameof(channelId));
+            return _api.GetStageInstanceAsync(channelId, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<StageInstance> ModifyStageInstanceAsync(Snowflake channelId, ModifyStageInstanceParams args, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(channelId, nameof(channelId));
+            Preconditions.NotNull(args, nameof(args));
+            args.Validate();
+            return _api.ModifyStageInstanceAsync(channelId, args, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task DeleteStageInstanceAsync(Snowflake channelId, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(channelId, nameof(channelId));
+            return _api.DeleteStageInstanceAsync(channelId, cancellationToken);
+        }
+
+        #endregion Stage Instance
+
+        #region User
+
+        /// <inheritdoc/>
+        public Task<User> GetCurrentUserAsync(CancellationToken cancellationToken = default)
+        {
+            return _api.GetCurrentUserAsync(cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<User> GetUserAsync(Snowflake userId, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(userId, nameof(userId));
+            return _api.GetUserAsync(userId, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<User> ModifyCurrentUserAsync(ModifyCurrentUserParams args, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotNull(args, nameof(args));
+            args.Validate();
+            return _api.ModifyCurrentUserAsync(args, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<IEnumerable<Guild>> GetCurrentUserGuildsAsync(GetCurrentUserGuildsParams args, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotNull(args, nameof(args));
+            args.Validate();
+            return _api.GetCurrentUserGuildsAsync(args, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task LeaveGuildAsync(Snowflake guildId, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(guildId, nameof(guildId));
+            return _api.LeaveGuildAsync(guildId, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<DMChannel> CreateDMAsync(CreateDMParams args, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotNull(args, nameof(args));
+            args.Validate();
+            return _api.CreateDMAsync(args, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<IEnumerable<Connection>> GetUserConnectionsAsync(CancellationToken cancellationToken = default)
+        {
+            return _api.GetUserConnectionsAsync(cancellationToken);
+        }
+
+        #endregion User
+
+        #region Voice
+
+        /// <inheritdoc/>
+        public Task<IEnumerable<VoiceRegion>> ListVoiceRegionsAsync(CancellationToken cancellationToken = default)
+        {
+            return _api.ListVoiceRegionsAsync(cancellationToken);
+        }
+
+        #endregion Voice
+
+        #region Webhook
+
+        /// <inheritdoc/>
+        public Task<Webhook> CreateWebhookAsync(Snowflake channelId, CreateWebhookParams args, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(channelId, nameof(channelId));
+            Preconditions.NotNull(args, nameof(args));
+            args.Validate();
+            return _api.CreateWebhookAsync(channelId, args, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<IEnumerable<Webhook>> GetChannelWebhooksAsync(Snowflake channelId, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(channelId, nameof(channelId));
+            return _api.GetChannelWebhooksAsync(channelId, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<IEnumerable<Webhook>> GetGuildWebhooksAsync(Snowflake guildId, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(guildId, nameof(guildId));
+            return _api.GetGuildWebhooksAsync(guildId, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<Webhook> GetWebhookAsync(Snowflake webhookId, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(webhookId, nameof(webhookId));
+            return _api.GetWebhookAsync(webhookId, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<Webhook> GetWebhookAsync(Snowflake webhookId, string webhookToken, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(webhookId, nameof(webhookId));
+            Preconditions.NotNull(webhookToken, nameof(webhookToken));
+            return _api.GetWebhookAsync(webhookId, webhookToken, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<Webhook> ModifyWebhookAsync(Snowflake webhookId, ModifyWebhookParams args, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(webhookId, nameof(webhookId));
+            Preconditions.NotNull(args, nameof(args));
+            args.Validate();
+            return _api.ModifyWebhookAsync(webhookId, args, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<Webhook> ModifyWebhookAsync(Snowflake webhookId, string webhookToken, ModifyWebhookWithTokenParams args, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(webhookId, nameof(webhookId));
+            Preconditions.NotNull(args, nameof(args));
+            args.Validate();
+            return _api.ModifyWebhookAsync(webhookId, webhookToken, args, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task DeleteWebhookAsync(Snowflake webhookId, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(webhookId, nameof(webhookId));
+            return _api.DeleteWebhookAsync(webhookId, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task DeleteWebhookAsync(Snowflake webhookId, string webhookToken, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(webhookId, nameof(webhookId));
+            Preconditions.NotNull(webhookToken, nameof(webhookToken));
+            return _api.DeleteWebhookAsync(webhookId, webhookToken, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<Message> ExecuteWebhookAsync(Snowflake webhookId, string webhookToken, ExecuteWebhookParams args, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(webhookId, nameof(webhookId));
+            Preconditions.NotNull(webhookToken, nameof(webhookToken));
+            Preconditions.NotNull(args, nameof(args));
+            args.Validate();
+            return _api.ExecuteWebhookAsync(webhookId, webhookToken, args, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<Message> GetWebhookMessageAsync(Snowflake messageId, Snowflake webhookId, string webhookToken, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(messageId, nameof(messageId));
+            Preconditions.NotZero(webhookId, nameof(webhookId));
+            Preconditions.NotNull(webhookToken, nameof(webhookToken));
+            return _api.GetWebhookMessageAsync(messageId, webhookId, webhookToken, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task<Message> EditWebhookMessageAsync(Snowflake messageId, Snowflake webhookId, string webhookToken, EditWebhookMessageParams args, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(messageId, nameof(messageId));
+            Preconditions.NotZero(webhookId, nameof(webhookId));
+            Preconditions.NotNull(webhookToken, nameof(webhookToken));
+            Preconditions.NotNull(args, nameof(args));
+            args.Validate();
+            return _api.EditWebhookMessageAsync(messageId, webhookId, webhookToken, args, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public Task DeleteWebhookMessageAsync(Snowflake messageId, Snowflake webhookId, string webhookToken, CancellationToken cancellationToken = default)
+        {
+            Preconditions.NotZero(messageId, nameof(messageId));
+            Preconditions.NotZero(webhookId, nameof(webhookId));
+            Preconditions.NotNull(webhookToken, nameof(webhookToken));
+            return _api.DeleteWebhookMessageAsync(messageId, webhookId, webhookToken, cancellationToken);
+        }
+
+        #endregion Webhook
     }
 }

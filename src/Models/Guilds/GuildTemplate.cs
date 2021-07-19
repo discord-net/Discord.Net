@@ -12,6 +12,26 @@ namespace Discord.Net.Models
     public record GuildTemplate
     {
         /// <summary>
+        /// Minimum langth of a template name.
+        /// </summary>
+        public const int MinTemplateNameLength = 1;
+
+        /// <summary>
+        /// Maximum langth of a template name.
+        /// </summary>
+        public const int MaxTemplateNameLength = 100;
+
+        /// <summary>
+        /// Minimum langth of a template description.
+        /// </summary>
+        public const int MinTemplateDescriptionLength = 0;
+
+        /// <summary>
+        /// Maximum langth of a template description.
+        /// </summary>
+        public const int MaxTemplateDescriptionLength = 120;
+
+        /// <summary>
         /// The template code (unique ID).
         /// </summary>
         [JsonPropertyName("code")]
