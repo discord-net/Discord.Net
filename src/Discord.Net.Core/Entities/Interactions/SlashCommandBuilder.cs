@@ -43,7 +43,7 @@ namespace Discord
                 // Discord updated the docs, this regex prevents special characters like @!$%(... etc,
                 // https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
                 if (!Regex.IsMatch(value, @"^[\w-]{3,32}$"))
-                    throw new ArgumentException("Command name cannot contian any special characters or whitespaces!");
+                    throw new ArgumentException("Command name cannot contain any special characters or whitespaces!");
 
                 _name = value;
             }
