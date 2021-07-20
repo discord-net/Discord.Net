@@ -50,15 +50,15 @@ namespace Discord.WebSocket
             {
                 if (this.Message == null)
                 {
-                    SocketUser author;
+                    SocketUser author = null;
                     if (this.Channel is SocketGuildChannel channel)
                     {
                         if (model.Message.Value.WebhookId.IsSpecified)
                             author = SocketWebhookUser.Create(channel.Guild, Discord.State, model.Message.Value.Author.Value, model.Message.Value.WebhookId.Value);
-                        else
+                        else if (model.Message.Value.Author.IsSpecified)
                             author = channel.Guild.GetUser(model.Message.Value.Author.Value.Id);
                     }
-                    else
+                    else if (model.Message.Value.Author.IsSpecified)
                         author = (this.Channel as SocketChannel).GetUser(model.Message.Value.Author.Value.Id);
 
                     this.Message = SocketUserMessage.Create(this.Discord, this.Discord.State, author, this.Channel, model.Message.Value);
