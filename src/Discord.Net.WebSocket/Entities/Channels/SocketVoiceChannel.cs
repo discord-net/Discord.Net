@@ -20,6 +20,7 @@ namespace Discord.WebSocket
         public int Bitrate { get; private set; }
         /// <inheritdoc />
         public int? UserLimit { get; private set; }
+
         /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
         /// <summary>
@@ -30,6 +31,10 @@ namespace Discord.WebSocket
         /// </returns>
         public ICategoryChannel Category
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
+
+        /// <inheritdoc />
+        public string Mention => MentionUtils.MentionChannel(Id);
+
         /// <inheritdoc />
         public Task SyncPermissionsAsync(RequestOptions options = null)
             => ChannelHelper.SyncPermissionsAsync(this, Discord, options);

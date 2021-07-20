@@ -6,7 +6,7 @@ namespace Discord
     /// <summary>
     ///     Represents a generic voice channel in a guild.
     /// </summary>
-    public interface IVoiceChannel : INestedChannel, IAudioChannel
+    public interface IVoiceChannel : INestedChannel, IAudioChannel, IMentionable
     {
         /// <summary>
         ///     Gets the bit-rate that the clients in this voice channel are requested to use.
