@@ -39,13 +39,19 @@ namespace Discord
         /// </summary>
         public int MaxValues { get; }
 
-        internal SelectMenu(string customId, List<SelectMenuOption> options, string placeholder, int minValues, int maxValues)
+        /// <summary>
+        ///     Whether this menu is disabled or not.
+        /// </summary>
+        public bool Disabled { get; }
+
+        internal SelectMenu(string customId, List<SelectMenuOption> options, string placeholder, int minValues, int maxValues, bool disabled)
         {
             this.CustomId = customId;
             this.Options = options;
             this.Placeholder = placeholder;
             this.MinValues = minValues;
             this.MaxValues = maxValues;
+            this.Disabled = disabled;
         }
     }
 }

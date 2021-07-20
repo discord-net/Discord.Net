@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -54,18 +52,19 @@ namespace Discord
         /// <param name="placeholder">The placeholder of the menu.</param>
         /// <param name="minValues">The min values of the placeholder.</param>
         /// <param name="maxValues">The max values of the placeholder.</param>
+        /// <param name="disabled">Whether or not the menu is disabled.</param>
         /// <param name="row">The row to add the menu to.</param>
         /// <returns></returns>
         public ComponentBuilder WithSelectMenu(string label, string customId, List<SelectMenuOptionBuilder> options,
-            string placeholder = null, int minValues = 1, int maxValues = 1, int row = 0)
+            string placeholder = null, int minValues = 1, int maxValues = 1, bool disabled = false, int row = 0)
         {
             return WithSelectMenu(new SelectMenuBuilder()
-                .WithLabel(label)
                 .WithCustomId(customId)
                 .WithOptions(options)
                 .WithPlaceholder(placeholder)
                 .WithMaxValues(maxValues)
-                .WithMinValues(minValues),
+                .WithMinValues(minValues)
+                .WithDisabled(disabled),
                 row);
         }
 
@@ -558,22 +557,6 @@ namespace Discord
         public const int MaxOptionCount = 25;
 
         /// <summary>
-        ///     Gets or sets the label of the current select menu.
-        /// </summary>
-        public string Label
-        {
-            get => _label;
-            set
-            {
-                if (value != null)
-                    if (value.Length > ComponentBuilder.MaxLabelLength)
-                        throw new ArgumentException(message: $"Button label must be {ComponentBuilder.MaxLabelLength} characters or less!", paramName: nameof(Label));
-
-                _label = value;
-            }
-        }
-
-        /// <summary>
         ///     Gets or sets the custom id of the current select menu.
         /// </summary>
         public string CustomId
@@ -608,11 +591,11 @@ namespace Discord
         /// </summary>
         public int MinValues
         {
-            get => _minvalues;
+            get => _minValues;
             set
             {
                 Preconditions.LessThan(value, MaxValuesCount, nameof(MinValues));
-                _minvalues = value;
+                _minValues = value;
             }
         }
 
@@ -621,11 +604,11 @@ namespace Discord
         /// </summary>
         public int MaxValues
         {
-            get => _maxvalues;
+            get => _maxValues;
             set
             {
                 Preconditions.LessThan(value, MaxValuesCount, nameof(MaxValues));
-                _maxvalues = value;
+                _maxValues = value;
             }
         }
 
@@ -644,11 +627,15 @@ namespace Discord
             }
         }
 
+        /// <summary>
+        ///     Gets or sets whether the current menu is disabled.
+        /// </summary>
+        public bool Disabled { get; set; }
+
         private List<SelectMenuOptionBuilder> _options;
-        private int _minvalues = 1;
-        private int _maxvalues = 1;
+        private int _minValues = 1;
+        private int _maxValues = 1;
         private string _placeholder;
-        private string _label;
         private string _customId;
 
         /// <summary>
@@ -665,19 +652,6 @@ namespace Discord
         {
             this.CustomId = customId;
             this.Options = options;
-        }
-
-        /// <summary>
-        ///     Sets the field label.
-        /// </summary>
-        /// <param name="label">The value to set the field label to.</param>
-        /// <returns>
-        ///     The current builder.
-        /// </returns>
-        public SelectMenuBuilder WithLabel(string label)
-        {
-            this.Label = label;
-            return this;
         }
 
         /// <summary>
@@ -746,14 +720,27 @@ namespace Discord
         }
 
         /// <summary>
+        ///     Sets whether the current menu is disabled.
+        /// </summary>
+        /// <param name="disabled">Whether the current menu is disabled or not.</param>
+        /// <returns>
+        ///     The current builder.
+        /// </returns>
+        public SelectMenuBuilder WithDisabled(bool disabled)
+        {
+            this.Disabled = disabled;
+            return this;
+        }
+
+        /// <summary>
         ///     Builds a <see cref="SelectMenu"/>
         /// </summary>
         /// <returns>The newly built <see cref="SelectMenu"/></returns>
         public SelectMenu Build()
         {
-            var opt = this.Options?.Select(x => x.Build()).ToList();
+            var options = this.Options?.Select(x => x.Build()).ToList();
 
-            return new SelectMenu(this.CustomId, opt, this.Placeholder, this.MinValues, this.MaxValues);
+            return new SelectMenu(this.CustomId, options, this.Placeholder, this.MinValues, this.MaxValues, this.Disabled);
         }
     }
 

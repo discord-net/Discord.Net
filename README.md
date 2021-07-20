@@ -96,7 +96,6 @@ Theres a new field in all `SendMessageAsync` functions that takes in a `MessageC
 var builder = new ComponentBuilder()
   .WithSelectMenu(new SelectMenuBuilder()
   .WithCustomId("id_2")
-  .WithLabel("Select menu!")
   .WithPlaceholder("This is a placeholder")
   .WithOptions(new List<SelectMenuOptionBuilder>()
   {

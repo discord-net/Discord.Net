@@ -2106,7 +2106,7 @@
         </member>
         <member name="M:Discord.Emoji.ToString">
             <summary>
-                Gets the Unicode representation of this emote.
+                Gets the Unicode representation of this emoji.
             </summary>
             <returns>
                 A string that resolves to <see cref="P:Discord.Emoji.Name"/>.
@@ -2123,6 +2123,17 @@
                 Determines whether the specified emoji is equal to the current one.
             </summary>
             <param name="other">The object to compare with the current object.</param>
+        </member>
+        <member name="M:Discord.Emoji.TryParse(System.String,Discord.Emoji@)">
+            <summary> Tries to parse an <see cref="T:Discord.Emoji"/> from its raw format. </summary>
+            <param name="text">The raw encoding of an emoji. For example: <code>:heart: or ❤</code></param>
+            <param name="result">An emoji.</param>
+        </member>
+        <member name="M:Discord.Emoji.Parse(System.String)">
+            <summary> Parse an <see cref="T:Discord.Emoji"/> from its raw format. </summary>
+            <param name="text">The raw encoding of an emoji. For example: <c>:heart: or ❤</c></param>
+            <param name="result">An emoji.</param>
+            <exception cref="T:System.FormatException">String is not emoji or unicode!</exception>
         </member>
         <member name="M:Discord.Emoji.GetHashCode">
             <inheritdoc />
@@ -4361,7 +4372,7 @@
                 Gets or sets the Action Rows for this Component Builder.
             </summary>
         </member>
-        <member name="M:Discord.ComponentBuilder.WithSelectMenu(System.String,System.String,System.Collections.Generic.List{Discord.SelectMenuOptionBuilder},System.String,System.Int32,System.Int32,System.Int32)">
+        <member name="M:Discord.ComponentBuilder.WithSelectMenu(System.String,System.String,System.Collections.Generic.List{Discord.SelectMenuOptionBuilder},System.String,System.Int32,System.Int32,System.Boolean,System.Int32)">
             <summary>
                 Adds a <see cref="T:Discord.SelectMenuBuilder"/> to the first row, if the first row cannot
                 accept the component then it will add it to a row that can
@@ -4372,6 +4383,7 @@
             <param name="placeholder">The placeholder of the menu.</param>
             <param name="minValues">The min values of the placeholder.</param>
             <param name="maxValues">The max values of the placeholder.</param>
+            <param name="disabled">Whether or not the menu is disabled.</param>
             <param name="row">The row to add the menu to.</param>
             <returns></returns>
         </member>
@@ -4607,11 +4619,6 @@
                 The maximum number of options a <see cref="T:Discord.SelectMenu"/> can have.
             </summary>
         </member>
-        <member name="P:Discord.SelectMenuBuilder.Label">
-            <summary>
-                Gets or sets the label of the current select menu.
-            </summary>
-        </member>
         <member name="P:Discord.SelectMenuBuilder.CustomId">
             <summary>
                 Gets or sets the custom id of the current select menu.
@@ -4637,6 +4644,11 @@
                 Gets or sets a collection of <see cref="T:Discord.SelectMenuOptionBuilder"/> for this current select menu.
             </summary>
         </member>
+        <member name="P:Discord.SelectMenuBuilder.Disabled">
+            <summary>
+                Gets or sets whether the current menu is disabled.
+            </summary>
+        </member>
         <member name="M:Discord.SelectMenuBuilder.#ctor">
             <summary>
                 Creates a new instance of a <see cref="T:Discord.SelectMenuBuilder"/>.
@@ -4648,15 +4660,6 @@
             </summary>
             <param name="customId">The custom id of this select menu.</param>
             <param name="options">The options for this select menu.</param>
-        </member>
-        <member name="M:Discord.SelectMenuBuilder.WithLabel(System.String)">
-            <summary>
-                Sets the field label.
-            </summary>
-            <param name="label">The value to set the field label to.</param>
-            <returns>
-                The current builder.
-            </returns>
         </member>
         <member name="M:Discord.SelectMenuBuilder.WithCustomId(System.String)">
             <summary>
@@ -4699,6 +4702,15 @@
                 Sets the field options.
             </summary>
             <param name="options">The value to set the field options to.</param>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.SelectMenuBuilder.WithDisabled(System.Boolean)">
+            <summary>
+                Sets whether the current menu is disabled.
+            </summary>
+            <param name="disabled">Whether the current menu is disabled or not.</param>
             <returns>
                 The current builder.
             </returns>
@@ -4878,6 +4890,11 @@
         <member name="P:Discord.SelectMenu.MaxValues">
             <summary>
                 The maximum number of items that can be chosen; default 1, max 25
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenu.Disabled">
+            <summary>
+                Whether this menu is disabled or not.
             </summary>
         </member>
         <member name="T:Discord.SelectMenuOption">
