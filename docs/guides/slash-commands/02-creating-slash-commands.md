@@ -81,3 +81,4 @@ public async Task Client_Ready()
 }
 
 ```
+**Note**: Slash commands only need to be created once. They do _not_ have to be 'created' on every startup or connection. The example simple shows creating them in the ready event as it's simpler than creating normal bot commands to register slash commands.
