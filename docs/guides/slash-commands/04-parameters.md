@@ -75,7 +75,7 @@ private async Task Client_InteractionCreated(SocketInteraction arg)
     }
 }
 
-private async Task HandleListRoleCommand(SocketSlashCommandData command)
+private async Task HandleListRoleCommand(SocketSlashCommand command)
 {
     // We need to extract the user parameter from the command. since we only have one option and it's required, we can just use the first option.
     var guildUser = (SocketGuildUser)command.Data.Options.First().Value;
