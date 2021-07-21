@@ -23,7 +23,7 @@ namespace Discord
         /// <summary> 
         ///     Returns the maximum count of command options allowed by Discord
         /// </summary>
-        public const int MaxOptionsCount = 10;
+        public const int MaxOptionsCount = 25;
 
         /// <summary>
         ///     The name of this slash command.
@@ -282,7 +282,7 @@ namespace Discord
         /// <summary>
         ///     The maximum number of choices allowed by Discord.
         /// </summary>
-        public const int MaxChoiceCount = 10;
+        public const int MaxChoiceCount = 25;
 
         private string _name;
         private string _description;
