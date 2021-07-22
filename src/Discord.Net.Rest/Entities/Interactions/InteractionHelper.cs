@@ -377,21 +377,26 @@ namespace Discord.Rest
             Preconditions.AtMost(args.Length, 10, nameof(args));
             Preconditions.GreaterThan(args.Length, 0, nameof(args));
 
-            List<ApplicationCommandPermissions> models = new List<ApplicationCommandPermissions>();
+            List<ApplicationCommandPermissions> permissionsList = new List<ApplicationCommandPermissions>();
 
             foreach (var arg in args)
             {
-                var model = new ApplicationCommandPermissions()
+                var permissions = new ApplicationCommandPermissions()
                 {
                     Id = arg.TargetId,
                     Permission = arg.Permission,
                     Type = arg.TargetType
                 };
 
-                models.Add(model);
+                permissionsList.Add(permissions);
             }
 
-            var apiModel = await client.ApiClient.ModifyApplicationCommandPermissions(models.ToArray(), guildId, commandId, options);
+            ModifyGuildApplicationCommandPermissionsParams model = new ModifyGuildApplicationCommandPermissionsParams()
+            {
+                Permissions = permissionsList.ToArray()
+            };
+
+            var apiModel = await client.ApiClient.ModifyApplicationCommandPermissions(model, guildId, commandId, options);
 
             return new GuildApplicationCommandPermission(apiModel.Id, apiModel.ApplicationId, guildId, apiModel.Permissions.Select(
                 x => new ApplicationCommandPermission(x.Id, x.Type, x.Permission)).ToArray());
