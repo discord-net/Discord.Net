@@ -65,7 +65,7 @@ namespace Discord.WebSocket
 
             if (Discord.AlwaysAcknowledgeInteractions)
             {
-                await FollowupAsync(embeds, text, isTTS, ephemeral, type, allowedMentions, options);
+                await FollowupAsync(embeds, text, isTTS, ephemeral, type, allowedMentions, options, component);
                 return;
             }
 
