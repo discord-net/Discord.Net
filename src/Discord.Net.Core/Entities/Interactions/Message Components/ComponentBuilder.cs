@@ -27,6 +27,8 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the Action Rows for this Component Builder.
         /// </summary>
+        /// <exception cref="ArgumentNullException" accessor="set"><see cref="ActionRows"/> cannot be null.</exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="ActionRows"/> count exceeds <see cref="MaxActionRowCount"/>.</exception>
         public List<ActionRowBuilder> ActionRows
         {
             get => _actionRows;
@@ -43,8 +45,8 @@ namespace Discord
         private List<ActionRowBuilder> _actionRows { get; set; }
 
         /// <summary>
-        ///     Adds a <see cref="SelectMenuBuilder"/> to the first row, if the first row cannot
-        ///     accept the component then it will add it to a row that can
+        ///     Adds a <see cref="SelectMenuBuilder"/> to the <see cref="ComponentBuilder"/> at the specific row.
+        ///     If the row cannot accept the component then it will add it to a row that can.
         /// </summary>
         /// <param name="label">The label of the menu.</param>
         /// <param name="customId">The custom id of the menu.</param>
@@ -69,38 +71,34 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Adds a <see cref="SelectMenuBuilder"/> to the first row, if the first row cannot
-        ///     accept the component then it will add it to a row that can
-        /// </summary>
-        /// <param name="menu">The menu to add</param>
-        /// <returns>The current builder.</returns>
-        public ComponentBuilder WithSelectMenu(SelectMenuBuilder menu)
-            => WithSelectMenu(menu, 0);
-
-        /// <summary>
-        ///     Adds a <see cref="SelectMenuBuilder"/> to the current builder at the specific row.
+        ///     Adds a <see cref="SelectMenuBuilder"/> to the <see cref="ComponentBuilder"/> at the specific row.
+        ///     If the row cannot accept the component then it will add it to a row that can.
         /// </summary>
         /// <param name="menu">The menu to add.</param>
         /// <param name="row">The row to attempt to add this component on.</param>
+        /// <exception cref="InvalidOperationException">There is no more row to add a menu.</exception>
+        /// <exception cref="ArgumentException"><paramref name="row"/> must be less than <see cref="MaxActionRowCount"/>.</exception>
         /// <returns>The current builder.</returns>
-        public ComponentBuilder WithSelectMenu(SelectMenuBuilder menu, int row)
+        public ComponentBuilder WithSelectMenu(SelectMenuBuilder menu, int row = 0)
         {
-            Preconditions.LessThan(row, 5, nameof(row));
+            Preconditions.LessThan(row, MaxActionRowCount, nameof(row));
 
             var builtMenu = menu.Build();
 
             if (_actionRows == null)
             {
-                _actionRows = new List<ActionRowBuilder>();
-                _actionRows.Add(new ActionRowBuilder().WithComponent(builtMenu));
+                _actionRows = new List<ActionRowBuilder>
+                {
+                    new ActionRowBuilder().AddComponent(builtMenu)
+                };
             }
             else
             {
                 if (_actionRows.Count == row)
-                    _actionRows.Add(new ActionRowBuilder().WithComponent(builtMenu));
+                    _actionRows.Add(new ActionRowBuilder().AddComponent(builtMenu));
                 else
                 {
-                    ActionRowBuilder actionRow = null;
+                    ActionRowBuilder actionRow;
                     if (_actionRows.Count > row)
                         actionRow = _actionRows.ElementAt(row);
                     else
@@ -110,11 +108,11 @@ namespace Discord
                     }
 
                     if (actionRow.CanTakeComponent(builtMenu))
-                        actionRow.WithComponent(builtMenu);
-                    else if (row < 5)
+                        actionRow.AddComponent(builtMenu);
+                    else if (row < MaxActionRowCount)
                         WithSelectMenu(menu, row + 1);
                     else
-                        throw new ArgumentOutOfRangeException($"There is no more room to add a {nameof(builtMenu)}");
+                        throw new InvalidOperationException($"There is no more row to add a {nameof(builtMenu)}");
                 }
             }
 
@@ -153,37 +151,32 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Adds a button to the first row.
-        /// </summary>
-        /// <param name="button">The button to add to the first row.</param>
-        /// <returns>The current builder.</returns>
-        public ComponentBuilder WithButton(ButtonBuilder button)
-            => this.WithButton(button, 0);
-
-        /// <summary>
-        ///     Adds a button to the specified row.
+        ///     Adds a <see cref="ButtonBuilder"/> to the <see cref="ComponentBuilder"/> at the specific row.
+        ///     If the row cannot accept the component then it will add it to a row that can.
         /// </summary>
         /// <param name="button">The button to add.</param>
         /// <param name="row">The row to add the button.</param>
+        /// <exception cref="InvalidOperationException">There is no more row to add a menu.</exception>
+        /// <exception cref="ArgumentException"><paramref name="row"/> must be less than <see cref="MaxActionRowCount"/>.</exception>
         /// <returns>The current builder.</returns>
         public ComponentBuilder WithButton(ButtonBuilder button, int row = 0)
         {
-            Preconditions.LessThan(row, 5, nameof(row));
+            Preconditions.LessThan(row, MaxActionRowCount, nameof(row));
 
             var builtButton = button.Build();
 
             if (_actionRows == null)
             {
                 _actionRows = new List<ActionRowBuilder>();
-                _actionRows.Add(new ActionRowBuilder().WithComponent(builtButton));
+                _actionRows.Add(new ActionRowBuilder().AddComponent(builtButton));
             }
             else
             {
                 if (_actionRows.Count == row)
-                    _actionRows.Add(new ActionRowBuilder().WithComponent(builtButton));
+                    _actionRows.Add(new ActionRowBuilder().AddComponent(builtButton));
                 else
                 {
-                    ActionRowBuilder actionRow = null;
+                    ActionRowBuilder actionRow;
                     if(_actionRows.Count > row)
                         actionRow = _actionRows.ElementAt(row);
                     else
@@ -193,11 +186,11 @@ namespace Discord
                     }
 
                     if (actionRow.CanTakeComponent(builtButton))
-                        actionRow.WithComponent(builtButton);
-                    else if (row < 5)
+                        actionRow.AddComponent(builtButton);
+                    else if (row < MaxActionRowCount)
                         WithButton(button, row + 1);
                     else
-                        throw new ArgumentOutOfRangeException($"There is no more room to add a {nameof(button)}");
+                        throw new InvalidOperationException($"There is no more row to add a {nameof(button)}");
                 }
             }
 
@@ -207,7 +200,7 @@ namespace Discord
         /// <summary>
         ///     Builds this builder into a <see cref="MessageComponent"/> used to send your components.
         /// </summary>
-        /// <returns>A <see cref="MessageComponent"/> that can be sent with <see cref="IMessageChannel.SendMessageAsync(string, bool, Embed, RequestOptions, AllowedMentions, MessageReference, MessageComponent)"/></returns>
+        /// <returns>A <see cref="MessageComponent"/> that can be sent with <see cref="IMessageChannel.SendMessageAsync(string, bool, Embed, RequestOptions, AllowedMentions, MessageReference, MessageComponent)"/>.</returns>
         public MessageComponent Build()
         {
             if (this._actionRows != null)
@@ -230,14 +223,22 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the components inside this row.
         /// </summary>
+        /// <exception cref="ArgumentNullException" accessor="set"><see cref="Components"/> cannot be null.</exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Components"/> count exceeds <see cref="MaxChildCount"/>.</exception>
         public List<IMessageComponent> Components
         {
             get => _components;
             set
             {
-                if (value != null)
-                    if (value.Count > MaxChildCount)
-                        throw new ArgumentException(message: $"Action row can only contain {MaxChildCount} child components!", paramName: nameof(Components));
+                if (value == null)
+                    throw new ArgumentNullException(message: "Action row components cannot be null!", paramName: nameof(Components));
+
+                if (value.Count <= 0)
+                    throw new ArgumentException(message: "There must be at least 1 component in a row", paramName: nameof(Components));
+
+                if (value.Count > MaxChildCount)
+                    throw new ArgumentException(message: $"Action row can only contain {MaxChildCount} child components!", paramName: nameof(Components));
+
                 _components = value;
             }
         }
@@ -248,6 +249,7 @@ namespace Discord
         ///     Adds a list of components to the current row.
         /// </summary>
         /// <param name="components">The list of components to add.</param>
+        /// <inheritdoc cref="Components"/>
         /// <returns>The current builder.</returns>
         public ActionRowBuilder WithComponents(List<IMessageComponent> components)
         {
@@ -259,14 +261,14 @@ namespace Discord
         ///     Adds a component at the end of the current row.
         /// </summary>
         /// <param name="component">The component to add.</param>
+        /// <exception cref="InvalidOperationException">Components count reached <see cref="MaxChildCount"/></exception>
         /// <returns>The current builder.</returns>
-        public ActionRowBuilder WithComponent(IMessageComponent component)
+        public ActionRowBuilder AddComponent(IMessageComponent component)
         {
-            if (this.Components == null)
-                this.Components = new List<IMessageComponent>();
+            if (this.Components.Count >= MaxChildCount)
+                throw new InvalidOperationException($"Components count reached {MaxChildCount}");
 
             this.Components.Add(component);
-
             return this;
         }
 
@@ -274,16 +276,8 @@ namespace Discord
         ///     Builds the current builder to a <see cref="ActionRowComponent"/> that can be used within a <see cref="ComponentBuilder"/>
         /// </summary>
         /// <returns>A <see cref="ActionRowComponent"/> that can be used within a <see cref="ComponentBuilder"/></returns>
-        /// <exception cref="ArgumentNullException"><see cref="Components"/> cannot be null.</exception>
-        /// <exception cref="ArgumentException">There must be at least 1 component in a row.</exception>
         public ActionRowComponent Build()
         {
-            if (this.Components == null)
-                throw new ArgumentNullException($"{nameof(Components)} cannot be null!");
-
-            if (this.Components.Count == 0)
-                throw new ArgumentException("There must be at least 1 component in a row");
-
             return new ActionRowComponent(this._components);
         }
 
@@ -314,14 +308,14 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the label of the current button.
         /// </summary>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="ComponentBuilder.MaxLabelLength"/>.</exception>
         public string Label
         {
             get => _label;
             set
             {
-                if (value != null)
-                    if (value.Length > ComponentBuilder.MaxLabelLength)
-                        throw new ArgumentException(message: $"Button label must be {ComponentBuilder.MaxLabelLength} characters or less!", paramName: nameof(Label));
+                if (value != null && value.Length > ComponentBuilder.MaxLabelLength)
+                    throw new ArgumentException(message: $"Button label must be {ComponentBuilder.MaxLabelLength} characters or less!", paramName: nameof(Label));
 
                 _label = value;
             }
@@ -330,14 +324,14 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the custom id of the current button.
         /// </summary>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="CustomId"/> length exceeds <see cref="ComponentBuilder.MaxCustomIdLength"/></exception>
         public string CustomId
         {
             get => _customId;
             set
             {
-                if (value != null)
-                    if (value.Length > ComponentBuilder.MaxCustomIdLength)
-                        throw new ArgumentException(message: $"Custom Id must be {ComponentBuilder.MaxCustomIdLength} characters or less!", paramName: nameof(CustomId));
+                if (value != null && value.Length > ComponentBuilder.MaxCustomIdLength)
+                    throw new ArgumentException(message: $"Custom Id must be {ComponentBuilder.MaxCustomIdLength} characters or less!", paramName: nameof(CustomId));
                 _customId = value;
             }
         }
@@ -367,20 +361,50 @@ namespace Discord
         private string _customId;
 
         /// <summary>
+        ///     Creates a new instance of a <see cref="ButtonBuilder"/>.
+        /// </summary>
+        public ButtonBuilder() { }
+
+        /// <summary>
+        ///     Creates a new instance of a <see cref="ButtonBuilder"/>.
+        /// </summary>
+        /// <param name="label">The label to use on the newly created link button.</param>
+        /// <param name="url">The url of this button.</param>
+        /// <param name="customId">The custom ID of this button</param>
+        /// <param name="style">The custom ID of this button</param>
+        /// <param name="emote">The emote of this button</param>
+        /// <param name="disabled">Disabled this button or not</param>
+        public ButtonBuilder(string label, string customId, ButtonStyle style = ButtonStyle.Primary, string url = null, IEmote emote = null, bool disabled = false)
+        {
+            this.CustomId = customId;
+            this.Style = style;
+            this.Url = url;
+            this.Label = label;
+            this.Disabled = disabled;
+            this.Emote = emote;
+        }
+
+        /// <summary>
+        ///     Creates a new instance of a <see cref="ButtonBuilder"/> from instance of a <see cref="ButtonComponent"/>.
+        /// </summary>
+        public ButtonBuilder(ButtonComponent button)
+        {
+            this.CustomId = button.CustomId;
+            this.Style = button.Style;
+            this.Url = button.Url;
+            this.Label = button.Label;
+            this.Disabled = button.Disabled;
+            this.Emote = button.Emote;
+        }
+
+        /// <summary>
         ///     Creates a button with the <see cref="ButtonStyle.Link"/> style.
         /// </summary>
         /// <param name="label">The label to use on the newly created link button.</param>
         /// <param name="url">The url for this link button to go to.</param>
         /// <returns>A builder with the newly created button.</returns>
         public static ButtonBuilder CreateLinkButton(string label, string url)
-        {
-            var builder = new ButtonBuilder()
-                .WithStyle(ButtonStyle.Link)
-                .WithUrl(url)
-                .WithLabel(label);
-
-            return builder;
-        }
+            => new ButtonBuilder(label, null, ButtonStyle.Link, url);
 
         /// <summary>
         ///     Creates a button with the <see cref="ButtonStyle.Danger"/> style.
@@ -389,14 +413,7 @@ namespace Discord
         /// <param name="customId">The custom id for this danger button.</param>
         /// <returns>A builder with the newly created button.</returns>
         public static ButtonBuilder CreateDangerButton(string label, string customId)
-        {
-            var builder = new ButtonBuilder()
-                .WithStyle(ButtonStyle.Danger)
-                .WithCustomId(customId)
-                .WithLabel(label);
-
-            return builder;
-        }
+            => new ButtonBuilder(label, customId, ButtonStyle.Danger);
 
         /// <summary>
         ///     Creates a button with the <see cref="ButtonStyle.Primary"/> style.
@@ -405,14 +422,7 @@ namespace Discord
         /// <param name="customId">The custom id for this primary button.</param>
         /// <returns>A builder with the newly created button.</returns>
         public static ButtonBuilder CreatePrimaryButton(string label, string customId)
-        {
-            var builder = new ButtonBuilder()
-                .WithStyle(ButtonStyle.Primary)
-                .WithCustomId(customId)
-                .WithLabel(label);
-
-            return builder;
-        }
+            => new ButtonBuilder(label, customId);
 
         /// <summary>
         ///     Creates a button with the <see cref="ButtonStyle.Secondary"/> style.
@@ -421,14 +431,7 @@ namespace Discord
         /// <param name="customId">The custom id for this secondary button.</param>
         /// <returns>A builder with the newly created button.</returns>
         public static ButtonBuilder CreateSecondaryButton(string label, string customId)
-        {
-            var builder = new ButtonBuilder()
-                .WithStyle(ButtonStyle.Secondary)
-                .WithCustomId(customId)
-                .WithLabel(label);
-
-            return builder;
-        }
+            => new ButtonBuilder(label, customId, ButtonStyle.Secondary);
 
         /// <summary>
         ///     Creates a button with the <see cref="ButtonStyle.Success"/> style.
@@ -437,19 +440,13 @@ namespace Discord
         /// <param name="customId">The custom id for this success button.</param>
         /// <returns>A builder with the newly created button.</returns>
         public static ButtonBuilder CreateSuccessButton(string label, string customId)
-        {
-            var builder = new ButtonBuilder()
-                .WithStyle(ButtonStyle.Success)
-                .WithCustomId(customId)
-                .WithLabel(label);
-
-            return builder;
-        }
+            => new ButtonBuilder(label, customId, ButtonStyle.Success);
 
         /// <summary>
         ///     Sets the current buttons label to the specified text.
         /// </summary>
         /// <param name="label">The text for the label</param>
+        /// <inheritdoc cref="Label"/>
         /// <returns>The current builder.</returns>
         public ButtonBuilder WithLabel(string label)
         {
@@ -494,6 +491,7 @@ namespace Discord
         ///     Sets the custom id of the current button.
         /// </summary>
         /// <param name="id">The id to use for the current button.</param>
+        /// <inheritdoc cref="CustomId"/>
         /// <returns>The current builder.</returns>
         public ButtonBuilder WithCustomId(string id)
         {
@@ -516,15 +514,15 @@ namespace Discord
         ///     Builds this builder into a <see cref="ButtonComponent"/> to be used in a <see cref="ComponentBuilder"/>.
         /// </summary>
         /// <returns>A <see cref="ButtonComponent"/> to be used in a <see cref="ComponentBuilder"/>.</returns>
-        /// <exception cref="InvalidOperationException">A button cannot contain a URL and a CustomId.</exception>
-        /// <exception cref="ArgumentException">A button must have an Emote or a label.</exception>
+        /// <exception cref="InvalidOperationException">A button cannot contain a <see cref="Url"/> and a <see cref="CustomId"/>.</exception>
+        /// <exception cref="InvalidOperationException">A button must have an <see cref="Emote"/> or a <see cref="Label"/>.</exception>
         public ButtonComponent Build()
         {
             if (string.IsNullOrEmpty(this.Label) && this.Emote == null)
-                throw new ArgumentException("A button must have an Emote or a label!");
+                throw new InvalidOperationException("A button must have an Emote or a label!");
 
             if (!string.IsNullOrEmpty(this.Url) && !string.IsNullOrEmpty(this.CustomId))
-                throw new InvalidOperationException("A button cannot contain a URL and a CustomId");
+                throw new InvalidOperationException("A button cannot contain a URL and a CustomId!");
 
             if (this.Style == ButtonStyle.Link && !string.IsNullOrEmpty(this.CustomId))
                 this.CustomId = null;
@@ -559,14 +557,14 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the custom id of the current select menu.
         /// </summary>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="CustomId"/> length exceeds <see cref="ComponentBuilder.MaxCustomIdLength"/>.</exception>
         public string CustomId
         {
             get => _customId;
             set
             {
-                if (value != null)
-                    if (value.Length > ComponentBuilder.MaxCustomIdLength)
-                        throw new ArgumentException(message: $"Custom Id must be {ComponentBuilder.MaxCustomIdLength} characters or less!", paramName: nameof(CustomId));
+                if (value != null && value.Length > ComponentBuilder.MaxCustomIdLength)
+                    throw new ArgumentException(message: $"Custom Id must be {ComponentBuilder.MaxCustomIdLength} characters or less!", paramName: nameof(CustomId));
                 _customId = value;
             }
         }
@@ -574,6 +572,7 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the placeholder text of the current select menu.
         /// </summary>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Placeholder"/> length exceeds <see cref="MaxPlaceholderLength"/>.</exception>
         public string Placeholder
         {
             get => _placeholder;
@@ -589,6 +588,7 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the minimum values of the current select menu.
         /// </summary>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="MinValues"/> exceeds <see cref="MaxValuesCount"/>.</exception>
         public int MinValues
         {
             get => _minValues;
@@ -602,6 +602,7 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the maximum values of the current select menu.
         /// </summary>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="MaxValues"/> exceeds <see cref="MaxValuesCount"/>.</exception>
         public int MaxValues
         {
             get => _maxValues;
@@ -615,6 +616,8 @@ namespace Discord
         /// <summary>
         ///     Gets or sets a collection of <see cref="SelectMenuOptionBuilder"/> for this current select menu.
         /// </summary>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Options"/> count exceeds <see cref="MaxOptionCount"/>.</exception>
+        /// <exception cref="ArgumentNullException" accessor="set"><see cref="Options"/> is null.</exception>
         public List<SelectMenuOptionBuilder> Options
         {
             get => _options;
@@ -622,6 +625,8 @@ namespace Discord
             {
                 if (value != null)
                     Preconditions.LessThan(value.Count, MaxOptionCount, nameof(Options));
+                else
+                    throw new ArgumentNullException(nameof(value));
 
                 _options = value;
             }
@@ -632,7 +637,7 @@ namespace Discord
         /// </summary>
         public bool Disabled { get; set; }
 
-        private List<SelectMenuOptionBuilder> _options;
+        private List<SelectMenuOptionBuilder> _options = new List<SelectMenuOptionBuilder>();
         private int _minValues = 1;
         private int _maxValues = 1;
         private string _placeholder;
@@ -644,20 +649,44 @@ namespace Discord
         public SelectMenuBuilder() { }
 
         /// <summary>
+        ///     Creates a new instance of a <see cref="SelectMenuBuilder"/> from instance of <see cref="SelectMenu"/>.
+        /// </summary>
+        public SelectMenuBuilder(SelectMenu selectMenu)
+        {
+            this.Placeholder = selectMenu.Placeholder;
+            this.CustomId = selectMenu.Placeholder;
+            this.MaxValues = selectMenu.MaxValues;
+            this.MinValues = selectMenu.MinValues;
+            this.Disabled = selectMenu.Disabled;
+            this.Options = selectMenu.Options?
+               .Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.Default))
+               .ToList();
+        }
+
+        /// <summary>
         ///     Creates a new instance of a <see cref="SelectMenuBuilder"/>.
         /// </summary>
         /// <param name="customId">The custom id of this select menu.</param>
         /// <param name="options">The options for this select menu.</param>
-        public SelectMenuBuilder(string customId, List<SelectMenuOptionBuilder> options)
+        /// <param name="placeholder">The placeholder of this select menu.</param>
+        /// <param name="maxValues">The max values of this select menu.</param>
+        /// <param name="minValues">The min values of this select menu.</param>
+        /// <param name="disabled">Disabled this select menu or not.</param>
+        public SelectMenuBuilder(string customId, List<SelectMenuOptionBuilder> options, string placeholder = null, int maxValues = 1, int minValues = 1, bool disabled = false)
         {
             this.CustomId = customId;
             this.Options = options;
+            this.Placeholder = placeholder;
+            this.Disabled = disabled;
+            this.MaxValues = maxValues;
+            this.MinValues = minValues;
         }
 
         /// <summary>
         ///     Sets the field CustomId.
         /// </summary>
         /// <param name="customId">The value to set the field CustomId to.</param>
+        /// <inheritdoc cref="CustomId"/>
         /// <returns>
         ///     The current builder.
         /// </returns>
@@ -671,6 +700,7 @@ namespace Discord
         ///     Sets the field placeholder.
         /// </summary>
         /// <param name="placeholder">The value to set the field placeholder to.</param>
+        /// <inheritdoc cref="Placeholder"/>
         /// <returns>
         ///     The current builder.
         /// </returns>
@@ -684,6 +714,7 @@ namespace Discord
         ///     Sets the field minValues.
         /// </summary>
         /// <param name="minValues">The value to set the field minValues to.</param>
+        /// <inheritdoc cref="MinValues"/>
         /// <returns>
         ///     The current builder.
         /// </returns>
@@ -697,6 +728,7 @@ namespace Discord
         ///     Sets the field maxValues.
         /// </summary>
         /// <param name="maxValues">The value to set the field maxValues to.</param>
+        /// <inheritdoc cref="MaxValues"/>
         /// <returns>
         ///     The current builder.
         /// </returns>
@@ -710,12 +742,48 @@ namespace Discord
         ///     Sets the field options.
         /// </summary>
         /// <param name="options">The value to set the field options to.</param>
+        /// <inheritdoc cref="Options"/>
         /// <returns>
         ///     The current builder.
         /// </returns>
         public SelectMenuBuilder WithOptions(List<SelectMenuOptionBuilder> options)
         {
             this.Options = options;
+            return this;
+        }
+
+        /// <summary>
+        ///     Add one option to menu options.
+        /// </summary>
+        /// <param name="option">The option builder class containing the option properties.</param>
+        /// <exception cref="InvalidOperationException">Options count reached <see cref="MaxOptionCount"/>.</exception>
+        /// <returns>
+        ///     The current builder.
+        /// </returns>
+        public SelectMenuBuilder AddOption(SelectMenuOptionBuilder option)
+        {
+            if (this.Options.Count >= MaxOptionCount)
+                throw new InvalidOperationException($"Options count reached {MaxOptionCount}.");
+
+            this.Options.Add(option);
+            return this;
+        }
+
+        /// <summary>
+        ///     Add one option to menu options.
+        /// </summary>
+        /// <param name="label">The label for this option.</param>
+        /// <param name="value">The value of this option.</param>
+        /// <param name="description">The description of this option.</param>
+        /// <param name="emote">The emote of this option.</param>
+        /// <param name="default">Render this option as selected by default or not.</param>
+        /// <exception cref="InvalidOperationException">Options count reached <see cref="MaxOptionCount"/>.</exception>
+        /// <returns>
+        ///     The current builder.
+        /// </returns>
+        public SelectMenuBuilder AddOption(string label, string value, string description = null, IEmote emote = null, bool? @default = null)
+        {
+            AddOption(new SelectMenuOptionBuilder(label, value, description, emote, @default));
             return this;
         }
 
@@ -757,6 +825,7 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the label of the current select menu.
         /// </summary>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="ComponentBuilder.MaxLabelLength"/></exception>
         public string Label
         {
             get => _label;
@@ -773,14 +842,14 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the custom id of the current select menu.
         /// </summary>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Value"/> length exceeds <see cref="ComponentBuilder.MaxCustomIdLength"/>.</exception>
         public string Value
         {
             get => _value;
             set
             {
-                if (value != null)
-                    if (value.Length > ComponentBuilder.MaxCustomIdLength)
-                        throw new ArgumentException(message: $"Value must be {ComponentBuilder.MaxCustomIdLength} characters or less!", paramName: nameof(Value));
+                if (value != null && value.Length > ComponentBuilder.MaxCustomIdLength)
+                    throw new ArgumentException(message: $"Value must be {ComponentBuilder.MaxCustomIdLength} characters or less!", paramName: nameof(Value));
                 _value = value;
             }
         }
@@ -788,13 +857,14 @@ namespace Discord
         /// <summary>
         ///     Gets or sets this menu options description.
         /// </summary>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Description"/> length exceeds <see cref="MaxDescriptionLength"/>.</exception>
         public string Description
         {
             get => _description;
             set
             {
-                if (value != null)
-                    Preconditions.LessThan(value.Length, MaxDescriptionLength, nameof(Description));
+                if (value != null && value.Length > MaxDescriptionLength)
+                    throw new ArgumentException($"Description must be {MaxDescriptionLength} characters or less!", nameof(Description));
 
                 _description = value;
             }
@@ -824,16 +894,23 @@ namespace Discord
         /// </summary>
         /// <param name="label">The label for this option.</param>
         /// <param name="value">The value of this option.</param>
-        public SelectMenuOptionBuilder(string label, string value)
+        /// <param name="description">The description of this option.</param>
+        /// <param name="emote">The emote of this option.</param>
+        /// <param name="default">Render this option as selected by default or not.</param>
+        public SelectMenuOptionBuilder(string label, string value, string description = null, IEmote emote = null, bool? @default = null)
         {
             this.Label = label;
             this.Value = value;
+            this.Description = description;
+            this.Emote = emote;
+            this.Default = @default;
         }
 
         /// <summary>
         ///     Sets the field label.
         /// </summary>
         /// <param name="label">The value to set the field label to.</param>
+        /// <inheritdoc cref="Label"/>
         /// <returns>
         ///     The current builder.
         /// </returns>
@@ -847,6 +924,7 @@ namespace Discord
         ///     Sets the field value.
         /// </summary>
         /// <param name="value">The value to set the field value to.</param>
+        /// <inheritdoc cref="Value"/>
         /// <returns>
         ///     The current builder.
         /// </returns>
@@ -860,6 +938,7 @@ namespace Discord
         ///     Sets the field description.
         /// </summary>
         /// <param name="description">The value to set the field description to.</param>
+        /// <inheritdoc cref="Description"/>
         /// <returns>
         ///     The current builder.
         /// </returns>

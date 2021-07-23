@@ -16,20 +16,20 @@ namespace Discord
         private EmbedThumbnail? _thumbnail;
         private List<EmbedFieldBuilder> _fields;
 
-        /// <summary> 
-        ///     Returns the maximum number of fields allowed by Discord. 
+        /// <summary>
+        ///     Returns the maximum number of fields allowed by Discord.
         /// </summary>
         public const int MaxFieldCount = 25;
-        /// <summary> 
-        ///     Returns the maximum length of title allowed by Discord. 
+        /// <summary>
+        ///     Returns the maximum length of title allowed by Discord.
         /// </summary>
         public const int MaxTitleLength = 256;
-        /// <summary> 
-        ///     Returns the maximum length of description allowed by Discord. 
+        /// <summary>
+        ///     Returns the maximum length of description allowed by Discord.
         /// </summary>
         public const int MaxDescriptionLength = 4096;
-        /// <summary> 
-        ///     Returns the maximum length of total characters allowed by Discord. 
+        /// <summary>
+        ///     Returns the maximum length of total characters allowed by Discord.
         /// </summary>
         public const int MaxEmbedLength = 6000;
 
@@ -88,9 +88,9 @@ namespace Discord
         }
 
         /// <summary> Gets or sets the list of <see cref="EmbedFieldBuilder"/> of an <see cref="Embed"/>. </summary>
-        /// <exception cref="ArgumentNullException" accessor="set">An embed builder's fields collection is set to 
+        /// <exception cref="ArgumentNullException" accessor="set">An embed builder's fields collection is set to
         /// <c>null</c>.</exception>
-        /// <exception cref="ArgumentException" accessor="set">Description length exceeds <see cref="MaxFieldCount"/>.
+        /// <exception cref="ArgumentException" accessor="set">Fields count exceeds <see cref="MaxFieldCount"/>.
         /// </exception>
         /// <returns> The list of existing <see cref="EmbedFieldBuilder"/>.</returns>
         public List<EmbedFieldBuilder> Fields
@@ -137,7 +137,7 @@ namespace Discord
         ///     Gets the total length of all embed properties.
         /// </summary>
         /// <returns>
-        ///     The combined length of <see cref="Title"/>, <see cref="EmbedAuthor.Name"/>, <see cref="Description"/>, 
+        ///     The combined length of <see cref="Title"/>, <see cref="EmbedAuthor.Name"/>, <see cref="Description"/>,
         ///     <see cref="EmbedFooter.Text"/>, <see cref="EmbedField.Name"/>, and <see cref="EmbedField.Value"/>.
         /// </returns>
         public int Length
@@ -166,7 +166,7 @@ namespace Discord
             Title = title;
             return this;
         }
-        /// <summary> 
+        /// <summary>
         ///     Sets the description of an <see cref="Embed"/>.
         /// </summary>
         /// <param name="description"> The description to be set. </param>
@@ -178,7 +178,7 @@ namespace Discord
             Description = description;
             return this;
         }
-        /// <summary> 
+        /// <summary>
         ///     Sets the URL of an <see cref="Embed"/>.
         /// </summary>
         /// <param name="url"> The URL to be set. </param>
@@ -190,7 +190,7 @@ namespace Discord
             Url = url;
             return this;
         }
-        /// <summary> 
+        /// <summary>
         ///     Sets the thumbnail URL of an <see cref="Embed"/>.
         /// </summary>
         /// <param name="thumbnailUrl"> The thumbnail URL to be set. </param>
