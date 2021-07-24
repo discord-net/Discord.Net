@@ -1,13 +1,8 @@
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord.API
 {
-    internal class InteractionApplicationCommandCallbackData
+    internal class InteractionCallbackData
     {
         [JsonProperty("tts")]
         public Optional<bool> TTS { get; set; }
@@ -27,12 +22,5 @@ namespace Discord.API
 
         [JsonProperty("components")]
         public Optional<API.ActionRowComponent[]> Components { get; set; }
-
-        public InteractionApplicationCommandCallbackData() { }
-        public InteractionApplicationCommandCallbackData(string text)
-        {
-            this.Content = text;
-        }
-        
     }
 }

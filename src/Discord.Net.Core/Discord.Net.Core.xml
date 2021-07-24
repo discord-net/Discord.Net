@@ -4838,6 +4838,11 @@
             <param name="emote">The emote of this option.</param>
             <param name="default">Render this option as selected by default or not.</param>
         </member>
+        <member name="M:Discord.SelectMenuOptionBuilder.#ctor(Discord.SelectMenuOption)">
+            <summary>
+                Creates a new instance of a <see cref="T:Discord.SelectMenuOptionBuilder"/> from instance of a <see cref="T:Discord.SelectMenuOption"/>.
+            </summary>
+        </member>
         <member name="M:Discord.SelectMenuOptionBuilder.WithLabel(System.String)">
             <summary>
                 Sets the field label.

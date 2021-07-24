@@ -907,6 +907,18 @@ namespace Discord
         }
 
         /// <summary>
+        ///     Creates a new instance of a <see cref="SelectMenuOptionBuilder"/> from instance of a <see cref="SelectMenuOption"/>.
+        /// </summary>
+        public SelectMenuOptionBuilder(SelectMenuOption option)
+        {
+            this.Label = option.Label;
+            this.Value = option.Value;
+            this.Description = option.Description;
+            this.Emote = option.Emote;
+            this.Default = option.Default;
+        }
+
+        /// <summary>
         ///     Sets the field label.
         /// </summary>
         /// <param name="label">The value to set the field label to.</param>

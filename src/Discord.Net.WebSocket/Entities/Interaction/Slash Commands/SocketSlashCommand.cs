@@ -90,16 +90,15 @@ namespace Discord.WebSocket
             }
 
 
-            var response = new API.InteractionResponse()
+            var response = new API.InteractionResponse
             {
                 Type = type,
-                Data = new API.InteractionApplicationCommandCallbackData(text)
+                Data = new API.InteractionCallbackData
                 {
+                    Content = text ?? Optional<string>.Unspecified,
                     AllowedMentions = allowedMentions?.ToModel(),
-                    Embeds = embeds != null
-                        ? embeds.Select(x => x.ToModel()).ToArray()
-                        : Optional<API.Embed[]>.Unspecified,
-                    TTS = isTTS,
+                    Embeds = embeds?.Select(x => x.ToModel()).ToArray() ?? Optional<API.Embed[]>.Unspecified,
+                    TTS = isTTS ? true : Optional<bool>.Unspecified,
                     Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
                 }
             };

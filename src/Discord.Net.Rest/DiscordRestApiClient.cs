@@ -55,7 +55,7 @@ namespace Discord.API
             _restClientProvider = restClientProvider;
             UserAgent = userAgent;
             DefaultRetryMode = defaultRetryMode;
-            _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
+            _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver(), NullValueHandling = NullValueHandling.Ignore };
             UseSystemClock = useSystemClock;
 
             RequestQueue = new RequestQueue();
