@@ -1,11 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.Interaction;
 using DataModel = Discord.API.MessageComponentInteractionData;
-using Newtonsoft.Json.Linq;
 using Discord.Rest;
 
 namespace Discord.WebSocket
@@ -71,18 +68,21 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc/>
-        public override async Task RespondAsync(Embed[] embeds = null, string text = null, bool isTTS = false, InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
-            bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
+        public override async Task RespondAsync(
+            string text = null,
+            Embed[] embeds = null,
+            bool isTTS = false,
+            bool ephemeral = false,
+            AllowedMentions allowedMentions = null,
+            RequestOptions options = null,
+            MessageComponent component = null)
         {
-            if (type == InteractionResponseType.Pong)
-                throw new InvalidOperationException($"Cannot use {Type} on a send message function");
-
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
             if (Discord.AlwaysAcknowledgeInteractions)
             {
-                await FollowupAsync(embeds, text, isTTS, ephemeral, type, allowedMentions, options);
+                await FollowupAsync(text, embeds, isTTS, ephemeral, allowedMentions, options);
                 return;
             }
 
@@ -109,13 +109,13 @@ namespace Discord.WebSocket
 
             var response = new API.InteractionResponse
             {
-                Type = type,
+                Type =  InteractionResponseType.ChannelMessageWithSource,
                 Data = new API.InteractionCallbackData
                 {
                     Content = text ?? Optional<string>.Unspecified,
                     AllowedMentions = allowedMentions?.ToModel(),
                     Embeds = embeds?.Select(x => x.ToModel()).ToArray() ?? Optional<API.Embed[]>.Unspecified,
-                    TTS = type == InteractionResponseType.ChannelMessageWithSource ? isTTS : Optional<bool>.Unspecified,
+                    TTS = isTTS,
                     Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
                 }
             };
@@ -123,17 +123,78 @@ namespace Discord.WebSocket
             if (ephemeral)
                 response.Data.Value.Flags = 64;
 
-            await InteractionHelper.SendInteractionResponse(this.Discord, this.Channel, response, this.Id, Token, options);
+            await InteractionHelper.SendInteractionResponse(this.Discord, response, this.Id, Token, options);
+        }
+
+        /// <summary>
+        ///     Updates the message which this component resides in with the type <see cref="InteractionResponseType.UpdateMessage"/>
+        /// </summary>
+        /// <param name="func">A delegate containing the properties to modify the message with.</param>
+        /// <param name="options">The request options for this async request.</param>
+        /// <returns>A task that represents the asynchronous operation of updating the message.</returns>
+        public async Task UpdateAsync(Action<MessageProperties> func, RequestOptions options = null)
+        {
+            var args = new MessageProperties();
+            func(args);
+
+            if (!IsValidToken)
+                throw new InvalidOperationException("Interaction token is no longer valid");
+
+            if (args.AllowedMentions.IsSpecified)
+            {
+               var allowedMentions = args.AllowedMentions.Value;
+               Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions), "A max of 100 role Ids are allowed.");
+               Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions), "A max of 100 user Ids are allowed.");
+            }
+
+            if (args.Embeds.IsSpecified)
+                Preconditions.AtMost(args.Embeds.Value?.Length ?? 0, 10, nameof(args.Embeds), "A max of 10 embeds are allowed.");
+
+            // check that user flag and user Id list are exclusive, same with role flag and role Id list
+            if (args.AllowedMentions.IsSpecified && args.AllowedMentions.Value != null && args.AllowedMentions.Value.AllowedTypes.HasValue)
+            {
+                var allowedMentions = args.AllowedMentions.Value;
+                if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Users)
+                && allowedMentions.UserIds != null && allowedMentions.UserIds.Count > 0)
+                {
+                    throw new ArgumentException("The Users flag is mutually exclusive with the list of User Ids.", nameof(args.AllowedMentions));
+                }
+
+                if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Roles)
+                && allowedMentions.RoleIds != null && allowedMentions.RoleIds.Count > 0)
+                {
+                    throw new ArgumentException("The Roles flag is mutually exclusive with the list of Role Ids.", nameof(args.AllowedMentions));
+                }
+            }
+
+            var response = new API.InteractionResponse
+            {
+                Type = InteractionResponseType.UpdateMessage,
+                Data = new API.InteractionCallbackData
+                {
+                    Content = args.Content,
+                    AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
+                    Embeds = args.Embeds.IsSpecified ? args.Embeds.Value?.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
+                    Components = args.Components.IsSpecified
+                        ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray()
+                        : Optional<API.ActionRowComponent[]>.Unspecified,
+                    Flags = args.Flags.IsSpecified ? (int?)args.Flags.Value ?? Optional<int>.Unspecified : Optional<int>.Unspecified
+                }
+            };
+
+            await InteractionHelper.SendInteractionResponse(this.Discord, response, this.Id, this.Token, options);
         }
 
         /// <inheritdoc/>
-        public override async Task<RestFollowupMessage> FollowupAsync(Embed[] embeds = null, string text = null, bool isTTS = false, bool ephemeral = false,
-            InteractionResponseType type = InteractionResponseType.ChannelMessageWithSource,
-            AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null)
+        public override async Task<RestFollowupMessage> FollowupAsync(
+            string text = null,
+            Embed[] embeds = null,
+            bool isTTS = false,
+            bool ephemeral = false,
+            AllowedMentions allowedMentions = null,
+            RequestOptions options = null,
+            MessageComponent component = null)
         {
-            if (type == InteractionResponseType.DeferredChannelMessageWithSource || type == InteractionResponseType.DeferredChannelMessageWithSource || type == InteractionResponseType.Pong)
-                throw new InvalidOperationException($"Cannot use {type} on a slash command!");
-
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
@@ -141,13 +202,12 @@ namespace Discord.WebSocket
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds?.Length ?? 0, 10, nameof(embeds), "A max of 10 embeds are allowed.");
 
-            var args = new API.Rest.CreateWebhookMessageParams(text)
+            var args = new API.Rest.CreateWebhookMessageParams
             {
-                AllowedMentions = allowedMentions?.ToModel(),
+                Content = text,
+                AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                 IsTTS = isTTS,
-                Embeds = embeds != null
-                        ? embeds.Select(x => x.ToModel()).ToArray()
-                        : Optional<API.Embed[]>.Unspecified,
+                Embeds = embeds?.Select(x => x.ToModel()).ToArray() ?? Optional<API.Embed[]>.Unspecified,
                 Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
             };
 
@@ -160,10 +220,11 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredUpdateMessage"/>.
         /// </summary>
+        /// <param name="options">The request options for this async request.</param>
         /// <returns>
         ///     A task that represents the asynchronous operation of acknowledging the interaction.
         /// </returns>
-        public override Task AcknowledgeAsync(RequestOptions options = null)
+        public override Task DeferAsync(RequestOptions options = null)
         {
             var response = new API.InteractionResponse()
             {

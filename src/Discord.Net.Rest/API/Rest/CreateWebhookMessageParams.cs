@@ -7,7 +7,7 @@ namespace Discord.API.Rest
     internal class CreateWebhookMessageParams
     {
         [JsonProperty("content")]
-        public string Content { get; }
+        public string Content { get; set;  }
 
         [JsonProperty("nonce")]
         public Optional<string> Nonce { get; set; }
@@ -32,10 +32,5 @@ namespace Discord.API.Rest
 
         [JsonProperty("components")]
         public Optional<API.ActionRowComponent[]> Components { get; set; }
-
-        public CreateWebhookMessageParams(string content)
-        {
-            Content = content;
-        }
     }
 }

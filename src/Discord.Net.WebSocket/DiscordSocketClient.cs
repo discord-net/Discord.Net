@@ -1904,7 +1904,7 @@ namespace Discord.WebSocket
                                         var interaction = SocketInteraction.Create(this, data, channel as ISocketMessageChannel);
 
                                         if (this.AlwaysAcknowledgeInteractions)
-                                            await interaction.AcknowledgeAsync().ConfigureAwait(false);
+                                            await interaction.DeferAsync().ConfigureAwait(false);
 
                                         await TimedInvokeAsync(_interactionCreatedEvent, nameof(InteractionCreated), interaction).ConfigureAwait(false);
                                     }

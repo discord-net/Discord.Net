@@ -120,7 +120,8 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Adds a button to the specified row.
+        ///     Adds a <see cref="ButtonBuilder"/> with specified parameters to the <see cref="ComponentBuilder"/> at the specific row.
+        ///     If the row cannot accept the component then it will add it to a row that can.
         /// </summary>
         /// <param name="label">The label text for the newly added button.</param>
         /// <param name="style">The style of this newly added button.</param>
@@ -131,8 +132,8 @@ namespace Discord
         /// <param name="row">The row the button should be placed on.</param>
         /// <returns>The current builder.</returns>
         public ComponentBuilder WithButton(
-            string label,
-            string customId,
+            string label = null,
+            string customId = null,
             ButtonStyle style = ButtonStyle.Primary,
             IEmote emote = null,
             string url = null,
@@ -374,7 +375,7 @@ namespace Discord
         /// <param name="style">The custom ID of this button</param>
         /// <param name="emote">The emote of this button</param>
         /// <param name="disabled">Disabled this button or not</param>
-        public ButtonBuilder(string label, string customId, ButtonStyle style = ButtonStyle.Primary, string url = null, IEmote emote = null, bool disabled = false)
+        public ButtonBuilder(string label = null, string customId = null, ButtonStyle style = ButtonStyle.Primary, string url = null, IEmote emote = null, bool disabled = false)
         {
             this.CustomId = customId;
             this.Style = style;
@@ -400,47 +401,52 @@ namespace Discord
         /// <summary>
         ///     Creates a button with the <see cref="ButtonStyle.Link"/> style.
         /// </summary>
-        /// <param name="label">The label to use on the newly created link button.</param>
+        /// <param name="label">The label for this link button.</param>
         /// <param name="url">The url for this link button to go to.</param>
+        /// <param name="emote">The emote for this link button</param>
         /// <returns>A builder with the newly created button.</returns>
-        public static ButtonBuilder CreateLinkButton(string label, string url)
-            => new ButtonBuilder(label, null, ButtonStyle.Link, url);
+        public static ButtonBuilder CreateLinkButton(string label, string url, IEmote emote = null)
+            => new ButtonBuilder(label, null, ButtonStyle.Link, url, emote: emote);
 
         /// <summary>
         ///     Creates a button with the <see cref="ButtonStyle.Danger"/> style.
         /// </summary>
         /// <param name="label">The label for this danger button.</param>
         /// <param name="customId">The custom id for this danger button.</param>
+        /// <param name="emote">The emote for this danger button</param>
         /// <returns>A builder with the newly created button.</returns>
-        public static ButtonBuilder CreateDangerButton(string label, string customId)
-            => new ButtonBuilder(label, customId, ButtonStyle.Danger);
+        public static ButtonBuilder CreateDangerButton(string label, string customId, IEmote emote = null)
+            => new ButtonBuilder(label, customId, ButtonStyle.Danger, emote: emote);
 
         /// <summary>
         ///     Creates a button with the <see cref="ButtonStyle.Primary"/> style.
         /// </summary>
         /// <param name="label">The label for this primary button.</param>
         /// <param name="customId">The custom id for this primary button.</param>
+        /// <param name="emote">The emote for this primary button</param>
         /// <returns>A builder with the newly created button.</returns>
-        public static ButtonBuilder CreatePrimaryButton(string label, string customId)
-            => new ButtonBuilder(label, customId);
+        public static ButtonBuilder CreatePrimaryButton(string label, string customId, IEmote emote = null)
+            => new ButtonBuilder(label, customId, emote: emote);
 
         /// <summary>
         ///     Creates a button with the <see cref="ButtonStyle.Secondary"/> style.
         /// </summary>
         /// <param name="label">The label for this secondary button.</param>
         /// <param name="customId">The custom id for this secondary button.</param>
+        /// <param name="emote">The emote for this secondary button</param>
         /// <returns>A builder with the newly created button.</returns>
-        public static ButtonBuilder CreateSecondaryButton(string label, string customId)
-            => new ButtonBuilder(label, customId, ButtonStyle.Secondary);
+        public static ButtonBuilder CreateSecondaryButton(string label, string customId, IEmote emote = null)
+            => new ButtonBuilder(label, customId, ButtonStyle.Secondary, emote: emote);
 
         /// <summary>
         ///     Creates a button with the <see cref="ButtonStyle.Success"/> style.
         /// </summary>
         /// <param name="label">The label for this success button.</param>
         /// <param name="customId">The custom id for this success button.</param>
+        /// <param name="emote">The emote for this success button</param>
         /// <returns>A builder with the newly created button.</returns>
-        public static ButtonBuilder CreateSuccessButton(string label, string customId)
-            => new ButtonBuilder(label, customId, ButtonStyle.Success);
+        public static ButtonBuilder CreateSuccessButton(string label, string customId, IEmote emote = null)
+            => new ButtonBuilder(label, customId, ButtonStyle.Success, emote: emote);
 
         /// <summary>
         ///     Sets the current buttons label to the specified text.
