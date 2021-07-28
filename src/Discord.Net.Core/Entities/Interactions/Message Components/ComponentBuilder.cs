@@ -520,21 +520,29 @@ namespace Discord
         ///     Builds this builder into a <see cref="ButtonComponent"/> to be used in a <see cref="ComponentBuilder"/>.
         /// </summary>
         /// <returns>A <see cref="ButtonComponent"/> to be used in a <see cref="ComponentBuilder"/>.</returns>
-        /// <exception cref="InvalidOperationException">A button cannot contain a <see cref="Url"/> and a <see cref="CustomId"/>.</exception>
+        /// <exception cref="InvalidOperationException">A button must contain either a <see cref="Url"/> or a <see cref="CustomId"/>, but not both.</exception>
         /// <exception cref="InvalidOperationException">A button must have an <see cref="Emote"/> or a <see cref="Label"/>.</exception>
+        /// <exception cref="InvalidOperationException">A link button must contain a URL.</exception>
+        /// <exception cref="InvalidOperationException">A URL must include a protocol (http or https).</exception>
+        /// <exception cref="InvalidOperationException">A non-link button must contain a custom id</exception>
         public ButtonComponent Build()
         {
             if (string.IsNullOrEmpty(this.Label) && this.Emote == null)
                 throw new InvalidOperationException("A button must have an Emote or a label!");
 
-            if (!string.IsNullOrEmpty(this.Url) && !string.IsNullOrEmpty(this.CustomId))
-                throw new InvalidOperationException("A button cannot contain a URL and a CustomId!");
+            if (!(string.IsNullOrEmpty(this.Url) ^ string.IsNullOrEmpty(this.CustomId)))
+                throw new InvalidOperationException("A button must contain either a URL or a CustomId, but not both!");
 
-            if (this.Style == ButtonStyle.Link && !string.IsNullOrEmpty(this.CustomId))
-                this.CustomId = null;
-
-            else if (this.Style != ButtonStyle.Link && !string.IsNullOrEmpty(this.Url)) // Thanks 𝑴𝒓𝑪𝒂𝒌𝒆𝑺𝒍𝒂𝒚𝒆𝒓 :D
-                this.Url = null;
+            if (this.Style == ButtonStyle.Link)
+            {
+                    if (string.IsNullOrEmpty(this.Url))
+                        throw new InvalidOperationException("Link buttons must have a link associated with them");
+                    else if (!Uri.IsWellFormedUriString(this.Url, UriKind.Absolute))
+                        throw new InvalidOperationException("Urls must be well formatted and include their protocol (either HTTP or HTTPS)");
+            }
+            
+            else if (string.IsNullOrEmpty(this.CustomId))
+                throw new InvalidOperationException("Non-link buttons must have a custom id associated with them");
 
             return new ButtonComponent(this.Style, this.Label, this.Emote, this.CustomId, this.Url, this.Disabled);
         }

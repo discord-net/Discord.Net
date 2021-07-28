@@ -4107,6 +4107,11 @@
                 A <see cref="T:Discord.IUser"/> or <see cref="T:Discord.IRole"/>.
             </summary>
         </member>
+        <member name="F:Discord.ApplicationCommandOptionType.Number">
+            <summary>
+                A <see cref="T:System.Double"/>.
+            </summary>
+        </member>
         <member name="T:Discord.ApplicationCommandProperties">
             <summary>
                 Provides properties that are used to modify a <see cref="T:Discord.IApplicationCommand" /> with the specified changes.
@@ -4502,7 +4507,8 @@
         </member>
         <member name="M:Discord.ComponentBuilder.WithButton(System.String,System.String,Discord.ButtonStyle,Discord.IEmote,System.String,System.Boolean,System.Int32)">
             <summary>
-                Adds a button to the specified row.
+                Adds a <see cref="T:Discord.ButtonBuilder"/> with specified parameters to the <see cref="T:Discord.ComponentBuilder"/> at the specific row.
+                If the row cannot accept the component then it will add it to a row that can.
             </summary>
             <param name="label">The label text for the newly added button.</param>
             <param name="style">The style of this newly added button.</param>
@@ -4627,44 +4633,49 @@
                 Creates a new instance of a <see cref="T:Discord.ButtonBuilder"/> from instance of a <see cref="T:Discord.ButtonComponent"/>.
             </summary>
         </member>
-        <member name="M:Discord.ButtonBuilder.CreateLinkButton(System.String,System.String)">
+        <member name="M:Discord.ButtonBuilder.CreateLinkButton(System.String,System.String,Discord.IEmote)">
             <summary>
                 Creates a button with the <see cref="F:Discord.ButtonStyle.Link"/> style.
             </summary>
-            <param name="label">The label to use on the newly created link button.</param>
+            <param name="label">The label for this link button.</param>
             <param name="url">The url for this link button to go to.</param>
+            <param name="emote">The emote for this link button</param>
             <returns>A builder with the newly created button.</returns>
         </member>
-        <member name="M:Discord.ButtonBuilder.CreateDangerButton(System.String,System.String)">
+        <member name="M:Discord.ButtonBuilder.CreateDangerButton(System.String,System.String,Discord.IEmote)">
             <summary>
                 Creates a button with the <see cref="F:Discord.ButtonStyle.Danger"/> style.
             </summary>
             <param name="label">The label for this danger button.</param>
             <param name="customId">The custom id for this danger button.</param>
+            <param name="emote">The emote for this danger button</param>
             <returns>A builder with the newly created button.</returns>
         </member>
-        <member name="M:Discord.ButtonBuilder.CreatePrimaryButton(System.String,System.String)">
+        <member name="M:Discord.ButtonBuilder.CreatePrimaryButton(System.String,System.String,Discord.IEmote)">
             <summary>
                 Creates a button with the <see cref="F:Discord.ButtonStyle.Primary"/> style.
             </summary>
             <param name="label">The label for this primary button.</param>
             <param name="customId">The custom id for this primary button.</param>
+            <param name="emote">The emote for this primary button</param>
             <returns>A builder with the newly created button.</returns>
         </member>
-        <member name="M:Discord.ButtonBuilder.CreateSecondaryButton(System.String,System.String)">
+        <member name="M:Discord.ButtonBuilder.CreateSecondaryButton(System.String,System.String,Discord.IEmote)">
             <summary>
                 Creates a button with the <see cref="F:Discord.ButtonStyle.Secondary"/> style.
             </summary>
             <param name="label">The label for this secondary button.</param>
             <param name="customId">The custom id for this secondary button.</param>
+            <param name="emote">The emote for this secondary button</param>
             <returns>A builder with the newly created button.</returns>
         </member>
-        <member name="M:Discord.ButtonBuilder.CreateSuccessButton(System.String,System.String)">
+        <member name="M:Discord.ButtonBuilder.CreateSuccessButton(System.String,System.String,Discord.IEmote)">
             <summary>
                 Creates a button with the <see cref="F:Discord.ButtonStyle.Success"/> style.
             </summary>
             <param name="label">The label for this success button.</param>
             <param name="customId">The custom id for this success button.</param>
+            <param name="emote">The emote for this success button</param>
             <returns>A builder with the newly created button.</returns>
         </member>
         <member name="M:Discord.ButtonBuilder.WithLabel(System.String)">
@@ -4716,8 +4727,11 @@
                 Builds this builder into a <see cref="T:Discord.ButtonComponent"/> to be used in a <see cref="T:Discord.ComponentBuilder"/>.
             </summary>
             <returns>A <see cref="T:Discord.ButtonComponent"/> to be used in a <see cref="T:Discord.ComponentBuilder"/>.</returns>
-            <exception cref="T:System.InvalidOperationException">A button cannot contain a <see cref="P:Discord.ButtonBuilder.Url"/> and a <see cref="P:Discord.ButtonBuilder.CustomId"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">A button must contain either a <see cref="P:Discord.ButtonBuilder.Url"/> or a <see cref="P:Discord.ButtonBuilder.CustomId"/>, but not both.</exception>
             <exception cref="T:System.InvalidOperationException">A button must have an <see cref="P:Discord.ButtonBuilder.Emote"/> or a <see cref="P:Discord.ButtonBuilder.Label"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">A link button must contain a URL.</exception>
+            <exception cref="T:System.InvalidOperationException">A link must include a protocol (http or https).</exception>
+            <exception cref="T:System.InvalidOperationException">A non-link button must contain a custom id</exception>
         </member>
         <member name="T:Discord.SelectMenuBuilder">
             <summary>
@@ -6010,6 +6024,7 @@
                 The built embed object.
             </returns>
             <exception cref="T:System.InvalidOperationException">Total embed length exceeds <see cref="F:Discord.EmbedBuilder.MaxEmbedLength"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">Any Url must include protocols (i.e http:// or https://).</exception>
         </member>
         <member name="T:Discord.EmbedFieldBuilder">
             <summary>
