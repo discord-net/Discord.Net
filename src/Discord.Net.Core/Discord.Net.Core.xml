@@ -4744,8 +4744,11 @@
                 Builds this builder into a <see cref="T:Discord.ButtonComponent"/> to be used in a <see cref="T:Discord.ComponentBuilder"/>.
             </summary>
             <returns>A <see cref="T:Discord.ButtonComponent"/> to be used in a <see cref="T:Discord.ComponentBuilder"/>.</returns>
-            <exception cref="T:System.InvalidOperationException">A button cannot contain a <see cref="P:Discord.ButtonBuilder.Url"/> and a <see cref="P:Discord.ButtonBuilder.CustomId"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">A button must contain either a <see cref="P:Discord.ButtonBuilder.Url"/> or a <see cref="P:Discord.ButtonBuilder.CustomId"/>, but not both.</exception>
             <exception cref="T:System.InvalidOperationException">A button must have an <see cref="P:Discord.ButtonBuilder.Emote"/> or a <see cref="P:Discord.ButtonBuilder.Label"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">A link button must contain a URL.</exception>
+            <exception cref="T:System.InvalidOperationException">A link must include a protocol (http or https).</exception>
+            <exception cref="T:System.InvalidOperationException">A non-link button must contain a custom id</exception>
         </member>
         <member name="T:Discord.SelectMenuBuilder">
             <summary>
@@ -6038,6 +6041,7 @@
                 The built embed object.
             </returns>
             <exception cref="T:System.InvalidOperationException">Total embed length exceeds <see cref="F:Discord.EmbedBuilder.MaxEmbedLength"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">Any Url must include protocols (i.e http:// or https://).</exception>
         </member>
         <member name="T:Discord.EmbedFieldBuilder">
             <summary>
