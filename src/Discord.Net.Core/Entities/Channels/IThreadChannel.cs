@@ -12,6 +12,11 @@ namespace Discord
     public interface IThreadChannel : ITextChannel, IGuildChannel
     {
         /// <summary>
+        ///     <see langword="true"/> if the current user has joined this thread, otherwise <see langword="false"/>.
+        /// </summary>
+        bool Joined { get; }
+
+        /// <summary>
         ///     <see langword="true"/> if the current thread is archived, otherwise <see langword="false"/>.
         /// </summary>
         bool Archived { get; }
@@ -40,5 +45,17 @@ namespace Discord
         ///     An approximate count of messages in a thread, stops counting at 50.
         /// </summary>
         int MessageCount { get; }
+
+        /// <summary>
+        ///     Joins the current thread.
+        /// </summary>
+        /// <returns></returns>
+        Task JoinAsync();
+
+        /// <summary>
+        ///     Leaves the current thread.
+        /// </summary>
+        /// <returns></returns>
+        Task LeaveAsync();
     }
 }

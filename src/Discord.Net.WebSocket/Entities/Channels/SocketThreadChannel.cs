@@ -2,19 +2,26 @@ using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
+using ThreadMember = Discord.API.ThreadMember;
 
 namespace Discord.WebSocket
 {
     /// <summary>
     ///     Represents a thread channel inside of a guild.
     /// </summary>
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketThreadChannel : SocketGuildChannel, IThreadChannel, ISocketMessageChannel
     {
+
+        /// <inheritdoc/>
+        public bool Joined { get; private set; }
+
         /// <summary>
         ///     <see langword="true"/> if this thread is private, otherwise <see langword="false"/>
         /// </summary>
@@ -65,6 +72,8 @@ namespace Discord.WebSocket
 
         private readonly MessageCache _messages;
 
+        private string DebuggerDisplay => $"{Name} ({Id}, Thread)";
+
         internal SocketThreadChannel(DiscordSocketClient discord, SocketGuild guild, ulong id, SocketTextChannel parent)
             : base(discord, id, guild)
         {
@@ -95,6 +104,11 @@ namespace Discord.WebSocket
                 this.AutoArchiveDuration = (ThreadArchiveDuration)model.ThreadMetadata.Value.AutoArchiveDuration;
                 this.Locked = model.ThreadMetadata.Value.Locked.GetValueOrDefault(false);
             }
+        }
+
+        internal void Update(ClientState state, ThreadMember self)
+        {
+
         }
 
         /// <inheritdoc />
@@ -253,10 +267,10 @@ namespace Discord.WebSocket
 
         public Task GetUsersAsync()
         {
-
+            return Task.CompletedTask;
         }
 
-        private string DebuggerDisplay => $"{Name} ({Id}, Thread)";
+        
         internal new SocketThreadChannel Clone() => MemberwiseClone() as SocketThreadChannel;
 
         //ITextChannel
@@ -325,22 +339,22 @@ namespace Discord.WebSocket
 
         public Task JoinAsync()
         {
-
+            return Task.CompletedTask;
         }
 
         public Task LeaveAsync()
         {
-
+            return Task.CompletedTask;
         }
 
         public Task AddThreadMember(IGuildUser user)
         {
-
+            return Task.CompletedTask;
         }
 
         public Task RemoveThreadMember(IGuildUser user)
         {
-
+            return Task.CompletedTask;
         }
 
 

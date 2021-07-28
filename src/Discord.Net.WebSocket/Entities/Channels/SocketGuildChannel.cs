@@ -66,9 +66,9 @@ namespace Discord.WebSocket
         internal override void Update(ClientState state, Model model)
         {
             Name = model.Name.Value;
-            Position = model.Position.Value;
+            Position = model.Position.GetValueOrDefault(0);
             
-            var overwrites = model.PermissionOverwrites.Value;
+            var overwrites = model.PermissionOverwrites.GetValueOrDefault(new API.Overwrite[0]);
             var newOverwrites = ImmutableArray.CreateBuilder<Overwrite>(overwrites.Length);
             for (int i = 0; i < overwrites.Length; i++)
                 newOverwrites.Add(overwrites[i].ToEntity());

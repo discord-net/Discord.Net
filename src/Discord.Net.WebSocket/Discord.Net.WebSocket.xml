@@ -756,6 +756,21 @@
                 </note>
             </remarks>
         </member>
+        <member name="E:Discord.WebSocket.BaseSocketClient.ThreadCreated">
+            <summary>
+                Fired when a thread is created within a guild.
+            </summary>
+        </member>
+        <member name="E:Discord.WebSocket.BaseSocketClient.ThreadUpdated">
+            <summary>
+                Fired when a thread is updated within a guild.
+            </summary>
+        </member>
+        <member name="E:Discord.WebSocket.BaseSocketClient.ThreadDeleted">
+            <summary>
+                Fired when a thread is deleted.
+            </summary>
+        </member>
         <member name="P:Discord.WebSocket.DiscordShardedClient.Latency">
             <inheritdoc />
         </member>
@@ -2154,6 +2169,11 @@
         <member name="P:Discord.WebSocket.SocketTextChannel.Users">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketTextChannel.Threads">
+            <summary>
+                Gets a collection of threads within this text channel.
+            </summary>
+        </member>
         <member name="M:Discord.WebSocket.SocketTextChannel.ModifyAsync(System.Action{Discord.TextChannelProperties},Discord.RequestOptions)">
             <inheritdoc />
         </member>
@@ -2360,8 +2380,18 @@
                 Represents a thread channel inside of a guild.
             </summary>
         </member>
-        <member name="P:Discord.WebSocket.SocketThreadChannel.ParentChannel">
+        <member name="P:Discord.WebSocket.SocketThreadChannel.Joined">
             <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadChannel.IsPrivateThread">
+            <summary>
+                <see langword="true"/> if this thread is private, otherwise <see langword="false"/>
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadChannel.ParentChannel">
+            <summary>
+                Gets the parent channel this thread resides in.
+            </summary>
         </member>
         <member name="P:Discord.WebSocket.SocketThreadChannel.MessageCount">
             <inheritdoc/>
@@ -2846,6 +2876,14 @@
             </summary>
             <returns>
                 A read-only collection of category channels found within this guild.
+            </returns>
+        </member>
+        <member name="P:Discord.WebSocket.SocketGuild.ThreadChannels">
+            <summary>
+                Gets a collection of all thread channels in this guild.
+            </summary>
+            <returns>
+                A read-only collection of thread channels found within this guild.
             </returns>
         </member>
         <member name="P:Discord.WebSocket.SocketGuild.CurrentUser">
@@ -3431,10 +3469,11 @@
         </member>
         <member name="M:Discord.WebSocket.SocketMessageComponent.UpdateAsync(System.Action{Discord.MessageProperties},Discord.RequestOptions)">
             <summary>
-                Updates the original message of the component on which the interaction was received on.
+                Updates the message which this component resides in with the type <see cref="F:Discord.InteractionResponseType.UpdateMessage"/>
             </summary>
             <param name="func">A delegate containing the properties to modify the message with.</param>
             <param name="options">The request options for this async request.</param>
+            <returns>A task that represents the asynchronous operation of updating the message.</returns>
         </member>
         <member name="M:Discord.WebSocket.SocketMessageComponent.FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)">
             <inheritdoc/>
@@ -3688,6 +3727,14 @@
             <param name="func">A delegate containing the properties to modify the message with.</param>
             <param name="options">The request options for this async request.</param>
             <returns>A <see cref="T:Discord.Rest.RestInteractionMessage"/> that represents the initial response.</returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketInteraction.AcknowledgeAsync(Discord.RequestOptions)">
+            <summary>
+                Acknowledges this interaction.
+            </summary>
+            <returns>
+                A task that represents the asynchronous operation of acknowledging the interaction.
+            </returns>
         </member>
         <member name="M:Discord.WebSocket.SocketInteraction.DeferAsync(Discord.RequestOptions)">
             <summary>
@@ -4487,6 +4534,156 @@
         </member>
         <member name="M:Discord.WebSocket.SocketSelfUser.ModifyAsync(System.Action{Discord.SelfUserProperties},Discord.RequestOptions)">
             <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.Thread">
+            <summary>
+                Gets the <see cref="T:Discord.WebSocket.SocketThreadChannel"/> this user is in.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.ThreadJoinedAt">
+            <summary>
+                Gets the timestamp for when this user joined this thread.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.Guild">
+            <summary>
+                Gets the guild this user is in.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.JoinedAt">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.Nickname">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.PremiumSince">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.IsPending">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.AvatarId">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.Discriminator">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.DiscriminatorValue">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.IsBot">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.IsWebhook">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.Username">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.PublicFlags">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.CreatedAt">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.Id">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.Mention">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.Status">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.ActiveClients">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.Activities">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.IsDeafened">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.IsMuted">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.IsSelfDeafened">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.IsSelfMuted">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.IsSuppressed">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.VoiceChannel">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.VoiceSessionId">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.IsStreaming">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadUser.GetPermissions(Discord.IGuildChannel)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadUser.KickAsync(System.String,Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadUser.ModifyAsync(System.Action{Discord.GuildUserProperties},Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadUser.AddRoleAsync(System.UInt64,Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadUser.AddRoleAsync(Discord.IRole,Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadUser.AddRolesAsync(System.Collections.Generic.IEnumerable{System.UInt64},Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadUser.AddRolesAsync(System.Collections.Generic.IEnumerable{Discord.IRole},Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadUser.RemoveRoleAsync(System.UInt64,Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadUser.RemoveRoleAsync(Discord.IRole,Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadUser.RemoveRolesAsync(System.Collections.Generic.IEnumerable{System.UInt64},Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadUser.RemoveRolesAsync(System.Collections.Generic.IEnumerable{Discord.IRole},Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadUser.GetAvatarUrl(Discord.ImageFormat,System.UInt16)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadUser.GetDefaultAvatarUrl">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadUser.CreateDMChannelAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.Discord#IGuildUser#GuildPermissions">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.Discord#IGuildUser#Guild">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.Discord#IGuildUser#GuildId">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.Discord#IGuildUser#RoleIds">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadUser.op_Explicit(Discord.WebSocket.SocketThreadUser)~Discord.WebSocket.SocketGuildUser">
+            <summary>
+                Gets the guild user of this thread user.
+            </summary>
+            <param name="user"></param>
         </member>
         <member name="T:Discord.WebSocket.SocketUnknownUser">
             <summary>
