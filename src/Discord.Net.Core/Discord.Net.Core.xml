@@ -2206,7 +2206,7 @@
         </member>
         <member name="M:Discord.Emoji.ToString">
             <summary>
-                Gets the Unicode representation of this emote.
+                Gets the Unicode representation of this emoji.
             </summary>
             <returns>
                 A string that resolves to <see cref="P:Discord.Emoji.Name"/>.
@@ -2223,6 +2223,17 @@
                 Determines whether the specified emoji is equal to the current one.
             </summary>
             <param name="other">The object to compare with the current object.</param>
+        </member>
+        <member name="M:Discord.Emoji.TryParse(System.String,Discord.Emoji@)">
+            <summary> Tries to parse an <see cref="T:Discord.Emoji"/> from its raw format. </summary>
+            <param name="text">The raw encoding of an emoji. For example: <code>:heart: or ❤</code></param>
+            <param name="result">An emoji.</param>
+        </member>
+        <member name="M:Discord.Emoji.Parse(System.String)">
+            <summary> Parse an <see cref="T:Discord.Emoji"/> from its raw format. </summary>
+            <param name="text">The raw encoding of an emoji. For example: <c>:heart: or ❤</c></param>
+            <param name="result">An emoji.</param>
+            <exception cref="T:System.FormatException">String is not emoji or unicode!</exception>
         </member>
         <member name="M:Discord.Emoji.GetHashCode">
             <inheritdoc />
@@ -4460,11 +4471,13 @@
             <summary>
                 Gets or sets the Action Rows for this Component Builder.
             </summary>
+            <exception cref="T:System.ArgumentNullException" accessor="set"><see cref="P:Discord.ComponentBuilder.ActionRows"/> cannot be null.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ComponentBuilder.ActionRows"/> count exceeds <see cref="F:Discord.ComponentBuilder.MaxActionRowCount"/>.</exception>
         </member>
-        <member name="M:Discord.ComponentBuilder.WithSelectMenu(System.String,System.String,System.Collections.Generic.List{Discord.SelectMenuOptionBuilder},System.String,System.Int32,System.Int32,System.Int32)">
+        <member name="M:Discord.ComponentBuilder.WithSelectMenu(System.String,System.String,System.Collections.Generic.List{Discord.SelectMenuOptionBuilder},System.String,System.Int32,System.Int32,System.Boolean,System.Int32)">
             <summary>
-                Adds a <see cref="T:Discord.SelectMenuBuilder"/> to the first row, if the first row cannot
-                accept the component then it will add it to a row that can
+                Adds a <see cref="T:Discord.SelectMenuBuilder"/> to the <see cref="T:Discord.ComponentBuilder"/> at the specific row.
+                If the row cannot accept the component then it will add it to a row that can.
             </summary>
             <param name="label">The label of the menu.</param>
             <param name="customId">The custom id of the menu.</param>
@@ -4472,23 +4485,19 @@
             <param name="placeholder">The placeholder of the menu.</param>
             <param name="minValues">The min values of the placeholder.</param>
             <param name="maxValues">The max values of the placeholder.</param>
+            <param name="disabled">Whether or not the menu is disabled.</param>
             <param name="row">The row to add the menu to.</param>
             <returns></returns>
         </member>
-        <member name="M:Discord.ComponentBuilder.WithSelectMenu(Discord.SelectMenuBuilder)">
-            <summary>
-                Adds a <see cref="T:Discord.SelectMenuBuilder"/> to the first row, if the first row cannot
-                accept the component then it will add it to a row that can
-            </summary>
-            <param name="menu">The menu to add</param>
-            <returns>The current builder.</returns>
-        </member>
         <member name="M:Discord.ComponentBuilder.WithSelectMenu(Discord.SelectMenuBuilder,System.Int32)">
             <summary>
-                Adds a <see cref="T:Discord.SelectMenuBuilder"/> to the current builder at the specific row.
+                Adds a <see cref="T:Discord.SelectMenuBuilder"/> to the <see cref="T:Discord.ComponentBuilder"/> at the specific row.
+                If the row cannot accept the component then it will add it to a row that can.
             </summary>
             <param name="menu">The menu to add.</param>
             <param name="row">The row to attempt to add this component on.</param>
+            <exception cref="T:System.InvalidOperationException">There is no more row to add a menu.</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="row"/> must be less than <see cref="F:Discord.ComponentBuilder.MaxActionRowCount"/>.</exception>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.ComponentBuilder.WithButton(System.String,System.String,Discord.ButtonStyle,Discord.IEmote,System.String,System.Boolean,System.Int32)">
@@ -4504,26 +4513,22 @@
             <param name="row">The row the button should be placed on.</param>
             <returns>The current builder.</returns>
         </member>
-        <member name="M:Discord.ComponentBuilder.WithButton(Discord.ButtonBuilder)">
-            <summary>
-                Adds a button to the first row.
-            </summary>
-            <param name="button">The button to add to the first row.</param>
-            <returns>The current builder.</returns>
-        </member>
         <member name="M:Discord.ComponentBuilder.WithButton(Discord.ButtonBuilder,System.Int32)">
             <summary>
-                Adds a button to the specified row.
+                Adds a <see cref="T:Discord.ButtonBuilder"/> to the <see cref="T:Discord.ComponentBuilder"/> at the specific row.
+                If the row cannot accept the component then it will add it to a row that can.
             </summary>
             <param name="button">The button to add.</param>
             <param name="row">The row to add the button.</param>
+            <exception cref="T:System.InvalidOperationException">There is no more row to add a menu.</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="row"/> must be less than <see cref="F:Discord.ComponentBuilder.MaxActionRowCount"/>.</exception>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.ComponentBuilder.Build">
             <summary>
                 Builds this builder into a <see cref="T:Discord.MessageComponent"/> used to send your components.
             </summary>
-            <returns>A <see cref="T:Discord.MessageComponent"/> that can be sent with <see cref="M:Discord.IMessageChannel.SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)"/></returns>
+            <returns>A <see cref="T:Discord.MessageComponent"/> that can be sent with <see cref="M:Discord.IMessageChannel.SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)"/>.</returns>
         </member>
         <member name="T:Discord.ActionRowBuilder">
             <summary>
@@ -4539,19 +4544,23 @@
             <summary>
                 Gets or sets the components inside this row.
             </summary>
+            <exception cref="T:System.ArgumentNullException" accessor="set"><see cref="P:Discord.ActionRowBuilder.Components"/> cannot be null.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ActionRowBuilder.Components"/> count exceeds <see cref="F:Discord.ActionRowBuilder.MaxChildCount"/>.</exception>
         </member>
         <member name="M:Discord.ActionRowBuilder.WithComponents(System.Collections.Generic.List{Discord.IMessageComponent})">
             <summary>
                 Adds a list of components to the current row.
             </summary>
             <param name="components">The list of components to add.</param>
+            <inheritdoc cref="P:Discord.ActionRowBuilder.Components"/>
             <returns>The current builder.</returns>
         </member>
-        <member name="M:Discord.ActionRowBuilder.WithComponent(Discord.IMessageComponent)">
+        <member name="M:Discord.ActionRowBuilder.AddComponent(Discord.IMessageComponent)">
             <summary>
                 Adds a component at the end of the current row.
             </summary>
             <param name="component">The component to add.</param>
+            <exception cref="T:System.InvalidOperationException">Components count reached <see cref="F:Discord.ActionRowBuilder.MaxChildCount"/></exception>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.ActionRowBuilder.Build">
@@ -4559,8 +4568,6 @@
                 Builds the current builder to a <see cref="T:Discord.ActionRowComponent"/> that can be used within a <see cref="T:Discord.ComponentBuilder"/>
             </summary>
             <returns>A <see cref="T:Discord.ActionRowComponent"/> that can be used within a <see cref="T:Discord.ComponentBuilder"/></returns>
-            <exception cref="T:System.ArgumentNullException"><see cref="P:Discord.ActionRowBuilder.Components"/> cannot be null.</exception>
-            <exception cref="T:System.ArgumentException">There must be at least 1 component in a row.</exception>
         </member>
         <member name="T:Discord.ButtonBuilder">
             <summary>
@@ -4571,11 +4578,13 @@
             <summary>
                 Gets or sets the label of the current button.
             </summary>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ButtonBuilder.Label"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxLabelLength"/>.</exception>
         </member>
         <member name="P:Discord.ButtonBuilder.CustomId">
             <summary>
                 Gets or sets the custom id of the current button.
             </summary>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ButtonBuilder.CustomId"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxCustomIdLength"/></exception>
         </member>
         <member name="P:Discord.ButtonBuilder.Style">
             <summary>
@@ -4595,6 +4604,27 @@
         <member name="P:Discord.ButtonBuilder.Disabled">
             <summary>
                 Gets or sets whether the current button is disabled.
+            </summary>
+        </member>
+        <member name="M:Discord.ButtonBuilder.#ctor">
+            <summary>
+                Creates a new instance of a <see cref="T:Discord.ButtonBuilder"/>.
+            </summary>
+        </member>
+        <member name="M:Discord.ButtonBuilder.#ctor(System.String,System.String,Discord.ButtonStyle,System.String,Discord.IEmote,System.Boolean)">
+            <summary>
+                Creates a new instance of a <see cref="T:Discord.ButtonBuilder"/>.
+            </summary>
+            <param name="label">The label to use on the newly created link button.</param>
+            <param name="url">The url of this button.</param>
+            <param name="customId">The custom ID of this button</param>
+            <param name="style">The custom ID of this button</param>
+            <param name="emote">The emote of this button</param>
+            <param name="disabled">Disabled this button or not</param>
+        </member>
+        <member name="M:Discord.ButtonBuilder.#ctor(Discord.ButtonComponent)">
+            <summary>
+                Creates a new instance of a <see cref="T:Discord.ButtonBuilder"/> from instance of a <see cref="T:Discord.ButtonComponent"/>.
             </summary>
         </member>
         <member name="M:Discord.ButtonBuilder.CreateLinkButton(System.String,System.String)">
@@ -4642,6 +4672,7 @@
                 Sets the current buttons label to the specified text.
             </summary>
             <param name="label">The text for the label</param>
+            <inheritdoc cref="P:Discord.ButtonBuilder.Label"/>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.ButtonBuilder.WithStyle(Discord.ButtonStyle)">
@@ -4670,6 +4701,7 @@
                 Sets the custom id of the current button.
             </summary>
             <param name="id">The id to use for the current button.</param>
+            <inheritdoc cref="P:Discord.ButtonBuilder.CustomId"/>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.ButtonBuilder.WithDisabled(System.Boolean)">
@@ -4684,8 +4716,8 @@
                 Builds this builder into a <see cref="T:Discord.ButtonComponent"/> to be used in a <see cref="T:Discord.ComponentBuilder"/>.
             </summary>
             <returns>A <see cref="T:Discord.ButtonComponent"/> to be used in a <see cref="T:Discord.ComponentBuilder"/>.</returns>
-            <exception cref="T:System.InvalidOperationException">A button cannot contain a URL and a CustomId.</exception>
-            <exception cref="T:System.ArgumentException">A button must have an Emote or a label.</exception>
+            <exception cref="T:System.InvalidOperationException">A button cannot contain a <see cref="P:Discord.ButtonBuilder.Url"/> and a <see cref="P:Discord.ButtonBuilder.CustomId"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">A button must have an <see cref="P:Discord.ButtonBuilder.Emote"/> or a <see cref="P:Discord.ButtonBuilder.Label"/>.</exception>
         </member>
         <member name="T:Discord.SelectMenuBuilder">
             <summary>
@@ -4707,34 +4739,40 @@
                 The maximum number of options a <see cref="T:Discord.SelectMenu"/> can have.
             </summary>
         </member>
-        <member name="P:Discord.SelectMenuBuilder.Label">
-            <summary>
-                Gets or sets the label of the current select menu.
-            </summary>
-        </member>
         <member name="P:Discord.SelectMenuBuilder.CustomId">
             <summary>
                 Gets or sets the custom id of the current select menu.
             </summary>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.CustomId"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxCustomIdLength"/>.</exception>
         </member>
         <member name="P:Discord.SelectMenuBuilder.Placeholder">
             <summary>
                 Gets or sets the placeholder text of the current select menu.
             </summary>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.Placeholder"/> length exceeds <see cref="F:Discord.SelectMenuBuilder.MaxPlaceholderLength"/>.</exception>
         </member>
         <member name="P:Discord.SelectMenuBuilder.MinValues">
             <summary>
                 Gets or sets the minimum values of the current select menu.
             </summary>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.MinValues"/> exceeds <see cref="F:Discord.SelectMenuBuilder.MaxValuesCount"/>.</exception>
         </member>
         <member name="P:Discord.SelectMenuBuilder.MaxValues">
             <summary>
                 Gets or sets the maximum values of the current select menu.
             </summary>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.MaxValues"/> exceeds <see cref="F:Discord.SelectMenuBuilder.MaxValuesCount"/>.</exception>
         </member>
         <member name="P:Discord.SelectMenuBuilder.Options">
             <summary>
                 Gets or sets a collection of <see cref="T:Discord.SelectMenuOptionBuilder"/> for this current select menu.
+            </summary>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.Options"/> count exceeds <see cref="F:Discord.SelectMenuBuilder.MaxOptionCount"/>.</exception>
+            <exception cref="T:System.ArgumentNullException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.Options"/> is null.</exception>
+        </member>
+        <member name="P:Discord.SelectMenuBuilder.Disabled">
+            <summary>
+                Gets or sets whether the current menu is disabled.
             </summary>
         </member>
         <member name="M:Discord.SelectMenuBuilder.#ctor">
@@ -4742,27 +4780,28 @@
                 Creates a new instance of a <see cref="T:Discord.SelectMenuBuilder"/>.
             </summary>
         </member>
-        <member name="M:Discord.SelectMenuBuilder.#ctor(System.String,System.Collections.Generic.List{Discord.SelectMenuOptionBuilder})">
+        <member name="M:Discord.SelectMenuBuilder.#ctor(Discord.SelectMenu)">
+            <summary>
+                Creates a new instance of a <see cref="T:Discord.SelectMenuBuilder"/> from instance of <see cref="T:Discord.SelectMenu"/>.
+            </summary>
+        </member>
+        <member name="M:Discord.SelectMenuBuilder.#ctor(System.String,System.Collections.Generic.List{Discord.SelectMenuOptionBuilder},System.String,System.Int32,System.Int32,System.Boolean)">
             <summary>
                 Creates a new instance of a <see cref="T:Discord.SelectMenuBuilder"/>.
             </summary>
             <param name="customId">The custom id of this select menu.</param>
             <param name="options">The options for this select menu.</param>
-        </member>
-        <member name="M:Discord.SelectMenuBuilder.WithLabel(System.String)">
-            <summary>
-                Sets the field label.
-            </summary>
-            <param name="label">The value to set the field label to.</param>
-            <returns>
-                The current builder.
-            </returns>
+            <param name="placeholder">The placeholder of this select menu.</param>
+            <param name="maxValues">The max values of this select menu.</param>
+            <param name="minValues">The min values of this select menu.</param>
+            <param name="disabled">Disabled this select menu or not.</param>
         </member>
         <member name="M:Discord.SelectMenuBuilder.WithCustomId(System.String)">
             <summary>
                 Sets the field CustomId.
             </summary>
             <param name="customId">The value to set the field CustomId to.</param>
+            <inheritdoc cref="P:Discord.SelectMenuBuilder.CustomId"/>
             <returns>
                 The current builder.
             </returns>
@@ -4772,6 +4811,7 @@
                 Sets the field placeholder.
             </summary>
             <param name="placeholder">The value to set the field placeholder to.</param>
+            <inheritdoc cref="P:Discord.SelectMenuBuilder.Placeholder"/>
             <returns>
                 The current builder.
             </returns>
@@ -4781,6 +4821,7 @@
                 Sets the field minValues.
             </summary>
             <param name="minValues">The value to set the field minValues to.</param>
+            <inheritdoc cref="P:Discord.SelectMenuBuilder.MinValues"/>
             <returns>
                 The current builder.
             </returns>
@@ -4790,6 +4831,7 @@
                 Sets the field maxValues.
             </summary>
             <param name="maxValues">The value to set the field maxValues to.</param>
+            <inheritdoc cref="P:Discord.SelectMenuBuilder.MaxValues"/>
             <returns>
                 The current builder.
             </returns>
@@ -4799,6 +4841,40 @@
                 Sets the field options.
             </summary>
             <param name="options">The value to set the field options to.</param>
+            <inheritdoc cref="P:Discord.SelectMenuBuilder.Options"/>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.SelectMenuBuilder.AddOption(Discord.SelectMenuOptionBuilder)">
+            <summary>
+                Add one option to menu options.
+            </summary>
+            <param name="option">The option builder class containing the option properties.</param>
+            <exception cref="T:System.InvalidOperationException">Options count reached <see cref="F:Discord.SelectMenuBuilder.MaxOptionCount"/>.</exception>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.SelectMenuBuilder.AddOption(System.String,System.String,System.String,Discord.IEmote,System.Nullable{System.Boolean})">
+            <summary>
+                Add one option to menu options.
+            </summary>
+            <param name="label">The label for this option.</param>
+            <param name="value">The value of this option.</param>
+            <param name="description">The description of this option.</param>
+            <param name="emote">The emote of this option.</param>
+            <param name="default">Render this option as selected by default or not.</param>
+            <exception cref="T:System.InvalidOperationException">Options count reached <see cref="F:Discord.SelectMenuBuilder.MaxOptionCount"/>.</exception>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.SelectMenuBuilder.WithDisabled(System.Boolean)">
+            <summary>
+                Sets whether the current menu is disabled.
+            </summary>
+            <param name="disabled">Whether the current menu is disabled or not.</param>
             <returns>
                 The current builder.
             </returns>
@@ -4823,16 +4899,19 @@
             <summary>
                 Gets or sets the label of the current select menu.
             </summary>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Label"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxLabelLength"/></exception>
         </member>
         <member name="P:Discord.SelectMenuOptionBuilder.Value">
             <summary>
                 Gets or sets the custom id of the current select menu.
             </summary>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Value"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxCustomIdLength"/>.</exception>
         </member>
         <member name="P:Discord.SelectMenuOptionBuilder.Description">
             <summary>
                 Gets or sets this menu options description.
             </summary>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Description"/> length exceeds <see cref="F:Discord.SelectMenuOptionBuilder.MaxDescriptionLength"/>.</exception>
         </member>
         <member name="P:Discord.SelectMenuOptionBuilder.Emote">
             <summary>
@@ -4849,18 +4928,27 @@
                 Creates a new instance of a <see cref="T:Discord.SelectMenuOptionBuilder"/>.
             </summary>
         </member>
-        <member name="M:Discord.SelectMenuOptionBuilder.#ctor(System.String,System.String)">
+        <member name="M:Discord.SelectMenuOptionBuilder.#ctor(System.String,System.String,System.String,Discord.IEmote,System.Nullable{System.Boolean})">
             <summary>
                 Creates a new instance of a <see cref="T:Discord.SelectMenuOptionBuilder"/>.
             </summary>
             <param name="label">The label for this option.</param>
             <param name="value">The value of this option.</param>
+            <param name="description">The description of this option.</param>
+            <param name="emote">The emote of this option.</param>
+            <param name="default">Render this option as selected by default or not.</param>
+        </member>
+        <member name="M:Discord.SelectMenuOptionBuilder.#ctor(Discord.SelectMenuOption)">
+            <summary>
+                Creates a new instance of a <see cref="T:Discord.SelectMenuOptionBuilder"/> from instance of a <see cref="T:Discord.SelectMenuOption"/>.
+            </summary>
         </member>
         <member name="M:Discord.SelectMenuOptionBuilder.WithLabel(System.String)">
             <summary>
                 Sets the field label.
             </summary>
             <param name="label">The value to set the field label to.</param>
+            <inheritdoc cref="P:Discord.SelectMenuOptionBuilder.Label"/>
             <returns>
                 The current builder.
             </returns>
@@ -4870,6 +4958,7 @@
                 Sets the field value.
             </summary>
             <param name="value">The value to set the field value to.</param>
+            <inheritdoc cref="P:Discord.SelectMenuOptionBuilder.Value"/>
             <returns>
                 The current builder.
             </returns>
@@ -4879,6 +4968,7 @@
                 Sets the field description.
             </summary>
             <param name="description">The value to set the field description to.</param>
+            <inheritdoc cref="P:Discord.SelectMenuOptionBuilder.Description"/>
             <returns>
                 The current builder.
             </returns>
@@ -4978,6 +5068,11 @@
         <member name="P:Discord.SelectMenu.MaxValues">
             <summary>
                 The maximum number of items that can be chosen; default 1, max 25
+            </summary>
+        </member>
+        <member name="P:Discord.SelectMenu.Disabled">
+            <summary>
+                Whether this menu is disabled or not.
             </summary>
         </member>
         <member name="T:Discord.SelectMenuOption">
@@ -5651,23 +5746,23 @@
             </summary>
         </member>
         <member name="F:Discord.EmbedBuilder.MaxFieldCount">
-            <summary> 
-                Returns the maximum number of fields allowed by Discord. 
+            <summary>
+                Returns the maximum number of fields allowed by Discord.
             </summary>
         </member>
         <member name="F:Discord.EmbedBuilder.MaxTitleLength">
-            <summary> 
-                Returns the maximum length of title allowed by Discord. 
+            <summary>
+                Returns the maximum length of title allowed by Discord.
             </summary>
         </member>
         <member name="F:Discord.EmbedBuilder.MaxDescriptionLength">
-            <summary> 
-                Returns the maximum length of description allowed by Discord. 
+            <summary>
+                Returns the maximum length of description allowed by Discord.
             </summary>
         </member>
         <member name="F:Discord.EmbedBuilder.MaxEmbedLength">
-            <summary> 
-                Returns the maximum length of total characters allowed by Discord. 
+            <summary>
+                Returns the maximum length of total characters allowed by Discord.
             </summary>
         </member>
         <member name="M:Discord.EmbedBuilder.#ctor">
@@ -5701,9 +5796,9 @@
         </member>
         <member name="P:Discord.EmbedBuilder.Fields">
             <summary> Gets or sets the list of <see cref="T:Discord.EmbedFieldBuilder"/> of an <see cref="T:Discord.Embed"/>. </summary>
-            <exception cref="T:System.ArgumentNullException" accessor="set">An embed builder's fields collection is set to 
+            <exception cref="T:System.ArgumentNullException" accessor="set">An embed builder's fields collection is set to
             <c>null</c>.</exception>
-            <exception cref="T:System.ArgumentException" accessor="set">Description length exceeds <see cref="F:Discord.EmbedBuilder.MaxFieldCount"/>.
+            <exception cref="T:System.ArgumentException" accessor="set">Fields count exceeds <see cref="F:Discord.EmbedBuilder.MaxFieldCount"/>.
             </exception>
             <returns> The list of existing <see cref="T:Discord.EmbedFieldBuilder"/>.</returns>
         </member>
@@ -5744,7 +5839,7 @@
                 Gets the total length of all embed properties.
             </summary>
             <returns>
-                The combined length of <see cref="P:Discord.EmbedBuilder.Title"/>, <see cref="P:Discord.EmbedAuthor.Name"/>, <see cref="P:Discord.EmbedBuilder.Description"/>, 
+                The combined length of <see cref="P:Discord.EmbedBuilder.Title"/>, <see cref="P:Discord.EmbedAuthor.Name"/>, <see cref="P:Discord.EmbedBuilder.Description"/>,
                 <see cref="P:Discord.EmbedFooter.Text"/>, <see cref="P:Discord.EmbedField.Name"/>, and <see cref="P:Discord.EmbedField.Value"/>.
             </returns>
         </member>
@@ -5758,7 +5853,7 @@
             </returns>
         </member>
         <member name="M:Discord.EmbedBuilder.WithDescription(System.String)">
-            <summary> 
+            <summary>
                 Sets the description of an <see cref="T:Discord.Embed"/>.
             </summary>
             <param name="description"> The description to be set. </param>
@@ -5767,7 +5862,7 @@
             </returns>
         </member>
         <member name="M:Discord.EmbedBuilder.WithUrl(System.String)">
-            <summary> 
+            <summary>
                 Sets the URL of an <see cref="T:Discord.Embed"/>.
             </summary>
             <param name="url"> The URL to be set. </param>
@@ -5776,7 +5871,7 @@
             </returns>
         </member>
         <member name="M:Discord.EmbedBuilder.WithThumbnailUrl(System.String)">
-            <summary> 
+            <summary>
                 Sets the thumbnail URL of an <see cref="T:Discord.Embed"/>.
             </summary>
             <param name="thumbnailUrl"> The thumbnail URL to be set. </param>
@@ -7149,7 +7244,7 @@
                 Properties that are used to modify an <see cref="T:Discord.IUserMessage" /> with the specified changes.
             </summary>
             <remarks>
-                The content of a message can be cleared with <see cref="F:System.String.Empty"/> if and only if an 
+                The content of a message can be cleared with <see cref="F:System.String.Empty"/> if and only if an
                 <see cref="T:Discord.Embed"/> is present.
             </remarks>
             <seealso cref="M:Discord.IUserMessage.ModifyAsync(System.Action{Discord.MessageProperties},Discord.RequestOptions)"/>
@@ -7162,9 +7257,9 @@
                 This must be less than the constant defined by <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.
             </remarks>
         </member>
-        <member name="P:Discord.MessageProperties.Embed">
+        <member name="P:Discord.MessageProperties.Embeds">
             <summary>
-                Gets or sets the embed the message should display.
+                Gets or sets the embeds of the message.
             </summary>
         </member>
         <member name="P:Discord.MessageProperties.Components">

@@ -20,10 +20,15 @@ namespace Discord.Webhook
                 throw new InvalidOperationException("Could not find a webhook with the supplied credentials.");
             return RestInternalWebhook.Create(client, model);
         }
-        public static async Task<ulong> SendMessageAsync(DiscordWebhookClient client, 
+        public static async Task<ulong> SendMessageAsync(DiscordWebhookClient client,
             string text, bool isTTS, IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, RequestOptions options)
         {
-            var args = new CreateWebhookMessageParams(text) { IsTTS = isTTS };
+            var args = new CreateWebhookMessageParams
+            {
+                Content = text,
+                IsTTS = isTTS
+            };
+
             if (embeds != null)
                 args.Embeds = embeds.Select(x => x.ToModel()).ToArray();
             if (username != null)

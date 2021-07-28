@@ -30,11 +30,11 @@ namespace Discord.Rest
             var args = new MessageProperties();
             func(args);
 
-            if (msg.Author.Id != client.CurrentUser.Id && (args.Content.IsSpecified || args.Embed.IsSpecified || args.AllowedMentions.IsSpecified))
+            if (msg.Author.Id != client.CurrentUser.Id && (args.Content.IsSpecified || args.Embeds.IsSpecified || args.AllowedMentions.IsSpecified))
                 throw new InvalidOperationException("Only the author of a message may modify the message content, embed, or allowed mentions.");
 
             bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(msg.Content);
-            bool hasEmbed = args.Embed.IsSpecified ? args.Embed.Value != null : msg.Embeds.Any();
+            bool hasEmbed = args.Embeds.IsSpecified ? args.Embeds.Value != null : msg.Embeds.Any();
             if (!hasText && !hasEmbed)
                 Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
 
@@ -61,13 +61,13 @@ namespace Discord.Rest
                 }
             }
 
-            var apiArgs = new API.Rest.ModifyMessageParams
+            var apiArgs = new ModifyMessageParams
             {
                 Content = args.Content,
-                Embed = args.Embed.IsSpecified ? args.Embed.Value.ToModel() : Optional.Create<API.Embed>(),
+                Embeds = args.Embeds.IsSpecified ? args.Embeds.Value.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
                 Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
-                Flags = args.Flags.IsSpecified ? args.Flags.Value : Optional.Create<MessageFlags?>(),
-                AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional.Create<API.AllowedMentions>(),
+                Flags = args.Flags,
+                AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional<API.AllowedMentions>.Unspecified,
             };
             return await client.ApiClient.ModifyMessageAsync(msg.Channel.Id, msg.Id, apiArgs, options).ConfigureAwait(false);
         }
@@ -78,7 +78,7 @@ namespace Discord.Rest
             var args = new MessageProperties();
             func(args);
 
-            if ((args.Content.IsSpecified && string.IsNullOrEmpty(args.Content.Value)) && (args.Embed.IsSpecified && args.Embed.Value == null))
+            if (args.Content.IsSpecified && string.IsNullOrEmpty(args.Content.Value) && args.Embeds.IsSpecified && args.Embeds.Value == null)
                 Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
 
             if (args.AllowedMentions.IsSpecified)
@@ -86,6 +86,7 @@ namespace Discord.Rest
                 AllowedMentions allowedMentions = args.AllowedMentions.Value;
                 Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
                 Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
+                Preconditions.AtMost(args.Embeds.Value?.Length ?? 0, 10, nameof(args.Embeds), "A max of 10 embeds are allowed.");
 
                 // check that user flag and user Id list are exclusive, same with role flag and role Id list
                 if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
@@ -107,7 +108,7 @@ namespace Discord.Rest
             var apiArgs = new API.Rest.ModifyMessageParams
             {
                 Content = args.Content,
-                Embed = args.Embed.IsSpecified ? args.Embed.Value.ToModel() : Optional.Create<API.Embed>(),
+                Embeds = args.Embeds.IsSpecified ? args.Embeds.Value.Select(x => x.ToModel()).ToArray() : Optional.Create<API.Embed[]>(),
                 Flags = args.Flags.IsSpecified ? args.Flags.Value : Optional.Create<MessageFlags?>(),
                 AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional.Create<API.AllowedMentions>(),
             };

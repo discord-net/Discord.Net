@@ -174,7 +174,8 @@ namespace Discord.Rest
                                         z.Default.ToNullable())).ToList(),
                                     parsed.Placeholder.GetValueOrDefault(),
                                     parsed.MinValues,
-                                    parsed.MaxValues
+                                    parsed.MaxValues,
+                                    parsed.Disabled
                                     );
                             }
                         default:
@@ -230,7 +231,7 @@ namespace Discord.Rest
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
-        
+
         /// <inheritdoc/>
         IReadOnlyCollection<IMessageComponent> IMessage.Components => Components;
 

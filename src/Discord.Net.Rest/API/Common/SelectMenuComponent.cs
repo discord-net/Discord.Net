@@ -27,6 +27,9 @@ namespace Discord.API
         [JsonProperty("max_values")]
         public int MaxValues { get; set; }
 
+        [JsonProperty("disabled")]
+        public bool Disabled { get; set; }
+
         public SelectMenuComponent() { }
 
         public SelectMenuComponent(Discord.SelectMenu component)
@@ -37,6 +40,7 @@ namespace Discord.API
             this.Placeholder = component.Placeholder;
             this.MinValues = component.MinValues;
             this.MaxValues = component.MaxValues;
+            this.Disabled = component.Disabled;
         }
     }
 }

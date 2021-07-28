@@ -4,7 +4,6 @@ using Discord.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.Rest
@@ -21,7 +20,7 @@ namespace Discord.Rest
             return client.ApiClient.BulkOverwriteGlobalApplicationCommands(new CreateApplicationCommandParams[0], options);
         }
 
-        public static Task SendInteractionResponse(BaseDiscordClient client, IMessageChannel channel, InteractionResponse response,
+        public static Task SendInteractionResponse(BaseDiscordClient client, InteractionResponse response,
             ulong interactionId, string interactionToken, RequestOptions options = null)
         {
             return client.ApiClient.CreateInteractionResponse(response, interactionId, interactionToken, options);
@@ -298,14 +297,14 @@ namespace Discord.Rest
             func(args);
 
             bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(message.Content);
-            bool hasEmbed = args.Embed.IsSpecified ? args.Embed.Value != null : message.Embeds.Any();
+            bool hasEmbed = args.Embeds.IsSpecified ? args.Embeds.Value != null : message.Embeds.Any();
             if (!hasText && !hasEmbed)
                 Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
 
             var apiArgs = new API.Rest.ModifyInteractionResponseParams
             {
                 Content = args.Content,
-                Embeds = args.Embed.IsSpecified ? new API.Embed[] { args.Embed.Value.ToModel() } : Optional.Create<API.Embed[]>(),
+                Embeds = args.Embeds.IsSpecified ? args.Embeds.Value.Select(x => x.ToModel()).ToArray() : Optional.Create<API.Embed[]>(),
                 AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional<API.AllowedMentions>.Unspecified,
                 Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
             };
@@ -316,27 +315,22 @@ namespace Discord.Rest
         public static async Task DeleteFollowupMessage(BaseDiscordClient client, RestFollowupMessage message, RequestOptions options = null)
             => await client.ApiClient.DeleteInteractionFollowupMessage(message.Id, message.Token, options);
 
-        public static async Task<Discord.API.Message> ModifyInteractionResponse(BaseDiscordClient client, RestInteractionMessage message, Action<MessageProperties> func,
+        public static async Task<Message> ModifyInteractionResponse(BaseDiscordClient client, string token, Action<MessageProperties> func,
            RequestOptions options = null)
         {
             var args = new MessageProperties();
             func(args);
 
-            bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(message.Content);
-            bool hasEmbed = args.Embed.IsSpecified ? args.Embed.Value != null : message.Embeds.Any();
-            if (!hasText && !hasEmbed)
-                Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
-
-            var apiArgs = new API.Rest.ModifyInteractionResponseParams
+            var apiArgs = new ModifyInteractionResponseParams
             {
                 Content = args.Content,
-                Embeds = args.Embed.IsSpecified ? new API.Embed[] { args.Embed.Value.ToModel() } : Optional.Create<API.Embed[]>(),
-                AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional<API.AllowedMentions>.Unspecified,
+                Embeds = args.Embeds.IsSpecified ? args.Embeds.Value?.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
+                AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
                 Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
                 Flags = args.Flags
             };
 
-            return await client.ApiClient.ModifyInteractionResponse(apiArgs, message.Token, options).ConfigureAwait(false);
+            return await client.ApiClient.ModifyInteractionResponse(apiArgs, token, options).ConfigureAwait(false);
         }
 
         public static async Task DeletedInteractionResponse(BaseDiscordClient client, RestInteractionMessage message, RequestOptions options = null)
@@ -378,21 +372,26 @@ namespace Discord.Rest
             Preconditions.AtMost(args.Length, 10, nameof(args));
             Preconditions.GreaterThan(args.Length, 0, nameof(args));
 
-            List<ApplicationCommandPermissions> models = new List<ApplicationCommandPermissions>();
+            List<ApplicationCommandPermissions> permissionsList = new List<ApplicationCommandPermissions>();
 
             foreach (var arg in args)
             {
-                var model = new ApplicationCommandPermissions()
+                var permissions = new ApplicationCommandPermissions()
                 {
                     Id = arg.TargetId,
                     Permission = arg.Permission,
                     Type = arg.TargetType
                 };
 
-                models.Add(model);
+                permissionsList.Add(permissions);
             }
 
-            var apiModel = await client.ApiClient.ModifyApplicationCommandPermissions(models.ToArray(), guildId, commandId, options);
+            ModifyGuildApplicationCommandPermissionsParams model = new ModifyGuildApplicationCommandPermissionsParams()
+            {
+                Permissions = permissionsList.ToArray()
+            };
+
+            var apiModel = await client.ApiClient.ModifyApplicationCommandPermissions(model, guildId, commandId, options);
 
             return new GuildApplicationCommandPermission(apiModel.Id, apiModel.ApplicationId, guildId, apiModel.Permissions.Select(
                 x => new ApplicationCommandPermission(x.Id, x.Type, x.Permission)).ToArray());

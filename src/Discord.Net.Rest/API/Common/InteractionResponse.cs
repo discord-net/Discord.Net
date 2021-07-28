@@ -13,6 +13,6 @@ namespace Discord.API
         public InteractionResponseType Type { get; set; }
 
         [JsonProperty("data")]
-        public Optional<InteractionApplicationCommandCallbackData> Data { get; set; }
+        public Optional<InteractionCallbackData> Data { get; set; }
     }
 }

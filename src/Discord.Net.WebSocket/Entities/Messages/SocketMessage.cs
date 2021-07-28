@@ -209,7 +209,8 @@ namespace Discord.WebSocket
                                         z.Default.ToNullable())).ToList(),
                                     parsed.Placeholder.GetValueOrDefault(),
                                     parsed.MinValues,
-                                    parsed.MaxValues
+                                    parsed.MaxValues,
+                                    parsed.Disabled
                                     );
                             }
                         default:
@@ -252,7 +253,7 @@ namespace Discord.WebSocket
         IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoles.Select(x => x.Id).ToImmutableArray();
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
-        
+
         /// <inheritdoc/>
         IReadOnlyCollection<IMessageComponent> IMessage.Components => Components;
 
