@@ -76,5 +76,7 @@ namespace Discord.API
         public Optional<int> ApproximateMemberCount { get; set; }
         [JsonProperty("approximate_presence_count")]
         public Optional<int> ApproximatePresenceCount { get; set; }
+        [JsonProperty("threads")]
+        public Optional<Channel[]> Threads { get; set; }
     }
 }

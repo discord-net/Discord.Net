@@ -1862,6 +1862,8 @@ namespace Discord.WebSocket
                                     }
                                 }
                                 break;
+
+                            // Interactions
                             case "INTERACTION_CREATE":
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (INTERACTION_CREATE)").ConfigureAwait(false);
@@ -1969,6 +1971,110 @@ namespace Discord.WebSocket
                                     await TimedInvokeAsync(_applicationCommandDeleted, nameof(ApplicationCommandDeleted), applicationCommand).ConfigureAwait(false);
                                 }
                                 break;
+
+                            // Threads
+                            case "THREAD_CREATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (THREAD_CREATE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<Channel>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId.Value);
+
+                                    if(guild == null)
+                                    {
+                                        await UnknownGuildAsync(type, data.GuildId.Value);
+                                        return;
+                                    }
+
+                                    var threadChannel = (SocketThreadChannel)guild.AddChannel(this.State, data);
+
+                                    await TimedInvokeAsync(_threadCreated, nameof(ThreadCreated), threadChannel).ConfigureAwait(false);
+                                }
+
+                                break;
+                            case "THREAD_UPDATE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (THREAD_UPDATE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<API.Channel>(_serializer);
+                                    var guild = State.GetGuild(data.GuildId.Value);
+                                    if (guild == null)
+                                    {
+                                        await UnknownGuildAsync(type, data.GuildId.Value);
+                                        return;
+                                    }
+
+                                    var channel = (SocketThreadChannel)guild.GetChannel(data.Id);
+
+                                    var before = channel.Clone();
+                                    channel.Update(State, data);
+
+                                    if (!(guild?.IsSynced ?? true))
+                                    {
+                                        await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
+                                        return;
+                                    }
+
+                                    await TimedInvokeAsync(_threadUpdated, nameof(ThreadUpdated), before, channel).ConfigureAwait(false);
+
+                                }
+                                break;
+                            case "THREAD_DELETE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (THREAD_DELETE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<API.Channel>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId.Value);
+
+                                    if(guild == null)
+                                    {
+                                        await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
+                                        return;
+                                    }
+
+                                    var thread = (SocketThreadChannel)guild.GetChannel(data.Id);
+
+                                    var cacheable = new Cacheable<SocketThreadChannel, ulong>(thread, data.Id, thread != null, null);
+
+                                    await TimedInvokeAsync(_threadDeleted, nameof(ThreadDeleted), cacheable).ConfigureAwait(false);
+                                }
+                                break;
+                            case "THREAD_LIST_SYNC":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (THREAD_LIST_SYNC)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<API.Gateway.ThreadListSyncEvent>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId);
+
+                                    if(guild == null)
+                                    {
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
+                                        return;
+                                    }
+
+                                    foreach(var thread in data.Threads)
+                                    {
+                                        var entity = guild.ThreadChannels.FirstOrDefault(x => x.Id == thread.Id);
+
+                                        if(entity == null)
+                                        {
+                                            guild.AddChannel(this.State, thread);
+                                        }
+                                        else
+                                        {
+                                            entity.Update(this.State, thread);
+                                        }
+                                    }
+                                }
+                                break;
+                            case "THREAD_MEMBER_UPDATE":
+                                break;
+                            case "THREAD_MEMBERS_UPDATE": // based on intents
+                                break;
+
                             //Ignored (User only)
                             case "CHANNEL_PINS_ACK":
                                 await _gatewayLogger.DebugAsync("Ignored Dispatch (CHANNEL_PINS_ACK)").ConfigureAwait(false);

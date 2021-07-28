@@ -1982,6 +1982,41 @@
                 of webhooks that is available in this channel.
             </returns>
         </member>
+        <member name="T:Discord.IThreadChannel">
+            <summary>
+                Represents a thread channel inside of a guild.
+            </summary>
+        </member>
+        <member name="P:Discord.IThreadChannel.Archived">
+            <summary>
+                <see langword="true"/> if the current thread is archived, otherwise <see langword="false"/>.
+            </summary>
+        </member>
+        <member name="P:Discord.IThreadChannel.AutoArchiveDuration">
+            <summary>
+                Duration to automatically archive the thread after recent activity.
+            </summary>
+        </member>
+        <member name="P:Discord.IThreadChannel.ArchiveTimestamp">
+            <summary>
+                Timestamp when the thread's archive status was last changed, used for calculating recent activity.
+            </summary>
+        </member>
+        <member name="P:Discord.IThreadChannel.Locked">
+            <summary>
+                <see langword="true"/> if the current thread is locked, otherwise <see langword="false"/>
+            </summary>
+        </member>
+        <member name="P:Discord.IThreadChannel.MemberCount">
+            <summary>
+                An approximate count of users in a thread, stops counting at 50.
+            </summary>
+        </member>
+        <member name="P:Discord.IThreadChannel.MessageCount">
+            <summary>
+                An approximate count of messages in a thread, stops counting at 50.
+            </summary>
+        </member>
         <member name="T:Discord.IVoiceChannel">
             <summary>
                 Represents a generic voice channel in a guild.
@@ -2068,6 +2103,71 @@
             </remarks>
         </member>
         <member name="P:Discord.TextChannelProperties.SlowModeInterval">
+            <summary>
+                Gets or sets the slow-mode ratelimit in seconds for this channel.
+            </summary>
+            <remarks>
+                Setting this value to anything above zero will require each user to wait X seconds before
+                sending another message; setting this value to <c>0</c> will disable slow-mode for this channel.
+                <note>
+                    Users with <see cref="F:Discord.ChannelPermission.ManageMessages"/> or 
+                    <see cref="F:Discord.ChannelPermission.ManageChannels"/> will be exempt from slow-mode.
+                </note>
+            </remarks>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown if the value does not fall within [0, 21600].</exception>
+        </member>
+        <member name="T:Discord.ThreadArchiveDuration">
+            <summary>
+                Represents the thread auto archive duration.
+            </summary>
+        </member>
+        <member name="F:Discord.ThreadArchiveDuration.OneHour">
+            <summary>
+                One hour (60 minutes).
+            </summary>
+        </member>
+        <member name="F:Discord.ThreadArchiveDuration.OneDay">
+            <summary>
+                One day (1440 minutes).
+            </summary>
+        </member>
+        <member name="F:Discord.ThreadArchiveDuration.ThreeDays">
+            <summary>
+                Three days (4320 minutes).
+                <remarks>
+                    This option is explicity avaliable to nitro users.
+                </remarks>
+            </summary>
+        </member>
+        <member name="F:Discord.ThreadArchiveDuration.OneWeek">
+            <summary>
+                One week (10080 minutes).
+                <remarks>
+                    This option is explicity avaliable to nitro users.
+                </remarks>
+            </summary>
+        </member>
+        <member name="P:Discord.Entities.ThreadChannelProperties.Archived">
+            <summary>
+                Gets or sets whether or not the thread is archived.
+            </summary>
+        </member>
+        <member name="P:Discord.Entities.ThreadChannelProperties.Locked">
+            <summary>
+                Gets or sets whether or not the thread is locked.
+            </summary>
+        </member>
+        <member name="P:Discord.Entities.ThreadChannelProperties.Name">
+            <summary>
+                Gets or sets the name of the thread.
+            </summary>
+        </member>
+        <member name="P:Discord.Entities.ThreadChannelProperties.AutoArchiveDuration">
+            <summary>
+                Gets or sets the auto archive duration.
+            </summary>
+        </member>
+        <member name="P:Discord.Entities.ThreadChannelProperties.SlowModeInterval">
             <summary>
                 Gets or sets the slow-mode ratelimit in seconds for this channel.
             </summary>
@@ -7027,6 +7127,21 @@
         <member name="F:Discord.MessageFlags.Urgent">
             <summary>
                 Flag given to messages that came from the urgent message system.
+            </summary>
+        </member>
+        <member name="F:Discord.MessageFlags.HasThread">
+            <summary>
+                Flag given to messages has an associated thread, with the same id as the message
+            </summary>
+        </member>
+        <member name="F:Discord.MessageFlags.Ephemeral">
+            <summary>
+                Flag given to messages that is only visible to the user who invoked the Interaction.
+            </summary>
+        </member>
+        <member name="F:Discord.MessageFlags.Loading">
+            <summary>
+                Flag given to messages that is an Interaction Response and the bot is "thinking"
             </summary>
         </member>
         <member name="T:Discord.MessageProperties">

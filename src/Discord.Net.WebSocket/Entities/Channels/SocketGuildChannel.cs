@@ -56,6 +56,8 @@ namespace Discord.WebSocket
                     return SocketVoiceChannel.Create(guild, state, model);
                 case ChannelType.Category:
                     return SocketCategoryChannel.Create(guild, state, model);
+                case ChannelType.PrivateThread or ChannelType.PublicThread or ChannelType.NewsThread:
+                    return SocketThreadChannel.Create(guild, state, model);
                 default:
                     return new SocketGuildChannel(guild.Discord, model.Id, guild);
             }

@@ -413,6 +413,160 @@ namespace Discord.API
                     break;
             }
         }
+
+        // Threads
+        public async Task<Channel> StartThreadAsync(ulong channelId, ulong messageId, StartThreadParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(messageId, 0, nameof(messageId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var bucket = new BucketIds(0, channelId);
+
+            return await SendJsonAsync<Channel>("POST", () => $"channels/{channelId}/messages/{messageId}/threads", args, bucket, options: options).ConfigureAwait(false);
+        }
+
+        public async Task<Channel> StartThreadAsync(ulong channelId, StartThreadParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var bucket = new BucketIds(0, channelId);
+
+            return await SendJsonAsync<Channel>("POST", () => $"channels/{channelId}/threads", args, bucket, options: options).ConfigureAwait(false);
+        }
+
+        public async Task JoinThreadAsync(ulong channelId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            await SendAsync("PUT", $"channels/{channelId}/thread-members/@me", options: options).ConfigureAwait(false);
+        }
+
+        public async Task AddThreadMemberAsync(ulong channelId, ulong userId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(userId, 0, nameof(channelId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            await SendAsync("PUT", $"channels/{channelId}/thread-members/{userId}", options: options).ConfigureAwait(false);
+        }
+
+        public async Task LeaveThreadAsync(ulong channelId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            await SendAsync("DELETE", $"channels/{channelId}/thread-members/@me", options: options).ConfigureAwait(false);
+        }
+
+        public async Task RemoveThreadMemberAsync(ulong channelId, ulong userId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(userId, 0, nameof(channelId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            await SendAsync("DELETE", $"channels/{channelId}/thread-members/{userId}", options: options).ConfigureAwait(false);
+        }
+
+        public async Task<ThreadMember[]> ListThreadMembersAsync(ulong channelId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var bucket = new BucketIds(channelId: channelId);
+
+            return await SendAsync<ThreadMember[]>("GET", () => $"/channels/{channelId}", bucket, options: options);
+        }
+
+        public async Task<ChannelThreads> GetActiveThreadsAsync(ulong channelId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var bucket = new BucketIds(channelId: channelId);
+
+            return await SendAsync<ChannelThreads>("GET", $"channels/{channelId}/threads/active");
+        }
+
+        public async Task<ChannelThreads> GetPublicArchivedThreadsAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var bucket = new BucketIds(channelId: channelId);
+
+            string query = "";
+
+            if (limit.HasValue)
+            {
+                query = $"?before={before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O")}&limit={limit.Value}";
+            }
+            else if (before.HasValue)
+            {
+                query = $"?before={before.Value.ToString("O")}";
+            }
+
+            return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/archived/public{query}", bucket, options: options);
+        }
+
+        public async Task<ChannelThreads> GetPrivateArchivedThreadsAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null,
+            RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var bucket = new BucketIds(channelId: channelId);
+
+            string query = "";
+
+            if (limit.HasValue)
+            {
+                query = $"?before={before.GetValueOrDefault(DateTimeOffset.UtcNow).ToString("O")}&limit={limit.Value}";
+            }
+            else if (before.HasValue)
+            {
+                query = $"?before={before.Value.ToString("O")}";
+            }
+
+            return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/archived/private{query}", bucket, options: options);
+        }
+
+        public async Task<ChannelThreads> GetJoinedPrivateArchivedThreadsAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null,
+            RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var bucket = new BucketIds(channelId: channelId);
+
+            string query = "";
+
+            if (limit.HasValue)
+            {
+                query = $"?before={SnowflakeUtils.ToSnowflake(before.GetValueOrDefault(DateTimeOffset.UtcNow))}&limit={limit.Value}";
+            }
+            else if (before.HasValue)
+            {
+                query = $"?before={before.Value.ToString("O")}";
+            }
+
+            return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/users/@me/threads/archived/private{query}", bucket, options: options);
+        }
+
+        // roles
         public async Task AddRoleAsync(ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));

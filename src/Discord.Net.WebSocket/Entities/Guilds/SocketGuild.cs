@@ -277,6 +277,14 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<SocketCategoryChannel> CategoryChannels
             => Channels.OfType<SocketCategoryChannel>().ToImmutableArray();
         /// <summary>
+        ///     Gets a collection of all thread channels in this guild.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection of thread channels found within this guild.
+        /// </returns>
+        public IReadOnlyCollection<SocketThreadChannel> ThreadChannels
+            => Channels.OfType<SocketThreadChannel>().ToImmutableArray();
+        /// <summary>
         ///     Gets the current logged-in user.
         /// </summary>
         public SocketGuildUser CurrentUser => _members.TryGetValue(Discord.CurrentUser.Id, out SocketGuildUser member) ? member : null;

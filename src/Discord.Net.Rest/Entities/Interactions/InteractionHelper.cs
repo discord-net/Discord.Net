@@ -333,6 +333,7 @@ namespace Discord.Rest
                 Embeds = args.Embed.IsSpecified ? new API.Embed[] { args.Embed.Value.ToModel() } : Optional.Create<API.Embed[]>(),
                 AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional<API.AllowedMentions>.Unspecified,
                 Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
+                Flags = args.Flags
             };
 
             return await client.ApiClient.ModifyInteractionResponse(apiArgs, message.Token, options).ConfigureAwait(false);

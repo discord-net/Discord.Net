@@ -2,80 +2,104 @@ using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 
 namespace Discord.WebSocket
 {
     /// <summary>
-    ///     Represents a WebSocket-based channel in a guild that can send and receive messages.
+    ///     Represents a thread channel inside of a guild.
     /// </summary>
-    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class SocketTextChannel : SocketGuildChannel, ITextChannel, ISocketMessageChannel
+    public class SocketThreadChannel : SocketGuildChannel, IThreadChannel, ISocketMessageChannel
     {
-        private readonly MessageCache _messages;
-
-        /// <inheritdoc />
-        public string Topic { get; private set; }
-        /// <inheritdoc />
-        public virtual int SlowModeInterval { get; private set; }
-        /// <inheritdoc />
-        public ulong? CategoryId { get; private set; }
         /// <summary>
-        ///     Gets the parent (category) of this channel in the guild's channel list.
+        ///     <see langword="true"/> if this thread is private, otherwise <see langword="false"/>
         /// </summary>
-        /// <returns>
-        ///     An <see cref="ICategoryChannel"/> representing the parent of this channel; <c>null</c> if none is set.
-        /// </returns>
-        public ICategoryChannel Category
-            => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
-        /// <inheritdoc />
-        public virtual Task SyncPermissionsAsync(RequestOptions options = null)
-            => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
+        public bool IsPrivateThread { get; private set; }
 
-        private bool _nsfw;
-        /// <inheritdoc />
-        public bool IsNsfw => _nsfw;
+        /// <summary>
+        ///     Gets the parent channel this thread resides in.
+        /// </summary>
+        public SocketTextChannel ParentChannel { get; private set; }
 
-        /// <inheritdoc />
-        public string Mention => MentionUtils.MentionChannel(Id);
+        /// <inheritdoc/>
+        public int MessageCount { get; private set; }
+
+        /// <inheritdoc/>
+        public int MemberCount { get; private set; }
+
+        /// <inheritdoc/>
+        public bool Archived { get; private set; }
+
+        /// <inheritdoc/>
+        public DateTimeOffset ArchiveTimestamp { get; private set; }
+
+        /// <inheritdoc/>
+        public ThreadArchiveDuration AutoArchiveDuration { get; private set; }
+
+        /// <inheritdoc/>
+        public bool Locked { get; private set; }
+
+        /// <inheritdoc/>
+        public bool IsNsfw { get; private set; }
+
+        /// <inheritdoc/>
+        public string Topic { get; private set; }
+
+        /// <inheritdoc/>
+        public int SlowModeInterval { get; private set; }
+
+        /// <inheritdoc/>
+        public string Mention { get; private set; }
+
+        /// <inheritdoc/>
+        public ulong? CategoryId { get; private set; }
+
         /// <inheritdoc />
         public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();
-        /// <inheritdoc />
-        public override IReadOnlyCollection<SocketGuildUser> Users
-            => Guild.Users.Where(x => Permissions.GetValue(
-                Permissions.ResolveChannel(Guild, x, this, Permissions.ResolveGuild(Guild, x)),
-                ChannelPermission.ViewChannel)).ToImmutableArray();
 
-        /// <summary>
-        ///     Gets a collection of threads within this text channel.
-        /// </summary>
-        public IReadOnlyCollection<SocketThreadChannel> Threads
-            => Guild.ThreadChannels.Where(x => x.ParentChannel.Id == this.Id).ToImmutableArray();
+        public new IReadOnlyCollection<SocketThreadUser> Users = ImmutableArray.Create<SocketThreadUser>();
 
-        internal SocketTextChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
+        private readonly MessageCache _messages;
+
+        internal SocketThreadChannel(DiscordSocketClient discord, SocketGuild guild, ulong id, SocketTextChannel parent)
             : base(discord, id, guild)
         {
-            if (Discord.MessageCacheSize > 0)
-                _messages = new MessageCache(Discord);
+            this.ParentChannel = parent;
         }
-        internal new static SocketTextChannel Create(SocketGuild guild, ClientState state, Model model)
+
+        internal static SocketThreadChannel Create(SocketGuild guild, ClientState state, Model model)
         {
-            var entity = new SocketTextChannel(guild.Discord, model.Id, guild);
+            var parent = (SocketTextChannel)guild.GetChannel(model.CategoryId.Value);
+            var entity = new SocketThreadChannel(guild.Discord, guild, model.Id, parent);
             entity.Update(state, model);
             return entity;
         }
+
         internal override void Update(ClientState state, Model model)
         {
             base.Update(state, model);
-            CategoryId = model.CategoryId;
-            Topic = model.Topic.Value;
-            SlowModeInterval = model.SlowMode.GetValueOrDefault(); // some guilds haven't been patched to include this yet?
-            _nsfw = model.Nsfw.GetValueOrDefault();
+
+            this.MessageCount = model.MessageCount.GetValueOrDefault(-1);
+            this.MemberCount = model.MemberCount.GetValueOrDefault(-1);
+
+            this.IsPrivateThread = model.Type == ChannelType.PrivateThread;
+            
+            if (model.ThreadMetadata.IsSpecified)
+            {
+                this.Archived = model.ThreadMetadata.Value.Archived;
+                this.ArchiveTimestamp = model.ThreadMetadata.Value.ArchiveTimestamp;
+                this.AutoArchiveDuration = (ThreadArchiveDuration)model.ThreadMetadata.Value.AutoArchiveDuration;
+                this.Locked = model.ThreadMetadata.Value.Locked.GetValueOrDefault(false);
+            }
         }
+
+        /// <inheritdoc />
+        public virtual Task SyncPermissionsAsync(RequestOptions options = null)
+            => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
 
         /// <inheritdoc />
         public Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
@@ -85,6 +109,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public SocketMessage GetCachedMessage(ulong id)
             => _messages?.Get(id);
+
         /// <summary>
         ///     Gets a message from this message channel.
         /// </summary>
@@ -120,6 +145,7 @@ namespace Discord.WebSocket
         /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, null, Direction.Before, limit, CacheMode.AllowDownload, options);
+
         /// <summary>
         ///     Gets a collection of messages in this channel.
         /// </summary>
@@ -136,6 +162,7 @@ namespace Discord.WebSocket
         /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessageId, dir, limit, CacheMode.AllowDownload, options);
+
         /// <summary>
         ///     Gets a collection of messages in this channel.
         /// </summary>
@@ -152,15 +179,19 @@ namespace Discord.WebSocket
         /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<IMessage>> GetMessagesAsync(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch, RequestOptions options = null)
             => SocketChannelHelper.GetMessagesAsync(this, Discord, _messages, fromMessage.Id, dir, limit, CacheMode.AllowDownload, options);
+
         /// <inheritdoc />
         public IReadOnlyCollection<SocketMessage> GetCachedMessages(int limit = DiscordConfig.MaxMessagesPerBatch)
             => SocketChannelHelper.GetCachedMessages(this, Discord, _messages, null, Direction.Before, limit);
+
         /// <inheritdoc />
         public IReadOnlyCollection<SocketMessage> GetCachedMessages(ulong fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
             => SocketChannelHelper.GetCachedMessages(this, Discord, _messages, fromMessageId, dir, limit);
+
         /// <inheritdoc />
         public IReadOnlyCollection<SocketMessage> GetCachedMessages(IMessage fromMessage, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
             => SocketChannelHelper.GetCachedMessages(this, Discord, _messages, fromMessage.Id, dir, limit);
+
         /// <inheritdoc />
         public Task<IReadOnlyCollection<RestMessage>> GetPinnedMessagesAsync(RequestOptions options = null)
             => ChannelHelper.GetPinnedMessagesAsync(this, Discord, options);
@@ -193,6 +224,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
             => ChannelHelper.DeleteMessageAsync(this, messageId, Discord, options);
+
         /// <inheritdoc />
         public Task DeleteMessageAsync(IMessage message, RequestOptions options = null)
             => ChannelHelper.DeleteMessageAsync(this, message.Id, Discord, options);
@@ -200,92 +232,43 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task TriggerTypingAsync(RequestOptions options = null)
             => ChannelHelper.TriggerTypingAsync(this, Discord, options);
+
         /// <inheritdoc />
         public IDisposable EnterTypingState(RequestOptions options = null)
             => ChannelHelper.EnterTypingState(this, Discord, options);
 
         internal void AddMessage(SocketMessage msg)
             => _messages?.Add(msg);
+
         internal SocketMessage RemoveMessage(ulong id)
             => _messages?.Remove(id);
 
         //Users
         /// <inheritdoc />
-        public override SocketGuildUser GetUser(ulong id)
+        public new SocketThreadUser GetUser(ulong id)
         {
-            var user = Guild.GetUser(id);
-            if (user != null)
-            {
-                var guildPerms = Permissions.ResolveGuild(Guild, user);
-                var channelPerms = Permissions.ResolveChannel(Guild, user, this, guildPerms);
-                if (Permissions.GetValue(channelPerms, ChannelPermission.ViewChannel))
-                    return user;
-            }
-            return null;
+            var user = Users.FirstOrDefault(x => x.Id == id);
+            return user;
         }
 
-        //Webhooks
-        /// <summary>
-        ///     Creates a webhook in this text channel.
-        /// </summary>
-        /// <param name="name">The name of the webhook.</param>
-        /// <param name="avatar">The avatar of the webhook.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
-        ///     webhook.
-        /// </returns>
-        public Task<RestWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null)
-            => ChannelHelper.CreateWebhookAsync(this, Discord, name, avatar, options);
-        /// <summary>
-        ///     Gets a webhook available in this text channel.
-        /// </summary>
-        /// <param name="id">The identifier of the webhook.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains a webhook associated
-        ///     with the identifier; <c>null</c> if the webhook is not found.
-        /// </returns>
-        public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
-            => ChannelHelper.GetWebhookAsync(this, Discord, id, options);
-        /// <summary>
-        ///     Gets the webhooks available in this text channel.
-        /// </summary>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
-        ///     of webhooks that is available in this channel.
-        /// </returns>
-        public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
-            => ChannelHelper.GetWebhooksAsync(this, Discord, options);
+        public Task GetUsersAsync()
+        {
 
-        //Invites
-        /// <inheritdoc />
-        public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
-        /// <inheritdoc />
-        public async Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteToApplicationAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, applicationId, options).ConfigureAwait(false);
-        /// <inheritdoc />
-        public async Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteToStreamAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, user, options).ConfigureAwait(false);
-        /// <inheritdoc />
-        public async Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
-            => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
+        }
 
-        private string DebuggerDisplay => $"{Name} ({Id}, Text)";
-        internal new SocketTextChannel Clone() => MemberwiseClone() as SocketTextChannel;
+        private string DebuggerDisplay => $"{Name} ({Id}, Thread)";
+        internal new SocketThreadChannel Clone() => MemberwiseClone() as SocketThreadChannel;
 
         //ITextChannel
         /// <inheritdoc />
-        async Task<IWebhook> ITextChannel.CreateWebhookAsync(string name, Stream avatar, RequestOptions options)
-            => await CreateWebhookAsync(name, avatar, options).ConfigureAwait(false);
+        Task<IWebhook> ITextChannel.CreateWebhookAsync(string name, Stream avatar, RequestOptions options)
+            => throw new NotSupportedException("Thread channels don't support webhooks");
         /// <inheritdoc />
-        async Task<IWebhook> ITextChannel.GetWebhookAsync(ulong id, RequestOptions options)
-            => await GetWebhookAsync(id, options).ConfigureAwait(false);
+        Task<IWebhook> ITextChannel.GetWebhookAsync(ulong id, RequestOptions options)
+            => throw new NotSupportedException("Thread channels don't support webhooks");
         /// <inheritdoc />
-        async Task<IReadOnlyCollection<IWebhook>> ITextChannel.GetWebhooksAsync(RequestOptions options)
-            => await GetWebhooksAsync(options).ConfigureAwait(false);
+        Task<IReadOnlyCollection<IWebhook>> ITextChannel.GetWebhooksAsync(RequestOptions options)
+            => throw new NotSupportedException("Thread channels don't support webhooks");
 
         //IGuildChannel
         /// <inheritdoc />
@@ -330,6 +313,36 @@ namespace Discord.WebSocket
         // INestedChannel
         /// <inheritdoc />
         Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
-            => Task.FromResult(Category);
+            => Task.FromResult(this.ParentChannel.Category);
+        Task<IInviteMetadata> INestedChannel.CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
+            => throw new NotSupportedException("Thread channels don't support invites");
+        Task<IInviteMetadata> INestedChannel.CreateInviteToApplicationAsync(ulong applicationId, int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
+            => throw new NotSupportedException("Thread channels don't support invites");
+        Task<IInviteMetadata> INestedChannel.CreateInviteToStreamAsync(IUser user, int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
+            => throw new NotSupportedException("Thread channels don't support invites");
+        Task<IReadOnlyCollection<IInviteMetadata>> INestedChannel.GetInvitesAsync(RequestOptions options)
+            => throw new NotSupportedException("Thread channels don't support invites");
+
+        public Task JoinAsync()
+        {
+
+        }
+
+        public Task LeaveAsync()
+        {
+
+        }
+
+        public Task AddThreadMember(IGuildUser user)
+        {
+
+        }
+
+        public Task RemoveThreadMember(IGuildUser user)
+        {
+
+        }
+
+
     }
 }
