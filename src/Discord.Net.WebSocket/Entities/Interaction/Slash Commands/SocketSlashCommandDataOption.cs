@@ -96,7 +96,15 @@ namespace Discord.WebSocket
                         {
                             if (model.Value.Value is bool val)
                                 this.Value = val;
-                            else if (bool.TryParse(model.Value.Value.ToString(), out var res))
+                            else if (bool.TryParse(model.Value.Value.ToString(), out bool res))
+                                this.Value = res;
+                        }
+                        break;
+                    case ApplicationCommandOptionType.Number:
+                        {
+                            if (model.Value.Value is int val)
+                                this.Value = val;
+                            else if (double.TryParse(model.Value.Value.ToString(), out double res))
                                 this.Value = res;
                         }
                         break;
