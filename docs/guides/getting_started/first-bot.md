@@ -80,15 +80,11 @@ recommended for these operations to be awaited in a
 properly established async context whenever possible.
 
 To establish an async context, we will be creating an async main method
-in your console application, and rewriting the static main method to
-invoke the new async main.
+in your console application.
 
 [!code-csharp[Async Context](samples/first-bot/async-context.cs)]
 
-As a result of this, your program will now start and immediately
-jump into an async context. This allows us to create a connection
-to Discord later on without having to worry about setting up the
-correct async implementation.
+As a result of this, your program will now start into an async context.
 
 > [!WARNING]
 > If your application throws any exceptions within an async context,

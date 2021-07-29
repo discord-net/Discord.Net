@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using EmbedModel = Discord.API.GuildEmbed;
 using WidgetModel = Discord.API.GuildWidget;
 using Model = Discord.API.Guild;
 
@@ -27,8 +26,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         public int AFKTimeout { get; private set; }
         /// <inheritdoc />
-        public bool IsEmbeddable { get; private set; }
-        /// <inheritdoc />
         public bool IsWidgetEnabled { get; private set; }
         /// <inheritdoc />
         public VerificationLevel VerificationLevel { get; private set; }
@@ -41,8 +38,6 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public ulong? AFKChannelId { get; private set; }
-        /// <inheritdoc />
-        public ulong? EmbedChannelId { get; private set; }
         /// <inheritdoc />
         public ulong? WidgetChannelId { get; private set; }
         /// <inheritdoc />
@@ -95,8 +90,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
-        [Obsolete("DefaultChannelId is deprecated, use GetDefaultChannelAsync")]
-        public ulong DefaultChannelId => Id;
         /// <inheritdoc />
         public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
         /// <inheritdoc />
@@ -133,16 +126,12 @@ namespace Discord.Rest
         internal void Update(Model model)
         {
             AFKChannelId = model.AFKChannelId;
-            if (model.EmbedChannelId.IsSpecified)
-                EmbedChannelId = model.EmbedChannelId.Value;
             if (model.WidgetChannelId.IsSpecified)
                 WidgetChannelId = model.WidgetChannelId.Value;
             SystemChannelId = model.SystemChannelId;
             RulesChannelId = model.RulesChannelId;
             PublicUpdatesChannelId = model.PublicUpdatesChannelId;
             AFKTimeout = model.AFKTimeout;
-            if (model.EmbedEnabled.IsSpecified)
-                IsEmbeddable = model.EmbedEnabled.Value;
             if (model.WidgetEnabled.IsSpecified)
                 IsWidgetEnabled = model.WidgetEnabled.Value;
             IconId = model.Icon;
@@ -200,11 +189,6 @@ namespace Discord.Rest
 
             Available = true;
         }
-        internal void Update(EmbedModel model)
-        {
-            EmbedChannelId = model.ChannelId;
-            IsEmbeddable = model.Enabled;
-        }
         internal void Update(WidgetModel model)
         {
             WidgetChannelId = model.ChannelId;
@@ -238,15 +222,6 @@ namespace Discord.Rest
         public async Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null)
         {
             var model = await GuildHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
-            Update(model);
-        }
-
-        /// <inheritdoc />
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
-        [Obsolete("This endpoint is deprecated, use ModifyWidgetAsync instead.")]
-        public async Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
-        {
-            var model = await GuildHelper.ModifyEmbedAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
 
@@ -461,23 +436,6 @@ namespace Discord.Rest
                 .Where(c => user.GetPermissions(c).ViewChannel)
                 .OrderBy(c => c.Position)
                 .FirstOrDefault();
-        }
-
-        /// <summary>
-        ///     Gets the embed channel (i.e. the channel set in the guild's widget settings) in this guild.
-        /// </summary>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains the embed channel set
-        ///     within the server's widget settings; <see langword="null"/> if none is set.
-        /// </returns>
-        [Obsolete("This endpoint is deprecated, use GetWidgetChannelAsync instead.")]
-        public async Task<RestGuildChannel> GetEmbedChannelAsync(RequestOptions options = null)
-        {
-            var embedId = EmbedChannelId;
-            if (embedId.HasValue)
-                return await GuildHelper.GetChannelAsync(this, Discord, embedId.Value, options).ConfigureAwait(false);
-            return null;
         }
 
         /// <summary>
@@ -828,6 +786,9 @@ namespace Discord.Rest
 
         //Emotes
         /// <inheritdoc />
+        public Task<IReadOnlyCollection<GuildEmote>> GetEmotesAsync(RequestOptions options = null)
+            => GuildHelper.GetEmotesAsync(this, Discord, options);
+        /// <inheritdoc />
         public Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null)
             => GuildHelper.GetEmoteAsync(this, Discord, id, options);
         /// <inheritdoc />
@@ -930,15 +891,6 @@ namespace Discord.Rest
         {
             if (mode == CacheMode.AllowDownload)
                 return await GetDefaultChannelAsync(options).ConfigureAwait(false);
-            else
-                return null;
-        }
-        /// <inheritdoc />
-        [Obsolete("This endpoint is deprecated, use GetWidgetChannelAsync instead.")]
-        async Task<IGuildChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
-        {
-            if (mode == CacheMode.AllowDownload)
-                return await GetEmbedChannelAsync(options).ConfigureAwait(false);
             else
                 return null;
         }

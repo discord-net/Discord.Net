@@ -36,14 +36,13 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => GetPrivateChannels().ToReadOnlyCollection(GetPrivateChannelCount);
         public IReadOnlyCollection<DiscordSocketClient> Shards => _shards;
-        /// <inheritdoc />
-        [Obsolete("This property is obsolete, use the GetVoiceRegionsAsync method instead.")]
-        public override IReadOnlyCollection<RestVoiceRegion> VoiceRegions => _shards[0].VoiceRegions;
 
         /// <summary>
         ///     Provides access to a REST-only client with a shared state from this client.
         /// </summary>
-        public override DiscordSocketRestClient Rest => _shards[0].Rest;
+        public override DiscordSocketRestClient Rest => _shards?[0].Rest;
+
+        public override SocketSelfUser CurrentUser { get => _shards?.FirstOrDefault(x => x.CurrentUser != null)?.CurrentUser; protected set => throw new InvalidOperationException(); }
 
         /// <summary> Creates a new REST/WebSocket Discord client. </summary>
         public DiscordShardedClient() : this(null, new DiscordSocketConfig()) { }
@@ -91,8 +90,7 @@ namespace Discord.WebSocket
             }
         }
         private static API.DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
-            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent,
-                rateLimitPrecision: config.RateLimitPrecision);
+            => new API.DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent);
 
         internal async Task AcquireIdentifyLockAsync(int shardId, CancellationToken token)
         {
@@ -265,11 +263,6 @@ namespace Discord.WebSocket
         }
 
         /// <inheritdoc />
-        [Obsolete("This method is obsolete, use GetVoiceRegionAsync instead.")]
-        public override RestVoiceRegion GetVoiceRegion(string id)
-            => _shards[0].GetVoiceRegion(id);
-
-        /// <inheritdoc />
         public override async ValueTask<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
         {
             return await _shards[0].GetVoiceRegionsAsync().ConfigureAwait(false);
@@ -339,14 +332,6 @@ namespace Discord.WebSocket
                 }
                 return Task.Delay(0);
             };
-            if (isPrimary)
-            {
-                client.Ready += () =>
-                {
-                    CurrentUser = client.CurrentUser;
-                    return Task.Delay(0);
-                };
-            }
 
             client.Connected += () => _shardConnectedEvent.InvokeAsync(client);
             client.Disconnected += (exception) => _shardDisconnectedEvent.InvokeAsync(exception, client);
@@ -432,11 +417,15 @@ namespace Discord.WebSocket
             => Task.FromResult<IUser>(GetUser(username, discriminator));
 
         /// <inheritdoc />
-        Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync(RequestOptions options)
-            => Task.FromResult<IReadOnlyCollection<IVoiceRegion>>(VoiceRegions);
+        async Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync(RequestOptions options)
+        {
+            return await GetVoiceRegionsAsync().ConfigureAwait(false);
+        }
         /// <inheritdoc />
-        Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
-            => Task.FromResult<IVoiceRegion>(GetVoiceRegion(id));
+        async Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
+        {
+            return await GetVoiceRegionAsync(id).ConfigureAwait(false);
+        }
 
         internal override void Dispose(bool disposing)
         {

@@ -65,8 +65,6 @@ namespace Discord
 		///		Allows for viewing of audit logs.
 		/// </summary>
         ViewAuditLog        = 0x00_00_00_80,
-        [Obsolete("Use ViewChannel instead.")]
-        ReadMessages        = ViewChannel,
         ViewChannel         = 0x00_00_04_00,
         SendMessages        = 0x00_00_08_00,
 		/// <summary>

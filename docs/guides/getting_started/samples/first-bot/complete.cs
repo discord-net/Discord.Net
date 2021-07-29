@@ -2,8 +2,7 @@ public class Program
 {
 	private DiscordSocketClient _client;
 	
-	public static void Main(string[] args)
-		=> new Program().MainAsync().GetAwaiter().GetResult();
+	public static Task Main(string[] args) => new Program().MainAsync();
 
 	public async Task MainAsync()
 	{

@@ -22,12 +22,6 @@ namespace Discord
         /// </summary>
         HypeSquadEvents = 1 << 2,
         /// <summary>
-        ///     Flag given to users who have participated in the bug report program.
-        ///     This flag is obsolete, use <see cref="BugHunterLevel1"/> instead.
-        /// </summary>
-        [Obsolete("Use BugHunterLevel1 instead.")]
-        BugHunter = 1 << 3,
-        /// <summary>
         ///     Flag given to users who have participated in the bug report program and are level 1.
         /// </summary>
         BugHunterLevel1 = 1 << 3,
@@ -67,5 +61,9 @@ namespace Discord
         ///     Flag given to users that developed bots and early verified their accounts.
         /// </summary>
         EarlyVerifiedBotDeveloper = 1 << 17,
+         /// <summary>
+        ///     Flag given to users that are discord certified moderators who has give discord's exam.
+        /// </summary>
+        DiscordCertifiedModerator = 1 << 18,
     }
 }

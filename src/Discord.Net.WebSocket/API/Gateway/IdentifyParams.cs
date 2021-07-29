@@ -17,8 +17,6 @@ namespace Discord.API.Gateway
         public Optional<int[]> ShardingParams { get; set; }
         [JsonProperty("presence")]
         public Optional<StatusUpdateParams> Presence { get; set; }
-        [JsonProperty("guild_subscriptions")]
-        public Optional<bool> GuildSubscriptions { get; set; }
         [JsonProperty("intents")]
         public Optional<int> Intents { get; set; }
     }

@@ -37,9 +37,6 @@ namespace Discord
         /// <summary> If <c>true</c>, a user may view the guild insights. </summary>
         public bool ViewGuildInsights => Permissions.GetValue(RawValue, GuildPermission.ViewGuildInsights);
 
-        /// <summary> If True, a user may join channels. </summary>
-        [Obsolete("Use ViewChannel instead.")]
-        public bool ReadMessages => ViewChannel;
         /// <summary> If True, a user may view channels. </summary>
         public bool ViewChannel => Permissions.GetValue(RawValue, GuildPermission.ViewChannel);
         /// <summary> If True, a user may send messages. </summary>
@@ -89,6 +86,9 @@ namespace Discord
 
         /// <summary> Creates a new <see cref="GuildPermissions"/> with the provided packed value. </summary>
         public GuildPermissions(ulong rawValue) { RawValue = rawValue; }
+
+        /// <summary> Creates a new <see cref="GuildPermissions"/> with the provided packed value after converting to ulong. </summary>
+        public GuildPermissions(string rawValue) { RawValue = ulong.Parse(rawValue); }
 
         private GuildPermissions(ulong initialValue,
             bool? createInstantInvite = null,

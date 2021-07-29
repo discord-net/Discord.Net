@@ -16,14 +16,6 @@ namespace Discord
         /// </returns>
         bool IsTemporary { get; }
         /// <summary>
-        ///     Gets a value that indicates whether the invite has been revoked.
-        /// </summary>
-        /// <returns>
-        ///     <c>true</c> if this invite was revoked; otherwise <c>false</c>.
-        /// </returns>
-        [Obsolete("This property doesn't exist anymore and shouldn't be used.")]
-        bool IsRevoked { get; }
-        /// <summary>
         ///     Gets the time (in seconds) until the invite expires.
         /// </summary>
         /// <returns>
