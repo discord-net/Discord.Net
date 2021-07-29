@@ -20,6 +20,10 @@ namespace Discord
         /// </summary>
         IReadOnlyList<ITeamMember> TeamMembers { get; }
         /// <summary>
+        ///     Gets the name of this team.
+        /// </summary>
+        string Name { get; }
+        /// <summary>
         ///     Gets the user identifier that owns this team.
         /// </summary>
         ulong OwnerUserId { get; }

@@ -9,9 +9,6 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketSystemMessage : SocketMessage, ISystemMessage
     {
-        /// <inheritdoc />
-        public MessageType Type { get; private set; }
-
         internal SocketSystemMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author)
             : base(discord, id, channel, author, MessageSource.System)
         {
@@ -25,8 +22,6 @@ namespace Discord.WebSocket
         internal override void Update(ClientState state, Model model)
         {
             base.Update(state, model);
-
-            Type = model.Type;
         }
         
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}, {Type})";

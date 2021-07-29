@@ -23,6 +23,7 @@ namespace Discord.WebSocket
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
         private ImmutableArray<SocketRole> _roleMentions = ImmutableArray.Create<SocketRole>();
         private ImmutableArray<SocketUser> _userMentions = ImmutableArray.Create<SocketUser>();
+        private ImmutableArray<Sticker> _stickers = ImmutableArray.Create<Sticker>();
 
         /// <inheritdoc />
         public override bool IsTTS => _isTTS;
@@ -46,6 +47,8 @@ namespace Discord.WebSocket
         public override IReadOnlyCollection<SocketRole> MentionedRoles => _roleMentions;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions;
+        /// <inheritdoc />
+        public override IReadOnlyCollection<Sticker> Stickers => _stickers;
         /// <inheritdoc />
         public IUserMessage ReferencedMessage => _referencedMessage;
 
@@ -158,6 +161,20 @@ namespace Discord.WebSocket
                     refMsgAuthor = new SocketUnknownUser(Discord, id: 0);
                 _referencedMessage = SocketUserMessage.Create(Discord, state, refMsgAuthor, Channel, refMsg);
             }
+
+            if (model.Stickers.IsSpecified)
+            {
+                var value = model.Stickers.Value;
+                if (value.Length > 0)
+                {
+                    var stickers = ImmutableArray.CreateBuilder<Sticker>(value.Length);
+                    for (int i = 0; i < value.Length; i++)
+                        stickers.Add(Sticker.Create(value[i]));
+                    _stickers = stickers.ToImmutable();
+                }
+                else
+                    _stickers = ImmutableArray.Create<Sticker>();
+            }
         }
 
         /// <inheritdoc />
@@ -172,9 +189,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task UnpinAsync(RequestOptions options = null)
             => MessageHelper.UnpinAsync(this, Discord, options);
-        /// <inheritdoc />
-        public Task ModifySuppressionAsync(bool suppressEmbeds, RequestOptions options = null)
-            => MessageHelper.SuppressEmbedsAsync(this, Discord, suppressEmbeds, options);
 
         public string Resolve(int startIndex, TagHandling userHandling = TagHandling.Name, TagHandling channelHandling = TagHandling.Name,
             TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)

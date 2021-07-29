@@ -22,11 +22,6 @@ namespace Discord
         /// </summary>
         AddReactions		= 0x00_00_00_40,
         /// <summary>
-        ///     Allows for reading of messages. This flag is obsolete, use <see cref = "ViewChannel" /> instead.
-        /// </summary>
-        [Obsolete("Use ViewChannel instead.")]
-        ReadMessages		= ViewChannel,
-        /// <summary>
         ///     Allows guild members to view a channel, which includes reading messages in text channels.
         /// </summary>
         ViewChannel			= 0x00_00_04_00,

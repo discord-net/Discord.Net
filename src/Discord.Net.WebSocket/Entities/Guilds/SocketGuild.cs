@@ -46,8 +46,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public int AFKTimeout { get; private set; }
         /// <inheritdoc />
-        public bool IsEmbeddable { get; private set; }
-        /// <inheritdoc />
         public bool IsWidgetEnabled { get; private set; }
         /// <inheritdoc />
         public VerificationLevel VerificationLevel { get; private set; }
@@ -84,7 +82,6 @@ namespace Discord.WebSocket
         public ulong? ApplicationId { get; internal set; }
 
         internal ulong? AFKChannelId { get; private set; }
-        internal ulong? EmbedChannelId { get; private set; }
         internal ulong? WidgetChannelId { get; private set; }
         internal ulong? SystemChannelId { get; private set; }
         internal ulong? RulesChannelId { get; private set; }
@@ -195,21 +192,6 @@ namespace Discord.WebSocket
                     _ => 96000,
                 };
                 return maxBitrate;
-            }
-        }
-        /// <summary>
-        ///     Gets the embed channel (i.e. the channel set in the guild's widget settings) in this guild.
-        /// </summary>
-        /// <returns>
-        ///     A channel set within the server's widget settings; <see langword="null"/> if none is set.
-        /// </returns>
-        [Obsolete("This property is deprecated, use WidgetChannel instead.")]
-        public SocketGuildChannel EmbedChannel
-        {
-            get
-            {
-                var id = EmbedChannelId;
-                return id.HasValue ? GetChannel(id.Value) : null;
             }
         }
         /// <summary>
@@ -405,7 +387,8 @@ namespace Discord.WebSocket
                 for (int i = 0; i < model.Members.Length; i++)
                 {
                     var member = SocketGuildUser.Create(this, state, model.Members[i]);
-                    members.TryAdd(member.Id, member);
+                    if (members.TryAdd(member.Id, member))
+                        member.GlobalUser.AddRef();
                 }
                 DownloadedMemberCount = members.Count;
 
@@ -440,16 +423,12 @@ namespace Discord.WebSocket
         internal void Update(ClientState state, Model model)
         {
             AFKChannelId = model.AFKChannelId;
-            if (model.EmbedChannelId.IsSpecified)
-                EmbedChannelId = model.EmbedChannelId.Value;
             if (model.WidgetChannelId.IsSpecified)
                 WidgetChannelId = model.WidgetChannelId.Value;
             SystemChannelId = model.SystemChannelId;
             RulesChannelId = model.RulesChannelId;
             PublicUpdatesChannelId = model.PublicUpdatesChannelId;
             AFKTimeout = model.AFKTimeout;
-            if (model.EmbedEnabled.IsSpecified)
-                IsEmbeddable = model.EmbedEnabled.Value;
             if (model.WidgetEnabled.IsSpecified)
                 IsWidgetEnabled = model.WidgetEnabled.Value;
             IconId = model.Icon;
@@ -504,7 +483,7 @@ namespace Discord.WebSocket
             }
             _roles = roles;
         }
-        internal void Update(ClientState state, GuildSyncModel model)
+        /*internal void Update(ClientState state, GuildSyncModel model) //TODO remove? userbot related
         {
             var members = new ConcurrentDictionary<ulong, SocketGuildUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Members.Length * 1.05));
             {
@@ -524,9 +503,9 @@ namespace Discord.WebSocket
             _members = members;
 
             var _ = _syncPromise.TrySetResultAsync(true);
-            /*if (!model.Large)
-                _ = _downloaderPromise.TrySetResultAsync(true);*/
-        }
+            //if (!model.Large)
+            //    _ = _downloaderPromise.TrySetResultAsync(true);
+        }*/
 
         internal void Update(ClientState state, EmojiUpdateModel model)
         {
@@ -546,11 +525,6 @@ namespace Discord.WebSocket
         public Task ModifyAsync(Action<GuildProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyAsync(this, Discord, func, options);
 
-        /// <inheritdoc />
-        /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
-        [Obsolete("This endpoint is deprecated, use ModifyWidgetAsync instead.")]
-        public Task ModifyEmbedAsync(Action<GuildEmbedProperties> func, RequestOptions options = null)
-            => GuildHelper.ModifyEmbedAsync(this, Discord, func, options);
         /// <inheritdoc />
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         public Task ModifyWidgetAsync(Action<GuildWidgetProperties> func, RequestOptions options = null)
@@ -869,16 +843,10 @@ namespace Discord.WebSocket
             else
             {
                 member = SocketGuildUser.Create(this, Discord.State, model);
-                if (member == null)
-                    throw new InvalidOperationException("SocketGuildUser.Create failed to produce a member"); // TODO 2.2rel: delete this
-                if (member.GlobalUser == null)
-                    throw new InvalidOperationException("Member was created without global user"); // TODO 2.2rel: delete this
                 member.GlobalUser.AddRef();
                 _members[member.Id] = member;
                 DownloadedMemberCount++;
             }
-            if (member == null)
-                throw new InvalidOperationException("AddOrUpdateUser failed to produce a user"); // TODO 2.2rel: delete this
             return member;
         }
         internal SocketGuildUser AddOrUpdateUser(PresenceModel model)
@@ -912,6 +880,7 @@ namespace Discord.WebSocket
             if (self != null)
                 _members.TryAdd(self.Id, self);
 
+            _downloaderPromise = new TaskCompletionSource<bool>();
             DownloadedMemberCount = _members.Count;
 
             foreach (var member in members)
@@ -1007,6 +976,9 @@ namespace Discord.WebSocket
             => GuildHelper.GetWebhooksAsync(this, Discord, options);
 
         //Emotes
+        /// <inheritdoc />
+        public Task<IReadOnlyCollection<GuildEmote>> GetEmotesAsync(RequestOptions options = null)
+            => GuildHelper.GetEmotesAsync(this, Discord, options);
         /// <inheritdoc />
         public Task<GuildEmote> GetEmoteAsync(ulong id, RequestOptions options = null)
             => GuildHelper.GetEmoteAsync(this, Discord, id, options);
@@ -1229,10 +1201,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         bool IGuild.Available => true;
         /// <inheritdoc />
-        ulong IGuild.DefaultChannelId => DefaultChannel?.Id ?? 0;
-        /// <inheritdoc />
-        ulong? IGuild.EmbedChannelId => EmbedChannelId;
-        /// <inheritdoc />
         ulong? IGuild.WidgetChannelId => WidgetChannelId;
         /// <inheritdoc />
         ulong? IGuild.SystemChannelId => SystemChannelId;
@@ -1286,10 +1254,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         Task<ITextChannel> IGuild.GetDefaultChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<ITextChannel>(DefaultChannel);
-        /// <inheritdoc />
-        [Obsolete("This method is deprecated, use GetWidgetChannelAsync instead.")]
-        Task<IGuildChannel> IGuild.GetEmbedChannelAsync(CacheMode mode, RequestOptions options)
-            => Task.FromResult<IGuildChannel>(EmbedChannel);
         /// <inheritdoc />
         Task<IGuildChannel> IGuild.GetWidgetChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildChannel>(WidgetChannel);

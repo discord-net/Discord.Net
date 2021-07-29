@@ -22,7 +22,7 @@ namespace Discord.Rest
             return RestToken.Create(client, model);
         }
 
-        public static async Task<RestChannel> GetChannelAsync(BaseDiscordClient client, 
+        public static async Task<RestChannel> GetChannelAsync(BaseDiscordClient client,
             ulong id, RequestOptions options)
         {
             var model = await client.ApiClient.GetChannelAsync(id, options).ConfigureAwait(false);
@@ -50,13 +50,13 @@ namespace Discord.Rest
                 .Where(x => x.Type == ChannelType.Group)
                 .Select(x => RestGroupChannel.Create(client, x)).ToImmutableArray();
         }
-        
+
         public static async Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(BaseDiscordClient client, RequestOptions options)
         {
             var models = await client.ApiClient.GetMyConnectionsAsync(options).ConfigureAwait(false);
             return models.Select(RestConnection.Create).ToImmutableArray();
         }
-        
+
         public static async Task<RestInviteMetadata> GetInviteAsync(BaseDiscordClient client,
             string inviteId, RequestOptions options)
         {
@@ -65,21 +65,13 @@ namespace Discord.Rest
                 return RestInviteMetadata.Create(client, null, null, model);
             return null;
         }
-        
+
         public static async Task<RestGuild> GetGuildAsync(BaseDiscordClient client,
             ulong id, bool withCounts, RequestOptions options)
         {
             var model = await client.ApiClient.GetGuildAsync(id, withCounts, options).ConfigureAwait(false);
             if (model != null)
                 return RestGuild.Create(client, model);
-            return null;
-        }
-        public static async Task<RestGuildEmbed?> GetGuildEmbedAsync(BaseDiscordClient client,
-            ulong id, RequestOptions options)
-        {
-            var model = await client.ApiClient.GetGuildEmbedAsync(id, options).ConfigureAwait(false);
-            if (model != null)
-                return RestGuildEmbed.Create(model);
             return null;
         }
         public static async Task<RestGuildWidget?> GetGuildWidgetAsync(BaseDiscordClient client,
@@ -90,7 +82,7 @@ namespace Discord.Rest
                 return RestGuildWidget.Create(model);
             return null;
         }
-        public static IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(BaseDiscordClient client, 
+        public static IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(BaseDiscordClient client,
             ulong? fromGuildId, int? limit, RequestOptions options)
         {
             return new PagedAsyncEnumerable<RestUserGuild>(
@@ -141,7 +133,7 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateGuildAsync(args, options).ConfigureAwait(false);
             return RestGuild.Create(client, model);
         }
-        
+
         public static async Task<RestUser> GetUserAsync(BaseDiscordClient client,
             ulong id, RequestOptions options)
         {
@@ -206,5 +198,9 @@ namespace Discord.Rest
                 }
             };
         }
+        public static Task AddRoleAsync(BaseDiscordClient client, ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
+            => client.ApiClient.AddRoleAsync(guildId, userId, roleId, options);
+        public static Task RemoveRoleAsync(BaseDiscordClient client, ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
+            => client.ApiClient.RemoveRoleAsync(guildId, userId, roleId, options);
     }
 }

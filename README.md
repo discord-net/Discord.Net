@@ -8,8 +8,6 @@ An unofficial .NET API Wrapper for the Discord client (https://discord.com).
 
 ## Documentation
 
-- [Stable](https://discord.foxbot.me/)
-  - Hosted by @foxbot
 - [Nightly](https://docs.stillu.cc/)
   - [Latest CI repo](https://github.com/discord-net/docs-static)
 

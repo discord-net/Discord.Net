@@ -45,9 +45,6 @@ namespace Discord
 
         /// <summary> If <c>true</c>, a user may add reactions. </summary>
         public bool AddReactions => Permissions.GetValue(RawValue, ChannelPermission.AddReactions);
-        /// <summary> If <c>true</c>, a user may join channels. </summary>
-        [Obsolete("Use ViewChannel instead.")]
-        public bool ReadMessages => ViewChannel;
         /// <summary> If <c>true</c>, a user may view channels. </summary>
         public bool ViewChannel => Permissions.GetValue(RawValue, ChannelPermission.ViewChannel);
 

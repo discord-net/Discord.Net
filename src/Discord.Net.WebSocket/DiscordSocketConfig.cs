@@ -112,28 +112,6 @@ namespace Discord.WebSocket
         public int? HandlerTimeout { get; set; } = 3000;
 
         /// <summary>
-        ///     Gets or sets the behavior for <see cref="BaseSocketClient.MessageDeleted"/> on bulk deletes.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        ///     If <c>true</c>, the <see cref="BaseSocketClient.MessageDeleted"/> event will not be raised for bulk
-        ///     deletes, and only the <see cref="BaseSocketClient.MessagesBulkDeleted"/> will be raised. If <c>false</c>
-        ///     , both events will be raised.
-        /// </para>
-        /// <para>
-        ///     If unset, both events will be raised, but a warning will be raised the first time a bulk delete event is
-        ///     received.
-        /// </para>
-        /// </remarks>
-        public bool? ExclusiveBulkDelete { get; set; } = null;
-
-        /// <summary>
-        ///     Gets or sets enabling dispatching of guild subscription events e.g. presence and typing events.
-        ///     This is not used if <see cref="GatewayIntents"/> are provided.
-        /// </summary>
-        public bool GuildSubscriptions { get; set; } = true;
-
-        /// <summary>
         ///     Gets or sets the maximum identify concurrency.
         /// </summary>
         /// <remarks>
@@ -172,14 +150,15 @@ namespace Discord.WebSocket
         private int maxWaitForGuildAvailable = 10000;
 
         /// <summary>
-        ///    Gets or sets gateway intents to limit what events are sent from Discord. Allows for more granular control than the <see cref="GuildSubscriptions"/> property.
+        ///    Gets or sets gateway intents to limit what events are sent from Discord.
+        ///    The default is <see cref="GatewayIntents.AllUnprivileged"/>.
         /// </summary>
         /// <remarks>
         ///     For more information, please see
         ///     <see href="https://discord.com/developers/docs/topics/gateway#gateway-intents">GatewayIntents</see>
         ///     on the official Discord API documentation.
         /// </remarks>
-        public GatewayIntents? GatewayIntents { get; set; }
+        public GatewayIntents GatewayIntents { get; set; } = GatewayIntents.AllUnprivileged;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="DiscordSocketConfig"/> class with the default configuration.

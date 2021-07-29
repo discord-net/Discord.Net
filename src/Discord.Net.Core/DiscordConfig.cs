@@ -16,7 +16,7 @@ namespace Discord
         ///     <see href="https://discord.com/developers/docs/reference#api-versioning">Discord API documentation</see>
         ///     .</para>
         /// </returns>
-        public const int APIVersion = 6;
+        public const int APIVersion = 9;
         /// <summary>
         /// Returns the Voice API version Discord.Net uses.
         /// </summary>
@@ -43,7 +43,7 @@ namespace Discord
         /// <returns>
         ///     The user agent used in each Discord.Net request.
         /// </returns>
-        public static string UserAgent { get; } = $"DiscordBot (https://github.com/RogueException/Discord.Net, v{Version})";
+        public static string UserAgent { get; } = $"DiscordBot (https://github.com/discord-net/Discord.Net, v{Version})";
         /// <summary>
         ///     Returns the base Discord API URL.
         /// </summary>
@@ -140,18 +140,6 @@ namespace Discord
         ///     the API version it uses on startup.
         /// </remarks>
         internal bool DisplayInitialLog { get; set; } = true;
-
-        /// <summary>
-        ///     Gets or sets the level of precision of the rate limit reset response.
-        /// </summary>
-        /// <remarks>
-        ///     If set to <see cref="RateLimitPrecision.Second"/>, this value will be rounded up to the
-        ///     nearest second.
-        /// </remarks>
-        /// <returns>
-        ///     The currently set <see cref="RateLimitPrecision"/>.
-        /// </returns>
-        public RateLimitPrecision RateLimitPrecision { get; set; } = RateLimitPrecision.Millisecond;
 
 		/// <summary>
 		/// 	Gets or sets whether or not rate-limits should use the system clock.

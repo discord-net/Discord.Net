@@ -15,7 +15,7 @@ namespace Discord.Net.Examples.WebSocket
             => client.ReactionAdded += HandleReactionAddedAsync;
 
         public async Task HandleReactionAddedAsync(Cacheable<IUserMessage, ulong> cachedMessage,
-            ISocketMessageChannel originChannel, SocketReaction reaction)
+            Cacheable<IMessageChannel, ulong> originChannel, SocketReaction reaction)
         {
             var message = await cachedMessage.GetOrDownloadAsync();
             if (message != null && reaction.User.IsSpecified)
@@ -100,16 +100,17 @@ namespace Discord.Net.Examples.WebSocket
         public void HookMessageDeleted(BaseSocketClient client)
             => client.MessageDeleted += HandleMessageDelete;
 
-        public Task HandleMessageDelete(Cacheable<IMessage, ulong> cachedMessage, ISocketMessageChannel channel)
+        public async Task HandleMessageDelete(Cacheable<IMessage, ulong> cachedMessage, Cacheable<IMessageChannel, ulong> cachedChannel)
         {
             // check if the message exists in cache; if not, we cannot report what was removed
-            if (!cachedMessage.HasValue) return Task.CompletedTask;
+            if (!cachedMessage.HasValue) return;
+            // gets or downloads the channel if it's not in the cache
+            IMessageChannel channel = await cachedChannel.GetOrDownloadAsync();
             var message = cachedMessage.Value;
             Console.WriteLine(
                 $"A message ({message.Id}) from {message.Author} was removed from the channel {channel.Name} ({channel.Id}):"
                 + Environment.NewLine
                 + message.Content);
-            return Task.CompletedTask;
         }
 
         #endregion

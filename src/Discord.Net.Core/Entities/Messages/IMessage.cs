@@ -10,7 +10,7 @@ namespace Discord
     public interface IMessage : ISnowflakeEntity, IDeletable
     {
         /// <summary>
-        ///     Gets the type of this system message.
+        ///     Gets the type of this message.
         /// </summary>
         MessageType Type { get; }
         /// <summary>
@@ -164,6 +164,14 @@ namespace Discord
         /// </summary>
         IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions { get; }
 
+        /// <summary>
+        ///     Gets all stickers included in this message.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection of sticker objects.
+        /// </returns>
+        IReadOnlyCollection<ISticker> Stickers { get; }
+        
         /// <summary>
         ///     Gets the flags related to this message.
         /// </summary>
