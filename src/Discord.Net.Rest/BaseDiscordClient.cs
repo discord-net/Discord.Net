@@ -217,6 +217,10 @@ namespace Discord.Rest
             => Task.FromResult<IWebhook>(null);
 
         /// <inheritdoc />
+        Task<IUserMessage> IDiscordClient.SendMessageAsync(ulong channelId, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, RequestOptions options)
+            => Task.FromResult<IUserMessage>(null);
+
+        /// <inheritdoc />
         Task IDiscordClient.StartAsync()
             => Task.Delay(0);
         /// <inheritdoc />

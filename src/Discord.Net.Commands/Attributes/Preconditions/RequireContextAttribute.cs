@@ -17,10 +17,6 @@ namespace Discord.Commands
         ///     Specifies the command to be executed within a DM.
         /// </summary>
         DM = 0x02,
-        /// <summary>
-        ///     Specifies the command to be executed within a group.
-        /// </summary>
-        Group = 0x04
     }
 
     /// <summary>
@@ -59,11 +55,9 @@ namespace Discord.Commands
             bool isValid = false;
 
             if ((Contexts & ContextType.Guild) != 0)
-                isValid = context.Channel is IGuildChannel;
+                isValid = context.GuildId != null;
             if ((Contexts & ContextType.DM) != 0)
-                isValid = isValid || context.Channel is IDMChannel;
-            if ((Contexts & ContextType.Group) != 0)
-                isValid = isValid || context.Channel is IGroupChannel;
+                isValid = context.GuildId == null;
 
             if (isValid)
                 return Task.FromResult(PreconditionResult.FromSuccess());

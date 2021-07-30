@@ -54,31 +54,32 @@ namespace Discord.Commands
         }
 
         /// <inheritdoc />
-        public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
+        public override async Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
             var guildUser = context.User as IGuildUser;
 
             if (GuildPermission.HasValue)
             {
                 if (guildUser == null)
-                    return Task.FromResult(PreconditionResult.FromError(NotAGuildErrorMessage ?? "Command must be used in a guild channel."));                
+                    return PreconditionResult.FromError(NotAGuildErrorMessage ?? "Command must be used in a guild channel.");                
                 if (!guildUser.GuildPermissions.Has(GuildPermission.Value))
-                    return Task.FromResult(PreconditionResult.FromError(ErrorMessage ?? $"User requires guild permission {GuildPermission.Value}."));
+                    return PreconditionResult.FromError(ErrorMessage ?? $"User requires guild permission {GuildPermission.Value}.");
             }
 
             if (ChannelPermission.HasValue)
             {
                 ChannelPermissions perms;
-                if (context.Channel is IGuildChannel guildChannel)
+                IMessageChannel channel = await context.Channel.GetOrDownloadAsync().ConfigureAwait(false);
+                if (channel is IGuildChannel guildChannel)
                     perms = guildUser.GetPermissions(guildChannel);
                 else
-                    perms = ChannelPermissions.All(context.Channel);
+                    perms = ChannelPermissions.All(channel);
 
                 if (!perms.Has(ChannelPermission.Value))
-                    return Task.FromResult(PreconditionResult.FromError(ErrorMessage ?? $"User requires channel permission {ChannelPermission.Value}."));
+                    return PreconditionResult.FromError(ErrorMessage ?? $"User requires channel permission {ChannelPermission.Value}.");
             }
 
-            return Task.FromResult(PreconditionResult.FromSuccess());
+            return PreconditionResult.FromSuccess();
         }
     }
 }

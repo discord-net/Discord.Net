@@ -18,7 +18,9 @@ namespace Discord.Commands
         public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
             var results = new Dictionary<ulong, TypeReaderValue>();
-            IAsyncEnumerable<IUser> channelUsers = context.Channel.GetUsersAsync(CacheMode.CacheOnly).Flatten(); // it's better
+            IAsyncEnumerable<IUser> channelUsers = context.Channel.HasValue
+                ? context.Channel.Value.GetUsersAsync(CacheMode.CacheOnly).Flatten()
+                : AsyncEnumerable.Empty<IUser>();
             IReadOnlyCollection<IGuildUser> guildUsers = ImmutableArray.Create<IGuildUser>();
 
             if (context.Guild != null)
@@ -29,8 +31,8 @@ namespace Discord.Commands
             {
                 if (context.Guild != null)
                     AddResult(results, await context.Guild.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 1.00f);
-                else
-                    AddResult(results, await context.Channel.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 1.00f);
+                else if (context.Channel.HasValue)
+                    AddResult(results, await context.Channel.Value.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 1.00f);
             }
 
             //By Id (0.9)
@@ -38,8 +40,8 @@ namespace Discord.Commands
             {
                 if (context.Guild != null)
                     AddResult(results, await context.Guild.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 0.90f);
-                else
-                    AddResult(results, await context.Channel.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 0.90f);
+                else if (context.Channel.HasValue)
+                    AddResult(results, await context.Channel.Value.GetUserAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) as T, 0.90f);
             }
 
             //By Username + Discriminator (0.7-0.85)

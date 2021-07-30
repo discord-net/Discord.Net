@@ -21,7 +21,7 @@ namespace Discord.WebSocket
         private ImmutableArray<Attachment> _attachments = ImmutableArray.Create<Attachment>();
         private ImmutableArray<Embed> _embeds = ImmutableArray.Create<Embed>();
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
-        private ImmutableArray<SocketRole> _roleMentions = ImmutableArray.Create<SocketRole>();
+        private ImmutableArray<ulong> _roleIdMentions = ImmutableArray.Create<ulong>();
         private ImmutableArray<SocketUser> _userMentions = ImmutableArray.Create<SocketUser>();
         private ImmutableArray<Sticker> _stickers = ImmutableArray.Create<Sticker>();
 
@@ -44,7 +44,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuildChannel> MentionedChannels => MessageHelper.FilterTagsByValue<SocketGuildChannel>(TagType.ChannelMention, _tags);
         /// <inheritdoc />
-        public override IReadOnlyCollection<SocketRole> MentionedRoles => _roleMentions;
+        public override IReadOnlyCollection<ulong> MentionedRoleIds => _roleIdMentions;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions;
         /// <inheritdoc />
@@ -52,11 +52,11 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public IUserMessage ReferencedMessage => _referencedMessage;
 
-        internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author, MessageSource source)
+        internal SocketUserMessage(DiscordSocketClient discord, ulong id, Cacheable<IMessageChannel, ulong> channel, SocketUser author, MessageSource source)
             : base(discord, id, channel, author, source)
         {
         }
-        internal new static SocketUserMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
+        internal static SocketUserMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, Cacheable<IMessageChannel, ulong> channel, Model model)
         {
             var entity = new SocketUserMessage(discord, model.Id, channel, author, MessageHelper.GetSource(model));
             entity.Update(state, model);
@@ -67,7 +67,11 @@ namespace Discord.WebSocket
         {
             base.Update(state, model);
 
-            SocketGuild guild = (Channel as SocketGuildChannel)?.Guild;
+            SocketGuild guild = null;
+            if (model.GuildId.IsSpecified)
+                guild = state.GetGuild(model.GuildId.Value);
+            else if (Channel.HasValue)
+                guild = (Channel.Value as SocketGuildChannel)?.Guild;
 
             if (model.IsTextToSpeech.IsSpecified)
                 _isTTS = model.IsTextToSpeech.Value;
@@ -78,7 +82,7 @@ namespace Discord.WebSocket
             if (model.MentionEveryone.IsSpecified)
                 _isMentioningEveryone = model.MentionEveryone.Value;
             if (model.RoleMentions.IsSpecified)
-                _roleMentions = model.RoleMentions.Value.Select(x => guild.GetRole(x)).ToImmutableArray();
+                _roleIdMentions = model.RoleMentions.Value.ToImmutableArray();
 
             if (model.Attachments.IsSpecified)
             {
@@ -119,7 +123,9 @@ namespace Discord.WebSocket
                         var val = value[i];
                         if (val.Object != null)
                         {
-                            var user = Channel.GetUserAsync(val.Object.Id, CacheMode.CacheOnly).GetAwaiter().GetResult() as SocketUser;
+                            SocketUser user = null;
+                            if (Channel.HasValue)
+                                user = Channel.Value.GetUserAsync(val.Object.Id, CacheMode.CacheOnly).GetAwaiter().GetResult() as SocketUser;
                             if (user != null)
                                 newMentions.Add(user);
                             else
@@ -133,7 +139,7 @@ namespace Discord.WebSocket
             if (model.Content.IsSpecified)
             {
                 var text = model.Content.Value;
-                _tags = MessageHelper.ParseTags(text, Channel, guild, _userMentions);
+                _tags = MessageHelper.ParseTags(text, Channel.HasValue ? Channel.Value : null, guild, _userMentions);
                 model.Content = text;
             }
 
@@ -151,8 +157,9 @@ namespace Discord.WebSocket
                         else
                             refMsgAuthor = guild.GetUser(refMsg.Author.Value.Id);
                     }
-                    else
-                        refMsgAuthor = (Channel as SocketChannel).GetUser(refMsg.Author.Value.Id);
+                    else if (Channel.HasValue)
+                        refMsgAuthor = (Channel.Value as SocketChannel).GetUser(refMsg.Author.Value.Id);
+
                     if (refMsgAuthor == null)
                         refMsgAuthor = SocketUnknownUser.Create(Discord, state, refMsg.Author.Value);
                 }
@@ -202,7 +209,7 @@ namespace Discord.WebSocket
         /// <exception cref="InvalidOperationException">This operation may only be called on a <see cref="INewsChannel"/> channel.</exception>
         public async Task CrosspostAsync(RequestOptions options = null)
         {
-            if (!(Channel is INewsChannel))
+            if (Channel.HasValue && !(Channel.Value is INewsChannel))
             {
                 throw new InvalidOperationException("Publishing (crossposting) is only valid in news channels.");
             }

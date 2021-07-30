@@ -17,7 +17,7 @@ namespace Discord.Commands
             //By Id (1.0)
             if (ulong.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out ulong id))
             {
-                if (await context.Channel.GetMessageAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) is T msg)
+                if (context.Channel.HasValue && await context.Channel.Value.GetMessageAsync(id, CacheMode.CacheOnly).ConfigureAwait(false) is T msg)
                     return TypeReaderResult.FromSuccess(msg);
             }
 

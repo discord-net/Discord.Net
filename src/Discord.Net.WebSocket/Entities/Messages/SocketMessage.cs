@@ -23,13 +23,10 @@ namespace Discord.WebSocket
         ///     A WebSocket-based user object.
         /// </returns>
         public SocketUser Author { get; }
-        /// <summary>
-        ///     Gets the source channel of the message.
-        /// </summary>
-        /// <returns>
-        ///     A WebSocket-based message channel.
-        /// </returns>
-        public ISocketMessageChannel Channel { get; }
+        /// <inheritdoc />
+        public Cacheable<IMessageChannel, ulong> Channel { get; }
+        /// <inheritdoc />
+        public ulong? GuildId { get; private set; }
         /// <inheritdoc />
         public MessageSource Source { get; }
 
@@ -85,13 +82,8 @@ namespace Discord.WebSocket
         ///     Collection of WebSocket-based guild channels.
         /// </returns>
         public virtual IReadOnlyCollection<SocketGuildChannel> MentionedChannels => ImmutableArray.Create<SocketGuildChannel>();
-        /// <summary>
-        ///     Returns the roles mentioned in this message.
-        /// </summary>
-        /// <returns>
-        ///     Collection of WebSocket-based roles.
-        /// </returns>
-        public virtual IReadOnlyCollection<SocketRole> MentionedRoles => ImmutableArray.Create<SocketRole>();
+        /// <inheritdoc/>
+        public virtual IReadOnlyCollection<ulong> MentionedRoleIds => ImmutableArray.Create<ulong>();
         /// <summary>
         ///     Returns the users mentioned in this message.
         /// </summary>
@@ -109,23 +101,32 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
-        internal SocketMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author, MessageSource source)
+        internal SocketMessage(DiscordSocketClient discord, ulong id, Cacheable<IMessageChannel, ulong> channel, SocketUser author, MessageSource source)
             : base(discord, id)
         {
             Channel = channel;
             Author = author;
             Source = source;
         }
-        internal static SocketMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
+        internal static SocketMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, IMessageChannel channel, Model model)
         {
+            var cacheableChannel = new Cacheable<IMessageChannel, ulong>(
+                channel,
+                model.ChannelId,
+                channel != null,
+                async () => (IMessageChannel)await ClientHelper.GetChannelAsync(discord, model.ChannelId, RequestOptions.Default).ConfigureAwait(false));
+
             if (model.Type == MessageType.Default || model.Type == MessageType.Reply)
-                return SocketUserMessage.Create(discord, state, author, channel, model);
+                return SocketUserMessage.Create(discord, state, author, cacheableChannel, model);
             else
-                return SocketSystemMessage.Create(discord, state, author, channel, model);
+                return SocketSystemMessage.Create(discord, state, author, cacheableChannel, model);
         }
         internal virtual void Update(ClientState state, Model model)
         {
             Type = model.Type;
+
+            if (model.GuildId.IsSpecified)
+                GuildId = model.GuildId.Value;
 
             if (model.Timestamp.IsSpecified)
                 _timestampTicks = model.Timestamp.Value.UtcTicks;
@@ -188,15 +189,11 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         IUser IMessage.Author => Author;
         /// <inheritdoc />
-        IMessageChannel IMessage.Channel => Channel;
-        /// <inheritdoc />
         IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
         /// <inheritdoc />
         IReadOnlyCollection<IEmbed> IMessage.Embeds => Embeds;
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedChannelIds => MentionedChannels.Select(x => x.Id).ToImmutableArray();
-        /// <inheritdoc />
-        IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoles.Select(x => x.Id).ToImmutableArray();
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
         /// <inheritdoc />

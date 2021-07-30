@@ -50,11 +50,11 @@ namespace Discord.Rest
         /// <inheritdoc />
         public IUserMessage ReferencedMessage => _referencedMessage;
 
-        internal RestUserMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
+        internal RestUserMessage(BaseDiscordClient discord, ulong id, Cacheable<IMessageChannel, ulong> channel, IUser author, MessageSource source)
             : base(discord, id, channel, author, source)
         {
         }
-        internal new static RestUserMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author, Model model)
+        internal static RestUserMessage Create(BaseDiscordClient discord, Cacheable<IMessageChannel, ulong> channel, IUser author, Model model)
         {
             var entity = new RestUserMessage(discord, model.Id, channel, author, MessageHelper.GetSource(model));
             entity.Update(model);
@@ -120,7 +120,7 @@ namespace Discord.Rest
                 }
             }
 
-            var guildId = (Channel as IGuildChannel)?.GuildId;
+            ulong? guildId = model.GuildId.IsSpecified ? model.GuildId.Value : null;
             var guild = guildId != null ? (Discord as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
             if (model.Content.IsSpecified)
             {
@@ -177,7 +177,7 @@ namespace Discord.Rest
         /// <exception cref="InvalidOperationException">This operation may only be called on a <see cref="INewsChannel"/> channel.</exception>
         public async Task CrosspostAsync(RequestOptions options = null)
         {
-            if (!(Channel is INewsChannel))
+            if (Channel.HasValue && !(Channel.Value is INewsChannel))
             {
                 throw new InvalidOperationException("Publishing (crossposting) is only valid in news channels.");
             }

@@ -9,7 +9,7 @@ namespace Discord.Commands
         public new DiscordShardedClient Client { get; }
 
         public ShardedCommandContext(DiscordShardedClient client, SocketUserMessage msg)
-            : base(client.GetShard(GetShardId(client, (msg.Channel as SocketGuildChannel)?.Guild)), msg)
+            : base(client.GetShardFor(msg.GuildId ?? 0), msg)
         {
             Client = client;
         }

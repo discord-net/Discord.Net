@@ -1263,24 +1263,16 @@ namespace Discord.WebSocket
                                     var channel = GetChannel(data.ChannelId) as ISocketMessageChannel;
 
                                     var guild = (channel as SocketGuildChannel)?.Guild;
+                                    if (channel == null && data.GuildId.IsSpecified)
+                                        guild = State.GetGuild(data.GuildId.Value);
                                     if (guild != null && !guild.IsSynced)
                                     {
                                         await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
                                         return;
                                     }
 
-                                    if (channel == null)
-                                    {
-                                        if (!data.GuildId.IsSpecified)  // assume it is a DM
-                                        {
-                                            channel = CreateDMChannel(data.ChannelId, data.Author.Value, State);
-                                        }
-                                        else
-                                        {
-                                            await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
-                                            return;
-                                        }
-                                    }
+                                    if (channel == null && !data.GuildId.IsSpecified)  // assume it is a DM
+                                        channel = CreateDMChannel(data.ChannelId, data.Author.Value, State);
 
                                     SocketUser author;
                                     if (guild != null)
@@ -1291,7 +1283,7 @@ namespace Discord.WebSocket
                                             author = guild.GetUser(data.Author.Value.Id);
                                     }
                                     else
-                                        author = (channel as SocketChannel).GetUser(data.Author.Value.Id);
+                                        author = (channel as SocketChannel)?.GetUser(data.Author.Value.Id);
 
                                     if (author == null)
                                     {
@@ -1309,13 +1301,14 @@ namespace Discord.WebSocket
                                             author = groupChannel.GetOrAddUser(data.Author.Value);
                                         else
                                         {
-                                            await UnknownChannelUserAsync(type, data.Author.Value.Id, channel.Id).ConfigureAwait(false);
+                                            await UnknownChannelUserAsync(type, data.Author.Value.Id, data.ChannelId).ConfigureAwait(false);
                                             return;
                                         }
                                     }
 
                                     var msg = SocketMessage.Create(this, State, author, channel, data);
-                                    SocketChannelHelper.AddMessage(channel, this, msg);
+                                    if (channel != null)
+                                        SocketChannelHelper.AddMessage(channel, this, msg);
                                     await TimedInvokeAsync(_messageReceivedEvent, nameof(MessageReceived), msg).ConfigureAwait(false);
                                 }
                                 break;
@@ -1327,6 +1320,8 @@ namespace Discord.WebSocket
                                     var channel = GetChannel(data.ChannelId) as ISocketMessageChannel;
 
                                     var guild = (channel as SocketGuildChannel)?.Guild;
+                                    if (channel == null && data.GuildId.IsSpecified)
+                                        guild = State.GetGuild(data.GuildId.Value);
                                     if (guild != null && !guild.IsSynced)
                                     {
                                         await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
@@ -1390,11 +1385,6 @@ namespace Discord.WebSocket
                                                 }
                                                 else
                                                     channel = CreateDMChannel(data.ChannelId, author, State);
-                                            }
-                                            else
-                                            {
-                                                await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
-                                                return;
                                             }
                                         }
 

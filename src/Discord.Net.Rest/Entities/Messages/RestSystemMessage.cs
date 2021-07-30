@@ -9,11 +9,11 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestSystemMessage : RestMessage, ISystemMessage
     {
-        internal RestSystemMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author)
+        internal RestSystemMessage(BaseDiscordClient discord, ulong id, Cacheable<IMessageChannel, ulong> channel, IUser author)
             : base(discord, id, channel, author, MessageSource.System)
         {
         }
-        internal new static RestSystemMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author, Model model)
+        internal static RestSystemMessage Create(BaseDiscordClient discord, Cacheable<IMessageChannel, ulong> channel, IUser author, Model model)
         {
             var entity = new RestSystemMessage(discord, model.Id, channel, author);
             entity.Update(model);

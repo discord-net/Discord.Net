@@ -15,10 +15,10 @@ namespace Discord.Commands
         ///     Gets the <see cref="SocketGuild" /> that the command is executed in.
         /// </summary>
         public SocketGuild Guild { get; }
-        /// <summary>
-        ///     Gets the <see cref="ISocketMessageChannel" /> that the command is executed in.
-        /// </summary>
-        public ISocketMessageChannel Channel { get; }
+        /// <inheritdoc/>
+        public ulong? GuildId { get; }
+        /// <inheritdoc/>
+        public Cacheable<IMessageChannel, ulong> Channel { get; }
         /// <summary>
         ///     Gets the <see cref="SocketUser" /> who executed the command.
         /// </summary>
@@ -31,7 +31,7 @@ namespace Discord.Commands
         /// <summary>
         ///     Indicates whether the channel that the command is executed in is a private channel.
         /// </summary>
-        public bool IsPrivate => Channel is IPrivateChannel;
+        public bool IsPrivate => GuildId == null;
 
         /// <summary>
         ///     Initializes a new <see cref="SocketCommandContext" /> class with the provided client and message.
@@ -41,7 +41,9 @@ namespace Discord.Commands
         public SocketCommandContext(DiscordSocketClient client, SocketUserMessage msg)
         {
             Client = client;
-            Guild = (msg.Channel as SocketGuildChannel)?.Guild;
+            GuildId = msg.GuildId;
+            if (msg.GuildId != null)
+                Guild = client.GetGuild(msg.GuildId.Value);
             Channel = msg.Channel;
             User = msg.Author;
             Message = msg;
@@ -53,7 +55,7 @@ namespace Discord.Commands
         /// <inheritdoc/>
         IGuild ICommandContext.Guild => Guild;
         /// <inheritdoc/>
-        IMessageChannel ICommandContext.Channel => Channel;
+        Cacheable<IMessageChannel, ulong> ICommandContext.Channel => Channel;
         /// <inheritdoc/>
         IUser ICommandContext.User => User;
         /// <inheritdoc/>

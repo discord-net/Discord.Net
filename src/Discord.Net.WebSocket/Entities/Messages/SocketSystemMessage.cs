@@ -9,11 +9,11 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketSystemMessage : SocketMessage, ISystemMessage
     {
-        internal SocketSystemMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author)
+        internal SocketSystemMessage(DiscordSocketClient discord, ulong id, Cacheable<IMessageChannel, ulong> channel, SocketUser author)
             : base(discord, id, channel, author, MessageSource.System)
         {
         }
-        internal new static SocketSystemMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
+        internal static SocketSystemMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, Cacheable<IMessageChannel, ulong> channel, Model model)
         {
             var entity = new SocketSystemMessage(discord, model.Id, channel, author);
             entity.Update(state, model);

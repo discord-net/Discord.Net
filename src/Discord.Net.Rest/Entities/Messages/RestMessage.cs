@@ -16,7 +16,9 @@ namespace Discord.Rest
         private ImmutableArray<RestReaction> _reactions = ImmutableArray.Create<RestReaction>();
 
         /// <inheritdoc />
-        public IMessageChannel Channel { get; }
+        public Cacheable<IMessageChannel, ulong> Channel { get; }
+        /// <inheritdoc />
+        public ulong? GuildId { get; private set; }
         /// <summary>
         ///     Gets the Author of the message.
         /// </summary>
@@ -74,7 +76,7 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public MessageType Type { get; private set; }
 
-        internal RestMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
+        internal RestMessage(BaseDiscordClient discord, ulong id, Cacheable<IMessageChannel, ulong> channel, IUser author, MessageSource source)
             : base(discord, id)
         {
             Channel = channel;
@@ -83,14 +85,23 @@ namespace Discord.Rest
         }
         internal static RestMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author, Model model)
         {
+            var cacheableChannel = new Cacheable<IMessageChannel, ulong>(
+                channel,
+                model.ChannelId,
+                channel != null,
+                async () => (IMessageChannel)await ClientHelper.GetChannelAsync(discord, model.ChannelId, RequestOptions.Default).ConfigureAwait(false));
+
             if (model.Type == MessageType.Default || model.Type == MessageType.Reply)
-                return RestUserMessage.Create(discord, channel, author, model);
+                return RestUserMessage.Create(discord, cacheableChannel, author, model);
             else
-                return RestSystemMessage.Create(discord, channel, author, model);
+                return RestSystemMessage.Create(discord, cacheableChannel, author, model);
         }
         internal virtual void Update(Model model)
         {
             Type = model.Type;
+
+            if (model.GuildId.IsSpecified)
+                GuildId = model.GuildId.Value;
 
             if (model.Timestamp.IsSpecified)
                 _timestampTicks = model.Timestamp.Value.UtcTicks;

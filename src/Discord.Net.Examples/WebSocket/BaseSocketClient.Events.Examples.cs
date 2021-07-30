@@ -84,12 +84,12 @@ namespace Discord.Net.Examples.WebSocket
             // check if the message is a user message as opposed to a system message (e.g. Clyde, pins, etc.)
             if (!(message is SocketUserMessage userMessage)) return Task.CompletedTask;
             // check if the message origin is a guild message channel
-            if (!(userMessage.Channel is SocketTextChannel textChannel)) return Task.CompletedTask;
+            if (userMessage.GuildId == null) return Task.CompletedTask;
             // check if the target user was mentioned
             var targetUsers = userMessage.MentionedUsers.Where(x => _targetUserIds.Contains(x.Id));
             foreach (var targetUser in targetUsers)
                 Console.WriteLine(
-                    $"{targetUser} was mentioned in the message '{message.Content}' by {message.Author} in {textChannel.Name}.");
+                    $"{targetUser} was mentioned in the message '{message.Content}' by {message.Author} in {MentionUtils.MentionChannel(message.Channel.Id)}.");
             return Task.CompletedTask;
         }
 

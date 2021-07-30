@@ -284,5 +284,24 @@ namespace Discord
         ///     that represents the gateway information related to the bot.
         /// </returns>
         Task<BotGateway> GetBotGatewayAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Sends a message to a channel.
+        /// </summary>
+        /// <param name="channelId">The channel to send the message.</param>
+        /// <param name="text">The message to be sent.</param>
+        /// <param name="isTTS">Determines whether the message should be read aloud by Discord or not.</param>
+        /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
+        /// <param name="allowedMentions">
+        ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
+        ///     If <c>null</c>, all mentioned roles and users will be notified.
+        /// </param>
+        /// <param name="messageReference">The reference for this message.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents an asynchronous send operation for delivering the message. The task result
+        ///     contains the sent message.
+        /// </returns>
+        Task<IUserMessage> SendMessageAsync(ulong channelId, string text = null, bool isTTS = false, Embed embed = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, RequestOptions options = null);
     }
 }

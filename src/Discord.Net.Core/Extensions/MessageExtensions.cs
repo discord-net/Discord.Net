@@ -17,7 +17,7 @@ namespace Discord
         public static string GetJumpUrl(this IMessage msg)
         {
             var channel = msg.Channel;
-            return $"https://discord.com/channels/{(channel is IDMChannel ? "@me" : $"{(channel as ITextChannel).GuildId}")}/{channel.Id}/{msg.Id}";
+            return $"https://discord.com/channels/{(msg.GuildId.HasValue ? $"{msg.GuildId}" : "@me")}/{channel.Id}/{msg.Id}";
         }
 
         /// <summary>
@@ -89,7 +89,8 @@ namespace Discord
         /// </returns>
         public static async Task<IUserMessage> ReplyAsync(this IUserMessage msg, string text = null, bool isTTS = false, Embed embed = null, AllowedMentions allowedMentions = null, RequestOptions options = null)
         {
-            return await msg.Channel.SendMessageAsync(text, isTTS, embed, options, allowedMentions, new MessageReference(messageId: msg.Id)).ConfigureAwait(false);
+            IMessageChannel channel = await msg.Channel.GetOrDownloadAsync().ConfigureAwait(false);
+            return await channel.SendMessageAsync(text, isTTS, embed, options, allowedMentions, new MessageReference(messageId: msg.Id)).ConfigureAwait(false);
         }
     }
 }
