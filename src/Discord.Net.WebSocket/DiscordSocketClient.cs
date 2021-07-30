@@ -1262,7 +1262,7 @@ namespace Discord.WebSocket
                                     var data = (payload as JToken).ToObject<API.Message>(_serializer);
                                     var channel = GetChannel(data.ChannelId) as ISocketMessageChannel;
 
-                                    var guild = (channel as SocketGuildChannel)?.Guild;
+                                    var guild = data.GuildId.IsSpecified ? State.GetGuild(data.GuildId.Value) : null;
                                     if (guild != null && !guild.IsSynced)
                                     {
                                         await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
@@ -1277,8 +1277,7 @@ namespace Discord.WebSocket
                                         }
                                         else
                                         {
-                                            await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
-                                            return;
+                                            channel = CreateUnknownChannel(data.ChannelId, data.GuildId.IsSpecified ? data.GuildId.Value : null, State);
                                         }
                                     }
 
@@ -1326,7 +1325,7 @@ namespace Discord.WebSocket
                                     var data = (payload as JToken).ToObject<API.Message>(_serializer);
                                     var channel = GetChannel(data.ChannelId) as ISocketMessageChannel;
 
-                                    var guild = (channel as SocketGuildChannel)?.Guild;
+                                    var guild = data.GuildId.IsSpecified ? State.GetGuild(data.GuildId.Value) : null;
                                     if (guild != null && !guild.IsSynced)
                                     {
                                         await UnsyncedGuildAsync(type, guild.Id).ConfigureAwait(false);
@@ -1393,8 +1392,7 @@ namespace Discord.WebSocket
                                             }
                                             else
                                             {
-                                                await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
-                                                return;
+                                                channel = CreateUnknownChannel(data.ChannelId, data.GuildId.IsSpecified ? data.GuildId.Value : null, State);
                                             }
                                         }
 
@@ -2016,6 +2014,10 @@ namespace Discord.WebSocket
             State.PurgeDMChannels();
             foreach (var channel in channels)
                 channel.Recipient.GlobalUser.RemoveRef(this);
+        }
+        internal SocketUnknownChannel CreateUnknownChannel(ulong channelId, ulong? guildId, ClientState state)
+        {
+            return SocketUnknownChannel.Create(this, state, channelId, guildId);
         }
 
         private async Task GuildAvailableAsync(SocketGuild guild)

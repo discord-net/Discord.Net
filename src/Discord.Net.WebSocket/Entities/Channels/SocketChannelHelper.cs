@@ -71,6 +71,7 @@ namespace Discord.WebSocket
                 case SocketDMChannel dmChannel: dmChannel.AddMessage(msg); break;
                 case SocketGroupChannel groupChannel: groupChannel.AddMessage(msg); break;
                 case SocketTextChannel textChannel: textChannel.AddMessage(msg); break;
+                case SocketUnknownChannel unknownChannel: unknownChannel.AddMessage(msg); break;
                 default: throw new NotSupportedException($"Unexpected {nameof(ISocketMessageChannel)} type.");
             }
         }
@@ -83,6 +84,7 @@ namespace Discord.WebSocket
                 case SocketDMChannel dmChannel: return dmChannel.RemoveMessage(id);
                 case SocketGroupChannel groupChannel: return groupChannel.RemoveMessage(id);
                 case SocketTextChannel textChannel: return textChannel.RemoveMessage(id);
+                case SocketUnknownChannel unknownChannel: return unknownChannel.RemoveMessage(id);
                 default: throw new NotSupportedException($"Unexpected {nameof(ISocketMessageChannel)} type.");
             }
         }
