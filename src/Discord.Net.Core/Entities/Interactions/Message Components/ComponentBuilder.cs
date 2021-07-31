@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Discord.Utils;
 
 namespace Discord
 {
@@ -535,12 +536,11 @@ namespace Discord
 
             if (this.Style == ButtonStyle.Link)
             {
-                    if (string.IsNullOrEmpty(this.Url))
-                        throw new InvalidOperationException("Link buttons must have a link associated with them");
-                    else if (!Uri.IsWellFormedUriString(this.Url, UriKind.Absolute))
-                        throw new InvalidOperationException("Urls must be well formatted and include their protocol (either HTTP or HTTPS)");
-            }
-            
+                if (string.IsNullOrEmpty(this.Url))
+                    throw new InvalidOperationException("Link buttons must have a link associated with them");
+                else
+                    UrlValidation.Validate(this.Url); 
+            }       
             else if (string.IsNullOrEmpty(this.CustomId))
                 throw new InvalidOperationException("Non-link buttons must have a custom id associated with them");
 

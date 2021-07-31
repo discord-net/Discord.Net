@@ -11643,5 +11643,13 @@
             <exception cref="T:System.ArgumentNullException"> Thrown when the supplied token string is <c>null</c>, empty, or contains only whitespace.</exception>
             <exception cref="T:System.ArgumentException"> Thrown when the supplied <see cref="T:Discord.TokenType"/> or token value is invalid. </exception>
         </member>
+        <member name="M:Discord.Utils.UrlValidation.Validate(System.String)">
+            <summary>
+            Not full URL validation right now. Just ensures protocol is present and that it's either http or https
+            </summary>
+            <param name="url">url to validate before sending to Discord</param>
+            <exception cref="T:System.InvalidOperationException">A URL must include a protocol (http or https).</exception>
+            <returns>true if url is valid by our standard, false if null, throws an error upon invalid </returns>
+        </member>
     </members>
 </doc>
