@@ -10,7 +10,10 @@ using System.Collections.Immutable;
 
 namespace Discord.WebSocket
 {
-    public class SocketThreadUser : IGuildUser
+    /// <summary>
+    ///     Represents a thread user received over the gateway.
+    /// </summary>
+    public class SocketThreadUser : SocketUser, IGuildUser
     {
         /// <summary>
         ///     Gets the <see cref="SocketThreadChannel"/> this user is in.
@@ -44,56 +47,36 @@ namespace Discord.WebSocket
             => GuildUser.IsPending;
 
         /// <inheritdoc/>
-        public string AvatarId
-            => GuildUser.AvatarId;
+        public override string AvatarId
+        {
+            get => GuildUser.AvatarId;
+            internal set => GuildUser.AvatarId = value;
+        }
 
         /// <inheritdoc/>
-        public string Discriminator
-            => GuildUser.Discriminator;
+        public override ushort DiscriminatorValue
+        {
+            get => GuildUser.DiscriminatorValue;
+            internal set => GuildUser.DiscriminatorValue = value;
+        }
 
         /// <inheritdoc/>
-        public ushort DiscriminatorValue
-            => GuildUser.DiscriminatorValue;
+        public override bool IsBot
+        {
+            get => GuildUser.IsBot;
+            internal set => GuildUser.IsBot = value;
+        }
 
         /// <inheritdoc/>
-        public bool IsBot
-            => GuildUser.IsBot;
-
-        /// <inheritdoc/>
-        public bool IsWebhook
+        public override bool IsWebhook
             => GuildUser.IsWebhook;
 
         /// <inheritdoc/>
-        public string Username
-            => GuildUser.Username;
-
-        /// <inheritdoc/>
-        public UserProperties? PublicFlags
-            => GuildUser.PublicFlags;
-
-        /// <inheritdoc/>
-        public DateTimeOffset CreatedAt
-            => GuildUser.CreatedAt;
-
-        /// <inheritdoc/>
-        public ulong Id
-            => GuildUser.Id;
-
-        /// <inheritdoc/>
-        public string Mention
-            => GuildUser.Mention;
-
-        /// <inheritdoc/>
-        public UserStatus Status
-            => GuildUser.Status;
-
-        /// <inheritdoc/>
-        public IImmutableSet<ClientType> ActiveClients
-            => GuildUser.ActiveClients;
-
-        /// <inheritdoc/>
-        public IImmutableList<IActivity> Activities
-            => GuildUser.Activities;
+        public override string Username
+        {
+            get => GuildUser.Username;
+            internal set => GuildUser.Username = value;
+        }
 
         /// <inheritdoc/>
         public bool IsDeafened
@@ -130,13 +113,14 @@ namespace Discord.WebSocket
         private SocketGuildUser GuildUser { get; set; }
 
         internal SocketThreadUser(SocketGuild guild, SocketThreadChannel thread, SocketGuildUser member)
+            : base(guild.Discord, member.Id)
         {
             this.Thread = thread;
             this.Guild = guild;
             this.GuildUser = member;
         }
 
-        internal SocketThreadUser Create(SocketGuild guild, SocketThreadChannel thread, Model model, SocketGuildUser member)
+        internal static SocketThreadUser Create(SocketGuild guild, SocketThreadChannel thread, Model model, SocketGuildUser member)
         {
             var entity = new SocketThreadUser(guild, thread, member);
             entity.Update(model);
@@ -146,6 +130,16 @@ namespace Discord.WebSocket
         internal void Update(Model model)
         {
             this.ThreadJoinedAt = model.JoinTimestamp;
+
+            if (model.Presence.IsSpecified)
+            {
+                this.GuildUser.Update(Discord.State, model.Presence.Value, true);
+            }
+
+            if (model.Member.IsSpecified)
+            {
+                this.GuildUser.Update(Discord.State, model.Member.Value);
+            }
         }
 
 
@@ -183,15 +177,6 @@ namespace Discord.WebSocket
         public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null) => GuildUser.RemoveRolesAsync(roles, options);
 
         /// <inheritdoc/>
-        public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128) => GuildUser.GetAvatarUrl(format, size);
-
-        /// <inheritdoc/>
-        public string GetDefaultAvatarUrl() => GuildUser.GetDefaultAvatarUrl();
-
-        /// <inheritdoc/>
-        public Task<IDMChannel> CreateDMChannelAsync(RequestOptions options = null) => GuildUser.CreateDMChannelAsync(options);
-
-        /// <inheritdoc/>
         GuildPermissions IGuildUser.GuildPermissions => this.GuildUser.GuildPermissions;
 
         /// <inheritdoc/>
@@ -202,6 +187,10 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         IReadOnlyCollection<ulong> IGuildUser.RoleIds => this.GuildUser.Roles.Select(x => x.Id).ToImmutableArray();
+
+        internal override SocketGlobalUser GlobalUser => GuildUser.GlobalUser;
+
+        internal override SocketPresence Presence { get => GuildUser.Presence; set => GuildUser.Presence = value; }
 
         /// <summary>
         ///     Gets the guild user of this thread user.

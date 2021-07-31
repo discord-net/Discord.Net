@@ -41,14 +41,14 @@ namespace Discord.Rest
         {
             base.Update(model);
             CategoryId = model.CategoryId;
-            Topic = model.Topic.Value;
+            Topic = model.Topic.GetValueOrDefault();
             if (model.SlowMode.IsSpecified)
                 SlowModeInterval = model.SlowMode.Value;
             IsNsfw = model.Nsfw.GetValueOrDefault();
         }
 
         /// <inheritdoc />
-        public async Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
+        public virtual async Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
         {
             var model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
@@ -173,7 +173,7 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous creation operation. The task result contains the newly created
         ///     webhook.
         /// </returns>
-        public Task<RestWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null)
+        public virtual Task<RestWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null)
             => ChannelHelper.CreateWebhookAsync(this, Discord, name, avatar, options);
         /// <summary>
         ///     Gets a webhook available in this text channel.
@@ -184,7 +184,7 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous get operation. The task result contains a webhook associated
         ///     with the identifier; <c>null</c> if the webhook is not found.
         /// </returns>
-        public Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
+        public virtual Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
             => ChannelHelper.GetWebhookAsync(this, Discord, id, options);
         /// <summary>
         ///     Gets the webhooks available in this text channel.
@@ -194,7 +194,7 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of webhooks that is available in this channel.
         /// </returns>
-        public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
+        public virtual Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => ChannelHelper.GetWebhooksAsync(this, Discord, options);
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous get operation. The task result contains the category channel
         ///     representing the parent of this channel; <c>null</c> if none is set.
         /// </returns>
-        public Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
+        public virtual Task<ICategoryChannel> GetCategoryAsync(RequestOptions options = null)
             => ChannelHelper.GetCategoryAsync(this, Discord, options);
         /// <inheritdoc />
         public Task SyncPermissionsAsync(RequestOptions options = null)
@@ -213,17 +213,54 @@ namespace Discord.Rest
 
         //Invites
         /// <inheritdoc />
-        public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+        public virtual async Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
             => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
-        public Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+        public virtual Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
             => throw new NotImplementedException();
-        public Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+        public virtual Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
             => throw new NotImplementedException();
         /// <inheritdoc />
-        public async Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
+        public virtual async Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
             => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
 
         private string DebuggerDisplay => $"{Name} ({Id}, Text)";
+
+        /// <summary>
+        ///     Creates a thread within this <see cref="ITextChannel"/>.
+        /// </summary>
+        /// <remarks>
+        ///     When <paramref name="message"/> is <see langword="null"/> the thread type will be based off of the
+        ///     channel its created in. When called on a <see cref="ITextChannel"/>, it creates a <see cref="ThreadType.PublicThread"/>.
+        ///     When called on a <see cref="INewsChannel"/>, it creates a <see cref="ThreadType.NewsThread"/>. The id of the created
+        ///     thread will be the same as the id of the message, and as such a message can only have a
+        ///     single thread created from it.
+        /// </remarks>
+        /// <param name="name">The name of the thread.</param>
+        /// <param name="type">
+        ///     The type of the thread.
+        ///     <para>
+        ///         <b>Note: </b>This parameter is not used if the <paramref name="message"/> parameter is not specified.
+        ///     </para>
+        /// </param>
+        /// <param name="autoArchiveDuration">
+        ///     The duration on which this thread archives after.
+        ///     <para>
+        ///         <b>Note: </b> Options <see cref="ThreadArchiveDuration.OneWeek"/> and <see cref="ThreadArchiveDuration.ThreeDays"/>
+        ///         are only available for guilds that are boosted. You can check in the <see cref="IGuild.Features"/> to see if the 
+        ///         guild has the <b>THREE_DAY_THREAD_ARCHIVE</b> and <b>SEVEN_DAY_THREAD_ARCHIVE</b>.
+        ///     </para>
+        /// </param>
+        /// <param name="message">The message which to start the thread from.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous create operation. The task result contains a <see cref="IThreadChannel"/>
+        /// </returns>
+        public async Task<RestThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread,
+            ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, RequestOptions options = null)
+        {
+            var model = await ThreadHelper.CreateThreadAsync(Discord, this, name, type, autoArchiveDuration, message, options);
+            return RestThreadChannel.Create(Discord, this.Guild, model);
+        }
 
         //ITextChannel
         /// <inheritdoc />
@@ -235,6 +272,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IWebhook>> ITextChannel.GetWebhooksAsync(RequestOptions options)
             => await GetWebhooksAsync(options).ConfigureAwait(false);
+
+        async Task<IThreadChannel> ITextChannel.CreateThreadAsync(string name, ThreadType type, ThreadArchiveDuration autoArchiveDuration, IMessage message, RequestOptions options)
+            => await CreateThreadAsync(name, type, autoArchiveDuration, message, options);
 
         //IMessageChannel
         /// <inheritdoc />

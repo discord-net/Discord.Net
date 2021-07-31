@@ -387,7 +387,15 @@ namespace Discord.WebSocket
                     state.AddChannel(channel);
                     channels.TryAdd(channel.Id);
                 }
+
+                for(int i = 0; i < model.Threads.Length; i++)
+                {
+                    var threadChannel = SocketThreadChannel.Create(this, state, model.Threads[i]);
+                    state.AddChannel(threadChannel);
+                    channels.TryAdd(threadChannel.Id);
+                }
             }
+
             _channels = channels;
 
             var members = new ConcurrentDictionary<ulong, SocketGuildUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Members.Length * 1.05));

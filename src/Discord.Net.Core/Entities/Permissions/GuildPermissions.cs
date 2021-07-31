@@ -82,7 +82,7 @@ namespace Discord
         /// <summary> If <c>true</c>, a user may edit the webhooks for this guild. </summary>
         public bool ManageWebhooks => Permissions.GetValue(RawValue, GuildPermission.ManageWebhooks);
         /// <summary> If <c>true</c>, a user may edit the emojis for this guild. </summary>
-        public bool ManageEmojis => Permissions.GetValue(RawValue, GuildPermission.ManageEmojis);
+        public bool ManageEmojisAndStickers => Permissions.GetValue(RawValue, GuildPermission.ManageEmojisAndStickers);
 
         /// <summary> Creates a new <see cref="GuildPermissions"/> with the provided packed value. </summary>
         public GuildPermissions(ulong rawValue) { RawValue = rawValue; }
@@ -121,7 +121,7 @@ namespace Discord
             bool? manageNicknames = null,
             bool? manageRoles = null,
             bool? manageWebhooks = null,
-            bool? manageEmojis = null)
+            bool? manageEmojisAndStickers = null)
         {
             ulong value = initialValue;
 
@@ -155,7 +155,7 @@ namespace Discord
             Permissions.SetValue(ref value, manageNicknames, GuildPermission.ManageNicknames);
             Permissions.SetValue(ref value, manageRoles, GuildPermission.ManageRoles);
             Permissions.SetValue(ref value, manageWebhooks, GuildPermission.ManageWebhooks);
-            Permissions.SetValue(ref value, manageEmojis, GuildPermission.ManageEmojis);
+            Permissions.SetValue(ref value, manageEmojisAndStickers, GuildPermission.ManageEmojisAndStickers);
 
             RawValue = value;
         }
@@ -224,7 +224,7 @@ namespace Discord
                 changeNickname: changeNickname,
                 manageNicknames: manageNicknames,
                 manageWebhooks: manageWebhooks,
-                manageEmojis: manageEmojis)
+                manageEmojisAndStickers: manageEmojis)
         { }
 
         /// <summary> Creates a new <see cref="GuildPermissions"/> from this one, changing the provided non-null permissions. </summary>

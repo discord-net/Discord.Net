@@ -771,6 +771,16 @@
                 Fired when a thread is deleted.
             </summary>
         </member>
+        <member name="E:Discord.WebSocket.BaseSocketClient.ThreadMemberJoined">
+            <summary>
+                Fired when a user joins a thread
+            </summary>
+        </member>
+        <member name="E:Discord.WebSocket.BaseSocketClient.ThreadMemberLeft">
+            <summary>
+                Fired when a user leaves a thread
+            </summary>
+        </member>
         <member name="P:Discord.WebSocket.DiscordShardedClient.Latency">
             <inheritdoc />
         </member>
@@ -2380,6 +2390,16 @@
                 Represents a thread channel inside of a guild.
             </summary>
         </member>
+        <member name="P:Discord.WebSocket.SocketThreadChannel.Owner">
+            <summary>
+                Gets the owner of the current thread.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadChannel.CurrentUser">
+            <summary>
+                Gets the current users within this thread.
+            </summary>
+        </member>
         <member name="P:Discord.WebSocket.SocketThreadChannel.Joined">
             <inheritdoc/>
         </member>
@@ -2411,182 +2431,152 @@
         <member name="P:Discord.WebSocket.SocketThreadChannel.Locked">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.WebSocket.SocketThreadChannel.IsNsfw">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketThreadChannel.Topic">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketThreadChannel.SlowModeInterval">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketThreadChannel.Mention">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketThreadChannel.CategoryId">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketThreadChannel.CachedMessages">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.SyncPermissionsAsync(Discord.RequestOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.ModifyAsync(System.Action{Discord.TextChannelProperties},Discord.RequestOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.GetCachedMessage(System.UInt64)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.GetMessageAsync(System.UInt64,Discord.RequestOptions)">
+        <member name="P:Discord.WebSocket.SocketThreadChannel.Users">
             <summary>
-                Gets a message from this message channel.
+                Gets a collection of cached users within this thread.
             </summary>
-            <remarks>
-                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessageAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)"/>.
-                Please visit its documentation for more details on this method.
-            </remarks>
-            <param name="id">The snowflake identifier of the message.</param>
-            <param name="options">The options to be used when sending the request.</param>
-            <returns>
-                A task that represents an asynchronous get operation for retrieving the message. The task result contains
-                the retrieved message; <c>null</c> if no message is found with the specified identifier.
-            </returns>
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.GetMessagesAsync(System.Int32,Discord.RequestOptions)">
-            <summary>
-                Gets the last N messages from this message channel.
-            </summary>
-            <remarks>
-                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessagesAsync(System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>.
-                Please visit its documentation for more details on this method.
-            </remarks>
-            <param name="limit">The numbers of message to be gotten from.</param>
-            <param name="options">The options to be used when sending the request.</param>
-            <returns>
-                Paged collection of messages.
-            </returns>
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.GetMessagesAsync(System.UInt64,Discord.Direction,System.Int32,Discord.RequestOptions)">
-            <summary>
-                Gets a collection of messages in this channel.
-            </summary>
-            <remarks>
-                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessagesAsync(System.UInt64,Discord.Direction,System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>.
-                Please visit its documentation for more details on this method.
-            </remarks>
-            <param name="fromMessageId">The ID of the starting message to get the messages from.</param>
-            <param name="dir">The direction of the messages to be gotten from.</param>
-            <param name="limit">The numbers of message to be gotten from.</param>
-            <param name="options">The options to be used when sending the request.</param>
-            <returns>
-                Paged collection of messages.
-            </returns>
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.GetMessagesAsync(Discord.IMessage,Discord.Direction,System.Int32,Discord.RequestOptions)">
-            <summary>
-                Gets a collection of messages in this channel.
-            </summary>
-            <remarks>
-                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessagesAsync(Discord.IMessage,Discord.Direction,System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>.
-                Please visit its documentation for more details on this method.
-            </remarks>
-            <param name="fromMessage">The starting message to get the messages from.</param>
-            <param name="dir">The direction of the messages to be gotten from.</param>
-            <param name="limit">The numbers of message to be gotten from.</param>
-            <param name="options">The options to be used when sending the request.</param>
-            <returns>
-                Paged collection of messages.
-            </returns>
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.GetCachedMessages(System.Int32)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.GetCachedMessages(System.UInt64,Discord.Direction,System.Int32)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.GetCachedMessages(Discord.IMessage,Discord.Direction,System.Int32)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.GetPinnedMessagesAsync(Discord.RequestOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)">
-            <inheritdoc />
-            <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)">
-            <inheritdoc />
-            <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.DeleteMessagesAsync(System.Collections.Generic.IEnumerable{Discord.IMessage},Discord.RequestOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.DeleteMessagesAsync(System.Collections.Generic.IEnumerable{System.UInt64},Discord.RequestOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.ModifyMessageAsync(System.UInt64,System.Action{Discord.MessageProperties},Discord.RequestOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.DeleteMessageAsync(System.UInt64,Discord.RequestOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.DeleteMessageAsync(Discord.IMessage,Discord.RequestOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.TriggerTypingAsync(Discord.RequestOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.EnterTypingState(Discord.RequestOptions)">
-            <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketThreadChannel.GetUser(System.UInt64)">
             <inheritdoc />
         </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.Discord#ITextChannel#CreateWebhookAsync(System.String,System.IO.Stream,Discord.RequestOptions)">
-            <inheritdoc />
+        <member name="M:Discord.WebSocket.SocketThreadChannel.GetUsersAsync(Discord.RequestOptions)">
+            <summary>
+                Gets all users inside this thread.
+            </summary>
+            <remarks>
+                If all users are not downloaded then this method will call <see cref="M:Discord.WebSocket.SocketThreadChannel.DownloadUsersAsync(Discord.RequestOptions)"/> and return the result.
+            </remarks>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>A task representing the download operation.</returns>
         </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.Discord#ITextChannel#GetWebhookAsync(System.UInt64,Discord.RequestOptions)">
-            <inheritdoc />
+        <member name="M:Discord.WebSocket.SocketThreadChannel.DownloadUsersAsync(Discord.RequestOptions)">
+            <summary>
+                Downloads all users that have access to this thread.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>A task representing the asyncronous download operation.</returns>
         </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.Discord#ITextChannel#GetWebhooksAsync(Discord.RequestOptions)">
-            <inheritdoc />
+        <member name="M:Discord.WebSocket.SocketThreadChannel.JoinAsync(Discord.RequestOptions)">
+            <inheritdoc/>
         </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.Discord#IGuildChannel#GetUserAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
-            <inheritdoc />
+        <member name="M:Discord.WebSocket.SocketThreadChannel.LeaveAsync(Discord.RequestOptions)">
+            <inheritdoc/>
         </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.Discord#IGuildChannel#GetUsersAsync(Discord.CacheMode,Discord.RequestOptions)">
-            <inheritdoc />
+        <member name="M:Discord.WebSocket.SocketThreadChannel.AddUserAsync(Discord.IGuildUser,Discord.RequestOptions)">
+            <summary>
+                Adds a user to this thread.
+            </summary>
+            <param name="user">The <see cref="T:Discord.IGuildUser"/> to add.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous operation of adding a member to a thread. 
+            </returns>
         </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.Discord#IMessageChannel#GetMessageAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
-            <inheritdoc />
+        <member name="M:Discord.WebSocket.SocketThreadChannel.RemoveUserAsync(Discord.IGuildUser,Discord.RequestOptions)">
+            <summary>
+                Removes a user from this thread.
+            </summary>
+            <param name="user">The <see cref="T:Discord.IGuildUser"/> to remove from this thread.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous operation of removing a user from this thread. 
+            </returns>
         </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.Discord#IMessageChannel#GetMessagesAsync(System.Int32,Discord.CacheMode,Discord.RequestOptions)">
-            <inheritdoc />
+        <member name="M:Discord.WebSocket.SocketThreadChannel.AddPermissionOverwriteAsync(Discord.IRole,Discord.OverwritePermissions,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
         </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.Discord#IMessageChannel#GetMessagesAsync(System.UInt64,Discord.Direction,System.Int32,Discord.CacheMode,Discord.RequestOptions)">
-            <inheritdoc />
+        <member name="M:Discord.WebSocket.SocketThreadChannel.AddPermissionOverwriteAsync(Discord.IUser,Discord.OverwritePermissions,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
         </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.Discord#IMessageChannel#GetMessagesAsync(Discord.IMessage,Discord.Direction,System.Int32,Discord.CacheMode,Discord.RequestOptions)">
-            <inheritdoc />
+        <member name="M:Discord.WebSocket.SocketThreadChannel.CreateInviteAsync(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
         </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.Discord#IMessageChannel#GetPinnedMessagesAsync(Discord.RequestOptions)">
-            <inheritdoc />
+        <member name="M:Discord.WebSocket.SocketThreadChannel.CreateInviteToApplicationAsync(System.UInt64,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
         </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.Discord#IMessageChannel#SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)">
-            <inheritdoc />
+        <member name="M:Discord.WebSocket.SocketThreadChannel.CreateInviteToStreamAsync(Discord.IUser,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
         </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.Discord#IMessageChannel#SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)">
-            <inheritdoc />
+        <member name="M:Discord.WebSocket.SocketThreadChannel.CreateWebhookAsync(System.String,System.IO.Stream,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
         </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.Discord#IMessageChannel#SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)">
-            <inheritdoc />
+        <member name="M:Discord.WebSocket.SocketThreadChannel.GetInvitesAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
         </member>
-        <member name="M:Discord.WebSocket.SocketThreadChannel.Discord#INestedChannel#GetCategoryAsync(Discord.CacheMode,Discord.RequestOptions)">
-            <inheritdoc />
+        <member name="M:Discord.WebSocket.SocketThreadChannel.GetPermissionOverwrite(Discord.IRole)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadChannel.GetPermissionOverwrite(Discord.IUser)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadChannel.GetWebhookAsync(System.UInt64,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadChannel.GetWebhooksAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadChannel.ModifyAsync(System.Action{Discord.TextChannelProperties},Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadChannel.RemovePermissionOverwriteAsync(Discord.IRole,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadChannel.RemovePermissionOverwriteAsync(Discord.IUser,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadChannel.PermissionOverwrites">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.WebSocket.SocketThreadChannel.SyncPermissionsAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
         </member>
         <member name="T:Discord.WebSocket.SocketVoiceChannel">
             <summary>
@@ -4535,6 +4525,11 @@
         <member name="M:Discord.WebSocket.SocketSelfUser.ModifyAsync(System.Action{Discord.SelfUserProperties},Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="T:Discord.WebSocket.SocketThreadUser">
+            <summary>
+                Represents a thread user received over the gateway.
+            </summary>
+        </member>
         <member name="P:Discord.WebSocket.SocketThreadUser.Thread">
             <summary>
                 Gets the <see cref="T:Discord.WebSocket.SocketThreadChannel"/> this user is in.
@@ -4565,9 +4560,6 @@
         <member name="P:Discord.WebSocket.SocketThreadUser.AvatarId">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.WebSocket.SocketThreadUser.Discriminator">
-            <inheritdoc/>
-        </member>
         <member name="P:Discord.WebSocket.SocketThreadUser.DiscriminatorValue">
             <inheritdoc/>
         </member>
@@ -4578,27 +4570,6 @@
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketThreadUser.Username">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketThreadUser.PublicFlags">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketThreadUser.CreatedAt">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketThreadUser.Id">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketThreadUser.Mention">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketThreadUser.Status">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketThreadUser.ActiveClients">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketThreadUser.Activities">
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketThreadUser.IsDeafened">
@@ -4656,15 +4627,6 @@
             <inheritdoc/>
         </member>
         <member name="M:Discord.WebSocket.SocketThreadUser.RemoveRolesAsync(System.Collections.Generic.IEnumerable{Discord.IRole},Discord.RequestOptions)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadUser.GetAvatarUrl(Discord.ImageFormat,System.UInt16)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadUser.GetDefaultAvatarUrl">
-            <inheritdoc/>
-        </member>
-        <member name="M:Discord.WebSocket.SocketThreadUser.CreateDMChannelAsync(Discord.RequestOptions)">
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketThreadUser.Discord#IGuildUser#GuildPermissions">

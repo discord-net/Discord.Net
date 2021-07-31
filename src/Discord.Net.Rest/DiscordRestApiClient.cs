@@ -415,6 +415,15 @@ namespace Discord.API
         }
 
         // Threads
+        public async Task<Channel> ModifyThreadAsync(ulong channelId, ModifyThreadParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            var bucket = new BucketIds(channelId: channelId);
+
+            return await SendJsonAsync<Channel>("PATCH", () => $"channels/{channelId}", args, bucket, options: options);
+        }
+
         public async Task<Channel> StartThreadAsync(ulong channelId, ulong messageId, StartThreadParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
@@ -426,7 +435,7 @@ namespace Discord.API
 
             return await SendJsonAsync<Channel>("POST", () => $"channels/{channelId}/messages/{messageId}/threads", args, bucket, options: options).ConfigureAwait(false);
         }
-
+        
         public async Task<Channel> StartThreadAsync(ulong channelId, StartThreadParams args, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
@@ -484,7 +493,7 @@ namespace Discord.API
 
             var bucket = new BucketIds(channelId: channelId);
 
-            return await SendAsync<ThreadMember[]>("GET", () => $"/channels/{channelId}", bucket, options: options);
+            return await SendAsync<ThreadMember[]>("GET", () => $"channels/{channelId}/thread-members", bucket, options: options);
         }
 
         public async Task<ChannelThreads> GetActiveThreadsAsync(ulong channelId, RequestOptions options = null)

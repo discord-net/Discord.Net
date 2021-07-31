@@ -1982,9 +1982,46 @@
                 of webhooks that is available in this channel.
             </returns>
         </member>
+        <member name="M:Discord.ITextChannel.CreateThreadAsync(System.String,Discord.ThreadType,Discord.ThreadArchiveDuration,Discord.IMessage,Discord.RequestOptions)">
+            <summary>
+                Creates a thread within this <see cref="T:Discord.ITextChannel"/>.
+            </summary>
+            <remarks>
+                When <paramref name="message"/> is <see langword="null"/> the thread type will be based off of the
+                channel its created in. When called on a <see cref="T:Discord.ITextChannel"/>, it creates a <see cref="F:Discord.ThreadType.PublicThread"/>.
+                When called on a <see cref="T:Discord.INewsChannel"/>, it creates a <see cref="F:Discord.ThreadType.NewsThread"/>. The id of the created
+                thread will be the same as the id of the message, and as such a message can only have a
+                single thread created from it.
+            </remarks>
+            <param name="name">The name of the thread.</param>
+            <param name="type">
+                The type of the thread.
+                <para>
+                    <b>Note: </b>This parameter is not used if the <paramref name="message"/> parameter is not specified.
+                </para>
+            </param>
+            <param name="autoArchiveDuration">
+                The duration on which this thread archives after.
+                <para>
+                    <b>Note: </b> Options <see cref="F:Discord.ThreadArchiveDuration.OneWeek"/> and <see cref="F:Discord.ThreadArchiveDuration.ThreeDays"/>
+                    are only available for guilds that are boosted. You can check in the <see cref="P:Discord.IGuild.Features"/> to see if the 
+                    guild has the <b>THREE_DAY_THREAD_ARCHIVE</b> and <b>SEVEN_DAY_THREAD_ARCHIVE</b>.
+                </para>
+            </param>
+            <param name="message">The message which to start the thread from.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous create operation. The task result contains a <see cref="T:Discord.IThreadChannel"/>
+            </returns>
+        </member>
         <member name="T:Discord.IThreadChannel">
             <summary>
                 Represents a thread channel inside of a guild.
+            </summary>
+        </member>
+        <member name="P:Discord.IThreadChannel.Type">
+            <summary>
+                Gets the type of the current thread channel.
             </summary>
         </member>
         <member name="P:Discord.IThreadChannel.Joined">
@@ -2022,17 +2059,43 @@
                 An approximate count of messages in a thread, stops counting at 50.
             </summary>
         </member>
-        <member name="M:Discord.IThreadChannel.JoinAsync">
+        <member name="M:Discord.IThreadChannel.JoinAsync(Discord.RequestOptions)">
             <summary>
                 Joins the current thread.
             </summary>
-            <returns></returns>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous join operation. 
+            </returns>
         </member>
-        <member name="M:Discord.IThreadChannel.LeaveAsync">
+        <member name="M:Discord.IThreadChannel.LeaveAsync(Discord.RequestOptions)">
             <summary>
                 Leaves the current thread.
             </summary>
-            <returns></returns>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous leave operation. 
+            </returns>
+        </member>
+        <member name="M:Discord.IThreadChannel.AddUserAsync(Discord.IGuildUser,Discord.RequestOptions)">
+            <summary>
+                Adds a user to this thread.
+            </summary>
+            <param name="user">The <see cref="T:Discord.IGuildUser"/> to add.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous operation of adding a member to a thread. 
+            </returns>
+        </member>
+        <member name="M:Discord.IThreadChannel.RemoveUserAsync(Discord.IGuildUser,Discord.RequestOptions)">
+            <summary>
+                Removes a user from this thread.
+            </summary>
+            <param name="user">The <see cref="T:Discord.IGuildUser"/> to remove from this thread.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous operation of removing a user from this thread. 
+            </returns>
         </member>
         <member name="T:Discord.IVoiceChannel">
             <summary>
@@ -2133,6 +2196,21 @@
             </remarks>
             <exception cref="T:System.ArgumentOutOfRangeException">Thrown if the value does not fall within [0, 21600].</exception>
         </member>
+        <member name="P:Discord.TextChannelProperties.Archived">
+            <summary>
+                Gets or sets whether or not the thread is archived.
+            </summary>
+        </member>
+        <member name="P:Discord.TextChannelProperties.Locked">
+            <summary>
+                Gets or sets whether or not the thread is locked.
+            </summary>
+        </member>
+        <member name="P:Discord.TextChannelProperties.AutoArchiveDuration">
+            <summary>
+                Gets or sets the auto archive duration.
+            </summary>
+        </member>
         <member name="T:Discord.ThreadArchiveDuration">
             <summary>
                 Represents the thread auto archive duration.
@@ -2164,39 +2242,25 @@
                 </remarks>
             </summary>
         </member>
-        <member name="P:Discord.Entities.ThreadChannelProperties.Archived">
+        <member name="T:Discord.ThreadType">
             <summary>
-                Gets or sets whether or not the thread is archived.
+                Represents types of threads.
             </summary>
         </member>
-        <member name="P:Discord.Entities.ThreadChannelProperties.Locked">
+        <member name="F:Discord.ThreadType.NewsThread">
             <summary>
-                Gets or sets whether or not the thread is locked.
+                Represents a temporary sub-channel within a GUILD_NEWS channel.
             </summary>
         </member>
-        <member name="P:Discord.Entities.ThreadChannelProperties.Name">
+        <member name="F:Discord.ThreadType.PublicThread">
             <summary>
-                Gets or sets the name of the thread.
+                Represents a temporary sub-channel within a GUILD_TEXT channel.
             </summary>
         </member>
-        <member name="P:Discord.Entities.ThreadChannelProperties.AutoArchiveDuration">
+        <member name="F:Discord.ThreadType.PrivateThread">
             <summary>
-                Gets or sets the auto archive duration.
+                Represents a temporary sub-channel within a GUILD_TEXT channel that is only viewable by those invited and those with the MANAGE_THREADS permission
             </summary>
-        </member>
-        <member name="P:Discord.Entities.ThreadChannelProperties.SlowModeInterval">
-            <summary>
-                Gets or sets the slow-mode ratelimit in seconds for this channel.
-            </summary>
-            <remarks>
-                Setting this value to anything above zero will require each user to wait X seconds before
-                sending another message; setting this value to <c>0</c> will disable slow-mode for this channel.
-                <note>
-                    Users with <see cref="F:Discord.ChannelPermission.ManageMessages"/> or 
-                    <see cref="F:Discord.ChannelPermission.ManageChannels"/> will be exempt from slow-mode.
-                </note>
-            </remarks>
-            <exception cref="T:System.ArgumentOutOfRangeException">Thrown if the value does not fall within [0, 21600].</exception>
         </member>
         <member name="T:Discord.VoiceChannelProperties">
             <summary>
@@ -4747,7 +4811,7 @@
             <exception cref="T:System.InvalidOperationException">A button must contain either a <see cref="P:Discord.ButtonBuilder.Url"/> or a <see cref="P:Discord.ButtonBuilder.CustomId"/>, but not both.</exception>
             <exception cref="T:System.InvalidOperationException">A button must have an <see cref="P:Discord.ButtonBuilder.Emote"/> or a <see cref="P:Discord.ButtonBuilder.Label"/>.</exception>
             <exception cref="T:System.InvalidOperationException">A link button must contain a URL.</exception>
-            <exception cref="T:System.InvalidOperationException">A link must include a protocol (http or https).</exception>
+            <exception cref="T:System.InvalidOperationException">A URL must include a protocol (http or https).</exception>
             <exception cref="T:System.InvalidOperationException">A non-link button must contain a custom id</exception>
         </member>
         <member name="T:Discord.SelectMenuBuilder">
@@ -6041,7 +6105,7 @@
                 The built embed object.
             </returns>
             <exception cref="T:System.InvalidOperationException">Total embed length exceeds <see cref="F:Discord.EmbedBuilder.MaxEmbedLength"/>.</exception>
-            <exception cref="T:System.InvalidOperationException">Any Url must include protocols (i.e http:// or https://).</exception>
+            <exception cref="T:System.InvalidOperationException">Any Url must be well formatted include its protocols (i.e http:// or https://).</exception>
         </member>
         <member name="T:Discord.EmbedFieldBuilder">
             <summary>
@@ -8024,6 +8088,16 @@
             	Allows for viewing of audit logs.
             </summary>
         </member>
+        <member name="F:Discord.GuildPermission.ViewChannel">
+            <summary>
+                Allows guild members to view a channel, which includes reading messages in text channels.
+            </summary>
+        </member>
+        <member name="F:Discord.GuildPermission.SendMessages">
+            <summary>
+                Allows for sending messages in a channel
+            </summary>
+        </member>
         <member name="F:Discord.GuildPermission.SendTTSMessages">
             <summary>
                 Allows for sending of text-to-speech messages.
@@ -8094,6 +8168,11 @@
                 Allows for using voice-activity-detection in a voice channel.
             </summary>
         </member>
+        <member name="F:Discord.GuildPermission.PrioritySpeaker">
+            <summary>
+                Allows for using priority speaker in a voice channel.	
+            </summary>
+        </member>
         <member name="F:Discord.GuildPermission.Stream">
             <summary>
                 Allows video streaming in a voice channel.
@@ -8127,14 +8206,48 @@
                 authentication when used on a guild that has server-wide 2FA enabled.
             </remarks>
         </member>
-        <member name="F:Discord.GuildPermission.ManageEmojis">
+        <member name="F:Discord.GuildPermission.ManageEmojisAndStickers">
             <summary>
-                Allows management and editing of emojis.
+                Allows management and editing of emojis and stickers.
             </summary>
             <remarks>
                 This permission requires the owner account to use two-factor
                 authentication when used on a guild that has server-wide 2FA enabled.
             </remarks>
+        </member>
+        <member name="F:Discord.GuildPermission.UseSlashCommands">
+            <summary>
+                Allows members to use slash commands in text channels.	
+            </summary>
+        </member>
+        <member name="F:Discord.GuildPermission.RequestToSpeak">
+            <summary>
+                Allows for requesting to speak in stage channels. <i>(This permission is under active development and may be changed or removed.)</i>.
+            </summary>
+        </member>
+        <member name="F:Discord.GuildPermission.ManageThreads">
+            <summary>
+                Allows for deleting and archiving threads, and viewing all private threads.
+            </summary>
+            <remarks>
+                This permission requires the owner account to use two-factor
+                authentication when used on a guild that has server-wide 2FA enabled.
+            </remarks>
+        </member>
+        <member name="F:Discord.GuildPermission.UsePublicThreads">
+            <summary>
+            Allows for creating and participating in threads.
+            </summary>
+        </member>
+        <member name="F:Discord.GuildPermission.UsePrivateThreads">
+            <summary>
+                Allows for creating and participating in private threads.
+            </summary>
+        </member>
+        <member name="F:Discord.GuildPermission.UseExternalStickers">
+            <summary>
+                Allows the usage of custom stickers from other servers.
+            </summary>
         </member>
         <member name="F:Discord.GuildPermissions.None">
             <summary> Gets a blank <see cref="T:Discord.GuildPermissions"/> that grants no permissions. </summary>
@@ -8238,7 +8351,7 @@
         <member name="P:Discord.GuildPermissions.ManageWebhooks">
             <summary> If <c>true</c>, a user may edit the webhooks for this guild. </summary>
         </member>
-        <member name="P:Discord.GuildPermissions.ManageEmojis">
+        <member name="P:Discord.GuildPermissions.ManageEmojisAndStickers">
             <summary> If <c>true</c>, a user may edit the emojis for this guild. </summary>
         </member>
         <member name="M:Discord.GuildPermissions.#ctor(System.UInt64)">

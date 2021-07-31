@@ -572,5 +572,25 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<Cacheable<SocketThreadChannel, ulong>, Task>> _threadDeleted = new AsyncEvent<Func<Cacheable<SocketThreadChannel, ulong>, Task>>();
 
+        /// <summary>
+        ///     Fired when a user joins a thread
+        /// </summary>
+        public event Func<SocketThreadUser, Task> ThreadMemberJoined
+        {
+            add { _threadMemberJoined.Add(value); }
+            remove { _threadMemberJoined.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<SocketThreadUser, Task>> _threadMemberJoined = new AsyncEvent<Func<SocketThreadUser, Task>>();
+
+        /// <summary>
+        ///     Fired when a user leaves a thread
+        /// </summary>
+        public event Func<SocketThreadUser, Task> ThreadMemberLeft
+        {
+            add { _threadMemberLeft.Add(value); }
+            remove { _threadMemberLeft.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<SocketThreadUser, Task>> _threadMemberLeft = new AsyncEvent<Func<SocketThreadUser, Task>>();
+
     }
 }

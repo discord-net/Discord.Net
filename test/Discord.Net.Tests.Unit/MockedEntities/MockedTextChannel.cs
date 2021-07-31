@@ -210,5 +210,7 @@ namespace Discord
         {
             throw new NotImplementedException();
         }
+
+        public Task<IThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, RequestOptions options = null) => throw new NotImplementedException();
     }
 }

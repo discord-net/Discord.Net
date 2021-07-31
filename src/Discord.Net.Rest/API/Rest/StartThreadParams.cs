@@ -16,6 +16,6 @@ namespace Discord.API.Rest
         public ThreadArchiveDuration Duration { get; set; }
 
         [JsonProperty("type")]
-        public Optional<ChannelType> Type { get; set; }
+        public Optional<ThreadType> Type { get; set; }
     }
 }

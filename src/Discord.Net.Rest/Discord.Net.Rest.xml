@@ -2458,6 +2458,38 @@
         <member name="M:Discord.Rest.RestTextChannel.GetInvitesAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.Rest.RestTextChannel.CreateThreadAsync(System.String,Discord.ThreadType,Discord.ThreadArchiveDuration,Discord.IMessage,Discord.RequestOptions)">
+            <summary>
+                Creates a thread within this <see cref="T:Discord.ITextChannel"/>.
+            </summary>
+            <remarks>
+                When <paramref name="message"/> is <see langword="null"/> the thread type will be based off of the
+                channel its created in. When called on a <see cref="T:Discord.ITextChannel"/>, it creates a <see cref="F:Discord.ThreadType.PublicThread"/>.
+                When called on a <see cref="T:Discord.INewsChannel"/>, it creates a <see cref="F:Discord.ThreadType.NewsThread"/>. The id of the created
+                thread will be the same as the id of the message, and as such a message can only have a
+                single thread created from it.
+            </remarks>
+            <param name="name">The name of the thread.</param>
+            <param name="type">
+                The type of the thread.
+                <para>
+                    <b>Note: </b>This parameter is not used if the <paramref name="message"/> parameter is not specified.
+                </para>
+            </param>
+            <param name="autoArchiveDuration">
+                The duration on which this thread archives after.
+                <para>
+                    <b>Note: </b> Options <see cref="F:Discord.ThreadArchiveDuration.OneWeek"/> and <see cref="F:Discord.ThreadArchiveDuration.ThreeDays"/>
+                    are only available for guilds that are boosted. You can check in the <see cref="P:Discord.IGuild.Features"/> to see if the 
+                    guild has the <b>THREE_DAY_THREAD_ARCHIVE</b> and <b>SEVEN_DAY_THREAD_ARCHIVE</b>.
+                </para>
+            </param>
+            <param name="message">The message which to start the thread from.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous create operation. The task result contains a <see cref="T:Discord.IThreadChannel"/>
+            </returns>
+        </member>
         <member name="M:Discord.Rest.RestTextChannel.Discord#ITextChannel#CreateWebhookAsync(System.String,System.IO.Stream,Discord.RequestOptions)">
             <inheritdoc />
         </member>
@@ -2505,6 +2537,163 @@
         </member>
         <member name="M:Discord.Rest.RestTextChannel.Discord#INestedChannel#GetCategoryAsync(Discord.CacheMode,Discord.RequestOptions)">
             <inheritdoc />
+        </member>
+        <member name="T:Discord.Rest.RestThreadChannel">
+            <summary>
+                Represents a thread channel recieved over REST.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.RestThreadChannel.Joined">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Rest.RestThreadChannel.Archived">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Rest.RestThreadChannel.AutoArchiveDuration">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Rest.RestThreadChannel.ArchiveTimestamp">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Rest.RestThreadChannel.Locked">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Rest.RestThreadChannel.MemberCount">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Rest.RestThreadChannel.MessageCount">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Rest.RestThreadChannel.ParentChannelId">
+            <summary>
+                Gets the parent text channel id.
+            </summary>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.GetUserAsync(System.UInt64,Discord.RequestOptions)">
+            <summary>
+                Gets a user within this thread.
+            </summary>
+            <param name="userId">The id of the user to fetch.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task representing the asyncronous get operation. The task returns a
+                <see cref="T:Discord.Rest.RestThreadUser"/> if found, otherwise <see langword="null"/>.
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.GetUsersAsync(Discord.RequestOptions)">
+            <summary>
+                Gets a collection of users within this thread.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task representing the asyncronous get operation. The task returns a
+                <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/> of <see cref="T:Discord.Rest.RestThreadUser"/>'s.
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.ModifyAsync(System.Action{Discord.TextChannelProperties},Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.AddPermissionOverwriteAsync(Discord.IRole,Discord.OverwritePermissions,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.AddPermissionOverwriteAsync(Discord.IUser,Discord.OverwritePermissions,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.CreateInviteAsync(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.CreateInviteToApplicationAsync(System.UInt64,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.CreateInviteToStreamAsync(Discord.IUser,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.CreateWebhookAsync(System.String,System.IO.Stream,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.GetCategoryAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.GetInvitesAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.GetPermissionOverwrite(Discord.IRole)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.GetPermissionOverwrite(Discord.IUser)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.GetWebhookAsync(System.UInt64,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.GetWebhooksAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.RemovePermissionOverwriteAsync(Discord.IRole,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.RemovePermissionOverwriteAsync(Discord.IUser,Discord.RequestOptions)">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="P:Discord.Rest.RestThreadChannel.PermissionOverwrites">
+            <inheritdoc/>
+            <remarks>
+                <b>This method is not supported in threads.</b>
+            </remarks>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.JoinAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.LeaveAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.AddUserAsync(Discord.IGuildUser,Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestThreadChannel.RemoveUserAsync(Discord.IGuildUser,Discord.RequestOptions)">
+            <inheritdoc/>
         </member>
         <member name="T:Discord.Rest.RestVoiceChannel">
             <summary>
@@ -4270,6 +4459,35 @@
         <member name="M:Discord.Rest.RestSelfUser.ModifyAsync(System.Action{Discord.SelfUserProperties},Discord.RequestOptions)">
             <inheritdoc />
             <exception cref="T:System.InvalidOperationException">Unable to modify this object using a different token.</exception>
+        </member>
+        <member name="T:Discord.Rest.RestThreadUser">
+            <summary>
+                Represents a thread user recieved over the REST api.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.RestThreadUser.Thread">
+            <summary>
+                Gets the <see cref="T:Discord.Rest.RestThreadChannel"/> this user is in.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.RestThreadUser.JoinedAt">
+            <summary>
+                Gets the timestamp for when this user joined this thread.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.RestThreadUser.Guild">
+            <summary>
+                Gets the guild this user is in.
+            </summary>
+        </member>
+        <member name="M:Discord.Rest.RestThreadUser.GetGuildUser">
+            <summary>
+                Gets the guild user for this thread user.
+            </summary>
+            <returns>
+                A task representing the asyncronous get operation. The task returns a
+                <see cref="T:Discord.IGuildUser"/> that represents the current thread user.
+            </returns>
         </member>
         <member name="T:Discord.Rest.RestUser">
             <summary>

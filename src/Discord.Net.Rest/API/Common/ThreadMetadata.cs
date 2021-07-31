@@ -13,7 +13,7 @@ namespace Discord.API
         public bool Archived { get; set; }
 
         [JsonProperty("auto_archive_duration")]
-        public int AutoArchiveDuration { get; set; }
+        public ThreadArchiveDuration AutoArchiveDuration { get; set; }
 
         [JsonProperty("archive_timestamp")]
         public DateTimeOffset ArchiveTimestamp { get; set; }

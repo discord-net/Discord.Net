@@ -18,6 +18,12 @@ namespace Discord.API
         [JsonProperty("join_timestamp")]
         public DateTimeOffset JoinTimestamp { get; set; }
 
+        [JsonProperty("presense")]
+        public Optional<Presence> Presence { get; set; }
+
+        [JsonProperty("member")]
+        public Optional<GuildMember> Member { get; set; }
+
         [JsonProperty("flags")]
         public int Flags { get; set; } // No enum type (yet?)
     }
