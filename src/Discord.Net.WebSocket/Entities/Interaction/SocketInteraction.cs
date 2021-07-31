@@ -96,7 +96,7 @@ namespace Discord.WebSocket
         ///     Responds to an Interaction with type <see cref="InteractionResponseType.ChannelMessageWithSource"/>.
         /// <para>
         ///     If you have <see cref="DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, You should use
-        ///     <see cref="FollowupAsync(Discord.Embed[],string,bool,bool,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent)"/> instead.
+        ///     <see cref="FollowupAsync"/> instead.
         /// </para>
         /// </summary>
         /// <param name="text">The text of the message to be sent.</param>
@@ -106,10 +106,11 @@ namespace Discord.WebSocket
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="component">A <see cref="MessageComponent"/> to be sent with this response</param>
+        /// <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
         public abstract Task RespondAsync(string text = null, Embed[] embeds = null, bool isTTS = false,
-            bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null);
+            bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null);
 
         /// <summary>
         ///     Sends a followup message for this interaction.
@@ -121,11 +122,12 @@ namespace Discord.WebSocket
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
         /// <param name="component">A <see cref="MessageComponent"/> to be sent with this response</param>
+        /// <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
         /// <returns>
         ///     The sent message.
         /// </returns>
-        public abstract Task<RestFollowupMessage> FollowupAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-             AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null);
+        public abstract Task<RestFollowupMessage> FollowupAsync(string text = null, Embed[] embeds = null,  bool isTTS = false, bool ephemeral = false,
+             AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null);
 
         /// <summary>
         ///     Gets the original response for this interaction.
