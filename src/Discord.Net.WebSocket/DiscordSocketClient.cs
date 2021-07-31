@@ -1992,12 +1992,15 @@ namespace Discord.WebSocket
                                     if ((threadChannel = guild.ThreadChannels.FirstOrDefault(x => x.Id == data.Id)) != null)
                                     {
                                         threadChannel.Update(this.State, data);
-                                        threadChannel.AddOrUpdateThreadMember(data.ThreadMember.Value, guild.CurrentUser);
+
+                                        if(data.ThreadMember.IsSpecified)
+                                            threadChannel.AddOrUpdateThreadMember(data.ThreadMember.Value, guild.CurrentUser);
                                     }
                                     else
                                     {
                                         threadChannel = (SocketThreadChannel)guild.AddChannel(this.State, data);
-                                        threadChannel.AddOrUpdateThreadMember(data.ThreadMember.Value, guild.CurrentUser);
+                                        if (data.ThreadMember.IsSpecified)
+                                            threadChannel.AddOrUpdateThreadMember(data.ThreadMember.Value, guild.CurrentUser);
                                         await TimedInvokeAsync(_threadCreated, nameof(ThreadCreated), threadChannel).ConfigureAwait(false);
                                     }
                                 }
@@ -2092,12 +2095,19 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<ThreadMember>(_serializer);
 
-                                    //var guild = State.GetGuild(data.)
+                                    var thread = (SocketThreadChannel)State.GetChannel(data.Id.Value);
 
+                                    if (thread == null)
+                                    {
+                                        await UnknownChannelAsync(type, data.Id.Value);
+                                        return;
+                                    }
+
+                                    thread.AddOrUpdateThreadMember(data, thread.Guild.CurrentUser);
                                 }
 
                                 break;
-                            case "THREAD_MEMBERS_UPDATE": // based on intents
+                            case "THREAD_MEMBERS_UPDATE": 
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (THREAD_MEMBERS_UPDATE)").ConfigureAwait(false);
 

@@ -146,7 +146,6 @@ namespace Discord.WebSocket
             return member;
         }
 
-        //Users
         /// <inheritdoc />
         public new SocketThreadUser GetUser(ulong id)
         {
@@ -310,7 +309,7 @@ namespace Discord.WebSocket
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
-            => throw new NotImplementedException();
+            => ThreadHelper.ModifyAsync(this, Discord, func, options);
 
         /// <inheritdoc/>
         /// <remarks>
@@ -339,5 +338,7 @@ namespace Discord.WebSocket
         /// </remarks>
         public override Task SyncPermissionsAsync(RequestOptions options = null)
             => throw new NotImplementedException();
+
+        string IChannel.Name => this.Name;
     }
 }

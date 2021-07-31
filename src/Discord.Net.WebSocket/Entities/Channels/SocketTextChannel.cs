@@ -72,7 +72,7 @@ namespace Discord.WebSocket
         {
             base.Update(state, model);
             CategoryId = model.CategoryId;
-            Topic = model.Topic.Value;
+            Topic = model.Topic.GetValueOrDefault();
             SlowModeInterval = model.SlowMode.GetValueOrDefault(); // some guilds haven't been patched to include this yet?
             _nsfw = model.Nsfw.GetValueOrDefault();
         }
@@ -115,7 +115,12 @@ namespace Discord.WebSocket
             ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, RequestOptions options = null)
         {
             var model = await ThreadHelper.CreateThreadAsync(Discord, this, name, type, autoArchiveDuration, message, options);
-            return SocketThreadChannel.Create(this.Guild, Discord.State, model);
+
+            var thread = (SocketThreadChannel)Guild.AddOrUpdateChannel(Discord.State, model);
+
+            await thread.DownloadUsersAsync();
+
+            return thread;
         }
 
         //Messages

@@ -1003,6 +1003,51 @@
                 A message was unpinned from this guild.
             </summary>
         </member>
+        <member name="F:Discord.ActionType.IntegrationCreated">
+            <summary>
+                A integration was created
+            </summary>
+        </member>
+        <member name="F:Discord.ActionType.IntegrationUpdated">
+            <summary>
+                A integration was updated
+            </summary>
+        </member>
+        <member name="F:Discord.ActionType.IntegrationDeleted">
+            <summary>
+            An integration was deleted
+            </summary>
+        </member>
+        <member name="F:Discord.ActionType.StageInstanceCreated">
+            <summary>
+                A stage instance was created.
+            </summary>
+        </member>
+        <member name="F:Discord.ActionType.StageInstanceUpdated">
+            <summary>
+                A stage instance was updated.
+            </summary>
+        </member>
+        <member name="F:Discord.ActionType.StageInstanceDeleted">
+            <summary>
+                A stage instance was deleted.
+            </summary>
+        </member>
+        <member name="F:Discord.ActionType.StickerCreated">
+            <summary>
+                A sticker was created.
+            </summary>
+        </member>
+        <member name="F:Discord.ActionType.StickerUpdated">
+            <summary>
+                A sticker was updated.
+            </summary>
+        </member>
+        <member name="F:Discord.ActionType.StickerDeleted">
+            <summary>
+                A sticker was deleted.
+            </summary>
+        </member>
         <member name="T:Discord.IAuditLogData">
             <summary>
                 Represents data applied to an <see cref="T:Discord.IAuditLogEntry"/>.
@@ -6105,7 +6150,7 @@
                 The built embed object.
             </returns>
             <exception cref="T:System.InvalidOperationException">Total embed length exceeds <see cref="F:Discord.EmbedBuilder.MaxEmbedLength"/>.</exception>
-            <exception cref="T:System.InvalidOperationException">Any Url must be well formatted include its protocols (i.e http:// or https://).</exception>
+            <exception cref="T:System.InvalidOperationException">Any Url must include its protocols (i.e http:// or https://).</exception>
         </member>
         <member name="T:Discord.EmbedFieldBuilder">
             <summary>

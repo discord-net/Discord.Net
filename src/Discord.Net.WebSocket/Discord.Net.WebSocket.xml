@@ -2187,6 +2187,38 @@
         <member name="M:Discord.WebSocket.SocketTextChannel.ModifyAsync(System.Action{Discord.TextChannelProperties},Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.WebSocket.SocketTextChannel.CreateThreadAsync(System.String,Discord.ThreadType,Discord.ThreadArchiveDuration,Discord.IMessage,Discord.RequestOptions)">
+            <summary>
+                Creates a thread within this <see cref="T:Discord.ITextChannel"/>.
+            </summary>
+            <remarks>
+                When <paramref name="message"/> is <see langword="null"/> the thread type will be based off of the
+                channel its created in. When called on a <see cref="T:Discord.ITextChannel"/>, it creates a <see cref="F:Discord.ThreadType.PublicThread"/>.
+                When called on a <see cref="T:Discord.INewsChannel"/>, it creates a <see cref="F:Discord.ThreadType.NewsThread"/>. The id of the created
+                thread will be the same as the id of the message, and as such a message can only have a
+                single thread created from it.
+            </remarks>
+            <param name="name">The name of the thread.</param>
+            <param name="type">
+                The type of the thread.
+                <para>
+                    <b>Note: </b>This parameter is not used if the <paramref name="message"/> parameter is not specified.
+                </para>
+            </param>
+            <param name="autoArchiveDuration">
+                The duration on which this thread archives after.
+                <para>
+                    <b>Note: </b> Options <see cref="F:Discord.ThreadArchiveDuration.OneWeek"/> and <see cref="F:Discord.ThreadArchiveDuration.ThreeDays"/>
+                    are only available for guilds that are boosted. You can check in the <see cref="P:Discord.IGuild.Features"/> to see if the 
+                    guild has the <b>THREE_DAY_THREAD_ARCHIVE</b> and <b>SEVEN_DAY_THREAD_ARCHIVE</b>.
+                </para>
+            </param>
+            <param name="message">The message which to start the thread from.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous create operation. The task result contains a <see cref="T:Discord.IThreadChannel"/>
+            </returns>
+        </member>
         <member name="M:Discord.WebSocket.SocketTextChannel.GetCachedMessage(System.UInt64)">
             <inheritdoc />
         </member>
@@ -2352,6 +2384,9 @@
         <member name="M:Discord.WebSocket.SocketTextChannel.Discord#ITextChannel#GetWebhooksAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.WebSocket.SocketTextChannel.Discord#ITextChannel#CreateThreadAsync(System.String,Discord.ThreadType,Discord.ThreadArchiveDuration,Discord.IMessage,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.WebSocket.SocketTextChannel.Discord#IGuildChannel#GetUserAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
             <inheritdoc />
         </member>
@@ -2389,6 +2424,9 @@
             <summary>
                 Represents a thread channel inside of a guild.
             </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadChannel.Type">
+            <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketThreadChannel.Owner">
             <summary>

@@ -463,7 +463,9 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            await SendAsync("PUT", $"channels/{channelId}/thread-members/{userId}", options: options).ConfigureAwait(false);
+            var bucket = new BucketIds(channelId: channelId);
+
+            await SendAsync("PUT", () => $"channels/{channelId}/thread-members/{userId}", bucket, options: options).ConfigureAwait(false);
         }
 
         public async Task LeaveThreadAsync(ulong channelId, RequestOptions options = null)

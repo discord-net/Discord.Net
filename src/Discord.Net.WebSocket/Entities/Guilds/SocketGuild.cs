@@ -32,7 +32,7 @@ namespace Discord.WebSocket
         private readonly SemaphoreSlim _audioLock;
         private TaskCompletionSource<bool> _syncPromise, _downloaderPromise;
         private TaskCompletionSource<AudioClient> _audioConnectPromise;
-        private ConcurrentHashSet<ulong> _channels;
+        private ConcurrentDictionary<ulong, SocketGuildChannel> _channels;
         private ConcurrentDictionary<ulong, SocketGuildUser> _members;
         private ConcurrentDictionary<ulong, SocketRole> _roles;
         private ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
@@ -307,7 +307,7 @@ namespace Discord.WebSocket
             {
                 var channels = _channels;
                 var state = Discord.State;
-                return channels.Select(x => state.GetChannel(x) as SocketGuildChannel).Where(x => x != null).ToReadOnlyCollection(channels);
+                return channels.Select(x => x.Value).Where(x => x != null).ToReadOnlyCollection(channels);
             }
         }
         /// <inheritdoc />
@@ -363,7 +363,7 @@ namespace Discord.WebSocket
             if (!IsAvailable)
             {
                 if (_channels == null)
-                    _channels = new ConcurrentHashSet<ulong>();
+                    _channels = new ConcurrentDictionary<ulong, SocketGuildChannel>();
                 if (_members == null)
                     _members = new ConcurrentDictionary<ulong, SocketGuildUser>();
                 if (_roles == null)
@@ -379,20 +379,20 @@ namespace Discord.WebSocket
 
             Update(state, model as Model);
 
-            var channels = new ConcurrentHashSet<ulong>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Channels.Length * 1.05));
+            var channels = new ConcurrentDictionary<ulong, SocketGuildChannel>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Channels.Length * 1.05));
             {
                 for (int i = 0; i < model.Channels.Length; i++)
                 {
                     var channel = SocketGuildChannel.Create(this, state, model.Channels[i]);
                     state.AddChannel(channel);
-                    channels.TryAdd(channel.Id);
+                    channels.TryAdd(channel.Id, channel);
                 }
 
                 for(int i = 0; i < model.Threads.Length; i++)
                 {
                     var threadChannel = SocketThreadChannel.Create(this, state, model.Threads[i]);
                     state.AddChannel(threadChannel);
-                    channels.TryAdd(threadChannel.Id);
+                    channels.TryAdd(threadChannel.Id, threadChannel);
                 }
             }
 
@@ -703,20 +703,34 @@ namespace Discord.WebSocket
         internal SocketGuildChannel AddChannel(ClientState state, ChannelModel model)
         {
             var channel = SocketGuildChannel.Create(this, state, model);
-            _channels.TryAdd(model.Id);
+            _channels.TryAdd(model.Id, channel);
             state.AddChannel(channel);
             return channel;
         }
+
+        internal SocketGuildChannel AddOrUpdateChannel(ClientState state, ChannelModel model)
+        {
+            if (_channels.TryGetValue(model.Id, out SocketGuildChannel channel))
+                channel.Update(Discord.State, model);
+            else
+            {
+                channel = SocketGuildChannel.Create(this, Discord.State, model);
+                _channels[channel.Id] = channel;
+                state.AddChannel(channel);
+            }
+            return channel;
+        }
+
         internal SocketGuildChannel RemoveChannel(ClientState state, ulong id)
         {
-            if (_channels.TryRemove(id))
+            if (_channels.TryRemove(id, out var _))
                 return state.RemoveChannel(id) as SocketGuildChannel;
             return null;
         }
         internal void PurgeChannelCache(ClientState state)
         {
             foreach (var channelId in _channels)
-                state.RemoveChannel(channelId);
+                state.RemoveChannel(channelId.Key);
 
             _channels.Clear();
         }
