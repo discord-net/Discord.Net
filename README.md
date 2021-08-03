@@ -108,15 +108,16 @@ Theres a new field in all `SendMessageAsync` functions that takes in a `MessageC
 ```cs
 var builder = new ComponentBuilder()
   .WithSelectMenu(new SelectMenuBuilder()
-  .WithCustomId("id_2")
-  .WithPlaceholder("This is a placeholder")
-  .AddOption(
-    label: "Option",
-    value: "value1",
-    description: "Evan pog champ",
-    emote: Emote.Parse("<:evanpog:810017136814194698>")
-  )
-  .AddOption("Option B", "value2", "Option B is poggers");
+    .WithCustomId("id_2")
+    .WithPlaceholder("This is a placeholder")
+    .AddOption(
+      label: "Option",
+      value: "value1",
+      description: "Evan pog champ",
+      emote: Emote.Parse("<:evanpog:810017136814194698>")
+    )
+    .AddOption("Option B", "value2", "Option B is poggers")
+  );
   
 await Context.Channel.SendMessageAsync("Test selection!", component: builder.Build());
 ```
