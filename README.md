@@ -17,14 +17,14 @@ Setting up labs in your project is really simple, here's how to do it:
 ### Dev
 The main branch we pull off of to introduce new features into, the dev branch is the same as Discord.Nets dev branch
 
-### Interactions
-This branch is for anything todo with Discord Interactions, such as [Slash commands](https://discord.com/developers/docs/interactions/slash-commands) and [Message Components](https://discord.com/developers/docs/interactions/message-components). This branch is stable enough to use but does not contain all the features of interactions. 
+### release/2.x
+This branch is what will be pushed to nuget, sometimes its not up to date as we wait for other features to be finished.
 
-### SlashCommandService
-This branch is on pause and does not work currently, Once everything is stable with the Interaction branch we will continue working on a slash command service for it.
+### old/SlashCommandService
+This branch is on pause and does not work currently, There is a pull request open to implement a working version of a slash command service. It can be found [here](https://github.com/Discord-Net-Labs/Discord.Net-Labs/pull/52)
 
-### web/SlashCommandService
-webmilio's spin on the SlashCommandService branch, again the state of this is unknown. 
+### feature/xyz
+These branches are features for new things, you are more than welcome to clone them and give feedback in the discord server or issues tab.
 
 ## Listening for interactions
 ```cs
@@ -124,4 +124,4 @@ await Context.Channel.SendMessageAsync("Test selection!", component: builder.Bui
 > Note: You can only have 5 buttons per row and 5 rows per message. If a row contains a selection dropdown it cannot contain any buttons.
 
 ## Slash commands
-Slash command example how to's can be found [here](https://github.com/Discord-Net-Labs/Discord.Net-Labs/tree/Interactions/docs/guides/slash-commands). If you want to read some code using slash commands, you can do that [here](https://github.com/quinchs/SwissbotCore/blob/master/SwissbotCore/Handlers/AutoMod/Censor.cs)
+Slash command example how to's can be found [here](https://github.com/Discord-Net-Labs/Discord.Net-Labs/tree/Interactions/docs/guides/slash-commands). 
