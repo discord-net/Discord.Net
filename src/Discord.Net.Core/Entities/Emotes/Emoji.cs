@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Discord
@@ -56,7 +58,7 @@ namespace Discord
             if (NamesAndUnicodes.ContainsKey(text))
                 result = new Emoji(NamesAndUnicodes[text]);
 
-            if (UnicodesAndNames.ContainsKey(text))
+            if (Unicodes.Contains(text))
                 result = new Emoji(text);
 
             return result != null;
@@ -5942,12 +5944,30 @@ namespace Discord
       ["♡"] = "❤️"
         };
 
-        private static IReadOnlyDictionary<string, string> _unicodesAndNames;
-        private static IReadOnlyDictionary<string, string> UnicodesAndNames
+        private static IReadOnlyCollection<string> _unicodes;
+        private static IReadOnlyCollection<string> Unicodes
         {
             get
             {
-                _unicodesAndNames ??= NamesAndUnicodes.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+                _unicodes ??= NamesAndUnicodes.Select(kvp => kvp.Value).ToImmutableHashSet();
+                return _unicodes;
+            }
+        }
+
+        private static IReadOnlyDictionary<string, ReadOnlyCollection<string>> _unicodesAndNames;
+        private static IReadOnlyDictionary<string, ReadOnlyCollection<string>> UnicodesAndNames
+        {
+            get
+            {
+                _unicodesAndNames ??=
+                    NamesAndUnicodes
+                        .GroupBy(kvp => kvp.Value)
+                        .ToImmutableDictionary(
+                            grouping => grouping.Key,
+                            grouping => grouping.Select(kvp => kvp.Key)
+                                .ToList()
+                                .AsReadOnly()
+                        );
                 return _unicodesAndNames;
             }
         }
