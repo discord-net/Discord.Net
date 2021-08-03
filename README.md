@@ -15,16 +15,16 @@ Setting up labs in your project is really simple, here's how to do it:
 
 ## Branches
 ### Dev
-The main branch we pull off of to introduce new features into, the dev branch is the same as Discord.Nets dev branch
+This branch is kept up to date with dnets dev branch. we pull of it to ensure that labs will work with pre existing dnet code.
 
-### Interactions
-This branch is for anything todo with Discord Interactions, such as [Slash commands](https://discord.com/developers/docs/interactions/slash-commands) and [Message Components](https://discord.com/developers/docs/interactions/message-components). This branch is stable enough to use but does not contain all the features of interactions. 
+### release/2.x
+This branch is what will be pushed to nuget, sometimes its not up to date as we wait for other features to be finished.
 
-### SlashCommandService
-This branch is on pause and does not work currently, Once everything is stable with the Interaction branch we will continue working on a slash command service for it.
+### old/SlashCommandService
+This branch is on pause and does not work currently, There is a pull request open to implement a working version of a slash command service. It can be found [here](https://github.com/Discord-Net-Labs/Discord.Net-Labs/pull/52)
 
-### web/SlashCommandService
-webmilio's spin on the SlashCommandService branch, again the state of this is unknown. 
+### feature/xyz
+These branches are features for new things, you are more than welcome to clone them and give feedback in the discord server or issues tab.
 
 ## Listening for interactions
 ```cs
@@ -32,52 +32,65 @@ webmilio's spin on the SlashCommandService branch, again the state of this is un
 client.InteractionCreated += Client_InteractionCreated;
 
 ...
-private async Task Client_InteractionCreated(SocketInteraction arg)
+private async Task Client_InteractionCreated(SocketInteraction interaction)
 {
-  switch (arg.Type) // We want to check the type of this interaction
+  // Checking the type of this interaction
+  switch (interaction)
   {
-    //Slash commands
-    case InteractionType.ApplicationCommand:
-      await MySlashCommandHandler(arg);
+    // Slash commands
+    case SocketSlashCommand commandInteraction:
+      await MySlashCommandHandler(commandInteraction);
       break;
-    //Button clicks/selection dropdowns
-    case InteractionType.MessageComponent:
-      await MyMessageComponentHandler(arg);
+      
+    // Button clicks/selection dropdowns
+    case SocketMessageComponent componentInteraction:
+      await MyMessageComponentHandler(componentInteraction);
       break;
-    //Unused
-    case InteractionType.Ping:
-      break;
-    //Unknown/Unsupported
+      
+    // Unused or Unknown/Unsupported
     default:
-      Console.WriteLine("Unsupported interaction type: " + arg.Type);
       break;
   }
 }
 ```
 
-### Handling button clicks and selection dropdowns
+### Simple handling slash commands
 ```cs
-private async Task MyMessageComponentHandler(SocketInteraction arg)
+private async Task MySlashCommandHandler(SocketSlashCommand interaction)
 {
-    // Parse the arg
-    var parsedArg = (SocketMessageComponent) arg;
+    // Checking command name
+    if (interaction.Data.Name == "ping")
+    {
+      // Respond to interaction with message.
+      // You can also use "ephemeral" so that only the original user of the interaction sees the message
+      await interaction.RespondAsync($"Pong!", ephemeral: true);
+      
+      // Also you can followup with a additional messages, which also can be "ephemeral"
+      await interaction.FollowupAsync($"PongPong!", ephemeral: true);
+    }
+}
+```
+
+### Simple handling button clicks and selection dropdowns
+```cs
+private async Task MyMessageComponentHandler(SocketMessageComponent interaction)
+{
     // Get the custom ID 
-    var customId = parsedArg.Data.CustomId;
+    var customId = interaction.Data.CustomId;
     // Get the user
-    var user = (SocketGuildUser) arg.User;
+    var user = (SocketGuildUser) interaction.User;
     // Get the guild
     var guild = user.Guild;
     
-    // Respond with the update message response type. This edits the original message if you have set AlwaysAcknowledgeInteractions to false.
-    // You can also use "ephemeral" so that only the original user of the interaction sees the message
-    await parsedArg.RespondAsync($"Clicked {parsedArg.Data.CustomId}!", type: InteractionResponseType.UpdateMessage, ephemeral: true);
+    // Respond with the update message. This edits the message which this component resides.
+    await interaction.UpdateAsync(msgProps => msgProps.Content = $"Clicked {interaction.Data.CustomId}!");
     
-    // You can also followup with a second message
-    await parsedArg.FollowupAsync($"Clicked {parsedArg.Data.CustomId}!", type: InteractionResponseType.ChannelMessageWithSource, ephemeral: true);
+    // Also you can followup with a additional messages
+    await interaction.FollowupAsync($"Clicked {interaction.Data.CustomId}!", ephemeral: true);
     
-    //If you are using selection dropdowns, you can get the selected label and values using these:
-    var selectedLabel = ((SelectMenu) parsedArg.Message.Components.First().Components.First()).Options.FirstOrDefault(x => x.Value == parsedArg.Data.Values.FirstOrDefault())?.Label;
-    var selectedValue = parsedArg.Data.Values.First();
+    // If you are using selection dropdowns, you can get the selected label and values using these
+    var selectedLabel = ((SelectMenu) interaction.Message.Components.First().Components.First()).Options.FirstOrDefault(x => x.Value == interaction.Data.Values.FirstOrDefault())?.Label;
+    var selectedValue = interaction.Data.Values.First();
 }
 ```
 
@@ -96,24 +109,19 @@ Theres a new field in all `SendMessageAsync` functions that takes in a `MessageC
 var builder = new ComponentBuilder()
   .WithSelectMenu(new SelectMenuBuilder()
   .WithCustomId("id_2")
-  .WithLabel("Select menu!")
   .WithPlaceholder("This is a placeholder")
-  .WithOptions(new List<SelectMenuOptionBuilder>()
-  {
-    new SelectMenuOptionBuilder()
-      .WithLabel("Option A")
-      .WithEmote(Emote.Parse("<:evanpog:810017136814194698>"))
-      .WithDescription("Evan pog champ")
-      .WithValue("value1"),
-    new SelectMenuOptionBuilder()
-      .WithLabel("Option B")
-      .WithDescription("Option B is poggers")
-      .WithValue("value2")
-  }));
+  .AddOption(
+    label: "Option",
+    value: "value1",
+    description: "Evan pog champ",
+    emote: Emote.Parse("<:evanpog:810017136814194698>")
+  )
+  .AddOption("Option B", "value2", "Option B is poggers");
+  
 await Context.Channel.SendMessageAsync("Test selection!", component: builder.Build());
 ```
 
 > Note: You can only have 5 buttons per row and 5 rows per message. If a row contains a selection dropdown it cannot contain any buttons.
 
 ## Slash commands
-Slash command example how to's can be found [here](https://github.com/Discord-Net-Labs/Discord.Net-Labs/tree/Interactions/docs/guides/slash-commands). If you want to read some code using slash commands, you can do that [here](https://github.com/quinchs/SwissbotCore/blob/master/SwissbotCore/Handlers/AutoMod/Censor.cs)
+Slash command example how to's can be found [here](https://github.com/Discord-Net-Labs/Discord.Net-Labs/tree/Interactions/docs/guides/slash-commands). 
