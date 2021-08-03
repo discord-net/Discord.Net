@@ -118,6 +118,8 @@ namespace Discord.WebSocket
         public int? MaxMembers { get; private set; }
         /// <inheritdoc />
         public int? MaxVideoChannelUsers { get; private set; }
+        /// <inheritdoc />
+        public NsfwLevel NsfwLevel { get; private set; }
 
         /// <inheritdoc />
         public CultureInfo PreferredCulture { get; private set; }
@@ -464,6 +466,7 @@ namespace Discord.WebSocket
             SystemChannelFlags = model.SystemChannelFlags;
             Description = model.Description;
             PremiumSubscriptionCount = model.PremiumSubscriptionCount.GetValueOrDefault();
+            NsfwLevel = model.NsfwLevel;
             if (model.MaxPresences.IsSpecified)
                 MaxPresences = model.MaxPresences.Value ?? 25000;
             if (model.MaxMembers.IsSpecified)

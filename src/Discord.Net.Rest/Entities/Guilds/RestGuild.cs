@@ -83,6 +83,8 @@ namespace Discord.Rest
         public int? ApproximateMemberCount { get; private set; }
         /// <inheritdoc />
         public int? ApproximatePresenceCount { get; private set; }
+        /// <inheritdoc />
+        public NsfwLevel NsfwLevel { get; private set; }
 
         /// <inheritdoc />
         public CultureInfo PreferredCulture { get; private set; }
@@ -151,6 +153,7 @@ namespace Discord.Rest
             SystemChannelFlags = model.SystemChannelFlags;
             Description = model.Description;
             PremiumSubscriptionCount = model.PremiumSubscriptionCount.GetValueOrDefault();
+            NsfwLevel = model.NsfwLevel;
             if (model.MaxPresences.IsSpecified)
                 MaxPresences = model.MaxPresences.Value ?? 25000;
             if (model.MaxMembers.IsSpecified)

@@ -2896,6 +2896,9 @@
         <member name="P:Discord.Rest.RestGuild.ApproximatePresenceCount">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestGuild.NsfwLevel">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.Rest.RestGuild.PreferredCulture">
             <inheritdoc />
         </member>

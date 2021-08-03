@@ -317,6 +317,14 @@ namespace Discord
         string PreferredLocale { get; }
 
         /// <summary>
+        ///     Gets the NSFW level of this guild.
+        /// </summary>
+        /// <returns>
+        ///     The NSFW level of this guild.
+        /// </returns>
+        NsfwLevel NsfwLevel { get; }
+
+        /// <summary>
         ///     Gets the preferred culture of this guild.
         /// </summary>
         /// <returns>
