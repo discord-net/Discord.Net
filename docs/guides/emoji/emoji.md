@@ -46,13 +46,15 @@ form; this can be obtained in several different ways.
 ### Emoji Declaration
 
 After obtaining the Unicode representation of the emoji, you may
-create the @Discord.Emoji object by passing the string into its
+create the @Discord.Emoji object by passing the string with unicode into its
 constructor (e.g. `new Emoji("👌");` or `new Emoji("\uD83D\uDC4C");`).
 
 Your method of declaring an @Discord.Emoji should look similar to
 this:
-
 [!code-csharp[Emoji Sample](samples/emoji-sample.cs)]
+
+Also you can use `Emoji.Parse()` or `Emoji.TryParse()` methods 
+for parsing emojis from strings like `:heart:`, `<3` or `❤`.
 
 [FileFormat.Info]: https://www.fileformat.info/info/emoji/list.htm
 

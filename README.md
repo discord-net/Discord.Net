@@ -32,52 +32,65 @@ webmilio's spin on the SlashCommandService branch, again the state of this is un
 client.InteractionCreated += Client_InteractionCreated;
 
 ...
-private async Task Client_InteractionCreated(SocketInteraction arg)
+private async Task Client_InteractionCreated(SocketInteraction interaction)
 {
-  switch (arg.Type) // We want to check the type of this interaction
+  // Checking the type of this interaction
+  switch (interaction)
   {
-    //Slash commands
-    case InteractionType.ApplicationCommand:
-      await MySlashCommandHandler(arg);
+    // Slash commands
+    case SocketSlashCommand commandInteraction:
+      await MySlashCommandHandler(commandInteraction);
       break;
-    //Button clicks/selection dropdowns
-    case InteractionType.MessageComponent:
-      await MyMessageComponentHandler(arg);
+      
+    // Button clicks/selection dropdowns
+    case SocketMessageComponent componentInteraction:
+      await MyMessageComponentHandler(componentInteraction);
       break;
-    //Unused
-    case InteractionType.Ping:
-      break;
-    //Unknown/Unsupported
+      
+    // Unused or Unknown/Unsupported
     default:
-      Console.WriteLine("Unsupported interaction type: " + arg.Type);
       break;
   }
 }
 ```
 
-### Handling button clicks and selection dropdowns
+### Simple handling slash commands
 ```cs
-private async Task MyMessageComponentHandler(SocketInteraction arg)
+private async Task MySlashCommandHandler(SocketSlashCommand interaction)
 {
-    // Parse the arg
-    var parsedArg = (SocketMessageComponent) arg;
+    // Checking command name
+    if (interaction.Data.Name == "ping")
+    {
+      // Respond to interaction with message.
+      // You can also use "ephemeral" so that only the original user of the interaction sees the message
+      await interaction.RespondAsync($"Pong!", ephemeral: true);
+      
+      // Also you can followup with a additional messages, which also can be "ephemeral"
+      await interaction.FollowupAsync($"PongPong!", ephemeral: true);
+    }
+}
+```
+
+### Simple handling button clicks and selection dropdowns
+```cs
+private async Task MyMessageComponentHandler(SocketMessageComponent interaction)
+{
     // Get the custom ID 
-    var customId = parsedArg.Data.CustomId;
+    var customId = interaction.Data.CustomId;
     // Get the user
-    var user = (SocketGuildUser) arg.User;
+    var user = (SocketGuildUser) interaction.User;
     // Get the guild
     var guild = user.Guild;
     
-    // Respond with the update message response type. This edits the original message if you have set AlwaysAcknowledgeInteractions to false.
-    // You can also use "ephemeral" so that only the original user of the interaction sees the message
-    await parsedArg.RespondAsync($"Clicked {parsedArg.Data.CustomId}!", type: InteractionResponseType.UpdateMessage, ephemeral: true);
+    // Respond with the update message. This edits the message which this component resides.
+    await interaction.UpdateAsync(msgProps => msgProps.Content = $"Clicked {interaction.Data.CustomId}!");
     
-    // You can also followup with a second message
-    await parsedArg.FollowupAsync($"Clicked {parsedArg.Data.CustomId}!", type: InteractionResponseType.ChannelMessageWithSource, ephemeral: true);
+    // Also you can followup with a additional messages
+    await interaction.FollowupAsync($"Clicked {interaction.Data.CustomId}!", ephemeral: true);
     
-    //If you are using selection dropdowns, you can get the selected label and values using these:
-    var selectedLabel = ((SelectMenu) parsedArg.Message.Components.First().Components.First()).Options.FirstOrDefault(x => x.Value == parsedArg.Data.Values.FirstOrDefault())?.Label;
-    var selectedValue = parsedArg.Data.Values.First();
+    // If you are using selection dropdowns, you can get the selected label and values using these
+    var selectedLabel = ((SelectMenu) interaction.Message.Components.First().Components.First()).Options.FirstOrDefault(x => x.Value == interaction.Data.Values.FirstOrDefault())?.Label;
+    var selectedValue = interaction.Data.Values.First();
 }
 ```
 
@@ -97,18 +110,14 @@ var builder = new ComponentBuilder()
   .WithSelectMenu(new SelectMenuBuilder()
   .WithCustomId("id_2")
   .WithPlaceholder("This is a placeholder")
-  .WithOptions(new List<SelectMenuOptionBuilder>()
-  {
-    new SelectMenuOptionBuilder()
-      .WithLabel("Option A")
-      .WithEmote(Emote.Parse("<:evanpog:810017136814194698>"))
-      .WithDescription("Evan pog champ")
-      .WithValue("value1"),
-    new SelectMenuOptionBuilder()
-      .WithLabel("Option B")
-      .WithDescription("Option B is poggers")
-      .WithValue("value2")
-  }));
+  .AddOption(
+    label: "Option",
+    value: "value1",
+    description: "Evan pog champ",
+    emote: Emote.Parse("<:evanpog:810017136814194698>")
+  )
+  .AddOption("Option B", "value2", "Option B is poggers");
+  
 await Context.Channel.SendMessageAsync("Test selection!", component: builder.Build());
 ```
 
