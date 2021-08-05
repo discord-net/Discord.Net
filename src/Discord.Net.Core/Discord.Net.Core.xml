@@ -1978,6 +1978,53 @@
                 A task that represents the asynchronous stop operation.
             </returns>
         </member>
+        <member name="M:Discord.IStageChannel.RequestToSpeak(Discord.RequestOptions)">
+            <summary>
+                Indicates that the bot would like to speak within a stage channel.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous request to speak operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IStageChannel.BecomeSpeakerAsync(Discord.RequestOptions)">
+            <summary>
+                Makes the current user become a speaker within a stage.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous speaker modify operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IStageChannel.StopSpeakingAsync(Discord.RequestOptions)">
+            <summary>
+                Makes the current user a listener.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous stop operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IStageChannel.MoveToSpeaker(Discord.IGuildUser,Discord.RequestOptions)">
+            <summary>
+                Makes a user a speaker within a stage.
+            </summary>
+            <param name="user">The user to make the speaker.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous move operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IStageChannel.RemoveFromSpeaker(Discord.IGuildUser,Discord.RequestOptions)">
+            <summary>
+                Removes a user from speaking.
+            </summary>
+            <param name="user">The user to remove from speaking.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous remove operation.
+            </returns>
+        </member>
         <member name="T:Discord.ITextChannel">
             <summary>
                 Represents a generic channel in a guild that can send and receive messages.
@@ -7548,6 +7595,14 @@
             </summary>
             <remarks>
                 This must be less than the constant defined by <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.
+            </remarks>
+        </member>
+        <member name="P:Discord.MessageProperties.Embed">
+            <summary>
+                Gets or sets a single embed for this message.
+            </summary>
+            <remarks>
+                This property will be added to the <see cref="P:Discord.MessageProperties.Embed"/> array, in the future please use the array rather then this property.
             </remarks>
         </member>
         <member name="P:Discord.MessageProperties.Embeds">

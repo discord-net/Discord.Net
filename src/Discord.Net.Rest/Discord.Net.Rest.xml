@@ -2313,6 +2313,18 @@
         <member name="M:Discord.Rest.RestStageChannel.RequestToSpeak(Discord.RequestOptions)">
             <inheritdoc/>
         </member>
+        <member name="M:Discord.Rest.RestStageChannel.BecomeSpeakerAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestStageChannel.StopSpeakingAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestStageChannel.MoveToSpeaker(Discord.IGuildUser,Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestStageChannel.RemoveFromSpeaker(Discord.IGuildUser,Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
         <member name="T:Discord.Rest.RestTextChannel">
             <summary>
                 Represents a REST-based channel in a guild that can send and receive messages.

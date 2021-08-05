@@ -2189,6 +2189,11 @@
         <member name="P:Discord.WebSocket.SocketStageChannel.Live">
             <inheritdoc/>
         </member>
+        <member name="P:Discord.WebSocket.SocketStageChannel.IsSpeaker">
+            <summary>
+                Returns <see langword="true"/> if the current user is a speaker within the stage, otherwise <see langword="false"/>.
+            </summary>
+        </member>
         <member name="P:Discord.WebSocket.SocketStageChannel.Speakers">
             <summary>
                 Gets a collection of users who are speakers within the stage.
@@ -2204,6 +2209,18 @@
             <inheritdoc/>
         </member>
         <member name="M:Discord.WebSocket.SocketStageChannel.RequestToSpeak(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketStageChannel.BecomeSpeakerAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketStageChannel.StopSpeakingAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketStageChannel.MoveToSpeaker(Discord.IGuildUser,Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketStageChannel.RemoveFromSpeaker(Discord.IGuildUser,Discord.RequestOptions)">
             <inheritdoc/>
         </member>
         <member name="T:Discord.WebSocket.SocketTextChannel">

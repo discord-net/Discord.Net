@@ -75,8 +75,15 @@ namespace Discord.API
                     using (var jsonReader = new JsonTextReader(reader))
                     {
                         var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
+
                         if (msg != null)
+                        {
+#if DEBUG_PACKETS
+                            Console.WriteLine($"<- {msg.Operation} [{msg.Type ?? "none"}] : {(msg.Payload as Newtonsoft.Json.Linq.JToken)?.ToString().Length}");
+#endif
+
                             await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                        }
                     }
                 }
             };
@@ -87,7 +94,13 @@ namespace Discord.API
                 {
                     var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
                     if (msg != null)
+                    {
+#if DEBUG_PACKETS
+                        Console.WriteLine($"<- {msg.Operation} [{msg.Type ?? "none"}] : {(msg.Payload as Newtonsoft.Json.Linq.JToken)?.ToString().Length}");
+#endif
+
                         await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                    }
                 }
             };
             WebSocketClient.Closed += async ex =>
@@ -214,8 +227,8 @@ namespace Discord.API
             await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, bytes, true, opCode == GatewayOpCode.Heartbeat, options)).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
 
-#if DEBUG
-            Console.WriteLine($"Sent {opCode}:\n{SerializeJson(payload)}");
+#if DEBUG_PACKETS
+            Console.WriteLine($"-> {opCode}:\n{SerializeJson(payload)}");
 #endif
         }
 
