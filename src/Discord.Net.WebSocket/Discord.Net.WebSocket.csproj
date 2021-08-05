@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../../Discord.Net.targets" />
   <Import Project="../../StyleAnalyzer.targets" />
   <PropertyGroup>
@@ -18,7 +18,7 @@
     <DocumentationFile>..\Discord.Net.WebSocket\Discord.Net.WebSocket.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;</DefineConstants>
   </PropertyGroup>
   
   <ItemGroup>
