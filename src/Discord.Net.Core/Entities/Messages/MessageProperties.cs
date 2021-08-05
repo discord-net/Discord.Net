@@ -19,6 +19,14 @@ namespace Discord
         public Optional<string> Content { get; set; }
 
         /// <summary>
+        ///     Gets or sets a single embed for this message.
+        /// </summary>
+        /// <remarks>
+        ///     This property will be added to the <see cref="Embed"/> array, in the future please use the array rather then this property.
+        /// </remarks>
+        public Optional<Embed> Embed { get; set; }
+
+        /// <summary>
         ///     Gets or sets the embeds of the message.
         /// </summary>
         public Optional<Embed[]> Embeds { get; set; }

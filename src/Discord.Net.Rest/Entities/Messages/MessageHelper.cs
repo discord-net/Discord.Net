@@ -61,10 +61,22 @@ namespace Discord.Rest
                 }
             }
 
+            var embeds = new List<API.Embed>();
+
+            if (args.Embed.IsSpecified)
+            {
+                embeds.Add(args.Embed.Value.ToModel());
+            }
+
+            if (args.Embeds.IsSpecified)
+            {
+                embeds.AddRange(args.Embeds.Value.Select(x => x.ToModel()));
+            }
+
             var apiArgs = new ModifyMessageParams
             {
                 Content = args.Content,
-                Embeds = args.Embeds.IsSpecified ? args.Embeds.Value.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
+                Embeds = embeds.ToArray(),
                 Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
                 Flags = args.Flags,
                 AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional<API.AllowedMentions>.Unspecified,
@@ -105,12 +117,25 @@ namespace Discord.Rest
                 }
             }
 
+            var embeds = new List<API.Embed>();
+
+            if (args.Embed.IsSpecified)
+            {
+                embeds.Add(args.Embed.Value.ToModel());
+            }
+
+            if (args.Embeds.IsSpecified)
+            {
+                embeds.AddRange(args.Embeds.Value.Select(x => x.ToModel()));
+            }
+
             var apiArgs = new API.Rest.ModifyMessageParams
             {
                 Content = args.Content,
-                Embeds = args.Embeds.IsSpecified ? args.Embeds.Value.Select(x => x.ToModel()).ToArray() : Optional.Create<API.Embed[]>(),
+                Embeds = embeds.ToArray(),
                 Flags = args.Flags.IsSpecified ? args.Flags.Value : Optional.Create<MessageFlags?>(),
                 AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional.Create<API.AllowedMentions>(),
+                Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
             };
             return await client.ApiClient.ModifyMessageAsync(channelId, msgId, apiArgs, options).ConfigureAwait(false);
         }
