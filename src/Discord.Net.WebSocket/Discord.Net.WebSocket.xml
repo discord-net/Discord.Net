@@ -758,7 +758,7 @@
         </member>
         <member name="E:Discord.WebSocket.BaseSocketClient.ThreadCreated">
             <summary>
-                Fired when a thread is created within a guild. or when the current user is added to a thread.
+                Fired when a thread is created within a guild, or when the current user is added to a thread.
             </summary>
         </member>
         <member name="E:Discord.WebSocket.BaseSocketClient.ThreadUpdated">
