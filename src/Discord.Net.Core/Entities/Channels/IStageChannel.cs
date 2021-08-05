@@ -70,6 +70,51 @@ namespace Discord
         /// </returns>
         Task StopStageAsync(RequestOptions options = null);
 
+        /// <summary>
+        ///     Indicates that the bot would like to speak within a stage channel.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous request to speak operation.
+        /// </returns>
         Task RequestToSpeak(RequestOptions options = null);
+
+        /// <summary>
+        ///     Makes the current user become a speaker within a stage.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous speaker modify operation.
+        /// </returns>
+        Task BecomeSpeakerAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Makes the current user a listener.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous stop operation.
+        /// </returns>
+        Task StopSpeakingAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Makes a user a speaker within a stage.
+        /// </summary>
+        /// <param name="user">The user to make the speaker.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous move operation.
+        /// </returns>
+        Task MoveToSpeaker(IGuildUser user, RequestOptions options = null);
+
+        /// <summary>
+        ///     Removes a user from speaking.
+        /// </summary>
+        /// <param name="user">The user to remove from speaking.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous remove operation.
+        /// </returns>
+        Task RemoveFromSpeaker(IGuildUser user, RequestOptions options = null);
     }
 }

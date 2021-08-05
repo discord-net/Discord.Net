@@ -28,6 +28,12 @@ namespace Discord.WebSocket
         public bool Live { get; private set; } = false;
 
         /// <summary>
+        ///     Returns <see langword="true"/> if the current user is a speaker within the stage, otherwise <see langword="false"/>.
+        /// </summary>
+        public bool IsSpeaker
+            => !Guild.CurrentUser.IsSuppressed;
+
+        /// <summary>
         ///     Gets a collection of users who are speakers within the stage.
         /// </summary>
         public IReadOnlyCollection<SocketGuildUser> Speakers
@@ -111,6 +117,52 @@ namespace Discord.WebSocket
                 RequestToSpeakTimestamp = DateTimeOffset.UtcNow
             };
             return Discord.ApiClient.ModifyMyVoiceState(this.Guild.Id, args, options);
+        }
+
+        /// <inheritdoc/>
+        public Task BecomeSpeakerAsync(RequestOptions options = null)
+        {
+            var args = new API.Rest.ModifyVoiceStateParams()
+            {
+                ChannelId = this.Id,
+                Suppressed = false
+            };
+            return Discord.ApiClient.ModifyMyVoiceState(this.Guild.Id, args, options);
+        }
+
+        /// <inheritdoc/>
+        public Task StopSpeakingAsync(RequestOptions options = null)
+        {
+            var args = new API.Rest.ModifyVoiceStateParams()
+            {
+                ChannelId = this.Id,
+                Suppressed = true
+            };
+            return Discord.ApiClient.ModifyMyVoiceState(this.Guild.Id, args, options);
+        }
+
+        /// <inheritdoc/>
+        public Task MoveToSpeaker(IGuildUser user, RequestOptions options = null)
+        {
+            var args = new API.Rest.ModifyVoiceStateParams()
+            {
+                ChannelId = this.Id,
+                Suppressed = false
+            };
+
+            return Discord.ApiClient.ModifyUserVoiceState(this.Guild.Id, user.Id, args);
+        }
+
+        /// <inheritdoc/>
+        public Task RemoveFromSpeaker(IGuildUser user, RequestOptions options = null)
+        {
+            var args = new API.Rest.ModifyVoiceStateParams()
+            {
+                ChannelId = this.Id,
+                Suppressed = true
+            };
+
+            return Discord.ApiClient.ModifyUserVoiceState(this.Guild.Id, user.Id, args);
         }
     }
 }

@@ -105,5 +105,51 @@ namespace Discord.Rest
             };
             return Discord.ApiClient.ModifyMyVoiceState(this.Guild.Id, args, options);
         }
+
+        /// <inheritdoc/>
+        public Task BecomeSpeakerAsync(RequestOptions options = null)
+        {
+            var args = new API.Rest.ModifyVoiceStateParams()
+            {
+                ChannelId = this.Id,
+                Suppressed = false
+            };
+            return Discord.ApiClient.ModifyMyVoiceState(this.Guild.Id, args, options);
+        }
+
+        /// <inheritdoc/>
+        public Task StopSpeakingAsync(RequestOptions options = null)
+        {
+            var args = new API.Rest.ModifyVoiceStateParams()
+            {
+                ChannelId = this.Id,
+                Suppressed = true
+            };
+            return Discord.ApiClient.ModifyMyVoiceState(this.Guild.Id, args, options);
+        }
+
+        /// <inheritdoc/>
+        public Task MoveToSpeaker(IGuildUser user, RequestOptions options = null)
+        {
+            var args = new API.Rest.ModifyVoiceStateParams()
+            {
+                ChannelId = this.Id,
+                Suppressed = false
+            };
+
+            return Discord.ApiClient.ModifyUserVoiceState(this.Guild.Id, user.Id, args);
+        }
+
+        /// <inheritdoc/>
+        public Task RemoveFromSpeaker(IGuildUser user, RequestOptions options = null)
+        {
+            var args = new API.Rest.ModifyVoiceStateParams()
+            {
+                ChannelId = this.Id,
+                Suppressed = true
+            };
+
+            return Discord.ApiClient.ModifyUserVoiceState(this.Guild.Id, user.Id, args);
+        }
     }
 }
