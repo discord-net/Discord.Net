@@ -19,6 +19,9 @@ namespace Discord.Rest
             if (autoArchiveDuration == ThreadArchiveDuration.ThreeDays && !channel.Guild.Features.Contains("THREE_DAY_THREAD_ARCHIVE"))
                 throw new ArgumentException($"The guild {channel.Guild.Name} does not have the THREE_DAY_THREAD_ARCHIVE feature!");
 
+            if (type == ThreadType.PrivateThread && !channel.Guild.Features.Contains("PRIVATE_THREADS"))
+                throw new ArgumentException($"The guild {channel.Guild.Name} does not have the PRIVATE_THREADS feature!");
+
             var args = new StartThreadParams()
             {
                 Name = name,

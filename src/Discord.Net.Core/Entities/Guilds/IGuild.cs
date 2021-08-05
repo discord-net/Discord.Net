@@ -589,6 +589,26 @@ namespace Discord
         ///     admins and moderators of Community guilds receive notices from Discord; <see langword="null" /> if none is set.
         /// </returns>
         Task<ITextChannel> GetPublicUpdatesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a thread channel within this guild.
+        /// </summary>
+        /// <param name="id">The id of the thread channel.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the thread channel.
+        /// </returns>
+        Task<IThreadChannel> GetThreadChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a collection of all thread channels in this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     thread channels found within this guild.
+        /// </returns>
+        Task<IReadOnlyCollection<IThreadChannel>> GetThreadChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 
         /// <summary>
         ///     Creates a new text channel in this guild.

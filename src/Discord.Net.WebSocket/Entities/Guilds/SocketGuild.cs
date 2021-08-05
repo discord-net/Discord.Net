@@ -633,6 +633,16 @@ namespace Discord.WebSocket
         public SocketTextChannel GetTextChannel(ulong id)
             => GetChannel(id) as SocketTextChannel;
         /// <summary>
+        ///     Gets a thread in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the thread.</param>
+        /// <returns>
+        ///     A thread channel associated with the specified <paramref name="id" />; <see langword="null"/> if none is found.
+        /// </returns>
+        public SocketThreadChannel GetThreadChannel(ulong id)
+            => GetChannel(id) as SocketThreadChannel;
+
+        /// <summary>
         ///     Gets a voice channel in this guild.
         /// </summary>
         /// <param name="id">The snowflake identifier for the voice channel.</param>
@@ -1328,6 +1338,12 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         Task<ITextChannel> IGuild.GetTextChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<ITextChannel>(GetTextChannel(id));
+        /// <inheritdoc />
+        Task<IThreadChannel> IGuild.GetThreadChannelAsync(ulong id, CacheMode mode, RequestOptions options)
+            => Task.FromResult<IThreadChannel>(GetThreadChannel(id));
+        /// <inheritdoc />
+        Task<IReadOnlyCollection<IThreadChannel>> IGuild.GetThreadChannelsAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult<IReadOnlyCollection<IThreadChannel>>(ThreadChannels);
         /// <inheritdoc />
         Task<IReadOnlyCollection<IVoiceChannel>> IGuild.GetVoiceChannelsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IVoiceChannel>>(VoiceChannels);

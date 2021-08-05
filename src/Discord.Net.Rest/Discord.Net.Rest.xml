@@ -3088,6 +3088,27 @@
                 message channels found within this guild.
             </returns>
         </member>
+        <member name="M:Discord.Rest.RestGuild.GetThreadChannelAsync(System.UInt64,Discord.RequestOptions)">
+            <summary>
+                Gets a thread channel in this guild.
+            </summary>
+            <param name="id">The snowflake identifier for the thread channel.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains the thread channel associated
+                with the specified <paramref name="id"/>; <see langword="null"/> if none is found.
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestGuild.GetThreadChannelsAsync(Discord.RequestOptions)">
+            <summary>
+                Gets a collection of all thread in this guild.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a read-only collection of
+                threads found within this guild.
+            </returns>
+        </member>
         <member name="M:Discord.Rest.RestGuild.GetVoiceChannelAsync(System.UInt64,Discord.RequestOptions)">
             <summary>
                 Gets a voice channel in this guild.
@@ -3461,6 +3482,12 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetTextChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetThreadChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetThreadChannelsAsync(Discord.CacheMode,Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetVoiceChannelsAsync(Discord.CacheMode,Discord.RequestOptions)">

@@ -542,7 +542,7 @@ namespace Discord.WebSocket
         internal readonly AsyncEvent<Func<SocketApplicationCommand, Task>> _applicationCommandDeleted = new AsyncEvent<Func<SocketApplicationCommand, Task>>();
 
         /// <summary>
-        ///     Fired when a thread is created within a guild.
+        ///     Fired when a thread is created within a guild, or when the current user is added to a thread.
         /// </summary>
         public event Func<SocketThreadChannel, Task> ThreadCreated
         {

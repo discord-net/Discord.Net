@@ -395,6 +395,35 @@ namespace Discord.Rest
         }
 
         /// <summary>
+        ///     Gets a thread channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the thread channel.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the thread channel associated
+        ///     with the specified <paramref name="id"/>; <see langword="null"/> if none is found.
+        /// </returns>
+        public async Task<RestThreadChannel> GetThreadChannelAsync(ulong id, RequestOptions options = null)
+        {
+            var channel = await GuildHelper.GetChannelAsync(this, Discord, id, options).ConfigureAwait(false);
+            return channel as RestThreadChannel;
+        }
+
+        /// <summary>
+        ///     Gets a collection of all thread in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     threads found within this guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestThreadChannel>> GetThreadChannelsAsync(RequestOptions options = null)
+        {
+            var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
+            return channels.OfType<RestThreadChannel>().ToImmutableArray();
+        }
+
+        /// <summary>
         ///     Gets a voice channel in this guild.
         /// </summary>
         /// <param name="id">The snowflake identifier for the voice channel.</param>
@@ -887,6 +916,22 @@ namespace Discord.Rest
         {
             if (mode == CacheMode.AllowDownload)
                 return await GetTextChannelAsync(id, options).ConfigureAwait(false);
+            else
+                return null;
+        }
+        /// <inheritdoc />
+        async Task<IThreadChannel> IGuild.GetThreadChannelAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetThreadChannelAsync(id, options).ConfigureAwait(false);
+            else
+                return null;
+        }
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IThreadChannel>> IGuild.GetThreadChannelsAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetThreadChannelsAsync(options).ConfigureAwait(false);
             else
                 return null;
         }

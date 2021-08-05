@@ -2001,8 +2001,9 @@ namespace Discord.WebSocket
                                         threadChannel = (SocketThreadChannel)guild.AddChannel(this.State, data);
                                         if (data.ThreadMember.IsSpecified)
                                             threadChannel.AddOrUpdateThreadMember(data.ThreadMember.Value, guild.CurrentUser);
-                                        await TimedInvokeAsync(_threadCreated, nameof(ThreadCreated), threadChannel).ConfigureAwait(false);
                                     }
+
+                                    await TimedInvokeAsync(_threadCreated, nameof(ThreadCreated), threadChannel).ConfigureAwait(false);
                                 }
 
                                 break;

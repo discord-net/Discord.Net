@@ -758,7 +758,7 @@
         </member>
         <member name="E:Discord.WebSocket.BaseSocketClient.ThreadCreated">
             <summary>
-                Fired when a thread is created within a guild.
+                Fired when a thread is created within a guild. or when the current user is added to a thread.
             </summary>
         </member>
         <member name="E:Discord.WebSocket.BaseSocketClient.ThreadUpdated">
@@ -3058,6 +3058,15 @@
                 A text channel associated with the specified <paramref name="id" />; <see langword="null"/> if none is found.
             </returns>
         </member>
+        <member name="M:Discord.WebSocket.SocketGuild.GetThreadChannel(System.UInt64)">
+            <summary>
+                Gets a thread in this guild.
+            </summary>
+            <param name="id">The snowflake identifier for the thread.</param>
+            <returns>
+                A thread channel associated with the specified <paramref name="id" />; <see langword="null"/> if none is found.
+            </returns>
+        </member>
         <member name="M:Discord.WebSocket.SocketGuild.GetVoiceChannel(System.UInt64)">
             <summary>
                 Gets a voice channel in this guild.
@@ -3391,6 +3400,12 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketGuild.Discord#IGuild#GetTextChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.SocketGuild.Discord#IGuild#GetThreadChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.SocketGuild.Discord#IGuild#GetThreadChannelsAsync(Discord.CacheMode,Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketGuild.Discord#IGuild#GetVoiceChannelsAsync(Discord.CacheMode,Discord.RequestOptions)">
