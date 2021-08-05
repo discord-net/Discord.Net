@@ -442,7 +442,7 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            var bucket = new BucketIds(0, channelId);
+            var bucket = new BucketIds(channelId: channelId);
 
             return await SendJsonAsync<Channel>("POST", () => $"channels/{channelId}/threads", args, bucket, options: options).ConfigureAwait(false);
         }
@@ -453,7 +453,9 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            await SendAsync("PUT", $"channels/{channelId}/thread-members/@me", options: options).ConfigureAwait(false);
+            var bucket = new BucketIds(channelId: channelId);
+
+            await SendAsync("PUT", () => $"channels/{channelId}/thread-members/@me", bucket, options: options).ConfigureAwait(false);
         }
 
         public async Task AddThreadMemberAsync(ulong channelId, ulong userId, RequestOptions options = null)
@@ -474,7 +476,9 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            await SendAsync("DELETE", $"channels/{channelId}/thread-members/@me", options: options).ConfigureAwait(false);
+            var bucket = new BucketIds(channelId: channelId);
+
+            await SendAsync("DELETE", () => $"channels/{channelId}/thread-members/@me", bucket, options: options).ConfigureAwait(false);
         }
 
         public async Task RemoveThreadMemberAsync(ulong channelId, ulong userId, RequestOptions options = null)
@@ -483,8 +487,9 @@ namespace Discord.API
             Preconditions.NotEqual(userId, 0, nameof(channelId));
 
             options = RequestOptions.CreateOrClone(options);
+            var bucket = new BucketIds(channelId: channelId);
 
-            await SendAsync("DELETE", $"channels/{channelId}/thread-members/{userId}", options: options).ConfigureAwait(false);
+            await SendAsync("DELETE", () => $"channels/{channelId}/thread-members/{userId}", bucket, options: options).ConfigureAwait(false);
         }
 
         public async Task<ThreadMember[]> ListThreadMembersAsync(ulong channelId, RequestOptions options = null)
@@ -506,7 +511,7 @@ namespace Discord.API
 
             var bucket = new BucketIds(channelId: channelId);
 
-            return await SendAsync<ChannelThreads>("GET", $"channels/{channelId}/threads/active");
+            return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/active", bucket);
         }
 
         public async Task<ChannelThreads> GetPublicArchivedThreadsAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null, RequestOptions options = null)
