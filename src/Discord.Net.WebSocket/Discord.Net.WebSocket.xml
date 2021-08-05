@@ -13,7 +13,7 @@
         <member name="F:Discord.API.Gateway.GatewayOpCode.Identify">
             <summary> C→S - Used to associate a connection with a token and specify configuration. </summary>
         </member>
-        <member name="F:Discord.API.Gateway.GatewayOpCode.StatusUpdate">
+        <member name="F:Discord.API.Gateway.GatewayOpCode.PresenceUpdate">
             <summary> C→S - Used to update client's status and current game id. </summary>
         </member>
         <member name="F:Discord.API.Gateway.GatewayOpCode.VoiceStateUpdate">

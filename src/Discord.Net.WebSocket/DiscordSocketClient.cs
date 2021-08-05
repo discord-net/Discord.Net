@@ -495,7 +495,7 @@ namespace Discord.WebSocket
 
             var presence = BuildCurrentStatus() ?? (UserStatus.Online, false, null, null);
 
-            await ApiClient.SendStatusUpdateAsync(
+            await ApiClient.SendPresenceUpdateAsync(
                 status: presence.Item1,
                 isAFK: presence.Item2,
                 since: presence.Item3,
