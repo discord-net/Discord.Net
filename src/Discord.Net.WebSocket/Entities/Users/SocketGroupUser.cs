@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using Model = Discord.API.User;
 
@@ -66,5 +67,7 @@ namespace Discord.WebSocket
         string IVoiceState.VoiceSessionId => null;
         /// <inheritdoc />
         bool IVoiceState.IsStreaming => false;
+        /// <inheritdoc />
+        DateTimeOffset? IVoiceState.RequestToSpeakTimestamp => null;
     }
 }

@@ -40,6 +40,8 @@ namespace Discord.Rest
                     return RestTextChannel.Create(discord, guild, model);
                 case ChannelType.Voice:
                     return RestVoiceChannel.Create(discord, guild, model);
+                case ChannelType.Stage:
+                    return RestStageChannel.Create(discord, guild, model);
                 case ChannelType.Category:
                     return RestCategoryChannel.Create(discord, guild, model);
                 case ChannelType.PublicThread or ChannelType.PrivateThread or ChannelType.NewsThread:

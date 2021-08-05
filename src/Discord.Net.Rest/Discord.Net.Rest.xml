@@ -2281,6 +2281,38 @@
                 Represents a REST-based news channel in a guild that has the same properties as a <see cref="T:Discord.Rest.RestTextChannel"/>.
             </summary>
         </member>
+        <member name="T:Discord.Rest.RestStageChannel">
+            <summary>
+                Represents a REST-based stage channel in a guild.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.RestStageChannel.Topic">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Rest.RestStageChannel.PrivacyLevel">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Rest.RestStageChannel.DiscoverableDisabled">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Rest.RestStageChannel.Live">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestStageChannel.ModifyInstanceAsync(System.Action{Discord.StageInstanceProperties},Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestStageChannel.StartStageAsync(System.String,Discord.StagePrivacyLevel,Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestStageChannel.StopStageAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestStageChannel.UpdateAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestStageChannel.RequestToSpeak(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
         <member name="T:Discord.Rest.RestTextChannel">
             <summary>
                 Represents a REST-based channel in a guild that can send and receive messages.
@@ -3130,6 +3162,28 @@
                 voice channels found within this guild.
             </returns>
         </member>
+        <member name="M:Discord.Rest.RestGuild.GetStageChannelAsync(System.UInt64,Discord.RequestOptions)">
+            <summary>
+                Gets a stage channel in this guild
+            </summary>
+            <param name="id">The snowflake identifier for the stage channel.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains the stage channel associated
+                with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestGuild.GetStageChannelsAsync(Discord.RequestOptions)">
+            <summary>
+                Gets a collection of all stage channels in this guild.
+            </summary>
+            <param name="mode">The <see cref="T:Discord.CacheMode"/> that determines whether the object should be fetched from cache.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a read-only collection of
+                stage channels found within this guild.
+            </returns>
+        </member>
         <member name="M:Discord.Rest.RestGuild.GetCategoryChannelsAsync(Discord.RequestOptions)">
             <summary>
                 Gets a collection of all category channels in this guild.
@@ -3494,6 +3548,12 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetCategoriesAsync(Discord.CacheMode,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetStageChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetStageChannelsAsync(Discord.CacheMode,Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetVoiceChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
@@ -4365,6 +4425,9 @@
         <member name="P:Discord.Rest.RestGroupUser.Discord#IVoiceState#IsStreaming">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestGroupUser.Discord#IVoiceState#RequestToSpeakTimestamp">
+            <inheritdoc />
+        </member>
         <member name="T:Discord.Rest.RestGuildUser">
             <summary>
                 Represents a REST-based guild user.
@@ -4454,6 +4517,9 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestGuildUser.Discord#IVoiceState#IsStreaming">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.RestGuildUser.Discord#IVoiceState#RequestToSpeakTimestamp">
             <inheritdoc />
         </member>
         <member name="T:Discord.Rest.RestSelfUser">
@@ -4677,6 +4743,9 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestWebhookUser.Discord#IVoiceState#IsStreaming">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.RestWebhookUser.Discord#IVoiceState#RequestToSpeakTimestamp">
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestWebhook.Token">

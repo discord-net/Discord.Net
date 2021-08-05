@@ -1914,6 +1914,70 @@
                 A read-only collection of users that can access this channel.
             </returns>
         </member>
+        <member name="T:Discord.IStageChannel">
+            <summary>
+                Represents a generic Stage Channel.
+            </summary>
+        </member>
+        <member name="P:Discord.IStageChannel.Topic">
+            <summary>
+                Gets the topic of the Stage instance.
+            </summary>
+            <remarks>
+                If the stage isn't live then this property will be set to <see langword="null"/>.
+            </remarks>
+        </member>
+        <member name="P:Discord.IStageChannel.PrivacyLevel">
+            <summary>
+                The <see cref="T:Discord.StagePrivacyLevel"/> of the current stage.
+            </summary>
+            <remarks>
+                If the stage isn't live then this property will be set to <see langword="null"/>.
+            </remarks>
+        </member>
+        <member name="P:Discord.IStageChannel.DiscoverableDisabled">
+            <summary>
+                <see langword="true"/> if stage discovery is disabled, otherwise <see langword="false"/>. 
+            </summary>
+        </member>
+        <member name="P:Discord.IStageChannel.Live">
+            <summary>
+                <see langword="true"/> when the stage is live, otherwise <see langword="false"/>.
+            </summary>
+            <remarks>
+                If the stage isn't live then this property will be set to <see langword="null"/>.
+            </remarks>
+        </member>
+        <member name="M:Discord.IStageChannel.StartStageAsync(System.String,Discord.StagePrivacyLevel,Discord.RequestOptions)">
+            <summary>
+                Starts the stage, creating a stage instance.
+            </summary>
+            <param name="topic">The topic for the stage/</param>
+            <param name="privacyLevel">The privacy level of the stage</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous start operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IStageChannel.ModifyInstanceAsync(System.Action{Discord.StageInstanceProperties},Discord.RequestOptions)">
+            <summary>
+                Modifies the current stage instance.
+            </summary>
+            <param name="func">The properties to modify the stage instance with.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous modify operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IStageChannel.StopStageAsync(Discord.RequestOptions)">
+            <summary>
+                Stops the stage, deleting the stage instance.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous stop operation.
+            </returns>
+        </member>
         <member name="T:Discord.ITextChannel">
             <summary>
                 Represents a generic channel in a guild that can send and receive messages.
@@ -2201,6 +2265,21 @@
             <summary> Initializes a new instance of the <see cref="T:Discord.ReorderChannelProperties"/> class used to reorder a channel. </summary>
             <param name="id"> Sets the ID of the channel to apply this position to. </param>
             <param name="position"> Sets the new zero-based position of this channel. </param>
+        </member>
+        <member name="T:Discord.StageInstanceProperties">
+            <summary>
+                Represents properties to use when modifying a stage instance.
+            </summary>
+        </member>
+        <member name="P:Discord.StageInstanceProperties.Topic">
+            <summary>
+                Gets or sets the topic of the stage.
+            </summary>
+        </member>
+        <member name="P:Discord.StageInstanceProperties.PrivacyLevel">
+            <summary>
+                Gets or sets the privacy level of the stage.
+            </summary>
         </member>
         <member name="T:Discord.TextChannelProperties">
             <summary>
@@ -3342,6 +3421,29 @@
             <returns>
                 A task that represents the asynchronous get operation. The task result contains the voice channel associated
                 with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
+            </returns>
+        </member>
+        <member name="M:Discord.IGuild.GetStageChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
+            <summary>
+                Gets a stage channel in this guild
+            </summary>
+            <param name="id">The snowflake identifier for the stage channel.</param>
+            <param name="mode">The <see cref="T:Discord.CacheMode"/> that determines whether the object should be fetched from cache.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains the stage channel associated
+                with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
+            </returns>
+        </member>
+        <member name="M:Discord.IGuild.GetStageChannelsAsync(Discord.CacheMode,Discord.RequestOptions)">
+            <summary>
+                Gets a collection of all stage channels in this guild.
+            </summary>
+            <param name="mode">The <see cref="T:Discord.CacheMode"/> that determines whether the object should be fetched from cache.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a read-only collection of
+                stage channels found within this guild.
             </returns>
         </member>
         <member name="M:Discord.IGuild.GetAFKChannelAsync(Discord.CacheMode,Discord.RequestOptions)">
@@ -9779,6 +9881,11 @@
             <returns>
                 <c>true</c> if the user is streaming; otherwise <c>false</c>.
             </returns>
+        </member>
+        <member name="P:Discord.IVoiceState.RequestToSpeakTimestamp">
+            <summary>
+                Gets the time on which the user requested to speak.
+            </summary>
         </member>
         <member name="T:Discord.IWebhookUser">
             <summary> Represents a Webhook Discord user. </summary>

@@ -1770,6 +1770,29 @@ namespace Discord.WebSocket
                                         }
                                     }
 
+                                    if (user is SocketGuildUser guildUser && data.ChannelId.HasValue)
+                                    {
+                                        SocketStageChannel stage = guildUser.Guild.GetStageChannel(data.ChannelId.Value);
+
+                                        if (stage != null && before.VoiceChannel != null && after.VoiceChannel != null)
+                                        {
+                                            if (!before.RequestToSpeakTimestamp.HasValue && after.RequestToSpeakTimestamp.HasValue)
+                                            {
+                                                await TimedInvokeAsync(_requestToSpeak, nameof(RequestToSpeak), stage, guildUser);
+                                                return;
+                                            }
+                                            if(before.IsSuppressed && !after.IsSuppressed)
+                                            {
+                                                await TimedInvokeAsync(_speakerAdded, nameof(SpeakerAdded), stage, guildUser);
+                                                return;
+                                            }
+                                            if(!before.IsSuppressed && after.IsSuppressed)
+                                            {
+                                                await TimedInvokeAsync(_speakerRemoved, nameof(SpeakerRemoved), stage, guildUser);
+                                            }
+                                        }    
+                                    }
+
                                     await TimedInvokeAsync(_userVoiceStateUpdatedEvent, nameof(UserVoiceStateUpdated), user, before, after).ConfigureAwait(false);
                                 }
                                 break;
@@ -2179,6 +2202,47 @@ namespace Discord.WebSocket
                                     }
                                 }
 
+                                break;
+
+                            case "STAGE_INSTANCE_CREATE" or "STAGE_INSTANCE_UPDATE" or "STAGE_INSTANCE_DELETE":
+                                {
+                                    await _gatewayLogger.DebugAsync($"Received Dispatch ({type})").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<StageInstance>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId);
+
+                                    if(guild == null)
+                                    {
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
+                                        return;
+                                    }
+
+                                    var stageChannel = guild.GetStageChannel(data.ChannelId);
+
+                                    if(stageChannel == null)
+                                    {
+                                        await UnknownChannelAsync(type, data.ChannelId).ConfigureAwait(false);
+                                        return;
+                                    }
+
+                                    SocketStageChannel before = type == "STAGE_INSTANCE_UPDATE" ? stageChannel.Clone() : null;
+
+                                    stageChannel.Update(data, type == "STAGE_INSTANCE_CREATE" ? true : type == "STAGE_INSTANCE_DELETE" ? false : false);
+
+                                    switch (type)
+                                    {
+                                        case "STAGE_INSTANCE_CREATE":
+                                            await TimedInvokeAsync(_stageStarted, nameof(StageStarted), stageChannel);
+                                            return;
+                                        case "STAGE_INSTANCE_DELETE":
+                                            await TimedInvokeAsync(_stageEnded, nameof(StageEnded), stageChannel);
+                                            return;
+                                        case "STAGE_INSTANCE_UPDATE":
+                                            await TimedInvokeAsync(_stageUpdated, nameof(StageUpdated), before, stageChannel);
+                                            return;
+                                    }
+                                }
                                 break;
 
                             //Ignored (User only)

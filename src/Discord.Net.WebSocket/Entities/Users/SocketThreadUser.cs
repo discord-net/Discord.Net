@@ -110,6 +110,10 @@ namespace Discord.WebSocket
         public bool IsStreaming
             => GuildUser.IsStreaming;
 
+        /// <inheritdoc/>
+        public DateTimeOffset? RequestToSpeakTimestamp
+            => GuildUser.RequestToSpeakTimestamp;
+
         private SocketGuildUser GuildUser { get; set; }
 
         internal SocketThreadUser(SocketGuild guild, SocketThreadChannel thread, SocketGuildUser member)

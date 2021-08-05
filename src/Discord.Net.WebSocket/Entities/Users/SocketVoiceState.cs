@@ -13,7 +13,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Initializes a default <see cref="SocketVoiceState"/> with everything set to <c>null</c> or <c>false</c>.
         /// </summary>
-        public static readonly SocketVoiceState Default = new SocketVoiceState(null, null, false, false, false, false, false, false);
+        public static readonly SocketVoiceState Default = new SocketVoiceState(null, null, null, false, false, false, false, false, false);
 
         [Flags]
         private enum Flags : byte
@@ -35,6 +35,8 @@ namespace Discord.WebSocket
         public SocketVoiceChannel VoiceChannel { get; }
         /// <inheritdoc />
         public string VoiceSessionId { get; }
+        /// <inheritdoc/>
+        public DateTimeOffset? RequestToSpeakTimestamp { get; private set; }
 
         /// <inheritdoc />
         public bool IsMuted => (_voiceStates & Flags.Muted) != 0;
@@ -48,11 +50,13 @@ namespace Discord.WebSocket
         public bool IsSelfDeafened => (_voiceStates & Flags.SelfDeafened) != 0;
         /// <inheritdoc />
         public bool IsStreaming => (_voiceStates & Flags.SelfStream) != 0;
+        
 
-        internal SocketVoiceState(SocketVoiceChannel voiceChannel, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed, bool isStream)
+        internal SocketVoiceState(SocketVoiceChannel voiceChannel, DateTimeOffset? requestToSpeak, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed, bool isStream)
         {
             VoiceChannel = voiceChannel;
             VoiceSessionId = sessionId;
+            RequestToSpeakTimestamp = requestToSpeak;
 
             Flags voiceStates = Flags.Normal;
             if (isSelfMuted)
@@ -71,7 +75,7 @@ namespace Discord.WebSocket
         }
         internal static SocketVoiceState Create(SocketVoiceChannel voiceChannel, Model model)
         {
-            return new SocketVoiceState(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Mute, model.Deaf, model.Suppress, model.SelfStream);
+            return new SocketVoiceState(voiceChannel, model.RequestToSpeakTimestamp.IsSpecified ? model.RequestToSpeakTimestamp.Value : null, model.SessionId, model.SelfMute, model.SelfDeaf, model.Mute, model.Deaf, model.Suppress, model.SelfStream);
         }
 
         /// <summary>
