@@ -3628,14 +3628,8 @@
         <member name="M:Discord.WebSocket.SocketMessageComponent.FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
             <inheritdoc/>
         </member>
-        <member name="M:Discord.WebSocket.SocketMessageComponent.DeferAsync(Discord.RequestOptions)">
-            <summary>
-                Acknowledges this interaction with the <see cref="F:Discord.InteractionResponseType.DeferredUpdateMessage"/>.
-            </summary>
-            <param name="options">The request options for this async request.</param>
-            <returns>
-                A task that represents the asynchronous operation of acknowledging the interaction.
-            </returns>
+        <member name="M:Discord.WebSocket.SocketMessageComponent.DeferAsync(System.Boolean,Discord.RequestOptions)">
+            <inheritdoc/>
         </member>
         <member name="T:Discord.WebSocket.SocketMessageComponentData">
             <summary>
@@ -3747,13 +3741,8 @@
         <member name="M:Discord.WebSocket.SocketSlashCommand.FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
             <inheritdoc/>
         </member>
-        <member name="M:Discord.WebSocket.SocketSlashCommand.DeferAsync(Discord.RequestOptions)">
-            <summary>
-                Acknowledges this interaction with the <see cref="F:Discord.InteractionResponseType.DeferredChannelMessageWithSource"/>.
-            </summary>
-            <returns>
-                A task that represents the asynchronous operation of acknowledging the interaction.
-            </returns>
+        <member name="M:Discord.WebSocket.SocketSlashCommand.DeferAsync(System.Boolean,Discord.RequestOptions)">
+            <inheritdoc/>
         </member>
         <member name="T:Discord.WebSocket.SocketSlashCommandData">
             <summary>
@@ -3888,10 +3877,12 @@
                 A task that represents the asynchronous operation of acknowledging the interaction.
             </returns>
         </member>
-        <member name="M:Discord.WebSocket.SocketInteraction.DeferAsync(Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketInteraction.DeferAsync(System.Boolean,Discord.RequestOptions)">
             <summary>
                 Acknowledges this interaction.
             </summary>
+            <param name="ephemeral"><see langword="true"/> to send this message ephemerally, otherwise <see langword="false"/>.</param>
+            <param name="options">The request options for this async request.</param>
             <returns>
                 A task that represents the asynchronous operation of acknowledging the interaction.
             </returns>

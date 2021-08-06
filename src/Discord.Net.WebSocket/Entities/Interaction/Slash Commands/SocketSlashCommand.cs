@@ -106,7 +106,7 @@ namespace Discord.WebSocket
             };
 
             if (ephemeral)
-                response.Data.Value.Flags = 64;
+                response.Data.Value.Flags = MessageFlags.Ephemeral;
 
             await InteractionHelper.SendInteractionResponse(this.Discord, response, this.Id, Token, options);
         }
@@ -141,22 +141,18 @@ namespace Discord.WebSocket
             };
 
             if (ephemeral)
-                args.Flags = 64;
+                args.Flags = MessageFlags.Ephemeral;
 
             return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
         }
 
-        /// <summary>
-        ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredChannelMessageWithSource"/>.
-        /// </summary>
-        /// <returns>
-        ///     A task that represents the asynchronous operation of acknowledging the interaction.
-        /// </returns>
-        public override Task DeferAsync(RequestOptions options = null)
+        /// <inheritdoc/>
+        public override Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
         {
             var response = new API.InteractionResponse
             {
                 Type = InteractionResponseType.DeferredChannelMessageWithSource,
+                Data = ephemeral ? new API.InteractionCallbackData() { Flags = MessageFlags.Ephemeral } : Optional<API.InteractionCallbackData>.Unspecified
             };
 
             return Discord.Rest.ApiClient.CreateInteractionResponse(response, this.Id, this.Token, options);

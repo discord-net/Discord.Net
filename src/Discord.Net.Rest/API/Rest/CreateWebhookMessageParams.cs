@@ -28,7 +28,7 @@ namespace Discord.API.Rest
         public Optional<AllowedMentions> AllowedMentions { get; set; }
 
         [JsonProperty("flags")]
-        public Optional<int> Flags { get; set; }
+        public Optional<MessageFlags> Flags { get; set; }
 
         [JsonProperty("components")]
         public Optional<API.ActionRowComponent[]> Components { get; set; }

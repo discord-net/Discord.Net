@@ -18,7 +18,7 @@ namespace Discord.API
 
         // New flags prop. this make the response "ephemeral". see https://discord.com/developers/docs/interactions/slash-commands#interaction-response-interactionapplicationcommandcallbackdata
         [JsonProperty("flags")]
-        public Optional<int> Flags { get; set; }
+        public Optional<MessageFlags> Flags { get; set; }
 
         [JsonProperty("components")]
         public Optional<API.ActionRowComponent[]> Components { get; set; }
