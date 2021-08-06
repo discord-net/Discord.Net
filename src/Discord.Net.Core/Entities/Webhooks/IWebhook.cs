@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -48,6 +48,11 @@ namespace Discord
         ///     Gets the user that created this webhook.
         /// </summary>
         IUser Creator { get; }
+
+        /// <summary>
+        ///     Gets the ID of the application owning this webhook.
+        /// </summary>
+        ulong? ApplicationId { get; }
 
         /// <summary>
         ///     Modifies this webhook.

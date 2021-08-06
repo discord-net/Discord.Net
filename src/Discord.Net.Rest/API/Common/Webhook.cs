@@ -21,5 +21,7 @@ namespace Discord.API
 
         [JsonProperty("user")]
         public Optional<User> Creator { get; set; }
+        [JsonProperty("application_id")]
+        public Optional<ulong> ApplicationId { get; set; }
     }
 }

@@ -4766,6 +4766,9 @@
         <member name="P:Discord.Rest.RestWebhook.Creator">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestWebhook.ApplicationId">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.Rest.RestWebhook.CreatedAt">
             <inheritdoc />
         </member>

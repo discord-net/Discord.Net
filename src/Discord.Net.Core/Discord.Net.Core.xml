@@ -10089,6 +10089,11 @@
                 Gets the user that created this webhook.
             </summary>
         </member>
+        <member name="P:Discord.IWebhook.ApplicationId">
+            <summary>
+                Gets the ID of the application owning this webhook.
+            </summary>
+        </member>
         <member name="M:Discord.IWebhook.ModifyAsync(System.Action{Discord.WebhookProperties},Discord.RequestOptions)">
             <summary>
                 Modifies this webhook.
