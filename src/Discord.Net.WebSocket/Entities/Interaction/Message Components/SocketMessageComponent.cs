@@ -213,13 +213,33 @@ namespace Discord.WebSocket
                 AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                 IsTTS = isTTS,
                 Embeds = embeds?.Select(x => x.ToModel()).ToArray() ?? Optional<API.Embed[]>.Unspecified,
-                Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
+                Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
             };
 
             if (ephemeral)
                 args.Flags = MessageFlags.Ephemeral;
 
             return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
+        }
+
+        /// <summary>
+        ///     Defers an interaction and responds with type 5 (<see cref="InteractionResponseType.DeferredChannelMessageWithSource"/>)
+        /// </summary>
+        /// <param name="ephemeral"><see langword="true"/> to send this message ephemerally, otherwise <see langword="false"/>.</param>
+        /// <param name="options">The request options for this async request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous operation of acknowledging the interaction.
+        /// </returns>
+        public Task DeferLoadingAsync(bool ephemeral = false, RequestOptions options = null)
+        {
+            var response = new API.InteractionResponse()
+            {
+                Type = InteractionResponseType.DeferredChannelMessageWithSource,
+                Data = ephemeral ? new API.InteractionCallbackData() { Flags = MessageFlags.Ephemeral } : Optional<API.InteractionCallbackData>.Unspecified
+
+            };
+
+            return Discord.Rest.ApiClient.CreateInteractionResponse(response, this.Id, this.Token, options);
         }
 
         /// <inheritdoc/>
