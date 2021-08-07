@@ -4,12 +4,13 @@ using System.Threading.Tasks;
 using Model = Discord.API.Interaction;
 using DataModel = Discord.API.MessageComponentInteractionData;
 using Discord.Rest;
+using System.Collections.Generic;
 
 namespace Discord.WebSocket
 {
-    /// <summary>
-    ///     Represents a Websocket-based interaction type for Message Components.
-    /// </summary>
+/// <summary>
+///     Represents a Websocket-based interaction type for Message Components.
+/// </summary>
     public class SocketMessageComponent : SocketInteraction
     {
         /// <summary>
@@ -149,8 +150,28 @@ namespace Discord.WebSocket
                Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions), "A max of 100 user Ids are allowed.");
             }
 
-            if (args.Embeds.IsSpecified)
-                Preconditions.AtMost(args.Embeds.Value?.Length ?? 0, 10, nameof(args.Embeds), "A max of 10 embeds are allowed.");
+            var embed = args.Embed;
+            var embeds = args.Embeds;
+
+            bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(Message.Content);
+            bool hasEmbeds = (embed.IsSpecified && embed.Value != null) || (embeds.IsSpecified && embeds.Value?.Length > 0) || Message.Embeds.Any();
+
+            if (!hasText && !hasEmbeds)
+                Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
+
+            var apiEmbeds = embed.IsSpecified || embeds.IsSpecified ? new List<API.Embed>() : null;
+
+            if (embed.IsSpecified && embed.Value != null)
+            {
+                apiEmbeds.Add(embed.Value.ToModel());
+            }
+
+            if (embeds.IsSpecified && embeds.Value != null)
+            {
+                apiEmbeds.AddRange(embeds.Value.Select(x => x.ToModel()));
+            }
+
+            Preconditions.AtMost(apiEmbeds?.Count ?? 0, 10, nameof(args.Embeds), "A max of 10 embeds are allowed.");
 
             // check that user flag and user Id list are exclusive, same with role flag and role Id list
             if (args.AllowedMentions.IsSpecified && args.AllowedMentions.Value != null && args.AllowedMentions.Value.AllowedTypes.HasValue)
@@ -176,7 +197,7 @@ namespace Discord.WebSocket
                 {
                     Content = args.Content,
                     AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
-                    Embeds = args.Embeds.IsSpecified ? args.Embeds.Value?.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
+                    Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                     Components = args.Components.IsSpecified
                         ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray()
                         : Optional<API.ActionRowComponent[]>.Unspecified,
