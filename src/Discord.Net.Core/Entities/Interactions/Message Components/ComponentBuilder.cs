@@ -11,11 +11,6 @@ namespace Discord
     public class ComponentBuilder
     {
         /// <summary>
-        ///     The max length of a <see cref="ButtonComponent.Label"/>.
-        /// </summary>
-        public const int MaxLabelLength = 80;
-
-        /// <summary>
         ///     The max length of a <see cref="ButtonComponent.CustomId"/>.
         /// </summary>
         public const int MaxCustomIdLength = 100;
@@ -308,16 +303,21 @@ namespace Discord
     public class ButtonBuilder
     {
         /// <summary>
+        ///     The max length of a <see cref="ButtonComponent.Label"/>.
+        /// </summary>
+        public const int MaxLabelLength = 80;
+
+        /// <summary>
         ///     Gets or sets the label of the current button.
         /// </summary>
-        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="ComponentBuilder.MaxLabelLength"/>.</exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="MaxLabelLength"/>.</exception>
         public string Label
         {
             get => _label;
             set
             {
-                if (value != null && value.Length > ComponentBuilder.MaxLabelLength)
-                    throw new ArgumentException(message: $"Button label must be {ComponentBuilder.MaxLabelLength} characters or less!", paramName: nameof(Label));
+                if (value != null && value.Length > MaxLabelLength)
+                    throw new ArgumentException(message: $"Button label must be {MaxLabelLength} characters or less!", paramName: nameof(Label));
 
                 _label = value;
             }
@@ -539,8 +539,8 @@ namespace Discord
                 if (string.IsNullOrEmpty(this.Url))
                     throw new InvalidOperationException("Link buttons must have a link associated with them");
                 else
-                    UrlValidation.Validate(this.Url); 
-            }       
+                    UrlValidation.Validate(this.Url);
+            }
             else if (string.IsNullOrEmpty(this.CustomId))
                 throw new InvalidOperationException("Non-link buttons must have a custom id associated with them");
 
@@ -832,22 +832,27 @@ namespace Discord
     public class SelectMenuOptionBuilder
     {
         /// <summary>
+        ///     The maximum length of a <see cref="SelectMenuOption.Label"/>.
+        /// </summary>
+        public const int MaxLabelLength = 100;
+
+        /// <summary>
         ///     The maximum length of a <see cref="SelectMenuOption.Description"/>.
         /// </summary>
-        public const int MaxDescriptionLength = 50;
+        public const int MaxDescriptionLength = 100;
 
         /// <summary>
         ///     Gets or sets the label of the current select menu.
         /// </summary>
-        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="ComponentBuilder.MaxLabelLength"/></exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="MaxLabelLength"/></exception>
         public string Label
         {
             get => _label;
             set
             {
                 if (value != null)
-                    if (value.Length > ComponentBuilder.MaxLabelLength)
-                        throw new ArgumentException(message: $"Button label must be {ComponentBuilder.MaxLabelLength} characters or less!", paramName: nameof(Label));
+                    if (value.Length > MaxLabelLength)
+                        throw new ArgumentException(message: $"Button label must be {MaxLabelLength} characters or less!", paramName: nameof(Label));
 
                 _label = value;
             }

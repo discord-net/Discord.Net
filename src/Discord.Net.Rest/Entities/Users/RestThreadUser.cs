@@ -9,7 +9,7 @@ using Model = Discord.API.ThreadMember;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a thread user recieved over the REST api.
+    ///     Represents a thread user received over the REST api.
     /// </summary>
     public class RestThreadUser : RestEntity<ulong>
     {
@@ -51,7 +51,7 @@ namespace Discord.Rest
         ///     Gets the guild user for this thread user.
         /// </summary>
         /// <returns>
-        ///     A task representing the asyncronous get operation. The task returns a
+        ///     A task representing the asynchronous get operation. The task returns a
         ///     <see cref="IGuildUser"/> that represents the current thread user.
         /// </returns>
         public Task<IGuildUser> GetGuildUser()

@@ -192,7 +192,7 @@ namespace Discord
             bool manageNicknames = false,
             bool manageRoles = false,
             bool manageWebhooks = false,
-            bool manageEmojis = false)
+            bool manageEmojisAndStickers = false)
             : this(0,
                 createInstantInvite: createInstantInvite,
                 manageRoles: manageRoles,
@@ -224,7 +224,7 @@ namespace Discord
                 changeNickname: changeNickname,
                 manageNicknames: manageNicknames,
                 manageWebhooks: manageWebhooks,
-                manageEmojisAndStickers: manageEmojis)
+                manageEmojisAndStickers: manageEmojisAndStickers)
         { }
 
         /// <summary> Creates a new <see cref="GuildPermissions"/> from this one, changing the provided non-null permissions. </summary>
@@ -259,11 +259,11 @@ namespace Discord
             bool? manageNicknames = null,
             bool? manageRoles = null,
             bool? manageWebhooks = null,
-            bool? manageEmojis = null)
+            bool? manageEmojisAndStickers = null)
             => new GuildPermissions(RawValue, createInstantInvite, kickMembers, banMembers, administrator, manageChannels, manageGuild, addReactions,
                 viewAuditLog, viewGuildInsights, viewChannel, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
-                useVoiceActivation, prioritySpeaker, stream, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojis);
+                useVoiceActivation, prioritySpeaker, stream, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojisAndStickers);
 
         /// <summary>
         ///     Returns a value that indicates if a specific <see cref="GuildPermission"/> is enabled
