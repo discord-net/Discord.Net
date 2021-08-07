@@ -91,7 +91,7 @@ namespace Discord
             AssertFlag(() => new GuildPermissions(manageNicknames: true), GuildPermission.ManageNicknames);
             AssertFlag(() => new GuildPermissions(manageRoles: true), GuildPermission.ManageRoles);
             AssertFlag(() => new GuildPermissions(manageWebhooks: true), GuildPermission.ManageWebhooks);
-            AssertFlag(() => new GuildPermissions(manageEmojis: true), GuildPermission.ManageEmojis);
+            AssertFlag(() => new GuildPermissions(manageEmojis: true), GuildPermission.ManageEmojisAndStickers);
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace Discord
             AssertUtil(GuildPermission.ManageNicknames, x => x.ManageNicknames, (p, enable) => p.Modify(manageNicknames: enable));
             AssertUtil(GuildPermission.ManageRoles, x => x.ManageRoles, (p, enable) => p.Modify(manageRoles: enable));
             AssertUtil(GuildPermission.ManageWebhooks, x => x.ManageWebhooks, (p, enable) => p.Modify(manageWebhooks: enable));
-            AssertUtil(GuildPermission.ManageEmojis, x => x.ManageEmojisAndStickers, (p, enable) => p.Modify(manageEmojis: enable));
+            AssertUtil(GuildPermission.ManageEmojisAndStickers, x => x.ManageEmojisAndStickers, (p, enable) => p.Modify(manageEmojis: enable));
         }
     }
 }
