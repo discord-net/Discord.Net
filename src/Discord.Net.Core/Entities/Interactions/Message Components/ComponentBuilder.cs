@@ -13,7 +13,7 @@ namespace Discord
         /// <summary>
         ///     The max length of a <see cref="ButtonComponent.Label"/>.
         /// </summary>
-        public const int MaxLabelLength = 80;
+        public const int MaxButtonLabelLength = 80;
 
         /// <summary>
         ///     The max length of a <see cref="ButtonComponent.CustomId"/>.
@@ -310,14 +310,14 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the label of the current button.
         /// </summary>
-        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="ComponentBuilder.MaxLabelLength"/>.</exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="ComponentBuilder.MaxButtonLabelLength"/>.</exception>
         public string Label
         {
             get => _label;
             set
             {
-                if (value != null && value.Length > ComponentBuilder.MaxLabelLength)
-                    throw new ArgumentException(message: $"Button label must be {ComponentBuilder.MaxLabelLength} characters or less!", paramName: nameof(Label));
+                if (value != null && value.Length > ComponentBuilder.MaxButtonLabelLength)
+                    throw new ArgumentException(message: $"Button label must be {ComponentBuilder.MaxButtonLabelLength} characters or less!", paramName: nameof(Label));
 
                 _label = value;
             }
@@ -834,20 +834,25 @@ namespace Discord
         /// <summary>
         ///     The maximum length of a <see cref="SelectMenuOption.Description"/>.
         /// </summary>
-        public const int MaxDescriptionLength = 50;
+        public const int MaxDescriptionLength = 100;
+        
+        /// <summary>
+        ///     The maximum length of a <see cref="SelectMenuOption.Label"/>.
+        /// </summary>
+        public const int MaxSelectLabelLength = 100;
 
         /// <summary>
         ///     Gets or sets the label of the current select menu.
         /// </summary>
-        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="ComponentBuilder.MaxLabelLength"/></exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="MaxSelectLabelLength"/></exception>
         public string Label
         {
             get => _label;
             set
             {
                 if (value != null)
-                    if (value.Length > ComponentBuilder.MaxLabelLength)
-                        throw new ArgumentException(message: $"Button label must be {ComponentBuilder.MaxLabelLength} characters or less!", paramName: nameof(Label));
+                    if (value.Length > MaxSelectLabelLength)
+                        throw new ArgumentException(message: $"Button label must be {MaxSelectLabelLength} characters or less!", paramName: nameof(Label));
 
                 _label = value;
             }
