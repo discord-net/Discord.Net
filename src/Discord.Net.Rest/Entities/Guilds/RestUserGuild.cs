@@ -20,7 +20,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
-        public string IconUrl => CDN.GetGuildIconUrl(Id, _iconId);
+        [Obsolete("This property is obsolete. Call GetIconUrl instead.")]
+        public string IconUrl => CDN.GetGuildIconUrl(Id, _iconId, 128, ImageFormat.Jpeg);
 
         internal RestUserGuild(BaseDiscordClient discord, ulong id)
             : base(discord, id)
@@ -40,7 +41,11 @@ namespace Discord.Rest
             Name = model.Name;
             Permissions = new GuildPermissions(model.Permissions);
         }
-        
+
+        /// <inheritdoc />
+        public string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetApplicationIconUrl(Id, _iconId, size, format);
+
         public async Task LeaveAsync(RequestOptions options = null)
         {
             await Discord.ApiClient.LeaveGuildAsync(Id, options).ConfigureAwait(false);

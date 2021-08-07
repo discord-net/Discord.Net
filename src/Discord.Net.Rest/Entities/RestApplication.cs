@@ -34,7 +34,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
-        public string IconUrl => CDN.GetApplicationIconUrl(Id, _iconId);
+        [Obsolete("This property is obsolete. Call GetIconUrl instead.")]
+        public string IconUrl => CDN.GetApplicationIconUrl(Id, _iconId, 128, ImageFormat.Jpeg);
 
         internal RestApplication(BaseDiscordClient discord, ulong id)
             : base(discord, id)
@@ -47,7 +48,7 @@ namespace Discord.Rest
             return entity;
         }
         internal void Update(Model model)
-        {            
+        {
             Description = model.Description;
             RPCOrigins = model.RPCOrigins;
             Name = model.Name;
@@ -71,6 +72,10 @@ namespace Discord.Rest
                 throw new InvalidOperationException("Unable to update this object from a different application token.");
             Update(response);
         }
+
+        /// <inheritdoc />
+        public string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetApplicationIconUrl(Id, _iconId, size, format);
 
         /// <summary>
         ///     Gets the name of the application.

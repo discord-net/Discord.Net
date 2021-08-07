@@ -21,7 +21,7 @@ namespace Discord
         /// <summary>
         ///     Gets the icon URL of the application.
         /// </summary>
-        string IconUrl  { get; }
+        string IconUrl { get; }
         /// <summary>
         ///     Gets if the bot is public.
         /// </summary>
@@ -39,5 +39,17 @@ namespace Discord
         ///     Gets the partial user object containing info on the owner of the application.
         /// </summary>
         IUser Owner { get; }
+
+        /// <summary>
+        ///     Get the icon URL for this Application.
+        /// </summary>
+        /// <remarks>
+        ///     This property retrieves a URL for this Application's icon. In event that the application does not have a valid icon
+        ///     (i.e. their icon identifier is not set), this property will return <c>null</c>.
+        /// </remarks>
+        /// <param name="format">The format to return.</param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048 inclusive.</param>
+        /// <returns>A string representing the application's icon URL; <c>null</c> if the application does not have an icon in place.</returns>
+        string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
     }
 }

@@ -325,6 +325,54 @@ namespace Discord
         CultureInfo PreferredCulture { get; }
 
         /// <summary>
+        ///     Get the icon URL for this Guild.
+        /// </summary>
+        /// <remarks>
+        ///     This property retrieves a URL for this Guild's icon. In event that the guild does not have a valid icon
+        ///     (i.e. their icon identifier is not set), this property will return <c>null</c>.
+        /// </remarks>
+        /// <param name="format">The format to return.</param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048 inclusive.</param>
+        /// <returns>A string representing the guild's icon URL; <c>null</c> if the guild does not have an icon in place.</returns>
+        string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
+
+        /// <summary>
+        ///     Get the splash URL for this Guild.
+        /// </summary>
+        /// <remarks>
+        ///     This property retrieves a URL for this Guild's splash. In event that the guild does not have a valid splash
+        ///     (i.e. their splash identifier is not set), this property will return <c>null</c>.
+        /// </remarks>
+        /// <param name="format">The format to return.</param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048 inclusive.</param>
+        /// <returns>A string representing the guild's splash URL; <c>null</c> if the guild does not have an splash in place.</returns>
+        string GetSplashUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
+
+        /// <summary>
+        ///     Get the discovery splash URL for this Guild.
+        /// </summary>
+        /// <remarks>
+        ///     This property retrieves a URL for this Guild's discovery splash. In event that the guild does not have a valid discovery splash
+        ///     (i.e. their discovery splash identifier is not set), this property will return <c>null</c>.
+        /// </remarks>
+        /// <param name="format">The format to return.</param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048 inclusive.</param>
+        /// <returns>A string representing the guild's discovery splash URL; <c>null</c> if the guild does not have a discovery splash in place.</returns>
+        string GetDiscoverySplashUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
+
+        /// <summary>
+        ///     Get the banner URL for this Guild.
+        /// </summary>
+        /// <remarks>
+        ///     This property retrieves a URL for this Guild's banner. In event that the guild does not have a valid banner
+        ///     (i.e. their banner identifier is not set), this property will return <c>null</c>.
+        /// </remarks>
+        /// <param name="format">The format to return.</param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048 inclusive.</param>
+        /// <returns>A string representing the guild's banner URL; <c>null</c> if the guild does not have a banner in place.</returns>
+        string GetBannerUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
+
+        /// <summary>
         ///     Modifies this guild.
         /// </summary>
         /// <param name="func">The delegate containing the properties to modify the guild with.</param>

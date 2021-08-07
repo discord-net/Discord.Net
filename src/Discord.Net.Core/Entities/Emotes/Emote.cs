@@ -29,7 +29,8 @@ namespace Discord
         /// <returns>
         ///     A string that points to the URL of this emote.
         /// </returns>
-        public string Url => CDN.GetEmojiUrl(Id, Animated);
+        [Obsolete("This property is obsolete. Call GetUrl instead.")]
+        public string Url => CDN.GetEmojiUrl(Id, Animated, 128, ImageFormat.Auto);
 
         internal Emote(ulong id, string name, bool animated)
         {
@@ -37,6 +38,15 @@ namespace Discord
             Name = name;
             Animated = animated;
         }
+
+        /// <summary>
+        ///     Get the URL for this Emote.
+        /// </summary>
+        /// <param name="format">The format to return.</param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 128 inclusive.</param>
+        /// <returns>A URL pointing to the custom emote.</returns>
+        public string GetUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetEmojiUrl(Id, Animated, size, format);
 
         /// <summary>
         ///     Determines whether the specified emote is equal to the current emote.

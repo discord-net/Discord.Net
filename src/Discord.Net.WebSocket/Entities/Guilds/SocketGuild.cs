@@ -125,13 +125,17 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
-        public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
+        [Obsolete("This property is obsolete. Call GetIconUrl instead.")]
+        public string IconUrl => CDN.GetGuildIconUrl(Id, IconId, 128, ImageFormat.Jpeg);
         /// <inheritdoc />
-        public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
+        [Obsolete("This property is obsolete. Call GetSplashUrl instead.")]
+        public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId, 128, ImageFormat.Jpeg);
         /// <inheritdoc />
-        public string DiscoverySplashUrl => CDN.GetGuildDiscoverySplashUrl(Id, DiscoverySplashId);
+        [Obsolete("This property is obsolete. Call GetDiscoverySplashUrl instead.")]
+        public string DiscoverySplashUrl => CDN.GetGuildDiscoverySplashUrl(Id, DiscoverySplashId, 128, ImageFormat.Jpeg);
         /// <inheritdoc />
-        public string BannerUrl => CDN.GetGuildBannerUrl(Id, BannerId);
+        [Obsolete("This property is obsolete. Call GetBannerUrl instead.")]
+        public string BannerUrl => CDN.GetGuildBannerUrl(Id, BannerId, 128, ImageFormat.Jpeg);
         /// <summary> Indicates whether the client has all the members downloaded to the local guild cache. </summary>
         public bool HasAllMembers => MemberCount <= DownloadedMemberCount;// _downloaderPromise.Task.IsCompleted;
         /// <summary> Indicates whether the guild cache is synced to this guild. </summary>
@@ -516,6 +520,19 @@ namespace Discord.WebSocket
         }
 
         //General
+        /// <inheritdoc />
+        public string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildIconUrl(Id, IconId, size, format);
+        /// <inheritdoc />
+        public string GetSplashUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildSplashUrl(Id, SplashId, size, format);
+        /// <inheritdoc />
+        public string GetDiscoverySplashUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildDiscoverySplashUrl(Id, DiscoverySplashId, size, format);
+        /// <inheritdoc />
+        public string GetBannerUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildBannerUrl(Id, BannerId, size, format);
+
         /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
             => GuildHelper.DeleteAsync(this, Discord, options);
@@ -1243,7 +1260,7 @@ namespace Discord.WebSocket
         Task<IReadOnlyCollection<IVoiceChannel>> IGuild.GetVoiceChannelsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IVoiceChannel>>(VoiceChannels);
         /// <inheritdoc />
-        Task<IReadOnlyCollection<ICategoryChannel>> IGuild.GetCategoriesAsync(CacheMode mode , RequestOptions options)
+        Task<IReadOnlyCollection<ICategoryChannel>> IGuild.GetCategoriesAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<ICategoryChannel>>(CategoryChannels);
         /// <inheritdoc />
         Task<IVoiceChannel> IGuild.GetVoiceChannelAsync(ulong id, CacheMode mode, RequestOptions options)

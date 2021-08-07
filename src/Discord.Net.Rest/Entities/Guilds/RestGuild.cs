@@ -91,13 +91,17 @@ namespace Discord.Rest
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
         /// <inheritdoc />
-        public string IconUrl => CDN.GetGuildIconUrl(Id, IconId);
+        [Obsolete("This property is obsolete. Call GetIconUrl instead.")]
+        public string IconUrl => CDN.GetGuildIconUrl(Id, IconId, 128, ImageFormat.Jpeg);
         /// <inheritdoc />
-        public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId);
+        [Obsolete("This property is obsolete. Call GetSplashUrl instead.")]
+        public string SplashUrl => CDN.GetGuildSplashUrl(Id, SplashId, 128, ImageFormat.Jpeg);
         /// <inheritdoc />
-        public string DiscoverySplashUrl => CDN.GetGuildDiscoverySplashUrl(Id, DiscoverySplashId);
+        [Obsolete("This property is obsolete. Call GetDiscoverySplashUrl instead.")]
+        public string DiscoverySplashUrl => CDN.GetGuildDiscoverySplashUrl(Id, DiscoverySplashId, 128, ImageFormat.Jpeg);
         /// <inheritdoc />
-        public string BannerUrl => CDN.GetGuildBannerUrl(Id, BannerId);
+        [Obsolete("This property is obsolete. Call GetBannerUrl instead.")]
+        public string BannerUrl => CDN.GetGuildBannerUrl(Id, BannerId, 128, ImageFormat.Jpeg);
 
         /// <summary>
         ///     Gets the built-in role containing all users in this guild.
@@ -196,6 +200,19 @@ namespace Discord.Rest
         }
 
         //General
+        /// <inheritdoc />
+        public string GetIconUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildIconUrl(Id, IconId, size, format);
+        /// <inheritdoc />
+        public string GetSplashUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildSplashUrl(Id, SplashId, size, format);
+        /// <inheritdoc />
+        public string GetDiscoverySplashUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildDiscoverySplashUrl(Id, DiscoverySplashId, size, format);
+        /// <inheritdoc />
+        public string GetBannerUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildBannerUrl(Id, BannerId, size, format);
+
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
             => Update(await Discord.ApiClient.GetGuildAsync(Id, false, options).ConfigureAwait(false));

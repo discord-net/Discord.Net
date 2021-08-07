@@ -25,5 +25,9 @@ namespace Discord
         ///     Use GIF.
         /// </summary>
         Gif,
+        /// <summary>
+        ///     Use Lottie.
+        /// </summary>
+        Lottie,
     }
 }
