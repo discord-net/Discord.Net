@@ -31,7 +31,7 @@
             <exception cref="T:System.ArgumentException">Thrown if the <paramref name="webhookUrl"/> is an invalid format.</exception>
             <exception cref="T:System.ArgumentNullException">Thrown if the <paramref name="webhookUrl"/> is null or whitespace.</exception>
         </member>
-        <member name="M:Discord.Webhook.DiscordWebhookClient.SendMessageAsync(System.String,System.Boolean,System.Collections.Generic.IEnumerable{Discord.Embed},System.String,System.String,Discord.RequestOptions,Discord.AllowedMentions)">
+        <member name="M:Discord.Webhook.DiscordWebhookClient.SendMessageAsync(System.String,System.Boolean,System.Collections.Generic.IEnumerable{Discord.Embed},System.String,System.String,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageComponent)">
             <summary> Sends a message to the channel for this webhook. </summary>
             <returns> Returns the ID of the created message. </returns>
         </member>
@@ -97,6 +97,11 @@
         <member name="P:Discord.Webhook.WebhookMessageProperties.AllowedMentions">
             <summary>
                 Gets or sets the allowed mentions of the message.
+            </summary>
+        </member>
+        <member name="P:Discord.Webhook.WebhookMessageProperties.Components">
+            <summary>
+                Gets or sets the components that the message should display.
             </summary>
         </member>
         <member name="M:Discord.Webhook.WebhookClientHelper.GetWebhookAsync(Discord.Webhook.DiscordWebhookClient,System.UInt64)">

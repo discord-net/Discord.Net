@@ -25,6 +25,10 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public abstract string AvatarId { get; internal set; }
         /// <inheritdoc />
+        public abstract string BannerId { get; internal set; }
+        /// <inheritdoc />
+        public abstract Color? AccentColor { get; internal set; }
+        /// <inheritdoc />
         public abstract bool IsWebhook { get; }
         /// <inheritdoc />
         public UserProperties? PublicFlags { get; private set; }
@@ -64,6 +68,16 @@ namespace Discord.WebSocket
                 AvatarId = model.Avatar.Value;
                 hasChanges = true;
             }
+            if (model.Banner.IsSpecified && model.Banner.Value != BannerId)
+            {
+                BannerId = model.Banner.Value;
+                hasChanges = true;
+            }
+            if (model.AccentColor.IsSpecified && model.AccentColor.Value != AccentColor?.RawValue)
+            {
+                AccentColor = model.AccentColor.Value;
+                hasChanges = true;
+            }
             if (model.Discriminator.IsSpecified)
             {
                 var newVal = ushort.Parse(model.Discriminator.Value, NumberStyles.None, CultureInfo.InvariantCulture);
@@ -98,6 +112,10 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
             => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
+
+        /// <inheritdoc />
+        public string GetBannerUrl(ImageFormat format = ImageFormat.Auto, ushort size = 256)
+            => CDN.GetUserBannerUrl(Id, BannerId, size, format);
 
         /// <inheritdoc />
         public string GetDefaultAvatarUrl()

@@ -21,7 +21,7 @@ namespace Discord.Webhook
             return RestInternalWebhook.Create(client, model);
         }
         public static async Task<ulong> SendMessageAsync(DiscordWebhookClient client,
-            string text, bool isTTS, IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, RequestOptions options)
+            string text, bool isTTS, IEnumerable<Embed> embeds, string username, string avatarUrl, AllowedMentions allowedMentions, RequestOptions options, MessageComponent component)
         {
             var args = new CreateWebhookMessageParams
             {
@@ -37,6 +37,8 @@ namespace Discord.Webhook
                 args.AvatarUrl = avatarUrl;
             if (allowedMentions != null)
                 args.AllowedMentions = allowedMentions.ToModel();
+            if (component != null)
+                args.Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray();
 
             var model = await client.ApiClient.CreateWebhookMessageAsync(client.Webhook.Id, args, options: options).ConfigureAwait(false);
             return model.Id;
@@ -83,7 +85,8 @@ namespace Discord.Webhook
                         : Optional.Create<API.Embed[]>(),
                 AllowedMentions = args.AllowedMentions.IsSpecified
                     ? args.AllowedMentions.Value.ToModel()
-                    : Optional.Create<API.AllowedMentions>()
+                    : Optional.Create<API.AllowedMentions>(),
+                Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
             };
 
             await client.ApiClient.ModifyWebhookMessageAsync(client.Webhook.Id, messageId, apiArgs, options)

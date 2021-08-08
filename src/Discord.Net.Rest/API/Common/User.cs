@@ -15,6 +15,10 @@ namespace Discord.API
         public Optional<bool> Bot { get; set; }
         [JsonProperty("avatar")]
         public Optional<string> Avatar { get; set; }
+        [JsonProperty("banner")]
+        public Optional<string> Banner { get; set; }
+        [JsonProperty("accent_color")]
+        public Optional<uint?> AccentColor { get; set; }
 
         //CurrentUser
         [JsonProperty("verified")]

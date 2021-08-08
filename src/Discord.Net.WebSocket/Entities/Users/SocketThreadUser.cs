@@ -36,7 +36,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public string Nickname
-            => GuildUser.Nickname; 
+            => GuildUser.Nickname;
 
         /// <inheritdoc/>
         public DateTimeOffset? PremiumSince
@@ -51,6 +51,20 @@ namespace Discord.WebSocket
         {
             get => GuildUser.AvatarId;
             internal set => GuildUser.AvatarId = value;
+        }
+
+        /// <inheritdoc/>
+        public override string BannerId
+        {
+            get => GuildUser.BannerId;
+            internal set => GuildUser.BannerId = value;
+        }
+
+        /// <inheritdoc/>
+        public override Color? AccentColor
+        {
+            get => GuildUser.AccentColor;
+            internal set => GuildUser.AccentColor = value;
         }
 
         /// <inheritdoc/>
