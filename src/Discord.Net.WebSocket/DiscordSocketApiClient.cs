@@ -171,7 +171,7 @@ namespace Discord.API
                     _gatewayUrl = $"{gatewayResponse.Url}?v={DiscordConfig.APIVersion}&encoding={DiscordSocketConfig.GatewayEncoding}&compress=zlib-stream";
                 }
 
-#if DEBUG
+#if DEBUG_PACKETS
                 Console.WriteLine("Connecting to gateway: " + _gatewayUrl);
 #endif
 
