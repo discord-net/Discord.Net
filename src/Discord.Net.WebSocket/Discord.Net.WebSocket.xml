@@ -3628,6 +3628,16 @@
         <member name="M:Discord.WebSocket.SocketMessageComponent.FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
             <inheritdoc/>
         </member>
+        <member name="M:Discord.WebSocket.SocketMessageComponent.DeferLoadingAsync(System.Boolean,Discord.RequestOptions)">
+            <summary>
+                Defers an interaction and responds with type 5 (<see cref="F:Discord.InteractionResponseType.DeferredChannelMessageWithSource"/>)
+            </summary>
+            <param name="ephemeral"><see langword="true"/> to send this message ephemerally, otherwise <see langword="false"/>.</param>
+            <param name="options">The request options for this async request.</param>
+            <returns>
+                A task that represents the asynchronous operation of acknowledging the interaction.
+            </returns>
+        </member>
         <member name="M:Discord.WebSocket.SocketMessageComponent.DeferAsync(System.Boolean,Discord.RequestOptions)">
             <inheritdoc/>
         </member>
