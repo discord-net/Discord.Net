@@ -4433,6 +4433,12 @@
         <member name="P:Discord.WebSocket.SocketGroupUser.AvatarId">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketGroupUser.BannerId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketGroupUser.AccentColor">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.WebSocket.SocketGroupUser.Presence">
             <inheritdoc />
         </member>
@@ -4489,6 +4495,12 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketGuildUser.AvatarId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketGuildUser.BannerId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketGuildUser.AccentColor">
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketGuildUser.GuildPermissions">
@@ -4554,7 +4566,7 @@
                 Returns the position of the user within the role hierarchy.
             </summary>
             <remarks>
-                The returned value equal to the position of the highest role the user has, or 
+                The returned value equal to the position of the highest role the user has, or
                 <see cref="F:System.Int32.MaxValue"/> if user is the server owner.
             </remarks>
         </member>
@@ -4676,6 +4688,12 @@
         <member name="P:Discord.WebSocket.SocketSelfUser.AvatarId">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketSelfUser.BannerId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketSelfUser.AccentColor">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.WebSocket.SocketSelfUser.Presence">
             <inheritdoc />
         </member>
@@ -4727,6 +4745,12 @@
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketThreadUser.AvatarId">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.BannerId">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.AccentColor">
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketThreadUser.DiscriminatorValue">
@@ -4836,6 +4860,12 @@
         <member name="P:Discord.WebSocket.SocketUnknownUser.AvatarId">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketUnknownUser.BannerId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketUnknownUser.AccentColor">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.WebSocket.SocketUnknownUser.IsBot">
             <inheritdoc />
         </member>
@@ -4864,6 +4894,12 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketUser.AvatarId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketUser.BannerId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketUser.AccentColor">
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketUser.IsWebhook">
@@ -4902,6 +4938,9 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketUser.GetAvatarUrl(Discord.ImageFormat,System.UInt16)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.SocketUser.GetBannerUrl(Discord.ImageFormat,System.UInt16)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketUser.GetDefaultAvatarUrl">
@@ -4984,6 +5023,14 @@
         </member>
         <member name="P:Discord.WebSocket.SocketWebhookUser.AvatarId">
             <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketWebhookUser.BannerId">
+            <inheritdoc />
+            <exception cref="T:System.NotSupportedException">Webhook users does not support banners.</exception>
+        </member>
+        <member name="P:Discord.WebSocket.SocketWebhookUser.AccentColor">
+            <inheritdoc />
+            <exception cref="T:System.NotSupportedException">Webhook users does not support accent colors.</exception>
         </member>
         <member name="P:Discord.WebSocket.SocketWebhookUser.IsBot">
             <inheritdoc />
