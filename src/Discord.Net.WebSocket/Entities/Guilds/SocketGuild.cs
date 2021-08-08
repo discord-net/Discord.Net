@@ -1436,6 +1436,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IWebhook>> IGuild.GetWebhooksAsync(RequestOptions options)
             => await GetWebhooksAsync(options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync (RequestOptions options)
+            => await GetApplicationCommandsAsync(options).ConfigureAwait(false);
 
         void IDisposable.Dispose()
         {
