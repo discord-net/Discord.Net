@@ -3599,6 +3599,9 @@
         <member name="M:Discord.WebSocket.SocketGuild.Discord#IGuild#GetWebhooksAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.WebSocket.SocketGuild.Discord#IGuild#GetApplicationCommandsAsync(Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="T:Discord.WebSocket.SocketMessageComponent">
             <summary>
                 Represents a Websocket-based interaction type for Message Components.
@@ -3896,6 +3899,15 @@
             <returns>
                 A task that represents the asynchronous operation of acknowledging the interaction.
             </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketInteraction.Discord#IDiscordInteraction#FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketInteraction.Discord#IDiscordInteraction#GetOriginalResponseAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketInteraction.Discord#IDiscordInteraction#ModifyOriginalResponseAsync(System.Action{Discord.MessageProperties},Discord.RequestOptions)">
+            <inheritdoc/>
         </member>
         <member name="T:Discord.WebSocket.SocketInvite">
             <summary>

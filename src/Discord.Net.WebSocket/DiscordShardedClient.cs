@@ -30,7 +30,16 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override IActivity Activity { get => _shards[0].Activity; protected set { } }
 
-        internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
+        internal new DiscordSocketApiClient ApiClient
+        {
+            get
+            {
+                if (base.ApiClient.CurrentUserId == null)
+                    base.ApiClient.CurrentUserId = CurrentUser?.Id;
+
+                return base.ApiClient;
+            }
+        }
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => GetGuilds().ToReadOnlyCollection(GetGuildCount);
         /// <inheritdoc />

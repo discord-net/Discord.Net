@@ -869,6 +869,18 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => GuildHelper.GetWebhooksAsync(this, Discord, options);
 
+        //Interactions
+        /// <summary>
+        ///     Gets this guilds slash commands commands
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of application commands found within the guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestApplicationCommand>> GetApplicationCommandsAsync (RequestOptions options = null)
+            => await ClientHelper.GetGuildApplicationCommands(Discord, Id, options).ConfigureAwait(false);
+
         /// <summary>
         ///     Returns the name of the guild.
         /// </summary>
@@ -1154,6 +1166,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IWebhook>> IGuild.GetWebhooksAsync(RequestOptions options)
             => await GetWebhooksAsync(options).ConfigureAwait(false);
-       
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync (RequestOptions options)
+            => await GetApplicationCommandsAsync(options).ConfigureAwait(false);
     }
 }

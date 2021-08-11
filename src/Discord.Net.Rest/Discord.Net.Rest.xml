@@ -3493,6 +3493,16 @@
                 of webhooks found within the guild.
             </returns>
         </member>
+        <member name="M:Discord.Rest.RestGuild.GetApplicationCommandsAsync(Discord.RequestOptions)">
+            <summary>
+                Gets this guilds slash commands commands
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a read-only collection
+                of application commands found within the guild.
+            </returns>
+        </member>
         <member name="M:Discord.Rest.RestGuild.ToString">
             <summary>
                 Returns the name of the guild.
@@ -3648,6 +3658,9 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetWebhooksAsync(Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetApplicationCommandsAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestGuildIntegration.Name">

@@ -173,5 +173,20 @@ namespace Discord.WebSocket
             // Tokens last for 15 minutes according to https://discord.com/developers/docs/interactions/slash-commands#responding-to-an-interaction
             return (DateTime.UtcNow - this.CreatedAt.UtcDateTime).TotalMinutes <= 15d;
         }
+
+        // IDiscordInteraction
+
+        /// <inheritdoc/>
+        async Task<IUserMessage> IDiscordInteraction.FollowupAsync (string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions,
+            RequestOptions options, MessageComponent component, Embed embed)
+            => await FollowupAsync(text, embeds, isTTS, ephemeral, allowedMentions, options, component, embed).ConfigureAwait(false);
+
+        /// <inheritdoc/>
+        async Task<IUserMessage> IDiscordInteraction.GetOriginalResponseAsync (RequestOptions options)
+            => await GetOriginalResponseAsync(options).ConfigureAwait(false);
+
+        /// <inheritdoc/>
+        async Task<IUserMessage> IDiscordInteraction.ModifyOriginalResponseAsync (Action<MessageProperties> func, RequestOptions options)
+            => await ModifyOriginalResponseAsync(func, options).ConfigureAwait(false);
     }
 }
