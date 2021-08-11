@@ -411,7 +411,7 @@ namespace Discord
                 UrlValidation.Validate(Url);
             if (!string.IsNullOrEmpty(ThumbnailUrl))
                 UrlValidation.Validate(ThumbnailUrl);
-            if (!string.IsNullOrEmpty(ImageUrl))
+            if (!string.IsNullOrEmpty(ImageUrl) && !ImageUrl.StartsWith("attachment://", StringComparison.Ordinal))
                 UrlValidation.Validate(ImageUrl);
             if (Author != null)
             {
