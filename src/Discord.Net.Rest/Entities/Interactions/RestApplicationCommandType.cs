@@ -15,10 +15,14 @@ namespace Discord.Rest
         ///     Specifies that this command is a Global command.
         /// </summary>
         GlobalCommand,
+        GlobalUserCommand,
+        GlobalMessageCommand,
 
         /// <summary>
         ///     Specifies that this command is a Guild specific command.
         /// </summary>
-        GuildCommand
+        GuildCommand,
+        GuildUserCommand,
+        GuildMessageCommand
     }
 }

@@ -20,7 +20,11 @@ namespace Discord
         ///     Gets or sets the discription of this command.
         /// </summary>
         public Optional<string> Description { get; set; }
-       
+
+        /// <summary>
+        ///     Gets or sets the type for this command.
+        /// </summary>
+        public Optional<ApplicationCommandType> Type { get; set; }
 
         /// <summary>
         ///     Gets or sets the options for this command.

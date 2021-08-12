@@ -3668,6 +3668,9 @@
         <member name="P:Discord.WebSocket.SocketApplicationCommand.Name">
             <inheritdoc/>
         </member>
+        <member name="P:Discord.WebSocket.SocketApplicationCommand.Type">
+            <inheritdoc/>
+        </member>
         <member name="P:Discord.WebSocket.SocketApplicationCommand.Description">
             <inheritdoc/>
         </member>

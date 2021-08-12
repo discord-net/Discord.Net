@@ -17,6 +17,11 @@ namespace Discord
         ulong ApplicationId { get; }
 
         /// <summary>
+        ///     The type of the command
+        /// </summary>
+        ApplicationCommandType Type { get; }
+
+        /// <summary>
         ///     The name of the command.
         /// </summary>
         string Name { get; }

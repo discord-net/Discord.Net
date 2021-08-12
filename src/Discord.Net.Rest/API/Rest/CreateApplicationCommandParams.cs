@@ -13,6 +13,9 @@ namespace Discord.API.Rest
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("type")]
+        public ApplicationCommandType Type { get; set; }
+
         [JsonProperty("description")]
         public string Description { get; set; }
 
@@ -23,11 +26,12 @@ namespace Discord.API.Rest
         public Optional<bool> DefaultPermission { get; set; }
 
         public CreateApplicationCommandParams() { }
-        public CreateApplicationCommandParams(string name, string description, ApplicationCommandOption[] options = null)
+        public CreateApplicationCommandParams(string name, string description, ApplicationCommandType type, ApplicationCommandOption[] options = null)
         {
             this.Name = name;
             this.Description = description;
             this.Options = Optional.Create<ApplicationCommandOption[]>(options);
+            this.Type = type;
         }
     }
 }

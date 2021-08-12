@@ -15,6 +15,9 @@ namespace Discord.API.Rest
         [JsonProperty("description")]
         public Optional<string> Description { get; set; }
 
+        [JsonProperty("type")]
+        public Optional<ApplicationCommandType> Type { get; set; }
+
         [JsonProperty("options")]
         public Optional<ApplicationCommandOption[]> Options { get; set; }
 

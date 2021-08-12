@@ -1,3 +1,4 @@
+//using Discord.Rest.Entities.Interactions;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -111,10 +112,26 @@ namespace Discord.Rest
             => InteractionHelper.CreateGlobalCommand(this, properties, options);
         public Task<RestGlobalCommand> CreateGlobalCommand(Action<SlashCommandCreationProperties> func, RequestOptions options = null)
             => InteractionHelper.CreateGlobalCommand(this, func, options);
+        public Task<RestGlobalUserCommand> CreateGlobalUserCommand(UserCommandCreationProperties properties, RequestOptions options = null)
+            => InteractionHelper.CreateGlobalUserCommand(this, properties, options);
+        public Task<RestGlobalUserCommand> CreateGlobalUserCommand(Action<UserCommandCreationProperties> func, RequestOptions options = null)
+            => InteractionHelper.CreateGlobalUserCommand(this, func, options);
+        public Task<RestGlobalMessageCommand> CreateGlobalMessageCommand(MessageCommandCreationProperties properties, RequestOptions options = null)
+            => InteractionHelper.CreateGlobalMessageCommand(this, properties, options);
+        public Task<RestGlobalMessageCommand> CreateGlobalMessageCommand(Action<MessageCommandCreationProperties> func, RequestOptions options = null)
+            => InteractionHelper.CreateGlobalMessageCommand(this, func, options);
         public Task<RestGuildCommand> CreateGuildCommand(SlashCommandCreationProperties properties, ulong guildId, RequestOptions options = null)
             => InteractionHelper.CreateGuildCommand(this, guildId, properties, options);
         public Task<RestGuildCommand> CreateGuildCommand(Action<SlashCommandCreationProperties> func, ulong guildId, RequestOptions options = null)
             => InteractionHelper.CreateGuildCommand(this, guildId, func, options);
+        public Task<RestGuildUserCommand> CreateGuildUserCommand(UserCommandCreationProperties properties, ulong guildId, RequestOptions options = null)
+            => InteractionHelper.CreateGuildUserCommand(this, guildId, properties, options);
+        public Task<RestGuildUserCommand> CreateGuildUserCommand(Action<UserCommandCreationProperties> func, ulong guildId, RequestOptions options = null)
+            => InteractionHelper.CreateGuildUserCommand(this, guildId, func, options);
+        public Task<RestGuildMessageCommand> CreateGuildMessageCommand(MessageCommandCreationProperties properties, ulong guildId, RequestOptions options = null)
+            => InteractionHelper.CreateGuildMessageCommand(this, guildId, properties, options);
+        public Task<RestGuildMessageCommand> CreateGuildMessageCommand(Action<MessageCommandCreationProperties> func, ulong guildId, RequestOptions options = null)
+            => InteractionHelper.CreateGuildMessageCommand(this, guildId, func, options);
         public Task<IReadOnlyCollection<RestGlobalCommand>> GetGlobalApplicationCommands(RequestOptions options = null)
             => ClientHelper.GetGlobalApplicationCommands(this, options);
         public Task<IReadOnlyCollection<RestGuildCommand>> GetGuildApplicationCommands(ulong guildId, RequestOptions options = null)

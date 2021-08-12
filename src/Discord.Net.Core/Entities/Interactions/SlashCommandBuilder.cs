@@ -102,7 +102,8 @@ namespace Discord
             {
                 Name = this.Name,
                 Description = this.Description,
-                DefaultPermission = this.DefaultPermission
+                DefaultPermission = this.DefaultPermission,
+                Type = ApplicationCommandType.Slash
             };
 
             if (this.Options != null && this.Options.Any())

@@ -3732,6 +3732,9 @@
         <member name="P:Discord.Rest.RestApplicationCommand.ApplicationId">
             <inheritdoc/>
         </member>
+        <member name="P:Discord.Rest.RestApplicationCommand.Type">
+            <inheritdoc/>
+        </member>
         <member name="P:Discord.Rest.RestApplicationCommand.Name">
             <inheritdoc/>
         </member>
@@ -3831,6 +3834,32 @@
                 The modified command.
             </returns>
         </member>
+        <member name="M:Discord.Rest.RestGlobalMessageCommand.DeleteAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestGlobalMessageCommand.ModifyAsync(System.Action{Discord.ApplicationCommandProperties},Discord.RequestOptions)">
+            <summary>
+                Modifies this <see cref="T:Discord.Rest.RestApplicationCommand"/>.
+            </summary>
+            <param name="func">The delegate containing the properties to modify the command with.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                The modified command.
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestGlobalUserCommand.DeleteAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestGlobalUserCommand.ModifyAsync(System.Action{Discord.ApplicationCommandProperties},Discord.RequestOptions)">
+            <summary>
+                Modifies this <see cref="T:Discord.Rest.RestApplicationCommand"/>.
+            </summary>
+            <param name="func">The delegate containing the properties to modify the command with.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                The modified command.
+            </returns>
+        </member>
         <member name="T:Discord.Rest.RestGuildCommand">
             <summary>
                 Represents a Rest-based guild command.
@@ -3876,6 +3905,74 @@
             </returns>
         </member>
         <member name="M:Discord.Rest.RestGuildCommand.GetGuild(System.Boolean,Discord.RequestOptions)">
+            <summary>
+                Gets the guild that this slash command resides in.
+            </summary>
+            <param name="withCounts"><see langword="true"/> if you want the approximate member and presence counts for the guild, otherwise <see langword="false"/>.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a
+                <see cref="T:Discord.Rest.RestGuild"/>.
+            </returns>
+        </member>
+        <member name="T:Discord.Rest.RestGuildMessageCommand">
+            <summary>
+                Represents a Rest-based guild command.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.RestGuildMessageCommand.GuildId">
+            <summary>
+                The guild Id where this command originates.
+            </summary>
+        </member>
+        <member name="M:Discord.Rest.RestGuildMessageCommand.DeleteAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestGuildMessageCommand.ModifyAsync(System.Action{Discord.ApplicationCommandProperties},Discord.RequestOptions)">
+            <summary>
+                Modifies this <see cref="T:Discord.Rest.RestApplicationCommand"/>.
+            </summary>
+            <param name="func">The delegate containing the properties to modify the command with.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                The modified command
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestGuildMessageCommand.GetGuild(System.Boolean,Discord.RequestOptions)">
+            <summary>
+                Gets the guild that this slash command resides in.
+            </summary>
+            <param name="withCounts"><see langword="true"/> if you want the approximate member and presence counts for the guild, otherwise <see langword="false"/>.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a
+                <see cref="T:Discord.Rest.RestGuild"/>.
+            </returns>
+        </member>
+        <member name="T:Discord.Rest.RestGuildUserCommand">
+            <summary>
+                Represents a Rest-based guild command.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.RestGuildUserCommand.GuildId">
+            <summary>
+                The guild Id where this command originates.
+            </summary>
+        </member>
+        <member name="M:Discord.Rest.RestGuildUserCommand.DeleteAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestGuildUserCommand.ModifyAsync(System.Action{Discord.ApplicationCommandProperties},Discord.RequestOptions)">
+            <summary>
+                Modifies this <see cref="T:Discord.Rest.RestApplicationCommand"/>.
+            </summary>
+            <param name="func">The delegate containing the properties to modify the command with.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                The modified command
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestGuildUserCommand.GetGuild(System.Boolean,Discord.RequestOptions)">
             <summary>
                 Gets the guild that this slash command resides in.
             </summary>

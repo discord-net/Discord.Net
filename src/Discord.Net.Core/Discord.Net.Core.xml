@@ -4452,6 +4452,11 @@
                 Gets or sets the discription of this command.
             </summary>
         </member>
+        <member name="P:Discord.ApplicationCommandProperties.Type">
+            <summary>
+                Gets or sets the type for this command.
+            </summary>
+        </member>
         <member name="P:Discord.ApplicationCommandProperties.Options">
             <summary>
                 Gets or sets the options for this command.
@@ -4470,6 +4475,11 @@
         <member name="P:Discord.IApplicationCommand.ApplicationId">
             <summary>
                 Gets the unique id of the parent application.
+            </summary>
+        </member>
+        <member name="P:Discord.IApplicationCommand.Type">
+            <summary>
+                The type of the command
             </summary>
         </member>
         <member name="P:Discord.IApplicationCommand.Name">
@@ -5444,6 +5454,73 @@
                 Will render this option as selected by default.
             </summary>
         </member>
+        <member name="T:Discord.MessageCommandBuilder">
+            <summary>
+                A class used to build slash commands.
+            </summary>
+        </member>
+        <member name="F:Discord.MessageCommandBuilder.MaxNameLength">
+            <summary> 
+                Returns the maximun length a commands name allowed by Discord
+            </summary>
+        </member>
+        <member name="F:Discord.MessageCommandBuilder.MaxDescriptionLength">
+            <summary> 
+                Returns the maximum length of a commands description allowed by Discord. 
+            </summary>
+        </member>
+        <member name="P:Discord.MessageCommandBuilder.Name">
+            <summary>
+                The name of this slash command.
+            </summary>
+        </member>
+        <member name="P:Discord.MessageCommandBuilder.Description">
+            <summary>
+               A 1-100 length description of this slash command
+            </summary>
+        </member>
+        <member name="M:Discord.MessageCommandBuilder.Build">
+            <summary>
+                Build the current builder into a <see cref="T:Discord.MessageCommandCreationProperties"/> class.
+            </summary>
+            <returns>A <see cref="T:Discord.MessageCommandCreationProperties"/> that can be used to create user commands over rest.</returns>
+        </member>
+        <member name="M:Discord.MessageCommandBuilder.WithName(System.String)">
+            <summary>
+                Sets the field name.
+            </summary>
+            <param name="name">The value to set the field name to.</param>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.MessageCommandBuilder.WithDescription(System.String)">
+            <summary>
+                Sets the description of the current command.
+            </summary>
+            <param name="description">The description of this command.</param>
+            <returns>The current builder.</returns>
+        </member>
+        <member name="T:Discord.MessageCommandCreationProperties">
+            <summary>
+                A class used to create Message commands.
+            </summary>
+        </member>
+        <member name="P:Discord.MessageCommandCreationProperties.Name">
+            <summary>
+                The name of this command.
+            </summary>
+        </member>
+        <member name="P:Discord.MessageCommandCreationProperties.Description">
+            <summary>
+               The discription of this command.
+            </summary>
+        </member>
+        <member name="P:Discord.MessageCommandCreationProperties.Type">
+            <summary>
+                Gets or sets the type for this command.
+            </summary>
+        </member>
         <member name="T:Discord.SlashCommandBuilder">
             <summary>
                 A class used to build slash commands.
@@ -5691,6 +5768,11 @@
                The discription of this command.
             </summary>
         </member>
+        <member name="P:Discord.SlashCommandCreationProperties.Type">
+            <summary>
+                Gets or sets the type for this command.
+            </summary>
+        </member>
         <member name="P:Discord.SlashCommandCreationProperties.Options">
             <summary>
                 Gets or sets the options for this command.
@@ -5699,6 +5781,73 @@
         <member name="P:Discord.SlashCommandCreationProperties.DefaultPermission">
             <summary>
                 Whether the command is enabled by default when the app is added to a guild. Default is <see langword="true"/>
+            </summary>
+        </member>
+        <member name="T:Discord.UserCommandBuilder">
+            <summary>
+                A class used to build slash commands.
+            </summary>
+        </member>
+        <member name="F:Discord.UserCommandBuilder.MaxNameLength">
+            <summary> 
+                Returns the maximun length a commands name allowed by Discord
+            </summary>
+        </member>
+        <member name="F:Discord.UserCommandBuilder.MaxDescriptionLength">
+            <summary> 
+                Returns the maximum length of a commands description allowed by Discord. 
+            </summary>
+        </member>
+        <member name="P:Discord.UserCommandBuilder.Name">
+            <summary>
+                The name of this slash command.
+            </summary>
+        </member>
+        <member name="P:Discord.UserCommandBuilder.Description">
+            <summary>
+               A 1-100 length description of this slash command
+            </summary>
+        </member>
+        <member name="M:Discord.UserCommandBuilder.Build">
+            <summary>
+                Build the current builder into a <see cref="T:Discord.UserCommandCreationProperties"/> class.
+            </summary>
+            <returns>A <see cref="T:Discord.UserCommandCreationProperties"/> that can be used to create user commands over rest.</returns>
+        </member>
+        <member name="M:Discord.UserCommandBuilder.WithName(System.String)">
+            <summary>
+                Sets the field name.
+            </summary>
+            <param name="name">The value to set the field name to.</param>
+            <returns>
+                The current builder.
+            </returns>
+        </member>
+        <member name="M:Discord.UserCommandBuilder.WithDescription(System.String)">
+            <summary>
+                Sets the description of the current command.
+            </summary>
+            <param name="description">The description of this command.</param>
+            <returns>The current builder.</returns>
+        </member>
+        <member name="T:Discord.UserCommandCreationProperties">
+            <summary>
+                A class used to create User commands.
+            </summary>
+        </member>
+        <member name="P:Discord.UserCommandCreationProperties.Name">
+            <summary>
+                The name of this command.
+            </summary>
+        </member>
+        <member name="P:Discord.UserCommandCreationProperties.Description">
+            <summary>
+               The discription of this command.
+            </summary>
+        </member>
+        <member name="P:Discord.UserCommandCreationProperties.Type">
+            <summary>
+                Gets or sets the type for this command.
             </summary>
         </member>
         <member name="T:Discord.IInvite">

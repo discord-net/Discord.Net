@@ -17,6 +17,9 @@ namespace Discord.Rest
         public ulong ApplicationId { get; private set; }
 
         /// <inheritdoc/>
+        public ApplicationCommandType Type { get; private set; }
+
+        /// <inheritdoc/>
         public string Name { get; private set; }
 
         /// <inheritdoc/>
@@ -47,13 +50,30 @@ namespace Discord.Rest
 
         internal static RestApplicationCommand Create(BaseDiscordClient client, Model model, RestApplicationCommandType type, ulong guildId = 0)
         {
-            if (type == RestApplicationCommandType.GlobalCommand)
-                return RestGlobalCommand.Create(client, model);
-
-            if (type == RestApplicationCommandType.GuildCommand)
-                return RestGuildCommand.Create(client, model, guildId);
-
-            return null;
+            switch (type)
+            {
+                case RestApplicationCommandType.GlobalCommand:
+                    return RestGlobalCommand.Create(client, model);
+                    break;
+                case RestApplicationCommandType.GlobalUserCommand:
+                    return RestGlobalUserCommand.Create(client, model);
+                    break;
+                case RestApplicationCommandType.GlobalMessageCommand:
+                    return RestGlobalMessageCommand.Create(client, model);
+                    break;
+                case RestApplicationCommandType.GuildCommand:
+                    return RestGuildCommand.Create(client, model, guildId);
+                    break;
+                case RestApplicationCommandType.GuildUserCommand:
+                    return RestGuildUserCommand.Create(client, model, guildId);
+                    break;
+                case RestApplicationCommandType.GuildMessageCommand:
+                    return RestGuildMessageCommand.Create(client, model, guildId);
+                    break;
+                default:
+                    return null;
+                    break;
+            }
         }
 
         internal virtual void Update(Model model)
