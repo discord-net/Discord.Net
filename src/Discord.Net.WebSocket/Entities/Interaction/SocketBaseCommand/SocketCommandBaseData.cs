@@ -5,16 +5,13 @@ using Model = Discord.API.ApplicationCommandInteractionData;
 
 namespace Discord.WebSocket
 {
-    /// <summary>
-    ///     Represents the data tied with the <see cref="SocketApplicationUserCommand"/> interaction.
-    /// </summary>
-    public class SocketApplicationUserCommandData : SocketEntity<ulong>, IApplicationCommandInteractionData
+    public class SocketCommandBaseData : SocketEntity<ulong>, IApplicationCommandInteractionData
     {
-        /// <inheritdoc/>
         public string Name { get; private set; }
 
-        public SocketUser Member { get; private set; }
-
+        public IReadOnlyCollection<SocketCommandBaseDataOption> Options { get; private set; }
+        // id
+        // type
         internal Dictionary<ulong, SocketGuildUser> guildMembers { get; private set; }
             = new Dictionary<ulong, SocketGuildUser>();
         internal Dictionary<ulong, SocketGlobalUser> users { get; private set; }
@@ -24,13 +21,13 @@ namespace Discord.WebSocket
         internal Dictionary<ulong, SocketRole> roles { get; private set; }
             = new Dictionary<ulong, SocketRole>();
 
-        IReadOnlyCollection<IApplicationCommandInteractionDataOption> IApplicationCommandInteractionData.Options => throw new System.NotImplementedException();
-
         private ulong? guildId;
 
-        private ApplicationCommandType Type;
+        internal SocketMessage Message { get; private set; }
 
-        internal SocketApplicationUserCommandData(DiscordSocketClient client, Model model, ulong? guildId)
+        private ApplicationCommandType Type { get; set; }
+
+        internal SocketCommandBaseData(DiscordSocketClient client, Model model, ulong? guildId)
             : base(client, model.Id)
         {
             this.guildId = guildId;
@@ -70,7 +67,7 @@ namespace Discord.WebSocket
                             socketChannel = guild != null
                                 ? SocketGuildChannel.Create(guild, Discord.State, channelModel)
                                 : (SocketChannel)SocketChannel.CreatePrivate(Discord, Discord.State, channelModel);
-                        }    
+                        }
 
                         Discord.State.AddChannel(socketChannel);
                         this.channels.Add(ulong.Parse(channel.Key), socketChannel);
@@ -84,7 +81,6 @@ namespace Discord.WebSocket
                         member.Value.User = resolved.Users.Value[member.Key];
                         var user = guild.AddOrUpdateUser(member.Value);
                         this.guildMembers.Add(ulong.Parse(member.Key), user);
-                        this.Member = user;
                     }
                 }
 
@@ -96,18 +92,54 @@ namespace Discord.WebSocket
                         this.roles.Add(ulong.Parse(role.Key), socketRole);
                     }
                 }
+
+                if (resolved.Messages.IsSpecified)
+                {
+                    foreach (var msg in resolved.Messages.Value)
+                    {
+                        var channel = client.GetChannel(msg.Value.ChannelId) as ISocketMessageChannel;
+
+                        SocketUser author;
+                        if (guild != null)
+                        {
+                            if (msg.Value.WebhookId.IsSpecified)
+                                author = SocketWebhookUser.Create(guild, client.State, msg.Value.Author.Value, msg.Value.WebhookId.Value);
+                            else
+                                author = guild.GetUser(msg.Value.Author.Value.Id);
+                        }
+                        else
+                            author = (channel as SocketChannel).GetUser(msg.Value.Author.Value.Id);
+
+                        if (channel == null)
+                        {
+                            if (!msg.Value.GuildId.IsSpecified)  // assume it is a DM
+                            {
+                                channel = client.CreateDMChannel(msg.Value.ChannelId, msg.Value.Author.Value, client.State);
+                            }
+                        }
+
+                        this.Message = SocketMessage.Create(client, client.State, author, channel, msg.Value);
+                    }
+                }
             }
         }
 
-        internal static SocketApplicationUserCommandData Create(DiscordSocketClient client, Model model, ulong id, ulong? guildId)
+        internal static SocketCommandBaseData Create(DiscordSocketClient client, Model model, ulong id, ulong? guildId)
         {
-            var entity = new SocketApplicationUserCommandData(client, model, guildId);
+            var entity = new SocketCommandBaseData(client, model, guildId);
             entity.Update(model);
             return entity;
         }
+
         internal void Update(Model model)
         {
             this.Name = model.Name;
+
+            this.Options = model.Options.IsSpecified
+                ? model.Options.Value.Select(x => new SocketCommandBaseDataOption(this, x)).ToImmutableArray()
+                : null;
         }
+
+        IReadOnlyCollection<IApplicationCommandInteractionDataOption> IApplicationCommandInteractionData.Options => Options;
     }
 }
