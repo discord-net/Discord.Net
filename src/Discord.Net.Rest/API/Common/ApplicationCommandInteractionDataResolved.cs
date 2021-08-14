@@ -16,5 +16,7 @@ namespace Discord.API
 
         [JsonProperty("roles")]
         public Optional<Dictionary<string, Role>> Roles { get; set; }
+        [JsonProperty("messages")]
+        public Optional<Dictionary<string, Message>> Messages { get; set; }
     }
 }

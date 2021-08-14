@@ -3599,6 +3599,70 @@
         <member name="M:Discord.WebSocket.SocketGuild.Discord#IGuild#GetWebhooksAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="T:Discord.WebSocket.SocketApplicationMessageCommand">
+            <summary>
+                Represents a Websocket-based slash command received over the gateway.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketApplicationMessageCommand.Data">
+            <summary>
+                The data associated with this interaction.
+            </summary>
+        </member>
+        <member name="M:Discord.WebSocket.SocketApplicationMessageCommand.RespondAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketApplicationMessageCommand.FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketApplicationMessageCommand.DeferAsync(Discord.RequestOptions)">
+            <summary>
+                Acknowledges this interaction with the <see cref="F:Discord.InteractionResponseType.DeferredChannelMessageWithSource"/>.
+            </summary>
+            <returns>
+                A task that represents the asynchronous operation of acknowledging the interaction.
+            </returns>
+        </member>
+        <member name="T:Discord.WebSocket.SocketApplicationMessageCommandData">
+            <summary>
+                Represents the data tied with the <see cref="T:Discord.WebSocket.SocketSlashCommand"/> interaction.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketApplicationMessageCommandData.Name">
+            <inheritdoc/>
+        </member>
+        <member name="T:Discord.WebSocket.SocketApplicationUserCommand">
+            <summary>
+                Represents a Websocket-based slash command received over the gateway.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketApplicationUserCommand.Data">
+            <summary>
+                The data associated with this interaction.
+            </summary>
+        </member>
+        <member name="M:Discord.WebSocket.SocketApplicationUserCommand.RespondAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketApplicationUserCommand.FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketApplicationUserCommand.DeferAsync(Discord.RequestOptions)">
+            <summary>
+                Acknowledges this interaction with the <see cref="F:Discord.InteractionResponseType.DeferredChannelMessageWithSource"/>.
+            </summary>
+            <returns>
+                A task that represents the asynchronous operation of acknowledging the interaction.
+            </returns>
+        </member>
+        <member name="T:Discord.WebSocket.SocketApplicationUserCommandData">
+            <summary>
+                Represents the data tied with the <see cref="T:Discord.WebSocket.SocketSlashCommand"/> interaction.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketApplicationUserCommandData.Name">
+            <inheritdoc/>
+        </member>
         <member name="T:Discord.WebSocket.SocketMessageComponent">
             <summary>
                 Represents a Websocket-based interaction type for Message Components.
