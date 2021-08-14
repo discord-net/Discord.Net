@@ -32,7 +32,7 @@ namespace Discord.WebSocket
 
         new internal static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
         {
-            var entity = new SocketSlashCommand(client, model, channel);
+            var entity = new SocketCommandBase(client, model, channel);
             entity.Update(model);
             return entity;
         }
