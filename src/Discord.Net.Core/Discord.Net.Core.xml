@@ -4691,7 +4691,7 @@
             <param name="options">The request options for this async request.</param>
             <returns>A <see cref="T:Discord.IUserMessage"/> that represents the initial response.</returns>
         </member>
-        <member name="M:Discord.IDiscordInteraction.DeferAsync(Discord.RequestOptions)">
+        <member name="M:Discord.IDiscordInteraction.DeferAsync(System.Boolean,Discord.RequestOptions)">
             <summary>
                 Acknowledges this interaction.
             </summary>

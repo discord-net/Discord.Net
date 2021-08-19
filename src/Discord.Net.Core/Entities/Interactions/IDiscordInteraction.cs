@@ -92,6 +92,6 @@ namespace Discord
         /// <returns>
         ///     A task that represents the asynchronous operation of acknowledging the interaction.
         /// </returns>
-        Task DeferAsync (RequestOptions options = null);
+        Task DeferAsync (bool ephemeral = false, RequestOptions options = null);
     }
 }

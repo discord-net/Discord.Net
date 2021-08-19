@@ -45,8 +45,8 @@ namespace Discord.Webhook
                 GuildId = model.GuildId.Value;
             if (model.Name.IsSpecified)
                 Name = model.Name.Value;
-            if (model.ApplicationId.IsSpecified)
-                ApplicationId = model.ApplicationId.Value;
+
+            ApplicationId = model.ApplicationId;
         }
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)

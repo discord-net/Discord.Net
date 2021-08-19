@@ -68,8 +68,8 @@ namespace Discord.Rest
                 GuildId = model.GuildId.Value;
             if (model.Name.IsSpecified)
                 Name = model.Name.Value;
-            if (model.ApplicationId.IsSpecified)
-                ApplicationId = model.ApplicationId.Value;
+
+            ApplicationId = model.ApplicationId;
         }
 
         /// <inheritdoc />
