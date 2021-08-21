@@ -103,12 +103,10 @@ namespace Discord.WebSocket
                     AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                     Embeds = embeds?.Select(x => x.ToModel()).ToArray() ?? Optional<API.Embed[]>.Unspecified,
                     TTS = isTTS ? true : Optional<bool>.Unspecified,
-                    Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
+                    Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
+                    Flags = ephemeral ? MessageFlags.Ephemeral : Optional<MessageFlags>.Unspecified
                 }
             };
-
-            if (ephemeral)
-                response.Data.Value.Flags = MessageFlags.Ephemeral;
 
             await InteractionHelper.SendInteractionResponse(this.Discord, response, this.Id, Token, options);
         }

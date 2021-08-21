@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Model = Discord.API.ApplicationCommandInteractionData;
 
 namespace Discord.WebSocket
@@ -9,9 +10,10 @@ namespace Discord.WebSocket
     public class SocketUserCommandData : SocketCommandBaseData
     {
         /// <summary>
-        ///     The user used to run the command
+        ///     Gets the user who this command targets.
         /// </summary>
-        public SocketUser Member { get; private set; }
+        public SocketUser Member
+            => (SocketUser)ResolvableData.GuildMembers.Values.FirstOrDefault() ?? ResolvableData.Users.Values.FirstOrDefault();
 
         /// <inheritdoc/>
         /// <remarks>
