@@ -142,6 +142,27 @@ namespace Discord
         Task<IReadOnlyCollection<IConnection>> GetConnectionsAsync(RequestOptions options = null);
 
         /// <summary>
+        ///     Gets a global application command.
+        /// </summary>
+        /// <param name="id">The id of the command.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the application command if found, otherwise
+        ///     <see langword="null"/>.
+        /// </returns>
+        Task<IApplicationCommand> GetGlobalApplicationCommandAsync(ulong id, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a collection of all global commands.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of global
+        ///     application commands.
+        /// </returns>
+        Task<IReadOnlyCollection<IApplicationCommand>> GetGlobalApplicationCommandsAsync(RequestOptions options = null);
+
+        /// <summary>
         ///     Gets a guild.
         /// </summary>
         /// <param name="id">The guild snowflake identifier.</param>

@@ -3916,12 +3916,24 @@
         </member>
         <member name="M:Discord.IGuild.GetApplicationCommandsAsync(Discord.RequestOptions)">
             <summary>
-                Gets this guilds slash commands commands
+                Gets this guilds application commands.
             </summary>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous get operation. The task result contains a read-only collection
                 of application commands found within the guild.
+            </returns>
+        </member>
+        <member name="M:Discord.IGuild.GetApplicationCommandAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
+            <summary>
+                Gets an application command within this guild with the specified id.
+            </summary>
+            <param name="id">The id of the application command to get.</param>
+            <param name="mode">The <see cref="T:Discord.CacheMode" /> that determines whether the object should be fetched from cache.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A ValueTask that represents the asynchronous get operation. The task result contains a <see cref="T:Discord.IApplicationCommand"/>
+                if found, otherwise <see langword="null"/>.
             </returns>
         </member>
         <member name="T:Discord.IGuildIntegration">
@@ -10969,6 +10981,27 @@
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous get operation. The task result contains a read-only collection of connections.
+            </returns>
+        </member>
+        <member name="M:Discord.IDiscordClient.GetGlobalApplicationCommandAsync(System.UInt64,Discord.RequestOptions)">
+            <summary>
+                Gets a global application command.
+            </summary>
+            <param name="id">The id of the command.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains the application command if found, otherwise
+                <see langword="null"/>.
+            </returns>
+        </member>
+        <member name="M:Discord.IDiscordClient.GetGlobalApplicationCommandsAsync(Discord.RequestOptions)">
+            <summary>
+                Gets a collection of all global commands.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a read-only collection of global
+                application commands.
             </returns>
         </member>
         <member name="M:Discord.IDiscordClient.GetGuildAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">

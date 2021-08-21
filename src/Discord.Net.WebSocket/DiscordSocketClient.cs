@@ -343,6 +343,54 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override SocketUser GetUser(string username, string discriminator)
             => State.Users.FirstOrDefault(x => x.Discriminator == discriminator && x.Username == username);
+
+        /// <summary>
+        ///     Gets a global application command.
+        /// </summary>
+        /// <param name="id">The id of the command.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A ValueTask that represents the asynchronous get operation. The task result contains the application command if found, otherwise
+        ///     <see langword="null"/>.
+        /// </returns>
+        public async ValueTask<SocketApplicationCommand> GetGlobalApplicationCommandAsync(ulong id, RequestOptions options = null)
+        {
+            var command = State.GetCommand(id);
+
+            if (command != null)
+                return command;
+
+            var model = await ApiClient.GetGlobalApplicationCommandAsync(id, options);
+
+            if (model == null)
+                return null;
+
+            command = SocketApplicationCommand.Create(this, model);
+
+            State.AddCommand(command);
+
+            return command;
+        }
+        /// <summary>
+        ///     Gets a collection of all global commands.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of global
+        ///     application commands.
+        /// </returns>
+        public async Task<IReadOnlyCollection<SocketApplicationCommand>> GetGlobalApplicationCommandsAsync(RequestOptions options = null)
+        {
+            var commands = (await ApiClient.GetGlobalApplicationCommandsAsync(options)).Select(x => SocketApplicationCommand.Create(this, x));
+
+            foreach(var command in commands)
+            {
+                State.AddCommand(command);
+            }
+
+            return commands.ToImmutableArray();
+        }
+
         /// <summary>
         ///     Clears cached users from the client.
         /// </summary>
@@ -1891,8 +1939,6 @@ namespace Discord.WebSocket
                                 {
                                     await _gatewayLogger.DebugAsync("Received Dispatch (INTERACTION_CREATE)").ConfigureAwait(false);
 
-                                    // 0x546861742062696720656e6469616e20656e636f64696e67206d616b6573206d79316d687a20636c6f636b207469636b
-
                                     var data = (payload as JToken).ToObject<API.Interaction>(_serializer);
 
                                     SocketChannel channel = null;
@@ -1958,6 +2004,8 @@ namespace Discord.WebSocket
 
                                     var applicationCommand = SocketApplicationCommand.Create(this, data);
 
+                                    State.AddCommand(applicationCommand);
+
                                     await TimedInvokeAsync(_applicationCommandCreated, nameof(ApplicationCommandCreated), applicationCommand).ConfigureAwait(false);
                                 }
                                 break;
@@ -1979,6 +2027,8 @@ namespace Discord.WebSocket
 
                                     var applicationCommand = SocketApplicationCommand.Create(this, data);
 
+                                    State.AddCommand(applicationCommand);
+
                                     await TimedInvokeAsync(_applicationCommandUpdated, nameof(ApplicationCommandUpdated), applicationCommand).ConfigureAwait(false);
                                 }
                                 break;
@@ -1999,6 +2049,8 @@ namespace Discord.WebSocket
                                     }
 
                                     var applicationCommand = SocketApplicationCommand.Create(this, data);
+
+                                    State.RemoveCommand(applicationCommand.Id);
 
                                     await TimedInvokeAsync(_applicationCommandDeleted, nameof(ApplicationCommandDeleted), applicationCommand).ConfigureAwait(false);
                                 }
@@ -2610,6 +2662,13 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
             => await GetVoiceRegionAsync(id, options).ConfigureAwait(false);
+
+        /// <inheritdoc />
+        async Task<IApplicationCommand> IDiscordClient.GetGlobalApplicationCommandAsync(ulong id, RequestOptions options)
+            => await GetGlobalApplicationCommandAsync(id, options);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.GetGlobalApplicationCommandsAsync(RequestOptions options)
+            => await GetGlobalApplicationCommandsAsync(options);
 
         /// <inheritdoc />
         async Task IDiscordClient.StartAsync()

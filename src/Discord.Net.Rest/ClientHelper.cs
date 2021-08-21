@@ -194,7 +194,8 @@ namespace Discord.Rest
             };
         }
 
-        public static async Task<IReadOnlyCollection<RestGlobalCommand>> GetGlobalApplicationCommands(BaseDiscordClient client, RequestOptions options)
+        public static async Task<IReadOnlyCollection<RestGlobalCommand>> GetGlobalApplicationCommands(BaseDiscordClient client,
+            RequestOptions options = null)
         {
             var response = await client.ApiClient.GetGlobalApplicationCommandsAsync(options).ConfigureAwait(false);
 
@@ -203,8 +204,16 @@ namespace Discord.Rest
 
             return response.Select(x => RestGlobalCommand.Create(client, x)).ToArray();
         }
+        public static async Task<RestGlobalCommand> GetGlobalApplicationCommand(BaseDiscordClient client, ulong id,
+            RequestOptions options = null)
+        {
+            var model = await client.ApiClient.GetGlobalApplicationCommandAsync(id, options);
 
-        public static async Task<IReadOnlyCollection<RestGuildCommand>> GetGuildApplicationCommands(BaseDiscordClient client, ulong guildId, RequestOptions options)
+            return model != null ? RestGlobalCommand.Create(client, model) : null;
+        }
+
+        public static async Task<IReadOnlyCollection<RestGuildCommand>> GetGuildApplicationCommands(BaseDiscordClient client, ulong guildId,
+            RequestOptions options = null)
         {
             var response = await client.ApiClient.GetGuildApplicationCommandsAsync(guildId, options).ConfigureAwait(false);
 
@@ -212,6 +221,13 @@ namespace Discord.Rest
                 return new RestGuildCommand[0].ToImmutableArray();
 
             return response.Select(x => RestGuildCommand.Create(client, x, guildId)).ToImmutableArray();
+        }
+        public static async Task<RestGuildCommand> GetGuildApplicationCommand(BaseDiscordClient client, ulong id, ulong guildId,
+            RequestOptions options = null)
+        {
+            var model = await client.ApiClient.GetGuildApplicationCommandAsync(guildId, id, options);
+
+            return model != null ? RestGuildCommand.Create(client, model, guildId) : null;
         }
 
 

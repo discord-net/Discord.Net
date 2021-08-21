@@ -5,7 +5,8 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Model = Discord.API.Gateway.ApplicationCommandCreatedUpdatedEvent;
+using GatewayModel = Discord.API.Gateway.ApplicationCommandCreatedUpdatedEvent;
+using Model = Discord.API.ApplicationCommand;
 
 namespace Discord.WebSocket
 {
@@ -60,14 +61,21 @@ namespace Discord.WebSocket
         {
             this.GuildId = guildId;
         }
-        internal static SocketApplicationCommand Create(DiscordSocketClient client, Model model)
+        internal static SocketApplicationCommand Create(DiscordSocketClient client, GatewayModel model)
         {
             var entity = new SocketApplicationCommand(client, model.Id, model.GuildId.ToNullable());
             entity.Update(model);
             return entity;
         }
 
-        internal void Update(API.ApplicationCommand model)
+        internal static SocketApplicationCommand Create(DiscordSocketClient client, Model model, ulong? guildId = null)
+        {
+            var entity = new SocketApplicationCommand(client, model.Id, guildId);
+            entity.Update(model);
+            return entity;
+        }
+
+        internal void Update(Model model)
         {
             this.ApplicationId = model.ApplicationId;
             this.Description = model.Description;
@@ -102,7 +110,7 @@ namespace Discord.WebSocket
                     throw new InvalidOperationException($"Cannot modify this application command with the parameter type {nameof(TArg)}");
             }
 
-            API.ApplicationCommand command = null;
+            Model command = null;
 
             if (this.IsGlobalCommand)
             {

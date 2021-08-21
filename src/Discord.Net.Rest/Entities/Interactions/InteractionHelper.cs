@@ -44,12 +44,20 @@ namespace Discord.Rest
         }
 
         // Global commands
-        public static async Task<RestGlobalCommand> CreateGlobalCommand<TArg>(BaseDiscordClient client,
-            Action<TArg> func, RequestOptions options) where TArg : ApplicationCommandProperties
+        public static async Task<RestGlobalCommand> GetGlobalCommandAsync(BaseDiscordClient client, ulong id,
+            RequestOptions options = null)
+        {
+            var model = await client.ApiClient.GetGlobalApplicationCommandAsync(id, options).ConfigureAwait(false);
+            
+
+            return RestGlobalCommand.Create(client, model);
+        }
+        public static Task<RestGlobalCommand> CreateGlobalCommand<TArg>(BaseDiscordClient client,
+            Action<TArg> func, RequestOptions options = null) where TArg : ApplicationCommandProperties
         {
             var args = Activator.CreateInstance(typeof(TArg));
             func((TArg)args);
-            return await CreateGlobalCommand(client, (TArg)args, options);
+            return CreateGlobalCommand(client, (TArg)args, options);
         }
         public static async Task<RestGlobalCommand> CreateGlobalCommand(BaseDiscordClient client,
             ApplicationCommandProperties arg, RequestOptions options = null)
@@ -116,7 +124,7 @@ namespace Discord.Rest
                 models.Add(model);
             }
 
-            var apiModels = await client.ApiClient.BulkOverwriteGlobalApplicationCommands(models.ToArray(), options);
+            var apiModels = await client.ApiClient.BulkOverwriteGlobalApplicationCommands(models.ToArray(), options).ConfigureAwait(false);
 
             return apiModels.Select(x => RestGlobalCommand.Create(client, x)).ToArray();
         }
@@ -156,7 +164,7 @@ namespace Discord.Rest
                 models.Add(model);
             }
 
-            var apiModels = await client.ApiClient.BulkOverwriteGuildApplicationCommands(guildId, models.ToArray(), options);
+            var apiModels = await client.ApiClient.BulkOverwriteGuildApplicationCommands(guildId, models.ToArray(), options).ConfigureAwait(false);
 
             return apiModels.Select(x => RestGuildCommand.Create(client, x, guildId)).ToArray();
         }
@@ -221,12 +229,12 @@ namespace Discord.Rest
         }
 
         // Guild Commands
-        public static async Task<RestGuildCommand> CreateGuildCommand<TArg>(BaseDiscordClient client, ulong guildId,
+        public static Task<RestGuildCommand> CreateGuildCommand<TArg>(BaseDiscordClient client, ulong guildId,
             Action<TArg> func, RequestOptions options) where TArg : ApplicationCommandProperties
         {
             var args = Activator.CreateInstance(typeof(TArg));
             func((TArg)args);
-            return await CreateGuildCommand(client, guildId, (TArg)args, options);
+            return CreateGuildCommand(client, guildId, (TArg)args, options);
         }
 
         public static async Task<RestGuildCommand> CreateGuildCommand(BaseDiscordClient client, ulong guildId,

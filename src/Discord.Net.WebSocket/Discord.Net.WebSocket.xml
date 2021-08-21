@@ -1078,6 +1078,27 @@
         <member name="M:Discord.WebSocket.DiscordSocketClient.GetUser(System.String,System.String)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.WebSocket.DiscordSocketClient.GetGlobalApplicationCommandAsync(System.UInt64,Discord.RequestOptions)">
+            <summary>
+                Gets a global application command.
+            </summary>
+            <param name="id">The id of the command.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A ValueTask that represents the asynchronous get operation. The task result contains the application command if found, otherwise
+                <see langword="null"/>.
+            </returns>
+        </member>
+        <member name="M:Discord.WebSocket.DiscordSocketClient.GetGlobalApplicationCommandsAsync(Discord.RequestOptions)">
+            <summary>
+                Gets a collection of all global commands.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a read-only collection of global
+                application commands.
+            </returns>
+        </member>
         <member name="M:Discord.WebSocket.DiscordSocketClient.PurgeUserCache">
             <summary>
                 Clears cached users from the client.
@@ -1164,6 +1185,12 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.DiscordSocketClient.Discord#IDiscordClient#GetVoiceRegionAsync(System.String,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.DiscordSocketClient.Discord#IDiscordClient#GetGlobalApplicationCommandAsync(System.UInt64,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.DiscordSocketClient.Discord#IDiscordClient#GetGlobalApplicationCommandsAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.DiscordSocketClient.Discord#IDiscordClient#StartAsync">

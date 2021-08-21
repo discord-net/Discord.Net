@@ -785,13 +785,13 @@ namespace Discord.WebSocket
 
         //Interactions
         /// <summary>
-        ///     Deletes all slash commands in the current guild.
+        ///     Deletes all application commands in the current guild.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous delete operation.
         /// </returns>
-        public Task DeleteSlashCommandsAsync(RequestOptions options = null)
+        public Task DeleteApplicationCommandsAsync(RequestOptions options = null)
             => InteractionHelper.DeleteAllGuildCommandsAsync(Discord, this.Id, options);
 
         /// <summary>
@@ -802,20 +802,39 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
         ///     slash commands created by the current user.
         /// </returns>
-        public Task<IReadOnlyCollection<RestGuildCommand>> GetSlashCommandsAsync(RequestOptions options = null)
-            => GuildHelper.GetSlashCommandsAsync(this, Discord, options);
+        public async Task<IReadOnlyCollection<SocketApplicationCommand>> GetApplicationCommandsAsync(RequestOptions options = null)
+        {
+            var commands = (await Discord.ApiClient.GetGuildApplicationCommandsAsync(this.Id, options)).Select(x => SocketApplicationCommand.Create(Discord, x));
 
-        /// <summary>
-        ///     Gets a slash command in the current guild.
-        /// </summary>
-        /// <param name="id">The unique identifier of the slash command.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains a
-        ///     slash command created by the current user.
-        /// </returns>
-        public Task<RestGuildCommand> GetSlashCommandAsync(ulong id, RequestOptions options = null)
-            => GuildHelper.GetSlashCommandAsync(this, id, Discord, options);
+            foreach (var command in commands)
+            {
+                Discord.State.AddCommand(command);
+            }
+
+            return commands.ToImmutableArray();
+        }
+
+        public async ValueTask<SocketApplicationCommand> GetApplicationCommandAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            var command = Discord.State.GetCommand(id);
+
+            if (command != null)
+                return command;
+
+            if (mode == CacheMode.CacheOnly)
+                return null;
+
+            var model = await Discord.ApiClient.GetGlobalApplicationCommandAsync(id, options);
+
+            if (model == null)
+                return null;
+
+            command = SocketApplicationCommand.Create(Discord, model);
+
+            Discord.State.AddCommand(command);
+
+            return command;
+        }
 
         //Invites
         /// <summary>
@@ -1078,18 +1097,6 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => GuildHelper.GetWebhooksAsync(this, Discord, options);
-
-        //Interactions
-        /// <summary>
-        ///     Gets this guilds slash commands commands
-        /// </summary>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
-        ///     of application commands found within the guild.
-        /// </returns>
-        public async Task<IReadOnlyCollection<RestApplicationCommand>> GetApplicationCommandsAsync(RequestOptions options = null)
-            => await Discord.Rest.GetGuildApplicationCommands(this.Id, options);
 
         //Emotes
         /// <inheritdoc />
@@ -1481,6 +1488,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync (RequestOptions options)
             => await GetApplicationCommandsAsync(options).ConfigureAwait(false);
+        async Task<IApplicationCommand> IGuild.GetApplicationCommandAsync(ulong id, CacheMode mode, RequestOptions options)
+            => await GetApplicationCommandAsync(id, mode, options);
 
         void IDisposable.Dispose()
         {

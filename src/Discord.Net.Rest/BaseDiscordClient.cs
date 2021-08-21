@@ -217,6 +217,14 @@ namespace Discord.Rest
             => Task.FromResult<IWebhook>(null);
 
         /// <inheritdoc />
+        Task<IApplicationCommand> IDiscordClient.GetGlobalApplicationCommandAsync(ulong id, RequestOptions options)
+            => Task.FromResult<IApplicationCommand>(null);
+
+        /// <inheritdoc />
+        Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.GetGlobalApplicationCommandsAsync(RequestOptions options)
+            => Task.FromResult<IReadOnlyCollection<IApplicationCommand>>(ImmutableArray.Create<IApplicationCommand>());
+
+        /// <inheritdoc />
         Task IDiscordClient.StartAsync()
             => Task.Delay(0);
         /// <inheritdoc />

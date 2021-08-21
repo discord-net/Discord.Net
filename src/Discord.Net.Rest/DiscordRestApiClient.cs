@@ -1063,6 +1063,18 @@ namespace Discord.API
             return await SendAsync<ApplicationCommand[]>("GET", () => $"applications/{this.CurrentUserId}/commands", new BucketIds(), options: options).ConfigureAwait(false);
         }
 
+        public async Task<ApplicationCommand> GetGlobalApplicationCommandAsync(ulong id, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(id, 0, nameof(id));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            try
+            {
+                return await SendAsync<ApplicationCommand>("GET", () => $"applications/{this.CurrentUserId}/commands/{id}", new BucketIds(), options: options).ConfigureAwait(false);
+            }
+            catch(HttpException x) when (x.HttpCode == HttpStatusCode.NotFound) { return null; }
+        }
 
         public async Task<ApplicationCommand> CreateGlobalApplicationCommandAsync(CreateApplicationCommandParams command, RequestOptions options = null)
         {
@@ -1073,7 +1085,6 @@ namespace Discord.API
             Preconditions.AtLeast(command.Description.Length, 1, nameof(command.Description));
 
             options = RequestOptions.CreateOrClone(options);
-
 
             return await TrySendApplicationCommand(SendJsonAsync<ApplicationCommand>("POST", () => $"applications/{this.CurrentUserId}/commands", command, new BucketIds(), options: options)).ConfigureAwait(false);
         }
@@ -1158,7 +1169,11 @@ namespace Discord.API
 
             var bucket = new BucketIds(guildId: guildId);
 
-            return await SendAsync<ApplicationCommand>("GET", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", bucket, options: options);
+            try
+            {
+                return await SendAsync<ApplicationCommand>("GET", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", bucket, options: options);
+            }
+            catch(HttpException x) when (x.HttpCode == HttpStatusCode.NotFound) { return null; }
         }
 
         public async Task<ApplicationCommand> CreateGuildApplicationCommandAsync(CreateApplicationCommandParams command, ulong guildId, RequestOptions options = null)
@@ -1187,58 +1202,6 @@ namespace Discord.API
         }
 
         public async Task<ApplicationCommand[]> BulkOverwriteGuildApplicationCommands(ulong guildId, CreateApplicationCommandParams[] commands, RequestOptions options = null)
-        {
-            options = RequestOptions.CreateOrClone(options);
-
-            var bucket = new BucketIds(guildId: guildId);
-
-            return await TrySendApplicationCommand(SendJsonAsync<ApplicationCommand[]>("PUT", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", commands, bucket, options: options)).ConfigureAwait(false);
-        }
-
-        public async Task<ApplicationCommand> CreateGuildApplicationUserCommandAsync(CreateApplicationCommandParams command, ulong guildId, RequestOptions options = null)
-        {
-            options = RequestOptions.CreateOrClone(options);
-
-            var bucket = new BucketIds(guildId: guildId);
-
-            return await TrySendApplicationCommand(SendJsonAsync<ApplicationCommand>("POST", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", command, bucket, options: options)).ConfigureAwait(false);
-        }
-
-        public async Task<ApplicationCommand> ModifyGuildApplicationUserCommandAsync(ModifyApplicationCommandParams command, ulong guildId, ulong commandId, RequestOptions options = null)
-        {
-            options = RequestOptions.CreateOrClone(options);
-
-            var bucket = new BucketIds(guildId: guildId);
-
-            return await TrySendApplicationCommand(SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", command, bucket, options: options)).ConfigureAwait(false);
-        }
-        public async Task<ApplicationCommand[]> BulkOverwriteGuildApplicationUserCommands(ulong guildId, CreateApplicationCommandParams[] commands, RequestOptions options = null)
-        {
-            options = RequestOptions.CreateOrClone(options);
-
-            var bucket = new BucketIds(guildId: guildId);
-
-            return await TrySendApplicationCommand(SendJsonAsync<ApplicationCommand[]>("PUT", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", commands, bucket, options: options)).ConfigureAwait(false);
-        }
-
-        public async Task<ApplicationCommand> CreateGuildApplicationMessageCommandAsync(CreateApplicationCommandParams command, ulong guildId, RequestOptions options = null)
-        {
-            options = RequestOptions.CreateOrClone(options);
-
-            var bucket = new BucketIds(guildId: guildId);
-
-            return await TrySendApplicationCommand(SendJsonAsync<ApplicationCommand>("POST", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", command, bucket, options: options)).ConfigureAwait(false);
-        }
-        public async Task<ApplicationCommand> ModifyGuildApplicationMessageCommandAsync(ModifyApplicationCommandParams command, ulong guildId, ulong commandId, RequestOptions options = null)
-        {
-            options = RequestOptions.CreateOrClone(options);
-
-            var bucket = new BucketIds(guildId: guildId);
-
-                return await TrySendApplicationCommand(SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", command, bucket, options: options)).ConfigureAwait(false);
-        }
-
-        public async Task<ApplicationCommand[]> BulkOverwriteGuildApplicationMessageCommands(ulong guildId, CreateApplicationCommandParams[] commands, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 

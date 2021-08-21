@@ -878,8 +878,19 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of application commands found within the guild.
         /// </returns>
-        public async Task<IReadOnlyCollection<RestApplicationCommand>> GetApplicationCommandsAsync (RequestOptions options = null)
+        public async Task<IReadOnlyCollection<RestGuildCommand>> GetApplicationCommandsAsync (RequestOptions options = null)
             => await ClientHelper.GetGuildApplicationCommands(Discord, Id, options).ConfigureAwait(false);
+        /// <summary>
+        ///     Gets an application command within this guild with the specified id.
+        /// </summary>
+        /// <param name="id">The id of the application command to get.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A ValueTask that represents the asynchronous get operation. The task result contains a <see cref="IApplicationCommand"/>
+        ///     if found, otherwise <see langword="null"/>.
+        /// </returns>
+        public async Task<RestGuildCommand> GetApplicationCommandAsync(ulong id, RequestOptions options = null)
+            => await ClientHelper.GetGuildApplicationCommand(Discord, id, this.Id, options);
 
         /// <summary>
         ///     Returns the name of the guild.
@@ -1169,5 +1180,14 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync (RequestOptions options)
             => await GetApplicationCommandsAsync(options).ConfigureAwait(false);
+        async Task<IApplicationCommand> IGuild.GetApplicationCommandAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+            {
+                return await GetApplicationCommandAsync(id, options);
+            }
+            else
+                return null;
+        }
     }
 }
