@@ -891,6 +891,35 @@ namespace Discord.Rest
         /// </returns>
         public async Task<RestGuildCommand> GetApplicationCommandAsync(ulong id, RequestOptions options = null)
             => await ClientHelper.GetGuildApplicationCommand(Discord, id, this.Id, options);
+        /// <summary>
+        ///     Creates an application command within this guild.
+        /// </summary>
+        /// <param name="properties">The properties to use when creating the command.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the command that was created.
+        /// </returns>
+        public async Task<RestGuildCommand> CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null)
+        {
+            var model = await InteractionHelper.CreateGuildCommand(Discord, this.Id, properties, options);
+
+            return RestGuildCommand.Create(Discord, model, this.Id);
+        }
+        /// <summary>
+        ///     Overwrites the application commands within this guild.
+        /// </summary>
+        /// <param name="properties">A collection of properties to use when creating the commands.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a collection of commands that was created.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestGuildCommand>> BulkOverwriteApplicationCommandsAsync(ApplicationCommandProperties[] properties,
+            RequestOptions options = null)
+        {
+            var models = await InteractionHelper.BulkOverwriteGuildCommands(Discord, this.Id, properties, options);
+
+            return models.Select(x => RestGuildCommand.Create(Discord, x, this.Id)).ToImmutableArray();
+        }
 
         /// <summary>
         ///     Returns the name of the guild.
@@ -1180,6 +1209,14 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync (RequestOptions options)
             => await GetApplicationCommandsAsync(options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IApplicationCommand> IGuild.CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options)
+            => await CreateApplicationCommandAsync(properties, options);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.BulkOverwriteApplicationCommandsAsync(ApplicationCommandProperties[] properties,
+            RequestOptions options)
+            => await BulkOverwriteApplicationCommandsAsync(properties, options);
+        /// <inheritdoc />
         async Task<IApplicationCommand> IGuild.GetApplicationCommandAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)

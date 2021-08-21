@@ -3290,6 +3290,38 @@
                 slash commands created by the current user.
             </returns>
         </member>
+        <member name="M:Discord.WebSocket.SocketGuild.GetApplicationCommandAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
+            <summary>
+                Gets an application command within this guild with the specified id.
+            </summary>
+            <param name="id">The id of the application command to get.</param>
+            <param name="mode">The <see cref="T:Discord.CacheMode" /> that determines whether the object should be fetched from cache.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A ValueTask that represents the asynchronous get operation. The task result contains a <see cref="T:Discord.IApplicationCommand"/>
+                if found, otherwise <see langword="null"/>.
+            </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketGuild.CreateApplicationCommandAsync(Discord.ApplicationCommandProperties,Discord.RequestOptions)">
+            <summary>
+                Creates an application command within this guild.
+            </summary>
+            <param name="properties">The properties to use when creating the command.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous creation operation. The task result contains the command that was created.
+            </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketGuild.BulkOverwriteApplicationCommandAsync(Discord.ApplicationCommandProperties[],Discord.RequestOptions)">
+            <summary>
+                Overwrites the application commands within this guild.
+            </summary>
+            <param name="properties">A collection of properties to use when creating the commands.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous creation operation. The task result contains a collection of commands that was created.
+            </returns>
+        </member>
         <member name="M:Discord.WebSocket.SocketGuild.GetInvitesAsync(Discord.RequestOptions)">
             <summary>
                 Gets a collection of all invites in this guild.

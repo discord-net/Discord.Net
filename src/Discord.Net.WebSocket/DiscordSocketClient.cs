@@ -391,6 +391,35 @@ namespace Discord.WebSocket
             return commands.ToImmutableArray();
         }
 
+        public async Task<SocketApplicationCommand> CreateGlobalApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null)
+        {
+            var model = await InteractionHelper.CreateGlobalCommand(this, properties, options).ConfigureAwait(false);
+
+            var entity = State.GetOrAddCommand(model.Id, (id) => SocketApplicationCommand.Create(this, model));
+
+            // update it incase it was cached
+            entity.Update(model);
+
+            return entity;
+        }
+        public async Task<IReadOnlyCollection<SocketApplicationCommand>> BulkOverwriteGlobalApplicationCommandsAsync(
+            ApplicationCommandProperties[] properties, RequestOptions options = null)
+        {
+            var models = await InteractionHelper.BulkOverwriteGlobalCommands(this, properties, options);
+
+            var entities = models.Select(x => SocketApplicationCommand.Create(this, x));
+
+            // purge our previous commands
+            State.PurgeCommands(x => x.IsGlobalCommand);
+
+            foreach(var entity in entities)
+            {
+                State.AddCommand(entity);
+            }
+
+            return entities.ToImmutableArray();
+        }
+
         /// <summary>
         ///     Clears cached users from the client.
         /// </summary>

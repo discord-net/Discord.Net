@@ -804,7 +804,7 @@ namespace Discord.WebSocket
         /// </returns>
         public async Task<IReadOnlyCollection<SocketApplicationCommand>> GetApplicationCommandsAsync(RequestOptions options = null)
         {
-            var commands = (await Discord.ApiClient.GetGuildApplicationCommandsAsync(this.Id, options)).Select(x => SocketApplicationCommand.Create(Discord, x));
+            var commands = (await Discord.ApiClient.GetGuildApplicationCommandsAsync(this.Id, options)).Select(x => SocketApplicationCommand.Create(Discord, x, this.Id));
 
             foreach (var command in commands)
             {
@@ -814,6 +814,16 @@ namespace Discord.WebSocket
             return commands.ToImmutableArray();
         }
 
+        /// <summary>
+        ///     Gets an application command within this guild with the specified id.
+        /// </summary>
+        /// <param name="id">The id of the application command to get.</param>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A ValueTask that represents the asynchronous get operation. The task result contains a <see cref="IApplicationCommand"/>
+        ///     if found, otherwise <see langword="null"/>.
+        /// </returns>
         public async ValueTask<SocketApplicationCommand> GetApplicationCommandAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
             var command = Discord.State.GetCommand(id);
@@ -829,11 +839,55 @@ namespace Discord.WebSocket
             if (model == null)
                 return null;
 
-            command = SocketApplicationCommand.Create(Discord, model);
+            command = SocketApplicationCommand.Create(Discord, model, this.Id);
 
             Discord.State.AddCommand(command);
 
             return command;
+        }
+
+        /// <summary>
+        ///     Creates an application command within this guild.
+        /// </summary>
+        /// <param name="properties">The properties to use when creating the command.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the command that was created.
+        /// </returns>
+        public async Task<SocketApplicationCommand> CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null)
+        {
+            var model = await InteractionHelper.CreateGuildCommand(Discord, this.Id, properties, options);
+
+            var entity = Discord.State.GetOrAddCommand(model.Id, (id) => SocketApplicationCommand.Create(Discord, model));
+
+            entity.Update(model);
+
+            return entity;
+        }
+
+        /// <summary>
+        ///     Overwrites the application commands within this guild.
+        /// </summary>
+        /// <param name="properties">A collection of properties to use when creating the commands.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a collection of commands that was created.
+        /// </returns>
+        public async Task<IReadOnlyCollection<SocketApplicationCommand>> BulkOverwriteApplicationCommandAsync(ApplicationCommandProperties[] properties,
+            RequestOptions options = null)
+        {
+            var models = await InteractionHelper.BulkOverwriteGuildCommands(Discord, this.Id, properties, options);
+
+            var entities = models.Select(x => SocketApplicationCommand.Create(Discord, x));
+
+            Discord.State.PurgeCommands(x => !x.IsGlobalCommand && x.Guild.Id == this.Id);
+
+            foreach(var entity in entities)
+            {
+                Discord.State.AddCommand(entity);
+            }
+
+            return entities.ToImmutableArray();
         }
 
         //Invites
@@ -1490,6 +1544,11 @@ namespace Discord.WebSocket
             => await GetApplicationCommandsAsync(options).ConfigureAwait(false);
         async Task<IApplicationCommand> IGuild.GetApplicationCommandAsync(ulong id, CacheMode mode, RequestOptions options)
             => await GetApplicationCommandAsync(id, mode, options);
+        async Task<IApplicationCommand> IGuild.CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options)
+            => await CreateApplicationCommandAsync(properties, options);
+        async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.BulkOverwriteApplicationCommandsAsync(ApplicationCommandProperties[] properties,
+            RequestOptions options)
+            => await BulkOverwriteApplicationCommandAsync(properties, options);
 
         void IDisposable.Dispose()
         {

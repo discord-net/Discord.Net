@@ -39,6 +39,7 @@ namespace Discord.WebSocket
             _guilds = new ConcurrentDictionary<ulong, SocketGuild>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(guildCount * CollectionMultiplier));
             _users = new ConcurrentDictionary<ulong, SocketGlobalUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
             _groupChannels = new ConcurrentHashSet<ulong>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(10 * CollectionMultiplier));
+            _commands = new ConcurrentDictionary<ulong, SocketApplicationCommand>();
         }
 
         internal SocketChannel GetChannel(ulong id)
@@ -152,11 +153,22 @@ namespace Discord.WebSocket
         {
             _commands[command.Id] = command;
         }
+        internal SocketApplicationCommand GetOrAddCommand(ulong id, Func<ulong, SocketApplicationCommand> commandFactory)
+        {
+            return _commands.GetOrAdd(id, commandFactory);
+        }
         internal SocketApplicationCommand RemoveCommand(ulong id)
         {
             if (_commands.TryRemove(id, out SocketApplicationCommand command))
                 return command;
             return null;
+        }
+        internal void PurgeCommands(Func<SocketApplicationCommand, bool> precondition)
+        {
+            var ids = _commands.Where(x => precondition(x.Value)).Select(x => x.Key);
+
+            foreach (var id in ids)
+                _commands.TryRemove(id, out var _);
         }
     }
 }

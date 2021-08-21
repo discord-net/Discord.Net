@@ -163,6 +163,26 @@ namespace Discord
         Task<IReadOnlyCollection<IApplicationCommand>> GetGlobalApplicationCommandsAsync(RequestOptions options = null);
 
         /// <summary>
+        ///     Creates a global application command.
+        /// </summary>
+        /// <param name="properties">The properties to use when creating the command.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///      A task that represents the asynchronous creation operation. The task result contains the created application command.
+        /// </returns>
+        Task<IApplicationCommand> CreateGlobalApplicationCommand(ApplicationCommandProperties properties, RequestOptions options = null);
+
+        /// <summary>
+        ///     Bulk overwrites all global application commands.
+        /// </summary>
+        /// <param name="properties">A collection of properties to use when creating the commands.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a collection of application commands that were created.
+        /// </returns>
+        Task<IReadOnlyCollection<IApplicationCommand>> BulkOverwriteGlobalApplicationCommand(ApplicationCommandProperties[] properties, RequestOptions options = null);
+
+        /// <summary>
         ///     Gets a guild.
         /// </summary>
         /// <param name="id">The guild snowflake identifier.</param>

@@ -3936,6 +3936,26 @@
                 if found, otherwise <see langword="null"/>.
             </returns>
         </member>
+        <member name="M:Discord.IGuild.CreateApplicationCommandAsync(Discord.ApplicationCommandProperties,Discord.RequestOptions)">
+            <summary>
+                Creates an application command within this guild.
+            </summary>
+            <param name="properties">The properties to use when creating the command.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous creation operation. The task result contains the command that was created.
+            </returns>
+        </member>
+        <member name="M:Discord.IGuild.BulkOverwriteApplicationCommandsAsync(Discord.ApplicationCommandProperties[],Discord.RequestOptions)">
+            <summary>
+                Overwrites the application commands within this guild.
+            </summary>
+            <param name="properties">A collection of properties to use when creating the commands.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous creation operation. The task result contains a collection of commands that was created.
+            </returns>
+        </member>
         <member name="T:Discord.IGuildIntegration">
             <summary>
                 Holds information for a guild integration feature.
@@ -11002,6 +11022,26 @@
             <returns>
                 A task that represents the asynchronous get operation. The task result contains a read-only collection of global
                 application commands.
+            </returns>
+        </member>
+        <member name="M:Discord.IDiscordClient.CreateGlobalApplicationCommand(Discord.ApplicationCommandProperties,Discord.RequestOptions)">
+            <summary>
+                Creates a global application command.
+            </summary>
+            <param name="properties">The properties to use when creating the command.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                 A task that represents the asynchronous creation operation. The task result contains the created application command.
+            </returns>
+        </member>
+        <member name="M:Discord.IDiscordClient.BulkOverwriteGlobalApplicationCommand(Discord.ApplicationCommandProperties[],Discord.RequestOptions)">
+            <summary>
+                Bulk overwrites all global application commands.
+            </summary>
+            <param name="properties">A collection of properties to use when creating the commands.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous creation operation. The task result contains a collection of application commands that were created.
             </returns>
         </member>
         <member name="M:Discord.IDiscordClient.GetGuildAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
