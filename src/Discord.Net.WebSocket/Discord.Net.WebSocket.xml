@@ -3617,8 +3617,16 @@
                 Represents the data tied with the <see cref="T:Discord.WebSocket.SocketMessageCommand"/> interaction.
             </summary>
         </member>
-        <member name="P:Discord.WebSocket.SocketMessageCommandData.Name">
+        <member name="P:Discord.WebSocket.SocketMessageCommandData.Message">
+            <summary>
+                Gets the messagte associated with this message command.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketMessageCommandData.Options">
             <inheritdoc/>
+            <remarks>
+                <b>Note</b> Not implemented for <see cref="T:Discord.WebSocket.SocketMessageCommandData"/>
+            </remarks>
         </member>
         <member name="T:Discord.WebSocket.SocketUserCommand">
             <summary>
@@ -3635,8 +3643,16 @@
                 Represents the data tied with the <see cref="T:Discord.WebSocket.SocketUserCommand"/> interaction.
             </summary>
         </member>
-        <member name="P:Discord.WebSocket.SocketUserCommandData.Name">
+        <member name="P:Discord.WebSocket.SocketUserCommandData.Member">
+            <summary>
+                The user used to run the command
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketUserCommandData.Options">
             <inheritdoc/>
+            <remarks>
+                <b>Note</b> Not implemented for <see cref="T:Discord.WebSocket.SocketUserCommandData"/>
+            </remarks>
         </member>
         <member name="T:Discord.WebSocket.SocketMessageComponent">
             <summary>
@@ -3713,14 +3729,6 @@
         <member name="T:Discord.WebSocket.SocketSlashCommandData">
             <summary>
                 Represents the data tied with the <see cref="T:Discord.WebSocket.SocketSlashCommand"/> interaction.
-            </summary>
-        </member>
-        <member name="P:Discord.WebSocket.SocketSlashCommandData.Name">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketSlashCommandData.Options">
-            <summary>
-                The <see cref="T:Discord.WebSocket.SocketSlashCommandDataOption"/>'s received with this interaction.
             </summary>
         </member>
         <member name="T:Discord.WebSocket.SocketSlashCommandDataOption">
@@ -3821,7 +3829,7 @@
         </member>
         <member name="T:Discord.WebSocket.SocketCommandBase">
             <summary>
-            Base class for User, Message, and Slash command interactions
+                Base class for User, Message, and Slash command interactions
             </summary>
         </member>
         <member name="P:Discord.WebSocket.SocketCommandBase.Data">
@@ -3843,36 +3851,22 @@
                 A task that represents the asynchronous operation of acknowledging the interaction.
             </returns>
         </member>
-        <member name="T:Discord.WebSocket.SocketCommandBaseData">
+        <member name="T:Discord.WebSocket.SocketCommandBaseData`1">
             <summary>
                 Represents the base data tied with the <see cref="T:Discord.WebSocket.SocketCommandBase"/> interaction.
             </summary>
         </member>
-        <member name="P:Discord.WebSocket.SocketCommandBaseData.Name">
+        <member name="P:Discord.WebSocket.SocketCommandBaseData`1.Name">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.WebSocket.SocketCommandBaseData.Options">
+        <member name="P:Discord.WebSocket.SocketCommandBaseData`1.Options">
             <summary>
-                The <see cref="T:Discord.WebSocket.SocketCommandBaseDataOption"/>'s received with this interaction.
+                The <typeparamref name="TOption"/> received with this interaction.
             </summary>
         </member>
-        <member name="T:Discord.WebSocket.SocketCommandBaseDataOption">
+        <member name="T:Discord.WebSocket.SocketCommandBaseData">
             <summary>
-                Represents the base Websocket-based <see cref="T:Discord.IApplicationCommandInteractionDataOption"/> recieved by the gateway
-            </summary>
-        </member>
-        <member name="P:Discord.WebSocket.SocketCommandBaseDataOption.Name">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketCommandBaseDataOption.Value">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketCommandBaseDataOption.Type">
-            <inheritdoc/>
-        </member>
-        <member name="P:Discord.WebSocket.SocketCommandBaseDataOption.Options">
-            <summary>
-                 The sub command options received for this sub command group.
+                Represents the base data tied with the <see cref="T:Discord.WebSocket.SocketCommandBase"/> interaction.
             </summary>
         </member>
         <member name="T:Discord.WebSocket.SocketInteraction">

@@ -15,7 +15,7 @@ namespace Discord.WebSocket
         /// <summary>
         ///     The data associated with this interaction.
         /// </summary>
-        new public SocketMessageCommandData Data { get; }
+        public new SocketMessageCommandData Data { get; }
 
         internal SocketMessageCommand(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
             : base(client, model, channel)

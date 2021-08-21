@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Discord.API
 {
-    internal class ApplicationCommandInteractionData : IDiscordInteractionData
+    internal class ApplicationCommandInteractionData : IResolvable, IDiscordInteractionData
     {
         [JsonProperty("id")]
         public ulong Id { get; set; }
@@ -18,7 +18,7 @@ namespace Discord.API
         public Optional<ApplicationCommandInteractionDataResolved> Resolved { get; set; }
 
         [JsonProperty("type")]
-        public Optional<ApplicationCommandType> Type { get; set; }
+        public ApplicationCommandType Type { get; set; }
 
     }
 }

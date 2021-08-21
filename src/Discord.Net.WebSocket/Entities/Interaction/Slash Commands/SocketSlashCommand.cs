@@ -28,7 +28,7 @@ namespace Discord.WebSocket
             if (this.Channel is SocketGuildChannel guildChannel)
                 guildId = guildChannel.Guild.Id;
 
-            Data = SocketSlashCommandData.Create(client, dataModel, model.Id, guildId);
+            Data = SocketSlashCommandData.Create(client, dataModel, guildId);
         }
 
         new internal static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
