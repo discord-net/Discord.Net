@@ -44,15 +44,16 @@ namespace Discord
         private string _name { get; set; }
 
         /// <summary>
-        ///     Build the current builder into a <see cref="ContextMenuCommandCreationProperties"/> class.
+        ///     Build the current builder into a <see cref="MessageCommandProperties"/> class.
         /// </summary>
-        /// <returns>A <see cref="ContextMenuCommandCreationProperties"/> that can be used to create message commands over rest.</returns>
-        public ContextMenuCommandCreationProperties Build()
+        /// <returns>
+        ///     A <see cref="MessageCommandProperties"/> that can be used to create message commands.
+        /// </returns>
+        public MessageCommandProperties Build()
         {
-            ContextMenuCommandCreationProperties props = new ContextMenuCommandCreationProperties()
+            MessageCommandProperties props = new MessageCommandProperties()
             {
                 Name = this.Name,
-                Type=ApplicationCommandType.Message
             };
 
             return props;

@@ -33,11 +33,6 @@ namespace Discord.Rest
         /// </summary>
         public IReadOnlyCollection<RestApplicationCommandOption> Options { get; private set; }
 
-        /// <summary>
-        ///     The type of this rest application command.
-        /// </summary>
-        public RestApplicationCommandType CommandType { get; internal set; }
-
         /// <inheritdoc/>
         public DateTimeOffset CreatedAt
             => SnowflakeUtils.FromSnowflake(this.Id);
@@ -48,31 +43,15 @@ namespace Discord.Rest
 
         }
 
-        internal static RestApplicationCommand Create(BaseDiscordClient client, Model model, RestApplicationCommandType type, ulong guildId = 0)
+        internal static RestApplicationCommand Create(BaseDiscordClient client, Model model, ulong? guildId)
         {
-            switch (type)
+            if (guildId.HasValue)
             {
-                case RestApplicationCommandType.GlobalCommand:
-                    return RestGlobalCommand.Create(client, model);
-                    break;
-                case RestApplicationCommandType.GlobalUserCommand:
-                    return RestGlobalUserCommand.Create(client, model);
-                    break;
-                case RestApplicationCommandType.GlobalMessageCommand:
-                    return RestGlobalMessageCommand.Create(client, model);
-                    break;
-                case RestApplicationCommandType.GuildCommand:
-                    return RestGuildCommand.Create(client, model, guildId);
-                    break;
-                case RestApplicationCommandType.GuildUserCommand:
-                    return RestGuildUserCommand.Create(client, model, guildId);
-                    break;
-                case RestApplicationCommandType.GuildMessageCommand:
-                    return RestGuildMessageCommand.Create(client, model, guildId);
-                    break;
-                default:
-                    return null;
-                    break;
+                return RestGuildCommand.Create(client, model, guildId.Value);
+            }
+            else
+            {
+                return RestGlobalCommand.Create(client, model);
             }
         }
 
@@ -92,7 +71,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public abstract Task DeleteAsync(RequestOptions options = null);
 
-        IReadOnlyCollection<IApplicationCommandOption> IApplicationCommand.Options => Options;
+        /// <inheritdoc/>
+        public abstract Task ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null);
 
+        IReadOnlyCollection<IApplicationCommandOption> IApplicationCommand.Options => Options;
     }
 }

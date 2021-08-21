@@ -7,27 +7,9 @@ using System.Threading.Tasks;
 
 namespace Discord.API.Gateway
 {
-    internal class ApplicationCommandCreatedUpdatedEvent
+    internal class ApplicationCommandCreatedUpdatedEvent : API.ApplicationCommand
     {
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("id")]
-        public ulong Id { get; set; }
-
-        [JsonProperty("description")]
-        public string Description { get; set; }
-
-        [JsonProperty("application_id")]
-        public ulong ApplicationId { get; set; }
-
         [JsonProperty("guild_id")]
-        public ulong GuildId { get; set; }
-
-        [JsonProperty("options")]
-        public Optional<List<Discord.API.ApplicationCommandOption>> Options { get; set; }
-
-        [JsonProperty("default_permission")]
-        public Optional<bool> DefaultPermission { get; set; }
+        public Optional<ulong> GuildId { get; set; }
     }
 }

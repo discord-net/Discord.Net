@@ -3752,7 +3752,12 @@
         </member>
         <member name="T:Discord.WebSocket.SocketApplicationCommand">
             <summary>
-                Represends a Websocket-based <see cref="T:Discord.IApplicationCommand"/> recieved over the gateway.
+                Represends a Websocket-based <see cref="T:Discord.IApplicationCommand"/>.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketApplicationCommand.IsGlobalCommand">
+            <summary>
+               <see langword="true"/> if this command is a global command, otherwise <see langword="false"/>.
             </summary>
         </member>
         <member name="P:Discord.WebSocket.SocketApplicationCommand.ApplicationId">
@@ -3772,19 +3777,33 @@
         </member>
         <member name="P:Discord.WebSocket.SocketApplicationCommand.Options">
             <summary>
-                A collection of <see cref="T:Discord.WebSocket.SocketApplicationCommandOption"/>'s recieved over the gateway.
+                A collection of <see cref="T:Discord.WebSocket.SocketApplicationCommandOption"/>'s for this command.
             </summary>
+            <remarks>
+                If the <see cref="P:Discord.WebSocket.SocketApplicationCommand.Type"/> is not a slash command, this field will be an empty collection.
+            </remarks>
         </member>
         <member name="P:Discord.WebSocket.SocketApplicationCommand.CreatedAt">
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketApplicationCommand.Guild">
             <summary>
-                The <see cref="T:Discord.WebSocket.SocketGuild"/> where this application was created.
+                Returns the guild this command resides in, if this command is a global command then it will return <see langword="null"/>
             </summary>
         </member>
         <member name="M:Discord.WebSocket.SocketApplicationCommand.DeleteAsync(Discord.RequestOptions)">
             <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketApplicationCommand.ModifyAsync``1(System.Action{``0},Discord.RequestOptions)">
+            <summary>
+                Modifies the current application command.
+            </summary>
+            <param name="func">The new properties to use when modifying the command.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous modification operation.
+            </returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when you pass in an invalid <see cref="T:Discord.ApplicationCommandProperties"/> type.</exception>
         </member>
         <member name="T:Discord.WebSocket.SocketApplicationCommandChoice">
             <summary>

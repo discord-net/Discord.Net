@@ -1946,11 +1946,14 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<API.Gateway.ApplicationCommandCreatedUpdatedEvent>(_serializer);
 
-                                    var guild = State.GetGuild(data.GuildId);
-                                    if(guild == null)
+                                    if (data.GuildId.IsSpecified)
                                     {
-                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
-                                        return;
+                                        var guild = State.GetGuild(data.GuildId.Value);
+                                        if (guild == null)
+                                        {
+                                            await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
 
                                     var applicationCommand = SocketApplicationCommand.Create(this, data);
@@ -1964,11 +1967,14 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<API.Gateway.ApplicationCommandCreatedUpdatedEvent>(_serializer);
 
-                                    var guild = State.GetGuild(data.GuildId);
-                                    if (guild == null)
+                                    if (data.GuildId.IsSpecified)
                                     {
-                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
-                                        return;
+                                        var guild = State.GetGuild(data.GuildId.Value);
+                                        if (guild == null)
+                                        {
+                                            await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
 
                                     var applicationCommand = SocketApplicationCommand.Create(this, data);
@@ -1982,11 +1988,14 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<API.Gateway.ApplicationCommandCreatedUpdatedEvent>(_serializer);
 
-                                    var guild = State.GetGuild(data.GuildId);
-                                    if (guild == null)
+                                    if (data.GuildId.IsSpecified)
                                     {
-                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
-                                        return;
+                                        var guild = State.GetGuild(data.GuildId.Value);
+                                        if (guild == null)
+                                        {
+                                            await UnknownGuildAsync(type, data.GuildId.Value).ConfigureAwait(false);
+                                            return;
+                                        }
                                     }
 
                                     var applicationCommand = SocketApplicationCommand.Create(this, data);
