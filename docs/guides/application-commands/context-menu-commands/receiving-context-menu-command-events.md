@@ -15,24 +15,21 @@ public async Task InteractionCreatedHandler(SocketInteraction arg)
 
 public async Task ApplicationCommandHandler(SocketInteraction arg)
 {
-	var slashCommand = arg as SocketSlashCommand;
-	if(slashCommand != null)
-		Console.Writeline("Slash command received!")
-		
-	var userCommand = arg as SocketApplicationUserCommand;
-	if(userCommand != null)
+	switch (arg)
 	{
-		Console.Writeline("User command received!")
-		// userCommand.User = User who ran command.
-		// userCommand.Data.Member = User who was clicked.
-	}
-		
-	var messageCommand = arg as SocketApplicationMessageCommand;
-	if(messageCommand != null)
-	{
-		Console.Writeline("Message command received!")
-		// messageCommand.User = User who ran command.
-		// messageCommand.Data.Message = Message that was clicked.
+		case SocketSlashCommand slashCommand:
+			Console.Writeline("Slash command received!");
+			break;
+		case SocketUserCommand userCommand:
+			Console.Writeline("User command received!")
+			// userCommand.User = User who ran command.
+			// userCommand.Data.Member = User who was clicked.
+			break;
+		case SocketMessageCommand messageCommand:
+			Console.Writeline("Message command received!")
+			// messageCommand.User = User who ran command.
+			// messageCommand.Data.Message = Message that was clicked.
+			break;
 	}
 }
 ```

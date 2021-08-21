@@ -22,5 +22,9 @@ namespace Discord.Webhook
         ///     Gets or sets the allowed mentions of the message.
         /// </summary>
         public Optional<AllowedMentions> AllowedMentions { get; set; }
+        /// <summary>
+        ///     Gets or sets the components that the message should display.
+        /// </summary>
+        public Optional<MessageComponent> Components { get; set; }
     }
 }

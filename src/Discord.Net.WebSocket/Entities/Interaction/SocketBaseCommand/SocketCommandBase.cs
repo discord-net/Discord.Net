@@ -9,6 +9,9 @@ using Model = Discord.API.Interaction;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    /// Base class for User, Message, and Slash command interactions
+    /// </summary>
     public class SocketCommandBase : SocketInteraction
     {
         /// <summary>
@@ -105,7 +108,7 @@ namespace Discord.WebSocket
             };
 
             if (ephemeral)
-                response.Data.Value.Flags = 64;
+                response.Data.Value.Flags = MessageFlags.Ephemeral;
 
             await InteractionHelper.SendInteractionResponse(this.Discord, response, this.Id, Token, options);
         }
@@ -140,7 +143,7 @@ namespace Discord.WebSocket
             };
 
             if (ephemeral)
-                args.Flags = 64;
+                args.Flags = MessageFlags.Ephemeral;
 
             return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
         }
@@ -151,7 +154,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous operation of acknowledging the interaction.
         /// </returns>
-        public override Task DeferAsync(RequestOptions options = null)
+        public override Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
         {
             var response = new API.InteractionResponse
             {

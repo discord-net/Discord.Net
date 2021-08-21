@@ -4,12 +4,13 @@ using System.Threading.Tasks;
 using Model = Discord.API.Interaction;
 using DataModel = Discord.API.MessageComponentInteractionData;
 using Discord.Rest;
+using System.Collections.Generic;
 
 namespace Discord.WebSocket
 {
-    /// <summary>
-    ///     Represents a Websocket-based interaction type for Message Components.
-    /// </summary>
+/// <summary>
+///     Represents a Websocket-based interaction type for Message Components.
+/// </summary>
     public class SocketMessageComponent : SocketInteraction
     {
         /// <summary>
@@ -123,7 +124,7 @@ namespace Discord.WebSocket
             };
 
             if (ephemeral)
-                response.Data.Value.Flags = 64;
+                response.Data.Value.Flags = MessageFlags.Ephemeral;
 
             await InteractionHelper.SendInteractionResponse(this.Discord, response, this.Id, Token, options);
         }
@@ -149,8 +150,28 @@ namespace Discord.WebSocket
                Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions), "A max of 100 user Ids are allowed.");
             }
 
-            if (args.Embeds.IsSpecified)
-                Preconditions.AtMost(args.Embeds.Value?.Length ?? 0, 10, nameof(args.Embeds), "A max of 10 embeds are allowed.");
+            var embed = args.Embed;
+            var embeds = args.Embeds;
+
+            bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(Message.Content);
+            bool hasEmbeds = (embed.IsSpecified && embed.Value != null) || (embeds.IsSpecified && embeds.Value?.Length > 0) || Message.Embeds.Any();
+
+            if (!hasText && !hasEmbeds)
+                Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
+
+            var apiEmbeds = embed.IsSpecified || embeds.IsSpecified ? new List<API.Embed>() : null;
+
+            if (embed.IsSpecified && embed.Value != null)
+            {
+                apiEmbeds.Add(embed.Value.ToModel());
+            }
+
+            if (embeds.IsSpecified && embeds.Value != null)
+            {
+                apiEmbeds.AddRange(embeds.Value.Select(x => x.ToModel()));
+            }
+
+            Preconditions.AtMost(apiEmbeds?.Count ?? 0, 10, nameof(args.Embeds), "A max of 10 embeds are allowed.");
 
             // check that user flag and user Id list are exclusive, same with role flag and role Id list
             if (args.AllowedMentions.IsSpecified && args.AllowedMentions.Value != null && args.AllowedMentions.Value.AllowedTypes.HasValue)
@@ -176,11 +197,11 @@ namespace Discord.WebSocket
                 {
                     Content = args.Content,
                     AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
-                    Embeds = args.Embeds.IsSpecified ? args.Embeds.Value?.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
+                    Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                     Components = args.Components.IsSpecified
                         ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray()
                         : Optional<API.ActionRowComponent[]>.Unspecified,
-                    Flags = args.Flags.IsSpecified ? (int?)args.Flags.Value ?? Optional<int>.Unspecified : Optional<int>.Unspecified
+                    Flags = args.Flags.IsSpecified ? args.Flags.Value ?? Optional<MessageFlags>.Unspecified : Optional<MessageFlags>.Unspecified
                 }
             };
 
@@ -213,27 +234,43 @@ namespace Discord.WebSocket
                 AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                 IsTTS = isTTS,
                 Embeds = embeds?.Select(x => x.ToModel()).ToArray() ?? Optional<API.Embed[]>.Unspecified,
-                Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
+                Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
             };
 
             if (ephemeral)
-                args.Flags = 64;
+                args.Flags = MessageFlags.Ephemeral;
 
             return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
         }
 
         /// <summary>
-        ///     Acknowledges this interaction with the <see cref="InteractionResponseType.DeferredUpdateMessage"/>.
+        ///     Defers an interaction and responds with type 5 (<see cref="InteractionResponseType.DeferredChannelMessageWithSource"/>)
         /// </summary>
+        /// <param name="ephemeral"><see langword="true"/> to send this message ephemerally, otherwise <see langword="false"/>.</param>
         /// <param name="options">The request options for this async request.</param>
         /// <returns>
         ///     A task that represents the asynchronous operation of acknowledging the interaction.
         /// </returns>
-        public override Task DeferAsync(RequestOptions options = null)
+        public Task DeferLoadingAsync(bool ephemeral = false, RequestOptions options = null)
+        {
+            var response = new API.InteractionResponse()
+            {
+                Type = InteractionResponseType.DeferredChannelMessageWithSource,
+                Data = ephemeral ? new API.InteractionCallbackData() { Flags = MessageFlags.Ephemeral } : Optional<API.InteractionCallbackData>.Unspecified
+
+            };
+
+            return Discord.Rest.ApiClient.CreateInteractionResponse(response, this.Id, this.Token, options);
+        }
+
+        /// <inheritdoc/>
+        public override Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
         {
             var response = new API.InteractionResponse()
             {
                 Type = InteractionResponseType.DeferredUpdateMessage,
+                Data = ephemeral ? new API.InteractionCallbackData() { Flags = MessageFlags.Ephemeral } : Optional<API.InteractionCallbackData>.Unspecified
+
             };
 
             return Discord.Rest.ApiClient.CreateInteractionResponse(response, this.Id, this.Token, options);

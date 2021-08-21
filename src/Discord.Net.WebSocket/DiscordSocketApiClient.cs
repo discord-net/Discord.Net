@@ -79,7 +79,7 @@ namespace Discord.API
                         if (msg != null)
                         {
 #if DEBUG_PACKETS
-                            Console.WriteLine($"<- {msg.Operation} [{msg.Type ?? "none"}] : {(msg.Payload as Newtonsoft.Json.Linq.JToken)?.ToString().Length}");
+                            Console.WriteLine($"<- {(GatewayOpCode)msg.Operation} [{msg.Type ?? "none"}] : {(msg.Payload as Newtonsoft.Json.Linq.JToken)?.ToString().Length}");
 #endif
 
                             await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
@@ -96,7 +96,7 @@ namespace Discord.API
                     if (msg != null)
                     {
 #if DEBUG_PACKETS
-                        Console.WriteLine($"<- {msg.Operation} [{msg.Type ?? "none"}] : {(msg.Payload as Newtonsoft.Json.Linq.JToken)?.ToString().Length}");
+                        Console.WriteLine($"<- {(GatewayOpCode)msg.Operation} [{msg.Type ?? "none"}] : {(msg.Payload as Newtonsoft.Json.Linq.JToken)?.ToString().Length}");
 #endif
 
                         await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
@@ -105,6 +105,10 @@ namespace Discord.API
             };
             WebSocketClient.Closed += async ex =>
             {
+#if DEBUG_PACKETS
+                Console.WriteLine(ex);
+#endif
+
                 await DisconnectAsync().ConfigureAwait(false);
                 await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
             };
@@ -166,6 +170,11 @@ namespace Discord.API
                     var gatewayResponse = await GetGatewayAsync().ConfigureAwait(false);
                     _gatewayUrl = $"{gatewayResponse.Url}?v={DiscordConfig.APIVersion}&encoding={DiscordSocketConfig.GatewayEncoding}&compress=zlib-stream";
                 }
+
+#if DEBUG_PACKETS
+                Console.WriteLine("Connecting to gateway: " + _gatewayUrl);
+#endif
+
                 await WebSocketClient.ConnectAsync(_gatewayUrl).ConfigureAwait(false);
 
                 ConnectionState = ConnectionState.Connected;
@@ -237,7 +246,9 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             var props = new Dictionary<string, string>
             {
-                ["$device"] = "Discord.Net"
+                ["$device"] = "Discord.Net Labs",
+                ["$os"] = Environment.OSVersion.Platform.ToString(),
+                [$"browser"] = "Discord.Net Labs"
             };
             var msg = new IdentifyParams()
             {

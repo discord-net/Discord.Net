@@ -42,8 +42,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Examples", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "idn", "samples\idn\idn.csproj", "{4A03840B-9EBE-47E3-89AB-E0914DF21AFB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeatureTesting", "..\FeatureTesting\FeatureTesting\FeatureTesting.csproj", "{0CC57A32-3AC7-489D-8DF5-C431925E4675}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

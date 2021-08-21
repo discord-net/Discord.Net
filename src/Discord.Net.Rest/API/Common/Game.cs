@@ -41,8 +41,8 @@ namespace Discord.API
         public Optional<Emoji> Emoji { get; set; }
         [JsonProperty("created_at")]
         public Optional<long> CreatedAt { get; set; }
-        [JsonProperty("buttons")]
-        public Optional<RichPresenceButton[]> Buttons { get; set; }
+        //[JsonProperty("buttons")]
+        //public Optional<RichPresenceButton[]> Buttons { get; set; }
 
         [OnError]
         internal void OnError(StreamingContext context, ErrorContext errorContext)

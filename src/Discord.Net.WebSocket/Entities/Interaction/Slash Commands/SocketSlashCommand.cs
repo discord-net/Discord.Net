@@ -36,6 +36,6 @@ namespace Discord.WebSocket
             var entity = new SocketSlashCommand(client, model, channel);
             entity.Update(model);
             return entity;
-        }        
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace Discord
     /// <summary>
     ///     The base command model that belongs to an application. see <see href="https://discord.com/developers/docs/interactions/slash-commands#applicationcommand"/>
     /// </summary>
-    public interface IApplicationCommand : ISnowflakeEntity
+    public interface IApplicationCommand : ISnowflakeEntity, IDeletable
     {
         /// <summary>
         ///     Gets the unique id of the parent application.
@@ -40,12 +40,5 @@ namespace Discord
         ///     If the option is a subcommand or subcommand group type, this nested options will be the parameters.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandOption> Options { get; }
-
-        /// <summary>
-        ///     Deletes this command
-        /// </summary>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>A task that represents the asynchronous delete operation.</returns>
-        Task DeleteAsync(RequestOptions options = null);
     }
 }

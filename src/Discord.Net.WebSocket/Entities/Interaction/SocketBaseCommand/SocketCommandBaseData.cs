@@ -5,13 +5,17 @@ using Model = Discord.API.ApplicationCommandInteractionData;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents the base data tied with the <see cref="SocketCommandBase"/> interaction.
+    /// </summary>
     public class SocketCommandBaseData : SocketEntity<ulong>, IApplicationCommandInteractionData
     {
+        /// <inheritdoc/>
         public string Name { get; private set; }
-
+        /// <summary>
+        ///     The <see cref="SocketCommandBaseDataOption"/>'s received with this interaction.
+        /// </summary>
         public IReadOnlyCollection<SocketCommandBaseDataOption> Options { get; private set; }
-        // id
-        // type
         internal Dictionary<ulong, SocketGuildUser> guildMembers { get; private set; }
             = new Dictionary<ulong, SocketGuildUser>();
         internal Dictionary<ulong, SocketGlobalUser> users { get; private set; }

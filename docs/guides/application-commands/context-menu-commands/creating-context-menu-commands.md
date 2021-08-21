@@ -15,14 +15,23 @@ Guild commands are specific to the guild you specify when making them. Guild com
 
 If you don't have the code for a bot ready yet please follow [this guide](https://docs.stillu.cc/guides/getting_started/first-bot.html).
 
-## SlashCommandBuilder
+## UserCommandBuilder
 
-The slash command builder will help you create slash commands. The builder has these available fields and methods:
+The context menu user command builder will help you create user commands. The builder has these available fields and methods:
 
 | Name                  | Type                             | Description                                                                                  |
 | --------------------- | -------------------------------- | -------------------------------------------------------------------------------------------- |
 | Name                  | string                           | The name of this context menu command.                                                       |
-| Description           | string                           | A 0 length string. Left in place for possible future use.                                    |
+| WithName              | Function                         | Sets the field name.                                                                         |
+| Build                 | Function                         | Builds the builder into the appropriate `CommandCreationProperties` class used to make Menu commands |
+
+## MessageCommandBuilder
+
+The context menu message command builder will help you create message commands. The builder has these available fields and methods:
+
+| Name                  | Type                             | Description                                                                                  |
+| --------------------- | -------------------------------- | -------------------------------------------------------------------------------------------- |
+| Name                  | string                           | The name of this context menu command.                                                       |
 | WithName              | Function                         | Sets the field name.                                                                         |
 | Build                 | Function                         | Builds the builder into the appropriate `CommandCreationProperties` class used to make Menu commands |
 

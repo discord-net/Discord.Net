@@ -68,6 +68,7 @@ namespace Discord.Rest
                 model.Video = entity.Video.Value.ToModel();
             return model;
         }
+
         public static API.AllowedMentions ToModel(this AllowedMentions entity)
         {
             return new API.AllowedMentions()

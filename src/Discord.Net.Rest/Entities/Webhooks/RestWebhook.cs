@@ -24,6 +24,8 @@ namespace Discord.Rest
         public ulong? GuildId { get; private set; }
         /// <inheritdoc />
         public IUser Creator { get; private set; }
+        /// <inheritdoc />
+        public ulong? ApplicationId { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -66,6 +68,8 @@ namespace Discord.Rest
                 GuildId = model.GuildId.Value;
             if (model.Name.IsSpecified)
                 Name = model.Name.Value;
+
+            ApplicationId = model.ApplicationId;
         }
 
         /// <inheritdoc />

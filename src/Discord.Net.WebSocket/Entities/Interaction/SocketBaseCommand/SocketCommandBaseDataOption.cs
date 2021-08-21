@@ -9,8 +9,12 @@ using Model = Discord.API.ApplicationCommandInteractionDataOption;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents the base Websocket-based <see cref="IApplicationCommandInteractionDataOption"/> recieved by the gateway
+    /// </summary>
     public class SocketCommandBaseDataOption : IApplicationCommandInteractionDataOption
     {
+        /// <inheritdoc/>
         public string Name { get; private set; }
 
         /// <inheritdoc/>

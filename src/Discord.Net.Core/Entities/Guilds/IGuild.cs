@@ -941,5 +941,15 @@ namespace Discord
         ///     A task that represents the asynchronous removal operation.
         /// </returns>
         Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets this guilds slash commands commands
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of application commands found within the guild.
+        /// </returns>
+        Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync (RequestOptions options = null);
     }
 }

@@ -22,7 +22,7 @@ namespace Discord
         ///     Gets or sets a single embed for this message.
         /// </summary>
         /// <remarks>
-        ///     This property will be added to the <see cref="Embed"/> array, in the future please use the array rather then this property.
+        ///     This property will be added to the <see cref="Embeds"/> array, in the future please use the array rather than this property.
         /// </remarks>
         public Optional<Embed> Embed { get; set; }
 

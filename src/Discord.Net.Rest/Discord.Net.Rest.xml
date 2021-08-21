@@ -3493,6 +3493,16 @@
                 of webhooks found within the guild.
             </returns>
         </member>
+        <member name="M:Discord.Rest.RestGuild.GetApplicationCommandsAsync(Discord.RequestOptions)">
+            <summary>
+                Gets this guilds slash commands commands
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a read-only collection
+                of application commands found within the guild.
+            </returns>
+        </member>
         <member name="M:Discord.Rest.RestGuild.ToString">
             <summary>
                 Returns the name of the guild.
@@ -3648,6 +3658,9 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetWebhooksAsync(Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetApplicationCommandsAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestGuildIntegration.Name">
@@ -4667,7 +4680,7 @@
         </member>
         <member name="T:Discord.Rest.RestThreadUser">
             <summary>
-                Represents a thread user recieved over the REST api.
+                Represents a thread user received over the REST api.
             </summary>
         </member>
         <member name="P:Discord.Rest.RestThreadUser.Thread">
@@ -4690,7 +4703,7 @@
                 Gets the guild user for this thread user.
             </summary>
             <returns>
-                A task representing the asyncronous get operation. The task returns a
+                A task representing the asynchronous get operation. The task returns a
                 <see cref="T:Discord.IGuildUser"/> that represents the current thread user.
             </returns>
         </member>
@@ -4709,6 +4722,12 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestUser.AvatarId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.RestUser.BannerId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.RestUser.AccentColor">
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestUser.PublicFlags">
@@ -4751,6 +4770,9 @@
             </returns>
         </member>
         <member name="M:Discord.Rest.RestUser.GetAvatarUrl(Discord.ImageFormat,System.UInt16)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestUser.GetBannerUrl(Discord.ImageFormat,System.UInt16)">
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestUser.GetDefaultAvatarUrl">
@@ -4873,6 +4895,9 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestWebhook.Creator">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.RestWebhook.ApplicationId">
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestWebhook.CreatedAt">

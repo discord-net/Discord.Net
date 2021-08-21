@@ -6,13 +6,15 @@ using Model = Discord.API.ApplicationCommandInteractionData;
 namespace Discord.WebSocket
 {
     /// <summary>
-    ///     Represents the data tied with the <see cref="SocketApplicationUserCommand"/> interaction.
+    ///     Represents the data tied with the <see cref="SocketUserCommand"/> interaction.
     /// </summary>
-    public class SocketApplicationUserCommandData : SocketEntity<ulong>, IApplicationCommandInteractionData
+    public class SocketUserCommandData : SocketEntity<ulong>, IApplicationCommandInteractionData
     {
         /// <inheritdoc/>
         public string Name { get; private set; }
-
+        /// <summary>
+        /// The user used to run the command
+        /// </summary>
         public SocketUser Member { get; private set; }
 
         internal Dictionary<ulong, SocketGuildUser> guildMembers { get; private set; }
@@ -28,14 +30,10 @@ namespace Discord.WebSocket
 
         private ulong? guildId;
 
-        private ApplicationCommandType Type;
-
-        internal SocketApplicationUserCommandData(DiscordSocketClient client, Model model, ulong? guildId)
+        internal SocketUserCommandData(DiscordSocketClient client, Model model, ulong? guildId)
             : base(client, model.Id)
         {
             this.guildId = guildId;
-
-            this.Type = (ApplicationCommandType)model.Type;
 
             if (model.Resolved.IsSpecified)
             {
@@ -99,9 +97,9 @@ namespace Discord.WebSocket
             }
         }
 
-        internal static SocketApplicationUserCommandData Create(DiscordSocketClient client, Model model, ulong id, ulong? guildId)
+        internal static SocketUserCommandData Create(DiscordSocketClient client, Model model, ulong id, ulong? guildId)
         {
-            var entity = new SocketApplicationUserCommandData(client, model, guildId);
+            var entity = new SocketUserCommandData(client, model, guildId);
             entity.Update(model);
             return entity;
         }

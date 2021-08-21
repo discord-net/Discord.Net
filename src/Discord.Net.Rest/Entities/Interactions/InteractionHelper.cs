@@ -200,22 +200,20 @@ namespace Discord.Rest
             await client.ApiClient.DeleteGlobalApplicationCommandAsync(command.Id, options).ConfigureAwait(false);
         }
 
-        public static async Task<RestGlobalUserCommand> CreateGlobalUserCommand(BaseDiscordClient client, Action<UserCommandCreationProperties> func, RequestOptions options = null)
+        public static async Task<RestGlobalUserCommand> CreateGlobalUserCommand(BaseDiscordClient client, Action<ContextMenuCommandCreationProperties> func, RequestOptions options = null)
         {
-            var args = new UserCommandCreationProperties();
+            var args = new ContextMenuCommandCreationProperties();
             func(args);
             return await CreateGlobalUserCommand(client, args, options).ConfigureAwait(false);
         }
 
-        public static async Task<RestGlobalUserCommand> CreateGlobalUserCommand(BaseDiscordClient client, UserCommandCreationProperties arg, RequestOptions options = null)
+        public static async Task<RestGlobalUserCommand> CreateGlobalUserCommand(BaseDiscordClient client, ContextMenuCommandCreationProperties arg, RequestOptions options = null)
         {
             Preconditions.NotNullOrEmpty(arg.Name, nameof(arg.Name));
-            Preconditions.Equals(arg.Description, "");
 
             var model = new CreateApplicationCommandParams()
             {
                 Name = arg.Name,
-                Description = arg.Description,
                 Type = arg.Type
             };
 
@@ -223,22 +221,20 @@ namespace Discord.Rest
             return RestGlobalUserCommand.Create(client, cmd);
         }
 
-        public static async Task<RestGlobalMessageCommand> CreateGlobalMessageCommand(BaseDiscordClient client, Action<MessageCommandCreationProperties> func, RequestOptions options = null)
+        public static async Task<RestGlobalMessageCommand> CreateGlobalMessageCommand(BaseDiscordClient client, Action<ContextMenuCommandCreationProperties> func, RequestOptions options = null)
         {
-            var args = new MessageCommandCreationProperties();
+            var args = new ContextMenuCommandCreationProperties();
             func(args);
             return await CreateGlobalMessageCommand(client, args, options).ConfigureAwait(false);
         }
 
-        public static async Task<RestGlobalMessageCommand> CreateGlobalMessageCommand(BaseDiscordClient client, MessageCommandCreationProperties arg, RequestOptions options = null)
+        public static async Task<RestGlobalMessageCommand> CreateGlobalMessageCommand(BaseDiscordClient client, ContextMenuCommandCreationProperties arg, RequestOptions options = null)
         {
             Preconditions.NotNullOrEmpty(arg.Name, nameof(arg.Name));
-            Preconditions.Equals(arg.Description, "");
 
             var model = new CreateApplicationCommandParams()
             {
                 Name = arg.Name,
-                Description = arg.Description,
                 Type = arg.Type
             };
 
@@ -246,7 +242,7 @@ namespace Discord.Rest
             return RestGlobalMessageCommand.Create(client, cmd);
         }
 
-        public static async Task<IReadOnlyCollection<RestGlobalUserCommand>> BulkOverwriteGlobalUserCommands(BaseDiscordClient client, UserCommandCreationProperties[] args, RequestOptions options = null)
+        public static async Task<IReadOnlyCollection<RestGlobalUserCommand>> BulkOverwriteGlobalUserCommands(BaseDiscordClient client, ContextMenuCommandCreationProperties[] args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
 
@@ -255,13 +251,11 @@ namespace Discord.Rest
             foreach (var arg in args)
             {
                 Preconditions.NotNullOrEmpty(arg.Name, nameof(arg.Name));
-                Preconditions.NotNullOrEmpty(arg.Description, nameof(arg.Description));
                 Preconditions.Equals(arg.Type, ApplicationCommandType.User);
 
                 var model = new CreateApplicationCommandParams()
                 {
                     Name = arg.Name,
-                    Description = arg.Description,
                     Type = arg.Type
                 };
 
@@ -307,7 +301,7 @@ namespace Discord.Rest
             await client.ApiClient.DeleteGlobalApplicationCommandAsync(command.Id, options).ConfigureAwait(false);
         }
 
-        public static async Task<IReadOnlyCollection<RestGlobalMessageCommand>> BulkOverwriteGlobalMessageCommands(BaseDiscordClient client, MessageCommandCreationProperties[] args, RequestOptions options = null)
+        public static async Task<IReadOnlyCollection<RestGlobalMessageCommand>> BulkOverwriteGlobalMessageCommands(BaseDiscordClient client, ContextMenuCommandCreationProperties[] args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
 
@@ -316,13 +310,11 @@ namespace Discord.Rest
             foreach (var arg in args)
             {
                 Preconditions.NotNullOrEmpty(arg.Name, nameof(arg.Name));
-                Preconditions.NotNullOrEmpty(arg.Description, nameof(arg.Description));
                 Preconditions.Equals(arg.Type, ApplicationCommandType.Message);
 
                 var model = new CreateApplicationCommandParams()
                 {
                     Name = arg.Name,
-                    Description = arg.Description,
                     Type = arg.Type
                 };
 
@@ -465,22 +457,20 @@ namespace Discord.Rest
             await client.ApiClient.DeleteGuildApplicationCommandAsync(guildId, command.Id, options).ConfigureAwait(false);
         }
 
-        public static async Task<RestGuildUserCommand> CreateGuildUserCommand(BaseDiscordClient client, ulong guildId, Action<UserCommandCreationProperties> func, RequestOptions options = null)
+        public static async Task<RestGuildUserCommand> CreateGuildUserCommand(BaseDiscordClient client, ulong guildId, Action<ContextMenuCommandCreationProperties> func, RequestOptions options = null)
         {
-            var args = new UserCommandCreationProperties();
+            var args = new ContextMenuCommandCreationProperties();
             func(args);
             return await CreateGuildUserCommand(client, guildId, args, options).ConfigureAwait(false);
         }
 
-        public static async Task<RestGuildUserCommand> CreateGuildUserCommand(BaseDiscordClient client, ulong guildId, UserCommandCreationProperties arg, RequestOptions options = null)
+        public static async Task<RestGuildUserCommand> CreateGuildUserCommand(BaseDiscordClient client, ulong guildId, ContextMenuCommandCreationProperties arg, RequestOptions options = null)
         {
             Preconditions.NotNullOrEmpty(arg.Name, nameof(arg.Name));
-            Preconditions.Equals(arg.Description, "");
 
             var model = new CreateApplicationCommandParams()
             {
                 Name = arg.Name,
-                Description = arg.Description,
                 Type = arg.Type
             };
 
@@ -488,22 +478,20 @@ namespace Discord.Rest
             return RestGuildUserCommand.Create(client, cmd, guildId);
         }
 
-        public static async Task<RestGuildMessageCommand> CreateGuildMessageCommand(BaseDiscordClient client, ulong guildId, Action<MessageCommandCreationProperties> func, RequestOptions options = null)
+        public static async Task<RestGuildMessageCommand> CreateGuildMessageCommand(BaseDiscordClient client, ulong guildId, Action<ContextMenuCommandCreationProperties> func, RequestOptions options = null)
         {
-            var args = new MessageCommandCreationProperties();
+            var args = new ContextMenuCommandCreationProperties();
             func(args);
             return await CreateGuildMessageCommand(client, guildId, args, options).ConfigureAwait(false);
         }
 
-        public static async Task<RestGuildMessageCommand> CreateGuildMessageCommand(BaseDiscordClient client, ulong guildId, MessageCommandCreationProperties arg, RequestOptions options = null)
+        public static async Task<RestGuildMessageCommand> CreateGuildMessageCommand(BaseDiscordClient client, ulong guildId, ContextMenuCommandCreationProperties arg, RequestOptions options = null)
         {
             Preconditions.NotNullOrEmpty(arg.Name, nameof(arg.Name));
-            Preconditions.Equals(arg.Description, "");
 
             var model = new CreateApplicationCommandParams()
             {
                 Name = arg.Name,
-                Description = arg.Description,
                 Type = arg.Type
             };
 
@@ -511,7 +499,7 @@ namespace Discord.Rest
             return RestGuildMessageCommand.Create(client, cmd, guildId);
         }
 
-        public static async Task<IReadOnlyCollection<RestGuildUserCommand>> BulkOverwriteGuildUserCommands(BaseDiscordClient client, ulong guildId, UserCommandCreationProperties[] args, RequestOptions options = null)
+        public static async Task<IReadOnlyCollection<RestGuildUserCommand>> BulkOverwriteGuildUserCommands(BaseDiscordClient client, ulong guildId, ContextMenuCommandCreationProperties[] args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
 
@@ -520,13 +508,11 @@ namespace Discord.Rest
             foreach (var arg in args)
             {
                 Preconditions.NotNullOrEmpty(arg.Name, nameof(arg.Name));
-                Preconditions.NotNullOrEmpty(arg.Description, nameof(arg.Description));
                 Preconditions.Equals(arg.Type, ApplicationCommandType.User);
 
                 var model = new CreateApplicationCommandParams()
                 {
                     Name = arg.Name,
-                    Description = arg.Description,
                     Type = arg.Type
                 };
 
@@ -573,7 +559,7 @@ namespace Discord.Rest
             await client.ApiClient.DeleteGuildApplicationCommandAsync(guildId, command.Id, options).ConfigureAwait(false);
         }
 
-        public static async Task<IReadOnlyCollection<RestGuildMessageCommand>> BulkOverwriteGuildMessageCommands(BaseDiscordClient client, ulong guildId, MessageCommandCreationProperties[] args, RequestOptions options = null)
+        public static async Task<IReadOnlyCollection<RestGuildMessageCommand>> BulkOverwriteGuildMessageCommands(BaseDiscordClient client, ulong guildId, ContextMenuCommandCreationProperties[] args, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
 
@@ -582,13 +568,11 @@ namespace Discord.Rest
             foreach (var arg in args)
             {
                 Preconditions.NotNullOrEmpty(arg.Name, nameof(arg.Name));
-                Preconditions.NotNullOrEmpty(arg.Description, nameof(arg.Description));
                 Preconditions.Equals(arg.Type, ApplicationCommandType.Message);
 
                 var model = new CreateApplicationCommandParams()
                 {
                     Name = arg.Name,
-                    Description = arg.Description,
                     Type = arg.Type
                 };
 
@@ -642,15 +626,33 @@ namespace Discord.Rest
             var args = new MessageProperties();
             func(args);
 
+            var embed = args.Embed;
+            var embeds = args.Embeds;
+
             bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(message.Content);
-            bool hasEmbed = args.Embeds.IsSpecified ? args.Embeds.Value != null : message.Embeds.Any();
-            if (!hasText && !hasEmbed)
+            bool hasEmbeds = (embed.IsSpecified && embed.Value != null) || (embeds.IsSpecified && embeds.Value?.Length > 0) || message.Embeds.Any();
+
+            if (!hasText && !hasEmbeds)
                 Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
+
+            var apiEmbeds = embed.IsSpecified || embeds.IsSpecified ? new List<API.Embed>() : null;
+
+            if (embed.IsSpecified && embed.Value != null)
+            {
+                apiEmbeds.Add(embed.Value.ToModel());
+            }
+
+            if (embeds.IsSpecified && embeds.Value != null)
+            {
+                apiEmbeds.AddRange(embeds.Value.Select(x => x.ToModel()));
+            }
+
+            Preconditions.AtMost(apiEmbeds?.Count ?? 0, 10, nameof(args.Embeds), "A max of 10 embeds are allowed.");
 
             var apiArgs = new API.Rest.ModifyInteractionResponseParams
             {
                 Content = args.Content,
-                Embeds = args.Embeds.IsSpecified ? args.Embeds.Value.Select(x => x.ToModel()).ToArray() : Optional.Create<API.Embed[]>(),
+                Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                 AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional<API.AllowedMentions>.Unspecified,
                 Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
             };
@@ -667,10 +669,33 @@ namespace Discord.Rest
             var args = new MessageProperties();
             func(args);
 
+            var embed = args.Embed;
+            var embeds = args.Embeds;
+
+            bool hasText = !string.IsNullOrEmpty(args.Content.GetValueOrDefault());
+            bool hasEmbeds = (embed.IsSpecified && embed.Value != null) || (embeds.IsSpecified && embeds.Value?.Length > 0);
+
+            if (!hasText && !hasEmbeds)
+                Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
+
+            var apiEmbeds = embed.IsSpecified || embeds.IsSpecified ? new List<API.Embed>() : null;
+
+            if (embed.IsSpecified && embed.Value != null)
+            {
+                apiEmbeds.Add(embed.Value.ToModel());
+            }
+
+            if (embeds.IsSpecified && embeds.Value != null)
+            {
+                apiEmbeds.AddRange(embeds.Value.Select(x => x.ToModel()));
+            }
+
+            Preconditions.AtMost(apiEmbeds?.Count ?? 0, 10, nameof(args.Embeds), "A max of 10 embeds are allowed.");
+
             var apiArgs = new ModifyInteractionResponseParams
             {
                 Content = args.Content,
-                Embeds = args.Embeds.IsSpecified ? args.Embeds.Value?.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
+                Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                 AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value?.ToModel() : Optional<API.AllowedMentions>.Unspecified,
                 Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
                 Flags = args.Flags

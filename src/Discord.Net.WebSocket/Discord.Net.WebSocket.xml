@@ -3599,40 +3599,43 @@
         <member name="M:Discord.WebSocket.SocketGuild.Discord#IGuild#GetWebhooksAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
-        <member name="T:Discord.WebSocket.SocketApplicationMessageCommand">
+        <member name="M:Discord.WebSocket.SocketGuild.Discord#IGuild#GetApplicationCommandsAsync(Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="T:Discord.WebSocket.SocketMessageCommand">
             <summary>
                 Represents a Websocket-based slash command received over the gateway.
             </summary>
         </member>
-        <member name="P:Discord.WebSocket.SocketApplicationMessageCommand.Data">
+        <member name="P:Discord.WebSocket.SocketMessageCommand.Data">
             <summary>
                 The data associated with this interaction.
             </summary>
         </member>
-        <member name="T:Discord.WebSocket.SocketApplicationMessageCommandData">
+        <member name="T:Discord.WebSocket.SocketMessageCommandData">
             <summary>
-                Represents the data tied with the <see cref="T:Discord.WebSocket.SocketApplicationMessageCommand"/> interaction.
+                Represents the data tied with the <see cref="T:Discord.WebSocket.SocketMessageCommand"/> interaction.
             </summary>
         </member>
-        <member name="P:Discord.WebSocket.SocketApplicationMessageCommandData.Name">
+        <member name="P:Discord.WebSocket.SocketMessageCommandData.Name">
             <inheritdoc/>
         </member>
-        <member name="T:Discord.WebSocket.SocketApplicationUserCommand">
+        <member name="T:Discord.WebSocket.SocketUserCommand">
             <summary>
                 Represents a Websocket-based slash command received over the gateway.
             </summary>
         </member>
-        <member name="P:Discord.WebSocket.SocketApplicationUserCommand.Data">
+        <member name="P:Discord.WebSocket.SocketUserCommand.Data">
             <summary>
                 The data associated with this interaction.
             </summary>
         </member>
-        <member name="T:Discord.WebSocket.SocketApplicationUserCommandData">
+        <member name="T:Discord.WebSocket.SocketUserCommandData">
             <summary>
-                Represents the data tied with the <see cref="T:Discord.WebSocket.SocketApplicationUserCommand"/> interaction.
+                Represents the data tied with the <see cref="T:Discord.WebSocket.SocketUserCommand"/> interaction.
             </summary>
         </member>
-        <member name="P:Discord.WebSocket.SocketApplicationUserCommandData.Name">
+        <member name="P:Discord.WebSocket.SocketUserCommandData.Name">
             <inheritdoc/>
         </member>
         <member name="T:Discord.WebSocket.SocketMessageComponent">
@@ -3664,14 +3667,18 @@
         <member name="M:Discord.WebSocket.SocketMessageComponent.FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
             <inheritdoc/>
         </member>
-        <member name="M:Discord.WebSocket.SocketMessageComponent.DeferAsync(Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketMessageComponent.DeferLoadingAsync(System.Boolean,Discord.RequestOptions)">
             <summary>
-                Acknowledges this interaction with the <see cref="F:Discord.InteractionResponseType.DeferredUpdateMessage"/>.
+                Defers an interaction and responds with type 5 (<see cref="F:Discord.InteractionResponseType.DeferredChannelMessageWithSource"/>)
             </summary>
+            <param name="ephemeral"><see langword="true"/> to send this message ephemerally, otherwise <see langword="false"/>.</param>
             <param name="options">The request options for this async request.</param>
             <returns>
                 A task that represents the asynchronous operation of acknowledging the interaction.
             </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketMessageComponent.DeferAsync(System.Boolean,Discord.RequestOptions)">
+            <inheritdoc/>
         </member>
         <member name="T:Discord.WebSocket.SocketMessageComponentData">
             <summary>
@@ -3812,6 +3819,11 @@
                 If the option is a subcommand or subcommand group type, this nested options will be the parameters.
             </summary>
         </member>
+        <member name="T:Discord.WebSocket.SocketCommandBase">
+            <summary>
+            Base class for User, Message, and Slash command interactions
+            </summary>
+        </member>
         <member name="P:Discord.WebSocket.SocketCommandBase.Data">
             <summary>
                 The data associated with this interaction.
@@ -3823,13 +3835,34 @@
         <member name="M:Discord.WebSocket.SocketCommandBase.FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
             <inheritdoc/>
         </member>
-        <member name="M:Discord.WebSocket.SocketCommandBase.DeferAsync(Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketCommandBase.DeferAsync(System.Boolean,Discord.RequestOptions)">
             <summary>
                 Acknowledges this interaction with the <see cref="F:Discord.InteractionResponseType.DeferredChannelMessageWithSource"/>.
             </summary>
             <returns>
                 A task that represents the asynchronous operation of acknowledging the interaction.
             </returns>
+        </member>
+        <member name="T:Discord.WebSocket.SocketCommandBaseData">
+            <summary>
+                Represents the base data tied with the <see cref="T:Discord.WebSocket.SocketCommandBase"/> interaction.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketCommandBaseData.Name">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketCommandBaseData.Options">
+            <summary>
+                The <see cref="T:Discord.WebSocket.SocketCommandBaseDataOption"/>'s received with this interaction.
+            </summary>
+        </member>
+        <member name="T:Discord.WebSocket.SocketCommandBaseDataOption">
+            <summary>
+                Represents the base Websocket-based <see cref="T:Discord.IApplicationCommandInteractionDataOption"/> recieved by the gateway
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketCommandBaseDataOption.Name">
+            <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketCommandBaseDataOption.Value">
             <inheritdoc/>
@@ -3943,13 +3976,24 @@
                 A task that represents the asynchronous operation of acknowledging the interaction.
             </returns>
         </member>
-        <member name="M:Discord.WebSocket.SocketInteraction.DeferAsync(Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketInteraction.DeferAsync(System.Boolean,Discord.RequestOptions)">
             <summary>
                 Acknowledges this interaction.
             </summary>
+            <param name="ephemeral"><see langword="true"/> to send this message ephemerally, otherwise <see langword="false"/>.</param>
+            <param name="options">The request options for this async request.</param>
             <returns>
                 A task that represents the asynchronous operation of acknowledging the interaction.
             </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketInteraction.Discord#IDiscordInteraction#FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketInteraction.Discord#IDiscordInteraction#GetOriginalResponseAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketInteraction.Discord#IDiscordInteraction#ModifyOriginalResponseAsync(System.Action{Discord.MessageProperties},Discord.RequestOptions)">
+            <inheritdoc/>
         </member>
         <member name="T:Discord.WebSocket.SocketInvite">
             <summary>
@@ -4487,6 +4531,12 @@
         <member name="P:Discord.WebSocket.SocketGroupUser.AvatarId">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketGroupUser.BannerId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketGroupUser.AccentColor">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.WebSocket.SocketGroupUser.Presence">
             <inheritdoc />
         </member>
@@ -4543,6 +4593,12 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketGuildUser.AvatarId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketGuildUser.BannerId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketGuildUser.AccentColor">
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketGuildUser.GuildPermissions">
@@ -4608,7 +4664,7 @@
                 Returns the position of the user within the role hierarchy.
             </summary>
             <remarks>
-                The returned value equal to the position of the highest role the user has, or 
+                The returned value equal to the position of the highest role the user has, or
                 <see cref="F:System.Int32.MaxValue"/> if user is the server owner.
             </remarks>
         </member>
@@ -4730,6 +4786,12 @@
         <member name="P:Discord.WebSocket.SocketSelfUser.AvatarId">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketSelfUser.BannerId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketSelfUser.AccentColor">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.WebSocket.SocketSelfUser.Presence">
             <inheritdoc />
         </member>
@@ -4781,6 +4843,12 @@
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketThreadUser.AvatarId">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.BannerId">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketThreadUser.AccentColor">
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketThreadUser.DiscriminatorValue">
@@ -4890,6 +4958,12 @@
         <member name="P:Discord.WebSocket.SocketUnknownUser.AvatarId">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketUnknownUser.BannerId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketUnknownUser.AccentColor">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.WebSocket.SocketUnknownUser.IsBot">
             <inheritdoc />
         </member>
@@ -4918,6 +4992,12 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketUser.AvatarId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketUser.BannerId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketUser.AccentColor">
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketUser.IsWebhook">
@@ -4956,6 +5036,9 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketUser.GetAvatarUrl(Discord.ImageFormat,System.UInt16)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.SocketUser.GetBannerUrl(Discord.ImageFormat,System.UInt16)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketUser.GetDefaultAvatarUrl">
@@ -5038,6 +5121,14 @@
         </member>
         <member name="P:Discord.WebSocket.SocketWebhookUser.AvatarId">
             <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketWebhookUser.BannerId">
+            <inheritdoc />
+            <exception cref="T:System.NotSupportedException">Webhook users does not support banners.</exception>
+        </member>
+        <member name="P:Discord.WebSocket.SocketWebhookUser.AccentColor">
+            <inheritdoc />
+            <exception cref="T:System.NotSupportedException">Webhook users does not support accent colors.</exception>
         </member>
         <member name="P:Discord.WebSocket.SocketWebhookUser.IsBot">
             <inheritdoc />
