@@ -78,5 +78,7 @@ namespace Discord.API
         public Optional<int> ApproximatePresenceCount { get; set; }
         [JsonProperty("threads")]
         public Optional<Channel[]> Threads { get; set; }
+        [JsonProperty("nsfw_level")]
+        public NsfwLevel NsfwLevel { get; set; }
     }
 }

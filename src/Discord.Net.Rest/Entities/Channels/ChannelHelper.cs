@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
+using StageInstance = Discord.API.StageInstance;
 
 namespace Discord.Rest
 {
@@ -90,6 +91,21 @@ namespace Discord.Rest
                     : Optional.Create<API.Overwrite[]>(),
             };
             return await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
+        }
+
+        public static async Task<StageInstance> ModifyAsync(IStageChannel channel, BaseDiscordClient client,
+            Action<StageInstanceProperties> func, RequestOptions options = null)
+        {
+            var args = new StageInstanceProperties();
+            func(args);
+
+            var apiArgs = new ModifyStageInstanceParams()
+            {
+                PrivacyLevel = args.PrivacyLevel,
+                Topic = args.Topic
+            };
+
+            return await client.ApiClient.ModifyStageInstanceAsync(channel.Id, apiArgs, options);
         }
 
         //Invites

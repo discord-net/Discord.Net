@@ -45,6 +45,6 @@ Let's try this out!
 
 Let's go over the response types quickly, as you would only change them for style points :P
 
-> After receiving an interaction, you must respond to acknowledge it. You can choose to respond with a message immediately using `ChannelMessageWithSource` or you can choose to send a deferred response with `DeferredChannelMessageWithSource`. If choosing a deferred response, the user will see a loading state for the interaction, and you'll have up to 15 minutes to edit the original deferred response using Edit Original Interaction Response. You can read more about response types [here](https://discord.com/developers/docs/interactions/slash-commands#interaction-response)
+> After receiving an interaction, you must respond to acknowledge it. You can choose to respond with a message immediately using `RespondAsync()` or you can choose to send a deferred response with `DeferAsync()`. If choosing a deferred response, the user will see a loading state for the interaction, and you'll have up to 15 minutes to edit the original deferred response using `ModifyOriginalResponseAsync()`. You can read more about response types [here](https://discord.com/developers/docs/interactions/slash-commands#interaction-response)
 
 This seems to be working! Next, we will look at parameters for slash commands.

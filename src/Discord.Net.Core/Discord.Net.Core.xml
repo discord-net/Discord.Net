@@ -100,6 +100,18 @@
                 A URL pointing to the user's avatar in the specified size.
             </returns>
         </member>
+        <member name="M:Discord.CDN.GetUserBannerUrl(System.UInt64,System.String,System.UInt16,Discord.ImageFormat)">
+            <summary>
+                Returns a user banner URL.
+            </summary>
+            <param name="userId">The user snowflake identifier.</param>
+            <param name="bannerId">The banner identifier.</param>
+            <param name="size">The size of the image to return in horizontal pixels. This can be any power of two between 16 and 2048.</param>
+            <param name="format">The format to return.</param>
+            <returns>
+                A URL pointing to the user's banner in the specified size.
+            </returns>
+        </member>
         <member name="M:Discord.CDN.GetDefaultUserAvatarUrl(System.UInt16)">
             <summary>
                 Returns the default user avatar URL.
@@ -1914,6 +1926,117 @@
                 A read-only collection of users that can access this channel.
             </returns>
         </member>
+        <member name="T:Discord.IStageChannel">
+            <summary>
+                Represents a generic Stage Channel.
+            </summary>
+        </member>
+        <member name="P:Discord.IStageChannel.Topic">
+            <summary>
+                Gets the topic of the Stage instance.
+            </summary>
+            <remarks>
+                If the stage isn't live then this property will be set to <see langword="null"/>.
+            </remarks>
+        </member>
+        <member name="P:Discord.IStageChannel.PrivacyLevel">
+            <summary>
+                The <see cref="T:Discord.StagePrivacyLevel"/> of the current stage.
+            </summary>
+            <remarks>
+                If the stage isn't live then this property will be set to <see langword="null"/>.
+            </remarks>
+        </member>
+        <member name="P:Discord.IStageChannel.DiscoverableDisabled">
+            <summary>
+                <see langword="true"/> if stage discovery is disabled, otherwise <see langword="false"/>. 
+            </summary>
+        </member>
+        <member name="P:Discord.IStageChannel.Live">
+            <summary>
+                <see langword="true"/> when the stage is live, otherwise <see langword="false"/>.
+            </summary>
+            <remarks>
+                If the stage isn't live then this property will be set to <see langword="null"/>.
+            </remarks>
+        </member>
+        <member name="M:Discord.IStageChannel.StartStageAsync(System.String,Discord.StagePrivacyLevel,Discord.RequestOptions)">
+            <summary>
+                Starts the stage, creating a stage instance.
+            </summary>
+            <param name="topic">The topic for the stage/</param>
+            <param name="privacyLevel">The privacy level of the stage</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous start operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IStageChannel.ModifyInstanceAsync(System.Action{Discord.StageInstanceProperties},Discord.RequestOptions)">
+            <summary>
+                Modifies the current stage instance.
+            </summary>
+            <param name="func">The properties to modify the stage instance with.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous modify operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IStageChannel.StopStageAsync(Discord.RequestOptions)">
+            <summary>
+                Stops the stage, deleting the stage instance.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous stop operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IStageChannel.RequestToSpeak(Discord.RequestOptions)">
+            <summary>
+                Indicates that the bot would like to speak within a stage channel.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous request to speak operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IStageChannel.BecomeSpeakerAsync(Discord.RequestOptions)">
+            <summary>
+                Makes the current user become a speaker within a stage.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous speaker modify operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IStageChannel.StopSpeakingAsync(Discord.RequestOptions)">
+            <summary>
+                Makes the current user a listener.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous stop operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IStageChannel.MoveToSpeaker(Discord.IGuildUser,Discord.RequestOptions)">
+            <summary>
+                Makes a user a speaker within a stage.
+            </summary>
+            <param name="user">The user to make the speaker.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous move operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IStageChannel.RemoveFromSpeaker(Discord.IGuildUser,Discord.RequestOptions)">
+            <summary>
+                Removes a user from speaking.
+            </summary>
+            <param name="user">The user to remove from speaking.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous remove operation.
+            </returns>
+        </member>
         <member name="T:Discord.ITextChannel">
             <summary>
                 Represents a generic channel in a guild that can send and receive messages.
@@ -2201,6 +2324,21 @@
             <summary> Initializes a new instance of the <see cref="T:Discord.ReorderChannelProperties"/> class used to reorder a channel. </summary>
             <param name="id"> Sets the ID of the channel to apply this position to. </param>
             <param name="position"> Sets the new zero-based position of this channel. </param>
+        </member>
+        <member name="T:Discord.StageInstanceProperties">
+            <summary>
+                Represents properties to use when modifying a stage instance.
+            </summary>
+        </member>
+        <member name="P:Discord.StageInstanceProperties.Topic">
+            <summary>
+                Gets or sets the topic of the stage.
+            </summary>
+        </member>
+        <member name="P:Discord.StageInstanceProperties.PrivacyLevel">
+            <summary>
+                Gets or sets the privacy level of the stage.
+            </summary>
         </member>
         <member name="T:Discord.TextChannelProperties">
             <summary>
@@ -3114,6 +3252,14 @@
                 language tag format.
             </returns>
         </member>
+        <member name="P:Discord.IGuild.NsfwLevel">
+            <summary>
+                Gets the NSFW level of this guild.
+            </summary>
+            <returns>
+                The NSFW level of this guild.
+            </returns>
+        </member>
         <member name="P:Discord.IGuild.PreferredCulture">
             <summary>
                 Gets the preferred culture of this guild.
@@ -3336,6 +3482,29 @@
                 with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
             </returns>
         </member>
+        <member name="M:Discord.IGuild.GetStageChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
+            <summary>
+                Gets a stage channel in this guild
+            </summary>
+            <param name="id">The snowflake identifier for the stage channel.</param>
+            <param name="mode">The <see cref="T:Discord.CacheMode"/> that determines whether the object should be fetched from cache.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains the stage channel associated
+                with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
+            </returns>
+        </member>
+        <member name="M:Discord.IGuild.GetStageChannelsAsync(Discord.CacheMode,Discord.RequestOptions)">
+            <summary>
+                Gets a collection of all stage channels in this guild.
+            </summary>
+            <param name="mode">The <see cref="T:Discord.CacheMode"/> that determines whether the object should be fetched from cache.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a read-only collection of
+                stage channels found within this guild.
+            </returns>
+        </member>
         <member name="M:Discord.IGuild.GetAFKChannelAsync(Discord.CacheMode,Discord.RequestOptions)">
             <summary>
                 Gets the AFK voice channel in this guild.
@@ -3400,6 +3569,28 @@
             <returns>
                 A task that represents the asynchronous get operation. The task result contains the text channel channel where
                 admins and moderators of Community guilds receive notices from Discord; <see langword="null" /> if none is set.
+            </returns>
+        </member>
+        <member name="M:Discord.IGuild.GetThreadChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
+            <summary>
+                Gets a thread channel within this guild.
+            </summary>
+            <param name="id">The id of the thread channel.</param>
+            <param name="mode">The <see cref="T:Discord.CacheMode"/> that determines whether the object should be fetched from cache.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains the thread channel.
+            </returns>
+        </member>
+        <member name="M:Discord.IGuild.GetThreadChannelsAsync(Discord.CacheMode,Discord.RequestOptions)">
+            <summary>
+                Gets a collection of all thread channels in this guild.
+            </summary>
+            <param name="mode">The <see cref="T:Discord.CacheMode" /> that determines whether the object should be fetched from cache.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a read-only collection of
+                thread channels found within this guild.
             </returns>
         </member>
         <member name="M:Discord.IGuild.CreateTextChannelAsync(System.String,System.Action{Discord.TextChannelProperties},Discord.RequestOptions)">
@@ -3723,6 +3914,16 @@
                 A task that represents the asynchronous removal operation.
             </returns>
         </member>
+        <member name="M:Discord.IGuild.GetApplicationCommandsAsync(Discord.RequestOptions)">
+            <summary>
+                Gets this guilds slash commands commands
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a read-only collection
+                of application commands found within the guild.
+            </returns>
+        </member>
         <member name="T:Discord.IGuildIntegration">
             <summary>
                 Holds information for a guild integration feature.
@@ -3889,6 +4090,26 @@
         <member name="F:Discord.MfaLevel.Enabled">
             <summary>
                 Users must have MFA enabled on their account to perform administrative actions.
+            </summary>
+        </member>
+        <member name="F:Discord.NsfwLevel.Default">
+            <summary>
+                Default or unset.
+            </summary>
+        </member>
+        <member name="F:Discord.NsfwLevel.Explicit">
+            <summary>
+                Guild has extremely suggestive or mature content that would only be suitable for users 18 or over.
+            </summary>
+        </member>
+        <member name="F:Discord.NsfwLevel.Safe">
+            <summary>
+                Guild has no content that could be deemed NSFW; in other words, SFW.
+            </summary>
+        </member>
+        <member name="F:Discord.NsfwLevel.AgeRestricted">
+            <summary>
+                Guild has mildly NSFW content that may not be suitable for users under 18.
             </summary>
         </member>
         <member name="T:Discord.PermissionTarget">
@@ -4293,13 +4514,6 @@
                 If the option is a subcommand or subcommand group type, this nested options will be the parameters.
             </summary>
         </member>
-        <member name="M:Discord.IApplicationCommand.DeleteAsync(Discord.RequestOptions)">
-            <summary>
-                Deletes this command
-            </summary>
-            <param name="options">The options to be used when sending the request.</param>
-            <returns>A task that represents the asynchronous delete operation.</returns>
-        </member>
         <member name="T:Discord.IApplicationCommandInteractionData">
             <summary>
                 Represents data of an Interaction Command, see <see href="https://discord.com/developers/docs/interactions/slash-commands#interaction-applicationcommandinteractiondata"/>.
@@ -4432,6 +4646,58 @@
             <summary>
                 read-only property, always 1.
             </summary>
+        </member>
+        <member name="M:Discord.IDiscordInteraction.RespondAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
+            <summary>
+                Responds to an Interaction with type <see cref="F:Discord.InteractionResponseType.ChannelMessageWithSource"/>.
+            </summary>
+            <param name="text">The text of the message to be sent.</param>
+            <param name="embeds">A array of embeds to send with this response. Max 10</param>
+            <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
+            <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+            <param name="allowedMentions">The allowed mentions for this response.</param>
+            <param name="options">The request options for this response.</param>
+            <param name="component">A <see cref="T:Discord.MessageComponent"/> to be sent with this response</param>
+            <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
+        </member>
+        <member name="M:Discord.IDiscordInteraction.FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
+            <summary>
+                Sends a followup message for this interaction.
+            </summary>
+            <param name="text">The text of the message to be sent</param>
+            <param name="embeds">A array of embeds to send with this response. Max 10</param>
+            <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
+            <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
+            <param name="allowedMentions">The allowed mentions for this response.</param>
+            <param name="options">The request options for this response.</param>
+            <param name="component">A <see cref="T:Discord.MessageComponent"/> to be sent with this response</param>
+            <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
+            <returns>
+                The sent message.
+            </returns>
+        </member>
+        <member name="M:Discord.IDiscordInteraction.GetOriginalResponseAsync(Discord.RequestOptions)">
+            <summary>
+                Gets the original response for this interaction.
+            </summary>
+            <param name="options">The request options for this async request.</param>
+            <returns>A <see cref="T:Discord.IUserMessage"/> that represents the initial response.</returns>
+        </member>
+        <member name="M:Discord.IDiscordInteraction.ModifyOriginalResponseAsync(System.Action{Discord.MessageProperties},Discord.RequestOptions)">
+            <summary>
+                Edits original response for this interaction.
+            </summary>
+            <param name="func">A delegate containing the properties to modify the message with.</param>
+            <param name="options">The request options for this async request.</param>
+            <returns>A <see cref="T:Discord.IUserMessage"/> that represents the initial response.</returns>
+        </member>
+        <member name="M:Discord.IDiscordInteraction.DeferAsync(System.Boolean,Discord.RequestOptions)">
+            <summary>
+                Acknowledges this interaction.
+            </summary>
+            <returns>
+                A task that represents the asynchronous operation of acknowledging the interaction.
+            </returns>
         </member>
         <member name="T:Discord.IDiscordInteractionData">
             <summary>
@@ -4583,7 +4849,7 @@
                 Represents a builder for creating a <see cref="T:Discord.MessageComponent"/>.
             </summary>
         </member>
-        <member name="F:Discord.ComponentBuilder.MaxLabelLength">
+        <member name="F:Discord.ComponentBuilder.MaxButtonLabelLength">
             <summary>
                 The max length of a <see cref="P:Discord.ButtonComponent.Label"/>.
             </summary>
@@ -4706,11 +4972,16 @@
                 Represents a class used to build <see cref="T:Discord.ButtonComponent"/>'s.
             </summary>
         </member>
+        <member name="F:Discord.ButtonBuilder.MaxLabelLength">
+            <summary>
+                The max length of a <see cref="P:Discord.ButtonComponent.Label"/>.
+            </summary>
+        </member>
         <member name="P:Discord.ButtonBuilder.Label">
             <summary>
                 Gets or sets the label of the current button.
             </summary>
-            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ButtonBuilder.Label"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxLabelLength"/>.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ButtonBuilder.Label"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxButtonLabelLength"/>.</exception>
         </member>
         <member name="P:Discord.ButtonBuilder.CustomId">
             <summary>
@@ -5030,16 +5301,26 @@
                 Represents a class used to build <see cref="T:Discord.SelectMenuOption"/>'s.
             </summary>
         </member>
+        <member name="F:Discord.SelectMenuOptionBuilder.MaxLabelLength">
+            <summary>
+                The maximum length of a <see cref="P:Discord.SelectMenuOption.Label"/>.
+            </summary>
+        </member>
         <member name="F:Discord.SelectMenuOptionBuilder.MaxDescriptionLength">
             <summary>
                 The maximum length of a <see cref="P:Discord.SelectMenuOption.Description"/>.
+            </summary>
+        </member>
+        <member name="F:Discord.SelectMenuOptionBuilder.MaxSelectLabelLength">
+            <summary>
+                The maximum length of a <see cref="P:Discord.SelectMenuOption.Label"/>.
             </summary>
         </member>
         <member name="P:Discord.SelectMenuOptionBuilder.Label">
             <summary>
                 Gets or sets the label of the current select menu.
             </summary>
-            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Label"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxLabelLength"/></exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Label"/> length exceeds <see cref="F:Discord.SelectMenuOptionBuilder.MaxSelectLabelLength"/></exception>
         </member>
         <member name="P:Discord.SelectMenuOptionBuilder.Value">
             <summary>
@@ -7398,6 +7679,14 @@
                 This must be less than the constant defined by <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.
             </remarks>
         </member>
+        <member name="P:Discord.MessageProperties.Embed">
+            <summary>
+                Gets or sets a single embed for this message.
+            </summary>
+            <remarks>
+                This property will be added to the <see cref="P:Discord.MessageProperties.Embeds"/> array, in the future please use the array rather than this property.
+            </remarks>
+        </member>
         <member name="P:Discord.MessageProperties.Embeds">
             <summary>
                 Gets or sets the embeds of the message.
@@ -7554,10 +7843,38 @@
                 The message for when a news channel subscription is added to a text channel.
             </summary>
         </member>
+        <member name="F:Discord.MessageType.GuildDiscoveryDisqualified">
+            <summary>
+                The message for when a guild is disqualified from discovery.
+            </summary>
+        </member>
+        <member name="F:Discord.MessageType.GuildDiscoveryRequalified">
+            <summary>
+                The message for when a guild is requalified for discovery.
+            </summary>
+        </member>
+        <member name="F:Discord.MessageType.GuildDiscoveryGracePeriodInitialWarning">
+            <summary>
+                The message for when the initial warning is sent for the initial grace period discovery.
+            </summary>
+        </member>
+        <member name="F:Discord.MessageType.GuildDiscoveryGracePeriodFinalWarning">
+            <summary>
+                The message for when the final warning is sent for the initial grace period discovery.
+            </summary>
+        </member>
+        <member name="F:Discord.MessageType.ThreadCreated">
+            <summary>
+                The message for when a thread is created.
+            </summary>
+        </member>
         <member name="F:Discord.MessageType.Reply">
             <summary>
                 The message is an inline reply.
             </summary>
+            <remarks>
+                Only available in API v8
+            </remarks>
         </member>
         <member name="F:Discord.MessageType.ApplicationCommand">
             <summary>
@@ -7566,6 +7883,19 @@
             <remarks>
                 Only available in API v8
             </remarks>
+        </member>
+        <member name="F:Discord.MessageType.ThreadStarterMessage">
+            <summary>
+                The message that starts a thread.
+            </summary>
+            <remarks>
+                Only available in API v9
+            </remarks>
+        </member>
+        <member name="F:Discord.MessageType.GuildInviteReminder">
+            <summary>
+                The message for a invite reminder
+            </summary>
         </member>
         <member name="T:Discord.ReactionMetadata">
             <summary>
@@ -8397,7 +8727,25 @@
             <summary> If <c>true</c>, a user may edit the webhooks for this guild. </summary>
         </member>
         <member name="P:Discord.GuildPermissions.ManageEmojisAndStickers">
-            <summary> If <c>true</c>, a user may edit the emojis for this guild. </summary>
+            <summary> If <c>true</c>, a user may edit the emojis and stickers for this guild. </summary>
+        </member>
+        <member name="P:Discord.GuildPermissions.UseSlashCommands">
+            <summary> If <c>true</c>, a user may use slash commands in this guild. </summary>
+        </member>
+        <member name="P:Discord.GuildPermissions.RequestToSpeak">
+            <summary> If <c>true</c>, a user may request to speak in stage channels. </summary>
+        </member>
+        <member name="P:Discord.GuildPermissions.ManageThreads">
+            <summary> If <c>true</c>, a user may manage threads in this guild. </summary>
+        </member>
+        <member name="P:Discord.GuildPermissions.UsePublicThreads">
+            <summary> If <c>true</c>, a user may create public threads in this guild. </summary>
+        </member>
+        <member name="P:Discord.GuildPermissions.UsePrivateThreads">
+            <summary> If <c>true</c>, a user may create private threads in this guild. </summary>
+        </member>
+        <member name="P:Discord.GuildPermissions.UseExternalStickers">
+            <summary> If <c>true</c>, a user may use external stickers in this guild. </summary>
         </member>
         <member name="M:Discord.GuildPermissions.#ctor(System.UInt64)">
             <summary> Creates a new <see cref="T:Discord.GuildPermissions"/> with the provided packed value. </summary>
@@ -8405,10 +8753,10 @@
         <member name="M:Discord.GuildPermissions.#ctor(System.String)">
             <summary> Creates a new <see cref="T:Discord.GuildPermissions"/> with the provided packed value after converting to ulong. </summary>
         </member>
-        <member name="M:Discord.GuildPermissions.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+        <member name="M:Discord.GuildPermissions.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
             <summary> Creates a new <see cref="T:Discord.GuildPermissions"/> structure with the provided permissions. </summary>
         </member>
-        <member name="M:Discord.GuildPermissions.Modify(System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+        <member name="M:Discord.GuildPermissions.Modify(System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
             <summary> Creates a new <see cref="T:Discord.GuildPermissions"/> from this one, changing the provided non-null permissions. </summary>
         </member>
         <member name="M:Discord.GuildPermissions.Has(Discord.GuildPermission)">
@@ -8595,6 +8943,9 @@
                 Represents a color used in Discord.
             </summary>
         </member>
+        <member name="F:Discord.Color.MaxDecimalValue">
+            <summary> Gets the max decimal value of color. </summary>
+        </member>
         <member name="F:Discord.Color.Default">
             <summary> Gets the default user color value. </summary>
         </member>
@@ -8699,20 +9050,21 @@
                 Initializes a <see cref="T:Discord.Color"/> struct with the given raw value.
             </summary>
             <example>
-                The following will create a color that has a hex value of 
+                The following will create a color that has a hex value of
                 <see href="http://www.color-hex.com/color/607d8b">#607D8B</see>.
                 <code language="cs">
                 Color darkGrey = new Color(0x607D8B);
                 </code>
             </example>
             <param name="rawValue">The raw value of the color (e.g. <c>0x607D8B</c>).</param>
+            <exception cref="T:System.ArgumentException">Value exceeds <see cref="F:Discord.Color.MaxDecimalValue"/>.</exception>
         </member>
         <member name="M:Discord.Color.#ctor(System.Byte,System.Byte,System.Byte)">
             <summary>
                 Initializes a <see cref="T:Discord.Color" /> struct with the given RGB bytes.
             </summary>
             <example>
-                The following will create a color that has a value of 
+                The following will create a color that has a value of
                 <see href="http://www.color-hex.com/color/607d8b">#607D8B</see>.
                 <code language="cs">
                 Color darkGrey = new Color((byte)0b_01100000, (byte)0b_01111101, (byte)0b_10001011);
@@ -8721,13 +9073,14 @@
             <param name="r">The byte that represents the red color.</param>
             <param name="g">The byte that represents the green color.</param>
             <param name="b">The byte that represents the blue color.</param>
+            <exception cref="T:System.ArgumentException">Value exceeds <see cref="F:Discord.Color.MaxDecimalValue"/>.</exception>
         </member>
         <member name="M:Discord.Color.#ctor(System.Int32,System.Int32,System.Int32)">
             <summary>
                 Initializes a <see cref="T:Discord.Color"/> struct with the given RGB value.
             </summary>
             <example>
-                The following will create a color that has a value of 
+                The following will create a color that has a value of
                 <see href="http://www.color-hex.com/color/607d8b">#607D8B</see>.
                 <code language="cs">
                 Color darkGrey = new Color(96, 125, 139);
@@ -8743,7 +9096,7 @@
                 Initializes a <see cref="T:Discord.Color"/> struct with the given RGB float value.
             </summary>
             <example>
-                The following will create a color that has a value of 
+                The following will create a color that has a value of
                 <see href="http://www.color-hex.com/color/607c8c">#607c8c</see>.
                 <code language="cs">
                 Color darkGrey = new Color(0.38f, 0.49f, 0.55f);
@@ -9511,19 +9864,33 @@
                 Gets the identifier of this user's avatar.
             </summary>
         </member>
+        <member name="P:Discord.IUser.BannerId">
+            <summary>
+                Gets the identifier of this user's banner.
+            </summary>
+        </member>
+        <member name="P:Discord.IUser.AccentColor">
+            <summary>
+                Gets the user's banner color.
+            </summary>
+            <returns>
+                A <see cref="T:Discord.Color"/> struct representing the accent color of this user's banner.
+            </returns>
+        </member>
         <member name="M:Discord.IUser.GetAvatarUrl(Discord.ImageFormat,System.UInt16)">
             <summary>
                 Gets the avatar URL for this user.
             </summary>
             <remarks>
                 This property retrieves a URL for this user's avatar. In event that the user does not have a valid avatar
-                (i.e. their avatar identifier is not set), this property will return <c>null</c>. If you wish to
+                (i.e. their avatar identifier is not set), this method will return <c>null</c>. If you wish to
                 retrieve the default avatar for this user, consider using <see cref="M:Discord.IUser.GetDefaultAvatarUrl"/> (see
                 example).
             </remarks>
             <example>
-                <para>The following example attempts to retrieve the user's current avatar and send it to a channel; if one is
-                not set, a default avatar for this user will be returned instead.</para>
+                <para
+                    >The following example attempts to retrieve the user's current avatar and send it to a channel; if one is
+                    not set, a default avatar for this user will be returned instead.</para>
                 <code language="cs" region="GetAvatarUrl"
                       source="..\..\..\Discord.Net.Examples\Core\Entities\Users\IUser.Examples.cs"/>
             </example>
@@ -9532,6 +9899,17 @@
             </param>
             <returns>
                 A string representing the user's avatar URL; <c>null</c> if the user does not have an avatar in place.
+            </returns>
+        </member>
+        <member name="M:Discord.IUser.GetBannerUrl(Discord.ImageFormat,System.UInt16)">
+            <summary>
+                Gets the banner URL for this user.
+            </summary>
+            <param name="format">The format to return.</param>
+            <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
+            </param>
+            <returns>
+                A string representing the user's avatar URL; <c>null</c> if the user does not have an banner in place.
             </returns>
         </member>
         <member name="M:Discord.IUser.GetDefaultAvatarUrl">
@@ -9601,8 +9979,8 @@
                 This method is used to obtain or create a channel used to send a direct message.
                 <note type="warning">
                      In event that the current user cannot send a message to the target user, a channel can and will
-                     still be created by Discord. However, attempting to send a message will yield a 
-                     <see cref="T:Discord.Net.HttpException"/> with a 403 as its 
+                     still be created by Discord. However, attempting to send a message will yield a
+                     <see cref="T:Discord.Net.HttpException"/> with a 403 as its
                      <see cref="P:Discord.Net.HttpException.HttpCode"/>. There are currently no official workarounds by
                      Discord.
                 </note>
@@ -9688,6 +10066,11 @@
             <returns>
                 <c>true</c> if the user is streaming; otherwise <c>false</c>.
             </returns>
+        </member>
+        <member name="P:Discord.IVoiceState.RequestToSpeakTimestamp">
+            <summary>
+                Gets the time on which the user requested to speak.
+            </summary>
         </member>
         <member name="T:Discord.IWebhookUser">
             <summary> Represents a Webhook Discord user. </summary>
@@ -9889,6 +10272,11 @@
         <member name="P:Discord.IWebhook.Creator">
             <summary>
                 Gets the user that created this webhook.
+            </summary>
+        </member>
+        <member name="P:Discord.IWebhook.ApplicationId">
+            <summary>
+                Gets the ID of the application owning this webhook.
             </summary>
         </member>
         <member name="M:Discord.IWebhook.ModifyAsync(System.Action{Discord.WebhookProperties},Discord.RequestOptions)">

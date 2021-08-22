@@ -1,3 +1,4 @@
+using Discord.API;
 using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
@@ -33,9 +34,13 @@ namespace Discord.Rest
             if (msg.Author.Id != client.CurrentUser.Id && (args.Content.IsSpecified || args.Embeds.IsSpecified || args.AllowedMentions.IsSpecified))
                 throw new InvalidOperationException("Only the author of a message may modify the message content, embed, or allowed mentions.");
 
+            var embed = args.Embed;
+            var embeds = args.Embeds;
+
             bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(msg.Content);
-            bool hasEmbed = args.Embeds.IsSpecified ? args.Embeds.Value != null : msg.Embeds.Any();
-            if (!hasText && !hasEmbed)
+            bool hasEmbeds = (embed.IsSpecified && embed.Value != null) || (embeds.IsSpecified && embeds.Value?.Length > 0) || msg.Embeds.Any();
+
+            if (!hasText && !hasEmbeds)
                 Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
 
             if (args.AllowedMentions.IsSpecified)
@@ -61,10 +66,24 @@ namespace Discord.Rest
                 }
             }
 
+            var apiEmbeds = embed.IsSpecified || embeds.IsSpecified ? new List<API.Embed>() : null;
+
+            if (embed.IsSpecified && embed.Value != null)
+            {
+                apiEmbeds.Add(embed.Value.ToModel());
+            }
+
+            if (embeds.IsSpecified && embeds.Value != null)
+            {
+                apiEmbeds.AddRange(embeds.Value.Select(x => x.ToModel()));
+            }
+
+            Preconditions.AtMost(apiEmbeds?.Count ?? 0, 10, nameof(args.Embeds), "A max of 10 embeds are allowed.");
+
             var apiArgs = new ModifyMessageParams
             {
                 Content = args.Content,
-                Embeds = args.Embeds.IsSpecified ? args.Embeds.Value.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
+                Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                 Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
                 Flags = args.Flags,
                 AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional<API.AllowedMentions>.Unspecified,
@@ -78,7 +97,13 @@ namespace Discord.Rest
             var args = new MessageProperties();
             func(args);
 
-            if (args.Content.IsSpecified && string.IsNullOrEmpty(args.Content.Value) && args.Embeds.IsSpecified && args.Embeds.Value == null)
+            var embed = args.Embed;
+            var embeds = args.Embeds;
+
+            bool hasText = args.Content.IsSpecified && string.IsNullOrEmpty(args.Content.Value);
+            bool hasEmbeds = (embed.IsSpecified && embed.Value != null) || (embeds.IsSpecified && embeds.Value?.Length > 0);
+
+            if (!hasText && !hasEmbeds)
                 Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
 
             if (args.AllowedMentions.IsSpecified)
@@ -105,12 +130,27 @@ namespace Discord.Rest
                 }
             }
 
+            var apiEmbeds = embed.IsSpecified || embeds.IsSpecified ? new List<API.Embed>() : null;
+
+            if (embed.IsSpecified && embed.Value != null)
+            {
+                apiEmbeds.Add(embed.Value.ToModel());
+            }
+
+            if (embeds.IsSpecified && embeds.Value != null)
+            {
+                apiEmbeds.AddRange(embeds.Value.Select(x => x.ToModel()));
+            }
+
+            Preconditions.AtMost(apiEmbeds?.Count ?? 0, 10, nameof(args.Embeds), "A max of 10 embeds are allowed.");
+
             var apiArgs = new API.Rest.ModifyMessageParams
             {
                 Content = args.Content,
-                Embeds = args.Embeds.IsSpecified ? args.Embeds.Value.Select(x => x.ToModel()).ToArray() : Optional.Create<API.Embed[]>(),
+                Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                 Flags = args.Flags.IsSpecified ? args.Flags.Value : Optional.Create<MessageFlags?>(),
                 AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional.Create<API.AllowedMentions>(),
+                Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() : Optional<API.ActionRowComponent[]>.Unspecified,
             };
             return await client.ApiClient.ModifyMessageAsync(channelId, msgId, apiArgs, options).ConfigureAwait(false);
         }

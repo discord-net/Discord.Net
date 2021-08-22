@@ -30,7 +30,16 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override IActivity Activity { get => _shards[0].Activity; protected set { } }
 
-        internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
+        internal new DiscordSocketApiClient ApiClient
+        {
+            get
+            {
+                if (base.ApiClient.CurrentUserId == null)
+                    base.ApiClient.CurrentUserId = CurrentUser?.Id;
+
+                return base.ApiClient;
+            }
+        }
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => GetGuilds().ToReadOnlyCollection(GetGuildCount);
         /// <inheritdoc />
@@ -379,6 +388,20 @@ namespace Discord.WebSocket
             client.InviteDeleted += (channel, invite) => _inviteDeletedEvent.InvokeAsync(channel, invite);
 
             client.InteractionCreated += (interaction) => _interactionCreatedEvent.InvokeAsync(interaction);
+
+            client.ThreadUpdated += (thread1, thread2) => _threadUpdated.InvokeAsync(thread1, thread2);
+            client.ThreadCreated += (thread) => _threadCreated.InvokeAsync(thread);
+            client.ThreadDeleted += (thread) => _threadDeleted.InvokeAsync(thread);
+
+            client.ThreadMemberJoined += (user) => _threadMemberJoined.InvokeAsync(user);
+            client.ThreadMemberLeft += (user) => _threadMemberLeft.InvokeAsync(user);
+            client.StageEnded += (stage) => _stageEnded.InvokeAsync(stage);
+            client.StageStarted += (stage) => _stageStarted.InvokeAsync(stage);
+            client.StageUpdated += (stage1, stage2) => _stageUpdated.InvokeAsync(stage1, stage2);
+
+            client.RequestToSpeak += (stage, user) => _requestToSpeak.InvokeAsync(stage, user);
+            client.SpeakerAdded += (stage, user) => _speakerAdded.InvokeAsync(stage, user);
+            client.SpeakerRemoved += (stage, user) => _speakerRemoved.InvokeAsync(stage, user);
         }
 
         //IDiscordClient

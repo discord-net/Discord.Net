@@ -12,17 +12,29 @@ namespace Discord
         /// </summary>
         string AvatarId { get; }
         /// <summary>
+        ///     Gets the identifier of this user's banner.
+        /// </summary>
+        string BannerId { get; }
+        /// <summary>
+        ///     Gets the user's banner color.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="Color"/> struct representing the accent color of this user's banner.
+        /// </returns>
+        Color? AccentColor { get; }
+        /// <summary>
         ///     Gets the avatar URL for this user.
         /// </summary>
         /// <remarks>
         ///     This property retrieves a URL for this user's avatar. In event that the user does not have a valid avatar
-        ///     (i.e. their avatar identifier is not set), this property will return <c>null</c>. If you wish to
+        ///     (i.e. their avatar identifier is not set), this method will return <c>null</c>. If you wish to
         ///     retrieve the default avatar for this user, consider using <see cref="IUser.GetDefaultAvatarUrl"/> (see
         ///     example).
         /// </remarks>
         /// <example>
-        ///     <para>The following example attempts to retrieve the user's current avatar and send it to a channel; if one is
-        ///     not set, a default avatar for this user will be returned instead.</para>
+        ///     <para
+        ///         >The following example attempts to retrieve the user's current avatar and send it to a channel; if one is
+        ///         not set, a default avatar for this user will be returned instead.</para>
         ///     <code language="cs" region="GetAvatarUrl"
         ///           source="..\..\..\Discord.Net.Examples\Core\Entities\Users\IUser.Examples.cs"/>
         /// </example>
@@ -33,6 +45,16 @@ namespace Discord
         ///     A string representing the user's avatar URL; <c>null</c> if the user does not have an avatar in place.
         /// </returns>
         string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
+        /// <summary>
+        ///     Gets the banner URL for this user.
+        /// </summary>
+        /// <param name="format">The format to return.</param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
+        /// </param>
+        /// <returns>
+        ///     A string representing the user's avatar URL; <c>null</c> if the user does not have an banner in place.
+        /// </returns>
+        string GetBannerUrl(ImageFormat format = ImageFormat.Auto, ushort size = 256);
         /// <summary>
         ///     Gets the default avatar URL for this user.
         /// </summary>
@@ -93,8 +115,8 @@ namespace Discord
         ///     This method is used to obtain or create a channel used to send a direct message.
         ///     <note type="warning">
         ///          In event that the current user cannot send a message to the target user, a channel can and will
-        ///          still be created by Discord. However, attempting to send a message will yield a 
-        ///          <see cref="Discord.Net.HttpException"/> with a 403 as its 
+        ///          still be created by Discord. However, attempting to send a message will yield a
+        ///          <see cref="Discord.Net.HttpException"/> with a 403 as its
         ///          <see cref="Discord.Net.HttpException.HttpCode"/>. There are currently no official workarounds by
         ///          Discord.
         ///     </note>

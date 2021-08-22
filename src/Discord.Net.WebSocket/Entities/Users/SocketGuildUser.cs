@@ -39,6 +39,11 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
         /// <inheritdoc />
+        public override string BannerId { get { return GlobalUser.BannerId; } internal set { GlobalUser.BannerId = value; } }
+        /// <inheritdoc />
+        public override Color? AccentColor { get { return GlobalUser.AccentColor; } internal set { GlobalUser.AccentColor = value; } }
+
+        /// <inheritdoc />
         public GuildPermissions GuildPermissions => new GuildPermissions(Permissions.ResolveGuild(Guild, this));
         internal override SocketPresence Presence { get; set; }
 
@@ -57,7 +62,11 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public bool IsStreaming => VoiceState?.IsStreaming ?? false;
         /// <inheritdoc />
+        public DateTimeOffset? RequestToSpeakTimestamp => VoiceState?.RequestToSpeakTimestamp ?? null;
+        /// <inheritdoc />
         public bool? IsPending { get; private set; }
+        
+
         /// <inheritdoc />
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
         /// <summary>
@@ -87,7 +96,7 @@ namespace Discord.WebSocket
         ///     Returns the position of the user within the role hierarchy.
         /// </summary>
         /// <remarks>
-        ///     The returned value equal to the position of the highest role the user has, or 
+        ///     The returned value equal to the position of the highest role the user has, or
         ///     <see cref="int.MaxValue"/> if user is the server owner.
         /// </remarks>
         public int Hierarchy

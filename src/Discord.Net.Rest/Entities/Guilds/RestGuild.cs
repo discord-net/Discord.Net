@@ -83,6 +83,8 @@ namespace Discord.Rest
         public int? ApproximateMemberCount { get; private set; }
         /// <inheritdoc />
         public int? ApproximatePresenceCount { get; private set; }
+        /// <inheritdoc />
+        public NsfwLevel NsfwLevel { get; private set; }
 
         /// <inheritdoc />
         public CultureInfo PreferredCulture { get; private set; }
@@ -151,6 +153,7 @@ namespace Discord.Rest
             SystemChannelFlags = model.SystemChannelFlags;
             Description = model.Description;
             PremiumSubscriptionCount = model.PremiumSubscriptionCount.GetValueOrDefault();
+            NsfwLevel = model.NsfwLevel;
             if (model.MaxPresences.IsSpecified)
                 MaxPresences = model.MaxPresences.Value ?? 25000;
             if (model.MaxMembers.IsSpecified)
@@ -392,6 +395,35 @@ namespace Discord.Rest
         }
 
         /// <summary>
+        ///     Gets a thread channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the thread channel.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the thread channel associated
+        ///     with the specified <paramref name="id"/>; <see langword="null"/> if none is found.
+        /// </returns>
+        public async Task<RestThreadChannel> GetThreadChannelAsync(ulong id, RequestOptions options = null)
+        {
+            var channel = await GuildHelper.GetChannelAsync(this, Discord, id, options).ConfigureAwait(false);
+            return channel as RestThreadChannel;
+        }
+
+        /// <summary>
+        ///     Gets a collection of all thread in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     threads found within this guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestThreadChannel>> GetThreadChannelsAsync(RequestOptions options = null)
+        {
+            var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
+            return channels.OfType<RestThreadChannel>().ToImmutableArray();
+        }
+
+        /// <summary>
         ///     Gets a voice channel in this guild.
         /// </summary>
         /// <param name="id">The snowflake identifier for the voice channel.</param>
@@ -418,6 +450,35 @@ namespace Discord.Rest
         {
             var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
             return channels.OfType<RestVoiceChannel>().ToImmutableArray();
+        }
+        /// <summary>
+        ///     Gets a stage channel in this guild
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the stage channel.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the stage channel associated
+        ///     with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
+        /// </returns>
+        public async Task<RestStageChannel> GetStageChannelAsync(ulong id, RequestOptions options = null)
+        {
+            var channel = await GuildHelper.GetChannelAsync(this, Discord, id, options).ConfigureAwait(false);
+            return channel as RestStageChannel;
+        }
+
+        /// <summary>
+        ///     Gets a collection of all stage channels in this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     stage channels found within this guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestStageChannel>> GetStageChannelsAsync(RequestOptions options = null)
+        {
+            var channels = await GuildHelper.GetChannelsAsync(this, Discord, options).ConfigureAwait(false);
+            return channels.OfType<RestStageChannel>().ToImmutableArray();
         }
 
         /// <summary>
@@ -808,6 +869,18 @@ namespace Discord.Rest
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => GuildHelper.GetWebhooksAsync(this, Discord, options);
 
+        //Interactions
+        /// <summary>
+        ///     Gets this guilds slash commands commands
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of application commands found within the guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestApplicationCommand>> GetApplicationCommandsAsync (RequestOptions options = null)
+            => await ClientHelper.GetGuildApplicationCommands(Discord, Id, options).ConfigureAwait(false);
+
         /// <summary>
         ///     Returns the name of the guild.
         /// </summary>
@@ -888,6 +961,22 @@ namespace Discord.Rest
                 return null;
         }
         /// <inheritdoc />
+        async Task<IThreadChannel> IGuild.GetThreadChannelAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetThreadChannelAsync(id, options).ConfigureAwait(false);
+            else
+                return null;
+        }
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IThreadChannel>> IGuild.GetThreadChannelsAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetThreadChannelsAsync(options).ConfigureAwait(false);
+            else
+                return null;
+        }
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<IVoiceChannel>> IGuild.GetVoiceChannelsAsync(CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -900,6 +989,22 @@ namespace Discord.Rest
         {
             if (mode == CacheMode.AllowDownload)
                 return await GetCategoryChannelsAsync(options).ConfigureAwait(false);
+            else
+                return null;
+        }
+        /// <inheritdoc />
+        async Task<IStageChannel> IGuild.GetStageChannelAsync(ulong id, CacheMode mode, RequestOptions options )
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetStageChannelAsync(id, options).ConfigureAwait(false);
+            else
+                return null;
+        }
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IStageChannel>> IGuild.GetStageChannelsAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode == CacheMode.AllowDownload)
+                return await GetStageChannelsAsync(options).ConfigureAwait(false);
             else
                 return null;
         }
@@ -1061,5 +1166,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IWebhook>> IGuild.GetWebhooksAsync(RequestOptions options)
             => await GetWebhooksAsync(options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync (RequestOptions options)
+            => await GetApplicationCommandsAsync(options).ConfigureAwait(false);
     }
 }

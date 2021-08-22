@@ -86,9 +86,9 @@ namespace Discord.WebSocket
                         break;
                     case ApplicationCommandOptionType.Integer:
                         {
-                            if (model.Value.Value is int val)
+                            if (model.Value.Value is long val)
                                 this.Value = val;
-                            else if (int.TryParse(model.Value.Value.ToString(), out int res))
+                            else if (long.TryParse(model.Value.Value.ToString(), out long res))
                                 this.Value = res;
                         }
                         break;
@@ -109,7 +109,7 @@ namespace Discord.WebSocket
                         }
                         break;
                 }
-                
+
             }
 
             this.Options = model.Options.IsSpecified

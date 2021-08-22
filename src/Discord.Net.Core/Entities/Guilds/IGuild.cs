@@ -317,6 +317,14 @@ namespace Discord
         string PreferredLocale { get; }
 
         /// <summary>
+        ///     Gets the NSFW level of this guild.
+        /// </summary>
+        /// <returns>
+        ///     The NSFW level of this guild.
+        /// </returns>
+        NsfwLevel NsfwLevel { get; }
+
+        /// <summary>
         ///     Gets the preferred culture of this guild.
         /// </summary>
         /// <returns>
@@ -522,6 +530,27 @@ namespace Discord
         /// </returns>
         Task<IVoiceChannel> GetVoiceChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
+        ///     Gets a stage channel in this guild
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the stage channel.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the stage channel associated
+        ///     with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
+        /// </returns>
+        Task<IStageChannel> GetStageChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a collection of all stage channels in this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     stage channels found within this guild.
+        /// </returns>
+        Task<IReadOnlyCollection<IStageChannel>> GetStageChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
         ///     Gets the AFK voice channel in this guild.
         /// </summary>
         /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
@@ -581,6 +610,26 @@ namespace Discord
         ///     admins and moderators of Community guilds receive notices from Discord; <see langword="null" /> if none is set.
         /// </returns>
         Task<ITextChannel> GetPublicUpdatesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a thread channel within this guild.
+        /// </summary>
+        /// <param name="id">The id of the thread channel.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the thread channel.
+        /// </returns>
+        Task<IThreadChannel> GetThreadChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a collection of all thread channels in this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     thread channels found within this guild.
+        /// </returns>
+        Task<IReadOnlyCollection<IThreadChannel>> GetThreadChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 
         /// <summary>
         ///     Creates a new text channel in this guild.
@@ -892,5 +941,15 @@ namespace Discord
         ///     A task that represents the asynchronous removal operation.
         /// </returns>
         Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets this guilds slash commands commands
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of application commands found within the guild.
+        /// </returns>
+        Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync (RequestOptions options = null);
     }
 }

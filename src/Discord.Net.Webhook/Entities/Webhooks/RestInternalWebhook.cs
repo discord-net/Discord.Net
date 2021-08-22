@@ -17,6 +17,7 @@ namespace Discord.Webhook
         public string Name { get; private set; }
         public string AvatarId { get; private set; }
         public ulong? GuildId { get; private set; }
+        public ulong? ApplicationId {  get; private set; }
 
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
@@ -44,6 +45,8 @@ namespace Discord.Webhook
                 GuildId = model.GuildId.Value;
             if (model.Name.IsSpecified)
                 Name = model.Name.Value;
+
+            ApplicationId = model.ApplicationId;
         }
 
         public string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)

@@ -55,7 +55,7 @@ namespace Discord.API
             _restClientProvider = restClientProvider;
             UserAgent = userAgent;
             DefaultRetryMode = defaultRetryMode;
-            _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver(), NullValueHandling = NullValueHandling.Ignore };
+            _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver(), NullValueHandling = NullValueHandling.Include };
             UseSystemClock = useSystemClock;
 
             RequestQueue = new RequestQueue();
@@ -442,7 +442,7 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            var bucket = new BucketIds(0, channelId);
+            var bucket = new BucketIds(channelId: channelId);
 
             return await SendJsonAsync<Channel>("POST", () => $"channels/{channelId}/threads", args, bucket, options: options).ConfigureAwait(false);
         }
@@ -453,7 +453,9 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            await SendAsync("PUT", $"channels/{channelId}/thread-members/@me", options: options).ConfigureAwait(false);
+            var bucket = new BucketIds(channelId: channelId);
+
+            await SendAsync("PUT", () => $"channels/{channelId}/thread-members/@me", bucket, options: options).ConfigureAwait(false);
         }
 
         public async Task AddThreadMemberAsync(ulong channelId, ulong userId, RequestOptions options = null)
@@ -474,7 +476,9 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            await SendAsync("DELETE", $"channels/{channelId}/thread-members/@me", options: options).ConfigureAwait(false);
+            var bucket = new BucketIds(channelId: channelId);
+
+            await SendAsync("DELETE", () => $"channels/{channelId}/thread-members/@me", bucket, options: options).ConfigureAwait(false);
         }
 
         public async Task RemoveThreadMemberAsync(ulong channelId, ulong userId, RequestOptions options = null)
@@ -483,8 +487,9 @@ namespace Discord.API
             Preconditions.NotEqual(userId, 0, nameof(channelId));
 
             options = RequestOptions.CreateOrClone(options);
+            var bucket = new BucketIds(channelId: channelId);
 
-            await SendAsync("DELETE", $"channels/{channelId}/thread-members/{userId}", options: options).ConfigureAwait(false);
+            await SendAsync("DELETE", () => $"channels/{channelId}/thread-members/{userId}", bucket, options: options).ConfigureAwait(false);
         }
 
         public async Task<ThreadMember[]> ListThreadMembersAsync(ulong channelId, RequestOptions options = null)
@@ -506,7 +511,7 @@ namespace Discord.API
 
             var bucket = new BucketIds(channelId: channelId);
 
-            return await SendAsync<ChannelThreads>("GET", $"channels/{channelId}/threads/active");
+            return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/threads/active", bucket);
         }
 
         public async Task<ChannelThreads> GetPublicArchivedThreadsAsync(ulong channelId, DateTimeOffset? before = null, int? limit = null, RequestOptions options = null)
@@ -575,6 +580,82 @@ namespace Discord.API
             }
 
             return await SendAsync<ChannelThreads>("GET", () => $"channels/{channelId}/users/@me/threads/archived/private{query}", bucket, options: options);
+        }
+
+        // stage
+        public async Task<StageInstance> CreateStageInstanceAsync(CreateStageInstanceParams args, RequestOptions options = null)
+        {
+           
+            options = RequestOptions.CreateOrClone(options);
+
+            var bucket = new BucketIds();
+
+            return await SendJsonAsync<StageInstance>("POST", () => $"stage-instances", args, bucket, options: options).ConfigureAwait(false);
+        }
+
+        public async Task<StageInstance> ModifyStageInstanceAsync(ulong channelId, ModifyStageInstanceParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var bucket = new BucketIds(channelId: channelId);
+
+            return await SendJsonAsync<StageInstance>("PATCH", () => $"stage-instances/{channelId}", args, bucket, options: options).ConfigureAwait(false);
+        }
+
+        public async Task DeleteStageInstanceAsync(ulong channelId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            try
+            {
+                await SendAsync("DELETE", $"stage-instances/{channelId}", options: options).ConfigureAwait(false);
+            }
+            catch (HttpException httpEx) when (httpEx.HttpCode == HttpStatusCode.NotFound) { }
+        }
+
+        public async Task<StageInstance> GetStageInstanceAsync(ulong channelId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var bucket = new BucketIds(channelId: channelId);
+
+            try
+            {
+                return await SendAsync<StageInstance>("POST", () => $"stage-instances/{channelId}", bucket, options: options).ConfigureAwait(false);
+            }
+            catch(HttpException httpEx) when (httpEx.HttpCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+        }
+
+        public async Task ModifyMyVoiceState(ulong guildId, ModifyVoiceStateParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var bucket = new BucketIds();
+
+            await SendJsonAsync("PATCH", () => $"guilds/{guildId}/voice-states/@me", args, bucket, options: options).ConfigureAwait(false);
+        }
+
+        public async Task ModifyUserVoiceState(ulong guildId, ulong userId, ModifyVoiceStateParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(userId, 0, nameof(userId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var bucket = new BucketIds();
+
+            await SendJsonAsync("PATCH", () => $"guilds/{guildId}/voice-states/{userId}", args, bucket, options: options).ConfigureAwait(false);
         }
 
         // roles

@@ -156,20 +156,37 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous operation of acknowledging the interaction.
         /// </returns>
         [Obsolete("This method deprecated, please use DeferAsync instead")]
-        public Task AcknowledgeAsync(RequestOptions options = null) => DeferAsync(options);
+        public Task AcknowledgeAsync(RequestOptions options = null) => DeferAsync(options: options);
 
         /// <summary>
         ///     Acknowledges this interaction.
         /// </summary>
+        /// <param name="ephemeral"><see langword="true"/> to send this message ephemerally, otherwise <see langword="false"/>.</param>
+        /// <param name="options">The request options for this async request.</param>
         /// <returns>
         ///     A task that represents the asynchronous operation of acknowledging the interaction.
         /// </returns>
-        public abstract Task DeferAsync(RequestOptions options = null);
+        public abstract Task DeferAsync(bool ephemeral = false, RequestOptions options = null);
 
         private bool CheckToken()
         {
             // Tokens last for 15 minutes according to https://discord.com/developers/docs/interactions/slash-commands#responding-to-an-interaction
             return (DateTime.UtcNow - this.CreatedAt.UtcDateTime).TotalMinutes <= 15d;
         }
+
+        // IDiscordInteraction
+
+        /// <inheritdoc/>
+        async Task<IUserMessage> IDiscordInteraction.FollowupAsync (string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions,
+            RequestOptions options, MessageComponent component, Embed embed)
+            => await FollowupAsync(text, embeds, isTTS, ephemeral, allowedMentions, options, component, embed).ConfigureAwait(false);
+
+        /// <inheritdoc/>
+        async Task<IUserMessage> IDiscordInteraction.GetOriginalResponseAsync (RequestOptions options)
+            => await GetOriginalResponseAsync(options).ConfigureAwait(false);
+
+        /// <inheritdoc/>
+        async Task<IUserMessage> IDiscordInteraction.ModifyOriginalResponseAsync (Action<MessageProperties> func, RequestOptions options)
+            => await ModifyOriginalResponseAsync(func, options).ConfigureAwait(false);
     }
 }

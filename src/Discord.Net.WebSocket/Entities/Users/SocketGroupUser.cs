@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using Model = Discord.API.User;
 
@@ -27,6 +28,10 @@ namespace Discord.WebSocket
         public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
         /// <inheritdoc />
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
+        /// <inheritdoc />
+        public override string BannerId { get { return GlobalUser.BannerId; } internal set { GlobalUser.BannerId = value; } }
+        /// <inheritdoc />
+        public override Color? AccentColor { get { return GlobalUser.AccentColor; } internal set { GlobalUser.AccentColor = value; } }
         /// <inheritdoc />
         internal override SocketPresence Presence { get { return GlobalUser.Presence; } set { GlobalUser.Presence = value; } }
 
@@ -66,5 +71,7 @@ namespace Discord.WebSocket
         string IVoiceState.VoiceSessionId => null;
         /// <inheritdoc />
         bool IVoiceState.IsStreaming => false;
+        /// <inheritdoc />
+        DateTimeOffset? IVoiceState.RequestToSpeakTimestamp => null;
     }
 }
