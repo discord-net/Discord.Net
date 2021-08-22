@@ -3527,6 +3527,50 @@
         <member name="M:Discord.Rest.RestGuild.DeleteEmoteAsync(Discord.GuildEmote,Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.Rest.RestGuild.CreateStickerAsync(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},Discord.Image,Discord.RequestOptions)">
+            <summary>
+                Creates a new sticker in this guild.
+            </summary>
+            <param name="name">The name of the sticker.</param>
+            <param name="description">The description of the sticker.</param>
+            <param name="tags">The tags of the sticker.</param>
+            <param name="image">The image of the new emote.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous creation operation. The task result contains the created sticker.
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestGuild.GetStickerAsync(System.UInt64,Discord.RequestOptions)">
+            <summary>
+                Gets a specific sticker within this guild.
+            </summary>
+            <param name="id">The id of the sticker to get.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains the sticker found with the
+                specified <paramref name="id"/>; <see langword="null" /> if none is found.
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestGuild.GetStickersAsync(Discord.RequestOptions)">
+            <summary>
+                Gets a collection of all stickers within this guild.
+            </summary>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a read-only collection
+                of stickers found within the guild.
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestGuild.DeleteStickerAsync(Discord.Rest.CustomSticker,Discord.RequestOptions)">
+            <summary>
+                Deletes a sticker within this guild.
+            </summary>
+            <param name="sticker">The sticker to delete.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous removal operation.
+            </returns>
+        </member>
         <member name="P:Discord.Rest.RestGuild.Discord#IGuild#Available">
             <inheritdoc />
         </member>
@@ -3970,6 +4014,33 @@
         <member name="P:Discord.Rest.RestInviteMetadata.CreatedAt">
             <inheritdoc />
         </member>
+        <member name="T:Discord.Rest.CustomSticker">
+            <summary>
+                Represents a Rest-based custom sticker within a guild.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.CustomSticker.AuthorId">
+            <summary>
+                Gets the users id who uploaded the sticker.
+            </summary>
+            <remarks>
+                In order to get the author id, the bot needs the MANAGE_EMOJIS_AND_STICKERS permission.
+            </remarks>
+        </member>
+        <member name="P:Discord.Rest.CustomSticker.Guild">
+            <summary>
+                Gets the guild that this custom sticker is in.
+            </summary>
+            <remarks>
+                <b>Note</b>: This property can be <see langword="null"/> if the sticker wasnt fetched from a guild.
+            </remarks>
+        </member>
+        <member name="M:Discord.Rest.CustomSticker.DeleteAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.CustomSticker.ModifyAsync(System.Action{Discord.StickerProperties},Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
         <member name="F:Discord.Rest.MessageHelper.InlineCodeRegex">
             <summary>
             Regex used to check if some text is formatted as inline code.
@@ -4267,6 +4338,52 @@
         <member name="M:Discord.Rest.RestUserMessage.CrosspostAsync(Discord.RequestOptions)">
             <inheritdoc />
             <exception cref="T:System.InvalidOperationException">This operation may only be called on a <see cref="T:Discord.INewsChannel"/> channel.</exception>
+        </member>
+        <member name="T:Discord.Rest.Sticker">
+            <inheritdoc cref="T:Discord.ISticker"/>
+        </member>
+        <member name="P:Discord.Rest.Sticker.PackId">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.Sticker.Name">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.Sticker.Description">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.Sticker.Tags">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.Sticker.Asset">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.Sticker.PreviewAsset">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.Sticker.Format">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.Sticker.GetStickerUrl">
+            <inheritdoc/>
+        </member>
+        <member name="T:Discord.Rest.StickerItem">
+            <summary>
+                Represents a partial sticker received in a message.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.StickerItem.Name">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Rest.StickerItem.Format">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.StickerItem.ResolveStickerAsync">
+            <summary>
+                Resolves this sticker item by fetching the <see cref="T:Discord.Rest.Sticker"/> from the API.
+            </summary>
+            <returns>
+                A task representing the download operation, the result of the task is a sticker object.
+            </returns>
         </member>
         <member name="T:Discord.Rest.RestApplication">
             <summary>
@@ -4869,33 +4986,6 @@
             <returns>
                 A string containing the filename of this attachment.
             </returns>
-        </member>
-        <member name="T:Discord.Sticker">
-            <inheritdoc cref="T:Discord.ISticker"/>
-        </member>
-        <member name="P:Discord.Sticker.Id">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.Sticker.PackId">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.Sticker.Name">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.Sticker.Description">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.Sticker.Tags">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.Sticker.Asset">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.Sticker.PreviewAsset">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.Sticker.FormatType">
-            <inheritdoc />
         </member>
     </members>
 </doc>

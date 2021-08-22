@@ -23,7 +23,7 @@ namespace Discord.WebSocket
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
         private ImmutableArray<SocketRole> _roleMentions = ImmutableArray.Create<SocketRole>();
         private ImmutableArray<SocketUser> _userMentions = ImmutableArray.Create<SocketUser>();
-        private ImmutableArray<Sticker> _stickers = ImmutableArray.Create<Sticker>();
+        private ImmutableArray<SocketSticker> _stickers = ImmutableArray.Create<SocketSticker>();
 
         /// <inheritdoc />
         public override bool IsTTS => _isTTS;
@@ -48,7 +48,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions;
         /// <inheritdoc />
-        public override IReadOnlyCollection<Sticker> Stickers => _stickers;
+        public override IReadOnlyCollection<SocketSticker> Stickers => _stickers;
         /// <inheritdoc />
         public IUserMessage ReferencedMessage => _referencedMessage;
 
@@ -162,18 +162,35 @@ namespace Discord.WebSocket
                 _referencedMessage = SocketUserMessage.Create(Discord, state, refMsgAuthor, Channel, refMsg);
             }
 
-            if (model.Stickers.IsSpecified)
+            if (model.StickerItems.IsSpecified)
             {
-                var value = model.Stickers.Value;
+                var value = model.StickerItems.Value;
                 if (value.Length > 0)
                 {
-                    var stickers = ImmutableArray.CreateBuilder<Sticker>(value.Length);
+                    var stickers = ImmutableArray.CreateBuilder<SocketSticker>(value.Length);
                     for (int i = 0; i < value.Length; i++)
-                        stickers.Add(Sticker.Create(value[i]));
+                    {
+                        var stickerItem = value[i];
+                        SocketSticker sticker = null;
+
+                        if (guild != null)
+                        {
+                            sticker = guild.GetSticker(stickerItem.Id);
+                        }
+
+                        if(sticker == null)
+                        {
+                            sticker = Discord.GetSticker(stickerItem.Id);
+                        }
+
+                        // if its still null, create an unknown
+                        sticker = SocketUnknownSticker.Create(Discord, stickerItem);
+                    }
+
                     _stickers = stickers.ToImmutable();
                 }
                 else
-                    _stickers = ImmutableArray.Create<Sticker>();
+                    _stickers = ImmutableArray.Create<SocketSticker>();
             }
         }
 

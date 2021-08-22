@@ -118,6 +118,11 @@
                 Provides access to a REST-only client with a shared state from this client.
             </summary>
         </member>
+        <member name="P:Discord.WebSocket.BaseSocketClient.DefaultStickerPacks">
+            <summary>
+                Gets a collection of default stickers.
+            </summary>
+        </member>
         <member name="P:Discord.WebSocket.BaseSocketClient.CurrentUser">
             <summary>
                 Gets the current logged-in user.
@@ -347,6 +352,17 @@
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous get operation. The task result contains the invite information.
+            </returns>
+        </member>
+        <member name="M:Discord.WebSocket.BaseSocketClient.GetStickerAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
+            <summary>
+                Gets a sticker.
+            </summary>
+            <param name="mode">Whether or not to allow downloading from the api.</param>
+            <param name="id">The id of the sticker to get.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A <see cref="T:Discord.WebSocket.SocketSticker"/> if found, otherwise <see langword="null"/>.
             </returns>
         </member>
         <member name="M:Discord.WebSocket.BaseSocketClient.Discord#IDiscordClient#GetApplicationInfoAsync(Discord.RequestOptions)">
@@ -820,6 +836,9 @@
         <member name="P:Discord.WebSocket.DiscordShardedClient.Activity">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.DiscordShardedClient.DefaultStickerPacks">
+            <inheritdoc/>
+        </member>
         <member name="P:Discord.WebSocket.DiscordShardedClient.Guilds">
             <inheritdoc />
         </member>
@@ -857,6 +876,9 @@
         </member>
         <member name="M:Discord.WebSocket.DiscordShardedClient.GetChannel(System.UInt64)">
             <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.DiscordShardedClient.GetStickerAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
+            <inheritdoc/>
         </member>
         <member name="M:Discord.WebSocket.DiscordShardedClient.GetUser(System.UInt64)">
             <inheritdoc />
@@ -958,6 +980,9 @@
         </member>
         <member name="P:Discord.WebSocket.DiscordSocketClient.Guilds">
             <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.DiscordSocketClient.DefaultStickerPacks">
+            <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.DiscordSocketClient.PrivateChannels">
             <inheritdoc />
@@ -1082,6 +1107,16 @@
             <summary>
                 Clears cached users from the client.
             </summary>
+        </member>
+        <member name="M:Discord.WebSocket.DiscordSocketClient.GetStickerAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.DiscordSocketClient.GetSticker(System.UInt64)">
+            <summary>
+                Gets a sticker.
+            </summary>
+            <param name="id">The unique identifier of the sticker.</param>
+            <returns>A sticker if found, otherwise <see langword="null"/>.</returns>
         </member>
         <member name="M:Discord.WebSocket.DiscordSocketClient.GetVoiceRegionsAsync(Discord.RequestOptions)">
             <inheritdoc />
@@ -3030,6 +3065,11 @@
         <member name="P:Discord.WebSocket.SocketGuild.Emotes">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketGuild.Stickers">
+            <summary>
+                Gets a collection of all custom stickers for this guild.
+            </summary>
+        </member>
         <member name="P:Discord.WebSocket.SocketGuild.Features">
             <inheritdoc />
         </member>
@@ -3438,6 +3478,59 @@
         <member name="M:Discord.WebSocket.SocketGuild.DeleteEmoteAsync(Discord.GuildEmote,Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.WebSocket.SocketGuild.GetStickerAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
+            <summary>
+                Gets a specific sticker within this guild.
+            </summary>
+            <param name="id">The id of the sticker to get.</param>
+            <param name="mode">The <see cref="T:Discord.CacheMode" /> that determines whether the object should be fetched from cache.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains the sticker found with the
+                specified <paramref name="id"/>; <see langword="null" /> if none is found.
+            </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketGuild.GetSticker(System.UInt64)">
+            <summary>
+                Gets a specific sticker within this guild.
+            </summary>
+            <param name="id">The id of the sticker to get.</param>
+            <returns>A sticker, if none is found then <see langword="null"/>.</returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketGuild.GetStickersAsync(Discord.CacheMode,Discord.RequestOptions)">
+            <summary>
+                Gets a collection of all stickers within this guild.
+            </summary>
+            <param name="mode">The <see cref="T:Discord.CacheMode" /> that determines whether the object should be fetched from cache.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous get operation. The task result contains a read-only collection
+                of stickers found within the guild.
+            </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketGuild.CreateStickerAsync(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},Discord.Image,Discord.RequestOptions)">
+            <summary>
+                Creates a new sticker in this guild.
+            </summary>
+            <param name="name">The name of the sticker.</param>
+            <param name="description">The description of the sticker.</param>
+            <param name="tags">The tags of the sticker.</param>
+            <param name="image">The image of the new emote.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous creation operation. The task result contains the created sticker.
+            </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketGuild.DeleteStickerAsync(Discord.WebSocket.SocketCustomSticker,Discord.RequestOptions)">
+            <summary>
+                Deletes a sticker within this guild.
+            </summary>
+            <param name="sticker">The sticker to delete.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous removal operation.
+            </returns>
+        </member>
         <member name="M:Discord.WebSocket.SocketGuild.ToString">
             <summary>
                 Gets the name of the guild.
@@ -3477,6 +3570,9 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketGuild.Discord#IGuild#ApproximatePresenceCount">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketGuild.Discord#IGuild#Stickers">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketGuild.Discord#IGuild#GetBansAsync(Discord.RequestOptions)">
@@ -4416,6 +4512,83 @@
         </member>
         <member name="P:Discord.WebSocket.SocketEntity`1.Id">
             <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketCustomSticker.Author">
+            <summary>
+                Gets the user that uploaded the guild sticker.
+            </summary>
+            <remarks>
+                <note>
+                    This may return <see langword="null"/> in the WebSocket implementation due to incomplete user collection in
+                    large guilds, or the bot doesnt have the MANAGE_EMOJIS_AND_STICKERS permission.
+                </note>
+            </remarks>
+        </member>
+        <member name="P:Discord.WebSocket.SocketCustomSticker.Guild">
+            <summary>
+                Gets the guild the sticker lives in.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketCustomSticker.AuthorId">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketCustomSticker.ModifyAsync(System.Action{Discord.StickerProperties},Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketCustomSticker.DeleteAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketSticker.PackId">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketSticker.Name">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketSticker.Description">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketSticker.Tags">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketSticker.Asset">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketSticker.PreviewAsset">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketSticker.Format">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketSticker.GetStickerUrl">
+            <inheritdoc/>
+        </member>
+        <member name="T:Discord.WebSocket.SocketUnknownSticker">
+            <summary>
+                Represents an unknown sticker received over the gateway.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketUnknownSticker.Asset">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketUnknownSticker.Tags">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketUnknownSticker.Description">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketUnknownSticker.PackId">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketUnknownSticker.PreviewAsset">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketUnknownSticker.ResolveAsync(Discord.CacheMode,Discord.RequestOptions)">
+            <summary>
+                Attempts to try to find the sticker.
+            </summary>
+            <returns>
+                The sticker representing this unknown stickers Id, if none is found then <see langword="null"/>.
+            </returns>
         </member>
         <member name="T:Discord.WebSocket.SocketGroupUser">
             <summary>

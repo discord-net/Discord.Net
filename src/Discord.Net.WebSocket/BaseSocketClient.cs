@@ -45,6 +45,10 @@ namespace Discord.WebSocket
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
 
         /// <summary>
+        ///     Gets a collection of default stickers.
+        /// </summary>
+        public abstract IReadOnlyCollection<StickerPack<SocketSticker>> DefaultStickerPacks { get; }
+        /// <summary>
         ///     Gets the current logged-in user.
         /// </summary>
         public virtual new SocketSelfUser CurrentUser { get => base.CurrentUser as SocketSelfUser; protected set => base.CurrentUser = value; }
@@ -268,6 +272,16 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<RestInviteMetadata> GetInviteAsync(string inviteId, RequestOptions options = null)
             => ClientHelper.GetInviteAsync(this, inviteId, options ?? RequestOptions.Default);
+        /// <summary>
+        ///     Gets a sticker.
+        /// </summary>
+        /// <param name="mode">Whether or not to allow downloading from the api.</param>
+        /// <param name="id">The id of the sticker to get.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A <see cref="SocketSticker"/> if found, otherwise <see langword="null"/>.
+        /// </returns>
+        public abstract Task<SocketSticker> GetStickerAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         
         // IDiscordClient
         /// <inheritdoc />

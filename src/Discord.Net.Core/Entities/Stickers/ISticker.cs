@@ -7,7 +7,7 @@ namespace Discord
     /// <summary>
     ///     Represents a discord sticker.
     /// </summary>
-    public interface ISticker
+    public interface ISticker : IStickerItem
     {
         /// <summary>
         ///     Gets the ID of this sticker.
@@ -64,7 +64,7 @@ namespace Discord
         /// <returns>
         ///     A <see cref="StickerFormatType"/> with the format type of this sticker.
         /// </returns>
-        StickerFormatType FormatType { get; }
+        StickerFormatType Format { get; }
 
         /// <summary>
         ///     Gets the image url for this sticker.

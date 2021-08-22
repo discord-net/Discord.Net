@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Collections.Immutable;
 
 namespace Discord.WebSocket
 {
@@ -16,6 +17,7 @@ namespace Discord.WebSocket
         private readonly bool _automaticShards;
         private int[] _shardIds;
         private DiscordSocketClient[] _shards;
+        private ImmutableArray<StickerPack<SocketSticker>> _defaultStickers;
         private int _totalShards;
         private SemaphoreSlim[] _identifySemaphores;
         private object _semaphoreResetLock;
@@ -40,6 +42,10 @@ namespace Discord.WebSocket
                 return base.ApiClient;
             }
         }
+        /// <inheritdoc/>
+        public override IReadOnlyCollection<StickerPack<SocketSticker>> DefaultStickerPacks
+            => _defaultStickers.ToReadOnlyCollection();
+
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => GetGuilds().ToReadOnlyCollection(GetGuildCount);
         /// <inheritdoc />
@@ -77,6 +83,7 @@ namespace Discord.WebSocket
             _shardIdsToIndex = new Dictionary<int, int>();
             config.DisplayInitialLog = false;
             _baseConfig = config;
+            _defaultStickers = new ImmutableArray<StickerPack<SocketSticker>>();
 
             if (config.TotalShards == null)
                 _automaticShards = true;
@@ -155,6 +162,10 @@ namespace Discord.WebSocket
             //Assume thread safe: already in a connection lock
             for (int i = 0; i < _shards.Length; i++)
                 await _shards[i].LoginAsync(tokenType, token);
+
+            if(this._defaultStickers.Length == 0)
+                await DownloadDefaultStickersAsync().ConfigureAwait(false);
+
         }
         internal override async Task OnLogoutAsync()
         {
@@ -246,6 +257,63 @@ namespace Discord.WebSocket
             for (int i = 0; i < _shards.Length; i++)
                 result += _shards[i].Guilds.Count;
             return result;
+        }
+        /// <inheritdoc/>
+        public override async Task<SocketSticker> GetStickerAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            var sticker = _defaultStickers.FirstOrDefault(x => x.Stickers.Any(y => y.Id == id))?.Stickers.FirstOrDefault(x => x.Id == id);
+
+            if (sticker != null)
+                return sticker;
+
+            foreach (var guild in Guilds)
+            {
+                sticker = await guild.GetStickerAsync(id, CacheMode.CacheOnly).ConfigureAwait(false);
+
+                if (sticker != null)
+                    return sticker;
+            }
+
+            if (mode == CacheMode.CacheOnly)
+                return null;
+
+            var model = await ApiClient.GetStickerAsync(id, options).ConfigureAwait(false);
+
+            if (model == null)
+                return null;
+
+
+            if (model.GuildId.IsSpecified)
+            {
+                var guild = GetGuild(model.GuildId.Value);
+                sticker = guild.AddOrUpdateSticker(model);
+                return sticker;
+            }
+            else
+            {
+                return SocketSticker.Create(_shards[0], model);
+            }
+        }
+        private async Task DownloadDefaultStickersAsync()
+        {
+            var models = await ApiClient.ListNitroStickerPacksAsync().ConfigureAwait(false);
+
+            foreach(var model in models.StickerPacks)
+            {
+                var stickers = model.Stickers.Select(x => SocketSticker.Create(_shards[0], x));
+
+                var pack = new StickerPack<SocketSticker>(
+                    model.Name,
+                    model.Id,
+                    model.SkuId,
+                    model.CoverStickerId.ToNullable(),
+                    model.Description,
+                    model.BannerAssetId,
+                    stickers
+                );
+
+                _defaultStickers.Add(pack);
+            }
         }
 
         /// <inheritdoc />

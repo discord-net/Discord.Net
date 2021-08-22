@@ -10,17 +10,13 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents a partial sticker received in a message.
     /// </summary>
-    public class StickerItem : RestEntity<ulong>
+    public class StickerItem : RestEntity<ulong>, IStickerItem
     {
-        /// <summary>
-        ///     The name of this sticker.
-        /// </summary>
-        public readonly string Name;
+        /// <inheritdoc/>
+        public string Name { get; }
 
-        /// <summary>
-        ///     The format of this sticker.
-        /// </summary>
-        public readonly StickerFormatType Format;
+        /// <inheritdoc/>
+        public StickerFormatType Format { get; }
 
         internal StickerItem(BaseDiscordClient client, Model model)
             : base(client, model.Id)
@@ -40,7 +36,10 @@ namespace Discord.Rest
         {
             var model = await Discord.ApiClient.GetStickerAsync(this.Id);
 
-            return Sticker.Create(model);
+            if (model.GuildId.IsSpecified)
+                return CustomSticker.Create(Discord, model, model.GuildId.Value, model.User.IsSpecified ? model.User.Value.Id : null);
+            else
+                return Sticker.Create(Discord, model);
         }
     }
 }

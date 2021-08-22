@@ -169,12 +169,13 @@ namespace Discord
         /// </summary>
         IReadOnlyCollection<IMessageComponent> Components { get; }
 
-        ///     Gets all stickers included in this message.
+        /// <summary>
+        ///     Gets all stickers items included in this message.
         /// </summary>
         /// <returns>
-        ///     A read-only collection of sticker objects.
+        ///     A read-only collection of sticker item objects.
         /// </returns>
-        IReadOnlyCollection<ISticker> Stickers { get; }
+        IReadOnlyCollection<IStickerItem> Stickers { get; }
         
         /// <summary>
         ///     Gets the flags related to this message.

@@ -533,6 +533,8 @@ namespace Discord.WebSocket
 
                     stickers.TryAdd(sticker.Id, entity);
                 }
+
+                _stickers = stickers;
             }
             else
                 _stickers = new ConcurrentDictionary<ulong, SocketCustomSticker>(ConcurrentHashSet.DefaultConcurrencyLevel, 7);
@@ -1192,6 +1194,13 @@ namespace Discord.WebSocket
             return AddOrUpdateSticker(model);
         }
         /// <summary>
+        ///     Gets a specific sticker within this guild.
+        /// </summary>
+        /// <param name="id">The id of the sticker to get.</param>
+        /// <returns>A sticker, if none is found then <see langword="null"/>.</returns>
+        public SocketCustomSticker GetSticker(ulong id)
+            => GetStickerAsync(id, CacheMode.CacheOnly).GetAwaiter().GetResult();
+        /// <summary>
         ///     Gets a collection of all stickers within this guild.
         /// </summary>
         /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
@@ -1629,7 +1638,8 @@ namespace Discord.WebSocket
             => await GetStickerAsync(id, mode, options);
         async Task<IReadOnlyCollection<ICustomSticker>> IGuild.GetStickersAsync(CacheMode mode, RequestOptions options)
             => await GetStickersAsync(mode, options);
-        Task IGuild.DeleteStickerAsync(ICustomSticker sticker, RequestOptions options) => throw new NotImplementedException();
+        Task IGuild.DeleteStickerAsync(ICustomSticker sticker, RequestOptions options)
+            => DeleteStickerAsync(_stickers[sticker.Id], options);
 
         void IDisposable.Dispose()
         {

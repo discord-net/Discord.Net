@@ -559,7 +559,7 @@ namespace Discord.Rest
             return await client.ApiClient.CreateGuildStickerAsync(apiArgs, guild.Id, options).ConfigureAwait(false);
         }
 
-        public static async Task<API.Sticker> ModifyStickerAsync(BaseDiscordClient client, IGuild guild, ISticker sticker, Action<StickerProperties> func,
+        public static async Task<API.Sticker> ModifyStickerAsync(BaseDiscordClient client, ulong guildId, ISticker sticker, Action<StickerProperties> func,
             RequestOptions options = null)
         {
             if (func == null)
@@ -577,10 +577,10 @@ namespace Discord.Rest
                     Optional<string>.Unspecified
             };
 
-            return await client.ApiClient.ModifyStickerAsync(apiArgs, guild.Id, sticker.Id, options).ConfigureAwait(false);
+            return await client.ApiClient.ModifyStickerAsync(apiArgs, guildId, sticker.Id, options).ConfigureAwait(false);
         }
 
-        public static async Task DeleteStickerAsync(BaseDiscordClient client, IGuild guild, ISticker sticker, RequestOptions options = null)
-            => await client.ApiClient.DeleteStickerAsync(guild.Id, sticker.Id, options).ConfigureAwait(false);
+        public static async Task DeleteStickerAsync(BaseDiscordClient client, ulong guildId, ISticker sticker, RequestOptions options = null)
+            => await client.ApiClient.DeleteStickerAsync(guildId, sticker.Id, options).ConfigureAwait(false);
     }
 }

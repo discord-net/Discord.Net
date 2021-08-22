@@ -19,6 +19,7 @@ namespace Discord.Rest
     {
         private ImmutableDictionary<ulong, RestRole> _roles;
         private ImmutableArray<GuildEmote> _emotes;
+        private ImmutableArray<CustomSticker> _stickers;
         private ImmutableArray<string> _features;
 
         /// <inheritdoc />
@@ -112,6 +113,7 @@ namespace Discord.Rest
         public IReadOnlyCollection<RestRole> Roles => _roles.ToReadOnlyCollection();
         /// <inheritdoc />
         public IReadOnlyCollection<GuildEmote> Emotes => _emotes;
+        public IReadOnlyCollection<CustomSticker> Stickers => _stickers;
         /// <inheritdoc />
         public IReadOnlyCollection<string> Features => _features;
 
@@ -189,6 +191,23 @@ namespace Discord.Rest
                     roles[model.Roles[i].Id] = RestRole.Create(Discord, this, model.Roles[i]);
             }
             _roles = roles.ToImmutable();
+
+            if (model.Stickers != null)
+            {
+                var stickers = new ImmutableArray<CustomSticker>();
+                for (int i = 0; i < model.Stickers.Length; i++)
+                {
+                    var sticker = model.Stickers[i];
+                    
+                    var entity = CustomSticker.Create(Discord, sticker, this, sticker.User.IsSpecified ? sticker.User.Value.Id : null);
+
+                    stickers.Add(entity);
+                }
+
+                _stickers = stickers;
+            }
+            else
+                _stickers = new ImmutableArray<CustomSticker>();
 
             Available = true;
         }
@@ -908,6 +927,78 @@ namespace Discord.Rest
         public Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null)
             => GuildHelper.DeleteEmoteAsync(this, Discord, emote.Id, options);
 
+        //Stickers
+        /// <summary>
+        ///     Creates a new sticker in this guild.
+        /// </summary>
+        /// <param name="name">The name of the sticker.</param>
+        /// <param name="description">The description of the sticker.</param>
+        /// <param name="tags">The tags of the sticker.</param>
+        /// <param name="image">The image of the new emote.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
+        /// </returns>
+        public async Task<CustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options = null)
+        {
+            var model = await GuildHelper.CreateStickerAsync(Discord, this, name, description, tags, image, options).ConfigureAwait(false);
+
+            return CustomSticker.Create(Discord, model, this, model.User.IsSpecified ? model.User.Value.Id : null);
+        }
+        /// <summary>
+        ///     Gets a specific sticker within this guild.
+        /// </summary>
+        /// <param name="id">The id of the sticker to get.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the sticker found with the
+        ///     specified <paramref name="id"/>; <see langword="null" /> if none is found.
+        /// </returns>
+        public async Task<CustomSticker> GetStickerAsync(ulong id, RequestOptions options = null)
+        {
+            var model = await Discord.ApiClient.GetGuildStickerAsync(this.Id, id, options).ConfigureAwait(false);
+
+            if (model == null)
+                return null;
+
+            return CustomSticker.Create(Discord, model, this, model.User.IsSpecified ? model.User.Value.Id : null);
+        }
+        /// <summary>
+        ///     Gets a collection of all stickers within this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of stickers found within the guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<CustomSticker>> GetStickersAsync(RequestOptions options = null)
+        {
+            var models = await Discord.ApiClient.ListGuildStickersAsync(this.Id, options).ConfigureAwait(false);
+
+            if (models.Length == 0)
+                return null;
+
+            List<CustomSticker> stickers = new List<CustomSticker>();
+
+            foreach(var model in models)
+            {
+                var entity = CustomSticker.Create(Discord, model, this, model.User.IsSpecified ? model.User.Value.Id : null);
+                stickers.Add(entity);
+            }
+
+            return stickers.ToImmutableArray();
+        }
+        /// <summary>
+        ///     Deletes a sticker within this guild.
+        /// </summary>
+        /// <param name="sticker">The sticker to delete.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous removal operation.
+        /// </returns>
+        public Task DeleteStickerAsync(CustomSticker sticker, RequestOptions options = null)
+            => sticker.DeleteAsync(options);
+
         //IGuild
         /// <inheritdoc />
         bool IGuild.Available => Available;
@@ -917,6 +1008,8 @@ namespace Discord.Rest
         IRole IGuild.EveryoneRole => EveryoneRole;
         /// <inheritdoc />
         IReadOnlyCollection<IRole> IGuild.Roles => Roles;
+
+        IReadOnlyCollection<ICustomSticker> IGuild.Stickers => Stickers;
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(RequestOptions options)
@@ -1169,5 +1262,23 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync (RequestOptions options)
             => await GetApplicationCommandsAsync(options).ConfigureAwait(false);
+        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options)
+            => await CreateStickerAsync(name, description, tags, image, options);
+        async Task<ICustomSticker> IGuild.GetStickerAsync(ulong id, CacheMode mode, RequestOptions options)
+        {
+            if (mode != CacheMode.AllowDownload)
+                return null;
+
+            return await GetStickerAsync(id, options);
+        }
+        async Task<IReadOnlyCollection<ICustomSticker>> IGuild.GetStickersAsync(CacheMode mode, RequestOptions options)
+        {
+            if (mode != CacheMode.AllowDownload)
+                return null;
+
+            return await GetStickersAsync(options);
+        }
+        Task IGuild.DeleteStickerAsync(ICustomSticker sticker, RequestOptions options)
+            => sticker.DeleteAsync();
     }
 }

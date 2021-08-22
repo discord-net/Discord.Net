@@ -44,6 +44,7 @@ namespace Discord.WebSocket
         private RestApplication _applicationInfo;
         private bool _isDisposed;
         private GatewayIntents _gatewayIntents;
+        private ImmutableArray<StickerPack<SocketSticker>> _defaultStickers;
 
         /// <summary>
         ///     Provides access to a REST-only client with a shared state from this client.
@@ -76,6 +77,17 @@ namespace Discord.WebSocket
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
+        /// <inheritdoc/>
+        public override IReadOnlyCollection<StickerPack<SocketSticker>> DefaultStickerPacks
+        {
+            get
+            {
+                if (this._shardedClient != null)
+                    return this._shardedClient.DefaultStickerPacks;
+                else
+                    return _defaultStickers.ToReadOnlyCollection();
+            }
+        }
         /// <inheritdoc />
         public override IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels => State.PrivateChannels;
         /// <summary>
@@ -137,6 +149,7 @@ namespace Discord.WebSocket
             Rest = new DiscordSocketRestClient(config, ApiClient);
             _heartbeatTimes = new ConcurrentQueue<long>();
             _gatewayIntents = config.GatewayIntents;
+            _defaultStickers = new ImmutableArray<StickerPack<SocketSticker>>();
 
             _stateLock = new SemaphoreSlim(1, 1);
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : $"Shard #{ShardId}");
@@ -193,6 +206,31 @@ namespace Discord.WebSocket
             }
 
             base.Dispose(disposing);
+        }
+
+        internal override async Task OnLoginAsync(TokenType tokenType, string token)
+        {
+            if(this._shardedClient != null && this._defaultStickers.Length == 0)
+            {
+                var models = await ApiClient.ListNitroStickerPacksAsync().ConfigureAwait(false);
+
+                foreach (var model in models.StickerPacks)
+                {
+                    var stickers = model.Stickers.Select(x => SocketSticker.Create(this, x));
+
+                    var pack = new StickerPack<SocketSticker>(
+                        model.Name,
+                        model.Id,
+                        model.SkuId,
+                        model.CoverStickerId.ToNullable(),
+                        model.Description,
+                        model.BannerAssetId,
+                        stickers
+                    );
+
+                    _defaultStickers.Add(pack);
+                }
+            }
         }
 
         /// <inheritdoc />
@@ -367,6 +405,51 @@ namespace Discord.WebSocket
         }
         internal void RemoveUser(ulong id)
             => State.RemoveUser(id);
+
+        /// <inheritdoc/>
+        public override async Task<SocketSticker> GetStickerAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            var sticker = _defaultStickers.FirstOrDefault(x => x.Stickers.Any(y => y.Id == id))?.Stickers.FirstOrDefault(x => x.Id == id);
+
+            if (sticker != null)
+                return sticker;
+
+            foreach(var guild in Guilds)
+            {
+                sticker = await guild.GetStickerAsync(id, CacheMode.CacheOnly).ConfigureAwait(false);
+
+                if (sticker != null)
+                    return sticker;
+            }
+
+            if (mode == CacheMode.CacheOnly)
+                return null;
+
+            var model = await ApiClient.GetStickerAsync(id, options).ConfigureAwait(false);
+
+            if(model == null)
+                return null;
+
+            
+            if (model.GuildId.IsSpecified)
+            {
+                var guild = State.GetGuild(model.GuildId.Value);
+                sticker = guild.AddOrUpdateSticker(model);
+                return sticker;
+            }
+            else
+            {
+                return SocketSticker.Create(this, model);
+            }
+        }
+
+        /// <summary>
+        ///     Gets a sticker.
+        /// </summary>
+        /// <param name="id">The unique identifier of the sticker.</param>
+        /// <returns>A sticker if found, otherwise <see langword="null"/>.</returns>
+        public SocketSticker GetSticker(ulong id)
+            => GetStickerAsync(id, CacheMode.CacheOnly).GetAwaiter().GetResult();
 
         /// <inheritdoc />
         public override async ValueTask<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
