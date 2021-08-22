@@ -21,6 +21,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
 
+        /// <inheritdoc />
+        public string Mention => MentionUtils.MentionChannel(Id);
+
         internal RestVoiceChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
         {
@@ -60,7 +63,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task SyncPermissionsAsync(RequestOptions options = null)
             => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
-         
+
         //Invites
         /// <inheritdoc />
         public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
