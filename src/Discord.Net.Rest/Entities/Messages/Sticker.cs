@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Model = Discord.API.Sticker;
 
 namespace Discord
@@ -39,7 +40,7 @@ namespace Discord
         internal static Sticker Create(Model model)
         {
             return new Sticker(model.Id, model.PackId, model.Name, model.Desription,
-                model.Tags.IsSpecified ? model.Tags.Value.Split(',') : new string[0],
+                model.Tags.IsSpecified ? model.Tags.Value.Split(',').Select(x => x.Trim()).ToArray() : new string[0],
                 model.Asset, model.PreviewAsset, model.FormatType);
         }
 

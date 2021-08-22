@@ -21,5 +21,7 @@ namespace Discord.API
         public string PreviewAsset { get; set; }
         [JsonProperty("format_type")]
         public StickerFormatType FormatType { get; set; }
+        [JsonProperty("user")]
+        public Optional<User> User { get; set; }
     }
 }

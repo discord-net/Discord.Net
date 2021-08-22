@@ -535,5 +535,52 @@ namespace Discord.Rest
         }
         public static Task DeleteEmoteAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
             => client.ApiClient.DeleteGuildEmoteAsync(guild.Id, id, options);
+
+        public static async Task<API.Sticker> CreateStickerAsync(BaseDiscordClient client, IGuild guild, string name, string description, IEnumerable<string> tags,
+            Image image, RequestOptions options = null)
+        {
+            Preconditions.NotNull(name, nameof(name));
+            Preconditions.NotNull(description, nameof(description));
+
+            Preconditions.AtLeast(name.Length, 2, nameof(name));
+            Preconditions.AtLeast(description.Length, 2, nameof(description));
+
+            Preconditions.AtMost(name.Length, 30, nameof(name));
+            Preconditions.AtMost(description.Length, 100, nameof(name));
+
+            var apiArgs = new CreateStickerParams()
+            {
+                Name = name,
+                Description = description,
+                File = image.Stream,
+                Tags = string.Join(", ", tags)
+            };
+
+            return await client.ApiClient.CreateGuildStickerAsync(apiArgs, guild.Id, options).ConfigureAwait(false);
+        }
+
+        public static async Task<API.Sticker> ModifyStickerAsync(BaseDiscordClient client, IGuild guild, ISticker sticker, Action<StickerProperties> func,
+            RequestOptions options = null)
+        {
+            if (func == null)
+                throw new ArgumentNullException(paramName: nameof(func));
+
+            var props = new StickerProperties();
+            func(props);
+
+            var apiArgs = new ModifyStickerParams()
+            {
+                Description = props.Description,
+                Name = props.Name,
+                Tags = props.Tags.IsSpecified ?
+                    string.Join(", ", props.Tags.Value) :
+                    Optional<string>.Unspecified
+            };
+
+            return await client.ApiClient.ModifyStickerAsync(apiArgs, guild.Id, sticker.Id, options).ConfigureAwait(false);
+        }
+
+        public static async Task DeleteStickerAsync(BaseDiscordClient client, IGuild guild, ISticker sticker, RequestOptions options = null)
+            => await client.ApiClient.DeleteStickerAsync(guild.Id, sticker.Id, options).ConfigureAwait(false);
     }
 }

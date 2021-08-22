@@ -886,6 +886,67 @@ namespace Discord.API
             return await SendJsonAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
 
+        // Stickers
+        public async Task<Sticker> GetStickerAsync(ulong id, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(id, 0, nameof(id));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return await NullifyNotFound(SendAsync<Sticker>("GET", () => $"stickers/{id}", new BucketIds(), options: options)).ConfigureAwait(false);
+        }
+        public async Task<Sticker> GetGuildStickerAsync(ulong guildId, ulong id, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(id, 0, nameof(id));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return await NullifyNotFound(SendAsync<Sticker>("GET", () => $"guilds/{guildId}/stickers/{id}", new BucketIds(guildId), options: options)).ConfigureAwait(false);
+        }
+        public async Task<Sticker[]> ListGuildStickersAsync(ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendAsync<Sticker[]>("GET", () => $"guilds/{guildId}/stickers", new BucketIds(guildId), options: options).ConfigureAwait(false);
+        }
+        public async Task<NitroStickerPacks> ListNitroStickerPacksAsync(RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendAsync<NitroStickerPacks>("GET", () => $"sticker-packs", new BucketIds(), options: options).ConfigureAwait(false);
+        }
+        public async Task<Sticker> CreateGuildStickerAsync(CreateStickerParams args, ulong guildId, RequestOptions options = null)
+        {
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendMultipartAsync<Sticker>("POST", () => $"guilds/{guildId}/stickers", args.ToDictionary(), new BucketIds(guildId), options: options).ConfigureAwait(false);
+        }
+        public async Task<Sticker> ModifyStickerAsync(ModifyStickerParams args, ulong guildId, ulong stickerId, RequestOptions options = null)
+        {
+            Preconditions.NotNull(args, nameof(args));
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(stickerId, 0, nameof(stickerId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            return await SendJsonAsync<Sticker>("PATCH", () => $"guilds/{guildId}/stickers/{stickerId}", args, new BucketIds(guildId), options: options).ConfigureAwait(false);
+        }
+        public async Task DeleteStickerAsync(ulong guildId, ulong stickerId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(guildId, 0, nameof(guildId));
+            Preconditions.NotEqual(stickerId, 0, nameof(stickerId));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            await SendAsync("DELETE", () => $"guilds/{guildId}/stickers/{stickerId}", new BucketIds(guildId), options: options).ConfigureAwait(false);
+        }
+
         public async Task AddReactionAsync(ulong channelId, ulong messageId, string emoji, RequestOptions options = null)
         {
             Preconditions.NotEqual(channelId, 0, nameof(channelId));
@@ -2002,6 +2063,32 @@ namespace Discord.API
             }
         }
 
+        protected async Task<T> NullifyNotFound<T>(Task<T> sendTask) where T : class
+        {
+            try
+            {
+                var result = await sendTask.ConfigureAwait(false);
+
+                if (sendTask.Exception != null)
+                {
+                    if (sendTask.Exception.InnerException is HttpException x)
+                    {
+                        if (x.HttpCode == HttpStatusCode.NotFound)
+                        {
+                            return null;
+                        }
+                    }
+
+                    throw sendTask.Exception;
+                }
+                else
+                    return result;
+            }
+            catch (HttpException x) when (x.HttpCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+        }
         internal class BucketIds
         {
             public ulong GuildId { get; internal set; }

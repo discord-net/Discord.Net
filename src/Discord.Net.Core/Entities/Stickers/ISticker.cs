@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -63,5 +65,10 @@ namespace Discord
         ///     A <see cref="StickerFormatType"/> with the format type of this sticker.
         /// </returns>
         StickerFormatType FormatType { get; }
+
+        /// <summary>
+        ///     Gets the image url for this sticker.
+        /// </summary>
+        string GetStickerUrl();
     }
 }

@@ -177,6 +177,34 @@ namespace Discord
         public static string GetSpotifyDirectUrl(string trackId)
             => $"https://open.spotify.com/track/{trackId}";
 
+        /// <summary>
+        ///     Gets a stickers url based off the id and format.
+        /// </summary>
+        /// <param name="stickerId">The id of the sticker.</param>
+        /// <param name="format">The format of the sticker</param>
+        /// <returns>
+        ///     A URL to the sticker.
+        /// </returns>
+        public static string GetStickerUrl(ulong stickerId, StickerFormatType format = StickerFormatType.Png)
+            => $"{DiscordConfig.CDNUrl}stickers/{stickerId}.{FormatToExtension(format)}";
+
+        private static string FormatToExtension(StickerFormatType format)
+        {
+            switch (format)
+            {
+                case StickerFormatType.None:
+                case StickerFormatType.Png:
+                    return "png";
+                case StickerFormatType.Lottie:
+                    return "lottie";
+                case StickerFormatType.Apng:
+                    return "apng";
+                default:
+                    throw new ArgumentException(nameof(format));
+
+            }
+        }
+
         private static string FormatToExtension(ImageFormat format, string imageId)
         {
             if (format == ImageFormat.Auto)

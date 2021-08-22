@@ -199,6 +199,13 @@ namespace Discord
         /// </returns>
         IReadOnlyCollection<GuildEmote> Emotes { get; }
         /// <summary>
+        ///     Gets a collection of all custom stickers for this guild.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection of all custom stickers for this guild.
+        /// </returns>
+        IReadOnlyCollection<ICustomSticker> Stickers { get; }
+        /// <summary>
         ///     Gets a collection of all extra features added to this guild.
         /// </summary>
         /// <returns>
@@ -941,6 +948,52 @@ namespace Discord
         ///     A task that represents the asynchronous removal operation.
         /// </returns>
         Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates a new sticker in this guild.
+        /// </summary>
+        /// <param name="name">The name of the sticker.</param>
+        /// <param name="description">The description of the sticker.</param>
+        /// <param name="tags">The tags of the sticker.</param>
+        /// <param name="image">The image of the new emote.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
+        /// </returns>
+        Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a specific sticker within this guild.
+        /// </summary>
+        /// <param name="id">The id of the sticker to get.</param>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the sticker found with the
+        ///     specified <paramref name="id"/>; <see langword="null" /> if none is found.
+        /// </returns>
+        Task<ICustomSticker> GetStickerAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a collection of all stickers within this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of stickers found within the guild.
+        /// </returns>
+        Task<IReadOnlyCollection<ICustomSticker>> GetStickersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Deletes a sticker within this guild.
+        /// </summary>
+        /// <param name="sticker">The sticker to delete.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous removal operation.
+        /// </returns>
+        Task DeleteStickerAsync(ICustomSticker sticker, RequestOptions options = null);
 
         /// <summary>
         ///     Gets this guilds slash commands commands

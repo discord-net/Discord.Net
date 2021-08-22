@@ -80,5 +80,7 @@ namespace Discord.API
         public Optional<Channel[]> Threads { get; set; }
         [JsonProperty("nsfw_level")]
         public NsfwLevel NsfwLevel { get; set; }
+        [JsonProperty("stickers")]
+        public Sticker[] Stickers { get; set; }
     }
 }
