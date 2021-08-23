@@ -827,6 +827,21 @@
                 Fired when a speaker is removed from a stage channel.
             </summary>
         </member>
+        <member name="E:Discord.WebSocket.BaseSocketClient.GuildStickerCreated">
+            <summary>
+                Fired when a sticker in a guild is created.
+            </summary>
+        </member>
+        <member name="E:Discord.WebSocket.BaseSocketClient.GuildStickerUpdated">
+            <summary>
+                Fired when a sticker in a guild is updated.
+            </summary>
+        </member>
+        <member name="E:Discord.WebSocket.BaseSocketClient.GuildStickerDeleted">
+            <summary>
+                Fired when a sticker in a guild is deleted.
+            </summary>
+        </member>
         <member name="P:Discord.WebSocket.DiscordShardedClient.Latency">
             <inheritdoc />
         </member>
@@ -4513,6 +4528,11 @@
         <member name="P:Discord.WebSocket.SocketEntity`1.Id">
             <inheritdoc />
         </member>
+        <member name="T:Discord.WebSocket.SocketCustomSticker">
+            <summary>
+                Represents a custom sticker within a guild received over the gateway.
+            </summary>
+        </member>
         <member name="P:Discord.WebSocket.SocketCustomSticker.Author">
             <summary>
                 Gets the user that uploaded the guild sticker.
@@ -4538,6 +4558,11 @@
         <member name="M:Discord.WebSocket.SocketCustomSticker.DeleteAsync(Discord.RequestOptions)">
             <inheritdoc/>
         </member>
+        <member name="T:Discord.WebSocket.SocketSticker">
+            <summary>
+                Represents a general sticker received over the gateway.
+            </summary>
+        </member>
         <member name="P:Discord.WebSocket.SocketSticker.PackId">
             <inheritdoc/>
         </member>
@@ -4560,6 +4585,9 @@
             <inheritdoc/>
         </member>
         <member name="M:Discord.WebSocket.SocketSticker.GetStickerUrl">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketSticker.Equals(System.Object)">
             <inheritdoc/>
         </member>
         <member name="T:Discord.WebSocket.SocketUnknownSticker">

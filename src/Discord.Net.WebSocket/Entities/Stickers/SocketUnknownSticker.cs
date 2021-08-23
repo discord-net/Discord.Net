@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace Discord.WebSocket
     /// <summary>
     ///     Represents an unknown sticker received over the gateway.
     /// </summary>
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketUnknownSticker : SocketSticker
     {
         /// <inheritdoc/>
@@ -56,5 +58,7 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<SocketSticker> ResolveAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
             => Discord.GetStickerAsync(this.Id, mode, options);
+
+        private string DebuggerDisplay => $"{Name} ({Id})";
     }
 }

@@ -20,7 +20,7 @@ namespace Discord.API.Rest
         {
             var d = new Dictionary<string, object>();
 
-            d["file"] = new MultipartFile(File, Name);
+            d["file"] = new MultipartFile(File, Name + ".dat");
 
             d["name"] = Name;
             d["description"] = Description;

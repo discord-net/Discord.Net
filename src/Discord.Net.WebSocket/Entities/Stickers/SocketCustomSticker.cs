@@ -1,6 +1,7 @@
 using Discord.Rest;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,10 @@ using Model = Discord.API.Sticker;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a custom sticker within a guild received over the gateway.
+    /// </summary>
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketCustomSticker : SocketSticker, ICustomSticker
     {
         /// <summary>
@@ -62,6 +67,10 @@ namespace Discord.WebSocket
             await GuildHelper.DeleteStickerAsync(Discord, this.Guild.Id, this, options);
             Guild.RemoveSticker(this.Id);
         }
+
+        internal SocketCustomSticker Clone() => MemberwiseClone() as SocketCustomSticker;
+
+        private string DebuggerDisplay => $"{Name} in {Guild.Name} ({Id})";
 
         // ICustomSticker
         ulong? ICustomSticker.AuthorId

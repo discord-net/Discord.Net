@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents a Rest-based custom sticker within a guild.
     /// </summary>
+    [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class CustomSticker : Sticker, ICustomSticker
     {
         /// <summary>
@@ -67,6 +69,8 @@ namespace Discord.Rest
             var model = await GuildHelper.ModifyStickerAsync(Discord, GuildId, this, func, options);
             Update(model);
         }
+
+        private string DebuggerDisplay => this.Guild != null ? $"{Name} in {Guild.Name} ({Id})" : $"{Name} ({Id})";
 
         IGuild ICustomSticker.Guild => Guild;
     }

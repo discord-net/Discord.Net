@@ -651,5 +651,35 @@ namespace Discord.WebSocket
             remove { _speakerRemoved.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketStageChannel, SocketGuildUser, Task>> _speakerRemoved = new AsyncEvent<Func<SocketStageChannel, SocketGuildUser, Task>>();
+
+        /// <summary>
+        ///     Fired when a sticker in a guild is created.
+        /// </summary>
+        public event Func<SocketCustomSticker, Task> GuildStickerCreated
+        {
+            add { _guildStickerCreated.Add(value); }
+            remove { _guildStickerCreated.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<SocketCustomSticker, Task>> _guildStickerCreated = new AsyncEvent<Func<SocketCustomSticker, Task>>();
+
+        /// <summary>
+        ///     Fired when a sticker in a guild is updated.
+        /// </summary>
+        public event Func<SocketCustomSticker, SocketCustomSticker, Task> GuildStickerUpdated
+        {
+            add { _guildStickerUpdated.Add(value); }
+            remove { _guildStickerUpdated.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<SocketCustomSticker, SocketCustomSticker, Task>> _guildStickerUpdated = new AsyncEvent<Func<SocketCustomSticker, SocketCustomSticker, Task>>();
+
+        /// <summary>
+        ///     Fired when a sticker in a guild is deleted.
+        /// </summary>
+        public event Func<SocketCustomSticker, Task> GuildStickerDeleted
+        {
+            add { _guildStickerDeleted.Add(value); }
+            remove { _guildStickerDeleted.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<SocketCustomSticker, Task>> _guildStickerDeleted = new AsyncEvent<Func<SocketCustomSticker, Task>>();
     }
 }
