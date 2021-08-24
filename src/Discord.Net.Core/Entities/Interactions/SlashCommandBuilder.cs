@@ -93,16 +93,16 @@ namespace Discord
         private List<SlashCommandOptionBuilder> _options { get; set; }
 
         /// <summary>
-        ///     Build the current builder into a <see cref="SlashCommandCreationProperties"/> class.
+        ///     Build the current builder into a <see cref="SlashCommandProperties"/> class.
         /// </summary>
-        /// <returns>A <see cref="SlashCommandCreationProperties"/> that can be used to create slash commands over rest.</returns>
-        public SlashCommandCreationProperties Build()
+        /// <returns>A <see cref="SlashCommandProperties"/> that can be used to create slash commands over rest.</returns>
+        public SlashCommandProperties Build()
         {
-            SlashCommandCreationProperties props = new SlashCommandCreationProperties()
+            SlashCommandProperties props = new SlashCommandProperties()
             {
                 Name = this.Name,
                 Description = this.Description,
-                DefaultPermission = this.DefaultPermission
+                DefaultPermission = this.DefaultPermission,
             };
 
             if (this.Options != null && this.Options.Any())

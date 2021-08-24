@@ -44,34 +44,34 @@ namespace Discord.WebSocket
                             {
                                 case ApplicationCommandOptionType.User:
                                     {
-                                        var guildUser = data.guildMembers.FirstOrDefault(x => x.Key == valueId).Value;
+                                        var guildUser = data.ResolvableData.GuildMembers.FirstOrDefault(x => x.Key == valueId).Value;
 
                                         if (guildUser != null)
                                             this.Value = guildUser;
                                         else
-                                            this.Value = data.users.FirstOrDefault(x => x.Key == valueId).Value;
+                                            this.Value = data.ResolvableData.Users.FirstOrDefault(x => x.Key == valueId).Value;
                                     }
                                     break;
                                 case ApplicationCommandOptionType.Channel:
-                                    this.Value = data.channels.FirstOrDefault(x => x.Key == valueId).Value;
+                                    this.Value = data.ResolvableData.Channels.FirstOrDefault(x => x.Key == valueId).Value;
                                     break;
                                 case ApplicationCommandOptionType.Role:
-                                    this.Value = data.roles.FirstOrDefault(x => x.Key == valueId).Value;
+                                    this.Value = data.ResolvableData.Roles.FirstOrDefault(x => x.Key == valueId).Value;
                                     break;
                                 case ApplicationCommandOptionType.Mentionable:
                                     {
-                                        if(data.guildMembers.Any(x => x.Key == valueId) || data.users.Any(x => x.Key == valueId))
+                                        if(data.ResolvableData.GuildMembers.Any(x => x.Key == valueId) || data.ResolvableData.Users.Any(x => x.Key == valueId))
                                         {
-                                            var guildUser = data.guildMembers.FirstOrDefault(x => x.Key == valueId).Value;
+                                            var guildUser = data.ResolvableData.GuildMembers.FirstOrDefault(x => x.Key == valueId).Value;
 
                                             if (guildUser != null)
                                                 this.Value = guildUser;
                                             else
-                                                this.Value = data.users.FirstOrDefault(x => x.Key == valueId).Value;
+                                                this.Value = data.ResolvableData.Users.FirstOrDefault(x => x.Key == valueId).Value;
                                         }
-                                        else if(data.roles.Any(x => x.Key == valueId))
+                                        else if(data.ResolvableData.Roles.Any(x => x.Key == valueId))
                                         {
-                                            this.Value = data.roles.FirstOrDefault(x => x.Key == valueId).Value;
+                                            this.Value = data.ResolvableData.Roles.FirstOrDefault(x => x.Key == valueId).Value;
                                         }
                                     }
                                     break;
@@ -125,6 +125,8 @@ namespace Discord.WebSocket
         public static explicit operator string(SocketSlashCommandDataOption option)
             => option.Value.ToString();
 
-        IReadOnlyCollection<IApplicationCommandInteractionDataOption> IApplicationCommandInteractionDataOption.Options => this.Options;
+        // IApplicationCommandInteractionDataOption
+        IReadOnlyCollection<IApplicationCommandInteractionDataOption> IApplicationCommandInteractionDataOption.Options
+            => this.Options;
     }
 }

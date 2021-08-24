@@ -226,6 +226,12 @@
         <member name="M:Discord.Rest.BaseDiscordClient.Discord#IDiscordClient#GetWebhookAsync(System.UInt64,Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.Rest.BaseDiscordClient.Discord#IDiscordClient#GetGlobalApplicationCommandAsync(System.UInt64,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.BaseDiscordClient.Discord#IDiscordClient#GetGlobalApplicationCommandsAsync(Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.Rest.BaseDiscordClient.Discord#IDiscordClient#StartAsync">
             <inheritdoc />
         </member>
@@ -297,6 +303,12 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.DiscordRestClient.Discord#IDiscordClient#GetWebhookAsync(System.UInt64,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.DiscordRestClient.Discord#IDiscordClient#GetGlobalApplicationCommandsAsync(Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.DiscordRestClient.Discord#IDiscordClient#GetGlobalApplicationCommandAsync(System.UInt64,Discord.RequestOptions)">
             <inheritdoc />
         </member>
         <member name="T:Discord.Rest.DiscordRestConfig">
@@ -3503,6 +3515,37 @@
                 of application commands found within the guild.
             </returns>
         </member>
+        <member name="M:Discord.Rest.RestGuild.GetApplicationCommandAsync(System.UInt64,Discord.RequestOptions)">
+            <summary>
+                Gets an application command within this guild with the specified id.
+            </summary>
+            <param name="id">The id of the application command to get.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A ValueTask that represents the asynchronous get operation. The task result contains a <see cref="T:Discord.IApplicationCommand"/>
+                if found, otherwise <see langword="null"/>.
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestGuild.CreateApplicationCommandAsync(Discord.ApplicationCommandProperties,Discord.RequestOptions)">
+            <summary>
+                Creates an application command within this guild.
+            </summary>
+            <param name="properties">The properties to use when creating the command.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous creation operation. The task result contains the command that was created.
+            </returns>
+        </member>
+        <member name="M:Discord.Rest.RestGuild.BulkOverwriteApplicationCommandsAsync(Discord.ApplicationCommandProperties[],Discord.RequestOptions)">
+            <summary>
+                Overwrites the application commands within this guild.
+            </summary>
+            <param name="properties">A collection of properties to use when creating the commands.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous creation operation. The task result contains a collection of commands that was created.
+            </returns>
+        </member>
         <member name="M:Discord.Rest.RestGuild.ToString">
             <summary>
                 Returns the name of the guild.
@@ -3752,6 +3795,15 @@
         <member name="M:Discord.Rest.RestGuild.Discord#IGuild#DeleteStickerAsync(Discord.ICustomSticker,Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.Rest.RestGuild.Discord#IGuild#CreateApplicationCommandAsync(Discord.ApplicationCommandProperties,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestGuild.Discord#IGuild#BulkOverwriteApplicationCommandsAsync(Discord.ApplicationCommandProperties[],Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetApplicationCommandAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.Rest.RestGuildIntegration.Name">
             <inheritdoc />
         </member>
@@ -3834,6 +3886,9 @@
         <member name="P:Discord.Rest.RestApplicationCommand.ApplicationId">
             <inheritdoc/>
         </member>
+        <member name="P:Discord.Rest.RestApplicationCommand.Type">
+            <inheritdoc/>
+        </member>
         <member name="P:Discord.Rest.RestApplicationCommand.Name">
             <inheritdoc/>
         </member>
@@ -3848,15 +3903,13 @@
                 The options of this command.
             </summary>
         </member>
-        <member name="P:Discord.Rest.RestApplicationCommand.CommandType">
-            <summary>
-                The type of this rest application command.
-            </summary>
-        </member>
         <member name="P:Discord.Rest.RestApplicationCommand.CreatedAt">
             <inheritdoc/>
         </member>
         <member name="M:Discord.Rest.RestApplicationCommand.DeleteAsync(Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.Rest.RestApplicationCommand.ModifyAsync(System.Action{Discord.ApplicationCommandProperties},Discord.RequestOptions)">
             <inheritdoc/>
         </member>
         <member name="T:Discord.Rest.RestApplicationCommandChoice">
@@ -3900,24 +3953,9 @@
                 A collection of <see cref="T:Discord.Rest.RestApplicationCommandOption"/>'s for this command.
             </summary>
         </member>
-        <member name="T:Discord.Rest.RestApplicationCommandType">
-            <summary>
-                Represents a type of Rest-based command.
-            </summary>
-        </member>
-        <member name="F:Discord.Rest.RestApplicationCommandType.GlobalCommand">
-            <summary>
-                Specifies that this command is a Global command.
-            </summary>
-        </member>
-        <member name="F:Discord.Rest.RestApplicationCommandType.GuildCommand">
-            <summary>
-                Specifies that this command is a Guild specific command.
-            </summary>
-        </member>
         <member name="T:Discord.Rest.RestGlobalCommand">
             <summary>
-                Represents a global Slash command.
+                Represents a Rest-based global application command.
             </summary>
         </member>
         <member name="M:Discord.Rest.RestGlobalCommand.DeleteAsync(Discord.RequestOptions)">
@@ -3935,7 +3973,7 @@
         </member>
         <member name="T:Discord.Rest.RestGuildCommand">
             <summary>
-                Represents a Rest-based guild command.
+                Represents a Rest-based guild application command.
             </summary>
         </member>
         <member name="P:Discord.Rest.RestGuildCommand.GuildId">

@@ -1024,7 +1024,7 @@ namespace Discord
         Task DeleteStickerAsync(ICustomSticker sticker, RequestOptions options = null);
 
         /// <summary>
-        ///     Gets this guilds slash commands commands
+        ///     Gets this guilds application commands.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
@@ -1032,5 +1032,39 @@ namespace Discord
         ///     of application commands found within the guild.
         /// </returns>
         Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync (RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets an application command within this guild with the specified id.
+        /// </summary>
+        /// <param name="id">The id of the application command to get.</param>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A ValueTask that represents the asynchronous get operation. The task result contains a <see cref="IApplicationCommand"/>
+        ///     if found, otherwise <see langword="null"/>.
+        /// </returns>
+        Task<IApplicationCommand> GetApplicationCommandAsync(ulong id, CacheMode mode = CacheMode.AllowDownload,
+            RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates an application command within this guild.
+        /// </summary>
+        /// <param name="properties">The properties to use when creating the command.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the command that was created.
+        /// </returns>
+        Task<IApplicationCommand> CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null);
+
+        /// <summary>
+        ///     Overwrites the application commands within this guild.
+        /// </summary>
+        /// <param name="properties">A collection of properties to use when creating the commands.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a collection of commands that was created.
+        /// </returns>
+        Task<IReadOnlyCollection<IApplicationCommand>> BulkOverwriteApplicationCommandsAsync(ApplicationCommandProperties[] properties,
+            RequestOptions options = null);
     }
 }

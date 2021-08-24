@@ -10,14 +10,14 @@ namespace Discord.WebSocket
     /// <summary>
     ///     Represents a Websocket-based slash command received over the gateway.
     /// </summary>
-    public class SocketSlashCommand : SocketCommandBase
+    public class SocketUserCommand : SocketCommandBase
     {
         /// <summary>
         ///     The data associated with this interaction.
         /// </summary>
-        new public SocketSlashCommandData Data { get; }
+        public new SocketUserCommandData Data { get; }
 
-        internal SocketSlashCommand(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
+        internal SocketUserCommand(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
             : base(client, model, channel)
         {
             var dataModel = model.Data.IsSpecified ?
@@ -28,14 +28,14 @@ namespace Discord.WebSocket
             if (this.Channel is SocketGuildChannel guildChannel)
                 guildId = guildChannel.Guild.Id;
 
-            Data = SocketSlashCommandData.Create(client, dataModel, guildId);
+            Data = SocketUserCommandData.Create(client, dataModel, model.Id, guildId);
         }
 
         new internal static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
         {
-            var entity = new SocketSlashCommand(client, model, channel);
+            var entity = new SocketUserCommand(client, model, channel);
             entity.Update(model);
             return entity;
-        }
+        }        
     }
 }

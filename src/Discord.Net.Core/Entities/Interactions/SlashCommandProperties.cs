@@ -9,18 +9,13 @@ namespace Discord
     /// <summary>
     ///     A class used to create slash commands.
     /// </summary>
-    public class SlashCommandCreationProperties
+    public class SlashCommandProperties : ApplicationCommandProperties
     {
-        /// <summary>
-        ///     The name of this command.
-        /// </summary>
-        public string Name { get; set; }
-
+        internal override ApplicationCommandType Type => ApplicationCommandType.Slash;
         /// <summary>
         ///    The discription of this command.
         /// </summary>
-        public string Description { get; set; }
-
+        public Optional<string> Description { get; set; }
 
         /// <summary>
         ///     Gets or sets the options for this command.
@@ -31,5 +26,7 @@ namespace Discord
         ///     Whether the command is enabled by default when the app is added to a guild. Default is <see langword="true"/>
         /// </summary>
         public Optional<bool> DefaultPermission { get; set; }
+
+        internal SlashCommandProperties() { }
     }
 }

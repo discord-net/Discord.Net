@@ -68,7 +68,10 @@ namespace Discord.Rest
                 : null;
         }
 
-        IReadOnlyCollection<IApplicationCommandOption> IApplicationCommandOption.Options => Options;
-        IReadOnlyCollection<IApplicationCommandOptionChoice> IApplicationCommandOption.Choices => Choices;
+        //IApplicationCommandOption
+        IReadOnlyCollection<IApplicationCommandOption> IApplicationCommandOption.Options
+            => Options;
+        IReadOnlyCollection<IApplicationCommandOptionChoice> IApplicationCommandOption.Choices
+            => Choices;
     }
 }

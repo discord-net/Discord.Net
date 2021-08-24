@@ -8,7 +8,7 @@ using Model = Discord.API.ApplicationCommand;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a Rest-based guild command.
+    ///     Represents a Rest-based guild application command.
     /// </summary>
     public class RestGuildCommand : RestApplicationCommand
     {
@@ -20,7 +20,6 @@ namespace Discord.Rest
         internal RestGuildCommand(BaseDiscordClient client, ulong id, ulong guildId)
             : base(client, id)
         {
-            this.CommandType = RestApplicationCommandType.GuildCommand;
             this.GuildId = guildId;
         }
 
@@ -43,8 +42,11 @@ namespace Discord.Rest
         /// <returns>
         ///     The modified command
         /// </returns>
-        public async Task<RestGuildCommand> ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null)
-            => await InteractionHelper.ModifyGuildCommand(Discord, this, func, options).ConfigureAwait(false);
+        public override async Task ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null)
+        {
+            var model = await InteractionHelper.ModifyGuildCommand(Discord, this, GuildId, func, options).ConfigureAwait(false);
+            this.Update(model);
+        }
 
         /// <summary>
         ///     Gets this commands permissions inside of the current guild.

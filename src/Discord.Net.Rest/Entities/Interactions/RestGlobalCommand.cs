@@ -8,14 +8,14 @@ using Model = Discord.API.ApplicationCommand;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a global Slash command.
+    ///     Represents a Rest-based global application command.
     /// </summary>
     public class RestGlobalCommand : RestApplicationCommand
     {
         internal RestGlobalCommand(BaseDiscordClient client, ulong id)
             : base(client, id)
         {
-            this.CommandType = RestApplicationCommandType.GlobalCommand;
+
         }
 
         internal static RestGlobalCommand Create(BaseDiscordClient client, Model model)
@@ -37,7 +37,10 @@ namespace Discord.Rest
         /// <returns>
         ///     The modified command.
         /// </returns>
-        public async Task<RestGlobalCommand> ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null)
-            => await InteractionHelper.ModifyGlobalCommand(Discord, this, func, options).ConfigureAwait(false);
+        public override async Task ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null)
+        {
+            var cmd = await InteractionHelper.ModifyGlobalCommand(Discord, this, func, options).ConfigureAwait(false);
+            this.Update(cmd);
+        }
     }
 }

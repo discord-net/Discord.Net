@@ -17,6 +17,9 @@ namespace Discord.Rest
         public ulong ApplicationId { get; private set; }
 
         /// <inheritdoc/>
+        public ApplicationCommandType Type { get; private set; }
+
+        /// <inheritdoc/>
         public string Name { get; private set; }
 
         /// <inheritdoc/>
@@ -30,11 +33,6 @@ namespace Discord.Rest
         /// </summary>
         public IReadOnlyCollection<RestApplicationCommandOption> Options { get; private set; }
 
-        /// <summary>
-        ///     The type of this rest application command.
-        /// </summary>
-        public RestApplicationCommandType CommandType { get; internal set; }
-
         /// <inheritdoc/>
         public DateTimeOffset CreatedAt
             => SnowflakeUtils.FromSnowflake(this.Id);
@@ -45,15 +43,16 @@ namespace Discord.Rest
 
         }
 
-        internal static RestApplicationCommand Create(BaseDiscordClient client, Model model, RestApplicationCommandType type, ulong guildId = 0)
+        internal static RestApplicationCommand Create(BaseDiscordClient client, Model model, ulong? guildId)
         {
-            if (type == RestApplicationCommandType.GlobalCommand)
+            if (guildId.HasValue)
+            {
+                return RestGuildCommand.Create(client, model, guildId.Value);
+            }
+            else
+            {
                 return RestGlobalCommand.Create(client, model);
-
-            if (type == RestApplicationCommandType.GuildCommand)
-                return RestGuildCommand.Create(client, model, guildId);
-
-            return null;
+            }
         }
 
         internal virtual void Update(Model model)
@@ -72,7 +71,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public abstract Task DeleteAsync(RequestOptions options = null);
 
-        IReadOnlyCollection<IApplicationCommandOption> IApplicationCommand.Options => Options;
+        /// <inheritdoc/>
+        public abstract Task ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null);
 
+        IReadOnlyCollection<IApplicationCommandOption> IApplicationCommand.Options => Options;
     }
 }

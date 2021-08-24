@@ -2,6 +2,7 @@ using Discord.Rest;
 using System;
 using System.Threading.Tasks;
 using Model = Discord.API.Interaction;
+using DataModel = Discord.API.ApplicationCommandInteractionData;
 
 namespace Discord.WebSocket
 {
@@ -61,7 +62,22 @@ namespace Discord.WebSocket
         internal static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
         {
             if (model.Type == InteractionType.ApplicationCommand)
+            {
+                if (model.ApplicationId != null)
+                {
+                    var dataModel = model.Data.IsSpecified ?
+                        (DataModel)model.Data.Value
+                        : null;
+                    if (dataModel != null)
+                    {
+                        if (dataModel.Type.Equals(ApplicationCommandType.User))
+                            return SocketUserCommand.Create(client, model, channel);
+                        if (dataModel.Type.Equals(ApplicationCommandType.Message))
+                            return SocketMessageCommand.Create(client, model, channel);
+                    }
+                }
                 return SocketSlashCommand.Create(client, model, channel);
+            }
             if (model.Type == InteractionType.MessageComponent)
                 return SocketMessageComponent.Create(client, model, channel);
             else

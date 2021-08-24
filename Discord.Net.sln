@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28407.52
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31521.260
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Core", "src\Discord.Net.Core\Discord.Net.Core.csproj", "{91E9E7BD-75C9-4E98-84AA-2C271922E5C2}"
 EndProject
@@ -40,7 +40,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Analyzers.Tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Examples", "src\Discord.Net.Examples\Discord.Net.Examples.csproj", "{47820065-3CFB-401C-ACEA-862BD564A404}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "idn", "samples\idn\idn.csproj", "{4A03840B-9EBE-47E3-89AB-E0914DF21AFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "idn", "samples\idn\idn.csproj", "{4A03840B-9EBE-47E3-89AB-E0914DF21AFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -232,6 +232,18 @@ Global
 		{4A03840B-9EBE-47E3-89AB-E0914DF21AFB}.Release|x64.Build.0 = Release|Any CPU
 		{4A03840B-9EBE-47E3-89AB-E0914DF21AFB}.Release|x86.ActiveCfg = Release|Any CPU
 		{4A03840B-9EBE-47E3-89AB-E0914DF21AFB}.Release|x86.Build.0 = Release|Any CPU
+		{0CC57A32-3AC7-489D-8DF5-C431925E4675}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CC57A32-3AC7-489D-8DF5-C431925E4675}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CC57A32-3AC7-489D-8DF5-C431925E4675}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0CC57A32-3AC7-489D-8DF5-C431925E4675}.Debug|x64.Build.0 = Debug|Any CPU
+		{0CC57A32-3AC7-489D-8DF5-C431925E4675}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0CC57A32-3AC7-489D-8DF5-C431925E4675}.Debug|x86.Build.0 = Debug|Any CPU
+		{0CC57A32-3AC7-489D-8DF5-C431925E4675}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CC57A32-3AC7-489D-8DF5-C431925E4675}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CC57A32-3AC7-489D-8DF5-C431925E4675}.Release|x64.ActiveCfg = Release|Any CPU
+		{0CC57A32-3AC7-489D-8DF5-C431925E4675}.Release|x64.Build.0 = Release|Any CPU
+		{0CC57A32-3AC7-489D-8DF5-C431925E4675}.Release|x86.ActiveCfg = Release|Any CPU
+		{0CC57A32-3AC7-489D-8DF5-C431925E4675}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
