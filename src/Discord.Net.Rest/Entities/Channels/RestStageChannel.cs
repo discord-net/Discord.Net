@@ -96,7 +96,7 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc/>
-        public Task RequestToSpeak(RequestOptions options = null)
+        public Task RequestToSpeakAsync(RequestOptions options = null)
         {
             var args = new API.Rest.ModifyVoiceStateParams()
             {
@@ -129,7 +129,7 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc/>
-        public Task MoveToSpeaker(IGuildUser user, RequestOptions options = null)
+        public Task MoveToSpeakerAsync(IGuildUser user, RequestOptions options = null)
         {
             var args = new API.Rest.ModifyVoiceStateParams()
             {
@@ -141,7 +141,7 @@ namespace Discord.Rest
         }
 
         /// <inheritdoc/>
-        public Task RemoveFromSpeaker(IGuildUser user, RequestOptions options = null)
+        public Task RemoveFromSpeakerAsync(IGuildUser user, RequestOptions options = null)
         {
             var args = new API.Rest.ModifyVoiceStateParams()
             {
