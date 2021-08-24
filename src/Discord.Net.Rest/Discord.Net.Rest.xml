@@ -2322,7 +2322,7 @@
         <member name="M:Discord.Rest.RestStageChannel.UpdateAsync(Discord.RequestOptions)">
             <inheritdoc/>
         </member>
-        <member name="M:Discord.Rest.RestStageChannel.RequestToSpeak(Discord.RequestOptions)">
+        <member name="M:Discord.Rest.RestStageChannel.RequestToSpeakAsync(Discord.RequestOptions)">
             <inheritdoc/>
         </member>
         <member name="M:Discord.Rest.RestStageChannel.BecomeSpeakerAsync(Discord.RequestOptions)">
@@ -2331,10 +2331,10 @@
         <member name="M:Discord.Rest.RestStageChannel.StopSpeakingAsync(Discord.RequestOptions)">
             <inheritdoc/>
         </member>
-        <member name="M:Discord.Rest.RestStageChannel.MoveToSpeaker(Discord.IGuildUser,Discord.RequestOptions)">
+        <member name="M:Discord.Rest.RestStageChannel.MoveToSpeakerAsync(Discord.IGuildUser,Discord.RequestOptions)">
             <inheritdoc/>
         </member>
-        <member name="M:Discord.Rest.RestStageChannel.RemoveFromSpeaker(Discord.IGuildUser,Discord.RequestOptions)">
+        <member name="M:Discord.Rest.RestStageChannel.RemoveFromSpeakerAsync(Discord.IGuildUser,Discord.RequestOptions)">
             <inheritdoc/>
         </member>
         <member name="T:Discord.Rest.RestTextChannel">

@@ -2310,7 +2310,7 @@
         <member name="M:Discord.WebSocket.SocketStageChannel.StopStageAsync(Discord.RequestOptions)">
             <inheritdoc/>
         </member>
-        <member name="M:Discord.WebSocket.SocketStageChannel.RequestToSpeak(Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketStageChannel.RequestToSpeakAsync(Discord.RequestOptions)">
             <inheritdoc/>
         </member>
         <member name="M:Discord.WebSocket.SocketStageChannel.BecomeSpeakerAsync(Discord.RequestOptions)">
@@ -2319,10 +2319,10 @@
         <member name="M:Discord.WebSocket.SocketStageChannel.StopSpeakingAsync(Discord.RequestOptions)">
             <inheritdoc/>
         </member>
-        <member name="M:Discord.WebSocket.SocketStageChannel.MoveToSpeaker(Discord.IGuildUser,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketStageChannel.MoveToSpeakerAsync(Discord.IGuildUser,Discord.RequestOptions)">
             <inheritdoc/>
         </member>
-        <member name="M:Discord.WebSocket.SocketStageChannel.RemoveFromSpeaker(Discord.IGuildUser,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketStageChannel.RemoveFromSpeakerAsync(Discord.IGuildUser,Discord.RequestOptions)">
             <inheritdoc/>
         </member>
         <member name="T:Discord.WebSocket.SocketTextChannel">

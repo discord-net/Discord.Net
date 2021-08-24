@@ -2000,7 +2000,7 @@
                 A task that represents the asynchronous stop operation.
             </returns>
         </member>
-        <member name="M:Discord.IStageChannel.RequestToSpeak(Discord.RequestOptions)">
+        <member name="M:Discord.IStageChannel.RequestToSpeakAsync(Discord.RequestOptions)">
             <summary>
                 Indicates that the bot would like to speak within a stage channel.
             </summary>
@@ -2027,7 +2027,7 @@
                 A task that represents the asynchronous stop operation.
             </returns>
         </member>
-        <member name="M:Discord.IStageChannel.MoveToSpeaker(Discord.IGuildUser,Discord.RequestOptions)">
+        <member name="M:Discord.IStageChannel.MoveToSpeakerAsync(Discord.IGuildUser,Discord.RequestOptions)">
             <summary>
                 Makes a user a speaker within a stage.
             </summary>
@@ -2037,7 +2037,7 @@
                 A task that represents the asynchronous move operation.
             </returns>
         </member>
-        <member name="M:Discord.IStageChannel.RemoveFromSpeaker(Discord.IGuildUser,Discord.RequestOptions)">
+        <member name="M:Discord.IStageChannel.RemoveFromSpeakerAsync(Discord.IGuildUser,Discord.RequestOptions)">
             <summary>
                 Removes a user from speaking.
             </summary>
