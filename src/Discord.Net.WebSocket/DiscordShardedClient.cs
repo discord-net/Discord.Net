@@ -470,6 +470,10 @@ namespace Discord.WebSocket
             client.RequestToSpeak += (stage, user) => _requestToSpeak.InvokeAsync(stage, user);
             client.SpeakerAdded += (stage, user) => _speakerAdded.InvokeAsync(stage, user);
             client.SpeakerRemoved += (stage, user) => _speakerRemoved.InvokeAsync(stage, user);
+
+            client.GuildStickerCreated += (sticker) => _guildStickerCreated.InvokeAsync(sticker);
+            client.GuildStickerDeleted += (sticker) => _guildStickerDeleted.InvokeAsync(sticker);
+            client.GuildStickerUpdated += (before, after) => _guildStickerUpdated.InvokeAsync(before, after);
         }
 
         //IDiscordClient
