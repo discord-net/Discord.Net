@@ -2090,6 +2090,25 @@ namespace Discord.WebSocket
                                             await interaction.DeferAsync().ConfigureAwait(false);
 
                                         await TimedInvokeAsync(_interactionCreatedEvent, nameof(InteractionCreated), interaction).ConfigureAwait(false);
+
+                                        switch (interaction)
+                                        {
+                                            case SocketSlashCommand slashCommand:
+                                                await TimedInvokeAsync(_slashCommandExecuted, nameof(SlashCommandExecuted), slashCommand).ConfigureAwait(false);
+                                                break;
+                                            case SocketMessageComponent messageComponent:
+                                                if(messageComponent.Data.Type == ComponentType.SelectMenu)
+                                                    await TimedInvokeAsync(_selectMenuExecuted, nameof(SelectMenuExecuted), messageComponent).ConfigureAwait(false);
+                                                if(messageComponent.Data.Type == ComponentType.Button)
+                                                    await TimedInvokeAsync(_buttonExecuted, nameof(ButtonExecuted), messageComponent).ConfigureAwait(false);
+                                                break;
+                                            case SocketUserCommand userCommand:
+                                                await TimedInvokeAsync(_userCommandExecuted, nameof(UserCommandExecuted), userCommand).ConfigureAwait(false);
+                                                break;
+                                            case SocketMessageCommand messageCommand:
+                                                await TimedInvokeAsync(_messageCommandExecuted, nameof(MessageCommandExecuted), messageCommand).ConfigureAwait(false);
+                                                break;
+                                        }
                                     }
                                     else
                                     {

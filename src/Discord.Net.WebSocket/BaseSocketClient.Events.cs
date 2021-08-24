@@ -457,7 +457,7 @@ namespace Discord.WebSocket
 
         //Interactions
         /// <summary>
-        ///     Fired when an Interaction is created.
+        ///     Fired when an Interaction is created. This event covers all types of interactions including but not limited to: buttons, select menus, slash commands.
         /// </summary>
         /// <remarks>
         ///     <para>
@@ -474,6 +474,55 @@ namespace Discord.WebSocket
             remove { _interactionCreatedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketInteraction, Task>> _interactionCreatedEvent = new AsyncEvent<Func<SocketInteraction, Task>>();
+
+        /// <summary>
+        ///     Fired when a button is clicked and its interaction is received.
+        /// </summary>
+        public event Func<SocketMessageComponent, Task> ButtonExecuted
+        {
+            add => _buttonExecuted.Add(value);
+            remove => _buttonExecuted.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketMessageComponent, Task>> _buttonExecuted = new AsyncEvent<Func<SocketMessageComponent, Task>>();
+
+        /// <summary>
+        ///     Fired when a select menu is used and its interaction is received.
+        /// </summary>
+        public event Func<SocketMessageComponent, Task> SelectMenuExecuted
+        {
+            add => _selectMenuExecuted.Add(value);
+            remove => _selectMenuExecuted.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketMessageComponent, Task>> _selectMenuExecuted = new AsyncEvent<Func<SocketMessageComponent, Task>>();
+        /// <summary>
+        ///     Fired when a slash command is used and its interaction is received.
+        /// </summary>
+        public event Func<SocketSlashCommand, Task> SlashCommandExecuted
+        {
+            add => _slashCommandExecuted.Add(value);
+            remove => _slashCommandExecuted.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketSlashCommand, Task>> _slashCommandExecuted = new AsyncEvent<Func<SocketSlashCommand, Task>>();
+
+        /// <summary>
+        ///     Fired when a user command is used and its interaction is received.
+        /// </summary>
+        public event Func<SocketUserCommand, Task> UserCommandExecuted
+        {
+            add => _userCommandExecuted.Add(value);
+            remove => _userCommandExecuted.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketUserCommand, Task>> _userCommandExecuted = new AsyncEvent<Func<SocketUserCommand, Task>>();
+
+        /// <summary>
+        ///     Fired when a message command is used and its interaction is received.
+        /// </summary>
+        public event Func<SocketMessageCommand, Task> MessageCommandExecuted
+        {
+            add => _messageCommandExecuted.Add(value);
+            remove => _messageCommandExecuted.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketMessageCommand, Task>> _messageCommandExecuted = new AsyncEvent<Func<SocketMessageCommand, Task>>();
 
         /// <summary>
         ///     Fired when a guild application command is created.

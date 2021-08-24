@@ -709,7 +709,7 @@
         </member>
         <member name="E:Discord.WebSocket.BaseSocketClient.InteractionCreated">
             <summary>
-                Fired when an Interaction is created.
+                Fired when an Interaction is created. This event covers all types of interactions including but not limited to: buttons, select menus, slash commands.
             </summary>
             <remarks>
                 <para>
@@ -720,6 +720,31 @@
                     The interaction created will be passed into the <see cref="T:Discord.WebSocket.SocketInteraction"/> parameter.
                 </para>
             </remarks>
+        </member>
+        <member name="E:Discord.WebSocket.BaseSocketClient.ButtonExecuted">
+            <summary>
+                Fired when a button is clicked and its interaction is received.
+            </summary>
+        </member>
+        <member name="E:Discord.WebSocket.BaseSocketClient.SelectMenuExecuted">
+            <summary>
+                Fired when a select menu is used and its interaction is received.
+            </summary>
+        </member>
+        <member name="E:Discord.WebSocket.BaseSocketClient.SlashCommandExecuted">
+            <summary>
+                Fired when a slash command is used and its interaction is received.
+            </summary>
+        </member>
+        <member name="E:Discord.WebSocket.BaseSocketClient.UserCommandExecuted">
+            <summary>
+                Fired when a user command is used and its interaction is received.
+            </summary>
+        </member>
+        <member name="E:Discord.WebSocket.BaseSocketClient.MessageCommandExecuted">
+            <summary>
+                Fired when a message command is used and its interaction is received.
+            </summary>
         </member>
         <member name="E:Discord.WebSocket.BaseSocketClient.ApplicationCommandCreated">
              <summary>
