@@ -2,6 +2,7 @@ using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -961,6 +962,33 @@ namespace Discord
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
         /// </returns>
         Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates a new sticker in this guild
+        /// </summary>
+        /// <param name="name">The name of the sticker.</param>
+        /// <param name="description">The description of the sticker.</param>
+        /// <param name="tags">The tags of the sticker.</param>
+        /// <param name="path">The path of the file to upload.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
+        /// </returns>
+        Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path, RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates a new sticker in this guild
+        /// </summary>
+        /// <param name="name">The name of the sticker.</param>
+        /// <param name="description">The description of the sticker.</param>
+        /// <param name="tags">The tags of the sticker.</param>
+        /// <param name="stream">The stream containing the file data.</param>
+        /// <param name="filename">The name of the file <b>with</b> the extension, ex: image.png</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
+        /// </returns>
+        Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Stream stream, string filename, RequestOptions options = null);
 
         /// <summary>
         ///     Gets a specific sticker within this guild.

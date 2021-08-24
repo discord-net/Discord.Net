@@ -20,6 +20,7 @@ using RoleModel = Discord.API.Role;
 using UserModel = Discord.API.User;
 using VoiceStateModel = Discord.API.VoiceState;
 using StickerModel = Discord.API.Sticker;
+using System.IO;
 
 namespace Discord.WebSocket
 {
@@ -1248,6 +1249,42 @@ namespace Discord.WebSocket
             return AddOrUpdateSticker(model);
         }
         /// <summary>
+        ///     Creates a new sticker in this guild
+        /// </summary>
+        /// <param name="name">The name of the sticker.</param>
+        /// <param name="description">The description of the sticker.</param>
+        /// <param name="tags">The tags of the sticker.</param>
+        /// <param name="path">The path of the file to upload.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
+        /// </returns>
+        public Task<SocketCustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path,
+            RequestOptions options = null)
+        {
+            var fs = File.OpenRead(path);
+            return CreateStickerAsync(name, description, tags, fs, Path.GetFileName(fs.Name), options);
+        }
+        /// <summary>
+        ///     Creates a new sticker in this guild
+        /// </summary>
+        /// <param name="name">The name of the sticker.</param>
+        /// <param name="description">The description of the sticker.</param>
+        /// <param name="tags">The tags of the sticker.</param>
+        /// <param name="stream">The stream containing the file data.</param>
+        /// <param name="filename">The name of the file <b>with</b> the extension, ex: image.png</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
+        /// </returns>
+        public async Task<SocketCustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Stream stream,
+            string filename, RequestOptions options = null)
+        {
+            var model = await GuildHelper.CreateStickerAsync(Discord, this, name, description, tags, stream, filename, options).ConfigureAwait(false);
+
+            return AddOrUpdateSticker(model);
+        }
+        /// <summary>
         ///     Deletes a sticker within this guild.
         /// </summary>
         /// <param name="sticker">The sticker to delete.</param>
@@ -1632,12 +1669,22 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync (RequestOptions options)
             => await GetApplicationCommandsAsync(options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options)
             => await CreateStickerAsync(name, description, tags, image, options);
+        /// <inheritdoc />
+        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, Stream stream, string filename, RequestOptions options)
+            => await CreateStickerAsync(name, description, tags, stream, filename, options);
+        /// <inheritdoc />
+        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path, RequestOptions options)
+            => await CreateStickerAsync(name, description, tags, path, options);
+        /// <inheritdoc />
         async Task<ICustomSticker> IGuild.GetStickerAsync(ulong id, CacheMode mode, RequestOptions options)
             => await GetStickerAsync(id, mode, options);
+        /// <inheritdoc />
         async Task<IReadOnlyCollection<ICustomSticker>> IGuild.GetStickersAsync(CacheMode mode, RequestOptions options)
             => await GetStickersAsync(mode, options);
+        /// <inheritdoc />
         Task IGuild.DeleteStickerAsync(ICustomSticker sticker, RequestOptions options)
             => DeleteStickerAsync(_stickers[sticker.Id], options);
 

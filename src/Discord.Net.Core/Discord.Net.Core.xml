@@ -3945,6 +3945,33 @@
                 A task that represents the asynchronous creation operation. The task result contains the created sticker.
             </returns>
         </member>
+        <member name="M:Discord.IGuild.CreateStickerAsync(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.String,Discord.RequestOptions)">
+            <summary>
+                Creates a new sticker in this guild
+            </summary>
+            <param name="name">The name of the sticker.</param>
+            <param name="description">The description of the sticker.</param>
+            <param name="tags">The tags of the sticker.</param>
+            <param name="path">The path of the file to upload.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous creation operation. The task result contains the created sticker.
+            </returns>
+        </member>
+        <member name="M:Discord.IGuild.CreateStickerAsync(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.IO.Stream,System.String,Discord.RequestOptions)">
+            <summary>
+                Creates a new sticker in this guild
+            </summary>
+            <param name="name">The name of the sticker.</param>
+            <param name="description">The description of the sticker.</param>
+            <param name="tags">The tags of the sticker.</param>
+            <param name="stream">The stream containing the file data.</param>
+            <param name="filename">The name of the file <b>with</b> the extension, ex: image.png</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous creation operation. The task result contains the created sticker.
+            </returns>
+        </member>
         <member name="M:Discord.IGuild.GetStickerAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
             <summary>
                 Gets a specific sticker within this guild.

@@ -8,6 +8,7 @@ using WidgetModel = Discord.API.GuildWidget;
 using Model = Discord.API.Guild;
 using RoleModel = Discord.API.Role;
 using ImageModel = Discord.API.Image;
+using System.IO;
 
 namespace Discord.Rest
 {
@@ -554,6 +555,32 @@ namespace Discord.Rest
                 Description = description,
                 File = image.Stream,
                 Tags = string.Join(", ", tags)
+            };
+
+            return await client.ApiClient.CreateGuildStickerAsync(apiArgs, guild.Id, options).ConfigureAwait(false);
+        }
+
+        public static async Task<API.Sticker> CreateStickerAsync(BaseDiscordClient client, IGuild guild, string name, string description, IEnumerable<string> tags,
+            Stream file, string filename, RequestOptions options = null)
+        {
+            Preconditions.NotNull(name, nameof(name));
+            Preconditions.NotNull(description, nameof(description));
+            Preconditions.NotNull(file, nameof(file));
+            Preconditions.NotNull(filename, nameof(filename));
+
+            Preconditions.AtLeast(name.Length, 2, nameof(name));
+            Preconditions.AtLeast(description.Length, 2, nameof(description));
+
+            Preconditions.AtMost(name.Length, 30, nameof(name));
+            Preconditions.AtMost(description.Length, 100, nameof(name));
+
+            var apiArgs = new CreateStickerParams()
+            {
+                Name = name,
+                Description = description,
+                File = file,
+                Tags = string.Join(", ", tags),
+                FileName = filename
             };
 
             return await client.ApiClient.CreateGuildStickerAsync(apiArgs, guild.Id, options).ConfigureAwait(false);
