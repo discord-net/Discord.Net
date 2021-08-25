@@ -5086,6 +5086,20 @@
             <exception cref="T:System.ArgumentNullException" accessor="set"><see cref="P:Discord.ComponentBuilder.ActionRows"/> cannot be null.</exception>
             <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ComponentBuilder.ActionRows"/> count exceeds <see cref="F:Discord.ComponentBuilder.MaxActionRowCount"/>.</exception>
         </member>
+        <member name="M:Discord.ComponentBuilder.FromMessage(Discord.IMessage)">
+            <summary>
+                Creates a new builder from a message.
+            </summary>
+            <param name="message">The message to create the builder from.</param>
+            <returns>The newly created builder.</returns>
+        </member>
+        <member name="M:Discord.ComponentBuilder.FromComponents(System.Collections.Generic.IReadOnlyCollection{Discord.IMessageComponent})">
+            <summary>
+                Creates a new builder from the provided list of components.
+            </summary>
+            <param name="components">The components to create the builder from.</param>
+            <returns>The newly created builder.</returns>
+        </member>
         <member name="M:Discord.ComponentBuilder.WithSelectMenu(System.String,System.String,System.Collections.Generic.List{Discord.SelectMenuOptionBuilder},System.String,System.Int32,System.Int32,System.Boolean,System.Int32)">
             <summary>
                 Adds a <see cref="T:Discord.SelectMenuBuilder"/> to the <see cref="T:Discord.ComponentBuilder"/> at the specific row.
