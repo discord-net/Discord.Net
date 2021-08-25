@@ -511,7 +511,12 @@ namespace Discord.WebSocket
             if (model.GuildId.IsSpecified)
             {
                 var guild = State.GetGuild(model.GuildId.Value);
-                sticker = guild.AddOrUpdateSticker(model);
+
+                // since the sticker can be from another guild, check if we are in the guild or its in the cache
+                if (guild != null)
+                    sticker = guild.AddOrUpdateSticker(model);
+                else
+                    sticker = SocketSticker.Create(this, model);
                 return sticker;
             }
             else

@@ -70,7 +70,7 @@ namespace Discord.WebSocket
 
         internal SocketCustomSticker Clone() => MemberwiseClone() as SocketCustomSticker;
 
-        private string DebuggerDisplay => $"{Name} in {Guild.Name} ({Id})";
+        private new string DebuggerDisplay => Guild == null ? base.DebuggerDisplay : $"{Name} in {Guild.Name} ({Id})";
 
         // ICustomSticker
         ulong? ICustomSticker.AuthorId

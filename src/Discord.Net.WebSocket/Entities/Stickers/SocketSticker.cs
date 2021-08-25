@@ -76,7 +76,7 @@ namespace Discord.WebSocket
             }
         }
 
-        private string DebuggerDisplay => $"{Name} ({Id})";
+        internal string DebuggerDisplay => $"{Name} ({Id})";
 
         /// <inheritdoc/>
         public override bool Equals(object obj)

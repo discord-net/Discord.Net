@@ -174,17 +174,16 @@ namespace Discord.WebSocket
                         SocketSticker sticker = null;
 
                         if (guild != null)
-                        {
                             sticker = guild.GetSticker(stickerItem.Id);
-                        }
 
-                        if(sticker == null)
-                        {
+                        if (sticker == null)
                             sticker = Discord.GetSticker(stickerItem.Id);
-                        }
 
                         // if its still null, create an unknown
-                        sticker = SocketUnknownSticker.Create(Discord, stickerItem);
+                        if (sticker == null)
+                            sticker = SocketUnknownSticker.Create(Discord, stickerItem);
+
+                        stickers.Add(sticker);
                     }
 
                     _stickers = stickers.ToImmutable();

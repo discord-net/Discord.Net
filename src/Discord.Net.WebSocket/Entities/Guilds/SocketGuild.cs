@@ -1240,10 +1240,10 @@ namespace Discord.WebSocket
         /// </returns>
         public async ValueTask<SocketCustomSticker> GetStickerAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
         {
-            var sticker = _stickers[id];
+            var sticker = _stickers.FirstOrDefault(x => x.Key == id);
 
-            if (sticker != null)
-                return sticker;
+            if (sticker.Value != null)
+                return sticker.Value;
 
             if (mode == CacheMode.CacheOnly)
                 return null;
