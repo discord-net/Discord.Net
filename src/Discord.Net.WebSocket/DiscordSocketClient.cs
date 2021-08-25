@@ -214,6 +214,8 @@ namespace Discord.WebSocket
             {
                 var models = await ApiClient.ListNitroStickerPacksAsync().ConfigureAwait(false);
 
+                var builder = ImmutableArray.CreateBuilder<StickerPack<SocketSticker>>();
+
                 foreach (var model in models.StickerPacks)
                 {
                     var stickers = model.Stickers.Select(x => SocketSticker.Create(this, x));
@@ -228,8 +230,10 @@ namespace Discord.WebSocket
                         stickers
                     );
 
-                    _defaultStickers.Add(pack);
+                    builder.Add(pack);
                 }
+
+                _defaultStickers = builder.ToImmutable();
             }
         }
 
