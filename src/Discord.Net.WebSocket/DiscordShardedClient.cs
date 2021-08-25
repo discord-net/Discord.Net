@@ -83,7 +83,7 @@ namespace Discord.WebSocket
             _shardIdsToIndex = new Dictionary<int, int>();
             config.DisplayInitialLog = false;
             _baseConfig = config;
-            _defaultStickers = new ImmutableArray<StickerPack<SocketSticker>>();
+            _defaultStickers = ImmutableArray.Create<StickerPack<SocketSticker>>();
 
             if (config.TotalShards == null)
                 _automaticShards = true;

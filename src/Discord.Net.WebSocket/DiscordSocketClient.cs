@@ -149,7 +149,7 @@ namespace Discord.WebSocket
             Rest = new DiscordSocketRestClient(config, ApiClient);
             _heartbeatTimes = new ConcurrentQueue<long>();
             _gatewayIntents = config.GatewayIntents;
-            _defaultStickers = new ImmutableArray<StickerPack<SocketSticker>>();
+            _defaultStickers = ImmutableArray.Create<StickerPack<SocketSticker>>();
 
             _stateLock = new SemaphoreSlim(1, 1);
             _gatewayLogger = LogManager.CreateLogger(ShardId == 0 && TotalShards == 1 ? "Gateway" : $"Shard #{ShardId}");
@@ -210,7 +210,7 @@ namespace Discord.WebSocket
 
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
-            if(this._shardedClient != null && this._defaultStickers.Length == 0)
+            if(this._shardedClient == null && this._defaultStickers.Length == 0)
             {
                 var models = await ApiClient.ListNitroStickerPacksAsync().ConfigureAwait(false);
 
