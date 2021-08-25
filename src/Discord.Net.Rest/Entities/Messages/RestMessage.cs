@@ -87,7 +87,10 @@ namespace Discord.Rest
         }
         internal static RestMessage Create(BaseDiscordClient discord, IMessageChannel channel, IUser author, Model model)
         {
-            if (model.Type == MessageType.Default || model.Type == MessageType.Reply)
+            if (model.Type == MessageType.Default ||
+                model.Type == MessageType.Reply ||
+                model.Type == MessageType.ApplicationCommand ||
+                model.Type == MessageType.ThreadStarterMessage)
                 return RestUserMessage.Create(discord, channel, author, model);
             else
                 return RestSystemMessage.Create(discord, channel, author, model);
