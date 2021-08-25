@@ -46,6 +46,47 @@ namespace Discord
         private List<ActionRowBuilder> _actionRows { get; set; }
 
         /// <summary>
+        ///     Creates a new builder from a message.
+        /// </summary>
+        /// <param name="message">The message to create the builder from.</param>
+        /// <returns>The newly created builder.</returns>
+        public static ComponentBuilder FromMessage(IMessage message)
+            => FromComponents(message.Components);
+
+        /// <summary>
+        ///     Creates a new builder from the provided list of components.
+        /// </summary>
+        /// <param name="components">The components to create the builder from.</param>
+        /// <returns>The newly created builder.</returns>
+        public static ComponentBuilder FromComponents(IReadOnlyCollection<IMessageComponent> components)
+        {
+            var builder = new ComponentBuilder();
+            for(int i = 0; i != components.Count; i++)
+            {
+                var component = components.ElementAt(i);
+                builder.AddComponent(component, i);
+            }
+            return builder;
+        }
+
+        internal void AddComponent(IMessageComponent component, int row)
+        {
+            switch (component)
+            {
+                case ButtonComponent button:
+                    this.WithButton(button.Label, button.CustomId, button.Style, button.Emote, button.Url, button.Disabled, row);
+                    break;
+                case ActionRowComponent actionRow:
+                    foreach (var cmp in actionRow.Components)
+                        AddComponent(cmp, row);
+                    break;
+                case SelectMenu menu:
+                    this.WithSelectMenu(menu.Placeholder, menu.CustomId, menu.Options.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.Default)).ToList(), menu.Placeholder, menu.MinValues, menu.MaxValues, menu.Disabled, row);
+                    break;
+            }
+        }
+
+        /// <summary>
         ///     Adds a <see cref="SelectMenuBuilder"/> to the <see cref="ComponentBuilder"/> at the specific row.
         ///     If the row cannot accept the component then it will add it to a row that can.
         /// </summary>
