@@ -2245,6 +2245,12 @@ namespace Discord.WebSocket
 
                                     var channel = (SocketThreadChannel)guild.GetChannel(data.Id);
 
+                                    if (channel == null)
+                                    {
+                                        await UnknownChannelAsync(type, data.Id);
+                                        return;
+                                    }
+
                                     var before = channel.Clone();
                                     channel.Update(State, data);
 
