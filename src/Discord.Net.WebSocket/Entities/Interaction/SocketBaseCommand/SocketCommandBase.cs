@@ -157,6 +157,10 @@ namespace Discord.WebSocket
             var response = new API.InteractionResponse
             {
                 Type = InteractionResponseType.DeferredChannelMessageWithSource,
+                Data = new API.InteractionCallbackData
+                {
+                    Flags = ephemeral ? MessageFlags.Ephemeral : Optional<MessageFlags>.Unspecified
+                }
             };
 
             return Discord.Rest.ApiClient.CreateInteractionResponse(response, this.Id, this.Token, options);
