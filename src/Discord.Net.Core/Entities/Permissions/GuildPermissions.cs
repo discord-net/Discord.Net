@@ -12,7 +12,7 @@ namespace Discord
         /// <summary> Gets a <see cref="GuildPermissions"/> that grants all guild permissions for webhook users. </summary>
         public static readonly GuildPermissions Webhook = new GuildPermissions(0b00000_0000000_0001101100000_000000);
         /// <summary> Gets a <see cref="GuildPermissions"/> that grants all guild permissions. </summary>
-        public static readonly GuildPermissions All = new GuildPermissions(0b11111_1111111_1111111111111_111111);
+        public static readonly GuildPermissions All = new GuildPermissions(0b11111111_11111_1111111_1111111111111_11111);
 
         /// <summary> Gets a packed value representing all the permissions in this <see cref="GuildPermissions"/>. </summary>
         public ulong RawValue { get; }
