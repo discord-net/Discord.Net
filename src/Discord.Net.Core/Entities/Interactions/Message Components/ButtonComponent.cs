@@ -57,7 +57,5 @@ namespace Discord
             this.Url = url;
             this.Disabled = disabled;
         }
-
-
     }
 }
