@@ -5667,9 +5667,19 @@
                 A select menu for picking from choices
             </summary>
         </member>
+        <member name="T:Discord.IMessageComponent">
+            <summary>
+                Represents a message component on a message.
+            </summary>
+        </member>
         <member name="P:Discord.IMessageComponent.Type">
             <summary>
-                The <see cref="T:Discord.ComponentType"/> of this Message Component.
+                Gets the <see cref="T:Discord.ComponentType"/> of this Message Component.
+            </summary>
+        </member>
+        <member name="P:Discord.IMessageComponent.CustomId">
+            <summary>
+                Gets the custom id of the component if possible; otherwise <see langword="null"/>.
             </summary>
         </member>
         <member name="T:Discord.MessageComponent">

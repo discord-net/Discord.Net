@@ -33,5 +33,8 @@ namespace Discord.API
                 }
             }).ToArray();
         }
+
+        [JsonIgnore]
+        string IMessageComponent.CustomId => null;
     }
 }

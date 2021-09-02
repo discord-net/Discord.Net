@@ -30,7 +30,6 @@ namespace Discord.API
         [JsonProperty("disabled")]
         public Optional<bool> Disabled { get; set; }
 
-
         public ButtonComponent() { }
 
         public ButtonComponent(Discord.ButtonComponent c)
@@ -62,5 +61,8 @@ namespace Discord.API
                 }
             }
         }
+
+        [JsonIgnore]
+        string IMessageComponent.CustomId => this.CustomId.GetValueOrDefault();
     }
 }
