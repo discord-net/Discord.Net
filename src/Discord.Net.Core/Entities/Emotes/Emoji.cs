@@ -64,9 +64,8 @@ namespace Discord
             return result != null;
         }
 
-        /// <summary> Parse an <see cref="Emoji"/> from its raw format. </summary>
-        /// <param name="text">The raw encoding of an emoji. For example: <c>:heart: or ❤</c></param>
-        /// <param name="result">An emoji.</param>
+        /// <summary> Parse an <see cref="Emoji"/> from its raw format.</summary>
+        /// <param name="emojiStr">The raw encoding of an emoji. For example: <c>:heart: or ❤</c></param>
         /// <exception cref="FormatException">String is not emoji or unicode!</exception>
         public static Emoji Parse(string emojiStr)
         {
@@ -5971,5 +5970,7 @@ namespace Discord
                 return _unicodesAndNames;
             }
         }
+
+        public static implicit operator Emoji(string s) => Parse(s);
     }
 }
