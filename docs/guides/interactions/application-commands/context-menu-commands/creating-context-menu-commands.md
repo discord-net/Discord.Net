@@ -19,21 +19,21 @@ If you don't have the code for a bot ready yet please follow [this guide](https:
 
 The context menu user command builder will help you create user commands. The builder has these available fields and methods:
 
-| Name                  | Type                             | Description                                                                                  |
-| --------------------- | -------------------------------- | -------------------------------------------------------------------------------------------- |
-| Name                  | string                           | The name of this context menu command.                                                       |
-| WithName              | Function                         | Sets the field name.                                                                         |
-| Build                 | Function                         | Builds the builder into the appropriate `CommandCreationProperties` class used to make Menu commands |
+| Name     | Type     | Description                                                                                      |
+| -------- | -------- | ------------------------------------------------------------------------------------------------ |
+| Name     | string   | The name of this context menu command.                                                           |
+| WithName | Function | Sets the field name.                                                                             |
+| Build    | Function | Builds the builder into the appropriate `UserCommandProperties` class used to make Menu commands |
 
 ## MessageCommandBuilder
 
 The context menu message command builder will help you create message commands. The builder has these available fields and methods:
 
-| Name                  | Type                             | Description                                                                                  |
-| --------------------- | -------------------------------- | -------------------------------------------------------------------------------------------- |
-| Name                  | string                           | The name of this context menu command.                                                       |
-| WithName              | Function                         | Sets the field name.                                                                         |
-| Build                 | Function                         | Builds the builder into the appropriate `CommandCreationProperties` class used to make Menu commands |
+| Name     | Type     | Description                                                                                         |
+| -------- | -------- | --------------------------------------------------------------------------------------------------- |
+| Name     | string   | The name of this context menu command.                                                              |
+| WithName | Function | Sets the field name.                                                                                |
+| Build    | Function | Builds the builder into the appropriate `MessageCommandProperties` class used to make Menu commands |
 
 **Note**: Context Menu command names can be upper and lowercase, and use spaces.
 
@@ -47,8 +47,8 @@ client.Ready += Client_Ready;
 
 public async Task Client_Ready()
 {
-    // Let's build a guild command! We're going to need a guild id so lets just put that in a variable.
-    ulong guildId = 848176216011046962;
+    // Let's build a guild command! We're going to need a guild so lets just put that in a variable.
+    var guild = client.GetGuild(guildId);
 
     // Next, lets create our user and message command builder. This is like the embed builder but for context menu commands.
     var guildUserCommand = new UserCommandBuilder();
@@ -62,20 +62,27 @@ public async Task Client_Ready()
     //guildCommand.WithDescription("");
 
     // Let's do our global commands
-    var globalCommand = new UserCommandBuilder();
+    var globalUserCommand = new UserCommandBuilder();
     globalCommand.WithName("Global User Command");
 	var globalMessageCommand = new MessageCommandBuilder();
 	globalMessageCommand.WithName("Global Message Command");
 
+
     try
     {
-        // Now that we have our builder, we can call the rest API to make our slash command.
-        await client.Rest.CreateGuildUserCommand(guildUserCommand.Build(), guildId);
-		await client.Rest.CreateGuildMessageCommand(guildMessageCommand.Build(), guildId);
+        // Now that we have our builder, we can call the BulkOverwriteApplicationCommandAsync to make our context commands. Note: this will overwrite all your previous commands with this array.
+        await guild.BulkOverwriteApplicationCommandAsync(new ApplicationCommandProperties[]
+        {
+            guildUserCommand.Build(),
+            guildMessageCommand.Build()
+        });
 
-        // With global commands we dont need the guild id.
-        await client.Rest.CreateGlobalUserCommand(globalUserCommand.Build());
-		await client.Rest.CreateGlobalMessageCommand(globalMessageCommand.Build());
+        // With global commands we dont need the guild.
+        await client.BulkOverwriteGlobalApplicationCommandsAsync(new ApplicationCommandProperties[]
+        {
+            globalUserCommand.Build(),
+            globalMessageCommand.Build()
+        })
     }
     catch(ApplicationCommandException exception)
     {
@@ -88,4 +95,5 @@ public async Task Client_Ready()
 }
 
 ```
+
 **Note**: Application commands only need to be created once. They do _not_ have to be 'created' on every startup or connection. The example simple shows creating them in the ready event as it's simpler than creating normal bot commands to register application commands.

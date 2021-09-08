@@ -18,7 +18,7 @@ There is a new special OAuth2 scope for applications called `applications.comman
 
 Head over to your discord applications OAuth2 screen and make sure to select the `application.commands` scope.
 
-![OAuth2 scoping](images/oauth.png)
+![OAuth2 scoping](slash-commands/images/oauth.png)
 
 From there you can then use the link to add your bot to a server.
 
