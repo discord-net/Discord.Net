@@ -1,6 +1,6 @@
 # Message Components
 
-Message components are a framework for adding interactive elements to a message your app or bot sends. They;re accessible, customizable, and easy to use.
+Message components are a framework for adding interactive elements to a message your app or bot sends. They're accessible, customizable, and easy to use.
 
 ## What is a Component
 
