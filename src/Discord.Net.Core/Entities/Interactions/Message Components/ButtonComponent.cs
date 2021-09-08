@@ -48,6 +48,15 @@ namespace Discord
         /// </summary>
         public bool Disabled { get; }
 
+        /// <summary>
+        ///     Turns this button into a button builder.
+        /// </summary>
+        /// <returns>
+        ///     A newly created button builder with the same properties as this button.
+        /// </returns>
+        public ButtonBuilder ToBuilder()
+            => new ButtonBuilder(this.Label, this.CustomId, this.Style, this.Url, this.Emote, this.Disabled);
+
         internal ButtonComponent(ButtonStyle style, string label, IEmote emote, string customId, string url, bool disabled)
         {
             this.Style = style;

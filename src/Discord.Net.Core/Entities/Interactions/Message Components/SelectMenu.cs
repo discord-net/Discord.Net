@@ -44,6 +44,21 @@ namespace Discord
         /// </summary>
         public bool Disabled { get; }
 
+        /// <summary>
+        ///     Turns this select menu into a builder.
+        /// </summary>
+        /// <returns>
+        ///     A newly create builder with the same properties as this select menu.
+        /// </returns>
+        public SelectMenuBuilder ToBuilder()
+            => new SelectMenuBuilder(
+                this.CustomId,
+                this.Options.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.Default)).ToList(),
+                this.Placeholder,
+                this.MaxValues,
+                this.MinValues,
+                this.Disabled);
+
         internal SelectMenu(string customId, List<SelectMenuOption> options, string placeholder, int minValues, int maxValues, bool disabled)
         {
             this.CustomId = customId;
