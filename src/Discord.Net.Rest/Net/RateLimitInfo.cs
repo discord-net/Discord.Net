@@ -4,19 +4,42 @@ using System.Globalization;
 
 namespace Discord.Net
 {
-    internal struct RateLimitInfo
+    /// <summary>
+    ///     Represents a REST-Based ratelimit info.
+    /// </summary>
+    public struct RateLimitInfo : IRateLimitInfo
     {
+        /// <inheritdoc/>
         public bool IsGlobal { get; }
+
+        /// <inheritdoc/>
         public int? Limit { get; }
+
+        /// <inheritdoc/>
         public int? Remaining { get; }
+
+        /// <inheritdoc/>
         public int? RetryAfter { get; }
+
+        /// <inheritdoc/>
         public DateTimeOffset? Reset { get; }
+
+        /// <inheritdoc/>
         public TimeSpan? ResetAfter { get; }
+
+        /// <inheritdoc/>
         public string Bucket { get; }
+
+        /// <inheritdoc/>
         public TimeSpan? Lag { get; }
 
-        internal RateLimitInfo(Dictionary<string, string> headers)
+        /// <inheritdoc/>
+        public string Endpoint { get; }
+
+        internal RateLimitInfo(Dictionary<string, string> headers, string endpoint)
         {
+            Endpoint = endpoint;
+
             IsGlobal = headers.TryGetValue("X-RateLimit-Global", out string temp) &&
                        bool.TryParse(temp, out var isGlobal) && isGlobal;
             Limit = headers.TryGetValue("X-RateLimit-Limit", out temp) && 
