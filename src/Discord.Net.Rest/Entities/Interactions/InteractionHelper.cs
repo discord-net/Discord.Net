@@ -453,7 +453,7 @@ namespace Discord.Rest
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.AtMost(args.Length, 10, nameof(args));
-            Preconditions.GreaterThan(args.Length, 0, nameof(args));
+            Preconditions.AtLeast(args.Length, 0, nameof(args));
 
             List<ApplicationCommandPermissions> permissionsList = new List<ApplicationCommandPermissions>();
 
