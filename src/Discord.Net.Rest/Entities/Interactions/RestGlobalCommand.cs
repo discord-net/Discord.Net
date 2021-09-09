@@ -37,9 +37,9 @@ namespace Discord.Rest
         /// <returns>
         ///     The modified command.
         /// </returns>
-        public override async Task ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null)
+        public override async Task ModifyAsync<TArg>(Action<TArg> func, RequestOptions options = null)
         {
-            var cmd = await InteractionHelper.ModifyGlobalCommand(Discord, this, func, options).ConfigureAwait(false);
+            var cmd = await InteractionHelper.ModifyGlobalCommand<TArg>(Discord, this, func, options).ConfigureAwait(false);
             this.Update(cmd);
         }
     }

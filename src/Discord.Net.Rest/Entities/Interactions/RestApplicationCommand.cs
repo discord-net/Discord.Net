@@ -57,6 +57,7 @@ namespace Discord.Rest
 
         internal virtual void Update(Model model)
         {
+            this.Type = model.Type;
             this.ApplicationId = model.ApplicationId;
             this.Name = model.Name;
             this.Description = model.Description;
@@ -67,12 +68,18 @@ namespace Discord.Rest
                 : null;
         }
 
-
         /// <inheritdoc/>
         public abstract Task DeleteAsync(RequestOptions options = null);
 
+        /// <inheritdoc />
+        public Task ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null)
+        {
+            return ModifyAsync<ApplicationCommandProperties>(func, options);
+        }
+        
         /// <inheritdoc/>
-        public abstract Task ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null);
+        public abstract Task ModifyAsync<TArg>(Action<TArg> func, RequestOptions options = null)
+            where TArg : ApplicationCommandProperties;
 
         IReadOnlyCollection<IApplicationCommandOption> IApplicationCommand.Options => Options;
     }

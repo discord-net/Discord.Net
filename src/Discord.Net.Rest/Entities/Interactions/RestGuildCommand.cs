@@ -42,9 +42,9 @@ namespace Discord.Rest
         /// <returns>
         ///     The modified command
         /// </returns>
-        public override async Task ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null)
+        public override async Task ModifyAsync<TArg>(Action<TArg> func, RequestOptions options = null)
         {
-            var model = await InteractionHelper.ModifyGuildCommand(Discord, this, GuildId, func, options).ConfigureAwait(false);
+            var model = await InteractionHelper.ModifyGuildCommand<TArg>(Discord, this, GuildId, func, options).ConfigureAwait(false);
             this.Update(model);
         }
 

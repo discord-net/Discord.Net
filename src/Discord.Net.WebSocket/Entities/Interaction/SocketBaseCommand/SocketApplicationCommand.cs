@@ -91,34 +91,24 @@ namespace Discord.WebSocket
         public Task DeleteAsync(RequestOptions options = null)
             => InteractionHelper.DeleteUnknownApplicationCommand(Discord, this.GuildId, this, options);
 
-        /// <summary>
-        ///     Modifies the current application command.
-        /// </summary>
-        /// <param name="func">The new properties to use when modifying the command.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous modification operation.
-        /// </returns>
-        /// <exception cref="InvalidOperationException">Thrown when you pass in an invalid <see cref="ApplicationCommandProperties"/> type.</exception>
+        /// <inheritdoc />
+        public Task ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null)
+        {
+            return ModifyAsync<ApplicationCommandProperties>(func, options);
+        }
+        
+        /// <inheritdoc />
         public async Task ModifyAsync<TArg>(Action<TArg> func, RequestOptions options = null) where TArg : ApplicationCommandProperties
         {
-            switch (typeof(TArg))
-            {
-                case Type messageCommand when messageCommand == typeof(MessageCommandProperties) && this.Type != ApplicationCommandType.Message:
-                case Type slashCommand   when slashCommand   == typeof(SlashCommandProperties)   && this.Type != ApplicationCommandType.Slash:
-                case Type userCommand    when userCommand    == typeof(UserCommandProperties)    && this.Type != ApplicationCommandType.User:
-                    throw new InvalidOperationException($"Cannot modify this application command with the parameter type {nameof(TArg)}");
-            }
-
             Model command = null;
 
             if (this.IsGlobalCommand)
             {
-                command = await InteractionHelper.ModifyGlobalCommand(Discord, this, func, options).ConfigureAwait(false);
+                command = await InteractionHelper.ModifyGlobalCommand<TArg>(Discord, this, func, options).ConfigureAwait(false);
             }
             else
             {
-                command = await InteractionHelper.ModifyGuildCommand(Discord, this, this.GuildId.Value, func, options);
+                command = await InteractionHelper.ModifyGuildCommand<TArg>(Discord, this, this.GuildId.Value, func, options);
             }
 
             this.Update(command);
@@ -126,7 +116,5 @@ namespace Discord.WebSocket
 
         // IApplicationCommand
         IReadOnlyCollection<IApplicationCommandOption> IApplicationCommand.Options => Options;
-        Task IApplicationCommand.ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options)
-            => ModifyAsync(func, options);
     }
 }

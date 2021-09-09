@@ -3910,6 +3910,9 @@
             <inheritdoc/>
         </member>
         <member name="M:Discord.Rest.RestApplicationCommand.ModifyAsync(System.Action{Discord.ApplicationCommandProperties},Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestApplicationCommand.ModifyAsync``1(System.Action{``0},Discord.RequestOptions)">
             <inheritdoc/>
         </member>
         <member name="T:Discord.Rest.RestApplicationCommandChoice">
@@ -3961,7 +3964,7 @@
         <member name="M:Discord.Rest.RestGlobalCommand.DeleteAsync(Discord.RequestOptions)">
             <inheritdoc/>
         </member>
-        <member name="M:Discord.Rest.RestGlobalCommand.ModifyAsync(System.Action{Discord.ApplicationCommandProperties},Discord.RequestOptions)">
+        <member name="M:Discord.Rest.RestGlobalCommand.ModifyAsync``1(System.Action{``0},Discord.RequestOptions)">
             <summary>
                 Modifies this <see cref="T:Discord.Rest.RestApplicationCommand"/>.
             </summary>
@@ -3984,7 +3987,7 @@
         <member name="M:Discord.Rest.RestGuildCommand.DeleteAsync(Discord.RequestOptions)">
             <inheritdoc/>
         </member>
-        <member name="M:Discord.Rest.RestGuildCommand.ModifyAsync(System.Action{Discord.ApplicationCommandProperties},Discord.RequestOptions)">
+        <member name="M:Discord.Rest.RestGuildCommand.ModifyAsync``1(System.Action{``0},Discord.RequestOptions)">
             <summary>
                 Modifies this <see cref="T:Discord.Rest.RestApplicationCommand"/>.
             </summary>

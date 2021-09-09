@@ -4686,7 +4686,7 @@
         </member>
         <member name="T:Discord.IApplicationCommand">
             <summary>
-                The base command model that belongs to an application. 
+                The base command model that belongs to an application.
             </summary>
         </member>
         <member name="P:Discord.IApplicationCommand.ApplicationId">
@@ -4728,6 +4728,17 @@
             <returns>
                 A task that represents the asynchronous modification operation.
             </returns>
+        </member>
+        <member name="M:Discord.IApplicationCommand.ModifyAsync``1(System.Action{``0},Discord.RequestOptions)">
+            <summary>
+                Modifies the current application command.
+            </summary>
+            <param name="func">The new properties to use when modifying the command.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous modification operation.
+            </returns>
+            <exception cref="T:System.InvalidOperationException">Thrown when you pass in an invalid <see cref="T:Discord.ApplicationCommandProperties"/> type.</exception>
         </member>
         <member name="T:Discord.IApplicationCommandInteractionData">
             <summary>
