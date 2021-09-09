@@ -2504,9 +2504,8 @@
             <param name="result">An emoji.</param>
         </member>
         <member name="M:Discord.Emoji.Parse(System.String)">
-            <summary> Parse an <see cref="T:Discord.Emoji"/> from its raw format. </summary>
-            <param name="text">The raw encoding of an emoji. For example: <c>:heart: or ❤</c></param>
-            <param name="result">An emoji.</param>
+            <summary> Parse an <see cref="T:Discord.Emoji"/> from its raw format.</summary>
+            <param name="emojiStr">The raw encoding of an emoji. For example: <c>:heart: or ❤</c></param>
             <exception cref="T:System.FormatException">String is not emoji or unicode!</exception>
         </member>
         <member name="M:Discord.Emoji.GetHashCode">
@@ -5029,6 +5028,14 @@
                 Whether this button is disabled or not.
             </summary>
         </member>
+        <member name="M:Discord.ButtonComponent.ToBuilder">
+            <summary>
+                Turns this button into a button builder.
+            </summary>
+            <returns>
+                A newly created button builder with the same properties as this button.
+            </returns>
+        </member>
         <member name="T:Discord.ButtonStyle">
             <summary>
                 Represents different styles to use with buttons. You can see an example of the different styles at <see href="https://discord.com/developers/docs/interactions/message-components#buttons-button-styles"/>
@@ -5734,6 +5741,14 @@
             <summary>
                 Whether this menu is disabled or not.
             </summary>
+        </member>
+        <member name="M:Discord.SelectMenu.ToBuilder">
+            <summary>
+                Turns this select menu into a builder.
+            </summary>
+            <returns>
+                A newly create builder with the same properties as this select menu.
+            </returns>
         </member>
         <member name="T:Discord.SelectMenuOption">
             <summary>
@@ -11802,6 +11817,56 @@
                 and an optional reason.
             </summary>
         </member>
+        <member name="T:Discord.IRateLimitInfo">
+            <summary>
+                Represents a generic ratelimit info.
+            </summary>
+        </member>
+        <member name="P:Discord.IRateLimitInfo.IsGlobal">
+            <summary>
+                Gets whether or not this ratelimit info is global.
+            </summary>
+        </member>
+        <member name="P:Discord.IRateLimitInfo.Limit">
+            <summary>
+                Gets the number of requests that can be made.
+            </summary>
+        </member>
+        <member name="P:Discord.IRateLimitInfo.Remaining">
+            <summary>
+                Gets the number of remaining requests that can be made.
+            </summary>
+        </member>
+        <member name="P:Discord.IRateLimitInfo.RetryAfter">
+            <summary>
+                Gets the total time (in seconds) of when the current rate limit bucket will reset. Can have decimals to match previous millisecond ratelimit precision
+            </summary>
+        </member>
+        <member name="P:Discord.IRateLimitInfo.Reset">
+            <summary>
+                Gets the <see cref="T:System.DateTimeOffset"/> at which the rate limit resets
+            </summary>
+        </member>
+        <member name="P:Discord.IRateLimitInfo.ResetAfter">
+            <summary>
+                Gets the absolute time when this ratelimit resets.
+            </summary>
+        </member>
+        <member name="P:Discord.IRateLimitInfo.Bucket">
+            <summary>
+                Gets a unique string denoting the rate limit being encountered (non-inclusive of major parameters in the route path).
+            </summary>
+        </member>
+        <member name="P:Discord.IRateLimitInfo.Lag">
+            <summary>
+                Gets the amount of lag for the request. This is used to denote the precise time of when the ratelimit expires.
+            </summary>
+        </member>
+        <member name="P:Discord.IRateLimitInfo.Endpoint">
+            <summary>
+                Gets the endpoint that this ratelimit info came from.
+            </summary>
+        </member>
         <member name="T:Discord.RequestOptions">
             <summary>
                 Represents options that should be used when sending a request.
@@ -11858,6 +11923,11 @@
             	when millisecond precision is especially important, and the
             	hosting system is known to have a desynced clock.
             </remarks>
+        </member>
+        <member name="P:Discord.RequestOptions.RatelimitCallback">
+            <summary>
+                Gets or sets the callback to execute regarding ratelimits for this request.
+            </summary>
         </member>
         <member name="M:Discord.RequestOptions.#ctor">
             <summary>

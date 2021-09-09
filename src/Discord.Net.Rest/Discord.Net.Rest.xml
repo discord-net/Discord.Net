@@ -149,6 +149,38 @@
         <member name="M:Discord.Net.Converters.ImageConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
             <exception cref="T:System.InvalidOperationException">Cannot read from image.</exception>
         </member>
+        <member name="T:Discord.Net.RateLimitInfo">
+            <summary>
+                Represents a REST-Based ratelimit info.
+            </summary>
+        </member>
+        <member name="P:Discord.Net.RateLimitInfo.IsGlobal">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Net.RateLimitInfo.Limit">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Net.RateLimitInfo.Remaining">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Net.RateLimitInfo.RetryAfter">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Net.RateLimitInfo.Reset">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Net.RateLimitInfo.ResetAfter">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Net.RateLimitInfo.Bucket">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Net.RateLimitInfo.Lag">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Net.RateLimitInfo.Endpoint">
+            <inheritdoc/>
+        </member>
         <member name="P:Discord.Rest.BaseDiscordClient.LoginState">
             <summary>
                 Gets the login state of the client.

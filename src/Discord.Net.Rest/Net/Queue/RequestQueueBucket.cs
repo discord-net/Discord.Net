@@ -65,7 +65,9 @@ namespace Discord.Net.Queue
                 try
                 {
                     var response = await request.SendAsync().ConfigureAwait(false);
-                    info = new RateLimitInfo(response.Headers);
+                    info = new RateLimitInfo(response.Headers, request.Endpoint);
+
+                    request.Options.ExecuteRatelimitCallback(info);
 
                     if (response.StatusCode < (HttpStatusCode)200 || response.StatusCode >= (HttpStatusCode)300)
                     {
