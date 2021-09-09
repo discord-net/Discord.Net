@@ -11850,12 +11850,12 @@
         </member>
         <member name="P:Discord.IRateLimitInfo.RetryAfter">
             <summary>
-                Gets the total time (in seconds) of when the current rate limit bucket will reset. Can have decimals to match previous millisecond ratelimit precision
+                Gets the total time (in seconds) of when the current rate limit bucket will reset. Can have decimals to match previous millisecond ratelimit precision.
             </summary>
         </member>
         <member name="P:Discord.IRateLimitInfo.Reset">
             <summary>
-                Gets the <see cref="T:System.DateTimeOffset"/> at which the rate limit resets
+                Gets the <see cref="T:System.DateTimeOffset"/> at which the rate limit resets.
             </summary>
         </member>
         <member name="P:Discord.IRateLimitInfo.ResetAfter">

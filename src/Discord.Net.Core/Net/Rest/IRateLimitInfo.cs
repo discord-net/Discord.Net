@@ -27,12 +27,12 @@ namespace Discord
         int? Remaining { get; }
 
         /// <summary>
-        ///     Gets the total time (in seconds) of when the current rate limit bucket will reset. Can have decimals to match previous millisecond ratelimit precision
+        ///     Gets the total time (in seconds) of when the current rate limit bucket will reset. Can have decimals to match previous millisecond ratelimit precision.
         /// </summary>
         int? RetryAfter { get; }
 
         /// <summary>
-        ///     Gets the <see cref="DateTimeOffset"/> at which the rate limit resets
+        ///     Gets the <see cref="DateTimeOffset"/> at which the rate limit resets.
         /// </summary>
         DateTimeOffset? Reset { get; }
 
