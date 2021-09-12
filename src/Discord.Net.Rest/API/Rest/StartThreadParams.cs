@@ -12,7 +12,7 @@ namespace Discord.API.Rest
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("duration")]
+        [JsonProperty("auto_archive_duration")]
         public ThreadArchiveDuration Duration { get; set; }
 
         [JsonProperty("type")]
