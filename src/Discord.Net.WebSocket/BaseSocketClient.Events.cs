@@ -603,13 +603,13 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Fired when a thread is updated within a guild.
         /// </summary>
-        public event Func<SocketThreadChannel, SocketThreadChannel, Task> ThreadUpdated
+        public event Func<Cacheable<SocketThreadChannel, ulong>, SocketThreadChannel, Task> ThreadUpdated
         {
             add { _threadUpdated.Add(value); }
             remove { _threadUpdated.Remove(value); }
         }
 
-        internal readonly AsyncEvent<Func<SocketThreadChannel, SocketThreadChannel, Task>> _threadUpdated = new AsyncEvent<Func<SocketThreadChannel, SocketThreadChannel, Task>>();
+        internal readonly AsyncEvent<Func<Cacheable<SocketThreadChannel, ulong>, SocketThreadChannel, Task>> _threadUpdated = new();
 
         /// <summary>
         ///     Fired when a thread is deleted.
