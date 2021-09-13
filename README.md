@@ -17,7 +17,7 @@ Setting up labs in your project is really simple, here's how to do it:
 ### Dev
 This branch is kept up to date with dnets dev branch. we pull of it to ensure that labs will work with pre existing dnet code.
 
-### release/2.x
+### release/3.x
 This branch is what will be pushed to nuget, sometimes its not up to date as we wait for other features to be finished.
 
 ### old/SlashCommandService
