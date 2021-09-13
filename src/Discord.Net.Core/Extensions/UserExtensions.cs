@@ -173,6 +173,16 @@ namespace Discord
         /// <param name="user">The user to move.</param>
         /// <param name="targetChannel">the channel where the user gets moved to.</param>
         /// <returns>A task that represents the asynchronous operation for moving a user.</returns>
-        public static Task MoveAsync(this IGuildUser user, IVoiceChannel targetChannel) => user.ModifyAsync(x => x.Channel = new Optional<IVoiceChannel>(targetChannel));
+        public static Task MoveAsync(this IGuildUser user, IVoiceChannel targetChannel)
+            => user.ModifyAsync(x => x.Channel = new Optional<IVoiceChannel>(targetChannel));
+
+
+        /// <summary>
+        /// Disconnects the user from its current voice channel
+        /// </summary>
+        /// <param name="user">The user to disconnect.</param>
+        /// <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
+        public static Task DisconnectAsync(this IGuildUser user)
+            => user.ModifyAsync(x => x.Channel = new Optional<IVoiceChannel>());
     }
 }
