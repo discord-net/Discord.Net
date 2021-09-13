@@ -74,6 +74,11 @@ namespace Discord
         bool? IsPending { get; }
 
         /// <summary>
+        ///     Gets the users position within the role hierarchy.
+        /// </summary>
+        int Hierarchy { get; }
+
+        /// <summary>
         ///     Gets the level permissions granted to this user to a given channel.
         /// </summary>
         /// <example>

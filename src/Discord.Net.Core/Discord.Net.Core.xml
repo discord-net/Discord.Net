@@ -10056,6 +10056,11 @@
                 Whether the user has passed the guild's Membership Screening requirements.
             </summary>
         </member>
+        <member name="P:Discord.IGuildUser.Hierarchy">
+            <summary>
+                Gets the users position within the role hierarchy.
+            </summary>
+        </member>
         <member name="M:Discord.IGuildUser.GetPermissions(Discord.IGuildChannel)">
             <summary>
                 Gets the level permissions granted to this user to a given channel.

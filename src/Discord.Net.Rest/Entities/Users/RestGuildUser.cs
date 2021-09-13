@@ -31,6 +31,18 @@ namespace Discord.Rest
         public ulong GuildId => Guild.Id;
         /// <inheritdoc />
         public bool? IsPending { get; private set; }
+        /// <inheritdoc />
+        public int Hierarchy
+        {
+            get
+            {
+                if (Guild.OwnerId == Id)
+                    return int.MaxValue;
+
+                var orderedRoles = Guild.Roles.OrderByDescending(x => x.Position);
+                return orderedRoles.Where(x => RoleIds.Contains(x.Id)).Max(x => x.Position);
+            }
+        }
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException" accessor="get">Resolving permissions requires the parent guild to be downloaded.</exception>

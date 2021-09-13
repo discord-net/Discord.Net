@@ -4711,6 +4711,9 @@
         <member name="P:Discord.Rest.RestGuildUser.IsPending">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestGuildUser.Hierarchy">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.Rest.RestGuildUser.GuildPermissions">
             <inheritdoc />
             <exception cref="T:System.InvalidOperationException" accessor="get">Resolving permissions requires the parent guild to be downloaded.</exception>
@@ -4952,6 +4955,9 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestWebhookUser.Discord#IGuildUser#IsPending">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Rest.RestWebhookUser.Discord#IGuildUser#Hierarchy">
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestWebhookUser.Discord#IGuildUser#GuildPermissions">

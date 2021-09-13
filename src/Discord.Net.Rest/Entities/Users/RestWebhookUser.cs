@@ -54,6 +54,8 @@ namespace Discord.Rest
         /// <inheritdoc />
         bool? IGuildUser.IsPending => null;
         /// <inheritdoc />
+        int IGuildUser.Hierarchy => 0;
+        /// <inheritdoc />
         GuildPermissions IGuildUser.GuildPermissions => GuildPermissions.Webhook;
 
         /// <inheritdoc />
