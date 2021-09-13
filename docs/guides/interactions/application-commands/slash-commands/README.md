@@ -9,3 +9,4 @@ Here you can find some guides on how to use slash commands.
 5. [Responding ephemerally](https://github.com/Discord-Net-Labs/Discord.Net-Labs/blob/Interactions/docs/guides/slash-commands/05-responding-ephemerally.md)
 6. [Subcommands](https://github.com/Discord-Net-Labs/Discord.Net-Labs/blob/Interactions/docs/guides/slash-commands/06-subcommands.md)
 7. [Choices](https://github.com/Discord-Net-Labs/Discord.Net-Labs/blob/Interactions/docs/guides/slash-commands/07-choice-slash-command.md) 
+7. [Bulk overwrite of global slash commands](https://github.com/Discord-Net-Labs/Discord.Net-Labs/blob/release/3.x/docs/guides/interactions/application-commands/slash-commands/08-bulk-overwrite-of-global-slash-commands.md) 
