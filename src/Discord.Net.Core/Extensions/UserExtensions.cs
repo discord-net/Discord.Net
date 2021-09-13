@@ -165,5 +165,14 @@ namespace Discord
         /// </returns>
         public static Task BanAsync(this IGuildUser user, int pruneDays = 0, string reason = null, RequestOptions options = null)
             => user.Guild.AddBanAsync(user, pruneDays, reason, options);
+
+
+        /// <summary>
+        /// Moves the user to the voice channel.
+        /// </summary>
+        /// <param name="user">The user to move.</param>
+        /// <param name="targetChannel">the channel where the user gets moved to.</param>
+        /// <returns>A task that represents the asynchronous operation for moving a user.</returns>
+        public static Task MoveAsync(this IGuildUser user, IVoiceChannel targetChannel) => user.ModifyAsync(x => x.Channel = new Optional<IVoiceChannel>(targetChannel));
     }
 }
