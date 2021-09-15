@@ -23,14 +23,17 @@ namespace Discord
             {
                 if(value?.Length > 100)
                     throw new ArgumentException("Name length must be less than or equal to 100");
+                if (value?.Length < 1)
+                    throw new ArgumentException("Name length must at least 1 character in length");
                 _name = value;
             }
         }
 
-        // Note: discord allows strings & ints as values. how should that be handled?
-        // should we make this an object and then just type check it?
         /// <summary>
         ///     The value of this choice.
+        ///     <note type="warning">
+        ///         Discord only accepts int and string as the input.
+        ///     </note>
         /// </summary>
         public object Value
         {
