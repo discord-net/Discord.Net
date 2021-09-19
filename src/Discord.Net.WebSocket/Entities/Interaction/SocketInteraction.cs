@@ -207,15 +207,6 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Acknowledges this interaction.
         /// </summary>
-        /// <returns>
-        ///     A task that represents the asynchronous operation of acknowledging the interaction.
-        /// </returns>
-        [Obsolete("This method deprecated, please use DeferAsync instead")]
-        public Task AcknowledgeAsync(RequestOptions options = null) => DeferAsync(options: options);
-
-        /// <summary>
-        ///     Acknowledges this interaction.
-        /// </summary>
         /// <param name="ephemeral"><see langword="true"/> to send this message ephemerally, otherwise <see langword="false"/>.</param>
         /// <param name="options">The request options for this async request.</param>
         /// <returns>
