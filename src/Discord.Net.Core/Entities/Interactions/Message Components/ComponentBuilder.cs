@@ -80,7 +80,7 @@ namespace Discord
                     foreach (var cmp in actionRow.Components)
                         AddComponent(cmp, row);
                     break;
-                case SelectMenu menu:
+                case SelectMenuComponent menu:
                     this.WithSelectMenu(menu.Placeholder, menu.CustomId, menu.Options.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.Default)).ToList(), menu.Placeholder, menu.MinValues, menu.MaxValues, menu.Disabled, row);
                     break;
             }
@@ -595,22 +595,22 @@ namespace Discord
     }
 
     /// <summary>
-    ///     Represents a class used to build <see cref="SelectMenu"/>'s.
+    ///     Represents a class used to build <see cref="SelectMenuComponent"/>'s.
     /// </summary>
     public class SelectMenuBuilder
     {
         /// <summary>
-        ///     The max length of a <see cref="SelectMenu.Placeholder"/>.
+        ///     The max length of a <see cref="SelectMenuComponent.Placeholder"/>.
         /// </summary>
         public const int MaxPlaceholderLength = 100;
 
         /// <summary>
-        ///     The maximum number of values for the <see cref="SelectMenu.MinValues"/> and <see cref="SelectMenu.MaxValues"/> properties.
+        ///     The maximum number of values for the <see cref="SelectMenuComponent.MinValues"/> and <see cref="SelectMenuComponent.MaxValues"/> properties.
         /// </summary>
         public const int MaxValuesCount = 25;
 
         /// <summary>
-        ///     The maximum number of options a <see cref="SelectMenu"/> can have.
+        ///     The maximum number of options a <see cref="SelectMenuComponent"/> can have.
         /// </summary>
         public const int MaxOptionCount = 25;
 
@@ -709,9 +709,9 @@ namespace Discord
         public SelectMenuBuilder() { }
 
         /// <summary>
-        ///     Creates a new instance of a <see cref="SelectMenuBuilder"/> from instance of <see cref="SelectMenu"/>.
+        ///     Creates a new instance of a <see cref="SelectMenuBuilder"/> from instance of <see cref="SelectMenuComponent"/>.
         /// </summary>
-        public SelectMenuBuilder(SelectMenu selectMenu)
+        public SelectMenuBuilder(SelectMenuComponent selectMenu)
         {
             this.Placeholder = selectMenu.Placeholder;
             this.CustomId = selectMenu.Placeholder;
@@ -861,14 +861,14 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Builds a <see cref="SelectMenu"/>
+        ///     Builds a <see cref="SelectMenuComponent"/>
         /// </summary>
-        /// <returns>The newly built <see cref="SelectMenu"/></returns>
-        public SelectMenu Build()
+        /// <returns>The newly built <see cref="SelectMenuComponent"/></returns>
+        public SelectMenuComponent Build()
         {
             var options = this.Options?.Select(x => x.Build()).ToList();
 
-            return new SelectMenu(this.CustomId, options, this.Placeholder, this.MinValues, this.MaxValues, this.Disabled);
+            return new SelectMenuComponent(this.CustomId, options, this.Placeholder, this.MinValues, this.MaxValues, this.Disabled);
         }
     }
 

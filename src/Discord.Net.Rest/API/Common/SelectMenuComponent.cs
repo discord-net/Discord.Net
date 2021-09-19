@@ -32,7 +32,7 @@ namespace Discord.API
 
         public SelectMenuComponent() { }
 
-        public SelectMenuComponent(Discord.SelectMenu component)
+        public SelectMenuComponent(Discord.SelectMenuComponent component)
         {
             this.Type = component.Type;
             this.CustomId = component.CustomId;
