@@ -68,6 +68,9 @@ namespace Discord.Rest
             {
                 Name = arg.Name.Value,
                 Type = arg.Type,
+                DefaultPermission = arg.DefaultPermission.IsSpecified
+                        ? arg.DefaultPermission.Value
+                        : Optional<bool>.Unspecified
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -79,10 +82,6 @@ namespace Discord.Rest
                 model.Options = slashProps.Options.IsSpecified
                     ? slashProps.Options.Value.Select(x => new Discord.API.ApplicationCommandOption(x)).ToArray()
                     : Optional<Discord.API.ApplicationCommandOption[]>.Unspecified;
-
-                model.DefaultPermission = slashProps.DefaultPermission.IsSpecified
-                    ? slashProps.DefaultPermission.Value
-                    : Optional<bool>.Unspecified;
             }
 
             return await client.ApiClient.CreateGlobalApplicationCommandAsync(model, options).ConfigureAwait(false);
@@ -103,6 +102,9 @@ namespace Discord.Rest
                 {
                     Name = arg.Name.Value,
                     Type = arg.Type,
+                    DefaultPermission = arg.DefaultPermission.IsSpecified
+                        ? arg.DefaultPermission.Value
+                        : Optional<bool>.Unspecified
                 };
 
                 if (arg is SlashCommandProperties slashProps)
@@ -114,10 +116,6 @@ namespace Discord.Rest
                     model.Options = slashProps.Options.IsSpecified
                         ? slashProps.Options.Value.Select(x => new Discord.API.ApplicationCommandOption(x)).ToArray()
                         : Optional<Discord.API.ApplicationCommandOption[]>.Unspecified;
-
-                    model.DefaultPermission = slashProps.DefaultPermission.IsSpecified
-                        ? slashProps.DefaultPermission.Value
-                        : Optional<bool>.Unspecified;
                 }
 
                 models.Add(model);
@@ -141,6 +139,9 @@ namespace Discord.Rest
                 {
                     Name = arg.Name.Value,
                     Type = arg.Type,
+                    DefaultPermission = arg.DefaultPermission.IsSpecified
+                        ? arg.DefaultPermission.Value
+                        : Optional<bool>.Unspecified
                 };
 
                 if (arg is SlashCommandProperties slashProps)
@@ -152,10 +153,6 @@ namespace Discord.Rest
                     model.Options = slashProps.Options.IsSpecified
                         ? slashProps.Options.Value.Select(x => new Discord.API.ApplicationCommandOption(x)).ToArray()
                         : Optional<Discord.API.ApplicationCommandOption[]>.Unspecified;
-
-                    model.DefaultPermission = slashProps.DefaultPermission.IsSpecified
-                        ? slashProps.DefaultPermission.Value
-                        : Optional<bool>.Unspecified;
                 }
 
                 models.Add(model);
@@ -202,6 +199,9 @@ namespace Discord.Rest
             var model = new Discord.API.Rest.ModifyApplicationCommandParams()
             {
                 Name = args.Name,
+                DefaultPermission = args.DefaultPermission.IsSpecified
+                        ? args.DefaultPermission.Value
+                        : Optional<bool>.Unspecified
             };
 
             if(args is SlashCommandProperties slashProps)
@@ -223,10 +223,6 @@ namespace Discord.Rest
                 model.Options = slashProps.Options.IsSpecified
                     ? slashProps.Options.Value.Select(x => new Discord.API.ApplicationCommandOption(x)).ToArray()
                     : Optional<Discord.API.ApplicationCommandOption[]>.Unspecified;
-
-                model.DefaultPermission = slashProps.DefaultPermission.IsSpecified
-                    ? slashProps.DefaultPermission.Value
-                    : Optional<bool>.Unspecified;
             }
 
             return await client.ApiClient.ModifyGlobalApplicationCommandAsync(model, command.Id, options).ConfigureAwait(false);
@@ -257,6 +253,9 @@ namespace Discord.Rest
             {
                 Name = arg.Name.Value,
                 Type = arg.Type,
+                DefaultPermission = arg.DefaultPermission.IsSpecified
+                        ? arg.DefaultPermission.Value
+                        : Optional<bool>.Unspecified
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -268,10 +267,6 @@ namespace Discord.Rest
                 model.Options = slashProps.Options.IsSpecified
                     ? slashProps.Options.Value.Select(x => new Discord.API.ApplicationCommandOption(x)).ToArray()
                     : Optional<Discord.API.ApplicationCommandOption[]>.Unspecified;
-
-                model.DefaultPermission = slashProps.DefaultPermission.IsSpecified
-                    ? slashProps.DefaultPermission.Value
-                    : Optional<bool>.Unspecified;
             }
 
             return await client.ApiClient.CreateGuildApplicationCommandAsync(model, guildId, options).ConfigureAwait(false);
@@ -291,6 +286,9 @@ namespace Discord.Rest
             var model = new ModifyApplicationCommandParams()
             {
                 Name = arg.Name,
+                DefaultPermission = arg.DefaultPermission.IsSpecified
+                        ? arg.DefaultPermission.Value
+                        : Optional<bool>.Unspecified
             };
 
             if (arg is SlashCommandProperties slashProps)
@@ -302,10 +300,6 @@ namespace Discord.Rest
                 model.Options = slashProps.Options.IsSpecified
                     ? slashProps.Options.Value.Select(x => new Discord.API.ApplicationCommandOption(x)).ToArray()
                     : Optional<Discord.API.ApplicationCommandOption[]>.Unspecified;
-
-                model.DefaultPermission = slashProps.DefaultPermission.IsSpecified
-                    ? slashProps.DefaultPermission.Value
-                    : Optional<bool>.Unspecified;
             }
 
             return await client.ApiClient.ModifyGuildApplicationCommandAsync(model, guildId, command.Id, options).ConfigureAwait(false);

@@ -36,6 +36,11 @@ namespace Discord
             }
         }
 
+        /// <summary>
+        ///     Whether the command is enabled by default when the app is added to a guild
+        /// </summary>
+        public bool DefaultPermission { get; set; } = true;
+
         private string _name { get; set; }
 
         /// <summary>
@@ -49,6 +54,7 @@ namespace Discord
             MessageCommandProperties props = new MessageCommandProperties()
             {
                 Name = this.Name,
+                DefaultPermission = this.DefaultPermission
             };
 
             return props;
@@ -66,6 +72,17 @@ namespace Discord
         {
             this.Name = name;
             return this;
-        }      
+        }
+
+        /// <summary>
+        ///     Sets the default permission of the current command.
+        /// </summary>
+        /// <param name="value">The default permission value to set.</param>
+        /// <returns>The current builder.</returns>
+        public MessageCommandBuilder WithDefaultPermission (bool value)
+        {
+            this.DefaultPermission = value;
+            return this;
+        }
     }
 }
