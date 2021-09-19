@@ -27,7 +27,7 @@ namespace Discord.API
                     case ComponentType.Button:
                         return new ButtonComponent(x as Discord.ButtonComponent);
                     case ComponentType.SelectMenu:
-                        return new SelectMenuComponent(x as Discord.SelectMenu);
+                        return new SelectMenuComponent(x as Discord.SelectMenuComponent);
                     default: return null;
 
                 }
