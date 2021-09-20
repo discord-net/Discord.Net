@@ -22,6 +22,7 @@ namespace Discord.API.Rest
         public Optional<AllowedMentions> AllowedMentions { get; set; }
         public Optional<MessageReference> MessageReference { get; set; }
         public Optional<ActionRowComponent[]> MessageComponent { get; set; }
+        public Optional<ulong[]> Stickers { get; set; }
         public bool IsSpoiler { get; set; } = false;
 
         public UploadFileParams(Stream file)
@@ -54,6 +55,8 @@ namespace Discord.API.Rest
                 payload["hasSpoiler"] = IsSpoiler.ToString();
             if (MessageReference.IsSpecified)
                 payload["message_reference"] = MessageReference.Value;
+            if (Stickers.IsSpecified)
+                payload["sticker_ids"] = Stickers.Value;
 
             var json = new StringBuilder();
             using (var text = new StringWriter(json))

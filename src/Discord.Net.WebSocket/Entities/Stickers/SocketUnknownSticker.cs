@@ -15,10 +15,6 @@ namespace Discord.WebSocket
     public class SocketUnknownSticker : SocketSticker
     {
         /// <inheritdoc/>
-        public override string Asset
-            => null;
-
-        /// <inheritdoc/>
         public override IReadOnlyCollection<string> Tags
             => null;
 
@@ -29,9 +25,16 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public override ulong PackId
             => 0;
+        /// <inheritdoc/>
+        public override bool? Available
+            => null;
 
         /// <inheritdoc/>
-        public override string PreviewAsset
+        public override int? SortOrder
+            => null;
+
+        /// <inheritdoc/>
+        public new StickerType? Type
             => null;
 
         internal SocketUnknownSticker(DiscordSocketClient client, ulong id)
@@ -59,6 +62,6 @@ namespace Discord.WebSocket
         public Task<SocketSticker> ResolveAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
             => Discord.GetStickerAsync(this.Id, mode, options);
 
-        private string DebuggerDisplay => $"{Name} ({Id})";
+        private new string DebuggerDisplay => $"{Name} ({Id})";
     }
 }

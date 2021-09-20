@@ -1507,7 +1507,7 @@
                 Represents a generic channel that can send and receive messages.
             </summary>
         </member>
-        <member name="M:Discord.IMessageChannel.SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)">
+        <member name="M:Discord.IMessageChannel.SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent,Discord.ISticker[])">
             <summary>
                 Sends a message to this message channel.
             </summary>
@@ -1527,12 +1527,13 @@
             </param>
             <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
             <param name="component">The message components to be included with this message. Used for interactions</param>
+            <param name="stickers">A collection of stickers to send with the message.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
             </returns>
         </member>
-        <member name="M:Discord.IMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)">
+        <member name="M:Discord.IMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent,Discord.ISticker[])">
             <summary>
                 Sends a file to this message channel with an optional caption.
             </summary>
@@ -1566,12 +1567,13 @@
             </param>
             <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
             <param name="component">The message components to be included with this message. Used for interactions</param>
+            <param name="stickers">A collection of stickers to send with the file.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
             </returns>
         </member>
-        <member name="M:Discord.IMessageChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)">
+        <member name="M:Discord.IMessageChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent,Discord.ISticker[])">
             <summary>
                 Sends a file to this message channel with an optional caption.
             </summary>
@@ -1602,6 +1604,7 @@
             </param>
             <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
             <param name="component">The message components to be included with this message. Used for interactions</param>
+            <param name="stickers">A collection of stickers to send with the file.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
@@ -3639,6 +3642,18 @@
                 voice channel.
             </returns>
         </member>
+        <member name="M:Discord.IGuild.CreateStageChannelAsync(System.String,System.Action{Discord.VoiceChannelProperties},Discord.RequestOptions)">
+            <summary>
+                Creates a new stage channel in this guild.
+            </summary>
+            <param name="name">The new name for the stage channel.</param>
+            <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous creation operation. The task result contains the newly created
+                stage channel.
+            </returns>
+        </member>
         <member name="M:Discord.IGuild.CreateCategoryAsync(System.String,System.Action{Discord.GuildChannelProperties},Discord.RequestOptions)">
             <summary>
                 Creates a new channel category in this guild.
@@ -5205,7 +5220,7 @@
             <summary>
                 Builds this builder into a <see cref="T:Discord.MessageComponent"/> used to send your components.
             </summary>
-            <returns>A <see cref="T:Discord.MessageComponent"/> that can be sent with <see cref="M:Discord.IMessageChannel.SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)"/>.</returns>
+            <returns>A <see cref="T:Discord.MessageComponent"/> that can be sent with <see cref="!:IMessageChannel.SendMessageAsync(string, bool, Embed, RequestOptions, AllowedMentions, MessageReference, MessageComponent)"/>.</returns>
         </member>
         <member name="T:Discord.ActionRowBuilder">
             <summary>
@@ -9652,21 +9667,10 @@
                 A read-only list with the tags of this sticker.
             </returns>
         </member>
-        <member name="P:Discord.ISticker.Asset">
+        <member name="P:Discord.ISticker.Type">
             <summary>
-                Gets the asset hash of this sticker.
+                Gets the type of this sticker.
             </summary>
-            <returns>
-                A <see langword="string"/> with the asset hash of this sticker.
-            </returns>
-        </member>
-        <member name="P:Discord.ISticker.PreviewAsset">
-            <summary>
-                Gets the preview asset hash of this sticker.
-            </summary>
-            <returns>
-                A <see langword="string"/> with the preview asset hash of this sticker.
-            </returns>
         </member>
         <member name="P:Discord.ISticker.Format">
             <summary>
@@ -9675,6 +9679,16 @@
             <returns>
                 A <see cref="T:Discord.StickerFormatType"/> with the format type of this sticker.
             </returns>
+        </member>
+        <member name="P:Discord.ISticker.Available">
+            <summary>
+                Gets whether this guild sticker can be used, may be false due to loss of Server Boosts
+            </summary>
+        </member>
+        <member name="P:Discord.ISticker.SortOrder">
+            <summary>
+                Gets the standard sticker's sort order within its pack
+            </summary>
         </member>
         <member name="M:Discord.ISticker.GetStickerUrl">
             <summary>
@@ -9760,6 +9774,21 @@
         <member name="P:Discord.StickerProperties.Tags">
             <summary>
                 Gets or sets the tags of the sticker.
+            </summary>
+        </member>
+        <member name="T:Discord.StickerType">
+            <summary>
+                Represents a type of sticker
+            </summary>
+        </member>
+        <member name="F:Discord.StickerType.Standard">
+            <summary>
+                Represents a discord standard sticker, this type of sticker cannot be modified by an application.
+            </summary>
+        </member>
+        <member name="F:Discord.StickerType.Guild">
+            <summary>
+                Represents a sticker that was created within a guild.
             </summary>
         </member>
         <member name="T:Discord.ITeam">
