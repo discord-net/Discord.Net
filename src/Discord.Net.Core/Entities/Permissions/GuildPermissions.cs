@@ -178,7 +178,7 @@ namespace Discord
             Permissions.SetValue(ref value, requestToSpeak, GuildPermission.RequestToSpeak);
             Permissions.SetValue(ref value, manageThreads, GuildPermission.ManageThreads);
             Permissions.SetValue(ref value, usePublicThreads, GuildPermission.UsePublicThreads);
-            Permissions.SetValue(ref value, usePrivateThreads, GuildPermission.UseExternalStickers);
+            Permissions.SetValue(ref value, usePrivateThreads, GuildPermission.UsePrivateThreads);
             Permissions.SetValue(ref value, useExternalStickers, GuildPermission.UseExternalStickers);
 
             RawValue = value;
