@@ -4524,6 +4524,9 @@
         <member name="P:Discord.ApplicationCommandOptionChoiceProperties.Value">
             <summary>
                 The value of this choice.
+                <note type="warning">
+                    Discord only accepts int and string as the input.
+                </note>
             </summary>
         </member>
         <member name="T:Discord.ApplicationCommandOptionType">
@@ -4591,6 +4594,11 @@
                 Gets or sets the name of this command.
             </summary>
         </member>
+        <member name="P:Discord.ApplicationCommandProperties.DefaultPermission">
+            <summary>
+                Whether the command is enabled by default when the app is added to a guild. Default is <see langword="true"/>
+            </summary>
+        </member>
         <member name="T:Discord.ApplicationCommandType">
             <summary>
                 ApplicationCommandType is enum of current valid Application Command Types: Slash, User, Message
@@ -4626,6 +4634,11 @@
                 The name of this Message command.
             </summary>
         </member>
+        <member name="P:Discord.MessageCommandBuilder.DefaultPermission">
+            <summary>
+                Whether the command is enabled by default when the app is added to a guild
+            </summary>
+        </member>
         <member name="M:Discord.MessageCommandBuilder.Build">
             <summary>
                 Build the current builder into a <see cref="T:Discord.MessageCommandProperties"/> class.
@@ -4642,6 +4655,13 @@
             <returns>
                 The current builder.
             </returns>
+        </member>
+        <member name="M:Discord.MessageCommandBuilder.WithDefaultPermission(System.Boolean)">
+            <summary>
+                Sets the default permission of the current command.
+            </summary>
+            <param name="value">The default permission value to set.</param>
+            <returns>The current builder.</returns>
         </member>
         <member name="T:Discord.MessageCommandProperties">
             <summary>
@@ -4663,6 +4683,11 @@
                 The name of this User command.
             </summary>
         </member>
+        <member name="P:Discord.UserCommandBuilder.DefaultPermission">
+            <summary>
+                Whether the command is enabled by default when the app is added to a guild
+            </summary>
+        </member>
         <member name="M:Discord.UserCommandBuilder.Build">
             <summary>
                 Build the current builder into a <see cref="T:Discord.UserCommandProperties"/> class.
@@ -4677,6 +4702,13 @@
             <returns>
                 The current builder.
             </returns>
+        </member>
+        <member name="M:Discord.UserCommandBuilder.WithDefaultPermission(System.Boolean)">
+            <summary>
+                Sets the default permission of the current command.
+            </summary>
+            <param name="value">The default permission value to set.</param>
+            <returns>The current builder.</returns>
         </member>
         <member name="T:Discord.UserCommandProperties">
             <summary>
@@ -5379,22 +5411,22 @@
         </member>
         <member name="T:Discord.SelectMenuBuilder">
             <summary>
-                Represents a class used to build <see cref="T:Discord.SelectMenu"/>'s.
+                Represents a class used to build <see cref="T:Discord.SelectMenuComponent"/>'s.
             </summary>
         </member>
         <member name="F:Discord.SelectMenuBuilder.MaxPlaceholderLength">
             <summary>
-                The max length of a <see cref="P:Discord.SelectMenu.Placeholder"/>.
+                The max length of a <see cref="P:Discord.SelectMenuComponent.Placeholder"/>.
             </summary>
         </member>
         <member name="F:Discord.SelectMenuBuilder.MaxValuesCount">
             <summary>
-                The maximum number of values for the <see cref="P:Discord.SelectMenu.MinValues"/> and <see cref="P:Discord.SelectMenu.MaxValues"/> properties.
+                The maximum number of values for the <see cref="P:Discord.SelectMenuComponent.MinValues"/> and <see cref="P:Discord.SelectMenuComponent.MaxValues"/> properties.
             </summary>
         </member>
         <member name="F:Discord.SelectMenuBuilder.MaxOptionCount">
             <summary>
-                The maximum number of options a <see cref="T:Discord.SelectMenu"/> can have.
+                The maximum number of options a <see cref="T:Discord.SelectMenuComponent"/> can have.
             </summary>
         </member>
         <member name="P:Discord.SelectMenuBuilder.CustomId">
@@ -5438,9 +5470,9 @@
                 Creates a new instance of a <see cref="T:Discord.SelectMenuBuilder"/>.
             </summary>
         </member>
-        <member name="M:Discord.SelectMenuBuilder.#ctor(Discord.SelectMenu)">
+        <member name="M:Discord.SelectMenuBuilder.#ctor(Discord.SelectMenuComponent)">
             <summary>
-                Creates a new instance of a <see cref="T:Discord.SelectMenuBuilder"/> from instance of <see cref="T:Discord.SelectMenu"/>.
+                Creates a new instance of a <see cref="T:Discord.SelectMenuBuilder"/> from instance of <see cref="T:Discord.SelectMenuComponent"/>.
             </summary>
         </member>
         <member name="M:Discord.SelectMenuBuilder.#ctor(System.String,System.Collections.Generic.List{Discord.SelectMenuOptionBuilder},System.String,System.Int32,System.Int32,System.Boolean)">
@@ -5539,9 +5571,9 @@
         </member>
         <member name="M:Discord.SelectMenuBuilder.Build">
             <summary>
-                Builds a <see cref="T:Discord.SelectMenu"/>
+                Builds a <see cref="T:Discord.SelectMenuComponent"/>
             </summary>
-            <returns>The newly built <see cref="T:Discord.SelectMenu"/></returns>
+            <returns>The newly built <see cref="T:Discord.SelectMenuComponent"/></returns>
         </member>
         <member name="T:Discord.SelectMenuOptionBuilder">
             <summary>
@@ -5715,45 +5747,45 @@
                 Returns a empty <see cref="T:Discord.MessageComponent"/>.
             </summary>
         </member>
-        <member name="T:Discord.SelectMenu">
+        <member name="T:Discord.SelectMenuComponent">
             <summary>
                 Represents a select menu component defined at <see href="https://discord.com/developers/docs/interactions/message-components#select-menu-object"/>
             </summary>
         </member>
-        <member name="P:Discord.SelectMenu.Type">
+        <member name="P:Discord.SelectMenuComponent.Type">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.SelectMenu.CustomId">
+        <member name="P:Discord.SelectMenuComponent.CustomId">
             <summary>
                 The custom id of this Select menu that will be sent with a <see cref="T:Discord.IDiscordInteraction"/>.
             </summary>
         </member>
-        <member name="P:Discord.SelectMenu.Options">
+        <member name="P:Discord.SelectMenuComponent.Options">
             <summary>
                 The menus options to select from.
             </summary>
         </member>
-        <member name="P:Discord.SelectMenu.Placeholder">
+        <member name="P:Discord.SelectMenuComponent.Placeholder">
             <summary>
                 A custom placeholder text if nothing is selected, max 100 characters.
             </summary>
         </member>
-        <member name="P:Discord.SelectMenu.MinValues">
+        <member name="P:Discord.SelectMenuComponent.MinValues">
             <summary>
                 The minimum number of items that must be chosen; default 1, min 0, max 25
             </summary>
         </member>
-        <member name="P:Discord.SelectMenu.MaxValues">
+        <member name="P:Discord.SelectMenuComponent.MaxValues">
             <summary>
                 The maximum number of items that can be chosen; default 1, max 25
             </summary>
         </member>
-        <member name="P:Discord.SelectMenu.Disabled">
+        <member name="P:Discord.SelectMenuComponent.Disabled">
             <summary>
                 Whether this menu is disabled or not.
             </summary>
         </member>
-        <member name="M:Discord.SelectMenu.ToBuilder">
+        <member name="M:Discord.SelectMenuComponent.ToBuilder">
             <summary>
                 Turns this select menu into a builder.
             </summary>
@@ -5763,7 +5795,7 @@
         </member>
         <member name="T:Discord.SelectMenuOption">
             <summary>
-                Represents a choice for a <see cref="T:Discord.SelectMenu"/>.
+                Represents a choice for a <see cref="T:Discord.SelectMenuComponent"/>.
             </summary>
         </member>
         <member name="P:Discord.SelectMenuOption.Label">
@@ -6036,11 +6068,6 @@
         <member name="P:Discord.SlashCommandProperties.Options">
             <summary>
                 Gets or sets the options for this command.
-            </summary>
-        </member>
-        <member name="P:Discord.SlashCommandProperties.DefaultPermission">
-            <summary>
-                Whether the command is enabled by default when the app is added to a guild. Default is <see langword="true"/>
             </summary>
         </member>
         <member name="T:Discord.IInvite">
