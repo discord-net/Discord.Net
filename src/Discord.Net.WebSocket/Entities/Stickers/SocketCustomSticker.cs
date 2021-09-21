@@ -16,6 +16,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketCustomSticker : SocketSticker, ICustomSticker
     {
+        #region SocketCustomSticker
         /// <summary>
         ///     Gets the user that uploaded the guild sticker.
         /// </summary>
@@ -71,12 +72,14 @@ namespace Discord.WebSocket
         internal SocketCustomSticker Clone() => MemberwiseClone() as SocketCustomSticker;
 
         private new string DebuggerDisplay => Guild == null ? base.DebuggerDisplay : $"{Name} in {Guild.Name} ({Id})";
+#endregion
 
-        // ICustomSticker
+        #region  ICustomSticker
         ulong? ICustomSticker.AuthorId
             => this.AuthorId;
 
         IGuild ICustomSticker.Guild
             => this.Guild;
+        #endregion
     }
 }

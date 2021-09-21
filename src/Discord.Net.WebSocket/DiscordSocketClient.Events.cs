@@ -6,7 +6,7 @@ namespace Discord.WebSocket
 {
     public partial class DiscordSocketClient
     {
-        //General
+        #region General
         /// <summary> Fired when connected to the Discord gateway. </summary>
         public event Func<Task> Connected
         {
@@ -45,5 +45,6 @@ namespace Discord.WebSocket
         internal DiscordSocketClient(DiscordSocketConfig config, DiscordRestApiClient client) : base(config, client)
         {
         }
+        #endregion
     }
 }

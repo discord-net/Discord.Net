@@ -12,6 +12,7 @@ namespace Discord.WebSocket
     /// </summary>
     public abstract class SocketInteraction : SocketEntity<ulong>, IDiscordInteraction
     {
+        #region SocketInteraction
         /// <summary>
         ///     The <see cref="ISocketMessageChannel"/> this interaction was used in.
         /// </summary>
@@ -219,9 +220,9 @@ namespace Discord.WebSocket
             // Tokens last for 15 minutes according to https://discord.com/developers/docs/interactions/slash-commands#responding-to-an-interaction
             return (DateTime.UtcNow - this.CreatedAt.UtcDateTime).TotalMinutes <= 15d;
         }
+#endregion
 
-        // IDiscordInteraction
-
+        #region  IDiscordInteraction
         /// <inheritdoc/>
         async Task<IUserMessage> IDiscordInteraction.FollowupAsync (string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions,
             RequestOptions options, MessageComponent component, Embed embed)
@@ -234,5 +235,6 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         async Task<IUserMessage> IDiscordInteraction.ModifyOriginalResponseAsync (Action<MessageProperties> func, RequestOptions options)
             => await ModifyOriginalResponseAsync(func, options).ConfigureAwait(false);
+        #endregion
     }
 }

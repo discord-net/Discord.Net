@@ -30,6 +30,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGuild : SocketEntity<ulong>, IGuild, IDisposable
     {
+        #region SocketGuild
 #pragma warning disable IDISP002, IDISP006
         private readonly SemaphoreSlim _audioLock;
         private TaskCompletionSource<bool> _syncPromise, _downloaderPromise;
@@ -571,6 +572,7 @@ namespace Discord.WebSocket
                 emotes.Add(model.Emojis[i].ToEntity());
             _emotes = emotes.ToImmutable();
         }
+        #endregion
 
         #region General
         /// <inheritdoc />
@@ -960,8 +962,9 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<RestInviteMetadata> GetVanityInviteAsync(RequestOptions options = null)
             => GuildHelper.GetVanityInviteAsync(this, Discord, options);
+        #endregion
 
-        //Roles
+        #region Roles
         /// <summary>
         ///     Gets a role in this guild.
         /// </summary>
@@ -1189,8 +1192,9 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<IReadOnlyCollection<RestGuildUser>> SearchUsersAsync(string query, int limit = DiscordConfig.MaxUsersPerBatch, RequestOptions options = null)
             => GuildHelper.SearchUsersAsync(this, Discord, query, limit, options);
+        #endregion
 
-        //Audit logs
+        #region Audit logs
         /// <summary>
         ///     Gets the specified number of audit log entries for this guild.
         /// </summary>
@@ -1205,8 +1209,9 @@ namespace Discord.WebSocket
         /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(int limit, RequestOptions options = null, ulong? beforeId = null, ulong? userId = null, ActionType? actionType = null)
             => GuildHelper.GetAuditLogsAsync(this, Discord, beforeId, limit, options, userId: userId, actionType: actionType);
+        #endregion
 
-        //Webhooks
+        #region Webhooks
         /// <summary>
         ///     Gets a webhook found within this guild.
         /// </summary>
@@ -1228,8 +1233,9 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => GuildHelper.GetWebhooksAsync(this, Discord, options);
+        #endregion
 
-        //Emotes
+        #region Emotes
         /// <inheritdoc />
         public Task<IReadOnlyCollection<GuildEmote>> GetEmotesAsync(RequestOptions options = null)
             => GuildHelper.GetEmotesAsync(this, Discord, options);

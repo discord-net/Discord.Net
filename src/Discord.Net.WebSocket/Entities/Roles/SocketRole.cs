@@ -1,6 +1,6 @@
 using Discord.Rest;
 using System;
-using System.Collections.Generic;  
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +14,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketRole : SocketEntity<ulong>, IRole
     {
+        #region SocketRole
         /// <summary>
         ///     Gets the guild that owns this role.
         /// </summary>
@@ -54,7 +55,7 @@ namespace Discord.WebSocket
         /// <summary>
         /// Returns an IEnumerable containing all <see cref="SocketGuildUser"/> that have this role.
         /// </summary>
-        public IEnumerable<SocketGuildUser> Members 
+        public IEnumerable<SocketGuildUser> Members
             => Guild.Users.Where(x => x.Roles.Any(r => r.Id == Id));
 
         internal SocketRole(SocketGuild guild, ulong id)
@@ -100,9 +101,11 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public int CompareTo(IRole role) => RoleUtils.Compare(this, role);
+        #endregion
 
-        //IRole
+        #region IRole
         /// <inheritdoc />
         IGuild IRole.Guild => Guild;
+        #endregion
     }
 }

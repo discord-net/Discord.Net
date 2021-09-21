@@ -5,7 +5,7 @@ namespace Discord.WebSocket
 {
     public partial class DiscordShardedClient
     {
-        //General
+        #region General
         /// <summary> Fired when a shard is connected to the Discord gateway. </summary>
         public event Func<DiscordSocketClient, Task> ShardConnected 
         {
@@ -34,5 +34,6 @@ namespace Discord.WebSocket
             remove { _shardLatencyUpdatedEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<int, int, DiscordSocketClient, Task>> _shardLatencyUpdatedEvent = new AsyncEvent<Func<int, int, DiscordSocketClient, Task>>();
+        #endregion
     }
 }

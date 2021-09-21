@@ -16,6 +16,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketDMChannel : SocketChannel, IDMChannel, ISocketPrivateChannel, ISocketMessageChannel
     {
+        #region SocketDMChannel
         /// <summary>
         ///     Gets the recipient of the channel.
         /// </summary>
@@ -58,8 +59,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task CloseAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
+#endregion
 
-        //Messages
+        #region Messages
         /// <inheritdoc />
         public SocketMessage GetCachedMessage(ulong id)
             => null;
@@ -172,8 +174,9 @@ namespace Discord.WebSocket
         {
             return null;
         }
+        #endregion
 
-        //Users
+        #region Users
         /// <summary>
         ///     Gets a user in this channel from the provided <paramref name="id"/>.
         /// </summary>
@@ -197,26 +200,31 @@ namespace Discord.WebSocket
         public override string ToString() => $"@{Recipient}";
         private string DebuggerDisplay => $"@{Recipient} ({Id}, DM)";
         internal new SocketDMChannel Clone() => MemberwiseClone() as SocketDMChannel;
+        #endregion
 
-        //SocketChannel
+        #region SocketChannel
         /// <inheritdoc />
         internal override IReadOnlyCollection<SocketUser> GetUsersInternal() => Users;
         /// <inheritdoc />
         internal override SocketUser GetUserInternal(ulong id) => GetUser(id);
+        #endregion
 
-        //IDMChannel
+        #region IDMChannel
         /// <inheritdoc />
         IUser IDMChannel.Recipient => Recipient;
+        #endregion
 
-        //ISocketPrivateChannel
+        #region ISocketPrivateChannel
         /// <inheritdoc />
         IReadOnlyCollection<SocketUser> ISocketPrivateChannel.Recipients => ImmutableArray.Create(Recipient);
+        #endregion
 
-        //IPrivateChannel
+        #region IPrivateChannel
         /// <inheritdoc />
         IReadOnlyCollection<IUser> IPrivateChannel.Recipients => ImmutableArray.Create<IUser>(Recipient);
+        #endregion
 
-        //IMessageChannel
+        #region IMessageChannel
         /// <inheritdoc />
         async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id, CacheMode mode, RequestOptions options)
         {
@@ -246,8 +254,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers)
             => await SendMessageAsync(text, isTTS, embed, options, allowedMentions, messageReference, component, stickers).ConfigureAwait(false);
+        #endregion
 
-        //IChannel
+        #region IChannel
         /// <inheritdoc />
         string IChannel.Name => $"@{Recipient}";
 
@@ -257,5 +266,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable();
+        #endregion
     }
 }
