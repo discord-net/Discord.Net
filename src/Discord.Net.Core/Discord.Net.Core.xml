@@ -11227,8 +11227,8 @@
         </member>
         <member name="F:Discord.GatewayIntents.AllUnprivileged">
             <summary>
-                This intent includes all but <see cref="F:Discord.GatewayIntents.GuildMembers"/> and <see cref="F:Discord.GatewayIntents.GuildMembers"/>
-                that are privileged must be enabled for the application.
+                This intent includes all but <see cref="F:Discord.GatewayIntents.GuildMembers"/> and <see cref="F:Discord.GatewayIntents.GuildPresences"/>
+                which are privileged and must be enabled in the Developer Portal.
             </summary>
         </member>
         <member name="F:Discord.GatewayIntents.All">
