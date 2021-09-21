@@ -962,7 +962,7 @@ namespace Discord.Rest
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
 
-        //Emotes
+        #region Emotes
         /// <inheritdoc />
         public Task<IReadOnlyCollection<GuildEmote>> GetEmotesAsync(RequestOptions options = null)
             => GuildHelper.GetEmotesAsync(this, Discord, options);
@@ -976,11 +976,20 @@ namespace Discord.Rest
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         public Task<GuildEmote> ModifyEmoteAsync(GuildEmote emote, Action<EmoteProperties> func, RequestOptions options = null)
             => GuildHelper.ModifyEmoteAsync(this, Discord, emote.Id, func, options);
+        /// <summary>
+        /// Moves the user to the voice channel.
+        /// </summary>
+        /// <param name="user">The user to move.</param>
+        /// <param name="targetChannel">the channel where the user gets moved to.</param>
+        /// <returns>A task that represents the asynchronous operation for moving a user.</returns>
+        public Task MoveAsync(IGuildUser user, IVoiceChannel targetChannel)
+            => user.ModifyAsync(x => x.Channel = new Optional<IVoiceChannel>(targetChannel));
         /// <inheritdoc />
         public Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null)
             => GuildHelper.DeleteEmoteAsync(this, Discord, emote.Id, options);
+        #endregion
 
-        //Stickers
+        #region Stickers
         /// <summary>
         ///     Creates a new sticker in this guild.
         /// </summary>
@@ -1087,8 +1096,9 @@ namespace Discord.Rest
         /// </returns>
         public Task DeleteStickerAsync(CustomSticker sticker, RequestOptions options = null)
             => sticker.DeleteAsync(options);
+        #endregion
 
-        //IGuild
+        #region IGuild
         /// <inheritdoc />
         bool IGuild.Available => Available;
         /// <inheritdoc />
@@ -1291,6 +1301,13 @@ namespace Discord.Rest
         async Task<IGuildUser> IGuild.AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func, RequestOptions options)
             => await AddGuildUserAsync(userId, accessToken, func, options);
 
+        /// <summary>
+        /// Disconnects the user from its current voice channel
+        /// </summary>
+        /// <param name="user">The user to disconnect.</param>
+        /// <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
+        async Task IGuild.DisconnectAsync(IGuildUser user) => await user.ModifyAsync(x => x.Channel = new Optional<IVoiceChannel>());
+
         /// <inheritdoc />
         async Task<IGuildUser> IGuild.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
         {
@@ -1399,5 +1416,6 @@ namespace Discord.Rest
             else
                 return null;
         }
+        #endregion
     }
 }
