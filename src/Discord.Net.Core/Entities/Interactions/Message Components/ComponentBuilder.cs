@@ -11,11 +11,6 @@ namespace Discord
     public class ComponentBuilder
     {
         /// <summary>
-        ///     The max length of a <see cref="ButtonComponent.Label"/>.
-        /// </summary>
-        public const int MaxButtonLabelLength = 80;
-
-        /// <summary>
         ///     The max length of a <see cref="ButtonComponent.CustomId"/>.
         /// </summary>
         public const int MaxCustomIdLength = 100;
@@ -353,19 +348,27 @@ namespace Discord
         /// <summary>
         ///     The max length of a <see cref="ButtonComponent.Label"/>.
         /// </summary>
-        public const int MaxLabelLength = 80;
+        public const int MaxButtonLabelLength = 80;
 
         /// <summary>
         ///     Gets or sets the label of the current button.
         /// </summary>
-        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="ComponentBuilder.MaxButtonLabelLength"/>.</exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="MaxButtonLabelLength"/>.</exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="MaxButtonLabelLength"/>.</exception>
         public string Label
         {
             get => _label;
             set
             {
-                if (value != null && value.Length > ComponentBuilder.MaxButtonLabelLength)
-                    throw new ArgumentException(message: $"Button label must be {ComponentBuilder.MaxButtonLabelLength} characters or less!", paramName: nameof(Label));
+                if (value != null)
+                {
+                    if (value.Length > MaxButtonLabelLength)
+                        throw new ArgumentException($"Button label must be {MaxButtonLabelLength} characters or less!", paramName: nameof(Label));
+                    if (value.Length < 1)
+                        throw new ArgumentException("Button label must be 1 character or more!", paramName: nameof(Label));
+                }
+                else
+                    throw new ArgumentException("Button label must not be null or empty!", paramName: nameof(Label));
 
                 _label = value;
             }
@@ -375,13 +378,21 @@ namespace Discord
         ///     Gets or sets the custom id of the current button.
         /// </summary>
         /// <exception cref="ArgumentException" accessor="set"><see cref="CustomId"/> length exceeds <see cref="ComponentBuilder.MaxCustomIdLength"/></exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="CustomId"/> length subceeds 1.</exception>
         public string CustomId
         {
             get => _customId;
             set
             {
-                if (value != null && value.Length > ComponentBuilder.MaxCustomIdLength)
-                    throw new ArgumentException(message: $"Custom Id must be {ComponentBuilder.MaxCustomIdLength} characters or less!", paramName: nameof(CustomId));
+                if (value != null)
+                {
+                    if (value.Length > ComponentBuilder.MaxCustomIdLength)
+                        throw new ArgumentException($"Custom Id must be {ComponentBuilder.MaxCustomIdLength} characters or less!", paramName: nameof(CustomId));
+                    if (value.Length < 1)
+                        throw new ArgumentException("Custom Id must be 1 character or more!", paramName: nameof(CustomId));
+                }
+                else
+                    throw new ArgumentException("Custom Id must not be null or empty!", paramName: nameof(CustomId));
                 _customId = value;
             }
         }
@@ -619,14 +630,22 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the custom id of the current select menu.
         /// </summary>
-        /// <exception cref="ArgumentException" accessor="set"><see cref="CustomId"/> length exceeds <see cref="ComponentBuilder.MaxCustomIdLength"/>.</exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="CustomId"/> length exceeds <see cref="ComponentBuilder.MaxCustomIdLength"/></exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="CustomId"/> length subceeds 1.</exception>
         public string CustomId
         {
             get => _customId;
             set
             {
-                if (value != null && value.Length > ComponentBuilder.MaxCustomIdLength)
-                    throw new ArgumentException(message: $"Custom Id must be {ComponentBuilder.MaxCustomIdLength} characters or less!", paramName: nameof(CustomId));
+                if (value != null)
+                {
+                    if (value.Length > ComponentBuilder.MaxCustomIdLength)
+                        throw new ArgumentException($"Custom Id must be {ComponentBuilder.MaxCustomIdLength} characters or less!", paramName: nameof(CustomId));
+                    if (value.Length < 1)
+                        throw new ArgumentException("Custom Id must be 1 character or more!", paramName: nameof(CustomId));
+                }
+                else
+                    throw new ArgumentException("Custom Id must not be null or empty!", paramName: nameof(CustomId));
                 _customId = value;
             }
         }
@@ -635,13 +654,21 @@ namespace Discord
         ///     Gets or sets the placeholder text of the current select menu.
         /// </summary>
         /// <exception cref="ArgumentException" accessor="set"><see cref="Placeholder"/> length exceeds <see cref="MaxPlaceholderLength"/>.</exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Placeholder"/> length subceeds 1.</exception>
         public string Placeholder
         {
             get => _placeholder;
             set
             {
-                if (value?.Length > MaxPlaceholderLength)
-                    throw new ArgumentException(message: $"Placeholder must be {MaxPlaceholderLength} characters or less!", paramName: nameof(Placeholder));
+                if (value != null)
+                {
+                    if (value.Length > MaxPlaceholderLength)
+                        throw new ArgumentException($"The placeholder must be {MaxPlaceholderLength} characters or less!", paramName: nameof(Placeholder));
+                    if (value.Length < 1)
+                        throw new ArgumentException("The placeholder must be 1 character or more!", paramName: nameof(Placeholder));
+                }
+                else
+                    throw new ArgumentException("The placeholder must not be null or empty!", paramName: nameof(Placeholder));
 
                 _placeholder = value;
             }
@@ -882,7 +909,7 @@ namespace Discord
         /// <summary>
         ///     The maximum length of a <see cref="SelectMenuOption.Label"/>.
         /// </summary>
-        public const int MaxLabelLength = 100;
+        public const int MaxSelectLabelLength = 100;
 
         /// <summary>
         ///     The maximum length of a <see cref="SelectMenuOption.Description"/>.
@@ -890,22 +917,29 @@ namespace Discord
         public const int MaxDescriptionLength = 100;
         
         /// <summary>
-        ///     The maximum length of a <see cref="SelectMenuOption.Label"/>.
+        ///     The maximum length of a <see cref="SelectMenuOption.Value"/>.
         /// </summary>
-        public const int MaxSelectLabelLength = 100;
+        public const int MaxSelectValueLength = 100;
 
         /// <summary>
         ///     Gets or sets the label of the current select menu.
         /// </summary>
         /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length exceeds <see cref="MaxSelectLabelLength"/></exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length subceeds 1.</exception>
         public string Label
         {
             get => _label;
             set
             {
                 if (value != null)
+                {
                     if (value.Length > MaxSelectLabelLength)
-                        throw new ArgumentException(message: $"Button label must be {MaxSelectLabelLength} characters or less!", paramName: nameof(Label));
+                        throw new ArgumentException($"Select option label must be {MaxSelectLabelLength} characters or less!", paramName: nameof(Label));
+                    if (value.Length < 1)
+                        throw new ArgumentException("Select option label must be 1 character or more!", paramName: nameof(Label));
+                }
+                else
+                    throw new ArgumentException("Select option label must not be null or empty!", paramName: nameof(Label));
 
                 _label = value;
             }
@@ -914,14 +948,23 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the custom id of the current select menu.
         /// </summary>
-        /// <exception cref="ArgumentException" accessor="set"><see cref="Value"/> length exceeds <see cref="ComponentBuilder.MaxCustomIdLength"/>.</exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Value"/> length exceeds <see cref="MaxSelectValueLength"/>.</exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Value"/> length subceeds 1.</exception>
         public string Value
         {
             get => _value;
             set
             {
-                if (value != null && value.Length > ComponentBuilder.MaxCustomIdLength)
-                    throw new ArgumentException(message: $"Value must be {ComponentBuilder.MaxCustomIdLength} characters or less!", paramName: nameof(Value));
+                if (value != null)
+                {
+                    if (value.Length > MaxSelectValueLength)
+                        throw new ArgumentException($"Select option value must be {MaxSelectValueLength} characters or less!", paramName: nameof(Label));
+                    if (value.Length < 1)
+                        throw new ArgumentException("Select option value must be 1 character or more!", paramName: nameof(Label));
+                }
+                else
+                    throw new ArgumentException("Select option value must not be null or empty!", paramName: nameof(Label));
+
                 _value = value;
             }
         }
@@ -930,13 +973,21 @@ namespace Discord
         ///     Gets or sets this menu options description.
         /// </summary>
         /// <exception cref="ArgumentException" accessor="set"><see cref="Description"/> length exceeds <see cref="MaxDescriptionLength"/>.</exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length subceeds 1.</exception>
         public string Description
         {
             get => _description;
             set
             {
-                if (value != null && value.Length > MaxDescriptionLength)
-                    throw new ArgumentException($"Description must be {MaxDescriptionLength} characters or less!", nameof(Description));
+                if (value != null)
+                {
+                    if (value.Length > MaxDescriptionLength)
+                        throw new ArgumentException($"The description must be {MaxDescriptionLength} characters or less!", paramName: nameof(Label));
+                    if (value.Length < 1)
+                        throw new ArgumentException("The description must be 1 character or more!", paramName: nameof(Label));
+                }
+                else
+                    throw new ArgumentException("The description must not be null or empty!", paramName: nameof(Label));
 
                 _description = value;
             }
