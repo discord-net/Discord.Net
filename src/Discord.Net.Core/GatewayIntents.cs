@@ -40,8 +40,8 @@ namespace Discord
         /// <summary> This intent includes TYPING_START </summary>
         DirectMessageTyping = 1 << 14,
         /// <summary>
-        ///     This intent includes all but <see cref="GuildMembers"/> and <see cref="GuildMembers"/>
-        ///     that are privileged must be enabled for the application.
+        ///     This intent includes all but <see cref="GuildMembers"/> and <see cref="GuildPresences"/>
+        ///     which are privileged and must be enabled in the Developer Portal.
         /// </summary>
         AllUnprivileged = Guilds | GuildBans | GuildEmojis | GuildIntegrations | GuildWebhooks | GuildInvites |
             GuildVoiceStates | GuildMessages | GuildMessageReactions | GuildMessageTyping | DirectMessages |
