@@ -3575,6 +3575,21 @@
         <member name="M:Discord.WebSocket.SocketGuild.DeleteEmoteAsync(Discord.GuildEmote,Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="M:Discord.WebSocket.SocketGuild.MoveAsync(Discord.IGuildUser,Discord.IVoiceChannel)">
+            <summary>
+            Moves the user to the voice channel.
+            </summary>
+            <param name="user">The user to move.</param>
+            <param name="targetChannel">the channel where the user gets moved to.</param>
+            <returns>A task that represents the asynchronous operation for moving a user.</returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketGuild.Discord#IGuild#DisconnectAsync(Discord.IGuildUser)">
+            <summary>
+            Disconnects the user from its current voice channel
+            </summary>
+            <param name="user">The user to disconnect.</param>
+            <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
+        </member>
         <member name="M:Discord.WebSocket.SocketGuild.GetStickerAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
             <summary>
                 Gets a specific sticker within this guild.
