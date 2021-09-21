@@ -124,6 +124,8 @@ namespace Discord
         public ComponentBuilder WithSelectMenu(SelectMenuBuilder menu, int row = 0)
         {
             Preconditions.LessThan(row, MaxActionRowCount, nameof(row));
+            if (menu.Options.Distinct().Count() != menu.Options.Count())
+                throw new InvalidOperationException("Please make sure that there is no duplicates values.");
 
             var builtMenu = menu.Build();
 
