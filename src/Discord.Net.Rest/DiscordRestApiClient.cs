@@ -897,7 +897,7 @@ namespace Discord.API
         }
         #endregion
 
-        #region Stickers
+        #region Stickers, Reactions, Crosspost, and Acks
         public async Task<Sticker> GetStickerAsync(ulong id, RequestOptions options = null)
         {
             Preconditions.NotEqual(id, 0, nameof(id));
@@ -1166,25 +1166,25 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            return await TrySendApplicationCommand(SendJsonAsync<ApplicationCommand>("POST", () => $"applications/{this.CurrentUserId}/commands", command, new BucketIds(), options: options)).ConfigureAwait(false);
+            return await TrySendApplicationCommandAsync(SendJsonAsync<ApplicationCommand>("POST", () => $"applications/{this.CurrentUserId}/commands", command, new BucketIds(), options: options)).ConfigureAwait(false);
         }
         public async Task<ApplicationCommand> ModifyGlobalApplicationCommandAsync(ModifyApplicationCommandParams command, ulong commandId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            return await TrySendApplicationCommand(SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{this.CurrentUserId}/commands/{commandId}", command, new BucketIds(), options: options)).ConfigureAwait(false);
+            return await TrySendApplicationCommandAsync(SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{this.CurrentUserId}/commands/{commandId}", command, new BucketIds(), options: options)).ConfigureAwait(false);
         }
         public async Task<ApplicationCommand> ModifyGlobalApplicationUserCommandAsync(ModifyApplicationCommandParams command, ulong commandId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            return await TrySendApplicationCommand(SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{this.CurrentUserId}/commands/{commandId}", command, new BucketIds(), options: options)).ConfigureAwait(false);
+            return await TrySendApplicationCommandAsync(SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{this.CurrentUserId}/commands/{commandId}", command, new BucketIds(), options: options)).ConfigureAwait(false);
         }
         public async Task<ApplicationCommand> ModifyGlobalApplicationMessageCommandAsync(ModifyApplicationCommandParams command, ulong commandId, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            return await TrySendApplicationCommand(SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{this.CurrentUserId}/commands/{commandId}", command, new BucketIds(), options: options)).ConfigureAwait(false);
+            return await TrySendApplicationCommandAsync(SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{this.CurrentUserId}/commands/{commandId}", command, new BucketIds(), options: options)).ConfigureAwait(false);
         }
         public async Task DeleteGlobalApplicationCommandAsync(ulong commandId, RequestOptions options = null)
         {
@@ -1193,11 +1193,11 @@ namespace Discord.API
             await SendAsync("DELETE", () => $"applications/{this.CurrentUserId}/commands/{commandId}", new BucketIds(), options: options).ConfigureAwait(false);
         }
 
-        public async Task<ApplicationCommand[]> BulkOverwriteGlobalApplicationCommands(CreateApplicationCommandParams[] commands, RequestOptions options = null)
+        public async Task<ApplicationCommand[]> BulkOverwriteGlobalApplicationCommandsAsync(CreateApplicationCommandParams[] commands, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
-            return await TrySendApplicationCommand(SendJsonAsync<ApplicationCommand[]>("PUT", () => $"applications/{this.CurrentUserId}/commands", commands, new BucketIds(), options: options)).ConfigureAwait(false);
+            return await TrySendApplicationCommandAsync(SendJsonAsync<ApplicationCommand[]>("PUT", () => $"applications/{this.CurrentUserId}/commands", commands, new BucketIds(), options: options)).ConfigureAwait(false);
         }
 
         public async Task<ApplicationCommand[]> GetGuildApplicationCommandsAsync(ulong guildId, RequestOptions options = null)
@@ -1239,7 +1239,7 @@ namespace Discord.API
 
             var bucket = new BucketIds(guildId: guildId);
 
-            return await TrySendApplicationCommand(SendJsonAsync<ApplicationCommand>("POST", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", command, bucket, options: options)).ConfigureAwait(false);
+            return await TrySendApplicationCommandAsync(SendJsonAsync<ApplicationCommand>("POST", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", command, bucket, options: options)).ConfigureAwait(false);
         }
         public async Task<ApplicationCommand> ModifyGuildApplicationCommandAsync(ModifyApplicationCommandParams command, ulong guildId, ulong commandId, RequestOptions options = null)
         {
@@ -1247,7 +1247,7 @@ namespace Discord.API
 
             var bucket = new BucketIds(guildId: guildId);
 
-                return await TrySendApplicationCommand(SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", command, bucket, options: options)).ConfigureAwait(false);
+                return await TrySendApplicationCommandAsync(SendJsonAsync<ApplicationCommand>("PATCH", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", command, bucket, options: options)).ConfigureAwait(false);
         }
         public async Task DeleteGuildApplicationCommandAsync(ulong guildId, ulong commandId, RequestOptions options = null)
         {
@@ -1258,18 +1258,18 @@ namespace Discord.API
             await SendAsync<ApplicationCommand>("DELETE", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}", bucket, options: options).ConfigureAwait(false);
         }
 
-        public async Task<ApplicationCommand[]> BulkOverwriteGuildApplicationCommands(ulong guildId, CreateApplicationCommandParams[] commands, RequestOptions options = null)
+        public async Task<ApplicationCommand[]> BulkOverwriteGuildApplicationCommandsAsync(ulong guildId, CreateApplicationCommandParams[] commands, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
             var bucket = new BucketIds(guildId: guildId);
 
-            return await TrySendApplicationCommand(SendJsonAsync<ApplicationCommand[]>("PUT", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", commands, bucket, options: options)).ConfigureAwait(false);
+            return await TrySendApplicationCommandAsync(SendJsonAsync<ApplicationCommand[]>("PUT", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands", commands, bucket, options: options)).ConfigureAwait(false);
         }
         #endregion
 
         #region Interaction Responses
-        public async Task CreateInteractionResponse(InteractionResponse response, ulong interactionId, string interactionToken, RequestOptions options = null)
+        public async Task CreateInteractionResponseAsync(InteractionResponse response, ulong interactionId, string interactionToken, RequestOptions options = null)
         {
             if(response.Data.IsSpecified && response.Data.Value.Content.IsSpecified)
                 Preconditions.AtMost(response.Data.Value.Content.Value?.Length ?? 0, 2000, nameof(response.Data.Value.Content));
@@ -1278,7 +1278,7 @@ namespace Discord.API
 
             await SendJsonAsync<Message>("POST", () => $"interactions/{interactionId}/{interactionToken}/callback", response, new BucketIds(), options: options);
         }
-        public async Task<Message> GetInteractionResponse(string interactionToken, RequestOptions options = null)
+        public async Task<Message> GetInteractionResponseAsync(string interactionToken, RequestOptions options = null)
         {
             Preconditions.NotNullOrEmpty(interactionToken, nameof(interactionToken));
 
@@ -1286,20 +1286,20 @@ namespace Discord.API
 
             return await SendAsync<Message>("GET", () => $"webhooks/{this.CurrentUserId}/{interactionToken}/messages/@original", new BucketIds(), options: options).ConfigureAwait(false);
         }
-        public async Task<Message> ModifyInteractionResponse(ModifyInteractionResponseParams args, string interactionToken, RequestOptions options = null)
+        public async Task<Message> ModifyInteractionResponseAsync(ModifyInteractionResponseParams args, string interactionToken, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
             return await SendJsonAsync<Message>("PATCH", () => $"webhooks/{this.CurrentUserId}/{interactionToken}/messages/@original", args, new BucketIds(), options: options);
         }
-        public async Task DeleteInteractionResponse(string interactionToken, RequestOptions options = null)
+        public async Task DeleteInteractionResponseAsync(string interactionToken, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
 
             await SendAsync("DELETE", () => $"webhooks/{this.CurrentUserId}/{interactionToken}/messages/@original", new BucketIds(), options: options);
         }
 
-        public async Task<Message> CreateInteractionFollowupMessage(CreateWebhookMessageParams args, string token, RequestOptions options = null)
+        public async Task<Message> CreateInteractionFollowupMessageAsync(CreateWebhookMessageParams args, string token, RequestOptions options = null)
         {
             if ((!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0) && !args.File.IsSpecified)
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
@@ -1315,7 +1315,7 @@ namespace Discord.API
                 return await SendMultipartAsync<Message>("POST", () => $"webhooks/{CurrentUserId}/{token}?wait=true", args.ToDictionary(), new BucketIds(), options: options).ConfigureAwait(false);
         }
 
-        public async Task<Message> ModifyInteractionFollowupMessage(ModifyInteractionResponseParams args, ulong id, string token, RequestOptions options = null)
+        public async Task<Message> ModifyInteractionFollowupMessageAsync(ModifyInteractionResponseParams args, ulong id, string token, RequestOptions options = null)
         {
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(id, 0, nameof(id));
@@ -1329,7 +1329,7 @@ namespace Discord.API
             return await SendJsonAsync<Message>("PATCH", () => $"webhooks/{CurrentUserId}/{token}/messages/{id}", args, new BucketIds(), options: options).ConfigureAwait(false);
         }
 
-        public async Task DeleteInteractionFollowupMessage(ulong id, string token, RequestOptions options = null)
+        public async Task DeleteInteractionFollowupMessageAsync(ulong id, string token, RequestOptions options = null)
         {
             Preconditions.NotEqual(id, 0, nameof(id));
 
@@ -1340,7 +1340,7 @@ namespace Discord.API
         #endregion
 
         #region Application Command permissions
-        public async Task<GuildApplicationCommandPermission[]> GetGuildApplicationCommandPermissions(ulong guildId, RequestOptions options = null)
+        public async Task<GuildApplicationCommandPermission[]> GetGuildApplicationCommandPermissionsAsync(ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
 
@@ -1349,7 +1349,7 @@ namespace Discord.API
             return await SendAsync<GuildApplicationCommandPermission[]>("GET", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/permissions", new BucketIds(), options: options).ConfigureAwait(false);
         }
 
-        public async Task<GuildApplicationCommandPermission> GetGuildApplicationCommandPermission(ulong guildId, ulong commandId, RequestOptions options = null)
+        public async Task<GuildApplicationCommandPermission> GetGuildApplicationCommandPermissionAsync(ulong guildId, ulong commandId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(commandId, 0, nameof(commandId));
@@ -1359,7 +1359,7 @@ namespace Discord.API
             return await SendAsync<GuildApplicationCommandPermission>("GET", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}/permissions", new BucketIds(), options: options).ConfigureAwait(false);
         }
 
-        public async Task<GuildApplicationCommandPermission> ModifyApplicationCommandPermissions(ModifyGuildApplicationCommandPermissionsParams permissions, ulong guildId, ulong commandId, RequestOptions options = null)
+        public async Task<GuildApplicationCommandPermission> ModifyApplicationCommandPermissionsAsync(ModifyGuildApplicationCommandPermissionsParams permissions, ulong guildId, ulong commandId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotEqual(commandId, 0, nameof(commandId));
@@ -1369,7 +1369,7 @@ namespace Discord.API
             return await SendJsonAsync<GuildApplicationCommandPermission>("PUT", () => $"applications/{this.CurrentUserId}/guilds/{guildId}/commands/{commandId}/permissions", permissions, new BucketIds(), options: options).ConfigureAwait(false);
         }
 
-        public async Task<IReadOnlyCollection<GuildApplicationCommandPermission>> BatchModifyApplicationCommandPermissions(ModifyGuildApplicationCommandPermissions[] permissions, ulong guildId, RequestOptions options = null)
+        public async Task<IReadOnlyCollection<GuildApplicationCommandPermission>> BatchModifyApplicationCommandPermissionsAsync(ModifyGuildApplicationCommandPermissions[] permissions, ulong guildId, RequestOptions options = null)
         {
             Preconditions.NotEqual(guildId, 0, nameof(guildId));
             Preconditions.NotNull(permissions, nameof(permissions));
@@ -2091,7 +2091,7 @@ namespace Discord.API
                 return _serializer.Deserialize<T>(reader);
         }
 
-        protected async Task<T> TrySendApplicationCommand<T>(Task<T> sendTask)
+        protected async Task<T> TrySendApplicationCommandAsync<T>(Task<T> sendTask)
         {
             try
             {

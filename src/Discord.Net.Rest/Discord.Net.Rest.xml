@@ -3617,6 +3617,14 @@
             <inheritdoc />
             <exception cref="T:System.ArgumentNullException"><paramref name="func"/> is <see langword="null"/>.</exception>
         </member>
+        <member name="M:Discord.Rest.RestGuild.MoveAsync(Discord.IGuildUser,Discord.IVoiceChannel)">
+            <summary>
+            Moves the user to the voice channel.
+            </summary>
+            <param name="user">The user to move.</param>
+            <param name="targetChannel">the channel where the user gets moved to.</param>
+            <returns>A task that represents the asynchronous operation for moving a user.</returns>
+        </member>
         <member name="M:Discord.Rest.RestGuild.DeleteEmoteAsync(Discord.GuildEmote,Discord.RequestOptions)">
             <inheritdoc />
         </member>
@@ -3801,6 +3809,13 @@
         </member>
         <member name="M:Discord.Rest.RestGuild.Discord#IGuild#AddGuildUserAsync(System.UInt64,System.String,System.Action{Discord.AddGuildUserProperties},Discord.RequestOptions)">
             <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestGuild.Discord#IGuild#DisconnectAsync(Discord.IGuildUser)">
+            <summary>
+            Disconnects the user from its current voice channel
+            </summary>
+            <param name="user">The user to disconnect.</param>
+            <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
         </member>
         <member name="M:Discord.Rest.RestGuild.Discord#IGuild#GetUserAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
             <inheritdoc />

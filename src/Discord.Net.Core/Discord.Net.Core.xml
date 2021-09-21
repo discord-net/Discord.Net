@@ -3747,6 +3747,13 @@
             <param name="options">The options to be used when sending the request.</param>
             <returns>A guild user associated with the specified <paramref name="userId" />; <see langword="null" /> if the user is already in the guild.</returns>
         </member>
+        <member name="M:Discord.IGuild.DisconnectAsync(Discord.IGuildUser)">
+            <summary>
+            Disconnects the user from its current voice channel
+            </summary>
+            <param name="user">The user to disconnect.</param>
+            <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
+        </member>
         <member name="M:Discord.IGuild.GetUsersAsync(Discord.CacheMode,Discord.RequestOptions)">
             <summary>
                 Gets a collection of all users in this guild.
@@ -3935,6 +3942,14 @@
                 A task that represents the asynchronous modification operation. The task result contains the modified
                 emote.
             </returns>
+        </member>
+        <member name="M:Discord.IGuild.MoveAsync(Discord.IGuildUser,Discord.IVoiceChannel)">
+            <summary>
+            Moves the user to the voice channel.
+            </summary>
+            <param name="user">The user to move.</param>
+            <param name="targetChannel">the channel where the user gets moved to.</param>
+            <returns>A task that represents the asynchronous operation for moving a user.</returns>
         </member>
         <member name="M:Discord.IGuild.DeleteEmoteAsync(Discord.GuildEmote,Discord.RequestOptions)">
             <summary>
@@ -4992,6 +5007,16 @@
                 ACK a Ping.
             </summary>
         </member>
+        <member name="F:Discord.InteractionResponseType.Acknowledge">
+            <summary>
+                ACK a command without sending a message, eating the user's input.
+            </summary>
+        </member>
+        <member name="F:Discord.InteractionResponseType.ChannelMessage">
+            <summary>
+                Respond with a message, showing the user's input.
+            </summary>
+        </member>
         <member name="F:Discord.InteractionResponseType.ChannelMessageWithSource">
             <summary>
                 Respond to an interaction with a message.
@@ -5129,11 +5154,6 @@
                 Represents a builder for creating a <see cref="T:Discord.MessageComponent"/>.
             </summary>
         </member>
-        <member name="F:Discord.ComponentBuilder.MaxButtonLabelLength">
-            <summary>
-                The max length of a <see cref="P:Discord.ButtonComponent.Label"/>.
-            </summary>
-        </member>
         <member name="F:Discord.ComponentBuilder.MaxCustomIdLength">
             <summary>
                 The max length of a <see cref="P:Discord.ButtonComponent.CustomId"/>.
@@ -5266,7 +5286,7 @@
                 Represents a class used to build <see cref="T:Discord.ButtonComponent"/>'s.
             </summary>
         </member>
-        <member name="F:Discord.ButtonBuilder.MaxLabelLength">
+        <member name="F:Discord.ButtonBuilder.MaxButtonLabelLength">
             <summary>
                 The max length of a <see cref="P:Discord.ButtonComponent.Label"/>.
             </summary>
@@ -5275,13 +5295,15 @@
             <summary>
                 Gets or sets the label of the current button.
             </summary>
-            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ButtonBuilder.Label"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxButtonLabelLength"/>.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ButtonBuilder.Label"/> length exceeds <see cref="F:Discord.ButtonBuilder.MaxButtonLabelLength"/>.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ButtonBuilder.Label"/> length exceeds <see cref="F:Discord.ButtonBuilder.MaxButtonLabelLength"/>.</exception>
         </member>
         <member name="P:Discord.ButtonBuilder.CustomId">
             <summary>
                 Gets or sets the custom id of the current button.
             </summary>
             <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ButtonBuilder.CustomId"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxCustomIdLength"/></exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ButtonBuilder.CustomId"/> length subceeds 1.</exception>
         </member>
         <member name="P:Discord.ButtonBuilder.Style">
             <summary>
@@ -5448,13 +5470,15 @@
             <summary>
                 Gets or sets the custom id of the current select menu.
             </summary>
-            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.CustomId"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxCustomIdLength"/>.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.CustomId"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxCustomIdLength"/></exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.CustomId"/> length subceeds 1.</exception>
         </member>
         <member name="P:Discord.SelectMenuBuilder.Placeholder">
             <summary>
                 Gets or sets the placeholder text of the current select menu.
             </summary>
             <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.Placeholder"/> length exceeds <see cref="F:Discord.SelectMenuBuilder.MaxPlaceholderLength"/>.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.Placeholder"/> length subceeds 1.</exception>
         </member>
         <member name="P:Discord.SelectMenuBuilder.MinValues">
             <summary>
@@ -5595,7 +5619,7 @@
                 Represents a class used to build <see cref="T:Discord.SelectMenuOption"/>'s.
             </summary>
         </member>
-        <member name="F:Discord.SelectMenuOptionBuilder.MaxLabelLength">
+        <member name="F:Discord.SelectMenuOptionBuilder.MaxSelectLabelLength">
             <summary>
                 The maximum length of a <see cref="P:Discord.SelectMenuOption.Label"/>.
             </summary>
@@ -5605,9 +5629,9 @@
                 The maximum length of a <see cref="P:Discord.SelectMenuOption.Description"/>.
             </summary>
         </member>
-        <member name="F:Discord.SelectMenuOptionBuilder.MaxSelectLabelLength">
+        <member name="F:Discord.SelectMenuOptionBuilder.MaxSelectValueLength">
             <summary>
-                The maximum length of a <see cref="P:Discord.SelectMenuOption.Label"/>.
+                The maximum length of a <see cref="P:Discord.SelectMenuOption.Value"/>.
             </summary>
         </member>
         <member name="P:Discord.SelectMenuOptionBuilder.Label">
@@ -5615,18 +5639,21 @@
                 Gets or sets the label of the current select menu.
             </summary>
             <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Label"/> length exceeds <see cref="F:Discord.SelectMenuOptionBuilder.MaxSelectLabelLength"/></exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Label"/> length subceeds 1.</exception>
         </member>
         <member name="P:Discord.SelectMenuOptionBuilder.Value">
             <summary>
                 Gets or sets the custom id of the current select menu.
             </summary>
-            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Value"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxCustomIdLength"/>.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Value"/> length exceeds <see cref="F:Discord.SelectMenuOptionBuilder.MaxSelectValueLength"/>.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Value"/> length subceeds 1.</exception>
         </member>
         <member name="P:Discord.SelectMenuOptionBuilder.Description">
             <summary>
                 Gets or sets this menu options description.
             </summary>
             <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Description"/> length exceeds <see cref="F:Discord.SelectMenuOptionBuilder.MaxDescriptionLength"/>.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Label"/> length subceeds 1.</exception>
         </member>
         <member name="P:Discord.SelectMenuOptionBuilder.Emote">
             <summary>

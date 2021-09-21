@@ -97,5 +97,7 @@ namespace Discord.Rest
                 throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
             }
         }
+
+        #endregion
     }
 }
