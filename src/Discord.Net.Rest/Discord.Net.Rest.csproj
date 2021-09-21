@@ -9,11 +9,11 @@
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard2.0;netstandard2.1</TargetFrameworks>
     <PackageIcon>Temporary.png</PackageIcon>
     <PackageProjectUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</PackageProjectUrl>
-    <Version>3.0.2</Version>
+    <Version>3.1.0</Version>
     <PackageId>Discord.Net.Labs.Rest</PackageId>
     <RepositoryUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</RepositoryUrl>
-    <AssemblyVersion>3.0.2</AssemblyVersion>
-    <FileVersion>3.0.2</FileVersion>
+    <AssemblyVersion>3.1.0</AssemblyVersion>
+    <FileVersion>3.1.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup>
     <DocumentationFile>..\Discord.Net.Rest\Discord.Net.Rest.xml</DocumentationFile>

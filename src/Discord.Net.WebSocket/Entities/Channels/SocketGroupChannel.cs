@@ -20,6 +20,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGroupChannel : SocketChannel, IGroupChannel, ISocketPrivateChannel, ISocketMessageChannel, ISocketAudioChannel
     {
+        #region SocketGroupChannel
         private readonly MessageCache _messages;
         private readonly ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
 
@@ -84,8 +85,9 @@ namespace Discord.WebSocket
         {
             throw new NotSupportedException("Voice is not yet supported for group channels.");
         }
+#endregion
 
-        //Messages
+        #region Messages
         /// <inheritdoc />
         public SocketMessage GetCachedMessage(ulong id)
             => _messages?.Get(id);
@@ -204,8 +206,9 @@ namespace Discord.WebSocket
             => _messages?.Add(msg);
         internal SocketMessage RemoveMessage(ulong id)
             => _messages?.Remove(id);
+        #endregion
 
-        //Users
+        #region Users
         /// <summary>
         ///     Gets a user from this group.
         /// </summary>
@@ -240,8 +243,9 @@ namespace Discord.WebSocket
             }
             return null;
         }
+        #endregion
 
-        //Voice States
+        #region Voice States
         internal SocketVoiceState AddOrUpdateVoiceState(ClientState state, VoiceStateModel model)
         {
             var voiceChannel = state.GetChannel(model.ChannelId.Value) as SocketVoiceChannel;
@@ -268,22 +272,26 @@ namespace Discord.WebSocket
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id}, Group)";
         internal new SocketGroupChannel Clone() => MemberwiseClone() as SocketGroupChannel;
+        #endregion
 
-        //SocketChannel
+        #region SocketChannel
         /// <inheritdoc />
         internal override IReadOnlyCollection<SocketUser> GetUsersInternal() => Users;
         /// <inheritdoc />
         internal override SocketUser GetUserInternal(ulong id) => GetUser(id);
+        #endregion
 
-        //ISocketPrivateChannel
+        #region ISocketPrivateChannel
         /// <inheritdoc />
         IReadOnlyCollection<SocketUser> ISocketPrivateChannel.Recipients => Recipients;
+        #endregion
 
-        //IPrivateChannel
+        #region IPrivateChannel
         /// <inheritdoc />
         IReadOnlyCollection<IUser> IPrivateChannel.Recipients => Recipients;
+        #endregion
 
-        //IMessageChannel
+        #region IMessageChannel
         /// <inheritdoc />
         async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id, CacheMode mode, RequestOptions options)
         {
@@ -314,19 +322,22 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers)
             => await SendMessageAsync(text, isTTS, embed, options, allowedMentions, messageReference, component, stickers).ConfigureAwait(false);
+        #endregion
 
-        //IAudioChannel
+        #region IAudioChannel
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Connecting to a group channel is not supported.</exception>
         Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external) { throw new NotSupportedException(); }
         Task IAudioChannel.DisconnectAsync() { throw new NotSupportedException(); }
+        #endregion
 
-        //IChannel        
+        #region IChannel        
         /// <inheritdoc />
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(id));
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable();
+        #endregion
     }
 }

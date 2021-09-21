@@ -14,6 +14,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketCategoryChannel : SocketGuildChannel, ICategoryChannel
     {
+        #region SocketCategoryChannel
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuildUser> Users
             => Guild.Users.Where(x => Permissions.GetValue(
@@ -41,8 +42,9 @@ namespace Discord.WebSocket
             entity.Update(state, model);
             return entity;
         }
+        #endregion
 
-        //Users
+        #region Users
         /// <inheritdoc />
         public override SocketGuildUser GetUser(ulong id)
         {
@@ -59,21 +61,24 @@ namespace Discord.WebSocket
 
         private string DebuggerDisplay => $"{Name} ({Id}, Category)";
         internal new SocketCategoryChannel Clone() => MemberwiseClone() as SocketCategoryChannel;
+        #endregion
 
-        // IGuildChannel
+        #region IGuildChannel
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IGuildUser>>(Users).ToAsyncEnumerable();
         /// <inheritdoc />
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(GetUser(id));
+        #endregion
 
-        //IChannel
+        #region IChannel
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable();
         /// <inheritdoc />
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(id));
+        #endregion
     }
 }

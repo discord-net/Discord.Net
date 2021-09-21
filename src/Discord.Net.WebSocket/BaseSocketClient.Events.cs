@@ -6,7 +6,7 @@ namespace Discord.WebSocket
 {
     public partial class BaseSocketClient
     {
-        //Channels
+        #region Channels
         /// <summary> Fired when a channel is created. </summary>
         /// <remarks>
         ///     <para>
@@ -74,8 +74,9 @@ namespace Discord.WebSocket
             remove { _channelUpdatedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketChannel, SocketChannel, Task>> _channelUpdatedEvent = new AsyncEvent<Func<SocketChannel, SocketChannel, Task>>();
+        #endregion
 
-        //Messages
+        #region Messages
         /// <summary> Fired when a message is received. </summary>
         /// <remarks>
         ///     <para>
@@ -128,7 +129,8 @@ namespace Discord.WebSocket
         ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs" />
         /// </example>
 
-        public event Func<Cacheable<IMessage, ulong>, Cacheable<IMessageChannel, ulong>, Task> MessageDeleted {
+        public event Func<Cacheable<IMessage, ulong>, Cacheable<IMessageChannel, ulong>, Task> MessageDeleted
+        {
             add { _messageDeletedEvent.Add(value); }
             remove { _messageDeletedEvent.Remove(value); }
         }
@@ -222,19 +224,22 @@ namespace Discord.WebSocket
         ///     <code language="cs" region="ReactionAdded"
         ///           source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
         /// </example>
-        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task> ReactionAdded {
+        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task> ReactionAdded
+        {
             add { _reactionAddedEvent.Add(value); }
             remove { _reactionAddedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task>> _reactionAddedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task>>();
         /// <summary> Fired when a reaction is removed from a message. </summary>
-        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task> ReactionRemoved {
+        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task> ReactionRemoved
+        {
             add { _reactionRemovedEvent.Add(value); }
             remove { _reactionRemovedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task>> _reactionRemovedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task>>();
         /// <summary> Fired when all reactions to a message are cleared. </summary>
-        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, Task> ReactionsCleared {
+        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, Task> ReactionsCleared
+        {
             add { _reactionsClearedEvent.Add(value); }
             remove { _reactionsClearedEvent.Remove(value); }
         }
@@ -261,8 +266,9 @@ namespace Discord.WebSocket
             remove { _reactionsRemovedForEmoteEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, IEmote, Task>> _reactionsRemovedForEmoteEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, IEmote, Task>>();
+        #endregion
 
-        //Roles
+        #region Roles
         /// <summary> Fired when a role is created. </summary>
         public event Func<SocketRole, Task> RoleCreated
         {
@@ -284,8 +290,9 @@ namespace Discord.WebSocket
             remove { _roleUpdatedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketRole, SocketRole, Task>> _roleUpdatedEvent = new AsyncEvent<Func<SocketRole, SocketRole, Task>>();
+        #endregion
 
-        //Guilds
+        #region Guilds
         /// <summary> Fired when the connected account joins a guild. </summary>
         public event Func<SocketGuild, Task> JoinedGuild
         {
@@ -328,8 +335,9 @@ namespace Discord.WebSocket
             remove { _guildUpdatedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketGuild, SocketGuild, Task>> _guildUpdatedEvent = new AsyncEvent<Func<SocketGuild, SocketGuild, Task>>();
+        #endregion
 
-        //Users
+        #region Users
         /// <summary> Fired when a user joins a guild. </summary>
         public event Func<SocketGuildUser, Task> UserJoined
         {
@@ -366,11 +374,12 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<SocketUser, SocketUser, Task>> _userUpdatedEvent = new AsyncEvent<Func<SocketUser, SocketUser, Task>>();
         /// <summary> Fired when a guild member is updated, or a member presence is updated. </summary>
-        public event Func<Cacheable<SocketGuildUser, ulong>, SocketGuildUser, Task> GuildMemberUpdated {
+        public event Func<Cacheable<SocketGuildUser, ulong>, SocketGuildUser, Task> GuildMemberUpdated
+        {
             add { _guildMemberUpdatedEvent.Add(value); }
             remove { _guildMemberUpdatedEvent.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<Cacheable<SocketGuildUser, ulong>, SocketGuildUser, Task>> _guildMemberUpdatedEvent = new AsyncEvent<Func<Cacheable<SocketGuildUser, ulong>, SocketGuildUser, Task>>();     
+        internal readonly AsyncEvent<Func<Cacheable<SocketGuildUser, ulong>, SocketGuildUser, Task>> _guildMemberUpdatedEvent = new AsyncEvent<Func<Cacheable<SocketGuildUser, ulong>, SocketGuildUser, Task>>();
         /// <summary> Fired when a user joins, leaves, or moves voice channels. </summary>
         public event Func<SocketUser, SocketVoiceState, SocketVoiceState, Task> UserVoiceStateUpdated
         {
@@ -393,7 +402,8 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<SocketSelfUser, SocketSelfUser, Task>> _selfUpdatedEvent = new AsyncEvent<Func<SocketSelfUser, SocketSelfUser, Task>>();
         /// <summary> Fired when a user starts typing. </summary>
-        public event Func<Cacheable<IUser, ulong>, Cacheable<IMessageChannel, ulong>, Task> UserIsTyping {
+        public event Func<Cacheable<IUser, ulong>, Cacheable<IMessageChannel, ulong>, Task> UserIsTyping
+        {
             add { _userIsTypingEvent.Add(value); }
             remove { _userIsTypingEvent.Remove(value); }
         }
@@ -412,8 +422,9 @@ namespace Discord.WebSocket
             remove { _recipientRemovedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketGroupUser, Task>> _recipientRemovedEvent = new AsyncEvent<Func<SocketGroupUser, Task>>();
+        #endregion
 
-        //Invites
+        #region Invites
         /// <summary>
         ///     Fired when an invite is created.
         /// </summary>
@@ -454,8 +465,9 @@ namespace Discord.WebSocket
             remove { _inviteDeletedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketGuildChannel, string, Task>> _inviteDeletedEvent = new AsyncEvent<Func<SocketGuildChannel, string, Task>>();
+        #endregion
 
-        //Interactions
+        #region Interactions
         /// <summary>
         ///     Fired when an Interaction is created. This event covers all types of interactions including but not limited to: buttons, select menus, slash commands.
         /// </summary>
@@ -730,5 +742,6 @@ namespace Discord.WebSocket
             remove { _guildStickerDeleted.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketCustomSticker, Task>> _guildStickerDeleted = new AsyncEvent<Func<SocketCustomSticker, Task>>();
+        #endregion
     }
 }

@@ -10,6 +10,7 @@ namespace Discord.WebSocket
     /// </summary>
     public class SocketSlashCommandDataOption : IApplicationCommandInteractionDataOption
     {
+        #region SocketSlashCommandDataOption
         /// <inheritdoc/>
         public string Name { get; private set; }
 
@@ -116,17 +117,20 @@ namespace Discord.WebSocket
                 ? model.Options.Value.Select(x => new SocketSlashCommandDataOption(data, x)).ToImmutableArray()
                 : null;
         }
+#endregion
 
-        // Converters
+        #region Converters
         public static explicit operator bool(SocketSlashCommandDataOption option)
             => (bool)option.Value;
         public static explicit operator int(SocketSlashCommandDataOption option)
             => (int)option.Value;
         public static explicit operator string(SocketSlashCommandDataOption option)
             => option.Value.ToString();
+        #endregion
 
-        // IApplicationCommandInteractionDataOption
+        #region IApplicationCommandInteractionDataOption
         IReadOnlyCollection<IApplicationCommandInteractionDataOption> IApplicationCommandInteractionDataOption.Options
             => this.Options;
+        #endregion
     }
 }

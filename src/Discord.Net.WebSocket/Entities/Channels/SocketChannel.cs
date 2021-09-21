@@ -13,6 +13,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class SocketChannel : SocketEntity<ulong>, IChannel
     {
+        #region SocketChannel
         /// <summary>
         ///     Gets when the channel is created.
         /// </summary>
@@ -41,8 +42,9 @@ namespace Discord.WebSocket
             }
         }
         internal abstract void Update(ClientState state, Model model);
+        #endregion
 
-        //User
+        #region User
         /// <summary>
         ///     Gets a generic user from this channel.
         /// </summary>
@@ -56,8 +58,9 @@ namespace Discord.WebSocket
 
         private string DebuggerDisplay => $"Unknown ({Id}, Channel)";
         internal SocketChannel Clone() => MemberwiseClone() as SocketChannel;
+        #endregion
 
-        //IChannel
+        #region IChannel
         /// <inheritdoc />
         string IChannel.Name => null;
 
@@ -67,5 +70,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overridden
+        #endregion
     }
 }
