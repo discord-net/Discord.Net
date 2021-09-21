@@ -8,6 +8,7 @@ namespace Discord.Commands.Builders
 {
     public class ParameterBuilder
     {
+        #region ParameterBuilder
         private readonly List<ParameterPreconditionAttribute> _preconditions;
         private readonly List<Attribute> _attributes;
 
@@ -24,8 +25,9 @@ namespace Discord.Commands.Builders
 
         public IReadOnlyList<ParameterPreconditionAttribute> Preconditions => _preconditions;
         public IReadOnlyList<Attribute> Attributes => _attributes;
+#endregion
 
-        //Automatic
+        #region Automatic
         internal ParameterBuilder(CommandBuilder command)
         {
             _preconditions = new List<ParameterPreconditionAttribute>();
@@ -33,7 +35,9 @@ namespace Discord.Commands.Builders
 
             Command = command;
         }
-        //User-defined
+        #endregion
+
+        #region User-defined
         internal ParameterBuilder(CommandBuilder command, string name, Type type)
             : this(command)
         {
@@ -132,5 +136,6 @@ namespace Discord.Commands.Builders
 
             return new ParameterInfo(this, info, Command.Module.Service);
         }
+        #endregion
     }
 }

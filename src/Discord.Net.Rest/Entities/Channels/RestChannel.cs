@@ -11,6 +11,7 @@ namespace Discord.Rest
     /// </summary>
     public class RestChannel : RestEntity<ulong>, IChannel, IUpdateable
     {
+        #region RestChannel
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
@@ -53,8 +54,9 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public virtual Task UpdateAsync(RequestOptions options = null) => Task.Delay(0);
+        #endregion
 
-        //IChannel
+        #region IChannel
         /// <inheritdoc />
         string IChannel.Name => null;
 
@@ -64,5 +66,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overridden
+        #endregion
     }
 }
