@@ -86,12 +86,6 @@ namespace Discord.WebSocket
             if (embeds == null && embed != null)
                 embeds = new[] { embed };
 
-            if (Discord.AlwaysAcknowledgeInteractions)
-            {
-                await FollowupAsync(text, embeds, isTTS, ephemeral, allowedMentions, options);
-                return;
-            }
-
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds?.Length ?? 0, 10, nameof(embeds), "A max of 10 embeds are allowed.");
@@ -341,7 +335,7 @@ namespace Discord.WebSocket
 
             };
 
-            return Discord.Rest.ApiClient.CreateInteractionResponse(response, this.Id, this.Token, options);
+            return Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, this.Id, this.Token, options);
         }
 
         /// <inheritdoc/>
@@ -354,7 +348,7 @@ namespace Discord.WebSocket
 
             };
 
-            return Discord.Rest.ApiClient.CreateInteractionResponse(response, this.Id, this.Token, options);
+            return Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, this.Id, this.Token, options);
         }
     }
 }

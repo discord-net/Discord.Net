@@ -72,8 +72,6 @@ namespace Discord.WebSocket
         internal WebSocketProvider WebSocketProvider { get; private set; }
         internal bool AlwaysDownloadUsers { get; private set; }
         internal int? HandlerTimeout { get; private set; }
-        internal bool AlwaysAcknowledgeInteractions { get; private set; }
-
         internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
@@ -143,7 +141,6 @@ namespace Discord.WebSocket
             UdpSocketProvider = config.UdpSocketProvider;
             WebSocketProvider = config.WebSocketProvider;
             AlwaysDownloadUsers = config.AlwaysDownloadUsers;
-            AlwaysAcknowledgeInteractions = config.AlwaysAcknowledgeInteractions;
             HandlerTimeout = config.HandlerTimeout;
             State = new ClientState(0, 0);
             Rest = new DiscordSocketRestClient(config, ApiClient);
@@ -2094,9 +2091,6 @@ namespace Discord.WebSocket
                                         }
 
                                         var interaction = SocketInteraction.Create(this, data, channel as ISocketMessageChannel);
-
-                                        if (this.AlwaysAcknowledgeInteractions)
-                                            await interaction.DeferAsync().ConfigureAwait(false);
 
                                         await TimedInvokeAsync(_interactionCreatedEvent, nameof(InteractionCreated), interaction).ConfigureAwait(false);
 

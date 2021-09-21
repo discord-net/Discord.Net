@@ -1393,29 +1393,6 @@
                 </note>
             </remarks>
         </member>
-        <member name="P:Discord.WebSocket.DiscordSocketConfig.AlwaysAcknowledgeInteractions">
-            <summary>
-                Gets or sets whether or not interactions are acknowledge with source. 
-            </summary>
-            <remarks>
-                <para>
-                    Discord interactions will not appear in chat until the client responds to them. With this option set to 
-                    <see langword="true"/>, the client will automatically acknowledge the interaction with <see cref="F:Discord.InteractionResponseType.DeferredChannelMessageWithSource"/>.
-                    See <see href="https://discord.com/developers/docs/interactions/slash-commands#interaction-interactionresponsetype">the docs</see> on
-                    responding to interactions for more info.
-                </para>
-                <para>
-                    With this option set to <see langword="false"/>, you will have to acknowledge the interaction with
-                    <see cref="!:SocketInteraction.RespondAsync(string, bool, Embed, InteractionResponseType, AllowedMentions, RequestOptions)"/>.
-                    Only after the interaction is acknowledged, the original slash command message will be visible.
-                </para>
-                <note>
-                    Please note that manually acknowledging the interaction with a message reply will not provide any return data.
-                    Automatically acknowledging the interaction without sending the message will allow for follow up responses to
-                    be used; follow up responses return the message data sent.
-                </note>
-            </remarks>
-        </member>
         <member name="P:Discord.WebSocket.DiscordSocketConfig.HandlerTimeout">
             <summary>
                 Gets or sets the timeout for event handlers, in milliseconds, after which a warning will be logged.
@@ -4207,7 +4184,7 @@
             <summary>
                 Responds to an Interaction with type <see cref="F:Discord.InteractionResponseType.ChannelMessageWithSource"/>.
             <para>
-                If you have <see cref="P:Discord.WebSocket.DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, You should use
+                If you have <see cref="!:DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, You should use
                 <see cref="M:Discord.WebSocket.SocketInteraction.FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)"/> instead.
             </para>
             </summary>
