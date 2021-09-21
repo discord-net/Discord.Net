@@ -15,6 +15,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGuildChannel : SocketChannel, IGuildChannel
     {
+        #region SocketGuildChannel
         private ImmutableArray<Overwrite> _overwrites;
 
         /// <summary>
@@ -27,7 +28,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string Name { get; private set; }
         /// <inheritdoc />
-        public int Position { get; private set; }        
+        public int Position { get; private set; }
 
         /// <inheritdoc />
         public virtual IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
@@ -69,7 +70,7 @@ namespace Discord.WebSocket
         {
             Name = model.Name.Value;
             Position = model.Position.GetValueOrDefault(0);
-            
+
             var overwrites = model.PermissionOverwrites.GetValueOrDefault(new API.Overwrite[0]);
             var newOverwrites = ImmutableArray.CreateBuilder<Overwrite>(overwrites.Length);
             for (int i = 0; i < overwrites.Length; i++)
@@ -180,14 +181,16 @@ namespace Discord.WebSocket
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id}, Guild)";
         internal new SocketGuildChannel Clone() => MemberwiseClone() as SocketGuildChannel;
+#endregion
 
-        //SocketChannel
+        #region SocketChannel
         /// <inheritdoc />
         internal override IReadOnlyCollection<SocketUser> GetUsersInternal() => Users;
         /// <inheritdoc />
         internal override SocketUser GetUserInternal(ulong id) => GetUser(id);
+        #endregion
 
-        //IGuildChannel
+        #region IGuildChannel
         /// <inheritdoc />
         IGuild IGuildChannel.Guild => Guild;
         /// <inheritdoc />
@@ -218,13 +221,15 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(GetUser(id));
+        #endregion
 
-        //IChannel
+        #region IChannel
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable(); //Overridden in Text/Voice
         /// <inheritdoc />
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(id)); //Overridden in Text/Voice
+        #endregion
     }
 }

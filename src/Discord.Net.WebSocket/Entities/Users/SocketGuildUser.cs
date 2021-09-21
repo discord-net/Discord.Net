@@ -18,6 +18,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGuildUser : SocketUser, IGuildUser
     {
+        #region SocketGuildUser
         private long? _premiumSinceTicks;
         private long? _joinedAtTicks;
         private ImmutableArray<ulong> _roleIds;
@@ -65,7 +66,7 @@ namespace Discord.WebSocket
         public DateTimeOffset? RequestToSpeakTimestamp => VoiceState?.RequestToSpeakTimestamp ?? null;
         /// <inheritdoc />
         public bool? IsPending { get; private set; }
-        
+
 
         /// <inheritdoc />
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
@@ -220,8 +221,9 @@ namespace Discord.WebSocket
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Guild)";
         internal new SocketGuildUser Clone() => MemberwiseClone() as SocketGuildUser;
+        #endregion
 
-        //IGuildUser
+        #region IGuildUser
         /// <inheritdoc />
         IGuild IGuildUser.Guild => Guild;
         /// <inheritdoc />
@@ -232,5 +234,6 @@ namespace Discord.WebSocket
         //IVoiceState
         /// <inheritdoc />
         IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;
+        #endregion
     }
 }

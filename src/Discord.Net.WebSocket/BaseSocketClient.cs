@@ -12,6 +12,7 @@ namespace Discord.WebSocket
     /// </summary>
     public abstract partial class BaseSocketClient : BaseDiscordClient, IDiscordClient
     {
+        #region BaseSocketClient
         protected readonly DiscordSocketConfig BaseConfig;
 
         /// <summary>
@@ -79,7 +80,7 @@ namespace Discord.WebSocket
             : base(config, client) => BaseConfig = config;
         private static DiscordSocketApiClient CreateApiClient(DiscordSocketConfig config)
             => new DiscordSocketApiClient(config.RestClientProvider, config.WebSocketProvider, DiscordRestConfig.UserAgent,
-				useSystemClock: config.UseSystemClock);
+                useSystemClock: config.UseSystemClock);
 
         /// <summary>
         ///     Gets a Discord application information for the logged-in user.
@@ -282,8 +283,9 @@ namespace Discord.WebSocket
         ///     A <see cref="SocketSticker"/> if found, otherwise <see langword="null"/>.
         /// </returns>
         public abstract Task<SocketSticker> GetStickerAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
-        
-        // IDiscordClient
+#endregion
+
+        #region IDiscordClient
         /// <inheritdoc />
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
             => await GetApplicationInfoAsync(options).ConfigureAwait(false);
@@ -331,5 +333,6 @@ namespace Discord.WebSocket
         {
             return await GetVoiceRegionsAsync().ConfigureAwait(false);
         }
+        #endregion
     }
 }

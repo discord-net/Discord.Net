@@ -7,6 +7,7 @@ namespace Discord.Commands
     /// </summary>
     public class SocketCommandContext : ICommandContext
     {
+        #region SocketCommandContext
         /// <summary>
         ///     Gets the <see cref="DiscordSocketClient" /> that the command is executed with.
         /// </summary>
@@ -46,8 +47,9 @@ namespace Discord.Commands
             User = msg.Author;
             Message = msg;
         }
+#endregion
 
-        //ICommandContext
+        #region ICommandContext
         /// <inheritdoc/>
         IDiscordClient ICommandContext.Client => Client;
         /// <inheritdoc/>
@@ -58,5 +60,6 @@ namespace Discord.Commands
         IUser ICommandContext.User => User;
         /// <inheritdoc/>
         IUserMessage ICommandContext.Message => Message;
+        #endregion
     }
 }
