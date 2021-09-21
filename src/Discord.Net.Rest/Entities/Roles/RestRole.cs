@@ -11,6 +11,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestRole : RestEntity<ulong>, IRole
     {
+        #region RestRole
         internal IGuild Guild { get; }
         /// <inheritdoc />
         public Color Color { get; private set; }
@@ -64,7 +65,7 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public async Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
-        { 
+        {
             var model = await RoleHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
@@ -83,8 +84,9 @@ namespace Discord.Rest
         /// </returns>
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
+        #endregion
 
-        //IRole
+        #region IRole
         /// <inheritdoc />
         IGuild IRole.Guild
         {
