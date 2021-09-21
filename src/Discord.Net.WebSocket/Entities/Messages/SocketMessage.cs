@@ -198,7 +198,7 @@ namespace Discord.WebSocket
                         case ComponentType.SelectMenu:
                             {
                                 var parsed = (API.SelectMenuComponent)y;
-                                return new SelectMenu(
+                                return new SelectMenuComponent(
                                     parsed.CustomId,
                                     parsed.Options.Select(z => new SelectMenuOption(
                                         z.Label,

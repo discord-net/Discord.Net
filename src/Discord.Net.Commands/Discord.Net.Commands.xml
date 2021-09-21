@@ -1129,7 +1129,7 @@
             <seealso cref="T:Discord.Commands.ICommandContext" />
             <seealso cref="T:Discord.Commands.CommandContext" />
         </member>
-        <member name="M:Discord.Commands.ModuleBase`1.ReplyAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)">
+        <member name="M:Discord.Commands.ModuleBase`1.ReplyAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent,Discord.ISticker[])">
             <summary>
                 Sends a message to the source channel.
             </summary>
@@ -1143,6 +1143,8 @@
                 If <c>null</c>, all mentioned roles and users will be notified.
             </param>
             <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
+            <param name="component">The message components to be included with this message. Used for interactions</param>
+            <param name="stickers">A collection of stickers to send with the file.</param>
         </member>
         <member name="M:Discord.Commands.ModuleBase`1.BeforeExecute(Discord.Commands.CommandInfo)">
             <summary>

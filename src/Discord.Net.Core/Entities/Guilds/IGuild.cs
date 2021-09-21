@@ -667,6 +667,17 @@ namespace Discord
         /// </returns>
         Task<IVoiceChannel> CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null);
         /// <summary>
+        ///     Creates a new stage channel in this guild.
+        /// </summary>
+        /// <param name="name">The new name for the stage channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     stage channel.
+        /// </returns>
+        Task<IStageChannel> CreateStageChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null);
+        /// <summary>
         ///     Creates a new channel category in this guild.
         /// </summary>
         /// <param name="name">The new name for the category.</param>
@@ -759,6 +770,12 @@ namespace Discord
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>A guild user associated with the specified <paramref name="userId" />; <see langword="null" /> if the user is already in the guild.</returns>
         Task<IGuildUser> AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func = null, RequestOptions options = null);
+        /// <summary>
+        /// Disconnects the user from its current voice channel
+        /// </summary>
+        /// <param name="user">The user to disconnect.</param>
+        /// <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
+        Task DisconnectAsync(IGuildUser user);
         /// <summary>
         ///     Gets a collection of all users in this guild.
         /// </summary>
@@ -940,6 +957,15 @@ namespace Discord
         ///     emote.
         /// </returns>
         Task<GuildEmote> ModifyEmoteAsync(GuildEmote emote, Action<EmoteProperties> func, RequestOptions options = null);
+
+        /// <summary>
+        /// Moves the user to the voice channel.
+        /// </summary>
+        /// <param name="user">The user to move.</param>
+        /// <param name="targetChannel">the channel where the user gets moved to.</param>
+        /// <returns>A task that represents the asynchronous operation for moving a user.</returns>
+        Task MoveAsync(IGuildUser user, IVoiceChannel targetChannel);
+
         /// <summary>
         ///     Deletes an existing <see cref="GuildEmote"/> from this guild.
         /// </summary>

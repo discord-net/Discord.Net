@@ -35,16 +35,17 @@ namespace Discord.WebSocket
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="component">The message components to be included with this message. Used for interactions</param>
+        /// <param name="stickers">A collection of stickers to send with the message.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        new Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null);
+        new Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null);
         /// <summary>
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
         /// <remarks>
-        ///     This method follows the same behavior as described in <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference, MessageComponent)"/>.
+        ///     This method follows the same behavior as described in <see cref="IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference, MessageComponent, ISticker[])"/>.
         ///     Please visit its documentation for more details on this method.
         /// </remarks>
         /// <param name="filePath">The file path of the file.</param>
@@ -59,16 +60,17 @@ namespace Discord.WebSocket
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="component">The message components to be included with this message. Used for interactions</param>
+        /// <param name="stickers">A collection of stickers to send with the file.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null);
+        new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null);
         /// <summary>
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
         /// <remarks>
-        ///     This method follows the same behavior as described in <see cref="IMessageChannel.SendFileAsync(Stream, string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference, MessageComponent)"/>.
+        ///     This method follows the same behavior as described in <see cref="IMessageChannel.SendFileAsync(Stream, string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference, MessageComponent, ISticker[])"/>.
         ///     Please visit its documentation for more details on this method.
         /// </remarks>
         /// <param name="stream">The <see cref="Stream" /> of the file to be sent.</param>
@@ -84,11 +86,12 @@ namespace Discord.WebSocket
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="component">The message components to be included with this message. Used for interactions</param>
+        /// <param name="stickers">A collection of stickers to send with the file.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null);
+        new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null);
 
         /// <summary>
         ///     Gets a cached message from this channel.

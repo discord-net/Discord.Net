@@ -8,6 +8,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestWebhook : RestEntity<ulong>, IWebhook, IUpdateable
     {
+        #region RestWebhook
         internal IGuild Guild { get; private set; }
         internal ITextChannel Channel { get; private set; }
 
@@ -95,8 +96,9 @@ namespace Discord.Rest
 
         public override string ToString() => $"Webhook: {Name}:{Id}";
         private string DebuggerDisplay => $"Webhook: {Name} ({Id})";
+        #endregion
 
-        //IWebhook
+        #region IWebhook
         /// <inheritdoc />
         IGuild IWebhook.Guild 
             => Guild ?? throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
@@ -106,5 +108,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         Task IWebhook.ModifyAsync(Action<WebhookProperties> func, RequestOptions options)
             => ModifyAsync(func, options);
+        #endregion
     }
 }

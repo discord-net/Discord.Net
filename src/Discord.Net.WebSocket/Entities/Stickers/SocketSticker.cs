@@ -20,7 +20,7 @@ namespace Discord.WebSocket
         public virtual ulong PackId { get; private set; }
 
         /// <inheritdoc/>
-        public string Name { get; internal set; }
+        public string Name { get; protected set; }
 
         /// <inheritdoc/>
         public virtual string Description { get; private set; }
@@ -29,13 +29,16 @@ namespace Discord.WebSocket
         public virtual IReadOnlyCollection<string> Tags { get; private set; }
 
         /// <inheritdoc/>
-        public virtual string Asset { get; private set; }
+        public virtual StickerType Type { get; private set; }
 
         /// <inheritdoc/>
-        public virtual string PreviewAsset { get; private set; }
+        public StickerFormatType Format { get; protected set; }
 
         /// <inheritdoc/>
-        public StickerFormatType Format { get; internal set; }
+        public virtual bool? Available { get; protected set; }
+
+        /// <inheritdoc/>
+        public virtual int? SortOrder { get; private set; }
 
         /// <inheritdoc/>
         public string GetStickerUrl()
@@ -62,9 +65,10 @@ namespace Discord.WebSocket
             this.Name = model.Name;
             this.Description = model.Desription;
             this.PackId = model.PackId;
-            this.Asset = model.Asset;
-            this.PreviewAsset = model.PreviewAsset;
+            this.Available = model.Available;
             this.Format = model.FormatType;
+            this.Type = model.Type;
+            this.SortOrder = model.SortValue;
 
             if (model.Tags.IsSpecified)
             {
@@ -88,8 +92,9 @@ namespace Discord.WebSocket
                     stickerModel.FormatType == this.Format &&
                     stickerModel.Id == this.Id &&
                     stickerModel.PackId == this.PackId &&
-                    stickerModel.Asset == this.Asset &&
-                    stickerModel.PreviewAsset == this.PreviewAsset &&
+                    stickerModel.Type == this.Type &&
+                    stickerModel.SortValue == this.SortOrder &&
+                    stickerModel.Available == this.Available &&
                     (stickerModel.Tags.IsSpecified ?
                         stickerModel.Tags.Value == string.Join(", ", this.Tags) :
                         true);

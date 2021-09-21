@@ -10,19 +10,21 @@ namespace Discord.Rest
     public class Sticker : RestEntity<ulong>, ISticker
     {
         /// <inheritdoc />
-        public ulong PackId { get; internal set; }
+        public ulong PackId { get; protected set; }
         /// <inheritdoc />
-        public string Name { get; internal set; }
+        public string Name { get; protected set; }
         /// <inheritdoc />
-        public string Description { get; internal set; }
+        public string Description { get; protected set; }
         /// <inheritdoc />
-        public IReadOnlyCollection<string> Tags { get; internal set; }
+        public IReadOnlyCollection<string> Tags { get; protected set; }
         /// <inheritdoc />
-        public string Asset { get; internal set; }
+        public StickerType Type { get; protected set; }
         /// <inheritdoc />
-        public string PreviewAsset { get; internal set; }
+        public bool? Available { get; protected set; }
         /// <inheritdoc />
-        public StickerFormatType Format { get; internal set; }
+        public int? SortOrder { get; protected set; }
+        /// <inheritdoc />
+        public StickerFormatType Format { get; protected set; }
 
         /// <inheritdoc/>
         public string GetStickerUrl()
@@ -43,8 +45,9 @@ namespace Discord.Rest
             Name = model.Name;
             Description = model.Desription;
             Tags = model.Tags.IsSpecified ? model.Tags.Value.Split(',').Select(x => x.Trim()).ToArray() : new string[0];
-            Asset = model.Asset;
-            PreviewAsset = model.PreviewAsset;
+            Type = model.Type;
+            SortOrder = model.SortValue;
+            Available = model.Available;
             Format = model.FormatType;
         }
 

@@ -15,15 +15,17 @@ namespace Discord.API
         public string Desription { get; set; }
         [JsonProperty("tags")]
         public Optional<string> Tags { get; set; }
-        [JsonProperty("asset")]
-        public string Asset { get; set; }
-        [JsonProperty("preview_asset")]
-        public string PreviewAsset { get; set; }
+        [JsonProperty("type")]
+        public StickerType Type { get; set; }
         [JsonProperty("format_type")]
         public StickerFormatType FormatType { get; set; }
+        [JsonProperty("available")]
+        public bool? Available { get; set; }
         [JsonProperty("guild_id")]
         public Optional<ulong> GuildId { get; set; }
         [JsonProperty("user")]
         public Optional<User> User { get; set; }
+        [JsonProperty("sort_value")]
+        public int? SortValue { get; set; }
     }
 }

@@ -7,7 +7,7 @@ namespace Discord.Rest
 {
     internal static class RoleHelper
     {
-        //General
+        #region General
         public static async Task DeleteAsync(IRole role, BaseDiscordClient client,
             RequestOptions options)
         {
@@ -36,5 +36,6 @@ namespace Discord.Rest
             }
             return model;
         }
+        #endregion
     }
 }

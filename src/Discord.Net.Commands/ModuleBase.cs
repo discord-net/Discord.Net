@@ -16,6 +16,7 @@ namespace Discord.Commands
     public abstract class ModuleBase<T> : IModuleBase
         where T : class, ICommandContext
     {
+        #region ModuleBase
         /// <summary>
         ///     The underlying context of the command.
         /// </summary>
@@ -36,9 +37,11 @@ namespace Discord.Commands
         ///     If <c>null</c>, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-        protected virtual async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null)
+        /// <param name="component">The message components to be included with this message. Used for interactions</param>
+        /// <param name="stickers">A collection of stickers to send with the file.</param>
+        protected virtual async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null)
         {
-            return await Context.Channel.SendMessageAsync(message, isTTS, embed, options, allowedMentions, messageReference, component).ConfigureAwait(false);
+            return await Context.Channel.SendMessageAsync(message, isTTS, embed, options, allowedMentions, messageReference, component, stickers).ConfigureAwait(false);
         }
         /// <summary>
         ///     The method to execute before executing the command.
@@ -63,8 +66,9 @@ namespace Discord.Commands
         protected virtual void OnModuleBuilding(CommandService commandService, ModuleBuilder builder)
         {
         }
+        #endregion
 
-        //IModuleBase
+        #region IModuleBase
         void IModuleBase.SetContext(ICommandContext context)
         {
             var newValue = context as T;
@@ -73,5 +77,6 @@ namespace Discord.Commands
         void IModuleBase.BeforeExecute(CommandInfo command) => BeforeExecute(command);
         void IModuleBase.AfterExecute(CommandInfo command) => AfterExecute(command);
         void IModuleBase.OnModuleBuilding(CommandService commandService, ModuleBuilder builder) => OnModuleBuilding(commandService, builder);
+        #endregion
     }
 }

@@ -10,6 +10,7 @@ namespace Discord.Rest
 {
     public abstract class BaseDiscordClient : IDiscordClient
     {
+        #region BaseDiscordClient
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
 
@@ -155,8 +156,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task<BotGateway> GetBotGatewayAsync(RequestOptions options = null)
             => ClientHelper.GetBotGatewayAsync(this, options);
+        #endregion
 
-        //IDiscordClient
+        #region IDiscordClient
         /// <inheritdoc />
         ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;
         /// <inheritdoc />
@@ -235,5 +237,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         Task IDiscordClient.StopAsync()
             => Task.Delay(0);
+        #endregion 
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     Represents a choice for a <see cref="SelectMenu"/>.
+    ///     Represents a choice for a <see cref="SelectMenuComponent"/>.
     /// </summary>
     public class SelectMenuOption
     {

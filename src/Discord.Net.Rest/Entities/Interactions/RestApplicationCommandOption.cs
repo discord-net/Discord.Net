@@ -13,6 +13,7 @@ namespace Discord.Rest
     /// </summary>
     public class RestApplicationCommandOption : IApplicationCommandOption
     {
+        #region RestApplicationCommandOption
         /// <inheritdoc/>
         public ApplicationCommandOptionType Type { get; private set; }
 
@@ -67,11 +68,13 @@ namespace Discord.Rest
                 ? model.Choices.Value.Select(x => new RestApplicationCommandChoice(x)).ToImmutableArray()
                 : null;
         }
+        #endregion
 
-        //IApplicationCommandOption
+        #region IApplicationCommandOption
         IReadOnlyCollection<IApplicationCommandOption> IApplicationCommandOption.Options
             => Options;
         IReadOnlyCollection<IApplicationCommandOptionChoice> IApplicationCommandOption.Choices
             => Choices;
+        #endregion
     }
 }

@@ -14,7 +14,7 @@ namespace Discord.Rest
 {
     internal static class GuildHelper
     {
-        //General
+        #region General
         /// <exception cref="ArgumentNullException"><paramref name="func"/> is <c>null</c>.</exception>
         public static async Task<Model> ModifyAsync(IGuild guild, BaseDiscordClient client,
             Action<GuildProperties> func, RequestOptions options)
@@ -123,8 +123,9 @@ namespace Discord.Rest
         {
             await client.ApiClient.DeleteGuildAsync(guild.Id, options).ConfigureAwait(false);
         }
+        #endregion
 
-        //Bans
+        #region Bans
         public static async Task<IReadOnlyCollection<RestBan>> GetBansAsync(IGuild guild, BaseDiscordClient client,
             RequestOptions options)
         {
@@ -148,8 +149,9 @@ namespace Discord.Rest
         {
             await client.ApiClient.RemoveGuildBanAsync(guild.Id, userId, options).ConfigureAwait(false);
         }
+        #endregion
 
-        //Channels
+        #region Channels
         public static async Task<RestGuildChannel> GetChannelAsync(IGuild guild, BaseDiscordClient client,
             ulong id, RequestOptions options)
         {
@@ -221,6 +223,34 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestVoiceChannel.Create(client, guild, model);
         }
+        public static async Task<RestStageChannel> CreateStageChannelAsync(IGuild guild, BaseDiscordClient client,
+            string name, RequestOptions options, Action<VoiceChannelProperties> func = null)
+        {
+            if (name == null)
+                throw new ArgumentNullException(paramName: nameof(name));
+
+            var props = new VoiceChannelProperties();
+            func?.Invoke(props);
+
+            var args = new CreateGuildChannelParams(name, ChannelType.Stage)
+            {
+                CategoryId = props.CategoryId,
+                Bitrate = props.Bitrate,
+                UserLimit = props.UserLimit,
+                Position = props.Position,
+                Overwrites = props.PermissionOverwrites.IsSpecified
+                    ? props.PermissionOverwrites.Value.Select(overwrite => new API.Overwrite
+                    {
+                        TargetId = overwrite.TargetId,
+                        TargetType = overwrite.TargetType,
+                        Allow = overwrite.Permissions.AllowValue.ToString(),
+                        Deny = overwrite.Permissions.DenyValue.ToString()
+                    }).ToArray()
+                    : Optional.Create<API.Overwrite[]>(),
+            };
+            var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
+            return RestStageChannel.Create(client, guild, model);
+        }
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
         public static async Task<RestCategoryChannel> CreateCategoryChannelAsync(IGuild guild, BaseDiscordClient client,
             string name, RequestOptions options, Action<GuildChannelProperties> func = null)
@@ -247,16 +277,18 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateGuildChannelAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestCategoryChannel.Create(client, guild, model);
         }
+        #endregion
 
-        //Voice Regions
+        #region Voice Regions
         public static async Task<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(IGuild guild, BaseDiscordClient client,
             RequestOptions options)
         {
             var models = await client.ApiClient.GetGuildVoiceRegionsAsync(guild.Id, options).ConfigureAwait(false);
             return models.Select(x => RestVoiceRegion.Create(client, x)).ToImmutableArray();
         }
+        #endregion
 
-        //Integrations
+        #region Integrations
         public static async Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(IGuild guild, BaseDiscordClient client,
             RequestOptions options)
         {
@@ -270,8 +302,9 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateGuildIntegrationAsync(guild.Id, args, options).ConfigureAwait(false);
             return RestGuildIntegration.Create(client, guild, model);
         }
+        #endregion
 
-        //Interactions
+        #region Interactions
         public static async Task<IReadOnlyCollection<RestGuildCommand>> GetSlashCommandsAsync(IGuild guild, BaseDiscordClient client,
             RequestOptions options)
         {
@@ -284,8 +317,9 @@ namespace Discord.Rest
             var model = await client.ApiClient.GetGuildApplicationCommandAsync(guild.Id, id, options);
             return RestGuildCommand.Create(client, model, guild.Id);
         }
+        #endregion
 
-        //Invites
+        #region Invites
         public static async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(IGuild guild, BaseDiscordClient client,
             RequestOptions options)
         {
@@ -301,8 +335,9 @@ namespace Discord.Rest
             inviteModel.Uses = vanityModel.Uses;
             return RestInviteMetadata.Create(client, guild, null, inviteModel);
         }
+        #endregion
 
-        //Roles
+        #region Roles
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is <c>null</c>.</exception>
         public static async Task<RestRole> CreateRoleAsync(IGuild guild, BaseDiscordClient client,
             string name, GuildPermissions? permissions, Color? color, bool isHoisted, bool isMentionable, RequestOptions options)
@@ -322,8 +357,9 @@ namespace Discord.Rest
 
             return RestRole.Create(client, guild, model);
         }
+        #endregion
 
-        //Users
+        #region Users
         public static async Task<RestGuildUser> AddGuildUserAsync(IGuild guild, BaseDiscordClient client, ulong userId, string accessToken,
             Action<AddGuildUserProperties> func, RequestOptions options)
         {
@@ -442,8 +478,9 @@ namespace Discord.Rest
             var models = await client.ApiClient.SearchGuildMembersAsync(guild.Id, apiArgs, options).ConfigureAwait(false);
             return models.Select(x => RestGuildUser.Create(client, guild, x)).ToImmutableArray();
         }
+        #endregion
 
-        // Audit logs
+        #region Audit logs
         public static IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(IGuild guild, BaseDiscordClient client,
             ulong? from, int? limit, RequestOptions options, ulong? userId = null, ActionType? actionType = null)
         {
@@ -475,8 +512,9 @@ namespace Discord.Rest
                 count: limit
             );
         }
+        #endregion
 
-        //Webhooks
+        #region Webhooks
         public static async Task<RestWebhook> GetWebhookAsync(IGuild guild, BaseDiscordClient client, ulong id, RequestOptions options)
         {
             var model = await client.ApiClient.GetWebhookAsync(id, options: options).ConfigureAwait(false);
@@ -489,8 +527,9 @@ namespace Discord.Rest
             var models = await client.ApiClient.GetGuildWebhooksAsync(guild.Id, options).ConfigureAwait(false);
             return models.Select(x => RestWebhook.Create(client, guild, x)).ToImmutableArray();
         }
+        #endregion
 
-        //Emotes
+        #region Emotes
         public static async Task<IReadOnlyCollection<GuildEmote>> GetEmotesAsync(IGuild guild, BaseDiscordClient client, RequestOptions options)
         {
             var models = await client.ApiClient.GetGuildEmotesAsync(guild.Id, options).ConfigureAwait(false);
@@ -609,5 +648,6 @@ namespace Discord.Rest
 
         public static async Task DeleteStickerAsync(BaseDiscordClient client, ulong guildId, ISticker sticker, RequestOptions options = null)
             => await client.ApiClient.DeleteStickerAsync(guildId, sticker.Id, options).ConfigureAwait(false);
+		#endregion
     }
 }

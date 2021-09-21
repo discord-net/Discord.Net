@@ -29,7 +29,7 @@ namespace Discord.WebSocket
             => this.AuthorId.HasValue ? Guild.GetUser(this.AuthorId.Value) : null;
 
         /// <summary>
-        ///     Gets the guild the sticker lives in.
+        ///     Gets the guild the sticker was created in.
         /// </summary>
         public SocketGuild Guild { get; }
 

@@ -1507,7 +1507,7 @@
                 Represents a generic channel that can send and receive messages.
             </summary>
         </member>
-        <member name="M:Discord.IMessageChannel.SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)">
+        <member name="M:Discord.IMessageChannel.SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent,Discord.ISticker[])">
             <summary>
                 Sends a message to this message channel.
             </summary>
@@ -1527,12 +1527,13 @@
             </param>
             <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
             <param name="component">The message components to be included with this message. Used for interactions</param>
+            <param name="stickers">A collection of stickers to send with the message.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
             </returns>
         </member>
-        <member name="M:Discord.IMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)">
+        <member name="M:Discord.IMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent,Discord.ISticker[])">
             <summary>
                 Sends a file to this message channel with an optional caption.
             </summary>
@@ -1566,12 +1567,13 @@
             </param>
             <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
             <param name="component">The message components to be included with this message. Used for interactions</param>
+            <param name="stickers">A collection of stickers to send with the file.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
             </returns>
         </member>
-        <member name="M:Discord.IMessageChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)">
+        <member name="M:Discord.IMessageChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent,Discord.ISticker[])">
             <summary>
                 Sends a file to this message channel with an optional caption.
             </summary>
@@ -1602,6 +1604,7 @@
             </param>
             <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
             <param name="component">The message components to be included with this message. Used for interactions</param>
+            <param name="stickers">A collection of stickers to send with the file.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
@@ -3639,6 +3642,18 @@
                 voice channel.
             </returns>
         </member>
+        <member name="M:Discord.IGuild.CreateStageChannelAsync(System.String,System.Action{Discord.VoiceChannelProperties},Discord.RequestOptions)">
+            <summary>
+                Creates a new stage channel in this guild.
+            </summary>
+            <param name="name">The new name for the stage channel.</param>
+            <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents the asynchronous creation operation. The task result contains the newly created
+                stage channel.
+            </returns>
+        </member>
         <member name="M:Discord.IGuild.CreateCategoryAsync(System.String,System.Action{Discord.GuildChannelProperties},Discord.RequestOptions)">
             <summary>
                 Creates a new channel category in this guild.
@@ -3731,6 +3746,13 @@
             <param name="func">The delegate containing the properties to be applied to the user upon being added to the guild.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>A guild user associated with the specified <paramref name="userId" />; <see langword="null" /> if the user is already in the guild.</returns>
+        </member>
+        <member name="M:Discord.IGuild.DisconnectAsync(Discord.IGuildUser)">
+            <summary>
+            Disconnects the user from its current voice channel
+            </summary>
+            <param name="user">The user to disconnect.</param>
+            <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
         </member>
         <member name="M:Discord.IGuild.GetUsersAsync(Discord.CacheMode,Discord.RequestOptions)">
             <summary>
@@ -3920,6 +3942,14 @@
                 A task that represents the asynchronous modification operation. The task result contains the modified
                 emote.
             </returns>
+        </member>
+        <member name="M:Discord.IGuild.MoveAsync(Discord.IGuildUser,Discord.IVoiceChannel)">
+            <summary>
+            Moves the user to the voice channel.
+            </summary>
+            <param name="user">The user to move.</param>
+            <param name="targetChannel">the channel where the user gets moved to.</param>
+            <returns>A task that represents the asynchronous operation for moving a user.</returns>
         </member>
         <member name="M:Discord.IGuild.DeleteEmoteAsync(Discord.GuildEmote,Discord.RequestOptions)">
             <summary>
@@ -4524,6 +4554,9 @@
         <member name="P:Discord.ApplicationCommandOptionChoiceProperties.Value">
             <summary>
                 The value of this choice.
+                <note type="warning">
+                    Discord only accepts int and string as the input.
+                </note>
             </summary>
         </member>
         <member name="T:Discord.ApplicationCommandOptionType">
@@ -4591,6 +4624,11 @@
                 Gets or sets the name of this command.
             </summary>
         </member>
+        <member name="P:Discord.ApplicationCommandProperties.DefaultPermission">
+            <summary>
+                Whether the command is enabled by default when the app is added to a guild. Default is <see langword="true"/>
+            </summary>
+        </member>
         <member name="T:Discord.ApplicationCommandType">
             <summary>
                 ApplicationCommandType is enum of current valid Application Command Types: Slash, User, Message
@@ -4626,6 +4664,11 @@
                 The name of this Message command.
             </summary>
         </member>
+        <member name="P:Discord.MessageCommandBuilder.DefaultPermission">
+            <summary>
+                Whether the command is enabled by default when the app is added to a guild
+            </summary>
+        </member>
         <member name="M:Discord.MessageCommandBuilder.Build">
             <summary>
                 Build the current builder into a <see cref="T:Discord.MessageCommandProperties"/> class.
@@ -4642,6 +4685,13 @@
             <returns>
                 The current builder.
             </returns>
+        </member>
+        <member name="M:Discord.MessageCommandBuilder.WithDefaultPermission(System.Boolean)">
+            <summary>
+                Sets the default permission of the current command.
+            </summary>
+            <param name="value">The default permission value to set.</param>
+            <returns>The current builder.</returns>
         </member>
         <member name="T:Discord.MessageCommandProperties">
             <summary>
@@ -4663,6 +4713,11 @@
                 The name of this User command.
             </summary>
         </member>
+        <member name="P:Discord.UserCommandBuilder.DefaultPermission">
+            <summary>
+                Whether the command is enabled by default when the app is added to a guild
+            </summary>
+        </member>
         <member name="M:Discord.UserCommandBuilder.Build">
             <summary>
                 Build the current builder into a <see cref="T:Discord.UserCommandProperties"/> class.
@@ -4677,6 +4732,13 @@
             <returns>
                 The current builder.
             </returns>
+        </member>
+        <member name="M:Discord.UserCommandBuilder.WithDefaultPermission(System.Boolean)">
+            <summary>
+                Sets the default permission of the current command.
+            </summary>
+            <param name="value">The default permission value to set.</param>
+            <returns>The current builder.</returns>
         </member>
         <member name="T:Discord.UserCommandProperties">
             <summary>
@@ -4945,6 +5007,16 @@
                 ACK a Ping.
             </summary>
         </member>
+        <member name="F:Discord.InteractionResponseType.Acknowledge">
+            <summary>
+                ACK a command without sending a message, eating the user's input.
+            </summary>
+        </member>
+        <member name="F:Discord.InteractionResponseType.ChannelMessage">
+            <summary>
+                Respond with a message, showing the user's input.
+            </summary>
+        </member>
         <member name="F:Discord.InteractionResponseType.ChannelMessageWithSource">
             <summary>
                 Respond to an interaction with a message.
@@ -5082,11 +5154,6 @@
                 Represents a builder for creating a <see cref="T:Discord.MessageComponent"/>.
             </summary>
         </member>
-        <member name="F:Discord.ComponentBuilder.MaxButtonLabelLength">
-            <summary>
-                The max length of a <see cref="P:Discord.ButtonComponent.Label"/>.
-            </summary>
-        </member>
         <member name="F:Discord.ComponentBuilder.MaxCustomIdLength">
             <summary>
                 The max length of a <see cref="P:Discord.ButtonComponent.CustomId"/>.
@@ -5173,7 +5240,7 @@
             <summary>
                 Builds this builder into a <see cref="T:Discord.MessageComponent"/> used to send your components.
             </summary>
-            <returns>A <see cref="T:Discord.MessageComponent"/> that can be sent with <see cref="M:Discord.IMessageChannel.SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent)"/>.</returns>
+            <returns>A <see cref="T:Discord.MessageComponent"/> that can be sent with <see cref="!:IMessageChannel.SendMessageAsync(string, bool, Embed, RequestOptions, AllowedMentions, MessageReference, MessageComponent)"/>.</returns>
         </member>
         <member name="T:Discord.ActionRowBuilder">
             <summary>
@@ -5219,7 +5286,7 @@
                 Represents a class used to build <see cref="T:Discord.ButtonComponent"/>'s.
             </summary>
         </member>
-        <member name="F:Discord.ButtonBuilder.MaxLabelLength">
+        <member name="F:Discord.ButtonBuilder.MaxButtonLabelLength">
             <summary>
                 The max length of a <see cref="P:Discord.ButtonComponent.Label"/>.
             </summary>
@@ -5228,13 +5295,15 @@
             <summary>
                 Gets or sets the label of the current button.
             </summary>
-            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ButtonBuilder.Label"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxButtonLabelLength"/>.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ButtonBuilder.Label"/> length exceeds <see cref="F:Discord.ButtonBuilder.MaxButtonLabelLength"/>.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ButtonBuilder.Label"/> length exceeds <see cref="F:Discord.ButtonBuilder.MaxButtonLabelLength"/>.</exception>
         </member>
         <member name="P:Discord.ButtonBuilder.CustomId">
             <summary>
                 Gets or sets the custom id of the current button.
             </summary>
             <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ButtonBuilder.CustomId"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxCustomIdLength"/></exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.ButtonBuilder.CustomId"/> length subceeds 1.</exception>
         </member>
         <member name="P:Discord.ButtonBuilder.Style">
             <summary>
@@ -5379,35 +5448,37 @@
         </member>
         <member name="T:Discord.SelectMenuBuilder">
             <summary>
-                Represents a class used to build <see cref="T:Discord.SelectMenu"/>'s.
+                Represents a class used to build <see cref="T:Discord.SelectMenuComponent"/>'s.
             </summary>
         </member>
         <member name="F:Discord.SelectMenuBuilder.MaxPlaceholderLength">
             <summary>
-                The max length of a <see cref="P:Discord.SelectMenu.Placeholder"/>.
+                The max length of a <see cref="P:Discord.SelectMenuComponent.Placeholder"/>.
             </summary>
         </member>
         <member name="F:Discord.SelectMenuBuilder.MaxValuesCount">
             <summary>
-                The maximum number of values for the <see cref="P:Discord.SelectMenu.MinValues"/> and <see cref="P:Discord.SelectMenu.MaxValues"/> properties.
+                The maximum number of values for the <see cref="P:Discord.SelectMenuComponent.MinValues"/> and <see cref="P:Discord.SelectMenuComponent.MaxValues"/> properties.
             </summary>
         </member>
         <member name="F:Discord.SelectMenuBuilder.MaxOptionCount">
             <summary>
-                The maximum number of options a <see cref="T:Discord.SelectMenu"/> can have.
+                The maximum number of options a <see cref="T:Discord.SelectMenuComponent"/> can have.
             </summary>
         </member>
         <member name="P:Discord.SelectMenuBuilder.CustomId">
             <summary>
                 Gets or sets the custom id of the current select menu.
             </summary>
-            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.CustomId"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxCustomIdLength"/>.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.CustomId"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxCustomIdLength"/></exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.CustomId"/> length subceeds 1.</exception>
         </member>
         <member name="P:Discord.SelectMenuBuilder.Placeholder">
             <summary>
                 Gets or sets the placeholder text of the current select menu.
             </summary>
             <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.Placeholder"/> length exceeds <see cref="F:Discord.SelectMenuBuilder.MaxPlaceholderLength"/>.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.Placeholder"/> length subceeds 1.</exception>
         </member>
         <member name="P:Discord.SelectMenuBuilder.MinValues">
             <summary>
@@ -5438,9 +5509,9 @@
                 Creates a new instance of a <see cref="T:Discord.SelectMenuBuilder"/>.
             </summary>
         </member>
-        <member name="M:Discord.SelectMenuBuilder.#ctor(Discord.SelectMenu)">
+        <member name="M:Discord.SelectMenuBuilder.#ctor(Discord.SelectMenuComponent)">
             <summary>
-                Creates a new instance of a <see cref="T:Discord.SelectMenuBuilder"/> from instance of <see cref="T:Discord.SelectMenu"/>.
+                Creates a new instance of a <see cref="T:Discord.SelectMenuBuilder"/> from instance of <see cref="T:Discord.SelectMenuComponent"/>.
             </summary>
         </member>
         <member name="M:Discord.SelectMenuBuilder.#ctor(System.String,System.Collections.Generic.List{Discord.SelectMenuOptionBuilder},System.String,System.Int32,System.Int32,System.Boolean)">
@@ -5539,16 +5610,16 @@
         </member>
         <member name="M:Discord.SelectMenuBuilder.Build">
             <summary>
-                Builds a <see cref="T:Discord.SelectMenu"/>
+                Builds a <see cref="T:Discord.SelectMenuComponent"/>
             </summary>
-            <returns>The newly built <see cref="T:Discord.SelectMenu"/></returns>
+            <returns>The newly built <see cref="T:Discord.SelectMenuComponent"/></returns>
         </member>
         <member name="T:Discord.SelectMenuOptionBuilder">
             <summary>
                 Represents a class used to build <see cref="T:Discord.SelectMenuOption"/>'s.
             </summary>
         </member>
-        <member name="F:Discord.SelectMenuOptionBuilder.MaxLabelLength">
+        <member name="F:Discord.SelectMenuOptionBuilder.MaxSelectLabelLength">
             <summary>
                 The maximum length of a <see cref="P:Discord.SelectMenuOption.Label"/>.
             </summary>
@@ -5558,9 +5629,9 @@
                 The maximum length of a <see cref="P:Discord.SelectMenuOption.Description"/>.
             </summary>
         </member>
-        <member name="F:Discord.SelectMenuOptionBuilder.MaxSelectLabelLength">
+        <member name="F:Discord.SelectMenuOptionBuilder.MaxSelectValueLength">
             <summary>
-                The maximum length of a <see cref="P:Discord.SelectMenuOption.Label"/>.
+                The maximum length of a <see cref="P:Discord.SelectMenuOption.Value"/>.
             </summary>
         </member>
         <member name="P:Discord.SelectMenuOptionBuilder.Label">
@@ -5568,18 +5639,21 @@
                 Gets or sets the label of the current select menu.
             </summary>
             <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Label"/> length exceeds <see cref="F:Discord.SelectMenuOptionBuilder.MaxSelectLabelLength"/></exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Label"/> length subceeds 1.</exception>
         </member>
         <member name="P:Discord.SelectMenuOptionBuilder.Value">
             <summary>
                 Gets or sets the custom id of the current select menu.
             </summary>
-            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Value"/> length exceeds <see cref="F:Discord.ComponentBuilder.MaxCustomIdLength"/>.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Value"/> length exceeds <see cref="F:Discord.SelectMenuOptionBuilder.MaxSelectValueLength"/>.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Value"/> length subceeds 1.</exception>
         </member>
         <member name="P:Discord.SelectMenuOptionBuilder.Description">
             <summary>
                 Gets or sets this menu options description.
             </summary>
             <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Description"/> length exceeds <see cref="F:Discord.SelectMenuOptionBuilder.MaxDescriptionLength"/>.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Label"/> length subceeds 1.</exception>
         </member>
         <member name="P:Discord.SelectMenuOptionBuilder.Emote">
             <summary>
@@ -5715,45 +5789,45 @@
                 Returns a empty <see cref="T:Discord.MessageComponent"/>.
             </summary>
         </member>
-        <member name="T:Discord.SelectMenu">
+        <member name="T:Discord.SelectMenuComponent">
             <summary>
                 Represents a select menu component defined at <see href="https://discord.com/developers/docs/interactions/message-components#select-menu-object"/>
             </summary>
         </member>
-        <member name="P:Discord.SelectMenu.Type">
+        <member name="P:Discord.SelectMenuComponent.Type">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.SelectMenu.CustomId">
+        <member name="P:Discord.SelectMenuComponent.CustomId">
             <summary>
                 The custom id of this Select menu that will be sent with a <see cref="T:Discord.IDiscordInteraction"/>.
             </summary>
         </member>
-        <member name="P:Discord.SelectMenu.Options">
+        <member name="P:Discord.SelectMenuComponent.Options">
             <summary>
                 The menus options to select from.
             </summary>
         </member>
-        <member name="P:Discord.SelectMenu.Placeholder">
+        <member name="P:Discord.SelectMenuComponent.Placeholder">
             <summary>
                 A custom placeholder text if nothing is selected, max 100 characters.
             </summary>
         </member>
-        <member name="P:Discord.SelectMenu.MinValues">
+        <member name="P:Discord.SelectMenuComponent.MinValues">
             <summary>
                 The minimum number of items that must be chosen; default 1, min 0, max 25
             </summary>
         </member>
-        <member name="P:Discord.SelectMenu.MaxValues">
+        <member name="P:Discord.SelectMenuComponent.MaxValues">
             <summary>
                 The maximum number of items that can be chosen; default 1, max 25
             </summary>
         </member>
-        <member name="P:Discord.SelectMenu.Disabled">
+        <member name="P:Discord.SelectMenuComponent.Disabled">
             <summary>
                 Whether this menu is disabled or not.
             </summary>
         </member>
-        <member name="M:Discord.SelectMenu.ToBuilder">
+        <member name="M:Discord.SelectMenuComponent.ToBuilder">
             <summary>
                 Turns this select menu into a builder.
             </summary>
@@ -5763,7 +5837,7 @@
         </member>
         <member name="T:Discord.SelectMenuOption">
             <summary>
-                Represents a choice for a <see cref="T:Discord.SelectMenu"/>.
+                Represents a choice for a <see cref="T:Discord.SelectMenuComponent"/>.
             </summary>
         </member>
         <member name="P:Discord.SelectMenuOption.Label">
@@ -6036,11 +6110,6 @@
         <member name="P:Discord.SlashCommandProperties.Options">
             <summary>
                 Gets or sets the options for this command.
-            </summary>
-        </member>
-        <member name="P:Discord.SlashCommandProperties.DefaultPermission">
-            <summary>
-                Whether the command is enabled by default when the app is added to a guild. Default is <see langword="true"/>
             </summary>
         </member>
         <member name="T:Discord.IInvite">
@@ -9625,21 +9694,10 @@
                 A read-only list with the tags of this sticker.
             </returns>
         </member>
-        <member name="P:Discord.ISticker.Asset">
+        <member name="P:Discord.ISticker.Type">
             <summary>
-                Gets the asset hash of this sticker.
+                Gets the type of this sticker.
             </summary>
-            <returns>
-                A <see langword="string"/> with the asset hash of this sticker.
-            </returns>
-        </member>
-        <member name="P:Discord.ISticker.PreviewAsset">
-            <summary>
-                Gets the preview asset hash of this sticker.
-            </summary>
-            <returns>
-                A <see langword="string"/> with the preview asset hash of this sticker.
-            </returns>
         </member>
         <member name="P:Discord.ISticker.Format">
             <summary>
@@ -9648,6 +9706,16 @@
             <returns>
                 A <see cref="T:Discord.StickerFormatType"/> with the format type of this sticker.
             </returns>
+        </member>
+        <member name="P:Discord.ISticker.Available">
+            <summary>
+                Gets whether this guild sticker can be used, may be false due to loss of Server Boosts
+            </summary>
+        </member>
+        <member name="P:Discord.ISticker.SortOrder">
+            <summary>
+                Gets the standard sticker's sort order within its pack
+            </summary>
         </member>
         <member name="M:Discord.ISticker.GetStickerUrl">
             <summary>
@@ -9733,6 +9801,21 @@
         <member name="P:Discord.StickerProperties.Tags">
             <summary>
                 Gets or sets the tags of the sticker.
+            </summary>
+        </member>
+        <member name="T:Discord.StickerType">
+            <summary>
+                Represents a type of sticker
+            </summary>
+        </member>
+        <member name="F:Discord.StickerType.Standard">
+            <summary>
+                Represents a discord standard sticker, this type of sticker cannot be modified by an application.
+            </summary>
+        </member>
+        <member name="F:Discord.StickerType.Guild">
+            <summary>
+                Represents a sticker that was created within a guild.
             </summary>
         </member>
         <member name="T:Discord.ITeam">

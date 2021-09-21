@@ -194,11 +194,10 @@ namespace Discord
             {
                 case StickerFormatType.None:
                 case StickerFormatType.Png:
+                case StickerFormatType.Apng: // In the case of the Sticker endpoint, the sticker will be available as PNG if its format_type is PNG or APNG, and as Lottie if its format_type is LOTTIE.
                     return "png";
                 case StickerFormatType.Lottie:
                     return "lottie";
-                case StickerFormatType.Apng:
-                    return "apng";
                 default:
                     throw new ArgumentException(nameof(format));
 

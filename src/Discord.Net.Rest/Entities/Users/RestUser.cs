@@ -13,6 +13,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestUser : RestEntity<ulong>, IUser, IUpdateable
     {
+        #region RestUser
         /// <inheritdoc />
         public bool IsBot { get; private set; }
         /// <inheritdoc />
@@ -116,10 +117,12 @@ namespace Discord.Rest
         /// </returns>
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
+        #endregion
 
-        //IUser
+        #region IUser
         /// <inheritdoc />
         async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
             => await CreateDMChannelAsync(options).ConfigureAwait(false);
+        #endregion
     }
 }
