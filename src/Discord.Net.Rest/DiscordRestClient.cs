@@ -12,6 +12,7 @@ namespace Discord.Rest
     /// </summary>
     public class DiscordRestClient : BaseDiscordClient, IDiscordClient
     {
+        #region DiscordRestClient
         private RestApplication _applicationInfo;
 
         /// <summary>
@@ -138,7 +139,9 @@ namespace Discord.Rest
             => MessageHelper.RemoveAllReactionsAsync(channelId, messageId, this, options);
         public Task RemoveAllReactionsForEmoteAsync(ulong channelId, ulong messageId, IEmote emote, RequestOptions options = null)
             => MessageHelper.RemoveAllReactionsForEmoteAsync(channelId, messageId, emote, this, options);
-        //IDiscordClient
+#endregion
+
+        #region IDiscordClient
         /// <inheritdoc />
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
             => await GetApplicationInfoAsync(options).ConfigureAwait(false);
@@ -229,5 +232,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IApplicationCommand> IDiscordClient.GetGlobalApplicationCommandAsync(ulong id, RequestOptions options)
             => await ClientHelper.GetGlobalApplicationCommand(this, id, options).ConfigureAwait(false);
+        #endregion
     }
 }

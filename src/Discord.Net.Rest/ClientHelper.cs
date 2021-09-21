@@ -10,7 +10,7 @@ namespace Discord.Rest
 {
     internal static class ClientHelper
     {
-        //Applications
+        #region Applications
         public static async Task<RestApplication> GetApplicationInfoAsync(BaseDiscordClient client, RequestOptions options)
         {
             var model = await client.ApiClient.GetMyApplicationAsync(options).ConfigureAwait(false);
@@ -263,5 +263,6 @@ namespace Discord.Rest
         
         public static Task RemoveRoleAsync(BaseDiscordClient client, ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
             => client.ApiClient.RemoveRoleAsync(guildId, userId, roleId, options);
+        #endregion
     }
 }

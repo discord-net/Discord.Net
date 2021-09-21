@@ -22,16 +22,16 @@ namespace Discord
         /// </summary>
         Pong = 1,
 
-        [Obsolete("This response type has been depricated by discord. Either use ChannelMessageWithSource or DeferredChannelMessageWithSource", true)]
         /// <summary>
         ///     ACK a command without sending a message, eating the user's input.
         /// </summary>
+        [Obsolete("This response type has been depricated by discord. Either use ChannelMessageWithSource or DeferredChannelMessageWithSource", true)]
         Acknowledge = 2,
 
-        [Obsolete("This response type has been depricated by discord. Either use ChannelMessageWithSource or DeferredChannelMessageWithSource", true)]
         /// <summary>
         ///     Respond with a message, showing the user's input.
         /// </summary>
+        [Obsolete("This response type has been depricated by discord. Either use ChannelMessageWithSource or DeferredChannelMessageWithSource", true)]
         ChannelMessage = 3,
 
         /// <summary>

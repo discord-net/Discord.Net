@@ -11,6 +11,7 @@ namespace Discord.Rest
 {
     internal static class InteractionHelper
     {
+        #region InteractionHelper
         public static Task DeleteAllGuildCommandsAsync(BaseDiscordClient client, ulong guildId, RequestOptions options = null)
         {
             return client.ApiClient.BulkOverwriteGuildApplicationCommands(guildId, new CreateApplicationCommandParams[0], options);
@@ -42,8 +43,9 @@ namespace Discord.Rest
             RestFollowupMessage entity = RestFollowupMessage.Create(client, model, token, channel);
             return entity;
         }
+#endregion
 
-        // Global commands
+        #region Global commands
         public static async Task<RestGlobalCommand> GetGlobalCommandAsync(BaseDiscordClient client, ulong id,
             RequestOptions options = null)
         {
@@ -236,8 +238,9 @@ namespace Discord.Rest
 
             await client.ApiClient.DeleteGlobalApplicationCommandAsync(command.Id, options).ConfigureAwait(false);
         }
+        #endregion
 
-        // Guild Commands
+        #region Guild Commands
         public static Task<ApplicationCommand> CreateGuildCommand<TArg>(BaseDiscordClient client, ulong guildId,
             Action<TArg> func, RequestOptions options) where TArg : ApplicationCommandProperties
         {
@@ -324,8 +327,9 @@ namespace Discord.Rest
                 return DeleteGlobalCommand(client, command, options);
             }
         }
+        #endregion
 
-        // Responses
+        #region Responses
         public static async Task<Discord.API.Message> ModifyFollowupMessage(BaseDiscordClient client, RestFollowupMessage message, Action<MessageProperties> func,
             RequestOptions options = null)
         {
@@ -412,8 +416,9 @@ namespace Discord.Rest
 
         public static async Task DeletedInteractionResponse(BaseDiscordClient client, RestInteractionMessage message, RequestOptions options = null)
             => await client.ApiClient.DeleteInteractionFollowupMessage(message.Id, message.Token, options);
+        #endregion
 
-        // Guild permissions
+        #region Guild permissions
         public static async Task<IReadOnlyCollection<GuildApplicationCommandPermission>> GetGuildCommandPermissionsAsync(BaseDiscordClient client,
             ulong guildId, RequestOptions options)
         {
@@ -506,5 +511,6 @@ namespace Discord.Rest
                 x => new GuildApplicationCommandPermission(x.Id, x.ApplicationId, x.GuildId, x.Permissions.Select(
                     y => new ApplicationCommandPermission(y.Id, y.Type, y.Permission)).ToArray())).ToArray();
         }
+        #endregion
     }
 }

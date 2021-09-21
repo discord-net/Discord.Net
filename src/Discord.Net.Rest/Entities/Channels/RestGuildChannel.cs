@@ -12,6 +12,7 @@ namespace Discord.Rest
     /// </summary>
     public class RestGuildChannel : RestChannel, IGuildChannel
     {
+        #region RestGuildChannel
         private ImmutableArray<Overwrite> _overwrites;
 
         /// <inheritdoc />
@@ -191,8 +192,9 @@ namespace Discord.Rest
         ///     A string that is the name of this channel.
         /// </returns>
         public override string ToString() => Name;
+        #endregion
 
-        //IGuildChannel
+        #region IGuildChannel
         /// <inheritdoc />
         IGuild IGuildChannel.Guild
         {
@@ -229,13 +231,15 @@ namespace Discord.Rest
         /// <inheritdoc />
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(null); //Overridden in Text/Voice
+        #endregion
 
-        //IChannel
+        #region IChannel
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overridden in Text/Voice
         /// <inheritdoc />
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null); //Overridden in Text/Voice
+        #endregion
     }
 }

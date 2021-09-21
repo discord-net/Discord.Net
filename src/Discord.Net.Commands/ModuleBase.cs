@@ -16,6 +16,7 @@ namespace Discord.Commands
     public abstract class ModuleBase<T> : IModuleBase
         where T : class, ICommandContext
     {
+        #region ModuleBase
         /// <summary>
         ///     The underlying context of the command.
         /// </summary>
@@ -65,8 +66,9 @@ namespace Discord.Commands
         protected virtual void OnModuleBuilding(CommandService commandService, ModuleBuilder builder)
         {
         }
+        #endregion
 
-        //IModuleBase
+        #region IModuleBase
         void IModuleBase.SetContext(ICommandContext context)
         {
             var newValue = context as T;
@@ -75,5 +77,6 @@ namespace Discord.Commands
         void IModuleBase.BeforeExecute(CommandInfo command) => BeforeExecute(command);
         void IModuleBase.AfterExecute(CommandInfo command) => AfterExecute(command);
         void IModuleBase.OnModuleBuilding(CommandService commandService, ModuleBuilder builder) => OnModuleBuilding(commandService, builder);
+        #endregion
     }
 }

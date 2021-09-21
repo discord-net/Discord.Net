@@ -29,6 +29,7 @@ namespace Discord.Commands
     /// </remarks>
     public class CommandService : IDisposable
     {
+        #region CommandService
         /// <summary>
         ///     Occurs when a command-related information is received.
         /// </summary>
@@ -131,8 +132,9 @@ namespace Discord.Commands
             entityTypeReaders.Add((typeof(IUser), typeof(UserTypeReader<>)));
             _entityTypeReaders = entityTypeReaders.ToImmutable();
         }
+        #endregion
 
-        //Modules
+        #region Modules
         public async Task<ModuleInfo> CreateModuleAsync(string primaryAlias, Action<ModuleBuilder> buildFunc)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
@@ -322,8 +324,9 @@ namespace Discord.Commands
 
             return true;
         }
+        #endregion
 
-        //Type Readers
+        #region Type Readers
         /// <summary>
         ///     Adds a custom <see cref="TypeReader" /> to this <see cref="CommandService" /> for the supplied object
         ///     type.
@@ -448,8 +451,9 @@ namespace Discord.Commands
             }
             return null;
         }
+        #endregion
 
-        //Execution
+        #region Execution
         /// <summary>
         ///     Searches for the command.
         /// </summary>
@@ -602,7 +606,9 @@ namespace Discord.Commands
                 await _commandExecutedEvent.InvokeAsync(chosenOverload.Key.Command, context, result);
             return result;
         }
+        #endregion
 
+        #region Dispose
         protected virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)
@@ -620,5 +626,6 @@ namespace Discord.Commands
         {
             Dispose(true);
         }
+        #endregion
     }
 }

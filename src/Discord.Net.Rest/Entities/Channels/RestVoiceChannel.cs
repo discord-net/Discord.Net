@@ -14,6 +14,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestVoiceChannel : RestGuildChannel, IVoiceChannel, IRestAudioChannel
     {
+        #region RestVoiceChannel
         /// <inheritdoc />
         public int Bitrate { get; private set; }
         /// <inheritdoc />
@@ -63,8 +64,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task SyncPermissionsAsync(RequestOptions options = null)
             => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
+        #endregion
 
-        //Invites
+        #region Invites
         /// <inheritdoc />
         public async Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
             => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
@@ -79,22 +81,25 @@ namespace Discord.Rest
             => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
 
         private string DebuggerDisplay => $"{Name} ({Id}, Voice)";
+        #endregion
 
-        //IAudioChannel
+        #region IAudioChannel
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Connecting to a REST-based channel is not supported.</exception>
         Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external) { throw new NotSupportedException(); }
         Task IAudioChannel.DisconnectAsync() { throw new NotSupportedException(); }
+        #endregion
 
-        //IGuildChannel
+        #region IGuildChannel
         /// <inheritdoc />
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(null);
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>();
+        #endregion
 
-        // INestedChannel
+        #region INestedChannel
         /// <inheritdoc />
         async Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
         {
@@ -102,5 +107,6 @@ namespace Discord.Rest
                 return (await Guild.GetChannelAsync(CategoryId.Value, mode, options).ConfigureAwait(false)) as ICategoryChannel;
             return null;
         }
+        #endregion
     }
 }

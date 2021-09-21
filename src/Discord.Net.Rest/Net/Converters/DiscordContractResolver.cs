@@ -10,6 +10,7 @@ namespace Discord.Net.Converters
 {
     internal class DiscordContractResolver : DefaultContractResolver
     {
+        #region DiscordContractResolver
         private static readonly TypeInfo _ienumerable = typeof(IEnumerable<ulong[]>).GetTypeInfo();
         private static readonly MethodInfo _shouldSerialize = typeof(DiscordContractResolver).GetTypeInfo().GetDeclaredMethod("ShouldSerialize");    
         
@@ -57,8 +58,9 @@ namespace Discord.Net.Converters
                 else if (genericType == typeof(EntityOrId<>))
                     return MakeGenericConverter(property, propInfo, typeof(UInt64EntityOrIdConverter<>), type.GenericTypeArguments[0], depth);
             }
+#endregion
 
-            //Primitives
+            #region Primitives
             bool hasInt53 = propInfo.GetCustomAttribute<Int53Attribute>() != null;
             if (!hasInt53)
             {
@@ -107,5 +109,6 @@ namespace Discord.Net.Converters
             var innerConverter = GetConverter(property, propInfo, innerType, depth + 1);
             return genericType.DeclaredConstructors.First().Invoke(new object[] { innerConverter }) as JsonConverter;
         }
+        #endregion
     }
 }
