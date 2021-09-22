@@ -1,38 +1,38 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>Discord.Net.Labs</id>
-    <version>3.1.0$suffix$</version>
-    <title>Discord.Net Labs</title>
+    <id>Discord.Net</id>
+    <version>3.0.0-dev$suffix$</version>
+    <title>Discord.Net</title>
     <authors>Discord.Net Contributors</authors>
-    <owners>quinchs</owners>
-    <description>An experimental fork of Discord.NET that adds all the new discord features to play around with! This metapackage includes all of the optional Discord.Net Labs components.</description>
+    <owners>foxbot</owners>
+    <description>An asynchronous API wrapper for Discord. This metapackage includes all of the optional Discord.Net components.</description>
     <tags>discord;discordapp</tags>
-    <projectUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</projectUrl>
+    <projectUrl>https://github.com/RogueException/Discord.Net</projectUrl>
     <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <iconUrl>https://avatars.githubusercontent.com/u/84047264</iconUrl>
+    <iconUrl>https://github.com/RogueException/Discord.Net/raw/dev/docs/marketing/logo/PackageLogo.png</iconUrl>
     <dependencies>
         <group targetFramework="net461">
-            <dependency id="Discord.Net.Labs.Core" version="3.1.0$suffix$" />
-            <dependency id="Discord.Net.Labs.Rest" version="3.1.0$suffix$" />
-            <dependency id="Discord.Net.Labs.WebSocket" version="3.1.0$suffix$" />
-            <dependency id="Discord.Net.Labs.Commands" version="3.0.0$suffix$" />
-            <dependency id="Discord.Net.Labs.Webhook" version="3.0.0$suffix$" />
+            <dependency id="Discord.Net.Core" version="3.0.0-dev$suffix$" />
+            <dependency id="Discord.Net.Rest" version="3.0.0-dev$suffix$" />
+            <dependency id="Discord.Net.WebSocket" version="3.0.0-dev$suffix$" />
+            <dependency id="Discord.Net.Commands" version="3.0.0-dev$suffix$" />
+            <dependency id="Discord.Net.Webhook" version="3.0.0-dev$suffix$" />
         </group>       
         <group targetFramework="netstandard2.0">
-            <dependency id="Discord.Net.Labs.Core" version="3.1.0$suffix$" />
-            <dependency id="Discord.Net.Labs.Rest" version="3.1.0$suffix$" />
-            <dependency id="Discord.Net.Labs.WebSocket" version="3.1.0$suffix$" />
-            <dependency id="Discord.Net.Labs.Commands" version="3.0.0$suffix$" />
-            <dependency id="Discord.Net.Labs.Webhook" version="3.0.0$suffix$" />
+            <dependency id="Discord.Net.Core" version="3.0.0-dev$suffix$" />
+            <dependency id="Discord.Net.Rest" version="3.0.0-dev$suffix$" />
+            <dependency id="Discord.Net.WebSocket" version="3.0.0-dev$suffix$" />
+            <dependency id="Discord.Net.Commands" version="3.0.0-dev$suffix$" />
+            <dependency id="Discord.Net.Webhook" version="3.0.0-dev$suffix$" />
         </group>
 		<group targetFramework="netstandard2.1">
-            <dependency id="Discord.Net.Labs.Core" version="3.1.0$suffix$" />
-            <dependency id="Discord.Net.Labs.Rest" version="3.1.0$suffix$" />
-            <dependency id="Discord.Net.Labs.WebSocket" version="3.1.0$suffix$" />
-            <dependency id="Discord.Net.Labs.Commands" version="3.0.0$suffix$" />
-            <dependency id="Discord.Net.Labs.Webhook" version="3.0.0$suffix$" />
+            <dependency id="Discord.Net.Core" version="3.0.0-dev$suffix$" />
+            <dependency id="Discord.Net.Rest" version="3.0.0-dev$suffix$" />
+            <dependency id="Discord.Net.WebSocket" version="3.0.0-dev$suffix$" />
+            <dependency id="Discord.Net.Commands" version="3.0.0-dev$suffix$" />
+            <dependency id="Discord.Net.Webhook" version="3.0.0-dev$suffix$" />
         </group>
     </dependencies>
   </metadata>
