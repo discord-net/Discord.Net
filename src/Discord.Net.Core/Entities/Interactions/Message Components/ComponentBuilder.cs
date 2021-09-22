@@ -367,8 +367,6 @@ namespace Discord
                     if (value.Length < 1)
                         throw new ArgumentException("Button label must be 1 character or more!", paramName: nameof(Label));
                 }
-                else
-                    throw new ArgumentException("Button label must not be null or empty!", paramName: nameof(Label));
 
                 _label = value;
             }
@@ -391,8 +389,6 @@ namespace Discord
                     if (value.Length < 1)
                         throw new ArgumentException("Custom Id must be 1 character or more!", paramName: nameof(CustomId));
                 }
-                else
-                    throw new ArgumentException("Custom Id must not be null or empty!", paramName: nameof(CustomId));
                 _customId = value;
             }
         }
@@ -644,8 +640,6 @@ namespace Discord
                     if (value.Length < 1)
                         throw new ArgumentException("Custom Id must be 1 character or more!", paramName: nameof(CustomId));
                 }
-                else
-                    throw new ArgumentException("Custom Id must not be null or empty!", paramName: nameof(CustomId));
                 _customId = value;
             }
         }
@@ -667,8 +661,6 @@ namespace Discord
                     if (value.Length < 1)
                         throw new ArgumentException("The placeholder must be 1 character or more!", paramName: nameof(Placeholder));
                 }
-                else
-                    throw new ArgumentException("The placeholder must not be null or empty!", paramName: nameof(Placeholder));
 
                 _placeholder = value;
             }
@@ -938,8 +930,6 @@ namespace Discord
                     if (value.Length < 1)
                         throw new ArgumentException("Select option label must be 1 character or more!", paramName: nameof(Label));
                 }
-                else
-                    throw new ArgumentException("Select option label must not be null or empty!", paramName: nameof(Label));
 
                 _label = value;
             }
@@ -973,7 +963,7 @@ namespace Discord
         ///     Gets or sets this menu options description.
         /// </summary>
         /// <exception cref="ArgumentException" accessor="set"><see cref="Description"/> length exceeds <see cref="MaxDescriptionLength"/>.</exception>
-        /// <exception cref="ArgumentException" accessor="set"><see cref="Label"/> length subceeds 1.</exception>
+        /// <exception cref="ArgumentException" accessor="set"><see cref="Description"/> length subceeds 1.</exception>
         public string Description
         {
             get => _description;
@@ -986,8 +976,6 @@ namespace Discord
                     if (value.Length < 1)
                         throw new ArgumentException("The description must be 1 character or more!", paramName: nameof(Label));
                 }
-                else
-                    throw new ArgumentException("The description must not be null or empty!", paramName: nameof(Label));
 
                 _description = value;
             }

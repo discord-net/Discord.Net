@@ -10,6 +10,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestGroupUser : RestUser, IGroupUser
     {
+        #region RestGroupUser
         internal RestGroupUser(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
@@ -20,8 +21,9 @@ namespace Discord.Rest
             entity.Update(model);
             return entity;
         }
+#endregion
 
-        //IVoiceState
+        #region IVoiceState
         /// <inheritdoc />
         bool IVoiceState.IsDeafened => false;
         /// <inheritdoc />
@@ -40,5 +42,6 @@ namespace Discord.Rest
         bool IVoiceState.IsStreaming => false;
         /// <inheritdoc />
         DateTimeOffset? IVoiceState.RequestToSpeakTimestamp => null;
+        #endregion
     }
 }

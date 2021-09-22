@@ -5653,7 +5653,7 @@
                 Gets or sets this menu options description.
             </summary>
             <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Description"/> length exceeds <see cref="F:Discord.SelectMenuOptionBuilder.MaxDescriptionLength"/>.</exception>
-            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Label"/> length subceeds 1.</exception>
+            <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Description"/> length subceeds 1.</exception>
         </member>
         <member name="P:Discord.SelectMenuOptionBuilder.Emote">
             <summary>
@@ -10979,7 +10979,7 @@
             <seealso cref="M:Discord.IMessage.RemoveReactionAsync(Discord.IEmote,Discord.IUser,Discord.RequestOptions)"/>
             <seealso cref="T:Discord.IEmote"/>
         </member>
-        <member name="M:Discord.MessageExtensions.ReplyAsync(Discord.IUserMessage,System.String,System.Boolean,Discord.Embed,Discord.AllowedMentions,Discord.RequestOptions)">
+        <member name="M:Discord.MessageExtensions.ReplyAsync(Discord.IUserMessage,System.String,System.Boolean,Discord.Embed,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.ISticker[])">
             <summary>
                 Sends an inline reply that references a message.
             </summary>

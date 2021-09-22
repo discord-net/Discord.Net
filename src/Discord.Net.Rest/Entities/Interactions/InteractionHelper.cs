@@ -340,9 +340,10 @@ namespace Discord.Rest
             var embeds = args.Embeds;
 
             bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(message.Content);
-            bool hasEmbeds = (embed.IsSpecified && embed.Value != null) || (embeds.IsSpecified && embeds.Value?.Length > 0) || message.Embeds.Any();
+            bool hasEmbeds = embed.IsSpecified && embed.Value != null || embeds.IsSpecified && embeds.Value?.Length > 0 || message.Embeds.Any();
+            bool hasComponents = args.Components.IsSpecified && args.Components.Value != null;
 
-            if (!hasText && !hasEmbeds)
+            if (!hasComponents && !hasText && !hasEmbeds)
                 Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
 
             var apiEmbeds = embed.IsSpecified || embeds.IsSpecified ? new List<API.Embed>() : null;
@@ -383,9 +384,10 @@ namespace Discord.Rest
             var embeds = args.Embeds;
 
             bool hasText = !string.IsNullOrEmpty(args.Content.GetValueOrDefault());
-            bool hasEmbeds = (embed.IsSpecified && embed.Value != null) || (embeds.IsSpecified && embeds.Value?.Length > 0);
+            bool hasEmbeds = embed.IsSpecified && embed.Value != null || embeds.IsSpecified && embeds.Value?.Length > 0;
+            bool hasComponents = args.Components.IsSpecified && args.Components.Value != null;
 
-            if (!hasText && !hasEmbeds)
+            if (!hasComponents && !hasText && !hasEmbeds)
                 Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
 
             var apiEmbeds = embed.IsSpecified || embeds.IsSpecified ? new List<API.Embed>() : null;

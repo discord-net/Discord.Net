@@ -150,7 +150,7 @@ namespace Discord.WebSocket
             var embeds = args.Embeds;
 
             bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(Message.Content);
-            bool hasEmbeds = (embed.IsSpecified && embed.Value != null) || (embeds.IsSpecified && embeds.Value?.Length > 0) || Message.Embeds.Any();
+            bool hasEmbeds = embed.IsSpecified && embed.Value != null || embeds.IsSpecified && embeds.Value?.Length > 0 || Message.Embeds.Any();
 
             if (!hasText && !hasEmbeds)
                 Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));

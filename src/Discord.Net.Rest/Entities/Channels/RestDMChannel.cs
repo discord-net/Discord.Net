@@ -15,6 +15,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestDMChannel : RestChannel, IDMChannel, IRestPrivateChannel, IRestMessageChannel
     {
+        #region RestDMChannel
         /// <summary>
         ///     Gets the current logged-in user.
         /// </summary>
@@ -154,20 +155,24 @@ namespace Discord.Rest
         /// </returns>
         public override string ToString() => $"@{Recipient}";
         private string DebuggerDisplay => $"@{Recipient} ({Id}, DM)";
+        #endregion
 
-        //IDMChannel
+        #region IDMChannel
         /// <inheritdoc />
         IUser IDMChannel.Recipient => Recipient;
+        #endregion
 
-        //IRestPrivateChannel
+        #region IRestPrivateChannel
         /// <inheritdoc />
         IReadOnlyCollection<RestUser> IRestPrivateChannel.Recipients => ImmutableArray.Create(Recipient);
+        #endregion
 
-        //IPrivateChannel
+        #region IPrivateChannel
         /// <inheritdoc />
         IReadOnlyCollection<IUser> IPrivateChannel.Recipients => ImmutableArray.Create<IUser>(Recipient);
+        #endregion
 
-        //IMessageChannel
+        #region IMessageChannel
         /// <inheritdoc />
         async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id, CacheMode mode, RequestOptions options)
         {
@@ -212,8 +217,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers)
             => await SendMessageAsync(text, isTTS, embed, options, allowedMentions, messageReference, component, stickers).ConfigureAwait(false);
+        #endregion
 
-        //IChannel
+        #region IChannel
         /// <inheritdoc />
         string IChannel.Name => $"@{Recipient}";
 
@@ -223,5 +229,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable();
+        #endregion
     }
 }
