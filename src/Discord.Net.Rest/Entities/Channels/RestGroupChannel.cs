@@ -16,6 +16,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestGroupChannel : RestChannel, IGroupChannel, IRestPrivateChannel, IRestMessageChannel, IRestAudioChannel
     {
+        #region RestGroupChannel
         private string _iconId;
         private ImmutableDictionary<ulong, RestGroupUser> _users;
 
@@ -143,14 +144,17 @@ namespace Discord.Rest
 
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id}, Group)";
+        #endregion
 
-        //ISocketPrivateChannel
+        #region ISocketPrivateChannel
         IReadOnlyCollection<RestUser> IRestPrivateChannel.Recipients => Recipients;
+        #endregion
 
-        //IPrivateChannel
+        #region IPrivateChannel
         IReadOnlyCollection<IUser> IPrivateChannel.Recipients => Recipients;
+        #endregion
 
-        //IMessageChannel
+        #region IMessageChannel
         async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id, CacheMode mode, RequestOptions options)
         {
             if (mode == CacheMode.AllowDownload)
@@ -190,17 +194,20 @@ namespace Discord.Rest
 
         async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers)
             => await SendMessageAsync(text, isTTS, embed, options, allowedMentions, messageReference, component, stickers).ConfigureAwait(false);
+        #endregion
 
-        //IAudioChannel
+        #region IAudioChannel
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Connecting to a group channel is not supported.</exception>
         Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external) { throw new NotSupportedException(); }
         Task IAudioChannel.DisconnectAsync() { throw new NotSupportedException(); }
+        #endregion
 
-        //IChannel        
+        #region IChannel        
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(id));
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable();
+        #endregion
     }
 }

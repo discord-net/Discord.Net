@@ -12,7 +12,7 @@ namespace Discord.Rest
 {
     internal static class ChannelHelper
     {
-        //General
+        #region General
         public static async Task DeleteAsync(IChannel channel, BaseDiscordClient client,
             RequestOptions options)
         {
@@ -107,8 +107,9 @@ namespace Discord.Rest
 
             return await client.ApiClient.ModifyStageInstanceAsync(channel.Id, apiArgs, options);
         }
+        #endregion
 
-        //Invites
+        #region Invites
         public static async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(IGuildChannel channel, BaseDiscordClient client,
             RequestOptions options)
         {
@@ -183,8 +184,9 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateChannelInviteAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestInviteMetadata.Create(client, null, channel, model);
         }
+        #endregion
 
-        //Messages
+        #region Messages
         public static async Task<RestMessage> GetMessageAsync(IMessageChannel channel, BaseDiscordClient client,
             ulong id, RequestOptions options)
         {
@@ -285,12 +287,12 @@ namespace Discord.Rest
                 }
             }
 
-            if(stickers != null)
+            if (stickers != null)
             {
                 Preconditions.AtMost(stickers.Length, 3, nameof(stickers), "A max of 3 stickers are allowed.");
             }
 
-            var args = new CreateMessageParams(text) { IsTTS = isTTS, Embed = embed?.ToModel(), AllowedMentions = allowedMentions?.ToModel(), MessageReference = messageReference?.ToModel(), Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified, Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified};
+            var args = new CreateMessageParams(text) { IsTTS = isTTS, Embed = embed?.ToModel(), AllowedMentions = allowedMentions?.ToModel(), MessageReference = messageReference?.ToModel(), Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified, Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified };
             var model = await client.ApiClient.CreateMessageAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }
@@ -397,8 +399,9 @@ namespace Discord.Rest
                 await client.ApiClient.DeleteMessagesAsync(channel.Id, args, options).ConfigureAwait(false);
             }
         }
+        #endregion
 
-        //Permission Overwrites
+        #region Permission Overwrites
         public static async Task AddPermissionOverwriteAsync(IGuildChannel channel, BaseDiscordClient client,
             IUser user, OverwritePermissions perms, RequestOptions options)
         {
@@ -421,8 +424,9 @@ namespace Discord.Rest
         {
             await client.ApiClient.DeleteChannelPermissionAsync(channel.Id, role.Id, options).ConfigureAwait(false);
         }
+        #endregion
 
-        //Users
+        #region Users
         /// <exception cref="InvalidOperationException">Resolving permissions requires the parent guild to be downloaded.</exception>
         public static async Task<RestGuildUser> GetUserAsync(IGuildChannel channel, IGuild guild, BaseDiscordClient client,
             ulong id, RequestOptions options)
@@ -467,8 +471,9 @@ namespace Discord.Rest
                 count: limit
             );
         }
+        #endregion
 
-        //Typing
+        #region Typing
         public static async Task TriggerTypingAsync(IMessageChannel channel, BaseDiscordClient client,
             RequestOptions options = null)
         {
@@ -477,8 +482,9 @@ namespace Discord.Rest
         public static IDisposable EnterTypingState(IMessageChannel channel, BaseDiscordClient client,
             RequestOptions options)
             => new TypingNotifier(channel, options);
+        #endregion
 
-        //Webhooks
+        #region Webhooks
         public static async Task<RestWebhook> CreateWebhookAsync(ITextChannel channel, BaseDiscordClient client, string name, Stream avatar, RequestOptions options)
         {
             var args = new CreateWebhookParams { Name = name };
@@ -501,7 +507,9 @@ namespace Discord.Rest
             return models.Select(x => RestWebhook.Create(client, channel, x))
                 .ToImmutableArray();
         }
-        // Categories
+        #endregion
+
+        #region Categories
         public static async Task<ICategoryChannel> GetCategoryAsync(INestedChannel channel, BaseDiscordClient client, RequestOptions options)
         {
             // if no category id specified, return null
@@ -515,7 +523,8 @@ namespace Discord.Rest
         public static async Task SyncPermissionsAsync(INestedChannel channel, BaseDiscordClient client, RequestOptions options)
         {
             var category = await GetCategoryAsync(channel, client, options).ConfigureAwait(false);
-            if (category == null) throw new InvalidOperationException("This channel does not have a parent channel.");
+            if (category == null)
+                throw new InvalidOperationException("This channel does not have a parent channel.");
 
             var apiArgs = new ModifyGuildChannelParams
             {
@@ -530,5 +539,6 @@ namespace Discord.Rest
             };
             await client.ApiClient.ModifyGuildChannelAsync(channel.Id, apiArgs, options).ConfigureAwait(false);
         }
+        #endregion
     }
 }
