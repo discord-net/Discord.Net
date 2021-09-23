@@ -1,4 +1,4 @@
-If you have too many global commands then you might want to consider doing a bulk overwrite.
+If you have too many global commands then you might want to consider using the bulk overwrite function.
 ```cs
 public async Task Client_Ready() {
     List<ApplicationCommandProperties> applicationCommandProperties = new();
