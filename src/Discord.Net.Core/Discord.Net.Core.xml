@@ -4533,7 +4533,7 @@
         </member>
         <member name="P:Discord.ApplicationCommandOptionProperties.Autocomplete">
             <summary>
-                Gets or sets whether or not this option supports autocomplete
+                Gets or sets whether or not this option supports autocomplete.
             </summary>
         </member>
         <member name="P:Discord.ApplicationCommandOptionProperties.Choices">
