@@ -246,9 +246,9 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             var props = new Dictionary<string, string>
             {
-                ["$device"] = "Discord.Net Labs",
+                ["$device"] = "Discord.Net",
                 ["$os"] = Environment.OSVersion.Platform.ToString(),
-                [$"browser"] = "Discord.Net Labs"
+                [$"browser"] = "Discord.Net"
             };
             var msg = new IdentifyParams()
             {
