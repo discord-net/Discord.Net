@@ -21,5 +21,8 @@ namespace Discord.API
 
         [JsonProperty("components")]
         public Optional<API.ActionRowComponent[]> Components { get; set; }
+
+        [JsonProperty("choices")]
+        public Optional<API.ApplicationCommandOptionChoice[]> Choices { get; set; }
     }
 }

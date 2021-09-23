@@ -65,23 +65,28 @@ namespace Discord.WebSocket
         {
             if (model.Type == InteractionType.ApplicationCommand)
             {
-                if (model.ApplicationId != null)
-                {
-                    var dataModel = model.Data.IsSpecified ?
+                var dataModel = model.Data.IsSpecified ?
                         (DataModel)model.Data.Value
                         : null;
-                    if (dataModel != null)
-                    {
-                        if (dataModel.Type.Equals(ApplicationCommandType.User))
-                            return SocketUserCommand.Create(client, model, channel);
-                        if (dataModel.Type.Equals(ApplicationCommandType.Message))
-                            return SocketMessageCommand.Create(client, model, channel);
-                    }
+
+                if (dataModel == null)
+                    return null;
+
+                switch (dataModel.Type)
+                {
+                    case ApplicationCommandType.Slash:
+                        return SocketSlashCommand.Create(client, model, channel);
+                    case ApplicationCommandType.Message:
+                        return SocketMessageCommand.Create(client, model, channel);
+                    case ApplicationCommandType.User:
+                        return SocketUserCommand.Create(client, model, channel);
+                    default: return null;
                 }
-                return SocketSlashCommand.Create(client, model, channel);
             }
-            if (model.Type == InteractionType.MessageComponent)
+            else if (model.Type == InteractionType.MessageComponent)
                 return SocketMessageComponent.Create(client, model, channel);
+            else if (model.Type == InteractionType.ApplicationCommandAutocomplete)
+                return SocketAutocompleteInteraction.Create(client, model, channel);
             else
                 return null;
         }

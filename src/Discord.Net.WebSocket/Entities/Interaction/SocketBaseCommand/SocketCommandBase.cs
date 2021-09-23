@@ -12,10 +12,22 @@ using Model = Discord.API.Interaction;
 namespace Discord.WebSocket
 {
     /// <summary>
-    ///     Base class for User, Message, and Slash command interactions
+    ///     Base class for User, Message, and Slash command interactions.
     /// </summary>
     public class SocketCommandBase : SocketInteraction
     {
+        /// <summary>
+        ///     Gets the name of the invoked command.
+        /// </summary>
+        public string CommandName
+            => Data.Name;
+
+        /// <summary>
+        ///     Gets the id of the invoked command.
+        /// </summary>
+        public ulong CommandId
+            => Data.Id;
+
         /// <summary>
         ///     The data associated with this interaction.
         /// </summary>

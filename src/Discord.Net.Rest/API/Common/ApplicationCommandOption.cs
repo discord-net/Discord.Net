@@ -30,6 +30,9 @@ namespace Discord.API
         [JsonProperty("options")]
         public Optional<ApplicationCommandOption[]> Options { get; set; }
 
+        [JsonProperty("autocomplete")]
+        public Optional<bool> Autocomplete { get; set; }
+
         public ApplicationCommandOption() { }
 
         public ApplicationCommandOption(IApplicationCommandOption cmd)
@@ -78,6 +81,7 @@ namespace Discord.API
             this.Name = option.Name;
             this.Type = option.Type;
             this.Description = option.Description;
+            this.Autocomplete = option.Autocomplete;
         }
     }
 }

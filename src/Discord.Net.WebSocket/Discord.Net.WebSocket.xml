@@ -3961,6 +3961,98 @@
                 The value(s) of a <see cref="T:Discord.SelectMenuComponent"/> interaction response.
             </summary>
         </member>
+        <member name="T:Discord.WebSocket.SocketAutocompleteInteraction">
+            <summary>
+                Represents a <see cref="F:Discord.InteractionType.ApplicationCommandAutocomplete"/> received over the gateway.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketAutocompleteInteraction.Data">
+            <summary>
+                The autocomplete data of this interaction.
+            </summary>
+        </member>
+        <member name="M:Discord.WebSocket.SocketAutocompleteInteraction.RespondAsync(System.Collections.Generic.IEnumerable{Discord.AutocompleteResult},Discord.RequestOptions)">
+            <summary>
+                Responds to this interaction with a set of choices.
+            </summary>
+            <param name="result">
+                The set of choices for the user to pick from.
+                <remarks>
+                    A max of 20 choices are allowed. Passing <see langword="null"/> for this argument will show the executing user that
+                    there is no choices for their autocompleted input.
+                </remarks>
+            </param>
+            <param name="options">The request options for this response.</param>
+            <returns>
+                A task that represents the asynchronous operation of responding to this interaction.
+            </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketAutocompleteInteraction.RespondAsync(Discord.RequestOptions,Discord.AutocompleteResult[])">
+            <summary>
+                Responds to this interaction with a set of choices.
+            </summary>
+            <param name="options">The request options for this response.</param>
+            <param name="result">
+             The set of choices for the user to pick from.
+                <remarks>
+                    A max of 20 choices are allowed. Passing <see langword="null"/> for this argument will show the executing user that
+                    there is no choices for their autocompleted input.
+                </remarks>
+            </param>
+            <returns>
+                A task that represents the asynchronous operation of responding to this interaction.
+            </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketAutocompleteInteraction.DeferAsync(System.Boolean,Discord.RequestOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketAutocompleteInteraction.FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketAutocompleteInteraction.FollowupWithFileAsync(System.String,System.IO.Stream,System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketAutocompleteInteraction.FollowupWithFileAsync(System.String,System.String,System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Discord.WebSocket.SocketAutocompleteInteraction.RespondAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Discord.WebSocket.SocketAutocompleteInteractionData">
+            <summary>
+                Represents data for a slash commands autocomplete interaction.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketAutocompleteInteractionData.CommandName">
+            <summary>
+                Gets the name of the invoked command.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketAutocompleteInteractionData.CommandId">
+            <summary>
+                Gets the id of the invoked command.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketAutocompleteInteractionData.Type">
+            <summary>
+                Gets the type of the invoked command.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketAutocompleteInteractionData.Version">
+            <summary>
+                Gets the version of the invoked command.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketAutocompleteInteractionData.Current">
+            <summary>
+                Gets the current autocomplete option that is activly being filled out.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketAutocompleteInteractionData.Options">
+            <summary>
+                Gets a collection of all the other options the executing users has filled out.
+            </summary>
+        </member>
         <member name="T:Discord.WebSocket.SocketSlashCommand">
             <summary>
                 Represents a Websocket-based slash command received over the gateway.
@@ -4088,7 +4180,17 @@
         </member>
         <member name="T:Discord.WebSocket.SocketCommandBase">
             <summary>
-                Base class for User, Message, and Slash command interactions
+                Base class for User, Message, and Slash command interactions.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketCommandBase.CommandName">
+            <summary>
+                Gets the name of the invoked command.
+            </summary>
+        </member>
+        <member name="P:Discord.WebSocket.SocketCommandBase.CommandId">
+            <summary>
+                Gets the id of the invoked command.
             </summary>
         </member>
         <member name="P:Discord.WebSocket.SocketCommandBase.Data">

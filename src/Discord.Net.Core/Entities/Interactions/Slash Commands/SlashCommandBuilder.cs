@@ -165,7 +165,7 @@ namespace Discord
         /// <param name="choices">The choices of this option.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandBuilder AddOption(string name, ApplicationCommandOptionType type,
-           string description, bool required = true, bool isDefault = false, List<SlashCommandOptionBuilder> options = null, params ApplicationCommandOptionChoiceProperties[] choices)
+           string description, bool required = true, bool isDefault = false, bool isAutocomplete = false, List<SlashCommandOptionBuilder> options = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             // Make sure the name matches the requirements from discord
             Preconditions.NotNullOrEmpty(name, nameof(name));
@@ -197,6 +197,7 @@ namespace Discord
             option.Default = isDefault;
             option.Options = options;
             option.Type = type;
+            option.Autocomplete = isAutocomplete;
             option.Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null;
 
             return AddOption(option);
@@ -288,7 +289,7 @@ namespace Discord
         private string _description;
 
         /// <summary>
-        ///     The name of this option.
+        ///     Gets or sets the name of this option.
         /// </summary>
         public string Name
         {
@@ -309,7 +310,7 @@ namespace Discord
         }
 
         /// <summary>
-        ///     The description of this option.
+        ///     Gets or sets the description of this option.
         /// </summary>
         public string Description
         {
@@ -326,27 +327,32 @@ namespace Discord
         }
 
         /// <summary>
-        ///     The type of this option.
+        ///     Gets or sets the type of this option.
         /// </summary>
         public ApplicationCommandOptionType Type { get; set; }
 
         /// <summary>
-        ///     The first required option for the user to complete. only one option can be default.
+        ///     Gets or sets whether or not this options is the first required option for the user to complete. only one option can be default.
         /// </summary>
         public bool? Default { get; set; }
 
         /// <summary>
-        ///     <see langword="true"/> if this option is required for this command, otherwise <see langword="false"/>.
+        ///     Gets or sets if the option is required.
         /// </summary>
         public bool Required { get; set; }
 
         /// <summary>
-        ///     choices for string and int types for the user to pick from.
+        ///     Gets or sets whether or not this option supports autocomplete.
+        /// </summary>
+        public bool Autocomplete { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the choices for string and int types for the user to pick from.
         /// </summary>
         public List<ApplicationCommandOptionChoiceProperties> Choices { get; set; }
 
         /// <summary>
-        ///     If the option is a subcommand or subcommand group type, this nested options will be the parameters.
+        ///     Gets or sets if this option is a subcommand or subcommand group type, these nested options will be the parameters.
         /// </summary>
         public List<SlashCommandOptionBuilder> Options { get; set; }
 
@@ -372,7 +378,8 @@ namespace Discord
                 Required = this.Required,
                 Type = this.Type,
                 Options = this.Options?.Count > 0 ? new List<ApplicationCommandOptionProperties>(this.Options.Select(x => x.Build())) : null,
-                Choices = this.Choices
+                Choices = this.Choices,
+                Autocomplete = this.Autocomplete
             };
         }
 
