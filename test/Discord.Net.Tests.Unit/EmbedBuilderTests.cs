@@ -290,8 +290,8 @@ namespace Discord
             {
                 Footer = footer
             };
-            Assert.Equal(url, e.Footer.IconUrl);
-            Assert.Equal(name, e.Footer.Text);
+            Assert.Equal(Url, e.Footer.IconUrl);
+            Assert.Equal(Name, e.Footer.Text);
         }
 
         /// <summary>
