@@ -93,6 +93,10 @@ namespace Discord
         public bool CreatePublicThreads => Permissions.GetValue(RawValue, GuildPermission.CreatePublicThreads);
         /// <summary> If <c>true</c>, a user may create private threads in this guild. </summary>
         public bool CreatePrivateThreads => Permissions.GetValue(RawValue, GuildPermission.CreatePrivateThreads);
+        /// <summary> If <c>true</c>, a user may use public threads in this guild. </summary>
+        public bool UsePublicThreads => Permissions.GetValue(RawValue, GuildPermission.UsePublicThreads);
+        /// <summary> If <c>true</c>, a user may use private threads in this guild. </summary>
+        public bool UsePrivateThreads => Permissions.GetValue(RawValue, GuildPermission.UsePrivateThreads);
         /// <summary> If <c>true</c>, a user may use external stickers in this guild. </summary>
         public bool UseExternalStickers => Permissions.GetValue(RawValue, GuildPermission.UseExternalStickers);
         /// <summary> If <c>true</c>, a user may send messages in threads in this guild. </summary>
@@ -143,6 +147,8 @@ namespace Discord
             bool? manageThreads = null,
             bool? createPublicThreads = null,
             bool? createPrivateThreads = null,
+            bool? usePublicThreads = null,
+            bool? usePrivateThreads = null,
             bool? useExternalStickers = null,
             bool? sendMessagesInThreads = null,
             bool? startEmbeddedActivities = null)
@@ -185,6 +191,8 @@ namespace Discord
             Permissions.SetValue(ref value, manageThreads, GuildPermission.ManageThreads);
             Permissions.SetValue(ref value, createPublicThreads, GuildPermission.CreatePublicThreads);
             Permissions.SetValue(ref value, createPrivateThreads, GuildPermission.CreatePrivateThreads);
+            Permissions.SetValue(ref value, usePublicThreads, GuildPermission.UsePublicThreads);
+            Permissions.SetValue(ref value, usePrivateThreads, GuildPermission.UsePrivateThreads);
             Permissions.SetValue(ref value, useExternalStickers, GuildPermission.UseExternalStickers);
             Permissions.SetValue(ref value, sendMessagesInThreads, GuildPermission.SendMessagesInThreads);
             Permissions.SetValue(ref value, startEmbeddedActivities, GuildPermission.StartEmbeddedActivities);
@@ -230,6 +238,8 @@ namespace Discord
             bool manageThreads = false,
             bool createPublicThreads = false,
             bool createPrivateThreads = false,
+            bool usePublicThreads = false,
+            bool usePrivateThreads = false,
             bool useExternalStickers = false,
             bool sendMessagesInThreads = false,
             bool startEmbeddedActivities = false)
@@ -270,6 +280,8 @@ namespace Discord
                 manageThreads: manageThreads,
                 createPublicThreads: createPublicThreads,
                 createPrivateThreads: createPrivateThreads,
+                usePublicThreads: usePublicThreads,
+                usePrivateThreads: usePrivateThreads,
 				useExternalStickers: useExternalStickers,
                 sendMessagesInThreads: sendMessagesInThreads,
                 startEmbeddedActivities: startEmbeddedActivities)
@@ -313,6 +325,8 @@ namespace Discord
             bool? manageThreads = null,
             bool? createPublicThreads = null,
             bool? createPrivateThreads = null,
+            bool? usePublicThreads = null,
+            bool? usePrivateThreads = null,
             bool? useExternalStickers = null,
             bool? sendMessagesInThreads = null,
             bool? startEmbeddedActivities = null)
@@ -320,7 +334,7 @@ namespace Discord
                 viewAuditLog, viewGuildInsights, viewChannel, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
                 useVoiceActivation, prioritySpeaker, stream, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojisAndStickers,
-                useSlashCommands, requestToSpeak, manageThreads, createPublicThreads, createPrivateThreads, useExternalStickers, sendMessagesInThreads,
+                useSlashCommands, requestToSpeak, manageThreads, createPublicThreads, createPrivateThreads, usePublicThreads, usePrivateThreads, useExternalStickers, sendMessagesInThreads,
                 startEmbeddedActivities);
 
         /// <summary>
