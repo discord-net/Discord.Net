@@ -51,9 +51,10 @@ namespace Discord.API.Rest
                 d["file"] = File.Value;
             }
 
-            var payload = new Dictionary<string, object>();
-
-            payload["content"] = Content;
+            var payload = new Dictionary<string, object>
+            {
+                ["content"] = Content
+            };
 
             if (IsTTS.IsSpecified)
                 payload["tts"] = IsTTS.Value.ToString();

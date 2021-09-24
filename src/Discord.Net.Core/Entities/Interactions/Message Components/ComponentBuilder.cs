@@ -207,8 +207,10 @@ namespace Discord
 
             if (_actionRows == null)
             {
-                _actionRows = new List<ActionRowBuilder>();
-                _actionRows.Add(new ActionRowBuilder().AddComponent(builtButton));
+                _actionRows = new List<ActionRowBuilder>
+                {
+                    new ActionRowBuilder().AddComponent(builtButton)
+                };
             }
             else
             {
