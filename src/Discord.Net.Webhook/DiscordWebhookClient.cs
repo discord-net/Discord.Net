@@ -60,8 +60,7 @@ namespace Discord.Webhook
         /// <exception cref="ArgumentNullException">Thrown if the <paramref name="webhookUrl"/> is null or whitespace.</exception>
         public DiscordWebhookClient(string webhookUrl, DiscordRestConfig config) : this(config)
         {
-            string token;
-            ParseWebhookUrl(webhookUrl, out _webhookId, out token);
+            ParseWebhookUrl(webhookUrl, out _webhookId, out string token);
             ApiClient.LoginAsync(TokenType.Webhook, token).GetAwaiter().GetResult();
             Webhook = WebhookClientHelper.GetWebhookAsync(this, _webhookId).GetAwaiter().GetResult();
         }
