@@ -72,16 +72,13 @@ namespace Discord.WebSocket
                 if (dataModel == null)
                     return null;
 
-                switch (dataModel.Type)
+                return dataModel.Type switch
                 {
-                    case ApplicationCommandType.Slash:
-                        return SocketSlashCommand.Create(client, model, channel);
-                    case ApplicationCommandType.Message:
-                        return SocketMessageCommand.Create(client, model, channel);
-                    case ApplicationCommandType.User:
-                        return SocketUserCommand.Create(client, model, channel);
-                    default: return null;
-                }
+                    ApplicationCommandType.Slash => SocketSlashCommand.Create(client, model, channel),
+                    ApplicationCommandType.Message => SocketMessageCommand.Create(client, model, channel),
+                    ApplicationCommandType.User => SocketUserCommand.Create(client, model, channel),
+                    _ => null,
+                };
             }
             else if (model.Type == InteractionType.MessageComponent)
                 return SocketMessageComponent.Create(client, model, channel);

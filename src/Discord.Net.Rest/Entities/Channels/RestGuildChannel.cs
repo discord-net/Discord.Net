@@ -33,23 +33,16 @@ namespace Discord.Rest
         }
         internal static RestGuildChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            switch (model.Type)
+            return model.Type switch
             {
-                case ChannelType.News:
-                    return RestNewsChannel.Create(discord, guild, model);
-                case ChannelType.Text:
-                    return RestTextChannel.Create(discord, guild, model);
-                case ChannelType.Voice:
-                    return RestVoiceChannel.Create(discord, guild, model);
-                case ChannelType.Stage:
-                    return RestStageChannel.Create(discord, guild, model);
-                case ChannelType.Category:
-                    return RestCategoryChannel.Create(discord, guild, model);
-                case ChannelType.PublicThread or ChannelType.PrivateThread or ChannelType.NewsThread:
-                    return RestThreadChannel.Create(discord, guild, model);
-                default:
-                    return new RestGuildChannel(discord, guild, model.Id);
-            }
+                ChannelType.News => RestNewsChannel.Create(discord, guild, model),
+                ChannelType.Text => RestTextChannel.Create(discord, guild, model),
+                ChannelType.Voice => RestVoiceChannel.Create(discord, guild, model),
+                ChannelType.Stage => RestStageChannel.Create(discord, guild, model),
+                ChannelType.Category => RestCategoryChannel.Create(discord, guild, model),
+                ChannelType.PublicThread or ChannelType.PrivateThread or ChannelType.NewsThread => RestThreadChannel.Create(discord, guild, model),
+                _ => new RestGuildChannel(discord, guild, model.Id),
+            };
         }
         internal override void Update(Model model)
         {

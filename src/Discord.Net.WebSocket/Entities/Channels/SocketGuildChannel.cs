@@ -47,23 +47,16 @@ namespace Discord.WebSocket
         }
         internal static SocketGuildChannel Create(SocketGuild guild, ClientState state, Model model)
         {
-            switch (model.Type)
+            return model.Type switch
             {
-                case ChannelType.News:
-                    return SocketNewsChannel.Create(guild, state, model);
-                case ChannelType.Text:
-                    return SocketTextChannel.Create(guild, state, model);
-                case ChannelType.Voice:
-                    return SocketVoiceChannel.Create(guild, state, model);
-                case ChannelType.Category:
-                    return SocketCategoryChannel.Create(guild, state, model);
-                case ChannelType.PrivateThread or ChannelType.PublicThread or ChannelType.NewsThread:
-                    return SocketThreadChannel.Create(guild, state, model);
-                case ChannelType.Stage:
-                    return SocketStageChannel.Create(guild, state, model);
-                default:
-                    return new SocketGuildChannel(guild.Discord, model.Id, guild);
-            }
+                ChannelType.News => SocketNewsChannel.Create(guild, state, model),
+                ChannelType.Text => SocketTextChannel.Create(guild, state, model),
+                ChannelType.Voice => SocketVoiceChannel.Create(guild, state, model),
+                ChannelType.Category => SocketCategoryChannel.Create(guild, state, model),
+                ChannelType.PrivateThread or ChannelType.PublicThread or ChannelType.NewsThread => SocketThreadChannel.Create(guild, state, model),
+                ChannelType.Stage => SocketStageChannel.Create(guild, state, model),
+                _ => new SocketGuildChannel(guild.Discord, model.Id, guild),
+            };
         }
         /// <inheritdoc />
         internal override void Update(ClientState state, Model model)

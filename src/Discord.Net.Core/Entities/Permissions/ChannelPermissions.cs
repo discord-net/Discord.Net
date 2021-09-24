@@ -24,15 +24,15 @@ namespace Discord
         /// <exception cref="ArgumentException">Unknown channel type.</exception>
         public static ChannelPermissions All(IChannel channel)
         {
-            switch (channel)
+            return channel switch
             {
-                case ITextChannel _: return Text;
-                case IVoiceChannel _: return Voice;
-                case ICategoryChannel _: return Category;
-                case IDMChannel _: return DM;
-                case IGroupChannel _: return Group;
-                default: throw new ArgumentException(message: "Unknown channel type.", paramName: nameof(channel));
-            }
+                ITextChannel _ => Text,
+                IVoiceChannel _ => Voice,
+                ICategoryChannel _ => Category,
+                IDMChannel _ => DM,
+                IGroupChannel _ => Group,
+                _ => throw new ArgumentException(message: "Unknown channel type.", paramName: nameof(channel)),
+            };
         }
 
         /// <summary> Gets a packed value representing all the permissions in this <see cref="ChannelPermissions"/>. </summary>

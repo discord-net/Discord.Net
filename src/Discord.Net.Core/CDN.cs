@@ -190,37 +190,26 @@ namespace Discord
 
         private static string FormatToExtension(StickerFormatType format)
         {
-            switch (format)
+            return format switch
             {
-                case StickerFormatType.None:
-                case StickerFormatType.Png:
-                case StickerFormatType.Apng: // In the case of the Sticker endpoint, the sticker will be available as PNG if its format_type is PNG or APNG, and as Lottie if its format_type is LOTTIE.
-                    return "png";
-                case StickerFormatType.Lottie:
-                    return "lottie";
-                default:
-                    throw new ArgumentException(nameof(format));
-
-            }
+                StickerFormatType.None or StickerFormatType.Png or StickerFormatType.Apng => "png", // In the case of the Sticker endpoint, the sticker will be available as PNG if its format_type is PNG or APNG, and as Lottie if its format_type is LOTTIE.
+                StickerFormatType.Lottie => "lottie",
+                _ => throw new ArgumentException(nameof(format)),
+            };
         }
 
         private static string FormatToExtension(ImageFormat format, string imageId)
         {
             if (format == ImageFormat.Auto)
                 format = imageId.StartsWith("a_") ? ImageFormat.Gif : ImageFormat.Png;
-            switch (format)
+            return format switch
             {
-                case ImageFormat.Gif:
-                    return "gif";
-                case ImageFormat.Jpeg:
-                    return "jpeg";
-                case ImageFormat.Png:
-                    return "png";
-                case ImageFormat.WebP:
-                    return "webp";
-                default:
-                    throw new ArgumentException(nameof(format));
-            }
+                ImageFormat.Gif => "gif",
+                ImageFormat.Jpeg => "jpeg",
+                ImageFormat.Png => "png",
+                ImageFormat.WebP => "webp",
+                _ => throw new ArgumentException(nameof(format)),
+            };
         }
     }
 }

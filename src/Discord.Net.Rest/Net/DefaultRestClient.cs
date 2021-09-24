@@ -157,15 +157,15 @@ namespace Discord.Net.Rest
         private static readonly HttpMethod Patch = new HttpMethod("PATCH");
         private HttpMethod GetMethod(string method)
         {
-            switch (method)
+            return method switch
             {
-                case "DELETE": return HttpMethod.Delete;
-                case "GET": return HttpMethod.Get;
-                case "PATCH": return Patch;
-                case "POST": return HttpMethod.Post;
-                case "PUT": return HttpMethod.Put;
-                default: throw new ArgumentOutOfRangeException(nameof(method), $"Unknown HttpMethod: {method}");
-            }
+                "DELETE" => HttpMethod.Delete,
+                "GET" => HttpMethod.Get,
+                "PATCH" => Patch,
+                "POST" => HttpMethod.Post,
+                "PUT" => HttpMethod.Put,
+                _ => throw new ArgumentOutOfRangeException(nameof(method), $"Unknown HttpMethod: {method}"),
+            };
         }
     }
 }

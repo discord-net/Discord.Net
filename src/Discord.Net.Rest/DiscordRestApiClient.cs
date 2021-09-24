@@ -715,22 +715,12 @@ namespace Discord.API
 
             int limit = args.Limit.GetValueOrDefault(DiscordConfig.MaxMessagesPerBatch);
             ulong? relativeId = args.RelativeMessageId.IsSpecified ? args.RelativeMessageId.Value : (ulong?)null;
-            string relativeDir;
-
-            switch (args.RelativeDirection.GetValueOrDefault(Direction.Before))
+            var relativeDir = args.RelativeDirection.GetValueOrDefault(Direction.Before) switch
             {
-                case Direction.Before:
-                default:
-                    relativeDir = "before";
-                    break;
-                case Direction.After:
-                    relativeDir = "after";
-                    break;
-                case Direction.Around:
-                    relativeDir = "around";
-                    break;
-            }
-
+                Direction.After => "after",
+                Direction.Around => "around",
+                _ => "before",
+            };
             var ids = new BucketIds(channelId: channelId);
             Expression<Func<string>> endpoint;
             if (relativeId != null)
@@ -2181,15 +2171,14 @@ namespace Discord.API
 
             internal static int? GetIndex(string name)
             {
-                switch (name)
+                return name switch
                 {
-                    case "httpMethod": return 0;
-                    case "guildId": return 1;
-                    case "channelId": return 2;
-                    case "webhookId": return 3;
-                    default:
-                        return null;
-                }
+                    "httpMethod" => 0,
+                    "guildId" => 1,
+                    "channelId" => 2,
+                    "webhookId" => 3,
+                    _ => null,
+                };
             }
         }
 

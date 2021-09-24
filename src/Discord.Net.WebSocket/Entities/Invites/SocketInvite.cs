@@ -31,16 +31,16 @@ namespace Discord.WebSocket
         {
             get
             {
-                switch (Channel)
+                return Channel switch
                 {
-                    case IVoiceChannel voiceChannel: return ChannelType.Voice;
-                    case ICategoryChannel categoryChannel: return ChannelType.Category;
-                    case IDMChannel dmChannel: return ChannelType.DM;
-                    case IGroupChannel groupChannel: return ChannelType.Group;
-                    case INewsChannel newsChannel: return ChannelType.News;
-                    case ITextChannel textChannel: return ChannelType.Text;
-                    default: throw new InvalidOperationException("Invalid channel type.");
-                }
+                    IVoiceChannel voiceChannel => ChannelType.Voice,
+                    ICategoryChannel categoryChannel => ChannelType.Category,
+                    IDMChannel dmChannel => ChannelType.DM,
+                    IGroupChannel groupChannel => ChannelType.Group,
+                    INewsChannel newsChannel => ChannelType.News,
+                    ITextChannel textChannel => ChannelType.Text,
+                    _ => throw new InvalidOperationException("Invalid channel type."),
+                };
             }
         }
         /// <inheritdoc />

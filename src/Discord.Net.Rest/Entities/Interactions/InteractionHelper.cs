@@ -43,7 +43,7 @@ namespace Discord.Rest
             RestFollowupMessage entity = RestFollowupMessage.Create(client, model, token, channel);
             return entity;
         }
-#endregion
+        #endregion
 
         #region Global commands
         public static async Task<RestGlobalCommand> GetGlobalCommandAsync(BaseDiscordClient client, ulong id,
