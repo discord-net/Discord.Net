@@ -19,8 +19,8 @@ namespace Discord.API
         internal ActionRowComponent() { }
         internal ActionRowComponent(Discord.ActionRowComponent c)
         {
-            this.Type = c.Type;
-            this.Components = c.Components?.Select<IMessageComponent, IMessageComponent>(x =>
+            Type = c.Type;
+            Components = c.Components?.Select<IMessageComponent, IMessageComponent>(x =>
             {
                 switch (x.Type)
                 {

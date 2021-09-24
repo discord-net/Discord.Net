@@ -35,7 +35,7 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         public DateTimeOffset CreatedAt
-            => SnowflakeUtils.FromSnowflake(this.Id);
+            => SnowflakeUtils.FromSnowflake(Id);
 
         internal RestApplicationCommand(BaseDiscordClient client, ulong id)
             : base(client, id)
@@ -57,13 +57,13 @@ namespace Discord.Rest
 
         internal virtual void Update(Model model)
         {
-            this.Type = model.Type;
-            this.ApplicationId = model.ApplicationId;
-            this.Name = model.Name;
-            this.Description = model.Description;
-            this.DefaultPermission = model.DefaultPermissions.GetValueOrDefault(true);
+            Type = model.Type;
+            ApplicationId = model.ApplicationId;
+            Name = model.Name;
+            Description = model.Description;
+            DefaultPermission = model.DefaultPermissions.GetValueOrDefault(true);
 
-            this.Options = model.Options.IsSpecified
+            Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => RestApplicationCommandOption.Create(x)).ToImmutableArray()
                 : null;
         }

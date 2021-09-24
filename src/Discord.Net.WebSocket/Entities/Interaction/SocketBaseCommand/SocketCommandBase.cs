@@ -41,7 +41,7 @@ namespace Discord.WebSocket
                 : null;
 
             ulong? guildId = null;
-            if (this.Channel is SocketGuildChannel guildChannel)
+            if (Channel is SocketGuildChannel guildChannel)
                 guildId = guildChannel.Guild.Id;
 
             Data = SocketCommandBaseData.Create(client, dataModel, model.Id, guildId);
@@ -60,7 +60,7 @@ namespace Discord.WebSocket
                 (DataModel)model.Data.Value
                 : null;
 
-            this.Data.Update(data);
+            Data.Update(data);
 
             base.Update(model);
         }
@@ -124,7 +124,7 @@ namespace Discord.WebSocket
                 }
             };
 
-            await InteractionHelper.SendInteractionResponse(this.Discord, response, this.Id, Token, options);
+            await InteractionHelper.SendInteractionResponse(Discord, response, Id, Token, options);
         }
 
         /// <inheritdoc/>
@@ -285,7 +285,7 @@ namespace Discord.WebSocket
                 }
             };
 
-            return Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, this.Id, this.Token, options);
+            return Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, Id, Token, options);
         }
     }
 }

@@ -45,7 +45,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public DateTimeOffset CreatedAt
-            => SnowflakeUtils.FromSnowflake(this.Id);
+            => SnowflakeUtils.FromSnowflake(Id);
 
         /// <summary>
         ///     <see langword="true"/> if the token is valid for replying to, otherwise <see langword="false"/>.
@@ -58,7 +58,7 @@ namespace Discord.WebSocket
         internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel)
             : base(client, id)
         {
-            this.Channel = channel;
+            Channel = channel;
         }
 
         internal static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
@@ -93,24 +93,24 @@ namespace Discord.WebSocket
 
         internal virtual void Update(Model model)
         {
-            this.Data = model.Data.IsSpecified
+            Data = model.Data.IsSpecified
                 ? model.Data.Value
                 : null;
 
-            this.GuildId = model.GuildId.ToNullable();
-            this.Token = model.Token;
-            this.Version = model.Version;
-            this.Type = model.Type;
+            GuildId = model.GuildId.ToNullable();
+            Token = model.Token;
+            Version = model.Version;
+            Type = model.Type;
 
-            if (this.User == null)
+            if (User == null)
             {
                 if (model.Member.IsSpecified && model.GuildId.IsSpecified)
                 {
-                    this.User = SocketGuildUser.Create(Discord.State.GetGuild(this.GuildId.Value), Discord.State, model.Member.Value);
+                    User = SocketGuildUser.Create(Discord.State.GetGuild(GuildId.Value), Discord.State, model.Member.Value);
                 }
                 else
                 {
-                    this.User = SocketGlobalUser.Create(this.Discord, this.Discord.State, model.User.Value);
+                    User = SocketGlobalUser.Create(Discord, Discord.State, model.User.Value);
                 }
             }
         }
@@ -192,7 +192,7 @@ namespace Discord.WebSocket
         /// <param name="options">The request options for this async request.</param>
         /// <returns>A <see cref="RestInteractionMessage"/> that represents the initial response.</returns>
         public Task<RestInteractionMessage> GetOriginalResponseAsync(RequestOptions options = null)
-            => InteractionHelper.GetOriginalResponseAsync(this.Discord, this.Channel, this, options);
+            => InteractionHelper.GetOriginalResponseAsync(Discord, Channel, this, options);
 
         /// <summary>
         ///     Edits original response for this interaction.
@@ -202,8 +202,8 @@ namespace Discord.WebSocket
         /// <returns>A <see cref="RestInteractionMessage"/> that represents the initial response.</returns>
         public async Task<RestInteractionMessage> ModifyOriginalResponseAsync(Action<MessageProperties> func, RequestOptions options = null)
         {
-            var model = await InteractionHelper.ModifyInteractionResponse(this.Discord, this.Token, func, options);
-            return RestInteractionMessage.Create(this.Discord, model, this.Token, this.Channel);
+            var model = await InteractionHelper.ModifyInteractionResponse(Discord, Token, func, options);
+            return RestInteractionMessage.Create(Discord, model, Token, Channel);
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace Discord.WebSocket
         private bool CheckToken()
         {
             // Tokens last for 15 minutes according to https://discord.com/developers/docs/interactions/slash-commands#responding-to-an-interaction
-            return (DateTime.UtcNow - this.CreatedAt.UtcDateTime).TotalMinutes <= 15d;
+            return (DateTime.UtcNow - CreatedAt.UtcDateTime).TotalMinutes <= 15d;
         }
 #endregion
 

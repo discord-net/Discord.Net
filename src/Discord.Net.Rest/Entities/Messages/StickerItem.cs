@@ -21,8 +21,8 @@ namespace Discord.Rest
         internal StickerItem(BaseDiscordClient client, Model model)
             : base(client, model.Id)
         {
-            this.Name = model.Name;
-            this.Format = model.FormatType;
+            Name = model.Name;
+            Format = model.FormatType;
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Discord.Rest
 
         public async Task<Sticker> ResolveStickerAsync()
         {
-            var model = await Discord.ApiClient.GetStickerAsync(this.Id);
+            var model = await Discord.ApiClient.GetStickerAsync(Id);
 
             if (model.GuildId.IsSpecified)
                 return CustomSticker.Create(Discord, model, model.GuildId.Value, model.User.IsSpecified ? model.User.Value.Id : null);

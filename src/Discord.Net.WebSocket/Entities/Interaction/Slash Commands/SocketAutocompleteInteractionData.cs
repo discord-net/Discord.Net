@@ -48,13 +48,13 @@ namespace Discord.WebSocket
         {
             var options = model.Options.Select(x => new AutocompleteOption(x.Type, x.Name, x.Value, x.Focused));
 
-            this.Current = options.FirstOrDefault(x => x.Focused);
-            this.Options = options.ToImmutableArray();
+            Current = options.FirstOrDefault(x => x.Focused);
+            Options = options.ToImmutableArray();
 
-            this.CommandName = model.Name;
-            this.CommandId = model.Id;
-            this.Type = model.Type;
-            this.Version = model.Version;
+            CommandName = model.Name;
+            CommandId = model.Id;
+            Type = model.Type;
+            Version = model.Version;
         }
     }
 }

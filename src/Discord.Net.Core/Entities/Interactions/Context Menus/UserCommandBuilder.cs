@@ -51,8 +51,8 @@ namespace Discord
         {
             UserCommandProperties props = new UserCommandProperties()
             {
-                Name = this.Name,
-                DefaultPermission = this.DefaultPermission
+                Name = Name,
+                DefaultPermission = DefaultPermission
             };
 
             return props;
@@ -68,7 +68,7 @@ namespace Discord
         /// </returns>
         public UserCommandBuilder WithName(string name)
         {
-            this.Name = name;
+            Name = name;
             return this;
         }
 
@@ -79,7 +79,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public UserCommandBuilder WithDefaultPermission (bool value)
         {
-            this.DefaultPermission = value;
+            DefaultPermission = value;
             return this;
         }
     }

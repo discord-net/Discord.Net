@@ -290,7 +290,7 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous delete operation.
         /// </returns>
         public Task DeleteSlashCommandsAsync(RequestOptions options = null)
-            => InteractionHelper.DeleteAllGuildCommandsAsync(Discord, this.Id, options);
+            => InteractionHelper.DeleteAllGuildCommandsAsync(Discord, Id, options);
 
         /// <summary>
         ///     Gets a collection of slash commands created by the current user in this guild.
@@ -933,7 +933,7 @@ namespace Discord.Rest
         ///     if found, otherwise <see langword="null"/>.
         /// </returns>
         public async Task<RestGuildCommand> GetApplicationCommandAsync(ulong id, RequestOptions options = null)
-            => await ClientHelper.GetGuildApplicationCommand(Discord, id, this.Id, options);
+            => await ClientHelper.GetGuildApplicationCommand(Discord, id, Id, options);
         /// <summary>
         ///     Creates an application command within this guild.
         /// </summary>
@@ -944,9 +944,9 @@ namespace Discord.Rest
         /// </returns>
         public async Task<RestGuildCommand> CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null)
         {
-            var model = await InteractionHelper.CreateGuildCommand(Discord, this.Id, properties, options);
+            var model = await InteractionHelper.CreateGuildCommand(Discord, Id, properties, options);
 
-            return RestGuildCommand.Create(Discord, model, this.Id);
+            return RestGuildCommand.Create(Discord, model, Id);
         }
         /// <summary>
         ///     Overwrites the application commands within this guild.
@@ -959,9 +959,9 @@ namespace Discord.Rest
         public async Task<IReadOnlyCollection<RestGuildCommand>> BulkOverwriteApplicationCommandsAsync(ApplicationCommandProperties[] properties,
             RequestOptions options = null)
         {
-            var models = await InteractionHelper.BulkOverwriteGuildCommands(Discord, this.Id, properties, options);
+            var models = await InteractionHelper.BulkOverwriteGuildCommands(Discord, Id, properties, options);
 
-            return models.Select(x => RestGuildCommand.Create(Discord, x, this.Id)).ToImmutableArray();
+            return models.Select(x => RestGuildCommand.Create(Discord, x, Id)).ToImmutableArray();
         }
 
         /// <summary>
@@ -1066,7 +1066,7 @@ namespace Discord.Rest
         /// </returns>
         public async Task<CustomSticker> GetStickerAsync(ulong id, RequestOptions options = null)
         {
-            var model = await Discord.ApiClient.GetGuildStickerAsync(this.Id, id, options).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetGuildStickerAsync(Id, id, options).ConfigureAwait(false);
 
             if (model == null)
                 return null;
@@ -1083,7 +1083,7 @@ namespace Discord.Rest
         /// </returns>
         public async Task<IReadOnlyCollection<CustomSticker>> GetStickersAsync(RequestOptions options = null)
         {
-            var models = await Discord.ApiClient.ListGuildStickersAsync(this.Id, options).ConfigureAwait(false);
+            var models = await Discord.ApiClient.ListGuildStickersAsync(Id, options).ConfigureAwait(false);
 
             if (models.Length == 0)
                 return null;

@@ -49,8 +49,8 @@ namespace Discord.WebSocket
 
         internal void Update(Model model)
         {
-            this.Name = model.Name;
-            this.Format = model.FormatType;
+            Name = model.Name;
+            Format = model.FormatType;
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Discord.WebSocket
         ///     The sticker representing this unknown stickers Id, if none is found then <see langword="null"/>.
         /// </returns>
         public Task<SocketSticker> ResolveAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
-            => Discord.GetStickerAsync(this.Id, mode, options);
+            => Discord.GetStickerAsync(Id, mode, options);
 
         private new string DebuggerDisplay => $"{Name} ({Id})";
     }

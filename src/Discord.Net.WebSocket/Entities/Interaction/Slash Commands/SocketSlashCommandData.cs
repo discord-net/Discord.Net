@@ -23,7 +23,7 @@ namespace Discord.WebSocket
         {
             base.Update(model);
 
-            this.Options = model.Options.IsSpecified
+            Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => new SocketSlashCommandDataOption(this, x)).ToImmutableArray()
                 : null;
         }

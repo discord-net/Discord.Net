@@ -29,9 +29,9 @@ namespace Discord.WebSocket
 
         internal SocketMessageComponentData(Model model)
         {
-            this.CustomId = model.CustomId;
-            this.Type = model.ComponentType;
-            this.Values = model.Values.GetValueOrDefault();
+            CustomId = model.CustomId;
+            Type = model.ComponentType;
+            Values = model.Values.GetValueOrDefault();
         }
     }
 }

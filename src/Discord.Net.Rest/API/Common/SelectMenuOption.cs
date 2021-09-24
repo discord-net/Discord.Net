@@ -28,15 +28,15 @@ namespace Discord.API
 
         public SelectMenuOption(Discord.SelectMenuOption option)
         {
-            this.Label = option.Label;
-            this.Value = option.Value;
-            this.Description = option.Description;
+            Label = option.Label;
+            Value = option.Value;
+            Description = option.Description;
 
             if (option.Emote != null)
             {
                 if (option.Emote is Emote e)
                 {
-                    this.Emoji = new Emoji()
+                    Emoji = new Emoji()
                     {
                         Name = e.Name,
                         Animated = e.Animated,
@@ -45,14 +45,14 @@ namespace Discord.API
                 }
                 else
                 {
-                    this.Emoji = new Emoji()
+                    Emoji = new Emoji()
                     {
                         Name = option.Emote.Name
                     };
                 }
             }
 
-            this.Default = option.Default.HasValue ? option.Default.Value : Optional<bool>.Unspecified;
+            Default = option.Default.HasValue ? option.Default.Value : Optional<bool>.Unspecified;
         }
     }
 }

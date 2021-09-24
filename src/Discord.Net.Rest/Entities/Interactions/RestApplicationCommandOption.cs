@@ -50,21 +50,21 @@ namespace Discord.Rest
 
         internal void Update(Model model)
         {
-            this.Type = model.Type;
-            this.Name = model.Name;
-            this.Description = model.Description;
+            Type = model.Type;
+            Name = model.Name;
+            Description = model.Description;
 
             if (model.Default.IsSpecified)
-                this.Default = model.Default.Value;
+                Default = model.Default.Value;
 
             if (model.Required.IsSpecified)
-                this.Required = model.Required.Value;
+                Required = model.Required.Value;
 
-            this.Options = model.Options.IsSpecified
+            Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => Create(x)).ToImmutableArray()
                 : null;
 
-            this.Choices = model.Choices.IsSpecified
+            Choices = model.Choices.IsSpecified
                 ? model.Choices.Value.Select(x => new RestApplicationCommandChoice(x)).ToImmutableArray()
                 : null;
         }

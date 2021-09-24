@@ -83,8 +83,8 @@ namespace Discord
         /// <exception cref="ArgumentException"/>
         public AutocompleteResult(string name, object value)
         {
-            this.Name = name;
-            this.Value = value;
+            Name = name;
+            Value = value;
         }
     }
 }

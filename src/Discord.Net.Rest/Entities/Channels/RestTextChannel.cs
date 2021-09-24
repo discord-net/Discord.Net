@@ -261,7 +261,7 @@ namespace Discord.Rest
             ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, RequestOptions options = null)
         {
             var model = await ThreadHelper.CreateThreadAsync(Discord, this, name, type, autoArchiveDuration, message, options);
-            return RestThreadChannel.Create(Discord, this.Guild, model);
+            return RestThreadChannel.Create(Discord, Guild, model);
         }
         #endregion
 

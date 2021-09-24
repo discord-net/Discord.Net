@@ -48,23 +48,23 @@ namespace Discord.WebSocket
 
         internal void Update(Model model)
         {
-            this.Name = model.Name;
-            this.Type = model.Type;
-            this.Description = model.Description;
+            Name = model.Name;
+            Type = model.Type;
+            Description = model.Description;
 
-            this.Default = model.Default.IsSpecified
+            Default = model.Default.IsSpecified
                 ? model.Default.Value
                 : null;
 
-            this.Required = model.Required.IsSpecified
+            Required = model.Required.IsSpecified
                 ? model.Required.Value
                 : null;
 
-            this.Choices = model.Choices.IsSpecified
+            Choices = model.Choices.IsSpecified
                 ? model.Choices.Value.Select(x => SocketApplicationCommandChoice.Create(x)).ToImmutableArray()
                 : new ImmutableArray<SocketApplicationCommandChoice>();
 
-            this.Options = model.Options.IsSpecified
+            Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => SocketApplicationCommandOption.Create(x)).ToImmutableArray()
                 : new ImmutableArray<SocketApplicationCommandOption>();
         }

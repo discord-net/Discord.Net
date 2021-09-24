@@ -100,16 +100,16 @@ namespace Discord
         {
             SlashCommandProperties props = new SlashCommandProperties()
             {
-                Name = this.Name,
-                Description = this.Description,
-                DefaultPermission = this.DefaultPermission,
+                Name = Name,
+                Description = Description,
+                DefaultPermission = DefaultPermission,
             };
 
-            if (this.Options != null && this.Options.Any())
+            if (Options != null && Options.Any())
             {
                 var options = new List<ApplicationCommandOptionProperties>();
 
-                this.Options.ForEach(x => options.Add(x.Build()));
+                Options.ForEach(x => options.Add(x.Build()));
 
                 props.Options = options;
             }
@@ -127,7 +127,7 @@ namespace Discord
         /// </returns>
         public SlashCommandBuilder WithName(string name)
         {
-            this.Name = name;
+            Name = name;
             return this;
         }
 
@@ -138,7 +138,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandBuilder WithDescription(string description)
         {
-            this.Description = description;
+            Description = description;
             return this;
         }
 
@@ -149,7 +149,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandBuilder WithDefaultPermission(bool value)
         {
-            this.DefaultPermission = value;
+            DefaultPermission = value;
             return this;
         }
 
@@ -186,8 +186,8 @@ namespace Discord
             // make sure theres only one option with default set to true
             if (isDefault.HasValue && isDefault.Value)
             {
-                if (this.Options != null)
-                    if (this.Options.Any(x => x.Default.HasValue && x.Default.Value))
+                if (Options != null)
+                    if (Options.Any(x => x.Default.HasValue && x.Default.Value))
                         throw new ArgumentException("There can only be one command option with default set to true!", nameof(isDefault));
             }
 
@@ -237,16 +237,16 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandBuilder AddOption(SlashCommandOptionBuilder option)
         {
-            if (this.Options == null)
-                this.Options = new List<SlashCommandOptionBuilder>();
+            if (Options == null)
+                Options = new List<SlashCommandOptionBuilder>();
 
-            if (this.Options.Count >= MaxOptionsCount)
+            if (Options.Count >= MaxOptionsCount)
                 throw new ArgumentOutOfRangeException(nameof(Options), $"Cannot have more than {MaxOptionsCount} options!");
 
             if (option == null)
                 throw new ArgumentNullException(nameof(option), "Option cannot be null");
 
-            this.Options.Add(option);
+            Options.Add(option);
             return this;
         }
         /// <summary>
@@ -262,13 +262,13 @@ namespace Discord
             if (options.Length == 0)
                 throw new ArgumentException(nameof(options), "Options cannot be empty!");
 
-            if (this.Options == null)
-                this.Options = new List<SlashCommandOptionBuilder>();
+            if (Options == null)
+                Options = new List<SlashCommandOptionBuilder>();
 
-            if (this.Options.Count + options.Length > MaxOptionsCount)
+            if (Options.Count + options.Length > MaxOptionsCount)
                 throw new ArgumentOutOfRangeException(nameof(options), $"Cannot have more than {MaxOptionsCount} options!");
 
-            this.Options.AddRange(options);
+            Options.AddRange(options);
             return this;
         }
     }
@@ -365,7 +365,7 @@ namespace Discord
         /// <returns>The built version of this option.</returns>
         public ApplicationCommandOptionProperties Build()
         {
-            bool isSubType = this.Type == ApplicationCommandOptionType.SubCommandGroup;
+            bool isSubType = Type == ApplicationCommandOptionType.SubCommandGroup;
 
             if (isSubType && (Options == null || !Options.Any()))
                 throw new ArgumentException(nameof(Options), "SubCommands/SubCommandGroups must have at least one option");
@@ -375,14 +375,14 @@ namespace Discord
 
             return new ApplicationCommandOptionProperties()
             {
-                Name = this.Name,
-                Description = this.Description,
-                Default = this.Default,
-                Required = this.Required,
-                Type = this.Type,
-                Options = this.Options?.Count > 0 ? new List<ApplicationCommandOptionProperties>(this.Options.Select(x => x.Build())) : null,
-                Choices = this.Choices,
-                Autocomplete = this.Autocomplete
+                Name = Name,
+                Description = Description,
+                Default = Default,
+                Required = Required,
+                Type = Type,
+                Options = Options?.Count > 0 ? new List<ApplicationCommandOptionProperties>(Options.Select(x => x.Build())) : null,
+                Choices = Choices,
+                Autocomplete = Autocomplete
             };
         }
 
@@ -418,8 +418,8 @@ namespace Discord
             // make sure theres only one option with default set to true
             if (isDefault)
             {
-                if (this.Options != null)
-                    if (this.Options.Any(x => x.Default.HasValue && x.Default.Value))
+                if (Options != null)
+                    if (Options.Any(x => x.Default.HasValue && x.Default.Value))
                         throw new ArgumentException("There can only be one command option with default set to true!", nameof(isDefault));
             }
 
@@ -443,10 +443,10 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddOption(SlashCommandOptionBuilder option)
         {
-            if (this.Options == null)
-                this.Options = new List<SlashCommandOptionBuilder>();
+            if (Options == null)
+                Options = new List<SlashCommandOptionBuilder>();
 
-            if (this.Options.Count >= SlashCommandBuilder.MaxOptionsCount)
+            if (Options.Count >= SlashCommandBuilder.MaxOptionsCount)
                 throw new ArgumentOutOfRangeException(nameof(Choices), $"There can only be {SlashCommandBuilder.MaxOptionsCount} options per sub command group!");
 
             if (option == null)
@@ -527,7 +527,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder WithName(string name)
         {
-            this.Name = name;
+            Name = name;
 
             return this;
         }
@@ -539,7 +539,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder WithDescription(string description)
         {
-            this.Description = description;
+            Description = description;
             return this;
         }
 
@@ -550,7 +550,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder WithRequired(bool value)
         {
-            this.Required = value;
+            Required = value;
             return this;
         }
 
@@ -561,7 +561,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder WithDefault(bool value)
         {
-            this.Default = value;
+            Default = value;
             return this;
         }
 
@@ -572,7 +572,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder WithType(ApplicationCommandOptionType type)
         {
-            this.Type = type;
+            Type = type;
             return this;
         }
     }

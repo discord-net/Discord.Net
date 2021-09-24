@@ -37,28 +37,28 @@ namespace Discord.API
 
         public ApplicationCommandOption(IApplicationCommandOption cmd)
         {
-            this.Choices = cmd.Choices.Select(x => new ApplicationCommandOptionChoice()
+            Choices = cmd.Choices.Select(x => new ApplicationCommandOptionChoice()
             {
                 Name = x.Name,
                 Value = x.Value
             }).ToArray();
 
-            this.Options = cmd.Options.Select(x => new ApplicationCommandOption(x)).ToArray();
+            Options = cmd.Options.Select(x => new ApplicationCommandOption(x)).ToArray();
 
-            this.Required = cmd.Required.HasValue
+            Required = cmd.Required.HasValue
                 ? cmd.Required.Value
                 : Optional<bool>.Unspecified;
-            this.Default = cmd.Default.HasValue
+            Default = cmd.Default.HasValue
                 ? cmd.Default.Value
                 : Optional<bool>.Unspecified;
 
-            this.Name = cmd.Name;
-            this.Type = cmd.Type;
-            this.Description = cmd.Description;
+            Name = cmd.Name;
+            Type = cmd.Type;
+            Description = cmd.Description;
         }
         public ApplicationCommandOption(Discord.ApplicationCommandOptionProperties option)
         {
-            this.Choices = option.Choices != null
+            Choices = option.Choices != null
                 ? option.Choices.Select(x => new ApplicationCommandOptionChoice()
                 {
                     Name = x.Name,
@@ -66,22 +66,22 @@ namespace Discord.API
                 }).ToArray()
                 : Optional<ApplicationCommandOptionChoice[]>.Unspecified;
 
-            this.Options = option.Options != null
+            Options = option.Options != null
                 ? option.Options.Select(x => new ApplicationCommandOption(x)).ToArray()
                 : Optional<ApplicationCommandOption[]>.Unspecified;
 
-            this.Required = option.Required.HasValue
+            Required = option.Required.HasValue
                 ? option.Required.Value
                 : Optional<bool>.Unspecified;
 
-            this.Default = option.Default.HasValue
+            Default = option.Default.HasValue
                 ? option.Default.Value
                 : Optional<bool>.Unspecified;
 
-            this.Name = option.Name;
-            this.Type = option.Type;
-            this.Description = option.Description;
-            this.Autocomplete = option.Autocomplete;
+            Name = option.Name;
+            Type = option.Type;
+            Description = option.Description;
+            Autocomplete = option.Autocomplete;
         }
     }
 }

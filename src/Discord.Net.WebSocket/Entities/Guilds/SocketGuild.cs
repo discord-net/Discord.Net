@@ -842,7 +842,7 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous delete operation.
         /// </returns>
         public Task DeleteApplicationCommandsAsync(RequestOptions options = null)
-            => InteractionHelper.DeleteAllGuildCommandsAsync(Discord, this.Id, options);
+            => InteractionHelper.DeleteAllGuildCommandsAsync(Discord, Id, options);
 
         /// <summary>
         ///     Gets a collection of slash commands created by the current user in this guild.
@@ -854,7 +854,7 @@ namespace Discord.WebSocket
         /// </returns>
         public async Task<IReadOnlyCollection<SocketApplicationCommand>> GetApplicationCommandsAsync(RequestOptions options = null)
         {
-            var commands = (await Discord.ApiClient.GetGuildApplicationCommandsAsync(this.Id, options)).Select(x => SocketApplicationCommand.Create(Discord, x, this.Id));
+            var commands = (await Discord.ApiClient.GetGuildApplicationCommandsAsync(Id, options)).Select(x => SocketApplicationCommand.Create(Discord, x, Id));
 
             foreach (var command in commands)
             {
@@ -889,7 +889,7 @@ namespace Discord.WebSocket
             if (model == null)
                 return null;
 
-            command = SocketApplicationCommand.Create(Discord, model, this.Id);
+            command = SocketApplicationCommand.Create(Discord, model, Id);
 
             Discord.State.AddCommand(command);
 
@@ -906,7 +906,7 @@ namespace Discord.WebSocket
         /// </returns>
         public async Task<SocketApplicationCommand> CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null)
         {
-            var model = await InteractionHelper.CreateGuildCommand(Discord, this.Id, properties, options);
+            var model = await InteractionHelper.CreateGuildCommand(Discord, Id, properties, options);
 
             var entity = Discord.State.GetOrAddCommand(model.Id, (id) => SocketApplicationCommand.Create(Discord, model));
 
@@ -926,11 +926,11 @@ namespace Discord.WebSocket
         public async Task<IReadOnlyCollection<SocketApplicationCommand>> BulkOverwriteApplicationCommandAsync(ApplicationCommandProperties[] properties,
             RequestOptions options = null)
         {
-            var models = await InteractionHelper.BulkOverwriteGuildCommands(Discord, this.Id, properties, options);
+            var models = await InteractionHelper.BulkOverwriteGuildCommands(Discord, Id, properties, options);
 
             var entities = models.Select(x => SocketApplicationCommand.Create(Discord, x));
 
-            Discord.State.PurgeCommands(x => !x.IsGlobalCommand && x.Guild.Id == this.Id);
+            Discord.State.PurgeCommands(x => !x.IsGlobalCommand && x.Guild.Id == Id);
 
             foreach(var entity in entities)
             {
@@ -1016,7 +1016,7 @@ namespace Discord.WebSocket
         internal SocketRole AddOrUpdateRole(RoleModel model)
         {
             if (_roles.TryGetValue(model.Id, out SocketRole role))
-                _roles[model.Id].Update(this.Discord.State, model);
+                _roles[model.Id].Update(Discord.State, model);
             else
                 role = AddRole(model);
 
@@ -1291,7 +1291,7 @@ namespace Discord.WebSocket
             if (mode == CacheMode.CacheOnly)
                 return null;
 
-            var model = await Discord.ApiClient.GetGuildStickerAsync(this.Id, id, options).ConfigureAwait(false);
+            var model = await Discord.ApiClient.GetGuildStickerAsync(Id, id, options).ConfigureAwait(false);
 
             if (model == null)
                 return null;
@@ -1317,13 +1317,13 @@ namespace Discord.WebSocket
         public async ValueTask<IReadOnlyCollection<SocketCustomSticker>> GetStickersAsync(CacheMode mode = CacheMode.AllowDownload,
             RequestOptions options = null)
         {
-            if (this.Stickers.Count > 0)
-                return this.Stickers;
+            if (Stickers.Count > 0)
+                return Stickers;
 
             if (mode == CacheMode.CacheOnly)
                 return ImmutableArray.Create<SocketCustomSticker>();
 
-            var models = await Discord.ApiClient.ListGuildStickersAsync(this.Id, options).ConfigureAwait(false);
+            var models = await Discord.ApiClient.ListGuildStickersAsync(Id, options).ConfigureAwait(false);
 
             List<SocketCustomSticker> stickers = new();
 

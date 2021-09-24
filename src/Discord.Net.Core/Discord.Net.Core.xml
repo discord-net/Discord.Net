@@ -4917,7 +4917,11 @@
                 Present if this option is a group or subcommand.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "T:Discord.IApplicationCommandOption" -->
+        <member name="T:Discord.IApplicationCommandOption">
+            <summary>
+                Options for the <see cref="T:Discord.IApplicationCommand"/>, see <see href="https://discord.com/developers/docs/interactions/slash-commands#applicationcommandoption">The docs</see>.
+            </summary>
+        </member>
         <member name="P:Discord.IApplicationCommandOption.Type">
             <summary>
                 The type of this <see cref="T:Discord.IApplicationCommandOption"/>.
@@ -5318,7 +5322,7 @@
             <summary>
                 Builds this builder into a <see cref="T:Discord.MessageComponent"/> used to send your components.
             </summary>
-            <returns>A <see cref="T:Discord.MessageComponent"/> that can be sent with <see cref="!:IMessageChannel.SendMessageAsync(string, bool, Embed, RequestOptions, AllowedMentions, MessageReference, MessageComponent)"/>.</returns>
+            <returns>A <see cref="T:Discord.MessageComponent"/> that can be sent with <see cref="M:Discord.IMessageChannel.SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent,Discord.ISticker[],Discord.Embed[])"/>.</returns>
         </member>
         <member name="T:Discord.ActionRowBuilder">
             <summary>
@@ -6021,6 +6025,7 @@
             <param name="description">The description of this option.</param>
             <param name="required">If this option is required for this command.</param>
             <param name="isDefault">If this option is the default option.</param>
+            <param name="isAutocomplete">If this option is set to autocompleate.</param>
             <param name="options">The options of the option to add.</param>
             <param name="choices">The choices of this option.</param>
             <returns>The current builder.</returns>
@@ -8262,7 +8267,7 @@
         </member>
         <member name="P:Discord.ReactionMetadata.IsMe">
             <summary>
-                Gets a value that indicates whether the current user has reacted to this.
+                Gets a value that indicates whether the current user has reacted to 
             </summary>
             <returns>
                 <c>true</c> if the user has reacted to the message; otherwise <c>false</c>.
@@ -10266,7 +10271,7 @@
             <example>
                 <para>The following example checks if the current user has the ability to send a message with attachment in
                 this channel; if so, uploads a file via <see cref="!:IMessageChannel.SendFileAsync(string, string, bool, Embed, RequestOptions, bool, AllowedMentions, MessageReference)"/>.</para>
-                <code language="cs">
+            <code language="cs">
                 if (currentUser?.GetPermissions(targetChannel)?.AttachFiles)
                     await targetChannel.SendFileAsync("fortnite.png");
                 </code>
@@ -11086,6 +11091,7 @@
             </code>
             </example>
             <param name="msg">The message to remove reactions from.</param>
+            <param name="user">The user who removed the reaction.</param>
             <param name="reactions">An array of reactions to remove from the message.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
@@ -11098,6 +11104,7 @@
             <summary>
                 Sends an inline reply that references a message.
             </summary>
+            <param name="msg">The message that is being replyed on.</param>
             <param name="text">The message to be sent.</param>
             <param name="isTTS">Determines whether the message should be read aloud by Discord or not.</param>
             <param name="embed">The <see cref="F:Discord.EmbedType.Rich"/> <see cref="T:Discord.Embed"/> to be sent.</param>
@@ -11107,6 +11114,8 @@
                 If <c>null</c>, all mentioned roles and users will be notified.
             </param>
             <param name="options">The options to be used when sending the request.</param>
+            <param name="components">The message components to be included with this message. Used for interactions.</param>
+            <param name="stickers">A collection of stickers to send with the message.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
@@ -11184,6 +11193,7 @@
             <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
             <param name="embed">The <see cref="F:Discord.EmbedType.Rich"/> <see cref="T:Discord.Embed"/> to be sent.</param>
             <param name="options">The options to be used when sending the request.</param>
+            <param name="component">The message component to be included with this message. Used for interactions.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
@@ -11231,6 +11241,7 @@
             <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
             <param name="embed">The <see cref="F:Discord.EmbedType.Rich"/> <see cref="T:Discord.Embed"/> to be sent.</param>
             <param name="options">The options to be used when sending the request.</param>
+            <param name="component">The message component to be included with this message. Used for interactions.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
@@ -11825,12 +11836,8 @@
             <summary>
                 Initializes a new instance of the <see cref="T:Discord.Net.ApplicationCommandException" /> class.
             </summary>
-            <param name="request">The request that was sent prior to the exception.</param>
             <param name="requestJson"></param>
             <param name="httpError"></param>
-            <param name="discordCode">The Discord status code returned.</param>
-            <param name="reason">The reason behind the exception.</param>
-            <param name="errors"></param>
         </member>
         <member name="T:Discord.Net.BucketId">
             <summary>

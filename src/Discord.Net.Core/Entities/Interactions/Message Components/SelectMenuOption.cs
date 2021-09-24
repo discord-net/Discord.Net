@@ -38,11 +38,11 @@ namespace Discord
 
         internal SelectMenuOption(string label, string value, string description, IEmote emote, bool? defaultValue)
         {
-            this.Label = label;
-            this.Value = value;
-            this.Description = description;
-            this.Emote = emote;
-            this.Default = defaultValue;
+            Label = label;
+            Value = value;
+            Description = description;
+            Emote = emote;
+            Default = defaultValue;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Discord.Rest
         internal RestInteractionMessage(BaseDiscordClient discord, ulong id, IUser author, string token, IMessageChannel channel)
             : base(discord, id, channel, author, MessageSource.Bot)
         {
-            this.Token = token;
+            Token = token;
         }
 
         internal static RestInteractionMessage Create(BaseDiscordClient discord, Model model, string token, IMessageChannel channel)
@@ -61,8 +61,8 @@ namespace Discord.Rest
         {
             try
             {
-                var model = await InteractionHelper.ModifyInteractionResponse(Discord, this.Token, func, options).ConfigureAwait(false);
-                this.Update(model);
+                var model = await InteractionHelper.ModifyInteractionResponse(Discord, Token, func, options).ConfigureAwait(false);
+                Update(model);
             }
             catch (Discord.Net.HttpException x)
             {

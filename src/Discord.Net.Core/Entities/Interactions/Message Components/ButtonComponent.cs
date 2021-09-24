@@ -55,16 +55,16 @@ namespace Discord
         ///     A newly created button builder with the same properties as this button.
         /// </returns>
         public ButtonBuilder ToBuilder()
-            => new ButtonBuilder(this.Label, this.CustomId, this.Style, this.Url, this.Emote, this.Disabled);
+            => new ButtonBuilder(Label, CustomId, Style, Url, Emote, Disabled);
 
         internal ButtonComponent(ButtonStyle style, string label, IEmote emote, string customId, string url, bool disabled)
         {
-            this.Style = style;
-            this.Label = label;
-            this.Emote = emote;
-            this.CustomId = customId;
-            this.Url = url;
-            this.Disabled = disabled;
+            Style = style;
+            Label = label;
+            Emote = emote;
+            CustomId = customId;
+            Url = url;
+            Disabled = disabled;
         }
     }
 }

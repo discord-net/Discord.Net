@@ -18,7 +18,7 @@ namespace Discord
 
         internal MessageComponent(List<ActionRowComponent> components)
         {
-            this.Components = components;
+            Components = components;
         }
 
         /// <summary>

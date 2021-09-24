@@ -31,8 +31,8 @@ namespace Discord.Rest
         internal RestThreadUser(BaseDiscordClient discord, IGuild guild, IThreadChannel channel, ulong id)
             : base(discord, id)
         {
-            this.Guild = guild;
-            this.Thread = channel;
+            Guild = guild;
+            Thread = channel;
         }
 
         internal static RestThreadUser Create(BaseDiscordClient client, IGuild guild, Model model, IThreadChannel channel)
@@ -44,7 +44,7 @@ namespace Discord.Rest
 
         internal void Update(Model model)
         {
-            this.JoinedAt = model.JoinTimestamp;
+            JoinedAt = model.JoinTimestamp;
         }
 
         /// <summary>
@@ -55,6 +55,6 @@ namespace Discord.Rest
         ///     <see cref="IGuildUser"/> that represents the current thread user.
         /// </returns>
         public Task<IGuildUser> GetGuildUser()
-            => Guild.GetUserAsync(this.Id);
+            => Guild.GetUserAsync(Id);
     }
 }

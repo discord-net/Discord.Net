@@ -28,8 +28,8 @@ namespace Discord.WebSocket
         internal SocketSlashCommandDataOption() { }
         internal SocketSlashCommandDataOption(SocketSlashCommandData data, Model model)
         {
-            this.Name = model.Name;
-            this.Type = model.Type;
+            Name = model.Name;
+            Type = model.Type;
 
             if (model.Value.IsSpecified)
             {
@@ -41,23 +41,23 @@ namespace Discord.WebSocket
                     case ApplicationCommandOptionType.Mentionable:
                         if (ulong.TryParse($"{model.Value.Value}", out var valueId))
                         {
-                            switch (this.Type)
+                            switch (Type)
                             {
                                 case ApplicationCommandOptionType.User:
                                     {
                                         var guildUser = data.ResolvableData.GuildMembers.FirstOrDefault(x => x.Key == valueId).Value;
 
                                         if (guildUser != null)
-                                            this.Value = guildUser;
+                                            Value = guildUser;
                                         else
-                                            this.Value = data.ResolvableData.Users.FirstOrDefault(x => x.Key == valueId).Value;
+                                            Value = data.ResolvableData.Users.FirstOrDefault(x => x.Key == valueId).Value;
                                     }
                                     break;
                                 case ApplicationCommandOptionType.Channel:
-                                    this.Value = data.ResolvableData.Channels.FirstOrDefault(x => x.Key == valueId).Value;
+                                    Value = data.ResolvableData.Channels.FirstOrDefault(x => x.Key == valueId).Value;
                                     break;
                                 case ApplicationCommandOptionType.Role:
-                                    this.Value = data.ResolvableData.Roles.FirstOrDefault(x => x.Key == valueId).Value;
+                                    Value = data.ResolvableData.Roles.FirstOrDefault(x => x.Key == valueId).Value;
                                     break;
                                 case ApplicationCommandOptionType.Mentionable:
                                     {
@@ -66,54 +66,54 @@ namespace Discord.WebSocket
                                             var guildUser = data.ResolvableData.GuildMembers.FirstOrDefault(x => x.Key == valueId).Value;
 
                                             if (guildUser != null)
-                                                this.Value = guildUser;
+                                                Value = guildUser;
                                             else
-                                                this.Value = data.ResolvableData.Users.FirstOrDefault(x => x.Key == valueId).Value;
+                                                Value = data.ResolvableData.Users.FirstOrDefault(x => x.Key == valueId).Value;
                                         }
                                         else if(data.ResolvableData.Roles.Any(x => x.Key == valueId))
                                         {
-                                            this.Value = data.ResolvableData.Roles.FirstOrDefault(x => x.Key == valueId).Value;
+                                            Value = data.ResolvableData.Roles.FirstOrDefault(x => x.Key == valueId).Value;
                                         }
                                     }
                                     break;
                                 default:
-                                    this.Value = model.Value.Value;
+                                    Value = model.Value.Value;
                                     break;
                             }
                         }
                         break;
                     case ApplicationCommandOptionType.String:
-                        this.Value = model.Value.ToString();
+                        Value = model.Value.ToString();
                         break;
                     case ApplicationCommandOptionType.Integer:
                         {
                             if (model.Value.Value is long val)
-                                this.Value = val;
+                                Value = val;
                             else if (long.TryParse(model.Value.Value.ToString(), out long res))
-                                this.Value = res;
+                                Value = res;
                         }
                         break;
                     case ApplicationCommandOptionType.Boolean:
                         {
                             if (model.Value.Value is bool val)
-                                this.Value = val;
+                                Value = val;
                             else if (bool.TryParse(model.Value.Value.ToString(), out bool res))
-                                this.Value = res;
+                                Value = res;
                         }
                         break;
                     case ApplicationCommandOptionType.Number:
                         {
                             if (model.Value.Value is int val)
-                                this.Value = val;
+                                Value = val;
                             else if (double.TryParse(model.Value.Value.ToString(), out double res))
-                                this.Value = res;
+                                Value = res;
                         }
                         break;
                 }
 
             }
 
-            this.Options = model.Options.IsSpecified
+            Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => new SocketSlashCommandDataOption(data, x)).ToImmutableArray()
                 : null;
         }
@@ -130,7 +130,7 @@ namespace Discord.WebSocket
 
         #region IApplicationCommandInteractionDataOption
         IReadOnlyCollection<IApplicationCommandInteractionDataOption> IApplicationCommandInteractionDataOption.Options
-            => this.Options;
+            => Options;
         #endregion
     }
 }

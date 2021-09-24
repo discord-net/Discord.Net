@@ -28,7 +28,7 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         public string GetStickerUrl()
-            => CDN.GetStickerUrl(this.Id, this.Format);
+            => CDN.GetStickerUrl(Id, Format);
 
         internal Sticker(BaseDiscordClient client, ulong id)
             : base(client, id) { }

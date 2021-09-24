@@ -25,7 +25,7 @@ namespace Discord
         internal ActionRowComponent() { }
         internal ActionRowComponent(List<IMessageComponent> components)
         {
-            this.Components = components;
+            Components = components;
         }
 
         string IMessageComponent.CustomId => null;

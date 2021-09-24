@@ -55,7 +55,7 @@ namespace Discord.WebSocket
         ///     Gets a collection of threads within this text channel.
         /// </summary>
         public IReadOnlyCollection<SocketThreadChannel> Threads
-            => Guild.ThreadChannels.Where(x => x.ParentChannel.Id == this.Id).ToImmutableArray();
+            => Guild.ThreadChannels.Where(x => x.ParentChannel.Id == Id).ToImmutableArray();
 
         internal SocketTextChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
             : base(discord, id, guild)

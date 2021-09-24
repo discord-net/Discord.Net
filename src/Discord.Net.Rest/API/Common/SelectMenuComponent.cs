@@ -34,13 +34,13 @@ namespace Discord.API
 
         public SelectMenuComponent(Discord.SelectMenuComponent component)
         {
-            this.Type = component.Type;
-            this.CustomId = component.CustomId;
-            this.Options = component.Options.Select(x => new SelectMenuOption(x)).ToArray();
-            this.Placeholder = component.Placeholder;
-            this.MinValues = component.MinValues;
-            this.MaxValues = component.MaxValues;
-            this.Disabled = component.Disabled;
+            Type = component.Type;
+            CustomId = component.CustomId;
+            Options = component.Options.Select(x => new SelectMenuOption(x)).ToArray();
+            Placeholder = component.Placeholder;
+            MinValues = component.MinValues;
+            MaxValues = component.MaxValues;
+            Disabled = component.Disabled;
         }
     }
 }

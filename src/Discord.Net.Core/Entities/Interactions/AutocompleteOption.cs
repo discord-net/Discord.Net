@@ -33,10 +33,10 @@ namespace Discord
 
         internal AutocompleteOption(ApplicationCommandOptionType type, string name, object value, bool focused)
         {
-            this.Type = type;
-            this.Name = name;
-            this.Value = value;
-            this.Focused = focused;
+            Type = type;
+            Name = name;
+            Value = value;
+            Focused = focused;
         }
     }
 }

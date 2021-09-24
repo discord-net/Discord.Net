@@ -32,7 +32,7 @@ namespace Discord.WebSocket
                 {
                     var socketUser = discord.GetOrCreateUser(discord.State, user.Value);
 
-                    this.Users.Add(ulong.Parse(user.Key), socketUser);
+                    Users.Add(ulong.Parse(user.Key), socketUser);
                 }
             }
 
@@ -56,7 +56,7 @@ namespace Discord.WebSocket
                     }
 
                     discord.State.AddChannel(socketChannel);
-                    this.Channels.Add(ulong.Parse(channel.Key), socketChannel);
+                    Channels.Add(ulong.Parse(channel.Key), socketChannel);
                 }
             }
 
@@ -66,7 +66,7 @@ namespace Discord.WebSocket
                 {
                     member.Value.User = resolved.Users.Value[member.Key];
                     var user = guild.AddOrUpdateUser(member.Value);
-                    this.GuildMembers.Add(ulong.Parse(member.Key), user);
+                    GuildMembers.Add(ulong.Parse(member.Key), user);
                 }
             }
 
@@ -75,7 +75,7 @@ namespace Discord.WebSocket
                 foreach (var role in resolved.Roles.Value)
                 {
                     var socketRole = guild.AddOrUpdateRole(role.Value);
-                    this.Roles.Add(ulong.Parse(role.Key), socketRole);
+                    Roles.Add(ulong.Parse(role.Key), socketRole);
                 }
             }
 
@@ -105,7 +105,7 @@ namespace Discord.WebSocket
                     }
 
                     var message = SocketMessage.Create(discord, discord.State, author, channel, msg.Value);
-                    this.Messages.Add(message.Id, message);
+                    Messages.Add(message.Id, message);
                 }
             }
         }

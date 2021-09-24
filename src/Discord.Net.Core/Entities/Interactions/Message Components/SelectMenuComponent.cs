@@ -52,21 +52,21 @@ namespace Discord
         /// </returns>
         public SelectMenuBuilder ToBuilder()
             => new SelectMenuBuilder(
-                this.CustomId,
-                this.Options.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.Default)).ToList(),
-                this.Placeholder,
-                this.MaxValues,
-                this.MinValues,
-                this.Disabled);
+                CustomId,
+                Options.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.Default)).ToList(),
+                Placeholder,
+                MaxValues,
+                MinValues,
+                Disabled);
 
         internal SelectMenuComponent(string customId, List<SelectMenuOption> options, string placeholder, int minValues, int maxValues, bool disabled)
         {
-            this.CustomId = customId;
-            this.Options = options;
-            this.Placeholder = placeholder;
-            this.MinValues = minValues;
-            this.MaxValues = maxValues;
-            this.Disabled = disabled;
+            CustomId = customId;
+            Options = options;
+            Placeholder = placeholder;
+            MinValues = minValues;
+            MaxValues = maxValues;
+            Disabled = disabled;
         }
     }
 }

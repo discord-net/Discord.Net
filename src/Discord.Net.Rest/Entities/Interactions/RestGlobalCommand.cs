@@ -40,7 +40,7 @@ namespace Discord.Rest
         public override async Task ModifyAsync<TArg>(Action<TArg> func, RequestOptions options = null)
         {
             var cmd = await InteractionHelper.ModifyGlobalCommand<TArg>(Discord, this, func, options).ConfigureAwait(false);
-            this.Update(cmd);
+            Update(cmd);
         }
     }
 }

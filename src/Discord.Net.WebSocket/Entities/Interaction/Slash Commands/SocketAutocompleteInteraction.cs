@@ -54,7 +54,7 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous operation of responding to this interaction.
         /// </returns>
         public Task RespondAsync(IEnumerable<AutocompleteResult> result, RequestOptions options = null)
-            => InteractionHelper.SendAutocompleteResult(Discord, result, this.Id, this.Token, options);
+            => InteractionHelper.SendAutocompleteResult(Discord, result, Id, Token, options);
 
         /// <summary>
         ///     Responds to this interaction with a set of choices.
@@ -71,7 +71,7 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous operation of responding to this interaction.
         /// </returns>
         public Task RespondAsync(RequestOptions options = null, params AutocompleteResult[] result)
-            => InteractionHelper.SendAutocompleteResult(Discord, result, this.Id, this.Token, options);
+            => InteractionHelper.SendAutocompleteResult(Discord, result, Id, Token, options);
 
 
         /// <inheritdoc/>

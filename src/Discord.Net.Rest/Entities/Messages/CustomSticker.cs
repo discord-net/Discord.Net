@@ -35,14 +35,14 @@ namespace Discord.Rest
         internal CustomSticker(BaseDiscordClient client, ulong id, RestGuild guild, ulong? authorId = null)
             : base(client, id)
         {
-            this.AuthorId = authorId;
-            this.Guild = guild;
+            AuthorId = authorId;
+            Guild = guild;
         }
         internal CustomSticker(BaseDiscordClient client, ulong id, ulong guildId, ulong? authorId = null)
             : base(client, id)
         {
-            this.AuthorId = authorId;
-            this.GuildId = guildId;
+            AuthorId = authorId;
+            GuildId = guildId;
         }
 
         internal static CustomSticker Create(BaseDiscordClient client, Model model, RestGuild guild, ulong? authorId = null)
@@ -70,7 +70,7 @@ namespace Discord.Rest
             Update(model);
         }
 
-        private string DebuggerDisplay => this.Guild != null ? $"{Name} in {Guild.Name} ({Id})" : $"{Name} ({Id})";
+        private string DebuggerDisplay => Guild != null ? $"{Name} in {Guild.Name} ({Id})" : $"{Name} ({Id})";
 
         IGuild ICustomSticker.Guild => Guild;
     }

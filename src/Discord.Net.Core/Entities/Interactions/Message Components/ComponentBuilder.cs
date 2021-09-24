@@ -69,14 +69,14 @@ namespace Discord
             switch (component)
             {
                 case ButtonComponent button:
-                    this.WithButton(button.Label, button.CustomId, button.Style, button.Emote, button.Url, button.Disabled, row);
+                    WithButton(button.Label, button.CustomId, button.Style, button.Emote, button.Url, button.Disabled, row);
                     break;
                 case ActionRowComponent actionRow:
                     foreach (var cmp in actionRow.Components)
                         AddComponent(cmp, row);
                     break;
                 case SelectMenuComponent menu:
-                    this.WithSelectMenu(menu.Placeholder, menu.CustomId, menu.Options.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.Default)).ToList(), menu.Placeholder, menu.MinValues, menu.MaxValues, menu.Disabled, row);
+                    WithSelectMenu(menu.Placeholder, menu.CustomId, menu.Options.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.Default)).ToList(), menu.Placeholder, menu.MinValues, menu.MaxValues, menu.Disabled, row);
                     break;
             }
         }
@@ -187,7 +187,7 @@ namespace Discord
                 .WithUrl(url)
                 .WithDisabled(disabled);
 
-            return this.WithButton(button, row);
+            return WithButton(button, row);
         }
 
         /// <summary>
@@ -245,8 +245,8 @@ namespace Discord
         /// <returns>A <see cref="MessageComponent"/> that can be sent with <see cref="IMessageChannel.SendMessageAsync"/>.</returns>
         public MessageComponent Build()
         {
-            if (this._actionRows != null)
-                return new MessageComponent(this._actionRows.Select(x => x.Build()).ToList());
+            if (_actionRows != null)
+                return new MessageComponent(_actionRows.Select(x => x.Build()).ToList());
             else
                 return MessageComponent.Empty;
         }
@@ -295,7 +295,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public ActionRowBuilder WithComponents(List<IMessageComponent> components)
         {
-            this.Components = components;
+            Components = components;
             return this;
         }
 
@@ -307,10 +307,10 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public ActionRowBuilder AddComponent(IMessageComponent component)
         {
-            if (this.Components.Count >= MaxChildCount)
+            if (Components.Count >= MaxChildCount)
                 throw new InvalidOperationException($"Components count reached {MaxChildCount}");
 
-            this.Components.Add(component);
+            Components.Add(component);
             return this;
         }
 
@@ -320,7 +320,7 @@ namespace Discord
         /// <returns>A <see cref="ActionRowComponent"/> that can be used within a <see cref="ComponentBuilder"/></returns>
         public ActionRowComponent Build()
         {
-            return new ActionRowComponent(this._components);
+            return new ActionRowComponent(_components);
         }
 
         internal bool CanTakeComponent(IMessageComponent component)
@@ -330,12 +330,12 @@ namespace Discord
                 case ComponentType.ActionRow:
                     return false;
                 case ComponentType.Button:
-                    if (this.Components.Any(x => x.Type == ComponentType.SelectMenu))
+                    if (Components.Any(x => x.Type == ComponentType.SelectMenu))
                         return false;
                     else
-                        return this.Components.Count < 5;
+                        return Components.Count < 5;
                 case ComponentType.SelectMenu:
-                    return this.Components.Count == 0;
+                    return Components.Count == 0;
                 default:
                     return false;
             }
@@ -435,12 +435,12 @@ namespace Discord
         /// <param name="disabled">Disabled this button or not.</param>
         public ButtonBuilder(string label = null, string customId = null, ButtonStyle style = ButtonStyle.Primary, string url = null, IEmote emote = null, bool disabled = false)
         {
-            this.CustomId = customId;
-            this.Style = style;
-            this.Url = url;
-            this.Label = label;
-            this.Disabled = disabled;
-            this.Emote = emote;
+            CustomId = customId;
+            Style = style;
+            Url = url;
+            Label = label;
+            Disabled = disabled;
+            Emote = emote;
         }
 
         /// <summary>
@@ -448,12 +448,12 @@ namespace Discord
         /// </summary>
         public ButtonBuilder(ButtonComponent button)
         {
-            this.CustomId = button.CustomId;
-            this.Style = button.Style;
-            this.Url = button.Url;
-            this.Label = button.Label;
-            this.Disabled = button.Disabled;
-            this.Emote = button.Emote;
+            CustomId = button.CustomId;
+            Style = button.Style;
+            Url = button.Url;
+            Label = button.Label;
+            Disabled = button.Disabled;
+            Emote = button.Emote;
         }
 
         /// <summary>
@@ -514,7 +514,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public ButtonBuilder WithLabel(string label)
         {
-            this.Label = label;
+            Label = label;
             return this;
         }
 
@@ -525,7 +525,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public ButtonBuilder WithStyle(ButtonStyle style)
         {
-            this.Style = style;
+            Style = style;
             return this;
         }
 
@@ -536,7 +536,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public ButtonBuilder WithEmote(IEmote emote)
         {
-            this.Emote = emote;
+            Emote = emote;
             return this;
         }
 
@@ -547,7 +547,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public ButtonBuilder WithUrl(string url)
         {
-            this.Url = url;
+            Url = url;
             return this;
         }
 
@@ -559,7 +559,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public ButtonBuilder WithCustomId(string id)
         {
-            this.CustomId = id;
+            CustomId = id;
             return this;
         }
 
@@ -570,7 +570,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public ButtonBuilder WithDisabled(bool disabled)
         {
-            this.Disabled = disabled;
+            Disabled = disabled;
             return this;
         }
 
@@ -585,23 +585,23 @@ namespace Discord
         /// <exception cref="InvalidOperationException">A non-link button must contain a custom id</exception>
         public ButtonComponent Build()
         {
-            if (string.IsNullOrEmpty(this.Label) && this.Emote == null)
+            if (string.IsNullOrEmpty(Label) && Emote == null)
                 throw new InvalidOperationException("A button must have an Emote or a label!");
 
-            if (!(string.IsNullOrEmpty(this.Url) ^ string.IsNullOrEmpty(this.CustomId)))
+            if (!(string.IsNullOrEmpty(Url) ^ string.IsNullOrEmpty(CustomId)))
                 throw new InvalidOperationException("A button must contain either a URL or a CustomId, but not both!");
 
-            if (this.Style == ButtonStyle.Link)
+            if (Style == ButtonStyle.Link)
             {
-                if (string.IsNullOrEmpty(this.Url))
+                if (string.IsNullOrEmpty(Url))
                     throw new InvalidOperationException("Link buttons must have a link associated with them");
                 else
-                    UrlValidation.Validate(this.Url);
+                    UrlValidation.Validate(Url);
             }
-            else if (string.IsNullOrEmpty(this.CustomId))
+            else if (string.IsNullOrEmpty(CustomId))
                 throw new InvalidOperationException("Non-link buttons must have a custom id associated with them");
 
-            return new ButtonComponent(this.Style, this.Label, this.Emote, this.CustomId, this.Url, this.Disabled);
+            return new ButtonComponent(Style, Label, Emote, CustomId, Url, Disabled);
         }
     }
 
@@ -736,12 +736,12 @@ namespace Discord
         /// </summary>
         public SelectMenuBuilder(SelectMenuComponent selectMenu)
         {
-            this.Placeholder = selectMenu.Placeholder;
-            this.CustomId = selectMenu.Placeholder;
-            this.MaxValues = selectMenu.MaxValues;
-            this.MinValues = selectMenu.MinValues;
-            this.Disabled = selectMenu.Disabled;
-            this.Options = selectMenu.Options?
+            Placeholder = selectMenu.Placeholder;
+            CustomId = selectMenu.Placeholder;
+            MaxValues = selectMenu.MaxValues;
+            MinValues = selectMenu.MinValues;
+            Disabled = selectMenu.Disabled;
+            Options = selectMenu.Options?
                .Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.Default))
                .ToList();
         }
@@ -757,12 +757,12 @@ namespace Discord
         /// <param name="disabled">Disabled this select menu or not.</param>
         public SelectMenuBuilder(string customId, List<SelectMenuOptionBuilder> options, string placeholder = null, int maxValues = 1, int minValues = 1, bool disabled = false)
         {
-            this.CustomId = customId;
-            this.Options = options;
-            this.Placeholder = placeholder;
-            this.Disabled = disabled;
-            this.MaxValues = maxValues;
-            this.MinValues = minValues;
+            CustomId = customId;
+            Options = options;
+            Placeholder = placeholder;
+            Disabled = disabled;
+            MaxValues = maxValues;
+            MinValues = minValues;
         }
 
         /// <summary>
@@ -775,7 +775,7 @@ namespace Discord
         /// </returns>
         public SelectMenuBuilder WithCustomId(string customId)
         {
-            this.CustomId = customId;
+            CustomId = customId;
             return this;
         }
 
@@ -789,7 +789,7 @@ namespace Discord
         /// </returns>
         public SelectMenuBuilder WithPlaceholder(string placeholder)
         {
-            this.Placeholder = placeholder;
+            Placeholder = placeholder;
             return this;
         }
 
@@ -803,7 +803,7 @@ namespace Discord
         /// </returns>
         public SelectMenuBuilder WithMinValues(int minValues)
         {
-            this.MinValues = minValues;
+            MinValues = minValues;
             return this;
         }
 
@@ -817,7 +817,7 @@ namespace Discord
         /// </returns>
         public SelectMenuBuilder WithMaxValues(int maxValues)
         {
-            this.MaxValues = maxValues;
+            MaxValues = maxValues;
             return this;
         }
 
@@ -831,7 +831,7 @@ namespace Discord
         /// </returns>
         public SelectMenuBuilder WithOptions(List<SelectMenuOptionBuilder> options)
         {
-            this.Options = options;
+            Options = options;
             return this;
         }
 
@@ -845,10 +845,10 @@ namespace Discord
         /// </returns>
         public SelectMenuBuilder AddOption(SelectMenuOptionBuilder option)
         {
-            if (this.Options.Count >= MaxOptionCount)
+            if (Options.Count >= MaxOptionCount)
                 throw new InvalidOperationException($"Options count reached {MaxOptionCount}.");
 
-            this.Options.Add(option);
+            Options.Add(option);
             return this;
         }
 
@@ -879,7 +879,7 @@ namespace Discord
         /// </returns>
         public SelectMenuBuilder WithDisabled(bool disabled)
         {
-            this.Disabled = disabled;
+            Disabled = disabled;
             return this;
         }
 
@@ -889,9 +889,9 @@ namespace Discord
         /// <returns>The newly built <see cref="SelectMenuComponent"/></returns>
         public SelectMenuComponent Build()
         {
-            var options = this.Options?.Select(x => x.Build()).ToList();
+            var options = Options?.Select(x => x.Build()).ToList();
 
-            return new SelectMenuComponent(this.CustomId, options, this.Placeholder, this.MinValues, this.MaxValues, this.Disabled);
+            return new SelectMenuComponent(CustomId, options, Placeholder, MinValues, MaxValues, Disabled);
         }
     }
 
@@ -1012,11 +1012,11 @@ namespace Discord
         /// <param name="default">Render this option as selected by default or not.</param>
         public SelectMenuOptionBuilder(string label, string value, string description = null, IEmote emote = null, bool? @default = null)
         {
-            this.Label = label;
-            this.Value = value;
-            this.Description = description;
-            this.Emote = emote;
-            this.Default = @default;
+            Label = label;
+            Value = value;
+            Description = description;
+            Emote = emote;
+            Default = @default;
         }
 
         /// <summary>
@@ -1024,11 +1024,11 @@ namespace Discord
         /// </summary>
         public SelectMenuOptionBuilder(SelectMenuOption option)
         {
-            this.Label = option.Label;
-            this.Value = option.Value;
-            this.Description = option.Description;
-            this.Emote = option.Emote;
-            this.Default = option.Default;
+            Label = option.Label;
+            Value = option.Value;
+            Description = option.Description;
+            Emote = option.Emote;
+            Default = option.Default;
         }
 
         /// <summary>
@@ -1041,7 +1041,7 @@ namespace Discord
         /// </returns>
         public SelectMenuOptionBuilder WithLabel(string label)
         {
-            this.Label = label;
+            Label = label;
             return this;
         }
 
@@ -1055,7 +1055,7 @@ namespace Discord
         /// </returns>
         public SelectMenuOptionBuilder WithValue(string value)
         {
-            this.Value = value;
+            Value = value;
             return this;
         }
 
@@ -1069,7 +1069,7 @@ namespace Discord
         /// </returns>
         public SelectMenuOptionBuilder WithDescription(string description)
         {
-            this.Description = description;
+            Description = description;
             return this;
         }
 
@@ -1082,7 +1082,7 @@ namespace Discord
         /// </returns>
         public SelectMenuOptionBuilder WithEmote(IEmote emote)
         {
-            this.Emote = emote;
+            Emote = emote;
             return this;
         }
 
@@ -1095,7 +1095,7 @@ namespace Discord
         /// </returns>
         public SelectMenuOptionBuilder WithDefault(bool defaultValue)
         {
-            this.Default = defaultValue;
+            Default = defaultValue;
             return this;
         }
 
@@ -1105,7 +1105,7 @@ namespace Discord
         /// <returns>The newly built <see cref="SelectMenuOption"/>.</returns>
         public SelectMenuOption Build()
         {
-            return new SelectMenuOption(this.Label, this.Value, this.Description, this.Emote, this.Default);
+            return new SelectMenuOption(Label, Value, Description, Emote, Default);
         }
     }
 }
