@@ -95,8 +95,10 @@ namespace Discord
         {
             Assert.Throws<ArgumentException>(() =>
             {
-                var builder = new EmbedBuilder();
-                builder.Title = title;
+                var builder = new EmbedBuilder
+                {
+                    Title = title
+                };
             });
             Assert.Throws<ArgumentException>(() =>
             {
@@ -113,8 +115,10 @@ namespace Discord
         [InlineData("jVyLChmA7aBZozXQuZ3VDEcwW6zOq0nteOVYBZi31ny73rpXfSSBXR4Jw6FiplDKQseKskwRMuBZkUewrewqAbkBZpslHirvC5nEzRySoDIdTRnkVvTXZUXg75l3bQCjuuHxDd6DfrY8ihd6yZX1Y0XFeg239YBcYV4TpL9uQ8H3HFYxrWhLlG2PRVjUmiglP5iXkawszNwMVm1SZ5LZT4jkMZHxFegVi7170d16iaPWOovu50aDDHy087XBtLKV")]
         public void Tile_Valid(string title)
         {
-            var builder = new EmbedBuilder();
-            builder.Title = title;
+            var builder = new EmbedBuilder
+            {
+                Title = title
+            };
             new EmbedBuilder().WithTitle(title);
         }
 
@@ -133,8 +137,10 @@ namespace Discord
                 Assert.Throws<ArgumentException>(() => new EmbedBuilder().WithDescription(description));
                 Assert.Throws<ArgumentException>(() =>
                 {
-                    var b = new EmbedBuilder();
-                    b.Description = description;
+                    var b = new EmbedBuilder
+                    {
+                        Description = description
+                    };
                 });
             }
         }
@@ -156,8 +162,10 @@ namespace Discord
                 var b = new EmbedBuilder().WithDescription(description);
                 Assert.Equal(description, b.Description);
 
-                b = new EmbedBuilder();
-                b.Description = description;
+                b = new EmbedBuilder
+                {
+                    Description = description
+                };
                 Assert.Equal(description, b.Description);
             }
         }
@@ -181,10 +189,12 @@ namespace Discord
             Assert.Equal(result.ImageUrl, url);
             Assert.Equal(result.ThumbnailUrl, url);
 
-            result = new EmbedBuilder();
-            result.Url = url;
-            result.ImageUrl = url;
-            result.ThumbnailUrl = url;
+            result = new EmbedBuilder
+            {
+                Url = url,
+                ImageUrl = url,
+                ThumbnailUrl = url
+            };
             Assert.Equal(result.Url, url);
             Assert.Equal(result.ImageUrl, url);
             Assert.Equal(result.ThumbnailUrl, url);
@@ -276,8 +286,10 @@ namespace Discord
             Assert.Equal(url, e.Footer.IconUrl);
             Assert.Equal(name, e.Footer.Text);
             // use the property
-            e = new EmbedBuilder();
-            e.Footer = footer;
+            e = new EmbedBuilder
+            {
+                Footer = footer
+            };
             Assert.Equal(url, e.Footer.IconUrl);
             Assert.Equal(name, e.Footer.Text);
         }
@@ -375,10 +387,12 @@ namespace Discord
             Assert.Equal("value", e.Value);
             Assert.True(e.IsInline);
             // use the properties
-            e = new EmbedFieldBuilder();
-            e.IsInline = true;
-            e.Name = "name";
-            e.Value = "value";
+            e = new EmbedFieldBuilder
+            {
+                IsInline = true,
+                Name = "name",
+                Value = "value"
+            };
             Assert.Equal("name", e.Name);
             Assert.Equal("value", e.Value);
             Assert.True(e.IsInline);

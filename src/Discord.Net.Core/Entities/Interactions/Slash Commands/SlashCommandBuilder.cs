@@ -191,15 +191,17 @@ namespace Discord
                         throw new ArgumentException("There can only be one command option with default set to true!", nameof(isDefault));
             }
 
-            SlashCommandOptionBuilder option = new SlashCommandOptionBuilder();
-            option.Name = name;
-            option.Description = description;
-            option.Required = required;
-            option.Default = isDefault;
-            option.Options = options;
-            option.Type = type;
-            option.Autocomplete = isAutocomplete;
-            option.Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null;
+            SlashCommandOptionBuilder option = new SlashCommandOptionBuilder
+            {
+                Name = name,
+                Description = description,
+                Required = required,
+                Default = isDefault,
+                Options = options,
+                Type = type,
+                Autocomplete = isAutocomplete,
+                Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null
+            };
 
             return AddOption(option);
         }
@@ -421,14 +423,16 @@ namespace Discord
                         throw new ArgumentException("There can only be one command option with default set to true!", nameof(isDefault));
             }
 
-            SlashCommandOptionBuilder option = new SlashCommandOptionBuilder();
-            option.Name = name;
-            option.Description = description;
-            option.Required = required;
-            option.Default = isDefault;
-            option.Options = options;
-            option.Type = type;
-            option.Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null;
+            SlashCommandOptionBuilder option = new SlashCommandOptionBuilder
+            {
+                Name = name,
+                Description = description,
+                Required = required,
+                Default = isDefault,
+                Options = options,
+                Type = type,
+                Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null
+            };
 
             return AddOption(option);
         }
