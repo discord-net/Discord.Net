@@ -21,7 +21,8 @@ namespace Discord.Rest
         public int? UserLimit { get; private set; }
         /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
-
+        /// <inheritdoc />
+        public string Mention => MentionUtils.MentionChannel(Id);
         internal RestVoiceChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
         {

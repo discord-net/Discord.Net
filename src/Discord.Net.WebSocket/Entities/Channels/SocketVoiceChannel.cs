@@ -32,6 +32,8 @@ namespace Discord.WebSocket
         public ICategoryChannel Category
             => CategoryId.HasValue ? Guild.GetChannel(CategoryId.Value) as ICategoryChannel : null;
         /// <inheritdoc />
+        public string Mention => MentionUtils.MentionChannel(Id);
+        /// <inheritdoc />
         public Task SyncPermissionsAsync(RequestOptions options = null)
             => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
 

@@ -2802,6 +2802,9 @@
                 A category channel representing the parent of this channel; <c>null</c> if none is set.
             </returns>
         </member>
+        <member name="P:Discord.WebSocket.SocketVoiceChannel.Mention">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.WebSocket.SocketVoiceChannel.SyncPermissionsAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>

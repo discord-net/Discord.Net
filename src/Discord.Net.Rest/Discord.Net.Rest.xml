@@ -2803,6 +2803,9 @@
         <member name="P:Discord.Rest.RestVoiceChannel.CategoryId">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestVoiceChannel.Mention">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.Rest.RestVoiceChannel.Update(Discord.API.Channel)">
             <inheritdoc />
         </member>

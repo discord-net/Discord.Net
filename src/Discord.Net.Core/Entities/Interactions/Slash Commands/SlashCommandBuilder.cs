@@ -165,7 +165,7 @@ namespace Discord
         /// <param name="choices">The choices of this option.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandBuilder AddOption(string name, ApplicationCommandOptionType type,
-           string description, bool required = true, bool isDefault = false, bool isAutocomplete = false, List<SlashCommandOptionBuilder> options = null, params ApplicationCommandOptionChoiceProperties[] choices)
+           string description, bool? required = null, bool? isDefault = null, bool isAutocomplete = false, List<SlashCommandOptionBuilder> options = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             // Make sure the name matches the requirements from discord
             Preconditions.NotNullOrEmpty(name, nameof(name));
@@ -183,7 +183,7 @@ namespace Discord
             Preconditions.AtMost(description.Length, MaxDescriptionLength, nameof(description));
 
             // make sure theres only one option with default set to true
-            if (isDefault)
+            if (isDefault.HasValue && isDefault.Value)
             {
                 if (this.Options != null)
                     if (this.Options.Any(x => x.Default.HasValue && x.Default.Value))
@@ -339,7 +339,7 @@ namespace Discord
         /// <summary>
         ///     Gets or sets if the option is required.
         /// </summary>
-        public bool Required { get; set; }
+        public bool? Required { get; set; } = null;
 
         /// <summary>
         ///     Gets or sets whether or not this option supports autocomplete.
@@ -395,7 +395,7 @@ namespace Discord
         /// <param name="choices">The choices of this option.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddOption(string name, ApplicationCommandOptionType type,
-           string description, bool required = true, bool isDefault = false, List<SlashCommandOptionBuilder> options = null, params ApplicationCommandOptionChoiceProperties[] choices)
+           string description, bool? required = null, bool isDefault = false, List<SlashCommandOptionBuilder> options = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             // Make sure the name matches the requirements from discord
             Preconditions.NotNullOrEmpty(name, nameof(name));
