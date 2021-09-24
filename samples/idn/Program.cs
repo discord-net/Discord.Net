@@ -13,7 +13,7 @@ using System.Threading;
 using System.Text;
 using System.Diagnostics;
 
-namespace idn
+namespace Idn
 {
     public class Program
     {
