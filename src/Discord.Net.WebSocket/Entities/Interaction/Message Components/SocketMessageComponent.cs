@@ -83,8 +83,17 @@ namespace Discord.WebSocket
         {
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
-            if (embeds == null && embed != null)
-                embeds = new[] { embed };
+
+            if (embed != null)
+            {
+                if (embeds == null)
+                    embeds = new[] { embed };
+                else
+                {
+                    List<Embed> listEmbeds = embeds.ToList();
+                    listEmbeds.Insert(0, embed);
+                }
+            }
 
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
@@ -108,7 +117,7 @@ namespace Discord.WebSocket
 
             var response = new API.InteractionResponse
             {
-                Type =  InteractionResponseType.ChannelMessageWithSource,
+                Type = InteractionResponseType.ChannelMessageWithSource,
                 Data = new API.InteractionCallbackData
                 {
                     Content = text ?? Optional<string>.Unspecified,
@@ -218,8 +227,17 @@ namespace Discord.WebSocket
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
-            if (embeds == null && embed != null)
-                embeds = new[] { embed };
+            if (embed != null)
+            {
+                if (embeds == null)
+                    embeds = new[] { embed };
+                else
+                {
+                    List<Embed> listEmbeds = embeds.ToList();
+                    listEmbeds.Insert(0, embed);
+                }
+            }
+
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds?.Length ?? 0, 10, nameof(embeds), "A max of 10 embeds are allowed.");
@@ -255,8 +273,17 @@ namespace Discord.WebSocket
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
-            if (embeds == null && embed != null)
-                embeds = new[] { embed };
+            if (embed != null)
+            {
+                if (embeds == null)
+                    embeds = new[] { embed };
+                else
+                {
+                    List<Embed> listEmbeds = embeds.ToList();
+                    listEmbeds.Insert(0, embed);
+                }
+            }
+
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds?.Length ?? 0, 10, nameof(embeds), "A max of 10 embeds are allowed.");
@@ -295,8 +322,17 @@ namespace Discord.WebSocket
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
-            if (embeds == null && embed != null)
-                embeds = new[] { embed };
+            if (embed != null)
+            {
+                if (embeds == null)
+                    embeds = new[] { embed };
+                else
+                {
+                    List<Embed> listEmbeds = embeds.ToList();
+                    listEmbeds.Insert(0, embed);
+                }
+            }
+
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds?.Length ?? 0, 10, nameof(embeds), "A max of 10 embeds are allowed.");

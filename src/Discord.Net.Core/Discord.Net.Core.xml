@@ -1507,7 +1507,7 @@
                 Represents a generic channel that can send and receive messages.
             </summary>
         </member>
-        <member name="M:Discord.IMessageChannel.SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent,Discord.ISticker[])">
+        <member name="M:Discord.IMessageChannel.SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent,Discord.ISticker[],Discord.Embed[])">
             <summary>
                 Sends a message to this message channel.
             </summary>
@@ -1528,6 +1528,7 @@
             <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
             <param name="component">The message components to be included with this message. Used for interactions</param>
             <param name="stickers">A collection of stickers to send with the message.</param>
+            <param name="embeds">A array of <see cref="T:Discord.Embed"/>s to send with this response. Max 10</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
@@ -11087,13 +11088,14 @@
             <seealso cref="M:Discord.IMessage.RemoveReactionAsync(Discord.IEmote,Discord.IUser,Discord.RequestOptions)"/>
             <seealso cref="T:Discord.IEmote"/>
         </member>
-        <member name="M:Discord.MessageExtensions.ReplyAsync(Discord.IUserMessage,System.String,System.Boolean,Discord.Embed,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.ISticker[])">
+        <member name="M:Discord.MessageExtensions.ReplyAsync(Discord.IUserMessage,System.String,System.Boolean,Discord.Embed,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.ISticker[],Discord.Embed[])">
             <summary>
                 Sends an inline reply that references a message.
             </summary>
             <param name="text">The message to be sent.</param>
             <param name="isTTS">Determines whether the message should be read aloud by Discord or not.</param>
             <param name="embed">The <see cref="F:Discord.EmbedType.Rich"/> <see cref="T:Discord.Embed"/> to be sent.</param>
+            <param name="embeds">A array of <see cref="T:Discord.Embed"/>s to send with this response. Max 10</param>
             <param name="allowedMentions">
                 Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
                 If <c>null</c>, all mentioned roles and users will be notified.
@@ -11107,7 +11109,7 @@
         <member name="T:Discord.UserExtensions">
             <summary> An extension class for various Discord user objects. </summary>
         </member>
-        <member name="M:Discord.UserExtensions.SendMessageAsync(Discord.IUser,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageComponent)">
+        <member name="M:Discord.UserExtensions.SendMessageAsync(Discord.IUser,System.String,System.Boolean,Discord.Embed,Discord.Embed[],Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageComponent)">
             <summary>
                 Sends a message via DM.
             </summary>
@@ -11128,11 +11130,13 @@
             <param name="text">The message to be sent.</param>
             <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
             <param name="embed">The <see cref="F:Discord.EmbedType.Rich"/> <see cref="T:Discord.Embed"/> to be sent.</param>
+            <param name="embeds">A array of <see cref="T:Discord.Embed"/>s to send with this response. Max 10</param>
             <param name="options">The options to be used when sending the request.</param>
             <param name="allowedMentions">
                 Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
                 If <c>null</c>, all mentioned roles and users will be notified.
             </param>
+            <param name="component">The message components to be included with this message. Used for interactions</param>
             <returns>
                 A task that represents the asynchronous send operation. The task result contains the sent message.
             </returns>

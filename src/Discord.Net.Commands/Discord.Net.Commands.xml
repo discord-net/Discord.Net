@@ -1129,7 +1129,7 @@
             <seealso cref="T:Discord.Commands.ICommandContext" />
             <seealso cref="T:Discord.Commands.CommandContext" />
         </member>
-        <member name="M:Discord.Commands.ModuleBase`1.ReplyAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent,Discord.ISticker[])">
+        <member name="M:Discord.Commands.ModuleBase`1.ReplyAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent,Discord.ISticker[],Discord.Embed[])">
             <summary>
                 Sends a message to the source channel.
             </summary>
@@ -1138,7 +1138,7 @@
             </param>
             <param name="isTTS">Specifies if Discord should read this <paramref name="message"/> aloud using text-to-speech.</param>
             <param name="embed">An embed to be displayed alongside the <paramref name="message"/>.</param>
-            <param name="allowedMentions">
+            <param name="embeds">A array of <see cref="T:Discord.Embed"/>s to send with this response. Max 10</param>        /// <param name="allowedMentions">
                 Specifies if notifications are sent for mentioned users and roles in the <paramref name="message"/>.
                 If <c>null</c>, all mentioned roles and users will be notified.
             </param>

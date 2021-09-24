@@ -36,12 +36,14 @@ namespace Discord.Commands
         ///     Specifies if notifications are sent for mentioned users and roles in the <paramref name="message"/>.
         ///     If <c>null</c>, all mentioned roles and users will be notified.
         /// </param>
+        /// <param name="options">The request options for this async request.</param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
         /// <param name="component">The message components to be included with this message. Used for interactions</param>
         /// <param name="stickers">A collection of stickers to send with the file.</param>
-        protected virtual async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null)
+        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10</param>
+        protected virtual async Task<IUserMessage> ReplyAsync(string message = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null, Embed[] embeds = null)
         {
-            return await Context.Channel.SendMessageAsync(message, isTTS, embed, options, allowedMentions, messageReference, component, stickers).ConfigureAwait(false);
+            return await Context.Channel.SendMessageAsync(message, isTTS, embed, options, allowedMentions, messageReference, component, stickers, embeds).ConfigureAwait(false);
         }
         /// <summary>
         ///     The method to execute before executing the command.
