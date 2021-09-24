@@ -62,7 +62,7 @@ namespace Discord.Rest
 
         public async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
         {
-            return _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this, options).ConfigureAwait(false));
+            return _applicationInfo ??= await ClientHelper.GetApplicationInfoAsync(this, options).ConfigureAwait(false);
         }
 
         public Task<RestChannel> GetChannelAsync(ulong id, RequestOptions options = null)

@@ -322,7 +322,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public override async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
-            => _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this, options ?? RequestOptions.Default).ConfigureAwait(false));
+            => _applicationInfo ??= await ClientHelper.GetApplicationInfoAsync(this, options ?? RequestOptions.Default).ConfigureAwait(false);
 
         /// <inheritdoc />
         public override SocketGuild GetGuild(ulong id)

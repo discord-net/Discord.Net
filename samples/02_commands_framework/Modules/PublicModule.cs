@@ -31,7 +31,7 @@ namespace _02_commands_framework.Modules
         [Command("userinfo")]
         public async Task UserInfoAsync(IUser user = null)
         {
-            user = user ?? Context.User;
+            user ??= Context.User;
 
             await ReplyAsync(user.ToString());
         }

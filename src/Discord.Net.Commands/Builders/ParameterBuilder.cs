@@ -131,7 +131,7 @@ namespace Discord.Commands.Builders
 
         internal ParameterInfo Build(CommandInfo info)
         {
-            if ((TypeReader ?? (TypeReader = GetReader(ParameterType))) == null)
+            if ((TypeReader ??= GetReader(ParameterType)) == null)
                 throw new InvalidOperationException($"No type reader found for type {ParameterType.Name}, one must be specified");
 
             return new ParameterInfo(this, info, Command.Module.Service);

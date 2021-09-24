@@ -177,7 +177,7 @@ namespace Discord.API
         public async Task SendAsync(string method, string endpoint,
             BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
-            options = options ?? new RequestOptions();
+            options ??= new RequestOptions();
             options.HeaderOnly = true;
             options.BucketId = bucketId;
 
@@ -191,7 +191,7 @@ namespace Discord.API
         public async Task SendJsonAsync(string method, string endpoint, object payload,
             BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
-            options = options ?? new RequestOptions();
+            options ??= new RequestOptions();
             options.HeaderOnly = true;
             options.BucketId = bucketId;
 
@@ -206,7 +206,7 @@ namespace Discord.API
         public async Task SendMultipartAsync(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
             BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
-            options = options ?? new RequestOptions();
+            options ??= new RequestOptions();
             options.HeaderOnly = true;
             options.BucketId = bucketId;
 
@@ -220,7 +220,7 @@ namespace Discord.API
         public async Task<TResponse> SendAsync<TResponse>(string method, string endpoint,
             BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
         {
-            options = options ?? new RequestOptions();
+            options ??= new RequestOptions();
             options.BucketId = bucketId;
 
             var request = new RestRequest(RestClient, method, endpoint, options);
@@ -233,7 +233,7 @@ namespace Discord.API
         public async Task<TResponse> SendJsonAsync<TResponse>(string method, string endpoint, object payload,
             BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null) where TResponse : class
         {
-            options = options ?? new RequestOptions();
+            options ??= new RequestOptions();
             options.BucketId = bucketId;
 
             string json = payload != null ? SerializeJson(payload) : null;
@@ -248,7 +248,7 @@ namespace Discord.API
         public async Task<TResponse> SendMultipartAsync<TResponse>(string method, string endpoint, IReadOnlyDictionary<string, object> multipartArgs,
             BucketId bucketId = null, ClientBucketType clientBucket = ClientBucketType.Unbucketed, RequestOptions options = null)
         {
-            options = options ?? new RequestOptions();
+            options ??= new RequestOptions();
             options.BucketId = bucketId;
 
             var request = new MultipartRestRequest(RestClient, method, endpoint, multipartArgs, options);

@@ -187,7 +187,7 @@ namespace TestHelper
 
         private static HashSet<Assembly> RecursiveReferencedAssemblies(Assembly a, HashSet<Assembly> assemblies = null)
         {
-            assemblies = assemblies ?? new HashSet<Assembly>();
+            assemblies ??= new HashSet<Assembly>();
             if (assemblies.Add(a))
             {
                 foreach (var referencedAssemblyName in a.GetReferencedAssemblies())
