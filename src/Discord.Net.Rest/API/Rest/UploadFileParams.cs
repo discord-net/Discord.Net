@@ -1,4 +1,3 @@
-#pragma warning disable CS1591
 using Discord.Net.Converters;
 using Discord.Net.Rest;
 using Newtonsoft.Json;
