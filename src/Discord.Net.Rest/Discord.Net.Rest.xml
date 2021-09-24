@@ -1781,9 +1781,9 @@
                 If <c>null</c>, all mentioned roles and users will be notified.
             </param>
             <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-            <param name="component">The message components to be included with this message. Used for interactions</param>
+            <param name="component">The message components to be included with this message. Used for interactions.</param>
             <param name="stickers">A collection of stickers to send with the message.</param>
-            <param name="embeds">A array of <see cref="T:Discord.Embed"/>s to send with this response. Max 10</param>
+            <param name="embeds">A array of <see cref="T:Discord.Embed"/>s to send with this response. Max 10.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
@@ -1809,7 +1809,7 @@
                 If <c>null</c>, all mentioned roles and users will be notified.
             </param>
             <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-            <param name="component">The message components to be included with this message. Used for interactions</param>
+            <param name="component">The message components to be included with this message. Used for interactions.</param>
             <param name="stickers">A collection of stickers to send with the message.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
@@ -1836,7 +1836,7 @@
                 If <c>null</c>, all mentioned roles and users will be notified.
             </param>
             <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-            <param name="component">The message components to be included with this message. Used for interactions</param>
+            <param name="component">The message components to be included with this message. Used for interactions.</param>
             <param name="stickers">A collection of stickers to send with the message.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
@@ -3666,7 +3666,7 @@
             <param name="description">The description of the sticker.</param>
             <param name="tags">The tags of the sticker.</param>
             <param name="stream">The stream containing the file data.</param>
-            <param name="filename">The name of the file <b>with</b> the extension, ex: image.png</param>
+            <param name="filename">The name of the file <b>with</b> the extension, ex: image.png.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous creation operation. The task result contains the created sticker.

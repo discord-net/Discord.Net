@@ -48,12 +48,8 @@ namespace Discord.Net
         /// <summary>
         ///     Initializes a new instance of the <see cref="ApplicationCommandException" /> class.
         /// </summary>
-        /// <param name="request">The request that was sent prior to the exception.</param>
         /// <param name="requestJson"></param>
         /// <param name="httpError"></param>
-        /// <param name="discordCode">The Discord status code returned.</param>
-        /// <param name="reason">The reason behind the exception.</param>
-        /// <param name="errors"></param>
         public ApplicationCommandException(string requestJson, HttpException httpError)
             : base("The application command failed to be created!", httpError)
         {

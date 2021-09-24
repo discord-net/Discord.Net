@@ -181,7 +181,7 @@ namespace Discord
         ///     Gets a stickers url based off the id and format.
         /// </summary>
         /// <param name="stickerId">The id of the sticker.</param>
-        /// <param name="format">The format of the sticker</param>
+        /// <param name="format">The format of the sticker.</param>
         /// <returns>
         ///     A URL to the sticker.
         /// </returns>

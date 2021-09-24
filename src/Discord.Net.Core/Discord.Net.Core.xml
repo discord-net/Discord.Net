@@ -217,7 +217,7 @@
                 Gets a stickers url based off the id and format.
             </summary>
             <param name="stickerId">The id of the sticker.</param>
-            <param name="format">The format of the sticker</param>
+            <param name="format">The format of the sticker.</param>
             <returns>
                 A URL to the sticker.
             </returns>
@@ -1526,9 +1526,9 @@
                 If <c>null</c>, all mentioned roles and users will be notified.
             </param>
             <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-            <param name="component">The message components to be included with this message. Used for interactions</param>
+            <param name="component">The message components to be included with this message. Used for interactions.</param>
             <param name="stickers">A collection of stickers to send with the message.</param>
-            <param name="embeds">A array of <see cref="T:Discord.Embed"/>s to send with this response. Max 10</param>
+            <param name="embeds">A array of <see cref="T:Discord.Embed"/>s to send with this response. Max 10.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
@@ -1567,7 +1567,7 @@
                 If <c>null</c>, all mentioned roles and users will be notified.
             </param>
             <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-            <param name="component">The message components to be included with this message. Used for interactions</param>
+            <param name="component">The message components to be included with this message. Used for interactions.</param>
             <param name="stickers">A collection of stickers to send with the file.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
@@ -1604,7 +1604,7 @@
                 If <c>null</c>, all mentioned roles and users will be notified.
             </param>
             <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-            <param name="component">The message components to be included with this message. Used for interactions</param>
+            <param name="component">The message components to be included with this message. Used for interactions.</param>
             <param name="stickers">A collection of stickers to send with the file.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
@@ -1870,7 +1870,7 @@
                 await guildChannel.CreateInviteAsync(maxAge: 43200, maxUses: 3);
                 </code>
             </example>
-            <param name="applicationId">The id of the embedded application to open for this invite</param>
+            <param name="applicationId">The id of the embedded application to open for this invite.</param>
             <param name="maxAge">The time (in seconds) until the invite expires. Set to <c>null</c> to never expire.</param>
             <param name="maxUses">The max amount of times this invite may be used. Set to <c>null</c> to have unlimited uses.</param>
             <param name="isTemporary">If <c>true</c>, the user accepting this invite will be kicked from the guild after closing their client.</param>
@@ -1892,7 +1892,7 @@
                 await guildChannel.CreateInviteAsync(maxAge: 43200, maxUses: 3);
                 </code>
             </example>
-            <param name="user">The id of the user whose stream to display for this invite</param>
+            <param name="user">The id of the user whose stream to display for this invite.</param>
             <param name="maxAge">The time (in seconds) until the invite expires. Set to <c>null</c> to never expire.</param>
             <param name="maxUses">The max amount of times this invite may be used. Set to <c>null</c> to have unlimited uses.</param>
             <param name="isTemporary">If <c>true</c>, the user accepting this invite will be kicked from the guild after closing their client.</param>
@@ -1979,7 +1979,7 @@
                 Starts the stage, creating a stage instance.
             </summary>
             <param name="topic">The topic for the stage/</param>
-            <param name="privacyLevel">The privacy level of the stage</param>
+            <param name="privacyLevel">The privacy level of the stage.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous start operation.
@@ -3996,7 +3996,7 @@
             <param name="description">The description of the sticker.</param>
             <param name="tags">The tags of the sticker.</param>
             <param name="stream">The stream containing the file data.</param>
-            <param name="filename">The name of the file <b>with</b> the extension, ex: image.png</param>
+            <param name="filename">The name of the file <b>with</b> the extension, ex: image.png.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous creation operation. The task result contains the created sticker.
@@ -5007,25 +5007,25 @@
                 Responds to an Interaction with type <see cref="F:Discord.InteractionResponseType.ChannelMessageWithSource"/>.
             </summary>
             <param name="text">The text of the message to be sent.</param>
-            <param name="embeds">A array of embeds to send with this response. Max 10</param>
+            <param name="embeds">A array of embeds to send with this response. Max 10.</param>
             <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
             <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
             <param name="allowedMentions">The allowed mentions for this response.</param>
             <param name="options">The request options for this response.</param>
-            <param name="component">A <see cref="T:Discord.MessageComponent"/> to be sent with this response</param>
+            <param name="component">A <see cref="T:Discord.MessageComponent"/> to be sent with this response.</param>
             <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
         </member>
         <member name="M:Discord.IDiscordInteraction.FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
             <summary>
                 Sends a followup message for this interaction.
             </summary>
-            <param name="text">The text of the message to be sent</param>
-            <param name="embeds">A array of embeds to send with this response. Max 10</param>
+            <param name="text">The text of the message to be sent.</param>
+            <param name="embeds">A array of embeds to send with this response. Max 10.</param>
             <param name="isTTS"><see langword="true"/> if the message should be read out by a text-to-speech reader, otherwise <see langword="false"/>.</param>
             <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
             <param name="allowedMentions">The allowed mentions for this response.</param>
             <param name="options">The request options for this response.</param>
-            <param name="component">A <see cref="T:Discord.MessageComponent"/> to be sent with this response</param>
+            <param name="component">A <see cref="T:Discord.MessageComponent"/> to be sent with this response.</param>
             <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
             <returns>
                 The sent message.
@@ -5414,10 +5414,10 @@
             </summary>
             <param name="label">The label to use on the newly created link button.</param>
             <param name="url">The url of this button.</param>
-            <param name="customId">The custom ID of this button</param>
-            <param name="style">The custom ID of this button</param>
-            <param name="emote">The emote of this button</param>
-            <param name="disabled">Disabled this button or not</param>
+            <param name="customId">The custom ID of this button.</param>
+            <param name="style">The custom ID of this button.</param>
+            <param name="emote">The emote of this button.</param>
+            <param name="disabled">Disabled this button or not.</param>
         </member>
         <member name="M:Discord.ButtonBuilder.#ctor(Discord.ButtonComponent)">
             <summary>
@@ -5430,7 +5430,7 @@
             </summary>
             <param name="label">The label for this link button.</param>
             <param name="url">The url for this link button to go to.</param>
-            <param name="emote">The emote for this link button</param>
+            <param name="emote">The emote for this link button.</param>
             <returns>A builder with the newly created button.</returns>
         </member>
         <member name="M:Discord.ButtonBuilder.CreateDangerButton(System.String,System.String,Discord.IEmote)">
@@ -5439,7 +5439,7 @@
             </summary>
             <param name="label">The label for this danger button.</param>
             <param name="customId">The custom id for this danger button.</param>
-            <param name="emote">The emote for this danger button</param>
+            <param name="emote">The emote for this danger button.</param>
             <returns>A builder with the newly created button.</returns>
         </member>
         <member name="M:Discord.ButtonBuilder.CreatePrimaryButton(System.String,System.String,Discord.IEmote)">
@@ -5448,7 +5448,7 @@
             </summary>
             <param name="label">The label for this primary button.</param>
             <param name="customId">The custom id for this primary button.</param>
-            <param name="emote">The emote for this primary button</param>
+            <param name="emote">The emote for this primary button.</param>
             <returns>A builder with the newly created button.</returns>
         </member>
         <member name="M:Discord.ButtonBuilder.CreateSecondaryButton(System.String,System.String,Discord.IEmote)">
@@ -5457,7 +5457,7 @@
             </summary>
             <param name="label">The label for this secondary button.</param>
             <param name="customId">The custom id for this secondary button.</param>
-            <param name="emote">The emote for this secondary button</param>
+            <param name="emote">The emote for this secondary button.</param>
             <returns>A builder with the newly created button.</returns>
         </member>
         <member name="M:Discord.ButtonBuilder.CreateSuccessButton(System.String,System.String,Discord.IEmote)">
@@ -5466,14 +5466,14 @@
             </summary>
             <param name="label">The label for this success button.</param>
             <param name="customId">The custom id for this success button.</param>
-            <param name="emote">The emote for this success button</param>
+            <param name="emote">The emote for this success button.</param>
             <returns>A builder with the newly created button.</returns>
         </member>
         <member name="M:Discord.ButtonBuilder.WithLabel(System.String)">
             <summary>
                 Sets the current buttons label to the specified text.
             </summary>
-            <param name="label">The text for the label</param>
+            <param name="label">The text for the label.</param>
             <inheritdoc cref="P:Discord.ButtonBuilder.Label"/>
             <returns>The current builder.</returns>
         </member>
@@ -9114,6 +9114,12 @@
         <member name="P:Discord.GuildPermissions.CreatePrivateThreads">
             <summary> If <c>true</c>, a user may create private threads in this guild. </summary>
         </member>
+        <member name="P:Discord.GuildPermissions.UsePublicThreads">
+            <summary> If <c>true</c>, a user may use public threads in this guild. </summary>
+        </member>
+        <member name="P:Discord.GuildPermissions.UsePrivateThreads">
+            <summary> If <c>true</c>, a user may use private threads in this guild. </summary>
+        </member>
         <member name="P:Discord.GuildPermissions.UseExternalStickers">
             <summary> If <c>true</c>, a user may use external stickers in this guild. </summary>
         </member>
@@ -9129,10 +9135,10 @@
         <member name="M:Discord.GuildPermissions.#ctor(System.String)">
             <summary> Creates a new <see cref="T:Discord.GuildPermissions"/> with the provided packed value after converting to ulong. </summary>
         </member>
-        <member name="M:Discord.GuildPermissions.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+        <member name="M:Discord.GuildPermissions.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
             <summary> Creates a new <see cref="T:Discord.GuildPermissions"/> structure with the provided permissions. </summary>
         </member>
-        <member name="M:Discord.GuildPermissions.Modify(System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+        <member name="M:Discord.GuildPermissions.Modify(System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
             <summary> Creates a new <see cref="T:Discord.GuildPermissions"/> from this one, changing the provided non-null permissions. </summary>
         </member>
         <member name="M:Discord.GuildPermissions.Has(Discord.GuildPermission)">
@@ -11058,7 +11064,7 @@
             </code>
             </example>
             <param name="msg">The message to add reactions to.</param>
-            <param name="reactions">An array of reactions to add to the message</param>
+            <param name="reactions">An array of reactions to add to the message.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous operation for adding a reaction to this message.
@@ -11080,7 +11086,7 @@
             </code>
             </example>
             <param name="msg">The message to remove reactions from.</param>
-            <param name="reactions">An array of reactions to remove from the message</param>
+            <param name="reactions">An array of reactions to remove from the message.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous operation for removing a reaction to this message.
@@ -11095,7 +11101,7 @@
             <param name="text">The message to be sent.</param>
             <param name="isTTS">Determines whether the message should be read aloud by Discord or not.</param>
             <param name="embed">The <see cref="F:Discord.EmbedType.Rich"/> <see cref="T:Discord.Embed"/> to be sent.</param>
-            <param name="embeds">A array of <see cref="T:Discord.Embed"/>s to send with this response. Max 10</param>
+            <param name="embeds">A array of <see cref="T:Discord.Embed"/>s to send with this response. Max 10.</param>
             <param name="allowedMentions">
                 Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
                 If <c>null</c>, all mentioned roles and users will be notified.
@@ -11130,13 +11136,13 @@
             <param name="text">The message to be sent.</param>
             <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
             <param name="embed">The <see cref="F:Discord.EmbedType.Rich"/> <see cref="T:Discord.Embed"/> to be sent.</param>
-            <param name="embeds">A array of <see cref="T:Discord.Embed"/>s to send with this response. Max 10</param>
+            <param name="embeds">A array of <see cref="T:Discord.Embed"/>s to send with this response. Max 10.</param>
             <param name="options">The options to be used when sending the request.</param>
             <param name="allowedMentions">
                 Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
                 If <c>null</c>, all mentioned roles and users will be notified.
             </param>
-            <param name="component">The message components to be included with this message. Used for interactions</param>
+            <param name="component">The message components to be included with this message. Used for interactions.</param>
             <returns>
                 A task that represents the asynchronous send operation. The task result contains the sent message.
             </returns>
@@ -12782,7 +12788,7 @@
             <summary>
             Not full URL validation right now. Just ensures protocol is present and that it's either http or https
             </summary>
-            <param name="url">url to validate before sending to Discord</param>
+            <param name="url">url to validate before sending to Discord.</param>
             <exception cref="T:System.InvalidOperationException">A URL must include a protocol (http or https).</exception>
             <returns>true if url is valid by our standard, false if null, throws an error upon invalid </returns>
         </member>

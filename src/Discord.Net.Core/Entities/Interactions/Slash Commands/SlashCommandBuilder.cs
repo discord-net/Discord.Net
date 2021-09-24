@@ -161,6 +161,7 @@ namespace Discord
         /// <param name="description">The description of this option.</param>
         /// <param name="required">If this option is required for this command.</param>
         /// <param name="isDefault">If this option is the default option.</param>
+        /// <param name="isAutocomplete">If this option is set to autocompleate.</param>
         /// <param name="options">The options of the option to add.</param>
         /// <param name="choices">The choices of this option.</param>
         /// <returns>The current builder.</returns>

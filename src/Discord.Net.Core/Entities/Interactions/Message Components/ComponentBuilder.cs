@@ -240,7 +240,7 @@ namespace Discord
         /// <summary>
         ///     Builds this builder into a <see cref="MessageComponent"/> used to send your components.
         /// </summary>
-        /// <returns>A <see cref="MessageComponent"/> that can be sent with <see cref="IMessageChannel.SendMessageAsync(string, bool, Embed, RequestOptions, AllowedMentions, MessageReference, MessageComponent)"/>.</returns>
+        /// <returns>A <see cref="MessageComponent"/> that can be sent with <see cref="IMessageChannel.SendMessageAsync"/>.</returns>
         public MessageComponent Build()
         {
             if (this._actionRows != null)
@@ -427,10 +427,10 @@ namespace Discord
         /// </summary>
         /// <param name="label">The label to use on the newly created link button.</param>
         /// <param name="url">The url of this button.</param>
-        /// <param name="customId">The custom ID of this button</param>
-        /// <param name="style">The custom ID of this button</param>
-        /// <param name="emote">The emote of this button</param>
-        /// <param name="disabled">Disabled this button or not</param>
+        /// <param name="customId">The custom ID of this button.</param>
+        /// <param name="style">The custom ID of this button.</param>
+        /// <param name="emote">The emote of this button.</param>
+        /// <param name="disabled">Disabled this button or not.</param>
         public ButtonBuilder(string label = null, string customId = null, ButtonStyle style = ButtonStyle.Primary, string url = null, IEmote emote = null, bool disabled = false)
         {
             this.CustomId = customId;
@@ -459,7 +459,7 @@ namespace Discord
         /// </summary>
         /// <param name="label">The label for this link button.</param>
         /// <param name="url">The url for this link button to go to.</param>
-        /// <param name="emote">The emote for this link button</param>
+        /// <param name="emote">The emote for this link button.</param>
         /// <returns>A builder with the newly created button.</returns>
         public static ButtonBuilder CreateLinkButton(string label, string url, IEmote emote = null)
             => new ButtonBuilder(label, null, ButtonStyle.Link, url, emote: emote);
@@ -469,7 +469,7 @@ namespace Discord
         /// </summary>
         /// <param name="label">The label for this danger button.</param>
         /// <param name="customId">The custom id for this danger button.</param>
-        /// <param name="emote">The emote for this danger button</param>
+        /// <param name="emote">The emote for this danger button.</param>
         /// <returns>A builder with the newly created button.</returns>
         public static ButtonBuilder CreateDangerButton(string label, string customId, IEmote emote = null)
             => new ButtonBuilder(label, customId, ButtonStyle.Danger, emote: emote);
@@ -479,7 +479,7 @@ namespace Discord
         /// </summary>
         /// <param name="label">The label for this primary button.</param>
         /// <param name="customId">The custom id for this primary button.</param>
-        /// <param name="emote">The emote for this primary button</param>
+        /// <param name="emote">The emote for this primary button.</param>
         /// <returns>A builder with the newly created button.</returns>
         public static ButtonBuilder CreatePrimaryButton(string label, string customId, IEmote emote = null)
             => new ButtonBuilder(label, customId, emote: emote);
@@ -489,7 +489,7 @@ namespace Discord
         /// </summary>
         /// <param name="label">The label for this secondary button.</param>
         /// <param name="customId">The custom id for this secondary button.</param>
-        /// <param name="emote">The emote for this secondary button</param>
+        /// <param name="emote">The emote for this secondary button.</param>
         /// <returns>A builder with the newly created button.</returns>
         public static ButtonBuilder CreateSecondaryButton(string label, string customId, IEmote emote = null)
             => new ButtonBuilder(label, customId, ButtonStyle.Secondary, emote: emote);
@@ -499,7 +499,7 @@ namespace Discord
         /// </summary>
         /// <param name="label">The label for this success button.</param>
         /// <param name="customId">The custom id for this success button.</param>
-        /// <param name="emote">The emote for this success button</param>
+        /// <param name="emote">The emote for this success button.</param>
         /// <returns>A builder with the newly created button.</returns>
         public static ButtonBuilder CreateSuccessButton(string label, string customId, IEmote emote = null)
             => new ButtonBuilder(label, customId, ButtonStyle.Success, emote: emote);
@@ -507,7 +507,7 @@ namespace Discord
         /// <summary>
         ///     Sets the current buttons label to the specified text.
         /// </summary>
-        /// <param name="label">The text for the label</param>
+        /// <param name="label">The text for the label.</param>
         /// <inheritdoc cref="Label"/>
         /// <returns>The current builder.</returns>
         public ButtonBuilder WithLabel(string label)

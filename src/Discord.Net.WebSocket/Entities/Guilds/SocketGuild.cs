@@ -1376,7 +1376,7 @@ namespace Discord.WebSocket
         /// <param name="description">The description of the sticker.</param>
         /// <param name="tags">The tags of the sticker.</param>
         /// <param name="stream">The stream containing the file data.</param>
-        /// <param name="filename">The name of the file <b>with</b> the extension, ex: image.png</param>
+        /// <param name="filename">The name of the file <b>with</b> the extension, ex: image.png.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
@@ -1666,10 +1666,10 @@ namespace Discord.WebSocket
         Task<IVoiceChannel> IGuild.GetVoiceChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IVoiceChannel>(GetVoiceChannel(id));
         /// <inheritdoc />
-        Task<IStageChannel> IGuild.GetStageChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        Task<IStageChannel> IGuild.GetStageChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IStageChannel>(GetStageChannel(id));
         /// <inheritdoc />
-        Task<IReadOnlyCollection<IStageChannel>> IGuild.GetStageChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        Task<IReadOnlyCollection<IStageChannel>> IGuild.GetStageChannelsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IStageChannel>>(StageChannels);
         /// <inheritdoc />
         Task<IVoiceChannel> IGuild.GetAFKChannelAsync(CacheMode mode, RequestOptions options)

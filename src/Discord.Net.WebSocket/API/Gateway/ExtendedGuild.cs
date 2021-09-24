@@ -27,6 +27,6 @@ namespace Discord.API.Gateway
         public DateTimeOffset JoinedAt { get; set; }
 
         [JsonProperty("threads")]
-        public Channel[] Threads { get; set; }
+        public new Channel[] Threads { get; set; }
     }
 }

@@ -18,7 +18,7 @@ namespace TestHelper
         /// Apply the inputted CodeAction to the inputted document.
         /// Meant to be used to apply codefixes.
         /// </summary>
-        /// <param name="document">The Document to apply the fix on</param>
+        /// <param name="document">The Document to apply the fix on.</param>
         /// <param name="codeAction">A CodeAction that will be applied to the Document.</param>
         /// <returns>A Document with the changes from the CodeAction</returns>
         private static Document ApplyFix(Document document, CodeAction codeAction)
@@ -33,8 +33,8 @@ namespace TestHelper
         /// Note: Considers Diagnostics to be the same if they have the same Ids.  In the case of multiple diagnostics with the same Id in a row,
         /// this method may not necessarily return the new one.
         /// </summary>
-        /// <param name="diagnostics">The Diagnostics that existed in the code before the CodeFix was applied</param>
-        /// <param name="newDiagnostics">The Diagnostics that exist in the code after the CodeFix was applied</param>
+        /// <param name="diagnostics">The Diagnostics that existed in the code before the CodeFix was applied.</param>
+        /// <param name="newDiagnostics">The Diagnostics that exist in the code after the CodeFix was applied.</param>
         /// <returns>A list of Diagnostics that only surfaced in the code after the CodeFix was applied</returns>
         private static IEnumerable<Diagnostic> GetNewDiagnostics(IEnumerable<Diagnostic> diagnostics, IEnumerable<Diagnostic> newDiagnostics)
         {
@@ -61,7 +61,7 @@ namespace TestHelper
         /// <summary>
         /// Get the existing compiler diagnostics on the inputted document.
         /// </summary>
-        /// <param name="document">The Document to run the compiler diagnostic analyzers on</param>
+        /// <param name="document">The Document to run the compiler diagnostic analyzers on.</param>
         /// <returns>The compiler diagnostics that were found in the code</returns>
         private static IEnumerable<Diagnostic> GetCompilerDiagnostics(Document document)
         {
@@ -71,7 +71,7 @@ namespace TestHelper
         /// <summary>
         /// Given a document, turn it into a string based on the syntax root
         /// </summary>
-        /// <param name="document">The Document to be converted to a string</param>
+        /// <param name="document">The Document to be converted to a string.</param>
         /// <returns>A string containing the syntax of the Document after formatting</returns>
         private static string GetStringFromDocument(Document document)
         {

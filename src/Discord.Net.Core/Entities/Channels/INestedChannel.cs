@@ -67,7 +67,7 @@ namespace Discord
         ///     await guildChannel.CreateInviteAsync(maxAge: 43200, maxUses: 3);
         ///     </code>
         /// </example>
-        /// <param name="applicationId">The id of the embedded application to open for this invite</param>
+        /// <param name="applicationId">The id of the embedded application to open for this invite.</param>
         /// <param name="maxAge">The time (in seconds) until the invite expires. Set to <c>null</c> to never expire.</param>
         /// <param name="maxUses">The max amount of times this invite may be used. Set to <c>null</c> to have unlimited uses.</param>
         /// <param name="isTemporary">If <c>true</c>, the user accepting this invite will be kicked from the guild after closing their client.</param>
@@ -89,7 +89,7 @@ namespace Discord
         ///     await guildChannel.CreateInviteAsync(maxAge: 43200, maxUses: 3);
         ///     </code>
         /// </example>
-        /// <param name="user">The id of the user whose stream to display for this invite</param>
+        /// <param name="user">The id of the user whose stream to display for this invite.</param>
         /// <param name="maxAge">The time (in seconds) until the invite expires. Set to <c>null</c> to never expire.</param>
         /// <param name="maxUses">The max amount of times this invite may be used. Set to <c>null</c> to have unlimited uses.</param>
         /// <param name="isTemporary">If <c>true</c>, the user accepting this invite will be kicked from the guild after closing their client.</param>

@@ -28,9 +28,9 @@ namespace Discord
         ///     If <c>null</c>, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-        /// <param name="component">The message components to be included with this message. Used for interactions</param>
+        /// <param name="component">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the message.</param>
-        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10</param>
+        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
@@ -68,7 +68,7 @@ namespace Discord
         ///     If <c>null</c>, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-        /// <param name="component">The message components to be included with this message. Used for interactions</param>
+        /// <param name="component">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the file.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
@@ -104,7 +104,7 @@ namespace Discord
         ///     If <c>null</c>, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-        /// <param name="component">The message components to be included with this message. Used for interactions</param>
+        /// <param name="component">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the file.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result

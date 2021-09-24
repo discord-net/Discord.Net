@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     Options for the <see cref="IApplicationCommand"/>, see <see href="https://discord.com/developers/docs/interactions/slash-commands#applicationcommandoption"/>The docs</see>.
+    ///     Options for the <see cref="IApplicationCommand"/>, see <see href="https://discord.com/developers/docs/interactions/slash-commands#applicationcommandoption">The docs</see>.
     /// </summary>
     public interface IApplicationCommandOption
     {
