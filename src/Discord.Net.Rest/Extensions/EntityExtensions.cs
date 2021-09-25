@@ -39,7 +39,7 @@ namespace Discord.Rest
             return new RoleTags(
                 model.BotId.IsSpecified ? model.BotId.Value : null,
                 model.IntegrationId.IsSpecified ? model.IntegrationId.Value : null,
-                model.IsPremiumSubscriber.IsSpecified ? true : false);
+                model.IsPremiumSubscriber.IsSpecified);
         }
         public static API.Embed ToModel(this Embed entity)
         {

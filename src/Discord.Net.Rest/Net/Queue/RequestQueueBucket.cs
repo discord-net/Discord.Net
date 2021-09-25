@@ -377,7 +377,7 @@ namespace Discord.Net.Queue
                     Debug.WriteLine($"[{id}] Retry-After: {info.RetryAfter.Value} ({info.RetryAfter.Value} ms)");
 #endif
                 }
-                else if (info.ResetAfter.HasValue && (request.Options.UseSystemClock.HasValue ? !request.Options.UseSystemClock.Value : false))
+                else if (info.ResetAfter.HasValue && (request.Options.UseSystemClock.HasValue && !request.Options.UseSystemClock.Value))
                 {
                     resetTick = DateTimeOffset.UtcNow.Add(info.ResetAfter.Value);
 #if DEBUG_LIMITS

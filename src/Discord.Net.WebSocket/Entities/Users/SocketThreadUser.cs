@@ -136,9 +136,9 @@ namespace Discord.WebSocket
         internal SocketThreadUser(SocketGuild guild, SocketThreadChannel thread, SocketGuildUser member)
             : base(guild.Discord, member.Id)
         {
-            this.Thread = thread;
-            this.Guild = guild;
-            this.GuildUser = member;
+            Thread = thread;
+            Guild = guild;
+            GuildUser = member;
         }
 
         internal static SocketThreadUser Create(SocketGuild guild, SocketThreadChannel thread, Model model, SocketGuildUser member)
@@ -150,16 +150,16 @@ namespace Discord.WebSocket
 
         internal void Update(Model model)
         {
-            this.ThreadJoinedAt = model.JoinTimestamp;
+            ThreadJoinedAt = model.JoinTimestamp;
 
             if (model.Presence.IsSpecified)
             {
-                this.GuildUser.Update(Discord.State, model.Presence.Value, true);
+                GuildUser.Update(Discord.State, model.Presence.Value, true);
             }
 
             if (model.Member.IsSpecified)
             {
-                this.GuildUser.Update(Discord.State, model.Member.Value);
+                GuildUser.Update(Discord.State, model.Member.Value);
             }
         }
 
@@ -198,16 +198,16 @@ namespace Discord.WebSocket
         public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null) => GuildUser.RemoveRolesAsync(roles, options);
 
         /// <inheritdoc/>
-        GuildPermissions IGuildUser.GuildPermissions => this.GuildUser.GuildPermissions;
+        GuildPermissions IGuildUser.GuildPermissions => GuildUser.GuildPermissions;
 
         /// <inheritdoc/>
-        IGuild IGuildUser.Guild => this.Guild;
+        IGuild IGuildUser.Guild => Guild;
 
         /// <inheritdoc/>
-        ulong IGuildUser.GuildId => this.Guild.Id;
+        ulong IGuildUser.GuildId => Guild.Id;
 
         /// <inheritdoc/>
-        IReadOnlyCollection<ulong> IGuildUser.RoleIds => this.GuildUser.Roles.Select(x => x.Id).ToImmutableArray();
+        IReadOnlyCollection<ulong> IGuildUser.RoleIds => GuildUser.Roles.Select(x => x.Id).ToImmutableArray();
 
         internal override SocketGlobalUser GlobalUser => GuildUser.GlobalUser;
 

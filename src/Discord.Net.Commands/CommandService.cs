@@ -189,7 +189,7 @@ namespace Discord.Commands
         /// </returns>
         public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services)
         {
-            services = services ?? EmptyServiceProvider.Instance;
+            services ??= EmptyServiceProvider.Instance;
 
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -224,7 +224,7 @@ namespace Discord.Commands
         /// </returns>
         public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly, IServiceProvider services)
         {
-            services = services ?? EmptyServiceProvider.Instance;
+            services ??= EmptyServiceProvider.Instance;
 
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -507,7 +507,7 @@ namespace Discord.Commands
         /// </returns>
         public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
-            services = services ?? EmptyServiceProvider.Instance;
+            services ??= EmptyServiceProvider.Instance;
 
             var searchResult = Search(input);
             if (!searchResult.IsSuccess)

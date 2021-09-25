@@ -13,26 +13,17 @@ trigger:
 
 jobs:
 - job: Linux
-  pool:
-    vmImage: 'ubuntu-latest'
+  pool: default
   steps:
   - template: azure/build.yml
 
-- job: Windows_build
-  pool:
-    vmImage: 'windows-latest'
-  condition: ne(variables['Build.SourceBranch'], 'refs/heads/dev')
-  steps:
-  - template: azure/build.yml
-
-- job: Windows_deploy
-  pool:
-    vmImage: 'windows-latest'
+- job: Linux_deploy
+  pool: default
   condition: |
       and (
         succeeded(),
         or (
-          eq(variables['Build.SourceBranch'], 'refs/heads/dev'),
+          eq(variables['Build.SourceBranch'], 'refs/heads/release/3.x'),
           eq(variables['buildTag'], True)
         )
       )

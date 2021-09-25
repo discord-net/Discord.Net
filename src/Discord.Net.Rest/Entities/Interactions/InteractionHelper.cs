@@ -43,7 +43,7 @@ namespace Discord.Rest
             RestFollowupMessage entity = RestFollowupMessage.Create(client, model, token, channel);
             return entity;
         }
-#endregion
+        #endregion
 
         #region Global commands
         public static async Task<RestGlobalCommand> GetGlobalCommandAsync(BaseDiscordClient client, ulong id,
@@ -418,6 +418,28 @@ namespace Discord.Rest
 
         public static async Task DeletedInteractionResponse(BaseDiscordClient client, RestInteractionMessage message, RequestOptions options = null)
             => await client.ApiClient.DeleteInteractionFollowupMessageAsync(message.Id, message.Token, options);
+
+        public static Task SendAutocompleteResult(BaseDiscordClient client, IEnumerable<AutocompleteResult> result, ulong interactionId,
+            string interactionToken, RequestOptions options)
+        {
+            if (result == null)
+                result = new AutocompleteResult[0];
+
+            Preconditions.AtMost(result.Count(), 20, nameof(result), "A maximum of 20 choices are allowed!");
+
+            var apiArgs = new InteractionResponse()
+            {
+                Type = InteractionResponseType.ApplicationCommandAutocompleteResult,
+                Data = new InteractionCallbackData()
+                {
+                    Choices = result.Any()
+                        ? result.Select(x => new API.ApplicationCommandOptionChoice() { Name = x.Name, Value = x.Value }).ToArray()
+                        : new ApplicationCommandOptionChoice[0]
+                }
+            };
+
+            return client.ApiClient.CreateInteractionResponseAsync(apiArgs, interactionId, interactionToken, options);
+        }
         #endregion
 
         #region Guild permissions

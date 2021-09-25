@@ -27,7 +27,7 @@ namespace Discord.WebSocket
         ///     </note>
         /// </remarks>
         public SocketGuildUser Author
-            => this.AuthorId.HasValue ? Guild.GetUser(this.AuthorId.Value) : null;
+            => AuthorId.HasValue ? Guild.GetUser(AuthorId.Value) : null;
 
         /// <summary>
         ///     Gets the guild the sticker was created in.
@@ -40,8 +40,8 @@ namespace Discord.WebSocket
         internal SocketCustomSticker(DiscordSocketClient client, ulong id, SocketGuild guild, ulong? authorId = null)
             : base(client, id)
         {
-            this.Guild = guild;
-            this.AuthorId = authorId;
+            Guild = guild;
+            AuthorId = authorId;
         }
 
         internal static SocketCustomSticker Create(DiscordSocketClient client, Model model, SocketGuild guild, ulong? authorId = null)
@@ -57,16 +57,16 @@ namespace Discord.WebSocket
             if(!Guild.CurrentUser.GuildPermissions.Has(GuildPermission.ManageEmojisAndStickers))
                 throw new InvalidOperationException($"Missing permission {nameof(GuildPermission.ManageEmojisAndStickers)}");
 
-            var model = await GuildHelper.ModifyStickerAsync(this.Discord, this.Guild.Id, this, func, options);
+            var model = await GuildHelper.ModifyStickerAsync(Discord, Guild.Id, this, func, options);
 
-            this.Update(model);
+            Update(model);
         }
 
         /// <inheritdoc/>
         public async Task DeleteAsync(RequestOptions options = null)
         {
-            await GuildHelper.DeleteStickerAsync(Discord, this.Guild.Id, this, options);
-            Guild.RemoveSticker(this.Id);
+            await GuildHelper.DeleteStickerAsync(Discord, Guild.Id, this, options);
+            Guild.RemoveSticker(Id);
         }
 
         internal SocketCustomSticker Clone() => MemberwiseClone() as SocketCustomSticker;
@@ -76,10 +76,10 @@ namespace Discord.WebSocket
 
         #region  ICustomSticker
         ulong? ICustomSticker.AuthorId
-            => this.AuthorId;
+            => AuthorId;
 
         IGuild ICustomSticker.Guild
-            => this.Guild;
+            => Guild;
         #endregion
     }
 }

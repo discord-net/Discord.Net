@@ -1,4 +1,3 @@
-#pragma warning disable CS1591
 using Discord.API;
 using Discord.API.Voice;
 using Discord.Net.Converters;

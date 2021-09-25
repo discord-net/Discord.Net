@@ -28,10 +28,10 @@ namespace Discord.API.Rest
         public CreateApplicationCommandParams() { }
         public CreateApplicationCommandParams(string name, string description, ApplicationCommandType type, ApplicationCommandOption[] options = null)
         {
-            this.Name = name;
-            this.Description = description;
-            this.Options = Optional.Create<ApplicationCommandOption[]>(options);
-            this.Type = type;
+            Name = name;
+            Description = description;
+            Options = Optional.Create<ApplicationCommandOption[]>(options);
+            Type = type;
         }
     }
 }

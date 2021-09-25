@@ -79,13 +79,13 @@ namespace Discord.WebSocket
         public static SocketMessage RemoveMessage(ISocketMessageChannel channel, DiscordSocketClient discord,
             ulong id)
         {
-            switch (channel)
+            return channel switch
             {
-                case SocketDMChannel dmChannel: return dmChannel.RemoveMessage(id);
-                case SocketGroupChannel groupChannel: return groupChannel.RemoveMessage(id);
-                case SocketTextChannel textChannel: return textChannel.RemoveMessage(id);
-                default: throw new NotSupportedException($"Unexpected {nameof(ISocketMessageChannel)} type.");
-            }
+                SocketDMChannel dmChannel => dmChannel.RemoveMessage(id),
+                SocketGroupChannel groupChannel => groupChannel.RemoveMessage(id),
+                SocketTextChannel textChannel => textChannel.RemoveMessage(id),
+                _ => throw new NotSupportedException($"Unexpected {nameof(ISocketMessageChannel)} type."),
+            };
         }
     }
 }

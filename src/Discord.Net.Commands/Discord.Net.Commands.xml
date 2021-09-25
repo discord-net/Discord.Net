@@ -1129,7 +1129,7 @@
             <seealso cref="T:Discord.Commands.ICommandContext" />
             <seealso cref="T:Discord.Commands.CommandContext" />
         </member>
-        <member name="M:Discord.Commands.ModuleBase`1.ReplyAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent,Discord.ISticker[])">
+        <member name="M:Discord.Commands.ModuleBase`1.ReplyAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,Discord.AllowedMentions,Discord.MessageReference,Discord.MessageComponent,Discord.ISticker[],Discord.Embed[])">
             <summary>
                 Sends a message to the source channel.
             </summary>
@@ -1142,9 +1142,11 @@
                 Specifies if notifications are sent for mentioned users and roles in the <paramref name="message"/>.
                 If <c>null</c>, all mentioned roles and users will be notified.
             </param>
+            <param name="options">The request options for this async request.</param>
             <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-            <param name="component">The message components to be included with this message. Used for interactions</param>
+            <param name="component">The message components to be included with this message. Used for interactions.</param>
             <param name="stickers">A collection of stickers to send with the file.</param>
+            <param name="embeds">A array of <see cref="T:Discord.Embed"/>s to send with this response. Max 10.</param>
         </member>
         <member name="M:Discord.Commands.ModuleBase`1.BeforeExecute(Discord.Commands.CommandInfo)">
             <summary>

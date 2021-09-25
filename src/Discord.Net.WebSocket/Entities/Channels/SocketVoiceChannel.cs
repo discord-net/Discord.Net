@@ -37,6 +37,8 @@ namespace Discord.WebSocket
         public string Mention => MentionUtils.MentionChannel(Id);
 
         /// <inheritdoc />
+        public string Mention => MentionUtils.MentionChannel(Id);
+        /// <inheritdoc />
         public Task SyncPermissionsAsync(RequestOptions options = null)
             => ChannelHelper.SyncPermissionsAsync(this, Discord, options);
 

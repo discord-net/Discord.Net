@@ -53,6 +53,13 @@ namespace Discord.Net.Converters
                             interaction.Data = messageComponent;
                         }
                         break;
+                    case InteractionType.ApplicationCommandAutocomplete:
+                        {
+                            var autocompleteData = new API.AutocompleteInteractionData();
+                            serializer.Populate(result.CreateReader(), autocompleteData);
+                            interaction.Data = autocompleteData;
+                        }
+                        break;
                 }
             }
             else

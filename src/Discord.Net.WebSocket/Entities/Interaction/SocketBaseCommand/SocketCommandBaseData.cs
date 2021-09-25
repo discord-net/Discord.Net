@@ -25,7 +25,7 @@ namespace Discord.WebSocket
         internal SocketCommandBaseData(DiscordSocketClient client, Model model, ulong? guildId)
             : base(client, model.Id)
         {
-            this.Type = model.Type;
+            Type = model.Type;
 
             if (model.Resolved.IsSpecified)
             {
@@ -42,7 +42,7 @@ namespace Discord.WebSocket
 
         internal virtual void Update(Model model)
         {
-            this.Name = model.Name;
+            Name = model.Name;
         }
 
         IReadOnlyCollection<IApplicationCommandInteractionDataOption> IApplicationCommandInteractionData.Options

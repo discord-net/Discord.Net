@@ -20,8 +20,8 @@ namespace Discord.Rest
 
         internal RestApplicationCommandChoice(Model model)
         {
-            this.Name = model.Name;
-            this.Value = model.Value;
+            Name = model.Name;
+            Value = model.Value;
         }
     }
 }

@@ -25,5 +25,10 @@ namespace Discord
         ///     A <see cref="IMessageComponent"/> sent from discord.
         /// </summary>
         MessageComponent = 3,
+
+        /// <summary>
+        ///     An autocomplete request sent from discord.
+        /// </summary>
+        ApplicationCommandAutocomplete = 4,
     }
 }

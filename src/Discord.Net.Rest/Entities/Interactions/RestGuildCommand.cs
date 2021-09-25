@@ -20,7 +20,7 @@ namespace Discord.Rest
         internal RestGuildCommand(BaseDiscordClient client, ulong id, ulong guildId)
             : base(client, id)
         {
-            this.GuildId = guildId;
+            GuildId = guildId;
         }
 
         internal static RestGuildCommand Create(BaseDiscordClient client, Model model, ulong guildId)
@@ -45,7 +45,7 @@ namespace Discord.Rest
         public override async Task ModifyAsync<TArg>(Action<TArg> func, RequestOptions options = null)
         {
             var model = await InteractionHelper.ModifyGuildCommand<TArg>(Discord, this, GuildId, func, options).ConfigureAwait(false);
-            this.Update(model);
+            Update(model);
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Discord.Rest
         ///     <see cref="GuildApplicationCommandPermission"/> object defining the permissions of the current slash command.
         /// </returns>
         public Task<GuildApplicationCommandPermission> GetCommandPermission(RequestOptions options = null)
-            => InteractionHelper.GetGuildCommandPermissionAsync(Discord, this.GuildId, this.Id, options);
+            => InteractionHelper.GetGuildCommandPermissionAsync(Discord, GuildId, Id, options);
 
         /// <summary>
         ///     Modifies the current command permissions for this guild command.
@@ -69,7 +69,7 @@ namespace Discord.Rest
         ///     <see cref="GuildApplicationCommandPermission"/> object containing the modified permissions.
         /// </returns>
         public Task<GuildApplicationCommandPermission> ModifyCommandPermissions(ApplicationCommandPermission[] permissions, RequestOptions options = null)
-            => InteractionHelper.ModifyGuildCommandPermissionsAsync(Discord, this.GuildId, this.Id, permissions, options);
+            => InteractionHelper.ModifyGuildCommandPermissionsAsync(Discord, GuildId, Id, permissions, options);
 
         /// <summary>
         ///     Gets the guild that this slash command resides in.
@@ -81,6 +81,6 @@ namespace Discord.Rest
         ///     <see cref="RestGuild"/>.
         /// </returns>
         public Task<RestGuild> GetGuild(bool withCounts = false, RequestOptions options = null)
-            => ClientHelper.GetGuildAsync(this.Discord, this.GuildId, withCounts, options);
+            => ClientHelper.GetGuildAsync(Discord, GuildId, withCounts, options);
     }
 }

@@ -39,18 +39,18 @@ namespace Discord.Rest
 
         internal void Update(StageInstance model, bool isLive = false)
         {
-            this.Live = isLive;
+            Live = isLive;
             if(isLive)
             {
-                this.Topic = model.Topic;
-                this.PrivacyLevel = model.PrivacyLevel;
-                this.DiscoverableDisabled = model.DiscoverableDisabled;
+                Topic = model.Topic;
+                PrivacyLevel = model.PrivacyLevel;
+                DiscoverableDisabled = model.DiscoverableDisabled;
             }
             else
             {
-                this.Topic = null;
-                this.PrivacyLevel = null;
-                this.DiscoverableDisabled = null;
+                Topic = null;
+                PrivacyLevel = null;
+                DiscoverableDisabled = null;
             }
         }
 
@@ -67,7 +67,7 @@ namespace Discord.Rest
         {
             var args = new API.Rest.CreateStageInstanceParams()
             {
-                ChannelId = this.Id,
+                ChannelId = Id,
                 PrivacyLevel = privacyLevel,
                 Topic = topic
             };
@@ -80,7 +80,7 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public async Task StopStageAsync(RequestOptions options = null)
         {
-            await Discord.ApiClient.DeleteStageInstanceAsync(this.Id, options);
+            await Discord.ApiClient.DeleteStageInstanceAsync(Id, options);
 
             Update(null, false);
         }
@@ -90,7 +90,7 @@ namespace Discord.Rest
         {
             await base.UpdateAsync(options);
 
-            var model = await Discord.ApiClient.GetStageInstanceAsync(this.Id, options);
+            var model = await Discord.ApiClient.GetStageInstanceAsync(Id, options);
 
             Update(model, model != null);
         }
@@ -100,10 +100,10 @@ namespace Discord.Rest
         {
             var args = new API.Rest.ModifyVoiceStateParams()
             {
-                ChannelId = this.Id,
+                ChannelId = Id,
                 RequestToSpeakTimestamp = DateTimeOffset.UtcNow
             };
-            return Discord.ApiClient.ModifyMyVoiceState(this.Guild.Id, args, options);
+            return Discord.ApiClient.ModifyMyVoiceState(Guild.Id, args, options);
         }
 
         /// <inheritdoc/>
@@ -111,10 +111,10 @@ namespace Discord.Rest
         {
             var args = new API.Rest.ModifyVoiceStateParams()
             {
-                ChannelId = this.Id,
+                ChannelId = Id,
                 Suppressed = false
             };
-            return Discord.ApiClient.ModifyMyVoiceState(this.Guild.Id, args, options);
+            return Discord.ApiClient.ModifyMyVoiceState(Guild.Id, args, options);
         }
 
         /// <inheritdoc/>
@@ -122,10 +122,10 @@ namespace Discord.Rest
         {
             var args = new API.Rest.ModifyVoiceStateParams()
             {
-                ChannelId = this.Id,
+                ChannelId = Id,
                 Suppressed = true
             };
-            return Discord.ApiClient.ModifyMyVoiceState(this.Guild.Id, args, options);
+            return Discord.ApiClient.ModifyMyVoiceState(Guild.Id, args, options);
         }
 
         /// <inheritdoc/>
@@ -133,11 +133,11 @@ namespace Discord.Rest
         {
             var args = new API.Rest.ModifyVoiceStateParams()
             {
-                ChannelId = this.Id,
+                ChannelId = Id,
                 Suppressed = false
             };
 
-            return Discord.ApiClient.ModifyUserVoiceState(this.Guild.Id, user.Id, args);
+            return Discord.ApiClient.ModifyUserVoiceState(Guild.Id, user.Id, args);
         }
 
         /// <inheritdoc/>
@@ -145,11 +145,11 @@ namespace Discord.Rest
         {
             var args = new API.Rest.ModifyVoiceStateParams()
             {
-                ChannelId = this.Id,
+                ChannelId = Id,
                 Suppressed = true
             };
 
-            return Discord.ApiClient.ModifyUserVoiceState(this.Guild.Id, user.Id, args);
+            return Discord.ApiClient.ModifyUserVoiceState(Guild.Id, user.Id, args);
         }
     }
 }

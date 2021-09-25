@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace idn
+namespace Idn
 {
     public static class Inspector
     {

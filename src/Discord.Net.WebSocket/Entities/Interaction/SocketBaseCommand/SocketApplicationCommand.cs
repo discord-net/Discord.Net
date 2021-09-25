@@ -47,20 +47,20 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public DateTimeOffset CreatedAt
-            => SnowflakeUtils.FromSnowflake(this.Id);
+            => SnowflakeUtils.FromSnowflake(Id);
 
         /// <summary>
         ///     Returns the guild this command resides in, if this command is a global command then it will return <see langword="null"/>
         /// </summary>
         public SocketGuild Guild
-            => GuildId.HasValue ? Discord.GetGuild(this.GuildId.Value) : null;
+            => GuildId.HasValue ? Discord.GetGuild(GuildId.Value) : null;
 
         private ulong? GuildId { get; set; }
 
         internal SocketApplicationCommand(DiscordSocketClient client, ulong id, ulong? guildId)
             : base(client, id)
         {
-            this.GuildId = guildId;
+            GuildId = guildId;
         }
         internal static SocketApplicationCommand Create(DiscordSocketClient client, GatewayModel model)
         {
@@ -78,19 +78,19 @@ namespace Discord.WebSocket
 
         internal void Update(Model model)
         {
-            this.ApplicationId = model.ApplicationId;
-            this.Description = model.Description;
-            this.Name = model.Name;
-            this.DefaultPermission = model.DefaultPermissions.GetValueOrDefault(true);
+            ApplicationId = model.ApplicationId;
+            Description = model.Description;
+            Name = model.Name;
+            DefaultPermission = model.DefaultPermissions.GetValueOrDefault(true);
 
-            this.Options = model.Options.IsSpecified
+            Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => SocketApplicationCommandOption.Create(x)).ToImmutableArray()
                 : new ImmutableArray<SocketApplicationCommandOption>();
         }
 
         /// <inheritdoc/>
         public Task DeleteAsync(RequestOptions options = null)
-            => InteractionHelper.DeleteUnknownApplicationCommand(Discord, this.GuildId, this, options);
+            => InteractionHelper.DeleteUnknownApplicationCommand(Discord, GuildId, this, options);
 
         /// <inheritdoc />
         public Task ModifyAsync(Action<ApplicationCommandProperties> func, RequestOptions options = null)
@@ -103,16 +103,16 @@ namespace Discord.WebSocket
         {
             Model command = null;
 
-            if (this.IsGlobalCommand)
+            if (IsGlobalCommand)
             {
                 command = await InteractionHelper.ModifyGlobalCommand<TArg>(Discord, this, func, options).ConfigureAwait(false);
             }
             else
             {
-                command = await InteractionHelper.ModifyGuildCommand<TArg>(Discord, this, this.GuildId.Value, func, options);
+                command = await InteractionHelper.ModifyGuildCommand<TArg>(Discord, this, GuildId.Value, func, options);
             }
 
-            this.Update(command);
+            Update(command);
         }
         #endregion
 

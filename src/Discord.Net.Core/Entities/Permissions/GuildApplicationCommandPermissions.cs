@@ -34,10 +34,10 @@ namespace Discord
 
         internal GuildApplicationCommandPermission(ulong commandId, ulong appId, ulong guildId, ApplicationCommandPermission[] permissions)
         {
-            this.CommandId = commandId;
-            this.ApplicationId = appId;
-            this.GuildId = guildId;
-            this.Permissions = permissions;
+            CommandId = commandId;
+            ApplicationId = appId;
+            GuildId = guildId;
+            Permissions = permissions;
         }
     }
 }

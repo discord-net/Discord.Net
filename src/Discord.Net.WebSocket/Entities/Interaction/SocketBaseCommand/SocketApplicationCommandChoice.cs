@@ -27,8 +27,8 @@ namespace Discord.WebSocket
         }
         internal void Update(Model model)
         {
-            this.Name = model.Name;
-            this.Value = model.Value;
+            Name = model.Name;
+            Value = model.Value;
         }
     }
 }

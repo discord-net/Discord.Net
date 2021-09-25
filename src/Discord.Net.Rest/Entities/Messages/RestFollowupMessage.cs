@@ -19,7 +19,7 @@ namespace Discord.Rest
         internal RestFollowupMessage(BaseDiscordClient discord, ulong id, IUser author, string token, IMessageChannel channel)
             : base(discord, id, channel, author, MessageSource.Bot)
         {
-            this.Token = token;
+            Token = token;
         }
 
         internal static RestFollowupMessage Create(BaseDiscordClient discord, Model model, string token, IMessageChannel channel)
@@ -66,7 +66,7 @@ namespace Discord.Rest
             try
             {
                 var model = await InteractionHelper.ModifyFollowupMessage(Discord, this, func, options).ConfigureAwait(false);
-                this.Update(model);
+                Update(model);
             }
             catch (Discord.Net.HttpException x)
             {

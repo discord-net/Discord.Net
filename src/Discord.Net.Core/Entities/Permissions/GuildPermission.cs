@@ -178,7 +178,12 @@ namespace Discord
         /// <summary>
         ///     Allows members to use slash commands in text channels.	
         /// </summary>
+        [Obsolete("UseSlashCommands has been replaced by UseApplicationCommands", true)]
         UseSlashCommands        = 0x80_00_00_00,
+        /// <summary>
+        ///     Allows members to use application commands like slash commands and context menus in text channels.	
+        /// </summary>
+        UseApplicationCommands = 0x80_00_00_00,
         /// <summary>
         ///     Allows for requesting to speak in stage channels. <i>(This permission is under active development and may be changed or removed.)</i>.
         /// </summary>
@@ -192,17 +197,35 @@ namespace Discord
         /// </remarks>
         ManageThreads           = 0x04_00_00_00_00,
         /// <summary>
-        /// Allows for creating and participating in threads.
+        ///     Allows for creating public threads.
         /// </summary>
-        UsePublicThreads        = 0x08_00_00_00_00,
+        CreatePublicThreads = 0x08_00_00_00_00,
         /// <summary>
-        ///     Allows for creating and participating in private threads.
+        ///     Allows for creating private threads.
         /// </summary>
-        UsePrivateThreads       = 0x10_00_00_00_00,
+        CreatePrivateThreads = 0x10_00_00_00_00,
+        /// <summary>
+        ///     Allows for creating public threads.
+        /// </summary>
+        [Obsolete("UsePublicThreads has been replaced by CreatePublicThreads and SendMessagesInThreads", true)]
+        UsePublicThreads = 0x08_00_00_00_00,
+        /// <summary>
+        ///     Allows for creating private threads.
+        /// </summary>
+        [Obsolete("UsePrivateThreads has been replaced by CreatePrivateThreads and SendMessagesInThreads", true)]
+        UsePrivateThreads = 0x10_00_00_00_00,
         /// <summary>
         ///     Allows the usage of custom stickers from other servers.
         /// </summary>
-        UseExternalStickers     = 0x20_00_00_00_00
+        UseExternalStickers     = 0x20_00_00_00_00,
+        /// <summary>
+        ///     Allows for sending messages in threads.
+        /// </summary>
+        SendMessagesInThreads = 0x40_00_00_00_00,
+        /// <summary>
+        ///     Allows for launching activities (applications with the EMBEDDED flag) in a voice channel.
+        /// </summary>
+        StartEmbeddedActivities = 0x80_00_00_00_00
 
     }
 }

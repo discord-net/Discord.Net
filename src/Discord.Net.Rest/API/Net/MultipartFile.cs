@@ -12,7 +12,7 @@ namespace Discord.Net.Rest
         {
             Stream = stream;
             Filename = filename;
-            this.ContentType = contentType;
+            ContentType = contentType;
         }
     }
 }

@@ -1,4 +1,3 @@
-#pragma warning disable CS1591
 using Newtonsoft.Json;
 using System;
 
@@ -28,6 +27,6 @@ namespace Discord.API.Gateway
         public DateTimeOffset JoinedAt { get; set; }
 
         [JsonProperty("threads")]
-        public Channel[] Threads { get; set; }
+        public new Channel[] Threads { get; set; }
     }
 }

@@ -19,18 +19,15 @@ namespace Discord.API
         internal ActionRowComponent() { }
         internal ActionRowComponent(Discord.ActionRowComponent c)
         {
-            this.Type = c.Type;
-            this.Components = c.Components?.Select<IMessageComponent, IMessageComponent>(x =>
+            Type = c.Type;
+            Components = c.Components?.Select<IMessageComponent, IMessageComponent>(x =>
             {
-                switch (x.Type)
+                return x.Type switch
                 {
-                    case ComponentType.Button:
-                        return new ButtonComponent(x as Discord.ButtonComponent);
-                    case ComponentType.SelectMenu:
-                        return new SelectMenuComponent(x as Discord.SelectMenuComponent);
-                    default: return null;
-
-                }
+                    ComponentType.Button => new ButtonComponent(x as Discord.ButtonComponent),
+                    ComponentType.SelectMenu => new SelectMenuComponent(x as Discord.SelectMenuComponent),
+                    _ => null,
+                };
             }).ToArray();
         }
 

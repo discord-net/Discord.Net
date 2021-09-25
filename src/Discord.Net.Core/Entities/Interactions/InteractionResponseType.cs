@@ -45,13 +45,18 @@ namespace Discord
         DeferredChannelMessageWithSource = 5,
 
         /// <summary>
-        ///     for components: ACK an interaction and edit the original message later; the user does not see a loading state
+        ///     For components: ACK an interaction and edit the original message later; the user does not see a loading state
         /// </summary>
         DeferredUpdateMessage = 6,
 
         /// <summary>
-        ///     for components: edit the message the component was attached to
+        ///     For components: edit the message the component was attached to
         /// </summary>
-        UpdateMessage = 7
+        UpdateMessage = 7,
+
+        /// <summary>
+        ///     Respond with a set of choices to a autocomplete interaction
+        /// </summary>
+        ApplicationCommandAutocompleteResult = 8
     }
 }

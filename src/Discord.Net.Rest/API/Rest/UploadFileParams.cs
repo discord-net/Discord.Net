@@ -1,4 +1,3 @@
-#pragma warning disable CS1591
 using Discord.Net.Converters;
 using Discord.Net.Rest;
 using Newtonsoft.Json;
@@ -18,7 +17,7 @@ namespace Discord.API.Rest
         public Optional<string> Content { get; set; }
         public Optional<string> Nonce { get; set; }
         public Optional<bool> IsTTS { get; set; }
-        public Optional<Embed> Embed { get; set; }
+        public Optional<Embed[]> Embeds { get; set; }
         public Optional<AllowedMentions> AllowedMentions { get; set; }
         public Optional<MessageReference> MessageReference { get; set; }
         public Optional<ActionRowComponent[]> MessageComponent { get; set; }
@@ -45,8 +44,8 @@ namespace Discord.API.Rest
                 payload["tts"] = IsTTS.Value.ToString();
             if (Nonce.IsSpecified)
                 payload["nonce"] = Nonce.Value;
-            if (Embed.IsSpecified)
-                payload["embed"] = Embed.Value;
+            if (Embeds.IsSpecified)
+                payload["embeds"] = Embeds.Value;
             if (AllowedMentions.IsSpecified)
                 payload["allowed_mentions"] = AllowedMentions.Value;
             if (MessageComponent.IsSpecified)

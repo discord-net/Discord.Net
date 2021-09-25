@@ -44,7 +44,7 @@ namespace Discord
         ///     Starts the stage, creating a stage instance.
         /// </summary>
         /// <param name="topic">The topic for the stage/</param>
-        /// <param name="privacyLevel">The privacy level of the stage</param>
+        /// <param name="privacyLevel">The privacy level of the stage.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous start operation.

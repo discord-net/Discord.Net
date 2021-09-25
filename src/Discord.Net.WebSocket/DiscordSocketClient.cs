@@ -82,8 +82,8 @@ namespace Discord.WebSocket
         {
             get
             {
-                if (this._shardedClient != null)
-                    return this._shardedClient.DefaultStickerPacks;
+                if (_shardedClient != null)
+                    return _shardedClient.DefaultStickerPacks;
                 else
                     return _defaultStickers.ToReadOnlyCollection();
             }
@@ -209,7 +209,7 @@ namespace Discord.WebSocket
 
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
-            if(this._shardedClient == null && this._defaultStickers.Length == 0)
+            if(_shardedClient == null && _defaultStickers.Length == 0)
             {
                 var models = await ApiClient.ListNitroStickerPacksAsync().ConfigureAwait(false);
 
@@ -322,7 +322,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public override async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
-            => _applicationInfo ?? (_applicationInfo = await ClientHelper.GetApplicationInfoAsync(this, options ?? RequestOptions.Default).ConfigureAwait(false));
+            => _applicationInfo ??= await ClientHelper.GetApplicationInfoAsync(this, options ?? RequestOptions.Default).ConfigureAwait(false);
 
         /// <inheritdoc />
         public override SocketGuild GetGuild(ulong id)
@@ -2085,14 +2085,14 @@ namespace Discord.WebSocket
 
                                     if (channel == null)
                                     {
-                                        var channelModel = await this.Rest.ApiClient.GetChannelAsync(data.ChannelId.Value);
+                                        var channelModel = await Rest.ApiClient.GetChannelAsync(data.ChannelId.Value);
 
                                         if (data.GuildId.IsSpecified)
-                                            channel = SocketTextChannel.Create(State.GetGuild(data.GuildId.Value), this.State, channelModel);
+                                            channel = SocketTextChannel.Create(State.GetGuild(data.GuildId.Value), State, channelModel);
                                         else
                                             channel = (SocketChannel)SocketChannel.CreatePrivate(this, State, channelModel);
 
-                                        this.State.AddChannel(channel);
+                                        State.AddChannel(channel);
                                     }
 
                                     if (channel is ISocketMessageChannel textChannel)
@@ -2224,14 +2224,14 @@ namespace Discord.WebSocket
 
                                     if ((threadChannel = guild.ThreadChannels.FirstOrDefault(x => x.Id == data.Id)) != null)
                                     {
-                                        threadChannel.Update(this.State, data);
+                                        threadChannel.Update(State, data);
 
                                         if(data.ThreadMember.IsSpecified)
                                             threadChannel.AddOrUpdateThreadMember(data.ThreadMember.Value, guild.CurrentUser);
                                     }
                                     else
                                     {
-                                        threadChannel = (SocketThreadChannel)guild.AddChannel(this.State, data);
+                                        threadChannel = (SocketThreadChannel)guild.AddChannel(State, data);
                                         if (data.ThreadMember.IsSpecified)
                                             threadChannel.AddOrUpdateThreadMember(data.ThreadMember.Value, guild.CurrentUser);
                                     }
@@ -2322,11 +2322,11 @@ namespace Discord.WebSocket
 
                                         if(entity == null)
                                         {
-                                            entity = (SocketThreadChannel)guild.AddChannel(this.State, thread);
+                                            entity = (SocketThreadChannel)guild.AddChannel(State, thread);
                                         }
                                         else
                                         {
-                                            entity.Update(this.State, thread);
+                                            entity.Update(State, thread);
                                         }
 
                                         foreach(var member in data.Members.Where(x => x.Id.Value == entity.Id))
@@ -2453,7 +2453,7 @@ namespace Discord.WebSocket
 
                                     SocketStageChannel before = type == "STAGE_INSTANCE_UPDATE" ? stageChannel.Clone() : null;
 
-                                    stageChannel.Update(data, type == "STAGE_INSTANCE_CREATE" ? true : type == "STAGE_INSTANCE_DELETE" ? false : false);
+                                    stageChannel.Update(data, type == "STAGE_INSTANCE_CREATE");
 
                                     switch (type)
                                     {

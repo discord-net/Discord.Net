@@ -344,7 +344,7 @@ namespace Discord.Rest
                     tags.Add(new Tag<Emote>(TagType.Emoji, index, content.Length, emoji.Id, emoji));
                 else //Bad Tag
                 {
-                    index = index + 1;
+                    index++;
                     continue;
                 }
                 index = endIndex + 1;

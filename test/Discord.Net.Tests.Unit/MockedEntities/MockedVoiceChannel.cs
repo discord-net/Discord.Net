@@ -27,7 +27,7 @@ namespace Discord
         public string Name => throw new NotImplementedException();
 
         public DateTimeOffset CreatedAt => throw new NotImplementedException();
-
+        public string Mention => throw new NotImplementedException();
         public ulong Id => throw new NotImplementedException();
 
         public Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null)

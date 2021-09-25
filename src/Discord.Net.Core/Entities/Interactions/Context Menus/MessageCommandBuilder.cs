@@ -53,8 +53,8 @@ namespace Discord
         {
             MessageCommandProperties props = new MessageCommandProperties()
             {
-                Name = this.Name,
-                DefaultPermission = this.DefaultPermission
+                Name = Name,
+                DefaultPermission = DefaultPermission
             };
 
             return props;
@@ -70,7 +70,7 @@ namespace Discord
         /// </returns>
         public MessageCommandBuilder WithName(string name)
         {
-            this.Name = name;
+            Name = name;
             return this;
         }
 
@@ -81,7 +81,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public MessageCommandBuilder WithDefaultPermission (bool value)
         {
-            this.DefaultPermission = value;
+            DefaultPermission = value;
             return this;
         }
     }

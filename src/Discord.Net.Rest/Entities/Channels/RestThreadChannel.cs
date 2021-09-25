@@ -58,21 +58,21 @@ namespace Discord.Rest
         {
             base.Update(model);
 
-            this.Joined = model.ThreadMember.IsSpecified;
+            Joined = model.ThreadMember.IsSpecified;
 
             if (model.ThreadMetadata.IsSpecified)
             {
-                this.Archived = model.ThreadMetadata.Value.Archived;
-                this.AutoArchiveDuration = model.ThreadMetadata.Value.AutoArchiveDuration;
-                this.ArchiveTimestamp = model.ThreadMetadata.Value.ArchiveTimestamp;
-                this.Locked = model.ThreadMetadata.Value.Locked.GetValueOrDefault(false);
+                Archived = model.ThreadMetadata.Value.Archived;
+                AutoArchiveDuration = model.ThreadMetadata.Value.AutoArchiveDuration;
+                ArchiveTimestamp = model.ThreadMetadata.Value.ArchiveTimestamp;
+                Locked = model.ThreadMetadata.Value.Locked.GetValueOrDefault(false);
                 
             }
 
-            this.MemberCount = model.MemberCount.GetValueOrDefault(0);
-            this.MessageCount = model.MessageCount.GetValueOrDefault(0);
-            this.Type = (ThreadType)model.Type;
-            this.ParentChannelId = model.CategoryId.Value;
+            MemberCount = model.MemberCount.GetValueOrDefault(0);
+            MessageCount = model.MessageCount.GetValueOrDefault(0);
+            Type = (ThreadType)model.Type;
+            ParentChannelId = model.CategoryId.Value;
         }
 
         /// <summary>
@@ -213,18 +213,18 @@ namespace Discord.Rest
         
         /// <inheritdoc/>
         public Task JoinAsync(RequestOptions options = null)
-            => Discord.ApiClient.JoinThreadAsync(this.Id, options);
+            => Discord.ApiClient.JoinThreadAsync(Id, options);
 
         /// <inheritdoc/>
         public Task LeaveAsync(RequestOptions options = null)
-            => Discord.ApiClient.LeaveThreadAsync(this.Id, options);
+            => Discord.ApiClient.LeaveThreadAsync(Id, options);
 
         /// <inheritdoc/>
         public Task AddUserAsync(IGuildUser user, RequestOptions options = null)
-            => Discord.ApiClient.AddThreadMemberAsync(this.Id, user.Id, options);
+            => Discord.ApiClient.AddThreadMemberAsync(Id, user.Id, options);
 
         /// <inheritdoc/>
         public Task RemoveUserAsync(IGuildUser user, RequestOptions options = null)
-            => Discord.ApiClient.RemoveThreadMemberAsync(this.Id, user.Id, options);
+            => Discord.ApiClient.RemoveThreadMemberAsync(Id, user.Id, options);
     }
 }

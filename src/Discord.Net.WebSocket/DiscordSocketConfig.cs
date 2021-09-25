@@ -137,13 +137,13 @@ namespace Discord.WebSocket
         {
             get
             {
-                return this.maxWaitForGuildAvailable;
+                return maxWaitForGuildAvailable;
             }
 
             set
             {
-                Preconditions.AtLeast(value, 0, nameof(this.MaxWaitBetweenGuildAvailablesBeforeReady));
-                this.maxWaitForGuildAvailable = value;
+                Preconditions.AtLeast(value, 0, nameof(MaxWaitBetweenGuildAvailablesBeforeReady));
+                maxWaitForGuildAvailable = value;
             }
         }
 

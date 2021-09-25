@@ -50,14 +50,14 @@ namespace Discord
 
         internal StickerPack(string name, ulong id, ulong skuid, ulong? coverStickerId, string description, ulong bannerAssetId, IEnumerable<TSticker> stickers)
         {
-            this.Name = name;
-            this.Id = id;
-            this.SkuId = skuid;
-            this.CoverStickerId = coverStickerId;
-            this.Description = description;
-            this.BannerAssetId = bannerAssetId;
+            Name = name;
+            Id = id;
+            SkuId = skuid;
+            CoverStickerId = coverStickerId;
+            Description = description;
+            BannerAssetId = bannerAssetId;
 
-            this.Stickers = stickers.ToImmutableArray();
+            Stickers = stickers.ToImmutableArray();
         }
     }
 }

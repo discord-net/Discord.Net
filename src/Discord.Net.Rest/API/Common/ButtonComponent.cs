@@ -34,18 +34,18 @@ namespace Discord.API
 
         public ButtonComponent(Discord.ButtonComponent c)
         {
-            this.Type = c.Type;
-            this.Style = c.Style;
-            this.Label = c.Label;
-            this.CustomId = c.CustomId;
-            this.Url = c.Url;
-            this.Disabled = c.Disabled;
+            Type = c.Type;
+            Style = c.Style;
+            Label = c.Label;
+            CustomId = c.CustomId;
+            Url = c.Url;
+            Disabled = c.Disabled;
 
             if (c.Emote != null)
             {
                 if (c.Emote is Emote e)
                 {
-                    this.Emote = new Emoji()
+                    Emote = new Emoji()
                     {
                         Name = e.Name,
                         Animated = e.Animated,
@@ -54,7 +54,7 @@ namespace Discord.API
                 }
                 else
                 {
-                    this.Emote = new Emoji()
+                    Emote = new Emoji()
                     {
                         Name = c.Emote.Name
                     };
@@ -63,6 +63,6 @@ namespace Discord.API
         }
 
         [JsonIgnore]
-        string IMessageComponent.CustomId => this.CustomId.GetValueOrDefault();
+        string IMessageComponent.CustomId => CustomId.GetValueOrDefault();
     }
 }

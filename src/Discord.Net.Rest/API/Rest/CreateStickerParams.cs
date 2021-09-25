@@ -19,11 +19,12 @@ namespace Discord.API.Rest
 
         public IReadOnlyDictionary<string, object> ToDictionary()
         {
-            var d = new Dictionary<string, object>();
-
-            d["name"] = $"{Name}";
-            d["description"] = Description;
-            d["tags"] = Tags;
+            var d = new Dictionary<string, object>
+            {
+                ["name"] = $"{Name}",
+                ["description"] = Description,
+                ["tags"] = Tags
+            };
 
             string contentType = "image/png";
 

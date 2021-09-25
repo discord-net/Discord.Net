@@ -100,16 +100,16 @@ namespace Discord
         {
             SlashCommandProperties props = new SlashCommandProperties()
             {
-                Name = this.Name,
-                Description = this.Description,
-                DefaultPermission = this.DefaultPermission,
+                Name = Name,
+                Description = Description,
+                DefaultPermission = DefaultPermission,
             };
 
-            if (this.Options != null && this.Options.Any())
+            if (Options != null && Options.Any())
             {
                 var options = new List<ApplicationCommandOptionProperties>();
 
-                this.Options.ForEach(x => options.Add(x.Build()));
+                Options.ForEach(x => options.Add(x.Build()));
 
                 props.Options = options;
             }
@@ -127,7 +127,7 @@ namespace Discord
         /// </returns>
         public SlashCommandBuilder WithName(string name)
         {
-            this.Name = name;
+            Name = name;
             return this;
         }
 
@@ -138,7 +138,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandBuilder WithDescription(string description)
         {
-            this.Description = description;
+            Description = description;
             return this;
         }
 
@@ -149,7 +149,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandBuilder WithDefaultPermission(bool value)
         {
-            this.DefaultPermission = value;
+            DefaultPermission = value;
             return this;
         }
 
@@ -161,11 +161,12 @@ namespace Discord
         /// <param name="description">The description of this option.</param>
         /// <param name="required">If this option is required for this command.</param>
         /// <param name="isDefault">If this option is the default option.</param>
+        /// <param name="isAutocomplete">If this option is set to autocompleate.</param>
         /// <param name="options">The options of the option to add.</param>
         /// <param name="choices">The choices of this option.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandBuilder AddOption(string name, ApplicationCommandOptionType type,
-           string description, bool required = true, bool isDefault = false, List<SlashCommandOptionBuilder> options = null, params ApplicationCommandOptionChoiceProperties[] choices)
+           string description, bool? required = null, bool? isDefault = null, bool isAutocomplete = false, List<SlashCommandOptionBuilder> options = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             // Make sure the name matches the requirements from discord
             Preconditions.NotNullOrEmpty(name, nameof(name));
@@ -183,21 +184,24 @@ namespace Discord
             Preconditions.AtMost(description.Length, MaxDescriptionLength, nameof(description));
 
             // make sure theres only one option with default set to true
-            if (isDefault)
+            if (isDefault.HasValue && isDefault.Value)
             {
-                if (this.Options != null)
-                    if (this.Options.Any(x => x.Default.HasValue && x.Default.Value))
+                if (Options != null)
+                    if (Options.Any(x => x.Default.HasValue && x.Default.Value))
                         throw new ArgumentException("There can only be one command option with default set to true!", nameof(isDefault));
             }
 
-            SlashCommandOptionBuilder option = new SlashCommandOptionBuilder();
-            option.Name = name;
-            option.Description = description;
-            option.Required = required;
-            option.Default = isDefault;
-            option.Options = options;
-            option.Type = type;
-            option.Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null;
+            SlashCommandOptionBuilder option = new SlashCommandOptionBuilder
+            {
+                Name = name,
+                Description = description,
+                Required = required,
+                Default = isDefault,
+                Options = options,
+                Type = type,
+                Autocomplete = isAutocomplete,
+                Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null
+            };
 
             return AddOption(option);
         }
@@ -233,16 +237,16 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandBuilder AddOption(SlashCommandOptionBuilder option)
         {
-            if (this.Options == null)
-                this.Options = new List<SlashCommandOptionBuilder>();
+            if (Options == null)
+                Options = new List<SlashCommandOptionBuilder>();
 
-            if (this.Options.Count >= MaxOptionsCount)
+            if (Options.Count >= MaxOptionsCount)
                 throw new ArgumentOutOfRangeException(nameof(Options), $"Cannot have more than {MaxOptionsCount} options!");
 
             if (option == null)
                 throw new ArgumentNullException(nameof(option), "Option cannot be null");
 
-            this.Options.Add(option);
+            Options.Add(option);
             return this;
         }
         /// <summary>
@@ -258,13 +262,13 @@ namespace Discord
             if (options.Length == 0)
                 throw new ArgumentException(nameof(options), "Options cannot be empty!");
 
-            if (this.Options == null)
-                this.Options = new List<SlashCommandOptionBuilder>();
+            if (Options == null)
+                Options = new List<SlashCommandOptionBuilder>();
 
-            if (this.Options.Count + options.Length > MaxOptionsCount)
+            if (Options.Count + options.Length > MaxOptionsCount)
                 throw new ArgumentOutOfRangeException(nameof(options), $"Cannot have more than {MaxOptionsCount} options!");
 
-            this.Options.AddRange(options);
+            Options.AddRange(options);
             return this;
         }
     }
@@ -288,7 +292,7 @@ namespace Discord
         private string _description;
 
         /// <summary>
-        ///     The name of this option.
+        ///     Gets or sets the name of this option.
         /// </summary>
         public string Name
         {
@@ -309,7 +313,7 @@ namespace Discord
         }
 
         /// <summary>
-        ///     The description of this option.
+        ///     Gets or sets the description of this option.
         /// </summary>
         public string Description
         {
@@ -326,27 +330,32 @@ namespace Discord
         }
 
         /// <summary>
-        ///     The type of this option.
+        ///     Gets or sets the type of this option.
         /// </summary>
         public ApplicationCommandOptionType Type { get; set; }
 
         /// <summary>
-        ///     The first required option for the user to complete. only one option can be default.
+        ///     Gets or sets whether or not this options is the first required option for the user to complete. only one option can be default.
         /// </summary>
         public bool? Default { get; set; }
 
         /// <summary>
-        ///     <see langword="true"/> if this option is required for this command, otherwise <see langword="false"/>.
+        ///     Gets or sets if the option is required.
         /// </summary>
-        public bool Required { get; set; }
+        public bool? Required { get; set; } = null;
 
         /// <summary>
-        ///     choices for string and int types for the user to pick from.
+        ///     Gets or sets whether or not this option supports autocomplete.
+        /// </summary>
+        public bool Autocomplete { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the choices for string and int types for the user to pick from.
         /// </summary>
         public List<ApplicationCommandOptionChoiceProperties> Choices { get; set; }
 
         /// <summary>
-        ///     If the option is a subcommand or subcommand group type, this nested options will be the parameters.
+        ///     Gets or sets if this option is a subcommand or subcommand group type, these nested options will be the parameters.
         /// </summary>
         public List<SlashCommandOptionBuilder> Options { get; set; }
 
@@ -356,7 +365,7 @@ namespace Discord
         /// <returns>The built version of this option.</returns>
         public ApplicationCommandOptionProperties Build()
         {
-            bool isSubType = this.Type == ApplicationCommandOptionType.SubCommandGroup;
+            bool isSubType = Type == ApplicationCommandOptionType.SubCommandGroup;
 
             if (isSubType && (Options == null || !Options.Any()))
                 throw new ArgumentException(nameof(Options), "SubCommands/SubCommandGroups must have at least one option");
@@ -366,13 +375,14 @@ namespace Discord
 
             return new ApplicationCommandOptionProperties()
             {
-                Name = this.Name,
-                Description = this.Description,
-                Default = this.Default,
-                Required = this.Required,
-                Type = this.Type,
-                Options = this.Options?.Count > 0 ? new List<ApplicationCommandOptionProperties>(this.Options.Select(x => x.Build())) : null,
-                Choices = this.Choices
+                Name = Name,
+                Description = Description,
+                Default = Default,
+                Required = Required,
+                Type = Type,
+                Options = Options?.Count > 0 ? new List<ApplicationCommandOptionProperties>(Options.Select(x => x.Build())) : null,
+                Choices = Choices,
+                Autocomplete = Autocomplete
             };
         }
 
@@ -388,7 +398,7 @@ namespace Discord
         /// <param name="choices">The choices of this option.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddOption(string name, ApplicationCommandOptionType type,
-           string description, bool required = true, bool isDefault = false, List<SlashCommandOptionBuilder> options = null, params ApplicationCommandOptionChoiceProperties[] choices)
+           string description, bool? required = null, bool isDefault = false, List<SlashCommandOptionBuilder> options = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             // Make sure the name matches the requirements from discord
             Preconditions.NotNullOrEmpty(name, nameof(name));
@@ -408,19 +418,21 @@ namespace Discord
             // make sure theres only one option with default set to true
             if (isDefault)
             {
-                if (this.Options != null)
-                    if (this.Options.Any(x => x.Default.HasValue && x.Default.Value))
+                if (Options != null)
+                    if (Options.Any(x => x.Default.HasValue && x.Default.Value))
                         throw new ArgumentException("There can only be one command option with default set to true!", nameof(isDefault));
             }
 
-            SlashCommandOptionBuilder option = new SlashCommandOptionBuilder();
-            option.Name = name;
-            option.Description = description;
-            option.Required = required;
-            option.Default = isDefault;
-            option.Options = options;
-            option.Type = type;
-            option.Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null;
+            SlashCommandOptionBuilder option = new SlashCommandOptionBuilder
+            {
+                Name = name,
+                Description = description,
+                Required = required,
+                Default = isDefault,
+                Options = options,
+                Type = type,
+                Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null
+            };
 
             return AddOption(option);
         }
@@ -431,10 +443,10 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddOption(SlashCommandOptionBuilder option)
         {
-            if (this.Options == null)
-                this.Options = new List<SlashCommandOptionBuilder>();
+            if (Options == null)
+                Options = new List<SlashCommandOptionBuilder>();
 
-            if (this.Options.Count >= SlashCommandBuilder.MaxOptionsCount)
+            if (Options.Count >= SlashCommandBuilder.MaxOptionsCount)
                 throw new ArgumentOutOfRangeException(nameof(Choices), $"There can only be {SlashCommandBuilder.MaxOptionsCount} options per sub command group!");
 
             if (option == null)
@@ -515,7 +527,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder WithName(string name)
         {
-            this.Name = name;
+            Name = name;
 
             return this;
         }
@@ -527,7 +539,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder WithDescription(string description)
         {
-            this.Description = description;
+            Description = description;
             return this;
         }
 
@@ -538,7 +550,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder WithRequired(bool value)
         {
-            this.Required = value;
+            Required = value;
             return this;
         }
 
@@ -549,7 +561,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder WithDefault(bool value)
         {
-            this.Default = value;
+            Default = value;
             return this;
         }
 
@@ -560,7 +572,7 @@ namespace Discord
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder WithType(ApplicationCommandOptionType type)
         {
-            this.Type = type;
+            Type = type;
             return this;
         }
     }

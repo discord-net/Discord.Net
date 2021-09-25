@@ -42,7 +42,7 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public string GetStickerUrl()
-            => CDN.GetStickerUrl(this.Id, this.Format);
+            => CDN.GetStickerUrl(Id, Format);
 
         internal SocketSticker(DiscordSocketClient client, ulong id)
             : base(client, id) { }
@@ -62,21 +62,21 @@ namespace Discord.WebSocket
 
         internal virtual void Update(Model model)
         {
-            this.Name = model.Name;
-            this.Description = model.Desription;
-            this.PackId = model.PackId;
-            this.Available = model.Available;
-            this.Format = model.FormatType;
-            this.Type = model.Type;
-            this.SortOrder = model.SortValue;
+            Name = model.Name;
+            Description = model.Desription;
+            PackId = model.PackId;
+            Available = model.Available;
+            Format = model.FormatType;
+            Type = model.Type;
+            SortOrder = model.SortValue;
 
             if (model.Tags.IsSpecified)
             {
-                this.Tags = model.Tags.Value.Split(',').Select(x => x.Trim()).ToImmutableArray();
+                Tags = model.Tags.Value.Split(',').Select(x => x.Trim()).ToImmutableArray();
             }
             else
             {
-                this.Tags = ImmutableArray<string>.Empty;
+                Tags = ImmutableArray<string>.Empty;
             }
         }
 
@@ -87,17 +87,15 @@ namespace Discord.WebSocket
         {
             if (obj is API.Sticker stickerModel)
             {
-                return stickerModel.Name == this.Name &&
-                    stickerModel.Desription == this.Description &&
-                    stickerModel.FormatType == this.Format &&
-                    stickerModel.Id == this.Id &&
-                    stickerModel.PackId == this.PackId &&
-                    stickerModel.Type == this.Type &&
-                    stickerModel.SortValue == this.SortOrder &&
-                    stickerModel.Available == this.Available &&
-                    (stickerModel.Tags.IsSpecified ?
-                        stickerModel.Tags.Value == string.Join(", ", this.Tags) :
-                        true);
+                return stickerModel.Name == Name &&
+                    stickerModel.Desription == Description &&
+                    stickerModel.FormatType == Format &&
+                    stickerModel.Id == Id &&
+                    stickerModel.PackId == PackId &&
+                    stickerModel.Type == Type &&
+                    stickerModel.SortValue == SortOrder &&
+                    stickerModel.Available == Available &&
+                    (!stickerModel.Tags.IsSpecified || stickerModel.Tags.Value == string.Join(", ", Tags));
             }
             else
                 return base.Equals(obj);

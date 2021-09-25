@@ -22,33 +22,23 @@ namespace Discord.Rest
         /// <exception cref="InvalidOperationException">Unexpected channel type.</exception>
         internal static RestChannel Create(BaseDiscordClient discord, Model model)
         {
-            switch (model.Type)
+            return model.Type switch
             {
-                case ChannelType.News:
-                case ChannelType.Text:
-                case ChannelType.Voice:
-                    return RestGuildChannel.Create(discord, new RestGuild(discord, model.GuildId.Value), model);
-                case ChannelType.DM:
-                case ChannelType.Group:
-                    return CreatePrivate(discord, model) as RestChannel;
-                case ChannelType.Category:
-                    return RestCategoryChannel.Create(discord, new RestGuild(discord, model.GuildId.Value), model);
-                default:
-                    return new RestChannel(discord, model.Id);
-            }
+                ChannelType.News or ChannelType.Text or ChannelType.Voice => RestGuildChannel.Create(discord, new RestGuild(discord, model.GuildId.Value), model),
+                ChannelType.DM or ChannelType.Group => CreatePrivate(discord, model) as RestChannel,
+                ChannelType.Category => RestCategoryChannel.Create(discord, new RestGuild(discord, model.GuildId.Value), model),
+                _ => new RestChannel(discord, model.Id),
+            };
         }
         /// <exception cref="InvalidOperationException">Unexpected channel type.</exception>
         internal static IRestPrivateChannel CreatePrivate(BaseDiscordClient discord, Model model)
         {
-            switch (model.Type)
+            return model.Type switch
             {
-                case ChannelType.DM:
-                    return RestDMChannel.Create(discord, model);
-                case ChannelType.Group:
-                    return RestGroupChannel.Create(discord, model);
-                default:
-                    throw new InvalidOperationException($"Unexpected channel type: {model.Type}");
-            }
+                ChannelType.DM => RestDMChannel.Create(discord, model),
+                ChannelType.Group => RestGroupChannel.Create(discord, model),
+                _ => throw new InvalidOperationException($"Unexpected channel type: {model.Type}"),
+            };
         }
         internal virtual void Update(Model model) { }
 

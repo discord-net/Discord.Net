@@ -25,7 +25,7 @@ namespace Discord.WebSocket
                 : null;
 
             ulong? guildId = null;
-            if (this.Channel is SocketGuildChannel guildChannel)
+            if (Channel is SocketGuildChannel guildChannel)
                 guildId = guildChannel.Guild.Id;
 
             Data = SocketMessageCommandData.Create(client, dataModel, model.Id, guildId);

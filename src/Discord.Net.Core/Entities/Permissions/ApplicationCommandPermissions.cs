@@ -30,9 +30,9 @@ namespace Discord
         /// <param name="allow">The value of this permission.</param>
         public ApplicationCommandPermission(ulong targetId, ApplicationCommandPermissionTarget targetType, bool allow)
         {
-            this.TargetId = targetId;
-            this.TargetType = targetType;
-            this.Permission = allow;
+            TargetId = targetId;
+            TargetType = targetType;
+            Permission = allow;
         }
 
         /// <summary>
@@ -42,9 +42,9 @@ namespace Discord
         /// <param name="allow">The value of this permission.</param>
         public ApplicationCommandPermission(IUser target, bool allow)
         {
-            this.TargetId = target.Id;
-            this.Permission = allow;
-            this.TargetType = ApplicationCommandPermissionTarget.User;
+            TargetId = target.Id;
+            Permission = allow;
+            TargetType = ApplicationCommandPermissionTarget.User;
         }
 
         /// <summary>
@@ -54,9 +54,9 @@ namespace Discord
         /// <param name="allow">The value of this permission.</param>
         public ApplicationCommandPermission(IRole target, bool allow)
         {
-            this.TargetId = target.Id;
-            this.Permission = allow;
-            this.TargetType = ApplicationCommandPermissionTarget.Role;
+            TargetId = target.Id;
+            Permission = allow;
+            TargetType = ApplicationCommandPermissionTarget.Role;
         }
     }
 }
