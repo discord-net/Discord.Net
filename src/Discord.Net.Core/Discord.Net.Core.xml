@@ -8267,7 +8267,7 @@
         </member>
         <member name="P:Discord.ReactionMetadata.IsMe">
             <summary>
-                Gets a value that indicates whether the current user has reacted to 
+                Gets a value that indicates whether the current user has reacted to this.
             </summary>
             <returns>
                 <c>true</c> if the user has reacted to the message; otherwise <c>false</c>.
@@ -8604,7 +8604,12 @@
                 Allows members to use slash commands in text channels.
             </summary>
         </member>
-        <member name="F:Discord.ChannelPermission.RequesToSpeak">
+        <member name="F:Discord.ChannelPermission.UseApplicationCommands">
+            <summary>
+                Allows members to use slash commands in text channels.
+            </summary>
+        </member>
+        <member name="F:Discord.ChannelPermission.RequestToSpeak">
             <summary>
                 Allows for requesting to speak in stage channels. (This permission is under active development and may be changed or removed.)
             </summary>
@@ -8624,106 +8629,158 @@
                 Allows for creating and participating in private threads
             </summary>
         </member>
+        <member name="F:Discord.ChannelPermission.CreatePublicThreads">
+            <summary>
+                Allows for creating public threads.
+            </summary>
+        </member>
+        <member name="F:Discord.ChannelPermission.CreatePrivateThreads">
+            <summary>
+                Allows for creating private threads.
+            </summary>
+        </member>
+        <member name="F:Discord.ChannelPermission.UseExternalStickers">
+            <summary>
+                Allows the usage of custom stickers from other servers.
+            </summary>
+        </member>
+        <member name="F:Discord.ChannelPermission.SendMessagesInThreads">
+            <summary>
+                Allows for sending messages in threads.
+            </summary>
+        </member>
+        <member name="F:Discord.ChannelPermission.StartEmbeddedActivities">
+            <summary>
+                Allows for launching activities (applications with the EMBEDDED flag) in a voice channel.
+            </summary>
+        </member>
         <member name="F:Discord.ChannelPermissions.None">
-            <summary> Gets a blank <see cref="T:Discord.ChannelPermissions"/> that grants no permissions. </summary>
-            <returns> A <see cref="T:Discord.ChannelPermissions"/> structure that does not contain any set permissions. </returns>
+            <summary> Gets a blank <see cref="T:Discord.ChannelPermissions"/> that grants no permissions.</summary>
+            <returns> A <see cref="T:Discord.ChannelPermissions"/> structure that does not contain any set permissions.</returns>
         </member>
         <member name="F:Discord.ChannelPermissions.Text">
-            <summary> Gets a <see cref="T:Discord.ChannelPermissions"/> that grants all permissions for text channels. </summary>
+            <summary> Gets a <see cref="T:Discord.ChannelPermissions"/> that grants all permissions for text channels.</summary>
         </member>
         <member name="F:Discord.ChannelPermissions.Voice">
-            <summary> Gets a <see cref="T:Discord.ChannelPermissions"/> that grants all permissions for voice channels. </summary>
+            <summary> Gets a <see cref="T:Discord.ChannelPermissions"/> that grants all permissions for voice channels.</summary>
+        </member>
+        <member name="F:Discord.ChannelPermissions.Stage">
+            <summary> Gets a <see cref="T:Discord.ChannelPermissions"/> that grants all permissions for stage channels.</summary>
         </member>
         <member name="F:Discord.ChannelPermissions.Category">
-            <summary> Gets a <see cref="T:Discord.ChannelPermissions"/> that grants all permissions for category channels. </summary>
+            <summary> Gets a <see cref="T:Discord.ChannelPermissions"/> that grants all permissions for category channels.</summary>
         </member>
         <member name="F:Discord.ChannelPermissions.DM">
-            <summary> Gets a <see cref="T:Discord.ChannelPermissions"/> that grants all permissions for direct message channels. </summary>
+            <summary> Gets a <see cref="T:Discord.ChannelPermissions"/> that grants all permissions for direct message channels.</summary>
         </member>
         <member name="F:Discord.ChannelPermissions.Group">
-            <summary> Gets a <see cref="T:Discord.ChannelPermissions"/> that grants all permissions for group channels. </summary>
+            <summary> Gets a <see cref="T:Discord.ChannelPermissions"/> that grants all permissions for group channels.</summary>
         </member>
         <member name="M:Discord.ChannelPermissions.All(Discord.IChannel)">
-            <summary> Gets a <see cref="T:Discord.ChannelPermissions"/> that grants all permissions for a given channel type. </summary>
+            <summary> Gets a <see cref="T:Discord.ChannelPermissions"/> that grants all permissions for a given channel type.</summary>
             <exception cref="T:System.ArgumentException">Unknown channel type.</exception>
         </member>
         <member name="P:Discord.ChannelPermissions.RawValue">
-            <summary> Gets a packed value representing all the permissions in this <see cref="T:Discord.ChannelPermissions"/>. </summary>
+            <summary> Gets a packed value representing all the permissions in this <see cref="T:Discord.ChannelPermissions"/>.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.CreateInstantInvite">
-            <summary> If <c>true</c>, a user may create invites. </summary>
+            <summary> If <c>true</c>, a user may create invites.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.ManageChannel">
-            <summary> If <c>true</c>, a user may create, delete and modify this channel. </summary>
+            <summary> If <c>true</c>, a user may create, delete and modify this channel.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.AddReactions">
-            <summary> If <c>true</c>, a user may add reactions. </summary>
+            <summary> If <c>true</c>, a user may add reactions.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.ViewChannel">
-            <summary> If <c>true</c>, a user may view channels. </summary>
+            <summary> If <c>true</c>, a user may view channels.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.SendMessages">
-            <summary> If <c>true</c>, a user may send messages. </summary>
+            <summary> If <c>true</c>, a user may send messages.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.SendTTSMessages">
-            <summary> If <c>true</c>, a user may send text-to-speech messages. </summary>
+            <summary> If <c>true</c>, a user may send text-to-speech messages.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.ManageMessages">
-            <summary> If <c>true</c>, a user may delete messages. </summary>
+            <summary> If <c>true</c>, a user may delete messages.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.EmbedLinks">
-            <summary> If <c>true</c>, Discord will auto-embed links sent by this user. </summary>
+            <summary> If <c>true</c>, Discord will auto-embed links sent by this user.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.AttachFiles">
-            <summary> If <c>true</c>, a user may send files. </summary>
+            <summary> If <c>true</c>, a user may send files.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.ReadMessageHistory">
-            <summary> If <c>true</c>, a user may read previous messages. </summary>
+            <summary> If <c>true</c>, a user may read previous messages.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.MentionEveryone">
-            <summary> If <c>true</c>, a user may mention @everyone. </summary>
+            <summary> If <c>true</c>, a user may mention @everyone.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.UseExternalEmojis">
-            <summary> If <c>true</c>, a user may use custom emoji from other guilds. </summary>
+            <summary> If <c>true</c>, a user may use custom emoji from other guilds.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.Connect">
-            <summary> If <c>true</c>, a user may connect to a voice channel. </summary>
+            <summary> If <c>true</c>, a user may connect to a voice channel.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.Speak">
-            <summary> If <c>true</c>, a user may speak in a voice channel. </summary>
+            <summary> If <c>true</c>, a user may speak in a voice channel.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.MuteMembers">
-            <summary> If <c>true</c>, a user may mute users. </summary>
+            <summary> If <c>true</c>, a user may mute users.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.DeafenMembers">
-            <summary> If <c>true</c>, a user may deafen users. </summary>
+            <summary> If <c>true</c>, a user may deafen users.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.MoveMembers">
-            <summary> If <c>true</c>, a user may move other users between voice channels. </summary>
+            <summary> If <c>true</c>, a user may move other users between voice channels.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.UseVAD">
-            <summary> If <c>true</c>, a user may use voice-activity-detection rather than push-to-talk. </summary>
+            <summary> If <c>true</c>, a user may use voice-activity-detection rather than push-to-talk.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.PrioritySpeaker">
-            <summary> If <c>true</c>, a user may use priority speaker in a voice channel. </summary>
+            <summary> If <c>true</c>, a user may use priority speaker in a voice channel.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.Stream">
-            <summary> If <c>true</c>, a user may stream video in a voice channel. </summary>
+            <summary> If <c>true</c>, a user may stream video in a voice channel.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.ManageRoles">
-            <summary> If <c>true</c>, a user may adjust role permissions. This also implictly grants all other permissions. </summary>
+            <summary> If <c>true</c>, a user may adjust role permissions. This also implictly grants all other permissions.</summary>
         </member>
         <member name="P:Discord.ChannelPermissions.ManageWebhooks">
-            <summary> If <c>true</c>, a user may edit the webhooks for this channel. </summary>
+            <summary> If <c>true</c>, a user may edit the webhooks for this channel.</summary>
+        </member>
+        <member name="P:Discord.ChannelPermissions.UseApplicationCommands">
+            <summary> If <c>true</c>, a user may use application commands in this guild.</summary>
+        </member>
+        <member name="P:Discord.ChannelPermissions.RequestToSpeak">
+            <summary> If <c>true</c>, a user may request to speak in stage channels.</summary>
+        </member>
+        <member name="P:Discord.ChannelPermissions.ManageThreads">
+            <summary> If <c>true</c>, a user may manage threads in this guild.</summary>
+        </member>
+        <member name="P:Discord.ChannelPermissions.CreatePublicThreads">
+            <summary> If <c>true</c>, a user may create public threads in this guild.</summary>
+        </member>
+        <member name="P:Discord.ChannelPermissions.CreatePrivateThreads">
+            <summary> If <c>true</c>, a user may create private threads in this guild.</summary>
+        </member>
+        <member name="P:Discord.ChannelPermissions.UseExternalStickers">
+            <summary> If <c>true</c>, a user may use external stickers in this guild.</summary>
+        </member>
+        <member name="P:Discord.ChannelPermissions.SendMessagesInThreads">
+            <summary> If <c>true</c>, a user may send messages in threads in this guild.</summary>
+        </member>
+        <member name="P:Discord.ChannelPermissions.StartEmbeddedActivities">
+            <summary> If <c>true</c>, a user launch application activites in voice channels in this guild.</summary>
         </member>
         <member name="M:Discord.ChannelPermissions.#ctor(System.UInt64)">
-            <summary> Creates a new <see cref="T:Discord.ChannelPermissions"/> with the provided packed value. </summary>
+            <summary> Creates a new <see cref="T:Discord.ChannelPermissions"/> with the provided packed value.</summary>
         </member>
-        <member name="M:Discord.ChannelPermissions.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
-            <summary> Creates a new <see cref="T:Discord.ChannelPermissions"/> with the provided permissions. </summary>
+        <member name="M:Discord.ChannelPermissions.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary> Creates a new <see cref="T:Discord.ChannelPermissions"/> with the provided permissions.</summary>
         </member>
-        <member name="M:Discord.ChannelPermissions.Modify(System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
-            <summary> Creates a new <see cref="T:Discord.ChannelPermissions"/> from this one, changing the provided non-null permissions. </summary>
+        <member name="M:Discord.ChannelPermissions.Modify(System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+            <summary> Creates a new <see cref="T:Discord.ChannelPermissions"/> from this one, changing the provided non-null permissions.</summary>
         </member>
         <member name="T:Discord.GuildApplicationCommandPermission">
             <summary>
@@ -8950,6 +9007,11 @@
                 Allows members to use slash commands in text channels.	
             </summary>
         </member>
+        <member name="F:Discord.GuildPermission.UseApplicationCommands">
+            <summary>
+                Allows members to use application commands like slash commands and context menus in text channels.	
+            </summary>
+        </member>
         <member name="F:Discord.GuildPermission.RequestToSpeak">
             <summary>
                 Allows for requesting to speak in stage channels. <i>(This permission is under active development and may be changed or removed.)</i>.
@@ -9104,7 +9166,7 @@
         <member name="P:Discord.GuildPermissions.ManageEmojisAndStickers">
             <summary> If <c>true</c>, a user may edit the emojis and stickers for this guild. </summary>
         </member>
-        <member name="P:Discord.GuildPermissions.UseSlashCommands">
+        <member name="P:Discord.GuildPermissions.UseApplicationCommands">
             <summary> If <c>true</c>, a user may use slash commands in this guild. </summary>
         </member>
         <member name="P:Discord.GuildPermissions.RequestToSpeak">
@@ -9118,12 +9180,6 @@
         </member>
         <member name="P:Discord.GuildPermissions.CreatePrivateThreads">
             <summary> If <c>true</c>, a user may create private threads in this guild. </summary>
-        </member>
-        <member name="P:Discord.GuildPermissions.UsePublicThreads">
-            <summary> If <c>true</c>, a user may use public threads in this guild. </summary>
-        </member>
-        <member name="P:Discord.GuildPermissions.UsePrivateThreads">
-            <summary> If <c>true</c>, a user may use private threads in this guild. </summary>
         </member>
         <member name="P:Discord.GuildPermissions.UseExternalStickers">
             <summary> If <c>true</c>, a user may use external stickers in this guild. </summary>
@@ -9140,10 +9196,10 @@
         <member name="M:Discord.GuildPermissions.#ctor(System.String)">
             <summary> Creates a new <see cref="T:Discord.GuildPermissions"/> with the provided packed value after converting to ulong. </summary>
         </member>
-        <member name="M:Discord.GuildPermissions.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+        <member name="M:Discord.GuildPermissions.#ctor(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
             <summary> Creates a new <see cref="T:Discord.GuildPermissions"/> structure with the provided permissions. </summary>
         </member>
-        <member name="M:Discord.GuildPermissions.Modify(System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+        <member name="M:Discord.GuildPermissions.Modify(System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
             <summary> Creates a new <see cref="T:Discord.GuildPermissions"/> from this one, changing the provided non-null permissions. </summary>
         </member>
         <member name="M:Discord.GuildPermissions.Has(Discord.GuildPermission)">
@@ -9284,18 +9340,42 @@
         <member name="P:Discord.OverwritePermissions.ManageWebhooks">
             <summary> If True, a user may edit the webhooks for this channel. </summary>
         </member>
+        <member name="P:Discord.OverwritePermissions.UseApplicationCommands">
+            <summary> If <c>true</c>, a user may use slash commands in this guild. </summary>
+        </member>
+        <member name="P:Discord.OverwritePermissions.RequestToSpeak">
+            <summary> If <c>true</c>, a user may request to speak in stage channels. </summary>
+        </member>
+        <member name="P:Discord.OverwritePermissions.ManageThreads">
+            <summary> If <c>true</c>, a user may manage threads in this guild. </summary>
+        </member>
+        <member name="P:Discord.OverwritePermissions.CreatePublicThreads">
+            <summary> If <c>true</c>, a user may create public threads in this guild. </summary>
+        </member>
+        <member name="P:Discord.OverwritePermissions.CreatePrivateThreads">
+            <summary> If <c>true</c>, a user may create private threads in this guild. </summary>
+        </member>
+        <member name="P:Discord.OverwritePermissions.UseExternalStickers">
+            <summary> If <c>true</c>, a user may use external stickers in this guild. </summary>
+        </member>
+        <member name="P:Discord.OverwritePermissions.SendMessagesInThreads">
+            <summary> If <c>true</c>, a user may send messages in threads in this guild. </summary>
+        </member>
+        <member name="P:Discord.OverwritePermissions.StartEmbeddedActivities">
+            <summary> If <c>true</c>, a user launch application activites in voice channels in this guild. </summary>
+        </member>
         <member name="M:Discord.OverwritePermissions.#ctor(System.UInt64,System.UInt64)">
             <summary> Creates a new OverwritePermissions with the provided allow and deny packed values. </summary>
         </member>
         <member name="M:Discord.OverwritePermissions.#ctor(System.String,System.String)">
             <summary> Creates a new OverwritePermissions with the provided allow and deny packed values after converting to ulong. </summary>
         </member>
-        <member name="M:Discord.OverwritePermissions.#ctor(Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue)">
+        <member name="M:Discord.OverwritePermissions.#ctor(Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue,Discord.PermValue)">
             <summary>
                 Initializes a new <see cref="T:Discord.ChannelPermissions"/> struct with the provided permissions.
             </summary>
         </member>
-        <member name="M:Discord.OverwritePermissions.Modify(System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue})">
+        <member name="M:Discord.OverwritePermissions.Modify(System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue},System.Nullable{Discord.PermValue})">
             <summary>
                 Initializes a new <see cref="T:Discord.OverwritePermissions" /> from the current one, changing the provided
                 non-null permissions.

@@ -15,7 +15,7 @@ namespace Discord
         {
             Assert.Equal(0u, new Color().RawValue);
             Assert.Equal(uint.MinValue, new Color(uint.MinValue).RawValue);
-            Assert.Equal(uint.MaxValue, new Color(uint.MaxValue).RawValue);
+            Assert.Throws<ArgumentException>(() => new Color(uint.MaxValue));
         }
         [Fact]
         public void Color_Default()

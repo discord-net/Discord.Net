@@ -4286,10 +4286,6 @@
         <member name="M:Discord.WebSocket.SocketInteraction.RespondAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
             <summary>
                 Responds to an Interaction with type <see cref="F:Discord.InteractionResponseType.ChannelMessageWithSource"/>.
-            <para>
-                If you have <see cref="!:DiscordSocketConfig.AlwaysAcknowledgeInteractions"/> set to <see langword="true"/>, You should use
-                <see cref="M:Discord.WebSocket.SocketInteraction.FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)"/> instead.
-            </para>
             </summary>
             <param name="text">The text of the message to be sent.</param>
             <param name="embeds">A array of embeds to send with this response. Max 10.</param>

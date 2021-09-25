@@ -113,12 +113,18 @@ namespace Discord
         /// <summary>
         ///     Allows members to use slash commands in text channels.
         /// </summary>
+        [Obsolete("UseSlashCommands has been replaced by UseApplicationCommands", true)]
         UseSlashCommands    = 0x00_80_00_00_00,
+
+        /// <summary>
+        ///     Allows members to use slash commands in text channels.
+        /// </summary>
+        UseApplicationCommands = 0x00_80_00_00_00,
 
         /// <summary>
         ///     Allows for requesting to speak in stage channels. (This permission is under active development and may be changed or removed.)
         /// </summary>
-        RequesToSpeak       = 0x01_00_00_00_00,
+        RequestToSpeak       = 0x01_00_00_00_00,
 
         /// <summary>
         ///     Allows for deleting and archiving threads, and viewing all private threads
@@ -128,12 +134,34 @@ namespace Discord
         /// <summary>
         ///     Allows for creating and participating in threads
         /// </summary>
-        UsePublicThreads    = 0x08_00_00_00_00,
+        [Obsolete("UsePublicThreads has been replaced by CreatePublicThreads and SendMessagesInThreads", true)]
+        UsePublicThreads = 0x08_00_00_00_00,
 
         /// <summary>
         ///     Allows for creating and participating in private threads
         /// </summary>
+        [Obsolete("UsePrivateThreads has been replaced by CreatePrivateThreads and SendMessagesInThreads", true)]
         UsePrivateThreads   = 0x10_00_00_00_00,
+        /// <summary>
+        ///     Allows for creating public threads.
+        /// </summary>
+        CreatePublicThreads = 0x08_00_00_00_00,
+        /// <summary>
+        ///     Allows for creating private threads.
+        /// </summary>
+        CreatePrivateThreads = 0x10_00_00_00_00,
+        /// <summary>
+        ///     Allows the usage of custom stickers from other servers.
+        /// </summary>
+        UseExternalStickers = 0x20_00_00_00_00,
+        /// <summary>
+        ///     Allows for sending messages in threads.
+        /// </summary>
+        SendMessagesInThreads = 0x40_00_00_00_00,
+        /// <summary>
+        ///     Allows for launching activities (applications with the EMBEDDED flag) in a voice channel.
+        /// </summary>
+        StartEmbeddedActivities = 0x80_00_00_00_00
 
     }
 }
