@@ -6,27 +6,36 @@ variables:
 trigger:
   tags:
     include:
-    - '*'
+      - "*"
   branches:
     include:
-    - '*'
+      - "*"
 
 jobs:
-- job: Linux
-  pool: default
-  steps:
-  - template: azure/build.yml
+  - job: Linux
+    pool:
+      vmImage: "ubuntu-latest"
+    steps:
+      - template: azure/build.yml
 
-- job: Linux_deploy
-  pool: default
-  condition: |
+  - job: Windows_build
+    pool:
+      vmImage: "windows-latest"
+    condition: ne(variables['Build.SourceBranch'], 'refs/heads/dev')
+    steps:
+      - template: azure/build.yml
+
+  - job: Windows_deploy
+    pool:
+      vmImage: "windows-latest"
+    condition: |
       and (
         succeeded(),
         or (
-          eq(variables['Build.SourceBranch'], 'refs/heads/release/3.x'),
+          eq(variables['Build.SourceBranch'], 'refs/heads/dev'),
           eq(variables['buildTag'], True)
         )
       )
-  steps:
-  - template: azure/build.yml
-  - template: azure/deploy.yml
+    steps:
+      - template: azure/build.yml
+      - template: azure/deploy.yml
