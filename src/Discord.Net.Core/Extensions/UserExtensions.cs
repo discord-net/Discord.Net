@@ -27,13 +27,13 @@ namespace Discord
         /// <param name="text">The message to be sent.</param>
         /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
         /// <param name="embed">The <see cref="EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
-        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
         ///     If <c>null</c>, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="component">The message components to be included with this message. Used for interactions.</param>
+        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
         /// <returns>
         ///     A task that represents the asynchronous send operation. The task result contains the sent message.
         /// </returns>
@@ -41,10 +41,10 @@ namespace Discord
             string text = null,
             bool isTTS = false,
             Embed embed = null,
-            Embed[] embeds = null,
             RequestOptions options = null,
             AllowedMentions allowedMentions = null,
-            MessageComponent component = null)
+            MessageComponent component = null,
+            Embed[] embeds = null)
         {
             return await (await user.CreateDMChannelAsync().ConfigureAwait(false)).SendMessageAsync(text, isTTS, embed, options, allowedMentions, component: component, embeds: embeds).ConfigureAwait(false);
         }
@@ -86,6 +86,7 @@ namespace Discord
         /// <param name="embed">The <see cref="EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <param name="component">The message component to be included with this message. Used for interactions.</param>
+        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
@@ -97,9 +98,10 @@ namespace Discord
             bool isTTS = false,
             Embed embed = null,
             RequestOptions options = null,
-            MessageComponent component = null)
+            MessageComponent component = null,
+            Embed[] embeds = null)
         {
-            return await (await user.CreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(stream, filename, text, isTTS, embed, options, component: component).ConfigureAwait(false);
+            return await (await user.CreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(stream, filename, text, isTTS, embed, options, component: component, embeds: embeds).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -144,6 +146,7 @@ namespace Discord
         /// <param name="embed">The <see cref="EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <param name="component">The message component to be included with this message. Used for interactions.</param>
+        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
@@ -154,9 +157,10 @@ namespace Discord
             bool isTTS = false,
             Embed embed = null,
             RequestOptions options = null,
-            MessageComponent component = null)
+            MessageComponent component = null,
+            Embed[] embeds = null)
         {
-            return await (await user.CreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(filePath, text, isTTS, embed, options, component: component).ConfigureAwait(false);
+            return await (await user.CreateDMChannelAsync().ConfigureAwait(false)).SendFileAsync(filePath, text, isTTS, embed, options, component: component, embeds: embeds).ConfigureAwait(false);
         }
 
         /// <summary>
