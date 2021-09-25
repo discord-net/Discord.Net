@@ -16,7 +16,6 @@ jobs:
   pool: default
   steps:
   - template: azure/build.yml
-  - template: azure/deploy.yml
 
 - job: Linux_deploy
   pool: default
