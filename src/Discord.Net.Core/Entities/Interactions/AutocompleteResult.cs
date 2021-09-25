@@ -57,6 +57,7 @@ namespace Discord
                 {
                     string str => str,
                     int integer => integer,
+                    long lng => lng,
                     double number => number,
                     _ => throw new ArgumentException($"Type {value.GetType().Name} cannot be set as a value! Only string, int, and double allowed!"),
                 };
