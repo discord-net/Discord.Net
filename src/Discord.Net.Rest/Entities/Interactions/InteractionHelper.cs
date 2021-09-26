@@ -195,7 +195,7 @@ namespace Discord.Rest
             if (args.Name.IsSpecified)
             {
                 Preconditions.AtMost(args.Name.Value.Length, 32, nameof(args.Name));
-                Preconditions.AtLeast(args.Name.Value.Length, 3, nameof(args.Name));
+                Preconditions.AtLeast(args.Name.Value.Length, 1, nameof(args.Name));
             }
 
             var model = new Discord.API.Rest.ModifyApplicationCommandParams()
