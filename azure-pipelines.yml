@@ -2,6 +2,7 @@ variables:
   buildConfiguration: Release
   buildTag: $[ startsWith(variables['Build.SourceBranch'], 'refs/tags') ]
   buildNumber: $[ variables['Build.BuildNumber'] ]
+  suffix: $(Date:yyyyMMdd)
 
 trigger:
   tags:
