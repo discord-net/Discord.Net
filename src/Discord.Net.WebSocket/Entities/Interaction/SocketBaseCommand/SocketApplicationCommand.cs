@@ -82,6 +82,7 @@ namespace Discord.WebSocket
             Description = model.Description;
             Name = model.Name;
             DefaultPermission = model.DefaultPermissions.GetValueOrDefault(true);
+            Type = model.Type;
 
             Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => SocketApplicationCommandOption.Create(x)).ToImmutableArray()
