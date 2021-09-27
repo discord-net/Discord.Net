@@ -50,7 +50,8 @@ namespace Discord
         }
 
         /// <summary>
-        ///    A 1-100 length description of this slash command
+        ///    A 1-100 length description of this slash command.
+        ///    The description is not allowed to be null.
         /// </summary>
         public string Description
         {
@@ -60,6 +61,7 @@ namespace Discord
             }
             set
             {
+                Preconditions.NotNullOrEmpty(value, nameof(Description));
                 Preconditions.AtLeast(value.Length, 1, nameof(Description));
                 Preconditions.AtMost(value.Length, MaxDescriptionLength, nameof(Description));
 
