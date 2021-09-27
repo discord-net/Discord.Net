@@ -5976,7 +5976,8 @@
         </member>
         <member name="P:Discord.SlashCommandBuilder.Description">
             <summary>
-               A 1-100 length description of this slash command
+               A 1-100 length description of this slash command.
+               The description is not allowed to be null.
             </summary>
         </member>
         <member name="P:Discord.SlashCommandBuilder.Options">
