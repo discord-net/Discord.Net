@@ -53,8 +53,6 @@ namespace Discord.WebSocket
         public bool IsValidToken
             => CheckToken();
 
-        private ulong? GuildId { get; set; }
-
         internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel)
             : base(client, id)
         {
@@ -93,8 +91,6 @@ namespace Discord.WebSocket
             Data = model.Data.IsSpecified
                 ? model.Data.Value
                 : null;
-
-            GuildId = model.GuildId.ToNullable();
             Token = model.Token;
             Version = model.Version;
             Type = model.Type;
@@ -103,7 +99,7 @@ namespace Discord.WebSocket
             {
                 if (model.Member.IsSpecified && model.GuildId.IsSpecified)
                 {
-                    User = SocketGuildUser.Create(Discord.State.GetGuild(GuildId.Value), Discord.State, model.Member.Value);
+                    User = SocketGuildUser.Create(Discord.State.GetGuild(model.GuildId.Value), Discord.State, model.Member.Value);
                 }
                 else
                 {
