@@ -12,15 +12,15 @@ namespace Discord
     /// </summary>
     public class SlashCommandBuilder
     {
-        /// <summary> 
+        /// <summary>
         ///     Returns the maximun length a commands name allowed by Discord
         /// </summary>
         public const int MaxNameLength = 32;
-        /// <summary> 
-        ///     Returns the maximum length of a commands description allowed by Discord. 
+        /// <summary>
+        ///     Returns the maximum length of a commands description allowed by Discord.
         /// </summary>
         public const int MaxDescriptionLength = 100;
-        /// <summary> 
+        /// <summary>
         ///     Returns the maximum count of command options allowed by Discord
         /// </summary>
         public const int MaxOptionsCount = 25;
@@ -382,6 +382,7 @@ namespace Discord
         /// <param name="description">The description of this option.</param>
         /// <param name="required">If this option is required for this command.</param>
         /// <param name="isDefault">If this option is the default option.</param>
+        /// <param name="isAutocomplete">If this option supports autocomplete.</param>
         /// <param name="options">The options of the option to add.</param>
         /// <param name="choices">The choices of this option.</param>
         /// <returns>The current builder.</returns>
@@ -417,6 +418,7 @@ namespace Discord
                 Description = description,
                 Required = required,
                 Default = isDefault,
+                Autocomplete = isAutocomplete,
                 Options = options,
                 Type = type,
                 Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null,
