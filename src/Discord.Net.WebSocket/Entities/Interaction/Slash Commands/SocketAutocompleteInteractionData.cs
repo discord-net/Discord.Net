@@ -70,7 +70,7 @@ namespace Discord.WebSocket
             }
             else if(model.Focused.IsSpecified)
             {
-                options.Add(new AutocompleteOption(model.Type, model.Name, model.Value, model.Focused.Value));
+                options.Add(new AutocompleteOption(model.Type, model.Name, model.Value.GetValueOrDefault(null), model.Focused.Value));
             }
 
             return options;
