@@ -422,7 +422,6 @@ namespace Discord
                 Options = options,
                 Type = type,
                 Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null,
-                Autocomplete = isAutocomplete,
             };
 
             return AddOption(option);

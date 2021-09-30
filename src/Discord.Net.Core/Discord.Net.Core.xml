@@ -5955,17 +5955,17 @@
             </summary>
         </member>
         <member name="F:Discord.SlashCommandBuilder.MaxNameLength">
-            <summary> 
+            <summary>
                 Returns the maximun length a commands name allowed by Discord
             </summary>
         </member>
         <member name="F:Discord.SlashCommandBuilder.MaxDescriptionLength">
-            <summary> 
-                Returns the maximum length of a commands description allowed by Discord. 
+            <summary>
+                Returns the maximum length of a commands description allowed by Discord.
             </summary>
         </member>
         <member name="F:Discord.SlashCommandBuilder.MaxOptionsCount">
-            <summary> 
+            <summary>
                 Returns the maximum count of command options allowed by Discord
             </summary>
         </member>
@@ -6117,7 +6117,7 @@
             </summary>
             <returns>The built version of this option.</returns>
         </member>
-        <member name="M:Discord.SlashCommandOptionBuilder.AddOption(System.String,Discord.ApplicationCommandOptionType,System.String,System.Nullable{System.Boolean},System.Boolean,System.Collections.Generic.List{Discord.SlashCommandOptionBuilder},Discord.ApplicationCommandOptionChoiceProperties[])">
+        <member name="M:Discord.SlashCommandOptionBuilder.AddOption(System.String,Discord.ApplicationCommandOptionType,System.String,System.Nullable{System.Boolean},System.Boolean,System.Boolean,System.Collections.Generic.List{Discord.SlashCommandOptionBuilder},Discord.ApplicationCommandOptionChoiceProperties[])">
             <summary>
                 Adds an option to the current slash command.
             </summary>
@@ -6126,6 +6126,7 @@
             <param name="description">The description of this option.</param>
             <param name="required">If this option is required for this command.</param>
             <param name="isDefault">If this option is the default option.</param>
+            <param name="isAutocomplete">If this option supports autocomplete.</param>
             <param name="options">The options of the option to add.</param>
             <param name="choices">The choices of this option.</param>
             <returns>The current builder.</returns>
@@ -6177,6 +6178,13 @@
         <member name="M:Discord.SlashCommandOptionBuilder.WithDefault(System.Boolean)">
             <summary>
                 Sets the current builders default field.
+            </summary>
+            <param name="value">The value to set.</param>
+            <returns>The current builder.</returns>
+        </member>
+        <member name="M:Discord.SlashCommandOptionBuilder.WithAutocomplete(System.Boolean)">
+            <summary>
+                Sets the current builders autocomplete field.
             </summary>
             <param name="value">The value to set.</param>
             <returns>The current builder.</returns>
