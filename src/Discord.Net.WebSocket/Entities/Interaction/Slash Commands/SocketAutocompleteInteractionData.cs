@@ -51,6 +51,9 @@ namespace Discord.WebSocket
             Current = options.FirstOrDefault(x => x.Focused);
             Options = options.ToImmutableArray();
 
+            if (Options?.Count == 1 && Current == null)
+                Current = Options.FirstOrDefault();
+
             CommandName = model.Name;
             CommandId = model.Id;
             Type = model.Type;
