@@ -208,20 +208,6 @@ namespace Discord
             return AddOption(option);
         }
 
-        ///// <summary>
-        /////     Adds an option to the current slash command.
-        ///// </summary>
-        ///// <param name="name">The name of the option to add.</param>
-        ///// <param name="type">The type of this option.</param>
-        ///// <param name="description">The description of this option.</param>
-        ///// <param name="required">If this option is required for this command.</param>
-        ///// <param name="isDefault">If this option is the default option.</param>
-        ///// <param name="choices">The choices of this option.</param>
-        ///// <returns>The current builder.</returns>
-        //public SlashCommandBuilder AddOption(string name, ApplicationCommandOptionType type,
-        //    string description, bool required = true, bool isDefault = false, params ApplicationCommandOptionChoiceProperties[] choices)
-        //    => AddOption(name, type, description, required, isDefault, null, choices);
-
         /// <summary>
         ///     Adds an option to the current slash command.
         /// </summary>
@@ -400,7 +386,7 @@ namespace Discord
         /// <param name="choices">The choices of this option.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddOption(string name, ApplicationCommandOptionType type,
-           string description, bool? required = null, bool isDefault = false, List<SlashCommandOptionBuilder> options = null, params ApplicationCommandOptionChoiceProperties[] choices)
+           string description, bool? required = null, bool isDefault = false, bool isAutocomplete = false, List<SlashCommandOptionBuilder> options = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             // Make sure the name matches the requirements from discord
             Preconditions.NotNullOrEmpty(name, nameof(name));
@@ -433,7 +419,8 @@ namespace Discord
                 Default = isDefault,
                 Options = options,
                 Type = type,
-                Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null
+                Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null,
+                Autocomplete = isAutocomplete,
             };
 
             return AddOption(option);
@@ -564,6 +551,17 @@ namespace Discord
         public SlashCommandOptionBuilder WithDefault(bool value)
         {
             Default = value;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the current builders autocomplete field.
+        /// </summary>
+        /// <param name="value">The value to set.</param>
+        /// <returns>The current builder.</returns>
+        public SlashCommandOptionBuilder WithAutocomplete(bool value)
+        {
+            Autocomplete = value;
             return this;
         }
 
