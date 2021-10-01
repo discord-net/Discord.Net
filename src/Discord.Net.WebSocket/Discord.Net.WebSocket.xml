@@ -4843,6 +4843,9 @@
         <member name="P:Discord.WebSocket.SocketRole.Name">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketRole.Icon">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.WebSocket.SocketRole.Permissions">
             <inheritdoc />
         </member>
@@ -4875,6 +4878,9 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketRole.DeleteAsync(Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.SocketRole.GetIconUrl">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketRole.ToString">

@@ -4613,6 +4613,9 @@
         <member name="P:Discord.Rest.RestRole.Name">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestRole.Icon">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.Rest.RestRole.Permissions">
             <inheritdoc />
         </member>
@@ -4637,6 +4640,9 @@
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestRole.DeleteAsync(Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Discord.Rest.RestRole.GetIconUrl">
             <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestRole.CompareTo(Discord.IRole)">

@@ -131,6 +131,16 @@
                 A URL pointing to the guild's icon.
             </returns>
         </member>
+        <member name="M:Discord.CDN.GetGuildRoleIconUrl(System.UInt64,System.String)">
+            <summary>
+                Returns a guild role's icon URL.
+            </summary>
+            <param name="roleId">The role identifier.</param>
+            <param name="roleHash">The icon hash.</param>
+            <returns>
+                A URL pointing to the guild role's icon.
+            </returns>
+        </member>
         <member name="M:Discord.CDN.GetGuildSplashUrl(System.UInt64,System.String)">
             <summary>
                 Returns a guild splash URL.
@@ -9646,6 +9656,14 @@
                 A string containing the name of this role.
             </returns>
         </member>
+        <member name="P:Discord.IRole.Icon">
+            <summary>
+                Gets the icon of this role.
+            </summary>
+            <returns>
+                A string containing the hash of this role's icon.
+            </returns>
+        </member>
         <member name="P:Discord.IRole.Permissions">
             <summary>
                 Gets the permissions granted to members of this role.
@@ -9682,6 +9700,14 @@
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous modification operation.
+            </returns>
+        </member>
+        <member name="M:Discord.IRole.GetIconUrl">
+            <summary>
+                Gets the image url of the icon role.
+            </summary>
+            <returns>
+                An image url of the icon role.
             </returns>
         </member>
         <member name="T:Discord.ReorderRoleProperties">

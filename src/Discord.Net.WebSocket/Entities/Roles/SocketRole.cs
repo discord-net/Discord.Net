@@ -34,6 +34,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string Name { get; private set; }
         /// <inheritdoc />
+        public string Icon { get; private set; }
+        /// <inheritdoc />
         public GuildPermissions Permissions { get; private set; }
         /// <inheritdoc />
         public int Position { get; private set; }
@@ -72,6 +74,7 @@ namespace Discord.WebSocket
         internal void Update(ClientState state, Model model)
         {
             Name = model.Name;
+            Icon = model.Icon;
             IsHoisted = model.Hoist;
             IsManaged = model.Managed;
             IsMentionable = model.Mentionable;
@@ -88,6 +91,10 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
             => RoleHelper.DeleteAsync(this, Discord, options);
+
+        /// <inheritdoc />
+        public string GetIconUrl()
+            => CDN.GetGuildRoleIconUrl(Id, Icon);
 
         /// <summary>
         ///     Gets the name of the role.
