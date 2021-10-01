@@ -4531,6 +4531,9 @@
         <member name="P:Discord.WebSocket.SocketMessage.Content">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketMessage.CleanContent">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.WebSocket.SocketMessage.CreatedAt">
             <inheritdoc />
         </member>

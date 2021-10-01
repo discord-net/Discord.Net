@@ -11423,6 +11423,13 @@
             <param name="text">The text to format.</param>
             <returns>Gets the formatted block quote text.</returns>
         </member>
+        <member name="M:Discord.Format.StripMarkDown(System.String)">
+            <summary>
+            Remove discord supported markdown from text.
+            </summary>
+            <param name="text">The to remove markdown from.</param>
+            <returns>Gets the unformatted text.</returns>
+        </member>
         <member name="F:Discord.GatewayIntents.None">
             <summary> This intent includes no events </summary>
         </member>

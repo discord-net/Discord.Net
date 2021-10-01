@@ -59,5 +59,20 @@ namespace Discord
         {
             Assert.Equal(expected, Format.BlockQuote(input));
         }
+
+        [Theory]
+        [InlineData("", "")]
+        [InlineData("\n", "\n")]
+        [InlineData("**hi**", "hi")]
+        [InlineData("__uwu__", "uwu")]
+        [InlineData(">>__uwu__", "uwu")]
+        [InlineData("```uwu```", "uwu")]
+        [InlineData("~uwu~", "uwu")]
+        [InlineData("berries __and__ *Cream**, i'm a little lad who loves berries and cream", "berries and Cream, i'm a little lad who loves berries and cream")]
+        public void StripMarkdown(string input, string expected)
+        {
+            var test = Format.StripMarkDown(input);
+            Assert.Equal(expected, test);
+        }
     }
 }

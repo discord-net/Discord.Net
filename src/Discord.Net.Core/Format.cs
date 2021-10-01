@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Discord
 {
@@ -90,6 +91,18 @@ namespace Discord
                 return text;
 
             return $">>> {text}";
+        }
+
+        /// <summary>
+        /// Remove discord supported markdown from text.
+        /// </summary>
+        /// <param name="text">The to remove markdown from.</param>
+        /// <returns>Gets the unformatted text.</returns>
+        public static string StripMarkDown(string text)
+        {
+            //Remove discord supported markdown
+            var newText = Regex.Replace(text, @"(\*|_|`|~|>|\\)", "");
+            return newText;
         }
     }
 }
