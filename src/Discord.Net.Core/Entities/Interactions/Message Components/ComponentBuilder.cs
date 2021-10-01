@@ -596,7 +596,7 @@ namespace Discord
                 if (string.IsNullOrEmpty(Url))
                     throw new InvalidOperationException("Link buttons must have a link associated with them");
                 else
-                    UrlValidation.Validate(Url);
+                    UrlValidation.ValidateButton(Url);
             }
             else if (string.IsNullOrEmpty(CustomId))
                 throw new InvalidOperationException("Non-link buttons must have a custom id associated with them");
