@@ -29,6 +29,9 @@ namespace Discord.Rest
         public string Content { get; private set; }
 
         /// <inheritdoc />
+        public string CleanContent => MessageHelper.SanitizeMessage(this);
+
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public virtual bool IsTTS => false;
@@ -208,7 +211,6 @@ namespace Discord.Rest
             else
                 _reactions = ImmutableArray.Create<RestReaction>();
         }
-
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
         {

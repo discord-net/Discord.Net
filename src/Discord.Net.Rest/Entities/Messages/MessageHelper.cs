@@ -246,6 +246,12 @@ namespace Discord.Rest
             return System.Web.HttpUtility.UrlEncode(text);
 #endif
         }
+        public static string SanitizeMessage(IMessage message)
+        {
+            var newContent = MentionUtils.Resolve(message, 0, TagHandling.Sanitize, TagHandling.Sanitize, TagHandling.Sanitize, TagHandling.Sanitize, TagHandling.Sanitize);
+            newContent = Format.StripMarkDown(newContent);
+            return newContent;
+        }
 
         public static async Task PinAsync(IMessage msg, BaseDiscordClient client,
             RequestOptions options)

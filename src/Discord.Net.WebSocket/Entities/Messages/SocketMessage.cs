@@ -39,7 +39,7 @@ namespace Discord.WebSocket
         public string Content { get; private set; }
 
         /// <inheritdoc />
-        public string CleanContent => SanitizeMessage();
+        public string CleanContent => MessageHelper.SanitizeMessage(this);
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -144,8 +144,6 @@ namespace Discord.WebSocket
             if (model.Content.IsSpecified)
             {
                 Content = model.Content.Value;
-                //Update CleanContent Property
-                SanitizeMessage();
             }
 
             if (model.Application.IsSpecified)
@@ -272,12 +270,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         IReadOnlyCollection<IStickerItem> IMessage.Stickers => Stickers;
 
-        internal string  SanitizeMessage()
-        {
-            var newContent = MentionUtils.Resolve(this, 0, TagHandling.Sanitize, TagHandling.Sanitize, TagHandling.Sanitize, TagHandling.Sanitize, TagHandling.Sanitize);
-            newContent = Format.StripMarkDown(newContent);
-            return newContent;
-        }
 
         internal void AddReaction(SocketReaction reaction)
         {

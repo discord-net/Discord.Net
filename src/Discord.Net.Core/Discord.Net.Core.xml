@@ -508,6 +508,11 @@
                 The user has set a custom status.
             </summary>
         </member>
+        <member name="F:Discord.ActivityType.Competing">
+            <summary>
+                The user is competing in a game.
+            </summary>
+        </member>
         <member name="T:Discord.CustomStatusGame">
             <summary>
                 A user's activity for their custom status.
@@ -7594,6 +7599,14 @@
                 A string that contains the body of the message; note that this field may be empty if there is an embed.
             </returns>
         </member>
+        <member name="P:Discord.IMessage.CleanContent">
+            <summary>
+                Gets the clean content for this message.
+            </summary>
+            <returns>
+                A string that contains the body of the message stripped of mentions, markdown, emojiis and pings; note that this field may be empty if there is an embed.
+            </returns>
+        </member>
         <member name="P:Discord.IMessage.Timestamp">
             <summary>
                 Gets the time this message was sent.
@@ -12920,10 +12933,20 @@
         <member name="M:Discord.Utils.UrlValidation.Validate(System.String)">
             <summary>
             Not full URL validation right now. Just ensures protocol is present and that it's either http or https
+            <see cref="M:Discord.Utils.UrlValidation.ValidateButton(System.String)"/> should be used for url buttons
             </summary>
             <param name="url">url to validate before sending to Discord.</param>
             <exception cref="T:System.InvalidOperationException">A URL must include a protocol (http or https).</exception>
             <returns>true if url is valid by our standard, false if null, throws an error upon invalid </returns>
+        </member>
+        <member name="M:Discord.Utils.UrlValidation.ValidateButton(System.String)">
+            <summary>
+            Not full URL validation right now. Just Ensures the protocol is either http, https, or discord
+            <see cref="M:Discord.Utils.UrlValidation.Validate(System.String)"/> should be used everything other than url buttons
+            </summary>
+            <param name="url">the url to validate before sending to discord</param>
+            <exception cref="T:System.InvalidOperationException">A URL must include a protocol (either http, https, or discord).</exception>
+            <returns>true if the url is valid by our standard, false if null, throws an error upon invalid</returns>
         </member>
     </members>
 </doc>

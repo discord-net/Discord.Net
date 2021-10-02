@@ -4299,6 +4299,9 @@
         <member name="P:Discord.Rest.RestMessage.Content">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestMessage.CleanContent">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.Rest.RestMessage.CreatedAt">
             <inheritdoc />
         </member>
