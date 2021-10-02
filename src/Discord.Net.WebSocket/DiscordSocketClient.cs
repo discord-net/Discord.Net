@@ -2125,6 +2125,9 @@ namespace Discord.WebSocket
                                             case SocketMessageCommand messageCommand:
                                                 await TimedInvokeAsync(_messageCommandExecuted, nameof(MessageCommandExecuted), messageCommand).ConfigureAwait(false);
                                                 break;
+                                            case SocketAutocompleteInteraction autocomplete:
+                                                await TimedInvokeAsync(_autocompleteExecuted, nameof(AutocompleteExecuted), autocomplete).ConfigureAwait(false);
+                                                break;
                                         }
                                     }
                                     else

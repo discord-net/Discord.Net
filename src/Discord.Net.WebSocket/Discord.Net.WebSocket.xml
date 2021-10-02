@@ -746,6 +746,11 @@
                 Fired when a message command is used and its interaction is received.
             </summary>
         </member>
+		<member name="E:Discord.WebSocket.BaseSocketClient.AutocompleteExecuted">
+			<summary>
+				Fired when an autocomplete is used and its interaction is received.
+			</summary>
+		</member>
         <member name="E:Discord.WebSocket.BaseSocketClient.ApplicationCommandCreated">
              <summary>
                  Fired when a guild application command is created.
