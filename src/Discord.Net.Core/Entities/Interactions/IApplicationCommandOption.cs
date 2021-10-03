@@ -22,7 +22,7 @@ namespace Discord
         string Name { get; }
 
         /// <summary>
-        ///     The discription of this command option, 1-100 character description.
+        ///     The description of this command option, 1-100 character description.
         /// </summary>
         string Description { get; }
 

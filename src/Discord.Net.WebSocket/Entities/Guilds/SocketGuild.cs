@@ -1551,7 +1551,7 @@ namespace Discord.WebSocket
         }
         internal async Task FinishConnectAudio(string url, string token)
         {
-            //TODO: Mem Leak: Disconnected/Connected handlers arent cleaned up
+            //TODO: Mem Leak: Disconnected/Connected handlers aren't cleaned up
             var voiceState = GetVoiceState(Discord.CurrentUser.Id).Value;
 
             await _audioLock.WaitAsync().ConfigureAwait(false);

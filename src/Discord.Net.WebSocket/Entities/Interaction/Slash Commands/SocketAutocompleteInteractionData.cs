@@ -35,7 +35,7 @@ namespace Discord.WebSocket
         public ulong Version { get; }
 
         /// <summary>
-        ///     Gets the current autocomplete option that is activly being filled out.
+        ///     Gets the current autocomplete option that is actively being filled out.
         /// </summary>
         public AutocompleteOption Current { get; }
 

@@ -6,7 +6,7 @@ using Model = Discord.API.ApplicationCommandInteractionDataOption;
 namespace Discord.WebSocket
 {
     /// <summary>
-    ///     Represents a Websocket-based <see cref="IApplicationCommandInteractionDataOption"/> recieved by the gateway
+    ///     Represents a Websocket-based <see cref="IApplicationCommandInteractionDataOption"/> received by the gateway
     /// </summary>
     public class SocketSlashCommandDataOption : IApplicationCommandInteractionDataOption
     {

@@ -24,7 +24,7 @@ namespace Discord
         ///     Add multiple reactions to a message.
         /// </summary>
         /// <remarks>
-        ///     This method does not bulk add reactions! It will send a request for each reaction inculded.
+        ///     This method does not bulk add reactions! It will send a request for each reaction included.
         /// </remarks>
         /// <example>
         /// <code language="cs">
@@ -76,7 +76,7 @@ namespace Discord
         /// <summary>
         ///     Sends an inline reply that references a message.
         /// </summary>
-        /// <param name="msg">The message that is being replyed on.</param>
+        /// <param name="msg">The message that is being replied on.</param>
         /// <param name="text">The message to be sent.</param>
         /// <param name="isTTS">Determines whether the message should be read aloud by Discord or not.</param>
         /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>

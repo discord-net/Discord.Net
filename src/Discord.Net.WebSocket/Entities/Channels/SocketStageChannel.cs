@@ -11,7 +11,7 @@ using StageInstance = Discord.API.StageInstance;
 namespace Discord.WebSocket
 {
     /// <summary>
-    ///     Represents a stage channel recieved over the gateway.
+    ///     Represents a stage channel received over the gateway.
     /// </summary>
     public class SocketStageChannel : SocketVoiceChannel, IStageChannel
     {

@@ -31,7 +31,7 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        ///     Deletes this object and all of it's childern.
+        ///     Deletes this object and all of it's children.
         /// </summary>
         /// <returns>A task that represents the asynchronous delete operation.</returns>
         public Task DeleteAsync()
@@ -56,7 +56,7 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
         /// <exception cref="InvalidOperationException">The token used to modify/delete this message expired.</exception>
-        /// /// <exception cref="Discord.Net.HttpException">Somthing went wrong during the request.</exception>
+        /// /// <exception cref="Discord.Net.HttpException">Something went wrong during the request.</exception>
         public new async Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
         {
             try

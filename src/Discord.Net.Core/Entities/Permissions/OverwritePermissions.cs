@@ -97,7 +97,7 @@ namespace Discord
         public PermValue UseExternalStickers => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.UseExternalStickers);
         /// <summary> If <c>true</c>, a user may send messages in threads in this guild. </summary>
         public PermValue SendMessagesInThreads => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.SendMessagesInThreads);
-        /// <summary> If <c>true</c>, a user launch application activites in voice channels in this guild. </summary>
+        /// <summary> If <c>true</c>, a user launch application activities in voice channels in this guild. </summary>
         public PermValue StartEmbeddedActivities => Permissions.GetValue(AllowValue, DenyValue, ChannelPermission.StartEmbeddedActivities);
 
         /// <summary> Creates a new OverwritePermissions with the provided allow and deny packed values. </summary>

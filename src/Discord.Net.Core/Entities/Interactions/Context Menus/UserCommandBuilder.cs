@@ -13,7 +13,7 @@ namespace Discord
     public class UserCommandBuilder
     {
         /// <summary> 
-        ///     Returns the maximun length a commands name allowed by Discord
+        ///     Returns the maximum length a commands name allowed by Discord
         /// </summary>
         public const int MaxNameLength = 32;
 

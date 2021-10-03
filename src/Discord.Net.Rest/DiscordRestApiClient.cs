@@ -2227,7 +2227,7 @@ namespace Discord.API
                     Array.Copy(elements, 0, methodArgs, 1, elements.Length);
                 }
 
-                int endIndex = format.IndexOf('?'); //Dont include params
+                int endIndex = format.IndexOf('?'); //Don't include params
                 if (endIndex == -1)
                     endIndex = format.Length;
 

@@ -68,7 +68,7 @@ namespace Discord
         [InlineData(">>__uwu__", "uwu")]
         [InlineData("```uwu```", "uwu")]
         [InlineData("~uwu~", "uwu")]
-        [InlineData("berries __and__ *Cream**, i'm a little lad who loves berries and cream", "berries and Cream, i'm a little lad who loves berries and cream")]
+        [InlineData("berries __and__ *Cream**, I'm a little lad who loves berries and cream", "berries and Cream, I'm a little lad who loves berries and cream")]
         public void StripMarkdown(string input, string expected)
         {
             var test = Format.StripMarkDown(input);

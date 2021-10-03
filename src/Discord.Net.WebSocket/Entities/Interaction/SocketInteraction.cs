@@ -8,7 +8,7 @@ using System.IO;
 namespace Discord.WebSocket
 {
     /// <summary>
-    ///     Represents an Interaction recieved over the gateway.
+    ///     Represents an Interaction received over the gateway.
     /// </summary>
     public abstract class SocketInteraction : SocketEntity<ulong>, IDiscordInteraction
     {

@@ -578,7 +578,7 @@ namespace Discord.Rest
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous get operation. The task result contains the text channel
-        ///     where guild notices such as welcome messages and boost events are poste; <see langword="null"/> if none is found.
+        ///     where guild notices such as welcome messages and boost events are post; <see langword="null"/> if none is found.
         /// </returns>
         public async Task<RestTextChannel> GetSystemChannelAsync(RequestOptions options = null)
         {
@@ -611,11 +611,11 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        ///     Gets the text channel channel where admins and moderators of Community guilds receive notices from Discord.
+        ///     Gets the text channel where admins and moderators of Community guilds receive notices from Discord.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains the text channel channel where
+        ///     A task that represents the asynchronous get operation. The task result contains the text channel where
         ///     admins and moderators of Community guilds receive notices from Discord; <see langword="null"/> if none is set.
         /// </returns>
         public async Task<RestTextChannel> GetPublicUpdatesChannelAsync(RequestOptions options = null)
@@ -914,7 +914,7 @@ namespace Discord.Rest
 
         #region Interactions
         /// <summary>
-        ///     Gets this guilds slash commands commands
+        ///     Gets this guilds slash commands
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>

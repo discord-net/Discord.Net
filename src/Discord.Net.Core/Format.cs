@@ -15,7 +15,7 @@ namespace Discord
         public static string Italics(string text) => $"*{text}*";
         /// <summary> Returns a markdown-formatted string with underline formatting. </summary>
         public static string Underline(string text) => $"__{text}__";
-        /// <summary> Returns a markdown-formatted string with strikethrough formatting. </summary>
+        /// <summary> Returns a markdown-formatted string with strike-through formatting. </summary>
         public static string Strikethrough(string text) => $"~~{text}~~";
         /// <summary> Returns a string with spoiler formatting. </summary>
         public static string Spoiler(string text) => $"||{text}||";

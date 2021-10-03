@@ -13,7 +13,7 @@ namespace Discord
     {
         internal override ApplicationCommandType Type => ApplicationCommandType.Slash;
         /// <summary>
-        ///    The discription of this command.
+        ///    The description of this command.
         /// </summary>
         public Optional<string> Description { get; set; }
 

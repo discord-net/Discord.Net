@@ -13,7 +13,7 @@ namespace Discord
     public class SlashCommandBuilder
     {
         /// <summary>
-        ///     Returns the maximun length a commands name allowed by Discord
+        ///     Returns the maximum length a commands name allowed by Discord
         /// </summary>
         public const int MaxNameLength = 32;
         /// <summary>
@@ -178,7 +178,7 @@ namespace Discord
             // Discord updated the docs, this regex prevents special characters like @!$%( and s p a c e s.. etc,
             // https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
             if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
-                throw new ArgumentException("Command name cannot contian any special characters or whitespaces!", nameof(name));
+                throw new ArgumentException("Command name cannot contain any special characters or whitespaces!", nameof(name));
 
             // same with description
             Preconditions.NotNullOrEmpty(description, nameof(description));
@@ -213,7 +213,7 @@ namespace Discord
         /// </summary>
         /// <param name="name">The name of the option to add.</param>
         /// <param name="type">The type of this option.</param>
-        /// <param name="description">The sescription of this option.</param>
+        /// <param name="description">The description of this option.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandBuilder AddOption(string name, ApplicationCommandOptionType type, string description)
             => AddOption(name, type, description, options: null, choices: null);
@@ -294,7 +294,7 @@ namespace Discord
 
                 if (value != null)
                     if (!Regex.IsMatch(value, @"^[\w-]{1,32}$"))
-                        throw new ArgumentException("Option name cannot contian any special characters or whitespaces!");
+                        throw new ArgumentException("Option name cannot contain any special characters or whitespaces!");
 
                 _name = value;
             }
@@ -397,7 +397,7 @@ namespace Discord
             // Discord updated the docs, this regex prevents special characters like @!$%( and s p a c e s.. etc,
             // https://discord.com/developers/docs/interactions/slash-commands#applicationcommand
             if (!Regex.IsMatch(name, @"^[\w-]{1,32}$"))
-                throw new ArgumentException("Command name cannot contian any special characters or whitespaces!", nameof(name));
+                throw new ArgumentException("Command name cannot contain any special characters or whitespaces!", nameof(name));
 
             // same with description
             Preconditions.NotNullOrEmpty(description, nameof(description));

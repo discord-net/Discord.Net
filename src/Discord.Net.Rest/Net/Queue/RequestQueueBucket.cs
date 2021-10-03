@@ -435,7 +435,7 @@ namespace Discord.Net.Queue
                 if (!hasQueuedReset || resetTick > _resetTick)
                 {
                     _resetTick = resetTick;
-                    LastAttemptAt = resetTick.Value; //Make sure we dont destroy this until after its been reset
+                    LastAttemptAt = resetTick.Value; //Make sure we don't destroy this until after its been reset
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Reset in {(int)Math.Ceiling((resetTick - DateTimeOffset.UtcNow).Value.TotalMilliseconds)} ms");
 #endif
@@ -456,7 +456,7 @@ namespace Discord.Net.Queue
                 lock (_lock)
                 {
                     millis = (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds);
-                    if (millis <= 0) //Make sure we havent gotten a more accurate reset time
+                    if (millis <= 0) //Make sure we haven't gotten a more accurate reset time
                     {
 #if DEBUG_LIMITS
                         Debug.WriteLine($"[{id}] * Reset *");

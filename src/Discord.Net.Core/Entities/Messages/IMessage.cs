@@ -56,7 +56,7 @@ namespace Discord
         ///     Gets the clean content for this message.
         /// </summary>
         /// <returns>
-        ///     A string that contains the body of the message stripped of mentions, markdown, emojiis and pings; note that this field may be empty if there is an embed.
+        ///     A string that contains the body of the message stripped of mentions, markdown, emojis and pings; note that this field may be empty if there is an embed.
         /// </returns>
         string CleanContent { get; }
         /// <summary>

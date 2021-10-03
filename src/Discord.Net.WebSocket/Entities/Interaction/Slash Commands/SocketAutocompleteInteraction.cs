@@ -75,7 +75,7 @@ namespace Discord.WebSocket
 
 
         /// <inheritdoc/>
-        [Obsolete("Autocomplete interactions cannot be defered!", true)]
+        [Obsolete("Autocomplete interactions cannot be deferred!", true)]
         public override Task DeferAsync(bool ephemeral = false, RequestOptions options = null) => throw new NotSupportedException();
 
         /// <inheritdoc/>

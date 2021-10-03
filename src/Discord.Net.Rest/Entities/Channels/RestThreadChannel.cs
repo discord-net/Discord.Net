@@ -10,7 +10,7 @@ using Model = Discord.API.Channel;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a thread channel recieved over REST.
+    ///     Represents a thread channel received over REST.
     /// </summary>
     public class RestThreadChannel : RestTextChannel, IThreadChannel
     {
@@ -81,7 +81,7 @@ namespace Discord.Rest
         /// <param name="userId">The id of the user to fetch.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task representing the asyncronous get operation. The task returns a
+        ///     A task representing the asynchronous get operation. The task returns a
         ///     <see cref="RestThreadUser"/> if found, otherwise <see langword="null"/>.
         /// </returns>
         public new Task<RestThreadUser> GetUserAsync(ulong userId, RequestOptions options = null)
@@ -92,7 +92,7 @@ namespace Discord.Rest
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task representing the asyncronous get operation. The task returns a
+        ///     A task representing the asynchronous get operation. The task returns a
         ///     <see cref="IReadOnlyCollection{T}"/> of <see cref="RestThreadUser"/>'s.
         /// </returns>
         public new async Task<IReadOnlyCollection<RestThreadUser>> GetUsersAsync(RequestOptions options = null)

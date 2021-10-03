@@ -23,7 +23,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     <note>
         ///         This may return <see langword="null"/> in the WebSocket implementation due to incomplete user collection in
-        ///         large guilds, or the bot doesnt have the MANAGE_EMOJIS_AND_STICKERS permission.
+        ///         large guilds, or the bot doesn't have the MANAGE_EMOJIS_AND_STICKERS permission.
         ///     </note>
         /// </remarks>
         public SocketGuildUser Author

@@ -74,7 +74,7 @@ namespace Discord
         /// <summary>
         ///     Gets the original response for this interaction.
         /// </summary>
-        /// <param name="options">The request options for this async request.</param>
+        /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A <see cref="IUserMessage"/> that represents the initial response.</returns>
         Task<IUserMessage> GetOriginalResponseAsync (RequestOptions options = null);
 
@@ -82,7 +82,7 @@ namespace Discord
         ///     Edits original response for this interaction.
         /// </summary>
         /// <param name="func">A delegate containing the properties to modify the message with.</param>
-        /// <param name="options">The request options for this async request.</param>
+        /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A <see cref="IUserMessage"/> that represents the initial response.</returns>
         Task<IUserMessage> ModifyOriginalResponseAsync (Action<MessageProperties> func, RequestOptions options = null);
 
