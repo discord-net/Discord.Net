@@ -65,7 +65,7 @@ namespace Discord.Rest
 
             Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => RestApplicationCommandOption.Create(x)).ToImmutableArray()
-                : null;
+                : ImmutableArray.Create<RestApplicationCommandOption>();
         }
 
         /// <inheritdoc/>
