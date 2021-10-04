@@ -19,8 +19,17 @@ jobs:
   steps:
   - template: azure/build.yml
 
-- job: Linux_deploy
-  pool: default
+- job: Windows_build
+  pool:
+    vmImage: 'windows-latest'
+  condition: ne(variables['Build.SourceBranch'], 'refs/heads/release/3.x')
+  steps:
+  - template: azure/build.yml
+
+
+- job: Windows_deploy
+  pool:
+    vmImage: 'windows-latest'
   condition: |
       and (
         succeeded(),
