@@ -14,7 +14,8 @@ trigger:
 
 jobs:
 - job: Linux
-  pool: default
+  pool:
+    vmImage: 'ubuntu-latest'
   steps:
   - template: azure/build.yml
 
