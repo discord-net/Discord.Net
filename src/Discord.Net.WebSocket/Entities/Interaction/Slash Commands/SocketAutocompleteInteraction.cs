@@ -34,7 +34,7 @@ namespace Discord.WebSocket
 
         internal new static SocketAutocompleteInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
         {
-            var entity =  new SocketAutocompleteInteraction(client, model, channel);
+            var entity = new SocketAutocompleteInteraction(client, model, channel);
             entity.Update(model);
             return entity;
         }
@@ -84,11 +84,11 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         [Obsolete("Autocomplete interactions cannot have followups!", true)]
-        public override Task<RestFollowupMessage> FollowupWithFileAsync(string text = null, Stream fileStream = null, string fileName = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null) => throw new NotSupportedException();
+        public override Task<RestFollowupMessage> FollowupWithFileAsync(Stream fileStream, string fileName, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null) => throw new NotSupportedException();
 
         /// <inheritdoc/>
         [Obsolete("Autocomplete interactions cannot have followups!", true)]
-        public override Task<RestFollowupMessage> FollowupWithFileAsync(string text = null, string filePath = null, string fileName = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null) => throw new NotSupportedException();
+        public override Task<RestFollowupMessage> FollowupWithFileAsync(string filePath, string text = null, string fileName = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null) => throw new NotSupportedException();
 
         /// <inheritdoc/>
         [Obsolete("Autocomplete interactions cannot have normal responses!", true)]

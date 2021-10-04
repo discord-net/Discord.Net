@@ -157,7 +157,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     The sent message.
         /// </returns>
-        public abstract Task<RestFollowupMessage> FollowupWithFileAsync(string text = null, Stream fileStream = null, string fileName = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
+        public abstract Task<RestFollowupMessage> FollowupWithFileAsync(Stream fileStream, string fileName, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
             AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null);
 
         /// <summary>
@@ -176,13 +176,13 @@ namespace Discord.WebSocket
         /// <returns>
         ///     The sent message.
         /// </returns>
-        public abstract Task<RestFollowupMessage> FollowupWithFileAsync(string text = null, string filePath = null, string fileName = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
+        public abstract Task<RestFollowupMessage> FollowupWithFileAsync(string filePath, string text = null, string fileName = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
             AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null);
 
         /// <summary>
         ///     Gets the original response for this interaction.
         /// </summary>
-        /// <param name="options">The request options for this async request.</param>
+        /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A <see cref="RestInteractionMessage"/> that represents the initial response.</returns>
         public Task<RestInteractionMessage> GetOriginalResponseAsync(RequestOptions options = null)
             => InteractionHelper.GetOriginalResponseAsync(Discord, Channel, this, options);
@@ -191,7 +191,7 @@ namespace Discord.WebSocket
         ///     Edits original response for this interaction.
         /// </summary>
         /// <param name="func">A delegate containing the properties to modify the message with.</param>
-        /// <param name="options">The request options for this async request.</param>
+        /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A <see cref="RestInteractionMessage"/> that represents the initial response.</returns>
         public async Task<RestInteractionMessage> ModifyOriginalResponseAsync(Action<MessageProperties> func, RequestOptions options = null)
         {
@@ -203,7 +203,7 @@ namespace Discord.WebSocket
         ///     Acknowledges this interaction.
         /// </summary>
         /// <param name="ephemeral"><see langword="true"/> to send this message ephemerally, otherwise <see langword="false"/>.</param>
-        /// <param name="options">The request options for this async request.</param>
+        /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>
         ///     A task that represents the asynchronous operation of acknowledging the interaction.
         /// </returns>
