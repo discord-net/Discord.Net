@@ -159,8 +159,8 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public override async Task<RestFollowupMessage> FollowupWithFileAsync(
+            Stream fileStream,
             string text = null,
-            Stream fileStream = null,
             string fileName = null,
             Embed[] embeds = null,
             bool isTTS = false,
@@ -181,7 +181,7 @@ namespace Discord.WebSocket
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds?.Length ?? 0, 10, nameof(embeds), "A max of 10 embeds are allowed.");
             Preconditions.NotNull(fileStream, nameof(fileStream), "File Stream must have data");
-            Preconditions.NotNullOrWhitespace(fileName, nameof(fileName), "File Name must not be empty or null");
+            Preconditions.NotNullOrEmpty(fileName, nameof(fileName), "File Name must not be empty or null");
 
             var args = new API.Rest.CreateWebhookMessageParams
             {
@@ -201,8 +201,8 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public override async Task<RestFollowupMessage> FollowupWithFileAsync(
+            string filePath,
             string text = null,
-            string filePath = null,
             string fileName = null,
             Embed[] embeds = null,
             bool isTTS = false,
@@ -222,7 +222,12 @@ namespace Discord.WebSocket
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds?.Length ?? 0, 10, nameof(embeds), "A max of 10 embeds are allowed.");
-            Preconditions.NotNullOrWhitespace(filePath, nameof(filePath), "Path must exist");
+            Preconditions.NotNullOrEmpty(filePath, nameof(filePath), "Path must exist");
+
+            fileName ??= Path.GetFileName(filePath);
+
+            if (fileName == null || !fileName.Contains('.'))
+                throw new ArgumentException("Make sure that the file path has a file name and a valid file extension.");
 
             var args = new API.Rest.CreateWebhookMessageParams
             {

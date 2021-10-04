@@ -2637,7 +2637,7 @@
         </member>
         <member name="T:Discord.Rest.RestThreadChannel">
             <summary>
-                Represents a thread channel recieved over REST.
+                Represents a thread channel received over REST.
             </summary>
         </member>
         <member name="P:Discord.Rest.RestThreadChannel.Joined">
@@ -2673,7 +2673,7 @@
             <param name="userId">The id of the user to fetch.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
-                A task representing the asyncronous get operation. The task returns a
+                A task representing the asynchronous get operation. The task returns a
                 <see cref="T:Discord.Rest.RestThreadUser"/> if found, otherwise <see langword="null"/>.
             </returns>
         </member>
@@ -2683,7 +2683,7 @@
             </summary>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
-                A task representing the asyncronous get operation. The task returns a
+                A task representing the asynchronous get operation. The task returns a
                 <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/> of <see cref="T:Discord.Rest.RestThreadUser"/>'s.
             </returns>
         </member>
@@ -3298,7 +3298,7 @@
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous get operation. The task result contains the text channel
-                where guild notices such as welcome messages and boost events are poste; <see langword="null"/> if none is found.
+                where guild notices such as welcome messages and boost events are post; <see langword="null"/> if none is found.
             </returns>
         </member>
         <member name="M:Discord.Rest.RestGuild.GetRulesChannelAsync(Discord.RequestOptions)">
@@ -3313,11 +3313,11 @@
         </member>
         <member name="M:Discord.Rest.RestGuild.GetPublicUpdatesChannelAsync(Discord.RequestOptions)">
             <summary>
-                Gets the text channel channel where admins and moderators of Community guilds receive notices from Discord.
+                Gets the text channel where admins and moderators of Community guilds receive notices from Discord.
             </summary>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
-                A task that represents the asynchronous get operation. The task result contains the text channel channel where
+                A task that represents the asynchronous get operation. The task result contains the text channel where
                 admins and moderators of Community guilds receive notices from Discord; <see langword="null"/> if none is set.
             </returns>
         </member>
@@ -3562,7 +3562,7 @@
         </member>
         <member name="M:Discord.Rest.RestGuild.GetApplicationCommandsAsync(Discord.RequestOptions)">
             <summary>
-                Gets this guilds slash commands commands
+                Gets this guilds slash commands
             </summary>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
@@ -4029,6 +4029,11 @@
                 A collection of <see cref="T:Discord.Rest.RestApplicationCommandOption"/>'s for this command.
             </summary>
         </member>
+        <member name="P:Discord.Rest.RestApplicationCommandOption.ChannelTypes">
+            <summary>
+            The allowed channel types for this option.
+            </summary>
+        </member>
         <member name="T:Discord.Rest.RestGlobalCommand">
             <summary>
                 Represents a Rest-based global application command.
@@ -4191,7 +4196,7 @@
                 Gets the guild that this custom sticker is in.
             </summary>
             <remarks>
-                <b>Note</b>: This property can be <see langword="null"/> if the sticker wasnt fetched from a guild.
+                <b>Note</b>: This property can be <see langword="null"/> if the sticker wasn't fetched from a guild.
             </remarks>
         </member>
         <member name="M:Discord.Rest.CustomSticker.DeleteAsync(Discord.RequestOptions)">
@@ -4221,7 +4226,7 @@
         </member>
         <member name="M:Discord.Rest.RestFollowupMessage.DeleteAsync">
             <summary>
-                Deletes this object and all of it's childern.
+                Deletes this object and all of it's children.
             </summary>
             <returns>A task that represents the asynchronous delete operation.</returns>
         </member>
@@ -4245,7 +4250,7 @@
                 A task that represents the asynchronous modification operation.
             </returns>
             <exception cref="T:System.InvalidOperationException">The token used to modify/delete this message expired.</exception>
-            /// <exception cref="T:Discord.Net.HttpException">Somthing went wrong during the request.</exception>
+            /// <exception cref="T:Discord.Net.HttpException">Something went wrong during the request.</exception>
         </member>
         <member name="T:Discord.Rest.RestInteractionMessage">
             <summary>
@@ -4254,7 +4259,7 @@
         </member>
         <member name="M:Discord.Rest.RestInteractionMessage.DeleteAsync">
             <summary>
-                Deletes this object and all of it's childern.
+                Deletes this object and all of it's children.
             </summary>
             <returns>A task that represents the asynchronous delete operation.</returns>
         </member>
@@ -4278,7 +4283,7 @@
                 A task that represents the asynchronous modification operation.
             </returns>
             <exception cref="T:System.InvalidOperationException">The token used to modify/delete this message expired.</exception>
-            /// <exception cref="T:Discord.Net.HttpException">Somthing went wrong during the request.</exception>
+            /// <exception cref="T:Discord.Net.HttpException">Something went wrong during the request.</exception>
         </member>
         <member name="T:Discord.Rest.RestMessage">
             <summary>

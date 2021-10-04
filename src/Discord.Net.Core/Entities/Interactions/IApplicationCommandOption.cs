@@ -45,5 +45,10 @@ namespace Discord
         ///     If the option is a subcommand or subcommand group type, this nested options will be the parameters.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandOption>? Options { get; }
+
+        /// <summary>
+        ///     The allowed channel types for this option.
+        /// </summary>
+        IReadOnlyCollection<ChannelType>? ChannelTypes { get; }
     }
 }

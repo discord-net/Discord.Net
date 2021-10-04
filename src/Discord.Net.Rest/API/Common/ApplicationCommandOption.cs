@@ -33,6 +33,9 @@ namespace Discord.API
         [JsonProperty("autocomplete")]
         public Optional<bool> Autocomplete { get; set; }
 
+        [JsonProperty("channel_types")]
+        public Optional<ChannelType[]> ChannelTypes { get; set; }
+
         public ApplicationCommandOption() { }
 
         public ApplicationCommandOption(IApplicationCommandOption cmd)
@@ -44,6 +47,8 @@ namespace Discord.API
             }).ToArray();
 
             Options = cmd.Options.Select(x => new ApplicationCommandOption(x)).ToArray();
+
+            ChannelTypes = cmd.ChannelTypes.ToArray();
 
             Required = cmd.Required.HasValue
                 ? cmd.Required.Value
@@ -77,6 +82,10 @@ namespace Discord.API
             Default = option.Default.HasValue
                 ? option.Default.Value
                 : Optional<bool>.Unspecified;
+
+            ChannelTypes = option.ChannelTypes != null
+                ? option.ChannelTypes.ToArray()
+                : Optional<ChannelType[]>.Unspecified;
 
             Name = option.Name;
             Type = option.Type;

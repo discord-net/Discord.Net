@@ -81,6 +81,9 @@ namespace Discord
         /// </summary>
         public List<ApplicationCommandOptionProperties> Options { get; set; }
 
-        
+        /// <summary>
+        ///     Gets or sets the allowed channel types for this option.
+        /// </summary>
+        public List<ChannelType> ChannelTypes { get; set; }
     }
 }
