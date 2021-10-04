@@ -38,6 +38,11 @@ namespace Discord.WebSocket
         /// </summary>
         public IReadOnlyCollection<SocketApplicationCommandOption> Options { get; private set; }
 
+        /// <summary>
+        ///     The allowed channel types for this option.
+        /// </summary>
+        public IReadOnlyCollection<ChannelType> ChannelTypes { get; private set; }
+
         internal SocketApplicationCommandOption() { }
         internal static SocketApplicationCommandOption Create(Model model)
         {
@@ -67,6 +72,10 @@ namespace Discord.WebSocket
             Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => SocketApplicationCommandOption.Create(x)).ToImmutableArray()
                 : new ImmutableArray<SocketApplicationCommandOption>();
+
+            ChannelTypes = model.ChannelTypes.IsSpecified
+                ? model.ChannelTypes.Value.ToImmutableArray()
+                : new ImmutableArray<ChannelType>();
         }
 
         IReadOnlyCollection<IApplicationCommandOptionChoice> IApplicationCommandOption.Choices => Choices;

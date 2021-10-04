@@ -39,6 +39,11 @@ namespace Discord.Rest
         /// </summary>
         public IReadOnlyCollection<RestApplicationCommandOption> Options { get; private set; }
 
+        /// <summary>
+        ///     The allowed channel types for this option.
+        /// </summary>
+        public IReadOnlyCollection<ChannelType> ChannelTypes { get; private set; }
+
         internal RestApplicationCommandOption() { }
 
         internal static RestApplicationCommandOption Create(Model model)
@@ -67,6 +72,10 @@ namespace Discord.Rest
             Choices = model.Choices.IsSpecified
                 ? model.Choices.Value.Select(x => new RestApplicationCommandChoice(x)).ToImmutableArray()
                 : ImmutableArray.Create<RestApplicationCommandChoice>();
+
+            ChannelTypes = model.ChannelTypes.IsSpecified
+                ? model.ChannelTypes.Value.ToImmutableArray()
+                : ImmutableArray.Create<ChannelType>();
         }
         #endregion
 

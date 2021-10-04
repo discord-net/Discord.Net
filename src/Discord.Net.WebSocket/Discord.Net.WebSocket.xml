@@ -709,7 +709,7 @@
         </member>
         <member name="E:Discord.WebSocket.BaseSocketClient.InteractionCreated">
             <summary>
-                Fired when an Interaction is created. This event covers all types of interactions including but not limited to: buttons, select menus, slash commands.
+                Fired when an Interaction is created. This event covers all types of interactions including but not limited to: buttons, select menus, slash commands, autocompletes.
             </summary>
             <remarks>
                 <para>
@@ -746,11 +746,11 @@
                 Fired when a message command is used and its interaction is received.
             </summary>
         </member>
-		<member name="E:Discord.WebSocket.BaseSocketClient.AutocompleteExecuted">
-			<summary>
-				Fired when an autocomplete is used and its interaction is received.
-			</summary>
-		</member>
+        <member name="E:Discord.WebSocket.BaseSocketClient.AutocompleteExecuted">
+            <summary>
+                Fired when an autocomplete is used and its interaction is received.
+            </summary>
+        </member>
         <member name="E:Discord.WebSocket.BaseSocketClient.ApplicationCommandCreated">
              <summary>
                  Fired when a guild application command is created.
@@ -1009,7 +1009,7 @@
             </summary>
         </member>
         <member name="P:Discord.WebSocket.DiscordSocketClient.ShardId">
-            <summary> Gets the shard of of this client. </summary>
+            <summary> Gets the shard of this client. </summary>
         </member>
         <member name="P:Discord.WebSocket.DiscordSocketClient.ConnectionState">
             <summary> Gets the current connection state of this client. </summary>
@@ -1373,7 +1373,7 @@
             <remarks>
                 <para>
                     By default, the Discord gateway will only send offline members if a guild has less than a certain number
-                    of members (determined by <see cref="P:Discord.WebSocket.DiscordSocketConfig.LargeThreshold"/> in this library). This behaviour is why
+                    of members (determined by <see cref="P:Discord.WebSocket.DiscordSocketConfig.LargeThreshold"/> in this library). This behavior is why
                     sometimes a user may be missing from the WebSocket cache for collections such as
                     <see cref="P:Discord.WebSocket.SocketGuild.Users"/>.
                 </para>
@@ -2265,7 +2265,7 @@
         </member>
         <member name="T:Discord.WebSocket.SocketStageChannel">
             <summary>
-                Represents a stage channel recieved over the gateway.
+                Represents a stage channel received over the gateway.
             </summary>
         </member>
         <member name="P:Discord.WebSocket.SocketStageChannel.Topic">
@@ -3869,7 +3869,7 @@
         </member>
         <member name="P:Discord.WebSocket.SocketMessageCommandData.Message">
             <summary>
-                Gets the messagte associated with this message command.
+                Gets the message associated with this message command.
             </summary>
         </member>
         <member name="P:Discord.WebSocket.SocketMessageCommandData.Options">
@@ -3927,7 +3927,7 @@
                 Updates the message which this component resides in with the type <see cref="F:Discord.InteractionResponseType.UpdateMessage"/>
             </summary>
             <param name="func">A delegate containing the properties to modify the message with.</param>
-            <param name="options">The request options for this async request.</param>
+            <param name="options">The request options for this <see langword="async"/> request.</param>
             <returns>A task that represents the asynchronous operation of updating the message.</returns>
         </member>
         <member name="M:Discord.WebSocket.SocketMessageComponent.FollowupAsync(System.String,Discord.Embed[],System.Boolean,System.Boolean,Discord.AllowedMentions,Discord.RequestOptions,Discord.MessageComponent,Discord.Embed)">
@@ -3944,7 +3944,7 @@
                 Defers an interaction and responds with type 5 (<see cref="F:Discord.InteractionResponseType.DeferredChannelMessageWithSource"/>)
             </summary>
             <param name="ephemeral"><see langword="true"/> to send this message ephemerally, otherwise <see langword="false"/>.</param>
-            <param name="options">The request options for this async request.</param>
+            <param name="options">The request options for this <see langword="async"/> request.</param>
             <returns>
                 A task that represents the asynchronous operation of acknowledging the interaction.
             </returns>
@@ -4056,7 +4056,7 @@
         </member>
         <member name="P:Discord.WebSocket.SocketAutocompleteInteractionData.Current">
             <summary>
-                Gets the current autocomplete option that is activly being filled out.
+                Gets the current autocomplete option that is actively being filled out.
             </summary>
         </member>
         <member name="P:Discord.WebSocket.SocketAutocompleteInteractionData.Options">
@@ -4081,7 +4081,7 @@
         </member>
         <member name="T:Discord.WebSocket.SocketSlashCommandDataOption">
             <summary>
-                Represents a Websocket-based <see cref="T:Discord.IApplicationCommandInteractionDataOption"/> recieved by the gateway
+                Represents a Websocket-based <see cref="T:Discord.IApplicationCommandInteractionDataOption"/> received by the gateway
             </summary>
         </member>
         <member name="P:Discord.WebSocket.SocketSlashCommandDataOption.Name">
@@ -4189,6 +4189,11 @@
                 If the option is a subcommand or subcommand group type, this nested options will be the parameters.
             </summary>
         </member>
+        <member name="P:Discord.WebSocket.SocketApplicationCommandOption.ChannelTypes">
+            <summary>
+            The allowed channel types for this option.
+            </summary>
+        </member>
         <member name="T:Discord.WebSocket.SocketCommandBase">
             <summary>
                 Base class for User, Message, and Slash command interactions.
@@ -4249,7 +4254,7 @@
         </member>
         <member name="T:Discord.WebSocket.SocketInteraction">
             <summary>
-                Represents an Interaction recieved over the gateway.
+                Represents an Interaction received over the gateway.
             </summary>
         </member>
         <member name="P:Discord.WebSocket.SocketInteraction.Channel">
@@ -4920,7 +4925,7 @@
             <remarks>
                 <note>
                     This may return <see langword="null"/> in the WebSocket implementation due to incomplete user collection in
-                    large guilds, or the bot doesnt have the MANAGE_EMOJIS_AND_STICKERS permission.
+                    large guilds, or the bot doesn't have the MANAGE_EMOJIS_AND_STICKERS permission.
                 </note>
             </remarks>
         </member>

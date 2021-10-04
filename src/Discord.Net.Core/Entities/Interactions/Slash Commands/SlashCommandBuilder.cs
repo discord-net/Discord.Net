@@ -165,10 +165,12 @@ namespace Discord
         /// <param name="isDefault">If this option is the default option.</param>
         /// <param name="isAutocomplete">If this option is set to autocompleate.</param>
         /// <param name="options">The options of the option to add.</param>
+        /// <param name="channelTypes">The allowed channel types for this option.</param>
         /// <param name="choices">The choices of this option.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandBuilder AddOption(string name, ApplicationCommandOptionType type,
-           string description, bool? required = null, bool? isDefault = null, bool isAutocomplete = false, List<SlashCommandOptionBuilder> options = null, params ApplicationCommandOptionChoiceProperties[] choices)
+           string description, bool? required = null, bool? isDefault = null, bool isAutocomplete = false, List<SlashCommandOptionBuilder> options = null,
+           List<ChannelType> channelTypes = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             // Make sure the name matches the requirements from discord
             Preconditions.NotNullOrEmpty(name, nameof(name));
@@ -202,7 +204,8 @@ namespace Discord
                 Options = options,
                 Type = type,
                 Autocomplete = isAutocomplete,
-                Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null
+                Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null,
+                ChannelTypes = channelTypes,
             };
 
             return AddOption(option);
@@ -348,6 +351,11 @@ namespace Discord
         public List<SlashCommandOptionBuilder> Options { get; set; }
 
         /// <summary>
+        ///     Gets or sets the allowed channel types for this option.
+        /// </summary>
+        public List<ChannelType> ChannelTypes { get; set; }
+
+        /// <summary>
         ///     Builds the current option.
         /// </summary>
         /// <returns>The built version of this option.</returns>
@@ -370,7 +378,8 @@ namespace Discord
                 Type = Type,
                 Options = Options?.Count > 0 ? new List<ApplicationCommandOptionProperties>(Options.Select(x => x.Build())) : null,
                 Choices = Choices,
-                Autocomplete = Autocomplete
+                Autocomplete = Autocomplete,
+                ChannelTypes = ChannelTypes
             };
         }
 
@@ -384,10 +393,12 @@ namespace Discord
         /// <param name="isDefault">If this option is the default option.</param>
         /// <param name="isAutocomplete">If this option supports autocomplete.</param>
         /// <param name="options">The options of the option to add.</param>
+        /// <param name="channelTypes">The allowed channel types for this option.</param>
         /// <param name="choices">The choices of this option.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddOption(string name, ApplicationCommandOptionType type,
-           string description, bool? required = null, bool isDefault = false, bool isAutocomplete = false, List<SlashCommandOptionBuilder> options = null, params ApplicationCommandOptionChoiceProperties[] choices)
+           string description, bool? required = null, bool isDefault = false, bool isAutocomplete = false, List<SlashCommandOptionBuilder> options = null,
+           List<ChannelType> channelTypes = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             // Make sure the name matches the requirements from discord
             Preconditions.NotNullOrEmpty(name, nameof(name));
@@ -422,6 +433,7 @@ namespace Discord
                 Options = options,
                 Type = type,
                 Choices = choices != null ? new List<ApplicationCommandOptionChoiceProperties>(choices) : null,
+                ChannelTypes = channelTypes,
             };
 
             return AddOption(option);
@@ -506,6 +518,21 @@ namespace Discord
                 Name = name,
                 Value = value
             });
+
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds a channnel type to the current option.
+        /// </summary>
+        /// <param name="channelType">The <see cref="ChannelType"/> to add.</param>
+        /// <returns>The current builder.</returns>
+        public SlashCommandOptionBuilder AddChannelType(ChannelType channelType)
+        {
+            if (ChannelTypes == null)
+                ChannelTypes = new List<ChannelType>();
+
+            ChannelTypes.Add(channelType);
 
             return this;
         }
