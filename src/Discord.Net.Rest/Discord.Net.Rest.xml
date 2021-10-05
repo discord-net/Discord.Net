@@ -1507,6 +1507,96 @@
                 A role information object containing the role information after the changes were made.
             </returns>
         </member>
+        <member name="T:Discord.Rest.StageInfo">
+            <summary>
+                Represents information for a stage.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.StageInfo.Topic">
+            <summary>
+                Gets the topic of the stage channel.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.StageInfo.PrivacyLevel">
+            <summary>
+                Gets the privacy level of the stage channel.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.StageInfo.User">
+            <summary>
+                Gets the user who started the stage channel.
+            </summary>
+        </member>
+        <member name="T:Discord.Rest.StageInstanceCreateAuditLogData">
+            <summary>
+                Contains a piece of audit log data related to a stage going live.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.StageInstanceCreateAuditLogData.Topic">
+            <summary>
+                Gets the topic of the stage channel.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.StageInstanceCreateAuditLogData.PrivacyLevel">
+            <summary>
+                Gets the privacy level of the stage channel.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.StageInstanceCreateAuditLogData.User">
+            <summary>
+                Gets the user who started the stage channel.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.StageInstanceCreateAuditLogData.StageChannelId">
+            <summary>
+                Gets the Id of the stage channel.
+            </summary>
+        </member>
+        <member name="T:Discord.Rest.StageInstanceDeleteAuditLogData">
+            <summary>
+                Contains a piece of audit log data related to a stage instance deleted.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.StageInstanceDeleteAuditLogData.Topic">
+            <summary>
+                Gets the topic of the stage channel.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.StageInstanceDeleteAuditLogData.PrivacyLevel">
+            <summary>
+                Gets the privacy level of the stage channel.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.StageInstanceDeleteAuditLogData.User">
+            <summary>
+                Gets the user who started the stage channel.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.StageInstanceDeleteAuditLogData.StageChannelId">
+            <summary>
+                Gets the Id of the stage channel.
+            </summary>
+        </member>
+        <member name="T:Discord.Rest.StageInstanceUpdatedAuditLogData">
+            <summary>
+                Contains a piece of audit log data related to a stage instance update.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.StageInstanceUpdatedAuditLogData.StageChannelId">
+            <summary>
+                Gets the Id of the stage channel.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.StageInstanceUpdatedAuditLogData.Before">
+            <summary>
+                Gets the stage information before the changes.
+            </summary>
+        </member>
+        <member name="P:Discord.Rest.StageInstanceUpdatedAuditLogData.After">
+            <summary>
+                Gets the stage information after the changes.
+            </summary>
+        </member>
         <member name="T:Discord.Rest.UnbanAuditLogData">
             <summary>
                 Contains a piece of audit log data related to an unban.
@@ -4031,7 +4121,7 @@
         </member>
         <member name="P:Discord.Rest.RestApplicationCommandOption.ChannelTypes">
             <summary>
-            The allowed channel types for this option.
+                The allowed channel types for this option.
             </summary>
         </member>
         <member name="T:Discord.Rest.RestGlobalCommand">
@@ -4341,11 +4431,6 @@
         <member name="P:Discord.Rest.RestMessage.MentionedRoleIds">
             <inheritdoc />
         </member>
-        <member name="P:Discord.Rest.RestMessage.MentionedUsers">
-            <summary>
-                Gets a collection of the mentioned users in the message.
-            </summary>
-        </member>
         <member name="P:Discord.Rest.RestMessage.Tags">
             <inheritdoc />
         </member>
@@ -4372,6 +4457,11 @@
         </member>
         <member name="P:Discord.Rest.RestMessage.Components">
             <inheritdoc/>
+        </member>
+        <member name="P:Discord.Rest.RestMessage.MentionedUsers">
+            <summary>
+                Gets a collection of the mentioned users in the message.
+            </summary>
         </member>
         <member name="M:Discord.Rest.RestMessage.UpdateAsync(Discord.RequestOptions)">
             <inheritdoc />
@@ -4476,9 +4566,6 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestUserMessage.MentionedRoleIds">
-            <inheritdoc />
-        </member>
-        <member name="P:Discord.Rest.RestUserMessage.MentionedUsers">
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestUserMessage.Tags">

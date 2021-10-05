@@ -15,6 +15,7 @@ namespace Discord.Rest
     {
         private long _timestampTicks;
         private ImmutableArray<RestReaction> _reactions = ImmutableArray.Create<RestReaction>();
+        private ImmutableArray<RestUser> _userMentions = ImmutableArray.Create<RestUser>();
 
         /// <inheritdoc />
         public IMessageChannel Channel { get; }
@@ -56,10 +57,6 @@ namespace Discord.Rest
         public virtual IReadOnlyCollection<ulong> MentionedChannelIds => ImmutableArray.Create<ulong>();
         /// <inheritdoc />
         public virtual IReadOnlyCollection<ulong> MentionedRoleIds => ImmutableArray.Create<ulong>();
-        /// <summary>
-        ///     Gets a collection of the mentioned users in the message.
-        /// </summary>
-        public virtual IReadOnlyCollection<RestUser> MentionedUsers => ImmutableArray.Create<RestUser>();
         /// <inheritdoc />
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
         /// <inheritdoc />
@@ -80,6 +77,10 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         public IReadOnlyCollection<ActionRowComponent> Components { get; private set; }
+        /// <summary>
+        ///     Gets a collection of the mentioned users in the message.
+        /// </summary>
+        public IReadOnlyCollection<RestUser> MentionedUsers => _userMentions;
 
         internal RestMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
             : base(discord, id)
@@ -210,6 +211,22 @@ namespace Discord.Rest
             }
             else
                 _reactions = ImmutableArray.Create<RestReaction>();
+
+            if (model.UserMentions.IsSpecified)
+            {
+                var value = model.UserMentions.Value;
+                if (value.Length > 0)
+                {
+                    var newMentions = ImmutableArray.CreateBuilder<RestUser>(value.Length);
+                    for (int i = 0; i < value.Length; i++)
+                    {
+                        var val = value[i];
+                        if (val != null)
+                            newMentions.Add(RestUser.Create(Discord, val));
+                    }
+                    _userMentions = newMentions.ToImmutable();
+                }
+            }
         }
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)

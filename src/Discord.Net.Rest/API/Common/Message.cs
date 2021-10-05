@@ -32,7 +32,7 @@ namespace Discord.API
         [JsonProperty("mention_everyone")]
         public Optional<bool> MentionEveryone { get; set; }
         [JsonProperty("mentions")]
-        public Optional<EntityOrId<User>[]> UserMentions { get; set; }
+        public Optional<User[]> UserMentions { get; set; }
         [JsonProperty("mention_roles")]
         public Optional<ulong[]> RoleMentions { get; set; }
         [JsonProperty("attachments")]

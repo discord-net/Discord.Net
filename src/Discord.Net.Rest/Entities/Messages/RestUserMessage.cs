@@ -20,7 +20,6 @@ namespace Discord.Rest
         private ImmutableArray<Embed> _embeds = ImmutableArray.Create<Embed>();
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
         private ImmutableArray<ulong> _roleMentionIds = ImmutableArray.Create<ulong>();
-        private ImmutableArray<RestUser> _userMentions = ImmutableArray.Create<RestUser>();
         private ImmutableArray<StickerItem> _stickers = ImmutableArray.Create<StickerItem>();
 
         /// <inheritdoc />
@@ -41,8 +40,6 @@ namespace Discord.Rest
         public override IReadOnlyCollection<ulong> MentionedChannelIds => MessageHelper.FilterTagsByKey(TagType.ChannelMention, _tags);
         /// <inheritdoc />
         public override IReadOnlyCollection<ulong> MentionedRoleIds => _roleMentionIds;
-        /// <inheritdoc />
-        public override IReadOnlyCollection<RestUser> MentionedUsers => _userMentions;
         /// <inheritdoc />
         public override IReadOnlyCollection<ITag> Tags => _tags;
         /// <inheritdoc />
@@ -104,28 +101,12 @@ namespace Discord.Rest
                     _embeds = ImmutableArray.Create<Embed>();
             }
 
-            if (model.UserMentions.IsSpecified)
-            {
-                var value = model.UserMentions.Value;
-                if (value.Length > 0)
-                {
-                    var newMentions = ImmutableArray.CreateBuilder<RestUser>(value.Length);
-                    for (int i = 0; i < value.Length; i++)
-                    {
-                        var val = value[i];
-                        if (val.Object != null)
-                            newMentions.Add(RestUser.Create(Discord, val.Object));
-                    }
-                    _userMentions = newMentions.ToImmutable();
-                }
-            }
-
             var guildId = (Channel as IGuildChannel)?.GuildId;
             var guild = guildId != null ? (Discord as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
             if (model.Content.IsSpecified)
             {
                 var text = model.Content.Value;
-                _tags = MessageHelper.ParseTags(text, null, guild, _userMentions);
+                _tags = MessageHelper.ParseTags(text, null, guild, MentionedUsers);
                 model.Content = text;
             }
 
