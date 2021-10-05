@@ -225,9 +225,7 @@ namespace Discord.WebSocket
             Preconditions.NotNullOrEmpty(filePath, nameof(filePath), "Path must exist");
 
             fileName ??= Path.GetFileName(filePath);
-
-            if (fileName == null || !fileName.Contains('.'))
-                throw new ArgumentException("Make sure that the file path has a file name and a valid file extension.");
+            Preconditions.NotNullOrEmpty(fileName, nameof(fileName), "File Name must not be empty or null");
 
             var args = new API.Rest.CreateWebhookMessageParams
             {
