@@ -338,9 +338,6 @@ namespace Discord.Rest
             string filePath, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers, RequestOptions options, bool isSpoiler, Embed[] embeds)
         {
             string filename = Path.GetFileName(filePath);
-            if (filename == null || !filename.Contains('.'))
-                throw new ArgumentException("Make sure that the file path has a file name and a valid file extension.");
-
             using (var file = File.OpenRead(filePath))
                 return await SendFileAsync(channel, client, file, filename, text, isTTS, embed, allowedMentions, messageReference, component, stickers, options, isSpoiler, embeds).ConfigureAwait(false);
         }
@@ -349,9 +346,6 @@ namespace Discord.Rest
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             Stream stream, string filename, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers, RequestOptions options, bool isSpoiler, Embed[] embeds)
         {
-            if (filename == null || !filename.Contains('.'))
-                throw new ArgumentException("Make sure that the file path has a file name and a valid file extension.");
-
             embeds ??= Array.Empty<Embed>();
             if (embed != null)
                 embeds = new[] { embed }.Concat(embeds).ToArray();
@@ -359,6 +353,7 @@ namespace Discord.Rest
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
+            Preconditions.NotNullOrEmpty(filename, nameof(filename), "File Name must not be empty or null");
 
             // check that user flag and user Id list are exclusive, same with role flag and role Id list
             if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
