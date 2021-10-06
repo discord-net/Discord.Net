@@ -1,12 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../../Discord.Net.targets" />
   <Import Project="../../StyleAnalyzer.targets" />
   <PropertyGroup>
     <AssemblyName>Discord.Net.Rest</AssemblyName>
     <RootNamespace>Discord.Rest</RootNamespace>
     <Description>A core Discord.Net Labs library containing the REST client and models.</Description>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net461;netstandard2.0;netstandard2.1</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net5.0;net461;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">net5.0;netstandard2.0;netstandard2.1</TargetFrameworks>
     <PackageIcon>Temporary.png</PackageIcon>
     <PackageProjectUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</PackageProjectUrl>
     <PackageId>Discord.Net.Labs.Rest</PackageId>
