@@ -538,7 +538,7 @@ namespace Discord
         /// </returns>
         Task<IVoiceChannel> GetVoiceChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
-        ///     Gets a stage channel in this guild
+        ///     Gets a stage channel in this guild.
         /// </summary>
         /// <param name="id">The snowflake identifier for the stage channel.</param>
         /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
