@@ -26,7 +26,7 @@ namespace Discord.Rest
         public string Description { get; private set; }
 
         /// <inheritdoc/>
-        public bool DefaultPermission { get; private set; }
+        public bool IsDefaultPermission { get; private set; }
 
         /// <summary>
         ///     The options of this command.
@@ -61,7 +61,7 @@ namespace Discord.Rest
             ApplicationId = model.ApplicationId;
             Name = model.Name;
             Description = model.Description;
-            DefaultPermission = model.DefaultPermissions.GetValueOrDefault(true);
+            IsDefaultPermission = model.DefaultPermissions.GetValueOrDefault(true);
 
             Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => RestApplicationCommandOption.Create(x)).ToImmutableArray()

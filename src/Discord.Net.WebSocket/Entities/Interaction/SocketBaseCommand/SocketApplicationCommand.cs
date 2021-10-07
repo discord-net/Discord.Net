@@ -35,7 +35,7 @@ namespace Discord.WebSocket
         public string Description { get; private set; }
 
         /// <inheritdoc/>
-        public bool DefaultPermission { get; private set; }
+        public bool IsDefaultPermission { get; private set; }
 
         /// <summary>
         ///     A collection of <see cref="SocketApplicationCommandOption"/>'s for this command.
@@ -81,7 +81,7 @@ namespace Discord.WebSocket
             ApplicationId = model.ApplicationId;
             Description = model.Description;
             Name = model.Name;
-            DefaultPermission = model.DefaultPermissions.GetValueOrDefault(true);
+            IsDefaultPermission = model.DefaultPermissions.GetValueOrDefault(true);
 
             Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => SocketApplicationCommandOption.Create(x)).ToImmutableArray()
