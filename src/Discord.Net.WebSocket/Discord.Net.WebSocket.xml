@@ -4963,7 +4963,7 @@
         <member name="P:Discord.WebSocket.SocketSticker.Format">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.WebSocket.SocketSticker.Available">
+        <member name="P:Discord.WebSocket.SocketSticker.IsAvailable">
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketSticker.SortOrder">
@@ -4989,7 +4989,7 @@
         <member name="P:Discord.WebSocket.SocketUnknownSticker.PackId">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.WebSocket.SocketUnknownSticker.Available">
+        <member name="P:Discord.WebSocket.SocketUnknownSticker.IsAvailable">
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketUnknownSticker.SortOrder">

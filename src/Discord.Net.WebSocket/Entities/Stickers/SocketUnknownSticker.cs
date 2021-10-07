@@ -26,7 +26,7 @@ namespace Discord.WebSocket
         public override ulong PackId
             => 0;
         /// <inheritdoc/>
-        public override bool? Available
+        public override bool? IsAvailable
             => null;
 
         /// <inheritdoc/>

@@ -4611,7 +4611,7 @@
         <member name="P:Discord.Rest.Sticker.Type">
             <inheritdoc />
         </member>
-        <member name="P:Discord.Rest.Sticker.Available">
+        <member name="P:Discord.Rest.Sticker.IsAvailable">
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.Sticker.SortOrder">

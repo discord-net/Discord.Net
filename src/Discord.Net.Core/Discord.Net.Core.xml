@@ -10001,7 +10001,7 @@
                 A <see cref="T:Discord.StickerFormatType"/> with the format type of this sticker.
             </returns>
         </member>
-        <member name="P:Discord.ISticker.Available">
+        <member name="P:Discord.ISticker.IsAvailable">
             <summary>
                 Gets whether this guild sticker can be used, may be false due to loss of Server Boosts
             </summary>

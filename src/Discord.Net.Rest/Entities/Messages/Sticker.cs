@@ -20,7 +20,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public StickerType Type { get; protected set; }
         /// <inheritdoc />
-        public bool? Available { get; protected set; }
+        public bool? IsAvailable { get; protected set; }
         /// <inheritdoc />
         public int? SortOrder { get; protected set; }
         /// <inheritdoc />
@@ -47,7 +47,7 @@ namespace Discord.Rest
             Tags = model.Tags.IsSpecified ? model.Tags.Value.Split(',').Select(x => x.Trim()).ToArray() : new string[0];
             Type = model.Type;
             SortOrder = model.SortValue;
-            Available = model.Available;
+            IsAvailable = model.Available;
             Format = model.FormatType;
         }
 
