@@ -20,10 +20,10 @@ namespace Discord.Rest
         public StagePrivacyLevel? PrivacyLevel { get; private set; }
 
         /// <inheritdoc/>
-        public bool? DiscoverableDisabled { get; private set; }
+        public bool? IsDiscoverableDisabled { get; private set; }
 
         /// <inheritdoc/>
-        public bool Live { get; private set; }
+        public bool IsLive { get; private set; }
         internal RestStageChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
         {
@@ -39,18 +39,18 @@ namespace Discord.Rest
 
         internal void Update(StageInstance model, bool isLive = false)
         {
-            Live = isLive;
+            IsLive = isLive;
             if(isLive)
             {
                 Topic = model.Topic;
                 PrivacyLevel = model.PrivacyLevel;
-                DiscoverableDisabled = model.DiscoverableDisabled;
+                IsDiscoverableDisabled = model.DiscoverableDisabled;
             }
             else
             {
                 Topic = null;
                 PrivacyLevel = null;
-                DiscoverableDisabled = null;
+                IsDiscoverableDisabled = null;
             }
         }
 

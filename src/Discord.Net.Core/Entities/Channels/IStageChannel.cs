@@ -30,7 +30,7 @@ namespace Discord
         /// <summary>
         ///     <see langword="true"/> if stage discovery is disabled, otherwise <see langword="false"/>. 
         /// </summary>
-        bool? DiscoverableDisabled { get; }
+        bool? IsDiscoverableDisabled { get; }
 
         /// <summary>
         ///     <see langword="true"/> when the stage is live, otherwise <see langword="false"/>.
@@ -38,7 +38,7 @@ namespace Discord
         /// <remarks>
         ///     If the stage isn't live then this property will be set to <see langword="null"/>.
         /// </remarks>
-        bool Live { get; }
+        bool IsLive { get; }
 
         /// <summary>
         ///     Starts the stage, creating a stage instance.

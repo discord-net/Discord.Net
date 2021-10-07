@@ -22,10 +22,10 @@ namespace Discord.WebSocket
         public StagePrivacyLevel? PrivacyLevel { get; private set; }
 
         /// <inheritdoc/>
-        public bool? DiscoverableDisabled { get; private set; }
+        public bool? IsDiscoverableDisabled { get; private set; }
 
         /// <inheritdoc/>
-        public bool Live { get; private set; } = false;
+        public bool IsLive { get; private set; } = false;
 
         /// <summary>
         ///     Returns <see langword="true"/> if the current user is a speaker within the stage, otherwise <see langword="false"/>.
@@ -62,18 +62,18 @@ namespace Discord.WebSocket
 
         internal void Update(StageInstance model, bool isLive = false)
         {
-            Live = isLive;
+            IsLive = isLive;
             if (isLive)
             {
                 Topic = model.Topic;
                 PrivacyLevel = model.PrivacyLevel;
-                DiscoverableDisabled = model.DiscoverableDisabled;
+                IsDiscoverableDisabled = model.DiscoverableDisabled;
             }
             else
             {
                 Topic = null;
                 PrivacyLevel = null;
-                DiscoverableDisabled = null;
+                IsDiscoverableDisabled = null;
             }
         }
 
