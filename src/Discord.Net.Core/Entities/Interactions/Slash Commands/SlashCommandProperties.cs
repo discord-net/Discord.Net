@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 namespace Discord
 {
     /// <summary>
-    ///     A class used to create slash commands.
+    ///     Represents a class used to create slash commands.
     /// </summary>
     public class SlashCommandProperties : ApplicationCommandProperties
     {
         internal override ApplicationCommandType Type => ApplicationCommandType.Slash;
+
         /// <summary>
-        ///    The discription of this command.
+        ///    Gets or sets the discription of this command.
         /// </summary>
         public Optional<string> Description { get; set; }
 
