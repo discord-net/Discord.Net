@@ -450,8 +450,6 @@ namespace Discord.WebSocket
             }
             _voiceStates = voiceStates;
 
-           
-
             _syncPromise = new TaskCompletionSource<bool>();
             _downloaderPromise = new TaskCompletionSource<bool>();
             var _ = _syncPromise.TrySetResultAsync(true);
