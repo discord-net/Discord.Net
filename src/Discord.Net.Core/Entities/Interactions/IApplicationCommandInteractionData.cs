@@ -12,17 +12,17 @@ namespace Discord
     public interface IApplicationCommandInteractionData
     {
         /// <summary>
-        ///     The snowflake id of this command.
+        ///     Gets the snowflake id of this command.
         /// </summary>
         ulong Id { get; }
 
         /// <summary>
-        ///     The name of this command.
+        ///     Gets the name of this command.
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        ///     The params + values from the user.
+        ///     Gets the options that the user has provided.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandInteractionDataOption> Options { get; }
     }
