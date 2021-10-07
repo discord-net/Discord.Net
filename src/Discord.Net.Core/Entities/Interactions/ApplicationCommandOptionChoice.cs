@@ -40,11 +40,6 @@ namespace Discord
             get => _value;
             set
             {
-                if(value != null)
-                {
-                    if(!(value is int) && !(value is string))
-                        throw new ArgumentException("The value of a choice must be a string or int!");
-                }
                 _value = value;
             }
         }
