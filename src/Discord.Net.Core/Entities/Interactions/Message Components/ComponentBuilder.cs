@@ -69,7 +69,7 @@ namespace Discord
             switch (component)
             {
                 case ButtonComponent button:
-                    WithButton(button.Label, button.CustomId, button.Style, button.Emote, button.Url, button.Disabled, row);
+                    WithButton(button.Label, button.CustomId, button.Style, button.Emote, button.Url, button.IsDisabled, row);
                     break;
                 case ActionRowComponent actionRow:
                     foreach (var cmp in actionRow.Components)
@@ -451,7 +451,7 @@ namespace Discord
             Style = button.Style;
             Url = button.Url;
             Label = button.Label;
-            IsDisabled = button.Disabled;
+            IsDisabled = button.IsDisabled;
             Emote = button.Emote;
         }
 

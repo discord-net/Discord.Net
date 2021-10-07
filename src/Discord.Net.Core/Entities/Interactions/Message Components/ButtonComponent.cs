@@ -16,27 +16,25 @@ namespace Discord
         public ComponentType Type { get; } = ComponentType.Button;
 
         /// <summary>
-        ///     The <see cref="ButtonStyle"/> of this button, example buttons with each style can be found <see href="https://discord.com/assets/7bb017ce52cfd6575e21c058feb3883b.png">Here</see>.
+        ///     Gets the <see cref="ButtonStyle"/> of this button, example buttons with each style can be found <see href="https://discord.com/assets/7bb017ce52cfd6575e21c058feb3883b.png">Here</see>.
         /// </summary>
         public ButtonStyle Style { get; }
 
         /// <summary>
-        ///     The label of the button, this is the text that is shown.
+        ///     Gets the label of the button, this is the text that is shown.
         /// </summary>
         public string Label { get; }
 
         /// <summary>
-        ///     A <see cref="IEmote"/> that will be displayed with this button.
+        ///     Gets the <see cref="IEmote"/> displayed with this button.
         /// </summary>
         public IEmote Emote { get; }
 
-        /// <summary>
-        ///     A unique id that will be sent with a <see cref="IDiscordInteraction"/>. This is how you know what button was pressed.
-        /// </summary>
+        /// <inheritdoc/>
         public string CustomId { get; }
 
         /// <summary>
-        ///     A URL for a <see cref="ButtonStyle.Link"/> button. 
+        ///     Gets the URL for a <see cref="ButtonStyle.Link"/> button. 
         /// </summary>
         /// <remarks>
         ///     You cannot have a button with a <b>URL</b> and a <b>CustomId</b>.
@@ -44,9 +42,9 @@ namespace Discord
         public string Url { get; }
 
         /// <summary>
-        ///     Whether this button is disabled or not.
+        ///     Gets whether this button is disabled or not.
         /// </summary>
-        public bool Disabled { get; }
+        public bool IsDisabled { get; }
 
         /// <summary>
         ///     Turns this button into a button builder.
@@ -55,16 +53,16 @@ namespace Discord
         ///     A newly created button builder with the same properties as this button.
         /// </returns>
         public ButtonBuilder ToBuilder()
-            => new ButtonBuilder(Label, CustomId, Style, Url, Emote, Disabled);
+            => new ButtonBuilder(Label, CustomId, Style, Url, Emote, IsDisabled);
 
-        internal ButtonComponent(ButtonStyle style, string label, IEmote emote, string customId, string url, bool disabled)
+        internal ButtonComponent(ButtonStyle style, string label, IEmote emote, string customId, string url, bool isDisabled)
         {
             Style = style;
             Label = label;
             Emote = emote;
             CustomId = customId;
             Url = url;
-            Disabled = disabled;
+            IsDisabled = isDisabled;
         }
     }
 }
