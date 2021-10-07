@@ -35,7 +35,7 @@ namespace Discord.WebSocket
         public StickerFormatType Format { get; protected set; }
 
         /// <inheritdoc/>
-        public virtual bool? Available { get; protected set; }
+        public virtual bool? IsAvailable { get; protected set; }
 
         /// <inheritdoc/>
         public virtual int? SortOrder { get; private set; }
@@ -65,7 +65,7 @@ namespace Discord.WebSocket
             Name = model.Name;
             Description = model.Desription;
             PackId = model.PackId;
-            Available = model.Available;
+            IsAvailable = model.Available;
             Format = model.FormatType;
             Type = model.Type;
             SortOrder = model.SortValue;
@@ -94,7 +94,7 @@ namespace Discord.WebSocket
                     stickerModel.PackId == PackId &&
                     stickerModel.Type == Type &&
                     stickerModel.SortValue == SortOrder &&
-                    stickerModel.Available == Available &&
+                    stickerModel.Available == IsAvailable &&
                     (!stickerModel.Tags.IsSpecified || stickerModel.Tags.Value == string.Join(", ", Tags));
             }
             else

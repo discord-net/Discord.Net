@@ -59,7 +59,7 @@ namespace Discord
         /// <summary>
         ///     Gets whether this guild sticker can be used, may be false due to loss of Server Boosts
         /// </summary>
-        bool? Available { get; }
+        bool? IsAvailable { get; }
 
         /// <summary>
         ///     Gets the standard sticker's sort order within its pack
