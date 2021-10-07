@@ -35,6 +35,10 @@
       topicUid: Guides.Commands.DI
     - name: Post-execution Handling
       topicUid: Guides.Commands.PostExecution
+- name: Working with Interactions
+  items:
+    - name: Introduction
+      topicUid: Guides.Interactions.Intro
 - name: Emoji
   topicUid: Guides.Emoji
 - name: Voice
