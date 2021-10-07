@@ -2566,7 +2566,6 @@ namespace Discord.WebSocket
             catch (Exception ex)
             {
                 await _gatewayLogger.ErrorAsync($"Error handling {opCode}{(type != null ? $" ({type})" : "")}", ex).ConfigureAwait(false);
-                Console.WriteLine(ex);
             }
         }
         #endregion
