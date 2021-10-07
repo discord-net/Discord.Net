@@ -52,7 +52,7 @@ namespace Discord.API
                 }
             }
 
-            Default = option.Default.HasValue ? option.Default.Value : Optional<bool>.Unspecified;
+            Default = option.IsDefault.HasValue ? option.IsDefault.Value : Optional<bool>.Unspecified;
         }
     }
 }

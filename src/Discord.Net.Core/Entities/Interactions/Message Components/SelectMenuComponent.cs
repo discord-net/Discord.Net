@@ -53,7 +53,7 @@ namespace Discord
         public SelectMenuBuilder ToBuilder()
             => new SelectMenuBuilder(
                 CustomId,
-                Options.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.Default)).ToList(),
+                Options.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.IsDefault)).ToList(),
                 Placeholder,
                 MaxValues,
                 MinValues,
