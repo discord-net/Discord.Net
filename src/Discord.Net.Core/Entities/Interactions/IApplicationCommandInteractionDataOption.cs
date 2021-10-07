@@ -12,12 +12,12 @@ namespace Discord
     public interface IApplicationCommandInteractionDataOption
     {
         /// <summary>
-        ///     The name of the parameter.
+        ///     Gets the name of the parameter.
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        ///     The value of the pair.
+        ///     Gets the value of the pair.
         ///     <note>
         ///         This objects type can be any one of the option types in <see cref="ApplicationCommandOptionType"/>
         ///     </note>
@@ -25,12 +25,12 @@ namespace Discord
         object Value { get; }
 
         /// <summary>
-        ///     The type of this data's option.
+        ///     Gets the type of this data's option.
         /// </summary>
         ApplicationCommandOptionType Type { get; }
 
         /// <summary>
-        ///     Present if this option is a group or subcommand.
+        ///     Gets the nested options of this option.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandInteractionDataOption> Options { get; }
 
