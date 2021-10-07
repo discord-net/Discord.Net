@@ -52,7 +52,7 @@ namespace Discord
             UserCommandProperties props = new UserCommandProperties()
             {
                 Name = Name,
-                DefaultPermission = DefaultPermission
+                IsDefaultPermission = DefaultPermission
             };
 
             return props;

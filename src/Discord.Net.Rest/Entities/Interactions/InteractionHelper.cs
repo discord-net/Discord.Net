@@ -70,8 +70,8 @@ namespace Discord.Rest
             {
                 Name = arg.Name.Value,
                 Type = arg.Type,
-                DefaultPermission = arg.DefaultPermission.IsSpecified
-                        ? arg.DefaultPermission.Value
+                DefaultPermission = arg.IsDefaultPermission.IsSpecified
+                        ? arg.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified
             };
 
@@ -104,8 +104,8 @@ namespace Discord.Rest
                 {
                     Name = arg.Name.Value,
                     Type = arg.Type,
-                    DefaultPermission = arg.DefaultPermission.IsSpecified
-                        ? arg.DefaultPermission.Value
+                    DefaultPermission = arg.IsDefaultPermission.IsSpecified
+                        ? arg.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified
                 };
 
@@ -141,8 +141,8 @@ namespace Discord.Rest
                 {
                     Name = arg.Name.Value,
                     Type = arg.Type,
-                    DefaultPermission = arg.DefaultPermission.IsSpecified
-                        ? arg.DefaultPermission.Value
+                    DefaultPermission = arg.IsDefaultPermission.IsSpecified
+                        ? arg.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified
                 };
 
@@ -201,8 +201,8 @@ namespace Discord.Rest
             var model = new Discord.API.Rest.ModifyApplicationCommandParams()
             {
                 Name = args.Name,
-                DefaultPermission = args.DefaultPermission.IsSpecified
-                        ? args.DefaultPermission.Value
+                DefaultPermission = args.IsDefaultPermission.IsSpecified
+                        ? args.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified
             };
 
@@ -256,8 +256,8 @@ namespace Discord.Rest
             {
                 Name = arg.Name.Value,
                 Type = arg.Type,
-                DefaultPermission = arg.DefaultPermission.IsSpecified
-                        ? arg.DefaultPermission.Value
+                DefaultPermission = arg.IsDefaultPermission.IsSpecified
+                        ? arg.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified
             };
 
@@ -289,8 +289,8 @@ namespace Discord.Rest
             var model = new ModifyApplicationCommandParams()
             {
                 Name = arg.Name,
-                DefaultPermission = arg.DefaultPermission.IsSpecified
-                        ? arg.DefaultPermission.Value
+                DefaultPermission = arg.IsDefaultPermission.IsSpecified
+                        ? arg.IsDefaultPermission.Value
                         : Optional<bool>.Unspecified
             };
 

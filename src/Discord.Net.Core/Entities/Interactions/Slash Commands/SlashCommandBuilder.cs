@@ -102,7 +102,7 @@ namespace Discord
             {
                 Name = Name,
                 Description = Description,
-                DefaultPermission = DefaultPermission,
+                IsDefaultPermission = DefaultPermission,
             };
 
             if (Options != null && Options.Any())
