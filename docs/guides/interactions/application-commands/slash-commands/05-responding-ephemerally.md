@@ -1,3 +1,8 @@
+---
+uid: Guides.SlashCommands.Ephemeral
+title: Ephemeral Responses
+---
+
 # Responding ephemerally
 
 What is an ephemeral response? Basically, only the user who executed the command can see the result of it. In labs this is pretty simple to do.

@@ -3,20 +3,19 @@ uid: Root.Landing
 title: Home
 ---
 
-# Discord.Net Documentation
+# Discord.Net Labs Documentation
 
 <div class="big-logo logo-switcher"></div>
 
-[![GitHub](https://img.shields.io/github/last-commit/discord-net/discord.net?style=plastic)](https://github.com/discord-net/Discord.Net)
-[![NuGet](https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic)](https://www.nuget.org/packages/Discord.Net)
-[![MyGet](https://img.shields.io/myget/discord-net/vpre/Discord.Net.svg)](https://www.myget.org/feed/Packages/discord-net)
-[![Build Status](https://dev.azure.com/discord-net/Discord.Net/_apis/build/status/discord-net.Discord.Net?branchName=dev)](https://dev.azure.com/discord-net/Discord.Net/_build/latest?definitionId=1&branchName=dev)
-[![Discord](https://discord.com/api/guilds/81384788765712384/widget.png)](https://discord.gg/jkrBmQR)
+[![GitHub](https://img.shields.io/github/last-commit/Discord-Net-Labs/Discord.Net-Labs?style=plastic)](https://github.com/Discord-Net-Labs/Discord.Net-Labs)
+[![NuGet](https://img.shields.io/nuget/vpre/Discord.Net.Labs.svg?maxAge=2592000?style=plastic)](https://www.nuget.org/packages/Discord.Net.Labs/)
+[![MyGet](https://img.shields.io/myget/discord-net-labs/vpre/Discord.Net.Labs.svg)](https://www.myget.org/feed/Packages/discord-net-labs)
+[![Build Status](https://dev.azure.com/Discord-Net-Labs/Discord-Net-Labs/_apis/build/status/discord-net.Discord.Net?branchName=dev)](https://dev.azure.com/Discord-Net-Labs/Discord-Net-Labs/_build/latest?definitionId=1&branchName=release%2F3.x)
+[![Discord](https://discord.com/api/guilds/848176216011046962/widget.png)](https://discord.gg/dvSfUTet3K)
 
-## What is Discord.Net?
+## What is Discord.Net Labs?
 
-Discord.Net is an asynchronous, multi-platform .NET Library used to
-interface with the [Discord API](https://discord.com/).
+Discord.Net Labs is an experimental fork of Discord.Net that implements the newest discord features for testing and development to eventually get merged into Discord.Net
 
 ## Where to begin?
 

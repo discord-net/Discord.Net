@@ -1,3 +1,8 @@
+---
+uid: Guides.SlashCommands.Choices
+title: Slash Command Choices
+---
+
 # Slash Command Choices.
 
 With slash command options you can add choices, making the user select between some set values. Lets create a command that asks how much they like our bot!

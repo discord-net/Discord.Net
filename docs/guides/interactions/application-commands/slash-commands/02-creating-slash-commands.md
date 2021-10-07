@@ -1,3 +1,8 @@
+---
+uid: Guides.SlashCommands.Creating
+title: Creating Slash Commands
+---
+
 # Creating your first slash commands.
 
 There are two kinds of Slash Commands: global commands and guild commands.
@@ -35,7 +40,10 @@ The slash command builder will help you create slash commands. The builder has t
 | AddOption             | Function                         | Adds an option to the current slash command.                                                 |
 | Build                 | Function                         | Builds the builder into a `SlashCommandCreationProperties` class used to make slash commands |
 
-**Note**: Slash command names must be all lowercase!
+> [!NOTE]
+> Slash command names must be all lowercase!
+
+## Creating a Slash Command
 
 Let's use the slash command builder to make a global and guild command.
 
@@ -84,4 +92,5 @@ public async Task Client_Ready()
 
 ```
 
-**Note**: Slash commands only need to be created once. They do _not_ have to be 'created' on every startup or connection. The example simple shows creating them in the ready event as it's simpler than creating normal bot commands to register slash commands.
+> [!NOTE]
+> Slash commands only need to be created once. They do _not_ have to be 'created' on every startup or connection. The example simple shows creating them in the ready event as it's simpler than creating normal bot commands to register slash commands.
