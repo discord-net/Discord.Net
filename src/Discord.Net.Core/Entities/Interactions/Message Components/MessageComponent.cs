@@ -12,7 +12,7 @@ namespace Discord
     public class MessageComponent
     {
         /// <summary>
-        ///     The components to be used in a message.
+        ///     Gets the components to be used in a message.
         /// </summary>
         public IReadOnlyCollection<ActionRowComponent> Components { get; }
 

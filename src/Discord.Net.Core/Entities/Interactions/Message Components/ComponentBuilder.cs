@@ -76,7 +76,7 @@ namespace Discord
                         AddComponent(cmp, row);
                     break;
                 case SelectMenuComponent menu:
-                    WithSelectMenu(menu.Placeholder, menu.CustomId, menu.Options.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.IsDefault)).ToList(), menu.Placeholder, menu.MinValues, menu.MaxValues, menu.Disabled, row);
+                    WithSelectMenu(menu.Placeholder, menu.CustomId, menu.Options.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.IsDefault)).ToList(), menu.Placeholder, menu.MinValues, menu.MaxValues, menu.IsDisabled, row);
                     break;
             }
         }
@@ -740,7 +740,7 @@ namespace Discord
             CustomId = selectMenu.Placeholder;
             MaxValues = selectMenu.MaxValues;
             MinValues = selectMenu.MinValues;
-            Disabled = selectMenu.Disabled;
+            Disabled = selectMenu.IsDisabled;
             Options = selectMenu.Options?
                .Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.IsDefault))
                .ToList();
