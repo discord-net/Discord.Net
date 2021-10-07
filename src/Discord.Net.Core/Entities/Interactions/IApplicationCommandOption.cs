@@ -29,12 +29,12 @@ namespace Discord
         /// <summary>
         ///     The first required option for the user to complete--only one option can be default.
         /// </summary>
-        bool? Default { get; }
+        bool? IsDefault { get; }
 
         /// <summary>
         ///     If the parameter is required or optional, default is <see langword="false"/>.
         /// </summary>
-        bool? Required { get; }
+        bool? IsRequired { get; }
 
         /// <summary>
         ///     Choices for string and int types for the user to pick from.

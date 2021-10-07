@@ -4875,7 +4875,7 @@
                 The description of the command.
             </summary>
         </member>
-        <member name="P:Discord.IApplicationCommand.DefaultPermission">
+        <member name="P:Discord.IApplicationCommand.IsDefaultPermission">
             <summary>
                 Whether the command is enabled by default when the app is added to a guild.
             </summary>
@@ -4974,12 +4974,12 @@
                 The description of this command option, 1-100 character description.
             </summary>
         </member>
-        <member name="P:Discord.IApplicationCommandOption.Default">
+        <member name="P:Discord.IApplicationCommandOption.IsDefault">
             <summary>
                 The first required option for the user to complete--only one option can be default.
             </summary>
         </member>
-        <member name="P:Discord.IApplicationCommandOption.Required">
+        <member name="P:Discord.IApplicationCommandOption.IsRequired">
             <summary>
                 If the parameter is required or optional, default is <see langword="false"/>.
             </summary>

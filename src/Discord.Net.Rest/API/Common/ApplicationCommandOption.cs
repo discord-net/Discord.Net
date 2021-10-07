@@ -50,11 +50,11 @@ namespace Discord.API
 
             ChannelTypes = cmd.ChannelTypes.ToArray();
 
-            Required = cmd.Required.HasValue
-                ? cmd.Required.Value
+            Required = cmd.IsRequired.HasValue
+                ? cmd.IsRequired.Value
                 : Optional<bool>.Unspecified;
-            Default = cmd.Default.HasValue
-                ? cmd.Default.Value
+            Default = cmd.IsDefault.HasValue
+                ? cmd.IsDefault.Value
                 : Optional<bool>.Unspecified;
 
             Name = cmd.Name;

@@ -4058,7 +4058,7 @@
         <member name="P:Discord.Rest.RestApplicationCommand.Description">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.Rest.RestApplicationCommand.DefaultPermission">
+        <member name="P:Discord.Rest.RestApplicationCommand.IsDefaultPermission">
             <inheritdoc/>
         </member>
         <member name="P:Discord.Rest.RestApplicationCommand.Options">
@@ -4103,10 +4103,10 @@
         <member name="P:Discord.Rest.RestApplicationCommandOption.Description">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.Rest.RestApplicationCommandOption.Default">
+        <member name="P:Discord.Rest.RestApplicationCommandOption.IsDefault">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.Rest.RestApplicationCommandOption.Required">
+        <member name="P:Discord.Rest.RestApplicationCommandOption.IsRequired">
             <inheritdoc/>
         </member>
         <member name="P:Discord.Rest.RestApplicationCommandOption.Choices">

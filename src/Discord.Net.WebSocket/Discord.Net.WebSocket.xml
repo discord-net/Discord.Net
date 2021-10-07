@@ -4120,7 +4120,7 @@
         <member name="P:Discord.WebSocket.SocketApplicationCommand.Description">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.WebSocket.SocketApplicationCommand.DefaultPermission">
+        <member name="P:Discord.WebSocket.SocketApplicationCommand.IsDefaultPermission">
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketApplicationCommand.Options">
@@ -4173,10 +4173,10 @@
         <member name="P:Discord.WebSocket.SocketApplicationCommandOption.Description">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.WebSocket.SocketApplicationCommandOption.Default">
+        <member name="P:Discord.WebSocket.SocketApplicationCommandOption.IsDefault">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.WebSocket.SocketApplicationCommandOption.Required">
+        <member name="P:Discord.WebSocket.SocketApplicationCommandOption.IsRequired">
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketApplicationCommandOption.Choices">

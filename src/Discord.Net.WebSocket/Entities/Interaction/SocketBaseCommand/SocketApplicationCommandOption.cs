@@ -23,10 +23,10 @@ namespace Discord.WebSocket
         public string Description { get; private set; }
 
         /// <inheritdoc/>
-        public bool? Default { get; private set; }
+        public bool? IsDefault { get; private set; }
 
         /// <inheritdoc/>
-        public bool? Required { get; private set; }
+        public bool? IsRequired { get; private set; }
 
         /// <summary>
         ///     Choices for string and int types for the user to pick from.
@@ -57,11 +57,11 @@ namespace Discord.WebSocket
             Type = model.Type;
             Description = model.Description;
 
-            Default = model.Default.IsSpecified
+            IsDefault = model.Default.IsSpecified
                 ? model.Default.Value
                 : null;
 
-            Required = model.Required.IsSpecified
+            IsRequired = model.Required.IsSpecified
                 ? model.Required.Value
                 : null;
 
