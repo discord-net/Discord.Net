@@ -17,27 +17,27 @@ namespace Discord
         ulong ApplicationId { get; }
 
         /// <summary>
-        ///     The type of the command
+        ///     Gets the type of the command
         /// </summary>
         ApplicationCommandType Type { get; }
 
         /// <summary>
-        ///     The name of the command.
+        ///     Gets the name of the command.
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        ///     The description of the command.
+        ///     Gets the description of the command.
         /// </summary>
         string Description { get; }
 
         /// <summary>
-        ///     Whether the command is enabled by default when the app is added to a guild.
+        ///     Gets whether or not the command is enabled by default when the app is added to a guild.
         /// </summary>
         bool IsDefaultPermission { get; }
 
         /// <summary>
-        ///     If the option is a subcommand or subcommand group type, this nested options will be the parameters.
+        ///     Gets the options for this application command.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandOption> Options { get; }
 
