@@ -2,10 +2,10 @@ using System;
 
 namespace Discord.Utils
 {
-    static class UrlValidation
+    internal static class UrlValidation
     {
         /// <summary>
-        /// Not full URL validation right now. Just ensures protocol is present and that it's either http or https
+        ///     Not full URL validation right now. Just ensures protocol is present and that it's either http or https
         /// </summary>
         /// <param name="url">url to validate before sending to Discord.</param>
         /// <exception cref="InvalidOperationException">A URL must include a protocol (http or https).</exception>
