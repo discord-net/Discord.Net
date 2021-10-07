@@ -20,7 +20,7 @@ namespace Discord
         string Topic { get; }
 
         /// <summary>
-        ///     The <see cref="StagePrivacyLevel"/> of the current stage.
+        ///     Gets the <see cref="StagePrivacyLevel"/> of the current stage.
         /// </summary>
         /// <remarks>
         ///     If the stage isn't live then this property will be set to <see langword="null"/>.
@@ -28,12 +28,12 @@ namespace Discord
         StagePrivacyLevel? PrivacyLevel { get; }
 
         /// <summary>
-        ///     <see langword="true"/> if stage discovery is disabled, otherwise <see langword="false"/>. 
+        ///     Gets whether or not stage discovery is disabled. 
         /// </summary>
         bool? IsDiscoverableDisabled { get; }
 
         /// <summary>
-        ///     <see langword="true"/> when the stage is live, otherwise <see langword="false"/>.
+        ///     Gets whether or not the stage is live.
         /// </summary>
         /// <remarks>
         ///     If the stage isn't live then this property will be set to <see langword="null"/>.
