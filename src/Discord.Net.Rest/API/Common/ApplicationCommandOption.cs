@@ -70,18 +70,18 @@ namespace Discord.API
                 ? option.Options.Select(x => new ApplicationCommandOption(x)).ToArray()
                 : Optional<ApplicationCommandOption[]>.Unspecified;
 
-            Required = option.Required.HasValue
-                ? option.Required.Value
+            Required = option.IsRequired.HasValue
+                ? option.IsRequired.Value
                 : Optional<bool>.Unspecified;
 
-            Default = option.Default.HasValue
-                ? option.Default.Value
+            Default = option.IsDefault.HasValue
+                ? option.IsDefault.Value
                 : Optional<bool>.Unspecified;
 
             Name = option.Name;
             Type = option.Type;
             Description = option.Description;
-            Autocomplete = option.Autocomplete;
+            Autocomplete = option.IsAutocomplete;
         }
     }
 }

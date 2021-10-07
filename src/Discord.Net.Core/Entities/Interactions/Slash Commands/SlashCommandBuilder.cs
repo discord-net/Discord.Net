@@ -377,12 +377,12 @@ namespace Discord
             {
                 Name = Name,
                 Description = Description,
-                Default = Default,
-                Required = Required,
+                IsDefault = Default,
+                IsRequired = Required,
                 Type = Type,
                 Options = Options?.Count > 0 ? new List<ApplicationCommandOptionProperties>(Options.Select(x => x.Build())) : null,
                 Choices = Choices,
-                Autocomplete = Autocomplete
+                IsAutocomplete = Autocomplete
             };
         }
 
