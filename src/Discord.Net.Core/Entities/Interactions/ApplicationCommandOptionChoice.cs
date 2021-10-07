@@ -14,7 +14,7 @@ namespace Discord
         private string _name;
         private object _value;
         /// <summary>
-        ///     The name of this choice.
+        ///     Gets or sets the name of this choice.
         /// </summary>
         public string Name
         {
@@ -30,7 +30,7 @@ namespace Discord
         }
 
         /// <summary>
-        ///     The value of this choice.
+        ///     Gets or sets the value of this choice.
         ///     <note type="warning">
         ///         Discord only accepts int and string as the input.
         ///     </note>
