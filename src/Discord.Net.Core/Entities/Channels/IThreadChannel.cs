@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -9,7 +6,7 @@ namespace Discord
     /// <summary>
     ///     Represents a thread channel inside of a guild.
     /// </summary>
-    public interface IThreadChannel : ITextChannel, IGuildChannel
+    public interface IThreadChannel : ITextChannel
     {
         /// <summary>
         ///     Gets the type of the current thread channel.
@@ -56,7 +53,7 @@ namespace Discord
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchronous join operation. 
+        ///     A task that represents the asynchronous join operation.
         /// </returns>
         Task JoinAsync(RequestOptions options = null);
 
@@ -65,7 +62,7 @@ namespace Discord
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchronous leave operation. 
+        ///     A task that represents the asynchronous leave operation.
         /// </returns>
         Task LeaveAsync(RequestOptions options = null);
 
@@ -75,7 +72,7 @@ namespace Discord
         /// <param name="user">The <see cref="IGuildUser"/> to add.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchronous operation of adding a member to a thread. 
+        ///     A task that represents the asynchronous operation of adding a member to a thread.
         /// </returns>
         Task AddUserAsync(IGuildUser user, RequestOptions options = null);
 
@@ -85,7 +82,7 @@ namespace Discord
         /// <param name="user">The <see cref="IGuildUser"/> to remove from this thread.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchronous operation of removing a user from this thread. 
+        ///     A task that represents the asynchronous operation of removing a user from this thread.
         /// </returns>
         Task RemoveUserAsync(IGuildUser user, RequestOptions options = null);
     }

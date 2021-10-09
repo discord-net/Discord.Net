@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord
 {
     /// <summary>
@@ -37,7 +31,7 @@ namespace Discord
         Boolean = 5,
 
         /// <summary>
-        ///     A <see cref="IGuildUser"/>.
+        ///     A <see cref="IUser"/>.
         /// </summary>
         User = 6,
 
@@ -55,7 +49,7 @@ namespace Discord
         ///     A <see cref="IUser"/> or <see cref="IRole"/>.
         /// </summary>
         Mentionable = 9,
-        
+
         /// <summary>
         ///     A <see cref="double"/>.
         /// </summary>

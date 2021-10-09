@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord
 {
     /// <summary>
@@ -24,7 +18,7 @@ namespace Discord
         /// <summary>
         ///     Three days (4320 minutes).
         ///     <remarks>
-        ///         This option is explicity avaliable to nitro users.
+        ///         This option is explicitly available to nitro users.
         ///     </remarks>
         /// </summary>
         ThreeDays = 4320,
@@ -32,9 +26,9 @@ namespace Discord
         /// <summary>
         ///     One week (10080 minutes).
         ///     <remarks>
-        ///         This option is explicity avaliable to nitro users.
+        ///         This option is explicitly available to nitro users.
         ///     </remarks>
         /// </summary>
-        OneWeek = 10080,
+        OneWeek = 10080
     }
 }

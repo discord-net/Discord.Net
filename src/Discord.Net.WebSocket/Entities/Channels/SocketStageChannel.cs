@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 using StageInstance = Discord.API.StageInstance;
@@ -25,7 +24,7 @@ namespace Discord.WebSocket
         public bool? IsDiscoverableDisabled { get; private set; }
 
         /// <inheritdoc/>
-        public bool IsLive { get; private set; } = false;
+        public bool IsLive { get; private set; }
 
         /// <summary>
         ///     Returns <see langword="true"/> if the current user is a speaker within the stage, otherwise <see langword="false"/>.
@@ -41,23 +40,14 @@ namespace Discord.WebSocket
 
         internal new SocketStageChannel Clone() => MemberwiseClone() as SocketStageChannel;
 
-
         internal SocketStageChannel(DiscordSocketClient discord, ulong id, SocketGuild guild)
-            : base(discord, id, guild)
-        {
-
-        }
+            : base(discord, id, guild) { }
 
         internal new static SocketStageChannel Create(SocketGuild guild, ClientState state, Model model)
         {
             var entity = new SocketStageChannel(guild.Discord, model.Id, guild);
             entity.Update(state, model);
             return entity;
-        }
-
-        internal override void Update(ClientState state, Model model)
-        {
-            base.Update(state, model);
         }
 
         internal void Update(StageInstance model, bool isLive = false)
@@ -80,11 +70,11 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public async Task StartStageAsync(string topic, StagePrivacyLevel privacyLevel = StagePrivacyLevel.GuildOnly, RequestOptions options = null)
         {
-            var args = new API.Rest.CreateStageInstanceParams()
+            var args = new API.Rest.CreateStageInstanceParams
             {
                 ChannelId = Id,
                 Topic = topic,
-                PrivacyLevel = privacyLevel,
+                PrivacyLevel = privacyLevel
             };
 
             var model = await Discord.ApiClient.CreateStageInstanceAsync(args, options).ConfigureAwait(false);
@@ -105,13 +95,13 @@ namespace Discord.WebSocket
         {
             await Discord.ApiClient.DeleteStageInstanceAsync(Id, options);
 
-            Update(null, false);
+            Update(null);
         }
 
         /// <inheritdoc/>
         public Task RequestToSpeakAsync(RequestOptions options = null)
         {
-            var args = new API.Rest.ModifyVoiceStateParams()
+            var args = new API.Rest.ModifyVoiceStateParams
             {
                 ChannelId = Id,
                 RequestToSpeakTimestamp = DateTimeOffset.UtcNow
@@ -122,7 +112,7 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public Task BecomeSpeakerAsync(RequestOptions options = null)
         {
-            var args = new API.Rest.ModifyVoiceStateParams()
+            var args = new API.Rest.ModifyVoiceStateParams
             {
                 ChannelId = Id,
                 Suppressed = false
@@ -133,7 +123,7 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public Task StopSpeakingAsync(RequestOptions options = null)
         {
-            var args = new API.Rest.ModifyVoiceStateParams()
+            var args = new API.Rest.ModifyVoiceStateParams
             {
                 ChannelId = Id,
                 Suppressed = true
@@ -144,7 +134,7 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public Task MoveToSpeakerAsync(IGuildUser user, RequestOptions options = null)
         {
-            var args = new API.Rest.ModifyVoiceStateParams()
+            var args = new API.Rest.ModifyVoiceStateParams
             {
                 ChannelId = Id,
                 Suppressed = false
@@ -156,7 +146,7 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public Task RemoveFromSpeakerAsync(IGuildUser user, RequestOptions options = null)
         {
-            var args = new API.Rest.ModifyVoiceStateParams()
+            var args = new API.Rest.ModifyVoiceStateParams
             {
                 ChannelId = Id,
                 Suppressed = true

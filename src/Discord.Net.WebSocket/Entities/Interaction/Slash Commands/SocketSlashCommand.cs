@@ -1,7 +1,3 @@
-using Discord.Rest;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using DataModel = Discord.API.ApplicationCommandInteractionData;
 using Model = Discord.API.Interaction;
 
@@ -15,13 +11,13 @@ namespace Discord.WebSocket
         /// <summary>
         ///     The data associated with this interaction.
         /// </summary>
-        new public SocketSlashCommandData Data { get; }
+        private new SocketSlashCommandData Data { get; }
 
         internal SocketSlashCommand(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
             : base(client, model, channel)
         {
-            var dataModel = model.Data.IsSpecified ?
-                (DataModel)model.Data.Value
+            var dataModel = model.Data.IsSpecified
+                ? (DataModel)model.Data.Value
                 : null;
 
             ulong? guildId = null;
@@ -31,7 +27,7 @@ namespace Discord.WebSocket
             Data = SocketSlashCommandData.Create(client, dataModel, guildId);
         }
 
-        new internal static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
+        internal new static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
         {
             var entity = new SocketSlashCommand(client, model, channel);
             entity.Update(model);

@@ -1,8 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -13,7 +9,7 @@ namespace Discord
     ///     After receiving an interaction, you must respond to acknowledge it. You can choose to respond with a message immediately using <see cref="ChannelMessageWithSource"/>
     ///     or you can choose to send a deferred response with <see cref="DeferredChannelMessageWithSource"/>. If choosing a deferred response, the user will see a loading state for the interaction,
     ///     and you'll have up to 15 minutes to edit the original deferred response using Edit Original Interaction Response.
-    ///     You can read more about Response types <see href="https://discord.com/developers/docs/interactions/slash-commands#interaction-response">Here</see>
+    ///     You can read more about Response types <see href="https://discord.com/developers/docs/interactions/slash-commands#interaction-response">Here</see>.
     /// </remarks>
     public enum InteractionResponseType : byte
     {
@@ -45,17 +41,17 @@ namespace Discord
         DeferredChannelMessageWithSource = 5,
 
         /// <summary>
-        ///     For components: ACK an interaction and edit the original message later; the user does not see a loading state
+        ///     For components: ACK an interaction and edit the original message later; the user does not see a loading state.
         /// </summary>
         DeferredUpdateMessage = 6,
 
         /// <summary>
-        ///     For components: edit the message the component was attached to
+        ///     For components: edit the message the component was attached to.
         /// </summary>
         UpdateMessage = 7,
 
         /// <summary>
-        ///     Respond with a set of choices to a autocomplete interaction
+        ///     Respond with a set of choices to a autocomplete interaction.
         /// </summary>
         ApplicationCommandAutocompleteResult = 8
     }

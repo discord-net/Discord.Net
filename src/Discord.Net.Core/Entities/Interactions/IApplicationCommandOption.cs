@@ -1,8 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -39,16 +35,16 @@ namespace Discord
         /// <summary>
         ///     Choices for string and int types for the user to pick from.
         /// </summary>
-        IReadOnlyCollection<IApplicationCommandOptionChoice>? Choices { get; }
+        IReadOnlyCollection<IApplicationCommandOptionChoice> Choices { get; }
 
         /// <summary>
         ///     If the option is a subcommand or subcommand group type, this nested options will be the parameters.
         /// </summary>
-        IReadOnlyCollection<IApplicationCommandOption>? Options { get; }
+        IReadOnlyCollection<IApplicationCommandOption> Options { get; }
 
         /// <summary>
         ///     The allowed channel types for this option.
         /// </summary>
-        IReadOnlyCollection<ChannelType>? ChannelTypes { get; }
+        IReadOnlyCollection<ChannelType> ChannelTypes { get; }
     }
 }

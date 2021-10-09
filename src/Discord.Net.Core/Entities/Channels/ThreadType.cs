@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord
 {
     /// <summary>
@@ -24,6 +18,6 @@ namespace Discord
         /// <summary>
         ///     Represents a temporary sub-channel within a GUILD_TEXT channel that is only viewable by those invited and those with the MANAGE_THREADS permission
         /// </summary>
-        PrivateThread = 12,
+        PrivateThread = 12
     }
 }

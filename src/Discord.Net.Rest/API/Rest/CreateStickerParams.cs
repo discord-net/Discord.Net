@@ -1,12 +1,6 @@
 using Discord.Net.Rest;
-using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord.API.Rest
 {
     internal class CreateStickerParams
@@ -30,7 +24,7 @@ namespace Discord.API.Rest
 
             if (File is FileStream fileStream)
                 contentType = $"image/{Path.GetExtension(fileStream.Name)}";
-            else if(FileName != null)
+            else if (FileName != null)
                 contentType = $"image/{Path.GetExtension(FileName)}";
 
             d["file"] = new MultipartFile(File, FileName ?? "image", contentType.Replace(".", ""));

@@ -6,7 +6,7 @@ using Model = Discord.API.ApplicationCommandInteractionDataOption;
 namespace Discord.WebSocket
 {
     /// <summary>
-    ///     Represents a Websocket-based <see cref="IApplicationCommandInteractionDataOption"/> received by the gateway
+    ///     Represents a Websocket-based <see cref="IApplicationCommandInteractionDataOption"/> received by the gateway.
     /// </summary>
     public class SocketSlashCommandDataOption : IApplicationCommandInteractionDataOption
     {
@@ -61,7 +61,7 @@ namespace Discord.WebSocket
                                     break;
                                 case ApplicationCommandOptionType.Mentionable:
                                     {
-                                        if(data.ResolvableData.GuildMembers.Any(x => x.Key == valueId) || data.ResolvableData.Users.Any(x => x.Key == valueId))
+                                        if (data.ResolvableData.GuildMembers.Any(x => x.Key == valueId) || data.ResolvableData.Users.Any(x => x.Key == valueId))
                                         {
                                             var guildUser = data.ResolvableData.GuildMembers.FirstOrDefault(x => x.Key == valueId).Value;
 
@@ -70,7 +70,7 @@ namespace Discord.WebSocket
                                             else
                                                 Value = data.ResolvableData.Users.FirstOrDefault(x => x.Key == valueId).Value;
                                         }
-                                        else if(data.ResolvableData.Roles.Any(x => x.Key == valueId))
+                                        else if (data.ResolvableData.Roles.Any(x => x.Key == valueId))
                                         {
                                             Value = data.ResolvableData.Roles.FirstOrDefault(x => x.Key == valueId).Value;
                                         }
@@ -110,14 +110,13 @@ namespace Discord.WebSocket
                         }
                         break;
                 }
-
             }
 
             Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => new SocketSlashCommandDataOption(data, x)).ToImmutableArray()
-                : null;
+                : ImmutableArray.Create<SocketSlashCommandDataOption>();
         }
-#endregion
+        #endregion
 
         #region Converters
         public static explicit operator bool(SocketSlashCommandDataOption option)

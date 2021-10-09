@@ -1,11 +1,7 @@
-using Discord.Rest;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Model = Discord.API.Sticker;
 
 namespace Discord.WebSocket
@@ -49,12 +45,9 @@ namespace Discord.WebSocket
 
         internal static SocketSticker Create(DiscordSocketClient client, Model model)
         {
-            SocketSticker entity;
-
-            if (model.GuildId.IsSpecified)
-                entity = new SocketCustomSticker(client, model.Id, client.GetGuild(model.GuildId.Value), model.User.IsSpecified ? model.User.Value.Id : null);
-            else
-                entity = new SocketSticker(client, model.Id);
+            var entity = model.GuildId.IsSpecified
+                ? new SocketCustomSticker(client, model.Id, client.GetGuild(model.GuildId.Value), model.User.IsSpecified ? model.User.Value.Id : null)
+                : new SocketSticker(client, model.Id);
 
             entity.Update(model);
             return entity;
@@ -63,21 +56,16 @@ namespace Discord.WebSocket
         internal virtual void Update(Model model)
         {
             Name = model.Name;
-            Description = model.Desription;
+            Description = model.Description;
             PackId = model.PackId;
             IsAvailable = model.Available;
             Format = model.FormatType;
             Type = model.Type;
             SortOrder = model.SortValue;
 
-            if (model.Tags.IsSpecified)
-            {
-                Tags = model.Tags.Value.Split(',').Select(x => x.Trim()).ToImmutableArray();
-            }
-            else
-            {
-                Tags = ImmutableArray<string>.Empty;
-            }
+            Tags = model.Tags.IsSpecified
+                ? model.Tags.Value.Split(',').Select(x => x.Trim()).ToImmutableArray()
+                : ImmutableArray.Create<string>();
         }
 
         internal string DebuggerDisplay => $"{Name} ({Id})";
@@ -85,10 +73,10 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            if (obj is API.Sticker stickerModel)
+            if (obj is Model stickerModel)
             {
                 return stickerModel.Name == Name &&
-                    stickerModel.Desription == Description &&
+                    stickerModel.Description == Description &&
                     stickerModel.FormatType == Format &&
                     stickerModel.Id == Id &&
                     stickerModel.PackId == PackId &&
@@ -97,8 +85,8 @@ namespace Discord.WebSocket
                     stickerModel.Available == IsAvailable &&
                     (!stickerModel.Tags.IsSpecified || stickerModel.Tags.Value == string.Join(", ", Tags));
             }
-            else
-                return base.Equals(obj);
+
+            return base.Equals(obj);
         }
     }
 }

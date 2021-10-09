@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord
 {
     /// <summary>
@@ -18,6 +12,6 @@ namespace Discord
         /// <summary>
         ///     The target of the permission is a user.
         /// </summary>
-        User = 2,
+        User = 2
     }
 }

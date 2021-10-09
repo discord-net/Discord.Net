@@ -31,14 +31,14 @@ namespace Discord
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(paramName: nameof(ActionRows), message: "Cannot set an component builder's components collection to null.");
+                    throw new ArgumentNullException(nameof(value), $"{nameof(ActionRows)} cannot be null.");
                 if (value.Count > MaxActionRowCount)
-                    throw new ArgumentException(message: $"Action row count must be less than or equal to {MaxActionRowCount}.", paramName: nameof(ActionRows));
+                    throw new ArgumentOutOfRangeException(nameof(value), $"Action row count must be less than or equal to {MaxActionRowCount}.");
                 _actionRows = value;
             }
         }
 
-        private List<ActionRowBuilder> _actionRows { get; set; }
+        private List<ActionRowBuilder> _actionRows;
 
         /// <summary>
         ///     Creates a new builder from a message.
@@ -56,7 +56,7 @@ namespace Discord
         public static ComponentBuilder FromComponents(IReadOnlyCollection<IMessageComponent> components)
         {
             var builder = new ComponentBuilder();
-            for(int i = 0; i != components.Count; i++)
+            for (int i = 0; i != components.Count; i++)
             {
                 var component = components.ElementAt(i);
                 builder.AddComponent(component, i);
@@ -118,7 +118,7 @@ namespace Discord
         public ComponentBuilder WithSelectMenu(SelectMenuBuilder menu, int row = 0)
         {
             Preconditions.LessThan(row, MaxActionRowCount, nameof(row));
-            if (menu.Options.Distinct().Count() != menu.Options.Count())
+            if (menu.Options.Distinct().Count() != menu.Options.Count)
                 throw new InvalidOperationException("Please make sure that there is no duplicates values.");
 
             var builtMenu = menu.Build();
@@ -218,7 +218,7 @@ namespace Discord
                 else
                 {
                     ActionRowBuilder actionRow;
-                    if(_actionRows.Count > row)
+                    if (_actionRows.Count > row)
                         actionRow = _actionRows.ElementAt(row);
                     else
                     {
@@ -244,10 +244,9 @@ namespace Discord
         /// <returns>A <see cref="MessageComponent"/> that can be sent with <see cref="IMessageChannel.SendMessageAsync"/>.</returns>
         public MessageComponent Build()
         {
-            if (_actionRows != null)
-                return new MessageComponent(_actionRows.Select(x => x.Build()).ToList());
-            else
-                return MessageComponent.Empty;
+            return _actionRows != null
+                ? new MessageComponent(_actionRows.Select(x => x.Build()).ToList())
+                : MessageComponent.Empty;
         }
     }
 
@@ -272,19 +271,18 @@ namespace Discord
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(message: "Action row components cannot be null!", paramName: nameof(Components));
+                    throw new ArgumentNullException(nameof(value), $"{nameof(Components)} cannot be null.");
 
-                if (value.Count <= 0)
-                    throw new ArgumentException(message: "There must be at least 1 component in a row", paramName: nameof(Components));
-
-                if (value.Count > MaxChildCount)
-                    throw new ArgumentException(message: $"Action row can only contain {MaxChildCount} child components!", paramName: nameof(Components));
-
-                _components = value;
+                _components = value.Count switch
+                {
+                    0 => throw new ArgumentOutOfRangeException(nameof(value), "There must be at least 1 component in a row."),
+                    > MaxChildCount => throw new ArgumentOutOfRangeException(nameof(value), $"Action row can only contain {MaxChildCount} child components!"),
+                    _ => value
+                };
             }
         }
 
-        private List<IMessageComponent> _components { get; set; } = new List<IMessageComponent>();
+        private List<IMessageComponent> _components = new List<IMessageComponent>();
 
         /// <summary>
         ///     Adds a list of components to the current row.
@@ -359,18 +357,12 @@ namespace Discord
         public string Label
         {
             get => _label;
-            set
+            set => _label = value?.Length switch
             {
-                if (value != null)
-                {
-                    if (value.Length > MaxButtonLabelLength)
-                        throw new ArgumentException($"Button label must be {MaxButtonLabelLength} characters or less!", paramName: nameof(Label));
-                    if (value.Length < 1)
-                        throw new ArgumentException("Button label must be 1 character or more!", paramName: nameof(Label));
-                }
-
-                _label = value;
-            }
+                > MaxButtonLabelLength => throw new ArgumentOutOfRangeException(nameof(value), $"Label length must be less or equal to {MaxButtonLabelLength}."),
+                0 => throw new ArgumentOutOfRangeException(nameof(value), "Label length must be at least 1."),
+                _ => value
+            };
         }
 
         /// <summary>
@@ -381,17 +373,12 @@ namespace Discord
         public string CustomId
         {
             get => _customId;
-            set
+            set => _customId = value?.Length switch
             {
-                if (value != null)
-                {
-                    if (value.Length > ComponentBuilder.MaxCustomIdLength)
-                        throw new ArgumentException($"Custom Id must be {ComponentBuilder.MaxCustomIdLength} characters or less!", paramName: nameof(CustomId));
-                    if (value.Length < 1)
-                        throw new ArgumentException("Custom Id must be 1 character or more!", paramName: nameof(CustomId));
-                }
-                _customId = value;
-            }
+                > ComponentBuilder.MaxCustomIdLength => throw new ArgumentOutOfRangeException(nameof(value), $"Custom Id length must be less or equal to {ComponentBuilder.MaxCustomIdLength}."),
+                0 => throw new ArgumentOutOfRangeException(nameof(value), "Custom Id length must be at least 1."),
+                _ => value
+            };
         }
 
         /// <summary>
@@ -413,7 +400,6 @@ namespace Discord
         ///     Gets or sets whether the current button is disabled.
         /// </summary>
         public bool IsDisabled { get; set; }
-
 
         private string _label;
         private string _customId;
@@ -594,8 +580,7 @@ namespace Discord
             {
                 if (string.IsNullOrEmpty(Url))
                     throw new InvalidOperationException("Link buttons must have a link associated with them");
-                else
-                    UrlValidation.ValidateButton(Url);
+                UrlValidation.ValidateButton(Url);
             }
             else if (string.IsNullOrEmpty(CustomId))
                 throw new InvalidOperationException("Non-link buttons must have a custom id associated with them");
@@ -632,17 +617,12 @@ namespace Discord
         public string CustomId
         {
             get => _customId;
-            set
+            set => _customId = value?.Length switch
             {
-                if (value != null)
-                {
-                    if (value.Length > ComponentBuilder.MaxCustomIdLength)
-                        throw new ArgumentException($"Custom Id must be {ComponentBuilder.MaxCustomIdLength} characters or less!", paramName: nameof(CustomId));
-                    if (value.Length < 1)
-                        throw new ArgumentException("Custom Id must be 1 character or more!", paramName: nameof(CustomId));
-                }
-                _customId = value;
-            }
+                > ComponentBuilder.MaxCustomIdLength => throw new ArgumentOutOfRangeException(nameof(value), $"Custom Id length must be less or equal to {ComponentBuilder.MaxCustomIdLength}."),
+                0 => throw new ArgumentOutOfRangeException(nameof(value), "Custom Id length must be at least 1."),
+                _ => value
+            };
         }
 
         /// <summary>
@@ -653,18 +633,12 @@ namespace Discord
         public string Placeholder
         {
             get => _placeholder;
-            set
+            set => _placeholder = value?.Length switch
             {
-                if (value != null)
-                {
-                    if (value.Length > MaxPlaceholderLength)
-                        throw new ArgumentException($"The placeholder must be {MaxPlaceholderLength} characters or less!", paramName: nameof(Placeholder));
-                    if (value.Length < 1)
-                        throw new ArgumentException("The placeholder must be 1 character or more!", paramName: nameof(Placeholder));
-                }
-
-                _placeholder = value;
-            }
+                > MaxPlaceholderLength => throw new ArgumentOutOfRangeException(nameof(value), $"Placeholder length must be less or equal to {MaxPlaceholderLength}."),
+                0 => throw new ArgumentOutOfRangeException(nameof(value), "Placeholder length must be at least 1."),
+                _ => value
+            };
         }
 
         /// <summary>
@@ -708,7 +682,7 @@ namespace Discord
                 if (value != null)
                     Preconditions.LessThan(value.Count, MaxOptionCount, nameof(Options));
                 else
-                    throw new ArgumentNullException(nameof(value));
+                    throw new ArgumentNullException(nameof(value), $"{nameof(Options)} cannot be null.");
 
                 _options = value;
             }
@@ -908,7 +882,7 @@ namespace Discord
         ///     The maximum length of a <see cref="SelectMenuOption.Description"/>.
         /// </summary>
         public const int MaxDescriptionLength = 100;
-        
+
         /// <summary>
         ///     The maximum length of a <see cref="SelectMenuOption.Value"/>.
         /// </summary>
@@ -922,42 +896,28 @@ namespace Discord
         public string Label
         {
             get => _label;
-            set
+            set => _label = value?.Length switch
             {
-                if (value != null)
-                {
-                    if (value.Length > MaxSelectLabelLength)
-                        throw new ArgumentException($"Select option label must be {MaxSelectLabelLength} characters or less!", paramName: nameof(Label));
-                    if (value.Length < 1)
-                        throw new ArgumentException("Select option label must be 1 character or more!", paramName: nameof(Label));
-                }
-
-                _label = value;
-            }
+                > MaxSelectLabelLength => throw new ArgumentOutOfRangeException(nameof(value), $"Label length must be less or equal to {MaxSelectLabelLength}."),
+                0 => throw new ArgumentOutOfRangeException(nameof(value), "Label length must be at least 1."),
+                _ => value
+            };
         }
 
         /// <summary>
-        ///     Gets or sets the custom id of the current select menu.
+        ///     Gets or sets the value of the current select menu.
         /// </summary>
         /// <exception cref="ArgumentException" accessor="set"><see cref="Value"/> length exceeds <see cref="MaxSelectValueLength"/>.</exception>
         /// <exception cref="ArgumentException" accessor="set"><see cref="Value"/> length subceeds 1.</exception>
         public string Value
         {
             get => _value;
-            set
+            set => _value = value?.Length switch
             {
-                if (value != null)
-                {
-                    if (value.Length > MaxSelectValueLength)
-                        throw new ArgumentException($"Select option value must be {MaxSelectValueLength} characters or less!", paramName: nameof(Label));
-                    if (value.Length < 1)
-                        throw new ArgumentException("Select option value must be 1 character or more!", paramName: nameof(Label));
-                }
-                else
-                    throw new ArgumentException("Select option value must not be null or empty!", paramName: nameof(Label));
-
-                _value = value;
-            }
+                > MaxSelectValueLength => throw new ArgumentOutOfRangeException(nameof(value), $"Value length must be less or equal to {MaxSelectValueLength}."),
+                0 => throw new ArgumentOutOfRangeException(nameof(value), "Value length must be at least 1."),
+                _ => value
+            };
         }
 
         /// <summary>
@@ -968,18 +928,12 @@ namespace Discord
         public string Description
         {
             get => _description;
-            set
+            set => _description = value?.Length switch
             {
-                if (value != null)
-                {
-                    if (value.Length > MaxDescriptionLength)
-                        throw new ArgumentException($"The description must be {MaxDescriptionLength} characters or less!", paramName: nameof(Label));
-                    if (value.Length < 1)
-                        throw new ArgumentException("The description must be 1 character or more!", paramName: nameof(Label));
-                }
-
-                _description = value;
-            }
+                > MaxDescriptionLength => throw new ArgumentOutOfRangeException(nameof(value), $"Description length must be less or equal to {MaxDescriptionLength}."),
+                0 => throw new ArgumentOutOfRangeException(nameof(value), "Description length must be at least 1."),
+                _ => value
+            };
         }
 
         /// <summary>

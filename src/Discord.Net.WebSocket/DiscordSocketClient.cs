@@ -434,7 +434,7 @@ namespace Discord.WebSocket
 
         public async Task<SocketApplicationCommand> CreateGlobalApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null)
         {
-            var model = await InteractionHelper.CreateGlobalCommand(this, properties, options).ConfigureAwait(false);
+            var model = await InteractionHelper.CreateGlobalCommandAsync(this, properties, options).ConfigureAwait(false);
 
             var entity = State.GetOrAddCommand(model.Id, (id) => SocketApplicationCommand.Create(this, model));
 
@@ -446,7 +446,7 @@ namespace Discord.WebSocket
         public async Task<IReadOnlyCollection<SocketApplicationCommand>> BulkOverwriteGlobalApplicationCommandsAsync(
             ApplicationCommandProperties[] properties, RequestOptions options = null)
         {
-            var models = await InteractionHelper.BulkOverwriteGlobalCommands(this, properties, options);
+            var models = await InteractionHelper.BulkOverwriteGlobalCommandsAsync(this, properties, options);
 
             var entities = models.Select(x => SocketApplicationCommand.Create(this, x));
 

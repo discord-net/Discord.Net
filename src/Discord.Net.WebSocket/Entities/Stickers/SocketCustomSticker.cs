@@ -1,12 +1,8 @@
 using Discord.Rest;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.Sticker;
-
 
 namespace Discord.WebSocket
 {
@@ -54,7 +50,7 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public async Task ModifyAsync(Action<StickerProperties> func, RequestOptions options = null)
         {
-            if(!Guild.CurrentUser.GuildPermissions.Has(GuildPermission.ManageEmojisAndStickers))
+            if (!Guild.CurrentUser.GuildPermissions.Has(GuildPermission.ManageEmojisAndStickers))
                 throw new InvalidOperationException($"Missing permission {nameof(GuildPermission.ManageEmojisAndStickers)}");
 
             var model = await GuildHelper.ModifyStickerAsync(Discord, Guild.Id, this, func, options);
@@ -72,7 +68,7 @@ namespace Discord.WebSocket
         internal SocketCustomSticker Clone() => MemberwiseClone() as SocketCustomSticker;
 
         private new string DebuggerDisplay => Guild == null ? base.DebuggerDisplay : $"{Name} in {Guild.Name} ({Id})";
-#endregion
+        #endregion
 
         #region  ICustomSticker
         ulong? ICustomSticker.AuthorId

@@ -1,9 +1,5 @@
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord.API
 {
@@ -40,7 +36,7 @@ namespace Discord.API
 
         public ApplicationCommandOption(IApplicationCommandOption cmd)
         {
-            Choices = cmd.Choices.Select(x => new ApplicationCommandOptionChoice()
+            Choices = cmd.Choices.Select(x => new ApplicationCommandOptionChoice
             {
                 Name = x.Name,
                 Value = x.Value
@@ -50,42 +46,28 @@ namespace Discord.API
 
             ChannelTypes = cmd.ChannelTypes.ToArray();
 
-            Required = cmd.IsRequired.HasValue
-                ? cmd.IsRequired.Value
-                : Optional<bool>.Unspecified;
-            Default = cmd.IsDefault.HasValue
-                ? cmd.IsDefault.Value
-                : Optional<bool>.Unspecified;
+            Required = cmd.IsRequired ?? Optional<bool>.Unspecified;
+            Default = cmd.IsDefault ?? Optional<bool>.Unspecified;
 
             Name = cmd.Name;
             Type = cmd.Type;
             Description = cmd.Description;
         }
-        public ApplicationCommandOption(Discord.ApplicationCommandOptionProperties option)
+        public ApplicationCommandOption(ApplicationCommandOptionProperties option)
         {
-            Choices = option.Choices != null
-                ? option.Choices.Select(x => new ApplicationCommandOptionChoice()
-                {
-                    Name = x.Name,
-                    Value = x.Value
-                }).ToArray()
-                : Optional<ApplicationCommandOptionChoice[]>.Unspecified;
+            Choices = option.Choices?.Select(x => new ApplicationCommandOptionChoice
+            {
+                Name = x.Name,
+                Value = x.Value
+            }).ToArray() ?? Optional<ApplicationCommandOptionChoice[]>.Unspecified;
 
-            Options = option.Options != null
-                ? option.Options.Select(x => new ApplicationCommandOption(x)).ToArray()
-                : Optional<ApplicationCommandOption[]>.Unspecified;
+            Options = option.Options?.Select(x => new ApplicationCommandOption(x)).ToArray() ?? Optional<ApplicationCommandOption[]>.Unspecified;
 
-            Required = option.Required.HasValue
-                ? option.Required.Value
-                : Optional<bool>.Unspecified;
+            Required = option.Required ?? Optional<bool>.Unspecified;
 
-            Default = option.Default.HasValue
-                ? option.Default.Value
-                : Optional<bool>.Unspecified;
+            Default = option.Default ?? Optional<bool>.Unspecified;
 
-            ChannelTypes = option.ChannelTypes != null
-                ? option.ChannelTypes.ToArray()
-                : Optional<ChannelType[]>.Unspecified;
+            ChannelTypes = option.ChannelTypes?.ToArray() ?? Optional<ChannelType[]>.Unspecified;
 
             Name = option.Name;
             Type = option.Type;

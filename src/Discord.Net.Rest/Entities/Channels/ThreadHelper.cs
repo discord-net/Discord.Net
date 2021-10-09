@@ -1,8 +1,6 @@
 using Discord.API.Rest;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 
@@ -14,22 +12,22 @@ namespace Discord.Rest
             ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, RequestOptions options = null)
         {
             if (autoArchiveDuration == ThreadArchiveDuration.OneWeek && !channel.Guild.Features.Contains("SEVEN_DAY_THREAD_ARCHIVE"))
-                throw new ArgumentException($"The guild {channel.Guild.Name} does not have the SEVEN_DAY_THREAD_ARCHIVE feature!");
+                throw new ArgumentException($"The guild {channel.Guild.Name} does not have the SEVEN_DAY_THREAD_ARCHIVE feature!", nameof(autoArchiveDuration));
 
             if (autoArchiveDuration == ThreadArchiveDuration.ThreeDays && !channel.Guild.Features.Contains("THREE_DAY_THREAD_ARCHIVE"))
-                throw new ArgumentException($"The guild {channel.Guild.Name} does not have the THREE_DAY_THREAD_ARCHIVE feature!");
+                throw new ArgumentException($"The guild {channel.Guild.Name} does not have the THREE_DAY_THREAD_ARCHIVE feature!", nameof(autoArchiveDuration));
 
             if (type == ThreadType.PrivateThread && !channel.Guild.Features.Contains("PRIVATE_THREADS"))
-                throw new ArgumentException($"The guild {channel.Guild.Name} does not have the PRIVATE_THREADS feature!");
+                throw new ArgumentException($"The guild {channel.Guild.Name} does not have the PRIVATE_THREADS feature!", nameof(type));
 
-            var args = new StartThreadParams()
+            var args = new StartThreadParams
             {
                 Name = name,
                 Duration = autoArchiveDuration,
                 Type = type
             };
 
-            Model model = null;
+            Model model;
 
             if (message != null)
                 model = await client.ApiClient.StartThreadAsync(channel.Id, message.Id, args, options).ConfigureAwait(false);
@@ -45,7 +43,7 @@ namespace Discord.Rest
         {
             var args = new TextChannelProperties();
             func(args);
-            var apiArgs = new API.Rest.ModifyThreadParams
+            var apiArgs = new ModifyThreadParams
             {
                 Name = args.Name,
                 Archived = args.Archived,
@@ -63,7 +61,7 @@ namespace Discord.Rest
             return users.Select(x => RestThreadUser.Create(client, channel.Guild, x, channel)).ToArray();
         }
 
-        public static async Task<RestThreadUser> GetUserAsync(ulong userdId, IThreadChannel channel, BaseDiscordClient client, RequestOptions options = null)
-            => (await GetUsersAsync(channel, client, options).ConfigureAwait(false)).FirstOrDefault(x => x.Id == userdId);
+        public static async Task<RestThreadUser> GetUserAsync(ulong userId, IThreadChannel channel, BaseDiscordClient client, RequestOptions options = null)
+            => (await GetUsersAsync(channel, client, options).ConfigureAwait(false)).FirstOrDefault(x => x.Id == userId);
     }
 }

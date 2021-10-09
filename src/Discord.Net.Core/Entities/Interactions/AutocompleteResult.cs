@@ -1,8 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -11,8 +7,8 @@ namespace Discord
     /// </summary>
     public class AutocompleteResult
     {
-        private object _value { get; set; }
-        private string _name { get; set; }
+        private object _value;
+        private string _name;
 
         /// <summary>
         ///     Gets or sets the name of the result.
@@ -28,12 +24,13 @@ namespace Discord
             set
             {
                 if (value == null)
-                    throw new ArgumentException("Name cannot be null!");
-                if (value.Length > 100)
-                    throw new ArgumentException("Name length must be less than or equal to 100 characters in length!");
-                if (value.Length < 1)
-                    throw new ArgumentException("Name length must at least 1 character in length!");
-                _name = value;
+                    throw new ArgumentNullException(nameof(value), $"{nameof(Name)} cannot be null.");
+                _name = value.Length switch
+                {
+                    > 100 => throw new ArgumentOutOfRangeException(nameof(value), "Name length must be less than or equal to 100."),
+                    0 => throw new ArgumentOutOfRangeException(nameof(value), "Name length must be at least 1."),
+                    _ => value
+                };
             }
         }
 
@@ -48,20 +45,15 @@ namespace Discord
         public object Value
         {
             get => _value;
-            set
+            set => _value = value switch
             {
-                if (value == null)
-                    throw new ArgumentNullException("Value cannot be null");
-
-                _value = value switch
-                {
-                    string str => str,
-                    int integer => integer,
-                    long lng => lng,
-                    double number => number,
-                    _ => throw new ArgumentException($"Type {value.GetType().Name} cannot be set as a value! Only string, int, and double allowed!"),
-                };
-            }
+                string str => str,
+                int integer => integer,
+                long lng => lng,
+                double number => number,
+                null => throw new ArgumentNullException(nameof(value), $"{nameof(Value)} cannot be null."),
+                _ => throw new ArgumentException($"Type {value.GetType().Name} cannot be set as a value! Only string, int, and double allowed!")
+            };
         }
 
         /// <summary>

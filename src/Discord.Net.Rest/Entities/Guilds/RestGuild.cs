@@ -922,7 +922,7 @@ namespace Discord.Rest
         ///     of application commands found within the guild.
         /// </returns>
         public async Task<IReadOnlyCollection<RestGuildCommand>> GetApplicationCommandsAsync (RequestOptions options = null)
-            => await ClientHelper.GetGuildApplicationCommands(Discord, Id, options).ConfigureAwait(false);
+            => await ClientHelper.GetGuildApplicationCommandsAsync(Discord, Id, options).ConfigureAwait(false);
         /// <summary>
         ///     Gets an application command within this guild with the specified id.
         /// </summary>
@@ -933,7 +933,7 @@ namespace Discord.Rest
         ///     if found, otherwise <see langword="null"/>.
         /// </returns>
         public async Task<RestGuildCommand> GetApplicationCommandAsync(ulong id, RequestOptions options = null)
-            => await ClientHelper.GetGuildApplicationCommand(Discord, id, Id, options);
+            => await ClientHelper.GetGuildApplicationCommandAsync(Discord, id, Id, options);
         /// <summary>
         ///     Creates an application command within this guild.
         /// </summary>
@@ -944,7 +944,7 @@ namespace Discord.Rest
         /// </returns>
         public async Task<RestGuildCommand> CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null)
         {
-            var model = await InteractionHelper.CreateGuildCommand(Discord, Id, properties, options);
+            var model = await InteractionHelper.CreateGuildCommandAsync(Discord, Id, properties, options);
 
             return RestGuildCommand.Create(Discord, model, Id);
         }
@@ -959,7 +959,7 @@ namespace Discord.Rest
         public async Task<IReadOnlyCollection<RestGuildCommand>> BulkOverwriteApplicationCommandsAsync(ApplicationCommandProperties[] properties,
             RequestOptions options = null)
         {
-            var models = await InteractionHelper.BulkOverwriteGuildCommands(Discord, Id, properties, options);
+            var models = await InteractionHelper.BulkOverwriteGuildCommandsAsync(Discord, Id, properties, options);
 
             return models.Select(x => RestGuildCommand.Create(Discord, x, Id)).ToImmutableArray();
         }

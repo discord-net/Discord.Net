@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Model = Discord.API.ApplicationCommandOption;
 
 namespace Discord.Rest
@@ -66,7 +63,7 @@ namespace Discord.Rest
                 IsRequired = model.Required.Value;
 
             Options = model.Options.IsSpecified
-                ? model.Options.Value.Select(x => Create(x)).ToImmutableArray()
+                ? model.Options.Value.Select(Create).ToImmutableArray()
                 : ImmutableArray.Create<RestApplicationCommandOption>();
 
             Choices = model.Choices.IsSpecified

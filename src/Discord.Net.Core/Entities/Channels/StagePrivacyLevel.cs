@@ -1,14 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord
 {
+    /// <summary>
+    ///     Specifies the privacy levels of a Stage instance.
+    /// </summary>
     public enum StagePrivacyLevel
     {
+        /// <summary>
+        ///     The Stage instance is visible publicly, such as on Stage Discovery.
+        /// </summary>
         Public = 1,
-        GuildOnly = 2,
+        /// <summary>
+        ///     The Stage instance is visible to only guild members.
+        /// </summary>
+        GuildOnly = 2
     }
 }

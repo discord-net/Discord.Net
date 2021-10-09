@@ -1,16 +1,12 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord
 {
     /// <summary>
     ///     Represents a discord sticker pack.
     /// </summary>
-    /// <typeparam name="TSticker">The type of the stickers within the collection</typeparam>
+    /// <typeparam name="TSticker">The type of the stickers within the collection.</typeparam>
     public class StickerPack<TSticker> where TSticker : ISticker
     {
         /// <summary>

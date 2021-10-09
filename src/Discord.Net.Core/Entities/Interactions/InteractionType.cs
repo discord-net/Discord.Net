@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord
 {
     /// <summary>
@@ -29,6 +23,6 @@ namespace Discord
         /// <summary>
         ///     An autocomplete request sent from discord.
         /// </summary>
-        ApplicationCommandAutocomplete = 4,
+        ApplicationCommandAutocomplete = 4
     }
 }

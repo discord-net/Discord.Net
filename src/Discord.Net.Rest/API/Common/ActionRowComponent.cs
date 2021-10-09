@@ -1,10 +1,5 @@
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord.API
 {
@@ -26,7 +21,7 @@ namespace Discord.API
                 {
                     ComponentType.Button => new ButtonComponent(x as Discord.ButtonComponent),
                     ComponentType.SelectMenu => new SelectMenuComponent(x as Discord.SelectMenuComponent),
-                    _ => null,
+                    _ => null
                 };
             }).ToArray();
         }

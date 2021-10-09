@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Model = Discord.API.ApplicationCommandOption;
 
 namespace Discord.WebSocket
@@ -66,16 +63,16 @@ namespace Discord.WebSocket
                 : null;
 
             Choices = model.Choices.IsSpecified
-                ? model.Choices.Value.Select(x => SocketApplicationCommandChoice.Create(x)).ToImmutableArray()
-                : new ImmutableArray<SocketApplicationCommandChoice>();
+                ? model.Choices.Value.Select(SocketApplicationCommandChoice.Create).ToImmutableArray()
+                : ImmutableArray.Create<SocketApplicationCommandChoice>();
 
             Options = model.Options.IsSpecified
-                ? model.Options.Value.Select(x => SocketApplicationCommandOption.Create(x)).ToImmutableArray()
-                : new ImmutableArray<SocketApplicationCommandOption>();
+                ? model.Options.Value.Select(Create).ToImmutableArray()
+                : ImmutableArray.Create<SocketApplicationCommandOption>();
 
             ChannelTypes = model.ChannelTypes.IsSpecified
                 ? model.ChannelTypes.Value.ToImmutableArray()
-                : new ImmutableArray<ChannelType>();
+                : ImmutableArray.Create<ChannelType>();
         }
 
         IReadOnlyCollection<IApplicationCommandOptionChoice> IApplicationCommandOption.Choices => Choices;

@@ -63,9 +63,9 @@ namespace Discord.WebSocket
         {
             if (model.Type == InteractionType.ApplicationCommand)
             {
-                var dataModel = model.Data.IsSpecified ?
-                        (DataModel)model.Data.Value
-                        : null;
+                var dataModel = model.Data.IsSpecified
+                    ? (DataModel)model.Data.Value
+                    : null;
 
                 if (dataModel == null)
                     return null;
@@ -75,15 +75,17 @@ namespace Discord.WebSocket
                     ApplicationCommandType.Slash => SocketSlashCommand.Create(client, model, channel),
                     ApplicationCommandType.Message => SocketMessageCommand.Create(client, model, channel),
                     ApplicationCommandType.User => SocketUserCommand.Create(client, model, channel),
-                    _ => null,
+                    _ => null
                 };
             }
-            else if (model.Type == InteractionType.MessageComponent)
+
+            if (model.Type == InteractionType.MessageComponent)
                 return SocketMessageComponent.Create(client, model, channel);
-            else if (model.Type == InteractionType.ApplicationCommandAutocomplete)
+
+            if (model.Type == InteractionType.ApplicationCommandAutocomplete)
                 return SocketAutocompleteInteraction.Create(client, model, channel);
-            else
-                return null;
+
+            return null;
         }
 
         internal virtual void Update(Model model)
@@ -138,7 +140,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     The sent message.
         /// </returns>
-        public abstract Task<RestFollowupMessage> FollowupAsync(string text = null, Embed[] embeds = null,  bool isTTS = false, bool ephemeral = false,
+        public abstract Task<RestFollowupMessage> FollowupAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
              AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null);
 
         /// <summary>
@@ -195,7 +197,7 @@ namespace Discord.WebSocket
         /// <returns>A <see cref="RestInteractionMessage"/> that represents the initial response.</returns>
         public async Task<RestInteractionMessage> ModifyOriginalResponseAsync(Action<MessageProperties> func, RequestOptions options = null)
         {
-            var model = await InteractionHelper.ModifyInteractionResponse(Discord, Token, func, options);
+            var model = await InteractionHelper.ModifyInteractionResponseAsync(Discord, Token, func, options);
             return RestInteractionMessage.Create(Discord, model, Token, Channel);
         }
 
@@ -214,20 +216,20 @@ namespace Discord.WebSocket
             // Tokens last for 15 minutes according to https://discord.com/developers/docs/interactions/slash-commands#responding-to-an-interaction
             return (DateTime.UtcNow - CreatedAt.UtcDateTime).TotalMinutes <= 15d;
         }
-#endregion
+        #endregion
 
         #region  IDiscordInteraction
         /// <inheritdoc/>
-        async Task<IUserMessage> IDiscordInteraction.FollowupAsync (string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions,
+        async Task<IUserMessage> IDiscordInteraction.FollowupAsync(string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions,
             RequestOptions options, MessageComponent component, Embed embed)
             => await FollowupAsync(text, embeds, isTTS, ephemeral, allowedMentions, options, component, embed).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        async Task<IUserMessage> IDiscordInteraction.GetOriginalResponseAsync (RequestOptions options)
+        async Task<IUserMessage> IDiscordInteraction.GetOriginalResponseAsync(RequestOptions options)
             => await GetOriginalResponseAsync(options).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        async Task<IUserMessage> IDiscordInteraction.ModifyOriginalResponseAsync (Action<MessageProperties> func, RequestOptions options)
+        async Task<IUserMessage> IDiscordInteraction.ModifyOriginalResponseAsync(Action<MessageProperties> func, RequestOptions options)
             => await ModifyOriginalResponseAsync(func, options).ConfigureAwait(false);
         #endregion
     }

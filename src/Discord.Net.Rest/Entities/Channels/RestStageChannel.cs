@@ -1,10 +1,8 @@
+using Discord.API;
+using Discord.API.Rest;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
-using StageInstance = Discord.API.StageInstance;
 
 namespace Discord.Rest
 {
@@ -25,12 +23,9 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public bool IsLive { get; private set; }
         internal RestStageChannel(BaseDiscordClient discord, IGuild guild, ulong id)
-            : base(discord, guild, id)
-        {
+            : base(discord, guild, id) { }
 
-        }
-
-        internal static new RestStageChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
+        internal new static RestStageChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
             var entity = new RestStageChannel(discord, guild, model.Id);
             entity.Update(model);
@@ -65,7 +60,7 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public async Task StartStageAsync(string topic, StagePrivacyLevel privacyLevel = StagePrivacyLevel.GuildOnly, RequestOptions options = null)
         {
-            var args = new API.Rest.CreateStageInstanceParams()
+            var args = new CreateStageInstanceParams
             {
                 ChannelId = Id,
                 PrivacyLevel = privacyLevel,
@@ -82,7 +77,7 @@ namespace Discord.Rest
         {
             await Discord.ApiClient.DeleteStageInstanceAsync(Id, options);
 
-            Update(null, false);
+            Update(null);
         }
 
         /// <inheritdoc/>
@@ -98,7 +93,7 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public Task RequestToSpeakAsync(RequestOptions options = null)
         {
-            var args = new API.Rest.ModifyVoiceStateParams()
+            var args = new ModifyVoiceStateParams
             {
                 ChannelId = Id,
                 RequestToSpeakTimestamp = DateTimeOffset.UtcNow
@@ -109,7 +104,7 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public Task BecomeSpeakerAsync(RequestOptions options = null)
         {
-            var args = new API.Rest.ModifyVoiceStateParams()
+            var args = new ModifyVoiceStateParams
             {
                 ChannelId = Id,
                 Suppressed = false
@@ -120,7 +115,7 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public Task StopSpeakingAsync(RequestOptions options = null)
         {
-            var args = new API.Rest.ModifyVoiceStateParams()
+            var args = new ModifyVoiceStateParams
             {
                 ChannelId = Id,
                 Suppressed = true
@@ -131,7 +126,7 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public Task MoveToSpeakerAsync(IGuildUser user, RequestOptions options = null)
         {
-            var args = new API.Rest.ModifyVoiceStateParams()
+            var args = new ModifyVoiceStateParams
             {
                 ChannelId = Id,
                 Suppressed = false
@@ -143,7 +138,7 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public Task RemoveFromSpeakerAsync(IGuildUser user, RequestOptions options = null)
         {
-            var args = new API.Rest.ModifyVoiceStateParams()
+            var args = new ModifyVoiceStateParams
             {
                 ChannelId = Id,
                 Suppressed = true

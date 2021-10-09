@@ -1,8 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -19,14 +15,12 @@ namespace Discord
         public string Name
         {
             get => _name;
-            set
+            set => _name = value?.Length switch
             {
-                if(value?.Length > 100)
-                    throw new ArgumentException("Name length must be less than or equal to 100");
-                if (value?.Length < 1)
-                    throw new ArgumentException("Name length must at least 1 character in length");
-                _name = value;
-            }
+                > 100 => throw new ArgumentOutOfRangeException(nameof(value), "Name length must be less than or equal to 100."),
+                0 => throw new ArgumentOutOfRangeException(nameof(value), "Name length must at least 1."),
+                _ => value
+            };
         }
 
         /// <summary>
@@ -40,11 +34,8 @@ namespace Discord
             get => _value;
             set
             {
-                if(value != null)
-                {
-                    if(!(value is int) && !(value is string))
-                        throw new ArgumentException("The value of a choice must be a string or int!");
-                }
+                if (value != null && value is not int && value is not string)
+                    throw new ArgumentException("The value of a choice must be a string or int!");
                 _value = value;
             }
         }

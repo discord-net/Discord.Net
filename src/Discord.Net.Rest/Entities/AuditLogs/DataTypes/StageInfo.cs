@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord.Rest
 {
     /// <summary>
@@ -28,9 +22,9 @@ namespace Discord.Rest
 
         internal StageInfo(IUser user, StagePrivacyLevel? level, string topic)
         {
-            this.Topic = topic;
-            this.PrivacyLevel = level;
-            this.User = user;
+            Topic = topic;
+            PrivacyLevel = level;
+            User = user;
         }
     }
 }

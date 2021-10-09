@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -17,7 +15,7 @@ namespace Discord
         ulong ApplicationId { get; }
 
         /// <summary>
-        ///     The type of the command
+        ///     The type of the command.
         /// </summary>
         ApplicationCommandType Type { get; }
 

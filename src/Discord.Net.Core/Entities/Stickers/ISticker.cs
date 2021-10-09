@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -57,12 +55,12 @@ namespace Discord
         new StickerFormatType Format { get; }
 
         /// <summary>
-        ///     Gets whether this guild sticker can be used, may be false due to loss of Server Boosts
+        ///     Gets whether this guild sticker can be used, may be false due to loss of Server Boosts.
         /// </summary>
         bool? IsAvailable { get; }
 
         /// <summary>
-        ///     Gets the standard sticker's sort order within its pack
+        ///     Gets the standard sticker's sort order within its pack.
         /// </summary>
         int? SortOrder { get; }
         /// <summary>

@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord
 {
     /// <summary>
-    ///     Represents a type of sticker
+    ///     Represents a type of sticker..
     /// </summary>
     public enum StickerType
     {
@@ -19,6 +13,6 @@ namespace Discord
         /// <summary>
         ///     Represents a sticker that was created within a guild.
         /// </summary>
-        Guild = 2,
+        Guild = 2
     }
 }

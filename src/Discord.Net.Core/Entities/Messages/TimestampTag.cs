@@ -1,8 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -24,18 +20,13 @@ namespace Discord
         /// <summary>
         ///     Converts the current timestamp tag to the string representation supported by discord.
         ///     <para>
-        ///         If the <see cref="TimestampTag.Time"/> is null then the default 0 will be used.
+        ///         If the <see cref="Time"/> is null then the default 0 will be used.
         ///     </para>
         /// </summary>
-        /// <returns>A string thats compatible in a discord message, ex: <code>&lt;t:1625944201:f&gt;</code></returns>
+        /// <returns>A string that is compatible in a discord message, ex: <code>&lt;t:1625944201:f&gt;</code></returns>
         public override string ToString()
         {
-            if (Time == null)
-                return $"<t:0:{(char)Style}>";
-
-            var offset = (DateTimeOffset)this.Time;
-
-            return $"<t:{offset.ToUnixTimeSeconds()}:{(char)Style}>";
+            return $"<t:{((DateTimeOffset)Time).ToUnixTimeSeconds()}:{(char)Style}>";
         }
 
         /// <summary>
@@ -46,7 +37,7 @@ namespace Discord
         /// <returns>The newly create timestamp tag.</returns>
         public static TimestampTag FromDateTime(DateTime time, TimestampTagStyles style = TimestampTagStyles.ShortDateTime)
         {
-            return new TimestampTag()
+            return new TimestampTag
             {
                 Style = style,
                 Time = time

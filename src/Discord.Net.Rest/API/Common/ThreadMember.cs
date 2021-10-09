@@ -1,9 +1,5 @@
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord.API
 {
@@ -18,7 +14,7 @@ namespace Discord.API
         [JsonProperty("join_timestamp")]
         public DateTimeOffset JoinTimestamp { get; set; }
 
-        [JsonProperty("presense")]
+        [JsonProperty("presence")]
         public Optional<Presence> Presence { get; set; }
 
         [JsonProperty("member")]
