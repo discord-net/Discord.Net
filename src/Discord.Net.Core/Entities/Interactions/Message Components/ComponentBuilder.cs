@@ -69,14 +69,14 @@ namespace Discord
             switch (component)
             {
                 case ButtonComponent button:
-                    WithButton(button.Label, button.CustomId, button.Style, button.Emote, button.Url, button.Disabled, row);
+                    WithButton(button.Label, button.CustomId, button.Style, button.Emote, button.Url, button.IsDisabled, row);
                     break;
                 case ActionRowComponent actionRow:
                     foreach (var cmp in actionRow.Components)
                         AddComponent(cmp, row);
                     break;
                 case SelectMenuComponent menu:
-                    WithSelectMenu(menu.Placeholder, menu.CustomId, menu.Options.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.Default)).ToList(), menu.Placeholder, menu.MinValues, menu.MaxValues, menu.Disabled, row);
+                    WithSelectMenu(menu.CustomId, menu.Options.Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.Default)).ToList(), menu.Placeholder, menu.MinValues, menu.MaxValues, menu.IsDisabled, row);
                     break;
             }
         }
@@ -85,7 +85,6 @@ namespace Discord
         ///     Adds a <see cref="SelectMenuBuilder"/> to the <see cref="ComponentBuilder"/> at the specific row.
         ///     If the row cannot accept the component then it will add it to a row that can.
         /// </summary>
-        /// <param name="label">The label of the menu.</param>
         /// <param name="customId">The custom id of the menu.</param>
         /// <param name="options">The options of the menu.</param>
         /// <param name="placeholder">The placeholder of the menu.</param>
@@ -94,7 +93,7 @@ namespace Discord
         /// <param name="disabled">Whether or not the menu is disabled.</param>
         /// <param name="row">The row to add the menu to.</param>
         /// <returns></returns>
-        public ComponentBuilder WithSelectMenu(string label, string customId, List<SelectMenuOptionBuilder> options,
+        public ComponentBuilder WithSelectMenu(string customId, List<SelectMenuOptionBuilder> options,
             string placeholder = null, int minValues = 1, int maxValues = 1, bool disabled = false, int row = 0)
         {
             return WithSelectMenu(new SelectMenuBuilder()
@@ -413,7 +412,7 @@ namespace Discord
         /// <summary>
         ///     Gets or sets whether the current button is disabled.
         /// </summary>
-        public bool Disabled { get; set; }
+        public bool IsDisabled { get; set; }
 
 
         private string _label;
@@ -432,14 +431,14 @@ namespace Discord
         /// <param name="customId">The custom ID of this button.</param>
         /// <param name="style">The custom ID of this button.</param>
         /// <param name="emote">The emote of this button.</param>
-        /// <param name="disabled">Disabled this button or not.</param>
-        public ButtonBuilder(string label = null, string customId = null, ButtonStyle style = ButtonStyle.Primary, string url = null, IEmote emote = null, bool disabled = false)
+        /// <param name="isDisabled">Disabled this button or not.</param>
+        public ButtonBuilder(string label = null, string customId = null, ButtonStyle style = ButtonStyle.Primary, string url = null, IEmote emote = null, bool isDisabled = false)
         {
             CustomId = customId;
             Style = style;
             Url = url;
             Label = label;
-            Disabled = disabled;
+            IsDisabled = isDisabled;
             Emote = emote;
         }
 
@@ -452,7 +451,7 @@ namespace Discord
             Style = button.Style;
             Url = button.Url;
             Label = button.Label;
-            Disabled = button.Disabled;
+            IsDisabled = button.IsDisabled;
             Emote = button.Emote;
         }
 
@@ -566,11 +565,11 @@ namespace Discord
         /// <summary>
         ///     Sets whether the current button is disabled.
         /// </summary>
-        /// <param name="disabled">Whether the current button is disabled or not.</param>
+        /// <param name="isDisabled">Whether the current button is disabled or not.</param>
         /// <returns>The current builder.</returns>
-        public ButtonBuilder WithDisabled(bool disabled)
+        public ButtonBuilder WithDisabled(bool isDisabled)
         {
-            Disabled = disabled;
+            IsDisabled = isDisabled;
             return this;
         }
 
@@ -601,7 +600,7 @@ namespace Discord
             else if (string.IsNullOrEmpty(CustomId))
                 throw new InvalidOperationException("Non-link buttons must have a custom id associated with them");
 
-            return new ButtonComponent(Style, Label, Emote, CustomId, Url, Disabled);
+            return new ButtonComponent(Style, Label, Emote, CustomId, Url, IsDisabled);
         }
     }
 
@@ -718,7 +717,7 @@ namespace Discord
         /// <summary>
         ///     Gets or sets whether the current menu is disabled.
         /// </summary>
-        public bool Disabled { get; set; }
+        public bool IsDisabled { get; set; }
 
         private List<SelectMenuOptionBuilder> _options = new List<SelectMenuOptionBuilder>();
         private int _minValues = 1;
@@ -740,7 +739,7 @@ namespace Discord
             CustomId = selectMenu.Placeholder;
             MaxValues = selectMenu.MaxValues;
             MinValues = selectMenu.MinValues;
-            Disabled = selectMenu.Disabled;
+            IsDisabled = selectMenu.IsDisabled;
             Options = selectMenu.Options?
                .Select(x => new SelectMenuOptionBuilder(x.Label, x.Value, x.Description, x.Emote, x.Default))
                .ToList();
@@ -754,13 +753,13 @@ namespace Discord
         /// <param name="placeholder">The placeholder of this select menu.</param>
         /// <param name="maxValues">The max values of this select menu.</param>
         /// <param name="minValues">The min values of this select menu.</param>
-        /// <param name="disabled">Disabled this select menu or not.</param>
-        public SelectMenuBuilder(string customId, List<SelectMenuOptionBuilder> options, string placeholder = null, int maxValues = 1, int minValues = 1, bool disabled = false)
+        /// <param name="isDisabled">Disabled this select menu or not.</param>
+        public SelectMenuBuilder(string customId, List<SelectMenuOptionBuilder> options, string placeholder = null, int maxValues = 1, int minValues = 1, bool isDisabled = false)
         {
             CustomId = customId;
             Options = options;
             Placeholder = placeholder;
-            Disabled = disabled;
+            IsDisabled = isDisabled;
             MaxValues = maxValues;
             MinValues = minValues;
         }
@@ -859,27 +858,27 @@ namespace Discord
         /// <param name="value">The value of this option.</param>
         /// <param name="description">The description of this option.</param>
         /// <param name="emote">The emote of this option.</param>
-        /// <param name="default">Render this option as selected by default or not.</param>
+        /// <param name="isDefault">Render this option as selected by default or not.</param>
         /// <exception cref="InvalidOperationException">Options count reached <see cref="MaxOptionCount"/>.</exception>
         /// <returns>
         ///     The current builder.
         /// </returns>
-        public SelectMenuBuilder AddOption(string label, string value, string description = null, IEmote emote = null, bool? @default = null)
+        public SelectMenuBuilder AddOption(string label, string value, string description = null, IEmote emote = null, bool? isDefault = null)
         {
-            AddOption(new SelectMenuOptionBuilder(label, value, description, emote, @default));
+            AddOption(new SelectMenuOptionBuilder(label, value, description, emote, isDefault));
             return this;
         }
 
         /// <summary>
         ///     Sets whether the current menu is disabled.
         /// </summary>
-        /// <param name="disabled">Whether the current menu is disabled or not.</param>
+        /// <param name="isDisabled">Whether the current menu is disabled or not.</param>
         /// <returns>
         ///     The current builder.
         /// </returns>
-        public SelectMenuBuilder WithDisabled(bool disabled)
+        public SelectMenuBuilder WithDisabled(bool isDisabled)
         {
-            Disabled = disabled;
+            IsDisabled = isDisabled;
             return this;
         }
 
@@ -891,7 +890,7 @@ namespace Discord
         {
             var options = Options?.Select(x => x.Build()).ToList();
 
-            return new SelectMenuComponent(CustomId, options, Placeholder, MinValues, MaxValues, Disabled);
+            return new SelectMenuComponent(CustomId, options, Placeholder, MinValues, MaxValues, IsDisabled);
         }
     }
 
@@ -991,7 +990,7 @@ namespace Discord
         /// <summary>
         ///     Gets or sets the whether or not this option will render selected by default.
         /// </summary>
-        public bool? Default { get; set; }
+        public bool? IsDefault { get; set; }
 
         private string _label;
         private string _value;
@@ -1009,14 +1008,14 @@ namespace Discord
         /// <param name="value">The value of this option.</param>
         /// <param name="description">The description of this option.</param>
         /// <param name="emote">The emote of this option.</param>
-        /// <param name="default">Render this option as selected by default or not.</param>
-        public SelectMenuOptionBuilder(string label, string value, string description = null, IEmote emote = null, bool? @default = null)
+        /// <param name="isDefault">Render this option as selected by default or not.</param>
+        public SelectMenuOptionBuilder(string label, string value, string description = null, IEmote emote = null, bool? isDefault = null)
         {
             Label = label;
             Value = value;
             Description = description;
             Emote = emote;
-            Default = @default;
+            this.IsDefault = isDefault;
         }
 
         /// <summary>
@@ -1028,7 +1027,7 @@ namespace Discord
             Value = option.Value;
             Description = option.Description;
             Emote = option.Emote;
-            Default = option.Default;
+            IsDefault = option.Default;
         }
 
         /// <summary>
@@ -1089,13 +1088,13 @@ namespace Discord
         /// <summary>
         ///     Sets the field default.
         /// </summary>
-        /// <param name="defaultValue">The value to set the field default to.</param>
+        /// <param name="isDefault">The value to set the field default to.</param>
         /// <returns>
         ///     The current builder.
         /// </returns>
-        public SelectMenuOptionBuilder WithDefault(bool defaultValue)
+        public SelectMenuOptionBuilder WithDefault(bool isDefault)
         {
-            Default = defaultValue;
+            IsDefault = isDefault;
             return this;
         }
 
@@ -1105,7 +1104,7 @@ namespace Discord
         /// <returns>The newly built <see cref="SelectMenuOption"/>.</returns>
         public SelectMenuOption Build()
         {
-            return new SelectMenuOption(Label, Value, Description, Emote, Default);
+            return new SelectMenuOption(Label, Value, Description, Emote, IsDefault);
         }
     }
 }

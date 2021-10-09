@@ -35,7 +35,7 @@ namespace Discord.WebSocket
             => Users.FirstOrDefault(x => x.Id == Discord.CurrentUser.Id);
 
         /// <inheritdoc/>
-        public bool Joined { get; private set; }
+        public bool HasJoined { get; private set; }
 
         /// <summary>
         ///     <see langword="true"/> if this thread is private, otherwise <see langword="false"/>
@@ -55,7 +55,7 @@ namespace Discord.WebSocket
         public int MemberCount { get; private set; }
 
         /// <inheritdoc/>
-        public bool Archived { get; private set; }
+        public bool IsArchived { get; private set; }
 
         /// <inheritdoc/>
         public DateTimeOffset ArchiveTimestamp { get; private set; }
@@ -64,7 +64,7 @@ namespace Discord.WebSocket
         public ThreadArchiveDuration AutoArchiveDuration { get; private set; }
 
         /// <inheritdoc/>
-        public bool Locked { get; private set; }
+        public bool IsLocked { get; private set; }
 
         /// <summary>
         ///     Gets a collection of cached users within this thread.
@@ -106,10 +106,10 @@ namespace Discord.WebSocket
             
             if (model.ThreadMetadata.IsSpecified)
             {
-                Archived = model.ThreadMetadata.Value.Archived;
+                IsArchived = model.ThreadMetadata.Value.Archived;
                 ArchiveTimestamp = model.ThreadMetadata.Value.ArchiveTimestamp;
                 AutoArchiveDuration = (ThreadArchiveDuration)model.ThreadMetadata.Value.AutoArchiveDuration;
-                Locked = model.ThreadMetadata.Value.Locked.GetValueOrDefault(false);
+                IsLocked = model.ThreadMetadata.Value.Locked.GetValueOrDefault(false);
             }
 
             if (model.OwnerId.IsSpecified)
@@ -117,7 +117,7 @@ namespace Discord.WebSocket
                 Owner = GetUser(model.OwnerId.Value);
             }
 
-            Joined = model.ThreadMember.IsSpecified;
+            HasJoined = model.ThreadMember.IsSpecified;
         }
 
         internal IReadOnlyCollection<SocketThreadUser> RemoveUsers(ulong[] users)

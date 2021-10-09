@@ -538,7 +538,7 @@ namespace Discord
         /// </returns>
         Task<IVoiceChannel> GetVoiceChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
-        ///     Gets a stage channel in this guild
+        ///     Gets a stage channel in this guild.
         /// </summary>
         /// <param name="id">The snowflake identifier for the stage channel.</param>
         /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
@@ -771,7 +771,7 @@ namespace Discord
         /// <returns>A guild user associated with the specified <paramref name="userId" />; <see langword="null" /> if the user is already in the guild.</returns>
         Task<IGuildUser> AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func = null, RequestOptions options = null);
         /// <summary>
-        /// Disconnects the user from its current voice channel
+        ///     Disconnects the user from its current voice channel.
         /// </summary>
         /// <param name="user">The user to disconnect.</param>
         /// <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
@@ -990,7 +990,7 @@ namespace Discord
         Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options = null);
 
         /// <summary>
-        ///     Creates a new sticker in this guild
+        ///     Creates a new sticker in this guild.
         /// </summary>
         /// <param name="name">The name of the sticker.</param>
         /// <param name="description">The description of the sticker.</param>
@@ -1003,7 +1003,7 @@ namespace Discord
         Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path, RequestOptions options = null);
 
         /// <summary>
-        ///     Creates a new sticker in this guild
+        ///     Creates a new sticker in this guild.
         /// </summary>
         /// <param name="name">The name of the sticker.</param>
         /// <param name="description">The description of the sticker.</param>

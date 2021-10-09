@@ -39,7 +39,7 @@ namespace Discord.API
             Label = c.Label;
             CustomId = c.CustomId;
             Url = c.Url;
-            Disabled = c.Disabled;
+            Disabled = c.IsDisabled;
 
             if (c.Emote != null)
             {

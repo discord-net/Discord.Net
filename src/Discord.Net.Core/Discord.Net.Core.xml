@@ -1988,23 +1988,21 @@
         <member name="P:Discord.IStageChannel.PrivacyLevel">
             <summary>
                 The <see cref="T:Discord.StagePrivacyLevel"/> of the current stage.
+                Gets the <see cref="T:Discord.StagePrivacyLevel"/> of the current stage.
             </summary>
             <remarks>
                 If the stage isn't live then this property will be set to <see langword="null"/>.
             </remarks>
         </member>
-        <member name="P:Discord.IStageChannel.DiscoverableDisabled">
+        <member name="P:Discord.IStageChannel.IsDiscoverableDisabled">
             <summary>
-                <see langword="true"/> if stage discovery is disabled, otherwise <see langword="false"/>. 
+                Gets whether or not stage discovery is disabled. 
             </summary>
         </member>
-        <member name="P:Discord.IStageChannel.Live">
+        <member name="P:Discord.IStageChannel.IsLive">
             <summary>
-                <see langword="true"/> when the stage is live, otherwise <see langword="false"/>.
+                Gets whether or not the stage is live.
             </summary>
-            <remarks>
-                If the stage isn't live then this property will be set to <see langword="null"/>.
-            </remarks>
         </member>
         <member name="M:Discord.IStageChannel.StartStageAsync(System.String,Discord.StagePrivacyLevel,Discord.RequestOptions)">
             <summary>
@@ -2238,39 +2236,39 @@
                 Gets the type of the current thread channel.
             </summary>
         </member>
-        <member name="P:Discord.IThreadChannel.Joined">
+        <member name="P:Discord.IThreadChannel.HasJoined">
             <summary>
-                <see langword="true"/> if the current user has joined this thread, otherwise <see langword="false"/>.
+                Gets whether or not the current user has joined this thread.
             </summary>
         </member>
-        <member name="P:Discord.IThreadChannel.Archived">
+        <member name="P:Discord.IThreadChannel.IsArchived">
             <summary>
                 <see langword="true"/> if the current thread is archived, otherwise <see langword="false"/>.
             </summary>
         </member>
         <member name="P:Discord.IThreadChannel.AutoArchiveDuration">
             <summary>
-                Duration to automatically archive the thread after recent activity.
+                Gets whether or not the current thread is archived.
             </summary>
         </member>
         <member name="P:Discord.IThreadChannel.ArchiveTimestamp">
             <summary>
-                Timestamp when the thread's archive status was last changed, used for calculating recent activity.
+                Gets the timestamp when the thread's archive status was last changed, used for calculating recent activity.
             </summary>
         </member>
-        <member name="P:Discord.IThreadChannel.Locked">
+        <member name="P:Discord.IThreadChannel.IsLocked">
             <summary>
-                <see langword="true"/> if the current thread is locked, otherwise <see langword="false"/>
+                Gets whether or not the current thread is locked.
             </summary>
         </member>
         <member name="P:Discord.IThreadChannel.MemberCount">
             <summary>
-                An approximate count of users in a thread, stops counting at 50.
+                Gets an approximate count of users in a thread, stops counting after 50.
             </summary>
         </member>
         <member name="P:Discord.IThreadChannel.MessageCount">
             <summary>
-                An approximate count of messages in a thread, stops counting at 50.
+                Gets an approximate count of messages in a thread, stops counting after 50.
             </summary>
         </member>
         <member name="M:Discord.IThreadChannel.JoinAsync(Discord.RequestOptions)">
@@ -3537,7 +3535,7 @@
         </member>
         <member name="M:Discord.IGuild.GetStageChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
             <summary>
-                Gets a stage channel in this guild
+                Gets a stage channel in this guild.
             </summary>
             <param name="id">The snowflake identifier for the stage channel.</param>
             <param name="mode">The <see cref="T:Discord.CacheMode"/> that determines whether the object should be fetched from cache.</param>
@@ -3782,7 +3780,7 @@
         </member>
         <member name="M:Discord.IGuild.DisconnectAsync(Discord.IGuildUser)">
             <summary>
-            Disconnects the user from its current voice channel
+                Disconnects the user from its current voice channel.
             </summary>
             <param name="user">The user to disconnect.</param>
             <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
@@ -4009,7 +4007,7 @@
         </member>
         <member name="M:Discord.IGuild.CreateStickerAsync(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.String,Discord.RequestOptions)">
             <summary>
-                Creates a new sticker in this guild
+                Creates a new sticker in this guild.
             </summary>
             <param name="name">The name of the sticker.</param>
             <param name="description">The description of the sticker.</param>
@@ -4022,7 +4020,7 @@
         </member>
         <member name="M:Discord.IGuild.CreateStickerAsync(System.String,System.String,System.Collections.Generic.IEnumerable{System.String},System.IO.Stream,System.String,Discord.RequestOptions)">
             <summary>
-                Creates a new sticker in this guild
+                Creates a new sticker in this guild.
             </summary>
             <param name="name">The name of the sticker.</param>
             <param name="description">The description of the sticker.</param>
@@ -4766,12 +4764,12 @@
         </member>
         <member name="P:Discord.MessageCommandBuilder.Name">
             <summary>
-                The name of this Message command.
+                Gets or sets the name of this Message command.
             </summary>
         </member>
-        <member name="P:Discord.MessageCommandBuilder.DefaultPermission">
+        <member name="P:Discord.MessageCommandBuilder.IsDefaultPermission">
             <summary>
-                Whether the command is enabled by default when the app is added to a guild
+                Gets or sets whether the command is enabled by default when the app is added to a guild
             </summary>
         </member>
         <member name="M:Discord.MessageCommandBuilder.Build">
@@ -4795,7 +4793,7 @@
             <summary>
                 Sets the default permission of the current command.
             </summary>
-            <param name="value">The default permission value to set.</param>
+            <param name="isDefaultPermission">The default permission value to set.</param>
             <returns>The current builder.</returns>
         </member>
         <member name="T:Discord.MessageCommandProperties">
@@ -4810,17 +4808,17 @@
         </member>
         <member name="F:Discord.UserCommandBuilder.MaxNameLength">
             <summary> 
-                Returns the maximum length a commands name allowed by Discord
+                Returns the maximum length a commands name allowed by Discord.
             </summary>
         </member>
         <member name="P:Discord.UserCommandBuilder.Name">
             <summary>
-                The name of this User command.
+                Gets or sets the name of this User command.
             </summary>
         </member>
-        <member name="P:Discord.UserCommandBuilder.DefaultPermission">
+        <member name="P:Discord.UserCommandBuilder.IsDefaultPermission">
             <summary>
-                Whether the command is enabled by default when the app is added to a guild
+                Gets or sets whether the command is enabled by default when the app is added to a guild.
             </summary>
         </member>
         <member name="M:Discord.UserCommandBuilder.Build">
@@ -4842,7 +4840,7 @@
             <summary>
                 Sets the default permission of the current command.
             </summary>
-            <param name="value">The default permission value to set.</param>
+            <param name="isDefaultPermission">The default permission value to set.</param>
             <returns>The current builder.</returns>
         </member>
         <member name="T:Discord.UserCommandProperties">
@@ -5191,7 +5189,7 @@
         </member>
         <member name="P:Discord.ActionRowComponent.Components">
             <summary>
-                The child components in this row.
+                Gets the child components in this row.
             </summary>
         </member>
         <member name="T:Discord.ButtonComponent">
@@ -5204,35 +5202,33 @@
         </member>
         <member name="P:Discord.ButtonComponent.Style">
             <summary>
-                The <see cref="T:Discord.ButtonStyle"/> of this button, example buttons with each style can be found <see href="https://discord.com/assets/7bb017ce52cfd6575e21c058feb3883b.png">Here</see>.
+                Gets the <see cref="T:Discord.ButtonStyle"/> of this button, example buttons with each style can be found <see href="https://discord.com/assets/7bb017ce52cfd6575e21c058feb3883b.png">Here</see>.
             </summary>
         </member>
         <member name="P:Discord.ButtonComponent.Label">
             <summary>
-                The label of the button, this is the text that is shown.
+                Gets the label of the button, this is the text that is shown.
             </summary>
         </member>
         <member name="P:Discord.ButtonComponent.Emote">
             <summary>
-                A <see cref="T:Discord.IEmote"/> that will be displayed with this button.
+                Gets the <see cref="T:Discord.IEmote"/> displayed with this button.
             </summary>
         </member>
         <member name="P:Discord.ButtonComponent.CustomId">
-            <summary>
-                A unique id that will be sent with a <see cref="T:Discord.IDiscordInteraction"/>. This is how you know what button was pressed.
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Discord.ButtonComponent.Url">
             <summary>
-                A URL for a <see cref="F:Discord.ButtonStyle.Link"/> button. 
+                Gets the URL for a <see cref="F:Discord.ButtonStyle.Link"/> button. 
             </summary>
             <remarks>
                 You cannot have a button with a <b>URL</b> and a <b>CustomId</b>.
             </remarks>
         </member>
-        <member name="P:Discord.ButtonComponent.Disabled">
+        <member name="P:Discord.ButtonComponent.IsDisabled">
             <summary>
-                Whether this button is disabled or not.
+                Gets whether this button is disabled or not.
             </summary>
         </member>
         <member name="M:Discord.ButtonComponent.ToBuilder">
@@ -5309,12 +5305,11 @@
             <param name="components">The components to create the builder from.</param>
             <returns>The newly created builder.</returns>
         </member>
-        <member name="M:Discord.ComponentBuilder.WithSelectMenu(System.String,System.String,System.Collections.Generic.List{Discord.SelectMenuOptionBuilder},System.String,System.Int32,System.Int32,System.Boolean,System.Int32)">
+        <member name="M:Discord.ComponentBuilder.WithSelectMenu(System.String,System.Collections.Generic.List{Discord.SelectMenuOptionBuilder},System.String,System.Int32,System.Int32,System.Boolean,System.Int32)">
             <summary>
                 Adds a <see cref="T:Discord.SelectMenuBuilder"/> to the <see cref="T:Discord.ComponentBuilder"/> at the specific row.
                 If the row cannot accept the component then it will add it to a row that can.
             </summary>
-            <param name="label">The label of the menu.</param>
             <param name="customId">The custom id of the menu.</param>
             <param name="options">The options of the menu.</param>
             <param name="placeholder">The placeholder of the menu.</param>
@@ -5444,7 +5439,7 @@
                 Gets or sets the url of the current button.
             </summary>
         </member>
-        <member name="P:Discord.ButtonBuilder.Disabled">
+        <member name="P:Discord.ButtonBuilder.IsDisabled">
             <summary>
                 Gets or sets whether the current button is disabled.
             </summary>
@@ -5463,7 +5458,7 @@
             <param name="customId">The custom ID of this button.</param>
             <param name="style">The custom ID of this button.</param>
             <param name="emote">The emote of this button.</param>
-            <param name="disabled">Disabled this button or not.</param>
+            <param name="isDisabled">Disabled this button or not.</param>
         </member>
         <member name="M:Discord.ButtonBuilder.#ctor(Discord.ButtonComponent)">
             <summary>
@@ -5556,7 +5551,7 @@
             <summary>
                 Sets whether the current button is disabled.
             </summary>
-            <param name="disabled">Whether the current button is disabled or not.</param>
+            <param name="isDisabled">Whether the current button is disabled or not.</param>
             <returns>The current builder.</returns>
         </member>
         <member name="M:Discord.ButtonBuilder.Build">
@@ -5623,7 +5618,7 @@
             <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.Options"/> count exceeds <see cref="F:Discord.SelectMenuBuilder.MaxOptionCount"/>.</exception>
             <exception cref="T:System.ArgumentNullException" accessor="set"><see cref="P:Discord.SelectMenuBuilder.Options"/> is null.</exception>
         </member>
-        <member name="P:Discord.SelectMenuBuilder.Disabled">
+        <member name="P:Discord.SelectMenuBuilder.IsDisabled">
             <summary>
                 Gets or sets whether the current menu is disabled.
             </summary>
@@ -5647,7 +5642,7 @@
             <param name="placeholder">The placeholder of this select menu.</param>
             <param name="maxValues">The max values of this select menu.</param>
             <param name="minValues">The min values of this select menu.</param>
-            <param name="disabled">Disabled this select menu or not.</param>
+            <param name="isDisabled">Disabled this select menu or not.</param>
         </member>
         <member name="M:Discord.SelectMenuBuilder.WithCustomId(System.String)">
             <summary>
@@ -5717,7 +5712,7 @@
             <param name="value">The value of this option.</param>
             <param name="description">The description of this option.</param>
             <param name="emote">The emote of this option.</param>
-            <param name="default">Render this option as selected by default or not.</param>
+            <param name="isDefault">Render this option as selected by default or not.</param>
             <exception cref="T:System.InvalidOperationException">Options count reached <see cref="F:Discord.SelectMenuBuilder.MaxOptionCount"/>.</exception>
             <returns>
                 The current builder.
@@ -5727,7 +5722,7 @@
             <summary>
                 Sets whether the current menu is disabled.
             </summary>
-            <param name="disabled">Whether the current menu is disabled or not.</param>
+            <param name="isDisabled">Whether the current menu is disabled or not.</param>
             <returns>
                 The current builder.
             </returns>
@@ -5784,7 +5779,7 @@
                 Gets or sets the emote of this option.
             </summary>
         </member>
-        <member name="P:Discord.SelectMenuOptionBuilder.Default">
+        <member name="P:Discord.SelectMenuOptionBuilder.IsDefault">
             <summary>
                 Gets or sets the whether or not this option will render selected by default.
             </summary>
@@ -5802,7 +5797,7 @@
             <param name="value">The value of this option.</param>
             <param name="description">The description of this option.</param>
             <param name="emote">The emote of this option.</param>
-            <param name="default">Render this option as selected by default or not.</param>
+            <param name="isDefault">Render this option as selected by default or not.</param>
         </member>
         <member name="M:Discord.SelectMenuOptionBuilder.#ctor(Discord.SelectMenuOption)">
             <summary>
@@ -5852,7 +5847,7 @@
             <summary>
                 Sets the field default.
             </summary>
-            <param name="defaultValue">The value to set the field default to.</param>
+            <param name="isDefault">The value to set the field default to.</param>
             <returns>
                 The current builder.
             </returns>
@@ -5905,7 +5900,7 @@
         </member>
         <member name="P:Discord.MessageComponent.Components">
             <summary>
-                The components to be used in a message.
+                Gets the components to be used in a message.
             </summary>
         </member>
         <member name="P:Discord.MessageComponent.Empty">
@@ -5922,33 +5917,31 @@
             <inheritdoc/>
         </member>
         <member name="P:Discord.SelectMenuComponent.CustomId">
-            <summary>
-                The custom id of this Select menu that will be sent with a <see cref="T:Discord.IDiscordInteraction"/>.
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Discord.SelectMenuComponent.Options">
             <summary>
-                The menus options to select from.
+                Gets the menus options to select from.
             </summary>
         </member>
         <member name="P:Discord.SelectMenuComponent.Placeholder">
             <summary>
-                A custom placeholder text if nothing is selected, max 100 characters.
+                Gets the custom placeholder text if nothing is selected.
             </summary>
         </member>
         <member name="P:Discord.SelectMenuComponent.MinValues">
             <summary>
-                The minimum number of items that must be chosen; default 1, min 0, max 25
+                Gets the minimum number of items that must be chosen.
             </summary>
         </member>
         <member name="P:Discord.SelectMenuComponent.MaxValues">
             <summary>
-                The maximum number of items that can be chosen; default 1, max 25
+                Gets the maximum number of items that can be chosen.
             </summary>
         </member>
-        <member name="P:Discord.SelectMenuComponent.Disabled">
+        <member name="P:Discord.SelectMenuComponent.IsDisabled">
             <summary>
-                Whether this menu is disabled or not.
+                Gets whether this menu is disabled or not.
             </summary>
         </member>
         <member name="M:Discord.SelectMenuComponent.ToBuilder">

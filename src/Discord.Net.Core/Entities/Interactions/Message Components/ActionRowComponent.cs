@@ -16,7 +16,7 @@ namespace Discord
         public ComponentType Type { get; } = ComponentType.ActionRow;
 
         /// <summary>
-        ///     The child components in this row.
+        ///     Gets the child components in this row.
         /// </summary>
         public IReadOnlyCollection<IMessageComponent> Components { get; internal set; }
 

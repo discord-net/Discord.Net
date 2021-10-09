@@ -2274,10 +2274,10 @@
         <member name="P:Discord.WebSocket.SocketStageChannel.PrivacyLevel">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.WebSocket.SocketStageChannel.DiscoverableDisabled">
+        <member name="P:Discord.WebSocket.SocketStageChannel.IsDiscoverableDisabled">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.WebSocket.SocketStageChannel.Live">
+        <member name="P:Discord.WebSocket.SocketStageChannel.IsLive">
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketStageChannel.IsSpeaker">
@@ -2610,7 +2610,7 @@
                 Gets the current users within this thread.
             </summary>
         </member>
-        <member name="P:Discord.WebSocket.SocketThreadChannel.Joined">
+        <member name="P:Discord.WebSocket.SocketThreadChannel.HasJoined">
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketThreadChannel.IsPrivateThread">
@@ -2629,7 +2629,7 @@
         <member name="P:Discord.WebSocket.SocketThreadChannel.MemberCount">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.WebSocket.SocketThreadChannel.Archived">
+        <member name="P:Discord.WebSocket.SocketThreadChannel.IsArchived">
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketThreadChannel.ArchiveTimestamp">
@@ -2638,7 +2638,7 @@
         <member name="P:Discord.WebSocket.SocketThreadChannel.AutoArchiveDuration">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.WebSocket.SocketThreadChannel.Locked">
+        <member name="P:Discord.WebSocket.SocketThreadChannel.IsLocked">
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketThreadChannel.Users">

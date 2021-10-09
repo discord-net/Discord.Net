@@ -14,35 +14,33 @@ namespace Discord
         /// <inheritdoc/>
         public ComponentType Type => ComponentType.SelectMenu;
 
-        /// <summary>
-        ///     The custom id of this Select menu that will be sent with a <see cref="IDiscordInteraction"/>.
-        /// </summary>
+        /// <inheritdoc/>
         public string CustomId { get; }
 
         /// <summary>
-        ///     The menus options to select from.
+        ///     Gets the menus options to select from.
         /// </summary>
         public IReadOnlyCollection<SelectMenuOption> Options { get; }
 
         /// <summary>
-        ///     A custom placeholder text if nothing is selected, max 100 characters.
+        ///     Gets the custom placeholder text if nothing is selected.
         /// </summary>
         public string Placeholder { get; }
 
         /// <summary>
-        ///     The minimum number of items that must be chosen; default 1, min 0, max 25
+        ///     Gets the minimum number of items that must be chosen.
         /// </summary>
         public int MinValues { get; }
 
         /// <summary>
-        ///     The maximum number of items that can be chosen; default 1, max 25
+        ///     Gets the maximum number of items that can be chosen.
         /// </summary>
         public int MaxValues { get; }
 
         /// <summary>
-        ///     Whether this menu is disabled or not.
+        ///     Gets whether this menu is disabled or not.
         /// </summary>
-        public bool Disabled { get; }
+        public bool IsDisabled { get; }
 
         /// <summary>
         ///     Turns this select menu into a builder.
@@ -57,7 +55,7 @@ namespace Discord
                 Placeholder,
                 MaxValues,
                 MinValues,
-                Disabled);
+                IsDisabled);
 
         internal SelectMenuComponent(string customId, List<SelectMenuOption> options, string placeholder, int minValues, int maxValues, bool disabled)
         {
@@ -66,7 +64,7 @@ namespace Discord
             Placeholder = placeholder;
             MinValues = minValues;
             MaxValues = maxValues;
-            Disabled = disabled;
+            IsDisabled = disabled;
         }
     }
 }

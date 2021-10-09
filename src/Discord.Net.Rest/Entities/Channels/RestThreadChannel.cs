@@ -16,10 +16,10 @@ namespace Discord.Rest
     {
         public ThreadType Type { get; private set; }
         /// <inheritdoc/>
-        public bool Joined { get; private set; }
+        public bool HasJoined { get; private set; }
 
         /// <inheritdoc/>
-        public bool Archived { get; private set; }
+        public bool IsArchived { get; private set; }
 
         /// <inheritdoc/>
         public ThreadArchiveDuration AutoArchiveDuration { get; private set; }
@@ -28,7 +28,7 @@ namespace Discord.Rest
         public DateTimeOffset ArchiveTimestamp { get; private set; }
 
         /// <inheritdoc/>
-        public bool Locked { get; private set; }
+        public bool IsLocked { get; private set; }
 
         /// <inheritdoc/>
         public int MemberCount { get; private set; }
@@ -58,14 +58,14 @@ namespace Discord.Rest
         {
             base.Update(model);
 
-            Joined = model.ThreadMember.IsSpecified;
+            HasJoined = model.ThreadMember.IsSpecified;
 
             if (model.ThreadMetadata.IsSpecified)
             {
-                Archived = model.ThreadMetadata.Value.Archived;
+                IsArchived = model.ThreadMetadata.Value.Archived;
                 AutoArchiveDuration = model.ThreadMetadata.Value.AutoArchiveDuration;
                 ArchiveTimestamp = model.ThreadMetadata.Value.ArchiveTimestamp;
-                Locked = model.ThreadMetadata.Value.Locked.GetValueOrDefault(false);
+                IsLocked = model.ThreadMetadata.Value.Locked.GetValueOrDefault(false);
                 
             }
 

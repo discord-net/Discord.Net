@@ -2435,10 +2435,10 @@
         <member name="P:Discord.Rest.RestStageChannel.PrivacyLevel">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.Rest.RestStageChannel.DiscoverableDisabled">
+        <member name="P:Discord.Rest.RestStageChannel.IsDiscoverableDisabled">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.Rest.RestStageChannel.Live">
+        <member name="P:Discord.Rest.RestStageChannel.IsLive">
             <inheritdoc/>
         </member>
         <member name="M:Discord.Rest.RestStageChannel.ModifyInstanceAsync(System.Action{Discord.StageInstanceProperties},Discord.RequestOptions)">
@@ -2730,10 +2730,10 @@
                 Represents a thread channel received over REST.
             </summary>
         </member>
-        <member name="P:Discord.Rest.RestThreadChannel.Joined">
+        <member name="P:Discord.Rest.RestThreadChannel.HasJoined">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.Rest.RestThreadChannel.Archived">
+        <member name="P:Discord.Rest.RestThreadChannel.IsArchived">
             <inheritdoc/>
         </member>
         <member name="P:Discord.Rest.RestThreadChannel.AutoArchiveDuration">
@@ -2742,7 +2742,7 @@
         <member name="P:Discord.Rest.RestThreadChannel.ArchiveTimestamp">
             <inheritdoc/>
         </member>
-        <member name="P:Discord.Rest.RestThreadChannel.Locked">
+        <member name="P:Discord.Rest.RestThreadChannel.IsLocked">
             <inheritdoc/>
         </member>
         <member name="P:Discord.Rest.RestThreadChannel.MemberCount">
