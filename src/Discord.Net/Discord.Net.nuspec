@@ -11,7 +11,7 @@
     <projectUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</projectUrl>
     <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <iconUrl>https://avatars.githubusercontent.com/u/84047264</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/Discord-Net-Labs/Discord.Net-Labs/release/3.x/docs/marketing/logo/PackageLogo.png</iconUrl>
     <dependencies>
         <group targetFramework="net5.0">
             <dependency id="Discord.Net.Labs.Core" version="3.1.2$suffix$" />

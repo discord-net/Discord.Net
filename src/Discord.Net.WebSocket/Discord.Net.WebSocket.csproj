@@ -27,12 +27,6 @@
     <ProjectReference Include="..\Discord.Net.Rest\Discord.Net.Rest.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\..\..\Downloads\Temporary.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Update="Discord.Net.WebSocket.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

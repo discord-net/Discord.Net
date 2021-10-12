@@ -34,12 +34,6 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\..\..\Downloads\Temporary.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Update="Discord.Net.Core.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
