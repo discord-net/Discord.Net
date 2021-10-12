@@ -18,6 +18,9 @@ namespace Discord.WebSocket
         /// </summary>
         public new SocketAutocompleteInteractionData Data { get; }
 
+        internal override bool _hasResponded { get; set; }
+        private object _lock = new object();
+
         internal SocketAutocompleteInteraction(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
             : base(client, model.Id, channel)
         {
@@ -50,8 +53,25 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous operation of responding to this interaction.
         /// </returns>
-        public Task RespondAsync(IEnumerable<AutocompleteResult> result, RequestOptions options = null)
-            => InteractionHelper.SendAutocompleteResultAsync(Discord, result, Id, Token, options);
+        public async Task RespondAsync(IEnumerable<AutocompleteResult> result, RequestOptions options = null)
+        {
+            if (!InteractionHelper.CanSendResponse(this))
+                throw new TimeoutException($"Cannot respond to an interaction after {InteractionHelper.ResponseTimeLimit} seconds!");
+
+            lock (_lock)
+            {
+                if (_hasResponded)
+                {
+                    throw new InvalidOperationException("Cannot respond twice to the same interaction");
+                }
+            }
+
+            await InteractionHelper.SendAutocompleteResultAsync(Discord, result, Id, Token, options).ConfigureAwait(false);
+            lock (_lock)
+            {
+                _hasResponded = true;
+            }
+        }
 
         /// <summary>
         ///     Responds to this interaction with a set of choices.
@@ -68,7 +88,7 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous operation of responding to this interaction.
         /// </returns>
         public Task RespondAsync(RequestOptions options = null, params AutocompleteResult[] result)
-            => InteractionHelper.SendAutocompleteResultAsync(Discord, result, Id, Token, options);
+            => RespondAsync(result, options);
 
         /// <inheritdoc/>
         [Obsolete("Autocomplete interactions cannot be deferred!", true)]
