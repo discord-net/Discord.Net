@@ -408,22 +408,22 @@ namespace Discord
             if (Length > MaxEmbedLength)
                 throw new InvalidOperationException($"Total embed length must be less than or equal to {MaxEmbedLength}.");
             if (!string.IsNullOrEmpty(Url))
-                UrlValidation.Validate(Url);
+                UrlValidation.Validate(Url, true);
             if (!string.IsNullOrEmpty(ThumbnailUrl))
-                UrlValidation.Validate(ThumbnailUrl);
-            if (!string.IsNullOrEmpty(ImageUrl) && !ImageUrl.StartsWith("attachment://", StringComparison.Ordinal))
-                UrlValidation.Validate(ImageUrl);
+                UrlValidation.Validate(ThumbnailUrl, true);
+            if (!string.IsNullOrEmpty(ImageUrl))
+                UrlValidation.Validate(ImageUrl, true);
             if (Author != null)
             {
                 if (!string.IsNullOrEmpty(Author.Url))
-                    UrlValidation.Validate(Author.Url);
+                    UrlValidation.Validate(Author.Url, true);
                 if (!string.IsNullOrEmpty(Author.IconUrl))
-                    UrlValidation.Validate(Author.IconUrl);
+                    UrlValidation.Validate(Author.IconUrl, true);
             }
             if(Footer != null)
             {
                 if (!string.IsNullOrEmpty(Footer.IconUrl))
-                    UrlValidation.Validate(Footer.IconUrl);
+                    UrlValidation.Validate(Footer.IconUrl, true);
             }
             var fields = ImmutableArray.CreateBuilder<EmbedField>(Fields.Count);
             for (int i = 0; i < Fields.Count; i++)

@@ -9,14 +9,15 @@ namespace Discord.Utils
         /// <see cref="ValidateButton(string)"/> should be used for url buttons.
         /// </summary>
         /// <param name="url">The URL to validate before sending to Discord.</param>
+        /// <param name="allowAttachments"><see langword="true"/> to allow the <b>attachment://</b> protocol; otherwise <see langword="false"/>.</param>
         /// <exception cref="InvalidOperationException">A URL must include a protocol (http or https).</exception>
         /// <returns>true if URL is valid by our standard, false if null, throws an error upon invalid.</returns>
-        public static bool Validate(string url)
+        public static bool Validate(string url, bool allowAttachments = false)
         {
             if (string.IsNullOrEmpty(url))
                 return false;
-            if (!(url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || url.StartsWith("https://", StringComparison.OrdinalIgnoreCase)))
-                throw new InvalidOperationException($"The url {url} must include a protocol (either HTTP or HTTPS)");
+            if (!(url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) || allowAttachments ? url.StartsWith("attachment://", StringComparison.Ordinal) : false))
+                throw new InvalidOperationException($"The url {url} must include a protocol (either {(allowAttachments ? "HTTP, HTTPS, or ATTACHMENT" : "HTTP or HTTPS")})");
             return true;
         }
 
