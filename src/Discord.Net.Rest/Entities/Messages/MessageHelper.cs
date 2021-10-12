@@ -248,7 +248,7 @@ namespace Discord.Rest
         }
         public static string SanitizeMessage(IMessage message)
         {
-            var newContent = MentionUtils.Resolve(message, 0, TagHandling.Sanitize, TagHandling.Sanitize, TagHandling.Sanitize, TagHandling.Sanitize, TagHandling.Sanitize);
+            var newContent = MentionUtils.Resolve(message, 0, TagHandling.FullName, TagHandling.FullName, TagHandling.FullName, TagHandling.FullName, TagHandling.FullName);
             newContent = Format.StripMarkDown(newContent);
             return newContent;
         }
