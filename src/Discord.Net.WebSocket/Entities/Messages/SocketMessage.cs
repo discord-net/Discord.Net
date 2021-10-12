@@ -118,8 +118,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     Collection of WebSocket-based users.
         /// </returns>
-        public IReadOnlyCollection<SocketUser> MentionedUsers => ImmutableArray.Create<SocketUser>();
-
+        public IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions; 
         /// <inheritdoc />
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
