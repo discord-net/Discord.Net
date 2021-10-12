@@ -47,11 +47,13 @@ namespace Discord.WebSocket
         public DateTimeOffset CreatedAt
             => SnowflakeUtils.FromSnowflake(Id);
 
+        internal abstract bool _hasResponded { get; set; }
+
         /// <summary>
         ///     <see langword="true"/> if the token is valid for replying to, otherwise <see langword="false"/>.
         /// </summary>
         public bool IsValidToken
-            => CheckToken();
+            => InteractionHelper.CanRespondOrFollowup(this);
 
         internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel)
             : base(client, id)
@@ -210,12 +212,7 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous operation of acknowledging the interaction.
         /// </returns>
         public abstract Task DeferAsync(bool ephemeral = false, RequestOptions options = null);
-
-        private bool CheckToken()
-        {
-            // Tokens last for 15 minutes according to https://discord.com/developers/docs/interactions/slash-commands#responding-to-an-interaction
-            return (DateTime.UtcNow - CreatedAt.UtcDateTime).TotalMinutes <= 15d;
-        }
+        
         #endregion
 
         #region  IDiscordInteraction

@@ -25,6 +25,9 @@ namespace Discord.WebSocket
         /// </summary>
         public SocketUserMessage Message { get; private set; }
 
+        private object _lock = new object();
+        internal override bool _hasResponded { get; set; } = false;
+
         internal SocketMessageComponent(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
             : base(client, model.Id, channel)
         {
@@ -82,6 +85,9 @@ namespace Discord.WebSocket
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
+            if (!InteractionHelper.CanSendResponse(this))
+                throw new TimeoutException($"Cannot respond to an interaction after {InteractionHelper.ResponseTimeLimit} seconds!");
+
             embeds ??= Array.Empty<Embed>();
             if (embed != null)
                 embeds = new[] { embed }.Concat(embeds).ToArray();
@@ -122,7 +128,20 @@ namespace Discord.WebSocket
             if (ephemeral)
                 response.Data.Value.Flags = MessageFlags.Ephemeral;
 
-            await InteractionHelper.SendInteractionResponseAsync(Discord, response, Id, Token, options);
+            lock (_lock)
+            {
+                if (_hasResponded)
+                {
+                    throw new InvalidOperationException("Cannot respond, update, or defer twice to the same interaction");
+                }
+            }
+
+            await InteractionHelper.SendInteractionResponseAsync(Discord, response, Id, Token, options).ConfigureAwait(false);
+
+            lock (_lock)
+            {
+                _hasResponded = true;
+            }
         }
 
         /// <summary>
@@ -138,6 +157,9 @@ namespace Discord.WebSocket
 
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
+
+            if (!InteractionHelper.CanSendResponse(this))
+                throw new TimeoutException($"Cannot respond to an interaction after {InteractionHelper.ResponseTimeLimit} seconds!");
 
             if (args.AllowedMentions.IsSpecified)
             {
@@ -201,7 +223,20 @@ namespace Discord.WebSocket
                 }
             };
 
-            await InteractionHelper.SendInteractionResponseAsync(Discord, response, Id, Token, options);
+            lock (_lock)
+            {
+                if (_hasResponded)
+                {
+                    throw new InvalidOperationException("Cannot respond, update, or defer twice to the same interaction");
+                }
+            }
+
+            await InteractionHelper.SendInteractionResponseAsync(Discord, response, Id, Token, options).ConfigureAwait(false);
+
+            lock (_lock)
+            {
+                _hasResponded = true;
+            }
         }
 
         /// <inheritdoc/>
@@ -238,7 +273,7 @@ namespace Discord.WebSocket
             if (ephemeral)
                 args.Flags = MessageFlags.Ephemeral;
 
-            return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
+            return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -280,7 +315,7 @@ namespace Discord.WebSocket
             if (ephemeral)
                 args.Flags = MessageFlags.Ephemeral;
 
-            return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
+            return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -321,7 +356,7 @@ namespace Discord.WebSocket
             if (ephemeral)
                 args.Flags = MessageFlags.Ephemeral;
 
-            return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options);
+            return await InteractionHelper.SendFollowupAsync(Discord.Rest, args, Token, Channel, options).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -332,27 +367,59 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous operation of acknowledging the interaction.
         /// </returns>
-        public Task DeferLoadingAsync(bool ephemeral = false, RequestOptions options = null)
+        public async Task DeferLoadingAsync(bool ephemeral = false, RequestOptions options = null)
         {
+            if (!InteractionHelper.CanSendResponse(this))
+                throw new TimeoutException($"Cannot defer an interaction after {InteractionHelper.ResponseTimeLimit} seconds of no response/acknowledgement");
+
             var response = new API.InteractionResponse
             {
                 Type = InteractionResponseType.DeferredChannelMessageWithSource,
                 Data = ephemeral ? new API.InteractionCallbackData { Flags = MessageFlags.Ephemeral } : Optional<API.InteractionCallbackData>.Unspecified
             };
 
-            return Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, Id, Token, options);
+            lock (_lock)
+            {
+                if (_hasResponded)
+                {
+                    throw new InvalidOperationException("Cannot respond or defer twice to the same interaction");
+                }
+            }
+
+            await Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, Id, Token, options).ConfigureAwait(false);
+
+            lock (_lock)
+            {
+                _hasResponded = true;
+            }
         }
 
         /// <inheritdoc/>
-        public override Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
+        public override async Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
         {
+            if (!InteractionHelper.CanSendResponse(this))
+                throw new TimeoutException($"Cannot defer an interaction after {InteractionHelper.ResponseTimeLimit} seconds of no response/acknowledgement");
+
             var response = new API.InteractionResponse
             {
                 Type = InteractionResponseType.DeferredUpdateMessage,
                 Data = ephemeral ? new API.InteractionCallbackData { Flags = MessageFlags.Ephemeral } : Optional<API.InteractionCallbackData>.Unspecified
             };
 
-            return Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, Id, Token, options);
+            lock (_lock)
+            {
+                if (_hasResponded)
+                {
+                    throw new InvalidOperationException("Cannot respond or defer twice to the same interaction");
+                }
+            }
+
+            await Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, Id, Token, options).ConfigureAwait(false);
+
+            lock (_lock)
+            {
+                _hasResponded = true;
+            }
         }
     }
 }

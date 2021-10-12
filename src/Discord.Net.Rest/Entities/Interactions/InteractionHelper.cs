@@ -11,7 +11,19 @@ namespace Discord.Rest
 {
     internal static class InteractionHelper
     {
+        public const double ResponseTimeLimit = 3;
+        public const double ResponseAndFollowupLimit = 15;
+
         #region InteractionHelper
+        public static bool CanSendResponse(IDiscordInteraction interaction)
+        {
+            return (DateTime.UtcNow - interaction.CreatedAt).TotalSeconds < ResponseTimeLimit;
+        }
+        public static bool CanRespondOrFollowup(IDiscordInteraction interaction)
+        {
+            return (DateTime.UtcNow - interaction.CreatedAt).TotalMinutes <= ResponseAndFollowupLimit;
+        }
+
         public static Task DeleteAllGuildCommandsAsync(BaseDiscordClient client, ulong guildId, RequestOptions options = null)
         {
             return client.ApiClient.BulkOverwriteGuildApplicationCommandsAsync(guildId, Array.Empty<CreateApplicationCommandParams>(), options);

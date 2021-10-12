@@ -31,6 +31,10 @@ namespace Discord.WebSocket
         /// </summary>
         internal new SocketCommandBaseData Data { get; }
 
+        internal override bool _hasResponded { get; set; }
+
+        private object _lock = new object();
+
         internal SocketCommandBase(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
             : base(client, model.Id, channel)
         {
@@ -77,6 +81,9 @@ namespace Discord.WebSocket
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
+            if (!InteractionHelper.CanSendResponse(this))
+                throw new TimeoutException($"Cannot respond to an interaction after {InteractionHelper.ResponseTimeLimit} seconds!");
+
             embeds ??= Array.Empty<Embed>();
             if (embed != null)
                 embeds = new[] { embed }.Concat(embeds).ToArray();
@@ -115,7 +122,20 @@ namespace Discord.WebSocket
                 }
             };
 
-            await InteractionHelper.SendInteractionResponseAsync(Discord, response, Id, Token, options);
+            lock (_lock)
+            {
+                if (_hasResponded)
+                {
+                    throw new InvalidOperationException("Cannot respond twice to the same interaction");
+                }
+            }
+
+            await InteractionHelper.SendInteractionResponseAsync(Discord, response, Id, Token, options).ConfigureAwait(false);
+
+            lock (_lock)
+            {
+                _hasResponded = true;
+            }
         }
 
         /// <inheritdoc/>
@@ -247,8 +267,11 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous operation of acknowledging the interaction.
         /// </returns>
-        public override Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
+        public override async Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
         {
+            if (!InteractionHelper.CanSendResponse(this))
+                throw new TimeoutException($"Cannot defer an interaction after {InteractionHelper.ResponseTimeLimit} seconds!");
+
             var response = new API.InteractionResponse
             {
                 Type = InteractionResponseType.DeferredChannelMessageWithSource,
@@ -258,7 +281,20 @@ namespace Discord.WebSocket
                 }
             };
 
-            return Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, Id, Token, options);
+            lock (_lock)
+            {
+                if (_hasResponded)
+                {
+                    throw new InvalidOperationException("Cannot respond or defer twice to the same interaction");
+                }
+            }
+
+            await Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, Id, Token, options).ConfigureAwait(false);
+
+            lock (_lock)
+            {
+                _hasResponded = true;
+            }
         }
     }
 }
