@@ -18,5 +18,6 @@ namespace Discord.API
         public Optional<int> Height { get; set; }
         [JsonProperty("width")]
         public Optional<int> Width { get; set; }
+        public Optional<bool> Ephemeral { get; set; }
     }
 }
