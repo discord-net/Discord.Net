@@ -194,7 +194,15 @@ namespace Discord
         ///     A message's flags, if any is associated.
         /// </returns>
         MessageFlags? Flags { get; }
-        
+
+        /// <summary>
+        ///     Gets the interaction this message is a response to.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="IMessageInteraction"/> if the message is a response to an interaction; otherwise <see langword="null"/>.
+        /// </returns>
+        IMessageInteraction Interaction { get; }
+
         /// <summary>
         ///     Adds a reaction to this message.
         /// </summary>

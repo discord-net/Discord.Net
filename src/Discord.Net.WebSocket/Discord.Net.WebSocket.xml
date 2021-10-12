@@ -2664,7 +2664,7 @@
                 Downloads all users that have access to this thread.
             </summary>
             <param name="options">The options to be used when sending the request.</param>
-            <returns>A task representing the asyncronous download operation.</returns>
+            <returns>A task representing the asynchronous download operation.</returns>
         </member>
         <member name="M:Discord.WebSocket.SocketThreadChannel.JoinAsync(Discord.RequestOptions)">
             <inheritdoc/>
@@ -2679,7 +2679,7 @@
             <param name="user">The <see cref="T:Discord.IGuildUser"/> to add.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
-                A task that represents the asynchronous operation of adding a member to a thread. 
+                A task that represents the asynchronous operation of adding a member to a thread.
             </returns>
         </member>
         <member name="M:Discord.WebSocket.SocketThreadChannel.RemoveUserAsync(Discord.IGuildUser,Discord.RequestOptions)">
@@ -2689,7 +2689,7 @@
             <param name="user">The <see cref="T:Discord.IGuildUser"/> to remove from this thread.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
-                A task that represents the asynchronous operation of removing a user from this thread. 
+                A task that represents the asynchronous operation of removing a user from this thread.
             </returns>
         </member>
         <member name="M:Discord.WebSocket.SocketThreadChannel.AddPermissionOverwriteAsync(Discord.IRole,Discord.OverwritePermissions,Discord.RequestOptions)">
@@ -4081,7 +4081,7 @@
         </member>
         <member name="T:Discord.WebSocket.SocketSlashCommandDataOption">
             <summary>
-                Represents a Websocket-based <see cref="T:Discord.IApplicationCommandInteractionDataOption"/> received by the gateway
+                Represents a Websocket-based <see cref="T:Discord.IApplicationCommandInteractionDataOption"/> received by the gateway.
             </summary>
         </member>
         <member name="P:Discord.WebSocket.SocketSlashCommandDataOption.Name">
@@ -4100,7 +4100,7 @@
         </member>
         <member name="T:Discord.WebSocket.SocketApplicationCommand">
             <summary>
-                Represends a Websocket-based <see cref="T:Discord.IApplicationCommand"/>.
+                Represents a Websocket-based <see cref="T:Discord.IApplicationCommand"/>.
             </summary>
         </member>
         <member name="P:Discord.WebSocket.SocketApplicationCommand.IsGlobalCommand">
@@ -4574,6 +4574,11 @@
         <member name="P:Discord.WebSocket.SocketMessage.Components">
             <inheritdoc/>
         </member>
+        <member name="P:Discord.WebSocket.SocketMessage.Interaction">
+            <summary>
+                Gets the interaction this message is a response to.
+            </summary>
+        </member>
         <member name="P:Discord.WebSocket.SocketMessage.Flags">
             <inheritdoc />
         </member>
@@ -4665,6 +4670,9 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketMessage.Discord#IMessage#Components">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.WebSocket.SocketMessage.Discord#IMessage#Interaction">
             <inheritdoc/>
         </member>
         <member name="P:Discord.WebSocket.SocketMessage.Discord#IMessage#Stickers">

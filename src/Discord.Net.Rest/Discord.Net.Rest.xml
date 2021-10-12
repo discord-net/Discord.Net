@@ -4449,6 +4449,11 @@
         <member name="P:Discord.Rest.RestMessage.Reference">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestMessage.Interaction">
+            <summary>
+                Gets the interaction this message is a response to.
+            </summary>
+        </member>
         <member name="P:Discord.Rest.RestMessage.Flags">
             <inheritdoc />
         </member>
@@ -4487,6 +4492,9 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.Rest.RestMessage.Discord#IMessage#Components">
+            <inheritdoc/>
+        </member>
+        <member name="P:Discord.Rest.RestMessage.Discord#IMessage#Interaction">
             <inheritdoc/>
         </member>
         <member name="P:Discord.Rest.RestMessage.Discord#IMessage#Stickers">
@@ -5246,6 +5254,9 @@
             <inheritdoc />
         </member>
         <member name="P:Discord.Attachment.Width">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Attachment.Ephemeral">
             <inheritdoc />
         </member>
         <member name="M:Discord.Attachment.ToString">

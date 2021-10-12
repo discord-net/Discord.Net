@@ -70,6 +70,11 @@ namespace Discord.Rest
         public MessageApplication Application { get; private set; }
         /// <inheritdoc />
         public MessageReference Reference { get; private set; }
+
+        /// <summary>
+        ///     Gets the interaction this message is a response to.
+        /// </summary>
+        public MessageInteraction<RestUser> Interaction { get; private set; }
         /// <inheritdoc />
         public MessageFlags? Flags { get; private set; }
         /// <inheritdoc/>
@@ -212,6 +217,14 @@ namespace Discord.Rest
             else
                 _reactions = ImmutableArray.Create<RestReaction>();
 
+            if (model.Interaction.IsSpecified)
+            {
+                Interaction = new MessageInteraction<RestUser>(model.Interaction.Value.Id,
+                    model.Interaction.Value.Type,
+                    model.Interaction.Value.Name,
+                    RestUser.Create(Discord, model.Interaction.Value.User));
+            }
+
             if (model.UserMentions.IsSpecified)
             {
                 var value = model.UserMentions.Value;
@@ -256,6 +269,9 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         IReadOnlyCollection<IMessageComponent> IMessage.Components => Components;
+
+        /// <inheritdoc/>
+        IMessageInteraction IMessage.Interaction => Interaction;
 
         /// <inheritdoc />
         IReadOnlyCollection<IStickerItem> IMessage.Stickers => Stickers;

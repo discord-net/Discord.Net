@@ -2277,7 +2277,7 @@
             </summary>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
-                A task that represents the asynchronous join operation. 
+                A task that represents the asynchronous join operation.
             </returns>
         </member>
         <member name="M:Discord.IThreadChannel.LeaveAsync(Discord.RequestOptions)">
@@ -2286,7 +2286,7 @@
             </summary>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
-                A task that represents the asynchronous leave operation. 
+                A task that represents the asynchronous leave operation.
             </returns>
         </member>
         <member name="M:Discord.IThreadChannel.AddUserAsync(Discord.IGuildUser,Discord.RequestOptions)">
@@ -2296,7 +2296,7 @@
             <param name="user">The <see cref="T:Discord.IGuildUser"/> to add.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
-                A task that represents the asynchronous operation of adding a member to a thread. 
+                A task that represents the asynchronous operation of adding a member to a thread.
             </returns>
         </member>
         <member name="M:Discord.IThreadChannel.RemoveUserAsync(Discord.IGuildUser,Discord.RequestOptions)">
@@ -2306,7 +2306,7 @@
             <param name="user">The <see cref="T:Discord.IGuildUser"/> to remove from this thread.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
-                A task that represents the asynchronous operation of removing a user from this thread. 
+                A task that represents the asynchronous operation of removing a user from this thread.
             </returns>
         </member>
         <member name="T:Discord.IVoiceChannel">
@@ -2384,6 +2384,21 @@
                 Gets or sets the privacy level of the stage.
             </summary>
         </member>
+        <member name="T:Discord.StagePrivacyLevel">
+            <summary>
+                Specifies the privacy levels of a Stage instance.
+            </summary>
+        </member>
+        <member name="F:Discord.StagePrivacyLevel.Public">
+            <summary>
+                The Stage instance is visible publicly, such as on Stage Discovery.
+            </summary>
+        </member>
+        <member name="F:Discord.StagePrivacyLevel.GuildOnly">
+            <summary>
+                The Stage instance is visible to only guild members.
+            </summary>
+        </member>
         <member name="T:Discord.TextChannelProperties">
             <summary>
                 Provides properties that are used to modify an <see cref="T:Discord.ITextChannel"/> with the specified changes.
@@ -2457,7 +2472,7 @@
             <summary>
                 Three days (4320 minutes).
                 <remarks>
-                    This option is explicity avaliable to nitro users.
+                    This option is explicitly available to nitro users.
                 </remarks>
             </summary>
         </member>
@@ -2465,7 +2480,7 @@
             <summary>
                 One week (10080 minutes).
                 <remarks>
-                    This option is explicity avaliable to nitro users.
+                    This option is explicitly available to nitro users.
                 </remarks>
             </summary>
         </member>
@@ -4632,7 +4647,7 @@
         </member>
         <member name="F:Discord.ApplicationCommandOptionType.User">
             <summary>
-                A <see cref="T:Discord.IGuildUser"/>.
+                A <see cref="T:Discord.IUser"/>.
             </summary>
         </member>
         <member name="F:Discord.ApplicationCommandOptionType.Channel">
@@ -4758,7 +4773,7 @@
             </summary>
         </member>
         <member name="F:Discord.MessageCommandBuilder.MaxNameLength">
-            <summary> 
+            <summary>
                 Returns the maximum length a commands name allowed by Discord
             </summary>
         </member>
@@ -4860,7 +4875,7 @@
         </member>
         <member name="P:Discord.IApplicationCommand.Type">
             <summary>
-                The type of the command
+                The type of the command.
             </summary>
         </member>
         <member name="P:Discord.IApplicationCommand.Name">
@@ -5100,7 +5115,7 @@
         </member>
         <member name="T:Discord.IDiscordInteractionData">
             <summary>
-                Represents an interface used to specify classes that they are a vaild data type of a <see cref="T:Discord.IDiscordInteraction"/> class.
+                Represents an interface used to specify classes that they are a valid data type of a <see cref="T:Discord.IDiscordInteraction"/> class.
             </summary>
         </member>
         <member name="T:Discord.InteractionResponseType">
@@ -5111,7 +5126,7 @@
                 After receiving an interaction, you must respond to acknowledge it. You can choose to respond with a message immediately using <see cref="F:Discord.InteractionResponseType.ChannelMessageWithSource"/>
                 or you can choose to send a deferred response with <see cref="F:Discord.InteractionResponseType.DeferredChannelMessageWithSource"/>. If choosing a deferred response, the user will see a loading state for the interaction,
                 and you'll have up to 15 minutes to edit the original deferred response using Edit Original Interaction Response.
-                You can read more about Response types <see href="https://discord.com/developers/docs/interactions/slash-commands#interaction-response">Here</see>
+                You can read more about Response types <see href="https://discord.com/developers/docs/interactions/slash-commands#interaction-response">Here</see>.
             </remarks>
         </member>
         <member name="F:Discord.InteractionResponseType.Pong">
@@ -5141,17 +5156,17 @@
         </member>
         <member name="F:Discord.InteractionResponseType.DeferredUpdateMessage">
             <summary>
-                For components: ACK an interaction and edit the original message later; the user does not see a loading state
+                For components: ACK an interaction and edit the original message later; the user does not see a loading state.
             </summary>
         </member>
         <member name="F:Discord.InteractionResponseType.UpdateMessage">
             <summary>
-                For components: edit the message the component was attached to
+                For components: edit the message the component was attached to.
             </summary>
         </member>
         <member name="F:Discord.InteractionResponseType.ApplicationCommandAutocompleteResult">
             <summary>
-                Respond with a set of choices to a autocomplete interaction
+                Respond with a set of choices to a autocomplete interaction.
             </summary>
         </member>
         <member name="T:Discord.InteractionType">
@@ -5181,7 +5196,7 @@
         </member>
         <member name="T:Discord.ActionRowComponent">
             <summary>
-                Represents a <see cref="T:Discord.IMessageComponent"/> Row for child components to live in. 
+                Represents a <see cref="T:Discord.IMessageComponent"/> Row for child components to live in.
             </summary>
         </member>
         <member name="P:Discord.ActionRowComponent.Type">
@@ -5220,7 +5235,7 @@
         </member>
         <member name="P:Discord.ButtonComponent.Url">
             <summary>
-                Gets the URL for a <see cref="F:Discord.ButtonStyle.Link"/> button. 
+                Gets the URL for a <see cref="F:Discord.ButtonStyle.Link"/> button.
             </summary>
             <remarks>
                 You cannot have a button with a <b>URL</b> and a <b>CustomId</b>.
@@ -5762,7 +5777,7 @@
         </member>
         <member name="P:Discord.SelectMenuOptionBuilder.Value">
             <summary>
-                Gets or sets the custom id of the current select menu.
+                Gets or sets the value of the current select menu.
             </summary>
             <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Value"/> length exceeds <see cref="F:Discord.SelectMenuOptionBuilder.MaxSelectValueLength"/>.</exception>
             <exception cref="T:System.ArgumentException" accessor="set"><see cref="P:Discord.SelectMenuOptionBuilder.Value"/> length subceeds 1.</exception>
@@ -5860,22 +5875,22 @@
         </member>
         <member name="T:Discord.ComponentType">
             <summary>
-                Represents a type of a component
+                Represents a type of a component.
             </summary>
         </member>
         <member name="F:Discord.ComponentType.ActionRow">
             <summary>
-                A container for other components
+                A container for other components.
             </summary>
         </member>
         <member name="F:Discord.ComponentType.Button">
             <summary>
-                A clickable button
+                A clickable button.
             </summary>
         </member>
         <member name="F:Discord.ComponentType.SelectMenu">
             <summary>
-                A select menu for picking from choices
+                A select menu for picking from choices.
             </summary>
         </member>
         <member name="T:Discord.IMessageComponent">
@@ -6061,7 +6076,7 @@
             <param name="description">The description of this option.</param>
             <param name="required">If this option is required for this command.</param>
             <param name="isDefault">If this option is the default option.</param>
-            <param name="isAutocomplete">If this option is set to autocompleate.</param>
+            <param name="isAutocomplete">If this option is set to autocomplete.</param>
             <param name="options">The options of the option to add.</param>
             <param name="channelTypes">The allowed channel types for this option.</param>
             <param name="choices">The choices of this option.</param>
@@ -6196,7 +6211,7 @@
         </member>
         <member name="M:Discord.SlashCommandOptionBuilder.AddChannelType(Discord.ChannelType)">
             <summary>
-                Adds a channnel type to the current option.
+                Adds a channel type to the current option.
             </summary>
             <param name="channelType">The <see cref="T:Discord.ChannelType"/> to add.</param>
             <returns>The current builder.</returns>
@@ -7466,6 +7481,14 @@
                 The width of this attachment if it is a picture; otherwise <c>null</c>.
             </returns>
         </member>
+        <member name="P:Discord.IAttachment.Ephemeral">
+            <summary>
+                Gets whether or not this attachment is ephemeral.
+            </summary>
+            <returns>
+                <see langword="true"/> if the attachment is ephemeral; otherwise <see langword="false"/>.
+            </returns>
+        </member>
         <member name="T:Discord.IEmbed">
             <summary>
                 Represents a Discord embed object.
@@ -7784,6 +7807,14 @@
                 A message's flags, if any is associated.
             </returns>
         </member>
+        <member name="P:Discord.IMessage.Interaction">
+            <summary>
+                Gets the interaction this message is a response to.
+            </summary>
+            <returns>
+                A <see cref="T:Discord.IMessageInteraction"/> if the message is a response to an interaction; otherwise <see langword="null"/>.
+            </returns>
+        </member>
         <member name="M:Discord.IMessage.AddReactionAsync(Discord.IEmote,Discord.RequestOptions)">
             <summary>
                 Adds a reaction to this message.
@@ -7890,6 +7921,31 @@
             <returns>
                  Paged collection of users.
             </returns>
+        </member>
+        <member name="T:Discord.IMessageInteraction">
+            <summary>
+                Represents a partial <see cref="T:Discord.IDiscordInteraction"/> within a message.
+            </summary>
+        </member>
+        <member name="P:Discord.IMessageInteraction.Id">
+            <summary>
+                Gets the snowflake id of the interaction.
+            </summary>
+        </member>
+        <member name="P:Discord.IMessageInteraction.Type">
+            <summary>
+                Gets the type of the interaction.
+            </summary>
+        </member>
+        <member name="P:Discord.IMessageInteraction.Name">
+            <summary>
+                Gets the name of the application command used.
+            </summary>
+        </member>
+        <member name="P:Discord.IMessageInteraction.User">
+            <summary>
+                Gets the <seealso cref="T:Discord.IUser"/> who invoked the interaction.
+            </summary>
         </member>
         <member name="T:Discord.IReaction">
             <summary>
@@ -8080,6 +8136,32 @@
         <member name="F:Discord.MessageFlags.Loading">
             <summary>
                 Flag given to messages that is an Interaction Response and the bot is "thinking"
+            </summary>
+        </member>
+        <member name="T:Discord.MessageInteraction`1">
+            <summary>
+                Represents a partial <see cref="T:Discord.IDiscordInteraction"/> within a message.
+            </summary>
+            <typeparam name="TUser">The type of the user.</typeparam>
+        </member>
+        <member name="P:Discord.MessageInteraction`1.Id">
+            <summary>
+                Gets the snowflake id of the interaction.
+            </summary>
+        </member>
+        <member name="P:Discord.MessageInteraction`1.Type">
+            <summary>
+                Gets the type of the interaction.
+            </summary>
+        </member>
+        <member name="P:Discord.MessageInteraction`1.Name">
+            <summary>
+                Gets the name of the application command used.
+            </summary>
+        </member>
+        <member name="P:Discord.MessageInteraction`1.User">
+            <summary>
+                Gets the <typeparamref name="TUser"/> who invoked the interaction.
             </summary>
         </member>
         <member name="T:Discord.MessageProperties">
@@ -8345,19 +8427,29 @@
             </returns>
         </member>
         <member name="T:Discord.StickerFormatType">
-            <summary> Defines the types of formats for stickers. </summary>
+            <summary>
+                Defines the types of formats for stickers.
+            </summary>
         </member>
         <member name="F:Discord.StickerFormatType.None">
-            <summary> Default value for a sticker format type. </summary>
+            <summary>
+                Default value for a sticker format type.
+            </summary>
         </member>
         <member name="F:Discord.StickerFormatType.Png">
-            <summary> The sticker format type is png. </summary>
+            <summary>
+                The sticker format type is png.
+            </summary>
         </member>
         <member name="F:Discord.StickerFormatType.Apng">
-            <summary> The sticker format type is apng. </summary>
+            <summary>
+                The sticker format type is apng.
+            </summary>
         </member>
         <member name="F:Discord.StickerFormatType.Lottie">
-            <summary> The sticker format type is lottie. </summary>
+            <summary>
+                The sticker format type is lottie.
+            </summary>
         </member>
         <member name="T:Discord.TagHandling">
             <summary>
@@ -8444,7 +8536,7 @@
                     If the <see cref="P:Discord.TimestampTag.Time"/> is null then the default 0 will be used.
                 </para>
             </summary>
-            <returns>A string thats compatible in a discord message, ex: <code>&lt;t:1625944201:f&gt;</code></returns>
+            <returns>A string that is compatible in a discord message, ex: <code>&lt;t:1625944201:f&gt;</code></returns>
         </member>
         <member name="M:Discord.TimestampTag.FromDateTime(System.DateTime,Discord.TimestampTagStyles)">
             <summary>
@@ -9996,12 +10088,12 @@
         </member>
         <member name="P:Discord.ISticker.IsAvailable">
             <summary>
-                Gets whether this guild sticker can be used, may be false due to loss of Server Boosts
+                Gets whether this guild sticker can be used, may be false due to loss of Server Boosts.
             </summary>
         </member>
         <member name="P:Discord.ISticker.SortOrder">
             <summary>
-                Gets the standard sticker's sort order within its pack
+                Gets the standard sticker's sort order within its pack.
             </summary>
         </member>
         <member name="M:Discord.ISticker.GetStickerUrl">
@@ -10033,7 +10125,7 @@
             <summary>
                 Represents a discord sticker pack.
             </summary>
-            <typeparam name="TSticker">The type of the stickers within the collection</typeparam>
+            <typeparam name="TSticker">The type of the stickers within the collection.</typeparam>
         </member>
         <member name="P:Discord.StickerPack`1.Id">
             <summary>
@@ -10092,7 +10184,7 @@
         </member>
         <member name="T:Discord.StickerType">
             <summary>
-                Represents a type of sticker
+                Represents a type of sticker..
             </summary>
         </member>
         <member name="F:Discord.StickerType.Standard">
@@ -12970,20 +13062,20 @@
         <member name="M:Discord.Utils.UrlValidation.Validate(System.String)">
             <summary>
             Not full URL validation right now. Just ensures protocol is present and that it's either http or https
-            <see cref="M:Discord.Utils.UrlValidation.ValidateButton(System.String)"/> should be used for url buttons
+            <see cref="M:Discord.Utils.UrlValidation.ValidateButton(System.String)"/> should be used for url buttons.
             </summary>
-            <param name="url">url to validate before sending to Discord.</param>
+            <param name="url">The URL to validate before sending to Discord.</param>
             <exception cref="T:System.InvalidOperationException">A URL must include a protocol (http or https).</exception>
-            <returns>true if url is valid by our standard, false if null, throws an error upon invalid </returns>
+            <returns>true if URL is valid by our standard, false if null, throws an error upon invalid.</returns>
         </member>
         <member name="M:Discord.Utils.UrlValidation.ValidateButton(System.String)">
             <summary>
             Not full URL validation right now. Just Ensures the protocol is either http, https, or discord
-            <see cref="M:Discord.Utils.UrlValidation.Validate(System.String)"/> should be used everything other than url buttons
+            <see cref="M:Discord.Utils.UrlValidation.Validate(System.String)"/> should be used everything other than url buttons.
             </summary>
-            <param name="url">the url to validate before sending to discord</param>
+            <param name="url">The URL to validate before sending to discord.</param>
             <exception cref="T:System.InvalidOperationException">A URL must include a protocol (either http, https, or discord).</exception>
-            <returns>true if the url is valid by our standard, false if null, throws an error upon invalid</returns>
+            <returns>true if the URL is valid by our standard, false if null, throws an error upon invalid.</returns>
         </member>
     </members>
 </doc>
