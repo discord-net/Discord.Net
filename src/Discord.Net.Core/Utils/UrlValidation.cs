@@ -16,7 +16,7 @@ namespace Discord.Utils
         {
             if (string.IsNullOrEmpty(url))
                 return false;
-            if (!(url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) || allowAttachments ? url.StartsWith("attachment://", StringComparison.Ordinal) : false))
+            if (!(url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) || (allowAttachments ? url.StartsWith("attachment://", StringComparison.Ordinal) : false)))
                 throw new InvalidOperationException($"The url {url} must include a protocol (either {(allowAttachments ? "HTTP, HTTPS, or ATTACHMENT" : "HTTP or HTTPS")})");
             return true;
         }
