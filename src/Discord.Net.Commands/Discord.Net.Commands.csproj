@@ -10,10 +10,11 @@
     <PackageId>Discord.Net.Labs.Commands</PackageId>
     <PackageProjectUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</RepositoryUrl>
-    <PackageIcon>..\..\docs\marketing\logo\PackageLogo.png</PackageIcon>
+    <PackageIcon>PackageLogo.png</PackageIcon>
   </PropertyGroup>
   <PropertyGroup>
     <DocumentationFile>..\Discord.Net.Commands\Discord.Net.Commands.xml</DocumentationFile>
+    <PackageIconUrl />
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
@@ -21,6 +22,10 @@
   <ItemGroup>
     <None Update="Discord.Net.Commands.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\docs\marketing\logo\PackageLogo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
     </None>
   </ItemGroup>
 

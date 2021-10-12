@@ -10,7 +10,7 @@
     <PackageId>Discord.Net.Labs.Core</PackageId>
     <Product>Discord.Net.Labs.Core</Product>
     <RepositoryUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</RepositoryUrl>
-    <PackageIcon>..\..\docs\marketing\logo\PackageLogo.png</PackageIcon>
+    <PackageIcon>PackageLogo.png</PackageIcon>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup>
@@ -36,6 +36,10 @@
   <ItemGroup>
     <None Update="Discord.Net.Core.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\docs\marketing\logo\PackageLogo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
     </None>
   </ItemGroup>
 </Project>

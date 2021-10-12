@@ -10,7 +10,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RepositoryUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</RepositoryUrl>
     <PackageProjectUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</PackageProjectUrl>
-    <PackageIcon>..\..\docs\marketing\logo\PackageLogo.png</PackageIcon>
+    <PackageIcon>PackageLogo.png</PackageIcon>
     <PackageId>Discord.Net.Labs.WebSocket</PackageId>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -29,6 +29,10 @@
   <ItemGroup>
     <None Update="Discord.Net.WebSocket.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\docs\marketing\logo\PackageLogo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
     </None>
   </ItemGroup>
 </Project>

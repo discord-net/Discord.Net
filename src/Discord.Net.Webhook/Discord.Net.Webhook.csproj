@@ -10,7 +10,7 @@
     <PackageId>Discord.Net.Labs.Webhook</PackageId>
     <PackageProjectUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</RepositoryUrl>
-    <PackageIcon>..\..\docs\marketing\logo\PackageLogo.png</PackageIcon>
+    <PackageIcon>PackageLogo.png</PackageIcon>
   </PropertyGroup>
   <PropertyGroup>
     <DocumentationFile>..\Discord.Net.Webhook\Discord.Net.Webhook.xml</DocumentationFile>
@@ -22,6 +22,10 @@
   <ItemGroup>
     <None Update="Discord.Net.Webhook.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\docs\marketing\logo\PackageLogo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
     </None>
   </ItemGroup>
 </Project>
