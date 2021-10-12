@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../../Discord.Net.targets" />
   <Import Project="../../StyleAnalyzer.targets" />
   <PropertyGroup>
@@ -7,14 +7,6 @@
     <Description>The core components for the Discord.Net Labs library.</Description>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net5.0;net461;netstandard2.0;netstandard2.1</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">net5.0;netstandard2.0;netstandard2.1</TargetFrameworks>
-    <PackageId>Discord.Net.Labs.Core</PackageId>
-    <Product>Discord.Net.Labs.Core</Product>
-    <RepositoryUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</RepositoryUrl>
-    <PackageIcon>PackageLogo.png</PackageIcon>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-  </PropertyGroup>
-  <PropertyGroup>
-    <DocumentationFile>..\Discord.Net.Core\Discord.Net.Core.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
@@ -32,14 +24,5 @@
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Discord.Net.Core.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\docs\marketing\logo\PackageLogo.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
   </ItemGroup>
 </Project>
