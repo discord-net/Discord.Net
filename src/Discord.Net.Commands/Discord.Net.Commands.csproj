@@ -10,7 +10,7 @@
     <PackageId>Discord.Net.Labs.Commands</PackageId>
     <PackageProjectUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</RepositoryUrl>
-    <PackageIcon>Temporary.png</PackageIcon>
+    <PackageIcon>..\..\docs\marketing\logo\PackageLogo.png</PackageIcon>
   </PropertyGroup>
   <PropertyGroup>
     <DocumentationFile>..\Discord.Net.Commands\Discord.Net.Commands.xml</DocumentationFile>

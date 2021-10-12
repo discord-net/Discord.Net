@@ -7,7 +7,7 @@
     <Description>A core Discord.Net Labs library containing the REST client and models.</Description>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net5.0;net461;netstandard2.0;netstandard2.1</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">net5.0;netstandard2.0;netstandard2.1</TargetFrameworks>
-    <PackageIcon>Temporary.png</PackageIcon>
+    <PackageIcon>..\..\docs\marketing\logo\PackageLogo.png</PackageIcon>
     <PackageProjectUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</PackageProjectUrl>
     <PackageId>Discord.Net.Labs.Rest</PackageId>
     <RepositoryUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</RepositoryUrl>

@@ -10,7 +10,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RepositoryUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</RepositoryUrl>
     <PackageProjectUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</PackageProjectUrl>
-    <PackageIcon>Temporary.png</PackageIcon>
+    <PackageIcon>..\..\docs\marketing\logo\PackageLogo.png</PackageIcon>
     <PackageId>Discord.Net.Labs.WebSocket</PackageId>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

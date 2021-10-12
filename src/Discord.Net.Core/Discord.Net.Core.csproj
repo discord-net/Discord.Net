@@ -10,7 +10,7 @@
     <PackageId>Discord.Net.Labs.Core</PackageId>
     <Product>Discord.Net.Labs.Core</Product>
     <RepositoryUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</RepositoryUrl>
-    <PackageIcon>Temporary.png</PackageIcon>
+    <PackageIcon>..\..\docs\marketing\logo\PackageLogo.png</PackageIcon>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup>
