@@ -1,10 +1,27 @@
-# Discord.Net Labs
-[![NuGet](https://img.shields.io/nuget/vpre/Discord.Net.Labs.svg?maxAge=2592000&logo=nuget)](https://www.nuget.org/packages/Discord.Net.Labs)
-[![Discord](https://discord.com/api/guilds/848176216011046962/widget.png)](https://discord.gg/dvSfUTet3K)
+<p align="center">
+  <a href="https://discord-net-labs.com/" title="Click to visit the documentation!">
+    <img src="https://discord-net-labs.com/marketing/Logo/SVG/Combinationmark%20White%20Border.svg" alt="Logo">
+  </a>
+    <br />
+    <br />
+  <a href="https://www.nuget.org/packages/Discord.Net.Labs/">
+    <img src="https://img.shields.io/nuget/vpre/Discord.Net.Labs.svg?maxAge=2592000?style=plastic" alt="NuGet">
+  </a>
+  <a href="https://www.myget.org/feed/Packages/discord-net-labs">
+    <img src="https://img.shields.io/myget/discord-net-labs/vpre/Discord.Net.Labs.svg" alt="MyGet">
+  </a>
+  <a href="https://dev.azure.com/Discord-Net-Labs/Discord-Net-Labs/_build/latest?definitionId=1&amp;branchName=release%2F3.x">
+    <img src="https://dev.azure.com/Discord-Net-Labs/Discord-Net-Labs/_apis/build/status/discord-net.Discord.Net?branchName=dev" alt="Build Status">
+  </a>
+  <a href="https://discord.gg/dvSfUTet3K">
+    <img src="https://discord.com/api/guilds/848176216011046962/widget.png" alt="Discord">
+  </a>
+</p>
 
 This repo is a custom fork of Discord.Net that introduces the newest features of discord for testing and experimenting. Nothing here is guaranteed to work but you are more than welcome to submit bugs in the issues tabs
 
-If this projects benefits you (*and you're financially stable*) consider donating or becoming a sponsor as it really helps out!
+### ♥ Sponsor us!
+- If this library benefits you consider [sponsoring](https://github.com/sponsors/quinchs) the project as it really helps out. *Only sponsor if you're financially stable!*
 
 ## Known issues
 Labs will not work with normal package of Playwo's [InteractivityAddon](https://www.nuget.org/packages/Discord.InteractivityAddon). The reason is that his package depends on the base discord.net lib. You can instead use the [InteractivityAddon.Labs](https://www.nuget.org/packages/Discord.InteractivityAddon.Labs) package which implements some of the features added in Discord.Net-Labs.
@@ -16,6 +33,7 @@ Setting up labs in your project is really simple, here's how to do it:
 3) Enjoy!
 
 ## Branches
+
 ### Dev
 This branch is kept up to date with dnets dev branch. we pull of it to ensure that labs will work with pre existing dnet code.
 
