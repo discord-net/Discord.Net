@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Discord.Net.Labs</id>
-    <version>3.1.4$suffix$</version>
+    <version>3.1.5$suffix$</version>
     <title>Discord.Net Labs</title>
     <authors>Discord.Net Contributors</authors>
     <owners>quinchs</owners>
@@ -14,30 +14,30 @@
     <iconUrl>https://raw.githubusercontent.com/Discord-Net-Labs/Discord.Net-Labs/release/3.x/docs/marketing/logo/PackageLogo.png</iconUrl>
     <dependencies>
         <group targetFramework="net5.0">
-            <dependency id="Discord.Net.Labs.Core" version="3.1.4$suffix$" />
+            <dependency id="Discord.Net.Labs.Core" version="3.1.5$suffix$" />
             <dependency id="Discord.Net.Labs.Rest" version="3.1.4$suffix$" />
-            <dependency id="Discord.Net.Labs.WebSocket" version="3.1.4$suffix$" />
+            <dependency id="Discord.Net.Labs.WebSocket" version="3.1.5$suffix$" />
             <dependency id="Discord.Net.Labs.Commands" version="3.1.4$suffix$" />
             <dependency id="Discord.Net.Labs.Webhook" version="3.1.4$suffix$" />
         </group>      
         <group targetFramework="net461">
-            <dependency id="Discord.Net.Labs.Core" version="3.1.4$suffix$" />
+            <dependency id="Discord.Net.Labs.Core" version="3.1.5$suffix$" />
             <dependency id="Discord.Net.Labs.Rest" version="3.1.4$suffix$" />
-            <dependency id="Discord.Net.Labs.WebSocket" version="3.1.4$suffix$" />
+            <dependency id="Discord.Net.Labs.WebSocket" version="3.1.5$suffix$" />
             <dependency id="Discord.Net.Labs.Commands" version="3.1.4$suffix$" />
             <dependency id="Discord.Net.Labs.Webhook" version="3.1.4$suffix$" />
         </group>       
         <group targetFramework="netstandard2.0">
-            <dependency id="Discord.Net.Labs.Core" version="3.1.4$suffix$" />
+            <dependency id="Discord.Net.Labs.Core" version="3.1.5$suffix$" />
             <dependency id="Discord.Net.Labs.Rest" version="3.1.4$suffix$" />
-            <dependency id="Discord.Net.Labs.WebSocket" version="3.1.4$suffix$" />
+            <dependency id="Discord.Net.Labs.WebSocket" version="3.1.5$suffix$" />
             <dependency id="Discord.Net.Labs.Commands" version="3.1.4$suffix$" />
             <dependency id="Discord.Net.Labs.Webhook" version="3.1.4$suffix$" />
         </group>
 		<group targetFramework="netstandard2.1">
-            <dependency id="Discord.Net.Labs.Core" version="3.1.4$suffix$" />
+            <dependency id="Discord.Net.Labs.Core" version="3.1.5$suffix$" />
             <dependency id="Discord.Net.Labs.Rest" version="3.1.4$suffix$" />
-            <dependency id="Discord.Net.Labs.WebSocket" version="3.1.4$suffix$" />
+            <dependency id="Discord.Net.Labs.WebSocket" version="3.1.5$suffix$" />
             <dependency id="Discord.Net.Labs.Commands" version="3.1.4$suffix$" />
             <dependency id="Discord.Net.Labs.Webhook" version="3.1.4$suffix$" />
         </group>
