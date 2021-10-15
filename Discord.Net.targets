@@ -6,7 +6,7 @@
         <PackageTags>discord;discordapp</PackageTags>
         <PackageProjectUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs</PackageProjectUrl>
         <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
-        <PackageIconUrl>https://github.com/Discord-Net-Labs/Discord.Net-Labs/raw/dev/docs/marketing/logo/PackageLogo.png</PackageIconUrl>
+        <PackageIconUrl>https://raw.githubusercontent.com/Discord-Net-Labs/Discord.Net-Labs/release/3.x/docs/marketing/logo/PackageLogo.png</PackageIconUrl>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>git://github.com/Discord-Net-Labs/Discord.Net-Labs</RepositoryUrl>
     </PropertyGroup>
