@@ -47,6 +47,10 @@ namespace Discord.WebSocket
         public DateTimeOffset CreatedAt
             => SnowflakeUtils.FromSnowflake(Id);
 
+        /// <inheritdoc/>
+        public DateTimeOffset ReceivedAt { get; private set; }
+            
+
         internal abstract bool _hasResponded { get; set; }
 
         /// <summary>
@@ -58,6 +62,7 @@ namespace Discord.WebSocket
         internal SocketInteraction(DiscordSocketClient client, ulong id, ISocketMessageChannel channel)
             : base(client, id)
         {
+            ReceivedAt = DateTime.UtcNow;
             Channel = channel;
         }
 
