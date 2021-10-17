@@ -1,3 +1,8 @@
+---
+uid: Guides.ContextCommands.Creating
+title: Creating Context Commands
+---
+
 # Creating context menu commands.
 
 There are two kinds of Context Menu Commands: User Commands and Message Commands.
@@ -96,4 +101,5 @@ public async Task Client_Ready()
 
 ```
 
-**Note**: Application commands only need to be created once. They do _not_ have to be 'created' on every startup or connection. The example simple shows creating them in the ready event as it's simpler than creating normal bot commands to register application commands.
+> [!NOTE]
+> Application commands only need to be created once. They do _not_ have to be 'created' on every startup or connection. The example simple shows creating them in the ready event as it's simpler than creating normal bot commands to register application commands.

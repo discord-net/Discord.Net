@@ -1,40 +1,33 @@
+---
+uid: Guides.ContextCommands.Reveiving
+title: Receiving Context Commands
+---
+
 # Receiving Context Menu events
 
-User commands and Message commands have their own unique objects returned. Different from Slash commands. To get the appropriate object returned, you can use a similar method to the slash commands.
+User commands and Message commands have their own unique event just like the other interaction types. For user commands the event is `UserCommandExecuted` and for message commands the event is `MessageCommandExecuted`.
 
 ```cs
-client.InteractionCreated += InteractionCreatedHandler;
+// For message commands
+client.MessageCommandExecuted += MessageCommandHandler;
+
+// For user commands
+client.UserCommandExecuted += UserCommandHandler;
 
 ...
 
-public async Task InteractionCreatedHandler(SocketInteraction arg)
+public async Task MessageCommandHandler(SocketMessageCommand arg)
 {
-	if ( arg.Type == InteractionType.ApplicationCommand)
-		Task.Run(() => ApplicationCommandHandler(arg));
+    Console.Writeline("Message command received!");
 }
 
-public async Task ApplicationCommandHandler(SocketInteraction arg)
+public async Task UserCommandHandler(SocketUserCommand arg)
 {
-	switch (arg)
-	{
-		case SocketSlashCommand slashCommand:
-			Console.Writeline("Slash command received!");
-			break;
-		case SocketUserCommand userCommand:
-			Console.Writeline("User command received!")
-			// userCommand.User = User who ran command.
-			// userCommand.Data.Member = User who was clicked.
-			break;
-		case SocketMessageCommand messageCommand:
-			Console.Writeline("Message command received!")
-			// messageCommand.User = User who ran command.
-			// messageCommand.Data.Message = Message that was clicked.
-			break;
-	}
+    Console.Writeline("User command received!");
 }
 ```
 
-User commands return a SocketUser object, showing the user that was clicked to run the command. 
-Message commands return a SocketMessage object, showing the message that was clicked to run the command.
+User commands contain a SocketUser object called `Member` in their data class, showing the user that was clicked to run the command. 
+Message commands contain a SocketMessage object called `Message` in their data class, showing the message that was clicked to run the command.
 
 Both return the user who ran the command, the guild (if any), channel, etc.

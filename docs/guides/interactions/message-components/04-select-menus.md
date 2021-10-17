@@ -1,3 +1,8 @@
+---
+uid: Guides.MessageComponents.SelectMenus
+title: Select Menus
+---
+
 # Select menus
 
 Select menus allow users to select from a range of options, this can be quite useful with configuration commands etc.
@@ -48,7 +53,7 @@ And opening the menu we see:
 
 ![](Images/image5.png)
 
-Lets handle the selection of an option, as before we can hook the `InteractionCreated` event and check the type ourself but for this example im just going to use the `SelectMenuExecuted` event
+Lets handle the selection of an option, We can hook the `SelectMenuExecuted` event to handle our select menu:
 
 ```cs
 client.SelectMenuExecuted += MyMenuHandler;
