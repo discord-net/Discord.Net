@@ -6,8 +6,6 @@ ECHO Y | RMDIR /S docs-static\latest || EXIT /B 1
 
 ECHO build docs
 
-TYPE D:\a\1\s\src\Discord.Net.Commands\Discord.Net.Commands.csproj || EXIT /B 1
-
 docfx.console\tools\docfx.exe docs/docfx.json -o docs-staging || EXIT /B 1
 ROBOCOPY docs-staging\_site docs-static\latest /MIR
 
