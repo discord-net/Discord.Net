@@ -23,7 +23,8 @@
         "files": ["toc.yml", "index.md"]
       },
       {
-        "files": ["faq/**.md", "faq/**/toc.yml"]
+        "src": "../",
+        "files": ["FAQ.md"]
       },
       {
         "files": ["guides/**.md", "guides/**/toc.yml"]
@@ -59,8 +60,8 @@
     ],
     "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
-      "_appTitle": "Discord.Net Documentation",
-      "_appFooter": "Discord.Net (c) 2015-2020 2.2.0",
+      "_appTitle": "Discord.Net-Labs Documentation",
+      "_appFooter": "Discord.Net-Labs (c) 2020-2021 3.1.6",
       "_enableSearch": true,
       "_appLogoPath": "marketing/logo/SVG/Logomark Purple.svg",
       "_appFaviconPath": "favicon.ico"

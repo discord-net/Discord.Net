@@ -2,8 +2,7 @@
   href: guides/
   topicUid: Guides.Introduction
 - name: FAQ
-  href: faq/
-  topicUid: FAQ.Basics.GetStarted
+  topicHref: ../FAQ.md
 - name: API Documentation
   href: api/
   topicUid: API.Docs
