@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Discord
 {
     /// <summary>
@@ -20,6 +14,5 @@ namespace Discord
         ///     Gets the value of the choice.
         /// </summary>
         object Value { get; }
-
     }
 }

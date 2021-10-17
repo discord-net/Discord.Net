@@ -22,7 +22,6 @@ namespace Discord.WebSocket
         private ImmutableArray<Embed> _embeds = ImmutableArray.Create<Embed>();
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
         private ImmutableArray<SocketRole> _roleMentions = ImmutableArray.Create<SocketRole>();
-        private ImmutableArray<SocketUser> _userMentions = ImmutableArray.Create<SocketUser>();
         private ImmutableArray<SocketSticker> _stickers = ImmutableArray.Create<SocketSticker>();
 
         /// <inheritdoc />
@@ -45,8 +44,6 @@ namespace Discord.WebSocket
         public override IReadOnlyCollection<SocketGuildChannel> MentionedChannels => MessageHelper.FilterTagsByValue<SocketGuildChannel>(TagType.ChannelMention, _tags);
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketRole> MentionedRoles => _roleMentions;
-        /// <inheritdoc />
-        public override IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketSticker> Stickers => _stickers;
         /// <inheritdoc />
@@ -108,32 +105,10 @@ namespace Discord.WebSocket
                     _embeds = ImmutableArray.Create<Embed>();
             }
 
-            if (model.UserMentions.IsSpecified)
-            {
-                var value = model.UserMentions.Value;
-                if (value.Length > 0)
-                {
-                    var newMentions = ImmutableArray.CreateBuilder<SocketUser>(value.Length);
-                    for (int i = 0; i < value.Length; i++)
-                    {
-                        var val = value[i];
-                        if (val.Object != null)
-                        {
-                            var user = Channel.GetUserAsync(val.Object.Id, CacheMode.CacheOnly).GetAwaiter().GetResult() as SocketUser;
-                            if (user != null)
-                                newMentions.Add(user);
-                            else
-                                newMentions.Add(SocketUnknownUser.Create(Discord, state, val.Object));
-                        }
-                    }
-                    _userMentions = newMentions.ToImmutable();
-                }
-            }
-
             if (model.Content.IsSpecified)
             {
                 var text = model.Content.Value;
-                _tags = MessageHelper.ParseTags(text, Channel, guild, _userMentions);
+                _tags = MessageHelper.ParseTags(text, Channel, guild, MentionedUsers);
                 model.Content = text;
             }
 

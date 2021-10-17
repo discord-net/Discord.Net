@@ -16,10 +16,10 @@ namespace Discord
         public static RequestOptions Default => new RequestOptions();
 
         /// <summary>
-        ///     Gets or sets the maximum time to wait for for this request to complete.
+        ///     Gets or sets the maximum time to wait for this request to complete.
         /// </summary>
         /// <remarks>
-        ///     Gets or set the max time, in milliseconds, to wait for for this request to complete. If 
+        ///     Gets or set the max time, in milliseconds, to wait for this request to complete. If 
         ///     <c>null</c>, a request will not time out. If a rate limit has been triggered for this request's bucket
         ///     and will not be unpaused in time, this request will fail immediately.
         /// </remarks>

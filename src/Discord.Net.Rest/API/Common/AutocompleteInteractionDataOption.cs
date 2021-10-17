@@ -1,9 +1,4 @@
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord.API
 {
@@ -15,10 +10,13 @@ namespace Discord.API
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("options")]
+        public Optional<AutocompleteInteractionDataOption[]> Options { get; set; }
+
         [JsonProperty("value")]
-        public object Value { get; set; }
+        public Optional<object> Value { get; set; }
 
         [JsonProperty("focused")]
-        public bool Focused { get; set; }
+        public Optional<bool> Focused { get; set; }
     }
 }

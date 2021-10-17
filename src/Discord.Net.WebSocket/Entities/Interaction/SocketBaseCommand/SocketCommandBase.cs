@@ -1,10 +1,8 @@
 using Discord.Net.Rest;
 using Discord.Rest;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using DataModel = Discord.API.ApplicationCommandInteractionData;
 using Model = Discord.API.Interaction;
@@ -31,13 +29,17 @@ namespace Discord.WebSocket
         /// <summary>
         ///     The data associated with this interaction.
         /// </summary>
-        new internal SocketCommandBaseData Data { get; }
+        internal new SocketCommandBaseData Data { get; }
+
+        internal override bool _hasResponded { get; set; }
+
+        private object _lock = new object();
 
         internal SocketCommandBase(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
             : base(client, model.Id, channel)
         {
-            var dataModel = model.Data.IsSpecified ?
-                (DataModel)model.Data.Value
+            var dataModel = model.Data.IsSpecified
+                ? (DataModel)model.Data.Value
                 : null;
 
             ulong? guildId = null;
@@ -47,7 +49,7 @@ namespace Discord.WebSocket
             Data = SocketCommandBaseData.Create(client, dataModel, model.Id, guildId);
         }
 
-        new internal static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
+        internal new static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
         {
             var entity = new SocketCommandBase(client, model, channel);
             entity.Update(model);
@@ -56,8 +58,8 @@ namespace Discord.WebSocket
 
         internal override void Update(Model model)
         {
-            var data = model.Data.IsSpecified ?
-                (DataModel)model.Data.Value
+            var data = model.Data.IsSpecified
+                ? (DataModel)model.Data.Value
                 : null;
 
             Data.Update(data);
@@ -79,20 +81,16 @@ namespace Discord.WebSocket
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
+            if (!InteractionHelper.CanSendResponse(this))
+                throw new TimeoutException($"Cannot respond to an interaction after {InteractionHelper.ResponseTimeLimit} seconds!");
+
+            embeds ??= Array.Empty<Embed>();
             if (embed != null)
-            {
-                if (embeds == null)
-                    embeds = new[] { embed };
-                else
-                {
-                    List<Embed> listEmbeds = embeds.ToList();
-                    listEmbeds.Insert(0, embed);
-                }
-            }
+                embeds = new[] { embed }.Concat(embeds).ToArray();
 
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
-            Preconditions.AtMost(embeds?.Length ?? 0, 10, nameof(embeds), "A max of 10 embeds are allowed.");
+            Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
 
             // check that user flag and user Id list are exclusive, same with role flag and role Id list
             if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
@@ -117,14 +115,27 @@ namespace Discord.WebSocket
                 {
                     Content = text,
                     AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
-                    Embeds = embeds?.Select(x => x.ToModel()).ToArray() ?? Optional<API.Embed[]>.Unspecified,
-                    TTS = isTTS ? true : Optional<bool>.Unspecified,
+                    Embeds = embeds.Select(x => x.ToModel()).ToArray(),
+                    TTS = isTTS,
                     Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
                     Flags = ephemeral ? MessageFlags.Ephemeral : Optional<MessageFlags>.Unspecified
                 }
             };
 
-            await InteractionHelper.SendInteractionResponse(Discord, response, Id, Token, options);
+            lock (_lock)
+            {
+                if (_hasResponded)
+                {
+                    throw new InvalidOperationException("Cannot respond twice to the same interaction");
+                }
+            }
+
+            await InteractionHelper.SendInteractionResponseAsync(Discord, response, Id, Token, options).ConfigureAwait(false);
+
+            lock (_lock)
+            {
+                _hasResponded = true;
+            }
         }
 
         /// <inheritdoc/>
@@ -141,27 +152,20 @@ namespace Discord.WebSocket
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
+            embeds ??= Array.Empty<Embed>();
             if (embed != null)
-            {
-                if (embeds == null)
-                    embeds = new[] { embed };
-                else
-                {
-                    List<Embed> listEmbeds = embeds.ToList();
-                    listEmbeds.Insert(0, embed);
-                }
-            }
+                embeds = new[] { embed }.Concat(embeds).ToArray();
 
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
-            Preconditions.AtMost(embeds?.Length ?? 0, 10, nameof(embeds), "A max of 10 embeds are allowed.");
+            Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
 
             var args = new API.Rest.CreateWebhookMessageParams
             {
                 Content = text,
                 AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                 IsTTS = isTTS,
-                Embeds = embeds?.Select(x => x.ToModel()).ToArray() ?? Optional<API.Embed[]>.Unspecified,
+                Embeds = embeds.Select(x => x.ToModel()).ToArray(),
                 Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
             };
 
@@ -173,8 +177,8 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public override async Task<RestFollowupMessage> FollowupWithFileAsync(
+            Stream fileStream,
             string text = null,
-            Stream fileStream = null,
             string fileName = null,
             Embed[] embeds = null,
             bool isTTS = false,
@@ -187,29 +191,22 @@ namespace Discord.WebSocket
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
+            embeds ??= Array.Empty<Embed>();
             if (embed != null)
-            {
-                if (embeds == null)
-                    embeds = new[] { embed };
-                else
-                {
-                    List<Embed> listEmbeds = embeds.ToList();
-                    listEmbeds.Insert(0, embed);
-                }
-            }
+                embeds = new[] { embed }.Concat(embeds).ToArray();
 
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
-            Preconditions.AtMost(embeds?.Length ?? 0, 10, nameof(embeds), "A max of 10 embeds are allowed.");
+            Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
             Preconditions.NotNull(fileStream, nameof(fileStream), "File Stream must have data");
-            Preconditions.NotNullOrWhitespace(fileName, nameof(fileName), "File Name must not be empty or null");
+            Preconditions.NotNullOrEmpty(fileName, nameof(fileName), "File Name must not be empty or null");
 
             var args = new API.Rest.CreateWebhookMessageParams
             {
                 Content = text,
                 AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                 IsTTS = isTTS,
-                Embeds = embeds?.Select(x => x.ToModel()).ToArray() ?? Optional<API.Embed[]>.Unspecified,
+                Embeds = embeds.Select(x => x.ToModel()).ToArray(),
                 Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
                 File = fileStream is not null ? new MultipartFile(fileStream, fileName) : Optional<MultipartFile>.Unspecified
             };
@@ -222,8 +219,8 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public override async Task<RestFollowupMessage> FollowupWithFileAsync(
+            string filePath,
             string text = null,
-            string filePath = null,
             string fileName = null,
             Embed[] embeds = null,
             bool isTTS = false,
@@ -236,28 +233,24 @@ namespace Discord.WebSocket
             if (!IsValidToken)
                 throw new InvalidOperationException("Interaction token is no longer valid");
 
+            embeds ??= Array.Empty<Embed>();
             if (embed != null)
-            {
-                if (embeds == null)
-                    embeds = new[] { embed };
-                else
-                {
-                    List<Embed> listEmbeds = embeds.ToList();
-                    listEmbeds.Insert(0, embed);
-                }
-            }
+                embeds = new[] { embed }.Concat(embeds).ToArray();
 
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
-            Preconditions.AtMost(embeds?.Length ?? 0, 10, nameof(embeds), "A max of 10 embeds are allowed.");
-            Preconditions.NotNullOrWhitespace(filePath, nameof(filePath), "Path must exist");
+            Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
+            Preconditions.NotNullOrEmpty(filePath, nameof(filePath), "Path must exist");
+
+            fileName ??= Path.GetFileName(filePath);
+            Preconditions.NotNullOrEmpty(fileName, nameof(fileName), "File Name must not be empty or null");
 
             var args = new API.Rest.CreateWebhookMessageParams
             {
                 Content = text,
                 AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                 IsTTS = isTTS,
-                Embeds = embeds?.Select(x => x.ToModel()).ToArray() ?? Optional<API.Embed[]>.Unspecified,
+                Embeds = embeds.Select(x => x.ToModel()).ToArray(),
                 Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
                 File = !string.IsNullOrEmpty(filePath) ? new MultipartFile(new MemoryStream(File.ReadAllBytes(filePath), false), fileName) : Optional<MultipartFile>.Unspecified
             };
@@ -274,8 +267,11 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous operation of acknowledging the interaction.
         /// </returns>
-        public override Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
+        public override async Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
         {
+            if (!InteractionHelper.CanSendResponse(this))
+                throw new TimeoutException($"Cannot defer an interaction after {InteractionHelper.ResponseTimeLimit} seconds!");
+
             var response = new API.InteractionResponse
             {
                 Type = InteractionResponseType.DeferredChannelMessageWithSource,
@@ -285,7 +281,20 @@ namespace Discord.WebSocket
                 }
             };
 
-            return Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, Id, Token, options);
+            lock (_lock)
+            {
+                if (_hasResponded)
+                {
+                    throw new InvalidOperationException("Cannot respond or defer twice to the same interaction");
+                }
+            }
+
+            await Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, Id, Token, options).ConfigureAwait(false);
+
+            lock (_lock)
+            {
+                _hasResponded = true;
+            }
         }
     }
 }

@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.ApplicationCommand;
 
@@ -13,10 +10,7 @@ namespace Discord.Rest
     public class RestGlobalCommand : RestApplicationCommand
     {
         internal RestGlobalCommand(BaseDiscordClient client, ulong id)
-            : base(client, id)
-        {
-
-        }
+            : base(client, id) { }
 
         internal static RestGlobalCommand Create(BaseDiscordClient client, Model model)
         {
@@ -27,7 +21,7 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         public override async Task DeleteAsync(RequestOptions options = null)
-            => await InteractionHelper.DeleteGlobalCommand(Discord, this).ConfigureAwait(false);
+            => await InteractionHelper.DeleteGlobalCommandAsync(Discord, this).ConfigureAwait(false);
 
         /// <summary>
         ///     Modifies this <see cref="RestApplicationCommand"/>.
@@ -39,7 +33,7 @@ namespace Discord.Rest
         /// </returns>
         public override async Task ModifyAsync<TArg>(Action<TArg> func, RequestOptions options = null)
         {
-            var cmd = await InteractionHelper.ModifyGlobalCommand<TArg>(Discord, this, func, options).ConfigureAwait(false);
+            var cmd = await InteractionHelper.ModifyGlobalCommandAsync(Discord, this, func, options).ConfigureAwait(false);
             Update(cmd);
         }
     }

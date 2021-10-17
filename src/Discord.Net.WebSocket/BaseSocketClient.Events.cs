@@ -469,7 +469,7 @@ namespace Discord.WebSocket
 
         #region Interactions
         /// <summary>
-        ///     Fired when an Interaction is created. This event covers all types of interactions including but not limited to: buttons, select menus, slash commands.
+        ///     Fired when an Interaction is created. This event covers all types of interactions including but not limited to: buttons, select menus, slash commands, autocompletes.
         /// </summary>
         /// <remarks>
         ///     <para>
@@ -535,6 +535,15 @@ namespace Discord.WebSocket
             remove => _messageCommandExecuted.Remove(value);
         }
         internal readonly AsyncEvent<Func<SocketMessageCommand, Task>> _messageCommandExecuted = new AsyncEvent<Func<SocketMessageCommand, Task>>();
+        /// <summary>
+        ///     Fired when an autocomplete is used and its interaction is received.
+        /// </summary>
+        public event Func<SocketAutocompleteInteraction, Task> AutocompleteExecuted
+        {
+            add => _autocompleteExecuted.Add(value);
+            remove => _autocompleteExecuted.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketAutocompleteInteraction, Task>> _autocompleteExecuted = new AsyncEvent<Func<SocketAutocompleteInteraction, Task>>();
 
         /// <summary>
         ///     Fired when a guild application command is created.

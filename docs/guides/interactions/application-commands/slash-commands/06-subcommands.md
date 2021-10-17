@@ -1,3 +1,8 @@
+---
+uid: Guides.SlashCommands.SubCommand
+title: Sub Commands
+---
+
 # Subcommands
 
 Subcommands allow you to have multiple commands available in a single command. They can be useful for representing sub options for a command. For example: A settings command. Let's first look at some limitations with subcommands set by discord.

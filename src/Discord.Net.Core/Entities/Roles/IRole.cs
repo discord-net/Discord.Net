@@ -52,6 +52,13 @@ namespace Discord
         /// </returns>
         string Name { get; }
         /// <summary>
+        ///     Gets the icon of this role.
+        /// </summary>
+        /// <returns>
+        ///     A string containing the hash of this role's icon.
+        /// </returns>
+        string Icon { get; }
+        /// <summary>
         ///     Gets the permissions granted to members of this role.
         /// </summary>
         /// <returns>
@@ -86,5 +93,13 @@ namespace Discord
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
         Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets the image url of the icon role.
+        /// </summary>
+        /// <returns>
+        ///     An image url of the icon role.
+        /// </returns>
+        string GetIconUrl();
     }
 }

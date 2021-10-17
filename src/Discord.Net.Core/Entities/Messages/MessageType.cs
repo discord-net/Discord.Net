@@ -81,26 +81,30 @@ namespace Discord
         ///     The message is an inline reply.
         /// </summary>
         /// <remarks>
-        ///     Only available in API v8
+        ///     Only available in API v8.
         /// </remarks>
         Reply = 19,
         /// <summary>
-        ///     The message is an Application Command
+        ///     The message is an Application Command.
         /// </summary>
         /// <remarks>
-        ///     Only available in API v8
+        ///     Only available in API v8.
         /// </remarks>
         ApplicationCommand = 20,
         /// <summary>
         ///     The message that starts a thread.
         /// </summary>
         /// <remarks>
-        ///     Only available in API v9
+        ///     Only available in API v9.
         /// </remarks>
         ThreadStarterMessage = 21,
         /// <summary>
-        ///     The message for a invite reminder
+        ///     The message for a invite reminder.
         /// </summary>
-        GuildInviteReminder = 22
+        GuildInviteReminder = 22,
+        /// <summary>
+        ///     The message for a context menu command.
+        /// </summary>
+        ContextMenuCommand = 23,
     }
 }

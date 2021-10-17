@@ -171,7 +171,7 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Tests that valid urls do not throw any exceptions.
+        ///     Tests that valid url's do not throw any exceptions.
         /// </summary>
         /// <param name="url">The url to set.</param>
         [Theory]

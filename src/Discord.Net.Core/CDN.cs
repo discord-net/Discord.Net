@@ -86,6 +86,16 @@ namespace Discord
         public static string GetGuildIconUrl(ulong guildId, string iconId)
             => iconId != null ? $"{DiscordConfig.CDNUrl}icons/{guildId}/{iconId}.jpg" : null;
         /// <summary>
+        ///     Returns a guild role's icon URL.
+        /// </summary>
+        /// <param name="roleId">The role identifier.</param>
+        /// <param name="roleHash">The icon hash.</param>
+        /// <returns>
+        ///     A URL pointing to the guild role's icon.
+        /// </returns>
+        public static string GetGuildRoleIconUrl(ulong roleId, string roleHash)
+            => roleHash != null ? $"{DiscordConfig.CDNUrl}role-icons/{roleId}/{roleHash}.png" : null;
+        /// <summary>
         ///     Returns a guild splash URL.
         /// </summary>
         /// <param name="guildId">The guild snowflake identifier.</param>

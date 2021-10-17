@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.ApplicationCommand;
 
@@ -32,7 +29,7 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         public override async Task DeleteAsync(RequestOptions options = null)
-            => await InteractionHelper.DeleteGuildCommand(Discord, GuildId, this).ConfigureAwait(false);
+            => await InteractionHelper.DeleteGuildCommandAsync(Discord, GuildId, this).ConfigureAwait(false);
 
         /// <summary>
         ///     Modifies this <see cref="RestApplicationCommand"/>.
@@ -44,7 +41,7 @@ namespace Discord.Rest
         /// </returns>
         public override async Task ModifyAsync<TArg>(Action<TArg> func, RequestOptions options = null)
         {
-            var model = await InteractionHelper.ModifyGuildCommand<TArg>(Discord, this, GuildId, func, options).ConfigureAwait(false);
+            var model = await InteractionHelper.ModifyGuildCommandAsync(Discord, this, GuildId, func, options).ConfigureAwait(false);
             Update(model);
         }
 

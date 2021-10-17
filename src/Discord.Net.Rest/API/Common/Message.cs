@@ -32,7 +32,7 @@ namespace Discord.API
         [JsonProperty("mention_everyone")]
         public Optional<bool> MentionEveryone { get; set; }
         [JsonProperty("mentions")]
-        public Optional<EntityOrId<User>[]> UserMentions { get; set; }
+        public Optional<User[]> UserMentions { get; set; }
         [JsonProperty("mention_roles")]
         public Optional<ulong[]> RoleMentions { get; set; }
         [JsonProperty("attachments")]
@@ -59,6 +59,7 @@ namespace Discord.API
         public Optional<Message> ReferencedMessage { get; set; }
         [JsonProperty("components")]
         public Optional<API.ActionRowComponent[]> Components { get; set; }
+        public Optional<MessageInteraction> Interaction { get; set; }
         [JsonProperty("sticker_items")]
         public Optional<StickerItem[]> StickerItems { get; set; }
     }

@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -51,7 +48,7 @@ namespace Discord
         ///     Deletes the current sticker.
         /// </summary>
         /// <remakrs>
-        ///     The bot neeeds the MANAGE_EMOJIS_AND_STICKERS permission inside the guild in order to delete stickers.
+        ///     The bot needs the MANAGE_EMOJIS_AND_STICKERS permission inside the guild in order to delete stickers.
         /// </remakrs>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>

@@ -1,9 +1,4 @@
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord.API
 {
@@ -36,23 +31,23 @@ namespace Discord.API
             {
                 if (option.Emote is Emote e)
                 {
-                    Emoji = new Emoji()
+                    Emoji = new Emoji
                     {
                         Name = e.Name,
                         Animated = e.Animated,
-                        Id = e.Id,
+                        Id = e.Id
                     };
                 }
                 else
                 {
-                    Emoji = new Emoji()
+                    Emoji = new Emoji
                     {
                         Name = option.Emote.Name
                     };
                 }
             }
 
-            Default = option.IsDefault.HasValue ? option.IsDefault.Value : Optional<bool>.Unspecified;
+            Default = option.IsDefault ?? Optional<bool>.Unspecified;
         }
     }
 }

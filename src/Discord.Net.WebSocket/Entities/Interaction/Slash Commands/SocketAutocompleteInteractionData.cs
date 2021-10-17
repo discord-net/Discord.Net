@@ -1,11 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DataModel = Discord.API.AutocompleteInteractionData;
-
 
 namespace Discord.WebSocket
 {
@@ -35,7 +31,7 @@ namespace Discord.WebSocket
         public ulong Version { get; }
 
         /// <summary>
-        ///     Gets the current autocomplete option that is activly being filled out.
+        ///     Gets the current autocomplete option that is actively being filled out.
         /// </summary>
         public AutocompleteOption Current { get; }
 
@@ -46,15 +42,34 @@ namespace Discord.WebSocket
 
         internal SocketAutocompleteInteractionData(DataModel model)
         {
-            var options = model.Options.Select(x => new AutocompleteOption(x.Type, x.Name, x.Value, x.Focused));
+            var options = model.Options.SelectMany(GetOptions);
 
             Current = options.FirstOrDefault(x => x.Focused);
             Options = options.ToImmutableArray();
+
+            if (Options.Count == 1 && Current == null)
+                Current = Options.FirstOrDefault();
 
             CommandName = model.Name;
             CommandId = model.Id;
             Type = model.Type;
             Version = model.Version;
+        }
+
+        private List<AutocompleteOption> GetOptions(API.AutocompleteInteractionDataOption model)
+        {
+            var options = new List<AutocompleteOption>();
+
+            if (model.Options.IsSpecified)
+            {
+                options.AddRange(model.Options.Value.SelectMany(GetOptions));
+            }
+            else if(model.Focused.IsSpecified)
+            {
+                options.Add(new AutocompleteOption(model.Type, model.Name, model.Value.GetValueOrDefault(null), model.Focused.Value));
+            }
+
+            return options;
         }
     }
 }

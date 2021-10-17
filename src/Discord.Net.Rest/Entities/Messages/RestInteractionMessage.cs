@@ -31,11 +31,11 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        ///     Deletes this object and all of it's childern.
+        ///     Deletes this object and all of it's children.
         /// </summary>
         /// <returns>A task that represents the asynchronous delete operation.</returns>
         public Task DeleteAsync()
-            => InteractionHelper.DeletedInteractionResponse(Discord, this);
+            => InteractionHelper.DeleteInteractionResponseAsync(Discord, this);
 
         /// <summary>
         ///     Modifies this interaction response
@@ -56,15 +56,15 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
         /// <exception cref="InvalidOperationException">The token used to modify/delete this message expired.</exception>
-        /// /// <exception cref="Discord.Net.HttpException">Somthing went wrong during the request.</exception>
+        /// /// <exception cref="Discord.Net.HttpException">Something went wrong during the request.</exception>
         public new async Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
         {
             try
             {
-                var model = await InteractionHelper.ModifyInteractionResponse(Discord, Token, func, options).ConfigureAwait(false);
+                var model = await InteractionHelper.ModifyInteractionResponseAsync(Discord, Token, func, options).ConfigureAwait(false);
                 Update(model);
             }
-            catch (Discord.Net.HttpException x)
+            catch (Net.HttpException x)
             {
                 if (x.HttpCode == System.Net.HttpStatusCode.NotFound)
                 {

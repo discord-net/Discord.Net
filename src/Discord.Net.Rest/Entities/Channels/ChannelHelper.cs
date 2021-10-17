@@ -353,6 +353,7 @@ namespace Discord.Rest
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
+            Preconditions.NotNullOrEmpty(filename, nameof(filename), "File Name must not be empty or null");
 
             // check that user flag and user Id list are exclusive, same with role flag and role Id list
             if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)

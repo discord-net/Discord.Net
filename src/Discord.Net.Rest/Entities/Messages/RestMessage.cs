@@ -15,6 +15,7 @@ namespace Discord.Rest
     {
         private long _timestampTicks;
         private ImmutableArray<RestReaction> _reactions = ImmutableArray.Create<RestReaction>();
+        private ImmutableArray<RestUser> _userMentions = ImmutableArray.Create<RestUser>();
 
         /// <inheritdoc />
         public IMessageChannel Channel { get; }
@@ -27,6 +28,9 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public string Content { get; private set; }
+
+        /// <inheritdoc />
+        public string CleanContent => MessageHelper.SanitizeMessage(this);
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -53,10 +57,6 @@ namespace Discord.Rest
         public virtual IReadOnlyCollection<ulong> MentionedChannelIds => ImmutableArray.Create<ulong>();
         /// <inheritdoc />
         public virtual IReadOnlyCollection<ulong> MentionedRoleIds => ImmutableArray.Create<ulong>();
-        /// <summary>
-        ///     Gets a collection of the mentioned users in the message.
-        /// </summary>
-        public virtual IReadOnlyCollection<RestUser> MentionedUsers => ImmutableArray.Create<RestUser>();
         /// <inheritdoc />
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
         /// <inheritdoc />
@@ -70,6 +70,11 @@ namespace Discord.Rest
         public MessageApplication Application { get; private set; }
         /// <inheritdoc />
         public MessageReference Reference { get; private set; }
+
+        /// <summary>
+        ///     Gets the interaction this message is a response to.
+        /// </summary>
+        public MessageInteraction<RestUser> Interaction { get; private set; }
         /// <inheritdoc />
         public MessageFlags? Flags { get; private set; }
         /// <inheritdoc/>
@@ -77,6 +82,10 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         public IReadOnlyCollection<ActionRowComponent> Components { get; private set; }
+        /// <summary>
+        ///     Gets a collection of the mentioned users in the message.
+        /// </summary>
+        public IReadOnlyCollection<RestUser> MentionedUsers => _userMentions;
 
         internal RestMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author, MessageSource source)
             : base(discord, id)
@@ -207,8 +216,31 @@ namespace Discord.Rest
             }
             else
                 _reactions = ImmutableArray.Create<RestReaction>();
-        }
 
+            if (model.Interaction.IsSpecified)
+            {
+                Interaction = new MessageInteraction<RestUser>(model.Interaction.Value.Id,
+                    model.Interaction.Value.Type,
+                    model.Interaction.Value.Name,
+                    RestUser.Create(Discord, model.Interaction.Value.User));
+            }
+
+            if (model.UserMentions.IsSpecified)
+            {
+                var value = model.UserMentions.Value;
+                if (value.Length > 0)
+                {
+                    var newMentions = ImmutableArray.CreateBuilder<RestUser>(value.Length);
+                    for (int i = 0; i < value.Length; i++)
+                    {
+                        var val = value[i];
+                        if (val != null)
+                            newMentions.Add(RestUser.Create(Discord, val));
+                    }
+                    _userMentions = newMentions.ToImmutable();
+                }
+            }
+        }
         /// <inheritdoc />
         public async Task UpdateAsync(RequestOptions options = null)
         {
@@ -237,6 +269,9 @@ namespace Discord.Rest
 
         /// <inheritdoc/>
         IReadOnlyCollection<IMessageComponent> IMessage.Components => Components;
+
+        /// <inheritdoc/>
+        IMessageInteraction IMessage.Interaction => Interaction;
 
         /// <inheritdoc />
         IReadOnlyCollection<IStickerItem> IMessage.Stickers => Stickers;

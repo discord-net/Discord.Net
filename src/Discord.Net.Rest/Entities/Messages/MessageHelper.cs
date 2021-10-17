@@ -84,7 +84,7 @@ namespace Discord.Rest
             {
                 Content = args.Content,
                 Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
-                Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? new API.ActionRowComponent[0] : Optional<API.ActionRowComponent[]>.Unspecified,
+                Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>() : Optional<API.ActionRowComponent[]>.Unspecified,
                 Flags = args.Flags,
                 AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional<API.AllowedMentions>.Unspecified,
             };
@@ -151,7 +151,7 @@ namespace Discord.Rest
                 Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
                 Flags = args.Flags.IsSpecified ? args.Flags.Value : Optional.Create<MessageFlags?>(),
                 AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional.Create<API.AllowedMentions>(),
-                Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? new API.ActionRowComponent[0] : Optional<API.ActionRowComponent[]>.Unspecified,
+                Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>() : Optional<API.ActionRowComponent[]>.Unspecified,
             };
             return await client.ApiClient.ModifyMessageAsync(channelId, msgId, apiArgs, options).ConfigureAwait(false);
         }
@@ -245,6 +245,12 @@ namespace Discord.Rest
 #else
             return System.Web.HttpUtility.UrlEncode(text);
 #endif
+        }
+        public static string SanitizeMessage(IMessage message)
+        {
+            var newContent = MentionUtils.Resolve(message, 0, TagHandling.FullName, TagHandling.FullName, TagHandling.FullName, TagHandling.FullName, TagHandling.FullName);
+            newContent = Format.StripMarkDown(newContent);
+            return newContent;
         }
 
         public static async Task PinAsync(IMessage msg, BaseDiscordClient client,

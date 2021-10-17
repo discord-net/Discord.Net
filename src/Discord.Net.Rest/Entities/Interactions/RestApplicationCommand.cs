@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.ApplicationCommand;
 
@@ -38,21 +37,13 @@ namespace Discord.Rest
             => SnowflakeUtils.FromSnowflake(Id);
 
         internal RestApplicationCommand(BaseDiscordClient client, ulong id)
-            : base(client, id)
-        {
-
-        }
+            : base(client, id) { }
 
         internal static RestApplicationCommand Create(BaseDiscordClient client, Model model, ulong? guildId)
         {
-            if (guildId.HasValue)
-            {
-                return RestGuildCommand.Create(client, model, guildId.Value);
-            }
-            else
-            {
-                return RestGlobalCommand.Create(client, model);
-            }
+            return guildId.HasValue
+                ? RestGuildCommand.Create(client, model, guildId.Value)
+                : RestGlobalCommand.Create(client, model);
         }
 
         internal virtual void Update(Model model)
@@ -64,8 +55,8 @@ namespace Discord.Rest
             IsDefaultPermission = model.DefaultPermissions.GetValueOrDefault(true);
 
             Options = model.Options.IsSpecified
-                ? model.Options.Value.Select(x => RestApplicationCommandOption.Create(x)).ToImmutableArray()
-                : null;
+                ? model.Options.Value.Select(RestApplicationCommandOption.Create).ToImmutableArray()
+                : ImmutableArray.Create<RestApplicationCommandOption>();
         }
 
         /// <inheritdoc/>
@@ -76,7 +67,7 @@ namespace Discord.Rest
         {
             return ModifyAsync<ApplicationCommandProperties>(func, options);
         }
-        
+
         /// <inheritdoc/>
         public abstract Task ModifyAsync<TArg>(Action<TArg> func, RequestOptions options = null)
             where TArg : ApplicationCommandProperties;

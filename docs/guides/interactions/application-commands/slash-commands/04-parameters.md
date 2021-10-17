@@ -1,3 +1,8 @@
+---
+uid: Guides.SlashCommands.Parameters
+title: Slash Command Parameters
+---
+
 # Slash command parameters
 
 Slash commands can have a bunch of parameters, each their own type. Let's first go over the types of parameters we can have.

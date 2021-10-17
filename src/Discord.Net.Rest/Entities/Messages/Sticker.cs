@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -43,8 +44,8 @@ namespace Discord.Rest
         {
             PackId = model.PackId;
             Name = model.Name;
-            Description = model.Desription;
-            Tags = model.Tags.IsSpecified ? model.Tags.Value.Split(',').Select(x => x.Trim()).ToArray() : new string[0];
+            Description = model.Description;
+            Tags = model.Tags.IsSpecified ? model.Tags.Value.Split(',').Select(x => x.Trim()).ToArray() : Array.Empty<string>();
             Type = model.Type;
             SortOrder = model.SortValue;
             IsAvailable = model.Available;

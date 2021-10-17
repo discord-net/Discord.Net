@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -24,13 +21,13 @@ namespace Discord
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException($"{nameof(Name)} cannot be null!");
+                    throw new ArgumentNullException(nameof(value), $"{nameof(Name)} cannot be null.");
 
                 if (value.Length > 32)
-                    throw new ArgumentException($"{nameof(Name)} length must be less than or equal to 32");
+                    throw new ArgumentOutOfRangeException(nameof(value), "Name length must be less than or equal to 32.");
 
                 if (!Regex.IsMatch(value, @"^[\w-]{1,32}$"))
-                    throw new ArgumentException($"{nameof(Name)} must match the regex ^[\\w-]{{1,32}}$");
+                    throw new FormatException($"{nameof(value)} must match the regex ^[\\w-]{{1,32}}$");
 
                 _name = value;
             }
@@ -42,14 +39,12 @@ namespace Discord
         public string Description
         {
             get => _description;
-            set
+            set => _description = value?.Length switch
             {
-                if (value?.Length > 100)
-                    throw new ArgumentException("Description length must be less than or equal to 100");
-                if (value?.Length < 1)
-                    throw new ArgumentException("Description length must at least 1 character in length");
-                _description = value;
-            }
+                > 100 => throw new ArgumentOutOfRangeException(nameof(value), "Description length must be less than or equal to 100."),
+                0 => throw new ArgumentOutOfRangeException(nameof(value), "Description length must be at least 1."),
+                _ => value
+            };
         }
 
         /// <summary>
@@ -81,6 +76,9 @@ namespace Discord
         /// </summary>
         public List<ApplicationCommandOptionProperties> Options { get; set; }
 
-        
+        /// <summary>
+        ///     Gets or sets the allowed channel types for this option.
+        /// </summary>
+        public List<ChannelType> ChannelTypes { get; set; }
     }
 }

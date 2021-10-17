@@ -11,7 +11,7 @@ namespace Discord.API
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("description")]
-        public string Desription { get; set; }
+        public string Description { get; set; }
         [JsonProperty("tags")]
         public Optional<string> Tags { get; set; }
         [JsonProperty("type")]

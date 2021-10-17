@@ -17,6 +17,7 @@ namespace Discord.WebSocket
         #region SocketMessage
         private long _timestampTicks;
         private readonly List<SocketReaction> _reactions = new List<SocketReaction>();
+        private ImmutableArray<SocketUser> _userMentions = ImmutableArray.Create<SocketUser>();
 
         /// <summary>
         ///     Gets the author of this message.
@@ -37,6 +38,9 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public string Content { get; private set; }
+
+        /// <inheritdoc />
+        public string CleanContent => MessageHelper.SanitizeMessage(this);
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -62,6 +66,11 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public IReadOnlyCollection<ActionRowComponent> Components { get; private set; }
+
+        /// <summary>
+        ///     Gets the interaction this message is a response to.
+        /// </summary>
+        public MessageInteraction<SocketUser> Interaction { get; private set; }
 
         /// <inheritdoc />
         public MessageFlags? Flags { get; private set; }
@@ -97,20 +106,19 @@ namespace Discord.WebSocket
         ///     Collection of WebSocket-based roles.
         /// </returns>
         public virtual IReadOnlyCollection<SocketRole> MentionedRoles => ImmutableArray.Create<SocketRole>();
-        /// <summary>
-        ///     Returns the users mentioned in this message.
-        /// </summary>
-        /// <returns>
-        ///     Collection of WebSocket-based users.
-        /// </returns>
-        public virtual IReadOnlyCollection<SocketUser> MentionedUsers => ImmutableArray.Create<SocketUser>();
         /// <inheritdoc />
         public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
         /// <inheritdoc />
         public virtual IReadOnlyCollection<SocketSticker> Stickers => ImmutableArray.Create<SocketSticker>();
         /// <inheritdoc />
         public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emote).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
-
+        /// <summary>
+        ///     Returns the users mentioned in this message.
+        /// </summary>
+        /// <returns>
+        ///     Collection of WebSocket-based users.
+        /// </returns>
+        public IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions; 
         /// <inheritdoc />
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
@@ -139,7 +147,9 @@ namespace Discord.WebSocket
                 _timestampTicks = model.Timestamp.Value.UtcTicks;
 
             if (model.Content.IsSpecified)
+            {
                 Content = model.Content.Value;
+            }
 
             if (model.Application.IsSpecified)
             {
@@ -225,6 +235,36 @@ namespace Discord.WebSocket
             else
                 Components = new List<ActionRowComponent>();
 
+            if (model.UserMentions.IsSpecified)
+            {
+                var value = model.UserMentions.Value;
+                if (value.Length > 0)
+                {
+                    var newMentions = ImmutableArray.CreateBuilder<SocketUser>(value.Length);
+                    for (int i = 0; i < value.Length; i++)
+                    {
+                        var val = value[i];
+                        if (val != null)
+                        {
+                            var user = Channel.GetUserAsync(val.Id, CacheMode.CacheOnly).GetAwaiter().GetResult() as SocketUser;
+                            if (user != null)
+                                newMentions.Add(user);
+                            else
+                                newMentions.Add(SocketUnknownUser.Create(Discord, state, val));
+                        }
+                    }
+                    _userMentions = newMentions.ToImmutable();
+                }
+            }
+
+            if (model.Interaction.IsSpecified)
+            {
+                Interaction = new MessageInteraction<SocketUser>(model.Interaction.Value.Id,
+                    model.Interaction.Value.Type,
+                    model.Interaction.Value.Name,
+                    SocketGlobalUser.Create(Discord, state, model.Interaction.Value.User));
+            }
+
             if (model.Flags.IsSpecified)
                 Flags = model.Flags.Value;
         }
@@ -262,8 +302,12 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         IReadOnlyCollection<IMessageComponent> IMessage.Components => Components;
 
+        /// <inheritdoc/>
+        IMessageInteraction IMessage.Interaction => Interaction;
+
         /// <inheritdoc />
         IReadOnlyCollection<IStickerItem> IMessage.Stickers => Stickers;
+
 
         internal void AddReaction(SocketReaction reaction)
         {

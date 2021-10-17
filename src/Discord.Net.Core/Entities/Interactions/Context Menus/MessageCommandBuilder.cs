@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
 namespace Discord
 {
     /// <summary>
@@ -12,8 +5,8 @@ namespace Discord
     /// </summary>
     public class MessageCommandBuilder
     {
-        /// <summary> 
-        ///     Returns the maximun length a commands name allowed by Discord
+        /// <summary>
+        ///     Returns the maximum length a commands name allowed by Discord
         /// </summary>
         public const int MaxNameLength = 32;
 
@@ -22,10 +15,7 @@ namespace Discord
         /// </summary>
         public string Name
         {
-            get
-            {
-                return _name;
-            }
+            get => _name;
             set
             {
                 Preconditions.NotNullOrEmpty(value, nameof(Name));
@@ -41,7 +31,7 @@ namespace Discord
         /// </summary>
         public bool IsDefaultPermission { get; set; } = true;
 
-        private string _name { get; set; }
+        private string _name;
 
         /// <summary>
         ///     Build the current builder into a <see cref="MessageCommandProperties"/> class.
@@ -51,14 +41,13 @@ namespace Discord
         /// </returns>
         public MessageCommandProperties Build()
         {
-            MessageCommandProperties props = new MessageCommandProperties()
+            var props = new MessageCommandProperties
             {
                 Name = Name,
                 IsDefaultPermission = IsDefaultPermission
             };
 
             return props;
-
         }
 
         /// <summary>

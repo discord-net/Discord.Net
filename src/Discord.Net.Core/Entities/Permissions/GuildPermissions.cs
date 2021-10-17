@@ -97,7 +97,7 @@ namespace Discord
         public bool UseExternalStickers => Permissions.GetValue(RawValue, GuildPermission.UseExternalStickers);
         /// <summary> If <c>true</c>, a user may send messages in threads in this guild. </summary>
         public bool SendMessagesInThreads => Permissions.GetValue(RawValue, GuildPermission.SendMessagesInThreads);
-        /// <summary> If <c>true</c>, a user launch application activites in voice channels in this guild. </summary>
+        /// <summary> If <c>true</c>, a user launch application activities in voice channels in this guild. </summary>
         public bool StartEmbeddedActivities => Permissions.GetValue(RawValue, GuildPermission.StartEmbeddedActivities);
 
         /// <summary> Creates a new <see cref="GuildPermissions"/> with the provided packed value. </summary>

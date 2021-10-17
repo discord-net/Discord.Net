@@ -1,5 +1,4 @@
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace Discord.API
 {
@@ -19,6 +18,5 @@ namespace Discord.API
 
         [JsonProperty("type")]
         public ApplicationCommandType Type { get; set; }
-
     }
 }

@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.ThreadMember;
-using MemberModel = Discord.API.GuildMember;
-using Discord.API;
 using System.Collections.Immutable;
 
 namespace Discord.WebSocket
@@ -162,7 +159,6 @@ namespace Discord.WebSocket
                 GuildUser.Update(Discord.State, model.Member.Value);
             }
         }
-
 
         /// <inheritdoc/>
         public ChannelPermissions GetPermissions(IGuildChannel channel) => GuildUser.GetPermissions(channel);

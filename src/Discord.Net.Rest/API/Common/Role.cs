@@ -8,6 +8,8 @@ namespace Discord.API
         public ulong Id { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
+        [JsonProperty("icon")]
+        public string Icon { get; set; }
         [JsonProperty("color")]
         public uint Color { get; set; }
         [JsonProperty("hoist")]

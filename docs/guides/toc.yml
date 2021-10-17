@@ -35,6 +35,24 @@
       topicUid: Guides.Commands.DI
     - name: Post-execution Handling
       topicUid: Guides.Commands.PostExecution
+- name: Working with Interactions
+  items:
+    - name: Introduction
+      topicUid: Guides.Interactions.Intro
+    - name: Creating slash commands
+      topicUid: Guides.SlashCommands.Creating
+    - name: Receiving and responding to slash commands
+      topicUid: Guides.SlashCommands.Receiving
+    - name: Slash command parameters
+      topicUid: Guides.SlashCommands.Parameters
+    - name: Ephemeral responses
+      topicUid: Guides.SlashCommands.Ephemeral
+    - name: Sub commands
+      topicUid: Guides.SlashCommands.SubCommand
+    - name: Slash command choices
+      topicUid: Guides.SlashCommands.Choices
+    - name: Slash ommands Bulk Overwrites
+      topicUid: Guides.SlashCommands.BulkOverwrite
 - name: Emoji
   topicUid: Guides.Emoji
 - name: Voice

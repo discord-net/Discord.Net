@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Model = Discord.API.ApplicationCommandInteractionData;
@@ -25,7 +24,7 @@ namespace Discord.WebSocket
 
             Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(x => new SocketSlashCommandDataOption(this, x)).ToImmutableArray()
-                : null;
+                : ImmutableArray.Create<SocketSlashCommandDataOption>();
         }
     }
 }

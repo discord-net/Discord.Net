@@ -110,17 +110,17 @@ namespace Discord.Rest
             => ClientHelper.GetWebhookAsync(this, id, options);
 
         public Task<RestGlobalCommand> CreateGlobalCommand(ApplicationCommandProperties properties, RequestOptions options = null)
-            => ClientHelper.CreateGlobalApplicationCommand(this, properties, options);
+            => ClientHelper.CreateGlobalApplicationCommandAsync(this, properties, options);
         public Task<RestGuildCommand> CreateGuildCommand(ApplicationCommandProperties properties, ulong guildId, RequestOptions options = null)
-            => ClientHelper.CreateGuildApplicationCommand(this, guildId, properties, options);
+            => ClientHelper.CreateGuildApplicationCommandAsync(this, guildId, properties, options);
         public Task<IReadOnlyCollection<RestGlobalCommand>> GetGlobalApplicationCommands(RequestOptions options = null)
-            => ClientHelper.GetGlobalApplicationCommands(this, options);
+            => ClientHelper.GetGlobalApplicationCommandsAsync(this, options);
         public Task<IReadOnlyCollection<RestGuildCommand>> GetGuildApplicationCommands(ulong guildId, RequestOptions options = null)
-            => ClientHelper.GetGuildApplicationCommands(this, guildId, options);
+            => ClientHelper.GetGuildApplicationCommandsAsync(this, guildId, options);
         public Task<IReadOnlyCollection<RestGlobalCommand>> BulkOverwriteGlobalCommands(ApplicationCommandProperties[] commandProperties, RequestOptions options = null)
-            => ClientHelper.BulkOverwriteGlobalApplicationCommand(this, commandProperties, options);
+            => ClientHelper.BulkOverwriteGlobalApplicationCommandAsync(this, commandProperties, options);
         public Task<IReadOnlyCollection<RestGuildCommand>> BulkOverwriteGuildCommands(ApplicationCommandProperties[] commandProperties, ulong guildId, RequestOptions options = null)
-            => ClientHelper.BulkOverwriteGuildApplicationCommand(this, guildId, commandProperties, options);
+            => ClientHelper.BulkOverwriteGuildApplicationCommandAsync(this, guildId, commandProperties, options);
         public Task<IReadOnlyCollection<GuildApplicationCommandPermission>> BatchEditGuildCommandPermissions(ulong guildId, IDictionary<ulong, ApplicationCommandPermission[]> permissions, RequestOptions options = null)
             => InteractionHelper.BatchEditGuildCommandPermissionsAsync(this, guildId, permissions, options);
         public Task DeleteAllGlobalCommandsAsync(RequestOptions options = null)
@@ -231,7 +231,7 @@ namespace Discord.Rest
             => await GetGlobalApplicationCommands(options).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<IApplicationCommand> IDiscordClient.GetGlobalApplicationCommandAsync(ulong id, RequestOptions options)
-            => await ClientHelper.GetGlobalApplicationCommand(this, id, options).ConfigureAwait(false);
+            => await ClientHelper.GetGlobalApplicationCommandAsync(this, id, options).ConfigureAwait(false);
         #endregion
     }
 }

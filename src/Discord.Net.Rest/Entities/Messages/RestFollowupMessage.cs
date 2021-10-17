@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.Message;
-
 
 namespace Discord.Rest
 {
@@ -35,11 +31,11 @@ namespace Discord.Rest
         }
 
         /// <summary>
-        ///     Deletes this object and all of it's childern.
+        ///     Deletes this object and all of it's children.
         /// </summary>
         /// <returns>A task that represents the asynchronous delete operation.</returns>
         public Task DeleteAsync()
-            => InteractionHelper.DeleteFollowupMessage(Discord, this);
+            => InteractionHelper.DeleteFollowupMessageAsync(Discord, this);
 
         /// <summary>
         ///     Modifies this interaction followup message.
@@ -60,17 +56,17 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
         /// <exception cref="InvalidOperationException">The token used to modify/delete this message expired.</exception>
-        /// /// <exception cref="Discord.Net.HttpException">Somthing went wrong during the request.</exception>
+        /// /// <exception cref="Discord.Net.HttpException">Something went wrong during the request.</exception>
         public new async Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
         {
             try
             {
-                var model = await InteractionHelper.ModifyFollowupMessage(Discord, this, func, options).ConfigureAwait(false);
+                var model = await InteractionHelper.ModifyFollowupMessageAsync(Discord, this, func, options).ConfigureAwait(false);
                 Update(model);
             }
-            catch (Discord.Net.HttpException x)
+            catch (Net.HttpException x)
             {
-                if(x.HttpCode == System.Net.HttpStatusCode.NotFound)
+                if (x.HttpCode == System.Net.HttpStatusCode.NotFound)
                 {
                     throw new InvalidOperationException("The token of this message has expired!", x);
                 }

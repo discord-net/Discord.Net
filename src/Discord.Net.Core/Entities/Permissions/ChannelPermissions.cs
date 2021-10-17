@@ -85,7 +85,7 @@ namespace Discord
         /// <summary> If <c>true</c>, a user may stream video in a voice channel.</summary>
         public bool Stream => Permissions.GetValue(RawValue, ChannelPermission.Stream);
 
-        /// <summary> If <c>true</c>, a user may adjust role permissions. This also implictly grants all other permissions.</summary>
+        /// <summary> If <c>true</c>, a user may adjust role permissions. This also implicitly grants all other permissions.</summary>
         public bool ManageRoles => Permissions.GetValue(RawValue, ChannelPermission.ManageRoles);
         /// <summary> If <c>true</c>, a user may edit the webhooks for this channel.</summary>
         public bool ManageWebhooks => Permissions.GetValue(RawValue, ChannelPermission.ManageWebhooks);
@@ -103,7 +103,7 @@ namespace Discord
         public bool UseExternalStickers => Permissions.GetValue(RawValue, ChannelPermission.UseExternalStickers);
         /// <summary> If <c>true</c>, a user may send messages in threads in this guild.</summary>
         public bool SendMessagesInThreads => Permissions.GetValue(RawValue, ChannelPermission.SendMessagesInThreads);
-        /// <summary> If <c>true</c>, a user launch application activites in voice channels in this guild.</summary>
+        /// <summary> If <c>true</c>, a user launch application activities in voice channels in this guild.</summary>
         public bool StartEmbeddedActivities => Permissions.GetValue(RawValue, ChannelPermission.StartEmbeddedActivities);
 
         /// <summary> Creates a new <see cref="ChannelPermissions"/> with the provided packed value.</summary>

@@ -2,12 +2,9 @@ using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.Interaction;
 using DataModel = Discord.API.AutocompleteInteractionData;
-
 
 namespace Discord.WebSocket
 {
@@ -20,6 +17,9 @@ namespace Discord.WebSocket
         ///     The autocomplete data of this interaction.
         /// </summary>
         public new SocketAutocompleteInteractionData Data { get; }
+
+        internal override bool _hasResponded { get; set; }
+        private object _lock = new object();
 
         internal SocketAutocompleteInteraction(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
             : base(client, model.Id, channel)
@@ -34,7 +34,7 @@ namespace Discord.WebSocket
 
         internal new static SocketAutocompleteInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
         {
-            var entity =  new SocketAutocompleteInteraction(client, model, channel);
+            var entity = new SocketAutocompleteInteraction(client, model, channel);
             entity.Update(model);
             return entity;
         }
@@ -53,8 +53,25 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous operation of responding to this interaction.
         /// </returns>
-        public Task RespondAsync(IEnumerable<AutocompleteResult> result, RequestOptions options = null)
-            => InteractionHelper.SendAutocompleteResult(Discord, result, Id, Token, options);
+        public async Task RespondAsync(IEnumerable<AutocompleteResult> result, RequestOptions options = null)
+        {
+            if (!InteractionHelper.CanSendResponse(this))
+                throw new TimeoutException($"Cannot respond to an interaction after {InteractionHelper.ResponseTimeLimit} seconds!");
+
+            lock (_lock)
+            {
+                if (_hasResponded)
+                {
+                    throw new InvalidOperationException("Cannot respond twice to the same interaction");
+                }
+            }
+
+            await InteractionHelper.SendAutocompleteResultAsync(Discord, result, Id, Token, options).ConfigureAwait(false);
+            lock (_lock)
+            {
+                _hasResponded = true;
+            }
+        }
 
         /// <summary>
         ///     Responds to this interaction with a set of choices.
@@ -71,27 +88,31 @@ namespace Discord.WebSocket
         ///     A task that represents the asynchronous operation of responding to this interaction.
         /// </returns>
         public Task RespondAsync(RequestOptions options = null, params AutocompleteResult[] result)
-            => InteractionHelper.SendAutocompleteResult(Discord, result, Id, Token, options);
-
-
-        /// <inheritdoc/>
-        [Obsolete("Autocomplete interactions cannot be defered!", true)]
-        public override Task DeferAsync(bool ephemeral = false, RequestOptions options = null) => throw new NotSupportedException();
+            => RespondAsync(result, options);
 
         /// <inheritdoc/>
-        [Obsolete("Autocomplete interactions cannot have followups!", true)]
-        public override Task<RestFollowupMessage> FollowupAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null) => throw new NotSupportedException();
+        [Obsolete("Autocomplete interactions cannot be deferred!", true)]
+        public override Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
+            => throw new NotSupportedException("Autocomplete interactions cannot be deferred!");
 
         /// <inheritdoc/>
         [Obsolete("Autocomplete interactions cannot have followups!", true)]
-        public override Task<RestFollowupMessage> FollowupWithFileAsync(string text = null, Stream fileStream = null, string fileName = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null) => throw new NotSupportedException();
+        public override Task<RestFollowupMessage> FollowupAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null)
+            => throw new NotSupportedException("Autocomplete interactions cannot be deferred!");
 
         /// <inheritdoc/>
         [Obsolete("Autocomplete interactions cannot have followups!", true)]
-        public override Task<RestFollowupMessage> FollowupWithFileAsync(string text = null, string filePath = null, string fileName = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null) => throw new NotSupportedException();
+        public override Task<RestFollowupMessage> FollowupWithFileAsync(Stream fileStream, string fileName, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null)
+            => throw new NotSupportedException("Autocomplete interactions cannot be deferred!");
+
+        /// <inheritdoc/>
+        [Obsolete("Autocomplete interactions cannot have followups!", true)]
+        public override Task<RestFollowupMessage> FollowupWithFileAsync(string filePath, string text = null, string fileName = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null)
+            => throw new NotSupportedException("Autocomplete interactions cannot be deferred!");
 
         /// <inheritdoc/>
         [Obsolete("Autocomplete interactions cannot have normal responses!", true)]
-        public override Task RespondAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null) => throw new NotSupportedException();
+        public override Task RespondAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null)
+            => throw new NotSupportedException("Autocomplete interactions cannot be deferred!");
     }
 }

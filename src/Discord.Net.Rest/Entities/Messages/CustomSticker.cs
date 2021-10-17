@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.Sticker;
 
@@ -26,7 +23,7 @@ namespace Discord.Rest
         ///     Gets the guild that this custom sticker is in.
         /// </summary>
         /// <remarks>
-        ///     <b>Note</b>: This property can be <see langword="null"/> if the sticker wasnt fetched from a guild.
+        ///     <b>Note</b>: This property can be <see langword="null"/> if the sticker wasn't fetched from a guild.
         /// </remarks>
         public RestGuild Guild { get; private set; }
 

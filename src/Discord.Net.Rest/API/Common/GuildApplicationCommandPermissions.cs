@@ -1,9 +1,4 @@
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord.API
 {
@@ -19,6 +14,6 @@ namespace Discord.API
         public ulong GuildId { get; set; }
 
         [JsonProperty("permissions")]
-        public API.ApplicationCommandPermissions[] Permissions { get; set; }
+        public ApplicationCommandPermissions[] Permissions { get; set; }
     }
 }

@@ -5,11 +5,9 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Model = Discord.API.Channel;
 using ThreadMember = Discord.API.ThreadMember;
-using MemberUpdates = Discord.API.Gateway.ThreadMembersUpdated;
 using System.Collections.Concurrent;
 
 namespace Discord.WebSocket
@@ -72,14 +70,13 @@ namespace Discord.WebSocket
         public new IReadOnlyCollection<SocketThreadUser> Users =>
             _members.Values.ToImmutableArray();
 
-
-        private ConcurrentDictionary<ulong, SocketThreadUser> _members;
+        private readonly ConcurrentDictionary<ulong, SocketThreadUser> _members;
 
         private string DebuggerDisplay => $"{Name} ({Id}, Thread)";
 
-        private bool _usersDownloaded = false;
+        private bool _usersDownloaded;
 
-        private object _downloadLock = new object();
+        private readonly object _downloadLock = new object();
 
         internal SocketThreadChannel(DiscordSocketClient discord, SocketGuild guild, ulong id, SocketTextChannel parent)
             : base(discord, id, guild)
@@ -103,12 +100,12 @@ namespace Discord.WebSocket
             Type = (ThreadType)model.Type;
             MessageCount = model.MessageCount.GetValueOrDefault(-1);
             MemberCount = model.MemberCount.GetValueOrDefault(-1);
-            
+
             if (model.ThreadMetadata.IsSpecified)
             {
                 IsArchived = model.ThreadMetadata.Value.Archived;
                 ArchiveTimestamp = model.ThreadMetadata.Value.ArchiveTimestamp;
-                AutoArchiveDuration = (ThreadArchiveDuration)model.ThreadMetadata.Value.AutoArchiveDuration;
+                AutoArchiveDuration = model.ThreadMetadata.Value.AutoArchiveDuration;
                 IsLocked = model.ThreadMetadata.Value.Locked.GetValueOrDefault(false);
             }
 
@@ -173,12 +170,11 @@ namespace Discord.WebSocket
             return Users;
         }
 
-
         /// <summary>
         ///     Downloads all users that have access to this thread.
         /// </summary>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>A task representing the asyncronous download operation.</returns>
+        /// <returns>A task representing the asynchronous download operation.</returns>
         public async Task DownloadUsersAsync(RequestOptions options = null)
         {
             var users = await Discord.ApiClient.ListThreadMembersAsync(Id, options);
@@ -193,7 +189,7 @@ namespace Discord.WebSocket
                 }
             }
         }
-        
+
         internal new SocketThreadChannel Clone() => MemberwiseClone() as SocketThreadChannel;
 
         /// <inheritdoc/>
@@ -210,7 +206,7 @@ namespace Discord.WebSocket
         /// <param name="user">The <see cref="IGuildUser"/> to add.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchronous operation of adding a member to a thread. 
+        ///     A task that represents the asynchronous operation of adding a member to a thread.
         /// </returns>
         public Task AddUserAsync(IGuildUser user, RequestOptions options = null)
             => Discord.ApiClient.AddThreadMemberAsync(Id, user.Id, options);
@@ -221,60 +217,59 @@ namespace Discord.WebSocket
         /// <param name="user">The <see cref="IGuildUser"/> to remove from this thread.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchronous operation of removing a user from this thread. 
+        ///     A task that represents the asynchronous operation of removing a user from this thread.
         /// </returns>
         public Task RemoveUserAsync(IGuildUser user, RequestOptions options = null)
             => Discord.ApiClient.RemoveThreadMemberAsync(Id, user.Id, options);
-
 
         /// <inheritdoc/>
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null)
-            => throw new NotImplementedException();
+            => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null)
-            => throw new NotImplementedException();
+            => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override Task<IInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => throw new NotImplementedException();
+            => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => throw new NotImplementedException();
+            => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => throw new NotImplementedException();
+            => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override Task<RestWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null)
-            => throw new NotImplementedException();
+            => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override Task<IReadOnlyCollection<IInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
-            => throw new NotImplementedException();
+            => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
         /// <remarks>
@@ -295,14 +290,14 @@ namespace Discord.WebSocket
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
-            => throw new NotImplementedException();
+            => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
-            => throw new NotImplementedException();
+            => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
         /// <remarks>
@@ -316,28 +311,28 @@ namespace Discord.WebSocket
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override Task RemovePermissionOverwriteAsync(IRole role, RequestOptions options = null)
-            => throw new NotImplementedException();
+            => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override Task RemovePermissionOverwriteAsync(IUser user, RequestOptions options = null)
-            => throw new NotImplementedException();
+            => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override IReadOnlyCollection<Overwrite> PermissionOverwrites
-            => throw new NotImplementedException();
+            => throw new NotSupportedException("This method is not supported in threads.");
 
         /// <inheritdoc/>
         /// <remarks>
         ///     <b>This method is not supported in threads.</b>
         /// </remarks>
         public override Task SyncPermissionsAsync(RequestOptions options = null)
-            => throw new NotImplementedException();
+            => throw new NotSupportedException("This method is not supported in threads.");
 
         string IChannel.Name => Name;
     }

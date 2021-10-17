@@ -53,6 +53,13 @@ namespace Discord
         /// </returns>
         string Content { get; }
         /// <summary>
+        ///     Gets the clean content for this message.
+        /// </summary>
+        /// <returns>
+        ///     A string that contains the body of the message stripped of mentions, markdown, emojis and pings; note that this field may be empty if there is an embed.
+        /// </returns>
+        string CleanContent { get; }
+        /// <summary>
         ///     Gets the time this message was sent.
         /// </summary>
         /// <returns>
@@ -187,7 +194,15 @@ namespace Discord
         ///     A message's flags, if any is associated.
         /// </returns>
         MessageFlags? Flags { get; }
-        
+
+        /// <summary>
+        ///     Gets the interaction this message is a response to.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="IMessageInteraction"/> if the message is a response to an interaction; otherwise <see langword="null"/>.
+        /// </returns>
+        IMessageInteraction Interaction { get; }
+
         /// <summary>
         ///     Adds a reaction to this message.
         /// </summary>

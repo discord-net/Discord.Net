@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
 using Model = Discord.API.ApplicationCommandInteractionData;
 
 namespace Discord.WebSocket

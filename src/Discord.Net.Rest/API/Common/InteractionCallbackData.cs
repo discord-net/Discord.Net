@@ -11,7 +11,7 @@ namespace Discord.API
         public Optional<string> Content { get; set; }
 
         [JsonProperty("embeds")]
-        public Optional<API.Embed[]> Embeds { get; set; }
+        public Optional<Embed[]> Embeds { get; set; }
 
         [JsonProperty("allowed_mentions")]
         public Optional<AllowedMentions> AllowedMentions { get; set; }
@@ -20,9 +20,9 @@ namespace Discord.API
         public Optional<MessageFlags> Flags { get; set; }
 
         [JsonProperty("components")]
-        public Optional<API.ActionRowComponent[]> Components { get; set; }
+        public Optional<ActionRowComponent[]> Components { get; set; }
 
         [JsonProperty("choices")]
-        public Optional<API.ApplicationCommandOptionChoice[]> Choices { get; set; }
+        public Optional<ApplicationCommandOptionChoice[]> Choices { get; set; }
     }
 }

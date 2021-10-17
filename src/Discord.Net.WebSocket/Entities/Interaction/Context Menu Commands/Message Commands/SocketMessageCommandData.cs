@@ -10,7 +10,7 @@ namespace Discord.WebSocket
     public class SocketMessageCommandData : SocketCommandBaseData
     {
         /// <summary>
-        ///     Gets the messagte associated with this message command.
+        ///     Gets the message associated with this message command.
         /// </summary>
         public SocketMessage Message
             => ResolvableData?.Messages.FirstOrDefault().Value;

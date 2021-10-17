@@ -51,7 +51,7 @@ namespace Discord.WebSocket
         ///     Provides access to a REST-only client with a shared state from this client.
         /// </summary>
         public override DiscordSocketRestClient Rest { get; }
-        /// <summary> Gets the shard of of this client. </summary>
+        /// <summary> Gets the shard of this client. </summary>
         public int ShardId { get; }
         /// <summary> Gets the current connection state of this client. </summary>
         public ConnectionState ConnectionState => _connection.State;
@@ -434,11 +434,11 @@ namespace Discord.WebSocket
 
         public async Task<SocketApplicationCommand> CreateGlobalApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null)
         {
-            var model = await InteractionHelper.CreateGlobalCommand(this, properties, options).ConfigureAwait(false);
+            var model = await InteractionHelper.CreateGlobalCommandAsync(this, properties, options).ConfigureAwait(false);
 
             var entity = State.GetOrAddCommand(model.Id, (id) => SocketApplicationCommand.Create(this, model));
 
-            //Update it incase it was cached
+            //Update it in case it was cached
             entity.Update(model);
 
             return entity;
@@ -446,7 +446,7 @@ namespace Discord.WebSocket
         public async Task<IReadOnlyCollection<SocketApplicationCommand>> BulkOverwriteGlobalApplicationCommandsAsync(
             ApplicationCommandProperties[] properties, RequestOptions options = null)
         {
-            var models = await InteractionHelper.BulkOverwriteGlobalCommands(this, properties, options);
+            var models = await InteractionHelper.BulkOverwriteGlobalCommandsAsync(this, properties, options);
 
             var entities = models.Select(x => SocketApplicationCommand.Create(this, x));
 
@@ -1522,7 +1522,7 @@ namespace Discord.WebSocket
                                     }
                                     else
                                     {
-                                        //Edited message isnt in cache, create a detached one
+                                        //Edited message isn't in cache, create a detached one
                                         SocketUser author;
                                         if (data.Author.IsSpecified)
                                         {
@@ -2124,6 +2124,9 @@ namespace Discord.WebSocket
                                                 break;
                                             case SocketMessageCommand messageCommand:
                                                 await TimedInvokeAsync(_messageCommandExecuted, nameof(MessageCommandExecuted), messageCommand).ConfigureAwait(false);
+                                                break;
+                                            case SocketAutocompleteInteraction autocomplete:
+                                                await TimedInvokeAsync(_autocompleteExecuted, nameof(AutocompleteExecuted), autocomplete).ConfigureAwait(false);
                                                 break;
                                         }
                                     }

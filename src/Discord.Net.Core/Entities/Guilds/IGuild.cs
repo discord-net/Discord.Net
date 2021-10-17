@@ -609,12 +609,12 @@ namespace Discord
         /// </returns>
         Task<ITextChannel> GetRulesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
-        ///     Gets the text channel channel where admins and moderators of Community guilds receive notices from Discord.
+        ///     Gets the text channel where admins and moderators of Community guilds receive notices from Discord.
         /// </summary>
         /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains the text channel channel where
+        ///     A task that represents the asynchronous get operation. The task result contains the text channel where
         ///     admins and moderators of Community guilds receive notices from Discord; <see langword="null" /> if none is set.
         /// </returns>
         Task<ITextChannel> GetPublicUpdatesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
@@ -771,7 +771,7 @@ namespace Discord
         /// <returns>A guild user associated with the specified <paramref name="userId" />; <see langword="null" /> if the user is already in the guild.</returns>
         Task<IGuildUser> AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func = null, RequestOptions options = null);
         /// <summary>
-        /// Disconnects the user from its current voice channel.
+        ///     Disconnects the user from its current voice channel.
         /// </summary>
         /// <param name="user">The user to disconnect.</param>
         /// <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
@@ -834,7 +834,7 @@ namespace Discord
         ///     Downloads all users for this guild if the current list is incomplete.
         /// </summary>
         /// <remarks>
-        ///     This method downloads all users found within this guild throught the Gateway and caches them.
+        ///     This method downloads all users found within this guild through the Gateway and caches them.
         /// </remarks>
         /// <returns>
         ///     A task that represents the asynchronous download operation.
@@ -1057,7 +1057,7 @@ namespace Discord
         ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
         ///     of application commands found within the guild.
         /// </returns>
-        Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync (RequestOptions options = null);
+        Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync(RequestOptions options = null);
 
         /// <summary>
         ///     Gets an application command within this guild with the specified id.
