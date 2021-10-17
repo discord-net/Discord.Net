@@ -1,5 +1,5 @@
 ECHO clone docs-static
-git clone git@github.com:discord-net/docs-static.git || EXIT /B 1
+git clone git@github.com:Discord-Net-Labs/docs.git || EXIT /B 1
 
 ECHO remove old 'latest'
 ECHO Y | RMDIR /S docs-static\latest || EXIT /B 1
