@@ -2,7 +2,7 @@ steps:
   - task: InstallSSHKey@0
     displayName: Install deploy key for docs
     inputs:
-      knownHostsEntry: X2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ== robot@discord-net-labs
+      knownHostsEntry: "|1|gFD+Dvd+09xvjlKReWSg3wE7q1A=|WJnD0RZ5H4HX5U0nA4Kt+R5yf+w= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ=="
       sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCzSnLkKn1QxQC0E5Hu3YPaAy5aPCHi2CHtgqBLQglj9Wr1MGCXKerNwVJm5HkXt3/mSxn2TjtIXidcGkankZQASMLFp76Ze8brUxEBSNepfmb4+wpjaZH45hujjBHhhq5ihXxrS9NbjhP2KKhwYS0PxWEdD9otOciidQZc8sD05ynZeaiufUzeiKilKXaGiinwrZl/RcJ6Nhxdp4BJ9OuQoX+FhD8wrRpx4CHFO9s6rSoVnm5yZ6CkQrgqfXPBX3nL18uSdF34EBeIt7xgyuoKF2NtRyGI3nCxIvNiqtp0wewMjHC9MPQn4Qd7IX6OlkItRbE6+3zcZdw/mJEW8qzQJukbGmtQ2hfMT0f4CCuSg9zQaRvZ2+5C2J0DHogKJPhcx3KdN0jaGXoeQQVWAnDI4kuHVfeZNQV+WQCTbBurMTqlIOk6bq7mu6lyMNVGDAZ6X8Pm+J/aVzzOR5DIZ+8n8Kkwu6UPGD9TFZ2CF+lDnjcSimk5VKRR4iMAu+5a4IU= robot@discord-net-labs
       sshKeySecureFile: docs-static_rsa
 
