@@ -10,7 +10,7 @@ steps:
     displayName: Install DocFx
     inputs:
       command: custom
-      arguments: install docfx.console -ExcludeVersion
+      arguments: install docfx.console -Version 2.57.0
 
   - script: azure/docs.bat
     displayName: Build and deploy docs
