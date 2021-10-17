@@ -38,11 +38,6 @@ namespace Discord
         int Version { get; }
 
         /// <summary>
-        ///     Gets the time that the interaction was received.
-        /// </summary>
-        DateTimeOffset ReceivedAt { get; }
-
-        /// <summary>
         ///     Responds to an Interaction with type <see cref="InteractionResponseType.ChannelMessageWithSource"/>.
         /// </summary>
         /// <param name="text">The text of the message to be sent.</param>
