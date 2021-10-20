@@ -24,7 +24,8 @@ namespace Discord.Rest
                 Hoist = args.Hoist,
                 Mentionable = args.Mentionable,
                 Name = args.Name,
-                Permissions = args.Permissions.IsSpecified ? args.Permissions.Value.RawValue.ToString() : Optional.Create<string>()
+                Permissions = args.Permissions.IsSpecified ? args.Permissions.Value.RawValue.ToString() : Optional.Create<string>(),
+                Icon = args.Icon.IsSpecified ? args.Icon.Value.ToModel() : Optional<API.Image>.Unspecified
             };
             var model = await client.ApiClient.ModifyGuildRoleAsync(role.Guild.Id, role.Id, apiArgs, options).ConfigureAwait(false);
 
