@@ -11,7 +11,7 @@
     <img src="https://img.shields.io/myget/discord-net-labs/vpre/Discord.Net.Labs.svg" alt="MyGet">
   </a>
   <a href="https://dev.azure.com/Discord-Net-Labs/Discord-Net-Labs/_build/latest?definitionId=1&amp;branchName=release%2F3.x">
-    <img src="https://dev.azure.com/Discord-Net-Labs/Discord-Net-Labs/_apis/build/status/discord-net.Discord.Net?branchName=dev" alt="Build Status">
+    <img src="https://dev.azure.com/Discord-Net-Labs/Discord-Net-Labs/_apis/build/status/Discord-Net-Labs.Discord.Net-Labs?branchName=release%2F3.x" alt="Build Status">
   </a>
   <a href="https://discord.gg/dvSfUTet3K">
     <img src="https://discord.com/api/guilds/848176216011046962/widget.png" alt="Discord">
