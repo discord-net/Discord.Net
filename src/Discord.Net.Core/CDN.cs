@@ -47,6 +47,14 @@ namespace Discord
             return $"{DiscordConfig.CDNUrl}avatars/{userId}/{avatarId}.{extension}?size={size}";
         }
 
+        public static string GetGuildUserAvatarUrl(ulong userId, ulong guildId, string avatarId, ushort size, ImageFormat format)
+        {
+            if (avatarId == null)
+                return null;
+            string extension = FormatToExtension(format, avatarId);
+            return $"{DiscordConfig.CDNUrl}guilds/{guildId}/users/{userId}/avatars/{avatarId}.{extension}?size={size}";
+        }
+
         /// <summary>
         ///     Returns a user banner URL.
         /// </summary>

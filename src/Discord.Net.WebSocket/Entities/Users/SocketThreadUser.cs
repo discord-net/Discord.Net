@@ -52,6 +52,9 @@ namespace Discord.WebSocket
             get => GuildUser.AvatarId;
             internal set => GuildUser.AvatarId = value;
         }
+        /// <inheritdoc/>
+        public string GuildAvatarId
+            => GuildUser.GuildAvatarId;
 
         /// <inheritdoc/>
         public override string BannerId
@@ -204,6 +207,8 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         IReadOnlyCollection<ulong> IGuildUser.RoleIds => GuildUser.Roles.Select(x => x.Id).ToImmutableArray();
+
+        string IGuildUser.GetGuildAvatarUrl(ImageFormat format, ushort size) => GuildUser.GetGuildAvatarUrl(format, size);
 
         internal override SocketGlobalUser GlobalUser => GuildUser.GlobalUser;
 
