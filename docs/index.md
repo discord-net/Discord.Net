@@ -19,9 +19,29 @@ Discord.Net Labs is an experimental fork of Discord.Net that implements the newe
 
 ## Where to begin?
 
-If this is your first time using Discord.Net, you should refer to the
-[Intro](xref:Guides.Introduction) for tutorials.
+If you are new to Discord.NET in general, you should refer their 
+[Documentation](https://docs.stillu.cc/) for guides & examples.
+
+Is this your first time using Labs, but you are already familiar with Discord.NET? 
+Refer to our [Guides](xref:Guides.Introduction)
+
+### Slashcommands:
+
+Examples on how slashcommands are created, handled & responded to is found
+[Here](xref:Guides.SlashCommands.Intro)
+
+### User & Message commands:
+
+Creating User & Message commands is found 
+[Here](xref:Guides.ContextCommands.Creating), 
+interacting with them is covered 
+[Here](xref:Guides.ContextCommands.Reveiving).
+
+### Message components
+
+Handling & creating message components such as buttons & dropdown menu's is found [Here](xref:Guides.MessageComponents.GettingStarted)
 
 More experienced users might want to refer to the
 [API Documentation](xref:API.Docs) for a breakdown of the individual
 objects in the library.
+
