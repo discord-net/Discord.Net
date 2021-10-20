@@ -1,4 +1,14 @@
 # Changelog
+## [3.1.7] - 10/20/2021
+### Added
+- Added `Icon` property when modifying roles.
+- Added `GuildAvatar` and `GetGuildAvatarUrl` to `IGuildUser`.
+
+### Fixed
+- Fixed `InvalidOperationException` in modify guild channel.
+
+### Misc
+- Revert received at time, confirmed by discord staff to be accurate
 
 ## [3.1.4 - 3.1.6] - 10/12/2021
 
@@ -169,7 +179,7 @@
 
 - Fixed `GetOriginalResponseAsync` using wrong http method and route.
 
-# [2.4.4] - 7/7/2021
+## [2.4.4] - 7/7/2021
 
 - Added comment and parsing for `Mentionable` application option type.
 - Added another `AddOption` method to SlashCommandOptionBuilder.
