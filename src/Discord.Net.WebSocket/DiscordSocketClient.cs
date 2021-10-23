@@ -1004,6 +1004,14 @@ namespace Discord.WebSocket
                                     }
                                 }
                                 break;
+                            case "GUILD_JOIN_REQUEST_DELETE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_JOIN_REQUEST_DELETE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<GuildJoinRequestDeleteEvent>(_serializer);
+                                    await TimedInvokeAsync(_guildJoinRequestDeletedEvent, nameof(GuildJoinRequestDeleted), data.UserId, data.GuildId).ConfigureAwait(false);
+                                }
+                                break;
                             #endregion
 
                             #region Channels
