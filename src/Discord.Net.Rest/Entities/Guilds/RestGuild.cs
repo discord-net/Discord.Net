@@ -102,7 +102,7 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string DiscoverySplashUrl => CDN.GetGuildDiscoverySplashUrl(Id, DiscoverySplashId);
         /// <inheritdoc />
-        public string BannerUrl => CDN.GetGuildBannerUrl(Id, BannerId);
+        public string BannerUrl => CDN.GetGuildBannerUrl(Id, BannerId, ImageFormat.Auto);
 
         /// <summary>
         ///     Gets the built-in role containing all users in this guild.

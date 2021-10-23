@@ -139,15 +139,17 @@ namespace Discord
         /// </summary>
         /// <param name="guildId">The guild snowflake identifier.</param>
         /// <param name="bannerId">The banner image identifier.</param>
+        /// <param name="format">The format to return.</param>
         /// <param name="size">The size of the image to return in horizontal pixels. This can be any power of two between 16 and 2048 inclusive.</param>
         /// <returns>
         ///     A URL pointing to the guild's banner image.
         /// </returns>
-        public static string GetGuildBannerUrl(ulong guildId, string bannerId, ushort? size = null)
+        public static string GetGuildBannerUrl(ulong guildId, string bannerId, ImageFormat format, ushort? size = null)
         {
-            if (!string.IsNullOrEmpty(bannerId))
-                return $"{DiscordConfig.CDNUrl}banners/{guildId}/{bannerId}.jpg" + (size.HasValue ? $"?size={size}" : string.Empty);
-            return null;
+	        if (string.IsNullOrEmpty(bannerId))
+		        return null;
+	        string extension = FormatToExtension(format, bannerId);
+	        return $"{DiscordConfig.CDNUrl}banners/{guildId}/{bannerId}.{extension}" + (size.HasValue ? $"?size={size}" : string.Empty);
         }
         /// <summary>
         ///     Returns an emoji URL.
