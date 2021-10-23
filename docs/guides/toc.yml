@@ -1,40 +1,5 @@
 - name: Introduction
   topicUid: Guides.Introduction
-- name: Getting Started
-  items:
-    - name: Installation
-      topicUid: Guides.GettingStarted.Installation
-      items:
-        - name: Nightly Builds
-          topicUid: Guides.GettingStarted.Installation.Nightlies
-    - name: Your First Bot
-      topicUid: Guides.GettingStarted.FirstBot
-    - name: Terminology
-      topicUid: Guides.GettingStarted.Terminology
-- name: Basic Concepts
-  items:
-    - name: Logging Data
-      topicUid: Guides.Concepts.Logging
-    - name: Working with Events
-      topicUid: Guides.Concepts.Events
-    - name: Managing Connections
-      topicUid: Guides.Concepts.ManageConnections
-    - name: Entities
-      topicUid: Guides.Concepts.Entities
-- name: Working with Commands
-  items:
-    - name: Introduction
-      topicUid: Guides.Commands.Intro
-    - name: TypeReaders
-      topicUid: Guides.Commands.TypeReaders
-    - name: Named Arguments
-      topicUid: Guides.Commands.NamedArguments
-    - name: Preconditions
-      topicUid: Guides.Commands.Preconditions
-    - name: Dependency Injection
-      topicUid: Guides.Commands.DI
-    - name: Post-execution Handling
-      topicUid: Guides.Commands.PostExecution
 - name: Working with Slash commands
   items:
     - name: Introduction
@@ -51,7 +16,7 @@
       topicUid: Guides.SlashCommands.SubCommand
     - name: Slash command choices
       topicUid: Guides.SlashCommands.Choices
-    - name: Slash ommands Bulk Overwrites
+    - name: Slash commands Bulk Overwrites
       topicUid: Guides.SlashCommands.BulkOverwrite
 - name: Working with Context commands
   items:
@@ -71,9 +36,3 @@
       topicUid: Guides.MessageComponents.SelectMenus
     - name: Advanced Concepts
       topicUid: Guides.MessageComponents.Advanced
-- name: Emoji
-  topicUid: Guides.Emoji
-- name: Voice
-  topicUid: Guides.Voice.SendingVoice
-- name: Deployment
-  topicUid: Guides.Deployment
