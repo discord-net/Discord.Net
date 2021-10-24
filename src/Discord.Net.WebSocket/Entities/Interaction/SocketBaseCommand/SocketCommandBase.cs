@@ -178,8 +178,8 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public override async Task<RestFollowupMessage> FollowupWithFileAsync(
             Stream fileStream,
+            string fileName,
             string text = null,
-            string fileName = null,
             Embed[] embeds = null,
             bool isTTS = false,
             bool ephemeral = false,
