@@ -336,12 +336,12 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<SocketGuild, SocketGuild, Task>> _guildUpdatedEvent = new AsyncEvent<Func<SocketGuild, SocketGuild, Task>>();
         /// <summary>Fired when a user leaves without agreeing to the member screening </summary>
-        public event Func<ulong, ulong, Task> GuildJoinRequestDeleted
+        public event Func<Cacheable<SocketGuildUser, ulong>, SocketGuild, Task> GuildJoinRequestDeleted
         {
             add { _guildJoinRequestDeletedEvent.Add(value); }
             remove { _guildJoinRequestDeletedEvent.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<ulong, ulong, Task>> _guildJoinRequestDeletedEvent = new AsyncEvent<Func<ulong, ulong, Task>>();
+        internal readonly AsyncEvent<Func<Cacheable<SocketGuildUser, ulong>, SocketGuild, Task>> _guildJoinRequestDeletedEvent = new AsyncEvent<Func<Cacheable<SocketGuildUser, ulong>, SocketGuild, Task>>();
         #endregion
 
         #region Users
