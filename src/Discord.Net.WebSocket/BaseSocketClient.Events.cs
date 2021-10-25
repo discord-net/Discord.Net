@@ -335,6 +335,13 @@ namespace Discord.WebSocket
             remove { _guildUpdatedEvent.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketGuild, SocketGuild, Task>> _guildUpdatedEvent = new AsyncEvent<Func<SocketGuild, SocketGuild, Task>>();
+        /// <summary>Fired when a user leaves without agreeing to the member screening </summary>
+        public event Func<ulong, ulong, Task> GuildJoinRequestDeleted
+        {
+            add { _guildJoinRequestDeletedEvent.Add(value); }
+            remove { _guildJoinRequestDeletedEvent.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<ulong, ulong, Task>> _guildJoinRequestDeletedEvent = new AsyncEvent<Func<ulong, ulong, Task>>();
         #endregion
 
         #region Users

@@ -35,10 +35,10 @@
       topicUid: Guides.Commands.DI
     - name: Post-execution Handling
       topicUid: Guides.Commands.PostExecution
-- name: Working with Interactions
+- name: Working with Slash commands
   items:
     - name: Introduction
-      topicUid: Guides.Interactions.Intro
+      topicUid: Guides.SlashCommands.Intro
     - name: Creating slash commands
       topicUid: Guides.SlashCommands.Creating
     - name: Receiving and responding to slash commands
@@ -51,8 +51,26 @@
       topicUid: Guides.SlashCommands.SubCommand
     - name: Slash command choices
       topicUid: Guides.SlashCommands.Choices
-    - name: Slash ommands Bulk Overwrites
+    - name: Slash commands Bulk Overwrites
       topicUid: Guides.SlashCommands.BulkOverwrite
+- name: Working with Context commands
+  items:
+    - name: Creating Context Commands
+      topicUid: Guides.ContextCommands.Creating
+    - name: Receiving Context Commands
+      topicUid: Guides.ContextCommands.Reveiving
+- name: Working with Message Components
+  items:
+    - name: Getting started
+      topicUid: Guides.MessageComponents.GettingStarted
+    - name: Responding to Components
+      topicUid: Guides.MessageComponents.Responding
+    - name: Buttons in depth
+      topicUid: Guides.MessageComponents.Buttons
+    - name: Select menus
+      topicUid: Guides.MessageComponents.SelectMenus
+    - name: Advanced Concepts
+      topicUid: Guides.MessageComponents.Advanced
 - name: Emoji
   topicUid: Guides.Emoji
 - name: Voice

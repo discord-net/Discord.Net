@@ -86,7 +86,7 @@ public async Task Client_Ready()
                 .WithName("set")
                 .WithDescription("Sets the field A")
                 .WithType(ApplicationCommandOptionType.SubCommand)
-                .AddOption("value", ApplicationCommandOptionType.String, "the value to set the field    ", required: true)
+                .AddOption("value", ApplicationCommandOptionType.String, "the value to set the field", isRequired: true)
             ).AddOption(new SlashCommandOptionBuilder()
                 .WithName("get")
                 .WithDescription("Gets the value of field A.")
@@ -100,7 +100,7 @@ public async Task Client_Ready()
                 .WithName("set")
                 .WithDescription("Sets the field B")
                 .WithType(ApplicationCommandOptionType.SubCommand)
-                .AddOption("value", ApplicationCommandOptionType.Integer, "the value to set the fie to.", required: true)
+                .AddOption("value", ApplicationCommandOptionType.Integer, "the value to set the fie to.", isRequired: true)
             ).AddOption(new SlashCommandOptionBuilder()
                 .WithName("get")
                 .WithDescription("Gets the value of field B.")
@@ -114,7 +114,7 @@ public async Task Client_Ready()
                 .WithName("set")
                 .WithDescription("Sets the field C")
                 .WithType(ApplicationCommandOptionType.SubCommand)
-                .AddOption("value", ApplicationCommandOptionType.Boolean, "the value to set the fie to.", required: true)
+                .AddOption("value", ApplicationCommandOptionType.Boolean, "the value to set the fie to.", isRequired: true)
             ).AddOption(new SlashCommandOptionBuilder()
                 .WithName("get")
                 .WithDescription("Gets the value of field C.")
@@ -140,20 +140,17 @@ All that code generates a command that looks like this:
 Now that we have our command made, we need to handle the multiple options with this command. So lets add this into our handler:
 
 ```cs
-private async Task Client_InteractionCreated(SocketInteraction arg)
+private async Task SlashCommandHandler(SocketSlashCommand command)
 {
-    if(arg is SocketSlashCommand command)
+    // Let's add a switch statement for the command name so we can handle multiple commands in one event.
+    switch(command.Data.Name)
     {
-        // Let's add a switch statement for the command name so we can handle multiple commands in one event.
-        switch(command.Data.Name)
-        {
-            case "list-roles":
-                await HandleListRoleCommand(command);
-                break;
-            case "settings":
-                await HandleSettingsCommand(command);
-                break;
-        }
+        case "list-roles":
+            await HandleListRoleCommand(command);
+            break;
+        case "settings":
+            await HandleSettingsCommand(command);
+            break;
     }
 }
 

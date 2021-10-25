@@ -60,13 +60,11 @@ namespace Discord.WebSocket
         {
             var options = new List<AutocompleteOption>();
 
+            options.Add(new AutocompleteOption(model.Type, model.Name, model.Value.GetValueOrDefault(null), model.Focused.GetValueOrDefault(false)));
+
             if (model.Options.IsSpecified)
             {
                 options.AddRange(model.Options.Value.SelectMany(GetOptions));
-            }
-            else if(model.Focused.IsSpecified)
-            {
-                options.Add(new AutocompleteOption(model.Type, model.Name, model.Value.GetValueOrDefault(null), model.Focused.Value));
             }
 
             return options;

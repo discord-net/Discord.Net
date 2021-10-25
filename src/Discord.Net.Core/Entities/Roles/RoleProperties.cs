@@ -50,6 +50,11 @@ namespace Discord
         ///     This value may not be set if the role is an @everyone role.
         /// </remarks>
         public Optional<bool> Hoist { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the icon of the role.
+        /// </summary>
+        public Optional<Image> Icon { get; set; }
         /// <summary>
         ///     Gets or sets whether or not this role can be mentioned.
         /// </summary>

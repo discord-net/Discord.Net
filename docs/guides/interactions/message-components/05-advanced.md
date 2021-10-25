@@ -1,3 +1,8 @@
+---
+uid: Guides.MessageComponents.Advanced
+title: Advanced Concepts
+---
+
 # Advanced
 
 Lets say you have some components on an ephemeral slash command, and you want to modify the message that the button is on. The issue with this is that ephemeral messages are not stored and can not be get via rest or other means.
@@ -45,31 +50,38 @@ break;
 Now, let's listen to the select menu executed event and add a case for `select-1`
 
 ```cs
-switch (arg.Data.CustomId)
+client.SelectMenuExecuted += SelectMenuHandler;
+
+...
+
+public async Task SelectMenuHandler(SocketMessageComponent arg)
 {
-    case "select-1":
-        var value = arg.Data.Values.First();
-        var menu = new SelectMenuBuilder()
-        {
-            CustomId = "select-1",
-            Placeholder = $"{(arg.Message.Components.First().Components.First() as SelectMenu).Options.FirstOrDefault(x => x.Value == value).Label}",
-            MaxValues = 1,
-            MinValues = 1,
-            Disabled = true
-        };
-
-        menu.AddOption("Meh", "1", "Its not gaming.")
-            .AddOption("Ish", "2", "Some would say that this is gaming.")
-            .AddOption("Moderate", "3", "It could pass as gaming")
-            .AddOption("Confirmed", "4", "We are gaming")
-            .AddOption("Excellent", "5", "It is renowned as gaming nation wide", new Emoji("🔥"));
-
-        // We use UpdateAsync to update the message and its original content and components.
-        await arg.UpdateAsync(x =>
-        {
-            x.Content = $"Thank you {arg.User.Mention} for rating us {value}/5 on the gaming scale";
-            x.Components = new ComponentBuilder().WithSelectMenu(menu).Build();
-        });
-    break;
+    switch (arg.Data.CustomId)
+    {
+        case "select-1":
+            var value = arg.Data.Values.First();
+            var menu = new SelectMenuBuilder()
+            {
+                CustomId = "select-1",
+                Placeholder = $"{(arg.Message.Components.First().Components.First() as SelectMenu).Options.FirstOrDefault(x => x.Value == value).Label}",
+                MaxValues = 1,
+                MinValues = 1,
+                Disabled = true
+            };
+    
+            menu.AddOption("Meh", "1", "Its not gaming.")
+                .AddOption("Ish", "2", "Some would say that this is gaming.")
+                .AddOption("Moderate", "3", "It could pass as gaming")
+                .AddOption("Confirmed", "4", "We are gaming")
+                .AddOption("Excellent", "5", "It is renowned as gaming nation wide", new Emoji("🔥"));
+    
+            // We use UpdateAsync to update the message and its original content and components.
+            await arg.UpdateAsync(x =>
+            {
+                x.Content = $"Thank you {arg.User.Mention} for rating us {value}/5 on the gaming scale";
+                x.Components = new ComponentBuilder().WithSelectMenu(menu).Build();
+            });
+        break;
+    }
 }
 ```

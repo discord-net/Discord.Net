@@ -46,7 +46,7 @@ public async Task Client_Ready()
     var guildCommand = new SlashCommandBuilder()
         .WithName("list-roles")
         .WithDescription("Lists all roles of a user.")
-        .AddOption("user", ApplicationCommandOptionType.User, "The users whos roles you want to be listed", required: true);
+        .AddOption("user", ApplicationCommandOptionType.User, "The users whos roles you want to be listed", isRequired: true);
 
     try
     {
@@ -66,17 +66,14 @@ public async Task Client_Ready()
 That seems to be working, now Let's handle the interaction.
 
 ```cs
-private async Task Client_InteractionCreated(SocketInteraction arg)
+private async Task SlashCommandHandler(SocketSlashCommand command)
 {
-    if(arg is SocketSlashCommand command)
+    // Let's add a switch statement for the command name so we can handle multiple commands in one event.
+    switch(command.Data.Name)
     {
-        // Let's add a switch statement for the command name so we can handle multiple commands in one event.
-        switch(command.Data.Name)
-        {
-            case "list-roles":
-                await HandleListRoleCommand(command);
-                break;
-        }
+        case "list-roles":
+            await HandleListRoleCommand(command);
+            break;
     }
 }
 

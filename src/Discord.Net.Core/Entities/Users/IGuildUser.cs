@@ -25,6 +25,13 @@ namespace Discord
         /// </returns>
         string Nickname { get; }
         /// <summary>
+        ///     Gets the guild specific avatar for this users.
+        /// </summary>
+        /// <returns>
+        ///     The users guild avatar hash if they have one; otherwise <see langword="null"/>.
+        /// </returns>
+        string GuildAvatarId { get; }
+        /// <summary>
         ///     Gets the guild-level permissions for this user.
         /// </summary>
         /// <returns>
@@ -96,6 +103,20 @@ namespace Discord
         /// </returns>
         ChannelPermissions GetPermissions(IGuildChannel channel);
 
+        /// <summary>
+        ///     Gets the guild avatar URL for this user.
+        /// </summary>
+        /// <remarks>
+        ///     This property retrieves a URL for this guild user's guild specific avatar. In event that the user does not have a valid guild avatar
+        ///     (i.e. their avatar identifier is not set), this method will return <c>null</c>.
+        /// </remarks>
+        /// <param name="format">The format to return.</param>
+        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
+        /// </param>
+        /// <returns>
+        ///     A string representing the user's avatar URL; <c>null</c> if the user does not have an avatar in place.
+        /// </returns>
+        string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
         /// <summary>
         ///     Kicks this user from this guild.
         /// </summary>

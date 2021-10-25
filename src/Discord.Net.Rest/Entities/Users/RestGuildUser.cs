@@ -21,6 +21,8 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public string Nickname { get; private set; }
+        /// <inheritdoc/>
+        public string GuildAvatarId { get; private set; }
         internal IGuild Guild { get; private set; }
         /// <inheritdoc />
         public bool IsDeafened { get; private set; }
@@ -80,6 +82,8 @@ namespace Discord.Rest
                 _joinedAtTicks = model.JoinedAt.Value.UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
+            if (model.Avatar.IsSpecified)
+                GuildAvatarId = model.Avatar.Value;
             if (model.Deaf.IsSpecified)
                 IsDeafened = model.Deaf.Value;
             if (model.Mute.IsSpecified)
@@ -156,6 +160,9 @@ namespace Discord.Rest
             var guildPerms = GuildPermissions;
             return new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, guildPerms.RawValue));
         }
+
+        public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildUserAvatarUrl(Id, GuildId, GuildAvatarId, size, format);
 #endregion
 
         #region IGuildUser

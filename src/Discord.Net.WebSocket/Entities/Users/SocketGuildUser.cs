@@ -30,7 +30,8 @@ namespace Discord.WebSocket
         public SocketGuild Guild { get; }
         /// <inheritdoc />
         public string Nickname { get; private set; }
-
+        /// <inheritdoc/>
+        public string GuildAvatarId { get; private set; }
         /// <inheritdoc />
         public override bool IsBot { get { return GlobalUser.IsBot; } internal set { GlobalUser.IsBot = value; } }
         /// <inheritdoc />
@@ -154,6 +155,8 @@ namespace Discord.WebSocket
                 _joinedAtTicks = model.JoinedAt.Value.UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
+            if (model.Avatar.IsSpecified)
+                GuildAvatarId = model.Avatar.Value;
             if (model.Roles.IsSpecified)
                 UpdateRoles(model.Roles.Value);
             if (model.PremiumSince.IsSpecified)
@@ -218,6 +221,8 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public ChannelPermissions GetPermissions(IGuildChannel channel)
             => new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, GuildPermissions.RawValue));
+        public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildUserAvatarUrl(Id, Guild.Id, GuildAvatarId, size, format);
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Guild)";
         internal new SocketGuildUser Clone() => MemberwiseClone() as SocketGuildUser;

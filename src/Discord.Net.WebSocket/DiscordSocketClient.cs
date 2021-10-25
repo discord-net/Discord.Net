@@ -74,7 +74,7 @@ namespace Discord.WebSocket
         internal WebSocketProvider WebSocketProvider { get; private set; }
         internal bool AlwaysDownloadUsers { get; private set; }
         internal int? HandlerTimeout { get; private set; }
-        internal new DiscordSocketApiClient ApiClient => base.ApiClient as DiscordSocketApiClient;
+        internal new DiscordSocketApiClient ApiClient => base.ApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
         /// <inheritdoc/>
@@ -1002,6 +1002,14 @@ namespace Discord.WebSocket
                                             return;
                                         }
                                     }
+                                }
+                                break;
+                            case "GUILD_JOIN_REQUEST_DELETE":
+                                {
+                                    await _gatewayLogger.DebugAsync("Received Dispatch (GUILD_JOIN_REQUEST_DELETE)").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<GuildJoinRequestDeleteEvent>(_serializer);
+                                    await TimedInvokeAsync(_guildJoinRequestDeletedEvent, nameof(GuildJoinRequestDeleted), data.UserId, data.GuildId).ConfigureAwait(false);
                                 }
                                 break;
                             #endregion

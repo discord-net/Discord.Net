@@ -24,7 +24,8 @@ namespace Discord
         /// <summary> The channel is a private temporary thread channel under a text channel.  </summary>
         PrivateThread = 12,
         /// <summary> The channel is a stage voice channel. </summary>
-        Stage = 13
-
+        Stage = 13,
+        /// <summary> The channel is a guild directory used in hub servers. (Unreleased)</summary>
+        GuildDirectory = 14
     }
 }

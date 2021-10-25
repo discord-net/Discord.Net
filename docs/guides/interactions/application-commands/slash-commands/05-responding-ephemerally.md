@@ -7,7 +7,8 @@ title: Ephemeral Responses
 
 What is an ephemeral response? Basically, only the user who executed the command can see the result of it, this is pretty simple to implement.
 
-**Note**: You don't have to run arg.DeferAsync() to capture the interaction, you can use arg.RespondAsync() with a message to capture it, this also follows the ephemeral rule.
+> [!NOTE]
+> You don't have to run arg.DeferAsync() to capture the interaction, you can use arg.RespondAsync() with a message to capture it, this also follows the ephemeral rule.
 
 When responding with either `FollowupAsync` or `RespondAsync` you can pass in an `ephemeral` property. When setting it to true it will respond ephemerally, false and it will respond non-ephemerally.
 

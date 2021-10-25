@@ -1,3 +1,9 @@
+---
+uid: Guides.SlashCommands.Intro
+title: Introduction to slash commands
+---
+
+
 # Getting started with application commands.
 
 Welcome! This guide will show you how to use application commands.
@@ -22,4 +28,5 @@ Head over to your discord applications OAuth2 screen and make sure to select the
 
 From there you can then use the link to add your bot to a server.
 
-**Note**: In order for users in your guild to use your slash commands, they need to have the "Use Slash Command" permission on the guild.
+> [!NOTE]
+> In order for users in your guild to use your slash commands, they need to have the "Use Slash Command" permission on the guild. 

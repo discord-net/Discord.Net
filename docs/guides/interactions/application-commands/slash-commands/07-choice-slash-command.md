@@ -40,8 +40,8 @@ private async Task Client_Ready()
     }
 }
 ```
-
-> **Note:** Your `ApplicationCommandOptionType` specifies which type your choices are, you need to use `ApplicationCommandOptionType.Integer` if choices whos value are numbers and `ApplicationCommandOptionType.String` for string values.
+> [!NOTE]
+>  Your `ApplicationCommandOptionType` specifies which type your choices are, you need to use `ApplicationCommandOptionType.Integer` for choices whos values are whole numbers, `ApplicationCommandOptionType.Number` for choices whos values are doubles, and `ApplicationCommandOptionType.String` for string values.
 
 We have defined 5 choices for the user to pick from, each choice has a value assigned to it. The value can either be a string or an int. In our case we're going to use an int. This is what the command looks like:
 
@@ -50,23 +50,20 @@ We have defined 5 choices for the user to pick from, each choice has a value ass
 Lets add our code for handling the interaction.
 
 ```cs
-private async Task Client_InteractionCreated(SocketInteraction arg)
+private async Task SlashCommandHandler(SocketSlashCommand command)
 {
-    if(arg is SocketSlashCommand command)
+    // Let's add a switch statement for the command name so we can handle multiple commands in one event.
+    switch(command.Data.Name)
     {
-        // Let's add a switch statement for the command name so we can handle multiple commands in one event.
-        switch(command.Data.Name)
-        {
-            case "list-roles":
-                await HandleListRoleCommand(command);
-                break;
-            case "settings":
-                await HandleSettingsCommand(HandleFeedbackCommand);
-                break;
-            case "feedback":
-                await HandleFeedbackCommand(command);
-                break;
-        }
+        case "list-roles":
+            await HandleListRoleCommand(command);
+            break;
+        case "settings":
+            await HandleSettingsCommand(command);
+            break;
+        case "feedback":
+            await HandleFeedbackCommand(command);
+            break;
     }
 }
 

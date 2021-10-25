@@ -373,7 +373,9 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.AtLeast(args.Position, 0, nameof(args.Position));
             Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
-            Preconditions.LessThan(args.Name.Value.Length, 100, nameof(args.Name));
+
+            if(args.Name.IsSpecified)
+                Preconditions.LessThan(args.Name.Value.Length, 100, nameof(args.Name));
 
             options = RequestOptions.CreateOrClone(options);
 
