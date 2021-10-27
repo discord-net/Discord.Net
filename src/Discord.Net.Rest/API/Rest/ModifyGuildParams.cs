@@ -35,5 +35,7 @@ namespace Discord.API.Rest
         public Optional<SystemChannelMessageDeny> SystemChannelFlags { get; set; }
         [JsonProperty("preferred_locale")]
         public string PreferredLocale { get; set; }
+        [JsonProperty("premium_progress_bar_enabled")]
+        public Optional<bool> IsBoostProgressBarEnabled { get; set; }
     }
 }
