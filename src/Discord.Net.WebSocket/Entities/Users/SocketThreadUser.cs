@@ -57,20 +57,6 @@ namespace Discord.WebSocket
             => GuildUser.GuildAvatarId;
 
         /// <inheritdoc/>
-        public override string BannerId
-        {
-            get => GuildUser.BannerId;
-            internal set => GuildUser.BannerId = value;
-        }
-
-        /// <inheritdoc/>
-        public override Color? AccentColor
-        {
-            get => GuildUser.AccentColor;
-            internal set => GuildUser.AccentColor = value;
-        }
-
-        /// <inheritdoc/>
         public override ushort DiscriminatorValue
         {
             get => GuildUser.DiscriminatorValue;

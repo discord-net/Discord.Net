@@ -10,18 +10,7 @@ namespace Discord
         /// <summary>
         ///     Gets the identifier of this user's avatar.
         /// </summary>
-        string AvatarId { get; }
-        /// <summary>
-        ///     Gets the identifier of this user's banner.
-        /// </summary>
-        string BannerId { get; }
-        /// <summary>
-        ///     Gets the user's banner color.
-        /// </summary>
-        /// <returns>
-        ///     A <see cref="Color"/> struct representing the accent color of this user's banner.
-        /// </returns>
-        Color? AccentColor { get; }
+        string AvatarId { get; }     
         /// <summary>
         ///     Gets the avatar URL for this user.
         /// </summary>
@@ -45,16 +34,6 @@ namespace Discord
         ///     A string representing the user's avatar URL; <c>null</c> if the user does not have an avatar in place.
         /// </returns>
         string GetAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128);
-        /// <summary>
-        ///     Gets the banner URL for this user.
-        /// </summary>
-        /// <param name="format">The format to return.</param>
-        /// <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
-        /// </param>
-        /// <returns>
-        ///     A string representing the user's avatar URL; <c>null</c> if the user does not have an banner in place.
-        /// </returns>
-        string GetBannerUrl(ImageFormat format = ImageFormat.Auto, ushort size = 256);
         /// <summary>
         ///     Gets the default avatar URL for this user.
         /// </summary>
