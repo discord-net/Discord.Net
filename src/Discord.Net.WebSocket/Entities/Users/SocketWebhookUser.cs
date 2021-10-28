@@ -26,21 +26,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override string AvatarId { get; internal set; }
 
-        /// <inheritdoc />
-        /// <exception cref="NotSupportedException">Webhook users does not support banners.</exception>
-        public override string BannerId
-        {
-            get => throw new NotSupportedException("Webhook users does not support banners.");
-            internal set => throw new NotSupportedException("Webhook users does not support banners.");
-        }
-
-        /// <inheritdoc />
-        /// <exception cref="NotSupportedException">Webhook users does not support accent colors.</exception>
-        public override Color? AccentColor
-        {
-            get => throw new NotSupportedException("Webhook users does not support accent colors.");
-            internal set => throw new NotSupportedException("Webhook users does not support accent colors.");
-        }
 
         /// <inheritdoc />
         public override bool IsBot { get; internal set; }

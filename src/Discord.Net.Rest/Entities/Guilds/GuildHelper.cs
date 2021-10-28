@@ -36,7 +36,8 @@ namespace Discord.Rest
                 Banner = args.Banner.IsSpecified ? args.Banner.Value?.ToModel() : Optional.Create<ImageModel?>(),
                 VerificationLevel = args.VerificationLevel,
                 ExplicitContentFilter = args.ExplicitContentFilter,
-                SystemChannelFlags = args.SystemChannelFlags
+                SystemChannelFlags = args.SystemChannelFlags,
+                IsBoostProgressBarEnabled = args.IsBoostProgressBarEnabled
             };
 
             if (args.AfkChannel.IsSpecified)

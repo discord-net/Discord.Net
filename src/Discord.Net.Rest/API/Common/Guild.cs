@@ -81,5 +81,7 @@ namespace Discord.API
         public NsfwLevel NsfwLevel { get; set; }
         [JsonProperty("stickers")]
         public Sticker[] Stickers { get; set; }
+        [JsonProperty("premium_progress_bar_enabled")]
+        public Optional<bool> IsBoostProgressBarEnabled { get; set; }
     }
 }

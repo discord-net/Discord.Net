@@ -108,5 +108,9 @@ namespace Discord
         ///     the value of <see cref="PreferredCulture"/> will be unused.
         /// </remarks>
         public Optional<CultureInfo> PreferredCulture { get; set; }
+        /// <summary>
+        ///     Gets or sets if the boost progress bar is enabled.
+        /// </summary>
+        public Optional<bool> IsBoostProgressBarEnabled { get; set; }
     }
 }
