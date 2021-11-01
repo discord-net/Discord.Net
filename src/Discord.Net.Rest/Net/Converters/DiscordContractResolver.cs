@@ -87,6 +87,8 @@ namespace Discord.Net.Converters
                 return MessageComponentConverter.Instance;
             if (type == typeof(API.Interaction))
                 return InteractionConverter.Instance;
+            if (type == typeof(GuildFeatures))
+                return GuildFeaturesConverter.Instance;
 
             //Entities
             var typeInfo = type.GetTypeInfo();

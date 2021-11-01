@@ -572,6 +572,8 @@ namespace Discord.WebSocket
         {
             if (ConnectionState == ConnectionState.Connected)
             {
+                EnsureGatewayIntent(GatewayIntents.GuildMembers);
+
                 //Race condition leads to guilds being requested twice, probably okay
                 await ProcessUserDownloadsAsync(guilds.Select(x => GetGuild(x.Id)).Where(x => x != null)).ConfigureAwait(false);
             }
@@ -2715,6 +2717,18 @@ namespace Discord.WebSocket
             State.PurgeDMChannels();
             foreach (var channel in channels)
                 channel.Recipient.GlobalUser.RemoveRef(this);
+        }
+
+        internal void EnsureGatewayIntent(GatewayIntents intents)
+        {
+            if (!_gatewayIntents.HasFlag(intents))
+            {
+                var vals = Enum.GetValues(typeof(GatewayIntents)).Cast<GatewayIntents>();
+
+                var missingValues = vals.Where(x => intents.HasFlag(x) && !_gatewayIntents.HasFlag(x));
+
+                throw new InvalidOperationException($"Missing required gateway intent{(missingValues.Count() > 1 ? "s" : "")} {string.Join(", ", missingValues.Select(x => x.ToString()))} in order to execute this operation.");
+            }
         }
 
         private async Task GuildAvailableAsync(SocketGuild guild)

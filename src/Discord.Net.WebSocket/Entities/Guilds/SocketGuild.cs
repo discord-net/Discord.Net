@@ -42,7 +42,6 @@ namespace Discord.WebSocket
         private ConcurrentDictionary<ulong, SocketCustomSticker> _stickers;
         private ImmutableArray<GuildEmote> _emotes;
 
-        private ImmutableArray<string> _features;
         private AudioClient _audioClient;
 #pragma warning restore IDISP002, IDISP006
 
@@ -129,6 +128,8 @@ namespace Discord.WebSocket
         public CultureInfo PreferredCulture { get; private set; }
         /// <inheritdoc />
         public bool IsBoostProgressBarEnabled { get; private set; }
+        /// <inheritdoc />
+        public GuildFeatures Features { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -333,8 +334,6 @@ namespace Discord.WebSocket
         /// </summary>
         public IReadOnlyCollection<SocketCustomSticker> Stickers
             => _stickers.Select(x => x.Value).ToImmutableArray();
-        /// <inheritdoc />
-        public IReadOnlyCollection<string> Features => _features;
         /// <summary>
         ///     Gets a collection of users in this guild.
         /// </summary>
@@ -370,7 +369,6 @@ namespace Discord.WebSocket
         {
             _audioLock = new SemaphoreSlim(1, 1);
             _emotes = ImmutableArray.Create<GuildEmote>();
-            _features = ImmutableArray.Create<string>();
         }
         internal static SocketGuild Create(DiscordSocketClient discord, ClientState state, ExtendedModel model)
         {
@@ -508,10 +506,7 @@ namespace Discord.WebSocket
             else
                 _emotes = ImmutableArray.Create<GuildEmote>();
 
-            if (model.Features != null)
-                _features = model.Features.ToImmutableArray();
-            else
-                _features = ImmutableArray.Create<string>();
+            Features = model.Features;
 
             var roles = new ConcurrentDictionary<ulong, SocketRole>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Roles.Length * 1.05));
             if (model.Roles != null)

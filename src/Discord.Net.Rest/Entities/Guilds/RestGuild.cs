@@ -22,7 +22,6 @@ namespace Discord.Rest
         private ImmutableDictionary<ulong, RestRole> _roles;
         private ImmutableArray<GuildEmote> _emotes;
         private ImmutableArray<CustomSticker> _stickers;
-        private ImmutableArray<string> _features;
 
         /// <inheritdoc />
         public string Name { get; private set; }
@@ -90,9 +89,10 @@ namespace Discord.Rest
         public NsfwLevel NsfwLevel { get; private set; }
         /// <inheritdoc />
         public bool IsBoostProgressBarEnabled { get; private set; }
-
         /// <inheritdoc />
         public CultureInfo PreferredCulture { get; private set; }
+        /// <inheritdoc />
+        public GuildFeatures Features { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -118,8 +118,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         public IReadOnlyCollection<GuildEmote> Emotes => _emotes;
         public IReadOnlyCollection<CustomSticker> Stickers => _stickers;
-        /// <inheritdoc />
-        public IReadOnlyCollection<string> Features => _features;
 
         internal RestGuild(BaseDiscordClient client, ulong id)
             : base(client, id)
@@ -185,10 +183,7 @@ namespace Discord.Rest
             else
                 _emotes = ImmutableArray.Create<GuildEmote>();
 
-            if (model.Features != null)
-                _features = model.Features.ToImmutableArray();
-            else
-                _features = ImmutableArray.Create<string>();
+            Features = model.Features;
 
             var roles = ImmutableDictionary.CreateBuilder<ulong, RestRole>();
             if (model.Roles != null)

@@ -35,7 +35,7 @@ namespace Discord.API
         [JsonProperty("emojis")]
         public Emoji[] Emojis { get; set; }
         [JsonProperty("features")]
-        public string[] Features { get; set; }
+        public GuildFeatures Features { get; set; }
         [JsonProperty("mfa_level")]
         public MfaLevel MfaLevel { get; set; }
         [JsonProperty("application_id")]
