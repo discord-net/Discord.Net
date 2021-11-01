@@ -37,14 +37,14 @@ namespace Discord
         /// <summary>
         ///     Indicates that a user is playing an activity in a voice channel with friends.
         /// </summary>
-        PARTY_PRIVACY_FRIENDS = 0b1000000,
+        PartyPrivacyFriends = 0b1000000,
         /// <summary>
         ///     Indicates that a user is playing an activity in a voice channel.
         /// </summary>
-        PARTY_PRIVACY_VOICE_CHANNEL = 0b10000000,
+        PartyPrivacyVoiceChannel = 0b10000000,
         /// <summary>
         ///     Indicates that a user is playing an activity in a voice channel.
         /// </summary>
-        EMBEDDED = 0b10000000
+        Embedded = 0b10000000
     }
 }
