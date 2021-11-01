@@ -3,9 +3,8 @@
   <PropertyGroup>
     <AssemblyName>Discord.Net.Providers.WS4Net</AssemblyName>
     <RootNamespace>Discord.Providers.WS4Net</RootNamespace>
-    <Description>An optional WebSocket client provider for Discord.Net Labs using WebSocket4Net</Description>
+    <Description>An optional WebSocket client provider for Discord.Net using WebSocket4Net</Description>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageId>Discord.Net.Labs.Providers.WS4Net</PackageId>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
