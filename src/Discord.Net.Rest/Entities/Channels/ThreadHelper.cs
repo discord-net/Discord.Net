@@ -63,6 +63,10 @@ namespace Discord.Rest
         }
 
         public static async Task<RestThreadUser> GetUserAsync(ulong userId, IThreadChannel channel, BaseDiscordClient client, RequestOptions options = null)
-            => (await GetUsersAsync(channel, client, options).ConfigureAwait(false)).FirstOrDefault(x => x.Id == userId);
+        {
+            var model = await client.ApiClient.GetThreadMemberAsync(channel.Id, userId, options).ConfigureAwait(false);
+
+            return RestThreadUser.Create(client, channel.Guild, model, channel);
+        }
     }
 }
