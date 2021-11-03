@@ -79,6 +79,8 @@ public async Task Client_Ready()
 
         // With global commands we dont need the guild.
         await client.CreateGlobalApplicationCommandAsync(globalCommand.Build());
+        // Using the ready event is a simple implementation for the sake of the example. Suitable for testing and development.
+        // For a production bot, it is recommended to only run the CreateGlobalApplicationCommandAsync() once for each command.
     }
     catch(ApplicationCommandException exception)
     {
@@ -93,4 +95,4 @@ public async Task Client_Ready()
 ```
 
 > [!NOTE]
-> Slash commands only need to be created once. They do _not_ have to be 'created' on every startup or connection. The example simple shows creating them in the ready event as it's simpler than creating normal bot commands to register slash commands.
+> Slash commands only need to be created once. They do _not_ have to be 'created' on every startup or connection. The example simple shows creating them in the ready event as it's simpler than creating normal bot commands to register slash commands. The global commands take up to an hour to register every time the CreateGlobalApplicationCommandAsync() is called for a given command.
