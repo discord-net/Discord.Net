@@ -34,8 +34,8 @@ namespace Discord
             get => _value;
             set
             {
-                if (value != null && value is not int && value is not string)
-                    throw new ArgumentException("The value of a choice must be a string or int!");
+                if (value != null && value is not string && !value.IsNumericType())
+                    throw new ArgumentException("The value of a choice must be a string or a numeric type!");
                 _value = value;
             }
         }
