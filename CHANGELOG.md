@@ -15,6 +15,8 @@
 - Added support Guild Boost Progress Bars
 - Added missing values to SystemChannelMessageDeny.
 - Added state checking to ConnectionManager.StartAsync
+- Added `SendFilesAsync` to channels.
+- Added `Attachments` property to `MessageProperties`
 
 ### Fixed
 
