@@ -1,13 +1,46 @@
 # Changelog
-## [3.1.7] - 10/20/2021
+
+## [3.2.0] - 11/09/2021
+
 ### Added
+
+- Added `GetThreadMemberAsync` implementation.
+- Added `GuildFeatures` to `IGuild`.
+- Added checks for gateway intent in some methods. `DownloadUsersAsync` will throw an exception if you don't have the gateway intent enabled locally now, this should help new people specify the correct intents locally.
+- Added strong types to `GuildJoinRequestDeleted` events.
+- Added support for GUILD_JOIN_REQUEST_DELETE event.
+- Added BotHTTPInteraction user flag.
+- Added support for animated guild banners.
+- Added student hub guild directory channel.
+- Added support Guild Boost Progress Bars
+- Added missing values to SystemChannelMessageDeny.
+- Added state checking to ConnectionManager.StartAsync
+
+### Fixed
+
+- Fixed numeric type check for slash command options.
+- Fixed followup with file overwrite having incorrect parameter locations.
+- Fixed non value type options not being included in autocomplete
+
+### Misc
+
+- Renamed `PARTY_PRIVACY_FRIENDS`, `PARTY_PRIVACY_VOICE_CHANNEL`, and `EMBEDDED` to `PartyPrivacyFriends`, `PartyPrivacyVoiceChannel`, and `Embedded` in `ActivityProperties`.
+- Removed error log for gateway reconnects.
+- Removed BannerId and AccentColor from socket users.
+
+## [3.1.7] - 10/20/2021
+
+### Added
+
 - Added `Icon` property when modifying roles.
 - Added `GuildAvatar` and `GetGuildAvatarUrl` to `IGuildUser`.
 
 ### Fixed
+
 - Fixed `InvalidOperationException` in modify guild channel.
 
 ### Misc
+
 - Revert received at time, confirmed by discord staff to be accurate
 
 ## [3.1.4 - 3.1.6] - 10/12/2021
