@@ -343,8 +343,19 @@ namespace Discord.Rest
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
+        public static Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             Stream stream, string filename, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers, RequestOptions options, bool isSpoiler, Embed[] embeds)
+        {
+            return SendFileAsync(channel, client, new FileAttachment(stream, filename, isSpoiler: isSpoiler), text, isTTS, embed, allowedMentions, messageReference, component, stickers, options, embeds);
+        }
+
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
+        public static Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
+            FileAttachment attachment, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers, RequestOptions options, Embed[] embeds)
+            => SendFilesAsync(channel, client, new[] { attachment }, text, isTTS, embed, allowedMentions, messageReference, component, stickers, options, embeds);
+
+        public static async Task<RestUserMessage> SendFilesAsync(IMessageChannel channel, BaseDiscordClient client,
+            IEnumerable<FileAttachment> attachments, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers, RequestOptions options,  Embed[] embeds)
         {
             embeds ??= Array.Empty<Embed>();
             if (embed != null)
@@ -353,7 +364,11 @@ namespace Discord.Rest
             Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
             Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
             Preconditions.AtMost(embeds.Length, 10, nameof(embeds), "A max of 10 embeds are allowed.");
-            Preconditions.NotNullOrEmpty(filename, nameof(filename), "File Name must not be empty or null");
+
+            foreach(var attachment in attachments)
+            {
+                Preconditions.NotNullOrEmpty(attachment.FileName, nameof(attachment.FileName), "File Name must not be empty or null");
+            }
 
             // check that user flag and user Id list are exclusive, same with role flag and role Id list
             if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
@@ -376,7 +391,7 @@ namespace Discord.Rest
                 Preconditions.AtMost(stickers.Length, 3, nameof(stickers), "A max of 3 stickers are allowed.");
             }
 
-            var args = new UploadFileParams(stream) { Filename = filename, Content = text, IsTTS = isTTS, Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified, AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified, MessageReference = messageReference?.ToModel() ?? Optional<API.MessageReference>.Unspecified, MessageComponent = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified, IsSpoiler = isSpoiler, Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified };
+            var args = new UploadFileParams(attachments.ToArray()) { Content = text, IsTTS = isTTS, Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified, AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified, MessageReference = messageReference?.ToModel() ?? Optional<API.MessageReference>.Unspecified, MessageComponent = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified, Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified };
             var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }

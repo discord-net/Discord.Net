@@ -914,6 +914,19 @@ namespace Discord.API
             var ids = new BucketIds(channelId: channelId);
             return await SendJsonAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
+
+        public async Task<Message> ModifyMessageAsync(ulong channelId, ulong messageId, Rest.UploadFileParams args, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(messageId, 0, nameof(messageId));
+            Preconditions.NotNull(args, nameof(args));
+            if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
+                throw new ArgumentOutOfRangeException($"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", nameof(args.Content));
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(channelId: channelId);
+            return await SendMultipartAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+        }
         #endregion
 
         #region Stickers, Reactions, Crosspost, and Acks

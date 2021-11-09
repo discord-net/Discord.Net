@@ -129,7 +129,6 @@ namespace Discord
         /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
         /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
         ///     If <c>null</c>, all mentioned roles and users will be notified.
@@ -142,7 +141,7 @@ namespace Discord
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        Task<IUserMessage> SendFileAsync(FileAttachment attachment, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null, Embed[] embeds = null);
+        Task<IUserMessage> SendFileAsync(FileAttachment attachment, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null, Embed[] embeds = null);
         /// <summary>
         ///     Sends a collection of files to this message channel.
         /// </summary>
@@ -159,7 +158,6 @@ namespace Discord
         /// <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
         /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
         /// <param name="options">The options to be used when sending the request.</param>
-        /// <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
         ///     If <c>null</c>, all mentioned roles and users will be notified.
@@ -172,7 +170,7 @@ namespace Discord
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        Task<IUserMessage> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null, Embed[] embeds = null);
+        Task<IUserMessage> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null, Embed[] embeds = null);
 
         /// <summary>
         ///     Gets a message from this message channel.

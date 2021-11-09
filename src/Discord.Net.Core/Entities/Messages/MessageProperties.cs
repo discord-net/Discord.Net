@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Discord
 {
     /// <summary>
@@ -48,5 +50,10 @@ namespace Discord
         ///     Gets or sets the allowed mentions of the message.
         /// </summary>
         public Optional<AllowedMentions> AllowedMentions { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the attachments for the message.
+        /// </summary>
+        public Optional<IEnumerable<FileAttachment>> Attachments { get; set; }
     }
 }

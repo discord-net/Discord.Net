@@ -11,6 +11,7 @@ namespace Discord
     {
         public string FileName { get; set; }
         public string Description { get; set; }
+        public bool IsSpoiler { get; set; }
 
 #pragma warning disable IDISP008
         public Stream Stream { get; }
@@ -24,12 +25,13 @@ namespace Discord
         /// <param name="stream">The stream to create the attachment from.</param>
         /// <param name="fileName">The name of the attachment.</param>
         /// <param name="description">The description of the attachment.</param>
-        public FileAttachment(Stream stream, string fileName, string description = null)
+        public FileAttachment(Stream stream, string fileName, string description = null, bool isSpoiler = false)
         {
             _isDisposed = false;
             FileName = fileName;
             Description = description;
             Stream = stream;
+            IsSpoiler = isSpoiler;
         }
 
         /// <summary>
@@ -60,12 +62,13 @@ namespace Discord
         /// <exception cref="FileNotFoundException">The file specified in <paramref name="path" /> was not found.
         /// </exception>
         /// <exception cref="IOException">An I/O error occurred while opening the file. </exception>
-        public FileAttachment(string path, string description = null)
+        public FileAttachment(string path, string description = null, bool isSpoiler = false)
         {
             _isDisposed = false;
             Stream = File.OpenRead(path);
             FileName = Path.GetFileName(path);
             Description = description;
+            IsSpoiler = isSpoiler;
         }
 
         public void Dispose()
