@@ -33,6 +33,16 @@ namespace Discord
         bool? IsRequired { get; }
 
         /// <summary>
+        ///     The smallest number value the user can input.
+        /// </summary>
+        double? MinValue { get; }
+
+        /// <summary>
+        ///     The largest number value the user can input.
+        /// </summary>
+        double? MaxValue { get; }
+
+        /// <summary>
         ///     Choices for string and int types for the user to pick from.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandOptionChoice> Choices { get; }

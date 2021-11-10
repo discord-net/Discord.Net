@@ -155,10 +155,12 @@ namespace Discord
         /// <param name="options">The options of the option to add.</param>
         /// <param name="channelTypes">The allowed channel types for this option.</param>
         /// <param name="choices">The choices of this option.</param>
+        /// <param name="minValue">The smallest number value the user can input.</param>
+        /// <param name="maxValue">The largest number value the user can input.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandBuilder AddOption(string name, ApplicationCommandOptionType type,
-           string description, bool? required = null, bool? isDefault = null, bool isAutocomplete = false, List<SlashCommandOptionBuilder> options = null,
-           List<ChannelType> channelTypes = null, params ApplicationCommandOptionChoiceProperties[] choices)
+           string description, bool? required = null, bool? isDefault = null, bool isAutocomplete = false, double? minValue = null, double? maxValue = null,
+           List<SlashCommandOptionBuilder> options = null, List<ChannelType> channelTypes = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             // Make sure the name matches the requirements from discord
             Preconditions.NotNullOrEmpty(name, nameof(name));
@@ -189,7 +191,9 @@ namespace Discord
                 Type = type,
                 Autocomplete = isAutocomplete,
                 Choices = (choices ?? Array.Empty<ApplicationCommandOptionChoiceProperties>()).ToList(),
-                ChannelTypes = channelTypes
+                ChannelTypes = channelTypes,
+                MinValue = minValue,
+                MaxValue = maxValue,
             };
 
             return AddOption(option);
@@ -322,6 +326,16 @@ namespace Discord
         public bool Autocomplete { get; set; }
 
         /// <summary>
+        ///     Gets or sets the smallest number value the user can input.
+        /// </summary>
+        public double? MinValue { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the largest number value the user can input.
+        /// </summary>
+        public double? MaxValue { get; set; }
+
+        /// <summary>
         ///     Gets or sets the choices for string and int types for the user to pick from.
         /// </summary>
         public List<ApplicationCommandOptionChoiceProperties> Choices { get; set; }
@@ -343,12 +357,19 @@ namespace Discord
         public ApplicationCommandOptionProperties Build()
         {
             bool isSubType = Type == ApplicationCommandOptionType.SubCommandGroup;
+            bool isIntType = Type == ApplicationCommandOptionType.Integer;
 
             if (isSubType && (Options == null || !Options.Any()))
                 throw new InvalidOperationException("SubCommands/SubCommandGroups must have at least one option");
 
             if (!isSubType && Options != null && Options.Any() && Type != ApplicationCommandOptionType.SubCommand)
                 throw new InvalidOperationException($"Cannot have options on {Type} type");
+
+            if (isIntType && MinValue != null && MinValue % 1 != 0)
+                throw new InvalidOperationException("MinValue cannot have decimals on Integer command options.");
+
+            if (isIntType && MaxValue != null && MaxValue % 1 != 0)
+                throw new InvalidOperationException("MaxValue cannot have decimals on Integer command options.");
 
             return new ApplicationCommandOptionProperties
             {
@@ -360,7 +381,9 @@ namespace Discord
                 Options = Options?.Count > 0 ? Options.Select(x => x.Build()).ToList() : new List<ApplicationCommandOptionProperties>(),
                 Choices = Choices,
                 Autocomplete = Autocomplete,
-                ChannelTypes = ChannelTypes
+                ChannelTypes = ChannelTypes,
+                MinValue = MinValue,
+                MaxValue = MaxValue
             };
         }
 
@@ -376,10 +399,12 @@ namespace Discord
         /// <param name="options">The options of the option to add.</param>
         /// <param name="channelTypes">The allowed channel types for this option.</param>
         /// <param name="choices">The choices of this option.</param>
+        /// <param name="minValue">The smallest number value the user can input.</param>
+        /// <param name="maxValue">The largest number value the user can input.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddOption(string name, ApplicationCommandOptionType type,
-           string description, bool? required = null, bool isDefault = false, bool isAutocomplete = false, List<SlashCommandOptionBuilder> options = null,
-           List<ChannelType> channelTypes = null, params ApplicationCommandOptionChoiceProperties[] choices)
+           string description, bool? required = null, bool isDefault = false, bool isAutocomplete = false, double? minValue = null, double? maxValue = null,
+           List<SlashCommandOptionBuilder> options = null, List<ChannelType> channelTypes = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             // Make sure the name matches the requirements from discord
             Preconditions.NotNullOrEmpty(name, nameof(name));
@@ -407,6 +432,8 @@ namespace Discord
                 Required = required,
                 Default = isDefault,
                 Autocomplete = isAutocomplete,
+                MinValue = minValue,
+                MaxValue = maxValue,
                 Options = options,
                 Type = type,
                 Choices = (choices ?? Array.Empty<ApplicationCommandOptionChoiceProperties>()).ToList(),
@@ -558,6 +585,28 @@ namespace Discord
         public SlashCommandOptionBuilder WithAutocomplete(bool value)
         {
             Autocomplete = value;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the current builders min value field.
+        /// </summary>
+        /// <param name="value">The value to set.</param>
+        /// <returns>The current builder.</returns>
+        public SlashCommandOptionBuilder WithMinValue(double value)
+        {
+            MinValue = value;
+            return this;
+        }
+        
+        /// <summary>
+        ///     Sets the current builders max value field.
+        /// </summary>
+        /// <param name="value">The value to set.</param>
+        /// <returns>The current builder.</returns>
+        public SlashCommandOptionBuilder WithMaxValue(double value)
+        {
+            MaxValue = value;
             return this;
         }
 
