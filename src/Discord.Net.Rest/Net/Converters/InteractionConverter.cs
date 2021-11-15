@@ -22,7 +22,7 @@ namespace Discord.Net.Converters
 
             // Remove the data property for manual deserialization
             var result = obj.GetValue("data", StringComparison.OrdinalIgnoreCase);
-            result.Parent.Remove();
+            result?.Parent.Remove();
 
             // Populate the remaining properties.
             using (var subReader = obj.CreateReader())

@@ -9,8 +9,9 @@ namespace Discord
     {
         private string _name;
         private object _value;
+
         /// <summary>
-        ///     The name of this choice.
+        ///     Gets the name of this choice.
         /// </summary>
         public string Name
         {
@@ -24,9 +25,9 @@ namespace Discord
         }
 
         /// <summary>
-        ///     The value of this choice.
+        ///     Gets the value of this choice.
         ///     <note type="warning">
-        ///         Discord only accepts int and string as the input.
+        ///         Discord only accepts int, double/floats, and string as the input.
         ///     </note>
         /// </summary>
         public object Value

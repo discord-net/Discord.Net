@@ -45,15 +45,13 @@ namespace Discord
         public object Value
         {
             get => _value;
-            set => _value = value switch
+            set
             {
-                string str => str,
-                int integer => integer,
-                long lng => lng,
-                double number => number,
-                null => throw new ArgumentNullException(nameof(value), $"{nameof(Value)} cannot be null."),
-                _ => throw new ArgumentException($"Type {value.GetType().Name} cannot be set as a value! Only string, int, and double allowed!")
-            };
+                if (value is not string || !value.IsNumericType())
+                    throw new ArgumentException($"{nameof(value)} must be a numeric type or a string!");
+
+                _value = value;
+            }
         }
 
         /// <summary>

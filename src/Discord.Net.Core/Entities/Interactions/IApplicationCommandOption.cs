@@ -3,57 +3,57 @@ using System.Collections.Generic;
 namespace Discord
 {
     /// <summary>
-    ///     Options for the <see cref="IApplicationCommand"/>, see <see href="https://discord.com/developers/docs/interactions/slash-commands#applicationcommandoption">The docs</see>.
+    ///     Options for the <see cref="IApplicationCommand"/>.
     /// </summary>
     public interface IApplicationCommandOption
     {
         /// <summary>
-        ///     The type of this <see cref="IApplicationCommandOption"/>.
+        ///     Gets the type of this <see cref="IApplicationCommandOption"/>.
         /// </summary>
         ApplicationCommandOptionType Type { get; }
 
         /// <summary>
-        ///     The name of this command option, 1-32 character name.
+        ///     Gets the name of this command option.
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        ///     The description of this command option, 1-100 character description.
+        ///     Gets the description of this command option.
         /// </summary>
         string Description { get; }
 
         /// <summary>
-        ///     The first required option for the user to complete--only one option can be default.
+        ///     Gets whether or not this is the first required option for the user to complete.
         /// </summary>
         bool? IsDefault { get; }
 
         /// <summary>
-        ///     If the parameter is required or optional, default is <see langword="false"/>.
+        ///     Gets whether or not the parameter is required or optional.
         /// </summary>
         bool? IsRequired { get; }
 
         /// <summary>
-        ///     The smallest number value the user can input.
+        ///     Gets the smallest number value the user can input.
         /// </summary>
         double? MinValue { get; }
 
         /// <summary>
-        ///     The largest number value the user can input.
+        ///     Gets the largest number value the user can input.
         /// </summary>
         double? MaxValue { get; }
 
         /// <summary>
-        ///     Choices for string and int types for the user to pick from.
+        ///     Gets the choices for string and int types for the user to pick from.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandOptionChoice> Choices { get; }
 
         /// <summary>
-        ///     If the option is a subcommand or subcommand group type, this nested options will be the parameters.
+        ///     Gets the sub-options for this command option.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandOption> Options { get; }
 
         /// <summary>
-        ///     The allowed channel types for this option.
+        ///     Gets the allowed channel types for this option.
         /// </summary>
         IReadOnlyCollection<ChannelType> ChannelTypes { get; }
     }

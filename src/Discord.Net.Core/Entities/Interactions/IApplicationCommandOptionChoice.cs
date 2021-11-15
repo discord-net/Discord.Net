@@ -6,12 +6,12 @@ namespace Discord
     public interface IApplicationCommandOptionChoice
     {
         /// <summary>
-        ///     1-100 character choice name.
+        ///     Gets the choice name.
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        ///     value of the choice.
+        ///     Gets the value of the choice.
         /// </summary>
         object Value { get; }
     }
