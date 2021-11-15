@@ -164,7 +164,7 @@ namespace Discord.WebSocket
             for (int i = 0; i < _shards.Length; i++)
                 await _shards[i].LoginAsync(tokenType, token);
 
-            if(_defaultStickers.Length == 0)
+            if(_defaultStickers.Length == 0 && _baseConfig.AlwaysDownloadDefaultStickers)
                 await DownloadDefaultStickersAsync().ConfigureAwait(false);
 
         }

@@ -65,7 +65,7 @@ namespace Discord.WebSocket
         private Optional<IActivity> _activity;
         #endregion
 
-        //From DiscordSocketConfig
+        // From DiscordSocketConfig
         internal int TotalShards { get; private set; }
         internal int MessageCacheSize { get; private set; }
         internal int LargeThreshold { get; private set; }
@@ -74,6 +74,8 @@ namespace Discord.WebSocket
         internal WebSocketProvider WebSocketProvider { get; private set; }
         internal bool AlwaysDownloadUsers { get; private set; }
         internal int? HandlerTimeout { get; private set; }
+        internal bool AlwaysDownloadDefaultStickers { get; private set; }
+        internal bool AlwaysResolveStickers { get; private set; }
         internal new DiscordSocketApiClient ApiClient => base.ApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
@@ -143,6 +145,8 @@ namespace Discord.WebSocket
             UdpSocketProvider = config.UdpSocketProvider;
             WebSocketProvider = config.WebSocketProvider;
             AlwaysDownloadUsers = config.AlwaysDownloadUsers;
+            AlwaysDownloadDefaultStickers = config.AlwaysDownloadDefaultStickers;
+            AlwaysResolveStickers = config.AlwaysResolveStickers;
             HandlerTimeout = config.HandlerTimeout;
             State = new ClientState(0, 0);
             Rest = new DiscordSocketRestClient(config, ApiClient);
@@ -209,7 +213,7 @@ namespace Discord.WebSocket
 
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
-            if(_shardedClient == null && _defaultStickers.Length == 0)
+            if (_shardedClient == null && _defaultStickers.Length == 0 && AlwaysDownloadDefaultStickers)
             {
                 var models = await ApiClient.ListNitroStickerPacksAsync().ConfigureAwait(false);
 
