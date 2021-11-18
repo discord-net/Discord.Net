@@ -8,11 +8,14 @@ using Model = Discord.API.Interaction;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a REST-based ping interaction.
+    /// </summary>
     public class RestPingInteraction : RestInteraction, IDiscordInteraction
     {
         internal override bool _hasResponded { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public RestPingInteraction(BaseDiscordClient client, ulong id)
+        internal RestPingInteraction(BaseDiscordClient client, ulong id)
             : base(client, id)
         {
         }
