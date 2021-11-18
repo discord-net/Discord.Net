@@ -100,7 +100,7 @@ namespace Discord
             {
                 var options = new List<ApplicationCommandOptionProperties>();
 
-                Options.ForEach(x => options.Add(x.Build()));
+                Options.OrderByDescending(x => x.Required ?? false).ToList().ForEach(x => options.Add(x.Build()));
 
                 props.Options = options;
             }
@@ -378,7 +378,9 @@ namespace Discord
                 Default = Default,
                 Required = Required,
                 Type = Type,
-                Options = Options?.Count > 0 ? Options.Select(x => x.Build()).ToList() : new List<ApplicationCommandOptionProperties>(),
+                Options = Options?.Count > 0
+                    ? Options.OrderByDescending(x => x.Required ?? false).Select(x => x.Build()).ToList()
+                    : new List<ApplicationCommandOptionProperties>(),
                 Choices = Choices,
                 Autocomplete = Autocomplete,
                 ChannelTypes = ChannelTypes,
