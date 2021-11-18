@@ -64,21 +64,6 @@ namespace Discord.Rest
         public override Task<RestThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null)
             => throw new InvalidOperationException("Cannot create a thread within a voice channel");
 
-        /// <inheritdoc/>
-        /// <exception cref="InvalidOperationException">Cannot create a webhook within a voice channel.</exception>
-        public override Task<RestWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null)
-            => throw new InvalidOperationException();
-
-        /// <inheritdoc/>
-        /// <exception cref="InvalidOperationException">Cannot get webhooks for a voice channel.</exception>
-        public override Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
-            => throw new InvalidOperationException();
-
-        /// <inheritdoc/>
-        /// <exception cref="InvalidOperationException">Cannot get webhooks for a voice channel.</exception>
-        public override Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
-            => throw new InvalidOperationException();
-
         #endregion
 
         #region Invites

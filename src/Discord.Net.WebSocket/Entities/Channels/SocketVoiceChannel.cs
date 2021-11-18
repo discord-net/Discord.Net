@@ -104,22 +104,12 @@ namespace Discord.WebSocket
         /// <exception cref="InvalidOperationException">Cannot create threads in voice channels.</exception>
         public override Task<SocketThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null)
             => throw new InvalidOperationException("Voice channels cannot contain threads.");
+        
         /// <inheritdoc/>
-        /// <exception cref="InvalidOperationException">Cannot create webhooks in voice channels.</exception>
-        public override Task<RestWebhook> CreateWebhookAsync(string name, Stream avatar = null, RequestOptions options = null)
-            => throw new InvalidOperationException("Voice channels cannot contain webhooks.");
-        /// <inheritdoc/>
-        /// <exception cref="InvalidOperationException">Cannot modify text channel properties within a webhook.</exception>
+        /// <exception cref="InvalidOperationException">Cannot modify text channel properties within a voice channel.</exception>
         public override Task ModifyAsync(Action<TextChannelProperties> func, RequestOptions options = null)
             => throw new InvalidOperationException("Cannot modify text channel properties for voice channels.");
-        /// <inheritdoc/>
-        /// <exception cref="InvalidOperationException">Cannot get webhooks for a voice channel.</exception>
-        public override Task<RestWebhook> GetWebhookAsync(ulong id, RequestOptions options = null)
-            => throw new InvalidOperationException("Cannot get webhooks for a voice channel.");
-        /// <inheritdoc/>
-        /// <exception cref="InvalidOperationException">Cannot get webhooks for a voice channel.</exception>
-        public override Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
-            => throw new InvalidOperationException("Cannot get webhooks for a voice channel.");
+        
         #endregion
 
         #region Invites
