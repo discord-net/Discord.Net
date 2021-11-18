@@ -650,7 +650,7 @@ namespace Discord
             get => _minValues;
             set
             {
-                Preconditions.LessThan(value, MaxValuesCount, nameof(MinValues));
+                Preconditions.AtMost(value, MaxValuesCount, nameof(MinValues));
                 _minValues = value;
             }
         }
@@ -664,7 +664,7 @@ namespace Discord
             get => _maxValues;
             set
             {
-                Preconditions.LessThan(value, MaxValuesCount, nameof(MaxValues));
+                Preconditions.AtMost(value, MaxValuesCount, nameof(MaxValues));
                 _maxValues = value;
             }
         }
@@ -680,7 +680,7 @@ namespace Discord
             set
             {
                 if (value != null)
-                    Preconditions.LessThan(value.Count, MaxOptionCount, nameof(Options));
+                    Preconditions.AtMost(value.Count, MaxOptionCount, nameof(Options));
                 else
                     throw new ArgumentNullException(nameof(value), $"{nameof(Options)} cannot be null.");
 
