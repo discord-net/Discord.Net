@@ -77,6 +77,7 @@ namespace Discord.Rest
             {
                 Bitrate = args.Bitrate,
                 Name = args.Name,
+                RTCRegion = args.RTCRegion,
                 Position = args.Position,
                 CategoryId = args.CategoryId,
                 UserLimit = args.UserLimit.IsSpecified ? (args.UserLimit.Value ?? 0) : Optional.Create<int>(),

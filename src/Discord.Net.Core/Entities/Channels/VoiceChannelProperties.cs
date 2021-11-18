@@ -13,5 +13,9 @@ namespace Discord
         ///     Gets or sets the maximum number of users that can be present in a channel, or <c>null</c> if none.
         /// </summary>
         public Optional<int?> UserLimit { get; set; }
+        /// <summary>
+        ///     Gets or sets the channel voice region id, automatic when set to <see langword="null"/>.
+        /// </summary>
+        public Optional<string> RTCRegion { get; set; }
     }
 }
