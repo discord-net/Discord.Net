@@ -185,9 +185,13 @@ namespace Discord
         /// </summary>
         UseApplicationCommands = 0x80_00_00_00,
         /// <summary>
-        ///     Allows for requesting to speak in stage channels. <i>(This permission is under active development and may be changed or removed.)</i>.
+        ///     Allows for requesting to speak in stage channels.
         /// </summary>
         RequestToSpeak          = 0x01_00_00_00_00,
+        /// <summary>
+        ///     Allows for creating, editing, and deleting guild scheduled events.
+        /// </summary>
+        ManageEvents = 0x02_00_00_00_00,
         /// <summary>
         ///     Allows for deleting and archiving threads, and viewing all private threads.
         /// </summary>

@@ -344,6 +344,61 @@ namespace Discord.WebSocket
         internal readonly AsyncEvent<Func<Cacheable<SocketGuildUser, ulong>, SocketGuild, Task>> _guildJoinRequestDeletedEvent = new AsyncEvent<Func<Cacheable<SocketGuildUser, ulong>, SocketGuild, Task>>();
         #endregion
 
+        #region Guild Events
+
+        /// <summary>
+        ///     Fired when a guild event is created.
+        /// </summary>
+        public event Func<SocketGuildEvent, Task> GuildScheduledEventCreated
+        {
+            add { _guildScheduledEventCreated.Add(value); }
+            remove { _guildScheduledEventCreated.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<SocketGuildEvent, Task>> _guildScheduledEventCreated = new AsyncEvent<Func<SocketGuildEvent, Task>>();
+
+        /// <summary>
+        ///     Fired when a guild event is updated.
+        /// </summary>
+        public event Func<Cacheable<SocketGuildEvent, ulong>, SocketGuildEvent, Task> GuildScheduledEventUpdated
+        {
+            add { _guildScheduledEventUpdated.Add(value); }
+            remove { _guildScheduledEventUpdated.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<Cacheable<SocketGuildEvent, ulong>, SocketGuildEvent, Task>> _guildScheduledEventUpdated = new AsyncEvent<Func<Cacheable<SocketGuildEvent, ulong>, SocketGuildEvent, Task>>();
+
+        
+        /// <summary>
+        ///     Fired when a guild event is cancelled.
+        /// </summary>
+        public event Func<SocketGuildEvent, Task> GuildScheduledEventCancelled
+        {
+            add { _guildScheduledEventCancelled.Add(value); }
+            remove { _guildScheduledEventCancelled.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<SocketGuildEvent, Task>> _guildScheduledEventCancelled = new AsyncEvent<Func<SocketGuildEvent, Task>>();
+
+        /// <summary>
+        ///     Fired when a guild event is completed.
+        /// </summary>
+        public event Func<SocketGuildEvent, Task> GuildScheduledEventCompleted
+        {
+            add { _guildScheduledEventCompleted.Add(value); }
+            remove { _guildScheduledEventCompleted.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<SocketGuildEvent, Task>> _guildScheduledEventCompleted = new AsyncEvent<Func<SocketGuildEvent, Task>>();
+
+        /// <summary>
+        ///     Fired when a guild event is started.
+        /// </summary>
+        public event Func<SocketGuildEvent, Task> GuildScheduledEventStarted
+        {
+            add { _guildScheduledEventStarted.Add(value); }
+            remove { _guildScheduledEventStarted.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<SocketGuildEvent, Task>> _guildScheduledEventStarted = new AsyncEvent<Func<SocketGuildEvent, Task>>();
+
+        #endregion
+
         #region Users
         /// <summary> Fired when a user joins a guild. </summary>
         public event Func<SocketGuildUser, Task> UserJoined

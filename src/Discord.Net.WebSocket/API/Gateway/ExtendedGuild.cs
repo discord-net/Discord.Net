@@ -28,5 +28,8 @@ namespace Discord.API.Gateway
 
         [JsonProperty("threads")]
         public new Channel[] Threads { get; set; }
+
+        [JsonProperty("guild_scheduled_events")]
+        public GuildScheduledEvent[] GuildScheduledEvents { get; set; }
     }
 }

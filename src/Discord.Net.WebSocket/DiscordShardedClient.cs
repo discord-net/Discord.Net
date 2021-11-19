@@ -486,6 +486,12 @@ namespace Discord.WebSocket
             client.GuildStickerDeleted += (sticker) => _guildStickerDeleted.InvokeAsync(sticker);
             client.GuildStickerUpdated += (before, after) => _guildStickerUpdated.InvokeAsync(before, after);
             client.GuildJoinRequestDeleted += (userId, guildId) => _guildJoinRequestDeletedEvent.InvokeAsync(userId, guildId);
+
+            client.GuildScheduledEventCancelled += (arg) => _guildScheduledEventCancelled.InvokeAsync(arg);
+            client.GuildScheduledEventCompleted += (arg) => _guildScheduledEventCompleted.InvokeAsync(arg);
+            client.GuildScheduledEventCreated += (arg) => _guildScheduledEventCreated.InvokeAsync(arg);
+            client.GuildScheduledEventUpdated += (arg1, arg2) => _guildScheduledEventUpdated.InvokeAsync(arg1, arg2);
+            client.GuildScheduledEventStarted += (arg) => _guildScheduledEventStarted.InvokeAsync(arg);
         }
 #endregion
 

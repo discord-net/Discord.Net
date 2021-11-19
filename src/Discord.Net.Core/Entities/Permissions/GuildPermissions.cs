@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Discord
 {
@@ -87,6 +88,8 @@ namespace Discord
         public bool UseApplicationCommands => Permissions.GetValue(RawValue, GuildPermission.UseApplicationCommands);
         /// <summary> If <c>true</c>, a user may request to speak in stage channels. </summary>
         public bool RequestToSpeak => Permissions.GetValue(RawValue, GuildPermission.RequestToSpeak);
+        /// <summary> If <c>true</c>, a user may create, edit, and delete events. </summary>
+        public bool ManageEvents => Permissions.GetValue(RawValue, GuildPermission.ManageEvents);
         /// <summary> If <c>true</c>, a user may manage threads in this guild. </summary>
         public bool ManageThreads => Permissions.GetValue(RawValue, GuildPermission.ManageThreads);
         /// <summary> If <c>true</c>, a user may create public threads in this guild. </summary>
@@ -140,6 +143,7 @@ namespace Discord
             bool? manageEmojisAndStickers = null,
             bool? useApplicationCommands = null,
             bool? requestToSpeak = null,
+            bool? manageEvents = null,
             bool? manageThreads = null,
             bool? createPublicThreads = null,
             bool? createPrivateThreads = null,
@@ -182,6 +186,7 @@ namespace Discord
             Permissions.SetValue(ref value, manageEmojisAndStickers, GuildPermission.ManageEmojisAndStickers);
             Permissions.SetValue(ref value, useApplicationCommands, GuildPermission.UseApplicationCommands);
             Permissions.SetValue(ref value, requestToSpeak, GuildPermission.RequestToSpeak);
+            Permissions.SetValue(ref value, manageEvents, GuildPermission.ManageEvents);
             Permissions.SetValue(ref value, manageThreads, GuildPermission.ManageThreads);
             Permissions.SetValue(ref value, createPublicThreads, GuildPermission.CreatePublicThreads);
             Permissions.SetValue(ref value, createPrivateThreads, GuildPermission.CreatePrivateThreads);
@@ -227,6 +232,7 @@ namespace Discord
             bool manageEmojisAndStickers = false,
             bool useApplicationCommands = false,
             bool requestToSpeak = false,
+            bool manageEvents = false,
             bool manageThreads = false,
             bool createPublicThreads = false,
             bool createPrivateThreads = false,
@@ -267,6 +273,7 @@ namespace Discord
                 manageEmojisAndStickers: manageEmojisAndStickers,
                 useApplicationCommands: useApplicationCommands,
                 requestToSpeak: requestToSpeak,
+                manageEvents: manageEvents,
                 manageThreads: manageThreads,
                 createPublicThreads: createPublicThreads,
                 createPrivateThreads: createPrivateThreads,
@@ -310,6 +317,7 @@ namespace Discord
             bool? manageEmojisAndStickers = null,
             bool? useApplicationCommands = null,
             bool? requestToSpeak = null,
+            bool? manageEvents = null,
             bool? manageThreads = null,
             bool? createPublicThreads = null,
             bool? createPrivateThreads = null,
@@ -320,7 +328,7 @@ namespace Discord
                 viewAuditLog, viewGuildInsights, viewChannel, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
                 useVoiceActivation, prioritySpeaker, stream, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojisAndStickers,
-                useApplicationCommands, requestToSpeak, manageThreads, createPublicThreads, createPrivateThreads, useExternalStickers, sendMessagesInThreads,
+                useApplicationCommands, requestToSpeak, manageEvents, manageThreads, createPublicThreads, createPrivateThreads, useExternalStickers, sendMessagesInThreads,
                 startEmbeddedActivities);
 
         /// <summary>
@@ -349,6 +357,18 @@ namespace Discord
                     perms.Add((GuildPermission)flag);
             }
             return perms;
+        }
+
+        internal void Ensure(GuildPermission permissions)
+        {
+            if (!Has(permissions))
+            {
+                var vals = Enum.GetValues(typeof(GuildPermission)).Cast<GuildPermission>();
+                var currentValues = RawValue;
+                var missingValues = vals.Where(x => permissions.HasFlag(x) && !Permissions.GetValue(currentValues, x));
+
+                throw new InvalidOperationException($"Missing required guild permission{(missingValues.Count() > 1 ? "s" : "")} {string.Join(", ", missingValues.Select(x => x.ToString()))} in order to execute this operation.");
+            }
         }
 
         public override string ToString() => RawValue.ToString();

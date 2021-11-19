@@ -94,6 +94,13 @@ namespace Discord
         ///     The maximum number of users that can be gotten per-batch.
         /// </returns>
         public const int MaxUsersPerBatch = 1000;
+        /// <summary>
+        ///     Returns the max users allowed to be in a request for guild event users.
+        /// </summary>
+        /// <returns>
+        ///     The maximum number of users that can be gotten per-batch.
+        /// </returns>
+        public const int MaxGuildEventUsersPerBatch = 100;
         /// <summary> 
         ///     Returns the max guilds allowed to be in a request. 
         /// </summary>
