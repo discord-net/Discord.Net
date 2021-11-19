@@ -11,7 +11,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents a REST-based slash command.
     /// </summary>
-    public class RestSlashCommand : RestCommandBase, IDiscordInteraction
+    public class RestSlashCommand : RestCommandBase, ISlashCommandInteraction, IDiscordInteraction
     {
         /// <summary>
         ///     Gets the data associated with this interaction.
@@ -39,6 +39,8 @@ namespace Discord.Rest
             Data = await RestSlashCommandData.CreateAsync(client, dataModel, Guild, Channel);
         }
 
-        IDiscordInteractionData IDiscordInteraction.Data => Data;
+        //ISlashCommandInteraction
+        /// <inheritdoc/>
+        IApplicationCommandInteractionData ISlashCommandInteraction.Data => Data;
     }
 }

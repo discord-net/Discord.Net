@@ -13,7 +13,7 @@ namespace Discord.WebSocket
     /// <summary>
     ///     Represents a Websocket-based interaction type for Message Components.
     /// </summary>
-    public class SocketMessageComponent : SocketInteraction, IDiscordInteraction
+    public class SocketMessageComponent : SocketInteraction, IComponentInteraction, IDiscordInteraction
     {
         /// <summary>
         ///     Gets the data received with this interaction, contains the button that was clicked.
@@ -422,6 +422,15 @@ namespace Discord.WebSocket
             }
         }
 
+        //IComponentInteraction
+        /// <inheritdoc/>
+        IComponentInteractionData IComponentInteraction.Data => Data;
+
+        /// <inheritdoc/>
+        IUserMessage IComponentInteraction.Message => Message;
+
+        //IDiscordInteraction
+        /// <inheritdoc/>
         IDiscordInteractionData IDiscordInteraction.Data => Data;
     }
 }

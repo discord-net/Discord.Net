@@ -12,7 +12,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents a REST-based autocomplete interaction.
     /// </summary>
-    public class RestAutocompleteInteraction : RestInteraction, IDiscordInteraction
+    public class RestAutocompleteInteraction : RestInteraction, IAutocompleteInteraction, IDiscordInteraction
     {
         /// <summary>
         ///     Gets the autocomplete data of this interaction.
@@ -128,7 +128,8 @@ namespace Discord.Rest
         public override string Respond(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null)
             => throw new NotSupportedException("Autocomplete interactions cannot be deferred!");
 
-        IDiscordInteractionData IDiscordInteraction.Data => Data;
-
+        //IAutocompleteInteraction
+        /// <inheritdoc/>
+        IAutocompleteInteractionData IAutocompleteInteraction.Data => Data;
     }
 }

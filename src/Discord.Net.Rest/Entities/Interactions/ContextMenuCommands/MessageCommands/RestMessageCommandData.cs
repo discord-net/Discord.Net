@@ -10,7 +10,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents the data for a <see cref="RestMessageCommand"/>.
     /// </summary>
-    public class RestMessageCommandData : RestCommandBaseData, IDiscordInteractionData
+    public class RestMessageCommandData : RestCommandBaseData, IMessageCommandInteractionData, IDiscordInteractionData
     {
         /// <summary>
         ///     Gets the message associated with this message command.
@@ -34,5 +34,9 @@ namespace Discord.Rest
             await entity.UpdateAsync(client, model, guild, channel).ConfigureAwait(false);
             return entity;
         }
+
+        //IMessageCommandInteractionData
+        /// <inheritdoc/>
+        IMessage IMessageCommandInteractionData.Message => Message;
     }
 }

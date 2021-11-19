@@ -8,7 +8,7 @@ namespace Discord.WebSocket
     /// <summary>
     ///     Represents data for a slash commands autocomplete interaction.
     /// </summary>
-    public class SocketAutocompleteInteractionData : IDiscordInteractionData
+    public class SocketAutocompleteInteractionData : IAutocompleteInteractionData, IDiscordInteractionData
     {
         /// <summary>
         ///     Gets the name of the invoked command.

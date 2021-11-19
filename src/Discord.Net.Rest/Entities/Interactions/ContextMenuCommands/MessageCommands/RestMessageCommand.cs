@@ -7,7 +7,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents a REST-based message command interaction.
     /// </summary>
-    public class RestMessageCommand : RestCommandBase, IDiscordInteraction
+    public class RestMessageCommand : RestCommandBase, IMessageCommandInteraction, IDiscordInteraction
     {
         /// <summary>
         ///     The data associated with this interaction.
@@ -38,6 +38,8 @@ namespace Discord.Rest
             Data = await RestMessageCommandData.CreateAsync(client, dataModel, Guild, Channel).ConfigureAwait(false);
         }
 
-        IDiscordInteractionData IDiscordInteraction.Data => Data;
+        //IMessageCommandInteraction
+        /// <inheritdoc/>
+        IMessageCommandInteractionData IMessageCommandInteraction.Data => Data;
     }
 }

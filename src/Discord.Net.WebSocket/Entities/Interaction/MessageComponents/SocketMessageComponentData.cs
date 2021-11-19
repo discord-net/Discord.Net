@@ -6,7 +6,7 @@ namespace Discord.WebSocket
     /// <summary>
     ///     Represents the data sent with a <see cref="InteractionType.MessageComponent"/>.
     /// </summary>
-    public class SocketMessageComponentData : IDiscordInteractionData
+    public class SocketMessageComponentData : IComponentInteractionData
     {
         /// <summary>
         ///     Gets the components Custom Id that was clicked.
