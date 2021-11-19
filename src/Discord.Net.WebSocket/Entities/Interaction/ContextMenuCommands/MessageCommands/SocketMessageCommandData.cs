@@ -7,7 +7,7 @@ namespace Discord.WebSocket
     /// <summary>
     ///     Represents the data tied with the <see cref="SocketMessageCommand"/> interaction.
     /// </summary>
-    public class SocketMessageCommandData : SocketCommandBaseData, IDiscordInteractionData
+    public class SocketMessageCommandData : SocketCommandBaseData, IMessageCommandInteractionData, IDiscordInteractionData
     {
         /// <summary>
         ///     Gets the message associated with this message command.
@@ -31,5 +31,9 @@ namespace Discord.WebSocket
             entity.Update(model);
             return entity;
         }
+
+        //IMessageCommandInteractionData
+        /// <inheritdoc/>
+        IMessage IMessageCommandInteractionData.Message => Message;
     }
 }

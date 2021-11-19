@@ -11,7 +11,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents a REST-based user command.
     /// </summary>
-    internal class RestUserCommand : RestCommandBase, IDiscordInteraction
+    internal class RestUserCommand : RestCommandBase, IUserCommandInteraction, IDiscordInteraction
     {
         /// <summary>
         ///     Gets the data associated with this interaction.
@@ -41,6 +41,8 @@ namespace Discord.Rest
             Data = await RestUserCommandData.CreateAsync(client, dataModel, Guild, Channel).ConfigureAwait(false);
         }
 
-        IDiscordInteractionData IDiscordInteraction.Data => Data;
+        //IUserCommandInteractionData
+        /// <inheritdoc/>
+        IUserCommandInteractionData IUserCommandInteraction.Data => Data;
     }
 }

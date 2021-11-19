@@ -11,7 +11,7 @@ namespace Discord.WebSocket
     /// <summary>
     ///     Represents a <see cref="InteractionType.ApplicationCommandAutocomplete"/> received over the gateway.
     /// </summary>
-    public class SocketAutocompleteInteraction : SocketInteraction, IDiscordInteraction
+    public class SocketAutocompleteInteraction : SocketInteraction, IAutocompleteInteraction, IDiscordInteraction
     {
         /// <summary>
         ///     The autocomplete data of this interaction.
@@ -115,6 +115,12 @@ namespace Discord.WebSocket
         public override Task RespondAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null)
             => throw new NotSupportedException("Autocomplete interactions cannot be deferred!");
 
+        //IAutocompleteInteraction
+        /// <inheritdoc/>
+        IAutocompleteInteractionData IAutocompleteInteraction.Data => Data;
+
+        //IDiscordInteraction
+        /// <inheritdoc/>
         IDiscordInteractionData IDiscordInteraction.Data => Data;
     }
 }

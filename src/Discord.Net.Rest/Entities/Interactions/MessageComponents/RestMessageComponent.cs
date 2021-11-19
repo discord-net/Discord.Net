@@ -13,7 +13,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents a REST-based message component.
     /// </summary>
-    internal class RestMessageComponent : RestInteraction, IDiscordInteraction
+    internal class RestMessageComponent : RestInteraction, IComponentInteraction, IDiscordInteraction
     {
         /// <summary>
         ///     Gets the data received with this interaction, contains the button that was clicked.
@@ -442,6 +442,11 @@ namespace Discord.Rest
             return SerializePayload(response);
         }
 
-        IDiscordInteractionData IDiscordInteraction.Data => Data;
+        //IComponentInteraction
+        /// <inheritdoc/>
+        IComponentInteractionData IComponentInteraction.Data => Data;
+
+        /// <inheritdoc/>
+        IUserMessage IComponentInteraction.Message => Message;
     }
 }

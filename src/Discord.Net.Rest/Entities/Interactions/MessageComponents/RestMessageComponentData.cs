@@ -10,7 +10,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents data for a <see cref="RestMessageComponent"/>.
     /// </summary>
-    public class RestMessageComponentData : IDiscordInteractionData
+    public class RestMessageComponentData : IComponentInteractionData, IDiscordInteractionData
     {
         /// <summary>
         ///     Gets the components Custom Id that was clicked.

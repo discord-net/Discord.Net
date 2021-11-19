@@ -11,7 +11,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents the data for a <see cref="RestAutocompleteInteraction"/>.
     /// </summary>
-    public class RestAutocompleteInteractionData : IDiscordInteractionData
+    public class RestAutocompleteInteractionData : IAutocompleteInteractionData
     {
         /// <summary>
         ///     Gets the name of the invoked command.

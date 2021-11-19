@@ -7,7 +7,7 @@ namespace Discord.WebSocket
     /// <summary>
     ///     Represents the data tied with the <see cref="SocketUserCommand"/> interaction.
     /// </summary>
-    public class SocketUserCommandData : SocketCommandBaseData, IDiscordInteractionData
+    public class SocketUserCommandData : SocketCommandBaseData, IUserCommandInteractionData, IDiscordInteractionData
     {
         /// <summary>
         ///     Gets the user who this command targets.
@@ -31,5 +31,9 @@ namespace Discord.WebSocket
             entity.Update(model);
             return entity;
         }
+
+        //IUserCommandInteractionData
+        /// <inheritdoc/>
+        IUser IUserCommandInteractionData.User => Member;
     }
 }

@@ -8,7 +8,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents the data for a <see cref="RestUserCommand"/>.
     /// </summary>
-    public class RestUserCommandData : RestCommandBaseData, IDiscordInteractionData
+    public class RestUserCommandData : RestCommandBaseData, IUserCommandInteractionData, IDiscordInteractionData
     {
         /// <summary>
         ///     Gets the user who this command targets.
@@ -32,5 +32,9 @@ namespace Discord.Rest
             await entity.UpdateAsync(client, model, guild, channel).ConfigureAwait(false);
             return entity;
         }
+
+        //IUserCommandInteractionData
+        /// <inheritdoc/>
+        IUser IUserCommandInteractionData.User => Member;
     }
 }
