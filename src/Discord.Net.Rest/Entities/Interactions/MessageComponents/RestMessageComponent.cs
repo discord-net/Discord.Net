@@ -41,12 +41,12 @@ namespace Discord.Rest
         internal new static async Task<RestMessageComponent> CreateAsync(DiscordRestClient client, Model model)
         {
             var entity = new RestMessageComponent(client, model);
-            await entity.UpdateAsync(client, model);
+            await entity.UpdateAsync(client, model).ConfigureAwait(false);
             return entity;
         }
         internal override async Task UpdateAsync(DiscordRestClient discord, Model model)
         {
-            await base.UpdateAsync(discord, model);
+            await base.UpdateAsync(discord, model).ConfigureAwait(false);
 
             if (model.Message.IsSpecified && model.ChannelId.IsSpecified)
             {
