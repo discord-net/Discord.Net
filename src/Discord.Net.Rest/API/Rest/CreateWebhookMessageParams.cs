@@ -68,6 +68,8 @@ namespace Discord.API.Rest
                 payload["embeds"] = Embeds.Value;
             if (AllowedMentions.IsSpecified)
                 payload["allowed_mentions"] = AllowedMentions.Value;
+            if (Components.IsSpecified)
+                payload["components"] = Components.Value;
 
             var json = new StringBuilder();
             using (var text = new StringWriter(json))
