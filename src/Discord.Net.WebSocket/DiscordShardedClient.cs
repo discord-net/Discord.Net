@@ -492,6 +492,8 @@ namespace Discord.WebSocket
             client.GuildScheduledEventCreated += (arg) => _guildScheduledEventCreated.InvokeAsync(arg);
             client.GuildScheduledEventUpdated += (arg1, arg2) => _guildScheduledEventUpdated.InvokeAsync(arg1, arg2);
             client.GuildScheduledEventStarted += (arg) => _guildScheduledEventStarted.InvokeAsync(arg);
+            client.GuildScheduledEventUserAdd += (arg1, arg2) => _guildScheduledEventUserAdd.InvokeAsync(arg1, arg2);
+            client.GuildScheduledEventUserRemove += (arg1, arg2) => _guildScheduledEventUserRemove.InvokeAsync(arg1, arg2);
         }
 #endregion
 
