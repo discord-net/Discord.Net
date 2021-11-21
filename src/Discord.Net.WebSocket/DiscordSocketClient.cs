@@ -2667,7 +2667,6 @@ namespace Discord.WebSocket
                                             await TimedInvokeAsync(_guildScheduledEventUserRemove, nameof(GuildScheduledEventUserRemove), cacheableUser, guildEvent).ConfigureAwait(false);
                                             break;
                                     }
-
                                 }
                                 break;
 
