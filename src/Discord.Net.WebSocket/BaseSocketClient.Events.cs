@@ -1,3 +1,4 @@
+using Discord.Rest;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -396,6 +397,21 @@ namespace Discord.WebSocket
             remove { _guildScheduledEventStarted.Remove(value); }
         }
         internal readonly AsyncEvent<Func<SocketGuildEvent, Task>> _guildScheduledEventStarted = new AsyncEvent<Func<SocketGuildEvent, Task>>();
+
+        public event Func<Cacheable<SocketUser, RestUser, IUser, ulong>, SocketGuildEvent, Task> GuildScheduledEventUserAdd
+        {
+            add { _guildScheduledEventUserAdd.Add(value); }
+            remove { _guildScheduledEventUserAdd.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<Cacheable<SocketUser, RestUser, IUser, ulong>, SocketGuildEvent, Task>> _guildScheduledEventUserAdd = new AsyncEvent<Func<Cacheable<SocketUser, RestUser, IUser, ulong>, SocketGuildEvent, Task>>();
+
+        public event Func<Cacheable<SocketUser, RestUser, IUser, ulong>, SocketGuildEvent, Task> GuildScheduledEventUserRemove
+        {
+            add { _guildScheduledEventUserRemove.Add(value); }
+            remove { _guildScheduledEventUserRemove.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<Cacheable<SocketUser, RestUser, IUser, ulong>, SocketGuildEvent, Task>> _guildScheduledEventUserRemove = new AsyncEvent<Func<Cacheable<SocketUser, RestUser, IUser, ulong>, SocketGuildEvent, Task>>();
+
 
         #endregion
 

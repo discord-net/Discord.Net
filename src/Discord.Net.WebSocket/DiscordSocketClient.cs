@@ -2597,6 +2597,7 @@ namespace Discord.WebSocket
                                     }
 
                                     var before = guild.GetEvent(data.Id);
+
                                     var beforeCacheable = new Cacheable<SocketGuildEvent, ulong>(before, data.Id, before != null, () => Task.FromResult((SocketGuildEvent)null));
 
                                     var after = guild.AddOrUpdateEvent(data);
@@ -2629,6 +2630,44 @@ namespace Discord.WebSocket
                                     var guildEvent = guild.RemoveEvent(data.Id) ?? SocketGuildEvent.Create(this, guild, data);
 
                                     await TimedInvokeAsync(_guildScheduledEventCancelled, nameof(GuildScheduledEventCancelled), guildEvent).ConfigureAwait(false);
+                                }
+                                break;
+                            case "GUILD_SCHEDULED_EVENT_USER_ADD" or "GUILD_SCHEDULED_EVENT_USER_REMOVE":
+                                {
+                                    await _gatewayLogger.DebugAsync($"Received Dispatch ({type})").ConfigureAwait(false);
+
+                                    var data = (payload as JToken).ToObject<GuildScheduledEventUserAddRemoveEvent>(_serializer);
+
+                                    var guild = State.GetGuild(data.GuildId);
+
+                                    if(guild == null)
+                                    {
+                                        await UnknownGuildAsync(type, data.GuildId).ConfigureAwait(false);
+                                        return;
+                                    }
+
+                                    var guildEvent = guild.GetEvent(data.EventId);
+
+                                    if (guildEvent == null)
+                                    {
+                                        await UnknownGuildEventAsync(type, data.EventId, data.GuildId).ConfigureAwait(false);
+                                        return;
+                                    }
+
+                                    var user = (SocketUser)guild.GetUser(data.UserId) ?? State.GetUser(data.UserId);
+
+                                    var cacheableUser = new Cacheable<SocketUser, RestUser, IUser, ulong>(user, data.UserId, user != null, () => Rest.GetUserAsync(data.UserId));
+
+                                    switch (type)
+                                    {
+                                        case "GUILD_SCHEDULED_EVENT_USER_ADD":
+                                            await TimedInvokeAsync(_guildScheduledEventUserAdd, nameof(GuildScheduledEventUserAdd), cacheableUser, guildEvent).ConfigureAwait(false);
+                                            break;
+                                        case "GUILD_SCHEDULED_EVENT_USER_REMOVE":
+                                            await TimedInvokeAsync(_guildScheduledEventUserRemove, nameof(GuildScheduledEventUserRemove), cacheableUser, guildEvent).ConfigureAwait(false);
+                                            break;
+                                    }
+
                                 }
                                 break;
 
@@ -2946,6 +2985,12 @@ namespace Discord.WebSocket
         {
             string details = $"{evnt} Guild={guildId}";
             await _gatewayLogger.WarningAsync($"Unknown Guild ({details}).").ConfigureAwait(false);
+        }
+
+        private async Task UnknownGuildEventAsync(string evnt, ulong eventId, ulong guildId)
+        {
+            string details = $"{evnt} Event={eventId} Guild={guildId}";
+            await _gatewayLogger.WarningAsync($"Unknown Guild Event ({details}).").ConfigureAwait(false);
         }
         private async Task UnsyncedGuildAsync(string evnt, ulong guildId)
         {
