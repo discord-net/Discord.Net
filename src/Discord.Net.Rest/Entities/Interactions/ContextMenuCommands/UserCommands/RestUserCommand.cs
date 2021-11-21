@@ -11,7 +11,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents a REST-based user command.
     /// </summary>
-    internal class RestUserCommand : RestCommandBase, IUserCommandInteraction, IDiscordInteraction
+    public class RestUserCommand : RestCommandBase, IUserCommandInteraction, IDiscordInteraction
     {
         /// <summary>
         ///     Gets the data associated with this interaction.
