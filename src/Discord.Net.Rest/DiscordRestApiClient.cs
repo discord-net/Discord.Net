@@ -2235,7 +2235,7 @@ namespace Discord.API
                         if (x.HttpCode == HttpStatusCode.BadRequest)
                         {
                             var json = (x.Request as JsonRestRequest).Json;
-                            throw new ApplicationCommandException(json, x);
+                            throw new ApplicationCommandException(x);
                         }
                     }
 
@@ -2249,7 +2249,7 @@ namespace Discord.API
                 if (x.HttpCode == HttpStatusCode.BadRequest)
                 {
                     var json = (x.Request as JsonRestRequest).Json;
-                    throw new ApplicationCommandException(json, x);
+                    throw new ApplicationCommandException(x);
                 }
 
                 throw;

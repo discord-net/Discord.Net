@@ -12,8 +12,8 @@ namespace Discord.Net.Converters
     {
         #region DiscordContractResolver
         private static readonly TypeInfo _ienumerable = typeof(IEnumerable<ulong[]>).GetTypeInfo();
-        private static readonly MethodInfo _shouldSerialize = typeof(DiscordContractResolver).GetTypeInfo().GetDeclaredMethod("ShouldSerialize");    
-        
+        private static readonly MethodInfo _shouldSerialize = typeof(DiscordContractResolver).GetTypeInfo().GetDeclaredMethod("ShouldSerialize");
+
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var property = base.CreateProperty(member, memberSerialization);
@@ -58,7 +58,7 @@ namespace Discord.Net.Converters
                 else if (genericType == typeof(EntityOrId<>))
                     return MakeGenericConverter(property, propInfo, typeof(UInt64EntityOrIdConverter<>), type.GenericTypeArguments[0], depth);
             }
-#endregion
+            #endregion
 
             #region Primitives
             bool hasInt53 = propInfo.GetCustomAttribute<Int53Attribute>() != null;
@@ -87,6 +87,8 @@ namespace Discord.Net.Converters
                 return MessageComponentConverter.Instance;
             if (type == typeof(API.Interaction))
                 return InteractionConverter.Instance;
+            if (type == typeof(API.DiscordError))
+                return DiscordErrorConverter.Instance;
             if (type == typeof(GuildFeatures))
                 return GuildFeaturesConverter.Instance;
 
