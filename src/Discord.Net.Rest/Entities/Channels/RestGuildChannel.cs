@@ -47,13 +47,20 @@ namespace Discord.Rest
         internal override void Update(Model model)
         {
             Name = model.Name.Value;
-            Position = model.Position.Value;
 
-            var overwrites = model.PermissionOverwrites.Value;
-            var newOverwrites = ImmutableArray.CreateBuilder<Overwrite>(overwrites.Length);
-            for (int i = 0; i < overwrites.Length; i++)
-                newOverwrites.Add(overwrites[i].ToEntity());
-            _overwrites = newOverwrites.ToImmutable();
+            if (model.Position.IsSpecified)
+            {
+                Position = model.Position.Value;
+            }
+
+            if (model.PermissionOverwrites.IsSpecified)
+            {
+                var overwrites = model.PermissionOverwrites.Value;
+                var newOverwrites = ImmutableArray.CreateBuilder<Overwrite>(overwrites.Length);
+                for (int i = 0; i < overwrites.Length; i++)
+                    newOverwrites.Add(overwrites[i].ToEntity());
+                _overwrites = newOverwrites.ToImmutable();
+            }
         }
 
         /// <inheritdoc />

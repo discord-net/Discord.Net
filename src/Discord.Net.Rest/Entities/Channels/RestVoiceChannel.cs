@@ -38,8 +38,12 @@ namespace Discord.Rest
         {
             base.Update(model);
             CategoryId = model.CategoryId;
-            Bitrate = model.Bitrate.Value;
-            UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
+
+            if(model.Bitrate.IsSpecified)
+                Bitrate = model.Bitrate.Value;
+
+            if(model.UserLimit.IsSpecified)
+                UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
         }
 
         /// <inheritdoc />

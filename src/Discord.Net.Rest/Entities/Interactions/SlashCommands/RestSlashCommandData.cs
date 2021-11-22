@@ -14,13 +14,13 @@ namespace Discord.Rest
         internal RestSlashCommandData(DiscordRestClient client, Model model)
             : base(client, model) { }
 
-        internal static new async Task<RestSlashCommandData> CreateAsync(DiscordRestClient client, Model model, IGuild guild, IRestMessageChannel channel)
+        internal static new async Task<RestSlashCommandData> CreateAsync(DiscordRestClient client, Model model, RestGuild guild, IRestMessageChannel channel)
         {
             var entity = new RestSlashCommandData(client, model);
             await entity.UpdateAsync(client, model, guild, channel).ConfigureAwait(false);
             return entity;
         }
-        internal override async Task UpdateAsync(DiscordRestClient client, Model model, IGuild guild, IRestMessageChannel channel)
+        internal override async Task UpdateAsync(DiscordRestClient client, Model model, RestGuild guild, IRestMessageChannel channel)
         {
             await base.UpdateAsync(client, model, guild, channel).ConfigureAwait(false);
 

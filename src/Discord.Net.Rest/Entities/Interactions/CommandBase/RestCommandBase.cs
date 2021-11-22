@@ -52,15 +52,6 @@ namespace Discord.Rest
         internal override async Task UpdateAsync(DiscordRestClient client, Model model)
         {
             await base.UpdateAsync(client, model).ConfigureAwait(false);
-
-            var data = model.Data.IsSpecified
-                ? (DataModel)model.Data.Value
-                : null;
-
-            if(Data == null)
-            {
-                Data = await RestCommandBaseData.CreateAsync(client, data, Guild, Channel).ConfigureAwait(false);
-            }
         }
 
         /// <summary>

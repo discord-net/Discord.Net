@@ -37,6 +37,23 @@ namespace Discord.Rest
                 _ => new RestChannel(discord, model.Id),
             };
         }
+        internal static RestChannel Create(BaseDiscordClient discord, Model model, IGuild guild)
+        {
+            return model.Type switch
+            {
+                ChannelType.News or
+                ChannelType.Text or
+                ChannelType.Voice or
+                ChannelType.Stage or
+                ChannelType.NewsThread or
+                ChannelType.PrivateThread or
+                ChannelType.PublicThread
+                    => RestGuildChannel.Create(discord, guild, model),
+                ChannelType.DM or ChannelType.Group => CreatePrivate(discord, model) as RestChannel,
+                ChannelType.Category => RestCategoryChannel.Create(discord, guild, model),
+                _ => new RestChannel(discord, model.Id),
+            };
+        }
         /// <exception cref="InvalidOperationException">Unexpected channel type.</exception>
         internal static IRestPrivateChannel CreatePrivate(BaseDiscordClient discord, Model model)
         {

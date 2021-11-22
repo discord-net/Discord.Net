@@ -19,7 +19,7 @@ namespace Discord.Rest
         internal readonly Dictionary<ulong, RestMessage> Messages
             = new Dictionary<ulong, RestMessage>();
 
-        internal async Task PopulateAsync(DiscordRestClient discord, IGuild guild, IRestMessageChannel channel, T model)
+        internal async Task PopulateAsync(DiscordRestClient discord, RestGuild guild, IRestMessageChannel channel, T model)
         {
             var resolved = model.Resolved.Value;
 
@@ -35,11 +35,13 @@ namespace Discord.Rest
 
             if (resolved.Channels.IsSpecified)
             {
-                //var channels = await guild.GetChannelsAsync().ConfigureAwait(false);
+                var channels = await guild.GetChannelsAsync().ConfigureAwait(false);
 
                 foreach (var channelModel in resolved.Channels.Value)
                 {
-                    var restChannel = RestChannel.Create(discord, channelModel.Value);
+                    var restChannel = channels.FirstOrDefault(x => x.Id == channelModel.Value.Id);
+
+                    restChannel.Update(channelModel.Value);
 
                     Channels.Add(ulong.Parse(channelModel.Key), restChannel);
                 }
@@ -49,6 +51,8 @@ namespace Discord.Rest
             {
                 foreach (var member in resolved.Members.Value)
                 {
+                    // pull the adjacent user model
+                    member.Value.User = resolved.Users.Value.FirstOrDefault(x => x.Key == member.Key).Value;
                     var restMember = RestGuildUser.Create(discord, guild, member.Value);
 
                     GuildMembers.Add(ulong.Parse(member.Key), restMember);
