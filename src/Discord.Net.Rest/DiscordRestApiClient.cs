@@ -1187,7 +1187,7 @@ namespace Discord.API
         {
             Preconditions.NotNull(command, nameof(command));
             Preconditions.AtMost(command.Name.Length, 32, nameof(command.Name));
-            Preconditions.AtLeast(command.Name.Length, 3, nameof(command.Name));
+            Preconditions.AtLeast(command.Name.Length, 1, nameof(command.Name));
 
             if (command.Type == ApplicationCommandType.Slash)
             {
@@ -1258,7 +1258,7 @@ namespace Discord.API
         {
             Preconditions.NotNull(command, nameof(command));
             Preconditions.AtMost(command.Name.Length, 32, nameof(command.Name));
-            Preconditions.AtLeast(command.Name.Length, 3, nameof(command.Name));
+            Preconditions.AtLeast(command.Name.Length, 1, nameof(command.Name));
 
             if (command.Type == ApplicationCommandType.Slash)
             {
