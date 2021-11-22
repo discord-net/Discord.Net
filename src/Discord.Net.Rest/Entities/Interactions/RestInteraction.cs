@@ -33,8 +33,7 @@ namespace Discord.Rest
         public RestUser User { get; private set; }
 
         /// <inheritdoc/>
-        public DateTimeOffset CreatedAt
-            => SnowflakeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt { get; private set; }
 
         internal abstract bool _hasResponded { get; set; }
 
@@ -57,7 +56,9 @@ namespace Discord.Rest
         internal RestInteraction(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
-            
+            CreatedAt = discord.UseInteractionSnowflakeDate
+                ? SnowflakeUtils.FromSnowflake(Id)
+                : DateTime.UtcNow;
         }
 
         internal static async Task<RestInteraction> CreateAsync(DiscordRestClient client, Model model)

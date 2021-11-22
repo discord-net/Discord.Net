@@ -35,6 +35,7 @@ namespace Discord.Rest
         public ISelfUser CurrentUser { get; protected set; }
         /// <inheritdoc />
         public TokenType TokenType => ApiClient.AuthTokenType;
+        internal bool UseInteractionSnowflakeDate { get; private set; }
 
         /// <summary> Creates a new REST-only Discord client. </summary>
         internal BaseDiscordClient(DiscordRestConfig config, API.DiscordRestApiClient client)
@@ -46,6 +47,8 @@ namespace Discord.Rest
             _stateLock = new SemaphoreSlim(1, 1);
             _restLogger = LogManager.CreateLogger("Rest");
             _isFirstLogin = config.DisplayInitialLog;
+
+            UseInteractionSnowflakeDate = config.UseInteractionSnowflakeDate;
 
             ApiClient.RequestQueue.RateLimitTriggered += async (id, info, endpoint) =>
             {

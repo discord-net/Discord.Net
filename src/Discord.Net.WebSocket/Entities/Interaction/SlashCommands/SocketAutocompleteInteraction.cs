@@ -18,7 +18,7 @@ namespace Discord.WebSocket
         /// </summary>
         public new SocketAutocompleteInteractionData Data { get; }
 
-        internal override bool _hasResponded { get; set; }
+        public override bool HasResponded { get; internal set; }
         private object _lock = new object();
 
         internal SocketAutocompleteInteraction(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
@@ -60,7 +60,7 @@ namespace Discord.WebSocket
 
             lock (_lock)
             {
-                if (_hasResponded)
+                if (HasResponded)
                 {
                     throw new InvalidOperationException("Cannot respond twice to the same interaction");
                 }
@@ -69,7 +69,7 @@ namespace Discord.WebSocket
             await InteractionHelper.SendAutocompleteResultAsync(Discord, result, Id, Token, options).ConfigureAwait(false);
             lock (_lock)
             {
-                _hasResponded = true;
+                HasResponded = true;
             }
         }
 

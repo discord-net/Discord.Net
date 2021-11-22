@@ -26,7 +26,7 @@ namespace Discord.WebSocket
         public SocketUserMessage Message { get; private set; }
 
         private object _lock = new object();
-        internal override bool _hasResponded { get; set; } = false;
+        public override bool HasResponded { get; internal set; } = false;
 
         internal SocketMessageComponent(DiscordSocketClient client, Model model, ISocketMessageChannel channel)
             : base(client, model.Id, channel)
@@ -130,7 +130,7 @@ namespace Discord.WebSocket
 
             lock (_lock)
             {
-                if (_hasResponded)
+                if (HasResponded)
                 {
                     throw new InvalidOperationException("Cannot respond, update, or defer twice to the same interaction");
                 }
@@ -140,7 +140,7 @@ namespace Discord.WebSocket
 
             lock (_lock)
             {
-                _hasResponded = true;
+                HasResponded = true;
             }
         }
 
@@ -225,7 +225,7 @@ namespace Discord.WebSocket
 
             lock (_lock)
             {
-                if (_hasResponded)
+                if (HasResponded)
                 {
                     throw new InvalidOperationException("Cannot respond, update, or defer twice to the same interaction");
                 }
@@ -235,7 +235,7 @@ namespace Discord.WebSocket
 
             lock (_lock)
             {
-                _hasResponded = true;
+                HasResponded = true;
             }
         }
 
@@ -380,7 +380,7 @@ namespace Discord.WebSocket
 
             lock (_lock)
             {
-                if (_hasResponded)
+                if (HasResponded)
                 {
                     throw new InvalidOperationException("Cannot respond or defer twice to the same interaction");
                 }
@@ -390,7 +390,7 @@ namespace Discord.WebSocket
 
             lock (_lock)
             {
-                _hasResponded = true;
+                HasResponded = true;
             }
         }
 
@@ -408,7 +408,7 @@ namespace Discord.WebSocket
 
             lock (_lock)
             {
-                if (_hasResponded)
+                if (HasResponded)
                 {
                     throw new InvalidOperationException("Cannot respond or defer twice to the same interaction");
                 }
@@ -418,7 +418,7 @@ namespace Discord.WebSocket
 
             lock (_lock)
             {
-                _hasResponded = true;
+                HasResponded = true;
             }
         }
 

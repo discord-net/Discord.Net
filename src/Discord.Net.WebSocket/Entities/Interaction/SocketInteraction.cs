@@ -44,10 +44,16 @@ namespace Discord.WebSocket
         public int Version { get; private set; }
 
         /// <inheritdoc/>
-        public DateTimeOffset CreatedAt
-            => SnowflakeUtils.FromSnowflake(Id);
+        public DateTimeOffset CreatedAt { get; private set; }
 
-        internal abstract bool _hasResponded { get; set; }
+        /// <summary>
+        ///     Gets whether or not this interaction has been responded to.
+        /// </summary>
+        /// <remarks>
+        ///     This property is locally set -- if you're running multiple bots
+        ///     off the same token then this property won't be in sync with them.
+        /// </remarks>
+        public abstract bool HasResponded { get; internal set; }
 
         /// <summary>
         ///     <see langword="true"/> if the token is valid for replying to, otherwise <see langword="false"/>.
@@ -59,6 +65,10 @@ namespace Discord.WebSocket
             : base(client, id)
         {
             Channel = channel;
+
+            CreatedAt = client.UseInteractionSnowflakeDate
+                ? SnowflakeUtils.FromSnowflake(Id)
+                : DateTime.UtcNow;
         }
 
         internal static SocketInteraction Create(DiscordSocketClient client, Model model, ISocketMessageChannel channel)

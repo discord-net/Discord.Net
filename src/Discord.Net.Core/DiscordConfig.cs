@@ -165,5 +165,17 @@ namespace Discord
 		///		clock. Your system will still need a stable clock.
 		/// </remarks>
 		public bool UseSystemClock { get; set; } = true;
+
+        /// <summary>
+        ///     Gets or sets whether or not the internal experation check uses the system date
+        ///     + snowflake date to check if an interaction can be responded to.
+        /// </summary>
+        /// <remarks>
+        ///     If set to <see langword="false"/> then the CreatedAt property in an interaction
+        ///     will be set to when it was received instead of the snowflakes date.
+        ///     <br/>
+        ///     <b>This will still require a stable clock on your system.</b>
+        /// </remarks>
+        public bool UseInteractionSnowflakeDate { get; set; } = true;
     }
 }
