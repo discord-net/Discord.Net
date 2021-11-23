@@ -51,7 +51,7 @@ namespace Discord.Net
             RetryAfter = headers.TryGetValue("Retry-After", out temp) &&
                 int.TryParse(temp, NumberStyles.None, CultureInfo.InvariantCulture, out var retryAfter) ? retryAfter : (int?)null;
 			ResetAfter = headers.TryGetValue("X-RateLimit-Reset-After", out temp) &&
-                double.TryParse(temp, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var resetAfter) ? TimeSpan.FromMilliseconds((long)(resetAfter * 1000)) : (TimeSpan?)null;
+                double.TryParse(temp, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var resetAfter) ? TimeSpan.FromSeconds(resetAfter) : (TimeSpan?)null;
             Bucket = headers.TryGetValue("X-RateLimit-Bucket", out temp) ? temp : null;
             Lag = headers.TryGetValue("Date", out temp) &&
                 DateTimeOffset.TryParse(temp, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date) ? DateTimeOffset.UtcNow - date : (TimeSpan?)null;
