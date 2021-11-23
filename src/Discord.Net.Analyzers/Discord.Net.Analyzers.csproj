@@ -6,9 +6,6 @@
     <Description>A Discord.Net extension adding support for design-time analysis of the API usage.</Description>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DocumentationFile>..\Discord.Net.Analyzers\Discord.Net.Analyzers.xml</DocumentationFile>
-  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis" Version="3.11.0" />
   </ItemGroup>
