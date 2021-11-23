@@ -371,7 +371,7 @@ namespace Discord.Net.Queue
                 if (info.RetryAfter.HasValue)
                 {
                     //RetryAfter is more accurate than Reset, where available
-                    resetTick = DateTimeOffset.UtcNow.AddMilliseconds(info.RetryAfter.Value);
+                    resetTick = DateTimeOffset.UtcNow.AddSeconds(info.RetryAfter.Value);
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Retry-After: {info.RetryAfter.Value} ({info.RetryAfter.Value} ms)");
 #endif
