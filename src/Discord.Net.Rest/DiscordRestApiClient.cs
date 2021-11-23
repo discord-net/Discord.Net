@@ -339,9 +339,9 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.GreaterThan(args.Bitrate, 0, nameof(args.Bitrate));
             Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
-            Preconditions.LessThan(args.Name.Length, 100, nameof(args.Name));
+            Preconditions.AtMost(args.Name.Length, 100, nameof(args.Name));
             if (args.Topic.IsSpecified)
-                Preconditions.LessThan(args.Topic.Value.Length, 1024, nameof(args.Name));
+                Preconditions.AtMost(args.Topic.Value.Length, 1024, nameof(args.Name));
 
             options = RequestOptions.CreateOrClone(options);
 
@@ -375,7 +375,7 @@ namespace Discord.API
             Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
 
             if(args.Name.IsSpecified)
-                Preconditions.LessThan(args.Name.Value.Length, 100, nameof(args.Name));
+                Preconditions.AtMost(args.Name.Value.Length, 100, nameof(args.Name));
 
             options = RequestOptions.CreateOrClone(options);
 
@@ -391,9 +391,9 @@ namespace Discord.API
             Preconditions.NotNullOrWhitespace(args.Name, nameof(args.Name));
 
             if(args.Name.IsSpecified)
-                Preconditions.LessThan(args.Name.Value.Length, 100, nameof(args.Name));
+                Preconditions.AtMost(args.Name.Value.Length, 100, nameof(args.Name));
             if(args.Topic.IsSpecified)
-                Preconditions.LessThan(args.Topic.Value.Length, 1024, nameof(args.Name));
+                Preconditions.AtMost(args.Topic.Value.Length, 1024, nameof(args.Name));
 
             Preconditions.AtLeast(args.SlowModeInterval, 0, nameof(args.SlowModeInterval));
             Preconditions.AtMost(args.SlowModeInterval, 21600, nameof(args.SlowModeInterval));
