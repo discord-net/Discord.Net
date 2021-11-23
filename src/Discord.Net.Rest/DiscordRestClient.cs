@@ -1,8 +1,13 @@
 //using Discord.Rest.Entities.Interactions;
+using Discord.Net;
+using Discord.Net.Converters;
+using Discord.Net.ED25519;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Discord.Rest
@@ -14,12 +19,13 @@ namespace Discord.Rest
     {
         #region DiscordRestClient
         private RestApplication _applicationInfo;
+        internal static JsonSerializer Serializer = new JsonSerializer() { ContractResolver = new DiscordContractResolver(), NullValueHandling = NullValueHandling.Include };
 
         /// <summary>
         ///     Gets the logged-in user.
         /// </summary>
         public new RestSelfUser CurrentUser { get => base.CurrentUser as RestSelfUser; internal set => base.CurrentUser = value; }
-
+        
         /// <inheritdoc />
         public DiscordRestClient() : this(new DiscordRestConfig()) { }
         /// <summary>
@@ -31,7 +37,7 @@ namespace Discord.Rest
         internal DiscordRestClient(DiscordRestConfig config, API.DiscordRestApiClient api) : base(config, api) { }
 
         private static API.DiscordRestApiClient CreateApiClient(DiscordRestConfig config)
-            => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, useSystemClock: config.UseSystemClock);
+            => new API.DiscordRestApiClient(config.RestClientProvider, DiscordRestConfig.UserAgent, serializer: Serializer, useSystemClock: config.UseSystemClock);
 
         internal override void Dispose(bool disposing)
         {
@@ -59,6 +65,70 @@ namespace Discord.Rest
             _applicationInfo = null;
             return Task.Delay(0);
         }
+
+        #region Rest interactions
+
+        public bool IsValidHttpInteraction(string publicKey, string signature, string timestamp, string body)
+            => IsValidHttpInteraction(publicKey, signature, timestamp, Encoding.UTF8.GetBytes(body));
+        public bool IsValidHttpInteraction(string publicKey, string signature, string timestamp, byte[] body)
+        {
+            var key = HexConverter.HexToByteArray(publicKey);
+            var sig = HexConverter.HexToByteArray(signature);
+            var tsp = Encoding.UTF8.GetBytes(timestamp);
+
+            var message = new List<byte>();
+            message.AddRange(tsp);
+            message.AddRange(body);
+
+            return IsValidHttpInteraction(key, sig, message.ToArray());
+        }
+
+        private bool IsValidHttpInteraction(byte[] publicKey, byte[] signature, byte[] message)
+        {
+            return Ed25519.Verify(signature, message, publicKey);
+        }
+
+        /// <summary>
+        ///     Creates a <see cref="RestInteraction"/> from a http message.
+        /// </summary>
+        /// <param name="publicKey">The public key of your application</param>
+        /// <param name="signature">The signature sent with the interaction.</param>
+        /// <param name="timestamp">The timestamp sent with the interaction.</param>
+        /// <param name="body">The body of the http message.</param>
+        /// <returns>
+        ///     A <see cref="RestInteraction"/> that represents the incoming http interaction.
+        /// </returns>
+        /// <exception cref="BadSignatureException">Thrown when the signature doesn't match the public key.</exception>
+        public Task<RestInteraction> ParseHttpInteractionAsync(string publicKey, string signature, string timestamp, string body)
+            => ParseHttpInteractionAsync(publicKey, signature, timestamp, Encoding.UTF8.GetBytes(body));
+
+        /// <summary>
+        ///     Creates a <see cref="RestInteraction"/> from a http message.
+        /// </summary>
+        /// <param name="publicKey">The public key of your application</param>
+        /// <param name="signature">The signature sent with the interaction.</param>
+        /// <param name="timestamp">The timestamp sent with the interaction.</param>
+        /// <param name="body">The body of the http message.</param>
+        /// <returns>
+        ///     A <see cref="RestInteraction"/> that represents the incoming http interaction.
+        /// </returns>
+        /// <exception cref="BadSignatureException">Thrown when the signature doesn't match the public key.</exception>
+        public async Task<RestInteraction> ParseHttpInteractionAsync(string publicKey, string signature, string timestamp, byte[] body)
+        {
+            if (!IsValidHttpInteraction(publicKey, signature, timestamp, body))
+            {
+                throw new BadSignatureException();
+            }
+
+            using (var textReader = new StringReader(Encoding.UTF8.GetString(body)))
+            using (var jsonReader = new JsonTextReader(textReader))
+            {
+                var model = Serializer.Deserialize<API.Interaction>(jsonReader);
+                return await RestInteraction.CreateAsync(this, model);
+            }
+        }
+
+        #endregion
 
         public async Task<RestApplication> GetApplicationInfoAsync(RequestOptions options = null)
         {

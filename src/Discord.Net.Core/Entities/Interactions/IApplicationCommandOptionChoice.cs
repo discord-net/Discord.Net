@@ -6,7 +6,7 @@ namespace Discord
     public interface IApplicationCommandOptionChoice
     {
         /// <summary>
-        ///    Gets the name of this choice.
+        ///     Gets the choice name.
         /// </summary>
         string Name { get; }
 

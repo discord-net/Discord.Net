@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
+using EventUserModel = Discord.API.GuildScheduledEventUser;
 
 namespace Discord.Rest
 {
@@ -62,6 +63,18 @@ namespace Discord.Rest
             entity.Update(model);
             return entity;
         }
+        internal static RestUser Create(BaseDiscordClient discord, IGuild guild, EventUserModel model)
+        {
+            if (model.Member.IsSpecified)
+            {
+                var member = model.Member.Value;
+                member.User = model.User;
+                return RestGuildUser.Create(discord, guild, member);
+            }
+            else
+                return RestUser.Create(discord, model.User);
+        }
+
         internal virtual void Update(Model model)
         {
             if (model.Avatar.IsSpecified)

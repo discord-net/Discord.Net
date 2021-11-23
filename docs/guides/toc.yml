@@ -1,26 +1,15 @@
 - name: Introduction
   topicUid: Guides.Introduction
-- name: Getting Started
+- name: "Working with Guild Events"
   items:
-    - name: Installation
-      topicUid: Guides.GettingStarted.Installation
-      items:
-        - name: Nightly Builds
-          topicUid: Guides.GettingStarted.Installation.Nightlies
-    - name: Your First Bot
-      topicUid: Guides.GettingStarted.FirstBot
-    - name: Terminology
-      topicUid: Guides.GettingStarted.Terminology
-- name: Basic Concepts
-  items:
-    - name: Logging Data
-      topicUid: Guides.Concepts.Logging
-    - name: Working with Events
-      topicUid: Guides.Concepts.Events
-    - name: Managing Connections
-      topicUid: Guides.Concepts.ManageConnections
-    - name: Entities
-      topicUid: Guides.Concepts.Entities
+    - name: Introduction
+      topicUid: Guides.GuildEvents.Intro
+    - name: Creating Events
+      topicUid: Guides.GuildEvents.Creating
+    - name: Getting Event Users
+      topicUid: Guides.GuildEvents.GettingUsers
+    - name: Modifying Events
+      topicUid: Guides.GuildEvents.Modifying
 - name: Working with Commands
   items:
     - name: Introduction
@@ -35,7 +24,7 @@
       topicUid: Guides.Commands.DI
     - name: Post-execution Handling
       topicUid: Guides.Commands.PostExecution
-- name: Working with Slash commands
+- name: Working with Slash Commands
   items:
     - name: Introduction
       topicUid: Guides.SlashCommands.Intro

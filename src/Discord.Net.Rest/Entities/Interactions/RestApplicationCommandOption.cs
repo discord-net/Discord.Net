@@ -26,6 +26,12 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public bool? IsRequired { get; private set; }
 
+        /// <inheritdoc/>
+        public double? MinValue { get; private set; }
+
+        /// <inheritdoc/>
+        public double? MaxValue { get; private set; }
+
         /// <summary>
         ///     A collection of <see cref="RestApplicationCommandChoice"/>'s for this command.
         /// </summary>
@@ -61,6 +67,12 @@ namespace Discord.Rest
 
             if (model.Required.IsSpecified)
                 IsRequired = model.Required.Value;
+
+            if (model.MinValue.IsSpecified)
+                MinValue = model.MinValue.Value;
+
+            if (model.MaxValue.IsSpecified)
+                MaxValue = model.MaxValue.Value;
 
             Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(Create).ToImmutableArray()

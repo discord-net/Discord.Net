@@ -6,7 +6,7 @@ namespace Discord
     public class AutocompleteOption
     {
         /// <summary>
-        ///     Gets the type of this option
+        ///     Gets the type of this option.
         /// </summary>
         public ApplicationCommandOptionType Type { get; }
 

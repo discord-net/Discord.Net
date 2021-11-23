@@ -22,7 +22,6 @@ namespace Discord.Rest
         private ImmutableDictionary<ulong, RestRole> _roles;
         private ImmutableArray<GuildEmote> _emotes;
         private ImmutableArray<CustomSticker> _stickers;
-        private ImmutableArray<string> _features;
 
         /// <inheritdoc />
         public string Name { get; private set; }
@@ -88,9 +87,12 @@ namespace Discord.Rest
         public int? ApproximatePresenceCount { get; private set; }
         /// <inheritdoc />
         public NsfwLevel NsfwLevel { get; private set; }
-
+        /// <inheritdoc />
+        public bool IsBoostProgressBarEnabled { get; private set; }
         /// <inheritdoc />
         public CultureInfo PreferredCulture { get; private set; }
+        /// <inheritdoc />
+        public GuildFeatures Features { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -116,8 +118,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         public IReadOnlyCollection<GuildEmote> Emotes => _emotes;
         public IReadOnlyCollection<CustomSticker> Stickers => _stickers;
-        /// <inheritdoc />
-        public IReadOnlyCollection<string> Features => _features;
 
         internal RestGuild(BaseDiscordClient client, ulong id)
             : base(client, id)
@@ -170,6 +170,8 @@ namespace Discord.Rest
                 ApproximateMemberCount = model.ApproximateMemberCount.Value;
             if (model.ApproximatePresenceCount.IsSpecified)
                 ApproximatePresenceCount = model.ApproximatePresenceCount.Value;
+            if (model.IsBoostProgressBarEnabled.IsSpecified)
+                IsBoostProgressBarEnabled = model.IsBoostProgressBarEnabled.Value;
 
             if (model.Emojis != null)
             {
@@ -181,10 +183,7 @@ namespace Discord.Rest
             else
                 _emotes = ImmutableArray.Create<GuildEmote>();
 
-            if (model.Features != null)
-                _features = model.Features.ToImmutableArray();
-            else
-                _features = ImmutableArray.Create<string>();
+            Features = model.Features;
 
             var roles = ImmutableDictionary.CreateBuilder<ulong, RestRole>();
             if (model.Roles != null)
@@ -1110,6 +1109,65 @@ namespace Discord.Rest
             => sticker.DeleteAsync(options);
         #endregion
 
+        #region Guild Events
+
+        /// <summary>
+        ///     Gets an event within this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the event.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation.
+        /// </returns>
+        public Task<RestGuildEvent> GetEventAsync(ulong id, RequestOptions options = null)
+            => GuildHelper.GetGuildEventAsync(Discord, id, this, options);
+
+        /// <summary>
+        ///     Gets all active events within this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation.
+        /// </returns>
+        public Task<IReadOnlyCollection<RestGuildEvent>> GetEventsAsync(RequestOptions options = null)
+            => GuildHelper.GetGuildEventsAsync(Discord, this, options);
+
+        /// <summary>
+        ///     Creates an event within this guild.
+        /// </summary>
+        /// <param name="name">The name of the event.</param>
+        /// <param name="privacyLevel">The privacy level of the event.</param>
+        /// <param name="startTime">The start time of the event.</param>
+        /// <param name="type">The type of the event.</param>
+        /// <param name="description">The description of the event.</param>
+        /// <param name="endTime">The end time of the event.</param>
+        /// <param name="channelId">
+        ///     The channel id of the event.
+        ///     <remarks>
+        ///     The event must have a type of <see cref="GuildScheduledEventType.Stage"/> or <see cref="GuildScheduledEventType.Voice"/>
+        ///     in order to use this property.
+        ///     </remarks>
+        /// </param>
+        /// <param name="speakers">A collection of speakers for the event.</param>
+        /// <param name="location">The location of the event; links are supported</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous create operation.
+        /// </returns>
+        public Task<RestGuildEvent> CreateEventAsync(
+            string name,
+            DateTimeOffset startTime,
+            GuildScheduledEventType type,
+            GuildScheduledEventPrivacyLevel privacyLevel = GuildScheduledEventPrivacyLevel.Private,
+            string description = null,
+            DateTimeOffset? endTime = null,
+            ulong? channelId = null,
+            string location = null,
+            RequestOptions options = null)
+            => GuildHelper.CreateGuildEventAsync(Discord, this, name, privacyLevel, startTime, type, description, endTime, channelId, location, options);
+
+        #endregion
+
         #region IGuild
         /// <inheritdoc />
         bool IGuild.Available => Available;
@@ -1121,6 +1179,18 @@ namespace Discord.Rest
         IReadOnlyCollection<IRole> IGuild.Roles => Roles;
 
         IReadOnlyCollection<ICustomSticker> IGuild.Stickers => Stickers;
+
+        /// <inheritdoc />
+        async Task<IGuildScheduledEvent> IGuild.CreateEventAsync(string name, DateTimeOffset startTime, GuildScheduledEventType type, GuildScheduledEventPrivacyLevel privacyLevel, string description, DateTimeOffset? endTime, ulong? channelId, string location, RequestOptions options)
+            => await CreateEventAsync(name, startTime, type, privacyLevel, description, endTime, channelId, location, options).ConfigureAwait(false);
+
+        /// <inheritdoc />
+        async Task<IGuildScheduledEvent> IGuild.GetEventAsync(ulong id, RequestOptions options)
+            => await GetEventAsync(id, options).ConfigureAwait(false);
+
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IGuildScheduledEvent>> IGuild.GetEventsAsync(RequestOptions options)
+            => await GetEventsAsync(options).ConfigureAwait(false);
 
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(RequestOptions options)

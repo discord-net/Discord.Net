@@ -9,6 +9,7 @@ namespace Discord
     {
         private string _name;
         private object _value;
+
         /// <summary>
         ///     Gets or sets the name of this choice.
         /// </summary>
@@ -24,9 +25,9 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Gets or sets the value of this choice.
+        ///     Gets the value of this choice.
         ///     <note type="warning">
-        ///         Discord only accepts int, string, and doubles as the input.
+        ///         Discord only accepts int, double/floats, and string as the input.
         ///     </note>
         /// </summary>
         public object Value
@@ -34,8 +35,8 @@ namespace Discord
             get => _value;
             set
             {
-                if (value != null && value is not int && value is not string && value is not double)
-                    throw new ArgumentException("The value of a choice must be a string, int, or double!");
+                if (value != null && value is not string && !value.IsNumericType())
+                    throw new ArgumentException("The value of a choice must be a string or a numeric type!");
                 _value = value;
             }
         }

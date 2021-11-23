@@ -15,7 +15,7 @@ namespace Discord
         ulong ApplicationId { get; }
 
         /// <summary>
-        ///     Gets the type of the command
+        ///     Gets the type of the command.
         /// </summary>
         ApplicationCommandType Type { get; }
 
@@ -30,12 +30,12 @@ namespace Discord
         string Description { get; }
 
         /// <summary>
-        ///     Gets whether or not the command is enabled by default when the app is added to a guild.
+        ///     Gets whether the command is enabled by default when the app is added to a guild.
         /// </summary>
         bool IsDefaultPermission { get; }
 
         /// <summary>
-        ///     Gets the options for this application command.
+        ///     Gets a collection of options for this application command.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandOption> Options { get; }
 

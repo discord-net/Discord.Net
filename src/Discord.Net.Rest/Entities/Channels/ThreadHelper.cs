@@ -9,22 +9,25 @@ namespace Discord.Rest
     internal static class ThreadHelper
     {
         public static async Task<Model> CreateThreadAsync(BaseDiscordClient client, ITextChannel channel, string name, ThreadType type = ThreadType.PublicThread,
-            ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, RequestOptions options = null)
+            ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null)
         {
-            if (autoArchiveDuration == ThreadArchiveDuration.OneWeek && !channel.Guild.Features.Contains("SEVEN_DAY_THREAD_ARCHIVE"))
+            var features = channel.Guild.Features;
+            if (autoArchiveDuration == ThreadArchiveDuration.OneWeek && !features.HasFeature(GuildFeature.SevenDayThreadArchive))
                 throw new ArgumentException($"The guild {channel.Guild.Name} does not have the SEVEN_DAY_THREAD_ARCHIVE feature!", nameof(autoArchiveDuration));
 
-            if (autoArchiveDuration == ThreadArchiveDuration.ThreeDays && !channel.Guild.Features.Contains("THREE_DAY_THREAD_ARCHIVE"))
+            if (autoArchiveDuration == ThreadArchiveDuration.ThreeDays && !features.HasFeature(GuildFeature.ThreeDayThreadArchive))
                 throw new ArgumentException($"The guild {channel.Guild.Name} does not have the THREE_DAY_THREAD_ARCHIVE feature!", nameof(autoArchiveDuration));
 
-            if (type == ThreadType.PrivateThread && !channel.Guild.Features.Contains("PRIVATE_THREADS"))
+            if (type == ThreadType.PrivateThread && !features.HasFeature(GuildFeature.PrivateThreads))
                 throw new ArgumentException($"The guild {channel.Guild.Name} does not have the PRIVATE_THREADS feature!", nameof(type));
 
             var args = new StartThreadParams
             {
                 Name = name,
                 Duration = autoArchiveDuration,
-                Type = type
+                Type = type,
+                Invitable = invitable.HasValue ? invitable.Value : Optional<bool>.Unspecified,
+                Ratelimit = slowmode.HasValue ? slowmode.Value : Optional<int?>.Unspecified,
             };
 
             Model model;
@@ -62,6 +65,10 @@ namespace Discord.Rest
         }
 
         public static async Task<RestThreadUser> GetUserAsync(ulong userId, IThreadChannel channel, BaseDiscordClient client, RequestOptions options = null)
-            => (await GetUsersAsync(channel, client, options).ConfigureAwait(false)).FirstOrDefault(x => x.Id == userId);
+        {
+            var model = await client.ApiClient.GetThreadMemberAsync(channel.Id, userId, options).ConfigureAwait(false);
+
+            return RestThreadUser.Create(client, channel.Guild, model, channel);
+        }
     }
 }

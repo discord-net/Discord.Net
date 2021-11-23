@@ -25,6 +25,12 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public bool? IsRequired { get; private set; }
 
+        /// <inheritdoc/>
+        public double? MinValue { get; private set; }
+
+        /// <inheritdoc/>
+        public double? MaxValue { get; private set; }
+
         /// <summary>
         ///     Choices for string and int types for the user to pick from.
         /// </summary>
@@ -54,13 +60,13 @@ namespace Discord.WebSocket
             Type = model.Type;
             Description = model.Description;
 
-            IsDefault = model.Default.IsSpecified
-                ? model.Default.Value
-                : null;
+            IsDefault = model.Default.ToNullable();
 
-            IsRequired = model.Required.IsSpecified
-                ? model.Required.Value
-                : null;
+            IsRequired = model.Required.ToNullable();
+
+            MinValue = model.MinValue.ToNullable();
+
+            MaxValue = model.MaxValue.ToNullable();
 
             Choices = model.Choices.IsSpecified
                 ? model.Choices.Value.Select(SocketApplicationCommandChoice.Create).ToImmutableArray()

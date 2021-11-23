@@ -1,3 +1,4 @@
+using Discord.API;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -5,6 +6,7 @@ using System;
 using System.Diagnostics;
 #endif
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -99,9 +101,7 @@ namespace Discord.Net.Queue
 
                                 continue; //Retry
                             default:
-                                int? code = null;
-                                string reason = null;
-                                object errors = null;
+                                API.DiscordError error = null;
                                 if (response.Stream != null)
                                 {
                                     try
@@ -109,15 +109,14 @@ namespace Discord.Net.Queue
                                         using (var reader = new StreamReader(response.Stream))
                                         using (var jsonReader = new JsonTextReader(reader))
                                         {
-                                            var json = JToken.Load(jsonReader);
-                                            try { code = json.Value<int>("code"); } catch { };
-                                            try { reason = json.Value<string>("message"); } catch { };
-                                            try { errors = json.Value<object>("errors"); } catch { };
+                                            error = Discord.Rest.DiscordRestClient.Serializer.Deserialize<API.DiscordError>(jsonReader);
                                         }
                                     }
                                     catch { }
                                 }
-                                throw new HttpException(response.StatusCode, request, code, reason, errors);
+                                throw new HttpException(response.StatusCode, request, error?.Code, error.Message, error.Errors.IsSpecified
+                                    ? error.Errors.Value.Select(x => new DiscordJsonError(x.Name.GetValueOrDefault("root"), x.Errors.Select(y => new DiscordError(y.Code, y.Message)).ToArray())).ToArray()
+                                    : null);
                         }
                     }
                     else
@@ -372,7 +371,7 @@ namespace Discord.Net.Queue
                 if (info.RetryAfter.HasValue)
                 {
                     //RetryAfter is more accurate than Reset, where available
-                    resetTick = DateTimeOffset.UtcNow.AddMilliseconds(info.RetryAfter.Value);
+                    resetTick = DateTimeOffset.UtcNow.AddSeconds(info.RetryAfter.Value);
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Retry-After: {info.RetryAfter.Value} ({info.RetryAfter.Value} ms)");
 #endif

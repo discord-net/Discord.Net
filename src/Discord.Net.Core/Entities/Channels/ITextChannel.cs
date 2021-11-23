@@ -141,11 +141,13 @@ namespace Discord
         ///     </para>
         /// </param>
         /// <param name="message">The message which to start the thread from.</param>
+        /// <param name="invitable">Whether non-moderators can add other non-moderators to a thread; only available when creating a private thread</param>
+        /// <param name="slowmode">The amount of seconds a user has to wait before sending another message (0-21600)</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous create operation. The task result contains a <see cref="IThreadChannel"/>
         /// </returns>
         Task<IThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay,
-            IMessage message = null, RequestOptions options = null);
+            IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null);
     }
 }

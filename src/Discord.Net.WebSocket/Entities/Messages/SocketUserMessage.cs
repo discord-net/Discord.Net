@@ -154,6 +154,12 @@ namespace Discord.WebSocket
                         if (sticker == null)
                             sticker = Discord.GetSticker(stickerItem.Id);
 
+                        // if they want to auto resolve
+                        if (Discord.AlwaysResolveStickers)
+                        {
+                            sticker = Task.Run(async () => await Discord.GetStickerAsync(stickerItem.Id).ConfigureAwait(false)).GetAwaiter().GetResult();
+                        }
+
                         // if its still null, create an unknown
                         if (sticker == null)
                             sticker = SocketUnknownSticker.Create(Discord, stickerItem);

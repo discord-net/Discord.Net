@@ -18,6 +18,12 @@ namespace Discord.Rest
         {
             var args = new RoleProperties();
             func(args);
+
+            if (args.Icon.IsSpecified)
+            {
+                role.Guild.Features.EnsureFeature(GuildFeature.RoleIcons);
+            }
+
             var apiArgs = new API.Rest.ModifyGuildRoleParams
             {
                 Color = args.Color.IsSpecified ? args.Color.Value.RawValue : Optional.Create<uint>(),

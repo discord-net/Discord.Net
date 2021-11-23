@@ -6,13 +6,12 @@ namespace Discord
     public enum StagePrivacyLevel
     {
         /// <summary>
-        ///     The stage is a public stage.
+        ///     The Stage instance is visible publicly, such as on Stage Discovery.
         /// </summary>
         Public = 1,
-
         /// <summary>
-        ///     The stage is non public and is only accessable from the guild.
+        ///     The Stage instance is visible to only guild members.
         /// </summary>
-        GuildOnly = 2,
+        GuildOnly = 2
     }
 }

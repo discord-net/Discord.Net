@@ -33,6 +33,10 @@ namespace Discord.WebSocket
         public bool IsMentionable { get; private set; }
         /// <inheritdoc />
         public string Name { get; private set; }
+        /// <inheritdoc/>
+        public Emoji Emoji { get; private set; }
+        /// <inheritdoc />
+        public string Icon { get; private set; }
         /// <inheritdoc />
         public string Icon { get; private set; }
         /// <inheritdoc />
@@ -83,6 +87,16 @@ namespace Discord.WebSocket
             Permissions = new GuildPermissions(model.Permissions);
             if (model.Tags.IsSpecified)
                 Tags = model.Tags.Value.ToEntity();
+
+            if (model.Icon.IsSpecified)
+            {
+                Icon = model.Icon.Value;
+            }
+
+            if (model.Emoji.IsSpecified)
+            {
+                Emoji = new Emoji(model.Emoji.Value);
+            }
         }
 
         /// <inheritdoc />

@@ -32,9 +32,6 @@ namespace Discord
         /// <summary>
         ///     Gets whether or not the stage is live.
         /// </summary>
-        /// <remarks>
-        ///     If the stage isn't live then this property will be set to <see langword="null"/>.
-        /// </remarks>
         bool IsLive { get; }
 
         /// <summary>
