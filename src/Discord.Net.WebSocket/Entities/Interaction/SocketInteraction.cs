@@ -55,8 +55,6 @@ namespace Discord.WebSocket
         /// </remarks>
         public abstract bool HasResponded { get; internal set; }
 
-        internal abstract bool _hasResponded { get; set; }
-
         /// <summary>
         ///     <see langword="true"/> if the token is valid for replying to, otherwise <see langword="false"/>.
         /// </summary>
