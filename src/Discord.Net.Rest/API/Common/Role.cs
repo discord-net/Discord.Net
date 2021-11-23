@@ -9,7 +9,9 @@ namespace Discord.API
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("icon")]
-        public string Icon { get; set; }
+        public Optional<string> Icon { get; set; }
+        [JsonProperty("unicode_emoji")]
+        public Optional<string> Emoji { get; set; }
         [JsonProperty("color")]
         public uint Color { get; set; }
         [JsonProperty("hoist")]
