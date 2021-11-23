@@ -13,6 +13,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public abstract class SocketChannel : SocketEntity<ulong>, IChannel
     {
+        #region SocketChannel
         /// <summary>
         ///     Gets when the channel is created.
         /// </summary>
@@ -30,19 +31,17 @@ namespace Discord.WebSocket
         /// <exception cref="InvalidOperationException">Unexpected channel type is created.</exception>
         internal static ISocketPrivateChannel CreatePrivate(DiscordSocketClient discord, ClientState state, Model model)
         {
-            switch (model.Type)
+            return model.Type switch
             {
-                case ChannelType.DM:
-                    return SocketDMChannel.Create(discord, state, model);
-                case ChannelType.Group:
-                    return SocketGroupChannel.Create(discord, state, model);
-                default:
-                    throw new InvalidOperationException($"Unexpected channel type: {model.Type}");
-            }
+                ChannelType.DM => SocketDMChannel.Create(discord, state, model),
+                ChannelType.Group => SocketGroupChannel.Create(discord, state, model),
+                _ => throw new InvalidOperationException($"Unexpected channel type: {model.Type}"),
+            };
         }
         internal abstract void Update(ClientState state, Model model);
+        #endregion
 
-        //User
+        #region User
         /// <summary>
         ///     Gets a generic user from this channel.
         /// </summary>
@@ -56,8 +55,9 @@ namespace Discord.WebSocket
 
         private string DebuggerDisplay => $"Unknown ({Id}, Channel)";
         internal SocketChannel Clone() => MemberwiseClone() as SocketChannel;
+        #endregion
 
-        //IChannel
+        #region IChannel
         /// <inheritdoc />
         string IChannel.Name => null;
 
@@ -67,5 +67,6 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overridden
+        #endregion
     }
 }

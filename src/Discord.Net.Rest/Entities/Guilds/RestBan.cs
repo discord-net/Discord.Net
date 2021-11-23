@@ -9,6 +9,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestBan : IBan
     {
+        #region RestBan
         /// <summary>
         ///     Gets the banned user.
         /// </summary>
@@ -37,9 +38,11 @@ namespace Discord.Rest
         /// </returns>
         public override string ToString() => User.ToString();
         private string DebuggerDisplay => $"{User}: {Reason}";
+#endregion
 
-        //IBan
+        #region IBan
         /// <inheritdoc />
         IUser IBan.User => User;
+        #endregion
     }
 }

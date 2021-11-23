@@ -102,5 +102,7 @@ namespace Discord
         ///     A string representing the raw presentation of the emote (e.g. <c>&lt;:thonkang:282745590985523200&gt;</c>).
         /// </returns>
         public override string ToString() => $"<{(Animated ? "a" : "")}:{Name}:{Id}>";
+
+        public static implicit operator Emote(string s) => Parse(s);
     }
 }

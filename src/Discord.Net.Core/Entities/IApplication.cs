@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Discord
 {
     /// <summary>
@@ -16,8 +18,16 @@ namespace Discord
         /// <summary>
         ///     Gets the RPC origins of the application.
         /// </summary>
-        string[] RPCOrigins { get; }
-        ulong Flags { get; }
+        IReadOnlyCollection<string> RPCOrigins { get; }
+        ApplicationFlags Flags { get; }
+        /// <summary>
+        ///     Gets a collection of install parameters for this application.
+        /// </summary>
+        ApplicationInstallParams InstallParams { get; }
+        /// <summary>
+        ///     Gets a collection of tags related to the application.
+        /// </summary>
+        IReadOnlyCollection<string> Tags { get; }
         /// <summary>
         ///     Gets the icon URL of the application.
         /// </summary>

@@ -7,6 +7,7 @@ namespace Discord.Commands.Builders
 {
     public class ModuleBuilder
     {
+        #region ModuleBuilder
         private readonly List<CommandBuilder> _commands;
         private readonly List<ModuleBuilder> _submodules;
         private readonly List<PreconditionAttribute> _preconditions;
@@ -27,8 +28,9 @@ namespace Discord.Commands.Builders
         public IReadOnlyList<string> Aliases => _aliases;
 
         internal TypeInfo TypeInfo { get; set; }
+        #endregion
 
-        //Automatic
+        #region Automatic
         internal ModuleBuilder(CommandService service, ModuleBuilder parent)
         {
             Service = service;
@@ -40,7 +42,9 @@ namespace Discord.Commands.Builders
             _attributes = new List<Attribute>();
             _aliases = new List<string>();
         }
-        //User-defined
+        #endregion
+
+        #region User-defined
         internal ModuleBuilder(CommandService service, ModuleBuilder parent, string primaryAlias)
             : this(service, parent)
         {
@@ -132,5 +136,6 @@ namespace Discord.Commands.Builders
         public ModuleInfo Build(CommandService service, IServiceProvider services) => BuildImpl(service, services);
 
         internal ModuleInfo Build(CommandService service, IServiceProvider services, ModuleInfo parent) => BuildImpl(service, services, parent);
+        #endregion
     }
 }

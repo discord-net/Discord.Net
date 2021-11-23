@@ -13,6 +13,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketWebhookUser : SocketUser, IWebhookUser
     {
+        #region SocketWebhookUser
         /// <summary> Gets the guild of this webhook. </summary>
         public SocketGuild Guild { get; }
         /// <inheritdoc />
@@ -24,6 +25,8 @@ namespace Discord.WebSocket
         public override ushort DiscriminatorValue { get; internal set; }
         /// <inheritdoc />
         public override string AvatarId { get; internal set; }
+
+
         /// <inheritdoc />
         public override bool IsBot { get; internal set; }
 
@@ -49,9 +52,9 @@ namespace Discord.WebSocket
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Webhook)";
         internal new SocketWebhookUser Clone() => MemberwiseClone() as SocketWebhookUser;
+#endregion
 
-
-        //IGuildUser
+        #region IGuildUser
         /// <inheritdoc />
         IGuild IGuildUser.Guild => Guild;
         /// <inheritdoc />
@@ -63,9 +66,15 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         string IGuildUser.Nickname => null;
         /// <inheritdoc />
+        string IGuildUser.GuildAvatarId => null;
+        /// <inheritdoc />
+        string IGuildUser.GetGuildAvatarUrl(ImageFormat format, ushort size) => null;
+        /// <inheritdoc />
         DateTimeOffset? IGuildUser.PremiumSince => null;
         /// <inheritdoc />
         bool? IGuildUser.IsPending => null;
+        /// <inheritdoc />
+        int IGuildUser.Hierarchy => 0;
         /// <inheritdoc />
         GuildPermissions IGuildUser.GuildPermissions => GuildPermissions.Webhook;
 
@@ -120,8 +129,9 @@ namespace Discord.WebSocket
         /// <exception cref="NotSupportedException">Roles are not supported on webhook users.</exception>
         Task IGuildUser.RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options) =>
             throw new NotSupportedException("Roles are not supported on webhook users.");
+        #endregion
 
-        //IVoiceState
+        #region IVoiceState
         /// <inheritdoc />
         bool IVoiceState.IsDeafened => false;
         /// <inheritdoc />
@@ -138,5 +148,8 @@ namespace Discord.WebSocket
         string IVoiceState.VoiceSessionId => null;
         /// <inheritdoc />
         bool IVoiceState.IsStreaming => false;
+        /// <inheritdoc />
+        DateTimeOffset? IVoiceState.RequestToSpeakTimestamp => null;
+        #endregion
     }
 }

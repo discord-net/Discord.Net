@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using Discord.Utils;
 
 namespace Discord
 {
@@ -16,20 +17,20 @@ namespace Discord
         private EmbedThumbnail? _thumbnail;
         private List<EmbedFieldBuilder> _fields;
 
-        /// <summary> 
-        ///     Returns the maximum number of fields allowed by Discord. 
+        /// <summary>
+        ///     Returns the maximum number of fields allowed by Discord.
         /// </summary>
         public const int MaxFieldCount = 25;
-        /// <summary> 
-        ///     Returns the maximum length of title allowed by Discord. 
+        /// <summary>
+        ///     Returns the maximum length of title allowed by Discord.
         /// </summary>
         public const int MaxTitleLength = 256;
-        /// <summary> 
-        ///     Returns the maximum length of description allowed by Discord. 
+        /// <summary>
+        ///     Returns the maximum length of description allowed by Discord.
         /// </summary>
         public const int MaxDescriptionLength = 4096;
-        /// <summary> 
-        ///     Returns the maximum length of total characters allowed by Discord. 
+        /// <summary>
+        ///     Returns the maximum length of total characters allowed by Discord.
         /// </summary>
         public const int MaxEmbedLength = 6000;
 
@@ -88,9 +89,9 @@ namespace Discord
         }
 
         /// <summary> Gets or sets the list of <see cref="EmbedFieldBuilder"/> of an <see cref="Embed"/>. </summary>
-        /// <exception cref="ArgumentNullException" accessor="set">An embed builder's fields collection is set to 
+        /// <exception cref="ArgumentNullException" accessor="set">An embed builder's fields collection is set to
         /// <c>null</c>.</exception>
-        /// <exception cref="ArgumentException" accessor="set">Description length exceeds <see cref="MaxFieldCount"/>.
+        /// <exception cref="ArgumentException" accessor="set">Fields count exceeds <see cref="MaxFieldCount"/>.
         /// </exception>
         /// <returns> The list of existing <see cref="EmbedFieldBuilder"/>.</returns>
         public List<EmbedFieldBuilder> Fields
@@ -137,7 +138,7 @@ namespace Discord
         ///     Gets the total length of all embed properties.
         /// </summary>
         /// <returns>
-        ///     The combined length of <see cref="Title"/>, <see cref="EmbedAuthor.Name"/>, <see cref="Description"/>, 
+        ///     The combined length of <see cref="Title"/>, <see cref="EmbedAuthor.Name"/>, <see cref="Description"/>,
         ///     <see cref="EmbedFooter.Text"/>, <see cref="EmbedField.Name"/>, and <see cref="EmbedField.Value"/>.
         /// </returns>
         public int Length
@@ -166,7 +167,7 @@ namespace Discord
             Title = title;
             return this;
         }
-        /// <summary> 
+        /// <summary>
         ///     Sets the description of an <see cref="Embed"/>.
         /// </summary>
         /// <param name="description"> The description to be set. </param>
@@ -178,7 +179,7 @@ namespace Discord
             Description = description;
             return this;
         }
-        /// <summary> 
+        /// <summary>
         ///     Sets the URL of an <see cref="Embed"/>.
         /// </summary>
         /// <param name="url"> The URL to be set. </param>
@@ -190,7 +191,7 @@ namespace Discord
             Url = url;
             return this;
         }
-        /// <summary> 
+        /// <summary>
         ///     Sets the thumbnail URL of an <see cref="Embed"/>.
         /// </summary>
         /// <param name="thumbnailUrl"> The thumbnail URL to be set. </param>
@@ -401,11 +402,29 @@ namespace Discord
         ///     The built embed object.
         /// </returns>
         /// <exception cref="InvalidOperationException">Total embed length exceeds <see cref="MaxEmbedLength"/>.</exception>
+        /// <exception cref="InvalidOperationException">Any Url must include its protocols (i.e http:// or https://).</exception>
         public Embed Build()
         {
             if (Length > MaxEmbedLength)
                 throw new InvalidOperationException($"Total embed length must be less than or equal to {MaxEmbedLength}.");
-
+            if (!string.IsNullOrEmpty(Url))
+                UrlValidation.Validate(Url, true);
+            if (!string.IsNullOrEmpty(ThumbnailUrl))
+                UrlValidation.Validate(ThumbnailUrl, true);
+            if (!string.IsNullOrEmpty(ImageUrl))
+                UrlValidation.Validate(ImageUrl, true);
+            if (Author != null)
+            {
+                if (!string.IsNullOrEmpty(Author.Url))
+                    UrlValidation.Validate(Author.Url, true);
+                if (!string.IsNullOrEmpty(Author.IconUrl))
+                    UrlValidation.Validate(Author.IconUrl, true);
+            }
+            if(Footer != null)
+            {
+                if (!string.IsNullOrEmpty(Footer.IconUrl))
+                    UrlValidation.Validate(Footer.IconUrl, true);
+            }
             var fields = ImmutableArray.CreateBuilder<EmbedField>(Fields.Count);
             for (int i = 0; i < Fields.Count; i++)
                 fields.Add(Fields[i].Build());

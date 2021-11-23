@@ -142,5 +142,55 @@ namespace Discord
         ///     A message was unpinned from this guild.
         /// </summary>
         MessageUnpinned = 75,
+
+        /// <summary>
+        ///     A integration was created
+        /// </summary>
+        IntegrationCreated = 80,
+        /// <summary>
+        ///     A integration was updated
+        /// </summary>
+        IntegrationUpdated = 81,
+        /// <summary>
+        /// An integration was deleted
+        /// </summary>
+        IntegrationDeleted = 82,
+        /// <summary>
+        ///     A stage instance was created.
+        /// </summary>
+        StageInstanceCreated = 83,
+        /// <summary>
+        ///     A stage instance was updated.
+        /// </summary>
+        StageInstanceUpdated = 84,
+        /// <summary>
+        ///     A stage instance was deleted.
+        /// </summary>
+        StageInstanceDeleted = 85,
+
+        /// <summary>
+        ///     A sticker was created.
+        /// </summary>
+        StickerCreated = 90,
+        /// <summary>
+        ///     A sticker was updated.
+        /// </summary>
+        StickerUpdated = 91,
+        /// <summary>
+        ///     A sticker was deleted.
+        /// </summary>
+        StickerDeleted = 92,
+        /// <summary>
+        ///     A thread was created.
+        /// </summary>
+        ThreadCreate = 110,
+        /// <summary>
+        ///     A thread was updated.
+        /// </summary>
+        ThreadUpdate = 111,
+        /// <summary>
+        ///     A thread was deleted.
+        /// </summary>
+        ThreadDelete = 112
     }
 }

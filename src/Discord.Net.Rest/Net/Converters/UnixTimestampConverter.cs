@@ -27,7 +27,7 @@ namespace Discord.Net.Converters
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            throw new NotImplementedException();
+            writer.WriteValue(((DateTimeOffset)value).ToString("O"));
         }
     }
 }

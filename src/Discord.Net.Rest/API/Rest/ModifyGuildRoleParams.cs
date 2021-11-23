@@ -1,4 +1,3 @@
-#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API.Rest
@@ -14,6 +13,8 @@ namespace Discord.API.Rest
         public Optional<uint> Color { get; set; }
         [JsonProperty("hoist")]
         public Optional<bool> Hoist { get; set; }
+        [JsonProperty("icon")]
+        public Optional<Image> Icon { get; set; }
         [JsonProperty("mentionable")]
         public Optional<bool> Mentionable { get; set; }
     }

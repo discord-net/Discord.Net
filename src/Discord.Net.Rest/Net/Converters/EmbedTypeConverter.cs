@@ -13,28 +13,19 @@ namespace Discord.Net.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            switch ((string)reader.Value)
+            return (string)reader.Value switch
             {
-                case "rich":
-                    return EmbedType.Rich;
-                case "link":
-                    return EmbedType.Link;
-                case "video":
-                    return EmbedType.Video;
-                case "image":
-                    return EmbedType.Image;
-                case "gifv":
-                    return EmbedType.Gifv;
-                case "article":
-                    return EmbedType.Article;
-                case "tweet":
-                    return EmbedType.Tweet;
-                case "html":
-                    return EmbedType.Html;
-                case "application_news": // TODO 2.2 EmbedType.News
-                default:
-                    return EmbedType.Unknown;
-            }
+                "rich" => EmbedType.Rich,
+                "link" => EmbedType.Link,
+                "video" => EmbedType.Video,
+                "image" => EmbedType.Image,
+                "gifv" => EmbedType.Gifv,
+                "article" => EmbedType.Article,
+                "tweet" => EmbedType.Tweet,
+                "html" => EmbedType.Html,
+                // TODO 2.2 EmbedType.News
+                _ => EmbedType.Unknown,
+            };
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

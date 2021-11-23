@@ -1,4 +1,3 @@
-﻿#pragma warning disable CS1591
 namespace Discord.API
 {
     internal enum RelationshipType

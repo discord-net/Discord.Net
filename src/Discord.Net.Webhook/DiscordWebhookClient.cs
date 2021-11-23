@@ -60,8 +60,7 @@ namespace Discord.Webhook
         /// <exception cref="ArgumentNullException">Thrown if the <paramref name="webhookUrl"/> is null or whitespace.</exception>
         public DiscordWebhookClient(string webhookUrl, DiscordRestConfig config) : this(config)
         {
-            string token;
-            ParseWebhookUrl(webhookUrl, out _webhookId, out token);
+            ParseWebhookUrl(webhookUrl, out _webhookId, out string token);
             ApiClient.LoginAsync(TokenType.Webhook, token).GetAwaiter().GetResult();
             Webhook = WebhookClientHelper.GetWebhookAsync(this, _webhookId).GetAwaiter().GetResult();
         }
@@ -88,8 +87,8 @@ namespace Discord.Webhook
         /// <summary> Sends a message to the channel for this webhook. </summary>
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendMessageAsync(string text = null, bool isTTS = false, IEnumerable<Embed> embeds = null,
-            string username = null, string avatarUrl = null, RequestOptions options = null, AllowedMentions allowedMentions = null)
-            => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, allowedMentions, options);
+            string username = null, string avatarUrl = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageComponent component = null)
+            => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, allowedMentions, options, component);
 
         /// <summary>
         ///     Modifies a message posted using this webhook.

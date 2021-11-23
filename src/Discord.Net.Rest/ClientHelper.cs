@@ -10,7 +10,7 @@ namespace Discord.Rest
 {
     internal static class ClientHelper
     {
-        //Applications
+        #region Applications
         public static async Task<RestApplication> GetApplicationInfoAsync(BaseDiscordClient client, RequestOptions options)
         {
             var model = await client.ApiClient.GetMyApplicationAsync(options).ConfigureAwait(false);
@@ -193,9 +193,76 @@ namespace Discord.Rest
                 }
             };
         }
+
+        public static async Task<IReadOnlyCollection<RestGlobalCommand>> GetGlobalApplicationCommandsAsync(BaseDiscordClient client,
+            RequestOptions options = null)
+        {
+            var response = await client.ApiClient.GetGlobalApplicationCommandsAsync(options).ConfigureAwait(false);
+
+            if (!response.Any())
+                return Array.Empty<RestGlobalCommand>();
+
+            return response.Select(x => RestGlobalCommand.Create(client, x)).ToArray();
+        }
+        public static async Task<RestGlobalCommand> GetGlobalApplicationCommandAsync(BaseDiscordClient client, ulong id,
+            RequestOptions options = null)
+        {
+            var model = await client.ApiClient.GetGlobalApplicationCommandAsync(id, options);
+
+            return model != null ? RestGlobalCommand.Create(client, model) : null;
+        }
+
+        public static async Task<IReadOnlyCollection<RestGuildCommand>> GetGuildApplicationCommandsAsync(BaseDiscordClient client, ulong guildId,
+            RequestOptions options = null)
+        {
+            var response = await client.ApiClient.GetGuildApplicationCommandsAsync(guildId, options).ConfigureAwait(false);
+
+            if (!response.Any())
+                return ImmutableArray.Create<RestGuildCommand>();
+
+            return response.Select(x => RestGuildCommand.Create(client, x, guildId)).ToImmutableArray();
+        }
+        public static async Task<RestGuildCommand> GetGuildApplicationCommandAsync(BaseDiscordClient client, ulong id, ulong guildId,
+            RequestOptions options = null)
+        {
+            var model = await client.ApiClient.GetGuildApplicationCommandAsync(guildId, id, options);
+
+            return model != null ? RestGuildCommand.Create(client, model, guildId) : null;
+        }
+        public static async Task<RestGuildCommand> CreateGuildApplicationCommandAsync(BaseDiscordClient client, ulong guildId, ApplicationCommandProperties properties,
+            RequestOptions options = null)
+        {
+            var model = await InteractionHelper.CreateGuildCommandAsync(client, guildId, properties, options);
+
+            return RestGuildCommand.Create(client, model, guildId);
+        }
+        public static async Task<RestGlobalCommand> CreateGlobalApplicationCommandAsync(BaseDiscordClient client, ApplicationCommandProperties properties,
+            RequestOptions options = null)
+        {
+            var model = await InteractionHelper.CreateGlobalCommandAsync(client, properties, options);
+
+            return RestGlobalCommand.Create(client, model);
+        }
+        public static async Task<IReadOnlyCollection<RestGlobalCommand>> BulkOverwriteGlobalApplicationCommandAsync(BaseDiscordClient client, ApplicationCommandProperties[] properties,
+            RequestOptions options = null)
+        {
+            var models = await InteractionHelper.BulkOverwriteGlobalCommandsAsync(client, properties, options);
+
+            return models.Select(x => RestGlobalCommand.Create(client, x)).ToImmutableArray();
+        }
+        public static async Task<IReadOnlyCollection<RestGuildCommand>> BulkOverwriteGuildApplicationCommandAsync(BaseDiscordClient client, ulong guildId,
+            ApplicationCommandProperties[] properties, RequestOptions options = null)
+        {
+            var models = await InteractionHelper.BulkOverwriteGuildCommandsAsync(client, guildId, properties, options);
+
+            return models.Select(x => RestGuildCommand.Create(client, x, guildId)).ToImmutableArray();
+        }
+
         public static Task AddRoleAsync(BaseDiscordClient client, ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
             => client.ApiClient.AddRoleAsync(guildId, userId, roleId, options);
+
         public static Task RemoveRoleAsync(BaseDiscordClient client, ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
             => client.ApiClient.RemoveRoleAsync(guildId, userId, roleId, options);
+        #endregion
     }
 }

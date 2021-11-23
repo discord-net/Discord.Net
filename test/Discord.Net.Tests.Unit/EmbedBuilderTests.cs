@@ -9,9 +9,9 @@ namespace Discord
     /// </summary>
     public class EmbedBuilderTests
     {
-        private const string name = "chrisj";
-        private const string icon = "https://meowpuffygottem.fun/blob.png";
-        private const string url = "https://meowpuffygottem.fun/";
+        private const string Name = "chrisj";
+        private const string Icon = "https://meowpuffygottem.fun/blob.png";
+        private const string Url = "https://meowpuffygottem.fun/";
 
         /// <summary>
         ///     Tests the behavior of <see cref="EmbedBuilder.WithAuthor(string, string, string)"/>.
@@ -24,12 +24,12 @@ namespace Discord
             Assert.Null(builder.Author);
 
             builder = new EmbedBuilder()
-                .WithAuthor(name, icon, url);
+                .WithAuthor(Name, Icon, Url);
 
             Assert.NotNull(builder.Author);
-            Assert.Equal(name, builder.Author.Name);
-            Assert.Equal(icon, builder.Author.IconUrl);
-            Assert.Equal(url, builder.Author.Url);
+            Assert.Equal(Name, builder.Author.Name);
+            Assert.Equal(Icon, builder.Author.IconUrl);
+            Assert.Equal(Url, builder.Author.Url);
         }
 
         /// <summary>
@@ -39,15 +39,15 @@ namespace Discord
         public void WithAuthor_AuthorBuilder()
         {
             var author = new EmbedAuthorBuilder()
-                .WithIconUrl(icon)
-                .WithName(name)
-                .WithUrl(url);
+                .WithIconUrl(Icon)
+                .WithName(Name)
+                .WithUrl(Url);
             var builder = new EmbedBuilder()
                 .WithAuthor(author);
             Assert.NotNull(builder.Author);
-            Assert.Equal(name, builder.Author.Name);
-            Assert.Equal(icon, builder.Author.IconUrl);
-            Assert.Equal(url, builder.Author.Url);
+            Assert.Equal(Name, builder.Author.Name);
+            Assert.Equal(Icon, builder.Author.IconUrl);
+            Assert.Equal(Url, builder.Author.Url);
         }
 
         /// <summary>
@@ -58,13 +58,13 @@ namespace Discord
         {
             var builder = new EmbedBuilder()
                 .WithAuthor((author) =>
-                author.WithIconUrl(icon)
-                .WithName(name)
-                .WithUrl(url));
+                author.WithIconUrl(Icon)
+                .WithName(Name)
+                .WithUrl(Url));
             Assert.NotNull(builder.Author);
-            Assert.Equal(name, builder.Author.Name);
-            Assert.Equal(icon, builder.Author.IconUrl);
-            Assert.Equal(url, builder.Author.Url);
+            Assert.Equal(Name, builder.Author.Name);
+            Assert.Equal(Icon, builder.Author.IconUrl);
+            Assert.Equal(Url, builder.Author.Url);
         }
 
         /// <summary>
@@ -74,12 +74,12 @@ namespace Discord
         public void EmbedAuthorBuilder()
         {
             var builder = new EmbedAuthorBuilder()
-                .WithIconUrl(icon)
-                .WithName(name)
-                .WithUrl(url);
-            Assert.Equal(icon, builder.IconUrl);
-            Assert.Equal(name, builder.Name);
-            Assert.Equal(url, builder.Url);
+                .WithIconUrl(Icon)
+                .WithName(Name)
+                .WithUrl(Url);
+            Assert.Equal(Icon, builder.IconUrl);
+            Assert.Equal(Name, builder.Name);
+            Assert.Equal(Url, builder.Url);
         }
 
         /// <summary>
@@ -95,8 +95,10 @@ namespace Discord
         {
             Assert.Throws<ArgumentException>(() =>
             {
-                var builder = new EmbedBuilder();
-                builder.Title = title;
+                var builder = new EmbedBuilder
+                {
+                    Title = title
+                };
             });
             Assert.Throws<ArgumentException>(() =>
             {
@@ -113,8 +115,10 @@ namespace Discord
         [InlineData("jVyLChmA7aBZozXQuZ3VDEcwW6zOq0nteOVYBZi31ny73rpXfSSBXR4Jw6FiplDKQseKskwRMuBZkUewrewqAbkBZpslHirvC5nEzRySoDIdTRnkVvTXZUXg75l3bQCjuuHxDd6DfrY8ihd6yZX1Y0XFeg239YBcYV4TpL9uQ8H3HFYxrWhLlG2PRVjUmiglP5iXkawszNwMVm1SZ5LZT4jkMZHxFegVi7170d16iaPWOovu50aDDHy087XBtLKV")]
         public void Tile_Valid(string title)
         {
-            var builder = new EmbedBuilder();
-            builder.Title = title;
+            var builder = new EmbedBuilder
+            {
+                Title = title
+            };
             new EmbedBuilder().WithTitle(title);
         }
 
@@ -133,8 +137,10 @@ namespace Discord
                 Assert.Throws<ArgumentException>(() => new EmbedBuilder().WithDescription(description));
                 Assert.Throws<ArgumentException>(() =>
                 {
-                    var b = new EmbedBuilder();
-                    b.Description = description;
+                    var b = new EmbedBuilder
+                    {
+                        Description = description
+                    };
                 });
             }
         }
@@ -156,14 +162,16 @@ namespace Discord
                 var b = new EmbedBuilder().WithDescription(description);
                 Assert.Equal(description, b.Description);
 
-                b = new EmbedBuilder();
-                b.Description = description;
+                b = new EmbedBuilder
+                {
+                    Description = description
+                };
                 Assert.Equal(description, b.Description);
             }
         }
 
         /// <summary>
-        ///     Tests that valid urls do not throw any exceptions.
+        ///     Tests that valid url's do not throw any exceptions.
         /// </summary>
         /// <param name="url">The url to set.</param>
         [Theory]
@@ -181,10 +189,12 @@ namespace Discord
             Assert.Equal(result.ImageUrl, url);
             Assert.Equal(result.ThumbnailUrl, url);
 
-            result = new EmbedBuilder();
-            result.Url = url;
-            result.ImageUrl = url;
-            result.ThumbnailUrl = url;
+            result = new EmbedBuilder
+            {
+                Url = url,
+                ImageUrl = url,
+                ThumbnailUrl = url
+            };
             Assert.Equal(result.Url, url);
             Assert.Equal(result.ImageUrl, url);
             Assert.Equal(result.ThumbnailUrl, url);
@@ -207,15 +217,15 @@ namespace Discord
         public void Length()
         {
             var e = new EmbedBuilder()
-                .WithAuthor(name, icon, url)
+                .WithAuthor(Name, Icon, Url)
                 .WithColor(Color.Blue)
                 .WithDescription("This is the test description.")
-                .WithFooter("This is the footer", url)
-                .WithImageUrl(url)
-                .WithThumbnailUrl(url)
+                .WithFooter("This is the footer", Url)
+                .WithImageUrl(Url)
+                .WithThumbnailUrl(Url)
                 .WithTimestamp(DateTimeOffset.MinValue)
                 .WithTitle("This is the title")
-                .WithUrl(url)
+                .WithUrl(Url)
                 .AddField("Field 1", "Inline", true)
                 .AddField("Field 2", "Not Inline", false);
             Assert.Equal(100, e.Length);
@@ -253,11 +263,11 @@ namespace Discord
             var e = new EmbedBuilder()
                 .WithFooter(x =>
                 {
-                    x.IconUrl = url;
-                    x.Text = name;
+                    x.IconUrl = Url;
+                    x.Text = Name;
                 });
-            Assert.Equal(url, e.Footer.IconUrl);
-            Assert.Equal(name, e.Footer.Text);
+            Assert.Equal(Url, e.Footer.IconUrl);
+            Assert.Equal(Name, e.Footer.Text);
         }
 
         /// <summary>
@@ -268,18 +278,20 @@ namespace Discord
         {
             var footer = new EmbedFooterBuilder()
             {
-                IconUrl = url,
-                Text = name
+                IconUrl = Url,
+                Text = Name
             };
             var e = new EmbedBuilder()
                 .WithFooter(footer);
-            Assert.Equal(url, e.Footer.IconUrl);
-            Assert.Equal(name, e.Footer.Text);
+            Assert.Equal(Url, e.Footer.IconUrl);
+            Assert.Equal(Name, e.Footer.Text);
             // use the property
-            e = new EmbedBuilder();
-            e.Footer = footer;
-            Assert.Equal(url, e.Footer.IconUrl);
-            Assert.Equal(name, e.Footer.Text);
+            e = new EmbedBuilder
+            {
+                Footer = footer
+            };
+            Assert.Equal(Url, e.Footer.IconUrl);
+            Assert.Equal(Name, e.Footer.Text);
         }
 
         /// <summary>
@@ -289,9 +301,9 @@ namespace Discord
         public void WithFooter_Strings()
         {
             var e = new EmbedBuilder()
-                .WithFooter(name, url);
-            Assert.Equal(url, e.Footer.IconUrl);
-            Assert.Equal(name, e.Footer.Text);
+                .WithFooter(Name, Url);
+            Assert.Equal(Url, e.Footer.IconUrl);
+            Assert.Equal(Name, e.Footer.Text);
         }
 
         /// <summary>
@@ -301,10 +313,10 @@ namespace Discord
         public void EmbedFooterBuilder()
         {
             var footer = new EmbedFooterBuilder()
-                .WithIconUrl(url)
-                .WithText(name);
-            Assert.Equal(url, footer.IconUrl);
-            Assert.Equal(name, footer.Text);
+                .WithIconUrl(Url)
+                .WithText(Name);
+            Assert.Equal(Url, footer.IconUrl);
+            Assert.Equal(Name, footer.Text);
         }
         /// <summary>
         ///     Tests that invalid text throws an <see cref="ArgumentException"/>.
@@ -375,10 +387,12 @@ namespace Discord
             Assert.Equal("value", e.Value);
             Assert.True(e.IsInline);
             // use the properties
-            e = new EmbedFieldBuilder();
-            e.IsInline = true;
-            e.Name = "name";
-            e.Value = "value";
+            e = new EmbedFieldBuilder
+            {
+                IsInline = true,
+                Name = "name",
+                Value = "value"
+            };
             Assert.Equal("name", e.Name);
             Assert.Equal("value", e.Value);
             Assert.True(e.IsInline);

@@ -1,5 +1,5 @@
-#pragma warning disable CS1591
 using Newtonsoft.Json;
+using System;
 
 namespace Discord.API
 {
@@ -28,5 +28,7 @@ namespace Discord.API
         public bool Suppress { get; set; }
         [JsonProperty("self_stream")]
         public bool SelfStream { get; set; }
+        [JsonProperty("request_to_speak_timestamp")]
+        public Optional<DateTimeOffset?> RequestToSpeakTimestamp { get; set; }
     }
 }

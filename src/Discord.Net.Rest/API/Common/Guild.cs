@@ -1,4 +1,3 @@
-#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -36,7 +35,7 @@ namespace Discord.API
         [JsonProperty("emojis")]
         public Emoji[] Emojis { get; set; }
         [JsonProperty("features")]
-        public string[] Features { get; set; }
+        public GuildFeatures Features { get; set; }
         [JsonProperty("mfa_level")]
         public MfaLevel MfaLevel { get; set; }
         [JsonProperty("application_id")]
@@ -76,5 +75,13 @@ namespace Discord.API
         public Optional<int> ApproximateMemberCount { get; set; }
         [JsonProperty("approximate_presence_count")]
         public Optional<int> ApproximatePresenceCount { get; set; }
+        [JsonProperty("threads")]
+        public Optional<Channel[]> Threads { get; set; }
+        [JsonProperty("nsfw_level")]
+        public NsfwLevel NsfwLevel { get; set; }
+        [JsonProperty("stickers")]
+        public Sticker[] Stickers { get; set; }
+        [JsonProperty("premium_progress_bar_enabled")]
+        public Optional<bool> IsBoostProgressBarEnabled { get; set; }
     }
 }

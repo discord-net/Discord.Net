@@ -18,6 +18,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGuildUser : SocketUser, IGuildUser
     {
+        #region SocketGuildUser
         private long? _premiumSinceTicks;
         private long? _joinedAtTicks;
         private ImmutableArray<ulong> _roleIds;
@@ -29,7 +30,8 @@ namespace Discord.WebSocket
         public SocketGuild Guild { get; }
         /// <inheritdoc />
         public string Nickname { get; private set; }
-
+        /// <inheritdoc/>
+        public string GuildAvatarId { get; private set; }
         /// <inheritdoc />
         public override bool IsBot { get { return GlobalUser.IsBot; } internal set { GlobalUser.IsBot = value; } }
         /// <inheritdoc />
@@ -38,6 +40,7 @@ namespace Discord.WebSocket
         public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
         /// <inheritdoc />
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
+
         /// <inheritdoc />
         public GuildPermissions GuildPermissions => new GuildPermissions(Permissions.ResolveGuild(Guild, this));
         internal override SocketPresence Presence { get; set; }
@@ -57,7 +60,11 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public bool IsStreaming => VoiceState?.IsStreaming ?? false;
         /// <inheritdoc />
+        public DateTimeOffset? RequestToSpeakTimestamp => VoiceState?.RequestToSpeakTimestamp ?? null;
+        /// <inheritdoc />
         public bool? IsPending { get; private set; }
+
+
         /// <inheritdoc />
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
         /// <summary>
@@ -87,7 +94,7 @@ namespace Discord.WebSocket
         ///     Returns the position of the user within the role hierarchy.
         /// </summary>
         /// <remarks>
-        ///     The returned value equal to the position of the highest role the user has, or 
+        ///     The returned value equal to the position of the highest role the user has, or
         ///     <see cref="int.MaxValue"/> if user is the server owner.
         /// </remarks>
         public int Hierarchy
@@ -144,6 +151,8 @@ namespace Discord.WebSocket
                 _joinedAtTicks = model.JoinedAt.Value.UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
+            if (model.Avatar.IsSpecified)
+                GuildAvatarId = model.Avatar.Value;
             if (model.Roles.IsSpecified)
                 UpdateRoles(model.Roles.Value);
             if (model.PremiumSince.IsSpecified)
@@ -208,11 +217,14 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public ChannelPermissions GetPermissions(IGuildChannel channel)
             => new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, GuildPermissions.RawValue));
+        public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildUserAvatarUrl(Id, Guild.Id, GuildAvatarId, size, format);
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Guild)";
         internal new SocketGuildUser Clone() => MemberwiseClone() as SocketGuildUser;
+        #endregion
 
-        //IGuildUser
+        #region IGuildUser
         /// <inheritdoc />
         IGuild IGuildUser.Guild => Guild;
         /// <inheritdoc />
@@ -223,5 +235,6 @@ namespace Discord.WebSocket
         //IVoiceState
         /// <inheritdoc />
         IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;
+        #endregion
     }
 }
