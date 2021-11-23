@@ -11,6 +11,12 @@ namespace Discord.API.Rest
         public ThreadArchiveDuration Duration { get; set; }
 
         [JsonProperty("type")]
-        public Optional<ThreadType> Type { get; set; }
+        public ThreadType Type { get; set; }
+
+        [JsonProperty("invitable")]
+        public Optional<bool> Invitable { get; set; }
+
+        [JsonProperty("rate_limit_per_user")]
+        public Optional<int?> Ratelimit { get; set; }
     }
 }

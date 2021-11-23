@@ -268,9 +268,9 @@ namespace Discord.Rest
         ///     A task that represents the asynchronous create operation. The task result contains a <see cref="IThreadChannel"/>
         /// </returns>
         public async Task<RestThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread,
-            ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, RequestOptions options = null)
+            ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null)
         {
-            var model = await ThreadHelper.CreateThreadAsync(Discord, this, name, type, autoArchiveDuration, message, options);
+            var model = await ThreadHelper.CreateThreadAsync(Discord, this, name, type, autoArchiveDuration, message, invitable, slowmode, options);
             return RestThreadChannel.Create(Discord, Guild, model);
         }
         #endregion
@@ -286,8 +286,8 @@ namespace Discord.Rest
         async Task<IReadOnlyCollection<IWebhook>> ITextChannel.GetWebhooksAsync(RequestOptions options)
             => await GetWebhooksAsync(options).ConfigureAwait(false);
 
-        async Task<IThreadChannel> ITextChannel.CreateThreadAsync(string name, ThreadType type, ThreadArchiveDuration autoArchiveDuration, IMessage message, RequestOptions options)
-            => await CreateThreadAsync(name, type, autoArchiveDuration, message, options);
+        async Task<IThreadChannel> ITextChannel.CreateThreadAsync(string name, ThreadType type, ThreadArchiveDuration autoArchiveDuration, IMessage message, bool? invitable, int? slowmode, RequestOptions options)
+            => await CreateThreadAsync(name, type, autoArchiveDuration, message, invitable, slowmode, options);
         #endregion
 
         #region IMessageChannel
@@ -387,7 +387,7 @@ namespace Discord.Rest
         }
         #endregion
 
-        #region ITextChannel
+        #region INestedChannel
         /// <inheritdoc />
         async Task<ICategoryChannel> INestedChannel.GetCategoryAsync(CacheMode mode, RequestOptions options)
         {

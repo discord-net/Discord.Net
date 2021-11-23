@@ -9,7 +9,7 @@ namespace Discord.Rest
     internal static class ThreadHelper
     {
         public static async Task<Model> CreateThreadAsync(BaseDiscordClient client, ITextChannel channel, string name, ThreadType type = ThreadType.PublicThread,
-            ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, RequestOptions options = null)
+            ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null)
         {
             var features = channel.Guild.Features;
             if (autoArchiveDuration == ThreadArchiveDuration.OneWeek && !features.HasFeature(GuildFeature.SevenDayThreadArchive))
@@ -25,7 +25,9 @@ namespace Discord.Rest
             {
                 Name = name,
                 Duration = autoArchiveDuration,
-                Type = type
+                Type = type,
+                Invitable = invitable.HasValue ? invitable.Value : Optional<bool>.Unspecified,
+                Ratelimit = slowmode.HasValue ? slowmode.Value : Optional<int?>.Unspecified,
             };
 
             Model model;
