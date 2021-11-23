@@ -13,9 +13,9 @@ namespace Discord
         public Optional<string> Name { get; set; }
 
         /// <summary>
-        ///     Gets whether the command is enabled by default when the app is added to a guild. Default is <see langword="true"/>.
+        ///     Gets or sets whether the command is enabled by default when the app is added to a guild. Default is <see langword="true"/>
         /// </summary>
-        public Optional<bool> DefaultPermission { get; set; }
+        public Optional<bool> IsDefaultPermission { get; set; }
 
         internal ApplicationCommandProperties() { }
     }

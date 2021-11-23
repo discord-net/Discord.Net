@@ -71,9 +71,9 @@ namespace Discord.API
 
             Options = option.Options?.Select(x => new ApplicationCommandOption(x)).ToArray() ?? Optional<ApplicationCommandOption[]>.Unspecified;
 
-            Required = option.Required ?? Optional<bool>.Unspecified;
+            Required = option.IsRequired ?? Optional<bool>.Unspecified;
 
-            Default = option.Default ?? Optional<bool>.Unspecified;
+            Default = option.IsDefault ?? Optional<bool>.Unspecified;
             MinValue = option.MinValue ?? Optional<double>.Unspecified;
             MaxValue = option.MaxValue ?? Optional<double>.Unspecified;
 
@@ -82,7 +82,7 @@ namespace Discord.API
             Name = option.Name;
             Type = option.Type;
             Description = option.Description;
-            Autocomplete = option.Autocomplete;
+            Autocomplete = option.IsAutocomplete;
         }
     }
 }

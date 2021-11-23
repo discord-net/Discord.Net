@@ -55,17 +55,17 @@ namespace Discord
         /// <summary>
         ///     Gets or sets whether or not this options is the first required option for the user to complete. only one option can be default.
         /// </summary>
-        public bool? Default { get; set; }
+        public bool? IsDefault { get; set; }
 
         /// <summary>
         ///     Gets or sets if the option is required.
         /// </summary>
-        public bool? Required { get; set; }
+        public bool? IsRequired { get; set; }
 
         /// <summary>
         ///     Gets or sets whether or not this option supports autocomplete.
         /// </summary>
-        public bool Autocomplete { get; set; }
+        public bool IsAutocomplete { get; set; }
 
         /// <summary>
         ///     Gets or sets the smallest number value the user can input.

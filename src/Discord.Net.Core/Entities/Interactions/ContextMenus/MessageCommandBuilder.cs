@@ -44,7 +44,7 @@ namespace Discord
             var props = new MessageCommandProperties
             {
                 Name = Name,
-                DefaultPermission = IsDefaultPermission
+                IsDefaultPermission = IsDefaultPermission
             };
 
             return props;
