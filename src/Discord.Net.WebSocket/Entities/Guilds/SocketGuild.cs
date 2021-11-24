@@ -19,6 +19,9 @@ using PresenceModel = Discord.API.Presence;
 using RoleModel = Discord.API.Role;
 using UserModel = Discord.API.User;
 using VoiceStateModel = Discord.API.VoiceState;
+using StickerModel = Discord.API.Sticker;
+using EventModel = Discord.API.GuildScheduledEvent;
+using System.IO;
 
 namespace Discord.WebSocket
 {
@@ -28,16 +31,19 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGuild : SocketEntity<ulong>, IGuild, IDisposable
     {
+        #region SocketGuild
 #pragma warning disable IDISP002, IDISP006
         private readonly SemaphoreSlim _audioLock;
         private TaskCompletionSource<bool> _syncPromise, _downloaderPromise;
         private TaskCompletionSource<AudioClient> _audioConnectPromise;
-        private ConcurrentHashSet<ulong> _channels;
+        private ConcurrentDictionary<ulong, SocketGuildChannel> _channels;
         private ConcurrentDictionary<ulong, SocketGuildUser> _members;
         private ConcurrentDictionary<ulong, SocketRole> _roles;
         private ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
+        private ConcurrentDictionary<ulong, SocketCustomSticker> _stickers;
+        private ConcurrentDictionary<ulong, SocketGuildEvent> _events;
         private ImmutableArray<GuildEmote> _emotes;
-        private ImmutableArray<string> _features;
+
         private AudioClient _audioClient;
 #pragma warning restore IDISP002, IDISP006
 
@@ -118,9 +124,14 @@ namespace Discord.WebSocket
         public int? MaxMembers { get; private set; }
         /// <inheritdoc />
         public int? MaxVideoChannelUsers { get; private set; }
-
+        /// <inheritdoc />
+        public NsfwLevel NsfwLevel { get; private set; }
         /// <inheritdoc />
         public CultureInfo PreferredCulture { get; private set; }
+        /// <inheritdoc />
+        public bool IsBoostProgressBarEnabled { get; private set; }
+        /// <inheritdoc />
+        public GuildFeatures Features { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -131,7 +142,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string DiscoverySplashUrl => CDN.GetGuildDiscoverySplashUrl(Id, DiscoverySplashId);
         /// <inheritdoc />
-        public string BannerUrl => CDN.GetGuildBannerUrl(Id, BannerId);
+        public string BannerUrl => CDN.GetGuildBannerUrl(Id, BannerId, ImageFormat.Auto);
         /// <summary> Indicates whether the client has all the members downloaded to the local guild cache. </summary>
         public bool HasAllMembers => MemberCount <= DownloadedMemberCount;// _downloaderPromise.Task.IsCompleted;
         /// <summary> Indicates whether the guild cache is synced to this guild. </summary>
@@ -263,6 +274,14 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<SocketVoiceChannel> VoiceChannels
             => Channels.OfType<SocketVoiceChannel>().ToImmutableArray();
         /// <summary>
+        ///     Gets a collection of all stage channels in this guild.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection of stage channels found within this guild.
+        /// </returns>
+        public IReadOnlyCollection<SocketStageChannel> StageChannels
+            => Channels.OfType<SocketStageChannel>().ToImmutableArray();
+        /// <summary>
         ///     Gets a collection of all category channels in this guild.
         /// </summary>
         /// <returns>
@@ -270,6 +289,14 @@ namespace Discord.WebSocket
         /// </returns>
         public IReadOnlyCollection<SocketCategoryChannel> CategoryChannels
             => Channels.OfType<SocketCategoryChannel>().ToImmutableArray();
+        /// <summary>
+        ///     Gets a collection of all thread channels in this guild.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection of thread channels found within this guild.
+        /// </returns>
+        public IReadOnlyCollection<SocketThreadChannel> ThreadChannels
+            => Channels.OfType<SocketThreadChannel>().ToImmutableArray();
         /// <summary>
         ///     Gets the current logged-in user.
         /// </summary>
@@ -293,13 +320,16 @@ namespace Discord.WebSocket
             {
                 var channels = _channels;
                 var state = Discord.State;
-                return channels.Select(x => state.GetChannel(x) as SocketGuildChannel).Where(x => x != null).ToReadOnlyCollection(channels);
+                return channels.Select(x => x.Value).Where(x => x != null).ToReadOnlyCollection(channels);
             }
         }
         /// <inheritdoc />
         public IReadOnlyCollection<GuildEmote> Emotes => _emotes;
-        /// <inheritdoc />
-        public IReadOnlyCollection<string> Features => _features;
+        /// <summary>
+        ///     Gets a collection of all custom stickers for this guild.
+        /// </summary>
+        public IReadOnlyCollection<SocketCustomSticker> Stickers
+            => _stickers.Select(x => x.Value).ToImmutableArray();
         /// <summary>
         ///     Gets a collection of users in this guild.
         /// </summary>
@@ -330,12 +360,22 @@ namespace Discord.WebSocket
         /// </returns>
         public IReadOnlyCollection<SocketRole> Roles => _roles.ToReadOnlyCollection();
 
+        /// <summary>
+        ///     Gets a collection of all events within this guild.
+        /// </summary>
+        /// <remarks>
+        ///     This field is based off of caching alone, since there is no events returned on the guild model.
+        /// </remarks>
+        /// <returns>
+        ///     A read-only collection of guild events found within this guild. 
+        /// </returns>
+        public IReadOnlyCollection<SocketGuildEvent> Events => _events.ToReadOnlyCollection();
+
         internal SocketGuild(DiscordSocketClient client, ulong id)
             : base(client, id)
         {
             _audioLock = new SemaphoreSlim(1, 1);
             _emotes = ImmutableArray.Create<GuildEmote>();
-            _features = ImmutableArray.Create<string>();
         }
         internal static SocketGuild Create(DiscordSocketClient discord, ClientState state, ExtendedModel model)
         {
@@ -348,8 +388,10 @@ namespace Discord.WebSocket
             IsAvailable = !(model.Unavailable ?? false);
             if (!IsAvailable)
             {
+                if(_events == null)
+                    _events = new ConcurrentDictionary<ulong, SocketGuildEvent>();
                 if (_channels == null)
-                    _channels = new ConcurrentHashSet<ulong>();
+                    _channels = new ConcurrentDictionary<ulong, SocketGuildChannel>();
                 if (_members == null)
                     _members = new ConcurrentDictionary<ulong, SocketGuildUser>();
                 if (_roles == null)
@@ -365,15 +407,23 @@ namespace Discord.WebSocket
 
             Update(state, model as Model);
 
-            var channels = new ConcurrentHashSet<ulong>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Channels.Length * 1.05));
+            var channels = new ConcurrentDictionary<ulong, SocketGuildChannel>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Channels.Length * 1.05));
             {
                 for (int i = 0; i < model.Channels.Length; i++)
                 {
                     var channel = SocketGuildChannel.Create(this, state, model.Channels[i]);
                     state.AddChannel(channel);
-                    channels.TryAdd(channel.Id);
+                    channels.TryAdd(channel.Id, channel);
+                }
+
+                for(int i = 0; i < model.Threads.Length; i++)
+                {
+                    var threadChannel = SocketThreadChannel.Create(this, state, model.Threads[i]);
+                    state.AddChannel(threadChannel);
+                    channels.TryAdd(threadChannel.Id, threadChannel);
                 }
             }
+
             _channels = channels;
 
             var members = new ConcurrentDictionary<ulong, SocketGuildUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Members.Length * 1.05));
@@ -407,6 +457,17 @@ namespace Discord.WebSocket
                 }
             }
             _voiceStates = voiceStates;
+
+            var events = new ConcurrentDictionary<ulong, SocketGuildEvent>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.GuildScheduledEvents.Length * 1.05));
+            {
+                for (int i = 0; i < model.GuildScheduledEvents.Length; i++)
+                {
+                    var guildEvent = SocketGuildEvent.Create(Discord, this, model.GuildScheduledEvents[i]);
+                    events.TryAdd(guildEvent.Id, guildEvent);
+                }
+            }
+            _events = events;
+
 
             _syncPromise = new TaskCompletionSource<bool>();
             _downloaderPromise = new TaskCompletionSource<bool>();
@@ -442,6 +503,7 @@ namespace Discord.WebSocket
             SystemChannelFlags = model.SystemChannelFlags;
             Description = model.Description;
             PremiumSubscriptionCount = model.PremiumSubscriptionCount.GetValueOrDefault();
+            NsfwLevel = model.NsfwLevel;
             if (model.MaxPresences.IsSpecified)
                 MaxPresences = model.MaxPresences.Value ?? 25000;
             if (model.MaxMembers.IsSpecified)
@@ -450,7 +512,8 @@ namespace Discord.WebSocket
                 MaxVideoChannelUsers = model.MaxVideoChannelUsers.Value;
             PreferredLocale = model.PreferredLocale;
             PreferredCulture = PreferredLocale == null ? null : new CultureInfo(PreferredLocale);
-
+            if (model.IsBoostProgressBarEnabled.IsSpecified)
+                IsBoostProgressBarEnabled = model.IsBoostProgressBarEnabled.Value;
             if (model.Emojis != null)
             {
                 var emojis = ImmutableArray.CreateBuilder<GuildEmote>(model.Emojis.Length);
@@ -461,10 +524,7 @@ namespace Discord.WebSocket
             else
                 _emotes = ImmutableArray.Create<GuildEmote>();
 
-            if (model.Features != null)
-                _features = model.Features.ToImmutableArray();
-            else
-                _features = ImmutableArray.Create<string>();
+            Features = model.Features;
 
             var roles = new ConcurrentDictionary<ulong, SocketRole>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Roles.Length * 1.05));
             if (model.Roles != null)
@@ -476,6 +536,25 @@ namespace Discord.WebSocket
                 }
             }
             _roles = roles;
+
+            if (model.Stickers != null)
+            {
+                var stickers = new ConcurrentDictionary<ulong, SocketCustomSticker>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(model.Stickers.Length * 1.05));
+                for (int i = 0; i < model.Stickers.Length; i++)
+                {
+                    var sticker = model.Stickers[i];
+                    if (sticker.User.IsSpecified)
+                        AddOrUpdateUser(sticker.User.Value);
+
+                    var entity = SocketCustomSticker.Create(Discord, sticker, this, sticker.User.IsSpecified ? sticker.User.Value.Id : null);
+
+                    stickers.TryAdd(sticker.Id, entity);
+                }
+
+                _stickers = stickers;
+            }
+            else
+                _stickers = new ConcurrentDictionary<ulong, SocketCustomSticker>(ConcurrentHashSet.DefaultConcurrencyLevel, 7);
         }
         /*internal void Update(ClientState state, GuildSyncModel model) //TODO remove? userbot related
         {
@@ -508,8 +587,9 @@ namespace Discord.WebSocket
                 emotes.Add(model.Emojis[i].ToEntity());
             _emotes = emotes.ToImmutable();
         }
+        #endregion
 
-        //General
+        #region General
         /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
             => GuildHelper.DeleteAsync(this, Discord, options);
@@ -533,8 +613,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task LeaveAsync(RequestOptions options = null)
             => GuildHelper.LeaveAsync(this, Discord, options);
+        #endregion
 
-        //Bans
+        #region Bans
         /// <summary>
         ///     Gets a collection of all users banned in this guild.
         /// </summary>
@@ -582,8 +663,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task RemoveBanAsync(ulong userId, RequestOptions options = null)
             => GuildHelper.RemoveBanAsync(this, Discord, userId, options);
+        #endregion
 
-        //Channels
+        #region Channels
         /// <summary>
         ///     Gets a channel in this guild.
         /// </summary>
@@ -608,6 +690,16 @@ namespace Discord.WebSocket
         public SocketTextChannel GetTextChannel(ulong id)
             => GetChannel(id) as SocketTextChannel;
         /// <summary>
+        ///     Gets a thread in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the thread.</param>
+        /// <returns>
+        ///     A thread channel associated with the specified <paramref name="id" />; <see langword="null"/> if none is found.
+        /// </returns>
+        public SocketThreadChannel GetThreadChannel(ulong id)
+            => GetChannel(id) as SocketThreadChannel;
+
+        /// <summary>
         ///     Gets a voice channel in this guild.
         /// </summary>
         /// <param name="id">The snowflake identifier for the voice channel.</param>
@@ -616,6 +708,15 @@ namespace Discord.WebSocket
         /// </returns>
         public SocketVoiceChannel GetVoiceChannel(ulong id)
             => GetChannel(id) as SocketVoiceChannel;
+        /// <summary>
+        ///     Gets a stage channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the stage channel.</param>
+        /// <returns>
+        ///     A stage channel associated with the specified <paramref name="id" />; <see langword="null"/> if none is found.
+        /// </returns>
+        public SocketStageChannel GetStageChannel(ulong id)
+            => GetChannel(id) as SocketStageChannel;
         /// <summary>
         ///     Gets a category channel in this guild.
         /// </summary>
@@ -664,6 +765,19 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<RestVoiceChannel> CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null)
             => GuildHelper.CreateVoiceChannelAsync(this, Discord, name, options, func);
+
+        /// <summary>
+        ///     Creates a new stage channel in this guild.
+        /// </summary>
+        /// <param name="name">The new name for the stage channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     stage channel.
+        /// </returns>
+        public Task<RestStageChannel> CreateStageChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null)
+            => GuildHelper.CreateStageChannelAsync(this, Discord, name, options, func);
         /// <summary>
         ///     Creates a new channel category in this guild.
         /// </summary>
@@ -681,25 +795,40 @@ namespace Discord.WebSocket
         internal SocketGuildChannel AddChannel(ClientState state, ChannelModel model)
         {
             var channel = SocketGuildChannel.Create(this, state, model);
-            _channels.TryAdd(model.Id);
+            _channels.TryAdd(model.Id, channel);
             state.AddChannel(channel);
             return channel;
         }
+
+        internal SocketGuildChannel AddOrUpdateChannel(ClientState state, ChannelModel model)
+        {
+            if (_channels.TryGetValue(model.Id, out SocketGuildChannel channel))
+                channel.Update(Discord.State, model);
+            else
+            {
+                channel = SocketGuildChannel.Create(this, Discord.State, model);
+                _channels[channel.Id] = channel;
+                state.AddChannel(channel);
+            }
+            return channel;
+        }
+
         internal SocketGuildChannel RemoveChannel(ClientState state, ulong id)
         {
-            if (_channels.TryRemove(id))
+            if (_channels.TryRemove(id, out var _))
                 return state.RemoveChannel(id) as SocketGuildChannel;
             return null;
         }
         internal void PurgeChannelCache(ClientState state)
         {
             foreach (var channelId in _channels)
-                state.RemoveChannel(channelId);
+                state.RemoveChannel(channelId.Key);
 
             _channels.Clear();
         }
+        #endregion
 
-        //Voice Regions
+        #region Voice Regions
         /// <summary>
         ///     Gets a collection of all the voice regions this guild can access.
         /// </summary>
@@ -710,14 +839,124 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<IReadOnlyCollection<RestVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null)
             => GuildHelper.GetVoiceRegionsAsync(this, Discord, options);
+        #endregion
 
-        //Integrations
+        #region Integrations
         public Task<IReadOnlyCollection<RestGuildIntegration>> GetIntegrationsAsync(RequestOptions options = null)
             => GuildHelper.GetIntegrationsAsync(this, Discord, options);
         public Task<RestGuildIntegration> CreateIntegrationAsync(ulong id, string type, RequestOptions options = null)
             => GuildHelper.CreateIntegrationAsync(this, Discord, id, type, options);
+        #endregion
 
-        //Invites
+        #region Interactions
+        /// <summary>
+        ///     Deletes all application commands in the current guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous delete operation.
+        /// </returns>
+        public Task DeleteApplicationCommandsAsync(RequestOptions options = null)
+            => InteractionHelper.DeleteAllGuildCommandsAsync(Discord, Id, options);
+
+        /// <summary>
+        ///     Gets a collection of slash commands created by the current user in this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     slash commands created by the current user.
+        /// </returns>
+        public async Task<IReadOnlyCollection<SocketApplicationCommand>> GetApplicationCommandsAsync(RequestOptions options = null)
+        {
+            var commands = (await Discord.ApiClient.GetGuildApplicationCommandsAsync(Id, options)).Select(x => SocketApplicationCommand.Create(Discord, x, Id));
+
+            foreach (var command in commands)
+            {
+                Discord.State.AddCommand(command);
+            }
+
+            return commands.ToImmutableArray();
+        }
+
+        /// <summary>
+        ///     Gets an application command within this guild with the specified id.
+        /// </summary>
+        /// <param name="id">The id of the application command to get.</param>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A ValueTask that represents the asynchronous get operation. The task result contains a <see cref="IApplicationCommand"/>
+        ///     if found, otherwise <see langword="null"/>.
+        /// </returns>
+        public async ValueTask<SocketApplicationCommand> GetApplicationCommandAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            var command = Discord.State.GetCommand(id);
+
+            if (command != null)
+                return command;
+
+            if (mode == CacheMode.CacheOnly)
+                return null;
+
+            var model = await Discord.ApiClient.GetGlobalApplicationCommandAsync(id, options);
+
+            if (model == null)
+                return null;
+
+            command = SocketApplicationCommand.Create(Discord, model, Id);
+
+            Discord.State.AddCommand(command);
+
+            return command;
+        }
+
+        /// <summary>
+        ///     Creates an application command within this guild.
+        /// </summary>
+        /// <param name="properties">The properties to use when creating the command.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the command that was created.
+        /// </returns>
+        public async Task<SocketApplicationCommand> CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null)
+        {
+            var model = await InteractionHelper.CreateGuildCommandAsync(Discord, Id, properties, options);
+
+            var entity = Discord.State.GetOrAddCommand(model.Id, (id) => SocketApplicationCommand.Create(Discord, model));
+
+            entity.Update(model);
+
+            return entity;
+        }
+
+        /// <summary>
+        ///     Overwrites the application commands within this guild.
+        /// </summary>
+        /// <param name="properties">A collection of properties to use when creating the commands.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a collection of commands that was created.
+        /// </returns>
+        public async Task<IReadOnlyCollection<SocketApplicationCommand>> BulkOverwriteApplicationCommandAsync(ApplicationCommandProperties[] properties,
+            RequestOptions options = null)
+        {
+            var models = await InteractionHelper.BulkOverwriteGuildCommandsAsync(Discord, Id, properties, options);
+
+            var entities = models.Select(x => SocketApplicationCommand.Create(Discord, x));
+
+            Discord.State.PurgeCommands(x => !x.IsGlobalCommand && x.Guild.Id == Id);
+
+            foreach(var entity in entities)
+            {
+                Discord.State.AddCommand(entity);
+            }
+
+            return entities.ToImmutableArray();
+        }
+        #endregion
+
+        #region Invites
         /// <summary>
         ///     Gets a collection of all invites in this guild.
         /// </summary>
@@ -738,8 +977,9 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<RestInviteMetadata> GetVanityInviteAsync(RequestOptions options = null)
             => GuildHelper.GetVanityInviteAsync(this, Discord, options);
+        #endregion
 
-        //Roles
+        #region Roles
         /// <summary>
         ///     Gets a role in this guild.
         /// </summary>
@@ -788,7 +1028,45 @@ namespace Discord.WebSocket
             return null;
         }
 
-        //Users
+        internal SocketRole AddOrUpdateRole(RoleModel model)
+        {
+            if (_roles.TryGetValue(model.Id, out SocketRole role))
+                _roles[model.Id].Update(Discord.State, model);
+            else
+                role = AddRole(model);
+
+            return role;
+        }
+
+        internal SocketCustomSticker AddSticker(StickerModel model)
+        {
+            if (model.User.IsSpecified)
+                AddOrUpdateUser(model.User.Value);
+
+            var sticker = SocketCustomSticker.Create(Discord, model, this, model.User.IsSpecified ? model.User.Value.Id : null);
+            _stickers[model.Id] = sticker;
+            return sticker;
+        }
+
+        internal SocketCustomSticker AddOrUpdateSticker(StickerModel model)
+        {
+            if (_stickers.TryGetValue(model.Id, out SocketCustomSticker sticker))
+                _stickers[model.Id].Update(model);
+            else
+                sticker = AddSticker(model);
+
+            return sticker;
+        }
+
+        internal SocketCustomSticker RemoveSticker(ulong id)
+        {
+            if (_stickers.TryRemove(id, out SocketCustomSticker sticker))
+                return sticker;
+            return null;
+        }
+        #endregion
+
+        #region Users
         /// <inheritdoc />
         public Task<RestGuildUser> AddGuildUserAsync(ulong id, string accessToken, Action<AddGuildUserProperties> func = null, RequestOptions options = null)
             => GuildHelper.AddGuildUserAsync(this, Discord, id, accessToken, func, options);
@@ -929,8 +1207,118 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<IReadOnlyCollection<RestGuildUser>> SearchUsersAsync(string query, int limit = DiscordConfig.MaxUsersPerBatch, RequestOptions options = null)
             => GuildHelper.SearchUsersAsync(this, Discord, query, limit, options);
+        #endregion
 
-        //Audit logs
+        #region Guild Events
+
+        /// <summary>
+        ///     Gets an event in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the event.</param>
+        /// <returns>
+        ///     An event that is associated with the specified <paramref name="id"/>; <see langword="null"/> if none is found.
+        /// </returns>
+        public SocketGuildEvent GetEvent(ulong id)
+        {
+            if (_events.TryGetValue(id, out SocketGuildEvent value))
+                return value;
+            return null;
+        }
+
+        internal SocketGuildEvent RemoveEvent(ulong id)
+        {
+            if (_events.TryRemove(id, out SocketGuildEvent value))
+                return value;
+            return null;
+        }
+
+        internal SocketGuildEvent AddOrUpdateEvent(EventModel model)
+        {
+            if (_events.TryGetValue(model.Id, out SocketGuildEvent value))
+                value.Update(model);
+            else
+            {
+                value = SocketGuildEvent.Create(Discord, this, model);
+                _events[model.Id] = value;
+            }
+            return value;
+        }
+
+        /// <summary>
+        ///     Gets an event within this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the event.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation.
+        /// </returns>
+        public Task<RestGuildEvent> GetEventAsync(ulong id, RequestOptions options = null)
+            => GuildHelper.GetGuildEventAsync(Discord, id, this, options);
+
+        /// <summary>
+        ///     Gets all active events within this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation.
+        /// </returns>
+        public Task<IReadOnlyCollection<RestGuildEvent>> GetEventsAsync(RequestOptions options = null)
+            => GuildHelper.GetGuildEventsAsync(Discord, this, options);
+
+        /// <summary>
+        ///     Creates an event within this guild.
+        /// </summary>
+        /// <param name="name">The name of the event.</param>
+        /// <param name="privacyLevel">The privacy level of the event.</param>
+        /// <param name="startTime">The start time of the event.</param>
+        /// <param name="type">The type of the event.</param>
+        /// <param name="description">The description of the event.</param>
+        /// <param name="endTime">The end time of the event.</param>
+        /// <param name="channelId">
+        ///     The channel id of the event.
+        ///     <remarks>
+        ///     The event must have a type of <see cref="GuildScheduledEventType.Stage"/> or <see cref="GuildScheduledEventType.Voice"/>
+        ///     in order to use this property.
+        ///     </remarks>
+        /// </param>
+        /// <param name="speakers">A collection of speakers for the event.</param>
+        /// <param name="location">The location of the event; links are supported</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous create operation.
+        /// </returns>
+        public Task<RestGuildEvent> CreateEventAsync(
+            string name,
+            DateTimeOffset startTime,
+            GuildScheduledEventType type,
+            GuildScheduledEventPrivacyLevel privacyLevel = GuildScheduledEventPrivacyLevel.Private,
+            string description = null,
+            DateTimeOffset? endTime = null,
+            ulong? channelId = null,
+            string location = null,
+            RequestOptions options = null)
+        {
+            // requirements taken from https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-permissions-requirements
+            switch (type)
+            {
+                case GuildScheduledEventType.Stage:
+                    CurrentUser.GuildPermissions.Ensure(GuildPermission.ManageEvents | GuildPermission.ManageChannels | GuildPermission.MuteMembers | GuildPermission.MoveMembers);
+                break;
+                case GuildScheduledEventType.Voice:
+                    CurrentUser.GuildPermissions.Ensure(GuildPermission.ManageEvents | GuildPermission.ViewChannel | GuildPermission.Connect);
+                    break;
+                case GuildScheduledEventType.External:
+                    CurrentUser.GuildPermissions.Ensure(GuildPermission.ManageEvents);
+                    break;
+            }
+
+            return GuildHelper.CreateGuildEventAsync(Discord, this, name, privacyLevel, startTime, type, description, endTime, channelId, location, options);
+        }
+
+
+        #endregion
+
+        #region Audit logs
         /// <summary>
         ///     Gets the specified number of audit log entries for this guild.
         /// </summary>
@@ -945,8 +1333,9 @@ namespace Discord.WebSocket
         /// </returns>
         public IAsyncEnumerable<IReadOnlyCollection<RestAuditLogEntry>> GetAuditLogsAsync(int limit, RequestOptions options = null, ulong? beforeId = null, ulong? userId = null, ActionType? actionType = null)
             => GuildHelper.GetAuditLogsAsync(this, Discord, beforeId, limit, options, userId: userId, actionType: actionType);
+        #endregion
 
-        //Webhooks
+        #region Webhooks
         /// <summary>
         ///     Gets a webhook found within this guild.
         /// </summary>
@@ -968,8 +1357,9 @@ namespace Discord.WebSocket
         /// </returns>
         public Task<IReadOnlyCollection<RestWebhook>> GetWebhooksAsync(RequestOptions options = null)
             => GuildHelper.GetWebhooksAsync(this, Discord, options);
+        #endregion
 
-        //Emotes
+        #region Emotes
         /// <inheritdoc />
         public Task<IReadOnlyCollection<GuildEmote>> GetEmotesAsync(RequestOptions options = null)
             => GuildHelper.GetEmotesAsync(this, Discord, options);
@@ -987,7 +1377,154 @@ namespace Discord.WebSocket
         public Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null)
             => GuildHelper.DeleteEmoteAsync(this, Discord, emote.Id, options);
 
-        //Voice States
+        /// <summary>
+        /// Moves the user to the voice channel.
+        /// </summary>
+        /// <param name="user">The user to move.</param>
+        /// <param name="targetChannel">the channel where the user gets moved to.</param>
+        /// <returns>A task that represents the asynchronous operation for moving a user.</returns>
+        public Task MoveAsync(IGuildUser user, IVoiceChannel targetChannel)
+            => user.ModifyAsync(x => x.Channel = new Optional<IVoiceChannel>(targetChannel));
+
+        /// <summary>
+        /// Disconnects the user from its current voice channel
+        /// </summary>
+        /// <param name="user">The user to disconnect.</param>
+        /// <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
+        async Task IGuild.DisconnectAsync(IGuildUser user) => await user.ModifyAsync(x => x.Channel = new Optional<IVoiceChannel>());
+        #endregion
+
+        #region Stickers
+        /// <summary>
+        ///     Gets a specific sticker within this guild.
+        /// </summary>
+        /// <param name="id">The id of the sticker to get.</param>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the sticker found with the
+        ///     specified <paramref name="id"/>; <see langword="null" /> if none is found.
+        /// </returns>
+        public async ValueTask<SocketCustomSticker> GetStickerAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null)
+        {
+            var sticker = _stickers.FirstOrDefault(x => x.Key == id);
+
+            if (sticker.Value != null)
+                return sticker.Value;
+
+            if (mode == CacheMode.CacheOnly)
+                return null;
+
+            var model = await Discord.ApiClient.GetGuildStickerAsync(Id, id, options).ConfigureAwait(false);
+
+            if (model == null)
+                return null;
+
+            return AddOrUpdateSticker(model);
+        }
+        /// <summary>
+        ///     Gets a specific sticker within this guild.
+        /// </summary>
+        /// <param name="id">The id of the sticker to get.</param>
+        /// <returns>A sticker, if none is found then <see langword="null"/>.</returns>
+        public SocketCustomSticker GetSticker(ulong id)
+            => GetStickerAsync(id, CacheMode.CacheOnly).GetAwaiter().GetResult();
+        /// <summary>
+        ///     Gets a collection of all stickers within this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of stickers found within the guild.
+        /// </returns>
+        public async ValueTask<IReadOnlyCollection<SocketCustomSticker>> GetStickersAsync(CacheMode mode = CacheMode.AllowDownload,
+            RequestOptions options = null)
+        {
+            if (Stickers.Count > 0)
+                return Stickers;
+
+            if (mode == CacheMode.CacheOnly)
+                return ImmutableArray.Create<SocketCustomSticker>();
+
+            var models = await Discord.ApiClient.ListGuildStickersAsync(Id, options).ConfigureAwait(false);
+
+            List<SocketCustomSticker> stickers = new();
+
+            foreach (var model in models)
+            {
+                stickers.Add(AddOrUpdateSticker(model));
+            }
+
+            return stickers;
+        }
+        /// <summary>
+        ///     Creates a new sticker in this guild.
+        /// </summary>
+        /// <param name="name">The name of the sticker.</param>
+        /// <param name="description">The description of the sticker.</param>
+        /// <param name="tags">The tags of the sticker.</param>
+        /// <param name="image">The image of the new emote.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
+        /// </returns>
+        public async Task<SocketCustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image,
+            RequestOptions options = null)
+        {
+            var model = await GuildHelper.CreateStickerAsync(Discord, this, name, description, tags, image, options).ConfigureAwait(false);
+
+            return AddOrUpdateSticker(model);
+        }
+        /// <summary>
+        ///     Creates a new sticker in this guild
+        /// </summary>
+        /// <param name="name">The name of the sticker.</param>
+        /// <param name="description">The description of the sticker.</param>
+        /// <param name="tags">The tags of the sticker.</param>
+        /// <param name="path">The path of the file to upload.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
+        /// </returns>
+        public Task<SocketCustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path,
+            RequestOptions options = null)
+        {
+            var fs = File.OpenRead(path);
+            return CreateStickerAsync(name, description, tags, fs, Path.GetFileName(fs.Name), options);
+        }
+        /// <summary>
+        ///     Creates a new sticker in this guild
+        /// </summary>
+        /// <param name="name">The name of the sticker.</param>
+        /// <param name="description">The description of the sticker.</param>
+        /// <param name="tags">The tags of the sticker.</param>
+        /// <param name="stream">The stream containing the file data.</param>
+        /// <param name="filename">The name of the file <b>with</b> the extension, ex: image.png.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
+        /// </returns>
+        public async Task<SocketCustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Stream stream,
+            string filename, RequestOptions options = null)
+        {
+            var model = await GuildHelper.CreateStickerAsync(Discord, this, name, description, tags, stream, filename, options).ConfigureAwait(false);
+
+            return AddOrUpdateSticker(model);
+        }
+        /// <summary>
+        ///     Deletes a sticker within this guild.
+        /// </summary>
+        /// <param name="sticker">The sticker to delete.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous removal operation.
+        /// </returns>
+        public Task DeleteStickerAsync(SocketCustomSticker sticker, RequestOptions options = null)
+            => sticker.DeleteAsync(options);
+        #endregion
+
+        #region Voice States
         internal async Task<SocketVoiceState> AddOrUpdateVoiceStateAsync(ClientState state, VoiceStateModel model)
         {
             var voiceChannel = state.GetChannel(model.ChannelId.Value) as SocketVoiceChannel;
@@ -1031,8 +1568,9 @@ namespace Discord.WebSocket
             }
             return null;
         }
+        #endregion
 
-        //Audio
+        #region Audio
         internal AudioInStream GetAudioStream(ulong userId)
         {
             return _audioClient?.GetInputStream(userId);
@@ -1137,7 +1675,7 @@ namespace Discord.WebSocket
         }
         internal async Task FinishConnectAudio(string url, string token)
         {
-            //TODO: Mem Leak: Disconnected/Connected handlers arent cleaned up
+            //TODO: Mem Leak: Disconnected/Connected handlers aren't cleaned up
             var voiceState = GetVoiceState(Discord.CurrentUser.Id).Value;
 
             await _audioLock.WaitAsync().ConfigureAwait(false);
@@ -1186,8 +1724,9 @@ namespace Discord.WebSocket
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
         internal SocketGuild Clone() => MemberwiseClone() as SocketGuild;
+        #endregion
 
-        //IGuild
+        #region  IGuild
         /// <inheritdoc />
         ulong? IGuild.AFKChannelId => AFKChannelId;
         /// <inheritdoc />
@@ -1210,7 +1749,17 @@ namespace Discord.WebSocket
         int? IGuild.ApproximateMemberCount => null;
         /// <inheritdoc />
         int? IGuild.ApproximatePresenceCount => null;
-
+        /// <inheritdoc />
+        IReadOnlyCollection<ICustomSticker> IGuild.Stickers => Stickers;
+        /// <inheritdoc />
+        async Task<IGuildScheduledEvent> IGuild.CreateEventAsync(string name, DateTimeOffset startTime, GuildScheduledEventType type, GuildScheduledEventPrivacyLevel privacyLevel, string description, DateTimeOffset? endTime, ulong? channelId, string location, RequestOptions options)
+            => await CreateEventAsync(name, startTime, type, privacyLevel, description, endTime, channelId, location, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IGuildScheduledEvent> IGuild.GetEventAsync(ulong id, RequestOptions options)
+            => await GetEventAsync(id, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IGuildScheduledEvent>> IGuild.GetEventsAsync(RequestOptions options)
+            => await GetEventsAsync(options).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IBan>> IGuild.GetBansAsync(RequestOptions options)
             => await GetBansAsync(options).ConfigureAwait(false);
@@ -1234,14 +1783,26 @@ namespace Discord.WebSocket
         Task<ITextChannel> IGuild.GetTextChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<ITextChannel>(GetTextChannel(id));
         /// <inheritdoc />
+        Task<IThreadChannel> IGuild.GetThreadChannelAsync(ulong id, CacheMode mode, RequestOptions options)
+            => Task.FromResult<IThreadChannel>(GetThreadChannel(id));
+        /// <inheritdoc />
+        Task<IReadOnlyCollection<IThreadChannel>> IGuild.GetThreadChannelsAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult<IReadOnlyCollection<IThreadChannel>>(ThreadChannels);
+        /// <inheritdoc />
         Task<IReadOnlyCollection<IVoiceChannel>> IGuild.GetVoiceChannelsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IVoiceChannel>>(VoiceChannels);
         /// <inheritdoc />
-        Task<IReadOnlyCollection<ICategoryChannel>> IGuild.GetCategoriesAsync(CacheMode mode , RequestOptions options)
+        Task<IReadOnlyCollection<ICategoryChannel>> IGuild.GetCategoriesAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<ICategoryChannel>>(CategoryChannels);
         /// <inheritdoc />
         Task<IVoiceChannel> IGuild.GetVoiceChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IVoiceChannel>(GetVoiceChannel(id));
+        /// <inheritdoc />
+        Task<IStageChannel> IGuild.GetStageChannelAsync(ulong id, CacheMode mode, RequestOptions options)
+            => Task.FromResult<IStageChannel>(GetStageChannel(id));
+        /// <inheritdoc />
+        Task<IReadOnlyCollection<IStageChannel>> IGuild.GetStageChannelsAsync(CacheMode mode, RequestOptions options)
+            => Task.FromResult<IReadOnlyCollection<IStageChannel>>(StageChannels);
         /// <inheritdoc />
         Task<IVoiceChannel> IGuild.GetAFKChannelAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IVoiceChannel>(AFKChannel);
@@ -1266,6 +1827,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IVoiceChannel> IGuild.CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func, RequestOptions options)
             => await CreateVoiceChannelAsync(name, func, options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IStageChannel> IGuild.CreateStageChannelAsync(string name, Action<VoiceChannelProperties> func, RequestOptions options)
+            => await CreateStageChannelAsync(name, func, options).ConfigureAwait(false);
         /// <inheritdoc />
         async Task<ICategoryChannel> IGuild.CreateCategoryAsync(string name, Action<GuildChannelProperties> func, RequestOptions options)
             => await CreateCategoryChannelAsync(name, func, options).ConfigureAwait(false);
@@ -1344,6 +1908,37 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         async Task<IReadOnlyCollection<IWebhook>> IGuild.GetWebhooksAsync(RequestOptions options)
             => await GetWebhooksAsync(options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.GetApplicationCommandsAsync (RequestOptions options)
+            => await GetApplicationCommandsAsync(options).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options)
+            => await CreateStickerAsync(name, description, tags, image, options);
+        /// <inheritdoc />
+        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, Stream stream, string filename, RequestOptions options)
+            => await CreateStickerAsync(name, description, tags, stream, filename, options);
+        /// <inheritdoc />
+        async Task<ICustomSticker> IGuild.CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path, RequestOptions options)
+            => await CreateStickerAsync(name, description, tags, path, options);
+        /// <inheritdoc />
+        async Task<ICustomSticker> IGuild.GetStickerAsync(ulong id, CacheMode mode, RequestOptions options)
+            => await GetStickerAsync(id, mode, options);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<ICustomSticker>> IGuild.GetStickersAsync(CacheMode mode, RequestOptions options)
+            => await GetStickersAsync(mode, options);
+        /// <inheritdoc />
+        Task IGuild.DeleteStickerAsync(ICustomSticker sticker, RequestOptions options)
+            => DeleteStickerAsync(_stickers[sticker.Id], options);
+        /// <inheritdoc />
+        async Task<IApplicationCommand> IGuild.GetApplicationCommandAsync(ulong id, CacheMode mode, RequestOptions options)
+            => await GetApplicationCommandAsync(id, mode, options);
+        /// <inheritdoc />
+        async Task<IApplicationCommand> IGuild.CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options)
+            => await CreateApplicationCommandAsync(properties, options);
+        /// <inheritdoc />
+        async Task<IReadOnlyCollection<IApplicationCommand>> IGuild.BulkOverwriteApplicationCommandsAsync(ApplicationCommandProperties[] properties,
+            RequestOptions options)
+            => await BulkOverwriteApplicationCommandAsync(properties, options);
 
         void IDisposable.Dispose()
         {
@@ -1351,5 +1946,6 @@ namespace Discord.WebSocket
             _audioLock?.Dispose();
             _audioClient?.Dispose();
         }
+        #endregion
     }
 }

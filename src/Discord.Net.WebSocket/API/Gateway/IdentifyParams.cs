@@ -1,4 +1,3 @@
-#pragma warning disable CS1591
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
@@ -16,7 +15,7 @@ namespace Discord.API.Gateway
         [JsonProperty("shard")]
         public Optional<int[]> ShardingParams { get; set; }
         [JsonProperty("presence")]
-        public Optional<StatusUpdateParams> Presence { get; set; }
+        public Optional<PresenceUpdateParams> Presence { get; set; }
         [JsonProperty("intents")]
         public Optional<int> Intents { get; set; }
     }

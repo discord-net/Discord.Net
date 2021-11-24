@@ -1,4 +1,3 @@
-﻿#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API.Rest
@@ -10,5 +9,7 @@ namespace Discord.API.Rest
         public Optional<int> Bitrate { get; set; }
         [JsonProperty("user_limit")]
         public Optional<int> UserLimit { get; set; }
+        [JsonProperty("rtc_region")]
+        public Optional<string> RTCRegion { get; set; }
     }
 }

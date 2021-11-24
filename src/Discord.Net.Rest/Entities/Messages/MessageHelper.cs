@@ -1,3 +1,4 @@
+using Discord.API;
 using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
@@ -24,52 +25,9 @@ namespace Discord.Rest
 
         /// <exception cref="InvalidOperationException">Only the author of a message may modify the message.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        public static async Task<Model> ModifyAsync(IMessage msg, BaseDiscordClient client, Action<MessageProperties> func,
+        public static Task<Model> ModifyAsync(IMessage msg, BaseDiscordClient client, Action<MessageProperties> func,
             RequestOptions options)
-        {
-            var args = new MessageProperties();
-            func(args);
-
-            if (msg.Author.Id != client.CurrentUser.Id && (args.Content.IsSpecified || args.Embed.IsSpecified || args.AllowedMentions.IsSpecified))
-                throw new InvalidOperationException("Only the author of a message may modify the message content, embed, or allowed mentions.");
-
-            bool hasText = args.Content.IsSpecified ? !string.IsNullOrEmpty(args.Content.Value) : !string.IsNullOrEmpty(msg.Content);
-            bool hasEmbed = args.Embed.IsSpecified ? args.Embed.Value != null : msg.Embeds.Any();
-            if (!hasText && !hasEmbed)
-                Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
-
-            if (args.AllowedMentions.IsSpecified)
-            {
-                AllowedMentions allowedMentions = args.AllowedMentions.Value;
-                Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
-                Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
-
-                // check that user flag and user Id list are exclusive, same with role flag and role Id list
-                if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
-                {
-                    if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Users) &&
-                        allowedMentions.UserIds != null && allowedMentions.UserIds.Count > 0)
-                    {
-                        throw new ArgumentException("The Users flag is mutually exclusive with the list of User Ids.", nameof(allowedMentions));
-                    }
-
-                    if (allowedMentions.AllowedTypes.Value.HasFlag(AllowedMentionTypes.Roles) &&
-                        allowedMentions.RoleIds != null && allowedMentions.RoleIds.Count > 0)
-                    {
-                        throw new ArgumentException("The Roles flag is mutually exclusive with the list of Role Ids.", nameof(allowedMentions));
-                    }
-                }
-            }
-
-            var apiArgs = new API.Rest.ModifyMessageParams
-            {
-                Content = args.Content,
-                Embed = args.Embed.IsSpecified ? args.Embed.Value.ToModel() : Optional.Create<API.Embed>(),
-                Flags = args.Flags.IsSpecified ? args.Flags.Value : Optional.Create<MessageFlags?>(),
-                AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional.Create<API.AllowedMentions>(),
-            };
-            return await client.ApiClient.ModifyMessageAsync(msg.Channel.Id, msg.Id, apiArgs, options).ConfigureAwait(false);
-        }
+            => ModifyAsync(msg.Channel.Id, msg.Id, client, func, options);
 
         public static async Task<Model> ModifyAsync(ulong channelId, ulong msgId, BaseDiscordClient client, Action<MessageProperties> func,
             RequestOptions options)
@@ -77,7 +35,15 @@ namespace Discord.Rest
             var args = new MessageProperties();
             func(args);
 
-            if ((args.Content.IsSpecified && string.IsNullOrEmpty(args.Content.Value)) && (args.Embed.IsSpecified && args.Embed.Value == null))
+            var embed = args.Embed;
+            var embeds = args.Embeds;
+
+            bool hasText = args.Content.IsSpecified && string.IsNullOrEmpty(args.Content.Value);
+            bool hasEmbeds = embed.IsSpecified && embed.Value != null || embeds.IsSpecified && embeds.Value?.Length > 0;
+            bool hasComponents = args.Components.IsSpecified && args.Components.Value != null;
+            bool hasAttachments = args.Attachments.IsSpecified;
+
+            if (!hasComponents && !hasText && !hasEmbeds && !hasAttachments)
                 Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
 
             if (args.AllowedMentions.IsSpecified)
@@ -85,6 +51,7 @@ namespace Discord.Rest
                 AllowedMentions allowedMentions = args.AllowedMentions.Value;
                 Preconditions.AtMost(allowedMentions?.RoleIds?.Count ?? 0, 100, nameof(allowedMentions.RoleIds), "A max of 100 role Ids are allowed.");
                 Preconditions.AtMost(allowedMentions?.UserIds?.Count ?? 0, 100, nameof(allowedMentions.UserIds), "A max of 100 user Ids are allowed.");
+                Preconditions.AtMost(args.Embeds.Value?.Length ?? 0, 10, nameof(args.Embeds), "A max of 10 embeds are allowed.");
 
                 // check that user flag and user Id list are exclusive, same with role flag and role Id list
                 if (allowedMentions != null && allowedMentions.AllowedTypes.HasValue)
@@ -103,14 +70,45 @@ namespace Discord.Rest
                 }
             }
 
-            var apiArgs = new API.Rest.ModifyMessageParams
+            var apiEmbeds = embed.IsSpecified || embeds.IsSpecified ? new List<API.Embed>() : null;
+
+            if (embed.IsSpecified && embed.Value != null)
             {
-                Content = args.Content,
-                Embed = args.Embed.IsSpecified ? args.Embed.Value.ToModel() : Optional.Create<API.Embed>(),
-                Flags = args.Flags.IsSpecified ? args.Flags.Value : Optional.Create<MessageFlags?>(),
-                AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional.Create<API.AllowedMentions>(),
-            };
-            return await client.ApiClient.ModifyMessageAsync(channelId, msgId, apiArgs, options).ConfigureAwait(false);
+                apiEmbeds.Add(embed.Value.ToModel());
+            }
+
+            if (embeds.IsSpecified && embeds.Value != null)
+            {
+                apiEmbeds.AddRange(embeds.Value.Select(x => x.ToModel()));
+            }
+
+            Preconditions.AtMost(apiEmbeds?.Count ?? 0, 10, nameof(args.Embeds), "A max of 10 embeds are allowed.");
+
+            if(!args.Attachments.IsSpecified)
+            {
+                var apiArgs = new API.Rest.ModifyMessageParams
+                {
+                    Content = args.Content,
+                    Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
+                    Flags = args.Flags.IsSpecified ? args.Flags.Value : Optional.Create<MessageFlags?>(),
+                    AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional.Create<API.AllowedMentions>(),
+                    Components = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>() : Optional<API.ActionRowComponent[]>.Unspecified,
+                };
+                return await client.ApiClient.ModifyMessageAsync(channelId, msgId, apiArgs, options).ConfigureAwait(false);
+            }
+            else
+            {
+                var apiArgs = new UploadFileParams(args.Attachments.Value.ToArray())
+                {
+                    Content = args.Content,
+                    Embeds = apiEmbeds?.ToArray() ?? Optional<API.Embed[]>.Unspecified,
+                    Flags = args.Flags.IsSpecified ? args.Flags.Value : Optional.Create<MessageFlags?>(),
+                    AllowedMentions = args.AllowedMentions.IsSpecified ? args.AllowedMentions.Value.ToModel() : Optional.Create<API.AllowedMentions>(),
+                    MessageComponent = args.Components.IsSpecified ? args.Components.Value?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Array.Empty<API.ActionRowComponent>() : Optional<API.ActionRowComponent[]>.Unspecified
+                };
+
+                return await client.ApiClient.ModifyMessageAsync(channelId, msgId, apiArgs, options).ConfigureAwait(false);
+            }
         }
 
         public static Task DeleteAsync(IMessage msg, BaseDiscordClient client, RequestOptions options)
@@ -202,6 +200,12 @@ namespace Discord.Rest
 #else
             return System.Web.HttpUtility.UrlEncode(text);
 #endif
+        }
+        public static string SanitizeMessage(IMessage message)
+        {
+            var newContent = MentionUtils.Resolve(message, 0, TagHandling.FullName, TagHandling.FullName, TagHandling.FullName, TagHandling.FullName, TagHandling.FullName);
+            newContent = Format.StripMarkDown(newContent);
+            return newContent;
         }
 
         public static async Task PinAsync(IMessage msg, BaseDiscordClient client,
@@ -301,7 +305,7 @@ namespace Discord.Rest
                     tags.Add(new Tag<Emote>(TagType.Emoji, index, content.Length, emoji.Id, emoji));
                 else //Bad Tag
                 {
-                    index = index + 1;
+                    index++;
                     continue;
                 }
                 index = endIndex + 1;

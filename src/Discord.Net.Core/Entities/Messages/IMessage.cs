@@ -10,7 +10,7 @@ namespace Discord
     public interface IMessage : ISnowflakeEntity, IDeletable
     {
         /// <summary>
-        ///     Gets the type of this system message.
+        ///     Gets the type of this message.
         /// </summary>
         MessageType Type { get; }
         /// <summary>
@@ -52,6 +52,13 @@ namespace Discord
         ///     A string that contains the body of the message; note that this field may be empty if there is an embed.
         /// </returns>
         string Content { get; }
+        /// <summary>
+        ///     Gets the clean content for this message.
+        /// </summary>
+        /// <returns>
+        ///     A string that contains the body of the message stripped of mentions, markdown, emojis and pings; note that this field may be empty if there is an embed.
+        /// </returns>
+        string CleanContent { get; }
         /// <summary>
         ///     Gets the time this message was sent.
         /// </summary>
@@ -165,12 +172,17 @@ namespace Discord
         IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions { get; }
 
         /// <summary>
-        ///     Gets all stickers included in this message.
+        ///     The <see cref="IMessageComponent"/>'s attached to this message
+        /// </summary>
+        IReadOnlyCollection<IMessageComponent> Components { get; }
+
+        /// <summary>
+        ///     Gets all stickers items included in this message.
         /// </summary>
         /// <returns>
-        ///     A read-only collection of sticker objects.
+        ///     A read-only collection of sticker item objects.
         /// </returns>
-        IReadOnlyCollection<ISticker> Stickers { get; }
+        IReadOnlyCollection<IStickerItem> Stickers { get; }
         
         /// <summary>
         ///     Gets the flags related to this message.
@@ -182,6 +194,14 @@ namespace Discord
         ///     A message's flags, if any is associated.
         /// </returns>
         MessageFlags? Flags { get; }
+
+        /// <summary>
+        ///     Gets the interaction this message is a response to.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="IMessageInteraction"/> if the message is a response to an interaction; otherwise <see langword="null"/>.
+        /// </returns>
+        IMessageInteraction Interaction { get; }
 
         /// <summary>
         ///     Adds a reaction to this message.

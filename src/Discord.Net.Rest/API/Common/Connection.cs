@@ -1,4 +1,3 @@
-﻿#pragma warning disable CS1591
 using Newtonsoft.Json;
 using System.Collections.Generic;
 

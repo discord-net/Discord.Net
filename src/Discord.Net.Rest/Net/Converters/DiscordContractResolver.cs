@@ -10,9 +10,10 @@ namespace Discord.Net.Converters
 {
     internal class DiscordContractResolver : DefaultContractResolver
     {
+        #region DiscordContractResolver
         private static readonly TypeInfo _ienumerable = typeof(IEnumerable<ulong[]>).GetTypeInfo();
-        private static readonly MethodInfo _shouldSerialize = typeof(DiscordContractResolver).GetTypeInfo().GetDeclaredMethod("ShouldSerialize");    
-        
+        private static readonly MethodInfo _shouldSerialize = typeof(DiscordContractResolver).GetTypeInfo().GetDeclaredMethod("ShouldSerialize");
+
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             var property = base.CreateProperty(member, memberSerialization);
@@ -57,8 +58,9 @@ namespace Discord.Net.Converters
                 else if (genericType == typeof(EntityOrId<>))
                     return MakeGenericConverter(property, propInfo, typeof(UInt64EntityOrIdConverter<>), type.GenericTypeArguments[0], depth);
             }
+            #endregion
 
-            //Primitives
+            #region Primitives
             bool hasInt53 = propInfo.GetCustomAttribute<Int53Attribute>() != null;
             if (!hasInt53)
             {
@@ -81,6 +83,14 @@ namespace Discord.Net.Converters
             //Special
             if (type == typeof(API.Image))
                 return ImageConverter.Instance;
+            if (typeof(IMessageComponent).IsAssignableFrom(type))
+                return MessageComponentConverter.Instance;
+            if (type == typeof(API.Interaction))
+                return InteractionConverter.Instance;
+            if (type == typeof(API.DiscordError))
+                return DiscordErrorConverter.Instance;
+            if (type == typeof(GuildFeatures))
+                return GuildFeaturesConverter.Instance;
 
             //Entities
             var typeInfo = type.GetTypeInfo();
@@ -103,5 +113,6 @@ namespace Discord.Net.Converters
             var innerConverter = GetConverter(property, propInfo, innerType, depth + 1);
             return genericType.DeclaredConstructors.First().Invoke(new object[] { innerConverter }) as JsonConverter;
         }
+        #endregion
     }
 }

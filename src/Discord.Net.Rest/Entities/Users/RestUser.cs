@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using Model = Discord.API.User;
+using EventUserModel = Discord.API.GuildScheduledEventUser;
 
 namespace Discord.Rest
 {
@@ -13,6 +14,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestUser : RestEntity<ulong>, IUser, IUpdateable
     {
+        #region RestUser
         /// <inheritdoc />
         public bool IsBot { get; private set; }
         /// <inheritdoc />
@@ -21,6 +23,10 @@ namespace Discord.Rest
         public ushort DiscriminatorValue { get; private set; }
         /// <inheritdoc />
         public string AvatarId { get; private set; }
+        /// <inheritdoc />
+        public string BannerId { get; private set; }
+        /// <inheritdoc />
+        public Color? AccentColor { get; private set; }
         /// <inheritdoc />
         public UserProperties? PublicFlags { get; private set; }
 
@@ -57,10 +63,26 @@ namespace Discord.Rest
             entity.Update(model);
             return entity;
         }
+        internal static RestUser Create(BaseDiscordClient discord, IGuild guild, EventUserModel model)
+        {
+            if (model.Member.IsSpecified)
+            {
+                var member = model.Member.Value;
+                member.User = model.User;
+                return RestGuildUser.Create(discord, guild, member);
+            }
+            else
+                return RestUser.Create(discord, model.User);
+        }
+
         internal virtual void Update(Model model)
         {
             if (model.Avatar.IsSpecified)
                 AvatarId = model.Avatar.Value;
+            if (model.Banner.IsSpecified)
+                BannerId = model.Banner.Value;
+            if (model.AccentColor.IsSpecified)
+                AccentColor = model.AccentColor.Value;
             if (model.Discriminator.IsSpecified)
                 DiscriminatorValue = ushort.Parse(model.Discriminator.Value, NumberStyles.None, CultureInfo.InvariantCulture);
             if (model.Bot.IsSpecified)
@@ -93,6 +115,10 @@ namespace Discord.Rest
             => CDN.GetUserAvatarUrl(Id, AvatarId, size, format);
 
         /// <inheritdoc />
+        public string GetBannerUrl(ImageFormat format = ImageFormat.Auto, ushort size = 256)
+            => CDN.GetUserBannerUrl(Id, BannerId, size, format);
+
+        /// <inheritdoc />
         public string GetDefaultAvatarUrl()
             => CDN.GetDefaultUserAvatarUrl(DiscriminatorValue);
 
@@ -104,10 +130,12 @@ namespace Discord.Rest
         /// </returns>
         public override string ToString() => $"{Username}#{Discriminator}";
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
+        #endregion
 
-        //IUser
+        #region IUser
         /// <inheritdoc />
         async Task<IDMChannel> IUser.CreateDMChannelAsync(RequestOptions options)
             => await CreateDMChannelAsync(options).ConfigureAwait(false);
+        #endregion
     }
 }

@@ -5,7 +5,7 @@ namespace Discord
     /// <summary>
     ///     Represents a discord sticker.
     /// </summary>
-    public interface ISticker
+    public interface ISticker : IStickerItem
     {
         /// <summary>
         ///     Gets the ID of this sticker.
@@ -13,7 +13,7 @@ namespace Discord
         /// <returns>
         ///     A snowflake ID associated with this sticker.
         /// </returns>
-        ulong Id { get; }
+        new ulong Id { get; }
         /// <summary>
         ///     Gets the ID of the pack of this sticker.
         /// </summary>
@@ -27,7 +27,7 @@ namespace Discord
         /// <returns>
         ///     A <see langword="string"/> with the name of this sticker.
         /// </returns>
-        string Name { get; }
+        new string Name { get; }
         /// <summary>
         ///     Gets the description of this sticker.
         /// </summary>
@@ -43,25 +43,29 @@ namespace Discord
         /// </returns>
         IReadOnlyCollection<string> Tags { get; }
         /// <summary>
-        ///     Gets the asset hash of this sticker.
+        ///     Gets the type of this sticker.
         /// </summary>
-        /// <returns>
-        ///     A <see langword="string"/> with the asset hash of this sticker.
-        /// </returns>
-        string Asset { get; }
-        /// <summary>
-        ///     Gets the preview asset hash of this sticker.
-        /// </summary>
-        /// <returns>
-        ///     A <see langword="string"/> with the preview asset hash of this sticker.
-        /// </returns>
-        string PreviewAsset { get; }
+        StickerType Type { get; }
         /// <summary>
         ///     Gets the format type of this sticker.
         /// </summary>
         /// <returns>
         ///     A <see cref="StickerFormatType"/> with the format type of this sticker.
         /// </returns>
-        StickerFormatType FormatType { get; }
+        new StickerFormatType Format { get; }
+
+        /// <summary>
+        ///     Gets whether this guild sticker can be used, may be false due to loss of Server Boosts.
+        /// </summary>
+        bool? IsAvailable { get; }
+
+        /// <summary>
+        ///     Gets the standard sticker's sort order within its pack.
+        /// </summary>
+        int? SortOrder { get; }
+        /// <summary>
+        ///     Gets the image url for this sticker.
+        /// </summary>
+        string GetStickerUrl();
     }
 }

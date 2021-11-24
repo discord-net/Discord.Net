@@ -25,5 +25,9 @@ namespace Discord
         ///     The user has set a custom status.
         /// </summary>
         CustomStatus = 4,
+        /// <summary>
+        ///     The user is competing in a game.
+        /// </summary>
+        Competing = 5,
     }
 }

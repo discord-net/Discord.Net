@@ -8,7 +8,7 @@ namespace Discord.Commands
     public enum RunMode
     {
         /// <summary>
-        /// The default behaviour set in <see cref="CommandServiceConfig"/>.
+        /// The default behavior set in <see cref="CommandServiceConfig"/>.
         /// </summary>
         Default,
         /// <summary>

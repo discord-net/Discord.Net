@@ -39,13 +39,15 @@ namespace Discord
         DirectMessageReactions = 1 << 13,
         /// <summary> This intent includes TYPING_START </summary>
         DirectMessageTyping = 1 << 14,
+        /// <summary> This intent includes GUILD_SCHEDULED_EVENT_CREATE, GUILD_SCHEDULED_EVENT_UPDATE, GUILD_SCHEDULED_EVENT_DELETE, GUILD_SCHEDULED_EVENT_USER_ADD, GUILD_SCHEDULED_EVENT_USER_REMOVE </summary>
+        GuildScheduledEvents = 1 << 16,
         /// <summary>
-        ///     This intent includes all but <see cref="GuildMembers"/> and <see cref="GuildMembers"/>
-        ///     that are privileged must be enabled for the application.
+        ///     This intent includes all but <see cref="GuildMembers"/> and <see cref="GuildPresences"/>
+        ///     which are privileged and must be enabled in the Developer Portal.
         /// </summary>
         AllUnprivileged = Guilds | GuildBans | GuildEmojis | GuildIntegrations | GuildWebhooks | GuildInvites |
             GuildVoiceStates | GuildMessages | GuildMessageReactions | GuildMessageTyping | DirectMessages |
-            DirectMessageReactions | DirectMessageTyping,
+            DirectMessageReactions | DirectMessageTyping | GuildScheduledEvents,
         /// <summary>
         ///     This intent includes all of them, including privileged ones.
         /// </summary>

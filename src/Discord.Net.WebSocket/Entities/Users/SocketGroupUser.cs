@@ -1,11 +1,16 @@
+using System;
 using System.Diagnostics;
 using Model = Discord.API.User;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a WebSocket-based group user.
+    /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class SocketGroupUser : SocketUser, IGroupUser
     {
+        #region SocketGroupUser
         /// <summary>
         ///     Gets the group channel of the user.
         /// </summary>
@@ -45,8 +50,9 @@ namespace Discord.WebSocket
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Group)";
         internal new SocketGroupUser Clone() => MemberwiseClone() as SocketGroupUser;
+        #endregion
 
-        //IVoiceState
+        #region IVoiceState
         /// <inheritdoc />
         bool IVoiceState.IsDeafened => false;
         /// <inheritdoc />
@@ -63,5 +69,8 @@ namespace Discord.WebSocket
         string IVoiceState.VoiceSessionId => null;
         /// <inheritdoc />
         bool IVoiceState.IsStreaming => false;
+        /// <inheritdoc />
+        DateTimeOffset? IVoiceState.RequestToSpeakTimestamp => null;
+        #endregion
     }
 }

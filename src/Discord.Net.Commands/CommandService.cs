@@ -29,6 +29,7 @@ namespace Discord.Commands
     /// </remarks>
     public class CommandService : IDisposable
     {
+        #region CommandService
         /// <summary>
         ///     Occurs when a command-related information is received.
         /// </summary>
@@ -131,8 +132,9 @@ namespace Discord.Commands
             entityTypeReaders.Add((typeof(IUser), typeof(UserTypeReader<>)));
             _entityTypeReaders = entityTypeReaders.ToImmutable();
         }
+        #endregion
 
-        //Modules
+        #region Modules
         public async Task<ModuleInfo> CreateModuleAsync(string primaryAlias, Action<ModuleBuilder> buildFunc)
         {
             await _moduleLock.WaitAsync().ConfigureAwait(false);
@@ -187,7 +189,7 @@ namespace Discord.Commands
         /// </returns>
         public async Task<ModuleInfo> AddModuleAsync(Type type, IServiceProvider services)
         {
-            services = services ?? EmptyServiceProvider.Instance;
+            services ??= EmptyServiceProvider.Instance;
 
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -222,7 +224,7 @@ namespace Discord.Commands
         /// </returns>
         public async Task<IEnumerable<ModuleInfo>> AddModulesAsync(Assembly assembly, IServiceProvider services)
         {
-            services = services ?? EmptyServiceProvider.Instance;
+            services ??= EmptyServiceProvider.Instance;
 
             await _moduleLock.WaitAsync().ConfigureAwait(false);
             try
@@ -322,8 +324,9 @@ namespace Discord.Commands
 
             return true;
         }
+        #endregion
 
-        //Type Readers
+        #region Type Readers
         /// <summary>
         ///     Adds a custom <see cref="TypeReader" /> to this <see cref="CommandService" /> for the supplied object
         ///     type.
@@ -448,8 +451,9 @@ namespace Discord.Commands
             }
             return null;
         }
+        #endregion
 
-        //Execution
+        #region Execution
         /// <summary>
         ///     Searches for the command.
         /// </summary>
@@ -503,7 +507,7 @@ namespace Discord.Commands
         /// </returns>
         public async Task<IResult> ExecuteAsync(ICommandContext context, string input, IServiceProvider services, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
-            services = services ?? EmptyServiceProvider.Instance;
+            services ??= EmptyServiceProvider.Instance;
 
             var searchResult = Search(input);
             if (!searchResult.IsSuccess)
@@ -598,11 +602,13 @@ namespace Discord.Commands
             //If we get this far, at least one parse was successful. Execute the most likely overload.
             var chosenOverload = successfulParses[0];
             var result = await chosenOverload.Key.ExecuteAsync(context, chosenOverload.Value, services).ConfigureAwait(false);
-            if (!result.IsSuccess && !(result is RuntimeResult || result is ExecuteResult)) // succesful results raise the event in CommandInfo#ExecuteInternalAsync (have to raise it there b/c deffered execution)
+            if (!result.IsSuccess && !(result is RuntimeResult || result is ExecuteResult)) // successful results raise the event in CommandInfo#ExecuteInternalAsync (have to raise it there b/c deferred execution)
                 await _commandExecutedEvent.InvokeAsync(chosenOverload.Key.Command, context, result);
             return result;
         }
+        #endregion
 
+        #region Dispose
         protected virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)
@@ -620,5 +626,6 @@ namespace Discord.Commands
         {
             Dispose(true);
         }
+        #endregion
     }
 }

@@ -1,46 +1,55 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Model = Discord.API.Sticker;
 
-namespace Discord
+namespace Discord.Rest
 {
     /// <inheritdoc cref="ISticker"/>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public class Sticker : ISticker
+    public class Sticker : RestEntity<ulong>, ISticker
     {
         /// <inheritdoc />
-        public ulong Id { get; }
+        public ulong PackId { get; protected set; }
         /// <inheritdoc />
-        public ulong PackId { get; }
+        public string Name { get; protected set; }
         /// <inheritdoc />
-        public string Name { get; }
+        public string Description { get; protected set; }
         /// <inheritdoc />
-        public string Description { get; }
+        public IReadOnlyCollection<string> Tags { get; protected set; }
         /// <inheritdoc />
-        public IReadOnlyCollection<string> Tags { get; }
+        public StickerType Type { get; protected set; }
         /// <inheritdoc />
-        public string Asset { get; }
+        public bool? IsAvailable { get; protected set; }
         /// <inheritdoc />
-        public string PreviewAsset { get; }
+        public int? SortOrder { get; protected set; }
         /// <inheritdoc />
-        public StickerFormatType FormatType { get; }
+        public StickerFormatType Format { get; protected set; }
 
-        internal Sticker(ulong id, ulong packId, string name, string description, string[] tags, string asset, string previewAsset, StickerFormatType formatType)
+        /// <inheritdoc/>
+        public string GetStickerUrl()
+            => CDN.GetStickerUrl(Id, Format);
+
+        internal Sticker(BaseDiscordClient client, ulong id)
+            : base(client, id) { }
+        internal static Sticker Create(BaseDiscordClient client, Model model)
         {
-            Id = id;
-            PackId = packId;
-            Name = name;
-            Description = description;
-            Tags = tags.ToReadOnlyCollection();
-            Asset = asset;
-            PreviewAsset = previewAsset;
-            FormatType = formatType;
+            var entity = new Sticker(client, model.Id);
+            entity.Update(model);
+            return entity;
         }
-        internal static Sticker Create(Model model)
+
+        internal void Update(Model model)
         {
-            return new Sticker(model.Id, model.PackId, model.Name, model.Desription,
-                model.Tags.IsSpecified ? model.Tags.Value.Split(',') : new string[0],
-                model.Asset, model.PreviewAsset, model.FormatType);
+            PackId = model.PackId;
+            Name = model.Name;
+            Description = model.Description;
+            Tags = model.Tags.IsSpecified ? model.Tags.Value.Split(',').Select(x => x.Trim()).ToArray() : Array.Empty<string>();
+            Type = model.Type;
+            SortOrder = model.SortValue;
+            IsAvailable = model.Available;
+            Format = model.FormatType;
         }
 
         private string DebuggerDisplay => $"{Name} ({Id})";

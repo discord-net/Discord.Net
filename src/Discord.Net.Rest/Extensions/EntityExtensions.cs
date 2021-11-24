@@ -39,7 +39,7 @@ namespace Discord.Rest
             return new RoleTags(
                 model.BotId.IsSpecified ? model.BotId.Value : null,
                 model.IntegrationId.IsSpecified ? model.IntegrationId.Value : null,
-                model.IsPremiumSubscriber.IsSpecified ? true : false);
+                model.IsPremiumSubscriber.GetValueOrDefault(false) ?? false);
         }
         public static API.Embed ToModel(this Embed entity)
         {
@@ -68,8 +68,10 @@ namespace Discord.Rest
                 model.Video = entity.Video.Value.ToModel();
             return model;
         }
+
         public static API.AllowedMentions ToModel(this AllowedMentions entity)
         {
+            if (entity == null) return null;
             return new API.AllowedMentions()
             {
                 Parse = entity.AllowedTypes?.EnumerateMentionTypes().ToArray(),

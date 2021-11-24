@@ -1,26 +1,15 @@
 - name: Introduction
   topicUid: Guides.Introduction
-- name: Getting Started
+- name: "Working with Guild Events"
   items:
-    - name: Installation
-      topicUid: Guides.GettingStarted.Installation
-      items:
-        - name: Nightly Builds
-          topicUid: Guides.GettingStarted.Installation.Nightlies
-    - name: Your First Bot
-      topicUid: Guides.GettingStarted.FirstBot
-    - name: Terminology
-      topicUid: Guides.GettingStarted.Terminology
-- name: Basic Concepts
-  items:
-    - name: Logging Data
-      topicUid: Guides.Concepts.Logging
-    - name: Working with Events
-      topicUid: Guides.Concepts.Events
-    - name: Managing Connections
-      topicUid: Guides.Concepts.ManageConnections
-    - name: Entities
-      topicUid: Guides.Concepts.Entities
+    - name: Introduction
+      topicUid: Guides.GuildEvents.Intro
+    - name: Creating Events
+      topicUid: Guides.GuildEvents.Creating
+    - name: Getting Event Users
+      topicUid: Guides.GuildEvents.GettingUsers
+    - name: Modifying Events
+      topicUid: Guides.GuildEvents.Modifying
 - name: Working with Commands
   items:
     - name: Introduction
@@ -35,6 +24,42 @@
       topicUid: Guides.Commands.DI
     - name: Post-execution Handling
       topicUid: Guides.Commands.PostExecution
+- name: Working with Slash Commands
+  items:
+    - name: Introduction
+      topicUid: Guides.SlashCommands.Intro
+    - name: Creating slash commands
+      topicUid: Guides.SlashCommands.Creating
+    - name: Receiving and responding to slash commands
+      topicUid: Guides.SlashCommands.Receiving
+    - name: Slash command parameters
+      topicUid: Guides.SlashCommands.Parameters
+    - name: Ephemeral responses
+      topicUid: Guides.SlashCommands.Ephemeral
+    - name: Sub commands
+      topicUid: Guides.SlashCommands.SubCommand
+    - name: Slash command choices
+      topicUid: Guides.SlashCommands.Choices
+    - name: Slash commands Bulk Overwrites
+      topicUid: Guides.SlashCommands.BulkOverwrite
+- name: Working with Context commands
+  items:
+    - name: Creating Context Commands
+      topicUid: Guides.ContextCommands.Creating
+    - name: Receiving Context Commands
+      topicUid: Guides.ContextCommands.Reveiving
+- name: Working with Message Components
+  items:
+    - name: Getting started
+      topicUid: Guides.MessageComponents.GettingStarted
+    - name: Responding to Components
+      topicUid: Guides.MessageComponents.Responding
+    - name: Buttons in depth
+      topicUid: Guides.MessageComponents.Buttons
+    - name: Select menus
+      topicUid: Guides.MessageComponents.SelectMenus
+    - name: Advanced Concepts
+      topicUid: Guides.MessageComponents.Advanced
 - name: Emoji
   topicUid: Guides.Emoji
 - name: Voice
