@@ -104,5 +104,15 @@ namespace Discord
             var newText = Regex.Replace(text, @"(\*|_|`|~|>|\\)", "");
             return newText;
         }
+
+        /// <summary>
+        ///     Formats a users username + discriminator while maintaining bidirectional unicode
+        /// </summary>
+        /// <param name="user">The user whos username and discriminator to format</param>
+        /// <returns>The username + discriminator</returns>
+        public static string UsernameAndDiscriminator(IUser user)
+        {
+            return $"\u2066{user.Username}\u2069#{user.Discriminator}";
+        }
     }
 }
