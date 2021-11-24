@@ -12,6 +12,7 @@ namespace Discord.Rest
     /// </summary>
     public class RestGuildChannel : RestChannel, IGuildChannel
     {
+        #region RestGuildChannel
         private ImmutableArray<Overwrite> _overwrites;
 
         /// <inheritdoc />
@@ -32,30 +33,34 @@ namespace Discord.Rest
         }
         internal static RestGuildChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            switch (model.Type)
+            return model.Type switch
             {
-                case ChannelType.News:
-                    return RestNewsChannel.Create(discord, guild, model);
-                case ChannelType.Text:
-                    return RestTextChannel.Create(discord, guild, model);
-                case ChannelType.Voice:
-                    return RestVoiceChannel.Create(discord, guild, model);
-                case ChannelType.Category:
-                    return RestCategoryChannel.Create(discord, guild, model);
-                default:
-                    return new RestGuildChannel(discord, guild, model.Id);
-            }
+                ChannelType.News => RestNewsChannel.Create(discord, guild, model),
+                ChannelType.Text => RestTextChannel.Create(discord, guild, model),
+                ChannelType.Voice => RestVoiceChannel.Create(discord, guild, model),
+                ChannelType.Stage => RestStageChannel.Create(discord, guild, model),
+                ChannelType.Category => RestCategoryChannel.Create(discord, guild, model),
+                ChannelType.PublicThread or ChannelType.PrivateThread or ChannelType.NewsThread => RestThreadChannel.Create(discord, guild, model),
+                _ => new RestGuildChannel(discord, guild, model.Id),
+            };
         }
         internal override void Update(Model model)
         {
             Name = model.Name.Value;
-            Position = model.Position.Value;
 
-            var overwrites = model.PermissionOverwrites.Value;
-            var newOverwrites = ImmutableArray.CreateBuilder<Overwrite>(overwrites.Length);
-            for (int i = 0; i < overwrites.Length; i++)
-                newOverwrites.Add(overwrites[i].ToEntity());
-            _overwrites = newOverwrites.ToImmutable();
+            if (model.Position.IsSpecified)
+            {
+                Position = model.Position.Value;
+            }
+
+            if (model.PermissionOverwrites.IsSpecified)
+            {
+                var overwrites = model.PermissionOverwrites.Value;
+                var newOverwrites = ImmutableArray.CreateBuilder<Overwrite>(overwrites.Length);
+                for (int i = 0; i < overwrites.Length; i++)
+                    newOverwrites.Add(overwrites[i].ToEntity());
+                _overwrites = newOverwrites.ToImmutable();
+            }
         }
 
         /// <inheritdoc />
@@ -187,8 +192,9 @@ namespace Discord.Rest
         ///     A string that is the name of this channel.
         /// </returns>
         public override string ToString() => Name;
+        #endregion
 
-        //IGuildChannel
+        #region IGuildChannel
         /// <inheritdoc />
         IGuild IGuildChannel.Guild
         {
@@ -225,13 +231,15 @@ namespace Discord.Rest
         /// <inheritdoc />
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(null); //Overridden in Text/Voice
+        #endregion
 
-        //IChannel
+        #region IChannel
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overridden in Text/Voice
         /// <inheritdoc />
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null); //Overridden in Text/Voice
+        #endregion
     }
 }

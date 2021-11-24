@@ -20,6 +20,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGroupChannel : SocketChannel, IGroupChannel, ISocketPrivateChannel, ISocketMessageChannel, ISocketAudioChannel
     {
+        #region SocketGroupChannel
         private readonly MessageCache _messages;
         private readonly ConcurrentDictionary<ulong, SocketVoiceState> _voiceStates;
 
@@ -31,7 +32,15 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();
+
+        /// <summary>
+        ///     Returns a collection representing all of the users in the group.
+        /// </summary>
         public new IReadOnlyCollection<SocketGroupUser> Users => _users.ToReadOnlyCollection();
+
+        /// <summary>
+        ///     Returns a collection representing all users in the group, not including the client.
+        /// </summary>
         public IReadOnlyCollection<SocketGroupUser> Recipients
             => _users.Select(x => x.Value).Where(x => x.Id != Discord.CurrentUser.Id).ToReadOnlyCollection(() => _users.Count - 1);
 
@@ -76,8 +85,9 @@ namespace Discord.WebSocket
         {
             throw new NotSupportedException("Voice is not yet supported for group channels.");
         }
+#endregion
 
-        //Messages
+        #region Messages
         /// <inheritdoc />
         public SocketMessage GetCachedMessage(ulong id)
             => _messages?.Get(id);
@@ -163,15 +173,24 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        public Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null)
-            => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, allowedMentions, messageReference, options);
+        public Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null, Embed[] embeds = null)
+            => ChannelHelper.SendMessageAsync(this, Discord, text, isTTS, embed, allowedMentions, messageReference, component, stickers, options, embeds);
 
         /// <inheritdoc />
-        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null)
-            => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, allowedMentions, messageReference, options, isSpoiler);
+        public Task<RestUserMessage> SendFileAsync(string filePath, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null, Embed[] embeds = null)
+            => ChannelHelper.SendFileAsync(this, Discord, filePath, text, isTTS, embed, allowedMentions, messageReference, component, stickers, options, isSpoiler, embeds);
         /// <inheritdoc />
-        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null)
-            => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, allowedMentions, messageReference, options, isSpoiler);
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
+        public Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null, Embed[] embeds = null)
+            => ChannelHelper.SendFileAsync(this, Discord, stream, filename, text, isTTS, embed, allowedMentions, messageReference, component, stickers, options, isSpoiler, embeds);
+        /// <inheritdoc />
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
+        public Task<RestUserMessage> SendFileAsync(FileAttachment attachment, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null, Embed[] embeds = null)
+            => ChannelHelper.SendFileAsync(this, Discord, attachment, text, isTTS, embed, allowedMentions, messageReference, component, stickers, options, embeds);
+        /// <inheritdoc />
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
+        public Task<RestUserMessage> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null, Embed[] embeds = null)
+            => ChannelHelper.SendFilesAsync(this, Discord, attachments, text, isTTS, embed, allowedMentions, messageReference, component, stickers, options, embeds);
 
         /// <inheritdoc />
         public Task DeleteMessageAsync(ulong messageId, RequestOptions options = null)
@@ -195,8 +214,9 @@ namespace Discord.WebSocket
             => _messages?.Add(msg);
         internal SocketMessage RemoveMessage(ulong id)
             => _messages?.Remove(id);
+        #endregion
 
-        //Users
+        #region Users
         /// <summary>
         ///     Gets a user from this group.
         /// </summary>
@@ -231,8 +251,9 @@ namespace Discord.WebSocket
             }
             return null;
         }
+        #endregion
 
-        //Voice States
+        #region Voice States
         internal SocketVoiceState AddOrUpdateVoiceState(ClientState state, VoiceStateModel model)
         {
             var voiceChannel = state.GetChannel(model.ChannelId.Value) as SocketVoiceChannel;
@@ -259,22 +280,26 @@ namespace Discord.WebSocket
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id}, Group)";
         internal new SocketGroupChannel Clone() => MemberwiseClone() as SocketGroupChannel;
+        #endregion
 
-        //SocketChannel
+        #region SocketChannel
         /// <inheritdoc />
         internal override IReadOnlyCollection<SocketUser> GetUsersInternal() => Users;
         /// <inheritdoc />
         internal override SocketUser GetUserInternal(ulong id) => GetUser(id);
+        #endregion
 
-        //ISocketPrivateChannel
+        #region ISocketPrivateChannel
         /// <inheritdoc />
         IReadOnlyCollection<SocketUser> ISocketPrivateChannel.Recipients => Recipients;
+        #endregion
 
-        //IPrivateChannel
+        #region IPrivateChannel
         /// <inheritdoc />
         IReadOnlyCollection<IUser> IPrivateChannel.Recipients => Recipients;
+        #endregion
 
-        //IMessageChannel
+        #region IMessageChannel
         /// <inheritdoc />
         async Task<IMessage> IMessageChannel.GetMessageAsync(ulong id, CacheMode mode, RequestOptions options)
         {
@@ -297,27 +322,37 @@ namespace Discord.WebSocket
             => await GetPinnedMessagesAsync(options).ConfigureAwait(false);
 
         /// <inheritdoc />
-        async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions, MessageReference messageReference)
-            => await SendFileAsync(filePath, text, isTTS, embed, options, isSpoiler, allowedMentions, messageReference).ConfigureAwait(false);
+        async Task<IUserMessage> IMessageChannel.SendFileAsync(string filePath, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers, Embed[] embeds)
+            => await SendFileAsync(filePath, text, isTTS, embed, options, isSpoiler, allowedMentions, messageReference, component, stickers, embeds).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions, MessageReference messageReference)
-            => await SendFileAsync(stream, filename, text, isTTS, embed, options, isSpoiler, allowedMentions, messageReference).ConfigureAwait(false);
+        async Task<IUserMessage> IMessageChannel.SendFileAsync(Stream stream, string filename, string text, bool isTTS, Embed embed, RequestOptions options, bool isSpoiler, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers, Embed[] embeds)
+            => await SendFileAsync(stream, filename, text, isTTS, embed, options, isSpoiler, allowedMentions, messageReference, component, stickers, embeds).ConfigureAwait(false);
         /// <inheritdoc />
-        async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageReference messageReference)
-            => await SendMessageAsync(text, isTTS, embed, options, allowedMentions, messageReference).ConfigureAwait(false);
+        async Task<IUserMessage> IMessageChannel.SendFileAsync(FileAttachment attachment, string text, bool isTTS, Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers, Embed[] embeds)
+            => await SendFileAsync(attachment, text, isTTS, embed, options, allowedMentions, messageReference, component, stickers, embeds).ConfigureAwait(false);
+        /// <inheritdoc />
+        async Task<IUserMessage> IMessageChannel.SendFilesAsync(IEnumerable<FileAttachment> attachments, string text, bool isTTS, Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers, Embed[] embeds)
+           => await SendFilesAsync(attachments, text, isTTS, embed, options, allowedMentions, messageReference, component, stickers, embeds).ConfigureAwait(false);
 
-        //IAudioChannel
+        /// <inheritdoc />
+        async Task<IUserMessage> IMessageChannel.SendMessageAsync(string text, bool isTTS, Embed embed, RequestOptions options, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers, Embed[] embeds)
+            => await SendMessageAsync(text, isTTS, embed, options, allowedMentions, messageReference, component, stickers, embeds).ConfigureAwait(false);
+        #endregion
+
+        #region IAudioChannel
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Connecting to a group channel is not supported.</exception>
         Task<IAudioClient> IAudioChannel.ConnectAsync(bool selfDeaf, bool selfMute, bool external) { throw new NotSupportedException(); }
         Task IAudioChannel.DisconnectAsync() { throw new NotSupportedException(); }
+        #endregion
 
-        //IChannel        
+        #region IChannel        
         /// <inheritdoc />
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(GetUser(id));
         /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => ImmutableArray.Create<IReadOnlyCollection<IUser>>(Users).ToAsyncEnumerable();
+        #endregion
     }
 }

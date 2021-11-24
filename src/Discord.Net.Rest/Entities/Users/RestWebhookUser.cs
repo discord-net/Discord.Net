@@ -10,6 +10,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestWebhookUser : RestUser, IWebhookUser
     {
+        #region RestWebhookUser
         /// <inheritdoc />
         public ulong WebhookId { get; }
         internal IGuild Guild { get; }
@@ -33,8 +34,9 @@ namespace Discord.Rest
             entity.Update(model);
             return entity;
         }
+#endregion
 
-        //IGuildUser
+        #region IGuildUser
         /// <inheritdoc />
         IGuild IGuildUser.Guild
         {
@@ -52,7 +54,13 @@ namespace Discord.Rest
         /// <inheritdoc />
         string IGuildUser.Nickname => null;
         /// <inheritdoc />
+        string IGuildUser.GuildAvatarId => null;
+        /// <inheritdoc />
+        string IGuildUser.GetGuildAvatarUrl(ImageFormat format, ushort size) => null;
+        /// <inheritdoc />
         bool? IGuildUser.IsPending => null;
+        /// <inheritdoc />
+        int IGuildUser.Hierarchy => 0;
         /// <inheritdoc />
         GuildPermissions IGuildUser.GuildPermissions => GuildPermissions.Webhook;
 
@@ -89,8 +97,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         Task IGuildUser.RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options) =>
             throw new NotSupportedException("Roles are not supported on webhook users.");
+        #endregion
 
-        //IVoiceState
+        #region IVoiceState
         /// <inheritdoc />
         bool IVoiceState.IsDeafened => false;
         /// <inheritdoc />
@@ -107,5 +116,8 @@ namespace Discord.Rest
         string IVoiceState.VoiceSessionId => null;
         /// <inheritdoc />
         bool IVoiceState.IsStreaming => false;
+        /// <inheritdoc />
+        DateTimeOffset? IVoiceState.RequestToSpeakTimestamp => null;
+        #endregion
     }
 }

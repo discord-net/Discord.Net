@@ -1,4 +1,3 @@
-﻿#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -21,5 +20,7 @@ namespace Discord.API
 
         [JsonProperty("user")]
         public Optional<User> Creator { get; set; }
+        [JsonProperty("application_id")]
+        public ulong? ApplicationId { get; set; }
     }
 }

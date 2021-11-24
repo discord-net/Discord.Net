@@ -1,4 +1,3 @@
-#pragma warning disable CS1591
 using Newtonsoft.Json;
 using System;
 
@@ -15,7 +14,7 @@ namespace Discord.API.Voice
         [JsonProperty("modes")]
         public string[] Modes { get; set; }
         [JsonProperty("heartbeat_interval")]
-        [Obsolete("This field is errorneous and should not be used", true)]
+        [Obsolete("This field is erroneous and should not be used", true)]
         public int HeartbeatInterval { get; set; }
     }
 }

@@ -1,4 +1,3 @@
-﻿#pragma warning disable CS1591
 namespace Discord.API.Gateway
 {
     internal enum GatewayOpCode : byte
@@ -10,7 +9,7 @@ namespace Discord.API.Gateway
         /// <summary> C→S - Used to associate a connection with a token and specify configuration. </summary>
         Identify = 2,
         /// <summary> C→S - Used to update client's status and current game id. </summary>
-        StatusUpdate = 3,
+        PresenceUpdate = 3,
         /// <summary> C→S - Used to join a particular voice channel. </summary>
         VoiceStateUpdate = 4,
         /// <summary> C→S - Used to ensure the guild's voice server is alive. </summary>

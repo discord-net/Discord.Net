@@ -14,12 +14,15 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestGuildUser : RestUser, IGuildUser
     {
+        #region RestGuildUser
         private long? _premiumSinceTicks;
         private long? _joinedAtTicks;
         private ImmutableArray<ulong> _roleIds;
 
         /// <inheritdoc />
         public string Nickname { get; private set; }
+        /// <inheritdoc/>
+        public string GuildAvatarId { get; private set; }
         internal IGuild Guild { get; private set; }
         /// <inheritdoc />
         public bool IsDeafened { get; private set; }
@@ -31,6 +34,18 @@ namespace Discord.Rest
         public ulong GuildId => Guild.Id;
         /// <inheritdoc />
         public bool? IsPending { get; private set; }
+        /// <inheritdoc />
+        public int Hierarchy
+        {
+            get
+            {
+                if (Guild.OwnerId == Id)
+                    return int.MaxValue;
+
+                var orderedRoles = Guild.Roles.OrderByDescending(x => x.Position);
+                return orderedRoles.Where(x => RoleIds.Contains(x.Id)).Max(x => x.Position);
+            }
+        }
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException" accessor="get">Resolving permissions requires the parent guild to be downloaded.</exception>
@@ -67,6 +82,8 @@ namespace Discord.Rest
                 _joinedAtTicks = model.JoinedAt.Value.UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
+            if (model.Avatar.IsSpecified)
+                GuildAvatarId = model.Avatar.Value;
             if (model.Deaf.IsSpecified)
                 IsDeafened = model.Deaf.Value;
             if (model.Mute.IsSpecified)
@@ -144,7 +161,11 @@ namespace Discord.Rest
             return new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, guildPerms.RawValue));
         }
 
-        //IGuildUser
+        public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildUserAvatarUrl(Id, GuildId, GuildAvatarId, size, format);
+#endregion
+
+        #region IGuildUser
         /// <inheritdoc />
         IGuild IGuildUser.Guild
         {
@@ -155,8 +176,9 @@ namespace Discord.Rest
                 throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
             }
         }
+        #endregion
 
-        //IVoiceState
+        #region IVoiceState
         /// <inheritdoc />
         bool IVoiceState.IsSelfDeafened => false;
         /// <inheritdoc />
@@ -169,5 +191,8 @@ namespace Discord.Rest
         string IVoiceState.VoiceSessionId => null;
         /// <inheritdoc />
         bool IVoiceState.IsStreaming => false;
+        /// <inheritdoc />
+        DateTimeOffset? IVoiceState.RequestToSpeakTimestamp => null;
+        #endregion
     }
 }

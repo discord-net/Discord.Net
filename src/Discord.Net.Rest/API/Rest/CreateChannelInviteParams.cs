@@ -1,4 +1,3 @@
-﻿#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API.Rest
@@ -14,5 +13,11 @@ namespace Discord.API.Rest
         public Optional<bool> IsTemporary { get; set; }
         [JsonProperty("unique")]
         public Optional<bool> IsUnique { get; set; }
+        [JsonProperty("target_type")]
+        public Optional<TargetUserType> TargetType { get; set; }
+        [JsonProperty("target_user_id")]
+        public Optional<ulong> TargetUserId { get; set; }
+        [JsonProperty("target_application_id")]
+        public Optional<ulong> TargetApplicationId { get; set; }
     }
 }

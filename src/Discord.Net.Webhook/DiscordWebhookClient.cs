@@ -60,8 +60,7 @@ namespace Discord.Webhook
         /// <exception cref="ArgumentNullException">Thrown if the <paramref name="webhookUrl"/> is null or whitespace.</exception>
         public DiscordWebhookClient(string webhookUrl, DiscordRestConfig config) : this(config)
         {
-            string token;
-            ParseWebhookUrl(webhookUrl, out _webhookId, out token);
+            ParseWebhookUrl(webhookUrl, out _webhookId, out string token);
             ApiClient.LoginAsync(TokenType.Webhook, token).GetAwaiter().GetResult();
             Webhook = WebhookClientHelper.GetWebhookAsync(this, _webhookId).GetAwaiter().GetResult();
         }
@@ -88,8 +87,8 @@ namespace Discord.Webhook
         /// <summary> Sends a message to the channel for this webhook. </summary>
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendMessageAsync(string text = null, bool isTTS = false, IEnumerable<Embed> embeds = null,
-            string username = null, string avatarUrl = null, RequestOptions options = null, AllowedMentions allowedMentions = null)
-            => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, allowedMentions, options);
+            string username = null, string avatarUrl = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageComponent component = null)
+            => WebhookClientHelper.SendMessageAsync(this, text, isTTS, embeds, username, avatarUrl, allowedMentions, options, component);
 
         /// <summary>
         ///     Modifies a message posted using this webhook.
@@ -124,14 +123,35 @@ namespace Discord.Webhook
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendFileAsync(string filePath, string text, bool isTTS = false,
             IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null,
-            RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
-            => WebhookClientHelper.SendFileAsync(this, filePath, text, isTTS, embeds, username, avatarUrl, allowedMentions, options, isSpoiler);
+            RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null,
+            MessageComponent components = null)
+            => WebhookClientHelper.SendFileAsync(this, filePath, text, isTTS, embeds, username, avatarUrl,
+                allowedMentions, options, isSpoiler, components);
         /// <summary> Sends a message to the channel for this webhook with an attachment. </summary>
         /// <returns> Returns the ID of the created message. </returns>
         public Task<ulong> SendFileAsync(Stream stream, string filename, string text, bool isTTS = false,
             IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null,
-            RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null)
-            => WebhookClientHelper.SendFileAsync(this, stream, filename, text, isTTS, embeds, username, avatarUrl, allowedMentions, options, isSpoiler);
+            RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null,
+            MessageComponent components = null)
+            => WebhookClientHelper.SendFileAsync(this, stream, filename, text, isTTS, embeds, username,
+                avatarUrl, allowedMentions, options, isSpoiler, components);
+
+        /// <summary> Sends a message to the channel for this webhook with an attachment. </summary>
+        /// <returns> Returns the ID of the created message. </returns>
+        public Task<ulong> SendFileAsync(FileAttachment attachment, string text, bool isTTS = false,
+            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null,
+            RequestOptions options = null, AllowedMentions allowedMentions = null, MessageComponent components = null)
+            => WebhookClientHelper.SendFileAsync(this, attachment, text, isTTS, embeds, username,
+                avatarUrl, allowedMentions, components, options);
+
+        /// <summary> Sends a message to the channel for this webhook with an attachment. </summary>
+        /// <returns> Returns the ID of the created message. </returns>
+        public Task<ulong> SendFilesAsync(IEnumerable<FileAttachment> attachments, string text, bool isTTS = false,
+            IEnumerable<Embed> embeds = null, string username = null, string avatarUrl = null,
+            RequestOptions options = null, AllowedMentions allowedMentions = null, MessageComponent components = null)
+            => WebhookClientHelper.SendFilesAsync(this, attachments, text, isTTS, embeds, username, avatarUrl,
+                allowedMentions, components, options);
+
 
         /// <summary> Modifies the properties of this webhook. </summary>
         public Task ModifyWebhookAsync(Action<WebhookProperties> func, RequestOptions options = null)

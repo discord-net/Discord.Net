@@ -57,6 +57,9 @@ namespace Discord
 
         public virtual async Task StartAsync()
         {
+            if (State != ConnectionState.Disconnected)
+                throw new InvalidOperationException("Cannot start an already running client.");
+
             await AcquireConnectionLock().ConfigureAwait(false);
             var reconnectCancelToken = new CancellationTokenSource();
             _reconnectCancelToken?.Dispose();
@@ -74,11 +77,6 @@ namespace Discord
                             await ConnectAsync(reconnectCancelToken).ConfigureAwait(false);
                             nextReconnectDelay = 1000; //Reset delay
                             await _connectionPromise.Task.ConfigureAwait(false);
-                        }
-                        catch (OperationCanceledException ex)
-                        {
-                            Cancel(); //In case this exception didn't come from another Error call
-                            await DisconnectAsync(ex, !reconnectCancelToken.IsCancellationRequested).ConfigureAwait(false);
                         }
                         catch (Exception ex)
                         {
@@ -143,16 +141,7 @@ namespace Discord
                     catch (OperationCanceledException) { }
                 });
 
-                try
-                {
-                    await _onConnecting().ConfigureAwait(false);
-                }
-                catch (TaskCanceledException ex)
-                {
-                    Exception innerEx = ex.InnerException ?? new OperationCanceledException("Failed to connect.");
-                    Error(innerEx);
-                    throw innerEx;
-                }
+                await _onConnecting().ConfigureAwait(false);
 
                 await _logger.InfoAsync("Connected").ConfigureAwait(false);
                 State = ConnectionState.Connected;

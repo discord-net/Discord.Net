@@ -75,7 +75,7 @@ namespace Discord.Commands
 
         public async Task<PreconditionResult> CheckPreconditionsAsync(ICommandContext context, object arg, IServiceProvider services = null)
         {
-            services = services ?? EmptyServiceProvider.Instance;
+            services ??= EmptyServiceProvider.Instance;
 
             foreach (var precondition in Preconditions)
             {
@@ -89,7 +89,7 @@ namespace Discord.Commands
 
         public async Task<TypeReaderResult> ParseAsync(ICommandContext context, string input, IServiceProvider services = null)
         {
-            services = services ?? EmptyServiceProvider.Instance;
+            services ??= EmptyServiceProvider.Instance;
             return await _reader.ReadAsync(context, input, services).ConfigureAwait(false);
         }
 

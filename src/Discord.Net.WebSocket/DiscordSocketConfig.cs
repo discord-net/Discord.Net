@@ -49,7 +49,30 @@ namespace Discord.WebSocket
         /// <summary>
         ///     Gets or sets the total number of shards for this application.
         /// </summary>
+        /// <remarks>
+        ///     If this is left <see langword="null"/> in a sharded client the bot will get the recommended shard
+        ///     count from discord and use that.
+        /// </remarks>
         public int? TotalShards { get; set; } = null;
+
+        /// <summary>
+        ///     Gets or sets whether or not the client should download the default stickers on startup.
+        /// </summary>
+        /// <remarks>
+        ///     When this is set to <see langword="false"/> default stickers arn't present and cannot be resolved by the client.
+        ///     This will make all default stickers have the type of <see cref="SocketUnknownSticker"/>.
+        /// </remarks>
+        public bool AlwaysDownloadDefaultStickers { get; set; } = false;
+
+        /// <summary>
+        ///     Gets or sets whether or not the client should automatically resolve the stickers sent on a message.
+        /// </summary>
+        /// <remarks>
+        ///     Note if a sticker isn't cached the client will preform a rest request to resolve it. This
+        ///     may be very rest heavy depending on your bots size, it isn't recommended to use this with large scale bots as you
+        ///     can get ratelimited easily.
+        /// </remarks>
+        public bool AlwaysResolveStickers { get; set; } = false;
 
         /// <summary>
         ///     Gets or sets the number of messages per channel that should be kept in cache. Setting this to zero
@@ -79,7 +102,7 @@ namespace Discord.WebSocket
         /// <remarks>
         ///     <para>
         ///         By default, the Discord gateway will only send offline members if a guild has less than a certain number
-        ///         of members (determined by <see cref="LargeThreshold"/> in this library). This behaviour is why
+        ///         of members (determined by <see cref="LargeThreshold"/> in this library). This behavior is why
         ///         sometimes a user may be missing from the WebSocket cache for collections such as
         ///         <see cref="Discord.WebSocket.SocketGuild.Users"/>.
         ///     </para>
@@ -112,22 +135,6 @@ namespace Discord.WebSocket
         public int? HandlerTimeout { get; set; } = 3000;
 
         /// <summary>
-        ///     Gets or sets the behavior for <see cref="BaseSocketClient.MessageDeleted"/> on bulk deletes.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        ///     If <c>true</c>, the <see cref="BaseSocketClient.MessageDeleted"/> event will not be raised for bulk
-        ///     deletes, and only the <see cref="BaseSocketClient.MessagesBulkDeleted"/> will be raised. If <c>false</c>
-        ///     , both events will be raised.
-        /// </para>
-        /// <para>
-        ///     If unset, both events will be raised, but a warning will be raised the first time a bulk delete event is
-        ///     received.
-        /// </para>
-        /// </remarks>
-        public bool? ExclusiveBulkDelete { get; set; } = null;
-
-        /// <summary>
         ///     Gets or sets the maximum identify concurrency.
         /// </summary>
         /// <remarks>
@@ -153,13 +160,13 @@ namespace Discord.WebSocket
         {
             get
             {
-                return this.maxWaitForGuildAvailable;
+                return maxWaitForGuildAvailable;
             }
 
             set
             {
-                Preconditions.AtLeast(value, 0, nameof(this.MaxWaitBetweenGuildAvailablesBeforeReady));
-                this.maxWaitForGuildAvailable = value;
+                Preconditions.AtLeast(value, 0, nameof(MaxWaitBetweenGuildAvailablesBeforeReady));
+                maxWaitForGuildAvailable = value;
             }
         }
 

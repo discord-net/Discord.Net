@@ -17,6 +17,14 @@ namespace Discord
         /// <summary>
         ///     Deny the messages that are sent when a user boosts the guild.
         /// </summary>
-        GuildBoost = 0b10
+        GuildBoost = 0b10,
+        /// <summary>
+        ///     Deny the messages that are related to guild setup.
+        /// </summary>
+        GuildSetupTip = 0b100,
+        /// <summary>
+        ///     Deny the reply with sticker button on welcome messages.
+        /// </summary>
+        WelcomeMessageReply = 0b1000
     }
 }

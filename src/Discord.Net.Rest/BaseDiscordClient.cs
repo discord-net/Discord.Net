@@ -10,6 +10,7 @@ namespace Discord.Rest
 {
     public abstract class BaseDiscordClient : IDiscordClient
     {
+        #region BaseDiscordClient
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
 
@@ -34,6 +35,7 @@ namespace Discord.Rest
         public ISelfUser CurrentUser { get; protected set; }
         /// <inheritdoc />
         public TokenType TokenType => ApiClient.AuthTokenType;
+        internal bool UseInteractionSnowflakeDate { get; private set; }
 
         /// <summary> Creates a new REST-only Discord client. </summary>
         internal BaseDiscordClient(DiscordRestConfig config, API.DiscordRestApiClient client)
@@ -45,6 +47,8 @@ namespace Discord.Rest
             _stateLock = new SemaphoreSlim(1, 1);
             _restLogger = LogManager.CreateLogger("Rest");
             _isFirstLogin = config.DisplayInitialLog;
+
+            UseInteractionSnowflakeDate = config.UseInteractionSnowflakeDate;
 
             ApiClient.RequestQueue.RateLimitTriggered += async (id, info, endpoint) =>
             {
@@ -155,8 +159,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         public Task<BotGateway> GetBotGatewayAsync(RequestOptions options = null)
             => ClientHelper.GetBotGatewayAsync(this, options);
+        #endregion
 
-        //IDiscordClient
+        #region IDiscordClient
         /// <inheritdoc />
         ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;
         /// <inheritdoc />
@@ -217,10 +222,24 @@ namespace Discord.Rest
             => Task.FromResult<IWebhook>(null);
 
         /// <inheritdoc />
+        Task<IApplicationCommand> IDiscordClient.GetGlobalApplicationCommandAsync(ulong id, RequestOptions options)
+            => Task.FromResult<IApplicationCommand>(null);
+
+        /// <inheritdoc />
+        Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.GetGlobalApplicationCommandsAsync(RequestOptions options)
+            => Task.FromResult<IReadOnlyCollection<IApplicationCommand>>(ImmutableArray.Create<IApplicationCommand>());
+        Task<IApplicationCommand> IDiscordClient.CreateGlobalApplicationCommand(ApplicationCommandProperties properties, RequestOptions options)
+            => Task.FromResult<IApplicationCommand>(null);
+        Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.BulkOverwriteGlobalApplicationCommand(ApplicationCommandProperties[] properties,
+            RequestOptions options)
+            => Task.FromResult<IReadOnlyCollection<IApplicationCommand>>(ImmutableArray.Create<IApplicationCommand>());
+
+        /// <inheritdoc />
         Task IDiscordClient.StartAsync()
             => Task.Delay(0);
         /// <inheritdoc />
         Task IDiscordClient.StopAsync()
             => Task.Delay(0);
+        #endregion 
     }
 }

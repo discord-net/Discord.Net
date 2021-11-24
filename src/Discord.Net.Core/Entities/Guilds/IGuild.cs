@@ -2,6 +2,7 @@ using Discord.Audio;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -199,12 +200,19 @@ namespace Discord
         /// </returns>
         IReadOnlyCollection<GuildEmote> Emotes { get; }
         /// <summary>
-        ///     Gets a collection of all extra features added to this guild.
+        ///     Gets a collection of all custom stickers for this guild.
         /// </summary>
         /// <returns>
-        ///     A read-only collection of enabled features in this guild.
+        ///     A read-only collection of all custom stickers for this guild.
         /// </returns>
-        IReadOnlyCollection<string> Features { get; }
+        IReadOnlyCollection<ICustomSticker> Stickers { get; }
+        /// <summary>
+        ///     Gets the features for this guild.
+        /// </summary>
+        /// <returns>
+        ///     A flags enum containing all the features for the guild.
+        /// </returns>
+        GuildFeatures Features { get; }
         /// <summary>
         ///     Gets a collection of all roles in this guild.
         /// </summary>
@@ -305,6 +313,13 @@ namespace Discord
         ///     The approximate number of non-offline members in this guild.
         /// </returns>
         int? ApproximatePresenceCount { get; }
+        /// <summary>
+        ///     Gets the max bitrate for voice channels in this guild.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="int"/> representing the maximum bitrate value allowed by Discord in this guild.
+        /// </returns>
+        int MaxBitrate { get; }
 
         /// <summary>
         ///     Gets the preferred locale of this guild in IETF BCP 47
@@ -317,12 +332,27 @@ namespace Discord
         string PreferredLocale { get; }
 
         /// <summary>
+        ///     Gets the NSFW level of this guild.
+        /// </summary>
+        /// <returns>
+        ///     The NSFW level of this guild.
+        /// </returns>
+        NsfwLevel NsfwLevel { get; }
+
+        /// <summary>
         ///     Gets the preferred culture of this guild.
         /// </summary>
         /// <returns>
         ///     The preferred culture information of this guild.
         /// </returns>
         CultureInfo PreferredCulture { get; }
+        /// <summary>
+        ///     Gets whether the guild has the boost progress bar enabled.
+        /// </summary>
+        /// <returns>
+        ///     <see langword="true"/> if the boost progress bar is enabled; otherwise <see langword="false"/>.
+        /// </returns>
+        bool IsBoostProgressBarEnabled { get; }
 
         /// <summary>
         ///     Modifies this guild.
@@ -522,6 +552,27 @@ namespace Discord
         /// </returns>
         Task<IVoiceChannel> GetVoiceChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
+        ///     Gets a stage channel in this guild.
+        /// </summary>
+        /// <param name="id">The snowflake identifier for the stage channel.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the stage channel associated
+        ///     with the specified <paramref name="id"/>; <see langword="null" /> if none is found.
+        /// </returns>
+        Task<IStageChannel> GetStageChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a collection of all stage channels in this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     stage channels found within this guild.
+        /// </returns>
+        Task<IReadOnlyCollection<IStageChannel>> GetStageChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
         ///     Gets the AFK voice channel in this guild.
         /// </summary>
         /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
@@ -572,15 +623,35 @@ namespace Discord
         /// </returns>
         Task<ITextChannel> GetRulesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
         /// <summary>
-        ///     Gets the text channel channel where admins and moderators of Community guilds receive notices from Discord.
+        ///     Gets the text channel where admins and moderators of Community guilds receive notices from Discord.
         /// </summary>
         /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
-        ///     A task that represents the asynchronous get operation. The task result contains the text channel channel where
+        ///     A task that represents the asynchronous get operation. The task result contains the text channel where
         ///     admins and moderators of Community guilds receive notices from Discord; <see langword="null" /> if none is set.
         /// </returns>
         Task<ITextChannel> GetPublicUpdatesChannelAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a thread channel within this guild.
+        /// </summary>
+        /// <param name="id">The id of the thread channel.</param>
+        /// <param name="mode">The <see cref="CacheMode"/> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the thread channel.
+        /// </returns>
+        Task<IThreadChannel> GetThreadChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+        /// <summary>
+        ///     Gets a collection of all thread channels in this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection of
+        ///     thread channels found within this guild.
+        /// </returns>
+        Task<IReadOnlyCollection<IThreadChannel>> GetThreadChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
 
         /// <summary>
         ///     Creates a new text channel in this guild.
@@ -609,6 +680,17 @@ namespace Discord
         ///     voice channel.
         /// </returns>
         Task<IVoiceChannel> CreateVoiceChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null);
+        /// <summary>
+        ///     Creates a new stage channel in this guild.
+        /// </summary>
+        /// <param name="name">The new name for the stage channel.</param>
+        /// <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the newly created
+        ///     stage channel.
+        /// </returns>
+        Task<IStageChannel> CreateStageChannelAsync(string name, Action<VoiceChannelProperties> func = null, RequestOptions options = null);
         /// <summary>
         ///     Creates a new channel category in this guild.
         /// </summary>
@@ -703,6 +785,12 @@ namespace Discord
         /// <returns>A guild user associated with the specified <paramref name="userId" />; <see langword="null" /> if the user is already in the guild.</returns>
         Task<IGuildUser> AddGuildUserAsync(ulong userId, string accessToken, Action<AddGuildUserProperties> func = null, RequestOptions options = null);
         /// <summary>
+        ///     Disconnects the user from its current voice channel.
+        /// </summary>
+        /// <param name="user">The user to disconnect.</param>
+        /// <returns>A task that represents the asynchronous operation for disconnecting a user.</returns>
+        Task DisconnectAsync(IGuildUser user);
+        /// <summary>
         ///     Gets a collection of all users in this guild.
         /// </summary>
         /// <remarks>
@@ -760,7 +848,7 @@ namespace Discord
         ///     Downloads all users for this guild if the current list is incomplete.
         /// </summary>
         /// <remarks>
-        ///     This method downloads all users found within this guild throught the Gateway and caches them.
+        ///     This method downloads all users found within this guild through the Gateway and caches them.
         /// </remarks>
         /// <returns>
         ///     A task that represents the asynchronous download operation.
@@ -883,6 +971,15 @@ namespace Discord
         ///     emote.
         /// </returns>
         Task<GuildEmote> ModifyEmoteAsync(GuildEmote emote, Action<EmoteProperties> func, RequestOptions options = null);
+
+        /// <summary>
+        /// Moves the user to the voice channel.
+        /// </summary>
+        /// <param name="user">The user to move.</param>
+        /// <param name="targetChannel">the channel where the user gets moved to.</param>
+        /// <returns>A task that represents the asynchronous operation for moving a user.</returns>
+        Task MoveAsync(IGuildUser user, IVoiceChannel targetChannel);
+
         /// <summary>
         ///     Deletes an existing <see cref="GuildEmote"/> from this guild.
         /// </summary>
@@ -892,5 +989,174 @@ namespace Discord
         ///     A task that represents the asynchronous removal operation.
         /// </returns>
         Task DeleteEmoteAsync(GuildEmote emote, RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates a new sticker in this guild.
+        /// </summary>
+        /// <param name="name">The name of the sticker.</param>
+        /// <param name="description">The description of the sticker.</param>
+        /// <param name="tags">The tags of the sticker.</param>
+        /// <param name="image">The image of the new emote.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
+        /// </returns>
+        Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Image image, RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates a new sticker in this guild.
+        /// </summary>
+        /// <param name="name">The name of the sticker.</param>
+        /// <param name="description">The description of the sticker.</param>
+        /// <param name="tags">The tags of the sticker.</param>
+        /// <param name="path">The path of the file to upload.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
+        /// </returns>
+        Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, string path, RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates a new sticker in this guild.
+        /// </summary>
+        /// <param name="name">The name of the sticker.</param>
+        /// <param name="description">The description of the sticker.</param>
+        /// <param name="tags">The tags of the sticker.</param>
+        /// <param name="stream">The stream containing the file data.</param>
+        /// <param name="filename">The name of the file <b>with</b> the extension, ex: image.png.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the created sticker.
+        /// </returns>
+        Task<ICustomSticker> CreateStickerAsync(string name, string description, IEnumerable<string> tags, Stream stream, string filename, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a specific sticker within this guild.
+        /// </summary>
+        /// <param name="id">The id of the sticker to get.</param>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains the sticker found with the
+        ///     specified <paramref name="id"/>; <see langword="null" /> if none is found.
+        /// </returns>
+        Task<ICustomSticker> GetStickerAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a collection of all stickers within this guild.
+        /// </summary>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of stickers found within the guild.
+        /// </returns>
+        Task<IReadOnlyCollection<ICustomSticker>> GetStickersAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null);
+
+        /// <summary>
+        ///     Deletes a sticker within this guild.
+        /// </summary>
+        /// <param name="sticker">The sticker to delete.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous removal operation.
+        /// </returns>
+        Task DeleteStickerAsync(ICustomSticker sticker, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a event within this guild.
+        /// </summary>
+        /// <param name="id">The id of the event.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation.
+        /// </returns>
+        Task<IGuildScheduledEvent> GetEventAsync(ulong id, RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets a collection of events within this guild.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation.
+        /// </returns>
+        Task<IReadOnlyCollection<IGuildScheduledEvent>> GetEventsAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates an event within this guild.
+        /// </summary>
+        /// <param name="name">The name of the event.</param>
+        /// <param name="privacyLevel">The privacy level of the event.</param>
+        /// <param name="startTime">The start time of the event.</param>
+        /// <param name="type">The type of the event.</param>
+        /// <param name="description">The description of the event.</param>
+        /// <param name="endTime">The end time of the event.</param>
+        /// <param name="channelId">
+        ///     The channel id of the event.
+        ///     <remarks>
+        ///     The event must have a type of <see cref="GuildScheduledEventType.Stage"/> or <see cref="GuildScheduledEventType.Voice"/>
+        ///     in order to use this property.
+        ///     </remarks>
+        /// </param>
+        /// <param name="speakers">A collection of speakers for the event.</param>
+        /// <param name="location">The location of the event; links are supported</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous create operation.
+        /// </returns>
+        Task<IGuildScheduledEvent> CreateEventAsync(
+            string name,
+            DateTimeOffset startTime,
+            GuildScheduledEventType type,
+            GuildScheduledEventPrivacyLevel privacyLevel = GuildScheduledEventPrivacyLevel.Private,
+            string description = null,
+            DateTimeOffset? endTime = null,
+            ulong? channelId = null,
+            string location = null,
+            RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets this guilds application commands.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous get operation. The task result contains a read-only collection
+        ///     of application commands found within the guild.
+        /// </returns>
+        Task<IReadOnlyCollection<IApplicationCommand>> GetApplicationCommandsAsync(RequestOptions options = null);
+
+        /// <summary>
+        ///     Gets an application command within this guild with the specified id.
+        /// </summary>
+        /// <param name="id">The id of the application command to get.</param>
+        /// <param name="mode">The <see cref="CacheMode" /> that determines whether the object should be fetched from cache.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A ValueTask that represents the asynchronous get operation. The task result contains a <see cref="IApplicationCommand"/>
+        ///     if found, otherwise <see langword="null"/>.
+        /// </returns>
+        Task<IApplicationCommand> GetApplicationCommandAsync(ulong id, CacheMode mode = CacheMode.AllowDownload,
+            RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates an application command within this guild.
+        /// </summary>
+        /// <param name="properties">The properties to use when creating the command.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains the command that was created.
+        /// </returns>
+        Task<IApplicationCommand> CreateApplicationCommandAsync(ApplicationCommandProperties properties, RequestOptions options = null);
+
+        /// <summary>
+        ///     Overwrites the application commands within this guild.
+        /// </summary>
+        /// <param name="properties">A collection of properties to use when creating the commands.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous creation operation. The task result contains a collection of commands that was created.
+        /// </returns>
+        Task<IReadOnlyCollection<IApplicationCommand>> BulkOverwriteApplicationCommandsAsync(ApplicationCommandProperties[] properties,
+            RequestOptions options = null);
     }
 }

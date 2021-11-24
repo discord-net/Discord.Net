@@ -47,9 +47,7 @@ namespace Discord
             var parsed = MentionUtils.ParseUser(user);
             Assert.Equal(id, parsed);
 
-            // also check tryparse
-            ulong result;
-            Assert.True(MentionUtils.TryParseUser(user, out result));
+            Assert.True(MentionUtils.TryParseUser(user, out ulong result));
             Assert.Equal(id, result);
         }
         [Theory]
@@ -75,9 +73,7 @@ namespace Discord
             var parsed = MentionUtils.ParseChannel(channel);
             Assert.Equal(id, parsed);
 
-            // also check tryparse
-            ulong result;
-            Assert.True(MentionUtils.TryParseChannel(channel, out result));
+            Assert.True(MentionUtils.TryParseChannel(channel, out ulong result));
             Assert.Equal(id, result);
         }
         [Theory]
@@ -103,9 +99,7 @@ namespace Discord
             var parsed = MentionUtils.ParseRole(role);
             Assert.Equal(id, parsed);
 
-            // also check tryparse
-            ulong result;
-            Assert.True(MentionUtils.TryParseRole(role, out result));
+            Assert.True(MentionUtils.TryParseRole(role, out ulong result));
             Assert.Equal(id, result);
         }
         [Theory]

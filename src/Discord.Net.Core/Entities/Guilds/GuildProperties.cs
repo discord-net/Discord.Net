@@ -85,8 +85,9 @@ namespace Discord
         ///     given that the <see cref="SystemChannelId"/> has also been set.
         ///     A value of <see cref="SystemChannelMessageDeny.GuildBoost"/> will deny guild boost messages from being sent, and allow all
         ///     other types of messages.
-        ///     Refer to the extension methods <see cref="GuildExtensions.GetGuildBoostMessagesEnabled(IGuild)"/> and
-        ///     <see cref="GuildExtensions.GetWelcomeMessagesEnabled(IGuild)"/> to check if these system channel message types
+        ///     Refer to the extension methods <see cref="GuildExtensions.GetGuildBoostMessagesEnabled(IGuild)"/>,  
+        ///     <see cref="GuildExtensions.GetWelcomeMessagesEnabled(IGuild)"/>, <see cref="GuildExtensions.GetGuildSetupTipMessagesEnabled(IGuild)"/>,
+        ///     and <see cref="GuildExtensions.GetGuildWelcomeMessageReplyEnabled(IGuild)"/> to check if these system channel message types
         ///     are enabled, without the need to manipulate the logic of the flag.
         /// </remarks>
         public Optional<SystemChannelMessageDeny> SystemChannelFlags { get; set; }
@@ -108,5 +109,9 @@ namespace Discord
         ///     the value of <see cref="PreferredCulture"/> will be unused.
         /// </remarks>
         public Optional<CultureInfo> PreferredCulture { get; set; }
+        /// <summary>
+        ///     Gets or sets if the boost progress bar is enabled.
+        /// </summary>
+        public Optional<bool> IsBoostProgressBarEnabled { get; set; }
     }
 }

@@ -32,5 +32,17 @@ namespace Discord
         ///     Flag given to messages that came from the urgent message system.
         /// </summary>
         Urgent = 1 << 4,
+        /// <summary>
+        ///     Flag given to messages has an associated thread, with the same id as the message
+        /// </summary>
+        HasThread = 1 << 5,
+        /// <summary>
+        ///     Flag given to messages that is only visible to the user who invoked the Interaction.
+        /// </summary>
+        Ephemeral = 1 << 6,
+        /// <summary>
+        ///     Flag given to messages that is an Interaction Response and the bot is "thinking"
+        /// </summary>
+        Loading = 1 << 7
     }
 }
