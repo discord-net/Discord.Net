@@ -85,6 +85,20 @@ namespace Discord.Rest
         public int? ApproximateMemberCount { get; private set; }
         /// <inheritdoc />
         public int? ApproximatePresenceCount { get; private set; }
+        /// <inheritdoc/>
+        public int MaxBitrate
+        {
+            get
+            {
+                return PremiumTier switch
+                {
+                    PremiumTier.Tier1 => 128000,
+                    PremiumTier.Tier2 => 256000,
+                    PremiumTier.Tier3 => 384000,
+                    _ => 96000,
+                };
+            }
+        }
         /// <inheritdoc />
         public NsfwLevel NsfwLevel { get; private set; }
         /// <inheritdoc />
