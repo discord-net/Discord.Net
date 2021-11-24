@@ -11,9 +11,8 @@ namespace Discord.API.Rest
     {
         private static JsonSerializer _serializer = new JsonSerializer { ContractResolver = new DiscordContractResolver() };
 
-        public Stream File { get; }
+        public FileAttachment[] Files { get; }
 
-        public Optional<string> Filename { get; set; }
         public Optional<string> Content { get; set; }
         public Optional<string> Nonce { get; set; }
         public Optional<bool> IsTTS { get; set; }
@@ -21,22 +20,16 @@ namespace Discord.API.Rest
         public Optional<string> AvatarUrl { get; set; }
         public Optional<Embed[]> Embeds { get; set; }
         public Optional<AllowedMentions> AllowedMentions { get; set; }
+        public Optional<ActionRowComponent[]> MessageComponents { get; set; }
 
-        public bool IsSpoiler { get; set; } = false;
-
-        public UploadWebhookFileParams(Stream file)
+        public UploadWebhookFileParams(params FileAttachment[] files)
         {
-            File = file;
+            Files = files;
         }
 
         public IReadOnlyDictionary<string, object> ToDictionary()
         {
             var d = new Dictionary<string, object>();
-            var filename = Filename.GetValueOrDefault("unknown.dat");
-            if (IsSpoiler && !filename.StartsWith(AttachmentExtensions.SpoilerPrefix))
-                filename = filename.Insert(0, AttachmentExtensions.SpoilerPrefix);
-
-            d["file"] = new MultipartFile(File, filename);
 
             var payload = new Dictionary<string, object>();
             if (Content.IsSpecified)
@@ -49,10 +42,33 @@ namespace Discord.API.Rest
                 payload["username"] = Username.Value;
             if (AvatarUrl.IsSpecified)
                 payload["avatar_url"] = AvatarUrl.Value;
+            if (MessageComponents.IsSpecified)
+                payload["components"] = MessageComponents.Value;
             if (Embeds.IsSpecified)
                 payload["embeds"] = Embeds.Value;
             if (AllowedMentions.IsSpecified)
                 payload["allowed_mentions"] = AllowedMentions.Value;
+
+            List<object> attachments = new();
+
+            for (int n = 0; n != Files.Length; n++)
+            {
+                var attachment = Files[n];
+
+                var filename = attachment.FileName ?? "unknown.dat";
+                if (attachment.IsSpoiler && !filename.StartsWith(AttachmentExtensions.SpoilerPrefix))
+                    filename = filename.Insert(0, AttachmentExtensions.SpoilerPrefix);
+                d[$"files[{n}]"] = new MultipartFile(attachment.Stream, filename);
+
+                attachments.Add(new
+                {
+                    id = (ulong)n,
+                    filename = filename,
+                    description = attachment.Description ?? Optional<string>.Unspecified
+                });
+            }
+
+            payload["attachments"] = attachments;
 
             var json = new StringBuilder();
             using (var text = new StringWriter(json))
