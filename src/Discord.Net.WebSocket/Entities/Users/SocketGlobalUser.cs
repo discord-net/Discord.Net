@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Linq;
 using Model = Discord.API.User;
-using PresenceModel = Discord.API.Presence;
 
 namespace Discord.WebSocket
 {
@@ -46,11 +45,6 @@ namespace Discord.WebSocket
                 if (--_references <= 0)
                     discord.RemoveUser(Id);
             }
-        }
-
-        internal void Update(ClientState state, PresenceModel model)
-        {
-            Presence = SocketPresence.Create(model);
         }
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Global)";
