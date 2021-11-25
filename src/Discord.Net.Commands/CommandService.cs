@@ -507,25 +507,42 @@ namespace Discord.Commands
 
             var searchResult = Search(input);
 
-            //Since ValidateAndGetBestMatch is deterministic on the return type, we can use pattern matching on the type for infering the code flow.
-            var (validationResult, commandMatch) = await ValidateAndGetBestMatch(searchResult, context, services, multiMatchHandling);
+            var validationResult = await ValidateAndGetBestMatch(searchResult, context, services, multiMatchHandling);
 
-            if(validationResult is SearchResult)
+            if (validationResult is SearchResult result)
             {
-                await _commandExecutedEvent.InvokeAsync(Optional.Create<CommandInfo>(), context, searchResult).ConfigureAwait(false);
-            }
-            else if(validationResult is ParseResult parseResult)
-            {
-                var result = await commandMatch.Value.Command.ExecuteAsync(context, parseResult, services).ConfigureAwait(false);
-                if (!result.IsSuccess && !(result is RuntimeResult || result is ExecuteResult)) // succesful results raise the event in CommandInfo#ExecuteInternalAsync (have to raise it there b/c deffered execution)
-                    await _commandExecutedEvent.InvokeAsync(commandMatch.Value.Command, context, result);
+                await _commandExecutedEvent.InvokeAsync(Optional.Create<CommandInfo>(), context, result).ConfigureAwait(false);
                 return result;
             }
-            else
+
+            if (validationResult is MatchResult matchResult)
             {
-                await _commandExecutedEvent.InvokeAsync(commandMatch.Value.Command, context, validationResult).ConfigureAwait(false);
+                return await handleCommandPipeline(matchResult, context, services);
             }
+
             return validationResult;
+        }
+
+        private async Task<IResult> handleCommandPipeline(MatchResult matchResult, ICommandContext context, IServiceProvider services)
+        {
+            if (!matchResult.IsSuccess)
+                return matchResult;
+
+            if (matchResult.Pipeline is ParseResult parseResult)
+            {
+                var executeResult = await matchResult.Match.Value.ExecuteAsync(context, parseResult, services);
+
+                if (!executeResult.IsSuccess && !(executeResult is RuntimeResult || executeResult is ExecuteResult)) // succesful results raise the event in CommandInfo#ExecuteInternalAsync (have to raise it there b/c deffered execution)
+                    await _commandExecutedEvent.InvokeAsync(matchResult.Match.Value.Command, context, executeResult);
+                return executeResult;
+            }
+
+            if (matchResult.Pipeline is PreconditionResult preconditionResult)
+            {
+                await _commandExecutedEvent.InvokeAsync(matchResult.Match.Value.Command, context, preconditionResult).ConfigureAwait(false);
+            }
+
+            return matchResult;
         }
 
         // Calculates the 'score' of a command given a parse result
@@ -554,11 +571,11 @@ namespace Discord.Commands
         /// <param name="provider">The service provider to be used on the command's dependency injection.</param>
         /// <param name="multiMatchHandling">The handling mode when multiple command matches are found.</param>
         /// <returns>A task that represents the asynchronous validation operation. The task result contains the result of the
-        ///     command validation and the command matched, if a match was found.</returns>
-        public async Task<(IResult, Optional<CommandMatch>)> ValidateAndGetBestMatch(SearchResult matches, ICommandContext context, IServiceProvider provider, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
+        ///     command validation as a <see cref="MatchResult"/> or a <see cref="SearchResult"/> if no matches were found.</returns>
+        public async Task<IResult> ValidateAndGetBestMatch(SearchResult matches, ICommandContext context, IServiceProvider provider, MultiMatchHandling multiMatchHandling = MultiMatchHandling.Exception)
         {
             if (!matches.IsSuccess)
-                return (matches, Optional.Create<CommandMatch>());
+                return matches;
 
             var commands = matches.Commands;
             var preconditionResults = new Dictionary<CommandMatch, PreconditionResult>();
@@ -574,11 +591,11 @@ namespace Discord.Commands
 
             if (successfulPreconditions.Length == 0)
             {
+                //All preconditions failed, return the one from the highest priority command
                 var bestCandidate = preconditionResults
                    .OrderByDescending(x => x.Key.Command.Priority)
                    .FirstOrDefault(x => !x.Value.IsSuccess);
-
-                return (bestCandidate.Value, bestCandidate.Key);
+                return MatchResult.FromSuccess(bestCandidate.Key,bestCandidate.Value);
             }
 
             var parseResults = new Dictionary<CommandMatch, ParseResult>();
@@ -615,12 +632,12 @@ namespace Discord.Commands
                 var bestMatch = parseResults
                     .FirstOrDefault(x => !x.Value.IsSuccess);
 
-                return (bestMatch.Value, bestMatch.Key);
+                return MatchResult.FromSuccess(bestMatch.Key,bestMatch.Value);
             }
 
             var chosenOverload = successfulParses[0];
 
-            return (chosenOverload.Value, chosenOverload.Key);
+            return MatchResult.FromSuccess(chosenOverload.Key,chosenOverload.Value);
         }
 
         protected virtual void Dispose(bool disposing)
