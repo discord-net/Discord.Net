@@ -106,7 +106,7 @@ namespace Discord
         }
 
         /// <summary>
-        ///     Formats a users username + discriminator while maintaining bidirectional unicode
+        ///     Formats a user's username + discriminator while maintaining bidirectional unicode
         /// </summary>
         /// <param name="user">The user whos username and discriminator to format</param>
         /// <returns>The username + discriminator</returns>
