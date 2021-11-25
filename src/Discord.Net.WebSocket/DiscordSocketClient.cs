@@ -76,6 +76,7 @@ namespace Discord.WebSocket
         internal int? HandlerTimeout { get; private set; }
         internal bool AlwaysDownloadDefaultStickers { get; private set; }
         internal bool AlwaysResolveStickers { get; private set; }
+        internal bool LogGatewayIntentWarnings { get; private set; }
         internal new DiscordSocketApiClient ApiClient => base.ApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
@@ -147,6 +148,7 @@ namespace Discord.WebSocket
             AlwaysDownloadUsers = config.AlwaysDownloadUsers;
             AlwaysDownloadDefaultStickers = config.AlwaysDownloadDefaultStickers;
             AlwaysResolveStickers = config.AlwaysResolveStickers;
+            LogGatewayIntentWarnings = config.LogGatewayIntentWarnings;
             HandlerTimeout = config.HandlerTimeout;
             State = new ClientState(0, 0);
             Rest = new DiscordSocketRestClient(config, ApiClient);
@@ -238,6 +240,9 @@ namespace Discord.WebSocket
 
                 _defaultStickers = builder.ToImmutable();
             }
+
+            if(LogGatewayIntentWarnings)
+                await LogGatewayIntentsWarning().ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -706,6 +711,52 @@ namespace Discord.WebSocket
                     status == UserStatus.AFK,
                     statusSince != null ? _statusSince.Value.ToUnixTimeMilliseconds() : (long?)null,
                     game);
+        }
+
+        private async Task LogGatewayIntentsWarning()
+        {
+            if(_gatewayIntents.HasFlag(GatewayIntents.GuildPresences) && !_presenceUpdated.HasSubscribers)
+            {
+                await _gatewayLogger.WarningAsync("You're using the GuildPresences intent without listening to the PresenceUpdate event, consider removing the intent from your config.").ConfigureAwait(false);
+            }
+
+            if(!_gatewayIntents.HasFlag(GatewayIntents.GuildPresences) && _presenceUpdated.HasSubscribers)
+            {
+                await _gatewayLogger.WarningAsync("You're using the PresenceUpdate event without specifying the GuildPresences intent, consider adding the intent to your config.").ConfigureAwait(false);
+            }
+
+            bool hasGuildScheduledEventsSubscribers =
+                _guildScheduledEventCancelled.HasSubscribers ||
+                _guildScheduledEventUserRemove.HasSubscribers ||
+                _guildScheduledEventCompleted.HasSubscribers ||
+                _guildScheduledEventCreated.HasSubscribers ||
+                _guildScheduledEventStarted.HasSubscribers ||
+                _guildScheduledEventUpdated.HasSubscribers ||
+                _guildScheduledEventUserAdd.HasSubscribers;
+
+            if(_gatewayIntents.HasFlag(GatewayIntents.GuildScheduledEvents) && !hasGuildScheduledEventsSubscribers)
+            {
+                await _gatewayLogger.WarningAsync("You're using the GuildScheduledEvents gateway intent without listening to any events related to that intent, consider removing the intent from your config.").ConfigureAwait(false);
+            }
+
+            if(!_gatewayIntents.HasFlag(GatewayIntents.GuildScheduledEvents) && hasGuildScheduledEventsSubscribers)
+            {
+                await _gatewayLogger.WarningAsync("You're using events related to the GuildScheduledEvents gateway intent without specifying the intent, consider adding the intent to your config.").ConfigureAwait(false);
+            }
+
+            bool hasInviteEventSubscribers =
+                _inviteCreatedEvent.HasSubscribers ||
+                _inviteDeletedEvent.HasSubscribers;
+
+            if (_gatewayIntents.HasFlag(GatewayIntents.GuildInvites) && !hasInviteEventSubscribers)
+            {
+                await _gatewayLogger.WarningAsync("You're using the GuildInvites gateway intent without listening to any events related to that intent, consider removing the intent from your config.").ConfigureAwait(false);
+            }
+
+            if (!_gatewayIntents.HasFlag(GatewayIntents.GuildInvites) && hasInviteEventSubscribers)
+            {
+                await _gatewayLogger.WarningAsync("You're using events related to the GuildInvites gateway intent without specifying the intent, consider adding the intent to your config.").ConfigureAwait(false);
+            }
         }
 
         #region ProcessMessageAsync
