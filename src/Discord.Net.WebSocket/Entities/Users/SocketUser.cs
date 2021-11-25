@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord.Rest;
 using Model = Discord.API.User;
+using PresenceModel = Discord.API.Presence;
 
 namespace Discord.WebSocket
 {
@@ -40,9 +41,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public UserStatus Status => Presence.Status;
         /// <inheritdoc />
-        public IImmutableSet<ClientType> ActiveClients => Presence.ActiveClients ?? ImmutableHashSet<ClientType>.Empty;
+        public IReadOnlyCollection<ClientType> ActiveClients => Presence.ActiveClients ?? ImmutableHashSet<ClientType>.Empty;
         /// <inheritdoc />
-        public IImmutableList<IActivity> Activities => Presence.Activities ?? ImmutableList<IActivity>.Empty;
+        public IReadOnlyCollection<IActivity> Activities => Presence.Activities ?? ImmutableList<IActivity>.Empty;
         /// <summary>
         ///     Gets mutual guilds shared with this user.
         /// </summary>
@@ -89,6 +90,11 @@ namespace Discord.WebSocket
                 hasChanges = true;
             }
             return hasChanges;
+        }
+
+        internal virtual void Update(PresenceModel model)
+        {
+            Presence.Update(model);
         }
 
         /// <inheritdoc />

@@ -1858,6 +1858,8 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<API.Presence>(_serializer);
 
+                                    SocketUser user = null;
+
                                     if (data.GuildId.IsSpecified)
                                     {
                                         var guild = State.GetGuild(data.GuildId.Value);
@@ -1872,7 +1874,7 @@ namespace Discord.WebSocket
                                             return;
                                         }
 
-                                        var user = guild.GetUser(data.User.Id);
+                                        user = guild.GetUser(data.User.Id);
                                         if (user == null)
                                         {
                                             if (data.Status == UserStatus.Offline)
@@ -1890,26 +1892,21 @@ namespace Discord.WebSocket
                                                 await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), globalBefore, user).ConfigureAwait(false);
                                             }
                                         }
-
-                                        var before = user.Clone();
-                                        user.Update(State, data, true);
-                                        var cacheableBefore = new Cacheable<SocketGuildUser, ulong>(before, user.Id, true, () => Task.FromResult(user));
-                                        await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), cacheableBefore, user).ConfigureAwait(false);
                                     }
                                     else
                                     {
-                                        var globalUser = State.GetUser(data.User.Id);
-                                        if (globalUser == null)
+                                        user = State.GetUser(data.User.Id);
+                                        if (user == null)
                                         {
                                             await UnknownGlobalUserAsync(type, data.User.Id).ConfigureAwait(false);
                                             return;
                                         }
-
-                                        var before = globalUser.Clone();
-                                        globalUser.Update(State, data.User);
-                                        globalUser.Update(State, data);
-                                        await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), before, globalUser).ConfigureAwait(false);
                                     }
+
+                                    var before = user.Presence.Clone();
+                                    user.Update(State, data.User);
+                                    user.Update(data);
+                                    await TimedInvokeAsync(_presenceUpdated, nameof(PresenceUpdated), user, before, user.Presence).ConfigureAwait(false);
                                 }
                                 break;
                             case "TYPING_START":
