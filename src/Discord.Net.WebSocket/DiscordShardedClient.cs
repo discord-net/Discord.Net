@@ -495,9 +495,12 @@ namespace Discord.WebSocket
             client.GuildScheduledEventUserAdd += (arg1, arg2) => _guildScheduledEventUserAdd.InvokeAsync(arg1, arg2);
             client.GuildScheduledEventUserRemove += (arg1, arg2) => _guildScheduledEventUserRemove.InvokeAsync(arg1, arg2);
         }
-#endregion
+        #endregion
 
         #region IDiscordClient
+        /// <inheritdoc />
+        ISelfUser IDiscordClient.CurrentUser => CurrentUser;
+
         /// <inheritdoc />
         async Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
             => await GetApplicationInfoAsync().ConfigureAwait(false);
