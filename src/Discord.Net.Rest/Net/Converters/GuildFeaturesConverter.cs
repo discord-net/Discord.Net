@@ -2,10 +2,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Discord.Net.Converters
 {
@@ -18,9 +14,6 @@ namespace Discord.Net.Converters
         public override bool CanWrite => false;
         public override bool CanRead => true;
 
-
-        private Regex _readRegex = new Regex(@"_(\w)");
-
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var obj = JToken.Load(reader);
@@ -31,20 +24,11 @@ namespace Discord.Net.Converters
 
             foreach(var item in arr)
             {
-                var name = _readRegex.Replace(item.ToLower(), (x) =>
+                if (Enum.TryParse<GuildFeature>(string.Concat(item.Split('_')), true, out var result))
                 {
-                    return x.Groups[1].Value.ToUpper();
-                });
-
-                name = name[0].ToString().ToUpper() + new string(name.Skip(1).ToArray());
-
-                try
-                {
-                    var result = (GuildFeature)Enum.Parse(typeof(GuildFeature), name);
-
                     features |= result;
                 }
-                catch
+                else
                 {
                     experimental.Add(item);
                 }
@@ -52,6 +36,7 @@ namespace Discord.Net.Converters
 
             return new GuildFeatures(features, experimental.ToArray());
         }
+
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             throw new NotImplementedException();
