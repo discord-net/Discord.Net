@@ -631,9 +631,6 @@ namespace Discord.Interactions
             if (_typeConverters.TryGetValue(type, out var specific))
                 return specific;
 
-            else if (_typeConverters.Any(x => x.Value.CanConvertTo(type)))
-                return _typeConverters.First(x => x.Value.CanConvertTo(type)).Value;
-
             else if (_genericTypeConverters.Any(x => x.Key.IsAssignableFrom(type)))
             {
                 services ??= EmptyServiceProvider.Instance;
@@ -643,6 +640,9 @@ namespace Discord.Interactions
                 _typeConverters[type] = converter;
                 return converter;
             }
+
+            else if (_typeConverters.Any(x => x.Value.CanConvertTo(type)))
+                return _typeConverters.First(x => x.Value.CanConvertTo(type)).Value;
 
             throw new ArgumentException($"No type {nameof(TypeConverter)} is defined for this {type.FullName}", "type");
         }
@@ -861,16 +861,14 @@ namespace Discord.Interactions
 
         private Type GetMostSpecificTypeConverter (Type type)
         {
-            var scorePairs = new Dictionary<Type, int>();
-            var validConverters = _genericTypeConverters.Where(x => x.Key.IsAssignableFrom(type));
+            if (_genericTypeConverters.TryGetValue(type, out var matching))
+                return matching;
 
-            foreach (var typeConverterPair in validConverters)
-            {
-                var score = validConverters.Count(x => typeConverterPair.Key.IsAssignableFrom(x.Key));
-                scorePairs.Add(typeConverterPair.Value, score);
-            }
+            var typeInterfaces = type.GetInterfaces();
+            var candidates = _genericTypeConverters.Where(x => x.Key.IsAssignableFrom(type))
+                .OrderByDescending(x => typeInterfaces.Count(y => y.IsAssignableFrom(x.Key)));
 
-            return scorePairs.OrderBy(x => x.Value).ElementAt(0).Key;
+            return candidates.First().Value;
         }
 
         private void EnsureClientReady()

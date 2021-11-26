@@ -40,8 +40,8 @@ This method is used by Interaction Service to search for alternative Type Conver
 Interaction Services determines the most suitable `TypeConverter` for a parameter type in the following order:
 
 1. It searches for a `TypeConverter` that is registered to specifically target that parameter type
-2. It searches for a `TypeConverter` that returns `true` when its `CanConvertTo()` method is invoked for thaty parameter type.
-3. It searches for a generic `TypeConverter` with a matching type constraint. If there are more multiple matches, the one whose type constraint is the most specialized will be chosen.
+2. It searches for a generic `TypeConverter` with a matching type constraint. If there are more multiple matches, the one whose type constraint is the most specialized will be chosen.
+3. It searches for a `TypeConverter` that returns `true` when its `CanConvertTo()` method is invoked for thaty parameter type.
 
 > Alternatively, you can use the generic variant (`TypeConverter<T>`) of the `TypeConverter` base class which implements the following method body for `CanConvertTo()` method
 
