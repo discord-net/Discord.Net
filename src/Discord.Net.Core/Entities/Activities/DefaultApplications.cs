@@ -78,6 +78,9 @@ namespace Discord
         /// </summary>
         PokerDev = 763133495793942528,
 
+        /// <summary>
+        ///     SketchyArtist.
+        /// </summary>
         SketchyArtist = 879864070101172255
     }
 }
