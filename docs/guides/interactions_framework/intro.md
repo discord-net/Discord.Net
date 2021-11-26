@@ -192,7 +192,7 @@ A valid Message Command must have the following structure:
 
 ```csharp
 [MessageCommand("Bookmark")]
-public async Task Bookmark(IUser user)
+public async Task Bookmark(IMessage user)
 {
     ...
 }
