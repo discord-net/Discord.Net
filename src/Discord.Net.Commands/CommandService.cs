@@ -517,13 +517,13 @@ namespace Discord.Commands
 
             if (validationResult is MatchResult matchResult)
             {
-                return await handleCommandPipeline(matchResult, context, services);
+                return await HandleCommandPipeline(matchResult, context, services);
             }
 
             return validationResult;
         }
 
-        private async Task<IResult> handleCommandPipeline(MatchResult matchResult, ICommandContext context, IServiceProvider services)
+        private async Task<IResult> HandleCommandPipeline(MatchResult matchResult, ICommandContext context, IServiceProvider services)
         {
             if (!matchResult.IsSuccess)
                 return matchResult;
