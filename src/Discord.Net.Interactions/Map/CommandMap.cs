@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Discord.Interactions
 {
@@ -46,8 +47,13 @@ namespace Discord.Interactions
             _root.RemoveCommand(key, 0);
         }
 
-        public SearchResult<T> GetCommand(string input) =>
-            GetCommand(input.Split(_seperators));
+        public SearchResult<T> GetCommand(string input)
+        {
+            if(_seperators.Any())
+                return GetCommand(input.Split(_seperators));
+            else
+                return GetCommand(new string[] { input });
+        }
 
         public SearchResult<T> GetCommand(string[] input) =>
             _root.GetCommand(input, 0);
