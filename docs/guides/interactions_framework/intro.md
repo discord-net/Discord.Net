@@ -191,7 +191,7 @@ User commands can only have one parameter and its type must be an implementation
 A valid Message Command must have the following structure:
 
 ```csharp
-[UserCommand("Bookmark")]
+[MessageCommand("Bookmark")]
 public async Task Bookmark(IUser user)
 {
     ...
