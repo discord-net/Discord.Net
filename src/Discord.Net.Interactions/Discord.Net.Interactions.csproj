@@ -4,9 +4,6 @@
   <PropertyGroup>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net5.0;net461;netstandard2.0;netstandard2.1</TargetFrameworks>
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">net5.0;netstandard2.0;netstandard2.1</TargetFrameworks>
-    <Version>$(VersionPrefix)-$(VersionSuffix)</Version>
-    <Company>$(Authors)</Company>
-    <Authors>Discord.Net Contributors</Authors>
     <RootNamespace>Discord.Interactions</RootNamespace>
     <AssemblyName>Discord.Net.Interactions</AssemblyName>
     <PackageId>Discord.Net.Labs.Interactions</PackageId>
