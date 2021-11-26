@@ -1,3 +1,8 @@
+---
+uid: Guides.InteractionsFramework.DependencyInjection
+title: Dependency Injection
+---
+
 # Dependency Injection
 
 Interaction Service uses dependency injection to perform most of its operations. This way, you can access service dependencies throughout the framework.

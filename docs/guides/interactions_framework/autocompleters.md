@@ -1,3 +1,8 @@
+---
+uid: Guides.InteractionsFramework.Autocompleters
+title: Autocompleters
+---
+
 # Autocompleters
 
 Autocompleters provide a similar pattern to TypeConverters. Autocompleters are cached, singleton services and they are used by the Interaction Service to handle Autocomplete Interations targeted to a specific Slash Command parameter.

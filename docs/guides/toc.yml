@@ -46,3 +46,17 @@
       topicUid: Guides.MessageComponents.SelectMenus
     - name: Advanced Concepts
       topicUid: Guides.MessageComponents.Advanced
+- name: Interaction Framework
+  items:
+    - name: Getting started
+      topicUid: Guides.InteractionsFramework.Intro
+    - name: Dependency Injection
+      topicUid: Guides.InteractionsFramework.DependencyInjection
+    - name: Autocompleters
+      topicUid: Guides.InteractionsFramework.Autocompleters
+    - name: Preconditions
+      topicUid: Guides.InteractionsFramework.Preconditions
+    - name: Type Converters
+      topicUid: Guides.InteractionsFramework.TypeConverters
+    - name: Post Execution
+      topicUid: Guides.InteractionsFramework.PostEx

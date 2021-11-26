@@ -1,3 +1,8 @@
+---
+uid: Guides.InteractionsFramework.PostEx
+title: Post-Execution
+---
+
 # Post-Execution Logic
 
 Interaction Service uses `IResult`s to provide information about the state of command execution. These can be used to log internal exceptions or provide some insight to the command user.

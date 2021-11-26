@@ -1,3 +1,8 @@
+---
+uid: Guides.InteractionsFramework.Intro
+title: Introduction to the Interaction Framework
+---
+
 # Getting Started
 
 Interaction Service provides an attribute based framework for creating Discord Interaction handlers.
@@ -50,9 +55,10 @@ Valid **Interaction Commands** must comply with the following requirements:
 |[Component Interaction Command](#component-interaction-commands)| `Task`/`Task<RuntimeResult>` | inf                 | `string` or `string[]`        | `[ComponentInteraction]` |
 |[Autocomplete Command](#autocomplete-commands)| `Task`/`Task<RuntimeResult>` | -             | -                   | `[AutocompleteCommand]`|
 
-**a `TypeConverter` that is capable of parsing type in question must be registered to the `InteractionService` instance.*
+> [!NOTE]
+> a `TypeConverter` that is capable of parsing type in question must be registered to the `InteractionService` instance. 
 
-> You should avoid using long running code in your command module. Depending on your setup, long running code may block the Gateway thread of your bot, interrupting its connection to Discord.
+You should avoid using long running code in your command module. Depending on your setup, long running code may block the Gateway thread of your bot, interrupting its connection to Discord.
 
 ### Slash Commands
 

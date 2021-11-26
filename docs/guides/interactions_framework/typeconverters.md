@@ -1,3 +1,8 @@
+---
+uid: Guides.InteractionsFramework.TypeConverters
+title: Type Converters
+---
+
 # TypeConverters
 
 TypeConverters are responsible for registering command parameters to Discord and parsing the user inputs into method parameters.
