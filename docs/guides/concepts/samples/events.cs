@@ -14,7 +14,7 @@ public class Program
 		var _config = new DiscordSocketConfig { MessageCacheSize = 100 };
 		_client = new DiscordSocketClient(_config);
 
-		await _client.LoginAsync(TokenType.Bot, "bot token");
+		await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("DiscordToken"));
 		await _client.StartAsync();
 
 		_client.MessageUpdated += MessageUpdated;

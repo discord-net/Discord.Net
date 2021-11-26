@@ -1,0 +1,18 @@
+- name: Basic Concepts
+  items:
+    - name: Getting Started
+      topicUid: FAQ.Basics.GetStarted
+    - name: Basic Operations
+      topicUid: FAQ.Basics.BasicOp
+    - name: Client Basics
+      topicUid: FAQ.Basics.ClientBasics
+- name: Commands
+  items: 
+    - name: General
+      topicUid: FAQ.Commands.General
+    - name: Dependency Injection
+      topicUid: FAQ.Commands.DI
+- name: Glossary
+  topicUid: FAQ.Glossary
+- name: Legacy or Upgrade
+  topicUid: FAQ.Legacy

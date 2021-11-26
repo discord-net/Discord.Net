@@ -165,7 +165,7 @@ namespace Discord
                         resolvedPermissions &= ~(ulong)ChannelPermission.AttachFiles;
                     }
                 }
-                resolvedPermissions &= mask; //Ensure we didnt get any permissions this channel doesnt support (from guildPerms, for example)
+                resolvedPermissions &= mask; //Ensure we didn't get any permissions this channel doesn't support (from guildPerms, for example)
             }
 
             return resolvedPermissions;

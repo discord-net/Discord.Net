@@ -5,10 +5,14 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains a piece of audit log data for a permissions overwrite creation.
+    /// </summary>
     public class OverwriteCreateAuditLogData : IAuditLogData
     {
-        private OverwriteCreateAuditLogData(Overwrite overwrite)
+        private OverwriteCreateAuditLogData(ulong channelId, Overwrite overwrite)
         {
+            ChannelId = channelId;
             Overwrite = overwrite;
         }
 
@@ -27,9 +31,23 @@ namespace Discord.Rest
             var id = entry.Options.OverwriteTargetId.Value;
             var type = entry.Options.OverwriteType;
 
-            return new OverwriteCreateAuditLogData(new Overwrite(id, type, permissions));
+            return new OverwriteCreateAuditLogData(entry.TargetId.Value, new Overwrite(id, type, permissions));
         }
 
+        /// <summary>
+        ///     Gets the ID of the channel that the overwrite was created from.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="ulong"/> representing the snowflake identifier for the channel that the overwrite was
+        ///     created from.
+        /// </returns>
+        public ulong ChannelId { get; }
+        /// <summary>
+        ///     Gets the permission overwrite object that was created.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="Overwrite"/> object representing the overwrite that was created.
+        /// </returns>
         public Overwrite Overwrite { get; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,21 +6,19 @@ namespace Discord.Rest
 {
     internal class TypingNotifier : IDisposable
     {
-        private readonly BaseDiscordClient _client;
         private readonly CancellationTokenSource _cancelToken;
         private readonly IMessageChannel _channel;
         private readonly RequestOptions _options;
 
-        public TypingNotifier(BaseDiscordClient discord, IMessageChannel channel, RequestOptions options)
+        public TypingNotifier(IMessageChannel channel, RequestOptions options)
         {
-            _client = discord;
             _cancelToken = new CancellationTokenSource();
             _channel = channel;
             _options = options;
-            var _ = Run();
+            _ = RunAsync();
         }
 
-        private async Task Run()
+        private async Task RunAsync()
         {
             try
             {
@@ -31,7 +29,11 @@ namespace Discord.Rest
                     {
                         await _channel.TriggerTypingAsync(_options).ConfigureAwait(false);
                     }
-                    catch { }
+                    catch
+                    {
+                        // ignored
+                    }
+
                     await Task.Delay(9500, token).ConfigureAwait(false);
                 }
             }

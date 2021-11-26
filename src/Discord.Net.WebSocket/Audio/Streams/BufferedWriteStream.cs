@@ -27,7 +27,7 @@ namespace Discord.Audio.Streams
 
         private readonly AudioClient _client;
         private readonly AudioStream _next;
-        private readonly CancellationTokenSource _cancelTokenSource;
+        private readonly CancellationTokenSource _disposeTokenSource, _cancelTokenSource;
         private readonly CancellationToken _cancelToken;
         private readonly Task _task;
         private readonly ConcurrentQueue<Frame> _queuedFrames;
@@ -49,21 +49,30 @@ namespace Discord.Audio.Streams
             _logger = logger;
             _queueLength = (bufferMillis + (_ticksPerFrame - 1)) / _ticksPerFrame; //Round up
 
-            _cancelTokenSource = new CancellationTokenSource();
-            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_cancelTokenSource.Token, cancelToken).Token;
+            _disposeTokenSource = new CancellationTokenSource();
+            _cancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_disposeTokenSource.Token, cancelToken);
+            _cancelToken = _cancelTokenSource.Token;
             _queuedFrames = new ConcurrentQueue<Frame>();
             _bufferPool = new ConcurrentQueue<byte[]>();
             for (int i = 0; i < _queueLength; i++)
-                _bufferPool.Enqueue(new byte[maxFrameSize]); 
+                _bufferPool.Enqueue(new byte[maxFrameSize]);
             _queueLock = new SemaphoreSlim(_queueLength, _queueLength);
             _silenceFrames = MaxSilenceFrames;
 
             _task = Run();
         }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
-                _cancelTokenSource.Cancel();
+            {
+                _disposeTokenSource?.Cancel();
+                _disposeTokenSource?.Dispose();
+                _cancelTokenSource?.Cancel();
+                _cancelTokenSource?.Dispose();
+                _queueLock?.Dispose();
+                _next.Dispose();
+            }
             base.Dispose(disposing);
         }
 
@@ -116,7 +125,7 @@ namespace Discord.Audio.Streams
                                     timestamp += OpusEncoder.FrameSamplesPerChannel;
                                 }
 #if DEBUG
-                                var _ = _logger?.DebugAsync("Buffer underrun");
+                                var _ = _logger?.DebugAsync("Buffer under run");
 #endif
                             }
                         }
@@ -131,8 +140,12 @@ namespace Discord.Audio.Streams
         public override void WriteHeader(ushort seq, uint timestamp, bool missed) { } //Ignore, we use our own timing
         public override async Task WriteAsync(byte[] data, int offset, int count, CancellationToken cancelToken)
         {
+            CancellationTokenSource writeCancelToken = null;
             if (cancelToken.CanBeCanceled)
-                cancelToken = CancellationTokenSource.CreateLinkedTokenSource(cancelToken, _cancelToken).Token;
+            {
+                writeCancelToken = CancellationTokenSource.CreateLinkedTokenSource(cancelToken, _cancelToken);
+                cancelToken = writeCancelToken.Token;
+            }
             else
                 cancelToken = _cancelToken;
 
@@ -142,6 +155,9 @@ namespace Discord.Audio.Streams
 #if DEBUG
                 var _ = _logger?.DebugAsync("Buffer overflow"); //Should never happen because of the queueLock
 #endif
+#pragma warning disable IDISP016
+                writeCancelToken?.Dispose();
+#pragma warning restore IDISP016
                 return;
             }
             Buffer.BlockCopy(data, offset, buffer, 0, count);
@@ -153,6 +169,7 @@ namespace Discord.Audio.Streams
 #endif
                 _isPreloaded = true;
             }
+            writeCancelToken?.Dispose();
         }
 
         public override async Task FlushAsync(CancellationToken cancelToken)

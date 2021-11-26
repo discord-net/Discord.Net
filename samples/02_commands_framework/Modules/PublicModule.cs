@@ -31,7 +31,7 @@ namespace _02_commands_framework.Modules
         [Command("userinfo")]
         public async Task UserInfoAsync(IUser user = null)
         {
-            user = user ?? Context.User;
+            user ??= Context.User;
 
             await ReplyAsync(user.ToString());
         }
@@ -59,5 +59,11 @@ namespace _02_commands_framework.Modules
         [Command("list")]
         public Task ListAsync(params string[] objects)
             => ReplyAsync("You listed: " + string.Join("; ", objects));
+
+        // Setting a custom ErrorMessage property will help clarify the precondition error
+        [Command("guild_only")]
+        [RequireContext(ContextType.Guild, ErrorMessage = "Sorry, this command must be ran from within a server, not a DM!")]
+        public Task GuildOnlyCommand()
+            => ReplyAsync("Nothing to see here!");
     }
 }

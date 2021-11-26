@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.Udp
 {
-    public interface IUdpSocket
+    public interface IUdpSocket : IDisposable
     {
         event Func<byte[], int, int, Task> ReceivedDatagram;
 

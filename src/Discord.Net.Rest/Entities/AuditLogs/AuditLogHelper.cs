@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Model = Discord.API.AuditLog;
@@ -27,6 +27,9 @@ namespace Discord.Rest
             [ActionType.Unban] = UnbanAuditLogData.Create,
             [ActionType.MemberUpdated] = MemberUpdateAuditLogData.Create,
             [ActionType.MemberRoleUpdated] = MemberRoleAuditLogData.Create,
+            [ActionType.MemberMoved] = MemberMoveAuditLogData.Create,
+            [ActionType.MemberDisconnected] = MemberDisconnectAuditLogData.Create,
+            [ActionType.BotAdded] = BotAddAuditLogData.Create,
 
             [ActionType.RoleCreated] = RoleCreateAuditLogData.Create,
             [ActionType.RoleUpdated] = RoleUpdateAuditLogData.Create,
@@ -45,6 +48,10 @@ namespace Discord.Rest
             [ActionType.EmojiDeleted] = EmoteDeleteAuditLogData.Create,
 
             [ActionType.MessageDeleted] = MessageDeleteAuditLogData.Create,
+            [ActionType.MessageBulkDeleted] = MessageBulkDeleteAuditLogData.Create,
+            [ActionType.MessagePinned] = MessagePinAuditLogData.Create,
+            [ActionType.MessageUnpinned] = MessageUnpinAuditLogData.Create,
+
         };
 
         public static IAuditLogData CreateData(BaseDiscordClient discord, Model log, EntryModel entry)

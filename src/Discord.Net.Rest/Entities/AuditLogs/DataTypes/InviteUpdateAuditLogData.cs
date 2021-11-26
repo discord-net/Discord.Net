@@ -5,6 +5,9 @@ using EntryModel = Discord.API.AuditLogEntry;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Contains a piece of audit log data relating to an invite update.
+    /// </summary>
     public class InviteUpdateAuditLogData : IAuditLogData
     {
         private InviteUpdateAuditLogData(InviteInfo before, InviteInfo after)
@@ -40,7 +43,19 @@ namespace Discord.Rest
             return new InviteUpdateAuditLogData(before, after);
         }
 
+        /// <summary>
+        ///     Gets the invite information before the changes.
+        /// </summary>
+        /// <returns>
+        ///     An information object containing the original invite information before the changes were made.
+        /// </returns>
         public InviteInfo Before { get; }
+        /// <summary>
+        ///     Gets the invite information after the changes.
+        /// </summary>
+        /// <returns>
+        ///     An information object containing the invite information after the changes were made.
+        /// </returns>
         public InviteInfo After { get; }
     }
 }

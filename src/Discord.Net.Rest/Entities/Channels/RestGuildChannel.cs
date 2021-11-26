@@ -7,15 +7,23 @@ using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a private REST-based group channel.
+    /// </summary>
     public class RestGuildChannel : RestChannel, IGuildChannel
     {
+        #region RestGuildChannel
         private ImmutableArray<Overwrite> _overwrites;
 
-        public IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
+        /// <inheritdoc />
+        public virtual IReadOnlyCollection<Overwrite> PermissionOverwrites => _overwrites;
 
         internal IGuild Guild { get; }
+        /// <inheritdoc />
         public string Name { get; private set; }
+        /// <inheritdoc />
         public int Position { get; private set; }
+        /// <inheritdoc />
         public ulong GuildId => Guild.Id;
 
         internal RestGuildChannel(BaseDiscordClient discord, IGuild guild, ulong id)
@@ -25,44 +33,60 @@ namespace Discord.Rest
         }
         internal static RestGuildChannel Create(BaseDiscordClient discord, IGuild guild, Model model)
         {
-            switch (model.Type)
+            return model.Type switch
             {
-                case ChannelType.Text:
-                    return RestTextChannel.Create(discord, guild, model);
-                case ChannelType.Voice:
-                    return RestVoiceChannel.Create(discord, guild, model);
-                case ChannelType.Category:
-                    return RestCategoryChannel.Create(discord, guild, model);
-                default:
-                    return new RestGuildChannel(discord, guild, model.Id);
-            }
+                ChannelType.News => RestNewsChannel.Create(discord, guild, model),
+                ChannelType.Text => RestTextChannel.Create(discord, guild, model),
+                ChannelType.Voice => RestVoiceChannel.Create(discord, guild, model),
+                ChannelType.Stage => RestStageChannel.Create(discord, guild, model),
+                ChannelType.Category => RestCategoryChannel.Create(discord, guild, model),
+                ChannelType.PublicThread or ChannelType.PrivateThread or ChannelType.NewsThread => RestThreadChannel.Create(discord, guild, model),
+                _ => new RestGuildChannel(discord, guild, model.Id),
+            };
         }
         internal override void Update(Model model)
         {
             Name = model.Name.Value;
-            Position = model.Position.Value;
 
-            var overwrites = model.PermissionOverwrites.Value;
-            var newOverwrites = ImmutableArray.CreateBuilder<Overwrite>(overwrites.Length);
-            for (int i = 0; i < overwrites.Length; i++)
-                newOverwrites.Add(overwrites[i].ToEntity());
-            _overwrites = newOverwrites.ToImmutable();
+            if (model.Position.IsSpecified)
+            {
+                Position = model.Position.Value;
+            }
+
+            if (model.PermissionOverwrites.IsSpecified)
+            {
+                var overwrites = model.PermissionOverwrites.Value;
+                var newOverwrites = ImmutableArray.CreateBuilder<Overwrite>(overwrites.Length);
+                for (int i = 0; i < overwrites.Length; i++)
+                    newOverwrites.Add(overwrites[i].ToEntity());
+                _overwrites = newOverwrites.ToImmutable();
+            }
         }
 
+        /// <inheritdoc />
         public override async Task UpdateAsync(RequestOptions options = null)
         {
             var model = await Discord.ApiClient.GetChannelAsync(GuildId, Id, options).ConfigureAwait(false);
             Update(model);
         }
+        /// <inheritdoc />
         public async Task ModifyAsync(Action<GuildChannelProperties> func, RequestOptions options = null)
         {
             var model = await ChannelHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
+        /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
             => ChannelHelper.DeleteAsync(this, Discord, options);
 
-        public OverwritePermissions? GetPermissionOverwrite(IUser user)
+        /// <summary>
+        ///     Gets the permission overwrite for a specific user.
+        /// </summary>
+        /// <param name="user">The user to get the overwrite from.</param>
+        /// <returns>
+        ///     An overwrite object for the targeted user; <c>null</c> if none is set.
+        /// </returns>
+        public virtual OverwritePermissions? GetPermissionOverwrite(IUser user)
         {
             for (int i = 0; i < _overwrites.Length; i++)
             {
@@ -71,7 +95,15 @@ namespace Discord.Rest
             }
             return null;
         }
-        public OverwritePermissions? GetPermissionOverwrite(IRole role)
+
+        /// <summary>
+        ///     Gets the permission overwrite for a specific role.
+        /// </summary>
+        /// <param name="role">The role to get the overwrite from.</param>
+        /// <returns>
+        ///     An overwrite object for the targeted role; <c>null</c> if none is set.
+        /// </returns>
+        public virtual OverwritePermissions? GetPermissionOverwrite(IRole role)
         {
             for (int i = 0; i < _overwrites.Length; i++)
             {
@@ -80,17 +112,45 @@ namespace Discord.Rest
             }
             return null;
         }
-        public async Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions perms, RequestOptions options = null)
+
+        /// <summary>
+        ///     Adds or updates the permission overwrite for the given user.
+        /// </summary>
+        /// <param name="user">The user to add the overwrite to.</param>
+        /// <param name="permissions">The overwrite to add to the user.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task representing the asynchronous permission operation for adding the specified permissions to the channel.
+        /// </returns>
+        public virtual async Task AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options = null)
         {
-            await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, user, perms, options).ConfigureAwait(false);
-            _overwrites = _overwrites.Add(new Overwrite(user.Id, PermissionTarget.User, new OverwritePermissions(perms.AllowValue, perms.DenyValue)));
+            await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, user, permissions, options).ConfigureAwait(false);
+            _overwrites = _overwrites.Add(new Overwrite(user.Id, PermissionTarget.User, new OverwritePermissions(permissions.AllowValue, permissions.DenyValue)));
         }
-        public async Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions perms, RequestOptions options = null)
+        /// <summary>
+        ///     Adds or updates the permission overwrite for the given role.
+        /// </summary>
+        /// <param name="role">The role to add the overwrite to.</param>
+        /// <param name="permissions">The overwrite to add to the role.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task representing the asynchronous permission operation for adding the specified permissions to the channel.
+        /// </returns>
+        public virtual async Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null)
         {
-            await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, role, perms, options).ConfigureAwait(false);
-            _overwrites = _overwrites.Add(new Overwrite(role.Id, PermissionTarget.Role, new OverwritePermissions(perms.AllowValue, perms.DenyValue)));
+            await ChannelHelper.AddPermissionOverwriteAsync(this, Discord, role, permissions, options).ConfigureAwait(false);
+            _overwrites = _overwrites.Add(new Overwrite(role.Id, PermissionTarget.Role, new OverwritePermissions(permissions.AllowValue, permissions.DenyValue)));
         }
-        public async Task RemovePermissionOverwriteAsync(IUser user, RequestOptions options = null)
+
+        /// <summary>
+        ///     Removes the permission overwrite for the given user, if one exists.
+        /// </summary>
+        /// <param name="user">The user to remove the overwrite from.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task representing the asynchronous operation for removing the specified permissions from the channel.
+        /// </returns>
+        public virtual async Task RemovePermissionOverwriteAsync(IUser user, RequestOptions options = null)
         {
             await ChannelHelper.RemovePermissionOverwriteAsync(this, Discord, user, options).ConfigureAwait(false);
 
@@ -103,7 +163,15 @@ namespace Discord.Rest
                 }
             }
         }
-        public async Task RemovePermissionOverwriteAsync(IRole role, RequestOptions options = null)
+        /// <summary>
+        ///     Removes the permission overwrite for the given role, if one exists.
+        /// </summary>
+        /// <param name="role">The role to remove the overwrite from.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task representing the asynchronous operation for removing the specified permissions from the channel.
+        /// </returns>
+        public virtual async Task RemovePermissionOverwriteAsync(IRole role, RequestOptions options = null)
         {
             await ChannelHelper.RemovePermissionOverwriteAsync(this, Discord, role, options).ConfigureAwait(false);
 
@@ -117,14 +185,17 @@ namespace Discord.Rest
             }
         }
 
-        public async Task<IReadOnlyCollection<RestInviteMetadata>> GetInvitesAsync(RequestOptions options = null)
-            => await ChannelHelper.GetInvitesAsync(this, Discord, options).ConfigureAwait(false);
-        public async Task<RestInviteMetadata> CreateInviteAsync(int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
-            => await ChannelHelper.CreateInviteAsync(this, Discord, maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
-
+        /// <summary>
+        ///     Gets the name of this channel.
+        /// </summary>
+        /// <returns>
+        ///     A string that is the name of this channel.
+        /// </returns>
         public override string ToString() => Name;
+        #endregion
 
-        //IGuildChannel
+        #region IGuildChannel
+        /// <inheritdoc />
         IGuild IGuildChannel.Guild
         {
             get
@@ -135,33 +206,40 @@ namespace Discord.Rest
             }
         }
 
-        async Task<IReadOnlyCollection<IInviteMetadata>> IGuildChannel.GetInvitesAsync(RequestOptions options)
-            => await GetInvitesAsync(options).ConfigureAwait(false);
-        async Task<IInviteMetadata> IGuildChannel.CreateInviteAsync(int? maxAge, int? maxUses, bool isTemporary, bool isUnique, RequestOptions options)
-            => await CreateInviteAsync(maxAge, maxUses, isTemporary, isUnique, options).ConfigureAwait(false);
-
+        /// <inheritdoc />
         OverwritePermissions? IGuildChannel.GetPermissionOverwrite(IRole role)
             => GetPermissionOverwrite(role);
+        /// <inheritdoc />
         OverwritePermissions? IGuildChannel.GetPermissionOverwrite(IUser user)
             => GetPermissionOverwrite(user);
+        /// <inheritdoc />
         async Task IGuildChannel.AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options)
             => await AddPermissionOverwriteAsync(role, permissions, options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task IGuildChannel.AddPermissionOverwriteAsync(IUser user, OverwritePermissions permissions, RequestOptions options)
             => await AddPermissionOverwriteAsync(user, permissions, options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task IGuildChannel.RemovePermissionOverwriteAsync(IRole role, RequestOptions options)
             => await RemovePermissionOverwriteAsync(role, options).ConfigureAwait(false);
+        /// <inheritdoc />
         async Task IGuildChannel.RemovePermissionOverwriteAsync(IUser user, RequestOptions options)
             => await RemovePermissionOverwriteAsync(user, options).ConfigureAwait(false);
 
+        /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IGuildUser>> IGuildChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IGuildUser>>(); //Overridden //Overridden in Text/Voice
+        /// <inheritdoc />
         Task<IGuildUser> IGuildChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuildUser>(null); //Overridden in Text/Voice
+        #endregion
 
-        //IChannel
+        #region IChannel
+        /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overridden in Text/Voice
+        /// <inheritdoc />
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null); //Overridden in Text/Voice
+        #endregion
     }
 }

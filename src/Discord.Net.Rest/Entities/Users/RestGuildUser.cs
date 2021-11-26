@@ -8,18 +8,47 @@ using Model = Discord.API.GuildMember;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a REST-based guild user.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestGuildUser : RestUser, IGuildUser
     {
+        #region RestGuildUser
+        private long? _premiumSinceTicks;
         private long? _joinedAtTicks;
         private ImmutableArray<ulong> _roleIds;
 
+        /// <inheritdoc />
         public string Nickname { get; private set; }
+        /// <inheritdoc/>
+        public string GuildAvatarId { get; private set; }
         internal IGuild Guild { get; private set; }
+        /// <inheritdoc />
         public bool IsDeafened { get; private set; }
+        /// <inheritdoc />
         public bool IsMuted { get; private set; }
-
+        /// <inheritdoc />
+        public DateTimeOffset? PremiumSince => DateTimeUtils.FromTicks(_premiumSinceTicks);
+        /// <inheritdoc />
         public ulong GuildId => Guild.Id;
+        /// <inheritdoc />
+        public bool? IsPending { get; private set; }
+        /// <inheritdoc />
+        public int Hierarchy
+        {
+            get
+            {
+                if (Guild.OwnerId == Id)
+                    return int.MaxValue;
+
+                var orderedRoles = Guild.Roles.OrderByDescending(x => x.Position);
+                return orderedRoles.Where(x => RoleIds.Contains(x.Id)).Max(x => x.Position);
+            }
+        }
+
+        /// <inheritdoc />
+        /// <exception cref="InvalidOperationException" accessor="get">Resolving permissions requires the parent guild to be downloaded.</exception>
         public GuildPermissions GuildPermissions
         {
             get
@@ -29,8 +58,10 @@ namespace Discord.Rest
                 return new GuildPermissions(Permissions.ResolveGuild(Guild, this));
             }
         }
+        /// <inheritdoc />
         public IReadOnlyCollection<ulong> RoleIds => _roleIds;
 
+        /// <inheritdoc />
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
 
         internal RestGuildUser(BaseDiscordClient discord, IGuild guild, ulong id)
@@ -51,12 +82,18 @@ namespace Discord.Rest
                 _joinedAtTicks = model.JoinedAt.Value.UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
+            if (model.Avatar.IsSpecified)
+                GuildAvatarId = model.Avatar.Value;
             if (model.Deaf.IsSpecified)
                 IsDeafened = model.Deaf.Value;
             if (model.Mute.IsSpecified)
                 IsMuted = model.Mute.Value;
             if (model.Roles.IsSpecified)
                 UpdateRoles(model.Roles.Value);
+            if (model.PremiumSince.IsSpecified)
+                _premiumSinceTicks = model.PremiumSince.Value?.UtcTicks;
+            if (model.Pending.IsSpecified)
+                IsPending = model.Pending.Value;
         }
         private void UpdateRoles(ulong[] roleIds)
         {
@@ -67,11 +104,13 @@ namespace Discord.Rest
             _roleIds = roles.ToImmutable();
         }
 
+        /// <inheritdoc />
         public override async Task UpdateAsync(RequestOptions options = null)
         {
             var model = await Discord.ApiClient.GetGuildMemberAsync(GuildId, Id, options).ConfigureAwait(false);
             Update(model);
         }
+        /// <inheritdoc />
         public async Task ModifyAsync(Action<GuildUserProperties> func, RequestOptions options = null)
         {
             var args = await UserHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
@@ -86,28 +125,48 @@ namespace Discord.Rest
             else if (args.RoleIds.IsSpecified)
                 UpdateRoles(args.RoleIds.Value.ToArray());
         }
+        /// <inheritdoc />
         public Task KickAsync(string reason = null, RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, reason, options);
         /// <inheritdoc />
+        public Task AddRoleAsync(ulong roleId, RequestOptions options = null)
+            => AddRolesAsync(new[] { roleId }, options);
+        /// <inheritdoc />
         public Task AddRoleAsync(IRole role, RequestOptions options = null)
-            => AddRolesAsync(new[] { role }, options);
+            => AddRoleAsync(role.Id, options);
+        /// <inheritdoc />
+        public Task AddRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
+            => UserHelper.AddRolesAsync(this, Discord, roleIds, options);
         /// <inheritdoc />
         public Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
-            => UserHelper.AddRolesAsync(this, Discord, roles, options);
+            => AddRolesAsync(roles.Select(x => x.Id), options);
+        /// <inheritdoc />
+        public Task RemoveRoleAsync(ulong roleId, RequestOptions options = null)
+            => RemoveRolesAsync(new[] { roleId }, options);
         /// <inheritdoc />
         public Task RemoveRoleAsync(IRole role, RequestOptions options = null)
-            => RemoveRolesAsync(new[] { role }, options);
+            => RemoveRoleAsync(role.Id, options);
+        /// <inheritdoc />
+        public Task RemoveRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
+            => UserHelper.RemoveRolesAsync(this, Discord, roleIds, options);
         /// <inheritdoc />
         public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
-            => UserHelper.RemoveRolesAsync(this, Discord, roles, options);
+            => RemoveRolesAsync(roles.Select(x => x.Id));
 
+        /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">Resolving permissions requires the parent guild to be downloaded.</exception>
         public ChannelPermissions GetPermissions(IGuildChannel channel)
         {
             var guildPerms = GuildPermissions;
             return new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, guildPerms.RawValue));
         }
 
-        //IGuildUser
+        public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildUserAvatarUrl(Id, GuildId, GuildAvatarId, size, format);
+#endregion
+
+        #region IGuildUser
+        /// <inheritdoc />
         IGuild IGuildUser.Guild
         {
             get
@@ -117,12 +176,23 @@ namespace Discord.Rest
                 throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
             }
         }
+        #endregion
 
-        //IVoiceState
+        #region IVoiceState
+        /// <inheritdoc />
         bool IVoiceState.IsSelfDeafened => false;
+        /// <inheritdoc />
         bool IVoiceState.IsSelfMuted => false;
+        /// <inheritdoc />
         bool IVoiceState.IsSuppressed => false;
+        /// <inheritdoc />
         IVoiceChannel IVoiceState.VoiceChannel => null;
+        /// <inheritdoc />
         string IVoiceState.VoiceSessionId => null;
+        /// <inheritdoc />
+        bool IVoiceState.IsStreaming => false;
+        /// <inheritdoc />
+        DateTimeOffset? IVoiceState.RequestToSpeakTimestamp => null;
+        #endregion
     }
 }

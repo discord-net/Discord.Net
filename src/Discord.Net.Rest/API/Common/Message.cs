@@ -1,4 +1,3 @@
-#pragma warning disable CS1591
 using Newtonsoft.Json;
 using System;
 
@@ -33,7 +32,7 @@ namespace Discord.API
         [JsonProperty("mention_everyone")]
         public Optional<bool> MentionEveryone { get; set; }
         [JsonProperty("mentions")]
-        public Optional<EntityOrId<User>[]> UserMentions { get; set; }
+        public Optional<User[]> UserMentions { get; set; }
         [JsonProperty("mention_roles")]
         public Optional<ulong[]> RoleMentions { get; set; }
         [JsonProperty("attachments")]
@@ -44,5 +43,24 @@ namespace Discord.API
         public Optional<bool> Pinned { get; set; }
         [JsonProperty("reactions")]
         public Optional<Reaction[]> Reactions { get; set; }
+        // sent with Rich Presence-related chat embeds
+        [JsonProperty("activity")]
+        public Optional<MessageActivity> Activity { get; set; }
+        // sent with Rich Presence-related chat embeds
+        [JsonProperty("application")]
+        public Optional<MessageApplication> Application { get; set; }
+        [JsonProperty("message_reference")]
+        public Optional<MessageReference> Reference { get; set; }
+        [JsonProperty("flags")]
+        public Optional<MessageFlags> Flags { get; set; }
+        [JsonProperty("allowed_mentions")]
+        public Optional<AllowedMentions> AllowedMentions { get; set; }
+        [JsonProperty("referenced_message")]
+        public Optional<Message> ReferencedMessage { get; set; }
+        [JsonProperty("components")]
+        public Optional<API.ActionRowComponent[]> Components { get; set; }
+        public Optional<MessageInteraction> Interaction { get; set; }
+        [JsonProperty("sticker_items")]
+        public Optional<StickerItem[]> StickerItems { get; set; }
     }
 }

@@ -13,24 +13,29 @@ namespace Discord.Net.Udp
         private readonly SemaphoreSlim _lock;
         private UdpClient _udp;
         private IPEndPoint _destination;
-        private CancellationTokenSource _cancelTokenSource;
+        private CancellationTokenSource _stopCancelTokenSource, _cancelTokenSource;
         private CancellationToken _cancelToken, _parentToken;
         private Task _task;
         private bool _isDisposed;
-        
+
         public ushort Port => (ushort)((_udp?.Client.LocalEndPoint as IPEndPoint)?.Port ?? 0);
 
         public DefaultUdpSocket()
         {
             _lock = new SemaphoreSlim(1, 1);
-            _cancelTokenSource = new CancellationTokenSource();
+            _stopCancelTokenSource = new CancellationTokenSource();
         }
         private void Dispose(bool disposing)
         {
             if (!_isDisposed)
             {
                 if (disposing)
+                {
                     StopInternalAsync(true).GetAwaiter().GetResult();
+                    _stopCancelTokenSource?.Dispose();
+                    _cancelTokenSource?.Dispose();
+                    _lock?.Dispose();
+                }
                 _isDisposed = true;
             }
         }
@@ -56,9 +61,14 @@ namespace Discord.Net.Udp
         {
             await StopInternalAsync().ConfigureAwait(false);
 
-            _cancelTokenSource = new CancellationTokenSource();
-            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
+            _stopCancelTokenSource?.Dispose();
+            _cancelTokenSource?.Dispose();
 
+            _stopCancelTokenSource = new CancellationTokenSource();
+            _cancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _stopCancelTokenSource.Token);
+            _cancelToken = _cancelTokenSource.Token;
+
+            _udp?.Dispose();
             _udp = new UdpClient(0);
 
             _task = RunAsync(_cancelToken);
@@ -77,7 +87,7 @@ namespace Discord.Net.Udp
         }
         public async Task StopInternalAsync(bool isDisposing = false)
         {
-            try { _cancelTokenSource.Cancel(false); } catch { }
+            try { _stopCancelTokenSource.Cancel(false); } catch { }
 
             if (!isDisposing)
                 await (_task ?? Task.Delay(0)).ConfigureAwait(false);
@@ -96,8 +106,11 @@ namespace Discord.Net.Udp
         }
         public void SetCancelToken(CancellationToken cancelToken)
         {
+            _cancelTokenSource?.Dispose();
+
             _parentToken = cancelToken;
-            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
+            _cancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _stopCancelTokenSource.Token);
+            _cancelToken = _cancelTokenSource.Token;
         }
 
         public async Task SendAsync(byte[] data, int index, int count)
@@ -117,6 +130,14 @@ namespace Discord.Net.Udp
             while (!cancelToken.IsCancellationRequested)
             {
                 var receiveTask = _udp.ReceiveAsync();
+
+                _ = receiveTask.ContinueWith((receiveResult) =>
+                {
+                    //observe the exception as to not receive as unhandled exception
+                    _ = receiveResult.Exception;
+
+                }, TaskContinuationOptions.OnlyOnFaulted);
+
                 var task = await Task.WhenAny(closeTask, receiveTask).ConfigureAwait(false);
                 if (task == closeTask)
                     break;

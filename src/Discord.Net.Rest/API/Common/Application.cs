@@ -1,4 +1,3 @@
-﻿#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -8,17 +7,27 @@ namespace Discord.API
         [JsonProperty("description")]
         public string Description { get; set; }
         [JsonProperty("rpc_origins")]
-        public string[] RPCOrigins { get; set; }
+        public Optional<string[]> RPCOrigins { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("id")]
         public ulong Id { get; set; }
         [JsonProperty("icon")]
         public string Icon { get; set; }
+        [JsonProperty("bot_public")]
+        public bool IsBotPublic { get; set; }
+        [JsonProperty("bot_require_code_grant")]
+        public bool BotRequiresCodeGrant { get; set; }
+        [JsonProperty("install_params")]
+        public Optional<InstallParams> InstallParams { get; set; }
+
+        [JsonProperty("team")]
+        public Team Team { get; set; }
 
         [JsonProperty("flags"), Int53]
-        public Optional<ulong> Flags { get; set; }
+        public Optional<ApplicationFlags> Flags { get; set; }
         [JsonProperty("owner")]
         public Optional<User> Owner { get; set; }
+        public Optional<string[]> Tags { get; set; }
     }
 }

@@ -42,3 +42,21 @@ where possible.
 
 As a general rule, follow the coding style already set in the file you
 are editing, or look at a similar file if you are adding a new one.
+
+### Documentation Style for Members
+
+When creating a new public member, the member must be annotated with sufficient documentation. This should include the
+following, but not limited to:
+
+* `<summary>` summarizing the purpose of the method.
+* `<param>` or `<typeparam>` explaining the parameter.
+* `<return>` explaining the type of the returned member and what it is.
+* `<exception>` if the method directly throws an exception.
+
+The length of the documentation should also follow the ruler as suggested by our
+[Visual Studio Code workspace](Discord.Net.code-workspace).
+
+#### Recommended Reads
+
+* [Official Microsoft Documentation](https://docs.microsoft.com)
+* [Sandcastle User Manual](https://ewsoftware.github.io/XMLCommentsGuide/html/4268757F-CE8D-4E6D-8502-4F7F2E22DDA3.htm)

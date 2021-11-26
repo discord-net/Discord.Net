@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Net.WebSockets
 {
-    public interface IWebSocketClient
+    public interface IWebSocketClient : IDisposable
     {
         event Func<byte[], int, int, Task> BinaryMessage;
         event Func<string, Task> TextMessage;
@@ -14,7 +14,7 @@ namespace Discord.Net.WebSockets
         void SetCancelToken(CancellationToken cancelToken);
 
         Task ConnectAsync(string host);
-        Task DisconnectAsync();
+        Task DisconnectAsync(int closeCode = 1000);
 
         Task SendAsync(byte[] data, int index, int count, bool isText);
     }

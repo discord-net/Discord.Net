@@ -1,3 +1,4 @@
+using System;
 using Discord.API.Rest;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -9,14 +10,14 @@ namespace Discord.Rest
 {
     internal static class ClientHelper
     {
-        //Applications
+        #region Applications
         public static async Task<RestApplication> GetApplicationInfoAsync(BaseDiscordClient client, RequestOptions options)
         {
             var model = await client.ApiClient.GetMyApplicationAsync(options).ConfigureAwait(false);
             return RestApplication.Create(client, model);
         }
 
-        public static async Task<RestChannel> GetChannelAsync(BaseDiscordClient client, 
+        public static async Task<RestChannel> GetChannelAsync(BaseDiscordClient client,
             ulong id, RequestOptions options)
         {
             var model = await client.ApiClient.GetChannelAsync(id, options).ConfigureAwait(false);
@@ -24,6 +25,7 @@ namespace Discord.Rest
                 return RestChannel.Create(client, model);
             return null;
         }
+        /// <exception cref="InvalidOperationException">Unexpected channel type.</exception>
         public static async Task<IReadOnlyCollection<IRestPrivateChannel>> GetPrivateChannelsAsync(BaseDiscordClient client, RequestOptions options)
         {
             var models = await client.ApiClient.GetMyPrivateChannelsAsync(options).ConfigureAwait(false);
@@ -43,13 +45,13 @@ namespace Discord.Rest
                 .Where(x => x.Type == ChannelType.Group)
                 .Select(x => RestGroupChannel.Create(client, x)).ToImmutableArray();
         }
-        
+
         public static async Task<IReadOnlyCollection<RestConnection>> GetConnectionsAsync(BaseDiscordClient client, RequestOptions options)
         {
             var models = await client.ApiClient.GetMyConnectionsAsync(options).ConfigureAwait(false);
             return models.Select(RestConnection.Create).ToImmutableArray();
         }
-        
+
         public static async Task<RestInviteMetadata> GetInviteAsync(BaseDiscordClient client,
             string inviteId, RequestOptions options)
         {
@@ -58,24 +60,24 @@ namespace Discord.Rest
                 return RestInviteMetadata.Create(client, null, null, model);
             return null;
         }
-        
+
         public static async Task<RestGuild> GetGuildAsync(BaseDiscordClient client,
-            ulong id, RequestOptions options)
+            ulong id, bool withCounts, RequestOptions options)
         {
-            var model = await client.ApiClient.GetGuildAsync(id, options).ConfigureAwait(false);
+            var model = await client.ApiClient.GetGuildAsync(id, withCounts, options).ConfigureAwait(false);
             if (model != null)
                 return RestGuild.Create(client, model);
             return null;
         }
-        public static async Task<RestGuildEmbed?> GetGuildEmbedAsync(BaseDiscordClient client,
+        public static async Task<RestGuildWidget?> GetGuildWidgetAsync(BaseDiscordClient client,
             ulong id, RequestOptions options)
         {
-            var model = await client.ApiClient.GetGuildEmbedAsync(id, options).ConfigureAwait(false);
+            var model = await client.ApiClient.GetGuildWidgetAsync(id, options).ConfigureAwait(false);
             if (model != null)
-                return RestGuildEmbed.Create(model);
+                return RestGuildWidget.Create(model);
             return null;
         }
-        public static IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(BaseDiscordClient client, 
+        public static IAsyncEnumerable<IReadOnlyCollection<RestUserGuild>> GetGuildSummariesAsync(BaseDiscordClient client,
             ulong? fromGuildId, int? limit, RequestOptions options)
         {
             return new PagedAsyncEnumerable<RestUserGuild>(
@@ -104,13 +106,13 @@ namespace Discord.Rest
                 count: limit
             );
         }
-        public static async Task<IReadOnlyCollection<RestGuild>> GetGuildsAsync(BaseDiscordClient client, RequestOptions options)
+        public static async Task<IReadOnlyCollection<RestGuild>> GetGuildsAsync(BaseDiscordClient client, bool withCounts, RequestOptions options)
         {
             var summaryModels = await GetGuildSummariesAsync(client, null, null, options).FlattenAsync().ConfigureAwait(false);
             var guilds = ImmutableArray.CreateBuilder<RestGuild>();
             foreach (var summaryModel in summaryModels)
             {
-                var guildModel = await client.ApiClient.GetGuildAsync(summaryModel.Id).ConfigureAwait(false);
+                var guildModel = await client.ApiClient.GetGuildAsync(summaryModel.Id, withCounts).ConfigureAwait(false);
                 if (guildModel != null)
                     guilds.Add(RestGuild.Create(client, guildModel));
             }
@@ -126,7 +128,7 @@ namespace Discord.Rest
             var model = await client.ApiClient.CreateGuildAsync(args, options).ConfigureAwait(false);
             return RestGuild.Create(client, model);
         }
-        
+
         public static async Task<RestUser> GetUserAsync(BaseDiscordClient client,
             ulong id, RequestOptions options)
         {
@@ -138,7 +140,7 @@ namespace Discord.Rest
         public static async Task<RestGuildUser> GetGuildUserAsync(BaseDiscordClient client,
             ulong guildId, ulong id, RequestOptions options)
         {
-            var guild = await GetGuildAsync(client, guildId, options).ConfigureAwait(false);
+            var guild = await GetGuildAsync(client, guildId, false, options).ConfigureAwait(false);
             if (guild == null)
                 return null;
 
@@ -151,7 +153,7 @@ namespace Discord.Rest
 
         public static async Task<RestWebhook> GetWebhookAsync(BaseDiscordClient client, ulong id, RequestOptions options)
         {
-            var model = await client.ApiClient.GetWebhookAsync(id);
+            var model = await client.ApiClient.GetWebhookAsync(id).ConfigureAwait(false);
             if (model != null)
                 return RestWebhook.Create(client, (IGuild)null, model);
             return null;
@@ -174,5 +176,93 @@ namespace Discord.Rest
             var response = await client.ApiClient.GetBotGatewayAsync(options).ConfigureAwait(false);
             return response.Shards;
         }
+
+        public static async Task<BotGateway> GetBotGatewayAsync(BaseDiscordClient client, RequestOptions options)
+        {
+            var response = await client.ApiClient.GetBotGatewayAsync(options).ConfigureAwait(false);
+            return new BotGateway
+            {
+                Url = response.Url,
+                Shards = response.Shards,
+                SessionStartLimit = new SessionStartLimit
+                {
+                    Total = response.SessionStartLimit.Total,
+                    Remaining = response.SessionStartLimit.Remaining,
+                    ResetAfter = response.SessionStartLimit.ResetAfter,
+                    MaxConcurrency = response.SessionStartLimit.MaxConcurrency
+                }
+            };
+        }
+
+        public static async Task<IReadOnlyCollection<RestGlobalCommand>> GetGlobalApplicationCommandsAsync(BaseDiscordClient client,
+            RequestOptions options = null)
+        {
+            var response = await client.ApiClient.GetGlobalApplicationCommandsAsync(options).ConfigureAwait(false);
+
+            if (!response.Any())
+                return Array.Empty<RestGlobalCommand>();
+
+            return response.Select(x => RestGlobalCommand.Create(client, x)).ToArray();
+        }
+        public static async Task<RestGlobalCommand> GetGlobalApplicationCommandAsync(BaseDiscordClient client, ulong id,
+            RequestOptions options = null)
+        {
+            var model = await client.ApiClient.GetGlobalApplicationCommandAsync(id, options);
+
+            return model != null ? RestGlobalCommand.Create(client, model) : null;
+        }
+
+        public static async Task<IReadOnlyCollection<RestGuildCommand>> GetGuildApplicationCommandsAsync(BaseDiscordClient client, ulong guildId,
+            RequestOptions options = null)
+        {
+            var response = await client.ApiClient.GetGuildApplicationCommandsAsync(guildId, options).ConfigureAwait(false);
+
+            if (!response.Any())
+                return ImmutableArray.Create<RestGuildCommand>();
+
+            return response.Select(x => RestGuildCommand.Create(client, x, guildId)).ToImmutableArray();
+        }
+        public static async Task<RestGuildCommand> GetGuildApplicationCommandAsync(BaseDiscordClient client, ulong id, ulong guildId,
+            RequestOptions options = null)
+        {
+            var model = await client.ApiClient.GetGuildApplicationCommandAsync(guildId, id, options);
+
+            return model != null ? RestGuildCommand.Create(client, model, guildId) : null;
+        }
+        public static async Task<RestGuildCommand> CreateGuildApplicationCommandAsync(BaseDiscordClient client, ulong guildId, ApplicationCommandProperties properties,
+            RequestOptions options = null)
+        {
+            var model = await InteractionHelper.CreateGuildCommandAsync(client, guildId, properties, options);
+
+            return RestGuildCommand.Create(client, model, guildId);
+        }
+        public static async Task<RestGlobalCommand> CreateGlobalApplicationCommandAsync(BaseDiscordClient client, ApplicationCommandProperties properties,
+            RequestOptions options = null)
+        {
+            var model = await InteractionHelper.CreateGlobalCommandAsync(client, properties, options);
+
+            return RestGlobalCommand.Create(client, model);
+        }
+        public static async Task<IReadOnlyCollection<RestGlobalCommand>> BulkOverwriteGlobalApplicationCommandAsync(BaseDiscordClient client, ApplicationCommandProperties[] properties,
+            RequestOptions options = null)
+        {
+            var models = await InteractionHelper.BulkOverwriteGlobalCommandsAsync(client, properties, options);
+
+            return models.Select(x => RestGlobalCommand.Create(client, x)).ToImmutableArray();
+        }
+        public static async Task<IReadOnlyCollection<RestGuildCommand>> BulkOverwriteGuildApplicationCommandAsync(BaseDiscordClient client, ulong guildId,
+            ApplicationCommandProperties[] properties, RequestOptions options = null)
+        {
+            var models = await InteractionHelper.BulkOverwriteGuildCommandsAsync(client, guildId, properties, options);
+
+            return models.Select(x => RestGuildCommand.Create(client, x, guildId)).ToImmutableArray();
+        }
+
+        public static Task AddRoleAsync(BaseDiscordClient client, ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
+            => client.ApiClient.AddRoleAsync(guildId, userId, roleId, options);
+
+        public static Task RemoveRoleAsync(BaseDiscordClient client, ulong guildId, ulong userId, ulong roleId, RequestOptions options = null)
+            => client.ApiClient.RemoveRoleAsync(guildId, userId, roleId, options);
+        #endregion
     }
 }

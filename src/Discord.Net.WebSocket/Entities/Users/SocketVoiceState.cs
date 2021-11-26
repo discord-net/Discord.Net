@@ -1,14 +1,19 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using Model = Discord.API.VoiceState;
 
 namespace Discord.WebSocket
 {
-    //TODO: C#7 Candidate for record type
+    /// <summary>
+    ///     Represents a WebSocket user's voice connection status.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct SocketVoiceState : IVoiceState
     {
-        public static readonly SocketVoiceState Default = new SocketVoiceState(null, null, false, false, false, false, false);
+        /// <summary>
+        ///     Initializes a default <see cref="SocketVoiceState"/> with everything set to <c>null</c> or <c>false</c>.
+        /// </summary>
+        public static readonly SocketVoiceState Default = new SocketVoiceState(null, null, null, false, false, false, false, false, false);
 
         [Flags]
         private enum Flags : byte
@@ -19,23 +24,39 @@ namespace Discord.WebSocket
             Deafened = 0x04,
             SelfMuted = 0x08,
             SelfDeafened = 0x10,
+            SelfStream = 0x20,
         }
 
         private readonly Flags _voiceStates;
-        
+
+        /// <summary>
+        ///     Gets the voice channel that the user is currently in; or <c>null</c> if none.
+        /// </summary>
         public SocketVoiceChannel VoiceChannel { get; }
+        /// <inheritdoc />
         public string VoiceSessionId { get; }
+        /// <inheritdoc/>
+        public DateTimeOffset? RequestToSpeakTimestamp { get; private set; }
 
+        /// <inheritdoc />
         public bool IsMuted => (_voiceStates & Flags.Muted) != 0;
+        /// <inheritdoc />
         public bool IsDeafened => (_voiceStates & Flags.Deafened) != 0;
+        /// <inheritdoc />
         public bool IsSuppressed => (_voiceStates & Flags.Suppressed) != 0;
+        /// <inheritdoc />
         public bool IsSelfMuted => (_voiceStates & Flags.SelfMuted) != 0;
+        /// <inheritdoc />
         public bool IsSelfDeafened => (_voiceStates & Flags.SelfDeafened) != 0;
+        /// <inheritdoc />
+        public bool IsStreaming => (_voiceStates & Flags.SelfStream) != 0;
+        
 
-        internal SocketVoiceState(SocketVoiceChannel voiceChannel, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed)
+        internal SocketVoiceState(SocketVoiceChannel voiceChannel, DateTimeOffset? requestToSpeak, string sessionId, bool isSelfMuted, bool isSelfDeafened, bool isMuted, bool isDeafened, bool isSuppressed, bool isStream)
         {
             VoiceChannel = voiceChannel;
             VoiceSessionId = sessionId;
+            RequestToSpeakTimestamp = requestToSpeak;
 
             Flags voiceStates = Flags.Normal;
             if (isSelfMuted)
@@ -48,17 +69,26 @@ namespace Discord.WebSocket
                 voiceStates |= Flags.Deafened;
             if (isSuppressed)
                 voiceStates |= Flags.Suppressed;
+            if (isStream)
+                voiceStates |= Flags.SelfStream;
             _voiceStates = voiceStates;
         }
         internal static SocketVoiceState Create(SocketVoiceChannel voiceChannel, Model model)
         {
-            return new SocketVoiceState(voiceChannel, model.SessionId, model.SelfMute, model.SelfDeaf, model.Mute, model.Deaf, model.Suppress);
+            return new SocketVoiceState(voiceChannel, model.RequestToSpeakTimestamp.IsSpecified ? model.RequestToSpeakTimestamp.Value : null, model.SessionId, model.SelfMute, model.SelfDeaf, model.Mute, model.Deaf, model.Suppress, model.SelfStream);
         }
 
+        /// <summary>
+        ///     Gets the name of this voice channel.
+        /// </summary>
+        /// <returns>
+        ///     A string that resolves to name of this voice channel; otherwise "Unknown".
+        /// </returns>
         public override string ToString() => VoiceChannel?.Name ?? "Unknown";
         private string DebuggerDisplay => $"{VoiceChannel?.Name ?? "Unknown"} ({_voiceStates})";
         internal SocketVoiceState Clone() => this;
 
+        /// <inheritdoc />
         IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;
     }
 }

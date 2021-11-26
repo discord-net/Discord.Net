@@ -10,6 +10,7 @@ namespace Discord.Rest
 {
     public abstract class BaseDiscordClient : IDiscordClient
     {
+        #region BaseDiscordClient
         public event Func<LogMessage, Task> Log { add { _logEvent.Add(value); } remove { _logEvent.Remove(value); } }
         internal readonly AsyncEvent<Func<LogMessage, Task>> _logEvent = new AsyncEvent<Func<LogMessage, Task>>();
 
@@ -24,11 +25,19 @@ namespace Discord.Rest
 
         internal API.DiscordRestApiClient ApiClient { get; }
         internal LogManager LogManager { get; }
+        /// <summary>
+        ///     Gets the login state of the client.
+        /// </summary>
         public LoginState LoginState { get; private set; }
+        /// <summary>
+        ///     Gets the logged-in user.
+        /// </summary>
         public ISelfUser CurrentUser { get; protected set; }
+        /// <inheritdoc />
         public TokenType TokenType => ApiClient.AuthTokenType;
-        
-        /// <summary> Creates a new REST-only discord client. </summary>
+        internal bool UseInteractionSnowflakeDate { get; private set; }
+
+        /// <summary> Creates a new REST-only Discord client. </summary>
         internal BaseDiscordClient(DiscordRestConfig config, API.DiscordRestApiClient client)
         {
             ApiClient = client;
@@ -39,17 +48,18 @@ namespace Discord.Rest
             _restLogger = LogManager.CreateLogger("Rest");
             _isFirstLogin = config.DisplayInitialLog;
 
-            ApiClient.RequestQueue.RateLimitTriggered += async (id, info) =>
+            UseInteractionSnowflakeDate = config.UseInteractionSnowflakeDate;
+
+            ApiClient.RequestQueue.RateLimitTriggered += async (id, info, endpoint) =>
             {
                 if (info == null)
-                    await _restLogger.VerboseAsync($"Preemptive Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
+                    await _restLogger.VerboseAsync($"Preemptive Rate limit triggered: {endpoint} {(id.IsHashBucket ? $"(Bucket: {id.BucketHash})" : "")}").ConfigureAwait(false);
                 else
-                    await _restLogger.WarningAsync($"Rate limit triggered: {id ?? "null"}").ConfigureAwait(false);
+                    await _restLogger.WarningAsync($"Rate limit triggered: {endpoint} {(id.IsHashBucket ? $"(Bucket: {id.BucketHash})" : "")}").ConfigureAwait(false);
             };
             ApiClient.SentRequest += async (method, endpoint, millis) => await _restLogger.VerboseAsync($"{method} {endpoint}: {millis} ms").ConfigureAwait(false);
         }
 
-        /// <inheritdoc />
         public async Task LoginAsync(TokenType tokenType, string token, bool validateToken = true)
         {
             await _stateLock.WaitAsync().ConfigureAwait(false);
@@ -59,7 +69,7 @@ namespace Discord.Rest
             }
             finally { _stateLock.Release(); }
         }
-        private async Task LoginInternalAsync(TokenType tokenType, string token, bool validateToken)
+        internal virtual async Task LoginInternalAsync(TokenType tokenType, string token, bool validateToken)
         {
             if (_isFirstLogin)
             {
@@ -84,7 +94,7 @@ namespace Discord.Rest
                     catch (ArgumentException ex)
                     {
                         // log these ArgumentExceptions and allow for the client to attempt to log in anyways
-                        await LogManager.WarningAsync("Discord", "A supplied token was invalid", ex).ConfigureAwait(false);
+                        await LogManager.WarningAsync("Discord", "A supplied token was invalid.", ex).ConfigureAwait(false);
                     }
                 }
 
@@ -100,10 +110,9 @@ namespace Discord.Rest
 
             await _loggedInEvent.InvokeAsync().ConfigureAwait(false);
         }
-        internal virtual Task OnLoginAsync(TokenType tokenType, string token) 
+        internal virtual Task OnLoginAsync(TokenType tokenType, string token)
             => Task.Delay(0);
 
-        /// <inheritdoc />
         public async Task LogoutAsync()
         {
             await _stateLock.WaitAsync().ConfigureAwait(false);
@@ -113,7 +122,7 @@ namespace Discord.Rest
             }
             finally { _stateLock.Release(); }
         }
-        private async Task LogoutInternalAsync()
+        internal virtual async Task LogoutInternalAsync()
         {
             if (LoginState == LoginState.LoggedOut) return;
             LoginState = LoginState.LoggingOut;
@@ -126,14 +135,17 @@ namespace Discord.Rest
 
             await _loggedOutEvent.InvokeAsync().ConfigureAwait(false);
         }
-        internal virtual Task OnLogoutAsync() 
+        internal virtual Task OnLogoutAsync()
             => Task.Delay(0);
 
         internal virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)
             {
+#pragma warning disable IDISP007
                 ApiClient.Dispose();
+#pragma warning restore IDISP007
+                _stateLock?.Dispose();
                 _isDisposed = true;
             }
         }
@@ -144,51 +156,90 @@ namespace Discord.Rest
         public Task<int> GetRecommendedShardCountAsync(RequestOptions options = null)
             => ClientHelper.GetRecommendShardCountAsync(this, options);
 
-        //IDiscordClient
+        /// <inheritdoc />
+        public Task<BotGateway> GetBotGatewayAsync(RequestOptions options = null)
+            => ClientHelper.GetBotGatewayAsync(this, options);
+        #endregion
+
+        #region IDiscordClient
+        /// <inheritdoc />
         ConnectionState IDiscordClient.ConnectionState => ConnectionState.Disconnected;
+        /// <inheritdoc />
         ISelfUser IDiscordClient.CurrentUser => CurrentUser;
 
-        Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options) 
+        /// <inheritdoc />
+        Task<IApplication> IDiscordClient.GetApplicationInfoAsync(RequestOptions options)
             => throw new NotSupportedException();
 
+        /// <inheritdoc />
         Task<IChannel> IDiscordClient.GetChannelAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IChannel>(null);
+        /// <inheritdoc />
         Task<IReadOnlyCollection<IPrivateChannel>> IDiscordClient.GetPrivateChannelsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IPrivateChannel>>(ImmutableArray.Create<IPrivateChannel>());
+        /// <inheritdoc />
         Task<IReadOnlyCollection<IDMChannel>> IDiscordClient.GetDMChannelsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IDMChannel>>(ImmutableArray.Create<IDMChannel>());
+        /// <inheritdoc />
         Task<IReadOnlyCollection<IGroupChannel>> IDiscordClient.GetGroupChannelsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IGroupChannel>>(ImmutableArray.Create<IGroupChannel>());
 
+        /// <inheritdoc />
         Task<IReadOnlyCollection<IConnection>> IDiscordClient.GetConnectionsAsync(RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IConnection>>(ImmutableArray.Create<IConnection>());
 
+        /// <inheritdoc />
         Task<IInvite> IDiscordClient.GetInviteAsync(string inviteId, RequestOptions options)
             => Task.FromResult<IInvite>(null);
 
+        /// <inheritdoc />
         Task<IGuild> IDiscordClient.GetGuildAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IGuild>(null);
+        /// <inheritdoc />
         Task<IReadOnlyCollection<IGuild>> IDiscordClient.GetGuildsAsync(CacheMode mode, RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IGuild>>(ImmutableArray.Create<IGuild>());
+        /// <inheritdoc />
+        /// <exception cref="NotSupportedException">Creating a guild is not supported with the base client.</exception>
         Task<IGuild> IDiscordClient.CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon, RequestOptions options)
             => throw new NotSupportedException();
 
+        /// <inheritdoc />
         Task<IUser> IDiscordClient.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null);
+        /// <inheritdoc />
         Task<IUser> IDiscordClient.GetUserAsync(string username, string discriminator, RequestOptions options)
             => Task.FromResult<IUser>(null);
 
+        /// <inheritdoc />
         Task<IReadOnlyCollection<IVoiceRegion>> IDiscordClient.GetVoiceRegionsAsync(RequestOptions options)
             => Task.FromResult<IReadOnlyCollection<IVoiceRegion>>(ImmutableArray.Create<IVoiceRegion>());
+        /// <inheritdoc />
         Task<IVoiceRegion> IDiscordClient.GetVoiceRegionAsync(string id, RequestOptions options)
             => Task.FromResult<IVoiceRegion>(null);
 
+        /// <inheritdoc />
         Task<IWebhook> IDiscordClient.GetWebhookAsync(ulong id, RequestOptions options)
             => Task.FromResult<IWebhook>(null);
 
+        /// <inheritdoc />
+        Task<IApplicationCommand> IDiscordClient.GetGlobalApplicationCommandAsync(ulong id, RequestOptions options)
+            => Task.FromResult<IApplicationCommand>(null);
+
+        /// <inheritdoc />
+        Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.GetGlobalApplicationCommandsAsync(RequestOptions options)
+            => Task.FromResult<IReadOnlyCollection<IApplicationCommand>>(ImmutableArray.Create<IApplicationCommand>());
+        Task<IApplicationCommand> IDiscordClient.CreateGlobalApplicationCommand(ApplicationCommandProperties properties, RequestOptions options)
+            => Task.FromResult<IApplicationCommand>(null);
+        Task<IReadOnlyCollection<IApplicationCommand>> IDiscordClient.BulkOverwriteGlobalApplicationCommand(ApplicationCommandProperties[] properties,
+            RequestOptions options)
+            => Task.FromResult<IReadOnlyCollection<IApplicationCommand>>(ImmutableArray.Create<IApplicationCommand>());
+
+        /// <inheritdoc />
         Task IDiscordClient.StartAsync()
             => Task.Delay(0);
+        /// <inheritdoc />
         Task IDiscordClient.StopAsync()
             => Task.Delay(0);
+        #endregion 
     }
 }

@@ -1,4 +1,3 @@
-﻿#pragma warning disable CS1591
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
@@ -9,6 +8,6 @@ namespace Discord.API.Gateway
         [JsonProperty("channel_id")]
         public ulong ChannelId { get; set; }
         [JsonProperty("ids")]
-        public IEnumerable<ulong> Ids { get; set; }
+        public ulong[] Ids { get; set; }
     }
 }

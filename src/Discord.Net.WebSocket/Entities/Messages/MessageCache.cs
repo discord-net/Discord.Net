@@ -14,7 +14,7 @@ namespace Discord.WebSocket
 
         public IReadOnlyCollection<SocketMessage> Messages => _messages.ToReadOnlyCollection();
 
-        public MessageCache(DiscordSocketClient discord, IChannel channel)
+        public MessageCache(DiscordSocketClient discord)
         {
             _size = discord.MessageCacheSize;
             _messages = new ConcurrentDictionary<ulong, SocketMessage>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(_size * 1.05));
@@ -44,6 +44,8 @@ namespace Discord.WebSocket
                 return result;
             return null;
         }
+
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="limit"/> is less than 0.</exception>
         public IReadOnlyCollection<SocketMessage> GetMany(ulong? fromMessageId, Direction dir, int limit = DiscordConfig.MaxMessagesPerBatch)
         {
             if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit));
@@ -54,11 +56,23 @@ namespace Discord.WebSocket
                 cachedMessageIds = _orderedMessages;
             else if (dir == Direction.Before)
                 cachedMessageIds = _orderedMessages.Where(x => x < fromMessageId.Value);
-            else
+            else if (dir == Direction.After)
                 cachedMessageIds = _orderedMessages.Where(x => x > fromMessageId.Value);
+            else //Direction.Around
+            {
+                if (!_messages.TryGetValue(fromMessageId.Value, out SocketMessage msg))
+                    return ImmutableArray<SocketMessage>.Empty;
+                int around = limit / 2;
+                var before = GetMany(fromMessageId, Direction.Before, around);
+                var after = GetMany(fromMessageId, Direction.After, around).Reverse();
+
+                return after.Concat(new SocketMessage[] { msg }).Concat(before).ToImmutableArray();
+            }
 
             if (dir == Direction.Before)
                 cachedMessageIds = cachedMessageIds.Reverse();
+            if (dir == Direction.Around) //Only happens if fromMessageId is null, should only get "around" and itself (+1)
+                limit = limit / 2 + 1;
 
             return cachedMessageIds
                 .Select(x =>

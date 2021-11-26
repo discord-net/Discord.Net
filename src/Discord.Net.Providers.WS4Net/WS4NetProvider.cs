@@ -1,4 +1,4 @@
-﻿using Discord.Net.WebSockets;
+using Discord.Net.WebSockets;
 
 namespace Discord.Net.Providers.WS4Net
 {

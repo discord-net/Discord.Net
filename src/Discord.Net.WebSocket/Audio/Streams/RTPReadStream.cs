@@ -1,4 +1,5 @@
-﻿using System.Threading;
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Discord.Audio.Streams
@@ -20,6 +21,8 @@ namespace Discord.Audio.Streams
             _nonce = new byte[24];
         }
 
+        /// <exception cref="OperationCanceledException">The token has had cancellation requested.</exception>
+        /// <exception cref="ObjectDisposedException">The associated <see cref="T:System.Threading.CancellationTokenSource" /> has been disposed.</exception>
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
             cancelToken.ThrowIfCancellationRequested();
@@ -72,6 +75,13 @@ namespace Discord.Audio.Streams
                 (buffer[extensionOffset + 2] << 8) | 
                 (buffer[extensionOffset + 3]);
             return extensionOffset + 4 + (extensionLength * 4);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                _next.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

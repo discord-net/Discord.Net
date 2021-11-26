@@ -1,4 +1,4 @@
-﻿using Discord.API.Rest;
+using Discord.API.Rest;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -39,7 +39,7 @@ namespace Discord.Rest
             };
 
             if (args.Channel.IsSpecified)
-                apiArgs.ChannelId = args.Channel.Value.Id;
+                apiArgs.ChannelId = args.Channel.Value?.Id;
             else if (args.ChannelId.IsSpecified)
                 apiArgs.ChannelId = args.ChannelId.Value;
 
@@ -73,16 +73,16 @@ namespace Discord.Rest
             return RestDMChannel.Create(client, await client.ApiClient.CreateDMChannelAsync(args, options).ConfigureAwait(false));
         }
 
-        public static async Task AddRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<IRole> roles, RequestOptions options)
+        public static async Task AddRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<ulong> roleIds, RequestOptions options)
         {
-            foreach (var role in roles)
-                await client.ApiClient.AddRoleAsync(user.Guild.Id, user.Id, role.Id, options);
+            foreach (var roleId in roleIds)
+                await client.ApiClient.AddRoleAsync(user.Guild.Id, user.Id, roleId, options).ConfigureAwait(false);
         }
 
-        public static async Task RemoveRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<IRole> roles, RequestOptions options)
+        public static async Task RemoveRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<ulong> roleIds, RequestOptions options)
         {
-            foreach (var role in roles)
-                await client.ApiClient.RemoveRoleAsync(user.Guild.Id, user.Id, role.Id, options);
+            foreach (var roleId in roleIds)
+                await client.ApiClient.RemoveRoleAsync(user.Guild.Id, user.Id, roleId, options).ConfigureAwait(false);
         }
     }
 }

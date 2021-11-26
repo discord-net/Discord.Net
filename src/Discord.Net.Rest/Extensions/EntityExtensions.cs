@@ -1,14 +1,26 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace Discord.Rest
 {
     internal static class EntityExtensions
     {
-        public static GuildEmote ToEntity(this API.Emoji model)
+        public static IEmote ToIEmote(this API.Emoji model)
         {
-            return new GuildEmote(model.Id.Value, model.Name, model.Animated.GetValueOrDefault(), model.Managed, model.RequireColons, ImmutableArray.Create(model.Roles));
+            if (model.Id.HasValue)
+                return model.ToEntity();
+            return new Emoji(model.Name);
         }
+
+        public static GuildEmote ToEntity(this API.Emoji model)
+            => new GuildEmote(model.Id.Value,
+                model.Name,
+                model.Animated.GetValueOrDefault(),
+                model.Managed,
+                model.RequireColons,
+                ImmutableArray.Create(model.Roles),
+                model.User.IsSpecified ? model.User.Value.Id : (ulong?)null);
 
         public static Embed ToEntity(this API.Embed model)
         {
@@ -21,6 +33,13 @@ namespace Discord.Rest
                 model.Provider.IsSpecified ? model.Provider.Value.ToEntity() : (EmbedProvider?)null,
                 model.Thumbnail.IsSpecified ? model.Thumbnail.Value.ToEntity() : (EmbedThumbnail?)null,
                 model.Fields.IsSpecified ? model.Fields.Value.Select(x => x.ToEntity()).ToImmutableArray() : ImmutableArray.Create<EmbedField>());
+        }
+        public static RoleTags ToEntity(this API.RoleTags model)
+        {
+            return new RoleTags(
+                model.BotId.IsSpecified ? model.BotId.Value : null,
+                model.IntegrationId.IsSpecified ? model.IntegrationId.Value : null,
+                model.IsPremiumSubscriber.GetValueOrDefault(false) ?? false);
         }
         public static API.Embed ToModel(this Embed entity)
         {
@@ -48,6 +67,36 @@ namespace Discord.Rest
             if (entity.Video != null)
                 model.Video = entity.Video.Value.ToModel();
             return model;
+        }
+
+        public static API.AllowedMentions ToModel(this AllowedMentions entity)
+        {
+            if (entity == null) return null;
+            return new API.AllowedMentions()
+            {
+                Parse = entity.AllowedTypes?.EnumerateMentionTypes().ToArray(),
+                Roles = entity.RoleIds?.ToArray(),
+                Users = entity.UserIds?.ToArray(),
+                RepliedUser = entity.MentionRepliedUser ?? Optional.Create<bool>(),
+            };
+        }
+        public static API.MessageReference ToModel(this MessageReference entity)
+        {
+            return new API.MessageReference()
+            {
+                ChannelId = entity.InternalChannelId,
+                GuildId = entity.GuildId,
+                MessageId = entity.MessageId,
+            };
+        }
+        public static IEnumerable<string> EnumerateMentionTypes(this AllowedMentionTypes mentionTypes)
+        {
+            if (mentionTypes.HasFlag(AllowedMentionTypes.Everyone))
+                yield return "everyone";
+            if (mentionTypes.HasFlag(AllowedMentionTypes.Roles))
+                yield return "roles";
+            if (mentionTypes.HasFlag(AllowedMentionTypes.Users))
+                yield return "users";
         }
         public static EmbedAuthor ToEntity(this API.EmbedAuthor model)
         {

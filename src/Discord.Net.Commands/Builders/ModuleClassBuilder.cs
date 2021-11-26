@@ -34,7 +34,7 @@ namespace Discord.Commands
                 }
                 else if (IsLoadableModule(typeInfo))
                 {
-                    await service._cmdLogger.WarningAsync($"Class {typeInfo.FullName} is not public and cannot be loaded. To suppress this message, mark the class with {nameof(DontAutoLoadAttribute)}.");
+                    await service._cmdLogger.WarningAsync($"Class {typeInfo.FullName} is not public and cannot be loaded. To suppress this message, mark the class with {nameof(DontAutoLoadAttribute)}.").ConfigureAwait(false);
                 }
             }
 
@@ -116,7 +116,7 @@ namespace Discord.Commands
                         builder.AddAliases(alias.Aliases);
                         break;
                     case GroupAttribute group:
-                        builder.Name = builder.Name ?? group.Prefix;
+                        builder.Name ??= group.Prefix;
                         builder.Group = group.Prefix;
                         builder.AddAliases(group.Prefix);
                         break;
@@ -135,7 +135,8 @@ namespace Discord.Commands
             if (builder.Name == null)
                 builder.Name = typeInfo.Name;
 
-            var validCommands = typeInfo.DeclaredMethods.Where(IsValidCommandDefinition);
+            // Get all methods (including from inherited members), that are valid commands
+            var validCommands = typeInfo.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(IsValidCommandDefinition);
 
             foreach (var method in validCommands)
             {
@@ -157,7 +158,7 @@ namespace Discord.Commands
                     case CommandAttribute command:
                         builder.AddAliases(command.Text);
                         builder.RunMode = command.RunMode;
-                        builder.Name = builder.Name ?? command.Text;
+                        builder.Name ??= command.Text;
                         builder.IgnoreExtraArgs = command.IgnoreExtraArgs ?? service._ignoreExtraArgs;
                         break;
                     case NameAttribute name:
@@ -280,7 +281,7 @@ namespace Discord.Commands
             }
         }
 
-        private static TypeReader GetTypeReader(CommandService service, Type paramType, Type typeReaderType, IServiceProvider services)
+        internal static TypeReader GetTypeReader(CommandService service, Type paramType, Type typeReaderType, IServiceProvider services)
         {
             var readers = service.GetTypeReaders(paramType);
             TypeReader reader = null;
@@ -290,7 +291,7 @@ namespace Discord.Commands
                     return reader;
             }
 
-            //We dont have a cached type reader, create one
+            //We don't have a cached type reader, create one
             reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, services);
             service.AddTypeReader(paramType, reader, false);
 

@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 namespace Discord.Net.Rest
 {
@@ -6,11 +6,13 @@ namespace Discord.Net.Rest
     {
         public Stream Stream { get; }
         public string Filename { get; }
+        public string ContentType { get; }
 
-        public MultipartFile(Stream stream, string filename)
+        public MultipartFile(Stream stream, string filename, string contentType = null)
         {
             Stream = stream;
             Filename = filename;
+            ContentType = contentType;
         }
     }
 }

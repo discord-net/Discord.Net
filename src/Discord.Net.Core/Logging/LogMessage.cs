@@ -1,15 +1,50 @@
-﻿using System;
+using System;
 using System.Text;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Provides a message object used for logging purposes.
+    /// </summary>
     public struct LogMessage
     {
+        /// <summary>
+        ///     Gets the severity of the log entry.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="LogSeverity"/> enum to indicate the severeness of the incident or event.
+        /// </returns>
         public LogSeverity Severity { get; }
+        /// <summary>
+        ///     Gets the source of the log entry.
+        /// </summary>
+        /// <returns>
+        ///     A string representing the source of the log entry.
+        /// </returns>
         public string Source { get; }
+        /// <summary>
+        ///     Gets the message of this log entry.
+        /// </summary>
+        /// <returns>
+        ///     A string containing the message of this log entry.
+        /// </returns>
         public string Message { get; }
+        /// <summary>
+        ///     Gets the exception of this log entry.
+        /// </summary>
+        /// <returns>
+        ///     An <see cref="Discord.LogMessage.Exception" /> object associated with an incident; otherwise <c>null</c>.
+        /// </returns>
         public Exception Exception { get; }
 
+        /// <summary>
+        ///     Initializes a new <see cref="LogMessage"/> struct with the severity, source, message of the event, and
+        ///     optionally, an exception.
+        /// </summary>
+        /// <param name="severity">The severity of the event.</param>
+        /// <param name="source">The source of the event.</param>
+        /// <param name="message">The message of the event.</param>
+        /// <param name="exception">The exception of the event.</param>
         public LogMessage(LogSeverity severity, string source, string message, Exception exception = null)
         {
             Severity = severity;
@@ -17,8 +52,8 @@ namespace Discord
             Message = message;
             Exception = exception;
         }
-
-        public override string ToString() => ToString(null);
+        
+        public override string ToString() => ToString();
         public string ToString(StringBuilder builder = null, bool fullException = true, bool prependTimestamp = true, DateTimeKind timestampKind = DateTimeKind.Local, int? padSource = 11)
         {
             string sourceName = Source;

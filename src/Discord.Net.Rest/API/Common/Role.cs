@@ -1,4 +1,3 @@
-﻿#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -9,6 +8,10 @@ namespace Discord.API
         public ulong Id { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
+        [JsonProperty("icon")]
+        public Optional<string> Icon { get; set; }
+        [JsonProperty("unicode_emoji")]
+        public Optional<string> Emoji { get; set; }
         [JsonProperty("color")]
         public uint Color { get; set; }
         [JsonProperty("hoist")]
@@ -18,8 +21,10 @@ namespace Discord.API
         [JsonProperty("position")]
         public int Position { get; set; }
         [JsonProperty("permissions"), Int53]
-        public ulong Permissions { get; set; }
+        public string Permissions { get; set; }
         [JsonProperty("managed")]
         public bool Managed { get; set; }
+        [JsonProperty("tags")]
+        public Optional<RoleTags> Tags { get; set; }
     }
 }

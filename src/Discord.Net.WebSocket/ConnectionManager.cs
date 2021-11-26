@@ -6,7 +6,7 @@ using Discord.Net;
 
 namespace Discord
 {
-    internal class ConnectionManager
+    internal class ConnectionManager : IDisposable
     {
         public event Func<Task> Connected { add { _connectedEvent.Add(value); } remove { _connectedEvent.Remove(value); } }
         private readonly AsyncEvent<Func<Task>> _connectedEvent = new AsyncEvent<Func<Task>>();
@@ -23,10 +23,12 @@ namespace Discord
         private CancellationTokenSource _combinedCancelToken, _reconnectCancelToken, _connectionCancelToken;
         private Task _task;
 
+        private bool _isDisposed;
+
         public ConnectionState State { get; private set; }
         public CancellationToken CancelToken { get; private set; }
 
-        internal ConnectionManager(SemaphoreSlim stateLock, Logger logger, int connectionTimeout, 
+        internal ConnectionManager(SemaphoreSlim stateLock, Logger logger, int connectionTimeout,
             Func<Task> onConnecting, Func<Exception, Task> onDisconnecting, Action<Func<Exception, Task>> clientDisconnectHandler)
         {
             _stateLock = stateLock;
@@ -42,6 +44,8 @@ namespace Discord
                     var ex2 = ex as WebSocketClosedException;
                     if (ex2?.CloseCode == 4006)
                         CriticalError(new Exception("WebSocket session expired", ex));
+                    else if (ex2?.CloseCode == 4014)
+                        CriticalError(new Exception("WebSocket connection was closed", ex));
                     else
                         Error(new Exception("WebSocket connection was closed", ex));
                 }
@@ -53,8 +57,12 @@ namespace Discord
 
         public virtual async Task StartAsync()
         {
+            if (State != ConnectionState.Disconnected)
+                throw new InvalidOperationException("Cannot start an already running client.");
+
             await AcquireConnectionLock().ConfigureAwait(false);
             var reconnectCancelToken = new CancellationTokenSource();
+            _reconnectCancelToken?.Dispose();
             _reconnectCancelToken = reconnectCancelToken;
             _task = Task.Run(async () =>
             {
@@ -67,16 +75,11 @@ namespace Discord
                         try
                         {
                             await ConnectAsync(reconnectCancelToken).ConfigureAwait(false);
-                            nextReconnectDelay = 1000; //Reset delay                          
+                            nextReconnectDelay = 1000; //Reset delay
                             await _connectionPromise.Task.ConfigureAwait(false);
                         }
-                        catch (OperationCanceledException ex) 
-                        { 
-                            Cancel(); //In case this exception didn't come from another Error call
-                            await DisconnectAsync(ex, !reconnectCancelToken.IsCancellationRequested).ConfigureAwait(false);
-                        }
-                        catch (Exception ex) 
-                        { 
+                        catch (Exception ex)
+                        {
                             Error(ex); //In case this exception didn't come from another Error call
                             if (!reconnectCancelToken.IsCancellationRequested)
                             {
@@ -103,16 +106,16 @@ namespace Discord
                 finally { _stateLock.Release(); }
             });
         }
-        public virtual async Task StopAsync()
+        public virtual Task StopAsync()
         {
             Cancel();
-            var task = _task;
-            if (task != null)
-                await task.ConfigureAwait(false);
+            return Task.CompletedTask;
         }
 
         private async Task ConnectAsync(CancellationTokenSource reconnectCancelToken)
         {
+            _connectionCancelToken?.Dispose();
+            _combinedCancelToken?.Dispose();
             _connectionCancelToken = new CancellationTokenSource();
             _combinedCancelToken = CancellationTokenSource.CreateLinkedTokenSource(_connectionCancelToken.Token, reconnectCancelToken.Token);
             CancelToken = _combinedCancelToken.Token;
@@ -120,7 +123,7 @@ namespace Discord
             _connectionPromise = new TaskCompletionSource<bool>();
             State = ConnectionState.Connecting;
             await _logger.InfoAsync("Connecting").ConfigureAwait(false);
-            
+
             try
             {
                 var readyPromise = new TaskCompletionSource<bool>();
@@ -159,9 +162,9 @@ namespace Discord
 
             await _onDisconnecting(ex).ConfigureAwait(false);
 
-            await _logger.InfoAsync("Disconnected").ConfigureAwait(false);
-            State = ConnectionState.Disconnected;
             await _disconnectedEvent.InvokeAsync(ex, isReconnecting).ConfigureAwait(false);
+            State = ConnectionState.Disconnected;
+            await _logger.InfoAsync("Disconnected").ConfigureAwait(false);
         }
 
         public async Task CompleteAsync()
@@ -205,6 +208,26 @@ namespace Discord
                 if (await _stateLock.WaitAsync(0).ConfigureAwait(false))
                     break;
             }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _combinedCancelToken?.Dispose();
+                    _reconnectCancelToken?.Dispose();
+                    _connectionCancelToken?.Dispose();
+                }
+
+                _isDisposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
         }
     }
 }

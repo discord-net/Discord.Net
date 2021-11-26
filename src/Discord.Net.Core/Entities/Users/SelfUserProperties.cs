@@ -1,25 +1,17 @@
-﻿namespace Discord
+namespace Discord
 {
     /// <summary>
-    /// Modify the current user with the specified arguments
+    ///     Properties that are used to modify the <see cref="ISelfUser" /> with the specified changes.
     /// </summary>
-    /// <example>
-    /// <code language="c#">
-    /// await Context.Client.CurrentUser.ModifyAsync(x =>
-    /// {
-    ///     x.Avatar = new Image(File.OpenRead("avatar.jpg"));
-    /// });
-    /// </code>
-    /// </example>
-    /// <seealso cref="ISelfUser"/>
+    /// <seealso cref="ISelfUser.ModifyAsync" />
     public class SelfUserProperties
     {
         /// <summary>
-        /// Your username
+        ///     Gets or sets the username.
         /// </summary>
         public Optional<string> Username { get; set; }
         /// <summary>
-        /// Your avatar
+        ///     Gets or sets the avatar.
         /// </summary>
         public Optional<Image?> Avatar { get; set; }
     }

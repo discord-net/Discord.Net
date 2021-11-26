@@ -1,4 +1,3 @@
-﻿#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -17,5 +16,7 @@ namespace Discord.API
         public bool RequireColons { get; set; }
         [JsonProperty("managed")]
         public bool Managed { get; set; }
+        [JsonProperty("user")]
+        public Optional<User> User { get; set; }
     }
 }

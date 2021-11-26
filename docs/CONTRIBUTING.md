@@ -1,46 +1,60 @@
 # Contributing to Docs
 
-I don't really have any strict conditions for writing documentation, 
-but just keep these few guidelines in mind:
+First of all, thank you for your interest in contributing to our
+documentation work. We really appreciate it! That being said,
+there are several guidelines you should attempt to follow when adding
+to/changing the documentation.
 
-* Keep code samples in the `guides/samples` folder
-* When referencing an object in the API, link to it's page in the 
-API documentation.
+## General Guidelines
+
+* Keep code samples in each section's `samples` folder
+* When referencing an object in the API, link to its page in the
+ API documentation
+* Documentation should be written in an FAQ/Wiki-style format
 * Documentation should be written in clear and proper English*
 
-\* If anyone is interested in translating documentation into other 
-languages, please open an issue or contact me on 
-Discord (`foxbot#0282`).
+\* If anyone is interested in translating documentation into other
+languages, please open an issue or contact `foxbot#0282` on
+Discord.
 
-### Layout
+## XML Docstrings Guidelines
 
-Documentation should be written in a FAQ/Wiki style format.
+* When using the `<summary>` tag, use concise verbs. For example:
 
-Recommended reads:
+```cs
+/// <summary> Gets or sets the guild user in this object. </summary>
+public IGuildUser GuildUser { get; set; }
+```
 
-* http://docs.microsoft.com
-* http://flask.pocoo.org/docs/0.12/
+* The `<summary>` tag should not be more than 3 lines long. Consider
+simplifying the terms or using the `<remarks>` tag instead.
+* When using the `<code>` tag, put the code sample within the
+`src/Discord.Net.Examples` project under the corresponding path of
+the object and surround the code with a `#region` tag.
+* If the remarks you are looking to write are too long, consider
+writing a shorter version in the XML docs while keeping the longer
+version in the `overwrites` folder using the DocFX overwrites syntax.
+  * You may find an example of this in the samples provided within
+  the folder.
 
-Style consistencies:
+## Docs Guide Guidelines
 
-* Use a ruler set at 70 characters
+* Use a ruler set at 70 characters (use the docs workspace provided
+if you are using Visual Studio Code)
 * Links should use long syntax
 * Pages should be short and concise, not broad and long
 
 Example of long link syntax:
 
-```
+```md
 Please consult the [API Documentation] for more information.
 
 [API Documentation]: xref:System.String
 ```
 
-### Compiling
+## Recommended Reads
 
-Documentation is compiled into a static site using [DocFx]. 
-We currently use the most recent build off the dev branch.
-
-After making changes, compile your changes into the static site with 
-`docfx`. You can also view your changes live with `docfx --serve`.
-
-[DocFx]: https://dotnet.github.io/docfx/
+* [Microsoft Docs](https://docs.microsoft.com)
+* [Flask Docs](https://flask.pocoo.org/docs/1.0/)
+* [DocFX Manual](https://dotnet.github.io/docfx/)
+* [Sandcastle XML Guide](http://ewsoftware.github.io/XMLCommentsGuide)

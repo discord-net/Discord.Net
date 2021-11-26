@@ -1,13 +1,14 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Model = Discord.API.Message;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a REST-based system message.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestSystemMessage : RestMessage, ISystemMessage
     {
-        public MessageType Type { get; private set; }
-
         internal RestSystemMessage(BaseDiscordClient discord, ulong id, IMessageChannel channel, IUser author)
             : base(discord, id, channel, author, MessageSource.System)
         {
@@ -21,8 +22,6 @@ namespace Discord.Rest
         internal override void Update(Model model)
         {
             base.Update(model);
-
-            Type = model.Type;
         }
 
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}, {Type})";

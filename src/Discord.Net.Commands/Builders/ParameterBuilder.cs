@@ -8,6 +8,7 @@ namespace Discord.Commands.Builders
 {
     public class ParameterBuilder
     {
+        #region ParameterBuilder
         private readonly List<ParameterPreconditionAttribute> _preconditions;
         private readonly List<Attribute> _attributes;
 
@@ -24,8 +25,9 @@ namespace Discord.Commands.Builders
 
         public IReadOnlyList<ParameterPreconditionAttribute> Preconditions => _preconditions;
         public IReadOnlyList<Attribute> Attributes => _attributes;
+#endregion
 
-        //Automatic
+        #region Automatic
         internal ParameterBuilder(CommandBuilder command)
         {
             _preconditions = new List<ParameterPreconditionAttribute>();
@@ -33,7 +35,9 @@ namespace Discord.Commands.Builders
 
             Command = command;
         }
-        //User-defined
+        #endregion
+
+        #region User-defined
         internal ParameterBuilder(CommandBuilder command, string name, Type type)
             : this(command)
         {
@@ -50,17 +54,42 @@ namespace Discord.Commands.Builders
             if (type.GetTypeInfo().IsValueType)
                 DefaultValue = Activator.CreateInstance(type);
             else if (type.IsArray)
-                type = ParameterType.GetElementType();
+                DefaultValue = Array.CreateInstance(type.GetElementType(), 0);
             ParameterType = type;
         }
 
         private TypeReader GetReader(Type type)
         {
-            var readers = Command.Module.Service.GetTypeReaders(type);
+            var commands = Command.Module.Service;
+            if (type.GetTypeInfo().GetCustomAttribute<NamedArgumentTypeAttribute>() != null)
+            {
+                IsRemainder = true;
+                var reader = commands.GetTypeReaders(type)?.FirstOrDefault().Value;
+                if (reader == null)
+                {
+                    Type readerType;
+                    try
+                    {
+                        readerType = typeof(NamedArgumentTypeReader<>).MakeGenericType(new[] { type });
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        throw new InvalidOperationException($"Parameter type '{type.Name}' for command '{Command.Name}' must be a class with a public parameterless constructor to use as a NamedArgumentType.", ex);
+                    }
+
+                    reader = (TypeReader)Activator.CreateInstance(readerType, new[] { commands });
+                    commands.AddTypeReader(type, reader);
+                }
+
+                return reader;
+            }
+
+
+            var readers = commands.GetTypeReaders(type);
             if (readers != null)
                 return readers.FirstOrDefault().Value;
             else
-                return Command.Module.Service.GetDefaultTypeReader(type);
+                return commands.GetDefaultTypeReader(type);
         }
 
         public ParameterBuilder WithSummary(string summary)
@@ -102,10 +131,11 @@ namespace Discord.Commands.Builders
 
         internal ParameterInfo Build(CommandInfo info)
         {
-            if ((TypeReader ?? (TypeReader = GetReader(ParameterType))) == null)
+            if ((TypeReader ??= GetReader(ParameterType)) == null)
                 throw new InvalidOperationException($"No type reader found for type {ParameterType.Name}, one must be specified");
 
             return new ParameterInfo(this, info, Command.Module.Service);
         }
+        #endregion
     }
 }

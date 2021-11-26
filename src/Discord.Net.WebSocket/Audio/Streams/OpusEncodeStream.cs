@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,7 +25,7 @@ namespace Discord.Audio.Streams
 
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancelToken)
         {
-            //Assume threadsafe
+            //Assume thread-safe
             while (count > 0)
             {
                 if (_partialFramePos == 0 && count >= OpusConverter.FrameBytes)
@@ -89,10 +89,12 @@ namespace Discord.Audio.Streams
 
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
-
             if (disposing)
+            {
                 _encoder.Dispose();
+                _next.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

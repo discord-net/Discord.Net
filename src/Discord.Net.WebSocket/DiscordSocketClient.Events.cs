@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
+using Discord.API;
 
 namespace Discord.WebSocket
-{                                
+{
     public partial class DiscordSocketClient
     {
-        //General
+        #region General
         /// <summary> Fired when connected to the Discord gateway. </summary>
         public event Func<Task> Connected
         {
@@ -20,7 +21,13 @@ namespace Discord.WebSocket
             remove { _disconnectedEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<Exception, Task>> _disconnectedEvent = new AsyncEvent<Func<Exception, Task>>();
-        /// <summary> Fired when guild data has finished downloading. </summary>
+        /// <summary>
+        ///     Fired when guild data has finished downloading.
+        /// </summary>
+        /// <remarks>
+        ///     It is possible that some guilds might be unsynced if <see cref="DiscordSocketConfig.MaxWaitBetweenGuildAvailablesBeforeReady" />
+        ///     was not long enough to receive all GUILD_AVAILABLEs before READY.
+        /// </remarks>
         public event Func<Task> Ready
         {
             add { _readyEvent.Add(value); }
@@ -34,5 +41,10 @@ namespace Discord.WebSocket
             remove { _latencyUpdatedEvent.Remove(value); }
         }
         private readonly AsyncEvent<Func<int, int, Task>> _latencyUpdatedEvent = new AsyncEvent<Func<int, int, Task>>();
+
+        internal DiscordSocketClient(DiscordSocketConfig config, DiscordRestApiClient client) : base(config, client)
+        {
+        }
+        #endregion
     }
 }

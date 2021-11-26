@@ -24,7 +24,10 @@ namespace Discord.Logging
                 if (severity <= Level)
                     await _messageEvent.InvokeAsync(new LogMessage(severity, source, null, ex)).ConfigureAwait(false);
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
         public async Task LogAsync(LogSeverity severity, string source, string message, Exception ex = null)
         {
@@ -33,7 +36,10 @@ namespace Discord.Logging
                 if (severity <= Level)
                 await _messageEvent.InvokeAsync(new LogMessage(severity, source, message, ex)).ConfigureAwait(false);
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
 
         public async Task LogAsync(LogSeverity severity, string source, FormattableString message, Exception ex = null)

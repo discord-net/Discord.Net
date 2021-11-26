@@ -7,6 +7,7 @@ namespace Discord.Commands.Builders
 {
     public class CommandBuilder
     {
+        #region CommandBuilder
         private readonly List<PreconditionAttribute> _preconditions;
         private readonly List<ParameterBuilder> _parameters;
         private readonly List<Attribute> _attributes;
@@ -27,8 +28,9 @@ namespace Discord.Commands.Builders
         public IReadOnlyList<ParameterBuilder> Parameters => _parameters;
         public IReadOnlyList<Attribute> Attributes => _attributes;
         public IReadOnlyList<string> Aliases => _aliases;
+        #endregion
 
-        //Automatic
+        #region Automatic
         internal CommandBuilder(ModuleBuilder module)
         {
             Module = module;
@@ -38,7 +40,9 @@ namespace Discord.Commands.Builders
             _attributes = new List<Attribute>();
             _aliases = new List<string>();
         }
-        //User-defined
+        #endregion
+
+        #region User-defined
         internal CommandBuilder(ModuleBuilder module, string primaryAlias, Func<ICommandContext, object[], IServiceProvider, CommandInfo, Task> callback)
             : this(module)
         {
@@ -118,6 +122,7 @@ namespace Discord.Commands.Builders
             return this;
         }
 
+        /// <exception cref="InvalidOperationException">Only the last parameter in a command may have the Remainder or Multiple flag.</exception>
         internal CommandInfo Build(ModuleInfo info, CommandService service)
         {
             //Default name to primary alias
@@ -131,7 +136,7 @@ namespace Discord.Commands.Builders
                 var firstMultipleParam = _parameters.FirstOrDefault(x => x.IsMultiple);
                 if ((firstMultipleParam != null) && (firstMultipleParam != lastParam))
                     throw new InvalidOperationException($"Only the last parameter in a command may have the Multiple flag. Parameter: {firstMultipleParam.Name} in {PrimaryAlias}");
-                
+
                 var firstRemainderParam = _parameters.FirstOrDefault(x => x.IsRemainder);
                 if ((firstRemainderParam != null) && (firstRemainderParam != lastParam))
                     throw new InvalidOperationException($"Only the last parameter in a command may have the Remainder flag. Parameter: {firstRemainderParam.Name} in {PrimaryAlias}");
@@ -139,5 +144,6 @@ namespace Discord.Commands.Builders
 
             return new CommandInfo(this, info, service);
         }
+        #endregion
     }
 }

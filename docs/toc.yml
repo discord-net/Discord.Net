@@ -1,6 +1,11 @@
-
 - name: Guides
   href: guides/
+  topicUid: Guides.Introduction
+- name: FAQ
+  href: faq/
+  topicUid: FAQ.Basics.GetStarted
 - name: API Documentation
   href: api/
-  homepage: api/index.md
+  topicUid: API.Docs
+- name: Changelog
+  topicHref: ../CHANGELOG.md

@@ -9,32 +9,51 @@ using Model = Discord.API.Message;
 
 namespace Discord.WebSocket
 {
+    /// <summary>
+    ///     Represents a WebSocket-based message sent by a user.
+    /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketUserMessage : SocketMessage, IUserMessage
     {
-        private readonly List<SocketReaction> _reactions = new List<SocketReaction>();
         private bool _isMentioningEveryone, _isTTS, _isPinned;
         private long? _editedTimestampTicks;
-        private ImmutableArray<Attachment> _attachments;
-        private ImmutableArray<Embed> _embeds;
-        private ImmutableArray<ITag> _tags;
-        
+        private IUserMessage _referencedMessage;
+        private ImmutableArray<Attachment> _attachments = ImmutableArray.Create<Attachment>();
+        private ImmutableArray<Embed> _embeds = ImmutableArray.Create<Embed>();
+        private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
+        private ImmutableArray<SocketRole> _roleMentions = ImmutableArray.Create<SocketRole>();
+        private ImmutableArray<SocketSticker> _stickers = ImmutableArray.Create<SocketSticker>();
+
+        /// <inheritdoc />
         public override bool IsTTS => _isTTS;
+        /// <inheritdoc />
         public override bool IsPinned => _isPinned;
+        /// <inheritdoc />
+        public override bool IsSuppressed => Flags.HasValue && Flags.Value.HasFlag(MessageFlags.SuppressEmbeds);
+        /// <inheritdoc />
         public override DateTimeOffset? EditedTimestamp => DateTimeUtils.FromTicks(_editedTimestampTicks);
+        /// <inheritdoc />
+        public override bool MentionedEveryone => _isMentioningEveryone;
+        /// <inheritdoc />
         public override IReadOnlyCollection<Attachment> Attachments => _attachments;
+        /// <inheritdoc />
         public override IReadOnlyCollection<Embed> Embeds => _embeds;
+        /// <inheritdoc />
         public override IReadOnlyCollection<ITag> Tags => _tags;
+        /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuildChannel> MentionedChannels => MessageHelper.FilterTagsByValue<SocketGuildChannel>(TagType.ChannelMention, _tags);
-        public override IReadOnlyCollection<SocketRole> MentionedRoles => MessageHelper.FilterTagsByValue<SocketRole>(TagType.RoleMention, _tags);
-        public override IReadOnlyCollection<SocketUser> MentionedUsers => MessageHelper.FilterTagsByValue<SocketUser>(TagType.UserMention, _tags);
-        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emote).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
+        /// <inheritdoc />
+        public override IReadOnlyCollection<SocketRole> MentionedRoles => _roleMentions;
+        /// <inheritdoc />
+        public override IReadOnlyCollection<SocketSticker> Stickers => _stickers;
+        /// <inheritdoc />
+        public IUserMessage ReferencedMessage => _referencedMessage;
 
         internal SocketUserMessage(DiscordSocketClient discord, ulong id, ISocketMessageChannel channel, SocketUser author, MessageSource source)
             : base(discord, id, channel, author, source)
         {
         }
-        internal static new SocketUserMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
+        internal new static SocketUserMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
             var entity = new SocketUserMessage(discord, model.Id, channel, author, MessageHelper.GetSource(model));
             entity.Update(state, model);
@@ -45,6 +64,8 @@ namespace Discord.WebSocket
         {
             base.Update(state, model);
 
+            SocketGuild guild = (Channel as SocketGuildChannel)?.Guild;
+
             if (model.IsTextToSpeech.IsSpecified)
                 _isTTS = model.IsTextToSpeech.Value;
             if (model.Pinned.IsSpecified)
@@ -53,6 +74,8 @@ namespace Discord.WebSocket
                 _editedTimestampTicks = model.EditedTimestamp.Value?.UtcTicks;
             if (model.MentionEveryone.IsSpecified)
                 _isMentioningEveryone = model.MentionEveryone.Value;
+            if (model.RoleMentions.IsSpecified)
+                _roleMentions = model.RoleMentions.Value.Select(x => guild.GetRole(x)).ToImmutableArray();
 
             if (model.Attachments.IsSpecified)
             {
@@ -82,68 +105,107 @@ namespace Discord.WebSocket
                     _embeds = ImmutableArray.Create<Embed>();
             }
 
-            IReadOnlyCollection<IUser> mentions = ImmutableArray.Create<SocketUnknownUser>(); //Is passed to ParseTags to get real mention collection
-            if (model.UserMentions.IsSpecified)
-            {
-                var value = model.UserMentions.Value;
-                if (value.Length > 0)
-                {
-                    var newMentions = ImmutableArray.CreateBuilder<SocketUnknownUser>(value.Length);
-                    for (int i = 0; i < value.Length; i++)
-                    {
-                        var val = value[i];
-                        if (val.Object != null)
-                            newMentions.Add(SocketUnknownUser.Create(Discord, state, val.Object));
-                    }
-                    mentions = newMentions.ToImmutable();
-                }
-            }
-
             if (model.Content.IsSpecified)
             {
                 var text = model.Content.Value;
-                var guild = (Channel as SocketGuildChannel)?.Guild;
-                _tags = MessageHelper.ParseTags(text, Channel, guild, mentions);
+                _tags = MessageHelper.ParseTags(text, Channel, guild, MentionedUsers);
                 model.Content = text;
             }
-        }
-        internal void AddReaction(SocketReaction reaction)
-        {
-            _reactions.Add(reaction);
-        }
-        internal void RemoveReaction(SocketReaction reaction)
-        {
-            if (_reactions.Contains(reaction))
-                _reactions.Remove(reaction);
-        }
-        internal void ClearReactions()
-        {
-            _reactions.Clear();
+
+            if (model.ReferencedMessage.IsSpecified && model.ReferencedMessage.Value != null)
+            {
+                var refMsg = model.ReferencedMessage.Value;
+                ulong? webhookId = refMsg.WebhookId.ToNullable();
+                SocketUser refMsgAuthor = null;
+                if (refMsg.Author.IsSpecified)
+                {
+                    if (guild != null)
+                    {
+                        if (webhookId != null)
+                            refMsgAuthor = SocketWebhookUser.Create(guild, state, refMsg.Author.Value, webhookId.Value);
+                        else
+                            refMsgAuthor = guild.GetUser(refMsg.Author.Value.Id);
+                    }
+                    else
+                        refMsgAuthor = (Channel as SocketChannel).GetUser(refMsg.Author.Value.Id);
+                    if (refMsgAuthor == null)
+                        refMsgAuthor = SocketUnknownUser.Create(Discord, state, refMsg.Author.Value);
+                }
+                else
+                    // Message author wasn't specified in the payload, so create a completely anonymous unknown user
+                    refMsgAuthor = new SocketUnknownUser(Discord, id: 0);
+                _referencedMessage = SocketUserMessage.Create(Discord, state, refMsgAuthor, Channel, refMsg);
+            }
+
+            if (model.StickerItems.IsSpecified)
+            {
+                var value = model.StickerItems.Value;
+                if (value.Length > 0)
+                {
+                    var stickers = ImmutableArray.CreateBuilder<SocketSticker>(value.Length);
+                    for (int i = 0; i < value.Length; i++)
+                    {
+                        var stickerItem = value[i];
+                        SocketSticker sticker = null;
+
+                        if (guild != null)
+                            sticker = guild.GetSticker(stickerItem.Id);
+
+                        if (sticker == null)
+                            sticker = Discord.GetSticker(stickerItem.Id);
+
+                        // if they want to auto resolve
+                        if (Discord.AlwaysResolveStickers)
+                        {
+                            sticker = Task.Run(async () => await Discord.GetStickerAsync(stickerItem.Id).ConfigureAwait(false)).GetAwaiter().GetResult();
+                        }
+
+                        // if its still null, create an unknown
+                        if (sticker == null)
+                            sticker = SocketUnknownSticker.Create(Discord, stickerItem);
+
+                        stickers.Add(sticker);
+                    }
+
+                    _stickers = stickers.ToImmutable();
+                }
+                else
+                    _stickers = ImmutableArray.Create<SocketSticker>();
+            }
         }
 
+        /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">Only the author of a message may modify the message.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null)
             => MessageHelper.ModifyAsync(this, Discord, func, options);
 
-        public Task AddReactionAsync(IEmote emote, RequestOptions options = null)
-            => MessageHelper.AddReactionAsync(this, emote, Discord, options);
-        public Task RemoveReactionAsync(IEmote emote, IUser user, RequestOptions options = null)
-            => MessageHelper.RemoveReactionAsync(this, user, emote, Discord, options);
-        public Task RemoveAllReactionsAsync(RequestOptions options = null)
-            => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
-        public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit, RequestOptions options = null)
-            => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, options);
-
+        /// <inheritdoc />
         public Task PinAsync(RequestOptions options = null)
             => MessageHelper.PinAsync(this, Discord, options);
+        /// <inheritdoc />
         public Task UnpinAsync(RequestOptions options = null)
             => MessageHelper.UnpinAsync(this, Discord, options);
 
         public string Resolve(int startIndex, TagHandling userHandling = TagHandling.Name, TagHandling channelHandling = TagHandling.Name,
             TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)
             => MentionUtils.Resolve(this, startIndex, userHandling, channelHandling, roleHandling, everyoneHandling, emojiHandling);
+        /// <inheritdoc />
         public string Resolve(TagHandling userHandling = TagHandling.Name, TagHandling channelHandling = TagHandling.Name,
             TagHandling roleHandling = TagHandling.Name, TagHandling everyoneHandling = TagHandling.Ignore, TagHandling emojiHandling = TagHandling.Name)
             => MentionUtils.Resolve(this, 0, userHandling, channelHandling, roleHandling, everyoneHandling, emojiHandling);
+
+        /// <inheritdoc />
+        /// <exception cref="InvalidOperationException">This operation may only be called on a <see cref="INewsChannel"/> channel.</exception>
+        public async Task CrosspostAsync(RequestOptions options = null)
+        {
+            if (!(Channel is INewsChannel))
+            {
+                throw new InvalidOperationException("Publishing (crossposting) is only valid in news channels.");
+            }
+
+            await MessageHelper.CrosspostAsync(this, Discord, options);
+        }
 
         private string DebuggerDisplay => $"{Author}: {Content} ({Id}{(Attachments.Count > 0 ? $", {Attachments.Count} Attachments" : "")})";
         internal new SocketUserMessage Clone() => MemberwiseClone() as SocketUserMessage;

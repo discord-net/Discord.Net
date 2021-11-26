@@ -6,52 +6,80 @@ using Model = Discord.API.Channel;
 
 namespace Discord.Rest
 {
+    /// <summary>
+    ///     Represents a generic REST-based channel.
+    /// </summary>
     public class RestChannel : RestEntity<ulong>, IChannel, IUpdateable
     {
+        #region RestChannel
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
 
         internal RestChannel(BaseDiscordClient discord, ulong id)
             : base(discord, id)
         {
         }
+        /// <exception cref="InvalidOperationException">Unexpected channel type.</exception>
         internal static RestChannel Create(BaseDiscordClient discord, Model model)
         {
-            switch (model.Type)
+            return model.Type switch
             {
-                case ChannelType.Text:
-                case ChannelType.Voice:
-                    return RestGuildChannel.Create(discord, new RestGuild(discord, model.GuildId.Value), model);
-                case ChannelType.DM:
-                case ChannelType.Group:
-                    return CreatePrivate(discord, model) as RestChannel;
-                case ChannelType.Category:
-                    return RestCategoryChannel.Create(discord, new RestGuild(discord, model.GuildId.Value), model);
-                default:
-                    return new RestChannel(discord, model.Id);
-            }
+                ChannelType.News or
+                ChannelType.Text or
+                ChannelType.Voice or
+                ChannelType.Stage or
+                ChannelType.NewsThread or
+                ChannelType.PrivateThread or
+                ChannelType.PublicThread
+                    => RestGuildChannel.Create(discord, new RestGuild(discord, model.GuildId.Value), model),
+                ChannelType.DM or ChannelType.Group => CreatePrivate(discord, model) as RestChannel,
+                ChannelType.Category => RestCategoryChannel.Create(discord, new RestGuild(discord, model.GuildId.Value), model),
+                _ => new RestChannel(discord, model.Id),
+            };
         }
+        internal static RestChannel Create(BaseDiscordClient discord, Model model, IGuild guild)
+        {
+            return model.Type switch
+            {
+                ChannelType.News or
+                ChannelType.Text or
+                ChannelType.Voice or
+                ChannelType.Stage or
+                ChannelType.NewsThread or
+                ChannelType.PrivateThread or
+                ChannelType.PublicThread
+                    => RestGuildChannel.Create(discord, guild, model),
+                ChannelType.DM or ChannelType.Group => CreatePrivate(discord, model) as RestChannel,
+                ChannelType.Category => RestCategoryChannel.Create(discord, guild, model),
+                _ => new RestChannel(discord, model.Id),
+            };
+        }
+        /// <exception cref="InvalidOperationException">Unexpected channel type.</exception>
         internal static IRestPrivateChannel CreatePrivate(BaseDiscordClient discord, Model model)
         {
-            switch (model.Type)
+            return model.Type switch
             {
-                case ChannelType.DM:
-                    return RestDMChannel.Create(discord, model);
-                case ChannelType.Group:
-                    return RestGroupChannel.Create(discord, model);
-                default:
-                    throw new InvalidOperationException($"Unexpected channel type: {model.Type}");
-            }
+                ChannelType.DM => RestDMChannel.Create(discord, model),
+                ChannelType.Group => RestGroupChannel.Create(discord, model),
+                _ => throw new InvalidOperationException($"Unexpected channel type: {model.Type}"),
+            };
         }
         internal virtual void Update(Model model) { }
 
+        /// <inheritdoc />
         public virtual Task UpdateAsync(RequestOptions options = null) => Task.Delay(0);
+        #endregion
 
-        //IChannel
+        #region IChannel
+        /// <inheritdoc />
         string IChannel.Name => null;
 
+        /// <inheritdoc />
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => Task.FromResult<IUser>(null); //Overridden
+        /// <inheritdoc />
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
             => AsyncEnumerable.Empty<IReadOnlyCollection<IUser>>(); //Overridden
+        #endregion
     }
 }

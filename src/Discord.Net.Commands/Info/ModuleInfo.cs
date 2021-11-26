@@ -6,20 +6,59 @@ using Discord.Commands.Builders;
 
 namespace Discord.Commands
 {
+    /// <summary>
+    ///     Provides the information of a module.
+    /// </summary>
     public class ModuleInfo
     {
+        /// <summary>
+        ///     Gets the command service associated with this module.
+        /// </summary>
         public CommandService Service { get; }
+        /// <summary>
+        ///     Gets the name of this module.
+        /// </summary>
         public string Name { get; }
+        /// <summary>
+        ///     Gets the summary of this module.
+        /// </summary>
         public string Summary { get; }
+        /// <summary>
+        ///     Gets the remarks of this module.
+        /// </summary>
         public string Remarks { get; }
+        /// <summary>
+        ///     Gets the group name (main prefix) of this module.
+        /// </summary>
         public string Group { get; }
 
+        /// <summary>
+        ///     Gets a read-only list of aliases associated with this module.
+        /// </summary>
         public IReadOnlyList<string> Aliases { get; }
+        /// <summary>
+        ///     Gets a read-only list of commands associated with this module.
+        /// </summary>
         public IReadOnlyList<CommandInfo> Commands { get; }
+        /// <summary>
+        ///     Gets a read-only list of preconditions that apply to this module.
+        /// </summary>
         public IReadOnlyList<PreconditionAttribute> Preconditions { get; }
+        /// <summary>
+        ///     Gets a read-only list of attributes that apply to this module.
+        /// </summary>
         public IReadOnlyList<Attribute> Attributes { get; }
+        /// <summary>
+        ///     Gets a read-only list of submodules associated with this module.
+        /// </summary>
         public IReadOnlyList<ModuleInfo> Submodules { get; }
+        /// <summary>
+        ///     Gets the parent module of this submodule if applicable.
+        /// </summary>
         public ModuleInfo Parent { get; }
+        /// <summary>
+        ///     Gets a value that indicates whether this module is a submodule or not.
+        /// </summary>
         public bool IsSubmodule => Parent != null;
 
         internal ModuleInfo(ModuleBuilder builder, CommandService service, IServiceProvider services, ModuleInfo parent = null)

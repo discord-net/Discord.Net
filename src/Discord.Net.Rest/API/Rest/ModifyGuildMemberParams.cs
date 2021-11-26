@@ -1,4 +1,3 @@
-﻿#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API.Rest
@@ -15,6 +14,6 @@ namespace Discord.API.Rest
         [JsonProperty("roles")]
         public Optional<ulong[]> RoleIds { get; set; }
         [JsonProperty("channel_id")]
-        public Optional<ulong> ChannelId { get; set; }
+        public Optional<ulong?> ChannelId { get; set; }
     }
 }

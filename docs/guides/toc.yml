@@ -1,27 +1,68 @@
-- name: Getting Started
+- name: Introduction
+  topicUid: Guides.Introduction
+- name: "Working with Guild Events"
   items:
-    - name: Installation
-      href: getting_started/installing.md
-    - name: Your First Bot
-      href: getting_started/intro.md
-    - name: Terminology
-      href: getting_started/terminology.md
-- name: Basic Concepts
+    - name: Introduction
+      topicUid: Guides.GuildEvents.Intro
+    - name: Creating Events
+      topicUid: Guides.GuildEvents.Creating
+    - name: Getting Event Users
+      topicUid: Guides.GuildEvents.GettingUsers
+    - name: Modifying Events
+      topicUid: Guides.GuildEvents.Modifying
+- name: Working with Commands
   items:
-    - name: Logging Data
-      href: concepts/logging.md
-    - name: Working with Events
-      href: concepts/events.md
-    - name: Managing Connections
-      href: concepts/connections.md
-    - name: Entities
-      href: concepts/entities.md
-- name: The Command Service
+    - name: Introduction
+      topicUid: Guides.Commands.Intro
+    - name: TypeReaders
+      topicUid: Guides.Commands.TypeReaders
+    - name: Named Arguments
+      topicUid: Guides.Commands.NamedArguments
+    - name: Preconditions
+      topicUid: Guides.Commands.Preconditions
+    - name: Dependency Injection
+      topicUid: Guides.Commands.DI
+    - name: Post-execution Handling
+      topicUid: Guides.Commands.PostExecution
+- name: Working with Slash Commands
   items:
-    - name: Command Guide
-      href: commands/commands.md
+    - name: Introduction
+      topicUid: Guides.SlashCommands.Intro
+    - name: Creating slash commands
+      topicUid: Guides.SlashCommands.Creating
+    - name: Receiving and responding to slash commands
+      topicUid: Guides.SlashCommands.Receiving
+    - name: Slash command parameters
+      topicUid: Guides.SlashCommands.Parameters
+    - name: Ephemeral responses
+      topicUid: Guides.SlashCommands.Ephemeral
+    - name: Sub commands
+      topicUid: Guides.SlashCommands.SubCommand
+    - name: Slash command choices
+      topicUid: Guides.SlashCommands.Choices
+    - name: Slash commands Bulk Overwrites
+      topicUid: Guides.SlashCommands.BulkOverwrite
+- name: Working with Context commands
+  items:
+    - name: Creating Context Commands
+      topicUid: Guides.ContextCommands.Creating
+    - name: Receiving Context Commands
+      topicUid: Guides.ContextCommands.Reveiving
+- name: Working with Message Components
+  items:
+    - name: Getting started
+      topicUid: Guides.MessageComponents.GettingStarted
+    - name: Responding to Components
+      topicUid: Guides.MessageComponents.Responding
+    - name: Buttons in depth
+      topicUid: Guides.MessageComponents.Buttons
+    - name: Select menus
+      topicUid: Guides.MessageComponents.SelectMenus
+    - name: Advanced Concepts
+      topicUid: Guides.MessageComponents.Advanced
+- name: Emoji
+  topicUid: Guides.Emoji
 - name: Voice
-  items:
-    - name: Voice Guide
-      href: voice/sending-voice.md
-- name: Migrating from 0.9
+  topicUid: Guides.Voice.SendingVoice
+- name: Deployment
+  topicUid: Guides.Deployment

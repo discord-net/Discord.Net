@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Model = Discord.API.Role;
 using BulkParams = Discord.API.Rest.ModifyGuildRolesParams;
@@ -7,7 +7,7 @@ namespace Discord.Rest
 {
     internal static class RoleHelper
     {
-        //General
+        #region General
         public static async Task DeleteAsync(IRole role, BaseDiscordClient client,
             RequestOptions options)
         {
@@ -18,13 +18,20 @@ namespace Discord.Rest
         {
             var args = new RoleProperties();
             func(args);
+
+            if (args.Icon.IsSpecified)
+            {
+                role.Guild.Features.EnsureFeature(GuildFeature.RoleIcons);
+            }
+
             var apiArgs = new API.Rest.ModifyGuildRoleParams
             {
                 Color = args.Color.IsSpecified ? args.Color.Value.RawValue : Optional.Create<uint>(),
                 Hoist = args.Hoist,
                 Mentionable = args.Mentionable,
                 Name = args.Name,
-                Permissions = args.Permissions.IsSpecified ? args.Permissions.Value.RawValue : Optional.Create<ulong>()
+                Permissions = args.Permissions.IsSpecified ? args.Permissions.Value.RawValue.ToString() : Optional.Create<string>(),
+                Icon = args.Icon.IsSpecified ? args.Icon.Value.ToModel() : Optional<API.Image>.Unspecified
             };
             var model = await client.ApiClient.ModifyGuildRoleAsync(role.Guild.Id, role.Id, apiArgs, options).ConfigureAwait(false);
 
@@ -36,5 +43,6 @@ namespace Discord.Rest
             }
             return model;
         }
+        #endregion
     }
 }

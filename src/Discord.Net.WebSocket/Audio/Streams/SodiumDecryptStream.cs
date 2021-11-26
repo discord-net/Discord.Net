@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 
 namespace Discord.Audio.Streams
 {
-    ///<summary> Decrypts an RTP frame using libsodium </summary>
+    /// <summary>
+    ///     Decrypts an RTP frame using libsodium.
+    /// </summary>
     public class SodiumDecryptStream : AudioOutStream
     {
         private readonly AudioClient _client;
@@ -41,6 +43,13 @@ namespace Discord.Audio.Streams
         public override async Task ClearAsync(CancellationToken cancelToken)
         {
             await _next.ClearAsync(cancelToken).ConfigureAwait(false);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                _next.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

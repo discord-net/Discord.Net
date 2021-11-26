@@ -1,4 +1,4 @@
-﻿using Discord.Net.WebSockets;
+using Discord.Net.WebSockets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +19,7 @@ namespace Discord.Net.Providers.WS4Net
         private readonly SemaphoreSlim _lock;
         private readonly Dictionary<string, string> _headers;
         private WS4NetSocket _client;
+        private CancellationTokenSource _disconnectCancelTokenSource;
         private CancellationTokenSource _cancelTokenSource;
         private CancellationToken _cancelToken, _parentToken;
         private ManualResetEventSlim _waitUntilConnect;
@@ -28,7 +29,7 @@ namespace Discord.Net.Providers.WS4Net
         {
             _headers = new Dictionary<string, string>();
             _lock = new SemaphoreSlim(1, 1);
-            _cancelTokenSource = new CancellationTokenSource();
+            _disconnectCancelTokenSource = new CancellationTokenSource();
             _cancelToken = CancellationToken.None;
             _parentToken = CancellationToken.None;
             _waitUntilConnect = new ManualResetEventSlim();
@@ -38,7 +39,11 @@ namespace Discord.Net.Providers.WS4Net
             if (!_isDisposed)
             {
                 if (disposing)
-                    DisconnectInternalAsync(true).GetAwaiter().GetResult();
+                {
+                    DisconnectInternalAsync(isDisposing: true).GetAwaiter().GetResult();
+                    _lock?.Dispose();
+                    _cancelTokenSource?.Dispose();
+                }
                 _isDisposed = true;
             }
         }
@@ -63,8 +68,13 @@ namespace Discord.Net.Providers.WS4Net
         {
             await DisconnectInternalAsync().ConfigureAwait(false);
 
-            _cancelTokenSource = new CancellationTokenSource();
-            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
+            _disconnectCancelTokenSource?.Dispose();
+            _cancelTokenSource?.Dispose();
+            _client?.Dispose();
+
+            _disconnectCancelTokenSource = new CancellationTokenSource();
+            _cancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _disconnectCancelTokenSource.Token);
+            _cancelToken = _cancelTokenSource.Token;
 
             _client = new WS4NetSocket(host, "", customHeaderItems: _headers.ToList())
             {
@@ -82,27 +92,27 @@ namespace Discord.Net.Providers.WS4Net
             _waitUntilConnect.Wait(_cancelToken);
         }
 
-        public async Task DisconnectAsync()
+        public async Task DisconnectAsync(int closeCode = 1000)
         {
             await _lock.WaitAsync().ConfigureAwait(false);
             try
             {
-                await DisconnectInternalAsync().ConfigureAwait(false);
+                await DisconnectInternalAsync(closeCode: closeCode).ConfigureAwait(false);
             }
             finally
             {
                 _lock.Release();
             }
         }
-        private Task DisconnectInternalAsync(bool isDisposing = false)
+        private Task DisconnectInternalAsync(int closeCode = 1000, bool isDisposing = false)
         {
-            _cancelTokenSource.Cancel();
+            _disconnectCancelTokenSource.Cancel();
             if (_client == null)
                 return Task.Delay(0);
 
             if (_client.State == WebSocketState.Open)
             {
-                try { _client.Close(1000, ""); }
+                try { _client.Close(closeCode, ""); }
                 catch { }
             }
 
@@ -125,8 +135,10 @@ namespace Discord.Net.Providers.WS4Net
         }
         public void SetCancelToken(CancellationToken cancelToken)
         {
+            _cancelTokenSource?.Dispose();
             _parentToken = cancelToken;
-            _cancelToken = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _cancelTokenSource.Token).Token;
+            _cancelTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_parentToken, _disconnectCancelTokenSource.Token);
+            _cancelToken = _cancelTokenSource.Token;
         }
 
         public async Task SendAsync(byte[] data, int index, int count, bool isText)
@@ -151,7 +163,7 @@ namespace Discord.Net.Providers.WS4Net
         }
         private void OnBinaryMessage(object sender, DataReceivedEventArgs e)
         {
-            BinaryMessage(e.Data, 0, e.Data.Count()).GetAwaiter().GetResult();
+            BinaryMessage(e.Data, 0, e.Data.Length).GetAwaiter().GetResult();
         }
         private void OnConnected(object sender, object e)
         {

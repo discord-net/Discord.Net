@@ -1,0 +1,27 @@
+steps:
+- task: DotNetCoreCLI@2
+  inputs:
+     command: 'restore'
+     projects: 'Discord.Net.sln'
+     feedsToUse: 'select'
+     verbosityRestore: 'Minimal'
+  displayName: Restore packages
+
+- script: dotnet build "Discord.Net.sln" --no-restore -v minimal -c $(buildConfiguration) /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
+  displayName: Build projects
+
+- script: dotnet test "test/Discord.Net.Tests.Unit/Discord.Net.Tests.Unit.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) --logger trx
+  displayName: Unit Tests
+
+- script: dotnet test "test/Discord.Net.Analyzers.Tests/Discord.Net.Analyzers.Tests.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) --logger trx
+  displayName: Analyzer Tests
+
+# - script: dotnet test "test/Discord.Net.Tests.Integration/Discord.Net.Tests.Integration.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) --logger trx
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))
+
+- task: PublishTestResults@2
+  displayName: Publish test results
+  condition: succeededOrFailed()
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
