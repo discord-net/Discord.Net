@@ -19,6 +19,7 @@
             <dependency id="Discord.Net.Labs.WebSocket" version="3.3.3$suffix$" />
             <dependency id="Discord.Net.Labs.Commands" version="3.3.3$suffix$" />
             <dependency id="Discord.Net.Labs.Webhook" version="3.3.3$suffix$" />
+            <dependency id="Discord.Net.Labs.Interactions" version="3.3.3$suffix$" />
         </group>      
         <group targetFramework="net461">
             <dependency id="Discord.Net.Labs.Core" version="3.3.3$suffix$" />
@@ -26,6 +27,7 @@
             <dependency id="Discord.Net.Labs.WebSocket" version="3.3.3$suffix$" />
             <dependency id="Discord.Net.Labs.Commands" version="3.3.3$suffix$" />
             <dependency id="Discord.Net.Labs.Webhook" version="3.3.3$suffix$" />
+            <dependency id="Discord.Net.Labs.Interactions" version="3.3.3$suffix$" />
         </group>       
         <group targetFramework="netstandard2.0">
             <dependency id="Discord.Net.Labs.Core" version="3.3.3$suffix$" />
@@ -33,13 +35,15 @@
             <dependency id="Discord.Net.Labs.WebSocket" version="3.3.3$suffix$" />
             <dependency id="Discord.Net.Labs.Commands" version="3.3.3$suffix$" />
             <dependency id="Discord.Net.Labs.Webhook" version="3.3.3$suffix$" />
+            <dependency id="Discord.Net.Labs.Interactions" version="3.3.3$suffix$" />
         </group>
-		<group targetFramework="netstandard2.1">
+	<group targetFramework="netstandard2.1">
             <dependency id="Discord.Net.Labs.Core" version="3.3.3$suffix$" />
             <dependency id="Discord.Net.Labs.Rest" version="3.3.3$suffix$" />
             <dependency id="Discord.Net.Labs.WebSocket" version="3.3.3$suffix$" />
             <dependency id="Discord.Net.Labs.Commands" version="3.3.3$suffix$" />
             <dependency id="Discord.Net.Labs.Webhook" version="3.3.3$suffix$" />
+            <dependency id="Discord.Net.Labs.Interactions" version="3.3.3$suffix$" />
         </group>
     </dependencies>
   </metadata>
