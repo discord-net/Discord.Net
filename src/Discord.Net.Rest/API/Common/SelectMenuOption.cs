@@ -47,7 +47,7 @@ namespace Discord.API
                 }
             }
 
-            Default = option.Default ?? Optional<bool>.Unspecified;
+            Default = option.IsDefault ?? Optional<bool>.Unspecified;
         }
     }
 }

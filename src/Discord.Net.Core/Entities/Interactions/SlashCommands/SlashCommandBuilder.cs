@@ -519,7 +519,7 @@ namespace Discord
             Preconditions.AtLeast(name.Length, 1, nameof(name));
             Preconditions.AtMost(name.Length, 100, nameof(name));
 
-            if (value is string str)
+            if(value is string str)
             {
                 Preconditions.AtLeast(str.Length, 1, nameof(value));
                 Preconditions.AtMost(str.Length, 100, nameof(value));
@@ -614,7 +614,7 @@ namespace Discord
             MinValue = value;
             return this;
         }
-
+        
         /// <summary>
         ///     Sets the current builders max value field.
         /// </summary>

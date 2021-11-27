@@ -5,7 +5,7 @@ namespace Discord.Utils
     internal static class UrlValidation
     {
         /// <summary>
-        /// Not full URL validation right now. Just ensures protocol is present and that it's either http or https
+        ///     Not full URL validation right now. Just ensures protocol is present and that it's either http or https
         /// <see cref="ValidateButton(string)"/> should be used for url buttons.
         /// </summary>
         /// <param name="url">The URL to validate before sending to Discord.</param>
@@ -22,7 +22,7 @@ namespace Discord.Utils
         }
 
         /// <summary>
-        /// Not full URL validation right now. Just Ensures the protocol is either http, https, or discord
+        ///     Not full URL validation right now. Just Ensures the protocol is either http, https, or discord
         /// <see cref="Validate(string)"/> should be used everything other than url buttons.
         /// </summary>
         /// <param name="url">The URL to validate before sending to discord.</param>

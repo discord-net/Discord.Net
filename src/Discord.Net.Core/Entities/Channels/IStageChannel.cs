@@ -17,7 +17,6 @@ namespace Discord
         string Topic { get; }
 
         /// <summary>
-        ///     The <see cref="StagePrivacyLevel"/> of the current stage.
         ///     Gets the <see cref="StagePrivacyLevel"/> of the current stage.
         /// </summary>
         /// <remarks>

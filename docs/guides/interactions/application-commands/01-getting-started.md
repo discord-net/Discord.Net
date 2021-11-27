@@ -6,7 +6,7 @@ title: Introduction to slash commands
 
 # Getting started with application commands.
 
-Welcome! This guide will show you how to use application commands. If you have extra questions that aren't covered here you can come to our [Discord](https://discord.com/invite/dvSfUTet3K) server and ask around there.
+Welcome! This guide will show you how to use application commands.
 
 ## What is an application command?
 

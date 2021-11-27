@@ -115,7 +115,7 @@ namespace Discord.WebSocket
             if (_guilds.TryRemove(id, out SocketGuild guild))
             {
                 guild.PurgeChannelCache(this);
-                guild.PurgeGuildUserCache();
+                guild.PurgeUserCache();
                 return guild;
             }
             return null;
@@ -140,7 +140,35 @@ namespace Discord.WebSocket
         internal void PurgeUsers()
         {
             foreach (var guild in _guilds.Values)
-                guild.PurgeGuildUserCache();
+                guild.PurgeUserCache();
+        }
+
+        internal SocketApplicationCommand GetCommand(ulong id)
+        {
+            if (_commands.TryGetValue(id, out SocketApplicationCommand command))
+                return command;
+            return null;
+        }
+        internal void AddCommand(SocketApplicationCommand command)
+        {
+            _commands[command.Id] = command;
+        }
+        internal SocketApplicationCommand GetOrAddCommand(ulong id, Func<ulong, SocketApplicationCommand> commandFactory)
+        {
+            return _commands.GetOrAdd(id, commandFactory);
+        }
+        internal SocketApplicationCommand RemoveCommand(ulong id)
+        {
+            if (_commands.TryRemove(id, out SocketApplicationCommand command))
+                return command;
+            return null;
+        }
+        internal void PurgeCommands(Func<SocketApplicationCommand, bool> precondition)
+        {
+            var ids = _commands.Where(x => precondition(x.Value)).Select(x => x.Key);
+
+            foreach (var id in ids)
+                _commands.TryRemove(id, out var _);
         }
 
         internal SocketApplicationCommand GetCommand(ulong id)

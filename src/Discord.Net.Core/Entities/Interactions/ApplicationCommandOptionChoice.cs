@@ -11,7 +11,7 @@ namespace Discord
         private object _value;
 
         /// <summary>
-        ///     Gets the name of this choice.
+        ///     Gets or sets the name of this choice.
         /// </summary>
         public string Name
         {

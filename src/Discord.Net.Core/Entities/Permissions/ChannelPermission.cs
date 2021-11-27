@@ -113,12 +113,6 @@ namespace Discord
         /// <summary>
         ///     Allows members to use slash commands in text channels.
         /// </summary>
-        [Obsolete("UseSlashCommands has been replaced by UseApplicationCommands", true)]
-        UseSlashCommands    = 0x00_80_00_00_00,
-
-        /// <summary>
-        ///     Allows members to use slash commands in text channels.
-        /// </summary>
         UseApplicationCommands = 0x00_80_00_00_00,
 
         /// <summary>
@@ -131,17 +125,6 @@ namespace Discord
         /// </summary>
         ManageThreads       = 0x04_00_00_00_00,
 
-        /// <summary>
-        ///     Allows for creating and participating in threads
-        /// </summary>
-        [Obsolete("UsePublicThreads has been replaced by CreatePublicThreads and SendMessagesInThreads", true)]
-        UsePublicThreads = 0x08_00_00_00_00,
-
-        /// <summary>
-        ///     Allows for creating and participating in private threads
-        /// </summary>
-        [Obsolete("UsePrivateThreads has been replaced by CreatePrivateThreads and SendMessagesInThreads", true)]
-        UsePrivateThreads   = 0x10_00_00_00_00,
         /// <summary>
         ///     Allows for creating public threads.
         /// </summary>

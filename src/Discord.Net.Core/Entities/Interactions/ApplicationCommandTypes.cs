@@ -1,22 +1,22 @@
 namespace Discord
 {
     /// <summary>
-    ///     ApplicationCommandType is enum of current valid Application Command Types: Slash, User, Message
+    ///    Represents the types of application commands.
     /// </summary>
     public enum ApplicationCommandType : byte
     {
         /// <summary>
-        ///     ApplicationCommandType.Slash is Slash command type
+        ///     A Slash command type
         /// </summary>
         Slash = 1,
 
         /// <summary>
-        ///     ApplicationCommandType.User is Context Menu User command type
+        ///     A Context Menu User command type
         /// </summary>
         User = 2,
 
         /// <summary>
-        ///     ApplicationCommandType.Message is Context Menu Message command type
+        ///     A Context Menu Message command type
         /// </summary>
         Message = 3
     }

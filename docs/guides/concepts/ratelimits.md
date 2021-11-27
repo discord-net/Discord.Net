@@ -1,6 +1,6 @@
 # Ratelimits
 
-Ratelimits are a core concept of the discord api, each verified library must follow the ratelimit guidelines. Labs introduces a ratelimit exposure system to help you follow these ratelimits in your own code.
+Ratelimits are a core concept of any API - Discords API is no exception. each verified library must follow the ratelimit guidelines.
 
 ### Using the ratelimit callback
 

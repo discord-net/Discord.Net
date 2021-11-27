@@ -74,6 +74,10 @@ namespace Discord
         public static bool TryParse(string text, out Emote result)
         {
             result = null;
+
+            if (text == null)
+                return false;
+
             if (text.Length >= 4 && text[0] == '<' && (text[1] == ':' || (text[1] == 'a' && text[2] == ':')) && text[text.Length - 1] == '>')
             {
                 bool animated = text[1] == 'a';

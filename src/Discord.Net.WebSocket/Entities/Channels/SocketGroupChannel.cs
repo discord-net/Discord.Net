@@ -34,12 +34,12 @@ namespace Discord.WebSocket
         public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();
 
         /// <summary>
-        /// Returns a collection representing all of the users in the group.
+        ///     Returns a collection representing all of the users in the group.
         /// </summary>
         public new IReadOnlyCollection<SocketGroupUser> Users => _users.ToReadOnlyCollection();
 
         /// <summary>
-        /// Returns a collection representing all users in the group, not including the client.
+        ///     Returns a collection representing all users in the group, not including the client.
         /// </summary>
         public IReadOnlyCollection<SocketGroupUser> Recipients
             => _users.Select(x => x.Value).Where(x => x.Id != Discord.CurrentUser.Id).ToReadOnlyCollection(() => _users.Count - 1);

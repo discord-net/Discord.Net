@@ -1,7 +1,7 @@
 namespace Discord
 {
     /// <summary>
-    ///     Specifies the privacy levels of a Stage instance.
+    ///     Represents the privacy level of a stage.
     /// </summary>
     public enum StagePrivacyLevel
     {

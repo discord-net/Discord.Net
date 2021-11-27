@@ -19,12 +19,12 @@ namespace Discord
         bool HasJoined { get; }
 
         /// <summary>
-        ///     <see langword="true"/> if the current thread is archived, otherwise <see langword="false"/>.
+        ///     Gets whether or not the current thread is archived.
         /// </summary>
         bool IsArchived { get; }
 
         /// <summary>
-        ///     Gets whether or not the current thread is archived.
+        ///     Gets the duration of time before the thread is automatically archived after no activity.
         /// </summary>
         ThreadArchiveDuration AutoArchiveDuration { get; }
 

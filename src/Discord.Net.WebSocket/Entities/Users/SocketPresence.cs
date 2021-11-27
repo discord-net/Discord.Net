@@ -11,26 +11,37 @@ namespace Discord.WebSocket
     ///     Represents the WebSocket user's presence status. This may include their online status and their activity.
     /// </summary>
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
-    public struct SocketPresence : IPresence
+    public class SocketPresence : IPresence
     {
         /// <inheritdoc />
-        public UserStatus Status { get; }
+        public UserStatus Status { get; private set; }
         /// <inheritdoc />
-        public IImmutableSet<ClientType> ActiveClients { get; }
+        public IReadOnlyCollection<ClientType> ActiveClients { get; private set; }
         /// <inheritdoc />
-        public IImmutableList<IActivity> Activities { get; }
+        public IReadOnlyCollection<IActivity> Activities { get; private set; }
+
+        internal SocketPresence() { }
         internal SocketPresence(UserStatus status, IImmutableSet<ClientType> activeClients, IImmutableList<IActivity> activities)
         {
             Status = status;
             ActiveClients = activeClients ?? ImmutableHashSet<ClientType>.Empty;
             Activities = activities ?? ImmutableList<IActivity>.Empty;
         }
+
         internal static SocketPresence Create(Model model)
         {
-            var clients = ConvertClientTypesDict(model.ClientStatus.GetValueOrDefault());
-            var activities = ConvertActivitiesList(model.Activities);
-            return new SocketPresence(model.Status, clients, activities);
+            var entity = new SocketPresence();
+            entity.Update(model);
+            return entity;
         }
+
+        internal void Update(Model model)
+        {
+            Status = model.Status;
+            ActiveClients = ConvertClientTypesDict(model.ClientStatus.GetValueOrDefault()) ?? ImmutableArray<ClientType>.Empty;
+            Activities = ConvertActivitiesList(model.Activities) ?? ImmutableArray<IActivity>.Empty;
+        }
+
         /// <summary>
         ///     Creates a new <see cref="IReadOnlyCollection{T}"/> containing all of the client types
         ///     where a user is active from the data supplied in the Presence update frame.
@@ -42,7 +53,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A collection of all <see cref="ClientType"/>s that this user is active.
         /// </returns>
-        private static IImmutableSet<ClientType> ConvertClientTypesDict(IDictionary<string, string> clientTypesDict)
+        private static IReadOnlyCollection<ClientType> ConvertClientTypesDict(IDictionary<string, string> clientTypesDict)
         {
             if (clientTypesDict == null || clientTypesDict.Count == 0)
                 return ImmutableHashSet<ClientType>.Empty;
@@ -84,6 +95,6 @@ namespace Discord.WebSocket
         public override string ToString() => Status.ToString();
         private string DebuggerDisplay => $"{Status}{(Activities?.FirstOrDefault()?.Name ?? "")}";
 
-        internal SocketPresence Clone() => this;
+        internal SocketPresence Clone() => MemberwiseClone() as SocketPresence;
     }
 }

@@ -47,7 +47,6 @@ namespace Discord.Rest
         /// </summary>
         public IReadOnlyCollection<ChannelType> ChannelTypes { get; private set; }
 
-
         internal RestApplicationCommandOption() { }
 
         internal static RestApplicationCommandOption Create(Model model)

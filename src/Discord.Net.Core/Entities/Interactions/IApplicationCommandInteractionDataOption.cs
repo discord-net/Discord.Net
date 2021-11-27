@@ -26,7 +26,7 @@ namespace Discord
         ApplicationCommandOptionType Type { get; }
 
         /// <summary>
-        ///     Gets the options for this command.
+        ///     Gets the nested options of this option.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandInteractionDataOption> Options { get; }
     }

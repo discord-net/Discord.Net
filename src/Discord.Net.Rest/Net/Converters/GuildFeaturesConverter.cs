@@ -36,7 +36,6 @@ namespace Discord.Net.Converters
 
             return new GuildFeatures(features, experimental.ToArray());
         }
-
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             throw new NotImplementedException();

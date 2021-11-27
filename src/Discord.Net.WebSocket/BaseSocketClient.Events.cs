@@ -502,6 +502,18 @@ namespace Discord.WebSocket
         internal readonly AsyncEvent<Func<SocketGroupUser, Task>> _recipientRemovedEvent = new AsyncEvent<Func<SocketGroupUser, Task>>();
         #endregion
 
+        #region Presence
+
+        /// <summary> Fired when a users presence is updated. </summary>
+        public event Func<SocketUser, SocketPresence, SocketPresence, Task> PresenceUpdated
+        {
+            add { _presenceUpdated.Add(value); }
+            remove { _presenceUpdated.Remove(value); }
+        }
+        internal readonly AsyncEvent<Func<SocketUser, SocketPresence, SocketPresence, Task>> _presenceUpdated = new AsyncEvent<Func<SocketUser, SocketPresence, SocketPresence, Task>>();
+
+        #endregion
+
         #region Invites
         /// <summary>
         ///     Fired when an invite is created.

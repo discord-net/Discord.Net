@@ -18,7 +18,7 @@ namespace Discord
         string Name { get; }
 
         /// <summary>
-        ///     Gets the params + values from the user.
+        ///     Gets the options that the user has provided.
         /// </summary>
         IReadOnlyCollection<IApplicationCommandInteractionDataOption> Options { get; }
     }

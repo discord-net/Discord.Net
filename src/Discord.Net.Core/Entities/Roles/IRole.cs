@@ -58,7 +58,7 @@ namespace Discord
         ///     A string containing the hash of this role's icon.
         /// </returns>
         string Icon { get; }
-         /// <summary>
+        /// <summary>
         ///     Gets the unicode emoji of this role.
         /// </summary>
         /// <remarks>
