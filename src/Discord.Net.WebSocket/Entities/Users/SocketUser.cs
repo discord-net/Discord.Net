@@ -94,6 +94,7 @@ namespace Discord.WebSocket
 
         internal virtual void Update(PresenceModel model)
         {
+            Presence ??= new SocketPresence();
             Presence.Update(model);
         }
 
