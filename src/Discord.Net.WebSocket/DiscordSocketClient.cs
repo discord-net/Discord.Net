@@ -1954,7 +1954,7 @@ namespace Discord.WebSocket
                                         }
                                     }
 
-                                    var before = user.Presence.Clone();
+                                    var before = user.Presence?.Clone();
                                     user.Update(State, data.User);
                                     user.Update(data);
                                     await TimedInvokeAsync(_presenceUpdated, nameof(PresenceUpdated), user, before, user.Presence).ConfigureAwait(false);

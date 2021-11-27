@@ -56,6 +56,7 @@ namespace Discord.WebSocket
         internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
         {
+            Presence = new SocketPresence();
         }
         internal virtual bool Update(ClientState state, Model model)
         {
