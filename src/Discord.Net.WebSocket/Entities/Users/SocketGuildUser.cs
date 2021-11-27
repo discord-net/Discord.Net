@@ -164,8 +164,7 @@ namespace Discord.WebSocket
         {
             if (updatePresence)
             {
-                Presence = SocketPresence.Create(model);
-                GlobalUser.Update(state, model);
+                Update(model);
             }
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
@@ -174,6 +173,13 @@ namespace Discord.WebSocket
             if (model.PremiumSince.IsSpecified)
                 _premiumSinceTicks = model.PremiumSince.Value?.UtcTicks;
         }
+
+        internal override void Update(PresenceModel model)
+        {
+            Presence.Update(model);
+            GlobalUser.Update(model);
+        }
+
         private void UpdateRoles(ulong[] roleIds)
         {
             var roles = ImmutableArray.CreateBuilder<ulong>(roleIds.Length + 1);

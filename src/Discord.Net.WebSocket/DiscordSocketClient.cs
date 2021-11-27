@@ -76,6 +76,7 @@ namespace Discord.WebSocket
         internal int? HandlerTimeout { get; private set; }
         internal bool AlwaysDownloadDefaultStickers { get; private set; }
         internal bool AlwaysResolveStickers { get; private set; }
+        internal bool LogGatewayIntentWarnings { get; private set; }
         internal new DiscordSocketApiClient ApiClient => base.ApiClient;
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketGuild> Guilds => State.Guilds;
@@ -147,6 +148,7 @@ namespace Discord.WebSocket
             AlwaysDownloadUsers = config.AlwaysDownloadUsers;
             AlwaysDownloadDefaultStickers = config.AlwaysDownloadDefaultStickers;
             AlwaysResolveStickers = config.AlwaysResolveStickers;
+            LogGatewayIntentWarnings = config.LogGatewayIntentWarnings;
             HandlerTimeout = config.HandlerTimeout;
             State = new ClientState(0, 0);
             Rest = new DiscordSocketRestClient(config, ApiClient);
@@ -238,6 +240,9 @@ namespace Discord.WebSocket
 
                 _defaultStickers = builder.ToImmutable();
             }
+
+            if(LogGatewayIntentWarnings)
+                await LogGatewayIntentsWarning().ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -706,6 +711,52 @@ namespace Discord.WebSocket
                     status == UserStatus.AFK,
                     statusSince != null ? _statusSince.Value.ToUnixTimeMilliseconds() : (long?)null,
                     game);
+        }
+
+        private async Task LogGatewayIntentsWarning()
+        {
+            if(_gatewayIntents.HasFlag(GatewayIntents.GuildPresences) && !_presenceUpdated.HasSubscribers)
+            {
+                await _gatewayLogger.WarningAsync("You're using the GuildPresences intent without listening to the PresenceUpdate event, consider removing the intent from your config.").ConfigureAwait(false);
+            }
+
+            if(!_gatewayIntents.HasFlag(GatewayIntents.GuildPresences) && _presenceUpdated.HasSubscribers)
+            {
+                await _gatewayLogger.WarningAsync("You're using the PresenceUpdate event without specifying the GuildPresences intent, consider adding the intent to your config.").ConfigureAwait(false);
+            }
+
+            bool hasGuildScheduledEventsSubscribers =
+                _guildScheduledEventCancelled.HasSubscribers ||
+                _guildScheduledEventUserRemove.HasSubscribers ||
+                _guildScheduledEventCompleted.HasSubscribers ||
+                _guildScheduledEventCreated.HasSubscribers ||
+                _guildScheduledEventStarted.HasSubscribers ||
+                _guildScheduledEventUpdated.HasSubscribers ||
+                _guildScheduledEventUserAdd.HasSubscribers;
+
+            if(_gatewayIntents.HasFlag(GatewayIntents.GuildScheduledEvents) && !hasGuildScheduledEventsSubscribers)
+            {
+                await _gatewayLogger.WarningAsync("You're using the GuildScheduledEvents gateway intent without listening to any events related to that intent, consider removing the intent from your config.").ConfigureAwait(false);
+            }
+
+            if(!_gatewayIntents.HasFlag(GatewayIntents.GuildScheduledEvents) && hasGuildScheduledEventsSubscribers)
+            {
+                await _gatewayLogger.WarningAsync("You're using events related to the GuildScheduledEvents gateway intent without specifying the intent, consider adding the intent to your config.").ConfigureAwait(false);
+            }
+
+            bool hasInviteEventSubscribers =
+                _inviteCreatedEvent.HasSubscribers ||
+                _inviteDeletedEvent.HasSubscribers;
+
+            if (_gatewayIntents.HasFlag(GatewayIntents.GuildInvites) && !hasInviteEventSubscribers)
+            {
+                await _gatewayLogger.WarningAsync("You're using the GuildInvites gateway intent without listening to any events related to that intent, consider removing the intent from your config.").ConfigureAwait(false);
+            }
+
+            if (!_gatewayIntents.HasFlag(GatewayIntents.GuildInvites) && hasInviteEventSubscribers)
+            {
+                await _gatewayLogger.WarningAsync("You're using events related to the GuildInvites gateway intent without specifying the intent, consider adding the intent to your config.").ConfigureAwait(false);
+            }
         }
 
         #region ProcessMessageAsync
@@ -1858,6 +1909,8 @@ namespace Discord.WebSocket
 
                                     var data = (payload as JToken).ToObject<API.Presence>(_serializer);
 
+                                    SocketUser user = null;
+
                                     if (data.GuildId.IsSpecified)
                                     {
                                         var guild = State.GetGuild(data.GuildId.Value);
@@ -1872,7 +1925,7 @@ namespace Discord.WebSocket
                                             return;
                                         }
 
-                                        var user = guild.GetUser(data.User.Id);
+                                        user = guild.GetUser(data.User.Id);
                                         if (user == null)
                                         {
                                             if (data.Status == UserStatus.Offline)
@@ -1890,26 +1943,21 @@ namespace Discord.WebSocket
                                                 await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), globalBefore, user).ConfigureAwait(false);
                                             }
                                         }
-
-                                        var before = user.Clone();
-                                        user.Update(State, data, true);
-                                        var cacheableBefore = new Cacheable<SocketGuildUser, ulong>(before, user.Id, true, () => Task.FromResult(user));
-                                        await TimedInvokeAsync(_guildMemberUpdatedEvent, nameof(GuildMemberUpdated), cacheableBefore, user).ConfigureAwait(false);
                                     }
                                     else
                                     {
-                                        var globalUser = State.GetUser(data.User.Id);
-                                        if (globalUser == null)
+                                        user = State.GetUser(data.User.Id);
+                                        if (user == null)
                                         {
                                             await UnknownGlobalUserAsync(type, data.User.Id).ConfigureAwait(false);
                                             return;
                                         }
-
-                                        var before = globalUser.Clone();
-                                        globalUser.Update(State, data.User);
-                                        globalUser.Update(State, data);
-                                        await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), before, globalUser).ConfigureAwait(false);
                                     }
+
+                                    var before = user.Presence.Clone();
+                                    user.Update(State, data.User);
+                                    user.Update(data);
+                                    await TimedInvokeAsync(_presenceUpdated, nameof(PresenceUpdated), user, before, user.Presence).ConfigureAwait(false);
                                 }
                                 break;
                             case "TYPING_START":

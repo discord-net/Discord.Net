@@ -7,7 +7,8 @@ namespace Discord
     public static class Format
     {
         // Characters which need escaping
-        private static readonly string[] SensitiveCharacters = { "\\", "*", "_", "~", "`", "|", ">" };
+        private static readonly string[] SensitiveCharacters = {
+            "\\", "*", "_", "~", "`", ".", ":", "/", ">", "|" };
 
         /// <summary> Returns a markdown-formatted string with bold formatting. </summary>
         public static string Bold(string text) => $"**{text}**";
@@ -103,6 +104,16 @@ namespace Discord
             //Remove discord supported markdown
             var newText = Regex.Replace(text, @"(\*|_|`|~|>|\\)", "");
             return newText;
+        }
+
+        /// <summary>
+        ///     Formats a user's username + discriminator while maintaining bidirectional unicode
+        /// </summary>
+        /// <param name="user">The user whos username and discriminator to format</param>
+        /// <returns>The username + discriminator</returns>
+        public static string UsernameAndDiscriminator(IUser user)
+        {
+            return $"\u2066{user.Username}\u2069#{user.Discriminator}";
         }
     }
 }

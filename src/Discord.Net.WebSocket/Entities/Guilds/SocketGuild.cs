@@ -1144,22 +1144,29 @@ namespace Discord.WebSocket
             }
             return null;
         }
-        internal void PurgeGuildUserCache()
+
+        /// <summary>
+        ///     Purges this guild's user cache.
+        /// </summary>
+        public void PurgeUserCache() => PurgeUserCache(_ => true);
+        /// <summary>
+        ///     Purges this guild's user cache.
+        /// </summary>
+        /// <param name="predicate">The predicate used to select which users to clear.</param>
+        public void PurgeUserCache(Func<SocketGuildUser, bool> predicate)
         {
-            var members = Users;
-            var self = CurrentUser;
-            _members.Clear();
-            if (self != null)
-                _members.TryAdd(self.Id, self);
+            var membersToPurge = Users.Where(x => predicate.Invoke(x) && x?.Id != Discord.CurrentUser.Id);
+            var membersToKeep = Users.Where(x => !predicate.Invoke(x) || x?.Id == Discord.CurrentUser.Id);
+
+            foreach (var member in membersToPurge)
+                if(_members.TryRemove(member.Id, out _))
+                    member.GlobalUser.RemoveRef(Discord);
+
+            foreach (var member in membersToKeep)
+                _members.TryAdd(member.Id, member);
 
             _downloaderPromise = new TaskCompletionSource<bool>();
             DownloadedMemberCount = _members.Count;
-
-            foreach (var member in members)
-            {
-                if (member.Id != self?.Id)
-                    member.GlobalUser.RemoveRef(Discord);
-            }
         }
 
         /// <summary>
