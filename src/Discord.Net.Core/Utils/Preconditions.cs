@@ -4,7 +4,7 @@ namespace Discord
 {
     internal static class Preconditions
     {
-        //Objects
+        #region Objects
         /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
         public static void NotNull<T>(T obj, string name, string msg = null) where T : class { if (obj == null) throw CreateNotNullException(name, msg); }
         /// <exception cref="ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
@@ -15,8 +15,9 @@ namespace Discord
             if (msg == null) return new ArgumentNullException(paramName: name);
             else return new ArgumentNullException(paramName: name, message: msg);
         }
+        #endregion
 
-        //Strings
+        #region Strings
         /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
         public static void NotEmpty(string obj, string name, string msg = null) { if (obj.Length == 0) throw CreateNotEmptyException(name, msg); }
         /// <exception cref="ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
@@ -58,8 +59,9 @@ namespace Discord
 
         private static ArgumentException CreateNotEmptyException(string name, string msg)
             => new ArgumentException(message: msg ?? "Argument cannot be blank.", paramName: name);
+        #endregion
 
-        //Numerics
+        #region Numerics
         /// <exception cref="ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
         public static void NotEqual(sbyte obj, sbyte value, string name, string msg = null) { if (obj == value) throw CreateNotEqualException(name, msg, value); }
         /// <exception cref="ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
@@ -271,8 +273,9 @@ namespace Discord
 
         private static ArgumentException CreateLessThanException<T>(string name, string msg, T value)
             => new ArgumentException(message: msg ?? $"Value must be less than {value}.", paramName: name);
+        #endregion
 
-        // Bulk Delete
+        #region Bulk Delete
         /// <exception cref="ArgumentOutOfRangeException">Messages are younger than 2 weeks.</exception>
         public static void YoungerThanTwoWeeks(ulong[] collection, string name)
         {
@@ -293,5 +296,6 @@ namespace Discord
                     throw new ArgumentException(message: "The everyone role cannot be assigned to a user.", paramName: name);
             }
         }
+        #endregion
     }
 }

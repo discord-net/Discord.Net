@@ -22,8 +22,7 @@ namespace Discord.WebSocket
         private ImmutableArray<Embed> _embeds = ImmutableArray.Create<Embed>();
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
         private ImmutableArray<SocketRole> _roleMentions = ImmutableArray.Create<SocketRole>();
-        private ImmutableArray<SocketUser> _userMentions = ImmutableArray.Create<SocketUser>();
-        private ImmutableArray<Sticker> _stickers = ImmutableArray.Create<Sticker>();
+        private ImmutableArray<SocketSticker> _stickers = ImmutableArray.Create<SocketSticker>();
 
         /// <inheritdoc />
         public override bool IsTTS => _isTTS;
@@ -46,9 +45,7 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public override IReadOnlyCollection<SocketRole> MentionedRoles => _roleMentions;
         /// <inheritdoc />
-        public override IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions;
-        /// <inheritdoc />
-        public override IReadOnlyCollection<Sticker> Stickers => _stickers;
+        public override IReadOnlyCollection<SocketSticker> Stickers => _stickers;
         /// <inheritdoc />
         public IUserMessage ReferencedMessage => _referencedMessage;
 
@@ -108,32 +105,10 @@ namespace Discord.WebSocket
                     _embeds = ImmutableArray.Create<Embed>();
             }
 
-            if (model.UserMentions.IsSpecified)
-            {
-                var value = model.UserMentions.Value;
-                if (value.Length > 0)
-                {
-                    var newMentions = ImmutableArray.CreateBuilder<SocketUser>(value.Length);
-                    for (int i = 0; i < value.Length; i++)
-                    {
-                        var val = value[i];
-                        if (val.Object != null)
-                        {
-                            var user = Channel.GetUserAsync(val.Object.Id, CacheMode.CacheOnly).GetAwaiter().GetResult() as SocketUser;
-                            if (user != null)
-                                newMentions.Add(user);
-                            else
-                                newMentions.Add(SocketUnknownUser.Create(Discord, state, val.Object));
-                        }
-                    }
-                    _userMentions = newMentions.ToImmutable();
-                }
-            }
-
             if (model.Content.IsSpecified)
             {
                 var text = model.Content.Value;
-                _tags = MessageHelper.ParseTags(text, Channel, guild, _userMentions);
+                _tags = MessageHelper.ParseTags(text, Channel, guild, MentionedUsers);
                 model.Content = text;
             }
 
@@ -162,18 +137,40 @@ namespace Discord.WebSocket
                 _referencedMessage = SocketUserMessage.Create(Discord, state, refMsgAuthor, Channel, refMsg);
             }
 
-            if (model.Stickers.IsSpecified)
+            if (model.StickerItems.IsSpecified)
             {
-                var value = model.Stickers.Value;
+                var value = model.StickerItems.Value;
                 if (value.Length > 0)
                 {
-                    var stickers = ImmutableArray.CreateBuilder<Sticker>(value.Length);
+                    var stickers = ImmutableArray.CreateBuilder<SocketSticker>(value.Length);
                     for (int i = 0; i < value.Length; i++)
-                        stickers.Add(Sticker.Create(value[i]));
+                    {
+                        var stickerItem = value[i];
+                        SocketSticker sticker = null;
+
+                        if (guild != null)
+                            sticker = guild.GetSticker(stickerItem.Id);
+
+                        if (sticker == null)
+                            sticker = Discord.GetSticker(stickerItem.Id);
+
+                        // if they want to auto resolve
+                        if (Discord.AlwaysResolveStickers)
+                        {
+                            sticker = Task.Run(async () => await Discord.GetStickerAsync(stickerItem.Id).ConfigureAwait(false)).GetAwaiter().GetResult();
+                        }
+
+                        // if its still null, create an unknown
+                        if (sticker == null)
+                            sticker = SocketUnknownSticker.Create(Discord, stickerItem);
+
+                        stickers.Add(sticker);
+                    }
+
                     _stickers = stickers.ToImmutable();
                 }
                 else
-                    _stickers = ImmutableArray.Create<Sticker>();
+                    _stickers = ImmutableArray.Create<SocketSticker>();
             }
         }
 

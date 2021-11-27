@@ -1,3 +1,5 @@
+using System;
+
 namespace Discord
 {
     /// <summary>
@@ -62,5 +64,9 @@ namespace Discord
         ///     <c>true</c> if the user is streaming; otherwise <c>false</c>.
         /// </returns>
         bool IsStreaming { get; }
+        /// <summary>
+        ///     Gets the time on which the user requested to speak.
+        /// </summary>
+        DateTimeOffset? RequestToSpeakTimestamp { get; }
     }
 }

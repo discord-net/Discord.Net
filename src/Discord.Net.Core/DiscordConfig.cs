@@ -94,6 +94,13 @@ namespace Discord
         ///     The maximum number of users that can be gotten per-batch.
         /// </returns>
         public const int MaxUsersPerBatch = 1000;
+        /// <summary>
+        ///     Returns the max users allowed to be in a request for guild event users.
+        /// </summary>
+        /// <returns>
+        ///     The maximum number of users that can be gotten per-batch.
+        /// </returns>
+        public const int MaxGuildEventUsersPerBatch = 100;
         /// <summary> 
         ///     Returns the max guilds allowed to be in a request. 
         /// </summary>
@@ -158,5 +165,17 @@ namespace Discord
 		///		clock. Your system will still need a stable clock.
 		/// </remarks>
 		public bool UseSystemClock { get; set; } = true;
+
+        /// <summary>
+        ///     Gets or sets whether or not the internal experation check uses the system date
+        ///     + snowflake date to check if an interaction can be responded to.
+        /// </summary>
+        /// <remarks>
+        ///     If set to <see langword="false"/> then the CreatedAt property in an interaction
+        ///     will be set to when it was received instead of the snowflakes date.
+        ///     <br/>
+        ///     <b>This will still require a stable clock on your system.</b>
+        /// </remarks>
+        public bool UseInteractionSnowflakeDate { get; set; } = true;
     }
 }

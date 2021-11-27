@@ -33,6 +33,5 @@ namespace Discord.Rest
         {
             await client.ApiClient.DeleteWebhookAsync(webhook.Id, options).ConfigureAwait(false);
         }
-
     }
 }

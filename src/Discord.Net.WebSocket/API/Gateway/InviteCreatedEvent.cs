@@ -19,7 +19,7 @@ namespace Discord.API.Gateway
         [JsonProperty("guild_id")]
         public ulong? GuildID { get; set; }
         [JsonProperty("inviter")]
-        public Optional<User> inviter { get; set; }
+        public Optional<User> Inviter { get; set; }
         [JsonProperty("max_age")]
         public int RawAge { get; set; }
         [JsonProperty("max_uses")]

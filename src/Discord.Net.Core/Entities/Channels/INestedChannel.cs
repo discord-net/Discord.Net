@@ -60,14 +60,7 @@ namespace Discord
         /// <summary>
         ///     Creates a new invite to this channel.
         /// </summary>
-        /// <example>
-        ///     <para>The following example creates a new invite to this channel; the invite lasts for 12 hours and can only
-        ///     be used 3 times throughout its lifespan.</para>
-        ///     <code language="cs">
-        ///     await guildChannel.CreateInviteAsync(maxAge: 43200, maxUses: 3);
-        ///     </code>
-        /// </example>
-        /// <param name="applicationId">The id of the embedded application to open for this invite</param>
+        /// <param name="applicationId">The id of the embedded application to open for this invite.</param>
         /// <param name="maxAge">The time (in seconds) until the invite expires. Set to <c>null</c> to never expire.</param>
         /// <param name="maxUses">The max amount of times this invite may be used. Set to <c>null</c> to have unlimited uses.</param>
         /// <param name="isTemporary">If <c>true</c>, the user accepting this invite will be kicked from the guild after closing their client.</param>
@@ -82,6 +75,21 @@ namespace Discord
         /// <summary>
         ///     Creates a new invite to this channel.
         /// </summary>
+        /// <param name="application">The application to open for this invite.</param>
+        /// <param name="maxAge">The time (in seconds) until the invite expires. Set to <c>null</c> to never expire.</param>
+        /// <param name="maxUses">The max amount of times this invite may be used. Set to <c>null</c> to have unlimited uses.</param>
+        /// <param name="isTemporary">If <c>true</c>, the user accepting this invite will be kicked from the guild after closing their client.</param>
+        /// <param name="isUnique">If <c>true</c>, don't try to reuse a similar invite (useful for creating many unique one time use invites).</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous invite creation operation. The task result contains an invite
+        ///     metadata object containing information for the created invite.
+        /// </returns>
+        Task<IInviteMetadata> CreateInviteToApplicationAsync(DefaultApplications application, int? maxAge = 86400, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null);
+
+        /// <summary>
+        ///     Creates a new invite to this channel.
+        /// </summary>
         /// <example>
         ///     <para>The following example creates a new invite to this channel; the invite lasts for 12 hours and can only
         ///     be used 3 times throughout its lifespan.</para>
@@ -89,7 +97,7 @@ namespace Discord
         ///     await guildChannel.CreateInviteAsync(maxAge: 43200, maxUses: 3);
         ///     </code>
         /// </example>
-        /// <param name="user">The id of the user whose stream to display for this invite</param>
+        /// <param name="user">The id of the user whose stream to display for this invite.</param>
         /// <param name="maxAge">The time (in seconds) until the invite expires. Set to <c>null</c> to never expire.</param>
         /// <param name="maxUses">The max amount of times this invite may be used. Set to <c>null</c> to have unlimited uses.</param>
         /// <param name="isTemporary">If <c>true</c>, the user accepting this invite will be kicked from the guild after closing their client.</param>

@@ -1,3 +1,4 @@
+using Discord.API;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -5,6 +6,7 @@ using System;
 using System.Diagnostics;
 #endif
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -65,7 +67,9 @@ namespace Discord.Net.Queue
                 try
                 {
                     var response = await request.SendAsync().ConfigureAwait(false);
-                    info = new RateLimitInfo(response.Headers);
+                    info = new RateLimitInfo(response.Headers, request.Endpoint);
+
+                    request.Options.ExecuteRatelimitCallback(info);
 
                     if (response.StatusCode < (HttpStatusCode)200 || response.StatusCode >= (HttpStatusCode)300)
                     {
@@ -97,8 +101,7 @@ namespace Discord.Net.Queue
 
                                 continue; //Retry
                             default:
-                                int? code = null;
-                                string reason = null;
+                                API.DiscordError error = null;
                                 if (response.Stream != null)
                                 {
                                     try
@@ -106,14 +109,14 @@ namespace Discord.Net.Queue
                                         using (var reader = new StreamReader(response.Stream))
                                         using (var jsonReader = new JsonTextReader(reader))
                                         {
-                                            var json = JToken.Load(jsonReader);
-                                            try { code = json.Value<int>("code"); } catch { };
-                                            try { reason = json.Value<string>("message"); } catch { };
+                                            error = Discord.Rest.DiscordRestClient.Serializer.Deserialize<API.DiscordError>(jsonReader);
                                         }
                                     }
                                     catch { }
                                 }
-                                throw new HttpException(response.StatusCode, request, code, reason);
+                                throw new HttpException(response.StatusCode, request, error?.Code, error.Message, error.Errors.IsSpecified
+                                    ? error.Errors.Value.Select(x => new DiscordJsonError(x.Name.GetValueOrDefault("root"), x.Errors.Select(y => new DiscordError(y.Code, y.Message)).ToArray())).ToArray()
+                                    : null);
                         }
                     }
                     else
@@ -351,7 +354,7 @@ namespace Discord.Net.Queue
                 if (info.Limit.HasValue && WindowCount != info.Limit.Value)
                 {
                     WindowCount = info.Limit.Value;
-                    _semaphore = info.Remaining.Value;
+                    _semaphore = is429 ? 0 : info.Remaining.Value;
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Upgraded Semaphore to {info.Remaining.Value}/{WindowCount}");
 #endif
@@ -368,12 +371,12 @@ namespace Discord.Net.Queue
                 if (info.RetryAfter.HasValue)
                 {
                     //RetryAfter is more accurate than Reset, where available
-                    resetTick = DateTimeOffset.UtcNow.AddMilliseconds(info.RetryAfter.Value);
+                    resetTick = DateTimeOffset.UtcNow.AddSeconds(info.RetryAfter.Value);
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Retry-After: {info.RetryAfter.Value} ({info.RetryAfter.Value} ms)");
 #endif
                 }
-                else if (info.ResetAfter.HasValue && (request.Options.UseSystemClock.HasValue ? !request.Options.UseSystemClock.Value : false))
+                else if (info.ResetAfter.HasValue && (request.Options.UseSystemClock.HasValue && !request.Options.UseSystemClock.Value))
                 {
                     resetTick = DateTimeOffset.UtcNow.Add(info.ResetAfter.Value);
 #if DEBUG_LIMITS
@@ -431,7 +434,7 @@ namespace Discord.Net.Queue
                 if (!hasQueuedReset || resetTick > _resetTick)
                 {
                     _resetTick = resetTick;
-                    LastAttemptAt = resetTick.Value; //Make sure we dont destroy this until after its been reset
+                    LastAttemptAt = resetTick.Value; //Make sure we don't destroy this until after its been reset
 #if DEBUG_LIMITS
                     Debug.WriteLine($"[{id}] Reset in {(int)Math.Ceiling((resetTick - DateTimeOffset.UtcNow).Value.TotalMilliseconds)} ms");
 #endif
@@ -452,7 +455,7 @@ namespace Discord.Net.Queue
                 lock (_lock)
                 {
                     millis = (int)Math.Ceiling((_resetTick.Value - DateTimeOffset.UtcNow).TotalMilliseconds);
-                    if (millis <= 0) //Make sure we havent gotten a more accurate reset time
+                    if (millis <= 0) //Make sure we haven't gotten a more accurate reset time
                     {
 #if DEBUG_LIMITS
                         Debug.WriteLine($"[{id}] * Reset *");

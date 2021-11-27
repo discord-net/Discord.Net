@@ -16,7 +16,7 @@ namespace Discord.Commands
     ///     <code language="cs">
     ///     [Command("stats")]
     ///     [Alias("stat", "info")]
-    ///     public async Task GetStatsAsync(IUser user)
+    ///     public <see langword="async"/> Task GetStatsAsync(IUser user)
     ///     {
     ///         // ...pull stats
     ///     }

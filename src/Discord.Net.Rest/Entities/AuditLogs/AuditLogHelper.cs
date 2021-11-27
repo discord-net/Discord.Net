@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Model = Discord.API.AuditLog;
@@ -51,6 +51,7 @@ namespace Discord.Rest
             [ActionType.MessageBulkDeleted] = MessageBulkDeleteAuditLogData.Create,
             [ActionType.MessagePinned] = MessagePinAuditLogData.Create,
             [ActionType.MessageUnpinned] = MessageUnpinAuditLogData.Create,
+
         };
 
         public static IAuditLogData CreateData(BaseDiscordClient discord, Model log, EntryModel entry)

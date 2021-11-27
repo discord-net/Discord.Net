@@ -116,7 +116,7 @@ namespace Discord.Commands
                         builder.AddAliases(alias.Aliases);
                         break;
                     case GroupAttribute group:
-                        builder.Name = builder.Name ?? group.Prefix;
+                        builder.Name ??= group.Prefix;
                         builder.Group = group.Prefix;
                         builder.AddAliases(group.Prefix);
                         break;
@@ -158,7 +158,7 @@ namespace Discord.Commands
                     case CommandAttribute command:
                         builder.AddAliases(command.Text);
                         builder.RunMode = command.RunMode;
-                        builder.Name = builder.Name ?? command.Text;
+                        builder.Name ??= command.Text;
                         builder.IgnoreExtraArgs = command.IgnoreExtraArgs ?? service._ignoreExtraArgs;
                         break;
                     case NameAttribute name:
@@ -291,7 +291,7 @@ namespace Discord.Commands
                     return reader;
             }
 
-            //We dont have a cached type reader, create one
+            //We don't have a cached type reader, create one
             reader = ReflectionUtils.CreateObject<TypeReader>(typeReaderType.GetTypeInfo(), service, services);
             service.AddTypeReader(paramType, reader, false);
 

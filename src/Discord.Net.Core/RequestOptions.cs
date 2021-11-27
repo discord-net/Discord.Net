@@ -1,5 +1,7 @@
 using Discord.Net;
+using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -14,10 +16,10 @@ namespace Discord
         public static RequestOptions Default => new RequestOptions();
 
         /// <summary>
-        ///     Gets or sets the maximum time to wait for for this request to complete.
+        ///     Gets or sets the maximum time to wait for this request to complete.
         /// </summary>
         /// <remarks>
-        ///     Gets or set the max time, in milliseconds, to wait for for this request to complete. If 
+        ///     Gets or set the max time, in milliseconds, to wait for this request to complete. If 
         ///     <c>null</c>, a request will not time out. If a rate limit has been triggered for this request's bucket
         ///     and will not be unpaused in time, this request will fail immediately.
         /// </remarks>
@@ -57,6 +59,11 @@ namespace Discord
 		/// </remarks>
 		public bool? UseSystemClock { get; set; }
 
+        /// <summary>
+        ///     Gets or sets the callback to execute regarding ratelimits for this request.
+        /// </summary>
+        public Func<IRateLimitInfo, Task> RatelimitCallback { get; set; }
+
         internal bool IgnoreState { get; set; }
         internal BucketId BucketId { get; set; }
         internal bool IsClientBucket { get; set; }
@@ -69,6 +76,17 @@ namespace Discord
                 return new RequestOptions();
             else
                 return options.Clone();
+        }
+
+        internal void ExecuteRatelimitCallback(IRateLimitInfo info)
+        {
+            if (RatelimitCallback != null)
+            {
+                _ = Task.Run(async () =>
+                {
+                    await RatelimitCallback(info);
+                });
+            }
         }
 
         /// <summary>

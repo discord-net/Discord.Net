@@ -1,4 +1,3 @@
-﻿#pragma warning disable CS1591
 using System;
 
 namespace Discord.API

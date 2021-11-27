@@ -54,7 +54,7 @@ namespace _03_sharded_client.Services
             if (!command.IsSpecified)
                 return;
 
-            // the command was succesful, we don't care about this result, unless we want to log that a command succeeded.
+            // the command was successful, we don't care about this result, unless we want to log that a command succeeded.
             if (result.IsSuccess)
                 return;
 
