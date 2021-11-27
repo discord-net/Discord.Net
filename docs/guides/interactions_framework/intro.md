@@ -347,7 +347,7 @@ Time it takes to create a module instance and execute a `Task.Delay(0)` method u
 
 ## Registering Commands to Discord
 
-Application commands loaded to the Interaciton Service can be registered to Discord using a number of different methods. In most cases `RegisterCommandsGloballyAsync()` and `RegisterCommandsToGuildAsync()` are the methods to use. Command registration methods can only be used after the gateway client is ready or the rest client is logged in.
+Application commands loaded to the Interaction Service can be registered to Discord using a number of different methods. In most cases `RegisterCommandsGloballyAsync()` and `RegisterCommandsToGuildAsync()` are the methods to use. Command registration methods can only be used after the gateway client is ready or the rest client is logged in.
 
 In debug environment, since Global commands can take up to 1 hour to register/update, you should register your commands to a test guild for your changes to take effect immediately. You can use the preprocessor directives to create a simple logic for registering commands:
 
