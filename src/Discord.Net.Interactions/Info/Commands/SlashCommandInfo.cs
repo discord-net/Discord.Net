@@ -81,7 +81,10 @@ namespace Discord.Interactions
                         var readResult = await typeConverter.ReadAsync(context, arg, services).ConfigureAwait(false);
 
                         if (!readResult.IsSuccess)
+                        {
+                            await InvokeModuleEvent(context, readResult).ConfigureAwait(false);
                             return readResult;
+                        }
 
                         args[i] = readResult.Value;
                     }
