@@ -8,6 +8,7 @@ namespace Discord.Commands.Builders
     public class ModuleBuilder
     {
         #region ModuleBuilder
+        private string _group;
         private readonly List<CommandBuilder> _commands;
         private readonly List<ModuleBuilder> _submodules;
         private readonly List<PreconditionAttribute> _preconditions;
@@ -19,7 +20,14 @@ namespace Discord.Commands.Builders
         public string Name { get; set; }
         public string Summary { get; set; }
         public string Remarks { get; set; }
-        public string Group { get; set; }
+        public string Group { get => _group;
+            set
+            {
+                _aliases.Remove(_group);
+                _group = value;
+                AddAliases(value);
+            }
+        }
 
         public IReadOnlyList<CommandBuilder> Commands => _commands;
         public IReadOnlyList<ModuleBuilder> Modules => _submodules;
