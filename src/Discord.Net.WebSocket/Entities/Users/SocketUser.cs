@@ -56,10 +56,10 @@ namespace Discord.WebSocket
         internal SocketUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)
         {
-            Presence = new SocketPresence();
         }
         internal virtual bool Update(ClientState state, Model model)
         {
+            Presence ??= new SocketPresence();
             bool hasChanges = false;
             if (model.Avatar.IsSpecified && model.Avatar.Value != AvatarId)
             {
