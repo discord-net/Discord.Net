@@ -48,7 +48,7 @@ async Task SlashCommandExecuted (SlashCommandInfo arg1, Discord.IInteractionCont
                         await arg2.Interaction.RespondAsync("Invalid number or arguments");
                         break;
                     case InteractionCommandError.Exception:
-                        await arg2.Interaction.RespondAsync("Command exception:{arg3.ErrorReason}");
+                        await arg2.Interaction.RespondAsync($"Command exception:{arg3.ErrorReason}");
                         break;
                     case InteractionCommandError.Unsuccessful:
                         await arg2.Interaction.RespondAsync("Command could not be executed");
