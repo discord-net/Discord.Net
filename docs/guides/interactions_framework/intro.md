@@ -315,7 +315,7 @@ You can also manually add Interaction modules using the `InteractionService.AddM
 
 ## Resolving Module Dependencies
 
-Module dependencies are resolved using the Constructor Injection and Property Injection patterns. Meaning, the constructor parameters and public settable properties of a module will be assigned using the `IServiceProvider`. For more information on dependency injection, check out [Dependency Injection](.\dependency-injection)
+Module dependencies are resolved using the Constructor Injection and Property Injection patterns. Meaning, the constructor parameters and public settable properties of a module will be assigned using the `IServiceProvider`. For more information on dependency injection, check out [Dependency Injection](./dependency-injection.md)
 
 ## Module Groups
 
