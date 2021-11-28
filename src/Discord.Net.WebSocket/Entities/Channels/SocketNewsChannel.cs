@@ -35,5 +35,13 @@ namespace Discord.WebSocket
         /// </remarks>
         public override int SlowModeInterval
             => throw new NotSupportedException("News channels do not support Slow Mode.");
+
+        /// <summary>
+        ///     <b>News channels do not support thread creation with bots.</b>
+        /// </summary>
+        /// <inheritdoc/>
+        /// <exception cref="NotSupportedException"></exception>
+        public override Task<SocketThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread, ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null)
+            => throw new NotSupportedException("Cannot create threads in News channels");
     }
 }
