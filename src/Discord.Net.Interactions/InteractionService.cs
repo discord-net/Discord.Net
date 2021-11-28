@@ -358,21 +358,19 @@ namespace Discord.Interactions
         /// </summary>
         /// <remarks>
         ///     Commands will be registered as standalone commands, if you want the <see cref="GroupAttribute"/> to take effect,
-        ///     use <see cref="AddModulesToGuildAsync(IGuild, ModuleInfo[])"/>.
+        ///     use <see cref="AddModulesToGuildAsync(IGuild, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
         /// </remarks>
         /// <param name="guild">The target guild.</param>
         /// <param name="commands">Commands to be registered to Discord.</param>
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
         /// </returns>
-        public async Task<IReadOnlyCollection<RestGuildCommand>> AddCommandsToGuildAsync (IGuild guild, params IApplicationCommandInfo[] commands)
+        public async Task<IReadOnlyCollection<RestGuildCommand>> AddCommandsToGuildAsync(IGuild guild, bool deleteMissing = false, params ICommandInfo[] commands)
         {
             EnsureClientReady();
 
             if (guild is null)
                 throw new ArgumentNullException(nameof(guild));
-
-            var existing = await RestClient.GetGuildApplicationCommands(guild.Id).ConfigureAwait(false);
 
             var props = new List<ApplicationCommandProperties>();
 
@@ -391,9 +389,10 @@ namespace Discord.Interactions
                 }
             }
 
-            if (existing != null)
+            if (!deleteMissing)
             {
-                var missing = existing.Where(oldCommand => !props.Any(newCommand => newCommand.Name.IsSpecified && newCommand.Name.Value == oldCommand.Name));
+                var existing = await RestClient.GetGuildApplicationCommands(guild.Id).ConfigureAwait(false);
+                var missing = existing.Where(x => !props.Any(y => y.Name.IsSpecified && y.Name.Value == x.Name));
                 props.AddRange(missing.Select(x => x.ToApplicationCommandProps()));
             }
 
@@ -408,20 +407,88 @@ namespace Discord.Interactions
         /// <returns>
         ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
         /// </returns>
-        public async Task<IReadOnlyCollection<RestGuildCommand>> AddModulesToGuildAsync (IGuild guild, params ModuleInfo[] modules)
+        public async Task<IReadOnlyCollection<RestGuildCommand>> AddModulesToGuildAsync(IGuild guild, bool deleteMissing = false, params ModuleInfo[] modules)
         {
             EnsureClientReady();
 
             if (guild is null)
                 throw new ArgumentNullException(nameof(guild));
 
-            var existing = await RestClient.GetGuildApplicationCommands(guild.Id).ConfigureAwait(false);
             var props = modules.SelectMany(x => x.ToApplicationCommandProps(true)).ToList();
 
-            foreach (var command in existing)
-                props.Add(command.ToApplicationCommandProps());
+            if (!deleteMissing)
+            {
+                var existing = await RestClient.GetGuildApplicationCommands(guild.Id).ConfigureAwait(false);
+                var missing = existing.Where(x => !props.Any(y => y.Name.IsSpecified && y.Name.Value == x.Name));
+                props.AddRange(missing.Select(x => x.ToApplicationCommandProps()));
+            }
 
             return await RestClient.BulkOverwriteGuildCommands(props.ToArray(), guild.Id).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Register Application Commands from modules provided in <paramref name="modules"/> as global commands. 
+        /// </summary>
+        /// <param name="modules">Modules to be registered to Discord.</param>
+        /// <returns>
+        ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestGlobalCommand>> AddModulesGloballyAsync(bool deleteMissing = false, params ModuleInfo[] modules)
+        {
+            EnsureClientReady();
+
+            var props = modules.SelectMany(x => x.ToApplicationCommandProps(true)).ToList();
+
+            if (!deleteMissing)
+            {
+                var existing = await RestClient.GetGlobalApplicationCommands().ConfigureAwait(false);
+                var missing = existing.Where(x => !props.Any(y => y.Name.IsSpecified && y.Name.Value == x.Name));
+                props.AddRange(missing.Select(x => x.ToApplicationCommandProps()));
+            }
+
+            return await RestClient.BulkOverwriteGlobalCommands(props.ToArray()).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Register Application Commands from <paramref name="commands"/> as global commands.
+        /// </summary>
+        /// <remarks>
+        ///     Commands will be registered as standalone commands, if you want the <see cref="GroupAttribute"/> to take effect,
+        ///     use <see cref="AddModulesToGuildAsync(IGuild, ModuleInfo[])"/>. Registering a commands without group names might cause the command traversal to fail.
+        /// </remarks>
+        /// <param name="commands">Commands to be registered to Discord.</param>
+        /// <returns>
+        ///     A task representing the command registration process. The task result contains the active application commands of the target guild.
+        /// </returns>
+        public async Task<IReadOnlyCollection<RestGlobalCommand>> AddCommandsGloballyAsync(bool deleteMissing = false, params IApplicationCommandInfo[] commands)
+        {
+            EnsureClientReady();
+
+            var props = new List<ApplicationCommandProperties>();
+
+            foreach (var command in commands)
+            {
+                switch (command)
+                {
+                    case SlashCommandInfo slashCommand:
+                        props.Add(slashCommand.ToApplicationCommandProps());
+                        break;
+                    case ContextCommandInfo contextCommand:
+                        props.Add(contextCommand.ToApplicationCommandProps());
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Command type {command.GetType().FullName} isn't supported yet");
+                }
+            }
+
+            if (!deleteMissing)
+            {
+                var existing = await RestClient.GetGlobalApplicationCommands().ConfigureAwait(false);
+                var missing = existing.Where(x => !props.Any(y => y.Name.IsSpecified && y.Name.Value == x.Name));
+                props.AddRange(missing.Select(x => x.ToApplicationCommandProps()));
+            }
+
+            return await RestClient.BulkOverwriteGlobalCommands(props.ToArray()).ConfigureAwait(false);
         }
 
         private void LoadModuleInternal (ModuleInfo module)
