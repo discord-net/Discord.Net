@@ -21,6 +21,9 @@ namespace Discord.Rest
             if (type == ThreadType.PrivateThread && !features.HasFeature(GuildFeature.PrivateThreads))
                 throw new ArgumentException($"The guild {channel.Guild.Name} does not have the PRIVATE_THREADS feature!", nameof(type));
 
+            if (channel is INewsChannel && type != ThreadType.NewsThread)
+                throw new ArgumentException($"{nameof(type)} must be a {ThreadType.NewsThread} in News channels");
+
             var args = new StartThreadParams
             {
                 Name = name,
