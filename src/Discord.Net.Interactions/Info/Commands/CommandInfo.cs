@@ -132,13 +132,13 @@ namespace Discord.Interactions
                 case RunMode.Sync:
                     {
                         using var scope = services?.CreateScope();
-                        return await ExecuteInternalAsync(context, args, scope.ServiceProvider ?? EmptyServiceProvider.Instance).ConfigureAwait(false);
+                        return await ExecuteInternalAsync(context, args, scope?.ServiceProvider ?? EmptyServiceProvider.Instance).ConfigureAwait(false);
                     }
                 case RunMode.Async:
                     _ = Task.Run(async () =>
                     {
                         using var scope = services?.CreateScope();
-                        await ExecuteInternalAsync(context, args, scope.ServiceProvider ?? EmptyServiceProvider.Instance).ConfigureAwait(false);
+                        await ExecuteInternalAsync(context, args, scope?.ServiceProvider ?? EmptyServiceProvider.Instance).ConfigureAwait(false);
                     });
                     break;
                 default:
