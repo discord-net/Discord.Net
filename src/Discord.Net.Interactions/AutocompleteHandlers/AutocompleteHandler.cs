@@ -19,7 +19,11 @@ namespace Discord.Interactions
         public abstract Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter,
             IServiceProvider services);
 
-        protected abstract string GetLogString(IInteractionContext context);
+        protected virtual string GetLogString(IInteractionContext context)
+        {
+            var interaction = (context.Interaction as IAutocompleteInteraction);
+            return $"{interaction.Data.CommandName}: {interaction.Data.Current.Name} Autocomplete";
+        }
 
         /// <inheritdoc/>
         public async Task<IResult> ExecuteAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter,
