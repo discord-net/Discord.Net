@@ -427,7 +427,7 @@ namespace Discord.Rest
         {
             result ??= Array.Empty<AutocompleteResult>();
 
-            Preconditions.AtMost(result.Count(), 20, nameof(result), "A maximum of 20 choices are allowed!");
+            Preconditions.AtMost(result.Count(), 25, nameof(result), "A maximum of 25 choices are allowed!");
 
             var apiArgs = new InteractionResponse
             {
