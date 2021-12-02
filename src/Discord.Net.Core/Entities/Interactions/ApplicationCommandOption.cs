@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Discord
@@ -28,6 +29,9 @@ namespace Discord
 
                 if (!Regex.IsMatch(value, @"^[\w-]{1,32}$"))
                     throw new FormatException($"{nameof(value)} must match the regex ^[\\w-]{{1,32}}$");
+
+                if (value.Any(x => char.IsUpper(x)))
+                    throw new FormatException("Name cannot contain any uppercase characters.");
 
                 _name = value;
             }
