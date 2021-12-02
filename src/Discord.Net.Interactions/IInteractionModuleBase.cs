@@ -1,7 +1,14 @@
 namespace Discord.Interactions
 {
-    internal interface IInteractionModuleBase
+    /// <summary>
+    ///     Represents a generic interaction module base.
+    /// </summary>
+    public interface IInteractionModuleBase
     {
+        /// <summary>
+        ///     Sets the context of this module.
+        /// </summary>
+        /// <param name="context"></param>
         void SetContext (IInteractionContext context);
 
         /// <summary>
