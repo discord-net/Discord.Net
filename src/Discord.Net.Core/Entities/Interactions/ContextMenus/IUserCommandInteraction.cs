@@ -3,7 +3,7 @@ namespace Discord
     /// <summary>
     ///     Represents a User Command interaction.
     /// </summary>
-    public interface IUserCommandInteraction : IDiscordInteraction
+    public interface IUserCommandInteraction : IApplicationCommandInteraction
     {
         /// <summary>
         ///     Gets the data associated with this interaction.

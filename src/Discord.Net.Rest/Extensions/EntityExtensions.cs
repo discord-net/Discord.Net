@@ -170,5 +170,48 @@ namespace Discord.Rest
         {
             return new Overwrite(model.TargetId, model.TargetType, new OverwritePermissions(model.Allow, model.Deny));
         }
+
+        public static API.Message ToMessage(this API.InteractionResponse model, IDiscordInteraction interaction)
+        {
+            if (model.Data.IsSpecified)
+            {
+                var data = model.Data.Value;
+                var messageModel = new API.Message
+                {
+                    IsTextToSpeech = data.TTS,
+                    Content = data.Content,
+                    Embeds = data.Embeds,
+                    AllowedMentions = data.AllowedMentions,
+                    Components = data.Components,
+                    Flags = data.Flags,
+                };
+
+                if(interaction is IApplicationCommandInteraction command)
+                {
+                    messageModel.Interaction = new API.MessageInteraction
+                    {
+                        Id = command.Id,
+                        Name = command.Data.Name,
+                        Type = InteractionType.ApplicationCommand,
+                        User = new API.User
+                        {
+                            Username = command.User.Username,
+                            Avatar = command.User.AvatarId,
+                            Bot = command.User.IsBot,
+                            Discriminator = command.User.Discriminator,
+                            PublicFlags = command.User.PublicFlags.HasValue ? command.User.PublicFlags.Value : Optional<UserProperties>.Unspecified,
+                            Id = command.User.Id,
+                        }
+                    };
+                }
+
+                return messageModel;
+            }
+
+            return new API.Message
+            {
+                Id = interaction.Id,
+            };
+        }
     }
 }

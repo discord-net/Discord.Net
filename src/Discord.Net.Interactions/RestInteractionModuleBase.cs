@@ -53,7 +53,7 @@ namespace Discord.Interactions
             if (Context.Interaction is not RestInteraction restInteraction)
                 throw new InvalidOperationException($"Invalid interaction type. Interaction must be a type of {nameof(RestInteraction)} in order to execute this method");
 
-            await InteractionService._restResponseCallback(Context, restInteraction.Respond(text, embeds, isTTS, ephemeral, allowedMentions, options, component, embed)).ConfigureAwait(false);
+            await InteractionService._restResponseCallback(Context, restInteraction.Respond(text, embeds, isTTS, ephemeral, allowedMentions, component, embed, options)).ConfigureAwait(false);
         }
     }
 }
