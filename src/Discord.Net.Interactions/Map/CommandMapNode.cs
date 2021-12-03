@@ -31,9 +31,9 @@ namespace Discord.Interactions
                 _wildCardStr = wildCardExp;
         }
 
-        public void AddCommand (string[] keywords, int index, T commandInfo)
+        public void AddCommand (IList<string> keywords, int index, T commandInfo)
         {
-            if (keywords.Length == index + 1)
+            if (keywords.Count == index + 1)
             {
                 if (commandInfo.SupportsWildCards && commandInfo.Name.Contains(_wildCardStr))
                 {
@@ -46,7 +46,7 @@ namespace Discord.Interactions
                 }
                 else
                 {
-                    if (!_commands.TryAdd(commandInfo.Name, commandInfo))
+                    if (!_commands.TryAdd(keywords[index], commandInfo))
                         throw new InvalidOperationException($"A {typeof(T).FullName} already exists with the same name: {string.Join(" ", keywords)}");
                 }
             }
@@ -57,9 +57,9 @@ namespace Discord.Interactions
             }
         }
 
-        public bool RemoveCommand (string[] keywords, int index)
+        public bool RemoveCommand (IList<string> keywords, int index)
         {
-            if (keywords.Length == index + 1)
+            if (keywords.Count == index + 1)
                 return _commands.TryRemove(keywords[index], out var _);
             else
             {
@@ -70,11 +70,11 @@ namespace Discord.Interactions
             }
         }
 
-        public SearchResult<T> GetCommand (string[] keywords, int index)
+        public SearchResult<T> GetCommand (IList<string> keywords, int index)
         {
             string name = string.Join(" ", keywords);
 
-            if (keywords.Length == index + 1)
+            if (keywords.Count == index + 1)
             {
                 if (_commands.TryGetValue(keywords[index], out var cmd))
                     return SearchResult<T>.FromSuccess(name, cmd);

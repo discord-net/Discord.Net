@@ -13,7 +13,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     The name of the executed command and its parents in hierarchical order.
         /// </returns>
-        public static string[] GetCommandKeywords(this IApplicationCommandInteractionData data)
+        public static IList<string> GetCommandKeywords(this IApplicationCommandInteractionData data)
         {
             var keywords = new List<string> { data.Name };
 
@@ -25,7 +25,7 @@ namespace Discord.WebSocket
                 child = child.Options?.ElementAtOrDefault(0);
             }
 
-            return keywords.ToArray();
+            return keywords;
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     The name of the executed command and its parents in hierarchical order.
         /// </returns>
-        public static string[] GetCommandKeywords(this IAutocompleteInteractionData data)
+        public static IList<string> GetCommandKeywords(this IAutocompleteInteractionData data)
         {
             var keywords = new List<string> { data.CommandName };
 
@@ -47,7 +47,7 @@ namespace Discord.WebSocket
             if (subcommand is not null)
                 keywords.Add(subcommand.Name);
 
-            return keywords.ToArray();
+            return keywords;
         }
     }
 }

@@ -64,23 +64,26 @@ namespace Discord.Interactions
                 return $"Autocomplete Command: \"{base.ToString()}\" for {context.User} in {context.Channel}";
         }
 
-        internal string[] GetCommandKeywords()
+        internal IList<string> GetCommandKeywords()
         {
             var keywords = new List<string>() { ParameterName, CommandName };
 
-            var currentParent = Module;
-
-            while (currentParent != null)
+            if(!IgnoreGroupNames)
             {
-                if (!string.IsNullOrEmpty(currentParent.SlashGroupName))
-                    keywords.Add(currentParent.SlashGroupName);
+                var currentParent = Module;
 
-                currentParent = currentParent.Parent;
+                while (currentParent != null)
+                {
+                    if (!string.IsNullOrEmpty(currentParent.SlashGroupName))
+                        keywords.Add(currentParent.SlashGroupName);
+
+                    currentParent = currentParent.Parent;
+                }
             }
 
             keywords.Reverse();
 
-            return keywords.ToArray();
+            return keywords;
         }
     }
 }

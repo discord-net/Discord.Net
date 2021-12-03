@@ -40,7 +40,7 @@ namespace Discord.Interactions
         /// <summary>
         ///     Gets whether this parameter is configured for Autocomplete Interactions.
         /// </summary>
-        public bool IsAutocomplete => AutocompleteHandler is not null;
+        public bool IsAutocomplete { get; }
 
         /// <summary>
         ///     Gets the Discord option type this parameter represents.
@@ -64,6 +64,7 @@ namespace Discord.Interactions
             Description = builder.Description;
             MaxValue = builder.MaxValue;
             MinValue = builder.MinValue;
+            IsAutocomplete = builder.Autocomplete;
             Choices = builder.Choices.ToImmutableArray();
             ChannelTypes = builder.ChannelTypes.ToImmutableArray();
         }

@@ -505,7 +505,7 @@ namespace Discord.Interactions
                 _componentCommandMap.AddCommand(interaction, interaction.IgnoreGroupNames);
 
             foreach (var command in module.AutocompleteCommands)
-                _autocompleteCommandMap.AddCommand(command, command.IgnoreGroupNames);
+                _autocompleteCommandMap.AddCommand(command.GetCommandKeywords(), command);
 
             foreach (var subModule in module.SubModules)
                 LoadModuleInternal(subModule);
@@ -675,10 +675,12 @@ namespace Discord.Interactions
                 {
                     var parameter = autocompleteHandlerResult.Command.Parameters.FirstOrDefault(x => string.Equals(x.Name, interaction.Data.Current.Name, StringComparison.Ordinal));
 
-                    if(parameter is not null)
+                    if(parameter?.AutocompleteHandler is not null)
                         return await parameter.AutocompleteHandler.ExecuteAsync(context, interaction, parameter, services).ConfigureAwait(false);
                 }
             }
+
+            keywords.Add(interaction.Data.Current.Name);
 
             var commandResult = _autocompleteCommandMap.GetCommand(keywords);
 
