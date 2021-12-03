@@ -34,14 +34,22 @@ namespace Discord.Interactions
 
         #region Commands
 
-        public static ApplicationCommandProperties ToApplicationCommandProps(this SlashCommandInfo commandInfo) =>
-            new SlashCommandProperties
+        public static SlashCommandProperties ToApplicationCommandProps(this SlashCommandInfo commandInfo)
+        {
+            var props = new SlashCommandBuilder()
             {
                 Name = commandInfo.Name,
                 Description = commandInfo.Description,
                 IsDefaultPermission = commandInfo.DefaultPermission,
-                Options = commandInfo.Parameters.Select(x => x.ToApplicationCommandOptionProps())?.ToList() ?? Optional<List<ApplicationCommandOptionProperties>>.Unspecified
-            };
+            }.Build();
+
+            if (commandInfo.Parameters.Count > SlashCommandBuilder.MaxOptionsCount)
+                throw new InvalidOperationException($"Slash Commands cannot have more than {SlashCommandBuilder.MaxOptionsCount} command parameters");
+
+            props.Options = commandInfo.Parameters.Select(x => x.ToApplicationCommandOptionProps())?.ToList() ?? Optional<List<ApplicationCommandOptionProperties>>.Unspecified;
+
+            return props;
+        }
 
         public static ApplicationCommandOptionProperties ToApplicationCommandOptionProps(this SlashCommandInfo commandInfo) =>
             new ApplicationCommandOptionProperties
@@ -53,11 +61,12 @@ namespace Discord.Interactions
                 Options = commandInfo.Parameters?.Select(x => x.ToApplicationCommandOptionProps())?.ToList()
             };
 
-        public static ApplicationCommandProperties ToApplicationCommandProps(this ContextCommandInfo commandInfo) =>
-            new ContextCommandProperties(commandInfo.CommandType)
+        public static ApplicationCommandProperties ToApplicationCommandProps(this ContextCommandInfo commandInfo)
+            => commandInfo.CommandType switch
             {
-                Name = commandInfo.Name,
-                IsDefaultPermission = commandInfo.DefaultPermission
+                ApplicationCommandType.Message => new MessageCommandBuilder { Name = commandInfo.Name, IsDefaultPermission = commandInfo.DefaultPermission}.Build(),
+                ApplicationCommandType.User => new UserCommandBuilder { Name = commandInfo.Name, IsDefaultPermission=commandInfo.DefaultPermission}.Build(),
+                _ => throw new InvalidOperationException($"{commandInfo.CommandType} isn't a supported command type.")
             };
         #endregion
 
@@ -99,13 +108,19 @@ namespace Discord.Interactions
 
                 options.AddRange(moduleInfo.SubModules?.SelectMany(x => x.ParseSubModule(args, ignoreDontRegister)));
 
-                args.Add(new SlashCommandProperties
+                var props = new SlashCommandBuilder
                 {
                     Name = moduleInfo.SlashGroupName.ToLower(),
                     Description = moduleInfo.Description,
                     IsDefaultPermission = moduleInfo.DefaultPermission,
-                    Options = options
-                });
+                }.Build();
+
+                if (options.Count > SlashCommandBuilder.MaxOptionsCount)
+                    throw new InvalidOperationException($"Slash Commands cannot have more than {SlashCommandBuilder.MaxOptionsCount} command parameters");
+
+                props.Options = options;
+
+                args.Add(props);
             }
         }
 
@@ -153,7 +168,12 @@ namespace Discord.Interactions
                     IsDefaultPermission = command.IsDefaultPermission,
                     Options = command.Options?.Select(x => x.ToApplicationCommandOptionProps())?.ToList() ?? Optional<List<ApplicationCommandOptionProperties>>.Unspecified
                 },
-                ApplicationCommandType.User or ApplicationCommandType.Message => new ContextCommandProperties(command.Type)
+                ApplicationCommandType.User => new UserCommandProperties
+                {
+                    Name = command.Name,
+                    IsDefaultPermission = command.IsDefaultPermission
+                },
+                ApplicationCommandType.Message => new MessageCommandProperties
                 {
                     Name = command.Name,
                     IsDefaultPermission = command.IsDefaultPermission
@@ -176,15 +196,5 @@ namespace Discord.Interactions
                 }).ToList(),
                 Options = commandOption.Options?.Select(x => x.ToApplicationCommandOptionProps()).ToList()
             };
-    }
-
-    internal sealed class ContextCommandProperties : ApplicationCommandProperties
-    {
-        internal override ApplicationCommandType Type { get; }
-
-        public ContextCommandProperties(ApplicationCommandType type)
-        {
-            Type = type;
-        }
     }
 }
