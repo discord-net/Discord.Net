@@ -118,7 +118,7 @@ namespace Discord.Interactions
             IsTopLevelGroup = CheckTopLevel(parent);
             DontAutoRegister = builder.DontAutoRegister;
 
-            GroupedPreconditions = builder.Preconditions.ToLookup(x => x.Group, x => x, StringComparer.Ordinal);
+            GroupedPreconditions = Preconditions.ToLookup(x => x.Group, x => x, StringComparer.Ordinal);
         }
 
         private IEnumerable<ModuleInfo> BuildSubModules (ModuleBuilder builder, InteractionService commandService, IServiceProvider services)
@@ -189,7 +189,7 @@ namespace Discord.Interactions
         {
             var preconditions = new List<PreconditionAttribute>();
 
-            var parent = builder.Parent;
+            var parent = builder;
 
             while (parent != null)
             {
