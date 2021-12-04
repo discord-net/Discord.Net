@@ -11,7 +11,7 @@ To start using Autocompleters, use the `[AutocompleteAttribute(Type autocomplete
 
 ## Creating Autocompleters
 
-A valid Autocompleter must inherit `Autocompleter` base type and implement all of its abstract methods.
+A valid Autocompleter must inherit `AutocompleteHandler` base type and implement all of its abstract methods.
 
 ### GenerateSuggestionsAsync()
 
