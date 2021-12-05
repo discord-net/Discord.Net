@@ -786,8 +786,9 @@ namespace Discord.API
             if (!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0)
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
-            if (args.Content?.Length > DiscordConfig.MaxMessageSize)
+            if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
+
             options = RequestOptions.CreateOrClone(options);
 
             var ids = new BucketIds(webhookId: webhookId);
@@ -1336,7 +1337,7 @@ namespace Discord.API
             if ((!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0) && !args.File.IsSpecified)
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
-            if (args.Content?.Length > DiscordConfig.MaxMessageSize)
+            if(args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
 
             options = RequestOptions.CreateOrClone(options);
