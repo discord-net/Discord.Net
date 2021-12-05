@@ -73,27 +73,6 @@ namespace Discord.API.Rest
 
             payload["attachments"] = attachments;
 
-            List<object> attachments = new();
-
-            for (int n = 0; n != Files.Length; n++)
-            {
-                var attachment = Files[n];
-
-                var filename = attachment.FileName ?? "unknown.dat";
-                if (attachment.IsSpoiler && !filename.StartsWith(AttachmentExtensions.SpoilerPrefix))
-                    filename = filename.Insert(0, AttachmentExtensions.SpoilerPrefix);
-                d[$"files[{n}]"] = new MultipartFile(attachment.Stream, filename);
-
-                attachments.Add(new
-                {
-                    id = (ulong)n,
-                    filename = filename,
-                    description = attachment.Description ?? Optional<string>.Unspecified
-                });
-            }
-
-            payload["attachments"] = attachments;
-
             var json = new StringBuilder();
             using (var text = new StringWriter(json))
             using (var writer = new JsonTextWriter(text))
