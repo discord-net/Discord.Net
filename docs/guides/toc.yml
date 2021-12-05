@@ -60,6 +60,14 @@
       topicUid: Guides.MessageComponents.SelectMenus
     - name: Advanced Concepts
       topicUid: Guides.MessageComponents.Advanced
+- name: Interaction Framework
+  items:
+    - name: Getting started
+      topicUid: Guides.InteractionsFramework.Intro
+    - name: Dependency Injection
+      topicUid: Guides.Commands.DI
+    - name: Post-execution Handling
+      topicUid: Guides.Commands.PostExecution
 - name: Emoji
   topicUid: Guides.Emoji
 - name: Voice

@@ -5,7 +5,7 @@ using Model = Discord.API.Message;
 namespace Discord.Rest
 {
     /// <summary>
-    ///     Represents a REST-based follow up message sent by a bot responding to a slash command.
+    ///     Represents a REST-based follow up message sent by a bot responding to an interaction.
     /// </summary>
     public class RestFollowupMessage : RestUserMessage
     {

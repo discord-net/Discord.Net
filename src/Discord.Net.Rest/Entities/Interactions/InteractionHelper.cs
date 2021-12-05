@@ -34,21 +34,33 @@ namespace Discord.Rest
             return client.ApiClient.BulkOverwriteGlobalApplicationCommandsAsync(Array.Empty<CreateApplicationCommandParams>(), options);
         }
 
-        public static Task SendInteractionResponseAsync(BaseDiscordClient client, InteractionResponse response,
-            ulong interactionId, string interactionToken, RequestOptions options = null)
+        public static async Task<RestInteractionMessage> SendInteractionResponseAsync(BaseDiscordClient client, InteractionResponse response,
+            IDiscordInteraction interaction, IMessageChannel channel = null, RequestOptions options = null)
         {
-            return client.ApiClient.CreateInteractionResponseAsync(response, interactionId, interactionToken, options);
+            await client.ApiClient.CreateInteractionResponseAsync(response, interaction.Id, interaction.Token, options).ConfigureAwait(false);
+            return RestInteractionMessage.Create(client, response, interaction, channel);
         }
 
         public static async Task<RestInteractionMessage> GetOriginalResponseAsync(BaseDiscordClient client, IMessageChannel channel,
             IDiscordInteraction interaction, RequestOptions options = null)
         {
             var model = await client.ApiClient.GetInteractionResponseAsync(interaction.Token, options).ConfigureAwait(false);
-            return RestInteractionMessage.Create(client, model, interaction.Token, channel);
+            if(model != null)
+                return RestInteractionMessage.Create(client, model, interaction.Token, channel);
+            return null;
         }
 
         public static async Task<RestFollowupMessage> SendFollowupAsync(BaseDiscordClient client, CreateWebhookMessageParams args,
             string token, IMessageChannel channel, RequestOptions options = null)
+        {
+            var model = await client.ApiClient.CreateInteractionFollowupMessageAsync(args, token, options).ConfigureAwait(false);
+
+            var entity = RestFollowupMessage.Create(client, model, token, channel);
+            return entity;
+        }
+
+        public static async Task<RestFollowupMessage> SendFollowupAsync(BaseDiscordClient client, UploadWebhookFileParams args,
+           string token, IMessageChannel channel, RequestOptions options = null)
         {
             var model = await client.ApiClient.CreateInteractionFollowupMessageAsync(args, token, options).ConfigureAwait(false);
 

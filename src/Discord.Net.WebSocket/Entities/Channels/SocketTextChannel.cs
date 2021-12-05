@@ -112,7 +112,7 @@ namespace Discord.WebSocket
         /// <returns>
         ///     A task that represents the asynchronous create operation. The task result contains a <see cref="IThreadChannel"/>
         /// </returns>
-        public async Task<SocketThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread,
+        public virtual async Task<SocketThreadChannel> CreateThreadAsync(string name, ThreadType type = ThreadType.PublicThread,
             ThreadArchiveDuration autoArchiveDuration = ThreadArchiveDuration.OneDay, IMessage message = null, bool? invitable = null, int? slowmode = null, RequestOptions options = null)
         {
             var model = await ThreadHelper.CreateThreadAsync(Discord, this, name, type, autoArchiveDuration, message, invitable, slowmode, options);

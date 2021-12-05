@@ -1954,7 +1954,7 @@ namespace Discord.WebSocket
                                         }
                                     }
 
-                                    var before = user.Presence.Clone();
+                                    var before = user.Presence?.Clone();
                                     user.Update(State, data.User);
                                     user.Update(data);
                                     await TimedInvokeAsync(_presenceUpdated, nameof(PresenceUpdated), user, before, user.Presence).ConfigureAwait(false);
@@ -2627,7 +2627,7 @@ namespace Discord.WebSocket
 
                                     var newEvent = guild.AddOrUpdateEvent(data);
 
-                                    await TimedInvokeAsync(_guildScheduledEventCancelled, nameof(GuildScheduledEventCreated), newEvent).ConfigureAwait(false);
+                                    await TimedInvokeAsync(_guildScheduledEventCreated, nameof(GuildScheduledEventCreated), newEvent).ConfigureAwait(false);
                                 }
                                 break;
                             case "GUILD_SCHEDULED_EVENT_UPDATE":
