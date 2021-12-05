@@ -115,7 +115,7 @@ namespace Discord.Rest
                 Type = InteractionResponseType.ChannelMessageWithSource,
                 Data = new API.InteractionCallbackData
                 {
-                    Content = text,
+                    Content = text ?? Optional<string>.Unspecified,
                     AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                     Embeds = embeds.Select(x => x.ToModel()).ToArray(),
                     TTS = isTTS,

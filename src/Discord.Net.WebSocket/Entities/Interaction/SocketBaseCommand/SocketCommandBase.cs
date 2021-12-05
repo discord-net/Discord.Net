@@ -114,7 +114,7 @@ namespace Discord.WebSocket
                 Type = InteractionResponseType.ChannelMessageWithSource,
                 Data = new API.InteractionCallbackData
                 {
-                    Content = text,
+                    Content = text ?? Optional<string>.Unspecified,
                     AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                     Embeds = embeds.Select(x => x.ToModel()).ToArray(),
                     TTS = isTTS,
@@ -168,7 +168,7 @@ namespace Discord.WebSocket
 
             var args = new API.Rest.CreateWebhookMessageParams
             {
-                Content = text,
+                Content = text ?? Optional<string>.Unspecified,
                 AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                 IsTTS = isTTS,
                 Embeds = embeds.Select(x => x.ToModel()).ToArray(),
