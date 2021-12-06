@@ -397,7 +397,7 @@ namespace Discord
         /// <param name="maxValue">The largest number value the user can input.</param>
         /// <returns>The current builder.</returns>
         public SlashCommandOptionBuilder AddOption(string name, ApplicationCommandOptionType type,
-           string description, bool? required = null, bool isDefault = false, bool isAutocomplete = false, double? minValue = null, double? maxValue = null,
+           string description, bool? isRequired = null, bool isDefault = false, bool isAutocomplete = false, double? minValue = null, double? maxValue = null,
            List<SlashCommandOptionBuilder> options = null, List<ChannelType> channelTypes = null, params ApplicationCommandOptionChoiceProperties[] choices)
         {
             // Make sure the name matches the requirements from discord
@@ -423,7 +423,7 @@ namespace Discord
             {
                 Name = name,
                 Description = description,
-                IsRequired = required,
+                IsRequired = isRequired,
                 IsDefault = isDefault,
                 IsAutocomplete = isAutocomplete,
                 MinValue = minValue,
