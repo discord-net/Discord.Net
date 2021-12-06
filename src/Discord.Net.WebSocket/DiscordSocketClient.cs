@@ -1300,7 +1300,7 @@ namespace Discord.WebSocket
                                     var guild = State.GetGuild(data.GuildId);
                                     if (guild != null)
                                     {
-                                        var user = guild.RemoveUser(data.User.Id);
+                                        SocketUser user = guild.RemoveUser(data.User.Id);
                                         guild.MemberCount--;
 
                                         if (!guild.IsSynced)
@@ -1309,16 +1309,10 @@ namespace Discord.WebSocket
                                             return;
                                         }
 
-                                        if (user != null)
-                                            await TimedInvokeAsync(_userLeftEvent, nameof(UserLeft), user).ConfigureAwait(false);
-                                        else
-                                        {
-                                            if (!guild.HasAllMembers)
-                                                await IncompleteGuildUserAsync(type, data.User.Id, data.GuildId).ConfigureAwait(false);
-                                            else
-                                                await UnknownGuildUserAsync(type, data.User.Id, data.GuildId).ConfigureAwait(false);
-                                            return;
-                                        }
+                                        if(user == null)
+                                            user = SocketGlobalUser.Create(this, State, data.User);
+
+                                        await TimedInvokeAsync(_userLeftEvent, nameof(UserLeft), user).ConfigureAwait(false);
                                     }
                                     else
                                     {

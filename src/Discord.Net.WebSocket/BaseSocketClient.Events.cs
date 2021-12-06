@@ -424,12 +424,12 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<SocketGuildUser, Task>> _userJoinedEvent = new AsyncEvent<Func<SocketGuildUser, Task>>();
         /// <summary> Fired when a user leaves a guild. </summary>
-        public event Func<SocketGuildUser, Task> UserLeft
+        public event Func<SocketUser, Task> UserLeft
         {
             add { _userLeftEvent.Add(value); }
             remove { _userLeftEvent.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<SocketGuildUser, Task>> _userLeftEvent = new AsyncEvent<Func<SocketGuildUser, Task>>();
+        internal readonly AsyncEvent<Func<SocketUser, Task>> _userLeftEvent = new AsyncEvent<Func<SocketUser, Task>>();
         /// <summary> Fired when a user is banned from a guild. </summary>
         public event Func<SocketUser, SocketGuild, Task> UserBanned
         {
