@@ -241,7 +241,7 @@ namespace Discord.Interactions
             }
             builder.AppendFormat(" {0}", Name);
 
-            return builder.ToString();
+            return builder.ToString().Trim();
         }
     }
 }
