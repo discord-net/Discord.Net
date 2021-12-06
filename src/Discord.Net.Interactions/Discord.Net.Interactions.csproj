@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../Discord.Net.targets" />
+  <Import Project="../../StyleAnalyzer.targets" />
+  <PropertyGroup>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net6.0;net5.0;net461;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">net6.0;net5.0;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <RootNamespace>Discord.Interactions</RootNamespace>
+    <AssemblyName>Discord.Net.Interactions</AssemblyName>
+    <PackageId>Discord.Net.Labs.Interactions</PackageId>
+    <Description>A Discord.Net extension adding support for Application Commands.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Discord.Net.Core\Discord.Net.Core.csproj" />
+    <ProjectReference Include="..\Discord.Net.Rest\Discord.Net.Rest.csproj" />
+    <ProjectReference Include="..\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
+    <PackageReference Include="System.Reactive" Version="5.0.0" />
+  </ItemGroup>
+
+</Project>

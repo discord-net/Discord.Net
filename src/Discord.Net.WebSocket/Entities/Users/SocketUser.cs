@@ -59,6 +59,7 @@ namespace Discord.WebSocket
         }
         internal virtual bool Update(ClientState state, Model model)
         {
+            Presence ??= new SocketPresence();
             bool hasChanges = false;
             if (model.Avatar.IsSpecified && model.Avatar.Value != AvatarId)
             {
@@ -94,6 +95,7 @@ namespace Discord.WebSocket
 
         internal virtual void Update(PresenceModel model)
         {
+            Presence ??= new SocketPresence();
             Presence.Update(model);
         }
 

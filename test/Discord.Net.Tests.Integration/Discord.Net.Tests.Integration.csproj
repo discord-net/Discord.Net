@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -10,7 +10,6 @@
     <ProjectReference Include="../../src/Discord.Net.Commands/Discord.Net.Commands.csproj" />
     <ProjectReference Include="../../src/Discord.Net.Core/Discord.Net.Core.csproj" />
     <ProjectReference Include="../../src/Discord.Net.Rest/Discord.Net.Rest.csproj" />
-    <ProjectReference Include="../../src/Discord.Net.Analyzers/Discord.Net.Analyzers.csproj" />
     <ProjectReference Include="..\..\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" />
   </ItemGroup>
 

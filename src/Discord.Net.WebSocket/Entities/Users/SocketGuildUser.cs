@@ -176,6 +176,8 @@ namespace Discord.WebSocket
 
         internal override void Update(PresenceModel model)
         {
+            Presence ??= new SocketPresence();
+
             Presence.Update(model);
             GlobalUser.Update(model);
         }

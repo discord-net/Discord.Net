@@ -21,6 +21,7 @@ namespace Discord.API.Rest
         public Optional<Embed[]> Embeds { get; set; }
         public Optional<AllowedMentions> AllowedMentions { get; set; }
         public Optional<ActionRowComponent[]> MessageComponents { get; set; }
+        public Optional<MessageFlags> Flags { get; set; }
 
         public UploadWebhookFileParams(params FileAttachment[] files)
         {
@@ -48,6 +49,8 @@ namespace Discord.API.Rest
                 payload["embeds"] = Embeds.Value;
             if (AllowedMentions.IsSpecified)
                 payload["allowed_mentions"] = AllowedMentions.Value;
+            if (Flags.IsSpecified)
+                payload["flags"] = Flags.Value;
 
             List<object> attachments = new();
 

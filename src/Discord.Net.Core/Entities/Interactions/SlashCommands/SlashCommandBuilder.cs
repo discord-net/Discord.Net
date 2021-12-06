@@ -40,6 +40,9 @@ namespace Discord
                 if (!Regex.IsMatch(value, @"^[\w-]{1,32}$"))
                     throw new ArgumentException("Command name cannot contain any special characters or whitespaces!", nameof(value));
 
+                if (value.Any(x => char.IsUpper(x)))
+                    throw new FormatException("Name cannot contain any uppercase characters.");
+
                 _name = value;
             }
         }

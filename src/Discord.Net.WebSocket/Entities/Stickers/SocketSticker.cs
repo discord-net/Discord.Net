@@ -88,5 +88,11 @@ namespace Discord.WebSocket
 
             return base.Equals(obj);
         }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 }

@@ -44,5 +44,9 @@ namespace Discord.Rest
         //IUserCommandInteractionData
         /// <inheritdoc/>
         IUserCommandInteractionData IUserCommandInteraction.Data => Data;
+
+        //IApplicationCommandInteraction
+        /// <inheritdoc/>
+        IApplicationCommandInteractionData IApplicationCommandInteraction.Data => Data;
     }
 }
