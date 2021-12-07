@@ -139,6 +139,7 @@ namespace Discord
         FileUploadTooBig = 50045,
         InvalidFileUpload = 50046,
         CannotSelfRedeemGift = 50054,
+        InvalidGuild = 50055,
         PaymentSourceRequiredForGift = 50070,
         CannotDeleteRequiredCommunityChannel = 50074,
         InvalidSticker = 50081,
