@@ -54,11 +54,12 @@ Setting up labs in your project is really simple, here's how to do it:
 What Discord.NET-labs has that Discord.NET does not:
 
 - Major changes
-  * Added Interaction Support.
-  * Added Application commands (slash, user, message).
-  * Added Message Components (buttons, select menus).
-  * Added Thread Channels.
-  * Added Stage Channels.
+  * Interaction Support.
+  * Application commands (slash, user, message).
+  * Message Components (buttons, select menus).
+  * Thread Channels.
+  * Stage Channels.
+  * Guild Events.
   * Revamped Stickers.
 
 - Minor changes
