@@ -267,7 +267,7 @@ namespace Discord.Rest
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public static async Task<RestUserMessage> SendMessageAsync(IMessageChannel channel, BaseDiscordClient client,
-            string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers, RequestOptions options, Embed[] embeds)
+            string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options, Embed[] embeds)
         {
             embeds ??= Array.Empty<Embed>();
             if (embed != null)
@@ -304,7 +304,7 @@ namespace Discord.Rest
                 Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified,
                 AllowedMentions = allowedMentions?.ToModel(),
                 MessageReference = messageReference?.ToModel(),
-                Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
+                Components = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
                 Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified
             };
             var model = await client.ApiClient.CreateMessageAsync(channel.Id, args, options).ConfigureAwait(false);
@@ -336,27 +336,27 @@ namespace Discord.Rest
         /// <exception cref="IOException">An I/O error occurred while opening the file.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
-            string filePath, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers, RequestOptions options, bool isSpoiler, Embed[] embeds)
+            string filePath, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options, bool isSpoiler, Embed[] embeds)
         {
             string filename = Path.GetFileName(filePath);
             using (var file = File.OpenRead(filePath))
-                return await SendFileAsync(channel, client, file, filename, text, isTTS, embed, allowedMentions, messageReference, component, stickers, options, isSpoiler, embeds).ConfigureAwait(false);
+                return await SendFileAsync(channel, client, file, filename, text, isTTS, embed, allowedMentions, messageReference, components, stickers, options, isSpoiler, embeds).ConfigureAwait(false);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public static Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
-            Stream stream, string filename, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers, RequestOptions options, bool isSpoiler, Embed[] embeds)
+            Stream stream, string filename, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options, bool isSpoiler, Embed[] embeds)
         {
-            return SendFileAsync(channel, client, new FileAttachment(stream, filename, isSpoiler: isSpoiler), text, isTTS, embed, allowedMentions, messageReference, component, stickers, options, embeds);
+            return SendFileAsync(channel, client, new FileAttachment(stream, filename, isSpoiler: isSpoiler), text, isTTS, embed, allowedMentions, messageReference, components, stickers, options, embeds);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         public static Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
-            FileAttachment attachment, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers, RequestOptions options, Embed[] embeds)
-            => SendFilesAsync(channel, client, new[] { attachment }, text, isTTS, embed, allowedMentions, messageReference, component, stickers, options, embeds);
+            FileAttachment attachment, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options, Embed[] embeds)
+            => SendFilesAsync(channel, client, new[] { attachment }, text, isTTS, embed, allowedMentions, messageReference, components, stickers, options, embeds);
 
         public static async Task<RestUserMessage> SendFilesAsync(IMessageChannel channel, BaseDiscordClient client,
-            IEnumerable<FileAttachment> attachments, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent component, ISticker[] stickers, RequestOptions options,  Embed[] embeds)
+            IEnumerable<FileAttachment> attachments, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options,  Embed[] embeds)
         {
             embeds ??= Array.Empty<Embed>();
             if (embed != null)
@@ -392,7 +392,7 @@ namespace Discord.Rest
                 Preconditions.AtMost(stickers.Length, 3, nameof(stickers), "A max of 3 stickers are allowed.");
             }
 
-            var args = new UploadFileParams(attachments.ToArray()) { Content = text, IsTTS = isTTS, Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified, AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified, MessageReference = messageReference?.ToModel() ?? Optional<API.MessageReference>.Unspecified, MessageComponent = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified, Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified };
+            var args = new UploadFileParams(attachments.ToArray()) { Content = text, IsTTS = isTTS, Embeds = embeds.Any() ? embeds.Select(x => x.ToModel()).ToArray() : Optional<API.Embed[]>.Unspecified, AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified, MessageReference = messageReference?.ToModel() ?? Optional<API.MessageReference>.Unspecified, MessageComponent = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified, Stickers = stickers?.Any() ?? false ? stickers.Select(x => x.Id).ToArray() : Optional<ulong[]>.Unspecified };
             var model = await client.ApiClient.UploadFileAsync(channel.Id, args, options).ConfigureAwait(false);
             return RestUserMessage.Create(client, channel, client.CurrentUser, model);
         }

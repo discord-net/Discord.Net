@@ -104,7 +104,7 @@ namespace Discord.Rest
             => Respond(result, options);
         public override string Defer(bool ephemeral = false, RequestOptions options = null)
             => throw new NotSupportedException("Autocomplete interactions don't support this method!");
-        public override string Respond(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent component = null, Embed embed = null, RequestOptions options = null)
+        public override string Respond(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null)
             => throw new NotSupportedException("Autocomplete interactions don't support this method!");
         public override Task<RestFollowupMessage> FollowupAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null)
             => throw new NotSupportedException("Autocomplete interactions don't support this method!");
