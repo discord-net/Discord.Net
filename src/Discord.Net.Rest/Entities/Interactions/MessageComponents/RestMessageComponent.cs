@@ -13,7 +13,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents a REST-based message component.
     /// </summary>
-    internal class RestMessageComponent : RestInteraction, IComponentInteraction, IDiscordInteraction
+    public class RestMessageComponent : RestInteraction, IComponentInteraction, IDiscordInteraction
     {
         /// <summary>
         ///     Gets the data received with this interaction, contains the button that was clicked.
