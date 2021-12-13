@@ -80,9 +80,3 @@ Message components can be set in rows and multiple can exist on a single message
 
 - Explanation on how to add & respond to message components can be found in the 
 [Message Component Guides](xref:Guides.MessageComponents.Intro)
-
-> [!Note]
-> More experienced users might want to refer to the
-> [API Documentation](xref:API.Docs) for a breakdown of the individual
-> components in the library.
-

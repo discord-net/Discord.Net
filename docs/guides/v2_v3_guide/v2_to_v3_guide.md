@@ -27,4 +27,4 @@ There is a new event called `PresenceUpdated` that is called when a user's prese
 
 ## Migrating your commands to slash command
 
-The new InteractionService was designed to act like the previous service for text-based commands. Your pre-existing code will continue to work, but you will need to migrate your modules and response functions to use the new InteractionService methods. Docs on this can be found in the Guides section.
+The new InteractionService was designed to act like the previous service for text-based commands. Your pre-existing code will continue to work, but you will need to migrate your modules and response functions to use the new InteractionService methods. Docs on this can be found [here](xref:Guides.IntFw.Intro)

@@ -10,7 +10,7 @@
       "dest": "api",
       "filter": "filterConfig.yml",
       "properties": {
-        "TargetFramework": "netstandard2.0"
+        "TargetFramework": "net5.0"
       }
     }
   ],
@@ -31,18 +31,6 @@
       {
         "src": "../",
         "files": ["CHANGELOG.md"]
-      }
-    ],
-    "resource": [
-      {
-        "files": [
-          "**/images/**",
-          "**/samples/**",
-          "langwordMapping.yml",
-          "marketing/logo/**.svg",
-          "marketing/logo/**.png",
-          "favicon.ico"
-        ]
       }
     ],
     "resource": [

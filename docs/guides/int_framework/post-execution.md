@@ -16,7 +16,7 @@ If you are using the `RunMode.Async` to run your commands,
 you must use the Interaction Service events to get the execution results. When using `RunMode.Async`,
 [InteractionService.ExecuteCommandAsync] will always return a successful result.
 
-[InteractionService.ExecuteCommandAsync]: xref: Discord.Interactions.InteractionService.ExecuteCommandAsync*
+[InteractionService.ExecuteCommandAsync]: xref:Discord.Interactions.InteractionService.ExecuteCommandAsync*
 
 ## Results
 
@@ -39,7 +39,7 @@ Interaction Result come in a handful of different flavours:
 [ExecuteResult]: xref:Discord.Interactions.ExecuteResult
 [PreconditionGroupResult]: xref:Discord.Interactions.PreconditionGroupResult
 [PreconditionResult]: xref:Discord.Interactions.PreconditionResult
-[SearchResult]: xref:Discord.Interactions.SearchResult
+[SearchResult]: xref:Discord.Interactions.SearchResult`1
 [TypeConverterResult]: xref:Discord.Interactions.TypeConverterResult
 [IResult.Error]: xref:Discord.Interactions.IResult.Error*
 

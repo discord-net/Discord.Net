@@ -31,8 +31,7 @@ But that doesn't mean a message _can't_ come from a
 retrieve information about a guild from a message entity, you will
 need to cast its channel object to a `SocketTextChannel`.
 
-You can find out various types of entities in the @FAQ.Misc.Glossary
-page.
+You can find out various types of entities in the [Glossary page.](xref:FAQ.Glossary)
 
 ## Navigation
 

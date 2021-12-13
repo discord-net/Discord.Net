@@ -11,7 +11,7 @@ may also compile this library yourself should you so desire.
 
 ## Supported Platforms
 
-Discord.Net targets [.NET 5.0], but is also available on older versions, like [.NET Standard] and [.NET Core]; this still means
+Discord.Net targets [.NET 6.0] and [.NET 5.0], but is also available on older versions, like [.NET Standard] and [.NET Core]; this still means
 that creating applications using the latest version of .NET (6.0)
 is most recommended. If you are bound by Windows-specific APIs or
 other limitations, you may also consider targeting [.NET Framework]
@@ -23,6 +23,7 @@ other limitations, you may also consider targeting [.NET Framework]
 > implementation and may crash the application upon startup.
 
 [Mono]: https://www.mono-project.com/
+[.NET 6.0]: https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-6
 [.NET 5.0]: https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-5
 [.NET Standard]: https://docs.microsoft.com/en-us/dotnet/articles/standard/library
 [.NET Core]: https://docs.microsoft.com/en-us/dotnet/articles/core/
