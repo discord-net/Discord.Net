@@ -118,7 +118,6 @@ namespace Discord.Commands
                     case GroupAttribute group:
                         builder.Name ??= group.Prefix;
                         builder.Group = group.Prefix;
-                        builder.AddAliases(group.Prefix);
                         break;
                     case PreconditionAttribute precondition:
                         builder.AddPrecondition(precondition);
