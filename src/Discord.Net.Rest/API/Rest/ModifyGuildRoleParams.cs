@@ -14,7 +14,9 @@ namespace Discord.API.Rest
         [JsonProperty("hoist")]
         public Optional<bool> Hoist { get; set; }
         [JsonProperty("icon")]
-        public Optional<Image> Icon { get; set; }
+        public Optional<Image?> Icon { get; set; }
+        [JsonProperty("unicode_emoji")]
+        public Optional<string> Emoji { get; set; }
         [JsonProperty("mentionable")]
         public Optional<bool> Mentionable { get; set; }
     }

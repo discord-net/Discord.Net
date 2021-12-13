@@ -25,14 +25,14 @@ namespace Discord.Rest
         ///     If <c>null</c>, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-        /// <param name="component">The message components to be included with this message. Used for interactions.</param>
+        /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the message.</param>
         /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        new Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null, Embed[] embeds = null);
+        new Task<RestUserMessage> SendMessageAsync(string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null);
         /// <summary>
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
@@ -52,14 +52,14 @@ namespace Discord.Rest
         ///     If <c>null</c>, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-        /// <param name="component">The message components to be included with this message. Used for interactions.</param>
+        /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the message.</param>
         /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null, Embed[] embeds = null);
+        new Task<RestUserMessage> SendFileAsync(string filePath, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null);
         /// <summary>
         ///     Sends a file to this message channel with an optional caption.
         /// </summary>
@@ -79,14 +79,14 @@ namespace Discord.Rest
         ///     If <c>null</c>, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="messageReference">The message references to be included. Used to reply to specific messages.</param>
-        /// <param name="component">The message components to be included with this message. Used for interactions.</param>
+        /// <param name="components">The message components to be included with this message. Used for interactions.</param>
         /// <param name="stickers">A collection of stickers to send with the message.</param>
         /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null, ISticker[] stickers = null, Embed[] embeds = null);
+        new Task<RestUserMessage> SendFileAsync(Stream stream, string filename, string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null, bool isSpoiler = false, AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null);
 
         /// <summary>
         ///     Gets a message from this message channel.

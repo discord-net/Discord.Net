@@ -35,18 +35,18 @@ namespace Discord.Interactions
 
         /// <inheritdoc cref="IDiscordInteraction.RespondAsync(string, Embed[], bool, bool, AllowedMentions, RequestOptions, MessageComponent, Embed)"/>
         protected virtual async Task RespondAsync (string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null) =>
-            await Context.Interaction.RespondAsync(text, embeds, isTTS, ephemeral, allowedMentions, component, embed, options).ConfigureAwait(false);
+            AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent components = null, Embed embed = null) =>
+            await Context.Interaction.RespondAsync(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
 
         /// <inheritdoc cref="IDiscordInteraction.FollowupAsync(string, Embed[], bool, bool, AllowedMentions, RequestOptions, MessageComponent, Embed)"/>
         protected virtual async Task<IUserMessage> FollowupAsync (string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
-            AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent component = null, Embed embed = null) =>
-            await Context.Interaction.FollowupAsync(text, embeds, isTTS, ephemeral, allowedMentions, component, embed, options).ConfigureAwait(false);
+            AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent components = null, Embed embed = null) =>
+            await Context.Interaction.FollowupAsync(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
 
         /// <inheritdoc cref="IMessageChannel.SendMessageAsync(string, bool, Embed, RequestOptions, AllowedMentions, MessageReference, MessageComponent, ISticker[], Embed[])"/>
         protected virtual async Task<IUserMessage> ReplyAsync (string text = null, bool isTTS = false, Embed embed = null, RequestOptions options = null,
-            AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent component = null) =>
-            await Context.Channel.SendMessageAsync(text, false, embed, options, allowedMentions, messageReference, component).ConfigureAwait(false);
+            AllowedMentions allowedMentions = null, MessageReference messageReference = null, MessageComponent components = null) =>
+            await Context.Channel.SendMessageAsync(text, false, embed, options, allowedMentions, messageReference, components).ConfigureAwait(false);
 
         /// <inheritdoc cref="IDeletable.DeleteAsync(RequestOptions)"/>
         protected virtual async Task DeleteOriginalResponseAsync ( )

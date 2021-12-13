@@ -27,6 +27,9 @@ namespace Discord.Rest
         public bool? IsRequired { get; private set; }
 
         /// <inheritdoc/>
+        public bool? IsAutocomplete { get; private set; } 
+
+        /// <inheritdoc/>
         public double? MinValue { get; private set; }
 
         /// <inheritdoc/>
@@ -73,6 +76,9 @@ namespace Discord.Rest
 
             if (model.MaxValue.IsSpecified)
                 MaxValue = model.MaxValue.Value;
+
+            if (model.Autocomplete.IsSpecified)
+                IsAutocomplete = model.Autocomplete.Value;
 
             Options = model.Options.IsSpecified
                 ? model.Options.Value.Select(Create).ToImmutableArray()

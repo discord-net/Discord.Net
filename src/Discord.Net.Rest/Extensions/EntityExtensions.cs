@@ -179,7 +179,7 @@ namespace Discord.Rest
                 var messageModel = new API.Message
                 {
                     IsTextToSpeech = data.TTS,
-                    Content = data.Content,
+                    Content = (data.Content.IsSpecified && data.Content.Value == null) ? Optional<string>.Unspecified : data.Content,
                     Embeds = data.Embeds,
                     AllowedMentions = data.AllowedMentions,
                     Components = data.Components,

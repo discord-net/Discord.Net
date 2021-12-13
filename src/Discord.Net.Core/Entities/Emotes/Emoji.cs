@@ -675,6 +675,7 @@ namespace Discord
       [":coconut:"] = "\uD83E\uDD65",
       [":coffee:"] = "☕",
       [":coffin:"] = "⚰️",
+      [":coin:"] = "\uD83E\uDE99",
       [":cold_face:"] = "\uD83E\uDD76",
       [":cold_sweat:"] = "\uD83D\uDE30",
       [":comet:"] = "☄️",

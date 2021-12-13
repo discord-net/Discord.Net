@@ -78,7 +78,7 @@ namespace Discord.WebSocket
             bool isTTS = false,
             bool ephemeral = false,
             AllowedMentions allowedMentions = null,
-            MessageComponent component = null,
+            MessageComponent components = null,
             Embed embed = null,
             RequestOptions options = null)
         {
@@ -121,7 +121,7 @@ namespace Discord.WebSocket
                     AllowedMentions = allowedMentions?.ToModel(),
                     Embeds = embeds.Select(x => x.ToModel()).ToArray(),
                     TTS = isTTS,
-                    Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
+                    Components = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
                 }
             };
 
@@ -155,7 +155,7 @@ namespace Discord.WebSocket
         /// <param name="func">A delegate containing the properties to modify the message with.</param>
         /// <param name="options">The request options for this <see langword="async"/> request.</param>
         /// <returns>A task that represents the asynchronous operation of updating the message.</returns>
-        public async Task UpdateAsync(Action<MessageProperties> func, RequestOptions options = null)
+        public async Task<RestInteractionMessage> UpdateAsync(Action<MessageProperties> func, RequestOptions options = null)
         {
             var args = new MessageProperties();
             func(args);
@@ -236,7 +236,7 @@ namespace Discord.WebSocket
                 }
             }
 
-            await InteractionHelper.SendInteractionResponseAsync(Discord, response, this, Channel, options).ConfigureAwait(false);
+            return await InteractionHelper.SendInteractionResponseAsync(Discord, response, this, Channel, options).ConfigureAwait(false);
 
             lock (_lock)
             {
@@ -251,7 +251,7 @@ namespace Discord.WebSocket
             bool isTTS = false,
             bool ephemeral = false,
             AllowedMentions allowedMentions = null,
-            MessageComponent component = null,
+            MessageComponent components = null,
             Embed embed = null,
             RequestOptions options = null)
         {
@@ -272,7 +272,7 @@ namespace Discord.WebSocket
                 AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                 IsTTS = isTTS,
                 Embeds = embeds.Select(x => x.ToModel()).ToArray(),
-                Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
+                Components = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
             };
 
             if (ephemeral)

@@ -67,7 +67,7 @@ namespace Discord.Interactions
         internal readonly LogManager _logManager;
         internal readonly Func<DiscordRestClient> _getRestClient;
 
-        internal readonly bool _throwOnError, _deleteUnkownSlashCommandAck, _useCompiledLambda, _enableAutocompleteHandlers;
+        internal readonly bool _throwOnError, _useCompiledLambda, _enableAutocompleteHandlers;
         internal readonly string _wildCardExp;
         internal readonly RunMode _runMode;
         internal readonly RestResponseCallback _restResponseCallback;
@@ -153,7 +153,6 @@ namespace Discord.Interactions
                 throw new InvalidOperationException($"RunMode cannot be set to {RunMode.Default}");
 
             _throwOnError = config.ThrowOnError;
-            _deleteUnkownSlashCommandAck = config.DeleteUnknownSlashCommandAck;
             _wildCardExp = config.WildCardExpression;
             _useCompiledLambda = config.UseCompiledLambda;
             _enableAutocompleteHandlers = config.EnableAutocompleteHandlers;
@@ -619,12 +618,6 @@ namespace Discord.Interactions
             if (!result.IsSuccess)
             {
                 await _cmdLogger.DebugAsync($"Unknown slash command, skipping execution ({string.Join(" ", keywords).ToUpper()})");
-
-                if (_deleteUnkownSlashCommandAck)
-                {
-                    var response = await context.Interaction.GetOriginalResponseAsync().ConfigureAwait(false);
-                    await response.DeleteAsync().ConfigureAwait(false);
-                }
 
                 await _slashCommandExecutedEvent.InvokeAsync(null, context, result).ConfigureAwait(false);
                 return result;
