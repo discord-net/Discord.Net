@@ -162,7 +162,7 @@ namespace Discord.Rest
             return RestInteractionMessage.Create(Discord, model, Token, Channel);
         }
         /// <inheritdoc/>
-        public abstract string Respond(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent component = null, Embed embed = null, RequestOptions options = null);
+        public abstract string Respond(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
 
         /// <summary>
         ///     Sends a followup message for this interaction.
@@ -274,8 +274,8 @@ namespace Discord.Rest
             => Task.FromResult(Defer(ephemeral, options));
         /// <inheritdoc/>
         async Task<IUserMessage> IDiscordInteraction.FollowupAsync(string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions,
-            MessageComponent component, Embed embed, RequestOptions options)
-            => await FollowupAsync(text, embeds, isTTS, ephemeral, allowedMentions, component, embed, options).ConfigureAwait(false);
+            MessageComponent components, Embed embed, RequestOptions options)
+            => await FollowupAsync(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
         /// <inheritdoc/>
         async Task<IUserMessage> IDiscordInteraction.GetOriginalResponseAsync(RequestOptions options)
             => await GetOriginalResponseAsync(options).ConfigureAwait(false);

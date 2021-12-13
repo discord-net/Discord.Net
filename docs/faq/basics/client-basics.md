@@ -28,8 +28,8 @@ There are few possible reasons why this may occur.
  mind that a token is **different** from a *client secret*.
 
 [TokenType]: xref:Discord.TokenType
-[827]: https://github.com/RogueException/Discord.Net/issues/827
-[958]: https://github.com/RogueException/Discord.Net/issues/958
+[827]: https://github.com/discord-net/Discord.Net/issues/827
+[958]: https://github.com/discord-net/Discord.Net/issues/958
 [Discord API Terms of Service]: https://discord.com/developers/docs/legal
 
 ## How do I do X, Y, Z when my bot connects/logs on? Why do I get a `NullReferenceException` upon calling any client methods after connect?
@@ -73,7 +73,9 @@ instances, with each one serving a different amount of guilds.
 There are very few differences from the [DiscordSocketClient] class, and it is very straightforward
 to modify your existing code to use a [DiscordShardedClient] when necessary.
 
-1. You need to specify the total amount of shards, or shard ids, via [DiscordShardedClient]'s constructors.
+1. You can specify the total amount of shards, or shard ids, via [DiscordShardedClient]'s constructors.
+If the total shards are not specified then the library will get the recommended shard count via the
+[Get Gateway Bot](https://discord.com/developers/docs/topics/gateway#get-gateway-bot) route.
 2. The [Connected], [Disconnected], [Ready], and [LatencyUpdated] events
  are replaced with [ShardConnected], [ShardDisconnected], [ShardReady], and [ShardLatencyUpdated].
 3. Every event handler you apply/remove to the [DiscordShardedClient] is applied/removed to each shard.

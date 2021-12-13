@@ -1353,8 +1353,7 @@ namespace Discord.API
             if ((!args.Embeds.IsSpecified || args.Embeds.Value == null || args.Embeds.Value.Length == 0) && !args.Files.Any())
                 Preconditions.NotNullOrEmpty(args.Content, nameof(args.Content));
 
-
-            if (args.Content.IsSpecified && args.Content.Value.Length > DiscordConfig.MaxMessageSize)
+            if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
                 throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
 
             options = RequestOptions.CreateOrClone(options);
@@ -1368,9 +1367,8 @@ namespace Discord.API
             Preconditions.NotNull(args, nameof(args));
             Preconditions.NotEqual(id, 0, nameof(id));
 
-            if (args.Content.IsSpecified)
-                if (args.Content.Value.Length > DiscordConfig.MaxMessageSize)
-                    throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
+            if (args.Content.IsSpecified && args.Content.Value?.Length > DiscordConfig.MaxMessageSize)
+                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(args.Content));
 
             options = RequestOptions.CreateOrClone(options);
 

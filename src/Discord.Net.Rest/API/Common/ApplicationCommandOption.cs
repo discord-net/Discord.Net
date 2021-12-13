@@ -56,6 +56,7 @@ namespace Discord.API
             Default = cmd.IsDefault ?? Optional<bool>.Unspecified;
             MinValue = cmd.MinValue ?? Optional<double>.Unspecified;
             MaxValue = cmd.MaxValue ?? Optional<double>.Unspecified;
+            Autocomplete = cmd.IsAutocomplete ?? Optional<bool>.Unspecified;
 
             Name = cmd.Name;
             Type = cmd.Type;

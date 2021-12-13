@@ -63,7 +63,7 @@ namespace Discord.Rest
         /// <param name="ephemeral"><see langword="true"/> if the response should be hidden to everyone besides the invoker of the command, otherwise <see langword="false"/>.</param>
         /// <param name="allowedMentions">The allowed mentions for this response.</param>
         /// <param name="options">The request options for this response.</param>
-        /// <param name="component">A <see cref="MessageComponent"/> to be sent with this response.</param>
+        /// <param name="components">A <see cref="MessageComponent"/> to be sent with this response.</param>
         /// <param name="embed">A single embed to send with this response. If this is passed alongside an array of embeds, the single embed will be ignored.</param>
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
         /// <exception cref="InvalidOperationException">The parameters provided were invalid or the token was invalid.</exception>
@@ -76,7 +76,7 @@ namespace Discord.Rest
             bool isTTS = false,
             bool ephemeral = false,
             AllowedMentions allowedMentions = null,
-            MessageComponent component = null,
+            MessageComponent components = null,
             Embed embed = null,
             RequestOptions options = null)
         {
@@ -119,7 +119,7 @@ namespace Discord.Rest
                     AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                     Embeds = embeds.Select(x => x.ToModel()).ToArray(),
                     TTS = isTTS,
-                    Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
+                    Components = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified,
                     Flags = ephemeral ? MessageFlags.Ephemeral : Optional<MessageFlags>.Unspecified
                 }
             };
@@ -152,7 +152,7 @@ namespace Discord.Rest
             bool isTTS = false,
             bool ephemeral = false,
             AllowedMentions allowedMentions = null,
-            MessageComponent component = null,
+            MessageComponent components = null,
             Embed embed = null,
             RequestOptions options = null)
         {
@@ -173,7 +173,7 @@ namespace Discord.Rest
                 AllowedMentions = allowedMentions?.ToModel() ?? Optional<API.AllowedMentions>.Unspecified,
                 IsTTS = isTTS,
                 Embeds = embeds.Select(x => x.ToModel()).ToArray(),
-                Components = component?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
+                Components = components?.Components.Select(x => new API.ActionRowComponent(x)).ToArray() ?? Optional<API.ActionRowComponent[]>.Unspecified
             };
 
             if (ephemeral)

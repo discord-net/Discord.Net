@@ -98,7 +98,7 @@ namespace Discord.Interactions
                 .WithButton("Cancel", declineId, ButtonStyle.Danger)
                 .Build();
 
-            var prompt = await channel.SendMessageAsync(message, component: component).ConfigureAwait(false);
+            var prompt = await channel.SendMessageAsync(message, components: component).ConfigureAwait(false);
 
             var response = await WaitForMessageComponentAsync(client, prompt, timeout, cancellationToken).ConfigureAwait(false) as SocketMessageComponent;
 

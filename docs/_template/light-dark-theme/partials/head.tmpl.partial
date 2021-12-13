@@ -10,7 +10,7 @@
   <meta property="og:locale" content="en-us">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Discord.Net Docs">
-  <meta property="og:image" content="https://cdn.jsdelivr.net/gh/discord-net/Discord.Net/docs/marketing/logo/PackageLogo.png">
+  <meta property="og:image" content="https://raw.githubusercontent.com/Discord-Net/Discord.Net/dev/docs/marketing/logo/PackageLogo.png">
   <meta property="og:image:alt" content="Discord.Net Logo">
   <meta name="theme-color" content="#995EA7"/>
   <meta name="generator" content="docfx {{_docfxVersion}}">

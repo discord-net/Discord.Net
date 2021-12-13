@@ -1,3 +1,5 @@
+using System;
+
 namespace Discord
 {
     /// <summary>
@@ -50,11 +52,24 @@ namespace Discord
         ///     This value may not be set if the role is an @everyone role.
         /// </remarks>
         public Optional<bool> Hoist { get; set; }
-
         /// <summary>
         ///     Gets or sets the icon of the role.
         /// </summary>
-        public Optional<Image> Icon { get; set; }
+        /// <remarks>
+        ///     This value cannot be set at the same time as Emoji, as they are both exclusive.
+        ///     
+        ///     Setting an Icon will override a currently existing Emoji if present.
+        /// </remarks>
+        public Optional<Image?> Icon { get; set; }
+        /// <summary>
+        ///     Gets or sets the unicode emoji of the role.
+        /// </summary>
+        /// <remarks>
+        ///     This value cannot be set at the same time as Icon, as they are both exclusive.
+        ///
+        ///     Setting an Emoji will override a currently existing Icon if present.
+        /// </remarks>
+        public Optional<Emoji> Emoji { get; set; }
         /// <summary>
         ///     Gets or sets whether or not this role can be mentioned.
         /// </summary>

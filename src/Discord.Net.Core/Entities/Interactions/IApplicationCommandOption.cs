@@ -33,6 +33,11 @@ namespace Discord
         bool? IsRequired { get; }
 
         /// <summary>
+        ///     Gets whether or not the option has autocomplete enabled.
+        /// </summary>
+        bool? IsAutocomplete { get; }
+
+        /// <summary>
         ///     Gets the smallest number value the user can input.
         /// </summary>
         double? MinValue { get; }
