@@ -4,38 +4,48 @@
 
 ### Added
 
+- #1152 Add characters commonly use in links to Sanitize (b9274d1)
+- #1518 Add default nullable enum typereader (f7a07ae)
+- #1700 Added Implementation of ValidateAndGetBestMatch (3cd9f39)
 - #1767 Add method to clear guild user cache (19a66bf)
 - #1847 Bump API version to 9 (06a64b7)
 - #1848 Remove obsolete sync voice regions methods and properties (ed8e573)
 - #1851 Remove DM cache and fix references (7a201e9)
 - #1860 Remove /users/@me call for socket and rework sharded client a bit (384ad85)
 - #1863 Change GuildMemberUpdate before state to cacheable (c2e87f5)
+- #1666 Added negative TimeSpan handling (6abdfcb)
+- #1861 Add MaxBitrate to the interface (e0dbe7c)
+- #1865 Add null check to AllowedMentions.ToModel() (3cb662f)
 - #1879 Add Name property to Teams (c5b4b64)
+- #1890 Add default avatar to WithAuthor extension (c200861)
 - #1896 IVoiceChannel implements IMentionable (3395700)
 - #1943 Handle bidirectional usernames (10afd96)
-- #1948 warn on invalid gateway intents (51e06e9)
-- #1949 default application games (82276e3)
-- #1923 Added Interaction Support (933ea42).
-- #1923 Added Application commands (933ea42).
-- #1923 Added Message Components (933ea42).
-- #1923 Added Thread Channels (933ea42).
-- #1923 Added Stage Channels (933ea42).
-- #1923 Added Guild Events (933ea42).
-- #1923 Revamped Stickers (933ea42).
-- #1923 Added `TimestampTag` (933ea42).
-- #1923 Added `Name` property to teams (933ea42).
-- #1923 Added url validation to embeds (933ea42).
-- #1923 Added `NsfwLevel` to Guilds (933ea42).
-- #1923 Added helpers to `Emoji` for parsing (933ea42).
-- #1923 Added banner and accent color to guild users (933ea42).
-- #1923 Added `RatelimitCallback` to `RequestOptions` (933ea42).
-- #1923 Added `Emoji` to roles (933ea42).
-- #1923 Added `UseInteractionSnowflakeDate` to config (933ea42).
-- #1923 Added checks for gateway intent in some methods. DownloadUsersAsync will throw an exception if you don't have the gateway intent enabled locally now, this will help with the vauge error that was given before (933ea42).
-- #1923 Added SendFilesAsync to channels (933ea42).
-- #1923 Added Attachments property to MessageProperties (933ea42).
-- #1958 Added NET5.0 and NET6.0 builds (aa6bb5e).
-- #1958 Added `Discord.Interactions` (aa6bb5e).
+- #1948 Added warnings on invalid gateway intents (51e06e9)
+- #1949 Add default application games (82276e3)
+- #1923 Add Interaction Support (933ea42)
+- #1923 Add Application commands (933ea42)
+- #1923 Add Message Components (933ea42)
+- #1923 Add Thread Channels (933ea42)
+- #1923 Add Stage Channels (933ea42)
+- #1923 Add Guild Events (933ea42)
+- #1923 Revamped Stickers (933ea42)
+- #1923 Add TimestampTag (933ea42)
+- #1923 Add name property to teams (933ea42)
+- #1923 Add url validation on embeds (933ea42)
+- #1923 Add NsfwLevel to Guilds (933ea42)
+- #1923 Add helpers to Emoji for parsing (933ea42)
+- #1923 Add banner and accent color to guild users (933ea42)
+- #1923 Add RatelimitCallback to RequestOptions (933ea42)
+- #1923 Add Emoji to roles (933ea42)
+- #1923 Add UseInteractionSnowflakeDate to config (933ea42)
+- #1923 Add checks for gateway intent in some methods (933ea42)
+- #1923 Add SendFilesAsync to channels (933ea42)
+- #1923 Add Attachments property to MessageProperties (933ea42)
+- #1942 Add multi-file upload to webhooks (bc440ab)
+- #1944 Add Voice binaries (b5c150d)
+- #1950 Add custom setter to Group property of ModuleBuilder to automatically invoke AddAliases (ba656e9)
+- #1958 Add NET5.0 and NET6.0 builds (aa6bb5e)
+- #1958 Add Discord.Interactions framework (aa6bb5e)
 
 ### Fixed
 
@@ -45,49 +55,30 @@
 - #1853 Fire GuildMemberUpdated without cached user (d176fef)
 - #1854 Gateway events for DMs (a7ff6ce)
 - #1858 MessageUpdated without author (8b29e0f)
-- #1859 Add missing AddRef and related (de7f9b5)
+- #1859 Fix missing AddRef and related (de7f9b5)
 - #1862 Message update without author (fabe034)
 - #1864 ApiClient.CurrentUser being null (08507c0)
-- #1871 Add empty role list if not present (f47001a)
+- #1871 Fix empty role list if not present (f47001a)
 - #1872 Connection deadlock when trying to Send and Disconnect (97d90b9)
 - #1873 Remove OperationCanceledException handling in connecting logic (7cf8499)
 - #1876 Message type (ac52a11)
 - #1877 Rest message type (22bb1b0)
 - #1886 Change embed description max length to 4096 (8349cd7)
-- #1890 Add default avatar to WithAuthor extension (c200861)
+- #1923 Fix ReactionAdded cached parameters (933ea42)
+- #1923 Fixed GuildMemberUpdated cached parameters (933ea42)
+- #1923 Fixed UserIsTypeing cached parameters (933ea42)
+- #1941 Fix Emote.TryParse (900c1f4)
+- #1946 NRE when adding parameters thru builders (143ca6d)
+- #1947 ShardedClient's CurrentUser interface property being null (d5f5ae1)
 
 ### Misc
 
-- #20 Update EmbedBuilder.Overwrites.md (76a878a)
-- #21 Fix line about PriorityAttribute (75b74e1)
-- #1152 Add characters commonly use in links to Sanitize (b9274d1)
-- #1518 Add default nullable enum typereader (f7a07ae)
-- #1666 Added negative TimeSpan handling (6abdfcb)
 - #1852 Internal change to GetOrCreateUser (dfaaa21)
-- #1861 Add MaxBitrate to the interface (e0dbe7c)
-- #1865 Add null check to AllowedMentions.ToModel() (3cb662f)
-- #1923 Merge Labs 3.X into dev (933ea42)
-- #1941 Fix emoto try parse (900c1f4)
-- #1942 Implement multi-file upload to webhooks (bc440ab)
-- #1944 Add Voice binaries (b5c150d)
-- #1945 Update socket presence and add new presence event (9d6dc62)
-- #1946 fix NRE when adding parameters thru builders (143ca6d)
-- #1947 fix sharded client current user (d5f5ae1)
-- #1950 Add custom setter to Group property of ModuleBuilder to automatically invoke AddAliases (ba656e9)
-- #1958 Update from Discord .Net Labs 3.4.8 (aa6bb5e)
-- #1959 Update isRequired (98b03be)
-- Add `MatchResult` (d1b31c8)
-- Add requested changes (a92ec56)
-- Fix incorrect casing on `HandleCommandPipeline` (adf3a9c)
-- Merge branch 'commands/validate-get-best-match' of https://github.com/siscodeorg/Discord.Net into siscodeorg-commands/validate-get-best-match (3cd9f39)
-- Merge branch 'siscodeorg-commands/validate-get-best-match' into dev (4f1fe2b)
-- Remove docs build from azure pipelines (2336b98)
-- use async main (125f6c7)
-- #1923 Made `Hierarchy` a `IGuildUser` property.
-- #1923 Changed embed discription length to 4096 (933ea42).
-- #1923 Fixed gateway serialization to include nulls for API v9 (933ea42).
-- #1923 Removed error log for gateway reconnects (933ea42).
-- #1966 Updated docs.
+- #1923 Make Hierarchy a IGuildUser property (933ea42)
+- #1923 Changed embed discription length to 4096 (933ea42)
+- #1923 Fixed gateway serialization to include nulls for API v9 (933ea42)
+- #1923 Removed error log for gateway reconnects (933ea42)
+- #1945 Updated socket presence and add new presence event (9d6dc62)
 
 ## [2.4.0] - 2021-05-22
 
