@@ -50,32 +50,6 @@ Setting up labs in your project is really simple, here's how to do it:
 2) Add Discord.Net Labs nuget to your project
 3) That's all!
 
-## Implementations
-What Discord.NET-labs has that Discord.NET does not:
-
-- Major changes
-  * Interaction Support.
-  * Application commands (slash, user, message).
-  * Message Components (buttons, select menus).
-  * Thread Channels.
-  * Stage Channels.
-  * Guild Events.
-  * Revamped Stickers.
-
-- Minor changes
-  * Added `TimestampTag`.
-  * Made `Hierarchy` a `IGuildUser` property.
-  * Changes embed discription length to 4096.
-  * Added `Name` property to teams.
-  * Added url validation to embeds.
-  * Added `NsfwLevel` to Guilds.
-  * Added helpers to `Emoji` for parsing.
-  * Fixed gateway serialization to include nulls.
-  * Added banner and accent color to guild users.
-  * Fixed `CurrentUserId` in sharded clients being null.
-  * Fixed Guild owner and Admin `GuildPermissions.All`.
-  * Added `RatelimitCallback` to `RequestOptions`.
-
 ## Branches
 
 ### Dev
@@ -83,9 +57,6 @@ This branch is kept up to date with dnets dev branch. we pull of it to ensure th
 
 ### release/3.x
 This branch is what will be pushed to nuget, sometimes its not up to date as we wait for other features to be finished.
-
-### old/SlashCommandService
-This branch is on pause and does not work currently, There is a pull request open to implement a working version of a slash command service. It can be found [here](https://github.com/Discord-Net-Labs/Discord.Net-Labs/pull/52)
 
 ### feature/xyz
 These branches are features for new things, you are more than welcome to clone them and give feedback in the discord server or issues tab.

@@ -452,12 +452,12 @@ namespace Discord.WebSocket
         }
         internal readonly AsyncEvent<Func<SocketUser, SocketUser, Task>> _userUpdatedEvent = new AsyncEvent<Func<SocketUser, SocketUser, Task>>();
         /// <summary> Fired when a guild member is updated, or a member presence is updated. </summary>
-        public event Func<Cacheable<SocketGuildUser, ulong>, SocketGuildUser, Task> GuildMemberUpdated
+        public event Func<Cacheable<SocketGuildUser, RestGuildUser, IGuildUser, ulong>, SocketGuildUser, Task> GuildMemberUpdated
         {
             add { _guildMemberUpdatedEvent.Add(value); }
             remove { _guildMemberUpdatedEvent.Remove(value); }
         }
-        internal readonly AsyncEvent<Func<Cacheable<SocketGuildUser, ulong>, SocketGuildUser, Task>> _guildMemberUpdatedEvent = new AsyncEvent<Func<Cacheable<SocketGuildUser, ulong>, SocketGuildUser, Task>>();
+        internal readonly AsyncEvent<Func<Cacheable<SocketGuildUser, RestGuildUser, IGuildUser, ulong>, SocketGuildUser, Task>> _guildMemberUpdatedEvent = new AsyncEvent<Func<Cacheable<SocketGuildUser, RestGuildUser, IGuildUser, ulong>, SocketGuildUser, Task>>();
         /// <summary> Fired when a user joins, leaves, or moves voice channels. </summary>
         public event Func<SocketUser, SocketVoiceState, SocketVoiceState, Task> UserVoiceStateUpdated
         {

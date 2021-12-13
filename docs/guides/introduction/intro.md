@@ -23,7 +23,7 @@ in [our GitHub repository].
 > Please note that you should *not* try to blindly copy paste
 > the code. The examples are meant to be a template or a guide.
 
-[our GitHub repository]: https://github.com/Discord-Net-Labs/Discord.Net-Labs
+[our GitHub repository]: https://github.com/discord-net/Discord.Net/
 [Task-based Asynchronous Pattern]: https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap
 [polymorphism]: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/polymorphism
 [interface]: https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/interfaces/
@@ -44,5 +44,5 @@ resources to get you started.
 
 ## Still have questions?
 
-Please visit us at the [Labs Discord](https://discord.gg/dnet-labs) server.
+Please visit us at the [Discord](https://discord.gg/dnet-labs) server.
 Describe the problem in details to us, what you've tried and what you need help with.

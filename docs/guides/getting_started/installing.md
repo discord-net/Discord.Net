@@ -11,9 +11,9 @@ may also compile this library yourself should you so desire.
 
 ## Supported Platforms
 
-Discord.Net targets [.NET Standard] both 1.3 and 2.0; this also means
-that creating applications using the latest version of [.NET Core] is
-the most recommended. If you are bound by Windows-specific APIs or
+Discord.Net targets [.NET 5.0], but is also available on older versions, like [.NET Standard] and [.NET Core]; this still means
+that creating applications using the latest version of .NET (6.0)
+is most recommended. If you are bound by Windows-specific APIs or
 other limitations, you may also consider targeting [.NET Framework]
 4.6.1 or higher.
 
@@ -23,6 +23,7 @@ other limitations, you may also consider targeting [.NET Framework]
 > implementation and may crash the application upon startup.
 
 [Mono]: https://www.mono-project.com/
+[.NET 5.0]: https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-5
 [.NET Standard]: https://docs.microsoft.com/en-us/dotnet/articles/standard/library
 [.NET Core]: https://docs.microsoft.com/en-us/dotnet/articles/core/
 [.NET Framework]: https://docs.microsoft.com/en-us/dotnet/framework/get-started/
@@ -90,15 +91,15 @@ In order to compile Discord.Net, you will need the following:
 
 ### Using Visual Studio
 
-* [Visual Studio 2019](https://visualstudio.microsoft.com/)
-* [.NET Core SDK]
+* [Visual Studio 2019](https://visualstudio.microsoft.com/) or later.
+* [.NET 5 SDK]
 
-The .NET Core and Docker workload is required during Visual Studio
+The .NET 5 and Docker workload is required during Visual Studio
 installation.
 
 ### Using Command Line
 
-* [.NET Core SDK]
+* [.NET 5 SDK]
 
 ## Additional Information
 
@@ -141,4 +142,4 @@ over the default ones.
 
 ***
 
-[.NET Core SDK]: https://dotnet.microsoft.com/download
+[.NET 5 SDK]: https://dotnet.microsoft.com/download

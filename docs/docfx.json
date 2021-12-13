@@ -17,21 +17,20 @@
   "build": {
     "content": [
       {
-        "files": ["api/**.yml", "api/index.md"]
+        "files": [ "api/**.yml", "api/index.md" ]
       },
       {
-        "files": ["toc.yml", "index.md"]
+        "files": [ "toc.yml", "index.md" ]
+      },
+      {
+        "files": [ "faq/**.md", "faq/**/toc.yml" ]
+      },
+      {
+        "files": [ "guides/**.md", "guides/**/toc.yml" ]
       },
       {
         "src": "../",
-        "files": ["FAQ.md"]
-      },
-      {
-        "files": ["guides/**.md", "guides/**/toc.yml"]
-      },
-      {
-        "src": "../",
-        "files": ["CHANGELOG.md"]
+        "files": [ "CHANGELOG.md" ]
       }
     ],
     "resource": [

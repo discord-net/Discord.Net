@@ -1,5 +1,165 @@
 # Changelog
 
+## [3.4.9] - 12/06/2021
+
+### Fixed
+
+- NRE when responding to an interaction with just an embed
+
+## [3.4.8] - 12/04/2021
+
+### Added
+
+- Check for creating threads in news channels.
+- Back netstandard2.0 and netstandard2.1 builds.
+- IApplicationCommandInteraction interface and make IUserCommandInteraction, IMessageCommandInteraction, and ISlashCommandInteraction inherit it.
+- FollowupWithFilesAsync to interactions to allow uploading multiple attachments.
+- IUser User to IDiscordInteraction.
+
+### Fixed
+
+- NRE on modifying messages allowed mentions again.
+
+### Misc
+
+- Deprecate ApplicationCommandException in favor for HttpException.
+- Made RespondAsync return a RestInteractionMessage based off of the parameters sent over to discord. This allows direct calls to ModifyAsync and DeleteAsync without having to get the interaction response first.
+- Change Followup / Respond method signatures to move RequestOptions to the last parameter as well as change component to components.
+- Update async summaries to contain information about the task in the return tag.
+
+## [3.4.7] - 28/11/2021
+
+### Added
+
+- Methods for manually registering global comands.
+
+### Fixed
+
+- NRE on service providerless command execution.
+- Wrong link in interactions framework docs.
+
+## [3.4.6] - 27/11/2021
+
+### Fixed
+
+- Self user presence throwing upon set.
+
+## [3.4.5] - 27/11/2021
+
+### Fixed
+
+- Another NRE with presence.
+
+## [3.4.4] - 27/11/2021
+
+### Fixed
+
+- NRE with presence causing guild members to basically not exist.
+
+## [3.4.3] - 27/11/2021
+
+### Added
+
+- PresenceUpdate socket event to help alleviate GuildMemberUpdate event calls.
+- Guild.ClearUserCache(Predicate) to socket guilds.
+- Warnings to the gateway client about intents, you can disable them by setting LogGatewayIntentWarnings to false in the discord socket config.
+- DefaultApplications enum with the default games in the discord games lab.
+- Support for sending multiple files on Webhooks.
+- MaxBitrate to the IGuild interface.
+
+### Fixed
+
+- Bi-directional unicode names getting formatted wrong when calling IUser.ToString().
+- CurrentUser with ICommandContext on DiscordShardedClient being null.
+- NRE on Emote.TryParse.
+
+## [3.4.2] - 26/11/2021
+
+### Fixed
+
+- Improve the GuildFeatures converter.
+- Message/User commands are not being executed when their name have spaces on it.
+
+## [3.4.1] - 26/11/2021
+
+### Fixed
+
+- SocketVoiceChannel options are created as generic mentionables in Interaction service
+
+## [3.4.0] - 26/11/2021
+
+### Added
+
+- Interaction Service framework.
+
+### Fixed
+
+- NRE when modifying allowed mentions.
+
+### Misc
+
+- Updated summaries of interaction related classes.
+
+## [3.3.3] - 11/23/2021
+
+### Added
+
+- Emoji to roles
+- Invitable and Slowmode to thread creation
+- Better discord errors.
+- UseInteractionSnowflakeDate to config.
+
+### Fixed
+
+- Components not showing on FollowUpWithFile.
+- Change the minimum length of slash commands to 1.
+- Ratelimit timings.
+
+### Misc
+
+- Make RestUserCommand public.
+
+## [3.3.2] - 11/21/2021
+
+### Added
+
+- GuildScheduledEventUserAdd and GuildScheduledEventUserRemove.
+- New Cacheable<> type for rest based downloads while maintaining strong typed entities.
+
+### Fixed
+
+- Autocomplete not accepting values
+
+## [3.3.1] - 11/21/2021
+
+### Added
+
+- ConfigureAwait(false) to async calls in rest based interactions.
+
+### Fixed
+
+- Slash commands will now have populated data.
+
+## [3.3.0] - 11/19/2021
+
+### Added
+
+- Guild events.
+- Rest-based http interactions.
+- RTCRegion to voice channel properties. 
+- Support Min and Max values on ApplicationCommandOptions.
+- Automatically fix ordering of optional command options.
+- Interaction Specific Interfaces.
+
+### Fixed
+
+- Maximum number of Select Menu Options.
+
+### Misc
+
+- Changed default sticker behavior. You can configure getting default stickers on startup and auto resolve stickers with AlwaysDownloadDefaultStickers and AlwaysResolveStickers.
+- Logomark, doc settings edit.
+
 ## [3.2.0] - 11/09/2021
 
 ### Added
