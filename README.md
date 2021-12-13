@@ -3,7 +3,7 @@
 [![NuGet](https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic)](https://www.nuget.org/packages/Discord.Net)
 [![MyGet](https://img.shields.io/myget/discord-net/vpre/Discord.Net.svg)](https://www.myget.org/feed/Packages/discord-net)
 [![Build Status](https://dev.azure.com/discord-net/Discord.Net/_apis/build/status/discord-net.Discord.Net?branchName=dev)](https://dev.azure.com/discord-net/Discord.Net/_build/latest?definitionId=1&branchName=dev)
-[![Discord](https://discord.com/api/guilds/81384788765712384/widget.png)](https://discord.gg/dnet)
+[![Discord](https://discord.com/api/guilds/848176216011046962/widget.png)](https://discord.gg/dnet)
 
 An unofficial .NET API Wrapper for the Discord client (https://discord.com).
 
