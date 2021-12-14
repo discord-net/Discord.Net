@@ -40,11 +40,10 @@
 - #1923 Add Attachments property to MessageProperties (933ea42)
 - #1942 Add multi-file upload to webhooks (bc440ab)
 - #1943 Handle bidirectional usernames (10afd96)
-- #1944 Add Voice binaries (b5c150d)
+- #1945 Updated socket presence and add new presence event (9d6dc62)
 - #1948 Added warnings on invalid gateway intents (51e06e9)
 - #1949 Add default application games (82276e3)
 - #1950 Add custom setter to Group property of ModuleBuilder to automatically invoke AddAliases (ba656e9)
-- #1958 Add NET5.0 and NET6.0 builds (aa6bb5e)
 - #1958 Add Discord.Interactions framework (aa6bb5e)
 
 ### Fixed
@@ -61,24 +60,22 @@
 - #1871 Fix empty role list if not present (f47001a)
 - #1872 Connection deadlock when trying to Send and Disconnect (97d90b9)
 - #1873 Remove OperationCanceledException handling in connecting logic (7cf8499)
-- #1876 Message type (ac52a11)
-- #1877 Rest message type (22bb1b0)
+- #1876 Fix SocketMessage type always being default (ac52a11)
+- #1877 Fix RestMessage type always being default (22bb1b0)
 - #1886 Change embed description max length to 4096 (8349cd7)
 - #1923 Fix ReactionAdded cached parameters (933ea42)
 - #1923 Fixed GuildMemberUpdated cached parameters (933ea42)
 - #1923 Fixed UserIsTypeing cached parameters (933ea42)
 - #1941 Fix Emote.TryParse (900c1f4)
-- #1946 NRE when adding parameters thru builders (143ca6d)
+- #1946 Fix NRE when adding parameters in ModuleBuilders (143ca6d)
 - #1947 ShardedClient's CurrentUser interface property being null (d5f5ae1)
 
 ### Misc
 
 - #1852 Internal change to GetOrCreateUser (dfaaa21)
 - #1923 Make Hierarchy a IGuildUser property (933ea42)
-- #1923 Changed embed discription length to 4096 (933ea42)
 - #1923 Fixed gateway serialization to include nulls for API v9 (933ea42)
 - #1923 Removed error log for gateway reconnects (933ea42)
-- #1945 Updated socket presence and add new presence event (9d6dc62)
 
 ## [2.4.0] - 2021-05-22
 
