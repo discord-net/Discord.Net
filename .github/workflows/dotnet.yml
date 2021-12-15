@@ -91,16 +91,6 @@ jobs:
           if: startsWith(github.ref, 'refs/tags/')
           run: echo "IsTagBuild=true" >> $GITHUB_ENV
           
-        - name: Generate Beta Suffix
-          if: env.IsTagBuild == 'true' && contains(github.ref_name, '-')
-          env: 
-            REF_NAME: ${{ github.ref_name }}
-          run: echo "Suffix=-${REF_NAME##*-}" >> $GITHUB_ENV
-
-        - name: Generate Suffix
-          if: env.IsTagBuild != 'true'
-          run: echo "Suffix=-nightly.$(date +'%Y%m%d').${{ github.run_number }}" >> $GITHUB_ENV
-          
         - name: setup NuGet
           uses: nuget/setup-nuget@v2
           with:
@@ -113,7 +103,27 @@ jobs:
             path: ${{ env.ArtifactStagingDirectory }}
         
         - name: Pack Metapackage
-          run: nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory ${{ env.ArtifactStagingDirectory }} -NonInteractive -p "suffix=${{ env.Suffix }}"
+          run: |
+            shopt -s nullglob
+
+            core_packages=()
+            for package in "${{ env.ArtifactStagingDirectory }}"/Discord.Net.Core.[0-9]*.nupkg; do
+              [[ "$package" == *.symbols.nupkg ]] && continue
+              core_packages+=("$package")
+            done
+
+            if [ "${#core_packages[@]}" -ne 1 ]; then
+              echo "Expected exactly one Discord.Net.Core package, found ${#core_packages[@]}"
+              printf '  %s\n' "${core_packages[@]}"
+              exit 1
+            fi
+
+            version=$(basename "${core_packages[0]}")
+            version="${version#Discord.Net.Core.}"
+            version="${version%.nupkg}"
+
+            echo "Packing metapackage version $version"
+            nuget pack "src/Discord.Net/Discord.Net.nuspec" -OutputDirectory "${{ env.ArtifactStagingDirectory }}" -NonInteractive -Properties "version=$version"
 
         - name: Set API Keys
           run: |
