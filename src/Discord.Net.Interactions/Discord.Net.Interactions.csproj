@@ -6,7 +6,7 @@
     <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">net6.0;net5.0;netstandard2.0;netstandard2.1</TargetFrameworks>
     <RootNamespace>Discord.Interactions</RootNamespace>
     <AssemblyName>Discord.Net.Interactions</AssemblyName>
-    <PackageId>Discord.Net.Labs.Interactions</PackageId>
+    <PackageId>Discord.Net.Interactions</PackageId>
     <Description>A Discord.Net extension adding support for Application Commands.</Description>
   </PropertyGroup>
 
