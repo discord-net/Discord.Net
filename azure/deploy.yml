@@ -10,22 +10,20 @@ steps:
     dotnet pack "src\Discord.Net.Interactions\Discord.Net.Interactions.csproj" --no-restore --no-build -v minimal -c $(buildConfiguration) -o "$(Build.ArtifactStagingDirectory)" /p:BuildNumber=$(buildNumber) /p:IsTagBuild=$(buildTag)
   displayName: Pack projects
 
-- task: NuGetCommand@2
-  displayName: Pack metapackage (release mode)
-  condition: eq(variables['buildTag'], True)
-  inputs:
-    command: 'pack'
-    packagesToPack: 'src/Discord.Net/Discord.Net.nuspec'
-    versioningScheme: 'off'  
+- pwsh: |
+    $package = Get-ChildItem $(Build.ArtifactStagingDirectory)/Discord.Net.Core*.nupkg
+    $version = $package.Name.Replace("Discord.Net.Core.", "").Replace(".nupkg", "")
+
+    Write-Output "##vso[task.setvariable variable=packedVersion;]$version"
+  displayName: Retrieve packed version
 
 - task: NuGetCommand@2
   displayName: Pack metapackage
-  condition: eq(variables['buildTag'], False)
   inputs:
     command: 'pack'
     packagesToPack: 'src/Discord.Net/Discord.Net.nuspec'
     versioningScheme: 'off'
-    buildProperties: 'suffix=-$(buildNumber)'
+    buildProperties: 'version=$(packedVersion)'
 
 - task: NuGetCommand@2
   displayName: Push to NuGet
