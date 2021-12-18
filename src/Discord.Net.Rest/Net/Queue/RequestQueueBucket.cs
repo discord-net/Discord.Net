@@ -1,6 +1,4 @@
-using Discord.API;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 #if DEBUG_LIMITS
 using System.Diagnostics;
@@ -106,17 +104,22 @@ namespace Discord.Net.Queue
                                 {
                                     try
                                     {
-                                        using (var reader = new StreamReader(response.Stream))
-                                        using (var jsonReader = new JsonTextReader(reader))
-                                        {
-                                            error = Discord.Rest.DiscordRestClient.Serializer.Deserialize<API.DiscordError>(jsonReader);
-                                        }
+                                        using var reader = new StreamReader(response.Stream);
+                                        using var jsonReader = new JsonTextReader(reader);
+
+                                        error = Discord.Rest.DiscordRestClient.Serializer.Deserialize<API.DiscordError>(jsonReader);
                                     }
                                     catch { }
                                 }
-                                throw new HttpException(response.StatusCode, request, error?.Code, error.Message, error.Errors.IsSpecified
-                                    ? error.Errors.Value.Select(x => new DiscordJsonError(x.Name.GetValueOrDefault("root"), x.Errors.Select(y => new DiscordError(y.Code, y.Message)).ToArray())).ToArray()
-                                    : null);
+                                throw new HttpException(
+                                    response.StatusCode,
+                                    request,
+                                    error?.Code,
+                                    error?.Message,
+                                    error?.Errors.IsSpecified == true ?
+                                        error.Errors.Value.Select(x => new DiscordJsonError(x.Name.GetValueOrDefault("root"), x.Errors.Select(y => new DiscordError(y.Code, y.Message)).ToArray())).ToArray() :
+                                        null
+                                    );
                         }
                     }
                     else
