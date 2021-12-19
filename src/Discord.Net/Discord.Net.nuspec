@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Discord.Net</id>
-    <version>3.0.0-dev$suffix$</version>
+    <version>3.0.0$suffix$</version>
     <title>Discord.Net</title>
     <authors>Discord.Net Contributors</authors>
     <owners>foxbot</owners>
