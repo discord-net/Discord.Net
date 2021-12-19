@@ -20,14 +20,17 @@ namespace Discord.API
         public bool BotRequiresCodeGrant { get; set; }
         [JsonProperty("install_params")]
         public Optional<InstallParams> InstallParams { get; set; }
-
         [JsonProperty("team")]
         public Team Team { get; set; }
-
         [JsonProperty("flags"), Int53]
         public Optional<ApplicationFlags> Flags { get; set; }
         [JsonProperty("owner")]
         public Optional<User> Owner { get; set; }
+        [JsonProperty("tags")]
         public Optional<string[]> Tags { get; set; }
+        [JsonProperty("terms_of_service_url")]
+        public string TermsOfService { get; set; }
+        [JsonProperty("privacy_policy_url")]
+        public string PrivacyPolicy { get; set; }
     }
 }

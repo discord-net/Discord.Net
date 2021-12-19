@@ -347,7 +347,8 @@ namespace Discord.Rest
         public static Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             Stream stream, string filename, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options, bool isSpoiler, Embed[] embeds)
         {
-            return SendFileAsync(channel, client, new FileAttachment(stream, filename, isSpoiler: isSpoiler), text, isTTS, embed, allowedMentions, messageReference, components, stickers, options, embeds);
+            using var file = new FileAttachment(stream, filename, isSpoiler: isSpoiler);
+            return SendFileAsync(channel, client, file, text, isTTS, embed, allowedMentions, messageReference, components, stickers, options, embeds);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>

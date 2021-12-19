@@ -260,15 +260,17 @@ namespace Discord.Rest
         public abstract Task<RestFollowupMessage> FollowupWithFilesAsync(IEnumerable<FileAttachment> attachments, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false,
             AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null);
 
+        /// <inheritdoc/>
+        public Task DeleteOriginalResponseAsync(RequestOptions options = null)
+            => InteractionHelper.DeleteInteractionResponseAsync(Discord, this, options);
+
         #region  IDiscordInteraction
         /// <inheritdoc/>
         IUser IDiscordInteraction.User => User;
 
         /// <inheritdoc/>
-        Task<IUserMessage> IDiscordInteraction.RespondAsync(string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options)
-        {
-            return Task.FromResult<IUserMessage>(null);
-        }
+        Task IDiscordInteraction.RespondAsync(string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options)
+            => Task.FromResult(Respond(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options));
         /// <inheritdoc/>
         Task IDiscordInteraction.DeferAsync(bool ephemeral, RequestOptions options)
             => Task.FromResult(Defer(ephemeral, options));
@@ -296,6 +298,17 @@ namespace Discord.Rest
         /// <inheritdoc/>
         async Task<IUserMessage> IDiscordInteraction.FollowupWithFilesAsync(IEnumerable<FileAttachment> attachments, string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options)
             => await FollowupWithFilesAsync(attachments, text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options).ConfigureAwait(false);
+        /// <inheritdoc/>
+        Task IDiscordInteraction.RespondWithFilesAsync(IEnumerable<FileAttachment> attachments, string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options) => throw new NotSupportedException("REST-Based interactions don't support files.");
+        /// <inheritdoc/>
+#if NETCOREAPP3_0_OR_GREATER != true
+        /// <inheritdoc/>
+        Task IDiscordInteraction.RespondWithFileAsync(Stream fileStream, string fileName, string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options) => throw new NotSupportedException("REST-Based interactions don't support files.");
+        /// <inheritdoc/>
+        Task IDiscordInteraction.RespondWithFileAsync(string filePath, string fileName, string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options) => throw new NotSupportedException("REST-Based interactions don't support files.");
+        /// <inheritdoc/>
+        Task IDiscordInteraction.RespondWithFileAsync(FileAttachment attachment, string text, Embed[] embeds, bool isTTS, bool ephemeral, AllowedMentions allowedMentions, MessageComponent components, Embed embed, RequestOptions options) => throw new NotSupportedException("REST-Based interactions don't support files.");
+#endif
         #endregion
     }
 }

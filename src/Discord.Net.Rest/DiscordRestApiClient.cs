@@ -1309,7 +1309,20 @@ namespace Discord.API
 
             options = RequestOptions.CreateOrClone(options);
 
-            await SendJsonAsync<Message>("POST", () => $"interactions/{interactionId}/{interactionToken}/callback", response, new BucketIds(), options: options);
+            await SendJsonAsync("POST", () => $"interactions/{interactionId}/{interactionToken}/callback", response, new BucketIds(), options: options);
+        }
+        public async Task CreateInteractionResponseAsync(UploadInteractionFileParams response, ulong interactionId, string interactionToken, RequestOptions options = null)
+        {
+            if ((!response.Embeds.IsSpecified || response.Embeds.Value == null || response.Embeds.Value.Length == 0) && !response.Files.Any())
+                Preconditions.NotNullOrEmpty(response.Content, nameof(response.Content));
+
+            if (response.Content.IsSpecified && response.Content.Value.Length > DiscordConfig.MaxMessageSize)
+                throw new ArgumentException(message: $"Message content is too long, length must be less or equal to {DiscordConfig.MaxMessageSize}.", paramName: nameof(response.Content));
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds();
+            await SendMultipartAsync("POST", () => $"interactions/{interactionId}/{interactionToken}/callback", response.ToDictionary(), ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
         }
         public async Task<Message> GetInteractionResponseAsync(string interactionToken, RequestOptions options = null)
         {

@@ -1,3 +1,4 @@
+using Discord.API;
 using Newtonsoft.Json;
 using System;
 #if DEBUG_LIMITS

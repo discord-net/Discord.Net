@@ -1,9 +1,12 @@
+using System;
+using System.Threading.Tasks;
+
 namespace Discord.Rest
 {
     /// <summary>
     ///     Represents a Rest based context of an <see cref="IDiscordInteraction"/>.
     /// </summary>
-    public class RestInteractionContext<TInteraction> : IInteractionContext
+    public class RestInteractionContext<TInteraction> : IRestInteractionContext
         where TInteraction : RestInteraction
     {
         /// <summary>
@@ -35,6 +38,14 @@ namespace Discord.Rest
         public TInteraction Interaction { get; }
 
         /// <summary>
+        ///     Gets or sets the callback to use when the service has outgoing json for the rest webhook.
+        /// </summary>
+        /// <remarks>
+        ///     If this property is <see langword="null"/> the default callback will be used.
+        /// </remarks>
+        public Func<string, Task> InteractionResponseCallback { get; set; }
+
+        /// <summary>
         ///     Initializes a new <see cref="RestInteractionContext{TInteraction}"/>. 
         /// </summary>
         /// <param name="client">The underlying client.</param>
@@ -46,6 +57,18 @@ namespace Discord.Rest
             Channel = interaction.Channel;
             User = interaction.User;
             Interaction = interaction;
+        }
+
+        /// <summary>
+        ///     Initializes a new <see cref="RestInteractionContext{TInteraction}"/>. 
+        /// </summary>
+        /// <param name="client">The underlying client.</param>
+        /// <param name="interaction">The underlying interaction.</param>
+        /// <param name="interactionResponseCallback">The callback for outgoing json.</param>
+        public RestInteractionContext(DiscordRestClient client, TInteraction interaction, Func<string, Task> interactionResponseCallback)
+            : this(client, interaction)
+        {
+            InteractionResponseCallback = interactionResponseCallback;
         }
 
         // IInterationContext
@@ -66,15 +89,24 @@ namespace Discord.Rest
     }
 
     /// <summary>
-    ///     Represents a Rest based context of an <see cref="IDiscordInteraction"/>
+    ///     Represents a Rest based context of an <see cref="IDiscordInteraction"/>.
     /// </summary>
     public class RestInteractionContext : RestInteractionContext<RestInteraction>
     {
         /// <summary>
-        ///     Initializes a new <see cref="RestInteractionContext"/> 
+        ///     Initializes a new <see cref="RestInteractionContext"/>.
         /// </summary>
-        /// <param name="client">The underlying client</param>
-        /// <param name="interaction">The underlying interaction</param>
+        /// <param name="client">The underlying client.</param>
+        /// <param name="interaction">The underlying interaction.</param>
         public RestInteractionContext(DiscordRestClient client, RestInteraction interaction) : base(client, interaction) { }
+
+        /// <summary>
+        ///     Initializes a new <see cref="RestInteractionContext"/>.
+        /// </summary>
+        /// <param name="client">The underlying client.</param>
+        /// <param name="interaction">The underlying interaction.</param>
+        /// <param name="interactionResponseCallback">The callback for outgoing json.</param>
+        public RestInteractionContext(DiscordRestClient client, RestInteraction interaction, Func<string, Task> interactionResponseCallback)
+            : base(client, interaction, interactionResponseCallback) { }
     }
 }

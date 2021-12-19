@@ -25,6 +25,7 @@ namespace Discord
         /// <param name="stream">The stream to create the attachment from.</param>
         /// <param name="fileName">The name of the attachment.</param>
         /// <param name="description">The description of the attachment.</param>
+        /// <param name="isSpoiler">Whether or not the attachment is a spoiler.</param>
         public FileAttachment(Stream stream, string fileName, string description = null, bool isSpoiler = false)
         {
             _isDisposed = false;
@@ -42,6 +43,9 @@ namespace Discord
         ///     <see cref="File.OpenRead"/>.
         /// </remarks>
         /// <param name="path">The path to the file.</param>
+        /// <param name="fileName">The name of the attachment.</param>
+        /// <param name="description">The description of the attachment.</param>
+        /// <param name="isSpoiler">Whether or not the attachment is a spoiler.</param>
         /// <exception cref="System.ArgumentException">
         /// <paramref name="path" /> is a zero-length string, contains only white space, or contains one or more invalid
         /// characters as defined by <see cref="Path.GetInvalidPathChars"/>.
@@ -62,11 +66,11 @@ namespace Discord
         /// <exception cref="FileNotFoundException">The file specified in <paramref name="path" /> was not found.
         /// </exception>
         /// <exception cref="IOException">An I/O error occurred while opening the file. </exception>
-        public FileAttachment(string path, string description = null, bool isSpoiler = false)
+        public FileAttachment(string path, string fileName = null, string description = null, bool isSpoiler = false)
         {
             _isDisposed = false;
             Stream = File.OpenRead(path);
-            FileName = Path.GetFileName(path);
+            FileName = fileName ?? Path.GetFileName(path);
             Description = description;
             IsSpoiler = isSpoiler;
         }

@@ -37,14 +37,14 @@ for testing and development to eventually get merged into Discord.NET.
 
 [Installing Discord.NET Labs](xref:Guides.GettingStarted.Installation.Labs)
 
-[discord.net labs]: https://github.com/Discord-Net-Labs/Discord.Net-Labs
+[Discord.NET Labs]: https://github.com/Discord-Net-Labs/Discord.Net-Labs
 
 ## Questions?
 
-Frequently asked questions are covered in the
-FAQ. Read it thoroughly because most common questions are already answered there.
+Frequently asked questions are covered in the 
+FAQ. Read it thoroughly because most common questions are already answered there. 
 
-If you still have unanswered questions after reading the [FAQ](xref:FAQ.Basics.GetStarted), further support is available on
+If you still have unanswered questions after reading the [FAQ](xref:FAQ.Basics.GetStarted), further support is available on 
 [Discord](https://discord.gg/dnet).
 
 ## Commonly used features

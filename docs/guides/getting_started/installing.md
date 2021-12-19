@@ -100,7 +100,7 @@ installation.
 
 ### Using Command Line
 
-- [.NET 5 SDK]
+* [.NET 5 SDK]
 
 ## Additional Information
 
@@ -143,4 +143,4 @@ by installing one or more custom packages as listed below.
 
 ---
 
-[.net 5 sdk]: https://dotnet.microsoft.com/download
+[.NET 5 SDK]: https://dotnet.microsoft.com/download
