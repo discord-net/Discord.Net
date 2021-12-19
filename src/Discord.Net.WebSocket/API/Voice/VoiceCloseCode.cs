@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Discord.API.Voice
+namespace Discord.WebSocket
 {
     /// <summary>
     ///     Represents generic op codes for voice disconnect.
