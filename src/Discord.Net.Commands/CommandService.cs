@@ -643,12 +643,12 @@ namespace Discord.Commands
                 var bestMatch = parseResults
                     .FirstOrDefault(x => !x.Value.IsSuccess);
 
-                return MatchResult.FromSuccess(bestMatch.Key,bestMatch.Value);
+                return MatchResult.FromSuccess(bestMatch.Key, bestMatch.Value);
             }
 
             var chosenOverload = successfulParses[0];
 
-            return MatchResult.FromSuccess(chosenOverload.Key,chosenOverload.Value);
+            return MatchResult.FromSuccess(chosenOverload.Key, chosenOverload.Value);
         }
         #endregion
 

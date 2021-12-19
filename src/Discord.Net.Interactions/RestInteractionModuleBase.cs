@@ -30,7 +30,12 @@ namespace Discord.Interactions
             if (Context.Interaction is not RestInteraction restInteraction)
                 throw new InvalidOperationException($"Invalid interaction type. Interaction must be a type of {nameof(RestInteraction)} in order to execute this method");
 
-            await InteractionService._restResponseCallback(Context, restInteraction.Defer(ephemeral, options)).ConfigureAwait(false);
+            var payload = restInteraction.Defer(ephemeral, options);
+
+            if (Context is IRestInteractionContext restContext && restContext.InteractionResponseCallback != null)
+                await restContext.InteractionResponseCallback.Invoke(payload).ConfigureAwait(false);
+            else
+                await InteractionService._restResponseCallback(Context, payload).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -53,7 +58,12 @@ namespace Discord.Interactions
             if (Context.Interaction is not RestInteraction restInteraction)
                 throw new InvalidOperationException($"Invalid interaction type. Interaction must be a type of {nameof(RestInteraction)} in order to execute this method");
 
-            await InteractionService._restResponseCallback(Context, restInteraction.Respond(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options)).ConfigureAwait(false);
+            var payload = restInteraction.Respond(text, embeds, isTTS, ephemeral, allowedMentions, components, embed, options);
+
+            if (Context is IRestInteractionContext restContext && restContext.InteractionResponseCallback != null)
+                await restContext.InteractionResponseCallback.Invoke(payload).ConfigureAwait(false);
+            else
+                await InteractionService._restResponseCallback(Context, payload).ConfigureAwait(false);
         }
     }
 }

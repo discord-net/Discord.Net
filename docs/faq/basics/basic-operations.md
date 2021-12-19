@@ -109,15 +109,15 @@ reactions.
 
 Unfortunately, not at the moment. See [#401](https://github.com/discord-net/Discord.Net/issues/401).
 
-[ichannel]: xref:Discord.IChannel
-[icategorychannel]: xref:Discord.ICategoryChannel
-[iguildchannel]: xref:Discord.IGuildChannel
-[itextchannel]: xref:Discord.ITextChannel
-[iguild]: xref:Discord.IGuild
-[ivoicechannel]: xref:Discord.IVoiceChannel
-[iguilduser]: xref:Discord.IGuildUser
-[imessagechannel]: xref:Discord.IMessageChannel
-[iusermessage]: xref:Discord.IUserMessage
-[iemote]: xref:Discord.IEmote
-[emote]: xref:Discord.Emote
-[emoji]: xref:Discord.Emoji
+[IChannel]: xref:Discord.IChannel
+[ICategoryChannel]: xref:Discord.ICategoryChannel
+[IGuildChannel]: xref:Discord.IGuildChannel
+[ITextChannel]: xref:Discord.ITextChannel
+[IGuild]: xref:Discord.IGuild
+[IVoiceChannel]: xref:Discord.IVoiceChannel
+[IGuildUser]: xref:Discord.IGuildUser
+[IMessageChannel]: xref:Discord.IMessageChannel
+[IUserMessage]: xref:Discord.IUserMessage
+[IEmote]: xref:Discord.IEmote
+[Emote]: xref:Discord.Emote
+[Emoji]: xref:Discord.Emoji

@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using MessageModel = Discord.API.Message;
-using Model = Discord.API.InteractionResponse;
 
 namespace Discord.Rest
 {
@@ -26,22 +25,9 @@ namespace Discord.Rest
             return entity;
         }
 
-        internal static RestInteractionMessage Create(BaseDiscordClient discord, Model model, IDiscordInteraction interaction, IMessageChannel channel)
-        {
-            var entity = new RestInteractionMessage(discord, interaction.Id, discord.CurrentUser, interaction.Token, channel);
-            entity.Update(model, interaction);
-            return entity;
-        }
-
         internal new void Update(MessageModel model)
         {
             base.Update(model);
-        }
-
-        internal void Update(Model model, IDiscordInteraction interaction)
-        {
-            ResponseType = model.Type;
-            base.Update(model.ToMessage(interaction));
         }
 
         /// <summary>

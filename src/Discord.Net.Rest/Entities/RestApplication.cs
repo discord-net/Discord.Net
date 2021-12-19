@@ -29,10 +29,12 @@ namespace Discord.Rest
         public bool BotRequiresCodeGrant { get; private set; }
         /// <inheritdoc />
         public ITeam Team { get; private set; }
-
         /// <inheritdoc />
         public IUser Owner { get; private set; }
-
+        /// <inheritdoc />
+        public string TermsOfService { get; private set; }
+        /// <inheritdoc />
+        public string PrivacyPolicy { get; private set; }
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
@@ -61,6 +63,8 @@ namespace Discord.Rest
             IsBotPublic = model.IsBotPublic;
             BotRequiresCodeGrant = model.BotRequiresCodeGrant;
             Tags = model.Tags.GetValueOrDefault(null)?.ToImmutableArray() ?? ImmutableArray<string>.Empty;
+            PrivacyPolicy = model.PrivacyPolicy;
+            TermsOfService = model.TermsOfService;
             var installParams = model.InstallParams.GetValueOrDefault(null);
             InstallParams = new ApplicationInstallParams(installParams?.Scopes ?? new string[0], (GuildPermission?)installParams?.Permission ?? null);
 

@@ -19,6 +19,9 @@ namespace Discord
         ///     Gets the RPC origins of the application.
         /// </summary>
         IReadOnlyCollection<string> RPCOrigins { get; }
+        /// <summary>
+        ///     Gets the application's public flags.
+        /// </summary>
         ApplicationFlags Flags { get; }
         /// <summary>
         ///     Gets a collection of install parameters for this application.
@@ -44,10 +47,18 @@ namespace Discord
         ///     Gets the team associated with this application if there is one.
         /// </summary>
         ITeam Team { get; }
-
         /// <summary>
         ///     Gets the partial user object containing info on the owner of the application.
         /// </summary>
         IUser Owner { get; }
+        /// <summary>
+        ///     Gets the url of the app's terms of service.
+        /// </summary>
+        public string TermsOfService { get; }
+        /// <summary>
+        ///     Gets the the url of the app's privacy policy.
+        /// </summary>
+        public string PrivacyPolicy { get; }
+
     }
 }

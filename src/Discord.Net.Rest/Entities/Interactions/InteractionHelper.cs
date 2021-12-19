@@ -34,11 +34,16 @@ namespace Discord.Rest
             return client.ApiClient.BulkOverwriteGlobalApplicationCommandsAsync(Array.Empty<CreateApplicationCommandParams>(), options);
         }
 
-        public static async Task<RestInteractionMessage> SendInteractionResponseAsync(BaseDiscordClient client, InteractionResponse response,
+        public static async Task SendInteractionResponseAsync(BaseDiscordClient client, InteractionResponse response,
             IDiscordInteraction interaction, IMessageChannel channel = null, RequestOptions options = null)
         {
             await client.ApiClient.CreateInteractionResponseAsync(response, interaction.Id, interaction.Token, options).ConfigureAwait(false);
-            return RestInteractionMessage.Create(client, response, interaction, channel);
+        }
+
+        public static async Task SendInteractionResponseAsync(BaseDiscordClient client, UploadInteractionFileParams response,
+            IDiscordInteraction interaction, IMessageChannel channel = null, RequestOptions options = null)
+        {
+            await client.ApiClient.CreateInteractionResponseAsync(response, interaction.Id, interaction.Token, options).ConfigureAwait(false);
         }
 
         public static async Task<RestInteractionMessage> GetOriginalResponseAsync(BaseDiscordClient client, IMessageChannel channel,
@@ -433,6 +438,9 @@ namespace Discord.Rest
 
         public static async Task DeleteInteractionResponseAsync(BaseDiscordClient client, RestInteractionMessage message, RequestOptions options = null)
             => await client.ApiClient.DeleteInteractionFollowupMessageAsync(message.Id, message.Token, options);
+
+        public static async Task DeleteInteractionResponseAsync(BaseDiscordClient client, IDiscordInteraction interaction, RequestOptions options = null)
+            => await client.ApiClient.DeleteInteractionFollowupMessageAsync(interaction.Id, interaction.Token, options);
 
         public static Task SendAutocompleteResultAsync(BaseDiscordClient client, IEnumerable<AutocompleteResult> result, ulong interactionId,
             string interactionToken, RequestOptions options)
