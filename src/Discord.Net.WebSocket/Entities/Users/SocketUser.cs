@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord.Rest;
 using Model = Discord.API.User;
+using PresenceModel = Discord.API.Presence;
 
 namespace Discord.WebSocket
 {
@@ -40,9 +41,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public UserStatus Status => Presence.Status;
         /// <inheritdoc />
-        public IImmutableSet<ClientType> ActiveClients => Presence.ActiveClients ?? ImmutableHashSet<ClientType>.Empty;
+        public IReadOnlyCollection<ClientType> ActiveClients => Presence.ActiveClients ?? ImmutableHashSet<ClientType>.Empty;
         /// <inheritdoc />
-        public IImmutableList<IActivity> Activities => Presence.Activities ?? ImmutableList<IActivity>.Empty;
+        public IReadOnlyCollection<IActivity> Activities => Presence.Activities ?? ImmutableList<IActivity>.Empty;
         /// <summary>
         ///     Gets mutual guilds shared with this user.
         /// </summary>
@@ -58,6 +59,7 @@ namespace Discord.WebSocket
         }
         internal virtual bool Update(ClientState state, Model model)
         {
+            Presence ??= new SocketPresence();
             bool hasChanges = false;
             if (model.Avatar.IsSpecified && model.Avatar.Value != AvatarId)
             {
@@ -91,6 +93,12 @@ namespace Discord.WebSocket
             return hasChanges;
         }
 
+        internal virtual void Update(PresenceModel model)
+        {
+            Presence ??= new SocketPresence();
+            Presence.Update(model);
+        }
+
         /// <inheritdoc />
         public async Task<IDMChannel> CreateDMChannelAsync(RequestOptions options = null)
             => await UserHelper.CreateDMChannelAsync(this, Discord, options).ConfigureAwait(false);
@@ -109,8 +117,8 @@ namespace Discord.WebSocket
         /// <returns>
         ///     The full name of the user.
         /// </returns>
-        public override string ToString() => $"{Username}#{Discriminator}";
-        private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")})";
+        public override string ToString() => Format.UsernameAndDiscriminator(this);
+        private string DebuggerDisplay => $"{Format.UsernameAndDiscriminator(this)} ({Id}{(IsBot ? ", Bot" : "")})";
         internal SocketUser Clone() => MemberwiseClone() as SocketUser;
     }
 }

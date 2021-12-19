@@ -1,4 +1,3 @@
-#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -11,6 +10,8 @@ namespace Discord.API
         public ulong Id { get; set; }
         [JsonProperty("members")]
         public TeamMember[] TeamMembers { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
         [JsonProperty("owner_user_id")]
         public ulong OwnerUserId { get; set; }
     }

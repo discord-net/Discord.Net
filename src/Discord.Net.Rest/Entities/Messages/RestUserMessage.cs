@@ -20,8 +20,7 @@ namespace Discord.Rest
         private ImmutableArray<Embed> _embeds = ImmutableArray.Create<Embed>();
         private ImmutableArray<ITag> _tags = ImmutableArray.Create<ITag>();
         private ImmutableArray<ulong> _roleMentionIds = ImmutableArray.Create<ulong>();
-        private ImmutableArray<RestUser> _userMentions = ImmutableArray.Create<RestUser>();
-        private ImmutableArray<Sticker> _stickers = ImmutableArray.Create<Sticker>();
+        private ImmutableArray<StickerItem> _stickers = ImmutableArray.Create<StickerItem>();
 
         /// <inheritdoc />
         public override bool IsTTS => _isTTS;
@@ -42,11 +41,9 @@ namespace Discord.Rest
         /// <inheritdoc />
         public override IReadOnlyCollection<ulong> MentionedRoleIds => _roleMentionIds;
         /// <inheritdoc />
-        public override IReadOnlyCollection<RestUser> MentionedUsers => _userMentions;
-        /// <inheritdoc />
         public override IReadOnlyCollection<ITag> Tags => _tags;
         /// <inheritdoc />
-        public override IReadOnlyCollection<Sticker> Stickers => _stickers;
+        public override IReadOnlyCollection<StickerItem> Stickers => _stickers;
         /// <inheritdoc />
         public IUserMessage ReferencedMessage => _referencedMessage;
 
@@ -104,28 +101,12 @@ namespace Discord.Rest
                     _embeds = ImmutableArray.Create<Embed>();
             }
 
-            if (model.UserMentions.IsSpecified)
-            {
-                var value = model.UserMentions.Value;
-                if (value.Length > 0)
-                {
-                    var newMentions = ImmutableArray.CreateBuilder<RestUser>(value.Length);
-                    for (int i = 0; i < value.Length; i++)
-                    {
-                        var val = value[i];
-                        if (val.Object != null)
-                            newMentions.Add(RestUser.Create(Discord, val.Object));
-                    }
-                    _userMentions = newMentions.ToImmutable();
-                }
-            }
-
             var guildId = (Channel as IGuildChannel)?.GuildId;
             var guild = guildId != null ? (Discord as IDiscordClient).GetGuildAsync(guildId.Value, CacheMode.CacheOnly).Result : null;
             if (model.Content.IsSpecified)
             {
                 var text = model.Content.Value;
-                _tags = MessageHelper.ParseTags(text, null, guild, _userMentions);
+                _tags = MessageHelper.ParseTags(text, null, guild, MentionedUsers);
                 model.Content = text;
             }
 
@@ -136,18 +117,18 @@ namespace Discord.Rest
                 _referencedMessage = RestUserMessage.Create(Discord, Channel, refMsgAuthor, refMsg);
             }
 
-            if (model.Stickers.IsSpecified)
+            if (model.StickerItems.IsSpecified)
             {
-                var value = model.Stickers.Value;
+                var value = model.StickerItems.Value;
                 if (value.Length > 0)
                 {
-                    var stickers = ImmutableArray.CreateBuilder<Sticker>(value.Length);
+                    var stickers = ImmutableArray.CreateBuilder<StickerItem>(value.Length);
                     for (int i = 0; i < value.Length; i++)
-                        stickers.Add(Sticker.Create(value[i]));
+                        stickers.Add(new StickerItem(Discord, value[i]));
                     _stickers = stickers.ToImmutable();
                 }
                 else
-                    _stickers = ImmutableArray.Create<Sticker>();
+                    _stickers = ImmutableArray.Create<StickerItem>();
             }
         }
 

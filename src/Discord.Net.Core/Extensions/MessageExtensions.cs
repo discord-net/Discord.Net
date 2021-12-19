@@ -24,7 +24,7 @@ namespace Discord
         ///     Add multiple reactions to a message.
         /// </summary>
         /// <remarks>
-        ///     This method does not bulk add reactions! It will send a request for each reaction inculded.
+        ///     This method does not bulk add reactions! It will send a request for each reaction included.
         /// </remarks>
         /// <example>
         /// <code language="cs">
@@ -34,7 +34,7 @@ namespace Discord
         /// </code>
         /// </example>
         /// <param name="msg">The message to add reactions to.</param>
-        /// <param name="reactions">An array of reactions to add to the message</param>
+        /// <param name="reactions">An array of reactions to add to the message.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous operation for adding a reaction to this message.
@@ -59,7 +59,8 @@ namespace Discord
         /// </code>
         /// </example>
         /// <param name="msg">The message to remove reactions from.</param>
-        /// <param name="reactions">An array of reactions to remove from the message</param>
+        /// <param name="user">The user who removed the reaction.</param>
+        /// <param name="reactions">An array of reactions to remove from the message.</param>
         /// <param name="options">The options to be used when sending the request.</param>
         /// <returns>
         ///     A task that represents the asynchronous operation for removing a reaction to this message.
@@ -75,21 +76,25 @@ namespace Discord
         /// <summary>
         ///     Sends an inline reply that references a message.
         /// </summary>
+        /// <param name="msg">The message that is being replied on.</param>
         /// <param name="text">The message to be sent.</param>
         /// <param name="isTTS">Determines whether the message should be read aloud by Discord or not.</param>
         /// <param name="embed">The <see cref="Discord.EmbedType.Rich"/> <see cref="Embed"/> to be sent.</param>
+        /// <param name="embeds">A array of <see cref="Embed"/>s to send with this response. Max 10.</param>
         /// <param name="allowedMentions">
         ///     Specifies if notifications are sent for mentioned users and roles in the message <paramref name="text"/>.
         ///     If <c>null</c>, all mentioned roles and users will be notified.
         /// </param>
         /// <param name="options">The options to be used when sending the request.</param>
+        /// <param name="components">The message components to be included with this message. Used for interactions.</param>
+        /// <param name="stickers">A collection of stickers to send with the message.</param>
         /// <returns>
         ///     A task that represents an asynchronous send operation for delivering the message. The task result
         ///     contains the sent message.
         /// </returns>
-        public static async Task<IUserMessage> ReplyAsync(this IUserMessage msg, string text = null, bool isTTS = false, Embed embed = null, AllowedMentions allowedMentions = null, RequestOptions options = null)
+        public static async Task<IUserMessage> ReplyAsync(this IUserMessage msg, string text = null, bool isTTS = false, Embed embed = null, AllowedMentions allowedMentions = null, RequestOptions options = null, MessageComponent components = null, ISticker[] stickers = null, Embed[] embeds = null)
         {
-            return await msg.Channel.SendMessageAsync(text, isTTS, embed, options, allowedMentions, new MessageReference(messageId: msg.Id)).ConfigureAwait(false);
+            return await msg.Channel.SendMessageAsync(text, isTTS, embed, options, allowedMentions, new MessageReference(messageId: msg.Id), components, stickers, embeds).ConfigureAwait(false);
         }
     }
 }

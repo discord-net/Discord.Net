@@ -12,6 +12,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestCategoryChannel : RestGuildChannel, ICategoryChannel
     {
+        #region RestCategoryChannel
         internal RestCategoryChannel(BaseDiscordClient discord, IGuild guild, ulong id)
             : base(discord, guild, id)
         {
@@ -24,8 +25,9 @@ namespace Discord.Rest
         }
 
         private string DebuggerDisplay => $"{Name} ({Id}, Category)";
+        #endregion
 
-        //IChannel
+        #region IChannel
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">This method is not supported with category channels.</exception>
         IAsyncEnumerable<IReadOnlyCollection<IUser>> IChannel.GetUsersAsync(CacheMode mode, RequestOptions options)
@@ -34,5 +36,6 @@ namespace Discord.Rest
         /// <exception cref="NotSupportedException">This method is not supported with category channels.</exception>
         Task<IUser> IChannel.GetUserAsync(ulong id, CacheMode mode, RequestOptions options)
             => throw new NotSupportedException();
+        #endregion
     }
 }

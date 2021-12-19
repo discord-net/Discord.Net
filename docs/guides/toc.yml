@@ -1,12 +1,14 @@
 - name: Introduction
   topicUid: Guides.Introduction
+- name: V2 to V3 Guide
+  topicUid: Guides.V2V3Guide
 - name: Getting Started
   items:
     - name: Installation
       topicUid: Guides.GettingStarted.Installation
       items:
-        - name: Nightly Builds
-          topicUid: Guides.GettingStarted.Installation.Nightlies
+        - name: Nightly builds
+          topicUid: Guides.GettingStarted.Installation.Labs
     - name: Your First Bot
       topicUid: Guides.GettingStarted.FirstBot
     - name: Terminology
@@ -21,20 +23,80 @@
       topicUid: Guides.Concepts.ManageConnections
     - name: Entities
       topicUid: Guides.Concepts.Entities
-- name: Working with Commands
+- name: Working with Text-based Commands
   items:
     - name: Introduction
-      topicUid: Guides.Commands.Intro
+      topicUid: Guides.TextCommands.Intro
     - name: TypeReaders
-      topicUid: Guides.Commands.TypeReaders
+      topicUid: Guides.TextCommands.TypeReaders
     - name: Named Arguments
-      topicUid: Guides.Commands.NamedArguments
+      topicUid: Guides.TextCommands.NamedArguments
     - name: Preconditions
-      topicUid: Guides.Commands.Preconditions
+      topicUid: Guides.TextCommands.Preconditions
     - name: Dependency Injection
-      topicUid: Guides.Commands.DI
+      topicUid: Guides.TextCommands.DI
     - name: Post-execution Handling
-      topicUid: Guides.Commands.PostExecution
+      topicUid: Guides.TextCommands.PostExecution
+- name: Working with the Interaction Framework
+  items:
+    - name: Introduction
+      topicUid: Guides.IntFw.Intro
+    - name: Auto-Completion
+      topicUid: Guides.IntFw.AutoCompletion
+    - name: TypeConverters
+      topicUid: Guides.IntFw.TypeConverters
+    - name: Preconditions
+      topicUid: Guides.IntFw.Preconditions
+    - name: Dependency Injection
+      topicUid: Guides.IntFw.DI
+    - name: Post-execution Handling
+      topicUid: Guides.IntFw.PostExecution
+- name: Slash Command Basics
+  items:
+    - name: Introduction
+      topicUid: Guides.SlashCommands.Intro
+    - name: Creating slash commands
+      topicUid: Guides.SlashCommands.Creating
+    - name: Receiving and responding to slash commands
+      topicUid: Guides.SlashCommands.Receiving
+    - name: Slash command parameters
+      topicUid: Guides.SlashCommands.Parameters
+    - name: Ephemeral responses
+      topicUid: Guides.SlashCommands.Ephemeral
+    - name: Sub commands
+      topicUid: Guides.SlashCommands.SubCommand
+    - name: Slash command choices
+      topicUid: Guides.SlashCommands.Choices
+    - name: Slash commands Bulk Overwrites
+      topicUid: Guides.SlashCommands.BulkOverwrite
+- name: Context Command Basics
+  items:
+    - name: Creating Context Commands
+      topicUid: Guides.ContextCommands.Creating
+    - name: Receiving Context Commands
+      topicUid: Guides.ContextCommands.Reveiving
+- name: Message Component Basics
+  items:
+    - name: Introduction
+      topicUid: Guides.MessageComponents.Intro
+    - name: Responding to Components
+      topicUid: Guides.MessageComponents.Responding
+    - name: Buttons in depth
+      topicUid: Guides.MessageComponents.Buttons
+    - name: Select menus
+      topicUid: Guides.MessageComponents.SelectMenus
+    - name: Advanced Concepts
+      topicUid: Guides.MessageComponents.Advanced
+- name: Guild Events
+  items:
+    - name: Introduction
+      topicUid: Guides.GuildEvents.Intro
+    - name: Creating Events
+      topicUid: Guides.GuildEvents.Creating
+    - name: Getting Event Users
+      topicUid: Guides.GuildEvents.GettingUsers
+    - name: Modifying Events
+      topicUid: Guides.GuildEvents.Modifying
 - name: Emoji
   topicUid: Guides.Emoji
 - name: Voice

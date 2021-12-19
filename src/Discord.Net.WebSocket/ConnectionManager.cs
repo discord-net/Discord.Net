@@ -57,6 +57,9 @@ namespace Discord
 
         public virtual async Task StartAsync()
         {
+            if (State != ConnectionState.Disconnected)
+                throw new InvalidOperationException("Cannot start an already running client.");
+
             await AcquireConnectionLock().ConfigureAwait(false);
             var reconnectCancelToken = new CancellationTokenSource();
             _reconnectCancelToken?.Dispose();

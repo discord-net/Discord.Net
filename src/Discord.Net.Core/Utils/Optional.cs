@@ -7,7 +7,7 @@ namespace Discord
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public struct Optional<T>
     {
-        public static Optional<T> Unspecified => default(Optional<T>);
+        public static Optional<T> Unspecified => default;
         private readonly T _value;
 
         /// <summary> Gets the value for this parameter. </summary>
@@ -43,18 +43,18 @@ namespace Discord
         public override int GetHashCode() => IsSpecified ? _value.GetHashCode() : 0;
 
         public override string ToString() => IsSpecified ? _value?.ToString() : null;
-        private string DebuggerDisplay => IsSpecified ? (_value?.ToString() ?? "<null>") : "<unspecified>";
+        private string DebuggerDisplay => IsSpecified ? _value?.ToString() ?? "<null>" : "<unspecified>";
 
-        public static implicit operator Optional<T>(T value) => new Optional<T>(value);
+        public static implicit operator Optional<T>(T value) => new(value);
         public static explicit operator T(Optional<T> value) => value.Value;
     }
     public static class Optional
     {
         public static Optional<T> Create<T>() => Optional<T>.Unspecified;
-        public static Optional<T> Create<T>(T value) => new Optional<T>(value);
+        public static Optional<T> Create<T>(T value) => new(value);
 
         public static T? ToNullable<T>(this Optional<T> val)
             where T : struct
-            => val.IsSpecified ? val.Value : (T?)null;
+            => val.IsSpecified ? val.Value : null;
     }
 }

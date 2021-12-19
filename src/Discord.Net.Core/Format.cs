@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Discord
 {
@@ -6,7 +7,8 @@ namespace Discord
     public static class Format
     {
         // Characters which need escaping
-        private static readonly string[] SensitiveCharacters = { "\\", "*", "_", "~", "`", "|", ">" };
+        private static readonly string[] SensitiveCharacters = {
+            "\\", "*", "_", "~", "`", ".", ":", "/", ">", "|" };
 
         /// <summary> Returns a markdown-formatted string with bold formatting. </summary>
         public static string Bold(string text) => $"**{text}**";
@@ -14,7 +16,7 @@ namespace Discord
         public static string Italics(string text) => $"*{text}*";
         /// <summary> Returns a markdown-formatted string with underline formatting. </summary>
         public static string Underline(string text) => $"__{text}__";
-        /// <summary> Returns a markdown-formatted string with strikethrough formatting. </summary>
+        /// <summary> Returns a markdown-formatted string with strike-through formatting. </summary>
         public static string Strikethrough(string text) => $"~~{text}~~";
         /// <summary> Returns a string with spoiler formatting. </summary>
         public static string Spoiler(string text) => $"||{text}||";
@@ -90,6 +92,28 @@ namespace Discord
                 return text;
 
             return $">>> {text}";
+        }
+
+        /// <summary>
+        /// Remove discord supported markdown from text.
+        /// </summary>
+        /// <param name="text">The to remove markdown from.</param>
+        /// <returns>Gets the unformatted text.</returns>
+        public static string StripMarkDown(string text)
+        {
+            //Remove discord supported markdown
+            var newText = Regex.Replace(text, @"(\*|_|`|~|>|\\)", "");
+            return newText;
+        }
+
+        /// <summary>
+        ///     Formats a user's username + discriminator while maintaining bidirectional unicode
+        /// </summary>
+        /// <param name="user">The user whos username and discriminator to format</param>
+        /// <returns>The username + discriminator</returns>
+        public static string UsernameAndDiscriminator(IUser user)
+        {
+            return $"\u2066{user.Username}\u2069#{user.Discriminator}";
         }
     }
 }

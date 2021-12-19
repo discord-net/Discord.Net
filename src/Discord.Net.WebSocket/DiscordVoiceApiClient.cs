@@ -1,4 +1,3 @@
-#pragma warning disable CS1591
 using Discord.API;
 using Discord.API.Voice;
 using Discord.Net.Converters;
@@ -18,6 +17,7 @@ namespace Discord.Audio
 {
     internal class DiscordVoiceAPIClient : IDisposable
     {
+        #region DiscordVoiceAPIClient
         public const int MaxBitrate = 128 * 1024;
         public const string Mode = "xsalsa20_poly1305";
 
@@ -126,8 +126,9 @@ namespace Discord.Audio
             await _udp.SendAsync(data, offset, bytes).ConfigureAwait(false);
             await _sentDataEvent.InvokeAsync(bytes).ConfigureAwait(false);
         }
+        #endregion
 
-        //WebSocket
+        #region WebSocket
         public async Task SendHeartbeatAsync(RequestOptions options = null)
         {
             await SendAsync(VoiceOpCode.Heartbeat, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), options: options).ConfigureAwait(false);
@@ -208,10 +209,12 @@ namespace Discord.Audio
         }
         private async Task DisconnectInternalAsync()
         {
-            if (ConnectionState == ConnectionState.Disconnected) return;
+            if (ConnectionState == ConnectionState.Disconnected)
+                return;
             ConnectionState = ConnectionState.Disconnecting;
 
-            try { _connectCancelToken?.Cancel(false); }
+            try
+            { _connectCancelToken?.Cancel(false); }
             catch { }
 
             //Wait for tasks to complete
@@ -220,8 +223,9 @@ namespace Discord.Audio
 
             ConnectionState = ConnectionState.Disconnected;
         }
+        #endregion
 
-        //Udp
+        #region Udp
         public async Task SendDiscoveryAsync(uint ssrc)
         {
             var packet = new byte[70];
@@ -252,8 +256,9 @@ namespace Discord.Audio
         {
             _udp.SetDestination(ip, port);
         }
+        #endregion
 
-        //Helpers
+        #region Helpers
         private static double ToMilliseconds(Stopwatch stopwatch) => Math.Round((double)stopwatch.ElapsedTicks / (double)Stopwatch.Frequency * 1000.0, 2);
         private string SerializeJson(object value)
         {
@@ -269,5 +274,6 @@ namespace Discord.Audio
             using (JsonReader reader = new JsonTextReader(text))
                 return _serializer.Deserialize<T>(reader);
         }
+        #endregion
     }
 }

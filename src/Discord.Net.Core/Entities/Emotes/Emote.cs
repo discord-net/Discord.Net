@@ -74,6 +74,10 @@ namespace Discord
         public static bool TryParse(string text, out Emote result)
         {
             result = null;
+
+            if (text == null)
+                return false;
+
             if (text.Length >= 4 && text[0] == '<' && (text[1] == ':' || (text[1] == 'a' && text[2] == ':')) && text[text.Length - 1] == '>')
             {
                 bool animated = text[1] == 'a';
@@ -102,5 +106,7 @@ namespace Discord
         ///     A string representing the raw presentation of the emote (e.g. <c>&lt;:thonkang:282745590985523200&gt;</c>).
         /// </returns>
         public override string ToString() => $"<{(Animated ? "a" : "")}:{Name}:{Id}>";
+
+        public static implicit operator Emote(string s) => Parse(s);
     }
 }

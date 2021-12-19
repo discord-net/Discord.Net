@@ -20,9 +20,9 @@ namespace TestHelper
                 throw new ArgumentOutOfRangeException(nameof(column), "column must be >= -1");
             }
 
-            this.Path = path;
-            this.Line = line;
-            this.Column = column;
+            Path = path;
+            Line = line;
+            Column = column;
         }
 
         public string Path { get; }
@@ -41,16 +41,16 @@ namespace TestHelper
         {
             get
             {
-                if (this.locations == null)
+                if (locations == null)
                 {
-                    this.locations = new DiagnosticResultLocation[] { };
+                    locations = new DiagnosticResultLocation[] { };
                 }
-                return this.locations;
+                return locations;
             }
 
             set
             {
-                this.locations = value;
+                locations = value;
             }
         }
 
@@ -64,7 +64,7 @@ namespace TestHelper
         {
             get
             {
-                return this.Locations.Length > 0 ? this.Locations[0].Path : "";
+                return Locations.Length > 0 ? Locations[0].Path : "";
             }
         }
 
@@ -72,7 +72,7 @@ namespace TestHelper
         {
             get
             {
-                return this.Locations.Length > 0 ? this.Locations[0].Line : -1;
+                return Locations.Length > 0 ? Locations[0].Line : -1;
             }
         }
 
@@ -80,7 +80,7 @@ namespace TestHelper
         {
             get
             {
-                return this.Locations.Length > 0 ? this.Locations[0].Column : -1;
+                return Locations.Length > 0 ? Locations[0].Column : -1;
             }
         }
     }

@@ -4,19 +4,42 @@ using System.Globalization;
 
 namespace Discord.Net
 {
-    internal struct RateLimitInfo
+    /// <summary>
+    ///     Represents a REST-Based ratelimit info.
+    /// </summary>
+    public struct RateLimitInfo : IRateLimitInfo
     {
+        /// <inheritdoc/>
         public bool IsGlobal { get; }
+
+        /// <inheritdoc/>
         public int? Limit { get; }
+
+        /// <inheritdoc/>
         public int? Remaining { get; }
+
+        /// <inheritdoc/>
         public int? RetryAfter { get; }
+
+        /// <inheritdoc/>
         public DateTimeOffset? Reset { get; }
+
+        /// <inheritdoc/>
         public TimeSpan? ResetAfter { get; }
+
+        /// <inheritdoc/>
         public string Bucket { get; }
+
+        /// <inheritdoc/>
         public TimeSpan? Lag { get; }
 
-        internal RateLimitInfo(Dictionary<string, string> headers)
+        /// <inheritdoc/>
+        public string Endpoint { get; }
+
+        internal RateLimitInfo(Dictionary<string, string> headers, string endpoint)
         {
+            Endpoint = endpoint;
+
             IsGlobal = headers.TryGetValue("X-RateLimit-Global", out string temp) &&
                        bool.TryParse(temp, out var isGlobal) && isGlobal;
             Limit = headers.TryGetValue("X-RateLimit-Limit", out temp) && 
@@ -28,7 +51,7 @@ namespace Discord.Net
             RetryAfter = headers.TryGetValue("Retry-After", out temp) &&
                 int.TryParse(temp, NumberStyles.None, CultureInfo.InvariantCulture, out var retryAfter) ? retryAfter : (int?)null;
 			ResetAfter = headers.TryGetValue("X-RateLimit-Reset-After", out temp) &&
-                double.TryParse(temp, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var resetAfter) ? TimeSpan.FromMilliseconds((long)(resetAfter * 1000)) : (TimeSpan?)null;
+                double.TryParse(temp, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var resetAfter) ? TimeSpan.FromSeconds(resetAfter) : (TimeSpan?)null;
             Bucket = headers.TryGetValue("X-RateLimit-Bucket", out temp) ? temp : null;
             Lag = headers.TryGetValue("Date", out temp) &&
                 DateTimeOffset.TryParse(temp, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date) ? DateTimeOffset.UtcNow - date : (TimeSpan?)null;

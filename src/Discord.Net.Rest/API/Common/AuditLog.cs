@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace Discord.API
 {
@@ -6,6 +6,12 @@ namespace Discord.API
     {
         [JsonProperty("webhooks")]
         public Webhook[] Webhooks { get; set; }
+
+        [JsonProperty("threads")]
+        public Channel[] Threads { get; set; }
+
+        [JsonProperty("integrations")]
+        public Integration[] Integrations { get; set; }
 
         [JsonProperty("users")]
         public User[] Users { get; set; }

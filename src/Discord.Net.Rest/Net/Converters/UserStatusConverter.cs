@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 
 namespace Discord.Net.Converters
@@ -13,21 +13,15 @@ namespace Discord.Net.Converters
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            switch ((string)reader.Value)
+            return (string)reader.Value switch
             {
-                case "online":
-                    return UserStatus.Online;
-                case "idle":
-                    return UserStatus.Idle;
-                case "dnd":
-                    return UserStatus.DoNotDisturb;
-                case "invisible":
-                    return UserStatus.Invisible; //Should never happen
-                case "offline":
-                    return UserStatus.Offline;
-                default:
-                    throw new JsonSerializationException("Unknown user status");
-            }
+                "online" => UserStatus.Online,
+                "idle" => UserStatus.Idle,
+                "dnd" => UserStatus.DoNotDisturb,
+                "invisible" => UserStatus.Invisible,//Should never happen
+                "offline" => UserStatus.Offline,
+                _ => throw new JsonSerializationException("Unknown user status"),
+            };
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

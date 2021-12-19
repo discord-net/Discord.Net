@@ -125,7 +125,7 @@ namespace Discord.Audio.Streams
                                     timestamp += OpusEncoder.FrameSamplesPerChannel;
                                 }
 #if DEBUG
-                                var _ = _logger?.DebugAsync("Buffer underrun");
+                                var _ = _logger?.DebugAsync("Buffer under run");
 #endif
                             }
                         }

@@ -17,7 +17,7 @@ any member of the community.
 
 We prefer pull-requests that are descriptive of the changes being made
 and highlight any potential benefits/drawbacks of the change, but these
-types of write-ups are not required. See this [merge request](https://github.com/RogueException/Discord.Net/pull/793)
+types of write-ups are not required. See this [merge request](https://github.com/discord-net/Discord.Net/pull/793)
 for an example of a well-written description.
 
 ## Semantic Versioning
@@ -28,7 +28,7 @@ that are SemVer compliant with the latest version of the library in
 development.
 
 The working release should be the latest build off of the `dev` branch,
-but can also be found on the [development board](https://github.com/RogueException/Discord.Net/projects/1).
+but can also be found on the [development board](https://github.com/discord-net/Discord.Net/projects/1).
 
 We follow the .NET Foundation's [Breaking Change Rules](https://github.com/dotnet/corefx/blob/master/Documentation/coding-guidelines/breaking-change-rules.md)
 when determining the SemVer compliance of a change.

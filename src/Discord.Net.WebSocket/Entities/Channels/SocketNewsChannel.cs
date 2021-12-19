@@ -35,5 +35,6 @@ namespace Discord.WebSocket
         /// </remarks>
         public override int SlowModeInterval
             => throw new NotSupportedException("News channels do not support Slow Mode.");
+
     }
 }
