@@ -89,22 +89,22 @@ namespace Discord.Rest
     }
 
     /// <summary>
-    ///     Represents a Rest based context of an <see cref="IDiscordInteraction"/>
+    ///     Represents a Rest based context of an <see cref="IDiscordInteraction"/>.
     /// </summary>
     public class RestInteractionContext : RestInteractionContext<RestInteraction>
     {
         /// <summary>
-        ///     Initializes a new <see cref="RestInteractionContext"/> 
+        ///     Initializes a new <see cref="RestInteractionContext"/>.
         /// </summary>
-        /// <param name="client">The underlying client</param>
-        /// <param name="interaction">The underlying interaction</param>
+        /// <param name="client">The underlying client.</param>
+        /// <param name="interaction">The underlying interaction.</param>
         public RestInteractionContext(DiscordRestClient client, RestInteraction interaction) : base(client, interaction) { }
 
         /// <summary>
-        ///     Initializes a new <see cref="RestInteractionContext"/> 
+        ///     Initializes a new <see cref="RestInteractionContext"/>.
         /// </summary>
-        /// <param name="client">The underlying client</param>
-        /// <param name="interaction">The underlying interaction</param>
+        /// <param name="client">The underlying client.</param>
+        /// <param name="interaction">The underlying interaction.</param>
         /// <param name="interactionResponseCallback">The callback for outgoing json.</param>
         public RestInteractionContext(DiscordRestClient client, RestInteraction interaction, Func<string, Task> interactionResponseCallback)
             : base(client, interaction, interactionResponseCallback) { }
