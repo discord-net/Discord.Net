@@ -318,6 +318,7 @@ namespace Discord.API
                 SelfDeaf = selfDeaf,
                 SelfMute = selfMute
             };
+            options = RequestOptions.CreateOrClone(options);
             await SendGatewayAsync(GatewayOpCode.VoiceStateUpdate, payload, options: options).ConfigureAwait(false);
         }
         public async Task SendVoiceStateUpdateAsync(VoiceStateUpdateParams payload, RequestOptions options = null)
