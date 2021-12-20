@@ -2529,16 +2529,14 @@ namespace Discord.WebSocket
                                         {
                                             SocketGuildUser guildMember;
 
-                                            if (threadMember.Member.IsSpecified)
+                                            guildMember = guild.GetUser(threadMember.UserId.Value);
+
+                                            if(guildMember == null)
                                             {
-                                                guildMember = guild.AddOrUpdateUser(threadMember.Member.Value);
+                                                await UnknownGuildUserAsync("THREAD_MEMBERS_UPDATE", threadMember.UserId.Value, guild.Id);
                                             }
                                             else
-                                            {
-                                                guildMember = guild.GetUser(threadMember.UserId.Value);
-                                            }
-
-                                            newThreadMembers.Add(thread.AddOrUpdateThreadMember(threadMember, guildMember));
+                                                newThreadMembers.Add(thread.AddOrUpdateThreadMember(threadMember, guildMember));
                                         }
 
                                         if (newThreadMembers.Any())
