@@ -54,15 +54,17 @@ namespace Discord.Interactions
                 if (guildUser.RoleIds.Contains(RoleId.Value))
                     return Task.FromResult(PreconditionResult.FromSuccess());
                 else
-                    Task.FromResult(PreconditionResult.FromError(ErrorMessage ?? $"User requires guild role {context.Guild.GetRole(RoleId.Value).Name}."));
+                    return Task.FromResult(PreconditionResult.FromError(ErrorMessage ?? $"User requires guild role {context.Guild.GetRole(RoleId.Value).Name}."));
             }
 
             if (!string.IsNullOrEmpty(RoleName))
             {
-                if (guildUser.Guild.Roles.Any(x => x.Name == RoleName))
+                var roleNames = guildUser.RoleIds.Select(x => guildUser.Guild.GetRole(x).Name);
+
+                if (roleNames.Contains(RoleName))
                     return Task.FromResult(PreconditionResult.FromSuccess());
                 else
-                    Task.FromResult(PreconditionResult.FromError(ErrorMessage ?? $"User requires guild role {RoleName}."));
+                    return Task.FromResult(PreconditionResult.FromError(ErrorMessage ?? $"User requires guild role {RoleName}."));
             }
 
             return Task.FromResult(PreconditionResult.FromSuccess());
