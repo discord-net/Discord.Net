@@ -2642,7 +2642,7 @@ namespace Discord.WebSocket
                                         return;
                                     }
 
-                                    var before = guild.GetEvent(data.Id);
+                                    var before = guild.GetEvent(data.Id)?.Clone();
 
                                     var beforeCacheable = new Cacheable<SocketGuildEvent, ulong>(before, data.Id, before != null, () => Task.FromResult((SocketGuildEvent)null));
 

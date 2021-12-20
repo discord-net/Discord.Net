@@ -196,6 +196,8 @@ namespace Discord.WebSocket
         public IAsyncEnumerable<IReadOnlyCollection<RestUser>> GetUsersAsync(ulong fromUserId, Direction dir, int limit = DiscordConfig.MaxGuildEventUsersPerBatch, RequestOptions options = null)
             => GuildHelper.GetEventUsersAsync(Discord, this, fromUserId, dir, limit, options);
 
+        internal SocketGuildEvent Clone() => MemberwiseClone() as SocketGuildEvent;
+
         #region IGuildScheduledEvent
 
         /// <inheritdoc/>
