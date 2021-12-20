@@ -137,16 +137,6 @@ namespace Discord.WebSocket
         internal void Update(Model model)
         {
             ThreadJoinedAt = model.JoinTimestamp;
-
-            if (model.Presence.IsSpecified)
-            {
-                GuildUser.Update(Discord.State, model.Presence.Value, true);
-            }
-
-            if (model.Member.IsSpecified)
-            {
-                GuildUser.Update(Discord.State, model.Member.Value);
-            }
         }
 
         /// <inheritdoc/>
