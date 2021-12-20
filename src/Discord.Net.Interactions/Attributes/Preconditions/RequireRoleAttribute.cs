@@ -62,7 +62,7 @@ namespace Discord.Interactions
                 if (guildUser.Guild.Roles.Any(x => x.Name == RoleName))
                     return Task.FromResult(PreconditionResult.FromSuccess());
                 else
-                    Task.FromResult(PreconditionResult.FromError(ErrorMessage ?? $"User requires guild role {RoleName}."));
+                    return Task.FromResult(PreconditionResult.FromError(ErrorMessage ?? $"User requires guild role {RoleName}."));
             }
 
             return Task.FromResult(PreconditionResult.FromSuccess());
