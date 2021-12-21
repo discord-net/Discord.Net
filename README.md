@@ -33,7 +33,7 @@ Nightly builds are available through our MyGet feed (`https://www.myget.org/F/di
 
 ### Unstable (Labs)
 
-Labs builds are avaiable on nuget (`https://www.nuget.org/packages/Discord.Net.Labs/`) and myget (`https://www.myget.org/F/discord-net-labs/api/v3/index.json`).
+Labs builds are available on nuget (`https://www.nuget.org/packages/Discord.Net.Labs/`) and myget (`https://www.myget.org/F/discord-net-labs/api/v3/index.json`).
 
 ## Compiling
 
