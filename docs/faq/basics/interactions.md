@@ -22,6 +22,10 @@ DeferAsync will not send out a response, RespondAsync will.
 [DeferAsync]: xref:Discord.IDiscordInteraction
 [FollowUpAsync]: xref:Discord.IDiscordInteraction
 
+## Im getting System.TimeoutException: 'Cannot respond to an interaction after 3 seconds!'
+
+This happens because your computers clock is out of sync or your trying to respond after 3 seconds. If your clock is out of sync and you cant fix it, you can set the `UseInteractionSnowflakeDate` to false in the config.
+
 ## Bad form Exception when I try to create my commands, why do I get this?
 
 Bad form exceptions are thrown if the slash, user or message command builder has invalid values.
