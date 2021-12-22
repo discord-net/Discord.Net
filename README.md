@@ -9,7 +9,7 @@
     <img src="https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic" alt="NuGet">
   </a>
   <a href="https://www.myget.org/feed/Packages/discord-net">
-    <img src="https://img.shields.io/myget/discord-net-labs/vpre/Discord.Net.svg" alt="MyGet">
+    <img src="https://img.shields.io/myget/discord-net/vpre/Discord.Net.svg" alt="MyGet">
   </a>
   <a href="https://dev.azure.com/discord-net/Discord.Net/_build/latest?definitionId=1&branchName=dev">
     <img src="https://dev.azure.com/discord-net/Discord.Net/_apis/build/status/discord-net.Discord.Net?branchName=dev" alt="Build Status">
