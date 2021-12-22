@@ -1,0 +1,77 @@
+name: 🐞 Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to fill out this bug report!
+  - type: checkboxes
+    attributes:
+      label: Check The Docs
+      description: Please refer to our [FAQs](https://discordnet.dev/faq), [Documentation](https://discordnet.dev/api/index.html), 
+                    and [Migration Guide](https://discordnet.dev/guides/v2_v3_guide/v2_to_v3_guide.html) before reporting issues.
+      options:
+      - label: "I double checked the docs and couldn't find amy useful information."
+        required: true
+  - type: checkboxes
+    attributes:
+      label: Verify Issue Source
+      description: If your issue is related to an exception make sure the error was thrown by Discord.Net, and not your code or another library. 
+                  If you get an `HttpException` with the error code `401`, than the error is caused by your bots permissions, not dnet.
+      options:
+      - label: I verified the issue was caused by Discord.Net.
+        required: true
+  - type: checkboxes
+    attributes:
+      label: Check your intents
+      description: If your issue is related to not recieving expected events you may have setup your gateway intents incorectly. 
+                    Newer versions of Discord.Net use a more modern versions of Discords API that requires you tell it what events
+                    you want to recieve. Discord.Net defaults to all non-privleged intents, but if your bot requires privleged intents 
+                    you need specify them in your clients config. You can see what intents you need for your events 
+                    [here](https://discord.com/developers/docs/topics/gateway#list-of-intents)
+      options:
+      - label: I double checked that I have the required intents.
+        required: true
+  - type: textarea
+    id: description
+    attributes: 
+      label: Description
+      description: A breif explination of the bug.
+      placeholder: When I start a DiscordSocketClient without stopping it the gatewat thread gets blocked.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of dnet are you using?
+      placeholder: ex. 3.0.0
+    validations:
+      required: true
+  - type: input
+    id: working-version
+    attributes:
+      label: Working Version
+      description: If this worked on an older version of Discord.Net put that version here.
+      placeholder: ex. 2.4.0
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes: 
+      label: Logs
+      description: Put applicable logs and/or a stacktrace here.
+    validations:
+      required: true
+  - type: textarea
+    id: sample
+    attributes:
+      label: Sample
+      description: Include a (short) code sample that reproduces your issue 100% of time (comments would be great).
+      placeholder: |
+        ```cs
+        My.Code();
+        ```
+    validations:
+      required: false
