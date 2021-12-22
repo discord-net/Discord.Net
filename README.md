@@ -1,16 +1,29 @@
 # Discord.Net
+<p align="center">
+  <a href="https://discordnet.dev/" title="Click to visit the documentation!">
+    <img src="https://svgshare.com/i/d09.svg" alt="Logo">
+  </a>
+    <br />
+    <br />
+  <a href="https://www.nuget.org/packages/Discord.Net/">
+    <img src="https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic" alt="NuGet">
+  </a>
+  <a href="https://www.myget.org/feed/Packages/discord-net">
+    <img src="https://img.shields.io/myget/discord-net-labs/vpre/Discord.Net.svg" alt="MyGet">
+  </a>
+  <a href="https://dev.azure.com/discord-net/Discord.Net/_build/latest?definitionId=1&branchName=dev">
+    <img src="https://dev.azure.com/discord-net/Discord.Net/_apis/build/status/discord-net.Discord.Net?branchName=dev" alt="Build Status">
+  </a>
+  <a href="https://discord.gg/dnet">
+    <img src="https://discord.com/api/guilds/848176216011046962/widget.png" alt="Discord">
+  </a>
+</p>
 
-[![NuGet](https://img.shields.io/nuget/vpre/Discord.Net.svg?maxAge=2592000?style=plastic)](https://www.nuget.org/packages/Discord.Net)
-[![MyGet](https://img.shields.io/myget/discord-net/vpre/Discord.Net.svg)](https://www.myget.org/feed/Packages/discord-net)
-[![Build Status](https://dev.azure.com/discord-net/Discord.Net/_apis/build/status/discord-net.Discord.Net?branchName=dev)](https://dev.azure.com/discord-net/Discord.Net/_build/latest?definitionId=1&branchName=dev)
-[![Discord](https://discord.com/api/guilds/848176216011046962/widget.png)](https://discord.gg/dnet)
-
-An unofficial .NET API Wrapper for the Discord client (https://discord.com).
+Discord NET is an unofficial .NET API Wrapper for the Discord client (https://discord.com).
 
 ## Documentation
 
-- [Nightly](https://docs.stillu.cc/)
-  - [Latest CI repo](https://github.com/discord-net/docs-static)
+- [Nightly](https://discordnet.dev)
 
 ## Installation
 
