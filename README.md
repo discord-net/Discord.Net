@@ -18,7 +18,6 @@
     <img src="https://discord.com/api/guilds/848176216011046962/widget.png" alt="Discord">
   </a>
 </p>
-
 Discord NET is an unofficial .NET API Wrapper for the Discord client (https://discord.com).
 
 ## Documentation
