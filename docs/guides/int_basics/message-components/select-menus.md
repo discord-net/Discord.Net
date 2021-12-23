@@ -47,11 +47,11 @@ public async Task Spawn()
 
 Running this produces this result:
 
-![](Images/image4.png)
+![](images/image4.png)
 
 And opening the menu we see:
 
-![](Images/image5.png)
+![](images/image5.png)
 
 Lets handle the selection of an option, We can hook the `SelectMenuExecuted` event to handle our select menu:
 
@@ -73,4 +73,4 @@ public async Task MyMenuHandler(SocketMessageComponent arg)
 
 Running this produces this result:
 
-![](Images/image6.png)
+![](images/image6.png)
