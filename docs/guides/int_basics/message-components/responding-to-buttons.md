@@ -34,4 +34,4 @@ public async Task MyButtonHandler(SocketMessageComponent component)
 
 Running it and clicking the button:
 
-![](Images/image2.png)
+![](images/image2.png)

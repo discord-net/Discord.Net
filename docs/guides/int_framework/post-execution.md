@@ -48,7 +48,7 @@ Interaction Result come in a handful of different flavours:
 Every time a command gets executed, Interaction Service raises a `CommandExecuted` event.
 These events can be used to create a post-execution pipeline.
 
-[!code-csharp[Error Review](samples/postexecution/error_review.cs)
+[!code-csharp[Error Review](samples/postexecution/error_review.cs)]
 
 ## Log Event
 

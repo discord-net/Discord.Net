@@ -28,7 +28,7 @@ This is the property sent to you by discord when a button is clicked. It is not 
 
 Styling your buttons are important for indicating different actions:
 
-![](Images/image3.png)
+![](images/image3.png)
 
 You can do this by using the `ButtonStyle` which has all the styles defined.
 
