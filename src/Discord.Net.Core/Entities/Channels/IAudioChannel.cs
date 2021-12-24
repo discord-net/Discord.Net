@@ -10,6 +10,14 @@ namespace Discord
     public interface IAudioChannel : IChannel
     {
         /// <summary>
+        ///     Gets the RTC region for this audio channel.
+        /// </summary>
+        /// <remarks>
+        ///     This property can be <see langword="null"/>.
+        /// </remarks>
+        string RTCRegion { get; }
+
+        /// <summary>
         ///     Connects to this audio channel.
         /// </summary>
         /// <param name="selfDeaf">Determines whether the client should deaf itself upon connection.</param>

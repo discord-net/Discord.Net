@@ -22,6 +22,8 @@ namespace Discord.Rest
 
         /// <inheritdoc />
         public string Name { get; private set; }
+        /// <inheritdoc/>
+        public string RTCRegion { get; private set; }
 
         public IReadOnlyCollection<RestGroupUser> Users => _users.ToReadOnlyCollection();
         public IReadOnlyCollection<RestGroupUser> Recipients
@@ -46,6 +48,8 @@ namespace Discord.Rest
 
             if (model.Recipients.IsSpecified)
                 UpdateUsers(model.Recipients.Value);
+
+            RTCRegion = model.RTCRegion.GetValueOrDefault(null);
         }
         internal void UpdateUsers(API.User[] models)
         {
