@@ -86,6 +86,17 @@ namespace Discord
         int Hierarchy { get; }
 
         /// <summary>
+        ///     Gets the date and time that indicates if and for how long a user has been timed out.
+        /// </summary>
+        /// <remarks>
+        ///     <see cref="null"/> or a timestamp in the past if the user is not timed out.
+        /// </remarks>
+        /// <returns>
+        ///     A <see cref="DateTimeOffset"/> indicating how long the user will be timed out for.
+        /// </returns>
+        DateTimeOffset? TimedOutUntil { get; }
+
+        /// <summary>
         ///     Gets the level permissions granted to this user to a given channel.
         /// </summary>
         /// <example>
@@ -211,5 +222,22 @@ namespace Discord
         ///     A task that represents the asynchronous role removal operation.
         /// </returns>
         Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null);
+        /// <summary>
+        ///     Sets a timeout based on provided <see cref="TimeSpan"/> to this user in the guild.
+        /// </summary>
+        /// <param name="span">The <see cref="TimeSpan"/> indicating how long a user should be timed out for.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous timeout creation operation.
+        /// </returns>
+        Task SetTimeOutAsync(TimeSpan span, RequestOptions options = null);
+        /// <summary>
+        ///     Removes the current timeout from the user in this guild if one exists.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous timeout removal operation.
+        /// </returns>
+        Task RemoveTimeOutAsync(RequestOptions options = null);
     }
 }

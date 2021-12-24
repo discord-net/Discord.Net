@@ -214,7 +214,10 @@ namespace Discord
         /// <summary>
         ///     Allows for launching activities (applications with the EMBEDDED flag) in a voice channel.
         /// </summary>
-        StartEmbeddedActivities = 0x80_00_00_00_00
-
+        StartEmbeddedActivities = 0x80_00_00_00_00,
+        /// <summary>
+        ///     Allows for timing out users.
+        /// </summary>
+        ModerateMembers = 0x01_00_00_00_00_00
     }
 }

@@ -99,6 +99,7 @@ namespace Discord
             AssertFlag(() => new GuildPermissions(createPublicThreads: true), GuildPermission.CreatePublicThreads);
             AssertFlag(() => new GuildPermissions(createPrivateThreads: true), GuildPermission.CreatePrivateThreads);
             AssertFlag(() => new GuildPermissions(useExternalStickers: true), GuildPermission.UseExternalStickers);
+            AssertFlag(() => new GuildPermissions(moderateMembers: true), GuildPermission.ModerateMembers);
         }
 
         /// <summary>
@@ -176,6 +177,7 @@ namespace Discord
             AssertUtil(GuildPermission.CreatePublicThreads, x => x.CreatePublicThreads, (p, enable) => p.Modify(createPublicThreads: enable));
             AssertUtil(GuildPermission.CreatePrivateThreads, x => x.CreatePrivateThreads, (p, enable) => p.Modify(createPrivateThreads: enable));
             AssertUtil(GuildPermission.UseExternalStickers, x => x.UseExternalStickers, (p, enable) => p.Modify(useExternalStickers: enable));
+            AssertUtil(GuildPermission.ModerateMembers, x => x.ModerateMembers, (p, enable) => p.Modify(moderateMembers: enable));
         }
     }
 }
