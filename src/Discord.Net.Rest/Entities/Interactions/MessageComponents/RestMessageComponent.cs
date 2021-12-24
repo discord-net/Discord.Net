@@ -26,7 +26,6 @@ namespace Discord.Rest
         public RestUserMessage Message { get; private set; }
 
         private object _lock = new object();
-        internal override bool _hasResponded { get; set; } = false;
 
         internal RestMessageComponent(BaseDiscordClient client, Model model)
             : base(client, model.Id)
@@ -128,15 +127,12 @@ namespace Discord.Rest
 
             lock (_lock)
             {
-                if (_hasResponded)
+                if (HasResponded)
                 {
                     throw new InvalidOperationException("Cannot respond, update, or defer twice to the same interaction");
                 }
-            }
 
-            lock (_lock)
-            {
-                _hasResponded = true;
+                HasResponded = true;
             }
 
             return SerializePayload(response);
@@ -223,15 +219,12 @@ namespace Discord.Rest
 
             lock (_lock)
             {
-                if (_hasResponded)
+                if (HasResponded)
                 {
                     throw new InvalidOperationException("Cannot respond, update, or defer twice to the same interaction");
                 }
-            }
 
-            lock (_lock)
-            {
-                _hasResponded = true;
+                HasResponded = true;
             }
 
             return SerializePayload(response);
@@ -410,15 +403,12 @@ namespace Discord.Rest
 
             lock (_lock)
             {
-                if (_hasResponded)
+                if (HasResponded)
                 {
                     throw new InvalidOperationException("Cannot respond or defer twice to the same interaction");
                 }
-            }
 
-            lock (_lock)
-            {
-                _hasResponded = true;
+                HasResponded = true;
             }
 
             return SerializePayload(response);
@@ -447,15 +437,12 @@ namespace Discord.Rest
 
             lock (_lock)
             {
-                if (_hasResponded)
+                if (HasResponded)
                 {
                     throw new InvalidOperationException("Cannot respond or defer twice to the same interaction");
                 }
-            }
 
-            lock (_lock)
-            {
-                _hasResponded = true;
+                HasResponded = true;
             }
 
             return SerializePayload(response);

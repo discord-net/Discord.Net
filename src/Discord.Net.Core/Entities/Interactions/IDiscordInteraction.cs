@@ -36,6 +36,15 @@ namespace Discord
         int Version { get; }
 
         /// <summary>
+        ///     Gets whether or not this interaction has been responded to.
+        /// </summary>
+        /// <remarks>
+        ///     This property is locally set -- if you're running multiple bots
+        ///     off the same token then this property won't be in sync with them.
+        /// </remarks>
+        bool HasResponded { get; }
+
+        /// <summary>
         ///     Gets the user who invoked the interaction.
         /// </summary>
         IUser User { get; }

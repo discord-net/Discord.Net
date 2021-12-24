@@ -35,8 +35,6 @@ namespace Discord.Rest
         /// <inheritdoc/>
         public DateTimeOffset CreatedAt { get; private set; }
 
-        internal abstract bool _hasResponded { get; set; }
-
         /// <summary>
         ///     <see langword="true"/> if the token is valid for replying to, otherwise <see langword="false"/>.
         /// </summary>
@@ -52,6 +50,9 @@ namespace Discord.Rest
         ///     Gets the guild this interaction was executed in.
         /// </summary>
         public RestGuild Guild { get; private set; }
+
+        /// <inheritdoc/>
+        public bool HasResponded { get; protected set; }
 
         internal RestInteraction(BaseDiscordClient discord, ulong id)
             : base(discord, id)
