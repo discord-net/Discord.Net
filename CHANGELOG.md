@@ -1,5 +1,32 @@
 # Changelog
 
+## [3.1.0] - 2021-12-24
+
+### Added
+
+- #1996 Add nullable type converter to Interaction service (ccc365e)
+- #1998 Add before and after execute async (9f124b2)
+- #2001 Add MaxUploadLimit to guilds (7745558)
+- #2002 Add RTCRegion to voice channels (2a416a3)
+- #2003 Add Guilduser timeouts and MODERATE_MEMBERS permission (144741e)
+
+### Fixed
+
+- #1976 fix guild scheduled events update (8daa0b6)
+- #1977 fix thread member nre (5d43fe6)
+- #1980 fix requireRole attribute of interaction service (a2f57f8)
+- #1990 Fix images path for select menu section (a8b5506)
+- #1992 fix images; fix closing brace on cs ref (fb52525)
+- #1993 Fix CommandExecuted not invoked on failed parse (82bb3e4)
+- #1995 Fixed file being disposed on upload (ad20e03)
+- #1999 Fix SocketGuildUser being changed to SocketGlobalUser in UserLeft (5446bfe)
+- Fix voice codes namespace (768a0a9)
+
+### Misc
+
+- #1994 Make HasResponded public and add it to IDiscordInteraction (1fbcbb8)
+- #1997 Make module service scopes optional (cb1aad3)
+
 ## [3.0.0] - 2021-12-13
 
 ### Added
