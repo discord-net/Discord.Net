@@ -102,7 +102,8 @@ namespace Discord
         public bool SendMessagesInThreads => Permissions.GetValue(RawValue, GuildPermission.SendMessagesInThreads);
         /// <summary> If <c>true</c>, a user launch application activities in voice channels in this guild. </summary>
         public bool StartEmbeddedActivities => Permissions.GetValue(RawValue, GuildPermission.StartEmbeddedActivities);
-
+        /// <summary> If <c>true</c>, a user can timeout other users in this guild.</summary>
+        public bool ModerateMembers => Permissions.GetValue(RawValue, GuildPermission.ModerateMembers);
         /// <summary> Creates a new <see cref="GuildPermissions"/> with the provided packed value. </summary>
         public GuildPermissions(ulong rawValue) { RawValue = rawValue; }
 
@@ -149,7 +150,8 @@ namespace Discord
             bool? createPrivateThreads = null,
             bool? useExternalStickers = null,
             bool? sendMessagesInThreads = null,
-            bool? startEmbeddedActivities = null)
+            bool? startEmbeddedActivities = null,
+            bool? moderateMembers = null)
         {
             ulong value = initialValue;
 
@@ -193,6 +195,7 @@ namespace Discord
             Permissions.SetValue(ref value, useExternalStickers, GuildPermission.UseExternalStickers);
             Permissions.SetValue(ref value, sendMessagesInThreads, GuildPermission.SendMessagesInThreads);
             Permissions.SetValue(ref value, startEmbeddedActivities, GuildPermission.StartEmbeddedActivities);
+            Permissions.SetValue(ref value, moderateMembers, GuildPermission.ModerateMembers);
 
             RawValue = value;
         }
@@ -238,7 +241,8 @@ namespace Discord
             bool createPrivateThreads = false,
             bool useExternalStickers = false,
             bool sendMessagesInThreads = false,
-            bool startEmbeddedActivities = false)
+            bool startEmbeddedActivities = false,
+            bool moderateMembers = false)
             : this(0,
                 createInstantInvite: createInstantInvite,
                 manageRoles: manageRoles,
@@ -279,7 +283,8 @@ namespace Discord
                 createPrivateThreads: createPrivateThreads,
 				useExternalStickers: useExternalStickers,
                 sendMessagesInThreads: sendMessagesInThreads,
-                startEmbeddedActivities: startEmbeddedActivities)
+                startEmbeddedActivities: startEmbeddedActivities,
+                moderateMembers: moderateMembers)
         { }
 
         /// <summary> Creates a new <see cref="GuildPermissions"/> from this one, changing the provided non-null permissions. </summary>
@@ -323,13 +328,14 @@ namespace Discord
             bool? createPrivateThreads = null,
             bool? useExternalStickers = null,
             bool? sendMessagesInThreads = null,
-            bool? startEmbeddedActivities = null)
+            bool? startEmbeddedActivities = null,
+            bool? moderateMembers = null)
             => new GuildPermissions(RawValue, createInstantInvite, kickMembers, banMembers, administrator, manageChannels, manageGuild, addReactions,
                 viewAuditLog, viewGuildInsights, viewChannel, sendMessages, sendTTSMessages, manageMessages, embedLinks, attachFiles,
                 readMessageHistory, mentionEveryone, useExternalEmojis, connect, speak, muteMembers, deafenMembers, moveMembers,
                 useVoiceActivation, prioritySpeaker, stream, changeNickname, manageNicknames, manageRoles, manageWebhooks, manageEmojisAndStickers,
                 useApplicationCommands, requestToSpeak, manageEvents, manageThreads, createPublicThreads, createPrivateThreads, useExternalStickers, sendMessagesInThreads,
-                startEmbeddedActivities);
+                startEmbeddedActivities, moderateMembers);
 
         /// <summary>
         ///     Returns a value that indicates if a specific <see cref="GuildPermission"/> is enabled

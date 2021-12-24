@@ -20,6 +20,7 @@ namespace Discord.WebSocket
     {
         #region SocketGuildUser
         private long? _premiumSinceTicks;
+        private long? _timedOutTicks;
         private long? _joinedAtTicks;
         private ImmutableArray<ulong> _roleIds;
 
@@ -89,6 +90,17 @@ namespace Discord.WebSocket
         public AudioInStream AudioStream => Guild.GetAudioStream(Id);
         /// <inheritdoc />
         public DateTimeOffset? PremiumSince => DateTimeUtils.FromTicks(_premiumSinceTicks);
+        /// <inheritdoc />
+        public DateTimeOffset? TimedOutUntil
+        {
+            get
+            {
+                if (!_timedOutTicks.HasValue || _timedOutTicks.Value < 0)
+                    return null;
+                else
+                    return DateTimeUtils.FromTicks(_timedOutTicks);
+            }
+        }
 
         /// <summary>
         ///     Returns the position of the user within the role hierarchy.
@@ -157,6 +169,8 @@ namespace Discord.WebSocket
                 UpdateRoles(model.Roles.Value);
             if (model.PremiumSince.IsSpecified)
                 _premiumSinceTicks = model.PremiumSince.Value?.UtcTicks;
+            if (model.TimedOutUntil.IsSpecified)
+                _timedOutTicks = model.TimedOutUntil.Value?.UtcTicks;
             if (model.Pending.IsSpecified)
                 IsPending = model.Pending.Value;
         }
@@ -221,7 +235,12 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
             => RemoveRolesAsync(roles.Select(x => x.Id));
-
+        /// <inheritdoc />
+        public Task SetTimeOutAsync(TimeSpan span, RequestOptions options = null)
+            => UserHelper.SetTimeoutAsync(this, Discord, span, options);
+        /// <inheritdoc />
+        public Task RemoveTimeOutAsync(RequestOptions options = null)
+            => UserHelper.RemoveTimeOutAsync(this, Discord, options);
         /// <inheritdoc />
         public ChannelPermissions GetPermissions(IGuildChannel channel)
             => new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, GuildPermissions.RawValue));
