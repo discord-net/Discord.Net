@@ -344,11 +344,11 @@ namespace Discord.Rest
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
-        public static Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
+        public static async Task<RestUserMessage> SendFileAsync(IMessageChannel channel, BaseDiscordClient client,
             Stream stream, string filename, string text, bool isTTS, Embed embed, AllowedMentions allowedMentions, MessageReference messageReference, MessageComponent components, ISticker[] stickers, RequestOptions options, bool isSpoiler, Embed[] embeds)
         {
-            using var file = new FileAttachment(stream, filename, isSpoiler: isSpoiler);
-            return SendFileAsync(channel, client, file, text, isTTS, embed, allowedMentions, messageReference, components, stickers, options, embeds);
+            using (var file = new FileAttachment(stream, filename, isSpoiler: isSpoiler))
+                return await SendFileAsync(channel, client, file, text, isTTS, embed, allowedMentions, messageReference, components, stickers, options, embeds).ConfigureAwait(false);
         }
 
         /// <exception cref="ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="DiscordConfig.MaxMessageSize"/>.</exception>
