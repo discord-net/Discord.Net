@@ -411,11 +411,7 @@ namespace Discord.WebSocket
             }
 
             await Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, Id, Token, options).ConfigureAwait(false);
-
-            lock (_lock)
-            {
-                HasResponded = true;
-            }
+            HasResponded = true;
         }
 
         /// <inheritdoc/>
@@ -439,11 +435,7 @@ namespace Discord.WebSocket
             }
 
             await Discord.Rest.ApiClient.CreateInteractionResponseAsync(response, Id, Token, options).ConfigureAwait(false);
-
-            lock (_lock)
-            {
-                HasResponded = true;
-            }
+            HasResponded = true;
         }
 
         //IComponentInteraction

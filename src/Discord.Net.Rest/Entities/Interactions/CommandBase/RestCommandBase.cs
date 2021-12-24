@@ -32,9 +32,6 @@ namespace Discord.Rest
         /// </summary>
         internal new RestCommandBaseData Data { get; private set; }
 
-
-        internal override bool _hasResponded { get; set; }
-
         private object _lock = new object();
 
         internal RestCommandBase(DiscordRestClient client, Model model)
@@ -126,23 +123,15 @@ namespace Discord.Rest
 
             lock (_lock)
             {
-                if (_hasResponded)
+                if (HasResponded)
                 {
                     throw new InvalidOperationException("Cannot respond twice to the same interaction");
                 }
+
+                HasResponded = true;
             }
 
-            try
-            {
-                return SerializePayload(response);
-            }
-            finally
-            {
-                lock (_lock)
-                {
-                    _hasResponded = true;
-                }
-            }
+            return SerializePayload(response);
         }
 
         /// <inheritdoc/>
@@ -317,15 +306,12 @@ namespace Discord.Rest
 
             lock (_lock)
             {
-                if (_hasResponded)
+                if (HasResponded)
                 {
                     throw new InvalidOperationException("Cannot respond or defer twice to the same interaction");
                 }
-            }
 
-            lock (_lock)
-            {
-                _hasResponded = true;
+                HasResponded = true;
             }
 
             return SerializePayload(response);
