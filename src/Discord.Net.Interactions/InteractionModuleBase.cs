@@ -21,6 +21,12 @@ namespace Discord.Interactions
         public virtual void BeforeExecute (ICommandInfo command) { }
 
         /// <inheritdoc/>
+        public virtual Task BeforeExecuteAsync(ICommandInfo command) => Task.CompletedTask;
+
+        /// <inheritdoc/>
+        public virtual Task AfterExecuteAsync(ICommandInfo command) => Task.CompletedTask;
+
+        /// <inheritdoc/>
         public virtual void OnModuleBuilding (InteractionService commandService, ModuleInfo module) { }
 
         internal void SetContext (IInteractionContext context)
