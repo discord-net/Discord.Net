@@ -166,7 +166,8 @@ namespace Discord.Interactions
                 [typeof(IUser)] = typeof(DefaultUserConverter<>),
                 [typeof(IMentionable)] = typeof(DefaultMentionableConverter<>),
                 [typeof(IConvertible)] = typeof(DefaultValueConverter<>),
-                [typeof(Enum)] = typeof(EnumConverter<>)
+                [typeof(Enum)] = typeof(EnumConverter<>),
+                [typeof(Nullable<>)] = typeof(NullableConverter<>),
             };
 
             _typeConverters = new ConcurrentDictionary<Type, TypeConverter>
@@ -693,8 +694,8 @@ namespace Discord.Interactions
         {
             if (_typeConverters.TryGetValue(type, out var specific))
                 return specific;
-
-            else if (_genericTypeConverters.Any(x => x.Key.IsAssignableFrom(type)))
+            else if (_genericTypeConverters.Any(x => x.Key.IsAssignableFrom(type)
+            || (x.Key.IsGenericTypeDefinition && type.IsGenericType && x.Key.GetGenericTypeDefinition() == type.GetGenericTypeDefinition())))
             {
                 services ??= EmptyServiceProvider.Instance;
 
@@ -926,6 +927,9 @@ namespace Discord.Interactions
         {
             if (_genericTypeConverters.TryGetValue(type, out var matching))
                 return matching;
+
+            if (type.IsGenericType && _genericTypeConverters.TryGetValue(type.GetGenericTypeDefinition(), out var genericDefinition))
+                return genericDefinition;
 
             var typeInterfaces = type.GetInterfaces();
             var candidates = _genericTypeConverters.Where(x => x.Key.IsAssignableFrom(type))
