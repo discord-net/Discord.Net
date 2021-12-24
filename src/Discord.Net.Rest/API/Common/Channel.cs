@@ -40,6 +40,8 @@ namespace Discord.API
         public Optional<int> Bitrate { get; set; }
         [JsonProperty("user_limit")]
         public Optional<int> UserLimit { get; set; }
+        [JsonProperty("rtc_region")]
+        public Optional<string> RTCRegion { get; set; }
 
         //PrivateChannel
         [JsonProperty("recipients")]

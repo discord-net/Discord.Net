@@ -21,6 +21,8 @@ namespace Discord.Rest
         public int? UserLimit { get; private set; }
         /// <inheritdoc />
         public ulong? CategoryId { get; private set; }
+        /// <inheritdoc/>
+        public string RTCRegion { get; private set; }
 
         /// <inheritdoc />
         public string Mention => MentionUtils.MentionChannel(Id);
@@ -46,6 +48,8 @@ namespace Discord.Rest
 
             if(model.UserLimit.IsSpecified)
                 UserLimit = model.UserLimit.Value != 0 ? model.UserLimit.Value : (int?)null;
+
+            RTCRegion = model.RTCRegion.GetValueOrDefault(null);
         }
 
         /// <inheritdoc />

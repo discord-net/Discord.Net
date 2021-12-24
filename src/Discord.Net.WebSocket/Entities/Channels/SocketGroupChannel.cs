@@ -30,6 +30,9 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public string Name { get; private set; }
 
+        /// <inheritdoc/>
+        public string RTCRegion { get; private set; }
+
         /// <inheritdoc />
         public IReadOnlyCollection<SocketMessage> CachedMessages => _messages?.Messages ?? ImmutableArray.Create<SocketMessage>();
 
@@ -67,6 +70,8 @@ namespace Discord.WebSocket
 
             if (model.Recipients.IsSpecified)
                 UpdateUsers(state, model.Recipients.Value);
+
+            RTCRegion = model.RTCRegion.GetValueOrDefault(null);
         }
         private void UpdateUsers(ClientState state, UserModel[] models)
         {
