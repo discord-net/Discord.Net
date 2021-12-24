@@ -355,6 +355,11 @@ namespace Discord
         bool IsBoostProgressBarEnabled { get; }
 
         /// <summary>
+        ///     Gets the upload limit in bytes for this guild. This number is dependent on the guild's boost status.
+        /// </summary>
+        ulong MaxUploadLimit { get; }
+
+        /// <summary>
         ///     Modifies this guild.
         /// </summary>
         /// <param name="func">The delegate containing the properties to modify the guild with.</param>
