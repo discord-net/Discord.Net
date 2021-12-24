@@ -541,6 +541,12 @@ namespace Discord.Commands
 
             if (matchResult.Pipeline is ParseResult parseResult)
             {
+                if (!parseResult.IsSuccess)
+                {
+                    await _commandExecutedEvent.InvokeAsync(matchResult.Match.Value.Command, context, parseResult);
+                    return parseResult;
+                }
+
                 var executeResult = await matchResult.Match.Value.ExecuteAsync(context, parseResult, services);
 
                 if (!executeResult.IsSuccess && !(executeResult is RuntimeResult || executeResult is ExecuteResult)) // succesful results raise the event in CommandInfo#ExecuteInternalAsync (have to raise it there b/c deffered execution)
