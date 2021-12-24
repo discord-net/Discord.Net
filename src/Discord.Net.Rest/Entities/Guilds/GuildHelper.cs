@@ -124,6 +124,15 @@ namespace Discord.Rest
         {
             await client.ApiClient.DeleteGuildAsync(guild.Id, options).ConfigureAwait(false);
         }
+        public static ulong GetUploadLimit(IGuild guild)
+        {
+            return guild.PremiumTier switch
+            {
+                PremiumTier.Tier2 => 50ul * 1000000,
+                PremiumTier.Tier3 => 100ul * 1000000,
+                _ => 8ul * 1000000
+            };
+        }
         #endregion
 
         #region Bans

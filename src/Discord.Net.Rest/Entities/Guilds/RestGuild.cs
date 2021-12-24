@@ -99,6 +99,9 @@ namespace Discord.Rest
                 };
             }
         }
+        /// <inheritdoc/>
+        public ulong MaxUploadLimit
+            => GuildHelper.GetUploadLimit(this);
         /// <inheritdoc />
         public NsfwLevel NsfwLevel { get; private set; }
         /// <inheritdoc />
