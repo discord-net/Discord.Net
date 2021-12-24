@@ -311,6 +311,7 @@ namespace Discord.Interactions.Builders
 
                 try
                 {
+                    await instance.BeforeExecuteAsync(commandInfo).ConfigureAwait(false);
                     instance.BeforeExecute(commandInfo);
                     var task = commandInvoker(instance, args) ?? Task.Delay(0);
 
@@ -332,6 +333,7 @@ namespace Discord.Interactions.Builders
                 }
                 finally
                 {
+                    await instance.AfterExecuteAsync(commandInfo).ConfigureAwait(false);
                     instance.AfterExecute(commandInfo);
                     ( instance as IDisposable )?.Dispose();
                 }
