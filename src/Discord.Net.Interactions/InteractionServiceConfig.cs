@@ -48,6 +48,11 @@ namespace Discord.Interactions
         public bool EnableAutocompleteHandlers { get; set; } = true;
 
         /// <summary>
+        ///     Gets or sets whether new service scopes should be automatically created when resolving module depedencies on every command execution.
+        /// </summary>
+        public bool AutoServiceScopes { get; set; } = true;
+
+        /// <summary>
         ///     Gets or sets delegate to be used by the <see cref="InteractionService"/> when responding to a Rest based interaction.
         /// </summary>
         public RestResponseCallback RestResponseCallback { get; set; } = (ctx, str) => Task.CompletedTask;
