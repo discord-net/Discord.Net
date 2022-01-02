@@ -26,7 +26,7 @@ namespace Discord.Interactions
             Client = client;
             Interaction = interaction;
             Channel = channel;
-            Guild = (interaction as IGuildUser)?.Guild;
+            Guild = (user as IGuildUser)?.Guild;
             User = user;
             Interaction = interaction;
         }
