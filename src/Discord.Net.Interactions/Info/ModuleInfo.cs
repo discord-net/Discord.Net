@@ -115,7 +115,7 @@ namespace Discord.Interactions
             SubModules = BuildSubModules(builder, commandService, services).ToImmutableArray();
             Attributes = BuildAttributes(builder).ToImmutableArray();
             Preconditions = BuildPreconditions(builder).ToImmutableArray();
-            IsTopLevelGroup = CheckTopLevel(parent);
+            IsTopLevelGroup = IsSlashGroup && CheckTopLevel(parent);
             DontAutoRegister = builder.DontAutoRegister;
 
             GroupedPreconditions = Preconditions.ToLookup(x => x.Group, x => x, StringComparer.Ordinal);
