@@ -232,7 +232,7 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Adds slash command builder to <see cref="ContextCommands"/>.
+        ///     Adds context command builder to <see cref="ContextCommands"/>.
         /// </summary>
         /// <param name="name">Name of the command.</param>
         /// <param name="callback">Command callback to be executed.</param>
@@ -264,7 +264,7 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Adds slash command builder to <see cref="ComponentCommands"/>.
+        ///     Adds component command builder to <see cref="ComponentCommands"/>.
         /// </summary>
         /// <param name="name">Name of the command.</param>
         /// <param name="callback">Command callback to be executed.</param>
@@ -296,7 +296,7 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Adds slash command builder to <see cref="AutocompleteCommands"/>.
+        ///     Adds autocomplete command builder to <see cref="AutocompleteCommands"/>.
         /// </summary>
         /// <param name="name">Name of the command.</param>
         /// <param name="callback">Command callback to be executed.</param>
