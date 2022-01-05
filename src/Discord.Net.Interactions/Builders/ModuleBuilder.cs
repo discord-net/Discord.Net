@@ -159,7 +159,7 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Adds attributes to <see cref="Attributes"/>
+        ///     Adds attributes to <see cref="Attributes"/>.
         /// </summary>
         /// <param name="attributes">New attributes to be added to <see cref="Attributes"/>.</param>
         /// <returns>
@@ -172,7 +172,7 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Adds preconditions to <see cref="Preconditions"/>
+        ///     Adds preconditions to <see cref="Preconditions"/>.
         /// </summary>
         /// <param name="preconditions">New preconditions to be added to <see cref="Preconditions"/>.</param>
         /// <returns>
@@ -185,7 +185,7 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Adds slash command builder to <see cref="SlashCommands"/>
+        ///     Adds slash command builder to <see cref="SlashCommands"/>.
         /// </summary>
         /// <param name="configure"><see cref="SlashCommandBuilder"/> factory.</param>
         /// <returns>
@@ -200,7 +200,24 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Adds context command builder to <see cref="ContextCommands"/>
+        ///     Adds slash command builder to <see cref="SlashCommands"/>.
+        /// </summary>
+        /// <param name="name">Name of the command.</param>
+        /// <param name="callback">Command callback to be executed.</param>
+        /// <param name="configure"><see cref="SlashCommandBuilder"/> factory.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModuleBuilder AddSlashCommand(string name, ExecuteCallback callback, Action<SlashCommandBuilder> configure)
+        {
+            var command = new SlashCommandBuilder(this, name, callback);
+            configure(command);
+            _slashCommands.Add(command);
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds context command builder to <see cref="ContextCommands"/>.
         /// </summary>
         /// <param name="configure"><see cref="ContextCommandBuilder"/> factory.</param>
         /// <returns>
@@ -215,7 +232,24 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Adds component command builder to <see cref="ComponentCommands"/>
+        ///     Adds context command builder to <see cref="ContextCommands"/>.
+        /// </summary>
+        /// <param name="name">Name of the command.</param>
+        /// <param name="callback">Command callback to be executed.</param>
+        /// <param name="configure"><see cref="ContextCommandBuilder"/> factory.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModuleBuilder AddContextCommand(string name, ExecuteCallback callback, Action<ContextCommandBuilder> configure)
+        {
+            var command = new ContextCommandBuilder(this, name, callback);
+            configure(command);
+            _contextCommands.Add(command);
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds component command builder to <see cref="ComponentCommands"/>.
         /// </summary>
         /// <param name="configure"><see cref="ComponentCommandBuilder"/> factory.</param>
         /// <returns>
@@ -230,7 +264,24 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Adds autocomplete command builder to <see cref="AutocompleteCommands"/>
+        ///     Adds component command builder to <see cref="ComponentCommands"/>.
+        /// </summary>
+        /// <param name="name">Name of the command.</param>
+        /// <param name="callback">Command callback to be executed.</param>
+        /// <param name="configure"><see cref="ComponentCommandBuilder"/> factory.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModuleBuilder AddComponentCommand(string name, ExecuteCallback callback, Action<ComponentCommandBuilder> configure)
+        {
+            var command = new ComponentCommandBuilder(this, name, callback);
+            configure(command);
+            _componentCommands.Add(command);
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds autocomplete command builder to <see cref="AutocompleteCommands"/>.
         /// </summary>
         /// <param name="configure"><see cref="AutocompleteCommands"/> factory.</param>
         /// <returns>
@@ -245,7 +296,24 @@ namespace Discord.Interactions.Builders
         }
 
         /// <summary>
-        ///     Adds sub-module builder to <see cref="SubModules"/>
+        ///     Adds autocomplete command builder to <see cref="AutocompleteCommands"/>.
+        /// </summary>
+        /// <param name="name">Name of the command.</param>
+        /// <param name="callback">Command callback to be executed.</param>
+        /// <param name="configure"><see cref="AutocompleteCommandBuilder"/> factory.</param>
+        /// <returns>
+        ///     The builder instance.
+        /// </returns>
+        public ModuleBuilder AddSlashCommand(string name, ExecuteCallback callback, Action<AutocompleteCommandBuilder> configure)
+        {
+            var command = new AutocompleteCommandBuilder(this, name, callback);
+            configure(command);
+            _autocompleteCommands.Add(command);
+            return this;
+        }
+
+        /// <summary>
+        ///     Adds sub-module builder to <see cref="SubModules"/>.
         /// </summary>
         /// <param name="configure"><see cref="ModuleBuilder"/> factory.</param>
         /// <returns>
