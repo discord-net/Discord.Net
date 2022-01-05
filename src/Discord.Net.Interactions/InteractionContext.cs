@@ -21,13 +21,13 @@ namespace Discord.Interactions
         /// <param name="interaction">The underlying interaction.</param>
         /// <param name="user"><see cref="IUser"/> who executed the command.</param>
         /// <param name="channel"><see cref="ISocketMessageChannel"/> the command originated from.</param>
-        public InteractionContext(IDiscordClient client, IDiscordInteraction interaction, IUser user, IMessageChannel channel = null)
+        public InteractionContext(IDiscordClient client, IDiscordInteraction interaction, IMessageChannel channel = null)
         {
             Client = client;
             Interaction = interaction;
             Channel = channel;
-            Guild = (interaction as IGuildUser)?.Guild;
-            User = user;
+            Guild = (interaction.User as IGuildUser)?.Guild;
+            User = interaction.User;
             Interaction = interaction;
         }
     }
