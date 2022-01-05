@@ -29,6 +29,9 @@ namespace Discord.Interactions
         /// <inheritdoc/>
         public virtual void OnModuleBuilding (InteractionService commandService, ModuleInfo module) { }
 
+        /// <inheritdoc/>
+        public virtual void Construct (Builders.ModuleBuilder builder, InteractionService commandService) { }
+
         internal void SetContext (IInteractionContext context)
         {
             var newValue = context as T;
