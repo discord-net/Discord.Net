@@ -43,8 +43,11 @@ namespace Discord.Rest
             bool hasComponents = args.Components.IsSpecified && args.Components.Value != null;
             bool hasAttachments = args.Attachments.IsSpecified;
 
-            if (!hasComponents && !hasText && !hasEmbeds && !hasAttachments)
+            // No content needed if modifying flags
+            if ((!hasComponents && !hasText && !hasEmbeds && !hasAttachments) && !args.Flags.IsSpecified)
+            {
                 Preconditions.NotNullOrEmpty(args.Content.IsSpecified ? args.Content.Value : string.Empty, nameof(args.Content));
+            }
 
             if (args.AllowedMentions.IsSpecified)
             {
