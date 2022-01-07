@@ -160,6 +160,15 @@ namespace Discord.Rest
             await client.ApiClient.RemoveAllReactionsForEmoteAsync(msg.Channel.Id, msg.Id, emote is Emote e ? $"{e.Name}:{e.Id}" : UrlEncode(emote.Name), options).ConfigureAwait(false);
         }
 
+        public static async Task SuppressEmbeds(IMessage msg, BaseDiscordClient client, RequestOptions options)
+        {
+            await client.ApiClient.SuppressEmbeds(msg.Channel.Id, msg.Id, options).ConfigureAwait(false);
+        }
+        public static async Task SuppressEmbeds(ulong channelId, ulong messageId, BaseDiscordClient client, RequestOptions options)
+        {
+            await client.ApiClient.SuppressEmbeds(channelId, messageId, options).ConfigureAwait(false);
+        }
+
         public static IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IMessage msg, IEmote emote,
             int? limit, BaseDiscordClient client, RequestOptions options)
         {

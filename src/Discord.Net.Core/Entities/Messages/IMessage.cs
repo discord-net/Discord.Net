@@ -270,7 +270,14 @@ namespace Discord
         ///     A task that represents the asynchronous removal operation.
         /// </returns>
         Task RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions options = null);
-
+        /// <summary>
+        ///     Suppresses embeds for a specified message.
+        /// </summary>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous operation to set the suppress embeds flags on a message.
+        /// </returns>
+        Task SuppressEmbeds(RequestOptions options = null);
         /// <summary>
         ///     Gets all users that reacted to a message with a given emote.
         /// </summary>

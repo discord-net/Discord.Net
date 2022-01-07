@@ -931,6 +931,19 @@ namespace Discord.API
         #endregion
 
         #region Stickers, Reactions, Crosspost, and Acks
+        public async Task SuppressEmbeds(ulong channelId, ulong messageId, RequestOptions options = null)
+        {
+            Preconditions.NotEqual(channelId, 0, nameof(channelId));
+            Preconditions.NotEqual(messageId, 0, nameof(messageId));
+
+            Rest.ModifyMessageParams args = new Rest.ModifyMessageParams();
+            args.Flags = MessageFlags.SuppressEmbeds;
+
+            options = RequestOptions.CreateOrClone(options);
+
+            var ids = new BucketIds(channelId: channelId);
+            await SendJsonAsync<Message>("PATCH", () => $"channels/{channelId}/messages/{messageId}", args, ids, clientBucket: ClientBucketType.SendEdit, options: options).ConfigureAwait(false);
+        }
         public async Task<Sticker> GetStickerAsync(ulong id, RequestOptions options = null)
         {
             Preconditions.NotEqual(id, 0, nameof(id));

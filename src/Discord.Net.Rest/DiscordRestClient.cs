@@ -209,7 +209,9 @@ namespace Discord.Rest
             => MessageHelper.RemoveAllReactionsAsync(channelId, messageId, this, options);
         public Task RemoveAllReactionsForEmoteAsync(ulong channelId, ulong messageId, IEmote emote, RequestOptions options = null)
             => MessageHelper.RemoveAllReactionsForEmoteAsync(channelId, messageId, emote, this, options);
-#endregion
+        public Task SuppressEmbeds(ulong channelId, ulong messageId, RequestOptions options = null)
+            => MessageHelper.SuppressEmbeds(channelId, messageId, this, options);
+        #endregion
 
         #region IDiscordClient
         /// <inheritdoc />
