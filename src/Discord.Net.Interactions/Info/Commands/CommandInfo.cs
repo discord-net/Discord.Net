@@ -50,7 +50,7 @@ namespace Discord.Interactions
         public abstract bool SupportsWildCards { get; }
 
         /// <inheritdoc/>
-        public bool IsTopLevelCommand => IgnoreGroupNames || !Module.IsTopLevelGroup;
+        public bool IsTopLevelCommand { get; }
 
         /// <inheritdoc/>
         public RunMode RunMode { get; }
@@ -72,6 +72,7 @@ namespace Discord.Interactions
             Name = builder.Name;
             MethodName = builder.MethodName;
             IgnoreGroupNames = builder.IgnoreGroupNames;
+            IsTopLevelCommand = IgnoreGroupNames || CheckTopLevel(Module);
             RunMode = builder.RunMode != RunMode.Default ? builder.RunMode : commandService._runMode;
             Attributes = builder.Attributes.ToImmutableArray();
             Preconditions = builder.Preconditions.ToImmutableArray();
@@ -228,6 +229,20 @@ namespace Discord.Interactions
             {
                 await CommandService._cmdLogger.VerboseAsync($"Executed {GetLogString(context)}").ConfigureAwait(false);
             }
+        }
+
+        private static bool CheckTopLevel(ModuleInfo parent)
+        {
+            var currentParent = parent;
+
+            while (currentParent != null)
+            {
+                if (currentParent.IsSlashGroup)
+                    return false;
+
+                currentParent = currentParent.Parent;
+            }
+            return true;
         }
 
         // ICommandInfo
