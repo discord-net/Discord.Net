@@ -110,7 +110,7 @@ namespace Discord.Interactions
 
                 var props = new SlashCommandBuilder
                 {
-                    Name = moduleInfo.SlashGroupName.ToLower(),
+                    Name = moduleInfo.SlashGroupName,
                     Description = moduleInfo.Description,
                     IsDefaultPermission = moduleInfo.DefaultPermission,
                 }.Build();
@@ -148,7 +148,7 @@ namespace Discord.Interactions
             else
                 return new List<ApplicationCommandOptionProperties>() { new ApplicationCommandOptionProperties
                 {
-                    Name = moduleInfo.SlashGroupName.ToLower(),
+                    Name = moduleInfo.SlashGroupName,
                     Description = moduleInfo.Description,
                     Type = ApplicationCommandOptionType.SubCommandGroup,
                     Options = options
