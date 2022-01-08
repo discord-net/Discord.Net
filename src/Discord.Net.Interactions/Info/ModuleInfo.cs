@@ -206,7 +206,7 @@ namespace Discord.Interactions
 
             while (currentParent != null)
             {
-                if (currentParent.IsTopLevelGroup)
+                if (currentParent.IsSlashGroup)
                     return false;
 
                 currentParent = currentParent.Parent;
