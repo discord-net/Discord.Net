@@ -580,7 +580,6 @@ namespace Discord.WebSocket
                         foreach (var client in _shards)
                             client?.Dispose();
                     }
-                    _connectionGroupLock?.Dispose();
                 }
 
                 _isDisposed = true;
@@ -588,5 +587,6 @@ namespace Discord.WebSocket
 
             return base.DisposeAsync(disposing);
         }
+        #endregion
     }
 }
