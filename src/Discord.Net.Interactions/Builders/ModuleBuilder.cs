@@ -329,19 +329,24 @@ namespace Discord.Interactions.Builders
 
         internal ModuleInfo Build (InteractionService interactionService, IServiceProvider services, ModuleInfo parent = null)
         {
-            var moduleInfo = new ModuleInfo(this, interactionService, services, parent);
-
-            IInteractionModuleBase instance = ReflectionUtils<IInteractionModuleBase>.CreateObject(TypeInfo, interactionService, services);
-            try
+            if (TypeInfo is not null && ModuleClassBuilder.IsValidModuleDefinition(TypeInfo))
             {
-                instance.OnModuleBuilding(interactionService, moduleInfo);
-            }
-            finally
-            {
-                ( instance as IDisposable )?.Dispose();
-            }
+                var instance = ReflectionUtils<IInteractionModuleBase>.CreateObject(TypeInfo, interactionService, services);
 
-            return moduleInfo;
+                try
+                {
+                    instance.Construct(this, interactionService);
+                    var moduleInfo = new ModuleInfo(this, interactionService, services, parent);
+                    instance.OnModuleBuilding(interactionService, moduleInfo);
+                    return moduleInfo;
+                }
+                finally
+                {
+                    (instance as IDisposable)?.Dispose();
+                }
+            }
+            else
+                return new(this, interactionService, services, parent);
         }
     }
 }
