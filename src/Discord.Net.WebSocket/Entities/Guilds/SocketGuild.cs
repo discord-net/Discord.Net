@@ -169,7 +169,7 @@ namespace Discord.WebSocket
         ///     A <see cref="SocketTextChannel"/> representing the first viewable channel that the user has access to.
         /// </returns>
         public SocketTextChannel DefaultChannel => TextChannels
-            .Where(c => CurrentUser.GetPermissions(c).ViewChannel)
+            .Where(c => CurrentUser.GetPermissions(c).ViewChannel && c is not IThreadChannel)
             .OrderBy(c => c.Position)
             .FirstOrDefault();
         /// <summary>
