@@ -34,6 +34,13 @@ namespace Discord.Rest
                 model.Thumbnail.IsSpecified ? model.Thumbnail.Value.ToEntity() : (EmbedThumbnail?)null,
                 model.Fields.IsSpecified ? model.Fields.Value.Select(x => x.ToEntity()).ToImmutableArray() : ImmutableArray.Create<EmbedField>());
         }
+        public static RoleTags ToEntity(this API.RoleTags model)
+        {
+            return new RoleTags(
+                model.BotId.IsSpecified ? model.BotId.Value : null,
+                model.IntegrationId.IsSpecified ? model.IntegrationId.Value : null,
+                model.IsPremiumSubscriber.IsSpecified);
+        }
         public static API.Embed ToModel(this Embed entity)
         {
             if (entity == null) return null;
@@ -61,13 +68,25 @@ namespace Discord.Rest
                 model.Video = entity.Video.Value.ToModel();
             return model;
         }
+
         public static API.AllowedMentions ToModel(this AllowedMentions entity)
         {
+            if (entity == null) return null;
             return new API.AllowedMentions()
             {
                 Parse = entity.AllowedTypes?.EnumerateMentionTypes().ToArray(),
                 Roles = entity.RoleIds?.ToArray(),
                 Users = entity.UserIds?.ToArray(),
+                RepliedUser = entity.MentionRepliedUser ?? Optional.Create<bool>(),
+            };
+        }
+        public static API.MessageReference ToModel(this MessageReference entity)
+        {
+            return new API.MessageReference()
+            {
+                ChannelId = entity.InternalChannelId,
+                GuildId = entity.GuildId,
+                MessageId = entity.MessageId,
             };
         }
         public static IEnumerable<string> EnumerateMentionTypes(this AllowedMentionTypes mentionTypes)
@@ -150,6 +169,49 @@ namespace Discord.Rest
         public static Overwrite ToEntity(this API.Overwrite model)
         {
             return new Overwrite(model.TargetId, model.TargetType, new OverwritePermissions(model.Allow, model.Deny));
+        }
+
+        public static API.Message ToMessage(this API.InteractionResponse model, IDiscordInteraction interaction)
+        {
+            if (model.Data.IsSpecified)
+            {
+                var data = model.Data.Value;
+                var messageModel = new API.Message
+                {
+                    IsTextToSpeech = data.TTS,
+                    Content = (data.Content.IsSpecified && data.Content.Value == null) ? Optional<string>.Unspecified : data.Content,
+                    Embeds = data.Embeds,
+                    AllowedMentions = data.AllowedMentions,
+                    Components = data.Components,
+                    Flags = data.Flags,
+                };
+
+                if(interaction is IApplicationCommandInteraction command)
+                {
+                    messageModel.Interaction = new API.MessageInteraction
+                    {
+                        Id = command.Id,
+                        Name = command.Data.Name,
+                        Type = InteractionType.ApplicationCommand,
+                        User = new API.User
+                        {
+                            Username = command.User.Username,
+                            Avatar = command.User.AvatarId,
+                            Bot = command.User.IsBot,
+                            Discriminator = command.User.Discriminator,
+                            PublicFlags = command.User.PublicFlags.HasValue ? command.User.PublicFlags.Value : Optional<UserProperties>.Unspecified,
+                            Id = command.User.Id,
+                        }
+                    };
+                }
+
+                return messageModel;
+            }
+
+            return new API.Message
+            {
+                Id = interaction.Id,
+            };
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Discord
     public interface IMessage : ISnowflakeEntity, IDeletable
     {
         /// <summary>
-        ///     Gets the type of this system message.
+        ///     Gets the type of this message.
         /// </summary>
         MessageType Type { get; }
         /// <summary>
@@ -39,12 +39,26 @@ namespace Discord
         /// </returns>
         bool IsSuppressed { get; }
         /// <summary>
+        ///     Gets the value that indicates whether this message mentioned everyone.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if this message mentioned everyone; otherwise <c>false</c>.
+        /// </returns>
+        bool MentionedEveryone { get; }
+        /// <summary>
         ///     Gets the content for this message.
         /// </summary>
         /// <returns>
         ///     A string that contains the body of the message; note that this field may be empty if there is an embed.
         /// </returns>
         string Content { get; }
+        /// <summary>
+        ///     Gets the clean content for this message.
+        /// </summary>
+        /// <returns>
+        ///     A string that contains the body of the message stripped of mentions, markdown, emojis and pings; note that this field may be empty if there is an embed.
+        /// </returns>
+        string CleanContent { get; }
         /// <summary>
         ///     Gets the time this message was sent.
         /// </summary>
@@ -85,10 +99,10 @@ namespace Discord
         ///     Gets all embeds included in this message.
         /// </summary>
         /// <remarks>
-        /// </remarks>
         ///     This property gets a read-only collection of embeds associated with this message. Depending on the
         ///     message, a sent message may contain one or more embeds. This is usually true when multiple link previews
         ///     are generated; however, only one <see cref="EmbedType.Rich"/> <see cref="Embed"/> can be featured.
+        /// </remarks>
         /// <returns>
         ///     A read-only collection of embed objects.
         /// </returns>
@@ -141,11 +155,11 @@ namespace Discord
         MessageApplication Application { get; }
 
         /// <summary>
-        ///     Gets the reference to the original message if it was crossposted.
+        ///     Gets the reference to the original message if it is a crosspost, channel follow add, pin, or reply message.
         /// </summary>
         /// <remarks>
-        ///     Sent with Cross-posted messages, meaning they were published from news channels
-        ///     and received by subscriber channels.
+        ///     Sent with cross-posted messages, meaning they were published from news channels
+        ///     and received by subscriber channels, channel follow adds, pins, and message replies.
         /// </remarks>
         /// <returns>
         ///     A message's reference, if any is associated.
@@ -156,6 +170,38 @@ namespace Discord
         ///     Gets all reactions included in this message.
         /// </summary>
         IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions { get; }
+
+        /// <summary>
+        ///     The <see cref="IMessageComponent"/>'s attached to this message
+        /// </summary>
+        IReadOnlyCollection<IMessageComponent> Components { get; }
+
+        /// <summary>
+        ///     Gets all stickers items included in this message.
+        /// </summary>
+        /// <returns>
+        ///     A read-only collection of sticker item objects.
+        /// </returns>
+        IReadOnlyCollection<IStickerItem> Stickers { get; }
+        
+        /// <summary>
+        ///     Gets the flags related to this message.
+        /// </summary>
+        /// <remarks>
+        ///     This value is determined by bitwise OR-ing <see cref="MessageFlags"/> values together.
+        /// </remarks>
+        /// <returns>
+        ///     A message's flags, if any is associated.
+        /// </returns>
+        MessageFlags? Flags { get; }
+
+        /// <summary>
+        ///     Gets the interaction this message is a response to.
+        /// </summary>
+        /// <returns>
+        ///     A <see cref="IMessageInteraction"/> if the message is a response to an interaction; otherwise <see langword="null"/>.
+        /// </returns>
+        IMessageInteraction Interaction { get; }
 
         /// <summary>
         ///     Adds a reaction to this message.
@@ -215,6 +261,15 @@ namespace Discord
         ///     A task that represents the asynchronous removal operation.
         /// </returns>
         Task RemoveAllReactionsAsync(RequestOptions options = null);
+        /// <summary>
+        ///     Removes all reactions with a specific emoji from this message.
+        /// </summary>
+        /// <param name="emote">The emoji used to react to this message.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous removal operation.
+        /// </returns>
+        Task RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions options = null);
 
         /// <summary>
         ///     Gets all users that reacted to a message with a given emote.

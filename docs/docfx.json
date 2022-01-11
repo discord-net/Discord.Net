@@ -1,19 +1,22 @@
 {
-  "metadata": [{
-    "src": [{
-      "src": "../src",
-      "files": [
-        "**.csproj"
-      ]
-    }],
-    "dest": "api",
-    "filter": "filterConfig.yml",
-    "properties": {
-      "TargetFramework": "netstandard2.0"
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../src",
+          "files": ["**.csproj"]
+        }
+      ],
+      "dest": "api",
+      "filter": "filterConfig.yml",
+      "properties": {
+        "TargetFramework": "net5.0"
+      }
     }
-  }],
+  ],
   "build": {
-    "content": [{
+    "content": [
+      {
         "files": ["api/**.yml", "api/index.md"]
       },
       {
@@ -27,19 +30,21 @@
       },
       {
         "src": "../",
-        "files": [ "CHANGELOG.md" ]
+        "files": ["CHANGELOG.md"]
       }
     ],
-    "resource": [{
-      "files": [
-        "**/images/**",
-        "**/samples/**",
-        "langwordMapping.yml",
-        "marketing/logo/**.svg",
-        "marketing/logo/**.png",
-        "favicon.ico"
-      ]
-    }],
+    "resource": [
+      {
+        "files": [
+          "**/images/**",
+          "**/samples/**",
+          "langwordMapping.yml",
+          "marketing/logo/**.svg",
+          "marketing/logo/**.png",
+          "favicon.ico"
+        ]
+      }
+    ],
     "dest": "_site",
     "template": [
       "default",
@@ -47,17 +52,19 @@
       "_template/last-modified",
       "_template/description-generator"
     ],
-    "postProcessors": ["ExtractSearchIndex", "LastModifiedPostProcessor", "DescriptionPostProcessor"],
+    "postProcessors": [
+      "ExtractSearchIndex",
+      "LastModifiedPostProcessor",
+      "DescriptionPostProcessor"
+    ],
     "overwrite": "_overwrites/**/**.md",
     "globalMetadata": {
       "_appTitle": "Discord.Net Documentation",
-      "_appFooter": "Discord.Net (c) 2015-2020 2.2.0",
+      "_appFooter": "Discord.Net (c) 2015-2021 3.1.0",
       "_enableSearch": true,
       "_appLogoPath": "marketing/logo/SVG/Logomark Purple.svg",
-      "_appFaviconPath":  "favicon.ico"
+      "_appFaviconPath": "favicon.ico"
     },
-    "xrefService": [
-      "https://xref.docs.microsoft.com/query?uid={uid}"
-    ]
+    "xrefService": ["https://xref.docs.microsoft.com/query?uid={uid}"]
   }
 }

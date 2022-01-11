@@ -13,10 +13,10 @@ namespace Discord
         /// <returns>
         ///     An <see cref="int"/> representing the API version that Discord.Net uses to communicate with Discord.
         ///     <para>A list of available API version can be seen on the official 
-        ///     <see href="https://discordapp.com/developers/docs/reference#api-versioning">Discord API documentation</see>
+        ///     <see href="https://discord.com/developers/docs/reference#api-versioning">Discord API documentation</see>
         ///     .</para>
         /// </returns>
-        public const int APIVersion = 6;
+        public const int APIVersion = 9;
         /// <summary>
         /// Returns the Voice API version Discord.Net uses.
         /// </summary>
@@ -43,14 +43,14 @@ namespace Discord
         /// <returns>
         ///     The user agent used in each Discord.Net request.
         /// </returns>
-        public static string UserAgent { get; } = $"DiscordBot (https://github.com/RogueException/Discord.Net, v{Version})";
+        public static string UserAgent { get; } = $"DiscordBot (https://github.com/discord-net/Discord.Net, v{Version})";
         /// <summary>
         ///     Returns the base Discord API URL.
         /// </summary>
         /// <returns>
         ///     The Discord API URL using <see cref="APIVersion"/>.
         /// </returns>
-        public static readonly string APIUrl = $"https://discordapp.com/api/v{APIVersion}/";
+        public static readonly string APIUrl = $"https://discord.com/api/v{APIVersion}/";
         /// <summary> 
         ///     Returns the base Discord CDN URL. 
         /// </summary>
@@ -94,6 +94,13 @@ namespace Discord
         ///     The maximum number of users that can be gotten per-batch.
         /// </returns>
         public const int MaxUsersPerBatch = 1000;
+        /// <summary>
+        ///     Returns the max users allowed to be in a request for guild event users.
+        /// </summary>
+        /// <returns>
+        ///     The maximum number of users that can be gotten per-batch.
+        /// </returns>
+        public const int MaxGuildEventUsersPerBatch = 100;
         /// <summary> 
         ///     Returns the max guilds allowed to be in a request. 
         /// </summary>
@@ -141,18 +148,6 @@ namespace Discord
         /// </remarks>
         internal bool DisplayInitialLog { get; set; } = true;
 
-        /// <summary>
-        ///     Gets or sets the level of precision of the rate limit reset response.
-        /// </summary>
-        /// <remarks>
-        ///     If set to <see cref="RateLimitPrecision.Second"/>, this value will be rounded up to the
-        ///     nearest second.
-        /// </remarks>
-        /// <returns>
-        ///     The currently set <see cref="RateLimitPrecision"/>.
-        /// </returns>
-        public RateLimitPrecision RateLimitPrecision { get; set; } = RateLimitPrecision.Millisecond;
-
 		/// <summary>
 		/// 	Gets or sets whether or not rate-limits should use the system clock.
 		/// </summary>
@@ -170,5 +165,17 @@ namespace Discord
 		///		clock. Your system will still need a stable clock.
 		/// </remarks>
 		public bool UseSystemClock { get; set; } = true;
+
+        /// <summary>
+        ///     Gets or sets whether or not the internal experation check uses the system date
+        ///     + snowflake date to check if an interaction can be responded to.
+        /// </summary>
+        /// <remarks>
+        ///     If set to <see langword="false"/> then the CreatedAt property in an interaction
+        ///     will be set to when it was received instead of the snowflakes date.
+        ///     <br/>
+        ///     <b>This will still require a stable clock on your system.</b>
+        /// </remarks>
+        public bool UseInteractionSnowflakeDate { get; set; } = true;
     }
 }

@@ -1,4 +1,5 @@
 using Discord.Audio;
+using System;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -8,6 +9,14 @@ namespace Discord
     /// </summary>
     public interface IAudioChannel : IChannel
     {
+        /// <summary>
+        ///     Gets the RTC region for this audio channel.
+        /// </summary>
+        /// <remarks>
+        ///     This property can be <see langword="null"/>.
+        /// </remarks>
+        string RTCRegion { get; }
+
         /// <summary>
         ///     Connects to this audio channel.
         /// </summary>
@@ -27,5 +36,16 @@ namespace Discord
         ///     A task representing the asynchronous operation for disconnecting from the audio channel.
         /// </returns>
         Task DisconnectAsync();
+
+        /// <summary>
+        ///     Modifies this audio channel.
+        /// </summary>
+        /// <param name="func">The properties to modify the channel with.</param>
+        /// <param name="options">The options to be used when sending the request.</param>
+        /// <returns>
+        ///     A task that represents the asynchronous modification operation.
+        /// </returns>
+        /// <seealso cref="AudioChannelProperties"/>
+        Task ModifyAsync(Action<AudioChannelProperties> func, RequestOptions options = null);
     }
 }

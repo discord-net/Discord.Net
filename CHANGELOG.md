@@ -1,7 +1,246 @@
 # Changelog
 
-## [2.2.0] - 2020-04-16
+## [3.1.0] - 2021-12-24
+
 ### Added
+
+- #1996 Add nullable type converter to Interaction service (ccc365e)
+- #1998 Add before and after execute async (9f124b2)
+- #2001 Add MaxUploadLimit to guilds (7745558)
+- #2002 Add RTCRegion to voice channels (2a416a3)
+- #2003 Add Guilduser timeouts and MODERATE_MEMBERS permission (144741e)
+
+### Fixed
+
+- #1976 fix guild scheduled events update (8daa0b6)
+- #1977 fix thread member nre (5d43fe6)
+- #1980 fix requireRole attribute of interaction service (a2f57f8)
+- #1990 Fix images path for select menu section (a8b5506)
+- #1992 fix images; fix closing brace on cs ref (fb52525)
+- #1993 Fix CommandExecuted not invoked on failed parse (82bb3e4)
+- #1995 Fixed file being disposed on upload (ad20e03)
+- #1999 Fix SocketGuildUser being changed to SocketGlobalUser in UserLeft (5446bfe)
+- Fix voice codes namespace (768a0a9)
+
+### Misc
+
+- #1994 Make HasResponded public and add it to IDiscordInteraction (1fbcbb8)
+- #1997 Make module service scopes optional (cb1aad3)
+
+## [3.0.0] - 2021-12-13
+
+### Added
+
+- #1152 Add characters commonly use in links to Sanitize (b9274d1)
+- #1518 Add default nullable enum typereader (f7a07ae)
+- #1700 Added Implementation of ValidateAndGetBestMatch (3cd9f39)
+- #1767 Add method to clear guild user cache (19a66bf)
+- #1847 Bump API version to 9 (06a64b7)
+- #1848 Remove obsolete sync voice regions methods and properties (ed8e573)
+- #1851 Remove DM cache and fix references (7a201e9)
+- #1860 Remove /users/@me call for socket and rework sharded client a bit (384ad85)
+- #1863 Change GuildMemberUpdate before state to cacheable (c2e87f5)
+- #1666 Added negative TimeSpan handling (6abdfcb)
+- #1861 Add MaxBitrate to the interface (e0dbe7c)
+- #1865 Add null check to AllowedMentions.ToModel() (3cb662f)
+- #1879 Add Name property to Teams (c5b4b64)
+- #1890 Add default avatar to WithAuthor extension (c200861)
+- #1896 IVoiceChannel implements IMentionable (3395700)
+- #1923 Add Interaction Support (933ea42)
+- #1923 Add Application commands (933ea42)
+- #1923 Add Message Components (933ea42)
+- #1923 Add Thread Channels (933ea42)
+- #1923 Add Stage Channels (933ea42)
+- #1923 Add Guild Events (933ea42)
+- #1923 Revamped Stickers (933ea42)
+- #1923 Add TimestampTag (933ea42)
+- #1923 Add name property to teams (933ea42)
+- #1923 Add url validation on embeds (933ea42)
+- #1923 Add NsfwLevel to Guilds (933ea42)
+- #1923 Add helpers to Emoji for parsing (933ea42)
+- #1923 Add banner and accent color to guild users (933ea42)
+- #1923 Add RatelimitCallback to RequestOptions (933ea42)
+- #1923 Add Emoji to roles (933ea42)
+- #1923 Add UseInteractionSnowflakeDate to config (933ea42)
+- #1923 Add checks for gateway intent in some methods (933ea42)
+- #1923 Add SendFilesAsync to channels (933ea42)
+- #1923 Add Attachments property to MessageProperties (933ea42)
+- #1942 Add multi-file upload to webhooks (bc440ab)
+- #1943 Handle bidirectional usernames (10afd96)
+- #1945 Updated socket presence and add new presence event (9d6dc62)
+- #1948 Added warnings on invalid gateway intents (51e06e9)
+- #1949 Add default application games (82276e3)
+- #1950 Add custom setter to Group property of ModuleBuilder to automatically invoke AddAliases (ba656e9)
+- #1958 Add Discord.Interactions framework (aa6bb5e)
+
+### Fixed
+
+- #1832 Grab correct Uses value for vanity urls (8ed8714)
+- #1849 Remove obsolete methods and properties (70aab6c)
+- #1850 Create DM channel with id and author alone (95bae78)
+- #1853 Fire GuildMemberUpdated without cached user (d176fef)
+- #1854 Gateway events for DMs (a7ff6ce)
+- #1858 MessageUpdated without author (8b29e0f)
+- #1859 Fix missing AddRef and related (de7f9b5)
+- #1862 Message update without author (fabe034)
+- #1864 ApiClient.CurrentUser being null (08507c0)
+- #1871 Fix empty role list if not present (f47001a)
+- #1872 Connection deadlock when trying to Send and Disconnect (97d90b9)
+- #1873 Remove OperationCanceledException handling in connecting logic (7cf8499)
+- #1876 Fix SocketMessage type always being default (ac52a11)
+- #1877 Fix RestMessage type always being default (22bb1b0)
+- #1886 Change embed description max length to 4096 (8349cd7)
+- #1923 Fix ReactionAdded cached parameters (933ea42)
+- #1923 Fixed GuildMemberUpdated cached parameters (933ea42)
+- #1923 Fixed UserIsTypeing cached parameters (933ea42)
+- #1941 Fix Emote.TryParse (900c1f4)
+- #1946 Fix NRE when adding parameters in ModuleBuilders (143ca6d)
+- #1947 ShardedClient's CurrentUser interface property being null (d5f5ae1)
+
+### Misc
+
+- #1852 Internal change to GetOrCreateUser (dfaaa21)
+- #1923 Make Hierarchy a IGuildUser property (933ea42)
+- #1923 Fixed gateway serialization to include nulls for API v9 (933ea42)
+- #1923 Removed error log for gateway reconnects (933ea42)
+
+## [2.4.0] - 2021-05-22
+
+### Added
+
+- #1726 Add stickers (91a9063)
+- #1753 Webhook message edit & delete functionality (f67cd8e)
+- #1757 Add ability to add/remove roles by id (4c9910c)
+- #1781 Add GetEmotesAsync to IGuild (df23d57)
+- #1801 Add missing property to MESSAGE_REACTION_ADD event (0715d7d)
+- #1828 Add methods to interact with reactions without a message object (5b244f2)
+- #1830 Add ModifyMessageAsync to IMessageChannel (365a848)
+- #1844 Add Discord Certified Moderator user flag (4b8d444)
+
+### Fixed
+
+- #1486 Add type reader when entity type reader exists (c46daaa)
+- #1835 Cached message emoji cleanup at MESSAGE_REACTION_REMOVE_EMOJI (8afef82)
+
+### Misc
+
+- #1778 Remove URI check from EmbedBuilder (25b04c4)
+- #1800 Fix spelling in SnowflakeUtils.FromSnowflake (6aff419)
+
+## [2.3.1] - 2021-03-10
+
+### Fixed
+
+- #1761 Deadlock in DiscordShardedClient when Ready is never received (73e5cc2)
+- #1773 Private methods aren't added as commands (0fc713a)
+- #1780 NullReferenceException in pin/unpin audit logs (f794163)
+- #1786 Add ChannelType property to ChannelInfo audit log (6ac5ea1)
+- #1791 Update Webhook ChannelId from model change (d2518db)
+- #1794 Audit log UserId can be null (d41aeee)
+
+### Misc
+
+- #1774 Add remark regarding CustomStatus as the activity (51b7afe)
+
+## [2.3.0] - 2021-01-28
+
+### Added
+
+- #1491 Add INVITE_CREATE and INVITE_DELETE events (1ab670b)
+- #1520 Support reading multiple activities (421a0c1)
+- #1521 Allow for inherited commands in modules (a51cdf6)
+- #1526 Add Direction.Around to GetMessagesAsync (f2130f8)
+- #1537 Implement gateway ratelimit (ec673e1)
+- #1544 Add MESSAGE_REACTION_REMOVE_EMOJI and RemoveAllReactionsForEmoteAsync (a89f076)
+- #1549 Add GetUsersAsync to SocketGuild (30b5a83)
+- #1566 Support Gateway Intents (d5d10d3)
+- #1573 Add missing properties to Guild and deprecate GuildEmbed (ec212b1)
+- #1581 Add includeRoleIds to PruneUsersAsync (a80e5ff)
+- #1588 Add GetStreams to AudioClient (1e012ac)
+- #1596 Add missing channel properties (2d80037)
+- #1604 Add missing application properties (including Teams) (10fcde0)
+- #1619 Add "View Guild Insights" to GuildPermission (2592264)
+- #1637 Added CultureInvariant RegexOption to WebhookUrlRegex (e3925a7)
+- #1659 Add inline replies (e3850e1)
+- #1688 Send presence on Identify payload (25d5d36)
+- #1721 Add role tags (6a62c47)
+- #1722 Add user public flags (c683b29)
+- #1724 Add MessageFlags and AllowedMentions to message modify (225550d)
+- #1731 Add GuildUser IsPending property (8b25c9b)
+- #1690 Add max bitrate value to SocketGuild (aacfea0)
+
+### Fixed
+
+- #1244 Missing AddReactions permission for DM channels. (e40ca4a)
+- #1469 unsupported property causes an exception (468f826)
+- #1525 AllowedMentions and AllowedMentionTypes (3325031)
+- #1531 Add AllowedMentions to SendFileAsync (ab32607)
+- #1532 GuildEmbed.ChannelId as nullable per API documentation (971d519)
+- #1546 Different ratelimits for the same route (implement discord buckets) (2f6c017)
+- #1548 Incomplete Ready, DownloadUsersAsync, and optimize AlwaysDownloadUsers (dc8c959)
+- #1555 InvalidOperationException at MESSAGE_CREATE (bd4672a)
+- #1557 Sending 2 requests instead of 1 to create a Guild role. (5430cc8)
+- #1571 Not using the new domain name. (df8a0f7)
+- #1578 Trim token before passing it to the authorization header (42ba372)
+- #1580 Stop TaskCanceledException from bubbling up (b8fa464)
+- #1599 Invite audit log without inviter (b95b95b)
+- #1602 Add AllowedMentions to webhooks (bd4516b)
+- #1603 Cancel reconnection when 4014 (f396cd9)
+- #1608 Voice overwrites and CategoryId remarks (43c8fc0)
+- #1614 Check error 404 and return null for GetBanAsync (ae9fff6)
+- #1621 Parse mentions from message payload (366ca9a)
+- #1622 Do not update overwrite cache locally (3860da0)
+- #1623 Invoke UserUpdated from GuildMemberUpdated if needed (3085e88)
+- #1624 Handle null PreferredLocale in rare cases (c1d04b4)
+- #1639 Invite and InviteMetadata properties (dd2e524)
+- #1642 Add missing permissions (4b389f3)
+- #1647 handicap member downloading for verified bots (fa5ef5e)
+- #1652 Update README.MD to reflect new discord domain (03b831e)
+- #1667 Audio stream dispose (a2af985)
+- #1671 Crosspost throwing InvalidOperationException (9134443)
+- #1672 Team is nullable, not optional (be60d81)
+- #1681 Emoji url encode (04389a4)
+- #1683 SocketGuild.HasAllMembers is false if a user left a guild (47f571e)
+- #1686 Revert PremiumSubscriptionCount type (97e71cd)
+- #1695 Possible NullReferenceException when receiving InvalidSession (5213916)
+- #1702 Rollback Activities to Game (9d7cb39)
+- #1727 Move and fix internal AllowedMentions object (4a7f8fe)
+- limit request members batch size (084db25)
+- UserMentions throwing NullRef (5ed01a3)
+- Wrong author for SocketUserMessage.ReferencedMessage (1e9b252)
+- Discord sends null when there's no team (05a1f0a)
+- IMessage.Embeds docs remarks (a4d32d3)
+- Missing MessageReference when sending files (2095701)
+
+### Misc
+
+- #1545 MutualGuilds optimization (323a677)
+- #1551 Update webhook regex to support discord.com (7585789)
+- #1556 Add SearchUsersAsync (57880de)
+- #1561 Minor refactor to switch expression (42826df)
+- #1576 Updating comments for privileged intents (c42bfa6)
+- #1678 Change ratelimit messages (47ed806)
+- #1714 Update summary of SocketVoiceChannel.Users (e385c40)
+- #1720 VoiceRegions and related changes (5934c79)
+- Add updated libraries for LastModified (d761846)
+- Add alternative documentation link (accd351)
+- Temporarily disable StyleCops until all the fixes are impl'd (36de7b2)
+- Remove redundant CreateGuildRoleParams (3df0539)
+- Add minor tweaks to DiscordSocketConfig docs strings (2cd1880)
+- Fix MaxWaitBetweenGuildAvailablesBeforeReady docs string (e31cdc7)
+- Missing summary tag for GatewayIntents (3a10018)
+- Add new method of role ID copy (857ef77)
+- Resolve inheritdocs for IAttachment (9ea3291)
+- Mark null as a specific langword in summary (13a41f8)
+- Cleanup GatewayReconnectException docs (833ee42)
+- Update Docfx.Plugins.LastModified to v1.2.4 (28a6f97)
+- Update framework version for tests to Core 3.1 to comply with LTS (4988a07)
+- Move bulk deletes remarks from <summary> to <remarks> (62539f0)
+
+## [2.2.0] - 2020-04-16
+
+### Added
+
 - #1247 Implement Client Status Support (9da11b4)
 - #1310 id overload for RemoveReactionAsync (c88b1da)
 - #1319 BOOST (faf23de)
@@ -24,6 +263,7 @@
 - suppress messages (cd28892)
 
 ### Fixed
+
 - #1318 #1314 Don't parse tags within code blocks (c977f2e)
 - #1333 Remove null coalescing on ToEmbedBuilder Color (120c0f7)
 - #1337 Fixed attempting to access a non-present optional value (4edda5b)
@@ -39,11 +279,13 @@
 - include MessageFlags and SuppressEmbedParams (d6d4429)
 
 ### Changed
+
 - #1368 Update ISystemMessage interface to allow reactions (07f4d5f)
 - #1417 fix #1415 Re-add support for overwrite permissions for news channels (e627f07)
 - use millisecond precision by default (bcb3534)
 
 ### Misc
+
 - #1290 Split Unit and Integration tests into separate projects (a797be9)
 - #1328 Fix #1327 Color.ToString returns wrong value (1e8aa08)
 - #1329 Fix invalid cref values in docs (363d1c6)
@@ -68,14 +310,16 @@
 - 2.2.0 (4b602b4)
 - target the Process env-var scope (3c6b376)
 - fix metapackage build (1794f95)
-- copy only _site to docs-static (a8cdadc)
+- copy only \_site to docs-static (a8cdadc)
 - do not exit on failed robocopy (fd204ee)
 - add idn debugger (91aec9f)
 - rename IsStream to IsStreaming (dcd9cdd)
 - feature (40844b9)
 
 ## [2.1.1] - 2019-06-08
+
 ### Fixed
+
 - #994: Remainder parameters now ignore character escaping, as there is no reason to escape characters here (2e95c49)
 - #1316: `Emote.Equals` now pays no respect to the Name property, since Discord's API does not care about an emote's name (abf3e90)
 - #1317: `Emote.GetHashCode` now pays no respect to the Name property, see above (1b54883)
@@ -84,16 +328,20 @@
 - News embeds will be processed as `EmbedType.Unknown`, rather than throwing an error and dropping the message (d287ed1)
 
 ### Changed
+
 - #1311: Members may now be disconnected from voice channels by passing `null` as `GuildUserProperties.Channel` (fc48c66)
 - #1313: `IMessage.Tags` now includes the EveryoneRole on @everyone and @here mentions (1f55f01)
 - #1320: The maximum value for setting slow-mode has been updated to 6 hours, per the new API limit (4433ca7)
 
 ### Misc
+
 - This library's compatibility with Semantic Versioning has been clarified. Please see the README (4d7de17)
 - The depency on System.Interactive.Async has been bumped to `3.2.0` (3e65e03)
 
 ## [2.1.0] - 2019-05-18
+
 ### Added
+
 - #1236: Bulk deletes (for messages) may now be accessed via the `MessagesBulkDeleted` event (dec353e)
 - #1240: OAuth applications utilizing the `guilds.join` scope may now add users to guilds through any client (1356ea9)
 - #1255: Message and attachment spoilers may now be set or detected (f3b20b2)
@@ -105,9 +353,11 @@
 - `ExclusiveBulkDelete` configuration setting can be used to control bulk delete event behavior (03e6401)
 
 ### Removed
+
 - #1294: The `IGuildUser` overload of `EmbedBuilder.WithAuthor` no longer exists (b52b54d)
 
 ### Fixed
+
 - #1256: Fetching audit logs no longer raises null reference exceptions when a webhook has been deleted (049b014)
 - #1268: Null reference exceptions on `MESSAGE_CREATE` concerning partial member objects no longer occur (377622b)
 - #1278: The token validator now internally pads tokens to the proper length (48b327b)
@@ -116,9 +366,11 @@
 - Exceptions in event handlers are now always logged (f6e3200)
 
 ### Changed
+
 - #1305: Token validation will fail when tokens contain whitespace (bb61efa)
 
 ### Misc
+
 - #1241: Added documentation samples for Webhooks (655a006)
 - #1243: Happy new year 🎉 (0275f7d)
 - #1257: Improved clarity in comments in the command samples (2473619)
@@ -129,16 +381,20 @@
 - IDisposableAnalyzers should now be a development dependency (8003ac8)
 
 ## [2.0.1] - 2019-01-04
+
 ### Fixed
+
 - #1226: Only escape the closing quotation mark of non-remainder strings (65b8c09)
 - Commands with async RunModes will now propagate exceptions up to CommandExecuted (497918e)
 
 ### Misc
+
 - #1225: Commands sample no longer hooks the log event twice (552f34c)
 - #1227: The logo on the docs index page should scale responsively (d39bf6e)
 - #1230: Replaced precondition sample on docs (feed4fd)
 
 ## [2.0.0] - 2018-12-28
+
 ### Added
 
 - #747: `CommandService` now has a `CommandExecuted` event (e991715)
@@ -194,6 +450,7 @@
 - Reactions can now be added to messages in bulk (5421df1)
 
 ### Fixed
+
 - #742: `DiscordShardedClient#GetGuildFor` will now direct null guilds to Shard 0 (d5e9d6f)
 - #743: Various issues with permissions and inheritance of permissions (f996338)
 - #755: `IRole.Mention` will correctly tag the @everyone role (6b5a6e7)
@@ -241,6 +498,7 @@
 - The default WebSocket will now close correctly (ac389f5)
 
 ### Changed
+
 - #731: `IUserMessage#GetReactionUsersAsync` now takes an `IEmote` instead of a `string` (5d7f2fc)
 - #744: IAsyncEnumerable has been redesigned (5bbd9bb)
 - #777: `IGuild#DefaultChannel` will now resolve the first accessible channel, per changes to Discord (1ffcd4b)
@@ -275,14 +533,15 @@
 - The socket client will now use additional fields to fill in member/guild information on messages (8fb2c71)
 - The Audio Client now uses Voice WS v3 (9ba38d7)
 
-
 ### Removed
+
 - #790: Redundant overloads for `AddField` removed from EmbedBuilder (479361b)
 - #925: RPC is no longer being maintained nor packaged (b30af57)
 - #958: Remove support for user tokens (2fd4f56)
 - User logins (including selfbots) are no longer supported (fc5adca)
 
 ### Misc
+
 - #786: Unit tests for the Color structure (22b969c)
 - #828: We now include a contributing guide (cd82a0f)
 - #876: We now include a standard editorconfig (5c8c784)
@@ -303,11 +562,13 @@
 - Fixed documentation layout for the logo (bafdce4)
 
 ## [1.0.2] - 2017-09-09
+
 ### Fixed
 
 - Guilds utilizing Channel Categories will no longer crash bots on the `READY` event.
 
 ## [1.0.1] - 2017-07-05
+
 ### Fixed
 
 - #732: Fixed parameter preconditions not being loaded from class-based modules (b6dcc9e)
@@ -316,4 +577,5 @@
 - Fixed module auto-detection for nested modules (d2afb06)
 
 ### Changed
+
 - ShardedCommandContext now inherits from SocketCommandContext (8cd99be)

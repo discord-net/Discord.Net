@@ -69,6 +69,7 @@ namespace Discord
             AssertFlag(() => new GuildPermissions(manageGuild: true), GuildPermission.ManageGuild);
             AssertFlag(() => new GuildPermissions(addReactions: true), GuildPermission.AddReactions);
             AssertFlag(() => new GuildPermissions(viewAuditLog: true), GuildPermission.ViewAuditLog);
+            AssertFlag(() => new GuildPermissions(viewGuildInsights: true), GuildPermission.ViewGuildInsights);
             AssertFlag(() => new GuildPermissions(viewChannel: true), GuildPermission.ViewChannel);
             AssertFlag(() => new GuildPermissions(sendMessages: true), GuildPermission.SendMessages);
             AssertFlag(() => new GuildPermissions(sendTTSMessages: true), GuildPermission.SendTTSMessages);
@@ -90,7 +91,15 @@ namespace Discord
             AssertFlag(() => new GuildPermissions(manageNicknames: true), GuildPermission.ManageNicknames);
             AssertFlag(() => new GuildPermissions(manageRoles: true), GuildPermission.ManageRoles);
             AssertFlag(() => new GuildPermissions(manageWebhooks: true), GuildPermission.ManageWebhooks);
-            AssertFlag(() => new GuildPermissions(manageEmojis: true), GuildPermission.ManageEmojis);
+            AssertFlag(() => new GuildPermissions(manageEmojisAndStickers: true), GuildPermission.ManageEmojisAndStickers);
+            AssertFlag(() => new GuildPermissions(useApplicationCommands: true), GuildPermission.UseApplicationCommands);
+            AssertFlag(() => new GuildPermissions(requestToSpeak: true), GuildPermission.RequestToSpeak);
+            AssertFlag(() => new GuildPermissions(manageEvents: true), GuildPermission.ManageEvents);
+            AssertFlag(() => new GuildPermissions(manageThreads: true), GuildPermission.ManageThreads);
+            AssertFlag(() => new GuildPermissions(createPublicThreads: true), GuildPermission.CreatePublicThreads);
+            AssertFlag(() => new GuildPermissions(createPrivateThreads: true), GuildPermission.CreatePrivateThreads);
+            AssertFlag(() => new GuildPermissions(useExternalStickers: true), GuildPermission.UseExternalStickers);
+            AssertFlag(() => new GuildPermissions(moderateMembers: true), GuildPermission.ModerateMembers);
         }
 
         /// <summary>
@@ -141,6 +150,7 @@ namespace Discord
             AssertUtil(GuildPermission.ManageGuild, x => x.ManageGuild, (p, enable) => p.Modify(manageGuild: enable));
             AssertUtil(GuildPermission.AddReactions, x => x.AddReactions, (p, enable) => p.Modify(addReactions: enable));
             AssertUtil(GuildPermission.ViewAuditLog, x => x.ViewAuditLog, (p, enable) => p.Modify(viewAuditLog: enable));
+            AssertUtil(GuildPermission.ViewGuildInsights, x => x.ViewGuildInsights, (p, enable) => p.Modify(viewGuildInsights: enable));
             AssertUtil(GuildPermission.ViewChannel, x => x.ViewChannel, (p, enable) => p.Modify(viewChannel: enable));
             AssertUtil(GuildPermission.SendMessages, x => x.SendMessages, (p, enable) => p.Modify(sendMessages: enable));
             AssertUtil(GuildPermission.SendTTSMessages, x => x.SendTTSMessages, (p, enable) => p.Modify(sendTTSMessages: enable));
@@ -159,7 +169,15 @@ namespace Discord
             AssertUtil(GuildPermission.ManageNicknames, x => x.ManageNicknames, (p, enable) => p.Modify(manageNicknames: enable));
             AssertUtil(GuildPermission.ManageRoles, x => x.ManageRoles, (p, enable) => p.Modify(manageRoles: enable));
             AssertUtil(GuildPermission.ManageWebhooks, x => x.ManageWebhooks, (p, enable) => p.Modify(manageWebhooks: enable));
-            AssertUtil(GuildPermission.ManageEmojis, x => x.ManageEmojis, (p, enable) => p.Modify(manageEmojis: enable));
+            AssertUtil(GuildPermission.ManageEmojisAndStickers, x => x.ManageEmojisAndStickers, (p, enable) => p.Modify(manageEmojisAndStickers: enable));
+            AssertUtil(GuildPermission.UseApplicationCommands, x => x.UseApplicationCommands, (p, enable) => p.Modify(useApplicationCommands: enable));
+            AssertUtil(GuildPermission.RequestToSpeak, x => x.RequestToSpeak, (p, enable) => p.Modify(requestToSpeak: enable));
+            AssertUtil(GuildPermission.ManageEvents, x => x.ManageEvents, (p, enable) => p.Modify(manageEvents: enable));
+            AssertUtil(GuildPermission.ManageThreads, x => x.ManageThreads, (p, enable) => p.Modify(manageThreads: enable));
+            AssertUtil(GuildPermission.CreatePublicThreads, x => x.CreatePublicThreads, (p, enable) => p.Modify(createPublicThreads: enable));
+            AssertUtil(GuildPermission.CreatePrivateThreads, x => x.CreatePrivateThreads, (p, enable) => p.Modify(createPrivateThreads: enable));
+            AssertUtil(GuildPermission.UseExternalStickers, x => x.UseExternalStickers, (p, enable) => p.Modify(useExternalStickers: enable));
+            AssertUtil(GuildPermission.ModerateMembers, x => x.ModerateMembers, (p, enable) => p.Modify(moderateMembers: enable));
         }
     }
 }

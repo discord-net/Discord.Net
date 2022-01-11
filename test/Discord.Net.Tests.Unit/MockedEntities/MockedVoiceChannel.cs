@@ -12,6 +12,8 @@ namespace Discord
 
         public int? UserLimit => throw new NotImplementedException();
 
+        public string Mention => throw new NotImplementedException();
+
         public ulong? CategoryId => throw new NotImplementedException();
 
         public int Position => throw new NotImplementedException();
@@ -25,8 +27,9 @@ namespace Discord
         public string Name => throw new NotImplementedException();
 
         public DateTimeOffset CreatedAt => throw new NotImplementedException();
-
         public ulong Id => throw new NotImplementedException();
+
+        public string RTCRegion => throw new NotImplementedException();
 
         public Task AddPermissionOverwriteAsync(IRole role, OverwritePermissions permissions, RequestOptions options = null)
         {
@@ -47,6 +50,11 @@ namespace Discord
         {
             throw new NotImplementedException();
         }
+        public Task<IInviteMetadata> CreateInviteToApplicationAsync(ulong applicationId, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+            => throw new NotImplementedException();
+        public Task<IInviteMetadata> CreateInviteToApplicationAsync(DefaultApplications application, int? maxAge = 86400, int? maxUses = null, bool isTemporary = false, bool isUnique = false, RequestOptions options = null) => throw new NotImplementedException();
+        public Task<IInviteMetadata> CreateInviteToStreamAsync(IUser user, int? maxAge, int? maxUses = default(int?), bool isTemporary = false, bool isUnique = false, RequestOptions options = null)
+            => throw new NotImplementedException();
 
         public Task DeleteAsync(RequestOptions options = null)
         {
@@ -54,6 +62,11 @@ namespace Discord
         }
 
         public Task DisconnectAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ModifyAsync(Action<AudioChannelProperties> func, RequestOptions options)
         {
             throw new NotImplementedException();
         }

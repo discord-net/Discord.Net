@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace Discord.API
 {
@@ -7,7 +7,7 @@ namespace Discord.API
         [JsonProperty("target_id")]
         public ulong? TargetId { get; set; }
         [JsonProperty("user_id")]
-        public ulong UserId { get; set; }
+        public ulong? UserId { get; set; }
 
         [JsonProperty("changes")]
         public AuditLogChange[] Changes { get; set; }

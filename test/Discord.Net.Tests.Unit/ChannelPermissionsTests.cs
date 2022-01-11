@@ -85,6 +85,10 @@ namespace Discord
             AssertFlag(() => new ChannelPermissions(stream: true), ChannelPermission.Stream);
             AssertFlag(() => new ChannelPermissions(manageRoles: true), ChannelPermission.ManageRoles);
             AssertFlag(() => new ChannelPermissions(manageWebhooks: true), ChannelPermission.ManageWebhooks);
+            AssertFlag(() => new ChannelPermissions(useApplicationCommands: true), ChannelPermission.UseApplicationCommands);
+            AssertFlag(() => new ChannelPermissions(createPrivateThreads: true), ChannelPermission.CreatePrivateThreads);
+            AssertFlag(() => new ChannelPermissions(createPublicThreads: true), ChannelPermission.CreatePublicThreads);
+            AssertFlag(() => new ChannelPermissions(sendMessagesInThreads: true), ChannelPermission.SendMessagesInThreads);
         }
 
         /// <summary>

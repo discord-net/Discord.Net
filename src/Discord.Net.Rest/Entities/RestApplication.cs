@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Model = Discord.API.Application;
@@ -18,17 +20,29 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string Description { get; private set; }
         /// <inheritdoc />
-        public string[] RPCOrigins { get; private set; }
+        public IReadOnlyCollection<string> RPCOrigins { get; private set; }
         /// <inheritdoc />
-        public ulong Flags { get; private set; }
-
+        public ApplicationFlags Flags { get; private set; }
+        /// <inheritdoc />
+        public bool IsBotPublic { get; private set; }
+        /// <inheritdoc />
+        public bool BotRequiresCodeGrant { get; private set; }
+        /// <inheritdoc />
+        public ITeam Team { get; private set; }
         /// <inheritdoc />
         public IUser Owner { get; private set; }
-
+        /// <inheritdoc />
+        public string TermsOfService { get; private set; }
+        /// <inheritdoc />
+        public string PrivacyPolicy { get; private set; }
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public string IconUrl => CDN.GetApplicationIconUrl(Id, _iconId);
+
+        public ApplicationInstallParams InstallParams { get; private set; }
+
+        public IReadOnlyCollection<string> Tags { get; private set; }
 
         internal RestApplication(BaseDiscordClient discord, ulong id)
             : base(discord, id)
@@ -43,14 +57,23 @@ namespace Discord.Rest
         internal void Update(Model model)
         {            
             Description = model.Description;
-            RPCOrigins = model.RPCOrigins;
+            RPCOrigins = model.RPCOrigins.IsSpecified ? model.RPCOrigins.Value.ToImmutableArray() : ImmutableArray<string>.Empty;
             Name = model.Name;
             _iconId = model.Icon;
+            IsBotPublic = model.IsBotPublic;
+            BotRequiresCodeGrant = model.BotRequiresCodeGrant;
+            Tags = model.Tags.GetValueOrDefault(null)?.ToImmutableArray() ?? ImmutableArray<string>.Empty;
+            PrivacyPolicy = model.PrivacyPolicy;
+            TermsOfService = model.TermsOfService;
+            var installParams = model.InstallParams.GetValueOrDefault(null);
+            InstallParams = new ApplicationInstallParams(installParams?.Scopes ?? new string[0], (GuildPermission?)installParams?.Permission ?? null);
 
             if (model.Flags.IsSpecified)
-                Flags = model.Flags.Value; //TODO: Do we still need this?
+                Flags = model.Flags.Value;
             if (model.Owner.IsSpecified)
                 Owner = RestUser.Create(Discord, model.Owner.Value);
+            if (model.Team != null)
+                Team = RestTeam.Create(Discord, model.Team);
         }
 
         /// <exception cref="InvalidOperationException">Unable to update this object from a different application token.</exception>

@@ -10,6 +10,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestWebhookUser : RestUser, IWebhookUser
     {
+        #region RestWebhookUser
         /// <inheritdoc />
         public ulong WebhookId { get; }
         internal IGuild Guild { get; }
@@ -33,8 +34,9 @@ namespace Discord.Rest
             entity.Update(model);
             return entity;
         }
+#endregion
 
-        //IGuildUser
+        #region IGuildUser
         /// <inheritdoc />
         IGuild IGuildUser.Guild
         {
@@ -52,35 +54,60 @@ namespace Discord.Rest
         /// <inheritdoc />
         string IGuildUser.Nickname => null;
         /// <inheritdoc />
+        string IGuildUser.GuildAvatarId => null;
+        /// <inheritdoc />
+        string IGuildUser.GetGuildAvatarUrl(ImageFormat format, ushort size) => null;
+        /// <inheritdoc />
+        bool? IGuildUser.IsPending => null;
+        /// <inheritdoc />
+        int IGuildUser.Hierarchy => 0;
+        /// <inheritdoc />
+        DateTimeOffset? IGuildUser.TimedOutUntil => null;
+        /// <inheritdoc />
         GuildPermissions IGuildUser.GuildPermissions => GuildPermissions.Webhook;
 
         /// <inheritdoc />
         ChannelPermissions IGuildUser.GetPermissions(IGuildChannel channel) => Permissions.ToChannelPerms(channel, GuildPermissions.Webhook.RawValue);
         /// <inheritdoc />
-        Task IGuildUser.KickAsync(string reason, RequestOptions options) => 
+        Task IGuildUser.KickAsync(string reason, RequestOptions options) =>
             throw new NotSupportedException("Webhook users cannot be kicked.");
 
         /// <inheritdoc />
-        Task IGuildUser.ModifyAsync(Action<GuildUserProperties> func, RequestOptions options) => 
+        Task IGuildUser.ModifyAsync(Action<GuildUserProperties> func, RequestOptions options) =>
             throw new NotSupportedException("Webhook users cannot be modified.");
-
         /// <inheritdoc />
-        Task IGuildUser.AddRoleAsync(IRole role, RequestOptions options) => 
+        Task IGuildUser.AddRoleAsync(ulong role, RequestOptions options) =>
             throw new NotSupportedException("Roles are not supported on webhook users.");
-
         /// <inheritdoc />
-        Task IGuildUser.AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options) => 
+        Task IGuildUser.AddRoleAsync(IRole role, RequestOptions options) =>
             throw new NotSupportedException("Roles are not supported on webhook users.");
-
         /// <inheritdoc />
-        Task IGuildUser.RemoveRoleAsync(IRole role, RequestOptions options) => 
+        Task IGuildUser.AddRolesAsync(IEnumerable<ulong> roles, RequestOptions options) =>
             throw new NotSupportedException("Roles are not supported on webhook users.");
-
         /// <inheritdoc />
-        Task IGuildUser.RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options) => 
+        Task IGuildUser.AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options) =>
             throw new NotSupportedException("Roles are not supported on webhook users.");
+        /// <inheritdoc />
+        Task IGuildUser.RemoveRoleAsync(ulong role, RequestOptions options) =>
+            throw new NotSupportedException("Roles are not supported on webhook users.");
+        /// <inheritdoc />
+        Task IGuildUser.RemoveRoleAsync(IRole role, RequestOptions options) =>
+            throw new NotSupportedException("Roles are not supported on webhook users.");
+        /// <inheritdoc />
+        Task IGuildUser.RemoveRolesAsync(IEnumerable<ulong> roles, RequestOptions options) =>
+            throw new NotSupportedException("Roles are not supported on webhook users.");
+        /// <inheritdoc />
+        Task IGuildUser.RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options) =>
+            throw new NotSupportedException("Roles are not supported on webhook users.");
+        /// <inheritdoc />
+        Task IGuildUser.SetTimeOutAsync(TimeSpan span, RequestOptions options) =>
+            throw new NotSupportedException("Timeouts are not supported on webhook users.");
+        /// <inheritdoc />
+        Task IGuildUser.RemoveTimeOutAsync(RequestOptions options) =>
+            throw new NotSupportedException("Timeouts are not supported on webhook users.");
+        #endregion
 
-        //IVoiceState
+        #region IVoiceState
         /// <inheritdoc />
         bool IVoiceState.IsDeafened => false;
         /// <inheritdoc />
@@ -97,5 +124,8 @@ namespace Discord.Rest
         string IVoiceState.VoiceSessionId => null;
         /// <inheritdoc />
         bool IVoiceState.IsStreaming => false;
+        /// <inheritdoc />
+        DateTimeOffset? IVoiceState.RequestToSpeakTimestamp => null;
+        #endregion
     }
 }

@@ -9,6 +9,58 @@ In the following section, you will find commonly asked questions and
 answers about common issues that you may face when utilizing the
 various clients offered by the library.
 
+## I keep having trouble with intents!
+
+As Discord.NET has upgraded from Discord API v6 to API v9,
+`GatewayIntents` must now be specified in the socket config, as well as on the [developer portal].
+
+```cs
+
+// Where ever you declared your websocket client.
+DiscordSocketClient _client;
+
+...
+
+var config = new DiscordSocketConfig()
+{
+  .. // Other config options can be presented here.
+  GatewayIntents = GatewayIntents.All
+}
+
+_client = new DiscordSocketClient(config);
+
+```
+### Common intents:
+
+- AllUnprivileged: This is a group of most common intents, that do NOT require any [developer portal] intents to be enabled.
+This includes intents that receive messages such as: `GatewayIntents.GuildMessages, GatewayIntents.DirectMessages`
+- GuildMembers: An intent disabled by default, as you need to enable it in the [developer portal].
+- GuildPresences: Also disabled by default, this intent together with `GuildMembers` are the only intents not included in `AllUnprivileged`.
+- All: All intents, it is ill adviced to use this without care, as it *can* cause a memory leak from presence.
+The library will give responsive warnings if you specify unnecessary intents.
+
+
+> [!NOTE]
+> All gateway intents, their Discord API counterpart and their enum value are listed
+> [HERE](xref:Discord.GatewayIntents)
+
+### Stacking intents:
+
+It is common that you require several intents together.
+The example below shows how this can be done.
+
+```cs
+
+GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers | ..
+
+```
+
+> [!NOTE]
+> Further documentation on the ` | ` operator can be found
+> [HERE](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/bitwise-and-shift-operators)
+
+[developer portal]: https://discord.com/developers/
+
 ## My client keeps returning 401 upon logging in!
 
 > [!WARNING]
@@ -28,9 +80,9 @@ There are few possible reasons why this may occur.
  mind that a token is **different** from a *client secret*.
 
 [TokenType]: xref:Discord.TokenType
-[827]: https://github.com/RogueException/Discord.Net/issues/827
-[958]: https://github.com/RogueException/Discord.Net/issues/958
-[Discord API Terms of Service]: https://discordapp.com/developers/docs/legal
+[827]: https://github.com/discord-net/Discord.Net/issues/827
+[958]: https://github.com/discord-net/Discord.Net/issues/958
+[Discord API Terms of Service]: https://discord.com/developers/docs/legal
 
 ## How do I do X, Y, Z when my bot connects/logs on? Why do I get a `NullReferenceException` upon calling any client methods after connect?
 
@@ -73,7 +125,9 @@ instances, with each one serving a different amount of guilds.
 There are very few differences from the [DiscordSocketClient] class, and it is very straightforward
 to modify your existing code to use a [DiscordShardedClient] when necessary.
 
-1. You need to specify the total amount of shards, or shard ids, via [DiscordShardedClient]'s constructors.
+1. You can specify the total amount of shards, or shard ids, via [DiscordShardedClient]'s constructors.
+If the total shards are not specified then the library will get the recommended shard count via the
+[Get Gateway Bot](https://discord.com/developers/docs/topics/gateway#get-gateway-bot) route.
 2. The [Connected], [Disconnected], [Ready], and [LatencyUpdated] events
  are replaced with [ShardConnected], [ShardDisconnected], [ShardReady], and [ShardLatencyUpdated].
 3. Every event handler you apply/remove to the [DiscordShardedClient] is applied/removed to each shard.

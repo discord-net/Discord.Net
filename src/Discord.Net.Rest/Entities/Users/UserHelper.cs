@@ -31,11 +31,16 @@ namespace Discord.Rest
         {
             var args = new GuildUserProperties();
             func(args);
+
+            if (args.TimedOutUntil.IsSpecified && args.TimedOutUntil.Value.Value.Offset > (new TimeSpan(28, 0, 0, 0)))
+                throw new ArgumentOutOfRangeException(nameof(args.TimedOutUntil), "Offset cannot be more than 28 days from the current date.");
+
             var apiArgs = new API.Rest.ModifyGuildMemberParams
             {
                 Deaf = args.Deaf,
                 Mute = args.Mute,
-                Nickname = args.Nickname
+                Nickname = args.Nickname,
+                TimedOutUntil = args.TimedOutUntil
             };
 
             if (args.Channel.IsSpecified)
@@ -73,16 +78,38 @@ namespace Discord.Rest
             return RestDMChannel.Create(client, await client.ApiClient.CreateDMChannelAsync(args, options).ConfigureAwait(false));
         }
 
-        public static async Task AddRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<IRole> roles, RequestOptions options)
+        public static async Task AddRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<ulong> roleIds, RequestOptions options)
         {
-            foreach (var role in roles)
-                await client.ApiClient.AddRoleAsync(user.Guild.Id, user.Id, role.Id, options).ConfigureAwait(false);
+            foreach (var roleId in roleIds)
+                await client.ApiClient.AddRoleAsync(user.Guild.Id, user.Id, roleId, options).ConfigureAwait(false);
         }
 
-        public static async Task RemoveRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<IRole> roles, RequestOptions options)
+        public static async Task RemoveRolesAsync(IGuildUser user, BaseDiscordClient client, IEnumerable<ulong> roleIds, RequestOptions options)
         {
-            foreach (var role in roles)
-                await client.ApiClient.RemoveRoleAsync(user.Guild.Id, user.Id, role.Id, options).ConfigureAwait(false);
+            foreach (var roleId in roleIds)
+                await client.ApiClient.RemoveRoleAsync(user.Guild.Id, user.Id, roleId, options).ConfigureAwait(false);
+        }
+
+        public static async Task SetTimeoutAsync(IGuildUser user, BaseDiscordClient client, TimeSpan span, RequestOptions options)
+        {
+            if (span.TotalDays > 28) // As its double, an exact value of 28 can be accepted.
+                throw new ArgumentOutOfRangeException(nameof(span), "Offset cannot be more than 28 days from the current date.");
+            if (span.Ticks <= 0)
+                throw new ArgumentOutOfRangeException(nameof(span), "Offset cannot hold no value or have a negative value.");
+            var apiArgs = new API.Rest.ModifyGuildMemberParams()
+            {
+                TimedOutUntil = DateTimeOffset.UtcNow.Add(span)
+            };
+            await client.ApiClient.ModifyGuildMemberAsync(user.Guild.Id, user.Id, apiArgs, options).ConfigureAwait(false);
+        }
+
+        public static async Task RemoveTimeOutAsync(IGuildUser user, BaseDiscordClient client, RequestOptions options)
+        {
+            var apiArgs = new API.Rest.ModifyGuildMemberParams()
+            {
+                TimedOutUntil = null
+            };
+            await client.ApiClient.ModifyGuildMemberAsync(user.Guild.Id, user.Id, apiArgs, options).ConfigureAwait(false);
         }
     }
 }

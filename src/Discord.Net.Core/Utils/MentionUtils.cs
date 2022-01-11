@@ -40,6 +40,7 @@ namespace Discord
         /// <summary>
         ///     Parses a provided user mention string.
         /// </summary>
+        /// <param name="text">The user mention.</param>
         /// <exception cref="ArgumentException">Invalid mention format.</exception>
         public static ulong ParseUser(string text)
         {
@@ -50,6 +51,8 @@ namespace Discord
         /// <summary>
         ///     Tries to parse a provided user mention string.
         /// </summary>
+        /// <param name="text">The user mention.</param>
+        /// <param name="userId">The UserId of the user.</param>
         public static bool TryParseUser(string text, out ulong userId)
         {
             if (text.Length >= 3 && text[0] == '<' && text[1] == '@' && text[text.Length - 1] == '>')

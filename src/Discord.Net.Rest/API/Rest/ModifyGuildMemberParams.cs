@@ -1,5 +1,5 @@
-#pragma warning disable CS1591
 using Newtonsoft.Json;
+using System;
 
 namespace Discord.API.Rest
 {
@@ -16,5 +16,7 @@ namespace Discord.API.Rest
         public Optional<ulong[]> RoleIds { get; set; }
         [JsonProperty("channel_id")]
         public Optional<ulong?> ChannelId { get; set; }
+        [JsonProperty("communication_disabled_until")]
+        public Optional<DateTimeOffset?> TimedOutUntil { get; set; }
     }
 }

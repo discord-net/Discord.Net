@@ -1,4 +1,3 @@
-#pragma warning disable CS1591
 using Newtonsoft.Json;
 
 namespace Discord.API
@@ -15,6 +14,10 @@ namespace Discord.API
         public Optional<bool> Bot { get; set; }
         [JsonProperty("avatar")]
         public Optional<string> Avatar { get; set; }
+        [JsonProperty("banner")]
+        public Optional<string> Banner { get; set; }
+        [JsonProperty("accent_color")]
+        public Optional<uint?> AccentColor { get; set; }
 
         //CurrentUser
         [JsonProperty("verified")]
@@ -29,5 +32,7 @@ namespace Discord.API
         public Optional<PremiumType> PremiumType { get; set; }
         [JsonProperty("locale")]
         public Optional<string> Locale { get; set; }
+        [JsonProperty("public_flags")]
+        public Optional<UserProperties> PublicFlags { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Discord
@@ -9,6 +8,14 @@ namespace Discord
     /// </summary>
     public interface IUserMessage : IMessage
     {
+        /// <summary>
+        ///     Gets the referenced message if it is a crosspost, channel follow add, pin, or reply message.
+        /// </summary>
+        /// <returns>
+        ///     The referenced message, if any is associated and still exists.
+        /// </returns>
+        IUserMessage ReferencedMessage { get; }
+
         /// <summary>
         ///     Modifies this message.
         /// </summary>
@@ -28,18 +35,6 @@ namespace Discord
         ///     A task that represents the asynchronous modification operation.
         /// </returns>
         Task ModifyAsync(Action<MessageProperties> func, RequestOptions options = null);
-        /// <summary>
-        ///     Modifies the suppression of this message.
-        /// </summary>
-        /// <remarks>
-        ///     This method modifies whether or not embeds in this message are suppressed (hidden).
-        /// </remarks>
-        /// <param name="suppressEmbeds">Whether or not embeds in this message should be suppressed.</param>
-        /// <param name="options">The options to be used when sending the request.</param>
-        /// <returns>
-        ///     A task that represents the asynchronous modification operation.
-        /// </returns>
-        Task ModifySuppressionAsync(bool suppressEmbeds, RequestOptions options = null);
         /// <summary>
         ///     Adds this message to its channel's pinned messages.
         /// </summary>

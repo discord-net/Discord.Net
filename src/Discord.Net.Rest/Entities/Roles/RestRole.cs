@@ -11,6 +11,7 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestRole : RestEntity<ulong>, IRole
     {
+        #region RestRole
         internal IGuild Guild { get; }
         /// <inheritdoc />
         public Color Color { get; private set; }
@@ -23,9 +24,15 @@ namespace Discord.Rest
         /// <inheritdoc />
         public string Name { get; private set; }
         /// <inheritdoc />
+        public string Icon { get; private set; }
+        /// <inheritdoc>/>
+        public Emoji Emoji { get; private set; }
+        /// <inheritdoc />
         public GuildPermissions Permissions { get; private set; }
         /// <inheritdoc />
         public int Position { get; private set; }
+        /// <inheritdoc />
+        public RoleTags Tags { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -56,17 +63,33 @@ namespace Discord.Rest
             Position = model.Position;
             Color = new Color(model.Color);
             Permissions = new GuildPermissions(model.Permissions);
+            if (model.Tags.IsSpecified)
+                Tags = model.Tags.Value.ToEntity();
+
+            if (model.Icon.IsSpecified)
+            {
+                Icon = model.Icon.Value;
+            }
+
+            if (model.Emoji.IsSpecified)
+            {
+                Emoji = new Emoji(model.Emoji.Value);
+            }
         }
 
         /// <inheritdoc />
         public async Task ModifyAsync(Action<RoleProperties> func, RequestOptions options = null)
-        { 
+        {
             var model = await RoleHelper.ModifyAsync(this, Discord, func, options).ConfigureAwait(false);
             Update(model);
         }
         /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
             => RoleHelper.DeleteAsync(this, Discord, options);
+
+        /// <inheritdoc />
+        public string GetIconUrl()
+            => CDN.GetGuildRoleIconUrl(Id, Icon);
 
         /// <inheritdoc />
         public int CompareTo(IRole role) => RoleUtils.Compare(this, role);
@@ -79,8 +102,9 @@ namespace Discord.Rest
         /// </returns>
         public override string ToString() => Name;
         private string DebuggerDisplay => $"{Name} ({Id})";
+        #endregion
 
-        //IRole
+        #region IRole
         /// <inheritdoc />
         IGuild IRole.Guild
         {
@@ -91,5 +115,6 @@ namespace Discord.Rest
                 throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
             }
         }
+        #endregion
     }
 }

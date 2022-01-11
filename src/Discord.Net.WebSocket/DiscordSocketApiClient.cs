@@ -1,4 +1,3 @@
-#pragma warning disable CS1591
 using Discord.API.Gateway;
 using Discord.Net.Queue;
 using Discord.Net.Rest;
@@ -12,6 +11,7 @@ using System.IO.Compression;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using GameModel = Discord.API.Game;
 
 namespace Discord.API
 {
@@ -39,9 +39,8 @@ namespace Discord.API
 
         public DiscordSocketApiClient(RestClientProvider restClientProvider, WebSocketProvider webSocketProvider, string userAgent,
             string url = null, RetryMode defaultRetryMode = RetryMode.AlwaysRetry, JsonSerializer serializer = null,
-            RateLimitPrecision rateLimitPrecision = RateLimitPrecision.Second,
 			bool useSystemClock = true)
-            : base(restClientProvider, userAgent, defaultRetryMode, serializer, rateLimitPrecision, useSystemClock)
+            : base(restClientProvider, userAgent, defaultRetryMode, serializer, useSystemClock)
         {
             _gatewayUrl = url;
             if (url != null)
@@ -75,8 +74,15 @@ namespace Discord.API
                     using (var jsonReader = new JsonTextReader(reader))
                     {
                         var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
+
                         if (msg != null)
+                        {
+#if DEBUG_PACKETS
+                            Console.WriteLine($"<- {(GatewayOpCode)msg.Operation} [{msg.Type ?? "none"}] : {(msg.Payload as Newtonsoft.Json.Linq.JToken)?.ToString().Length}");
+#endif
+
                             await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                        }
                     }
                 }
             };
@@ -87,11 +93,21 @@ namespace Discord.API
                 {
                     var msg = _serializer.Deserialize<SocketFrame>(jsonReader);
                     if (msg != null)
+                    {
+#if DEBUG_PACKETS
+                        Console.WriteLine($"<- {(GatewayOpCode)msg.Operation} [{msg.Type ?? "none"}] : {(msg.Payload as Newtonsoft.Json.Linq.JToken)?.ToString().Length}");
+#endif
+
                         await _receivedGatewayEvent.InvokeAsync((GatewayOpCode)msg.Operation, msg.Sequence, msg.Type, msg.Payload).ConfigureAwait(false);
+                    }
                 }
             };
             WebSocketClient.Closed += async ex =>
             {
+#if DEBUG_PACKETS
+                Console.WriteLine(ex);
+#endif
+
                 await DisconnectAsync().ConfigureAwait(false);
                 await _disconnectedEvent.InvokeAsync(ex).ConfigureAwait(false);
             };
@@ -159,6 +175,8 @@ namespace Discord.API
             if (WebSocketClient == null)
                 throw new NotSupportedException("This client is not configured with WebSocket support.");
 
+            RequestQueue.ClearGatewayBuckets();
+
             //Re-create streams to reset the zlib state
             _compressed?.Dispose();
             _decompressor?.Dispose();
@@ -178,6 +196,11 @@ namespace Discord.API
                     var gatewayResponse = await GetGatewayAsync().ConfigureAwait(false);
                     _gatewayUrl = $"{gatewayResponse.Url}?v={DiscordConfig.APIVersion}&encoding={DiscordSocketConfig.GatewayEncoding}&compress=zlib-stream";
                 }
+
+#if DEBUG_PACKETS
+                Console.WriteLine("Connecting to gateway: " + _gatewayUrl);
+#endif
+
                 await WebSocketClient.ConnectAsync(_gatewayUrl).ConfigureAwait(false);
 
                 ConnectionState = ConnectionState.Connected;
@@ -213,14 +236,14 @@ namespace Discord.API
             catch { }
 
             if (ex is GatewayReconnectException)
-                await WebSocketClient.DisconnectAsync(4000);
+                await WebSocketClient.DisconnectAsync(4000).ConfigureAwait(false);
             else
-            await WebSocketClient.DisconnectAsync().ConfigureAwait(false);
+                await WebSocketClient.DisconnectAsync().ConfigureAwait(false);
 
             ConnectionState = ConnectionState.Disconnected;
         }
 
-        //Core
+        #region Core
         public Task SendGatewayAsync(GatewayOpCode opCode, object payload, RequestOptions options = null)
             => SendGatewayInternalAsync(opCode, payload, options);
         private async Task SendGatewayInternalAsync(GatewayOpCode opCode, object payload, RequestOptions options)
@@ -232,26 +255,50 @@ namespace Discord.API
             payload = new SocketFrame { Operation = (int)opCode, Payload = payload };
             if (payload != null)
                 bytes = Encoding.UTF8.GetBytes(SerializeJson(payload));
-            await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, null, bytes, true, options)).ConfigureAwait(false);
+
+            options.IsGatewayBucket = true;
+            if (options.BucketId == null)
+                options.BucketId = GatewayBucket.Get(GatewayBucketType.Unbucketed).Id;
+            await RequestQueue.SendAsync(new WebSocketRequest(WebSocketClient, bytes, true, opCode == GatewayOpCode.Heartbeat, options)).ConfigureAwait(false);
             await _sentGatewayMessageEvent.InvokeAsync(opCode).ConfigureAwait(false);
+
+#if DEBUG_PACKETS
+            Console.WriteLine($"-> {opCode}:\n{SerializeJson(payload)}");
+#endif
         }
 
-        public async Task SendIdentifyAsync(int largeThreshold = 100, int shardID = 0, int totalShards = 1, bool guildSubscriptions = true, RequestOptions options = null)
+        public async Task SendIdentifyAsync(int largeThreshold = 100, int shardID = 0, int totalShards = 1, GatewayIntents gatewayIntents = GatewayIntents.AllUnprivileged, (UserStatus, bool, long?, GameModel)? presence = null, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
             var props = new Dictionary<string, string>
             {
-                ["$device"] = "Discord.Net"
+                ["$device"] = "Discord.Net",
+                ["$os"] = Environment.OSVersion.Platform.ToString(),
+                [$"browser"] = "Discord.Net"
             };
             var msg = new IdentifyParams()
             {
                 Token = AuthToken,
                 Properties = props,
-                LargeThreshold = largeThreshold,
-                GuildSubscriptions = guildSubscriptions
+                LargeThreshold = largeThreshold
             };
             if (totalShards > 1)
                 msg.ShardingParams = new int[] { shardID, totalShards };
+
+            options.BucketId = GatewayBucket.Get(GatewayBucketType.Identify).Id;
+
+            msg.Intents = (int)gatewayIntents;
+
+            if (presence.HasValue)
+            {
+                msg.Presence = new PresenceUpdateParams
+                {
+                    Status = presence.Value.Item1,
+                    IsAFK = presence.Value.Item2,
+                    IdleSince = presence.Value.Item3,
+                    Activities = new object[] { presence.Value.Item4 }
+                };
+            }
 
             await SendGatewayAsync(GatewayOpCode.Identify, msg, options: options).ConfigureAwait(false);
         }
@@ -271,17 +318,18 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             await SendGatewayAsync(GatewayOpCode.Heartbeat, lastSeq, options: options).ConfigureAwait(false);
         }
-        public async Task SendStatusUpdateAsync(UserStatus status, bool isAFK, long? since, Game game, RequestOptions options = null)
+        public async Task SendPresenceUpdateAsync(UserStatus status, bool isAFK, long? since, GameModel game, RequestOptions options = null)
         {
             options = RequestOptions.CreateOrClone(options);
-            var args = new StatusUpdateParams
+            var args = new PresenceUpdateParams
             {
                 Status = status,
                 IdleSince = since,
                 IsAFK = isAFK,
-                Game = game
+                Activities = new object[] { game }
             };
-            await SendGatewayAsync(GatewayOpCode.StatusUpdate, args, options: options).ConfigureAwait(false);
+            options.BucketId = GatewayBucket.Get(GatewayBucketType.PresenceUpdate).Id;
+            await SendGatewayAsync(GatewayOpCode.PresenceUpdate, args, options: options).ConfigureAwait(false);
         }
         public async Task SendRequestMembersAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)
         {
@@ -290,7 +338,6 @@ namespace Discord.API
         }
         public async Task SendVoiceStateUpdateAsync(ulong guildId, ulong? channelId, bool selfDeaf, bool selfMute, RequestOptions options = null)
         {
-            options = RequestOptions.CreateOrClone(options);
             var payload = new VoiceStateUpdateParams
             {
                 GuildId = guildId,
@@ -298,6 +345,12 @@ namespace Discord.API
                 SelfDeaf = selfDeaf,
                 SelfMute = selfMute
             };
+            options = RequestOptions.CreateOrClone(options);
+            await SendGatewayAsync(GatewayOpCode.VoiceStateUpdate, payload, options: options).ConfigureAwait(false);
+        }
+        public async Task SendVoiceStateUpdateAsync(VoiceStateUpdateParams payload, RequestOptions options = null)
+        {
+            options = RequestOptions.CreateOrClone(options);
             await SendGatewayAsync(GatewayOpCode.VoiceStateUpdate, payload, options: options).ConfigureAwait(false);
         }
         public async Task SendGuildSyncAsync(IEnumerable<ulong> guildIds, RequestOptions options = null)
@@ -305,5 +358,6 @@ namespace Discord.API
             options = RequestOptions.CreateOrClone(options);
             await SendGatewayAsync(GatewayOpCode.GuildSync, guildIds, options: options).ConfigureAwait(false);
         }
+        #endregion
     }
 }

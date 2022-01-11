@@ -1,4 +1,5 @@
 using Discord.Rest;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -13,8 +14,10 @@ namespace Discord.WebSocket
     /// </summary>
     public abstract class SocketMessage : SocketEntity<ulong>, IMessage
     {
+        #region SocketMessage
         private long _timestampTicks;
         private readonly List<SocketReaction> _reactions = new List<SocketReaction>();
+        private ImmutableArray<SocketUser> _userMentions = ImmutableArray.Create<SocketUser>();
 
         /// <summary>
         ///     Gets the author of this message.
@@ -37,6 +40,9 @@ namespace Discord.WebSocket
         public string Content { get; private set; }
 
         /// <inheritdoc />
+        public string CleanContent => MessageHelper.SanitizeMessage(this);
+
+        /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
         /// <inheritdoc />
         public virtual bool IsTTS => false;
@@ -46,6 +52,8 @@ namespace Discord.WebSocket
         public virtual bool IsSuppressed => false;
         /// <inheritdoc />
         public virtual DateTimeOffset? EditedTimestamp => null;
+        /// <inheritdoc />
+        public virtual bool MentionedEveryone => false;
 
         /// <inheritdoc />
         public MessageActivity Activity { get; private set; }
@@ -55,6 +63,20 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public MessageReference Reference { get; private set; }
+
+        /// <inheritdoc/>
+        public IReadOnlyCollection<ActionRowComponent> Components { get; private set; }
+
+        /// <summary>
+        ///     Gets the interaction this message is a response to.
+        /// </summary>
+        public MessageInteraction<SocketUser> Interaction { get; private set; }
+
+        /// <inheritdoc />
+        public MessageFlags? Flags { get; private set; }
+
+        /// <inheritdoc/>
+        public MessageType Type { get; private set; }
 
         /// <summary>
         ///     Returns all attachments included in this message.
@@ -84,18 +106,19 @@ namespace Discord.WebSocket
         ///     Collection of WebSocket-based roles.
         /// </returns>
         public virtual IReadOnlyCollection<SocketRole> MentionedRoles => ImmutableArray.Create<SocketRole>();
+        /// <inheritdoc />
+        public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
+        /// <inheritdoc />
+        public virtual IReadOnlyCollection<SocketSticker> Stickers => ImmutableArray.Create<SocketSticker>();
+        /// <inheritdoc />
+        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emote).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
         /// <summary>
         ///     Returns the users mentioned in this message.
         /// </summary>
         /// <returns>
         ///     Collection of WebSocket-based users.
         /// </returns>
-        public virtual IReadOnlyCollection<SocketUser> MentionedUsers => ImmutableArray.Create<SocketUser>();
-        /// <inheritdoc />
-        public virtual IReadOnlyCollection<ITag> Tags => ImmutableArray.Create<ITag>();
-        /// <inheritdoc />
-        public IReadOnlyDictionary<IEmote, ReactionMetadata> Reactions => _reactions.GroupBy(r => r.Emote).ToDictionary(x => x.Key, x => new ReactionMetadata { ReactionCount = x.Count(), IsMe = x.Any(y => y.UserId == Discord.CurrentUser.Id) });
-
+        public IReadOnlyCollection<SocketUser> MentionedUsers => _userMentions; 
         /// <inheritdoc />
         public DateTimeOffset Timestamp => DateTimeUtils.FromTicks(_timestampTicks);
 
@@ -108,18 +131,25 @@ namespace Discord.WebSocket
         }
         internal static SocketMessage Create(DiscordSocketClient discord, ClientState state, SocketUser author, ISocketMessageChannel channel, Model model)
         {
-            if (model.Type == MessageType.Default)
+            if (model.Type == MessageType.Default ||
+                model.Type == MessageType.Reply ||
+                model.Type == MessageType.ApplicationCommand ||
+                model.Type == MessageType.ThreadStarterMessage)
                 return SocketUserMessage.Create(discord, state, author, channel, model);
             else
                 return SocketSystemMessage.Create(discord, state, author, channel, model);
         }
         internal virtual void Update(ClientState state, Model model)
         {
+            Type = model.Type;
+
             if (model.Timestamp.IsSpecified)
                 _timestampTicks = model.Timestamp.Value.UtcTicks;
 
             if (model.Content.IsSpecified)
+            {
                 Content = model.Content.Value;
+            }
 
             if (model.Application.IsSpecified)
             {
@@ -140,7 +170,7 @@ namespace Discord.WebSocket
                 Activity = new MessageActivity()
                 {
                     Type = model.Activity.Value.Type.Value,
-                    PartyId = model.Activity.Value.PartyId.Value
+                    PartyId = model.Activity.Value.PartyId.GetValueOrDefault()
                 };
             }
 
@@ -150,10 +180,93 @@ namespace Discord.WebSocket
                 Reference = new MessageReference
                 {
                     GuildId = model.Reference.Value.GuildId,
-                    ChannelId = model.Reference.Value.ChannelId,
+                    InternalChannelId = model.Reference.Value.ChannelId,
                     MessageId = model.Reference.Value.MessageId
                 };
             }
+
+            if (model.Components.IsSpecified)
+            {
+                Components = model.Components.Value.Select(x => new ActionRowComponent(x.Components.Select<IMessageComponent, IMessageComponent>(y =>
+                {
+                    switch (y.Type)
+                    {
+                        case ComponentType.Button:
+                            {
+                                var parsed = (API.ButtonComponent)y;
+                                return new Discord.ButtonComponent(
+                                    parsed.Style,
+                                    parsed.Label.GetValueOrDefault(),
+                                    parsed.Emote.IsSpecified
+                                        ? parsed.Emote.Value.Id.HasValue
+                                            ? new Emote(parsed.Emote.Value.Id.Value, parsed.Emote.Value.Name, parsed.Emote.Value.Animated.GetValueOrDefault())
+                                            : new Emoji(parsed.Emote.Value.Name)
+                                        : null,
+                                    parsed.CustomId.GetValueOrDefault(),
+                                    parsed.Url.GetValueOrDefault(),
+                                    parsed.Disabled.GetValueOrDefault());
+                            }
+                        case ComponentType.SelectMenu:
+                            {
+                                var parsed = (API.SelectMenuComponent)y;
+                                return new SelectMenuComponent(
+                                    parsed.CustomId,
+                                    parsed.Options.Select(z => new SelectMenuOption(
+                                        z.Label,
+                                        z.Value,
+                                        z.Description.GetValueOrDefault(),
+                                        z.Emoji.IsSpecified
+                                        ? z.Emoji.Value.Id.HasValue
+                                            ? new Emote(z.Emoji.Value.Id.Value, z.Emoji.Value.Name, z.Emoji.Value.Animated.GetValueOrDefault())
+                                            : new Emoji(z.Emoji.Value.Name)
+                                        : null,
+                                        z.Default.ToNullable())).ToList(),
+                                    parsed.Placeholder.GetValueOrDefault(),
+                                    parsed.MinValues,
+                                    parsed.MaxValues,
+                                    parsed.Disabled
+                                    );
+                            }
+                        default:
+                            return null;
+                    }
+                }).ToList())).ToImmutableArray();
+            }
+            else
+                Components = new List<ActionRowComponent>();
+
+            if (model.UserMentions.IsSpecified)
+            {
+                var value = model.UserMentions.Value;
+                if (value.Length > 0)
+                {
+                    var newMentions = ImmutableArray.CreateBuilder<SocketUser>(value.Length);
+                    for (int i = 0; i < value.Length; i++)
+                    {
+                        var val = value[i];
+                        if (val != null)
+                        {
+                            var user = Channel.GetUserAsync(val.Id, CacheMode.CacheOnly).GetAwaiter().GetResult() as SocketUser;
+                            if (user != null)
+                                newMentions.Add(user);
+                            else
+                                newMentions.Add(SocketUnknownUser.Create(Discord, state, val));
+                        }
+                    }
+                    _userMentions = newMentions.ToImmutable();
+                }
+            }
+
+            if (model.Interaction.IsSpecified)
+            {
+                Interaction = new MessageInteraction<SocketUser>(model.Interaction.Value.Id,
+                    model.Interaction.Value.Type,
+                    model.Interaction.Value.Name,
+                    SocketGlobalUser.Create(Discord, state, model.Interaction.Value.User));
+            }
+
+            if (model.Flags.IsSpecified)
+                Flags = model.Flags.Value;
         }
 
         /// <inheritdoc />
@@ -168,14 +281,13 @@ namespace Discord.WebSocket
         /// </returns>
         public override string ToString() => Content;
         internal SocketMessage Clone() => MemberwiseClone() as SocketMessage;
+#endregion
 
-        //IMessage
+        #region IMessage
         /// <inheritdoc />
         IUser IMessage.Author => Author;
         /// <inheritdoc />
         IMessageChannel IMessage.Channel => Channel;
-        /// <inheritdoc />
-        MessageType IMessage.Type => MessageType.Default;
         /// <inheritdoc />
         IReadOnlyCollection<IAttachment> IMessage.Attachments => Attachments;
         /// <inheritdoc />
@@ -186,6 +298,16 @@ namespace Discord.WebSocket
         IReadOnlyCollection<ulong> IMessage.MentionedRoleIds => MentionedRoles.Select(x => x.Id).ToImmutableArray();
         /// <inheritdoc />
         IReadOnlyCollection<ulong> IMessage.MentionedUserIds => MentionedUsers.Select(x => x.Id).ToImmutableArray();
+
+        /// <inheritdoc/>
+        IReadOnlyCollection<IMessageComponent> IMessage.Components => Components;
+
+        /// <inheritdoc/>
+        IMessageInteraction IMessage.Interaction => Interaction;
+
+        /// <inheritdoc />
+        IReadOnlyCollection<IStickerItem> IMessage.Stickers => Stickers;
+
 
         internal void AddReaction(SocketReaction reaction)
         {
@@ -199,6 +321,10 @@ namespace Discord.WebSocket
         internal void ClearReactions()
         {
             _reactions.Clear();
+        }
+        internal void RemoveReactionsForEmote(IEmote emote)
+        {
+            _reactions.RemoveAll(x => x.Emote.Equals(emote));
         }
 
         /// <inheritdoc />
@@ -214,7 +340,11 @@ namespace Discord.WebSocket
         public Task RemoveAllReactionsAsync(RequestOptions options = null)
             => MessageHelper.RemoveAllReactionsAsync(this, Discord, options);
         /// <inheritdoc />
+        public Task RemoveAllReactionsForEmoteAsync(IEmote emote, RequestOptions options = null)
+            => MessageHelper.RemoveAllReactionsForEmoteAsync(this, emote, Discord, options);
+        /// <inheritdoc />
         public IAsyncEnumerable<IReadOnlyCollection<IUser>> GetReactionUsersAsync(IEmote emote, int limit, RequestOptions options = null)
             => MessageHelper.GetReactionUsersAsync(this, emote, limit, Discord, options);
+        #endregion
     }
 }

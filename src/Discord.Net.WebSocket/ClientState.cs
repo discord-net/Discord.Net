@@ -16,12 +16,14 @@ namespace Discord.WebSocket
         private readonly ConcurrentDictionary<ulong, SocketGuild> _guilds;
         private readonly ConcurrentDictionary<ulong, SocketGlobalUser> _users;
         private readonly ConcurrentHashSet<ulong> _groupChannels;
+        private readonly ConcurrentDictionary<ulong, SocketApplicationCommand> _commands;
 
         internal IReadOnlyCollection<SocketChannel> Channels => _channels.ToReadOnlyCollection();
         internal IReadOnlyCollection<SocketDMChannel> DMChannels => _dmChannels.ToReadOnlyCollection();
         internal IReadOnlyCollection<SocketGroupChannel> GroupChannels => _groupChannels.Select(x => GetChannel(x) as SocketGroupChannel).ToReadOnlyCollection(_groupChannels);
         internal IReadOnlyCollection<SocketGuild> Guilds => _guilds.ToReadOnlyCollection();
         internal IReadOnlyCollection<SocketGlobalUser> Users => _users.ToReadOnlyCollection();
+        internal IReadOnlyCollection<SocketApplicationCommand> Commands => _commands.ToReadOnlyCollection();
 
         internal IReadOnlyCollection<ISocketPrivateChannel> PrivateChannels =>
             _dmChannels.Select(x => x.Value as ISocketPrivateChannel).Concat(
@@ -37,6 +39,7 @@ namespace Discord.WebSocket
             _guilds = new ConcurrentDictionary<ulong, SocketGuild>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(guildCount * CollectionMultiplier));
             _users = new ConcurrentDictionary<ulong, SocketGlobalUser>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(estimatedUsersCount * CollectionMultiplier));
             _groupChannels = new ConcurrentHashSet<ulong>(ConcurrentHashSet.DefaultConcurrencyLevel, (int)(10 * CollectionMultiplier));
+            _commands = new ConcurrentDictionary<ulong, SocketApplicationCommand>();
         }
 
         internal SocketChannel GetChannel(ulong id)
@@ -112,7 +115,7 @@ namespace Discord.WebSocket
             if (_guilds.TryRemove(id, out SocketGuild guild))
             {
                 guild.PurgeChannelCache(this);
-                guild.PurgeGuildUserCache();
+                guild.PurgeUserCache();
                 return guild;
             }
             return null;
@@ -137,7 +140,35 @@ namespace Discord.WebSocket
         internal void PurgeUsers()
         {
             foreach (var guild in _guilds.Values)
-                guild.PurgeGuildUserCache();
+                guild.PurgeUserCache();
+        }
+
+        internal SocketApplicationCommand GetCommand(ulong id)
+        {
+            if (_commands.TryGetValue(id, out SocketApplicationCommand command))
+                return command;
+            return null;
+        }
+        internal void AddCommand(SocketApplicationCommand command)
+        {
+            _commands[command.Id] = command;
+        }
+        internal SocketApplicationCommand GetOrAddCommand(ulong id, Func<ulong, SocketApplicationCommand> commandFactory)
+        {
+            return _commands.GetOrAdd(id, commandFactory);
+        }
+        internal SocketApplicationCommand RemoveCommand(ulong id)
+        {
+            if (_commands.TryRemove(id, out SocketApplicationCommand command))
+                return command;
+            return null;
+        }
+        internal void PurgeCommands(Func<SocketApplicationCommand, bool> precondition)
+        {
+            var ids = _commands.Where(x => precondition(x.Value)).Select(x => x.Key);
+
+            foreach (var id in ids)
+                _commands.TryRemove(id, out var _);
         }
     }
 }

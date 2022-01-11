@@ -1,6 +1,6 @@
 using Discord.Rest;
 using System;
-using System.Collections.Generic;  
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +14,7 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketRole : SocketEntity<ulong>, IRole
     {
+        #region SocketRole
         /// <summary>
         ///     Gets the guild that owns this role.
         /// </summary>
@@ -32,10 +33,16 @@ namespace Discord.WebSocket
         public bool IsMentionable { get; private set; }
         /// <inheritdoc />
         public string Name { get; private set; }
+        /// <inheritdoc/>
+        public Emoji Emoji { get; private set; }
+        /// <inheritdoc />
+        public string Icon { get; private set; }
         /// <inheritdoc />
         public GuildPermissions Permissions { get; private set; }
         /// <inheritdoc />
         public int Position { get; private set; }
+        /// <inheritdoc />
+        public RoleTags Tags { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -48,7 +55,11 @@ namespace Discord.WebSocket
         public bool IsEveryone => Id == Guild.Id;
         /// <inheritdoc />
         public string Mention => IsEveryone ? "@everyone" : MentionUtils.MentionRole(Id);
-        public IEnumerable<SocketGuildUser> Members 
+
+        /// <summary>
+        ///     Returns an IEnumerable containing all <see cref="SocketGuildUser"/> that have this role.
+        /// </summary>
+        public IEnumerable<SocketGuildUser> Members
             => Guild.Users.Where(x => x.Roles.Any(r => r.Id == Id));
 
         internal SocketRole(SocketGuild guild, ulong id)
@@ -71,6 +82,18 @@ namespace Discord.WebSocket
             Position = model.Position;
             Color = new Color(model.Color);
             Permissions = new GuildPermissions(model.Permissions);
+            if (model.Tags.IsSpecified)
+                Tags = model.Tags.Value.ToEntity();
+
+            if (model.Icon.IsSpecified)
+            {
+                Icon = model.Icon.Value;
+            }
+
+            if (model.Emoji.IsSpecified)
+            {
+                Emoji = new Emoji(model.Emoji.Value);
+            }
         }
 
         /// <inheritdoc />
@@ -79,6 +102,10 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public Task DeleteAsync(RequestOptions options = null)
             => RoleHelper.DeleteAsync(this, Discord, options);
+
+        /// <inheritdoc />
+        public string GetIconUrl()
+            => CDN.GetGuildRoleIconUrl(Id, Icon);
 
         /// <summary>
         ///     Gets the name of the role.
@@ -92,9 +119,11 @@ namespace Discord.WebSocket
 
         /// <inheritdoc />
         public int CompareTo(IRole role) => RoleUtils.Compare(this, role);
+        #endregion
 
-        //IRole
+        #region IRole
         /// <inheritdoc />
         IGuild IRole.Guild => Guild;
+        #endregion
     }
 }

@@ -31,7 +31,7 @@ the Discord Applications Portal first.
 
     ![Step 7](images/intro-public-bot.png)
 
-[Discord Applications Portal]: https://discordapp.com/developers/applications/
+[Discord Applications Portal]: https://discord.com/developers/applications/
 
 ## Adding your bot to a server
 
@@ -80,15 +80,11 @@ recommended for these operations to be awaited in a
 properly established async context whenever possible.
 
 To establish an async context, we will be creating an async main method
-in your console application, and rewriting the static main method to
-invoke the new async main.
+in your console application.
 
 [!code-csharp[Async Context](samples/first-bot/async-context.cs)]
 
-As a result of this, your program will now start and immediately
-jump into an async context. This allows us to create a connection
-to Discord later on without having to worry about setting up the
-correct async implementation.
+As a result of this, your program will now start into an async context.
 
 > [!WARNING]
 > If your application throws any exceptions within an async context,
@@ -165,11 +161,11 @@ or any other blocking method, such as reading from the console.
 > the source code for your bot.
 >
 > In the following example, we retrieve the token from a pre-defined
-> variable, which is **NOT** secure, especially if you plan on 
+> variable, which is **NOT** secure, especially if you plan on
 > distributing the application in any shape or form.
 >
-> We recommend alternative storage such as 
-> [Environment Variables], an external configuration file, or a 
+> We recommend alternative storage such as
+> [Environment Variables], an external configuration file, or a
 > secrets manager for safe-handling of secrets.
 >
 > [Environment Variables]: https://en.wikipedia.org/wiki/Environment_variable

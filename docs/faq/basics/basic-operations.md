@@ -13,7 +13,7 @@ language-specific tips when using this library.
 
 > [!WARNING]
 > Direct casting (e.g., `(Type)type`) is **the least recommended**
-> way of casting, as it *can* throw an [InvalidCastException]
+> way of casting, as it _can_ throw an [InvalidCastException]
 > when the object isn't the desired type.
 >
 > Please refer to [this post] for more details.
@@ -26,7 +26,7 @@ A good and safe casting example:
 
 [!code-csharp[Casting](samples/cast.cs)]
 
-[InvalidCastException]: https://docs.microsoft.com/en-us/dotnet/api/system.invalidcastexception
+[invalidcastexception]: https://docs.microsoft.com/en-us/dotnet/api/system.invalidcastexception
 [this post]: https://docs.microsoft.com/en-us/dotnet/csharp/how-to/safely-cast-using-pattern-matching-is-and-as-operators
 
 ## How do I send a message?
@@ -45,15 +45,15 @@ means casting is your friend. You should attempt to cast the channel
 as an [IMessageChannel] or any other entity that implements it to be
 able to message.
 
-[SendMessageAsync]: xref:Discord.IMessageChannel.SendMessageAsync*
-[GetChannel]: xref:Discord.WebSocket.DiscordSocketClient.GetChannel*
+[sendmessageasync]: xref:Discord.IMessageChannel.SendMessageAsync*
+[getchannel]: xref:Discord.WebSocket.DiscordSocketClient.GetChannel*
 
 ## How can I tell if a message is from X, Y, Z channel?
 
 You may check the message channel type. Visit [Glossary] to see the
 various types of channels.
 
-[Glossary]: xref:FAQ.Glossary#message-channels
+[glossary]: xref:FAQ.Glossary#message-channels
 
 ## How can I get the guild from a message?
 
@@ -86,9 +86,9 @@ implement [IEmote] and are valid options.
 
 [!code-csharp[Emoji](samples/emoji-self.cs)]
 
-***
+---
 
-[AddReactionAsync]: xref:Discord.IMessage.AddReactionAsync*
+[addreactionasync]: xref:Discord.IMessage.AddReactionAsync*
 
 ## What is a "preemptive rate limit?"
 
@@ -107,7 +107,7 @@ reactions.
 
 ## Can I opt-out of preemptive rate limits?
 
-Unfortunately, not at the moment. See [#401](https://github.com/RogueException/Discord.Net/issues/401).
+Unfortunately, not at the moment. See [#401](https://github.com/discord-net/Discord.Net/issues/401).
 
 [IChannel]: xref:Discord.IChannel
 [ICategoryChannel]: xref:Discord.ICategoryChannel

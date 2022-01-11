@@ -6,10 +6,14 @@
       topicUid: FAQ.Basics.BasicOp
     - name: Client Basics
       topicUid: FAQ.Basics.ClientBasics
+    - name: Interactions
+      topicUid: FAQ.Basics.InteractionBasics
 - name: Commands
   items: 
-    - name: General
+    - name: String commands
       topicUid: FAQ.Commands.General
+    - name: Interaction commands
+      topicUid: FAQ.Commands.Interactions
     - name: Dependency Injection
       topicUid: FAQ.Commands.DI
 - name: Glossary

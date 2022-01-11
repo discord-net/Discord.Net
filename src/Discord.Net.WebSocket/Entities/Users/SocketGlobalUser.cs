@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Linq;
 using Model = Discord.API.User;
-using PresenceModel = Discord.API.Presence;
 
 namespace Discord.WebSocket
 {
@@ -12,7 +11,6 @@ namespace Discord.WebSocket
         public override string Username { get; internal set; }
         public override ushort DiscriminatorValue { get; internal set; }
         public override string AvatarId { get; internal set; }
-        public SocketDMChannel DMChannel { get; internal set; }
         internal override SocketPresence Presence { get; set; }
 
         public override bool IsWebhook => false;
@@ -47,12 +45,6 @@ namespace Discord.WebSocket
                 if (--_references <= 0)
                     discord.RemoveUser(Id);
             }
-        }
-        
-        internal void Update(ClientState state, PresenceModel model)
-        {
-            Presence = SocketPresence.Create(model);
-            DMChannel = state.DMChannels.FirstOrDefault(x => x.Recipient.Id == Id);
         }
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Global)";

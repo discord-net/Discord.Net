@@ -8,14 +8,15 @@ namespace Discord.Rest
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class RestWebhook : RestEntity<ulong>, IWebhook, IUpdateable
     {
+        #region RestWebhook
         internal IGuild Guild { get; private set; }
         internal ITextChannel Channel { get; private set; }
 
         /// <inheritdoc />
-        public ulong ChannelId { get; }
-        /// <inheritdoc />
         public string Token { get; }
 
+        /// <inheritdoc />
+        public ulong ChannelId { get; private set; }
         /// <inheritdoc />
         public string Name { get; private set; }
         /// <inheritdoc />
@@ -24,6 +25,8 @@ namespace Discord.Rest
         public ulong? GuildId { get; private set; }
         /// <inheritdoc />
         public IUser Creator { get; private set; }
+        /// <inheritdoc />
+        public ulong? ApplicationId { get; private set; }
 
         /// <inheritdoc />
         public DateTimeOffset CreatedAt => SnowflakeUtils.FromSnowflake(Id);
@@ -56,6 +59,8 @@ namespace Discord.Rest
 
         internal void Update(Model model)
         {
+            if (ChannelId != model.ChannelId)
+                ChannelId = model.ChannelId;
             if (model.Avatar.IsSpecified)
                 AvatarId = model.Avatar.Value;
             if (model.Creator.IsSpecified)
@@ -64,6 +69,8 @@ namespace Discord.Rest
                 GuildId = model.GuildId.Value;
             if (model.Name.IsSpecified)
                 Name = model.Name.Value;
+
+            ApplicationId = model.ApplicationId;
         }
 
         /// <inheritdoc />
@@ -89,8 +96,9 @@ namespace Discord.Rest
 
         public override string ToString() => $"Webhook: {Name}:{Id}";
         private string DebuggerDisplay => $"Webhook: {Name} ({Id})";
+        #endregion
 
-        //IWebhook
+        #region IWebhook
         /// <inheritdoc />
         IGuild IWebhook.Guild 
             => Guild ?? throw new InvalidOperationException("Unable to return this entity's parent unless it was fetched through that object.");
@@ -100,5 +108,6 @@ namespace Discord.Rest
         /// <inheritdoc />
         Task IWebhook.ModifyAsync(Action<WebhookProperties> func, RequestOptions options)
             => ModifyAsync(func, options);
+        #endregion
     }
 }

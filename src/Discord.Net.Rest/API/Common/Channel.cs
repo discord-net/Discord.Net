@@ -1,4 +1,3 @@
-#pragma warning disable CS1591
 using Newtonsoft.Json;
 using System;
 
@@ -41,6 +40,8 @@ namespace Discord.API
         public Optional<int> Bitrate { get; set; }
         [JsonProperty("user_limit")]
         public Optional<int> UserLimit { get; set; }
+        [JsonProperty("rtc_region")]
+        public Optional<string> RTCRegion { get; set; }
 
         //PrivateChannel
         [JsonProperty("recipients")]
@@ -49,5 +50,21 @@ namespace Discord.API
         //GroupChannel
         [JsonProperty("icon")]
         public Optional<string> Icon { get; set; }
+
+        //ThreadChannel
+        [JsonProperty("member")]
+        public Optional<ThreadMember> ThreadMember { get; set; }
+
+        [JsonProperty("thread_metadata")]
+        public Optional<ThreadMetadata> ThreadMetadata { get; set; }
+
+        [JsonProperty("owner_id")]
+        public Optional<ulong> OwnerId { get; set; }
+
+        [JsonProperty("message_count")]
+        public Optional<int> MessageCount { get; set; }
+
+        [JsonProperty("member_count")]
+        public Optional<int> MemberCount { get; set; }
     }
 }

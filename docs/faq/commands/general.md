@@ -1,9 +1,9 @@
 ---
 uid: FAQ.Commands.General
-title: General Questions about Commands
+title: General Questions about chat Commands
 ---
 
-# Command-related Questions
+# Chat Command-related Questions
 
 In the following section, you will find commonly asked questions and
 answered regarding general command usage when using @Discord.Commands.

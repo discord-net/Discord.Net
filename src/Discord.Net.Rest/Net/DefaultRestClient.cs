@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -101,7 +102,7 @@ namespace Discord.Net.Rest
                         switch (p.Value)
                         {
 #pragma warning disable IDISP004
-                            case string stringValue: { content.Add(new StringContent(stringValue), p.Key); continue; }
+                            case string stringValue: { content.Add(new StringContent(stringValue, Encoding.UTF8, "text/plain"), p.Key); continue; }
                             case byte[] byteArrayValue: { content.Add(new ByteArrayContent(byteArrayValue), p.Key); continue; }
                             case Stream streamValue: { content.Add(new StreamContent(streamValue), p.Key); continue; }
                             case MultipartFile fileValue:
@@ -116,11 +117,20 @@ namespace Discord.Net.Rest
                                     stream = memoryStream;
 #pragma warning restore IDISP001
                                 }
-                                content.Add(new StreamContent(stream), p.Key, fileValue.Filename);
+
+                                var streamContent = new StreamContent(stream);
+                                var extension = fileValue.Filename.Split('.').Last();
+
+                                if(fileValue.ContentType != null)
+                                    streamContent.Headers.ContentType = new MediaTypeHeaderValue(fileValue.ContentType);
+
+                                content.Add(streamContent, p.Key, fileValue.Filename);
 #pragma warning restore IDISP004
+                                    
                                 continue;
                             }
-                            default: throw new InvalidOperationException($"Unsupported param type \"{p.Value.GetType().Name}\".");
+                            default:
+                                throw new InvalidOperationException($"Unsupported param type \"{p.Value.GetType().Name}\".");
                         }
                     }
                 }
@@ -148,15 +158,15 @@ namespace Discord.Net.Rest
         private static readonly HttpMethod Patch = new HttpMethod("PATCH");
         private HttpMethod GetMethod(string method)
         {
-            switch (method)
+            return method switch
             {
-                case "DELETE": return HttpMethod.Delete;
-                case "GET": return HttpMethod.Get;
-                case "PATCH": return Patch;
-                case "POST": return HttpMethod.Post;
-                case "PUT": return HttpMethod.Put;
-                default: throw new ArgumentOutOfRangeException(nameof(method), $"Unknown HttpMethod: {method}");
-            }
+                "DELETE" => HttpMethod.Delete,
+                "GET" => HttpMethod.Get,
+                "PATCH" => Patch,
+                "POST" => HttpMethod.Post,
+                "PUT" => HttpMethod.Put,
+                _ => throw new ArgumentOutOfRangeException(nameof(method), $"Unknown HttpMethod: {method}"),
+            };
         }
     }
 }

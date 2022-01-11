@@ -108,7 +108,6 @@ namespace Discord.Net.Examples.Core.Entities.Channels
             using (channel.EnterTypingState()) await LongRunningAsync();
 
             #endregion
-
         }
     }
 }

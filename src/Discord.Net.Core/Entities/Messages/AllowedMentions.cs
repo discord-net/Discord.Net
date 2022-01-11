@@ -39,7 +39,7 @@ namespace Discord
         ///     flag of the <see cref="AllowedTypes"/> property. If the flag is set, the value of this property
         ///     must be <c>null</c> or empty.
         /// </summary>
-        public List<ulong> RoleIds { get; set; }
+        public List<ulong> RoleIds { get; set; } = new List<ulong>();
 
         /// <summary>
         ///     Gets or sets the list of all user ids that will be mentioned.
@@ -47,7 +47,15 @@ namespace Discord
         ///     flag of the <see cref="AllowedTypes"/> property. If the flag is set, the value of this property
         ///     must be <c>null</c> or empty.
         /// </summary>
-        public List<ulong> UserIds { get; set; }
+        public List<ulong> UserIds { get; set; } = new List<ulong>();
+
+        /// <summary>
+        ///     Gets or sets whether to mention the author of the message you are replying to or not.
+        /// </summary>
+        /// <remarks>
+        ///     Specifically for inline replies.
+        /// </remarks>
+        public bool? MentionRepliedUser { get; set; } = null;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="AllowedMentions"/> class.

@@ -18,7 +18,9 @@ namespace Discord.WebSocket
     [DebuggerDisplay(@"{DebuggerDisplay,nq}")]
     public class SocketGuildUser : SocketUser, IGuildUser
     {
+        #region SocketGuildUser
         private long? _premiumSinceTicks;
+        private long? _timedOutTicks;
         private long? _joinedAtTicks;
         private ImmutableArray<ulong> _roleIds;
 
@@ -29,7 +31,8 @@ namespace Discord.WebSocket
         public SocketGuild Guild { get; }
         /// <inheritdoc />
         public string Nickname { get; private set; }
-
+        /// <inheritdoc/>
+        public string GuildAvatarId { get; private set; }
         /// <inheritdoc />
         public override bool IsBot { get { return GlobalUser.IsBot; } internal set { GlobalUser.IsBot = value; } }
         /// <inheritdoc />
@@ -38,6 +41,7 @@ namespace Discord.WebSocket
         public override ushort DiscriminatorValue { get { return GlobalUser.DiscriminatorValue; } internal set { GlobalUser.DiscriminatorValue = value; } }
         /// <inheritdoc />
         public override string AvatarId { get { return GlobalUser.AvatarId; } internal set { GlobalUser.AvatarId = value; } }
+
         /// <inheritdoc />
         public GuildPermissions GuildPermissions => new GuildPermissions(Permissions.ResolveGuild(Guild, this));
         internal override SocketPresence Presence { get; set; }
@@ -57,11 +61,17 @@ namespace Discord.WebSocket
         /// <inheritdoc />
         public bool IsStreaming => VoiceState?.IsStreaming ?? false;
         /// <inheritdoc />
+        public DateTimeOffset? RequestToSpeakTimestamp => VoiceState?.RequestToSpeakTimestamp ?? null;
+        /// <inheritdoc />
+        public bool? IsPending { get; private set; }
+
+
+        /// <inheritdoc />
         public DateTimeOffset? JoinedAt => DateTimeUtils.FromTicks(_joinedAtTicks);
         /// <summary>
         ///     Returns a collection of roles that the user possesses.
         /// </summary>
-        public IReadOnlyCollection<SocketRole> Roles 
+        public IReadOnlyCollection<SocketRole> Roles
             => _roleIds.Select(id => Guild.GetRole(id)).Where(x => x != null).ToReadOnlyCollection(() => _roleIds.Length);
         /// <summary>
         ///     Returns the voice channel the user is in, or <c>null</c> if none.
@@ -80,12 +90,23 @@ namespace Discord.WebSocket
         public AudioInStream AudioStream => Guild.GetAudioStream(Id);
         /// <inheritdoc />
         public DateTimeOffset? PremiumSince => DateTimeUtils.FromTicks(_premiumSinceTicks);
+        /// <inheritdoc />
+        public DateTimeOffset? TimedOutUntil
+        {
+            get
+            {
+                if (!_timedOutTicks.HasValue || _timedOutTicks.Value < 0)
+                    return null;
+                else
+                    return DateTimeUtils.FromTicks(_timedOutTicks);
+            }
+        }
 
         /// <summary>
         ///     Returns the position of the user within the role hierarchy.
         /// </summary>
         /// <remarks>
-        ///     The returned value equal to the position of the highest role the user has, or 
+        ///     The returned value equal to the position of the highest role the user has, or
         ///     <see cref="int.MaxValue"/> if user is the server owner.
         /// </remarks>
         public int Hierarchy
@@ -123,12 +144,16 @@ namespace Discord.WebSocket
         {
             var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
             entity.Update(state, model);
+            if (!model.Roles.IsSpecified)
+                entity.UpdateRoles(new ulong[0]);
             return entity;
         }
         internal static SocketGuildUser Create(SocketGuild guild, ClientState state, PresenceModel model)
         {
             var entity = new SocketGuildUser(guild, guild.Discord.GetOrCreateUser(state, model.User));
             entity.Update(state, model, false);
+            if (!model.Roles.IsSpecified)
+                entity.UpdateRoles(new ulong[0]);
             return entity;
         }
         internal void Update(ClientState state, MemberModel model)
@@ -138,23 +163,39 @@ namespace Discord.WebSocket
                 _joinedAtTicks = model.JoinedAt.Value.UtcTicks;
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
+            if (model.Avatar.IsSpecified)
+                GuildAvatarId = model.Avatar.Value;
             if (model.Roles.IsSpecified)
                 UpdateRoles(model.Roles.Value);
             if (model.PremiumSince.IsSpecified)
                 _premiumSinceTicks = model.PremiumSince.Value?.UtcTicks;
+            if (model.TimedOutUntil.IsSpecified)
+                _timedOutTicks = model.TimedOutUntil.Value?.UtcTicks;
+            if (model.Pending.IsSpecified)
+                IsPending = model.Pending.Value;
         }
         internal void Update(ClientState state, PresenceModel model, bool updatePresence)
         {
             if (updatePresence)
             {
-                Presence = SocketPresence.Create(model);
-                GlobalUser.Update(state, model);
+                Update(model);
             }
             if (model.Nick.IsSpecified)
                 Nickname = model.Nick.Value;
             if (model.Roles.IsSpecified)
                 UpdateRoles(model.Roles.Value);
+            if (model.PremiumSince.IsSpecified)
+                _premiumSinceTicks = model.PremiumSince.Value?.UtcTicks;
         }
+
+        internal override void Update(PresenceModel model)
+        {
+            Presence ??= new SocketPresence();
+
+            Presence.Update(model);
+            GlobalUser.Update(model);
+        }
+
         private void UpdateRoles(ulong[] roleIds)
         {
             var roles = ImmutableArray.CreateBuilder<ulong>(roleIds.Length + 1);
@@ -171,26 +212,46 @@ namespace Discord.WebSocket
         public Task KickAsync(string reason = null, RequestOptions options = null)
             => UserHelper.KickAsync(this, Discord, reason, options);
         /// <inheritdoc />
+        public Task AddRoleAsync(ulong roleId, RequestOptions options = null)
+            => AddRolesAsync(new[] { roleId }, options);
+        /// <inheritdoc />
         public Task AddRoleAsync(IRole role, RequestOptions options = null)
-            => AddRolesAsync(new[] { role }, options);
+            => AddRoleAsync(role.Id, options);
+        /// <inheritdoc />
+        public Task AddRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
+            => UserHelper.AddRolesAsync(this, Discord, roleIds, options);
         /// <inheritdoc />
         public Task AddRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
-            => UserHelper.AddRolesAsync(this, Discord, roles, options);
+            => AddRolesAsync(roles.Select(x => x.Id), options);
+        /// <inheritdoc />
+        public Task RemoveRoleAsync(ulong roleId, RequestOptions options = null)
+            => RemoveRolesAsync(new[] { roleId }, options);
         /// <inheritdoc />
         public Task RemoveRoleAsync(IRole role, RequestOptions options = null)
-            => RemoveRolesAsync(new[] { role }, options);
+            => RemoveRoleAsync(role.Id, options);
+        /// <inheritdoc />
+        public Task RemoveRolesAsync(IEnumerable<ulong> roleIds, RequestOptions options = null)
+            => UserHelper.RemoveRolesAsync(this, Discord, roleIds, options);
         /// <inheritdoc />
         public Task RemoveRolesAsync(IEnumerable<IRole> roles, RequestOptions options = null)
-            => UserHelper.RemoveRolesAsync(this, Discord, roles, options);
-
+            => RemoveRolesAsync(roles.Select(x => x.Id));
+        /// <inheritdoc />
+        public Task SetTimeOutAsync(TimeSpan span, RequestOptions options = null)
+            => UserHelper.SetTimeoutAsync(this, Discord, span, options);
+        /// <inheritdoc />
+        public Task RemoveTimeOutAsync(RequestOptions options = null)
+            => UserHelper.RemoveTimeOutAsync(this, Discord, options);
         /// <inheritdoc />
         public ChannelPermissions GetPermissions(IGuildChannel channel)
             => new ChannelPermissions(Permissions.ResolveChannel(Guild, this, channel, GuildPermissions.RawValue));
+        public string GetGuildAvatarUrl(ImageFormat format = ImageFormat.Auto, ushort size = 128)
+            => CDN.GetGuildUserAvatarUrl(Id, Guild.Id, GuildAvatarId, size, format);
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Guild)";
         internal new SocketGuildUser Clone() => MemberwiseClone() as SocketGuildUser;
+        #endregion
 
-        //IGuildUser
+        #region IGuildUser
         /// <inheritdoc />
         IGuild IGuildUser.Guild => Guild;
         /// <inheritdoc />
@@ -201,5 +262,6 @@ namespace Discord.WebSocket
         //IVoiceState
         /// <inheritdoc />
         IVoiceChannel IVoiceState.VoiceChannel => VoiceChannel;
+        #endregion
     }
 }
