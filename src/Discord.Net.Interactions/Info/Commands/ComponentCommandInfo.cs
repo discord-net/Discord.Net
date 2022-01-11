@@ -11,10 +11,10 @@ namespace Discord.Interactions
     /// <summary>
     ///     Represents the info class of an attribute based method for handling Component Interaction events.
     /// </summary>
-    public class ComponentCommandInfo : CommandInfo<CommandParameterInfo>
+    public class ComponentCommandInfo : CommandInfo<ComponentCommandParameterInfo>
     {
         /// <inheritdoc/>
-        public override IReadOnlyCollection<CommandParameterInfo> Parameters { get; }
+        public override IReadOnlyCollection<ComponentCommandParameterInfo> Parameters { get; }
 
         /// <inheritdoc/>
         public override bool SupportsWildCards => true;
@@ -73,14 +73,16 @@ namespace Discord.Interactions
 
                 if (componentValues is not null)
                 {
-                    if (Parameters.Last().ParameterType == typeof(string[]))
-                        args[args.Length - 1] = componentValues.ToArray();
+                    var lastParam = Parameters.Last();
+
+                    if (lastParam.ParameterType.IsArray)
+                        args[args.Length - 1] = componentValues.Select(async x => await lastParam.TypeReader.ReadAsync(context, x, services).ConfigureAwait(false)).ToArray();
                     else
                         return ExecuteResult.FromError(InteractionCommandError.BadArgs, $"Select Menu Interaction handlers must accept a {typeof(string[]).FullName} as its last parameter");
                 }
 
                 for (var i = 0; i < strCount; i++)
-                    args[i] = values.ElementAt(i);
+                    args[i] = await Parameters.ElementAt(i).TypeReader.ReadAsync(context, values.ElementAt(i), services).ConfigureAwait(false);
 
                 return await RunAsync(context, args, services).ConfigureAwait(false);
             }

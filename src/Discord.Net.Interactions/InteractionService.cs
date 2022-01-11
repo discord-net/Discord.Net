@@ -66,8 +66,8 @@ namespace Discord.Interactions
         private readonly CommandMap<AutocompleteCommandInfo> _autocompleteCommandMap;
         private readonly CommandMap<ModalCommandInfo> _modalCommandMap;
         private readonly HashSet<ModuleInfo> _moduleDefs;
-        private readonly ConcurrentDictionary<Type, TypeConverter> _typeConverters;
-        private readonly ConcurrentDictionary<Type, Type> _genericTypeConverters;
+        private readonly TypeMap<TypeConverter> _typeConverterMap;
+        private readonly TypeMap<TypeReader> _typeReaderMap;
         private readonly ConcurrentDictionary<Type, IAutocompleteHandler> _autocompleteHandlers = new();
         private readonly ConcurrentDictionary<Type, ModalInfo> _modalInfos = new();
         private readonly SemaphoreSlim _lock;
@@ -179,7 +179,10 @@ namespace Discord.Interactions
             _autoServiceScopes = config.AutoServiceScopes;
             _restResponseCallback = config.RestResponseCallback;
 
-            _genericTypeConverters = new ConcurrentDictionary<Type, Type>
+            _typeConverterMap = new TypeMap<TypeConverter>(this, new Dictionary<Type, TypeConverter>
+            {
+                [typeof(TimeSpan)] = new TimeSpanConverter()
+            }, new Dictionary<Type, Type>
             {
                 [typeof(IChannel)] = typeof(DefaultChannelConverter<>),
                 [typeof(IRole)] = typeof(DefaultRoleConverter<>),
@@ -189,12 +192,9 @@ namespace Discord.Interactions
                 [typeof(IConvertible)] = typeof(DefaultValueConverter<>),
                 [typeof(Enum)] = typeof(EnumConverter<>),
                 [typeof(Nullable<>)] = typeof(NullableConverter<>),
-            };
+            });
 
-            _typeConverters = new ConcurrentDictionary<Type, TypeConverter>
-            {
-                [typeof(TimeSpan)] = new TimeSpanConverter()
-            };
+            _typeReaderMap = new TypeMap<TypeReader>(this);
         }
 
         /// <summary>
@@ -769,61 +769,24 @@ namespace Discord.Interactions
             return await commandResult.Command.ExecuteAsync(context, services).ConfigureAwait(false);
         }
 
-        private async Task<IResult> ExecuteModalCommandAsync(IInteractionContext context, string input, IServiceProvider services)
-        {
-            var result = _modalCommandMap.GetCommand(input);
-
-            if (!result.IsSuccess)
-            {
-                await _cmdLogger.DebugAsync($"Unknown custom interaction id, skipping execution ({input.ToUpper()})");
-
-                await _componentCommandExecutedEvent.InvokeAsync(null, context, result).ConfigureAwait(false);
-                return result;
-            }
-            return await result.Command.ExecuteAsync(context, services, result.RegexCaptureGroups).ConfigureAwait(false);
-        }
-
-        internal TypeConverter GetTypeConverter (Type type, IServiceProvider services = null)
-        {
-            if (_typeConverters.TryGetValue(type, out var specific))
-                return specific;
-            else if (_genericTypeConverters.Any(x => x.Key.IsAssignableFrom(type)
-            || (x.Key.IsGenericTypeDefinition && type.IsGenericType && x.Key.GetGenericTypeDefinition() == type.GetGenericTypeDefinition())))
-            {
-                services ??= EmptyServiceProvider.Instance;
-
-                var converterType = GetMostSpecificTypeConverter(type);
-                var converter = ReflectionUtils<TypeConverter>.CreateObject(converterType.MakeGenericType(type).GetTypeInfo(), this, services);
-                _typeConverters[type] = converter;
-                return converter;
-            }
-
-            else if (_typeConverters.Any(x => x.Value.CanConvertTo(type)))
-                return _typeConverters.First(x => x.Value.CanConvertTo(type)).Value;
-
-            throw new ArgumentException($"No type {nameof(TypeConverter)} is defined for this {type.FullName}", "type");
-        }
+        internal TypeConverter GetTypeConverter(Type type, IServiceProvider services = null)
+            => _typeConverterMap.Get(type, services);
 
         /// <summary>
         ///     Add a concrete type <see cref="TypeConverter"/>.
         /// </summary>
         /// <typeparam name="T">Primary target <see cref="Type"/> of the <see cref="TypeConverter"/>.</typeparam>
         /// <param name="converter">The <see cref="TypeConverter"/> instance.</param>
-        public void AddTypeConverter<T> (TypeConverter converter) =>
-            AddTypeConverter(typeof(T), converter);
+        public void AddTypeConverter<T>(TypeConverter converter) =>
+            _typeConverterMap.AddConcrete<T>(converter);
 
         /// <summary>
         ///     Add a concrete type <see cref="TypeConverter"/>.
         /// </summary>
         /// <param name="type">Primary target <see cref="Type"/> of the <see cref="TypeConverter"/>.</param>
         /// <param name="converter">The <see cref="TypeConverter"/> instance.</param>
-        public void AddTypeConverter (Type type, TypeConverter converter)
-        {
-            if (!converter.CanConvertTo(type))
-                throw new ArgumentException($"This {converter.GetType().FullName} cannot read {type.FullName} and cannot be registered as its {nameof(TypeConverter)}");
-
-            _typeConverters[type] = converter;
-        }
+        public void AddTypeConverter(Type type, TypeConverter converter) =>
+            _typeConverterMap.AddConcrete(type, converter);
 
         /// <summary>
         ///     Add a generic type <see cref="TypeConverter{T}"/>.
@@ -831,58 +794,55 @@ namespace Discord.Interactions
         /// <typeparam name="T">Generic Type constraint of the <see cref="Type"/> of the <see cref="TypeConverter{T}"/>.</typeparam>
         /// <param name="converterType">Type of the <see cref="TypeConverter{T}"/>.</param>
 
-        public void AddGenericTypeConverter<T> (Type converterType) =>
-            AddGenericTypeConverter(typeof(T), converterType);
+        public void AddGenericTypeConverter<T>(Type converterType) =>
+            _typeConverterMap.AddGeneric<T>(converterType);
 
         /// <summary>
         ///     Add a generic type <see cref="TypeConverter{T}"/>.
         /// </summary>
         /// <param name="targetType">Generic Type constraint of the <see cref="Type"/> of the <see cref="TypeConverter{T}"/>.</param>
         /// <param name="converterType">Type of the <see cref="TypeConverter{T}"/>.</param>
-        public void AddGenericTypeConverter (Type targetType, Type converterType)
-        {
-            if (!converterType.IsGenericTypeDefinition)
-                throw new ArgumentException($"{converterType.FullName} is not generic.");
+        public void AddGenericTypeConverter(Type targetType, Type converterType) =>
+            _typeConverterMap.AddGeneric(targetType, converterType);
 
-            var genericArguments = converterType.GetGenericArguments();
-
-            if (genericArguments.Count() > 1)
-                throw new InvalidOperationException($"Valid generic {converterType.FullName}s cannot have more than 1 generic type parameter");
-
-            var constraints = genericArguments.SelectMany(x => x.GetGenericParameterConstraints());
-
-            if (!constraints.Any(x => x.IsAssignableFrom(targetType)))
-                throw new InvalidOperationException($"This generic class does not support type {targetType.FullName}");
+        internal TypeReader GetTypeReader(Type type, IServiceProvider services = null)
+            => _typeReaderMap.Get(type, services);
 
         /// <summary>
-        ///     Serialize an object using a <see cref="TypeReader"/> into a <see cref="string"/> to be placed in a Component CustomId.
+        ///     Add a concrete type <see cref="TypeReader"/>.
         /// </summary>
-        /// <typeparam name="T">Type of the object to be serialized.</typeparam>
-        /// <param name="obj">Object to be serialized.</param>
-        /// <param name="services">Services that will be passed on to the TypeReader.</param>
-        /// <returns>
-        ///     A task representing the conversion process. The task result contains the result of the conversion.
-        /// </returns>
-        public Task<string> SerializeValueAsync<T>(T obj, IServiceProvider services = null) =>
-            _typeReaderMap.Get(typeof(T), services).SerializeAsync(obj);
+        /// <typeparam name="T">Primary target <see cref="Type"/> of the <see cref="TypeReader"/>.</typeparam>
+        /// <param name="reader">The <see cref="TypeReader"/> instance.</param>
+        public void AddTypeReader<T>(TypeReader reader) =>
+            _typeReaderMap.AddConcrete<T>(reader);
 
         /// <summary>
-        ///     Loads and caches an <see cref="ModalInfo"/> for the provided <see cref="IModal"/>.
+        ///     Add a concrete type <see cref="TypeReader"/>.
         /// </summary>
-        /// <typeparam name="T">Type of <see cref="IModal"/> to be loaded.</typeparam>
-        /// <returns>
-        ///     The built <see cref="ModalInfo"/> instance.
-        /// </returns>
-        /// <exception cref="InvalidOperationException"></exception>
-        public ModalInfo AddModalInfo<T>() where T : class, IModal
-        {
-            var type = typeof(T);
+        /// <param name="type">Primary target <see cref="Type"/> of the <see cref="TypeReader"/>.</param>
+        /// <param name="reader">The <see cref="TypeReader"/> instance.</param>
+        public void AddTypeReader(Type type, TypeReader converter) =>
+            _typeReaderMap.AddConcrete(type, converter);
 
-            if (_modalInfos.ContainsKey(type))
-                throw new InvalidOperationException($"Modal type {type.FullName} already exists.");
+        /// <summary>
+        ///     Add a generic type <see cref="TypeReader{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">Generic Type constraint of the <see cref="Type"/> of the <see cref="TypeReader{T}"/>.</typeparam>
+        /// <param name="readerType">Type of the <see cref="TypeReader{T}"/>.</param>
 
-            return ModalUtils.GetOrAdd(type);
-        }
+        public void AddGenericTypeReader<T>(Type readerType) =>
+            _typeReaderMap.AddGeneric<T>(readerType);
+
+        /// <summary>
+        ///     Add a generic type <see cref="TypeReader{T}"/>.
+        /// </summary>
+        /// <param name="targetType">Generic Type constraint of the <see cref="Type"/> of the <see cref="TypeReader{T}"/>.</param>
+        /// <param name="readerType">Type of the <see cref="TypeReader{T}"/>.</param>
+        public void AddGenericTypeReader(Type targetType, Type readerType) =>
+            _typeConverterMap.AddGeneric(targetType, readerType);
+
+        public string SerializeWithTypeReader<T>(object obj, IServiceProvider services = null) =>
+            _typeReaderMap.Get(typeof(T), services)?.Serialize(obj);
 
         internal IAutocompleteHandler GetAutocompleteHandler(Type autocompleteHandlerType, IServiceProvider services = null)
         {
@@ -1041,21 +1001,6 @@ namespace Discord.Interactions
         public void Dispose ( )
         {
             _lock.Dispose();
-        }
-
-        private Type GetMostSpecificTypeConverter (Type type)
-        {
-            if (_genericTypeConverters.TryGetValue(type, out var matching))
-                return matching;
-
-            if (type.IsGenericType && _genericTypeConverters.TryGetValue(type.GetGenericTypeDefinition(), out var genericDefinition))
-                return genericDefinition;
-
-            var typeInterfaces = type.GetInterfaces();
-            var candidates = _genericTypeConverters.Where(x => x.Key.IsAssignableFrom(type))
-                .OrderByDescending(x => typeInterfaces.Count(y => y.IsAssignableFrom(x.Key)));
-
-            return candidates.First().Value;
         }
 
         private void EnsureClientReady()

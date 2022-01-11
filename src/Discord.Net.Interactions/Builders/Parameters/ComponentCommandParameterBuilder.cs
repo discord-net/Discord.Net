@@ -1,8 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Discord.Interactions.Builders
 {
@@ -29,7 +25,7 @@ namespace Discord.Interactions.Builders
         public ComponentCommandParameterBuilder SetParameterType(Type type, IServiceProvider services = null)
         {
             base.SetParameterType(type);
-            TypeReader = Command.Module.InteractionService.GetTypeConverter(ParameterType, services);
+            TypeReader = Command.Module.InteractionService.GetTypeReader(ParameterType, services);
             return this;
         }
 
