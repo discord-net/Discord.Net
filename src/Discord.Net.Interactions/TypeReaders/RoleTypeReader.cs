@@ -1,48 +1,44 @@
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord.Commands
+namespace Discord.Interactions
 {
     /// <summary>
     ///     A <see cref="TypeReader"/> for parsing objects implementing <see cref="IRole"/>.
     /// </summary>
     /// <typeparam name="T">The type to be checked; must implement <see cref="IRole"/>.</typeparam>
-    public class RoleTypeReader<T> : TypeReader
-        where T : class, IRole
+    internal class RoleTypeReader<T> : TypeReader<T> where T : class, IRole
     {
         /// <inheritdoc />
-        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
+        public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, object input, IServiceProvider services)
         {
-            if (context.Guild != null)
+            if (context.Guild is not null)
             {
-                var results = new Dictionary<ulong, TypeReaderValue>();
-                var roles = context.Guild.Roles;
+                if (ulong.TryParse(input as string, out var id))
+                {
+                    var role = context.Guild.GetRole(id);
 
-                //By Mention (1.0)
-                if (MentionUtils.TryParseRole(input, out var id))
-                    AddResult(results, context.Guild.GetRole(id) as T, 1.00f);
+                    if (role is not null)
+                        return Task.FromResult(TypeConverterResult.FromSuccess(role as T));
+                }
 
-                //By Id (0.9)
-                if (ulong.TryParse(input, NumberStyles.None, CultureInfo.InvariantCulture, out id))
-                     AddResult(results, context.Guild.GetRole(id) as T, 0.90f);
+                if (MentionUtils.TryParseRole(input as string, out id))
+                {
+                    var role = context.Guild.GetRole(id);
 
-                //By Name (0.7-0.8)
-                foreach (var role in roles.Where(x => string.Equals(input, x.Name, StringComparison.OrdinalIgnoreCase)))
-                    AddResult(results, role as T, role.Name == input ? 0.80f : 0.70f);
+                    if (role is not null)
+                        return Task.FromResult(TypeConverterResult.FromSuccess(role as T));
+                }
 
-                if (results.Count > 0)
-                    return Task.FromResult(TypeReaderResult.FromSuccess(results.Values.ToReadOnlyCollection()));
+                var channels = context.Guild.Roles;
+                var nameMatch = channels.First(x => string.Equals(x, input as string));
+
+                if (nameMatch is not null)
+                    return Task.FromResult(TypeConverterResult.FromSuccess(nameMatch as T));
             }
-            return Task.FromResult(TypeReaderResult.FromError(CommandError.ObjectNotFound, "Role not found."));
-        }
 
-        private void AddResult(Dictionary<ulong, TypeReaderValue> results, T role, float score)
-        {
-            if (role != null && !results.ContainsKey(role.Id))
-                results.Add(role.Id, new TypeReaderValue(role, score));
+            return Task.FromResult(TypeConverterResult.FromError(InteractionCommandError.ConvertFailed, "Role not found."));
         }
     }
 }

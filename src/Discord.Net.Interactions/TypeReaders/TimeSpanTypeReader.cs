@@ -2,9 +2,9 @@ using System;
 using System.Globalization;
 using System.Threading.Tasks;
 
-namespace Discord.Commands
+namespace Discord.Interactions
 {
-    internal class TimeSpanTypeReader : TypeReader
+    internal class TimeSpanTypeReader : TypeReader<TimeSpan>
     {
         /// <summary>
         /// TimeSpan try parse formats.
@@ -29,26 +29,28 @@ namespace Discord.Commands
         };
 
         /// <inheritdoc />
-        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
+        public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, object input, IServiceProvider services)
         {
-            if (string.IsNullOrEmpty(input))
-                throw new ArgumentException(message: $"{nameof(input)} must not be null or empty.", paramName: nameof(input));
+            var str = input as string;
 
-            var isNegative = input[0] == '-'; // Char for CultureInfo.InvariantCulture.NumberFormat.NegativeSign
+            if (string.IsNullOrEmpty(str))
+                throw new ArgumentException($"{nameof(input)} must not be null or empty.", nameof(input));
+
+            var isNegative = str[0] == '-'; // Char for CultureInfo.InvariantCulture.NumberFormat.NegativeSign
             if (isNegative)
             {
-                input = input.Substring(1);
+                str = str.Substring(1);
             }
 
-            if (TimeSpan.TryParseExact(input.ToLowerInvariant(), Formats, CultureInfo.InvariantCulture, out var timeSpan))
+            if (TimeSpan.TryParseExact(str.ToLowerInvariant(), Formats, CultureInfo.InvariantCulture, out var timeSpan))
             {
                 return isNegative
-                    ? Task.FromResult(TypeReaderResult.FromSuccess(-timeSpan))
-                    : Task.FromResult(TypeReaderResult.FromSuccess(timeSpan));
+                    ? Task.FromResult(TypeConverterResult.FromSuccess(-timeSpan))
+                    : Task.FromResult(TypeConverterResult.FromSuccess(timeSpan));
             }
             else
             {
-                return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Failed to parse TimeSpan"));
+                return Task.FromResult(TypeConverterResult.FromError(InteractionCommandError.ParseFailed, "Failed to parse TimeSpan"));
             }
         }
     }

@@ -42,19 +42,19 @@ namespace Discord.Interactions
             if (context.Interaction is not IComponentInteraction componentInteraction)
                 return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Message Component Interaction");
 
-            var args = new List<string>();
+            var args = new List<object>();
 
             if (additionalArgs is not null)
                 args.AddRange(additionalArgs);
 
             if (componentInteraction.Data?.Values is not null)
-                args.AddRange(componentInteraction.Data.Values);
+                args.Add(componentInteraction.Data.Values);
 
             return await ExecuteAsync(context, Parameters, args, services);
         }
 
         /// <inheritdoc/>
-        public async Task<IResult> ExecuteAsync(IInteractionContext context, IEnumerable<CommandParameterInfo> paramList, IEnumerable<string> values,
+        public async Task<IResult> ExecuteAsync(IInteractionContext context, IEnumerable<CommandParameterInfo> paramList, IEnumerable<object> values,
             IServiceProvider services)
         {
             if (context.Interaction is not IComponentInteraction messageComponent)
@@ -62,27 +62,42 @@ namespace Discord.Interactions
 
             try
             {
-                var strCount = Parameters.Count(x => x.ParameterType == typeof(string));
+                var valueCount = values.Count();
+                var args = new object[paramList.Count()];
 
-                if (strCount > values?.Count())
-                    return ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command was invoked with too few parameters");
-
-                var componentValues = messageComponent.Data?.Values;
-
-                var args = new object[Parameters.Count];
-
-                if (componentValues is not null)
+                for(var i = 0; i < paramList.Count(); i++)
                 {
-                    var lastParam = Parameters.Last();
+                    var parameter = Parameters.ElementAt(i);
 
-                    if (lastParam.ParameterType.IsArray)
-                        args[args.Length - 1] = componentValues.Select(async x => await lastParam.TypeReader.ReadAsync(context, x, services).ConfigureAwait(false)).ToArray();
+                    if(i > valueCount)
+                    {
+                        if (!parameter.IsRequired)
+                            args[i] = parameter.DefaultValue;
+                        else
+                        {
+                            var result = ExecuteResult.FromError(InteractionCommandError.BadArgs, "Command was invoked with too few parameters");
+                            await InvokeModuleEvent(context, result).ConfigureAwait(false);
+                            return result;
+                        }
+                            
+                    }
                     else
-                        return ExecuteResult.FromError(InteractionCommandError.BadArgs, $"Select Menu Interaction handlers must accept a {typeof(string[]).FullName} as its last parameter");
+                    {
+                        var value = values.ElementAt(i);
+                        var typeReader = parameter.TypeReader;
+
+                        var readResult = await typeReader.ReadAsync(context, value, services).ConfigureAwait(false);
+
+                        if (!readResult.IsSuccess)
+                        {
+                            await InvokeModuleEvent(context, readResult).ConfigureAwait(false);
+                            return readResult;
+                        }
+
+                        args[i] = readResult.Value;
+                    }
                 }
 
-                for (var i = 0; i < strCount; i++)
-                    args[i] = await Parameters.ElementAt(i).TypeReader.ReadAsync(context, values.ElementAt(i), services).ConfigureAwait(false);
 
                 return await RunAsync(context, args, services).ConfigureAwait(false);
             }

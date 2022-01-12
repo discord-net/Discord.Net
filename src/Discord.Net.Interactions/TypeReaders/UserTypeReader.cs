@@ -5,17 +5,16 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Discord.Commands
+namespace Discord.Interactions
 {
     /// <summary>
     ///     A <see cref="TypeReader"/> for parsing objects implementing <see cref="IUser"/>.
     /// </summary>
     /// <typeparam name="T">The type to be checked; must implement <see cref="IUser"/>.</typeparam>
-    public class UserTypeReader<T> : TypeReader
-        where T : class, IUser
+    public class UserTypeReader<T> : TypeReader<T> where T : class, IUser
     {
         /// <inheritdoc />
-        public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
+        public override async Task<TypeConverterResult> ReadAsync(IInteractionContext context, string input, IServiceProvider services)
         {
             var results = new Dictionary<ulong, TypeReaderValue>();
             IAsyncEnumerable<IUser> channelUsers = context.Channel.GetUsersAsync(CacheMode.CacheOnly).Flatten(); // it's better
@@ -84,12 +83,6 @@ namespace Discord.Commands
             if (results.Count > 0)
                 return TypeReaderResult.FromSuccess(results.Values.ToImmutableArray());
             return TypeReaderResult.FromError(CommandError.ObjectNotFound, "User not found.");
-        }
-
-        private void AddResult(Dictionary<ulong, TypeReaderValue> results, T user, float score)
-        {
-            if (user != null && !results.ContainsKey(user.Id))
-                results.Add(user.Id, new TypeReaderValue(user, score));
         }
     }
 }
