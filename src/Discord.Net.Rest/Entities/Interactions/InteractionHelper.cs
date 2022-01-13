@@ -437,7 +437,7 @@ namespace Discord.Rest
         }
 
         public static async Task DeleteInteractionResponseAsync(BaseDiscordClient client, RestInteractionMessage message, RequestOptions options = null)
-             => await client.ApiClient.DeleteInteractionResponseAsync(message.Token, options);
+            => await client.ApiClient.DeleteInteractionResponseAsync(message.Token, options);
 
         public static async Task DeleteInteractionResponseAsync(BaseDiscordClient client, IDiscordInteraction interaction, RequestOptions options = null)
             => await client.ApiClient.DeleteInteractionResponseAsync(interaction.Token, options);
