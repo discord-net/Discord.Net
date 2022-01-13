@@ -81,6 +81,16 @@ namespace Discord
         /// </summary>
         public bool IsDefaultPermission { get; set; } = true;
 
+        /// <summary>
+        ///     Gets or sets whether or not this command can be used in DMs.
+        /// </summary>
+        public bool IsDMEnabled { get; set; } = true;
+
+        /// <summary>
+        ///     Gets or sets the default permission required to use this slash command.
+        /// </summary>
+        public GuildPermission? DefaultMemberPermissions { get; set; }
+
         private string _name;
         private string _description;
         private List<SlashCommandOptionBuilder> _options;
@@ -96,6 +106,8 @@ namespace Discord
                 Name = Name,
                 Description = Description,
                 IsDefaultPermission = IsDefaultPermission,
+                IsDMEnabled = IsDMEnabled,
+                DefaultMemberPermissions = DefaultMemberPermissions ?? Optional<GuildPermission>.Unspecified
             };
 
             if (Options != null && Options.Any())
@@ -142,6 +154,28 @@ namespace Discord
         public SlashCommandBuilder WithDefaultPermission(bool value)
         {
             IsDefaultPermission = value;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets whether or not this command can be used in dms
+        /// </summary>
+        /// <param name="permission"><see langword="true"/> if the command is available in dms, otherwise <see langword="false"/>.</param>
+        /// <returns>The current builder.</returns>
+        public SlashCommandBuilder WithDMPermission(bool permission)
+        {
+            IsDMEnabled = permission;
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the default member permissions required to use this application command.
+        /// </summary>
+        /// <param name="permissions">The permissions required to use this command.</param>
+        /// <returns>The current builder.</returns>
+        public SlashCommandBuilder WithDefaultMemberPermissions(GuildPermission? permissions)
+        {
+            DefaultMemberPermissions = permissions;
             return this;
         }
 
