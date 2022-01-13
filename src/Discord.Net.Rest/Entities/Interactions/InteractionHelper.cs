@@ -437,10 +437,10 @@ namespace Discord.Rest
         }
 
         public static async Task DeleteInteractionResponseAsync(BaseDiscordClient client, RestInteractionMessage message, RequestOptions options = null)
-            => await client.ApiClient.DeleteInteractionFollowupMessageAsync(message.Id, message.Token, options);
+             => await client.ApiClient.DeleteInteractionResponseAsync(message.Token, options);
 
         public static async Task DeleteInteractionResponseAsync(BaseDiscordClient client, IDiscordInteraction interaction, RequestOptions options = null)
-            => await client.ApiClient.DeleteInteractionFollowupMessageAsync(interaction.Id, interaction.Token, options);
+            => await client.ApiClient.DeleteInteractionResponseAsync(interaction.Token, options);
 
         public static Task SendAutocompleteResultAsync(BaseDiscordClient client, IEnumerable<AutocompleteResult> result, ulong interactionId,
             string interactionToken, RequestOptions options)
