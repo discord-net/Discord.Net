@@ -31,15 +31,15 @@ var config = new DiscordSocketConfig()
 _client = new DiscordSocketClient(config);
 
 ```
+
 #### Common intents:
 
 - AllUnprivileged: This is a group of most common intents, that do NOT require any [developer portal] intents to be enabled.
-This includes intents that receive messages such as: `GatewayIntents.GuildMessages, GatewayIntents.DirectMessages`
+  This includes intents that receive messages such as: `GatewayIntents.GuildMessages, GatewayIntents.DirectMessages`
 - GuildMembers: An intent disabled by default, as you need to enable it in the [developer portal].
 - GuildPresences: Also disabled by default, this intent together with `GuildMembers` are the only intents not included in `AllUnprivileged`.
-- All: All intents, it is ill adviced to use this without care, as it *can* cause a memory leak from presence.
-The library will give responsive warnings if you specify unnecessary intents.
-
+- All: All intents, it is ill adviced to use this without care, as it _can_ cause a memory leak from presence.
+  The library will give responsive warnings if you specify unnecessary intents.
 
 > [!NOTE]
 > All gateway intents, their Discord API counterpart and their enum value are listed
@@ -62,7 +62,12 @@ GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers | 
 
 [developer portal]: https://discord.com/developers/
 
-### ReactionAdded Event
+### UserLeft event
+
+UserLeft has been changed to have the `SocketUser` and `SocketGuild` parameters instead of a `SocketGuildUser` parameter.
+Because of this, guild-only user data cannot be retrieved from this user anymore, as this user is not part of the guild.
+
+### ReactionAdded event
 
 The reaction added event has been changed to have both parameters cacheable.
 This allows you to download the channel and message if they aren't cached instead of them being null.
@@ -78,8 +83,8 @@ There is a new event called `PresenceUpdated` that is called when a user's prese
 instead of `GuildMemberUpdated` or `UserUpdated`.
 If your code relied on these events to get presence data then you need to update it to work with the new event.
 
-## Migrating your commands to slash command
+## Migrating your commands to application commands
 
-The new InteractionService was designed to act like the previous service for text-based commands.
+The new interaction service was designed to act like the previous service for text-based commands.
 Your pre-existing code will continue to work, but you will need to migrate your modules and response functions to use the new
-InteractionService methods. Docs on this can be found in the Guides section.
+interaction service methods. Documentation on this can be found in the [Guides](xref:Guides.IntFw.Intro).
