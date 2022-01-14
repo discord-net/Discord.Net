@@ -374,7 +374,7 @@ namespace Discord.Rest
 
             if (channel is ITextChannel guildTextChannel)
             {
-                var contentSize = (ulong)attachments.Sum(x => x.Stream.Length);
+                ulong contentSize = (ulong)attachments.Where(x => x.Stream.CanSeek).Sum(x => x.Stream.Length);
 
                 if (contentSize > guildTextChannel.Guild.MaxUploadLimit)
                 {
