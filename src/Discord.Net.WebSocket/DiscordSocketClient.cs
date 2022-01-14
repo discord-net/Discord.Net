@@ -261,9 +261,6 @@ namespace Discord.WebSocket
 
                 _defaultStickers = builder.ToImmutable();
             }
-
-            if(LogGatewayIntentWarnings)
-                await LogGatewayIntentsWarning().ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -314,6 +311,10 @@ namespace Discord.WebSocket
 
             //Wait for READY
             await _connection.WaitAsync().ConfigureAwait(false);
+
+            // Log warnings on ready event
+            if (LogGatewayIntentWarnings)
+                await LogGatewayIntentsWarning().ConfigureAwait(false);
         }
         private async Task OnDisconnectingAsync(Exception ex)
         {
@@ -743,7 +744,7 @@ namespace Discord.WebSocket
 
             if(!_gatewayIntents.HasFlag(GatewayIntents.GuildPresences) && _presenceUpdated.HasSubscribers)
             {
-                await _gatewayLogger.WarningAsync("You're using the PresenceUpdate event without specifying the GuildPresences intent, consider adding the intent to your config.").ConfigureAwait(false);
+                await _gatewayLogger.WarningAsync("You're using the PresenceUpdate event without specifying the GuildPresences intent. Discord wont send this event to your client without the intent set in your config.").ConfigureAwait(false);
             }
 
             bool hasGuildScheduledEventsSubscribers =
@@ -762,7 +763,7 @@ namespace Discord.WebSocket
 
             if(!_gatewayIntents.HasFlag(GatewayIntents.GuildScheduledEvents) && hasGuildScheduledEventsSubscribers)
             {
-                await _gatewayLogger.WarningAsync("You're using events related to the GuildScheduledEvents gateway intent without specifying the intent, consider adding the intent to your config.").ConfigureAwait(false);
+                await _gatewayLogger.WarningAsync("You're using events related to the GuildScheduledEvents gateway intent without specifying the intent. Discord wont send this event to your client without the intent set in your config.").ConfigureAwait(false);
             }
 
             bool hasInviteEventSubscribers =
@@ -776,7 +777,7 @@ namespace Discord.WebSocket
 
             if (!_gatewayIntents.HasFlag(GatewayIntents.GuildInvites) && hasInviteEventSubscribers)
             {
-                await _gatewayLogger.WarningAsync("You're using events related to the GuildInvites gateway intent without specifying the intent, consider adding the intent to your config.").ConfigureAwait(false);
+                await _gatewayLogger.WarningAsync("You're using events related to the GuildInvites gateway intent without specifying the intent. Discord wont send this event to your client without the intent set in your config.").ConfigureAwait(false);
             }
         }
 
