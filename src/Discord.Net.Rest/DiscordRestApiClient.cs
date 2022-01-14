@@ -46,17 +46,19 @@ namespace Discord.API
         internal IRestClient RestClient { get; private set; }
         internal ulong? CurrentUserId { get; set; }
         internal bool UseSystemClock { get; set; }
+        internal Func<IRateLimitInfo, Task> DefaultRatelimitCallback { get; set; }
         internal JsonSerializer Serializer => _serializer;
 
         /// <exception cref="ArgumentException">Unknown OAuth token type.</exception>
         public DiscordRestApiClient(RestClientProvider restClientProvider, string userAgent, RetryMode defaultRetryMode = RetryMode.AlwaysRetry,
-            JsonSerializer serializer = null, bool useSystemClock = true)
+            JsonSerializer serializer = null, bool useSystemClock = true, Func<IRateLimitInfo, Task> defaultRatelimitCallback = null)
         {
             _restClientProvider = restClientProvider;
             UserAgent = userAgent;
             DefaultRetryMode = defaultRetryMode;
             _serializer = serializer ?? new JsonSerializer { ContractResolver = new DiscordContractResolver() };
             UseSystemClock = useSystemClock;
+            DefaultRatelimitCallback = defaultRatelimitCallback;
 
             RequestQueue = new RequestQueue();
             _stateLock = new SemaphoreSlim(1, 1);
@@ -279,10 +281,10 @@ namespace Discord.API
         {
             if (!request.Options.IgnoreState)
                 CheckState();
-            if (request.Options.RetryMode == null)
-                request.Options.RetryMode = DefaultRetryMode;
-            if (request.Options.UseSystemClock == null)
-                request.Options.UseSystemClock = UseSystemClock;
+
+            request.Options.RetryMode ??= DefaultRetryMode;
+            request.Options.UseSystemClock ??= UseSystemClock;
+            request.Options.RatelimitCallback ??= DefaultRatelimitCallback;
 
             var stopwatch = Stopwatch.StartNew();
             var responseStream = await RequestQueue.SendAsync(request).ConfigureAwait(false);
