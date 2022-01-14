@@ -37,5 +37,11 @@ namespace Discord.API
 
         [JsonProperty("message")]
         public Optional<Message> Message { get; set; }
+
+        [JsonProperty("locale")]
+        public Optional<string> UserLocale { get; set; }
+
+        [JsonProperty("guild_locale")]
+        public Optional<string> GuildLocale { get; set; }
     }
 }

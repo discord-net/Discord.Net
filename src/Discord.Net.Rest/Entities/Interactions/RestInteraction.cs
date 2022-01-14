@@ -33,6 +33,12 @@ namespace Discord.Rest
         public RestUser User { get; private set; }
 
         /// <inheritdoc/>
+        public string UserLocale { get; private set; }
+
+        /// <inheritdoc/>
+        public string GuildLocale { get; private set; }
+
+        /// <inheritdoc/>
         public DateTimeOffset CreatedAt { get; private set; }
 
         /// <summary>
@@ -126,6 +132,13 @@ namespace Discord.Rest
             {
                 Channel = (IRestMessageChannel)await discord.GetChannelAsync(model.ChannelId.Value);
             }
+
+            UserLocale = model.UserLocale.IsSpecified
+               ? model.UserLocale.Value
+               : null;
+            GuildLocale = model.GuildLocale.IsSpecified
+                ? model.GuildLocale.Value
+                : null;
         }
 
         internal string SerializePayload(object payload)
