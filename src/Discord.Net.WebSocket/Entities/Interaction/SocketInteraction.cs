@@ -39,6 +39,12 @@ namespace Discord.WebSocket
         /// </summary>
         public IDiscordInteractionData Data { get; private set; }
 
+        /// <inheritdoc/>
+        public string UserLocale { get; private set; }
+
+        /// <inheritdoc/>
+        public string GuildLocale { get; private set; }
+
         /// <summary>
         ///     The version of this interaction.
         /// </summary>
@@ -121,6 +127,13 @@ namespace Discord.WebSocket
                     User = SocketGlobalUser.Create(Discord, Discord.State, model.User.Value);
                 }
             }
+
+            UserLocale = model.UserLocale.IsSpecified
+                ? model.UserLocale.Value
+                : null;
+            GuildLocale = model.GuildLocale.IsSpecified
+                ? model.GuildLocale.Value
+                : null;
         }
 
         /// <summary>
