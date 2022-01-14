@@ -23,6 +23,8 @@ interface with the [Discord API](https://discord.com/).
 If this is your first time using Discord.Net, you should refer to the
 [Intro](xref:Guides.Introduction) for tutorials.
 
+If you're coming from Discord.Net V2.x, you should refer to the [V2 -> V3](xref:Guides.V2V3Guide) guides.
+
 More experienced users might want to refer to the
 [API Documentation](xref:API.Docs) for a breakdown of the individual
 objects in the library.
@@ -37,22 +39,22 @@ for testing and development to eventually get merged into Discord.NET.
 
 [Installing Discord.NET Labs](xref:Guides.GettingStarted.Installation.Labs)
 
-[Discord.NET Labs]: https://github.com/Discord-Net-Labs/Discord.Net-Labs
+[discord.net labs]: https://github.com/Discord-Net-Labs/Discord.Net-Labs
 
 ## Questions?
 
-Frequently asked questions are covered in the 
-FAQ. Read it thoroughly because most common questions are already answered there. 
+Frequently asked questions are covered in the
+FAQ. Read it thoroughly because most common questions are already answered there.
 
-If you still have unanswered questions after reading the [FAQ](xref:FAQ.Basics.GetStarted), further support is available on 
+If you still have unanswered questions after reading the [FAQ](xref:FAQ.Basics.GetStarted), further support is available on
 [Discord](https://discord.gg/dnet).
 
-## Commonly used features
+## New in V3
 
 #### Interaction Framework
 
-A counterpart to staple command service of Discord.NET, the Interaction Framework implements the same
-feature-rich structure to register & handle interactions like Slash commands & buttons.
+A counterpart to the well-known command service of Discord.Net, the Interaction Framework implements the same
+feature-rich structure to register & handle interactions like application commands & buttons.
 
 - Read about the Interaction Framework
   [here](xref:Guides.IntFw.Intro)
