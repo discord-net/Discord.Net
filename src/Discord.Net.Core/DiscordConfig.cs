@@ -1,4 +1,6 @@
+using System;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Discord
 {
@@ -130,6 +132,14 @@ namespace Discord
         ///     The currently set <see cref="RetryMode"/>.
         /// </returns>
         public RetryMode DefaultRetryMode { get; set; } = RetryMode.AlwaysRetry;
+
+        /// <summary>
+        ///     Gets or sets the default callback for ratelimits.
+        /// </summary>
+        /// <remarks>
+        ///     This property is mutually exclusive with <see cref="RequestOptions.RatelimitCallback"/>.
+        /// </remarks>
+        public Func<IRateLimitInfo, Task> DefaultRatelimitCallback { get; set; }
 
         /// <summary>
         ///     Gets or sets the minimum log level severity that will be sent to the Log event.
