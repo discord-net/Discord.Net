@@ -40,6 +40,12 @@ namespace Discord.Rest
                 IsBoostProgressBarEnabled = args.IsBoostProgressBarEnabled
             };
 
+            if (apiArgs.Banner.IsSpecified)
+                guild.Features.EnsureFeature(GuildFeature.Banner);
+
+            if (apiArgs.Splash.IsSpecified)
+                guild.Features.EnsureFeature(GuildFeature.InviteSplash);
+
             if (args.AfkChannel.IsSpecified)
                 apiArgs.AfkChannelId = args.AfkChannel.Value.Id;
             else if (args.AfkChannelId.IsSpecified)
