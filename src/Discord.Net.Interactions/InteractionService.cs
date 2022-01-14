@@ -589,6 +589,60 @@ namespace Discord.Interactions
         }
 
         /// <summary>
+        ///     Search the registered slash commands using a <see cref="ISlashCommandInteraction"/>.
+        /// </summary>
+        /// <param name="slashCommandInteraction">Interaction entity to perform the search with.</param>
+        /// <returns>
+        ///     The search result. When successful, result contains the found <see cref="SlashCommandInfo"/>.
+        /// </returns>
+        public SearchResult<SlashCommandInfo> SearchSlashCommand(ISlashCommandInteraction slashCommandInteraction)
+            => _slashCommandMap.GetCommand(slashCommandInteraction.Data.GetCommandKeywords());
+
+        /// <summary>
+        ///     Search the registered slash commands using a <see cref="IComponentInteraction"/>.
+        /// </summary>
+        /// <param name="componentInteraction">Interaction entity to perform the search with.</param>
+        /// <returns>
+        ///     The search result. When successful, result contains the found <see cref="ComponentCommandInfo"/>.
+        /// </returns>
+        public SearchResult<ComponentCommandInfo> SearchComponentCommand(IComponentInteraction componentInteraction)
+            => _componentCommandMap.GetCommand(componentInteraction.Data.CustomId);
+
+        /// <summary>
+        ///     Search the registered slash commands using a <see cref="IUserCommandInteraction"/>.
+        /// </summary>
+        /// <param name="userCommandInteraction">Interaction entity to perform the search with.</param>
+        /// <returns>
+        ///     The search result. When successful, result contains the found <see cref="ContextCommandInfo"/>.
+        /// </returns>
+        public SearchResult<ContextCommandInfo> SearchUserCommand(IUserCommandInteraction userCommandInteraction)
+            => _contextCommandMaps[ApplicationCommandType.User].GetCommand(userCommandInteraction.Data.Name);
+
+        /// <summary>
+        ///     Search the registered slash commands using a <see cref="IMessageCommandInteraction"/>.
+        /// </summary>
+        /// <param name="messageCommandInteraction">Interaction entity to perform the search with.</param>
+        /// <returns>
+        ///     The search result. When successful, result contains the found <see cref="ContextCommandInfo"/>.
+        /// </returns>
+        public SearchResult<ContextCommandInfo> SearchMessageCommand(IMessageCommandInteraction messageCommandInteraction)
+            => _contextCommandMaps[ApplicationCommandType.Message].GetCommand(messageCommandInteraction.Data.Name);
+
+        /// <summary>
+        ///     Search the registered slash commands using a <see cref="IAutocompleteInteraction"/>.
+        /// </summary>
+        /// <param name="autocompleteInteraction">Interaction entity to perform the search with.</param>
+        /// <returns>
+        ///     The search result. When successful, result contains the found <see cref="AutocompleteCommandInfo"/>.
+        /// </returns>
+        public SearchResult<AutocompleteCommandInfo> SearchAutocompleteCommand(IAutocompleteInteraction autocompleteInteraction)
+        {
+            var keywords = autocompleteInteraction.Data.GetCommandKeywords();
+            keywords.Add(autocompleteInteraction.Data.Current.Name);
+            return _autocompleteCommandMap.GetCommand(keywords);
+        }
+
+        /// <summary>
         ///     Execute a Command from a given <see cref="IInteractionContext"/>.
         /// </summary>
         /// <param name="context">Name context of the command.</param>
