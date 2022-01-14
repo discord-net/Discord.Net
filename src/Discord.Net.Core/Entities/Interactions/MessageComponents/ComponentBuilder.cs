@@ -239,6 +239,38 @@ namespace Discord
         }
 
         /// <summary>
+        ///     Adds a row to this component builder.
+        /// </summary>
+        /// <param name="row">The row to add.</param>
+        /// <exception cref="IndexOutOfRangeException">The component builder contains the max amount of rows defined as <see cref="MaxActionRowCount"/>.</exception>
+        /// <returns>The current builder.</returns>
+        public ComponentBuilder AddRow(ActionRowBuilder row)
+        {
+            _actionRows ??= new();
+
+            if (_actionRows.Count >= MaxActionRowCount)
+                throw new IndexOutOfRangeException("The max amount of rows has been reached");
+
+            ActionRows.Add(row);
+            return this;
+        }
+
+        /// <summary>
+        ///     Sets the rows of this component builder to a specified collection.
+        /// </summary>
+        /// <param name="rows">The rows to set.</param>
+        /// <exception cref="IndexOutOfRangeException">The collection contains more rows then is allowed by discord.</exception>
+        /// <returns>The current builder.</returns>
+        public ComponentBuilder WithRows(IEnumerable<ActionRowBuilder> rows)
+        {
+            if (rows.Count() > MaxActionRowCount)
+                throw new IndexOutOfRangeException($"Cannot have more than {MaxActionRowCount} rows");
+
+            _actionRows = new List<ActionRowBuilder>(rows);
+            return this;
+        }
+
+        /// <summary>
         ///     Builds this builder into a <see cref="MessageComponent"/> used to send your components.
         /// </summary>
         /// <returns>A <see cref="MessageComponent"/> that can be sent with <see cref="IMessageChannel.SendMessageAsync"/>.</returns>
