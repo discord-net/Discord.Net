@@ -57,7 +57,7 @@ GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers | 
 ```
 
 > [!NOTE]
-> Further documentation on the `|` operator can be found
+> Further documentation on the ` | ` operator can be found
 > [HERE](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/bitwise-and-shift-operators)
 
 [developer portal]: https://discord.com/developers/
@@ -72,7 +72,7 @@ Because of this, guild-only user data cannot be retrieved from this user anymore
 The reaction added event has been changed to have both parameters cacheable.
 This allows you to download the channel and message if they aren't cached instead of them being null.
 
-### UserIsTyping event
+### UserIsTyping Event
 
 The user is typing event has been changed to have both parameters cacheable.
 This allows you to download the user and channel if they aren't cached instead of them being null.
