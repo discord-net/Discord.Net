@@ -123,8 +123,8 @@ namespace Discord.WebSocket
 
         private SocketGuildUser GuildUser { get; set; }
 
-        internal SocketThreadUser(SocketGuild guild, SocketThreadChannel thread, SocketGuildUser member)
-            : base(guild.Discord, member.Id)
+        internal SocketThreadUser(SocketGuild guild, SocketThreadChannel thread, SocketGuildUser member, ulong userId)
+            : base(guild.Discord, userId)
         {
             Thread = thread;
             Guild = guild;
@@ -133,7 +133,7 @@ namespace Discord.WebSocket
 
         internal static SocketThreadUser Create(SocketGuild guild, SocketThreadChannel thread, Model model, SocketGuildUser member)
         {
-            var entity = new SocketThreadUser(guild, thread, member);
+            var entity = new SocketThreadUser(guild, thread, member, model.UserId.Value);
             entity.Update(model);
             return entity;
         }
