@@ -1,5 +1,34 @@
 # Changelog
 
+## [3.2.0] - 2022-01-15
+
+## Added
+- #2015 Add user-built AddCommand overloads to ModuleBuilder (68e3bed)
+- #2016 Add Construct Method to InteractionModuleBase and Fix NRE on User-Built Module Creation (4ed4718)
+- #2035 Add GetChannelType extension method (64423a0)
+- #2036 Add missing guild features (7075d4e)
+- #2037 Add default ratelimit callback (4d9389b)
+- #2038 Add AddRow and WithRows to ComponentBuilder (3429cf9)
+- #2040 Add user locale & guild locale in interactions (2731e20)
+- #2041 Add search methods to InteractionService (9a52d05)
+
+### Fixed
+- #1562 Fix OperationCancelledException and add IAsyncEnumerable to wait without thread blocking (cd36bb8)
+- #2014 Fix InteractionContext.Guild (944a0de)
+- #2023 Fix ModifyAsync when only modifying a message's flags (e3eb0a9)
+- #2025 Fix IsTopLevelCommand returning the wrong value (4b7cda0)
+- #2031 Fix DefaultChannel to exclude threads (a06ba9f)
+- #2033 Fix Interaction delete original response throwing 404 (291d1e4)
+- #2034 Fix exception when uploading files with non seekable streams (7f4feea)
+- #2044 Fix ApplicationId not being used for interactions (c682564)
+- #2045 Fix argument null exception on Message Create (a07531f)
+- #2046 Fix ThreadMember null ref in constructor (bcd5fa4)
+
+### Misc
+- #2018 Match argument defaults with IDiscordInteraction on SocketInteraction (093e548)
+- #2024 Remove .ToLower from group name registration (9594ccc)
+- #2042 Move gateway intents warning to ready event (3633929)
+
 ## [3.1.0] - 2021-12-24
 
 ### Added
