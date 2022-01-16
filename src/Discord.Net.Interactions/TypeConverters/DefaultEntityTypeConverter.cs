@@ -72,7 +72,8 @@ namespace Discord.Interactions
 
         public override void Write (ApplicationCommandOptionProperties properties, IParameterInfo parameter)
         {
-            properties.ChannelTypes = _channelTypes;
+            if (_channelTypes is not null)
+                properties.ChannelTypes = _channelTypes;
         }
     }
 
