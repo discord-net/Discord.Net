@@ -58,7 +58,9 @@ namespace ShardedClient
             => new ServiceCollection()
                 .AddSingleton(new DiscordShardedClient(config))
                 .AddSingleton<CommandService>()
+                .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordShardedClient>()))
                 .AddSingleton<CommandHandlingService>()
+                .AddSingleton<InteractionHandlingService>()
                 .BuildServiceProvider();
 
 
