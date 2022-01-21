@@ -21,8 +21,6 @@
       topicUid: Guides.Concepts.Events
     - name: Managing Connections
       topicUid: Guides.Concepts.ManageConnections
-    - name: Entities
-      topicUid: Guides.Concepts.Entities
 - name: Entities
   items:
     - name: Introduction

@@ -7,7 +7,7 @@ title: Glossary & Flowcharts
 
 A list of all Discord.Net entities, what they can be cast to and what their properties are.
 
-> [!IMPORTANT]
+> [!NOTE]
 > All interfaces have the same inheritance tree for both `Socket` and `Rest` entities.
 > Entities with that have been marked red are exclusive to the project they source from.
 
@@ -53,8 +53,8 @@ exist under a category.
 
 ![IMessageChart](images/IMessage.png)
 
-* A **Rest Followup Message ([RestFollowupMessage]) is a message returned by followup on on an interaction.
-* A **Rest Interaction Message ([RestInteractionMessage]) is a message returned by the interactions' original response.
+* A **Rest Followup Message** ([RestFollowupMessage]) is a message returned by followup on on an interaction.
+* A **Rest Interaction Message** ([RestInteractionMessage]) is a message returned by the interactions' original response.
 * A **Rest User Message** ([RestUserMessage]) is a message sent over rest, can be any of the above.
 * An **User Message** ([IUserMessage]) is a message sent by a user.
 * A **System Message** ([ISystemMessage]) is a message sent by Discord itself.
@@ -94,13 +94,13 @@ exist under a category.
 * An **Autocomplete Interaction** ([IAutocompleteinteraction]) is an interaction that has been automatically completed.
 * An **Interaction** ([IDiscordInteraction]) is any of the above.
 
-[ISlashCommandInteraction] xref: Discord.ISlashCommandInteraction
-[IMessageCommandInteraction] xref: Discord.IMessageCommandInteraction
-[IUserCommandInteraction] xref: Discord.IUserCommandInteraction
-[IApplicationCommandInteraction] xref: Discord.IApplicationCommandInteraction
-[IMessageComponent] xref: Discord.IMessageComponent
-[IAutocompleteinteraction] xref: Discord.IAutocompleteInteraction
-[IDiscordInteraction] xref: Discord.IDiscordInteraction
+[ISlashCommandInteraction]: xref: Discord.ISlashCommandInteraction
+[IMessageCommandInteraction]: xref: Discord.IMessageCommandInteraction
+[IUserCommandInteraction]: xref: Discord.IUserCommandInteraction
+[IApplicationCommandInteraction]: xref: Discord.IApplicationCommandInteraction
+[IMessageComponent]: xref: Discord.IMessageComponent
+[IAutocompleteinteraction]: xref: Discord.IAutocompleteInteraction
+[IDiscordInteraction]: xref: Discord.IDiscordInteraction
 
 ## Other types:
 

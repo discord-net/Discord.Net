@@ -1,6 +1,5 @@
 using Discord;
 using Discord.Interactions;
-using InteractionFramework.Attributes;
 using System.Threading.Tasks;
 
 namespace InteractionFramework.Modules
