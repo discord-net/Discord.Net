@@ -30,9 +30,9 @@ A list of all Discord.Net entities, what they can be cast to and what their prop
 	- This can be any channels that may exist in a guild.
 * A **Voice Channel** ([IVoiceChannel]) is a voice channel in a guild.
 * A **Stage Channel** ([IStageChannel]) is a stage channel in a guild.
-* A **Category Channel** ([ICategoryChannel]) (2.0+) is a category that
+* A **Category Channel** ([ICategoryChannel]) is a category that
 holds one or more sub-channels.
-* A **Nested Channel** ([INestedChannel]) (2.0+) is a channel that can
+* A **Nested Channel** ([INestedChannel]) is a channel that can
 exist under a category.
 
 [INestedChannel]: xref:Discord.INestedChannel
@@ -86,6 +86,22 @@ exist under a category.
 
 ![IInteractionChart](images/IInteraction.png)
 
+* A **Slash command** ([ISlashCommandInteraction]) is an application command executed in the text box, with provided parameters.
+* A **Message Command** ([IMessageCommandInteraction]) is an application command targetting a message.
+* An **User Command** ([IUserCommandInteraction]) is an application command targetting a user.
+* An **Application Command** ([IApplicationCommandInteraction]) is any of the above.
+* A **Message component** ([IMessageComponent]) is the interaction of a button being clicked/dropdown option(s) entered.
+* An **Autocomplete Interaction** ([IAutocompleteinteraction]) is an interaction that has been automatically completed.
+* An **Interaction** ([IDiscordInteraction]) is any of the above.
+
+[ISlashCommandInteraction] xref: Discord.ISlashCommandInteraction
+[IMessageCommandInteraction] xref: Discord.IMessageCommandInteraction
+[IUserCommandInteraction] xref: Discord.IUserCommandInteraction
+[IApplicationCommandInteraction] xref: Discord.IApplicationCommandInteraction
+[IMessageComponent] xref: Discord.IMessageComponent
+[IAutocompleteinteraction] xref: Discord.IAutocompleteInteraction
+[IDiscordInteraction] xref: Discord.IDiscordInteraction
+
 ## Other types:
 
 ### Emoji
@@ -97,7 +113,6 @@ exist under a category.
 
 [Emote]: xref:Discord.Emote
 [Emoji]: xref:Discord.Emoji
-
 
 ### Stickers
 
