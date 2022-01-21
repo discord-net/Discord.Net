@@ -1,10 +1,11 @@
-using System.Threading.Tasks;
 using Discord.Interactions;
+using Discord.WebSocket;
+using System.Threading.Tasks;
 
 namespace ShardedClient.Modules
 {
     // A display of portability, which shows how minimal the difference between the 2 frameworks is.
-    public class PublicModule : InteractionModuleBase<ShardedInteractionContext<SocketSlashCommand>>
+    public class InteractionModule : InteractionModuleBase<ShardedInteractionContext<SocketSlashCommand>>
     {
         [SlashCommand("info", "Information about this shard.")]
         public async Task InfoAsync()

@@ -1,11 +1,12 @@
+using Discord;
+using Discord.Commands;
+using Discord.Interactions;
+using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
+using ShardedClient.Services;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ShardedClient.Services;
-using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ShardedClient
 {
@@ -44,6 +45,7 @@ namespace ShardedClient
                 client.ShardReady += ReadyAsync;
                 client.Log += LogAsync;
 
+                await services.GetRequiredService<InteractionHandlingService>().InitializeAsync();
                 await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
 
                 // Tokens should be considered secret data, and never hard-coded.

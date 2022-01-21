@@ -1,6 +1,6 @@
+using JetBrains.Annotations;
 using System;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 
 namespace Discord.Net.Examples.Core.Entities.Channels
 {
@@ -11,8 +11,10 @@ namespace Discord.Net.Examples.Core.Entities.Channels
 
         public async Task MuteRoleAsync(IRole role, IGuildChannel channel)
         {
-            if (role == null) throw new ArgumentNullException(nameof(role));
-            if (channel == null) throw new ArgumentNullException(nameof(channel));
+            if (role == null)
+                throw new ArgumentNullException(nameof(role));
+            if (channel == null)
+                throw new ArgumentNullException(nameof(channel));
 
             // Fetches the previous overwrite and bail if one is found
             var previousOverwrite = channel.GetPermissionOverwrite(role);
@@ -29,8 +31,10 @@ namespace Discord.Net.Examples.Core.Entities.Channels
 
         public async Task MuteUserAsync(IGuildUser user, IGuildChannel channel)
         {
-            if (user == null) throw new ArgumentNullException(nameof(user));
-            if (channel == null) throw new ArgumentNullException(nameof(channel));
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+            if (channel == null)
+                throw new ArgumentNullException(nameof(channel));
 
             // Fetches the previous overwrite and bail if one is found
             var previousOverwrite = channel.GetPermissionOverwrite(user);

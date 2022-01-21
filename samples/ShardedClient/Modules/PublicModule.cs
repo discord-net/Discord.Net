@@ -1,5 +1,5 @@
-using System.Threading.Tasks;
 using Discord.Commands;
+using System.Threading.Tasks;
 
 namespace ShardedClient.Modules
 {

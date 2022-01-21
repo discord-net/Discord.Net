@@ -1,10 +1,10 @@
-using System;
-using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace TextCommandFramework.Services
 {
@@ -36,21 +36,24 @@ namespace TextCommandFramework.Services
         public async Task MessageReceivedAsync(SocketMessage rawMessage)
         {
             // Ignore system messages, or messages from other bots
-            if (!(rawMessage is SocketUserMessage message)) return;
-            if (message.Source != MessageSource.User) return;
+            if (!(rawMessage is SocketUserMessage message))
+                return;
+            if (message.Source != MessageSource.User)
+                return;
 
             // This value holds the offset where the prefix ends
             var argPos = 0;
             // Perform prefix check. You may want to replace this with
             // (!message.HasCharPrefix('!', ref argPos))
             // for a more traditional command format like !help.
-            if (!message.HasMentionPrefix(_discord.CurrentUser, ref argPos)) return;
+            if (!message.HasMentionPrefix(_discord.CurrentUser, ref argPos))
+                return;
 
             var context = new SocketCommandContext(_discord, message);
             // Perform the execution of the command. In this method,
             // the command service will perform precondition and parsing check
             // then execute the command if one is matched.
-            await _commands.ExecuteAsync(context, argPos, _services); 
+            await _commands.ExecuteAsync(context, argPos, _services);
             // Note that normally a result will be returned by this format, but here
             // we will handle the result in CommandExecutedAsync,
         }

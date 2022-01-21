@@ -1,8 +1,8 @@
+using JetBrains.Annotations;
 using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 
 namespace Discord.Net.Examples.Core.Entities.Channels
 {
@@ -90,7 +90,7 @@ namespace Discord.Net.Examples.Core.Entities.Channels
             #region SendFileAsync.FilePath.EmbeddedImage
 
             await channel.SendFileAsync("b1nzy.jpg",
-                embed: new EmbedBuilder {ImageUrl = "attachment://b1nzy.jpg"}.Build());
+                embed: new EmbedBuilder { ImageUrl = "attachment://b1nzy.jpg" }.Build());
 
             #endregion
 
@@ -99,13 +99,14 @@ namespace Discord.Net.Examples.Core.Entities.Channels
 
             using (var b1nzyStream = await httpClient.GetStreamAsync("https://example.com/b1nzy"))
                 await channel.SendFileAsync(b1nzyStream, "b1nzy.jpg",
-                    embed: new EmbedBuilder {ImageUrl = "attachment://b1nzy.jpg"}.Build());
+                    embed: new EmbedBuilder { ImageUrl = "attachment://b1nzy.jpg" }.Build());
 
             #endregion
 
             #region EnterTypingState
 
-            using (channel.EnterTypingState()) await LongRunningAsync();
+            using (channel.EnterTypingState())
+                await LongRunningAsync();
 
             #endregion
         }

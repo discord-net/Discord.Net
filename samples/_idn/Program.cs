@@ -1,17 +1,17 @@
+using Discord;
+using Discord.WebSocket;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
-using Discord;
-using Discord.WebSocket;
-using System.Collections.Concurrent;
-using System.Threading;
 using System.Text;
-using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Idn
 {

@@ -1,8 +1,8 @@
+using Discord.WebSocket;
+using JetBrains.Annotations;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.WebSocket;
-using JetBrains.Annotations;
 
 namespace Discord.Net.Examples.WebSocket
 {
@@ -74,7 +74,7 @@ namespace Discord.Net.Examples.WebSocket
 
         #region MessageReceived
 
-        private readonly ulong[] _targetUserIds = {168693960628371456, 53905483156684800};
+        private readonly ulong[] _targetUserIds = { 168693960628371456, 53905483156684800 };
 
         public void HookMessageReceived(BaseSocketClient client)
             => client.MessageReceived += HandleMessageReceived;
@@ -82,9 +82,11 @@ namespace Discord.Net.Examples.WebSocket
         public Task HandleMessageReceived(SocketMessage message)
         {
             // check if the message is a user message as opposed to a system message (e.g. Clyde, pins, etc.)
-            if (!(message is SocketUserMessage userMessage)) return Task.CompletedTask;
+            if (!(message is SocketUserMessage userMessage))
+                return Task.CompletedTask;
             // check if the message origin is a guild message channel
-            if (!(userMessage.Channel is SocketTextChannel textChannel)) return Task.CompletedTask;
+            if (!(userMessage.Channel is SocketTextChannel textChannel))
+                return Task.CompletedTask;
             // check if the target user was mentioned
             var targetUsers = userMessage.MentionedUsers.Where(x => _targetUserIds.Contains(x.Id));
             foreach (var targetUser in targetUsers)
@@ -103,7 +105,8 @@ namespace Discord.Net.Examples.WebSocket
         public async Task HandleMessageDelete(Cacheable<IMessage, ulong> cachedMessage, Cacheable<IMessageChannel, ulong> cachedChannel)
         {
             // check if the message exists in cache; if not, we cannot report what was removed
-            if (!cachedMessage.HasValue) return;
+            if (!cachedMessage.HasValue)
+                return;
             // gets or downloads the channel if it's not in the cache
             IMessageChannel channel = await cachedChannel.GetOrDownloadAsync();
             var message = cachedMessage.Value;

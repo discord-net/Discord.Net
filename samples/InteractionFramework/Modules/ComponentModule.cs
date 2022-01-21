@@ -1,8 +1,6 @@
-using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using InteractionFramework.Attributes;
-using System;
 using System.Threading.Tasks;
 
 namespace InteractionFramework
@@ -17,3 +15,4 @@ namespace InteractionFramework
         public async Task ClickButtonAsync(string userId)
             => await RespondAsync(text: ":thumbsup: Clicked!");
     }
+}

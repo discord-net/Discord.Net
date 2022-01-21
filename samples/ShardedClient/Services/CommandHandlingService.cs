@@ -1,10 +1,10 @@
-using System;
-using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace ShardedClient.Services
 {
@@ -33,7 +33,7 @@ namespace ShardedClient.Services
         public async Task MessageReceivedAsync(SocketMessage rawMessage)
         {
             // Ignore system messages, or messages from other bots
-            if (!(rawMessage is SocketUserMessage message))
+            if (rawMessage is not SocketUserMessage message)
                 return;
             if (message.Source != MessageSource.User)
                 return;
@@ -59,7 +59,7 @@ namespace ShardedClient.Services
                 return;
 
             // the command failed, let's notify the user that something happened.
-            await context.Channel.SendMessageAsync($"error: {result.ToString()}");
+            await context.Channel.SendMessageAsync($"error: {result}");
         }
 
         private Task LogAsync(LogMessage log)

@@ -1,7 +1,7 @@
-using System.IO;
-using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using System.IO;
+using System.Threading.Tasks;
 using TextCommandFramework.Services;
 
 namespace TextCommandFramework.Modules

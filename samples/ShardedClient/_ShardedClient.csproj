@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Discord.Net.Commands\Discord.Net.Commands.csproj" />
+    <ProjectReference Include="..\..\src\Discord.Net.Interactions\Discord.Net.Interactions.csproj" />
     <ProjectReference Include="..\..\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" />
   </ItemGroup>
 

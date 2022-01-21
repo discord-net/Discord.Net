@@ -1,11 +1,6 @@
 using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 using InteractionFramework.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace InteractionFramework.Modules
@@ -66,7 +61,7 @@ namespace InteractionFramework.Modules
 
         // Message Commands can only have one parameter, which must be a type of SocketMessage
         [MessageCommand("Delete")]
-        [RequireOwner]
+        [Attributes.RequireOwner]
         public async Task DeleteMesage(IMessage message)
         {
             await message.DeleteAsync();

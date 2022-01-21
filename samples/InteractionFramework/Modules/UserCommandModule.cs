@@ -1,11 +1,10 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using System;
 using System.Threading.Tasks;
 
 namespace InteractionFramework.Modules
-{ 
+{
     // A transient module for executing commands. This module will NOT keep any information after the command is executed.
     class UserCommandModule : InteractionModuleBase<SocketInteractionContext<SocketUserCommand>>
     {

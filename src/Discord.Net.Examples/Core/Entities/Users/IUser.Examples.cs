@@ -1,7 +1,7 @@
+using JetBrains.Annotations;
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 
 namespace Discord.Net.Examples.Core.Entities.Users
 {
