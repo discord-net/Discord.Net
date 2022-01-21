@@ -18,11 +18,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Webhook", "src\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{BB59D5B5-E7B0-4BF4-8F82-D14431B2799B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "01_basic_ping_bot", "samples\01_basic_ping_bot\01_basic_ping_bot.csproj", "{F2FF84FB-F6AD-47E5-9EE5-18206CAE136E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Basic_Ping_Bot", "samples\BasicPingBot\_BasicPingBot.csproj", "{F2FF84FB-F6AD-47E5-9EE5-18206CAE136E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "02_commands_framework", "samples\02_commands_framework\02_commands_framework.csproj", "{4E1F1F40-B1DD-40C9-A4B1-A2046A4C9C76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Text_Command_Framework", "samples\TextCommandFramework\_TextCommandFramework.csproj", "{4E1F1F40-B1DD-40C9-A4B1-A2046A4C9C76}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "03_sharded_client", "samples\03_sharded_client\03_sharded_client.csproj", "{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharded_Client", "samples\ShardedClient\_ShardedClient.csproj", "{9B4C4AFB-3D15-44C6-9E36-12ED625AAA26}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Interaction_Framework", "samples\InteractionFramework\_InteractionFramework.csproj", "{A23E46D2-1610-4AE5-820F-422D34810887}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webhook_Client", "samples\WebhookClient\_WebhookClient.csproj", "{A23E46D2-1610-4AE5-820F-422D34810887}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Tests.Unit", "test\Discord.Net.Tests.Unit\Discord.Net.Tests.Unit.csproj", "{DBF8B16E-5967-4480-8EDE-15D98A0DF0C4}"
 EndProject
@@ -34,11 +38,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Analyzers.Tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Examples", "src\Discord.Net.Examples\Discord.Net.Examples.csproj", "{47820065-3CFB-401C-ACEA-862BD564A404}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "idn", "samples\idn\idn.csproj", "{4A03840B-9EBE-47E3-89AB-E0914DF21AFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDN", "samples\idn\_idn.csproj", "{4A03840B-9EBE-47E3-89AB-E0914DF21AFB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Interactions", "src\Discord.Net.Interactions\Discord.Net.Interactions.csproj", "{137DB209-B357-4EE8-A6EE-4B6127F6DEE9}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "04_interactions_framework", "samples\04_interactions_framework\04_interactions_framework.csproj", "{A23E46D2-1610-4AE5-820F-422D34810887}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Analyzers", "src\Discord.Net.Analyzers\Discord.Net.Analyzers.csproj", "{24C231FD-8CF3-444A-9E7C-45C18BAD4A0D}"
 EndProject
