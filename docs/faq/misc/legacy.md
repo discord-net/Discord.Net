@@ -24,6 +24,6 @@ Visit the repo's [release tag] to see the latest public pre-release.
 
 The `DependencyMap` has been replaced with Microsoft's
 [DependencyInjection] Abstractions. An example usage can be seen
-[here](https://github.com/foxbot/DiscordBotBase/blob/csharp/src/DiscordBot/Program.cs#L36).
+[here](https://github.com/Discord-Net-Labs/Discord.Net-Labs/blob/release/3.x/samples/InteractionFramework/Program.cs#L66).
 
 [DependencyInjection]: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection

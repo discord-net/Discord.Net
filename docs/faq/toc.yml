@@ -16,7 +16,5 @@
       topicUid: FAQ.Commands.Interactions
     - name: Dependency Injection
       topicUid: FAQ.Commands.DI
-- name: Glossary
-  topicUid: FAQ.Glossary
 - name: Legacy or Upgrade
   topicUid: FAQ.Legacy
