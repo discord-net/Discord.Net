@@ -7,7 +7,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents a thread user received over the REST api.
     /// </summary>
-    public class RestThreadUser : RestEntity<ulong>, IThreadUser
+    public class RestThreadUser : RestEntity<ulong>, IThreadUser, IMentionable
     {
         /// <inheritdoc />
         public IThreadChannel Thread { get; }
@@ -19,6 +19,9 @@ namespace Discord.Rest
         ///     Gets the guild this user is in.
         /// </summary>
         public IGuild Guild { get; }
+
+        /// <inheritdoc />
+        public string Mention => MentionUtils.MentionUser(Id);
 
         internal RestThreadUser(BaseDiscordClient discord, IGuild guild, IThreadChannel channel, ulong id)
             : base(discord, id)
