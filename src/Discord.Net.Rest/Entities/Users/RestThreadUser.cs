@@ -9,18 +9,16 @@ namespace Discord.Rest
     /// </summary>
     public class RestThreadUser : RestEntity<ulong>, IThreadUser
     {
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public IThreadChannel Thread { get; }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public DateTimeOffset ThreadJoinedAt { get; private set; }
 
-        /// <summary>
-        ///     Gets the guild this user is in.
-        /// </summary>
+        /// <inheritdoc/>
         public IGuild Guild { get; }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public string Mention => MentionUtils.MentionUser(Id);
 
         internal RestThreadUser(BaseDiscordClient discord, IGuild guild, IThreadChannel channel, ulong id)

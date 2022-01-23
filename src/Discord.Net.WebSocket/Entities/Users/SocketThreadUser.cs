@@ -179,17 +179,20 @@ namespace Discord.WebSocket
         /// <inheritdoc/>
         public Task RemoveTimeOutAsync(RequestOptions options = null) => GuildUser.RemoveTimeOutAsync(options);
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         IThreadChannel IThreadUser.Thread => Thread;
 
         /// <inheritdoc/>
-        GuildPermissions IGuildUser.GuildPermissions => GuildUser.GuildPermissions;
+        IGuild IThreadUser.Guild => Guild;
 
         /// <inheritdoc/>
         IGuild IGuildUser.Guild => Guild;
 
         /// <inheritdoc/>
         ulong IGuildUser.GuildId => Guild.Id;
+
+        /// <inheritdoc/>
+        GuildPermissions IGuildUser.GuildPermissions => GuildUser.GuildPermissions;
 
         /// <inheritdoc/>
         IReadOnlyCollection<ulong> IGuildUser.RoleIds => GuildUser.Roles.Select(x => x.Id).ToImmutableArray();

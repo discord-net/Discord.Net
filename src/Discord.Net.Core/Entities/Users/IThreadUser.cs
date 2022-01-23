@@ -2,6 +2,9 @@ using System;
 
 namespace Discord
 {
+    /// <summary>
+    ///     Represents a Discord thread user.
+    /// </summary>
     public interface IThreadUser : IMentionable
     {
         /// <summary>
@@ -14,7 +17,9 @@ namespace Discord
         /// </summary>
         DateTimeOffset ThreadJoinedAt { get; }
 
-        /// <inheritdoc />
-        string Mention { get; }
+        /// <summary>
+        ///     Gets the guild this thread was created in.
+        /// </summary>
+        IGuild Guild { get; }
     }
 }
