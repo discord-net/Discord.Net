@@ -7,17 +7,13 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents a thread user received over the REST api.
     /// </summary>
-    public class RestThreadUser : RestEntity<ulong>
+    public class RestThreadUser : RestEntity<ulong>, IThreadUser
     {
-        /// <summary>
-        ///     Gets the <see cref="RestThreadChannel"/> this user is in.
-        /// </summary>
+        /// <inheritdoc />
         public IThreadChannel Thread { get; }
 
-        /// <summary>
-        ///     Gets the timestamp for when this user joined this thread.
-        /// </summary>
-        public DateTimeOffset JoinedAt { get; private set; }
+        /// <inheritdoc />
+        public DateTimeOffset ThreadJoinedAt { get; private set; }
 
         /// <summary>
         ///     Gets the guild this user is in.
@@ -40,7 +36,7 @@ namespace Discord.Rest
 
         internal void Update(Model model)
         {
-            JoinedAt = model.JoinTimestamp;
+            ThreadJoinedAt = model.JoinTimestamp;
         }
 
         /// <summary>

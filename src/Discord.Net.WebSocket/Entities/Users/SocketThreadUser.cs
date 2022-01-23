@@ -10,16 +10,14 @@ namespace Discord.WebSocket
     /// <summary>
     ///     Represents a thread user received over the gateway.
     /// </summary>
-    public class SocketThreadUser : SocketUser, IGuildUser
+    public class SocketThreadUser : SocketUser, IThreadUser, IGuildUser
     {
         /// <summary>
         ///     Gets the <see cref="SocketThreadChannel"/> this user is in.
         /// </summary>
         public SocketThreadChannel Thread { get; private set; }
 
-        /// <summary>
-        ///     Gets the timestamp for when this user joined this thread.
-        /// </summary>
+        /// <inheritdoc/>
         public DateTimeOffset ThreadJoinedAt { get; private set; }
 
         /// <summary>
@@ -180,6 +178,10 @@ namespace Discord.WebSocket
 
         /// <inheritdoc/>
         public Task RemoveTimeOutAsync(RequestOptions options = null) => GuildUser.RemoveTimeOutAsync(options);
+
+        /// <inheritdoc />
+        IThreadChannel IThreadUser.Thread => Thread;
+
         /// <inheritdoc/>
         GuildPermissions IGuildUser.GuildPermissions => GuildUser.GuildPermissions;
 
