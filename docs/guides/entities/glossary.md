@@ -94,13 +94,13 @@ exist under a category.
 * An **Autocomplete Interaction** ([IAutocompleteinteraction]) is an interaction that has been automatically completed.
 * An **Interaction** ([IDiscordInteraction]) is any of the above.
 
-[ISlashCommandInteraction]: xref: Discord.ISlashCommandInteraction
-[IMessageCommandInteraction]: xref: Discord.IMessageCommandInteraction
-[IUserCommandInteraction]: xref: Discord.IUserCommandInteraction
-[IApplicationCommandInteraction]: xref: Discord.IApplicationCommandInteraction
-[IMessageComponent]: xref: Discord.IMessageComponent
-[IAutocompleteinteraction]: xref: Discord.IAutocompleteInteraction
-[IDiscordInteraction]: xref: Discord.IDiscordInteraction
+[ISlashCommandInteraction]: xref:Discord.ISlashCommandInteraction
+[IMessageCommandInteraction]: xref:Discord.IMessageCommandInteraction
+[IUserCommandInteraction]: xref:Discord.IUserCommandInteraction
+[IApplicationCommandInteraction]: xref:Discord.IApplicationCommandInteraction
+[IMessageComponent]: xref:Discord.IMessageComponent
+[IAutocompleteinteraction]: xref:Discord.IAutocompleteInteraction
+[IDiscordInteraction]: xref:Discord.IDiscordInteraction
 
 ## Other types:
 
