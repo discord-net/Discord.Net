@@ -2,7 +2,7 @@ using System;
 
 namespace Discord
 {
-    public interface IThreadUser
+    public interface IThreadUser : IMentionable
     {
         /// <summary>
         ///     Gets the <see cref="IThreadChannel"/> this user is in.
@@ -13,5 +13,8 @@ namespace Discord
         ///     Gets the timestamp for when this user joined this thread.
         /// </summary>
         DateTimeOffset ThreadJoinedAt { get; }
+
+        /// <inheritdoc />
+        string Mention { get; }
     }
 }

@@ -7,7 +7,7 @@ namespace Discord.Rest
     /// <summary>
     ///     Represents a thread user received over the REST api.
     /// </summary>
-    public class RestThreadUser : RestEntity<ulong>, IThreadUser, IMentionable
+    public class RestThreadUser : RestEntity<ulong>, IThreadUser
     {
         /// <inheritdoc />
         public IThreadChannel Thread { get; }
