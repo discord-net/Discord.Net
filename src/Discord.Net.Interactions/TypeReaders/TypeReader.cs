@@ -9,7 +9,7 @@ namespace Discord.Interactions
     /// <remarks>
     ///     <see cref="TypeReader"/>s are mainly used to parse message component values. For interfacing with Slash Command parameters use <see cref="TypeConverter"/>s instead.
     /// </remarks>
-    public abstract class TypeReader<T> : ITypeHandler
+    public abstract class TypeReader : ITypeHandler
     {
         /// <summary>
         ///     Will be used to search for alternative TypeReaders whenever the Command Service encounters an unknown parameter type.
@@ -25,21 +25,19 @@ namespace Discord.Interactions
         /// <param name="input">Raw string input value.</param>
         /// <param name="services">Service provider that will be used to initialize the command module.</param>
         /// <returns>The result of the read process.</returns>
-        public abstract Task<TypeConverterResult> ReadAsync(IInteractionContext context, T input, IServiceProvider services);
+        public abstract Task<TypeConverterResult> ReadAsync(IInteractionContext context, object input, IServiceProvider services);
 
         /// <summary>
         ///     Will be used to manipulate the outgoing command option, before the command gets registered to Discord.
         /// </summary>
-        public virtual T Serialize(object value) => default;
+        public virtual string Serialize(object value) => null;
     }
 
     /// <inheritdoc/>
-    public abstract class TypeReader<TGeneric, T> : TypeReader<T>
+    public abstract class TypeReader<T> : TypeReader
     {
         /// <inheritdoc/>
         public sealed override bool CanConvertTo(Type type) =>
             typeof(T).IsAssignableFrom(type);
     }
-
-    public abstract class TypeReader : TypeReader<object> { }
 }

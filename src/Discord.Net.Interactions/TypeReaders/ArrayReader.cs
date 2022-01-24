@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Discord.Interactions
 {
-    internal class ArrayReader<T> : TypeReader<T> where T : IEnumerable
+    internal class ArrayReader<T> : TypeReader where T : IEnumerable
     {
         private readonly TypeReader _baseReader;
 
@@ -17,6 +17,10 @@ namespace Discord.Interactions
 
             interactionService.GetTypeReader(typeof)
         }
+
+        public override TypeReaderTarget[] TypeReaderTargets { get; }
+
+        public override bool CanConvertTo(Type type) => throw new NotImplementedException();
 
         public override Task<TypeConverterResult> ReadAsync(IInteractionContext context, object input, IServiceProvider services)
         {

@@ -67,7 +67,7 @@ namespace Discord.Interactions
         private readonly CommandMap<ModalCommandInfo> _modalCommandMap;
         private readonly HashSet<ModuleInfo> _moduleDefs;
         private readonly TypeMap<TypeConverter> _typeConverterMap;
-        private readonly TypeMap<TypeReader> _typeReaderMap;
+        private readonly ConcurrentDictionary<TypeReaderTarget, TypeMap<TypeReader>> _typeReaderMaps;
         private readonly ConcurrentDictionary<Type, IAutocompleteHandler> _autocompleteHandlers = new();
         private readonly ConcurrentDictionary<Type, ModalInfo> _modalInfos = new();
         private readonly SemaphoreSlim _lock;
@@ -194,7 +194,7 @@ namespace Discord.Interactions
                 [typeof(Nullable<>)] = typeof(NullableConverter<>),
             });
 
-            _typeReaderMap = new TypeMap<TypeReader>(this);
+            _typeReaderMaps = new ConcurrentDictionary<TypeReaderTarget, TypeMap<TypeReader>>();
         }
 
         /// <summary>
@@ -805,24 +805,39 @@ namespace Discord.Interactions
         public void AddGenericTypeConverter(Type targetType, Type converterType) =>
             _typeConverterMap.AddGeneric(targetType, converterType);
 
-        internal TypeReader GetTypeReader(Type type, IServiceProvider services = null)
-            => _typeReaderMap.Get(type, services);
+        internal IEnumerable<TypeReader> GetTypeReader(Type type, TypeReaderTarget targets, IServiceProvider services = null)
+        {
+            var flattenedTargets = targets.GetFlags();
+
+            foreach (var target in flattenedTargets)
+                yield return _typeReaderMaps[target].Get(type, services);
+        }
 
         /// <summary>
         ///     Add a concrete type <see cref="TypeReader"/>.
         /// </summary>
         /// <typeparam name="T">Primary target <see cref="Type"/> of the <see cref="TypeReader"/>.</typeparam>
         /// <param name="reader">The <see cref="TypeReader"/> instance.</param>
-        public void AddTypeReader<T>(TypeReader reader) =>
-            _typeReaderMap.AddConcrete<T>(reader);
+        public void AddTypeReader<T>(TypeReader reader, TypeReaderTarget targets)
+        {
+            var flattenedTargets = targets.GetFlags();
+
+            foreach (var target in flattenedTargets)
+                _typeReaderMaps[target].AddConcrete<T>(reader);
+        }
 
         /// <summary>
         ///     Add a concrete type <see cref="TypeReader"/>.
         /// </summary>
         /// <param name="type">Primary target <see cref="Type"/> of the <see cref="TypeReader"/>.</param>
         /// <param name="reader">The <see cref="TypeReader"/> instance.</param>
-        public void AddTypeReader(Type type, TypeReader converter) =>
-            _typeReaderMap.AddConcrete(type, converter);
+        public void AddTypeReader(Type type, TypeReader reader, TypeReaderTarget targets)
+        {
+            var flattenedTargets = targets.GetFlags();
+
+            foreach (var target in flattenedTargets)
+                _typeReaderMaps[target].AddConcrete(type, reader);
+        }
 
         /// <summary>
         ///     Add a generic type <see cref="TypeReader{T}"/>.
@@ -830,19 +845,36 @@ namespace Discord.Interactions
         /// <typeparam name="T">Generic Type constraint of the <see cref="Type"/> of the <see cref="TypeReader{T}"/>.</typeparam>
         /// <param name="readerType">Type of the <see cref="TypeReader{T}"/>.</param>
 
-        public void AddGenericTypeReader<T>(Type readerType) =>
-            _typeReaderMap.AddGeneric<T>(readerType);
+        public void AddGenericTypeReader<T>(Type readerType, TypeReaderTarget targets)
+        {
+            var flattenedTargets = targets.GetFlags();
+
+            foreach (var target in flattenedTargets)
+                _typeReaderMaps[target].AddGeneric<T>(readerType);
+        }
 
         /// <summary>
         ///     Add a generic type <see cref="TypeReader{T}"/>.
         /// </summary>
         /// <param name="targetType">Generic Type constraint of the <see cref="Type"/> of the <see cref="TypeReader{T}"/>.</param>
         /// <param name="readerType">Type of the <see cref="TypeReader{T}"/>.</param>
-        public void AddGenericTypeReader(Type targetType, Type readerType) =>
-            _typeConverterMap.AddGeneric(targetType, readerType);
+        public void AddGenericTypeReader(Type targetType, Type readerType, TypeReaderTarget targets)
+        {
+            var flattenedTargets = targets.GetFlags();
 
-        public string SerializeWithTypeReader<T>(object obj, IServiceProvider services = null) =>
-            _typeReaderMap.Get(typeof(T), services)?.Serialize(obj);
+            foreach(var target in flattenedTargets)
+                _typeReaderMaps[target].AddGeneric(targetType, readerType);
+        }
+
+        public string SerializeWithTypeReader<T>(object obj, TypeReaderTarget targets, IServiceProvider services = null)
+        {
+            var flattenedTargets = targets.GetFlags();
+
+            if (flattenedTargets.Count() != 1)
+                throw new ArgumentException("Cannot serialize object for multiple targets.", nameof(targets));
+
+            return _typeReaderMaps[flattenedTargets.First()].Get(typeof(T), services)?.Serialize(obj);
+        }
 
         internal IAutocompleteHandler GetAutocompleteHandler(Type autocompleteHandlerType, IServiceProvider services = null)
         {
