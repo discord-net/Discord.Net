@@ -117,7 +117,7 @@ exist under a category.
 ### Stickers
 
 * A **Sticker** ([ISticker]) is a standard Discord sticker.
-* A **Custom Sticker ([ICustomSticker]) is a Guild-unique sticker.
+* A **Custom Sticker** ([ICustomSticker]) is a Guild-unique sticker.
 
 [ISticker]: xref:Discord.ISticker
 [ICustomSticker]: xref:Discord.ICustomSticker
