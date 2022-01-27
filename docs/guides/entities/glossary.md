@@ -54,8 +54,8 @@ exist under a category.
 ![IMessageChart](images/IMessage.png)
 
 * A **Rest Followup Message** ([RestFollowupMessage]) is a message returned by followup on on an interaction.
-* A **Rest Interaction Message** ([RestInteractionMessage]) is a message returned by the interactions' original response.
-* A **Rest User Message** ([RestUserMessage]) is a message sent over rest, can be any of the above.
+* A **Rest Interaction Message** ([RestInteractionMessage]) is a message returned by the interaction's original response.
+* A **Rest User Message** ([RestUserMessage]) is a message sent over rest; it can be any of the above.
 * An **User Message** ([IUserMessage]) is a message sent by a user.
 * A **System Message** ([ISystemMessage]) is a message sent by Discord itself.
 * A **Message** ([IMessage]) can be any of the above.

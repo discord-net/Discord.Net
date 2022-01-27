@@ -6,7 +6,7 @@ using Discord.WebSocket;
 
 namespace BasicBot
 {
-    // This is a minimal, bare-bones example of using Discord.Net
+    // This is a minimal, bare-bones example of using Discord.Net.
     //
     // If writing a bot with commands/interactions, we recommend using the Discord.Net.Commands/Discord.Net.Interactions
     // framework, rather than handling them yourself, like we do in this sample.

@@ -10,7 +10,7 @@ Casting only works for types that inherit the base type that you want to unbox f
 `IUser` cannot be cast to `IMessage`.
 
 > [!NOTE]
-> Interfaces **can** be cast to other interfaces, as long as they inherit eachother.
+> Interfaces **can** be cast to other interfaces, as long as they inherit each other.
 > The same goes for reverse casting. As long as some entity can be simplified into what it inherits, your cast will pass.
 
 ## Boxing
@@ -35,7 +35,7 @@ it will become said type, and its properties can be accessed.
 [!code-csharp[Casting](samples/casting.cs)]
 
 > [!WARNING]
-> If the type you're casting to is null, a `NullReferenceException` will be thrown when its called.
+> If the type you're casting to is null, a `NullReferenceException` will be thrown when it's called.
 > This makes safety casting much more interesting to use, as it prevents this exception from being thrown.
 
 ## Safety casting

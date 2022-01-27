@@ -1,4 +1,4 @@
-// RestUser entities expose the accentcolor and banner of a user.
+// RestUser entities expose the accent color and banner of a user.
 // This being one of the few use-cases for requesting a RestUser instead of depending on the Socket counterpart.
 public static EmbedBuilder WithUserColor(this EmbedBuilder builder, IUser user)
 {

@@ -4,7 +4,7 @@ private void MyFunction(IMessage message)
     if (message is not IUserMessage userMessage)
         return;
 
-    // Because we do the above check inline (dont give the statement a body),
+    // Because we do the above check inline (don't give the statement a body),
     // the code will still declare `userMessage` as available outside of the above statement.
     Console.WriteLine(userMessage.Author);
 }
