@@ -49,7 +49,7 @@ namespace Discord.Net
         /// <param name="discordCode">The Discord status code returned.</param>
         /// <param name="reason">The reason behind the exception.</param>
         public HttpException(HttpStatusCode httpCode, IRequest request, DiscordErrorCode? discordCode = null, string reason = null, DiscordJsonError[] errors = null)
-            : base(CreateMessage(httpCode, (int?)discordCode, reason))
+            : base(CreateMessage(httpCode, (int?)discordCode, reason, errors))
         {
             HttpCode = httpCode;
             Request = request;
@@ -58,8 +58,8 @@ namespace Discord.Net
             Errors = errors?.ToImmutableArray() ?? ImmutableArray<DiscordJsonError>.Empty;
         }
 
-        private static string CreateMessage(HttpStatusCode httpCode, int? discordCode = null, string reason = null)
-        {   
+        private static string CreateMessage(HttpStatusCode httpCode, int? discordCode = null, string reason = null, DiscordJsonError[] errors = null)
+        {
             string msg;
             if (discordCode != null && discordCode != 0)
             {
@@ -75,6 +75,16 @@ namespace Discord.Net
                 else
                     msg = $"The server responded with error {(int)httpCode}: {httpCode}";
             }
+
+            if (errors?.Length > 0)
+            {
+                msg += "\nInner Errors:";
+                foreach (var error in errors)
+                    if (error.Errors?.Count > 0)
+                        foreach (var innerError in error.Errors)
+                            msg += $"\n{innerError.Code}: {innerError.Message}";
+            }
+
             return msg;
         }
     }
