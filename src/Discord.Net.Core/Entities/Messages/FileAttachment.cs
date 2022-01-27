@@ -32,6 +32,11 @@ namespace Discord
             FileName = fileName;
             Description = description;
             Stream = stream;
+            try
+            {
+                Stream.Position = 0;
+            }
+            catch { }
             IsSpoiler = isSpoiler;
         }
 
