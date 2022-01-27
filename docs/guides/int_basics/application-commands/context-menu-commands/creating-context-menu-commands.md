@@ -70,7 +70,7 @@ public async Task Client_Ready()
 
     // Let's do our global commands
     var globalUserCommand = new UserCommandBuilder();
-    globalCommand.WithName("Global User Command");
+    globalUserCommand.WithName("Global User Command");
 	var globalMessageCommand = new MessageCommandBuilder();
 	globalMessageCommand.WithName("Global Message Command");
 
@@ -89,7 +89,7 @@ public async Task Client_Ready()
         {
             globalUserCommand.Build(),
             globalMessageCommand.Build()
-        })
+        });
     }
     catch(ApplicationCommandException exception)
     {
