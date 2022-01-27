@@ -53,7 +53,7 @@ able to message.
 You may check the message channel type. Visit [Glossary] to see the
 various types of channels.
 
-[glossary]: xref:FAQ.Glossary#message-channels
+[Glossary]: xref:Guides.Entities.Glossary#channels
 
 ## How can I get the guild from a message?
 

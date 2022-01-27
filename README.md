@@ -81,3 +81,22 @@ Due to the nature of the Discord API, we will oftentimes need to add a property 
 Furthermore, while we will never break the API (outside of interface changes) on minor builds, we will occasionally need to break the ABI, by introducing parameters to a method to match changes upstream with Discord. As such, a minor version increment may require you to recompile your code, and dependencies, such as addons, may also need to be recompiled and republished on the newer version. When a binary breaking change is made, the change will be noted in the release notes.
 
 An increment of the MAJOR component indicates that breaking changes have been made to the library; consumers should check the release notes to determine what changes need to be made.
+
+## Branches
+
+### Release/X.X
+
+Release branch following Major.Minor. Upon release, patches will be pushed to these branches.
+New NuGet releases will be tagged on these branches.
+
+### Dev
+
+Development branch, available on MyGet. This branch is what pull requests are targetted to.
+
+### Feature/X
+
+Branches that target Dev, adding new features. Feel free to explore these branches and give feedback where necessary.
+
+### Docs/X
+
+Usually targets Dev. These branches are used to update documentation with either new features or existing feature rework.
