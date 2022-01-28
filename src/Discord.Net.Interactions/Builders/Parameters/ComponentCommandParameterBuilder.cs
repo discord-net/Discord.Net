@@ -4,7 +4,7 @@ namespace Discord.Interactions.Builders
 {
     public class ComponentCommandParameterBuilder : ParameterBuilder<ComponentCommandParameterInfo, ComponentCommandParameterBuilder>
     {
-        public TypeReader TypeReader { get; private set; }
+        public CompTypeConverter TypeReader { get; private set; }
         protected override ComponentCommandParameterBuilder Instance => this;
 
         public ComponentCommandParameterBuilder(ICommandBuilder command) : base(command) { }

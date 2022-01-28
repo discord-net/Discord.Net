@@ -6,20 +6,21 @@ using System.Reflection;
 
 namespace Discord.Interactions
 {
-    internal class TypeMap<T> where T : class, ITypeHandler
+    internal class TypeMap<TConverter, TData>
+        where TConverter : class, ITypeConverter<TData>
     {
-        private readonly ConcurrentDictionary<Type, T> _concretes;
+        private readonly ConcurrentDictionary<Type, TConverter> _concretes;
         private readonly ConcurrentDictionary<Type, Type> _generics;
         private readonly InteractionService _interactionService;
 
-        public TypeMap(InteractionService interactionService, IDictionary<Type, T> concretes = null, IDictionary<Type, Type> generics = null)
+        public TypeMap(InteractionService interactionService, IDictionary<Type, TConverter> concretes = null, IDictionary<Type, Type> generics = null)
         {
             _interactionService = interactionService;
             _concretes = concretes is not null ? new(concretes) : new();
             _generics = generics is not null ? new(generics) : new();
         }
 
-        internal T Get(Type type, IServiceProvider services = null)
+        internal TConverter Get(Type type, IServiceProvider services = null)
         {
             if (_concretes.TryGetValue(type, out var specific))
                 return specific;
@@ -30,7 +31,7 @@ namespace Discord.Interactions
                 services ??= EmptyServiceProvider.Instance;
 
                 var converterType = GetMostSpecific(type);
-                var converter = ReflectionUtils<T>.CreateObject(converterType.MakeGenericType(type).GetTypeInfo(), _interactionService, services);
+                var converter = ReflectionUtils<TConverter>.CreateObject(converterType.MakeGenericType(type).GetTypeInfo(), _interactionService, services);
                 _concretes[type] = converter;
                 return converter;
             }
@@ -38,13 +39,13 @@ namespace Discord.Interactions
             else if (_concretes.Any(x => x.Value.CanConvertTo(type)))
                 return _concretes.First(x => x.Value.CanConvertTo(type)).Value;
 
-            throw new ArgumentException($"No type {nameof(T)} is defined for this {type.FullName}", "type");
+            throw new ArgumentException($"No type {nameof(TConverter)} is defined for this {type.FullName}", "type");
         }
 
-        public void AddConcrete<TTarget>(T converter) =>
+        public void AddConcrete<TTarget>(TConverter converter) =>
             AddConcrete(typeof(TTarget), converter);
 
-        public void AddConcrete(Type type, T converter)
+        public void AddConcrete(Type type, TConverter converter)
         {
             if (!converter.CanConvertTo(type))
                 throw new ArgumentException($"This {converter.GetType().FullName} cannot read {type.FullName} and cannot be registered as its {nameof(TypeConverter)}");

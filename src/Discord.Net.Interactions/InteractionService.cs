@@ -66,8 +66,8 @@ namespace Discord.Interactions
         private readonly CommandMap<AutocompleteCommandInfo> _autocompleteCommandMap;
         private readonly CommandMap<ModalCommandInfo> _modalCommandMap;
         private readonly HashSet<ModuleInfo> _moduleDefs;
-        private readonly TypeMap<TypeConverter> _typeConverterMap;
-        private readonly ConcurrentDictionary<TypeReaderTarget, TypeMap<TypeReader>> _typeReaderMaps;
+        private readonly TypeMap<TypeConverter, IApplicationCommandInteractionDataOption> _typeConverterMap;
+        private readonly TypeMap<CompTypeConverter, IComponentInteractionData> _compTypeConverterMap;
         private readonly ConcurrentDictionary<Type, IAutocompleteHandler> _autocompleteHandlers = new();
         private readonly ConcurrentDictionary<Type, ModalInfo> _modalInfos = new();
         private readonly SemaphoreSlim _lock;
@@ -179,7 +179,7 @@ namespace Discord.Interactions
             _autoServiceScopes = config.AutoServiceScopes;
             _restResponseCallback = config.RestResponseCallback;
 
-            _typeConverterMap = new TypeMap<TypeConverter>(this, new Dictionary<Type, TypeConverter>
+            _typeConverterMap = new TypeMap<TypeConverter, IApplicationCommandInteractionDataOption>(this, new Dictionary<Type, TypeConverter>
             {
                 [typeof(TimeSpan)] = new TimeSpanConverter()
             }, new Dictionary<Type, Type>
@@ -194,7 +194,11 @@ namespace Discord.Interactions
                 [typeof(Nullable<>)] = typeof(NullableConverter<>),
             });
 
-            _typeReaderMaps = new ConcurrentDictionary<TypeReaderTarget, TypeMap<TypeReader>>();
+            _compTypeConverterMap = new TypeMap<CompTypeConverter, IComponentInteractionData>(this, new Dictionary<Type, CompTypeConverter>
+            {
+            }, new Dictionary<Type, Type>
+            {
+            });
         }
 
         /// <summary>
@@ -805,76 +809,44 @@ namespace Discord.Interactions
         public void AddGenericTypeConverter(Type targetType, Type converterType) =>
             _typeConverterMap.AddGeneric(targetType, converterType);
 
-        internal IEnumerable<TypeReader> GetTypeReader(Type type, TypeReaderTarget targets, IServiceProvider services = null)
-        {
-            var flattenedTargets = targets.GetFlags();
-
-            foreach (var target in flattenedTargets)
-                yield return _typeReaderMaps[target].Get(type, services);
-        }
+        internal CompTypeConverter GetComponentTypeConverter(Type type, IServiceProvider services = null) =>
+            _compTypeConverterMap.Get(type, services);
 
         /// <summary>
         ///     Add a concrete type <see cref="TypeReader"/>.
         /// </summary>
         /// <typeparam name="T">Primary target <see cref="Type"/> of the <see cref="TypeReader"/>.</typeparam>
-        /// <param name="reader">The <see cref="TypeReader"/> instance.</param>
-        public void AddTypeReader<T>(TypeReader reader, TypeReaderTarget targets)
-        {
-            var flattenedTargets = targets.GetFlags();
-
-            foreach (var target in flattenedTargets)
-                _typeReaderMaps[target].AddConcrete<T>(reader);
-        }
+        /// <param name="converter">The <see cref="TypeReader"/> instance.</param>
+        public void AddComponentTypeConverter<T>(CompTypeConverter converter) =>
+            AddComponentTypeConverter(typeof(T), converter);
 
         /// <summary>
         ///     Add a concrete type <see cref="TypeReader"/>.
         /// </summary>
         /// <param name="type">Primary target <see cref="Type"/> of the <see cref="TypeReader"/>.</param>
-        /// <param name="reader">The <see cref="TypeReader"/> instance.</param>
-        public void AddTypeReader(Type type, TypeReader reader, TypeReaderTarget targets)
-        {
-            var flattenedTargets = targets.GetFlags();
-
-            foreach (var target in flattenedTargets)
-                _typeReaderMaps[target].AddConcrete(type, reader);
-        }
+        /// <param name="converter">The <see cref="TypeReader"/> instance.</param>
+        public void AddComponentTypeConverter(Type type, CompTypeConverter converter) =>
+            _compTypeConverterMap.AddConcrete(type, converter);
 
         /// <summary>
-        ///     Add a generic type <see cref="TypeReader{T}"/>.
+        ///     Add a generic type <see cref="CompTypeConverter{T}"/>.
         /// </summary>
-        /// <typeparam name="T">Generic Type constraint of the <see cref="Type"/> of the <see cref="TypeReader{T}"/>.</typeparam>
-        /// <param name="readerType">Type of the <see cref="TypeReader{T}"/>.</param>
+        /// <typeparam name="T">Generic Type constraint of the <see cref="Type"/> of the <see cref="CompTypeConverter{T}"/>.</typeparam>
+        /// <param name="converterType">Type of the <see cref="CompTypeConverter{T}"/>.</param>
 
-        public void AddGenericTypeReader<T>(Type readerType, TypeReaderTarget targets)
-        {
-            var flattenedTargets = targets.GetFlags();
-
-            foreach (var target in flattenedTargets)
-                _typeReaderMaps[target].AddGeneric<T>(readerType);
-        }
+        public void AddGenericComponentTypeConverter<T>(Type converterType) =>
+            AddGenericComponentTypeConverter(typeof(T), converterType);
 
         /// <summary>
-        ///     Add a generic type <see cref="TypeReader{T}"/>.
+        ///     Add a generic type <see cref="CompTypeConverter{T}"/>.
         /// </summary>
-        /// <param name="targetType">Generic Type constraint of the <see cref="Type"/> of the <see cref="TypeReader{T}"/>.</param>
-        /// <param name="readerType">Type of the <see cref="TypeReader{T}"/>.</param>
-        public void AddGenericTypeReader(Type targetType, Type readerType, TypeReaderTarget targets)
-        {
-            var flattenedTargets = targets.GetFlags();
+        /// <param name="targetType">Generic Type constraint of the <see cref="Type"/> of the <see cref="CompTypeConverter{T}"/>.</param>
+        /// <param name="converterType">Type of the <see cref="CompTypeConverter{T}"/>.</param>
+        public void AddGenericComponentTypeConverter(Type targetType, Type converterType) =>
+            _compTypeConverterMap.AddGeneric(targetType, converterType);
 
-            foreach(var target in flattenedTargets)
-                _typeReaderMaps[target].AddGeneric(targetType, readerType);
-        }
-
-        public string SerializeWithTypeReader<T>(object obj, TypeReaderTarget targets, IServiceProvider services = null)
-        {
-            var flattenedTargets = targets.GetFlags();
-
-            if (flattenedTargets.Count() != 1)
-                throw new ArgumentException("Cannot serialize object for multiple targets.", nameof(targets));
-
-            return _typeReaderMaps[flattenedTargets.First()].Get(typeof(T), services)?.Serialize(obj);
-        }
+        public string SerializeWithTypeReader<T>(object obj, IServiceProvider services = null) =>
+            _compTypeConverterMap.Get(typeof(T), services).Serialize(obj);
 
         internal IAutocompleteHandler GetAutocompleteHandler(Type autocompleteHandlerType, IServiceProvider services = null)
         {

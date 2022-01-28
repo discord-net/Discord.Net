@@ -18,7 +18,7 @@ namespace Discord.Interactions
             (componentType) switch
             {
                 ComponentType.SelectMenu => TypeReaderTarget.SelectMenu,
-                _ => throw new InvalidOperationException($"{componentType} isn't supported by {nameof(TypeReader)}s.");
+                _ => throw new InvalidOperationException($"{componentType} isn't supported by {nameof(CompTypeConverter)}s.");
             };
     }
 }

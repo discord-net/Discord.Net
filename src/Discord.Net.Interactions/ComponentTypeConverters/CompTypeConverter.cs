@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 namespace Discord.Interactions
 {
     /// <summary>
-    ///     Base class for creating <see cref="TypeReader"/>s. <see cref="InteractionService"/> uses <see cref="TypeReader"/>s to parse string values into entities.
+    ///     Base class for creating <see cref="CompTypeConverter"/>s. <see cref="InteractionService"/> uses <see cref="CompTypeConverter"/>s to parse string values into entities.
     /// </summary>
     /// <remarks>
-    ///     <see cref="TypeReader"/>s are mainly used to parse message component values. For interfacing with Slash Command parameters use <see cref="TypeConverter"/>s instead.
+    ///     <see cref="CompTypeConverter"/>s are mainly used to parse message component values. For interfacing with Slash Command parameters use <see cref="TypeConverter"/>s instead.
     /// </remarks>
-    public abstract class TypeReader : ITypeHandler
+    public abstract class CompTypeConverter : ITypeConverter<IComponentInteractionData>
     {
         /// <summary>
         ///     Will be used to search for alternative TypeReaders whenever the Command Service encounters an unknown parameter type.
@@ -25,7 +25,7 @@ namespace Discord.Interactions
         /// <param name="input">Raw string input value.</param>
         /// <param name="services">Service provider that will be used to initialize the command module.</param>
         /// <returns>The result of the read process.</returns>
-        public abstract Task<TypeConverterResult> ReadAsync(IInteractionContext context, object input, IServiceProvider services);
+        public abstract Task<TypeConverterResult> ReadAsync(IInteractionContext context, IComponentInteractionData data, IServiceProvider services);
 
         /// <summary>
         ///     Will be used to manipulate the outgoing command option, before the command gets registered to Discord.
@@ -34,7 +34,7 @@ namespace Discord.Interactions
     }
 
     /// <inheritdoc/>
-    public abstract class TypeReader<T> : TypeReader
+    public abstract class CompTypeConverter<T> : CompTypeConverter
     {
         /// <inheritdoc/>
         public sealed override bool CanConvertTo(Type type) =>

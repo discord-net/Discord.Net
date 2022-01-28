@@ -11,7 +11,7 @@ namespace Discord.Interactions
         ///     Gets the <see cref="TypeReader"/> that will be used to convert a message component value into
         ///     <see cref="CommandParameterInfo.ParameterType"/>.
         /// </summary>
-        public TypeReader TypeReader { get; }
+        public CompTypeConverter TypeReader { get; }
 
         internal ComponentCommandParameterInfo(ComponentCommandParameterBuilder builder, ICommandInfo command) : base(builder, command)
         {
