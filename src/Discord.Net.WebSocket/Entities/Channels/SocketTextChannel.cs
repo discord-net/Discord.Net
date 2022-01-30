@@ -119,7 +119,8 @@ namespace Discord.WebSocket
 
             var thread = (SocketThreadChannel)Guild.AddOrUpdateChannel(Discord.State, model);
 
-            await thread.DownloadUsersAsync();
+            if(Discord.AlwaysDownloadUsers && Discord.HasGatewayIntent(GatewayIntents.GuildMembers))
+                await thread.DownloadUsersAsync();
 
             return thread;
         }
