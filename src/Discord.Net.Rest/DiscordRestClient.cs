@@ -59,10 +59,14 @@ namespace Discord.Rest
         internal override async Task OnLoginAsync(TokenType tokenType, string token)
         {
             var user = await ApiClient.GetMyUserAsync(new RequestOptions { RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
-            await GetApplicationInfoAsync(new RequestOptions { RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
             ApiClient.CurrentUserId = user.Id;
-            ApiClient.CurrentApplicationId = _applicationInfo.Id;
             base.CurrentUser = RestSelfUser.Create(this, user);
+
+            if(tokenType == TokenType.Bot)
+            {
+                await GetApplicationInfoAsync(new RequestOptions { RetryMode = RetryMode.AlwaysRetry }).ConfigureAwait(false);
+                ApiClient.CurrentApplicationId = _applicationInfo.Id;
+            }
         }
 
         internal void CreateRestSelfUser(API.User user)
