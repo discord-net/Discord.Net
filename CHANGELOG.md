@@ -1,8 +1,28 @@
 # Changelog
 
+## [3.2.1] - 2022-01-30
+
+### Added
+
+- #2055 Add IThreadUser interface (3475bd8)
+
+### Fixed
+
+- #2030 Fix logging a TaskCanceledException out of users control (82f3879)
+- #2064 Fix markdown formatting in Glossary (f525131)
+- #2066 Fix Channel Types Attribute (1917961)
+- #2071 Fix attempt to get application info for non-bot tokens (37ada59)
+- #2072 Fix thread member download on create (09eb9fa)
+- #2063 Fix stream position not being zero when uploading files (6dada66)
+
+### Misc
+
+- #2059 Update HttpException to display inner-errors on the HttpException.Message for better debugging (5773b8e)
+
 ## [3.2.0] - 2022-01-15
 
-## Added
+### Added
+
 - #2015 Add user-built AddCommand overloads to ModuleBuilder (68e3bed)
 - #2016 Add Construct Method to InteractionModuleBase and Fix NRE on User-Built Module Creation (4ed4718)
 - #2035 Add GetChannelType extension method (64423a0)
@@ -13,6 +33,7 @@
 - #2041 Add search methods to InteractionService (9a52d05)
 
 ### Fixed
+
 - #1562 Fix OperationCancelledException and add IAsyncEnumerable to wait without thread blocking (cd36bb8)
 - #2014 Fix InteractionContext.Guild (944a0de)
 - #2023 Fix ModifyAsync when only modifying a message's flags (e3eb0a9)
@@ -25,6 +46,7 @@
 - #2046 Fix ThreadMember null ref in constructor (bcd5fa4)
 
 ### Misc
+
 - #2018 Match argument defaults with IDiscordInteraction on SocketInteraction (093e548)
 - #2024 Remove .ToLower from group name registration (9594ccc)
 - #2042 Move gateway intents warning to ready event (3633929)
