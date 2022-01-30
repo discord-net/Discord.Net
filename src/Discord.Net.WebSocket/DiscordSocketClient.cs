@@ -2913,6 +2913,9 @@ namespace Discord.WebSocket
             }
         }
 
+        internal bool HasGatewayIntent(GatewayIntents intents)
+            => _gatewayIntents.HasFlag(intents);
+
         private async Task GuildAvailableAsync(SocketGuild guild)
         {
             if (!guild.IsConnected)
