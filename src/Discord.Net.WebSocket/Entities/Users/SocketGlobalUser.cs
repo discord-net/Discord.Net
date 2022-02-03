@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Linq;
 using Model = Discord.API.User;
@@ -14,7 +15,7 @@ namespace Discord.WebSocket
         internal override SocketPresence Presence { get; set; }
 
         public override bool IsWebhook => false;
-        internal override SocketGlobalUser GlobalUser => this;
+        internal override SocketGlobalUser GlobalUser { get => this; set => throw new NotImplementedException(); }
 
         private readonly object _lockObj = new object();
         private ushort _references;

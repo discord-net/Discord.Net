@@ -34,8 +34,7 @@ namespace Discord.WebSocket
         public override bool IsWebhook => true;
         /// <inheritdoc />
         internal override SocketPresence Presence { get { return new SocketPresence(UserStatus.Offline, null, null); } set { } }
-        internal override SocketGlobalUser GlobalUser =>
-            throw new NotSupportedException();
+        internal override SocketGlobalUser GlobalUser { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         internal SocketWebhookUser(SocketGuild guild, ulong id, ulong webhookId)
             : base(guild.Discord, id)

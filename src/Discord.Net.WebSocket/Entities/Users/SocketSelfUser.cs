@@ -18,7 +18,7 @@ namespace Discord.WebSocket
         public bool IsVerified { get; private set; }
         /// <inheritdoc />
         public bool IsMfaEnabled { get; private set; }
-        internal override SocketGlobalUser GlobalUser { get; }
+        internal override SocketGlobalUser GlobalUser { get; set; }
 
         /// <inheritdoc />
         public override bool IsBot { get { return GlobalUser.IsBot; } internal set { GlobalUser.IsBot = value; } }
