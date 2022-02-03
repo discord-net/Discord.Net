@@ -1293,7 +1293,7 @@ namespace Discord.WebSocket
                                             if (user.GlobalUser.Update(State, data.User))
                                             {
                                                 //Global data was updated, trigger UserUpdated
-                                                await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), beforeGlobal, user).ConfigureAwait(false);
+                                                await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), before.GlobalUser, user).ConfigureAwait(false);
                                             }
 
                                             user.Update(State, data);

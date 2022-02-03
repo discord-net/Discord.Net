@@ -24,7 +24,7 @@ namespace Discord.WebSocket
         private long? _joinedAtTicks;
         private ImmutableArray<ulong> _roleIds;
 
-        internal override SocketGlobalUser GlobalUser { get; }
+        internal override SocketGlobalUser GlobalUser { get; set; }
         /// <summary>
         ///     Gets the guild the user is in.
         /// </summary>
@@ -252,7 +252,7 @@ namespace Discord.WebSocket
         internal new SocketGuildUser Clone()
         {
             var clone = MemberwiseClone() as SocketGuildUser;
-            clone.GlobalUser.Clone();
+            clone.GlobalUser = GlobalUser.Clone();
             return clone;
         }
         #endregion
