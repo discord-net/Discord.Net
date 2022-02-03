@@ -1289,14 +1289,13 @@ namespace Discord.WebSocket
 
                                         if (user != null)
                                         {
-                                            var globalBefore = user.GlobalUser.Clone();
+                                            var before = user.Clone();
                                             if (user.GlobalUser.Update(State, data.User))
                                             {
                                                 //Global data was updated, trigger UserUpdated
-                                                await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), globalBefore, user).ConfigureAwait(false);
+                                                await TimedInvokeAsync(_userUpdatedEvent, nameof(UserUpdated), before.GlobalUser, user).ConfigureAwait(false);
                                             }
 
-                                            var before = user.Clone();
                                             user.Update(State, data);
 
                                             var cacheableBefore = new Cacheable<SocketGuildUser, ulong>(before, user.Id, true, () => null);
