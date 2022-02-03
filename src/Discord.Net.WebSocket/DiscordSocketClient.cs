@@ -1290,7 +1290,6 @@ namespace Discord.WebSocket
                                         if (user != null)
                                         {
                                             var before = user.Clone();
-                                            var beforeGlobal = user.GlobalUser.Clone();
                                             if (user.GlobalUser.Update(State, data.User))
                                             {
                                                 //Global data was updated, trigger UserUpdated

@@ -248,7 +248,13 @@ namespace Discord.WebSocket
             => CDN.GetGuildUserAvatarUrl(Id, Guild.Id, GuildAvatarId, size, format);
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Guild)";
-        internal new SocketGuildUser Clone() => MemberwiseClone() as SocketGuildUser;
+
+        internal new SocketGuildUser Clone()
+        {
+            var clone = MemberwiseClone() as SocketGuildUser;
+            clone.GlobalUser.Clone();
+            return clone;
+        }
         #endregion
 
         #region IGuildUser
