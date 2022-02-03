@@ -6,7 +6,7 @@ body:
     attributes:
       label: Check The Docs
       description: Please refer to our [FAQs](https://discordnet.dev/faq/basics/getting-started.html), [Documentation](https://discordnet.dev/api/index.html), 
-                    and [Migration Guide](https://labs.discordnet.dev/guides/v2_v3_guide/v2_to_v3_guide.html) before reporting issues.
+                    and [Migration Guide](https://discordnet.dev/guides/v2_v3_guide/v2_to_v3_guide.html) before reporting issues.
       options:
       - label: "I double checked the docs and couldn't find any useful information."
         required: true
