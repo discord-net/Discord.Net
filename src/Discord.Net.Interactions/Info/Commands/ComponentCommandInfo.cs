@@ -57,7 +57,7 @@ namespace Discord.Interactions
         public async Task<IResult> ExecuteAsync(IInteractionContext context, IEnumerable<CommandParameterInfo> paramList, IEnumerable<string> values,
             IServiceProvider services)
         {
-            if (context.Interaction is not SocketMessageComponent messageComponent)
+            if (context.Interaction is not IComponentInteraction messageComponent)
                 return ExecuteResult.FromError(InteractionCommandError.ParseFailed, $"Provided {nameof(IInteractionContext)} doesn't belong to a Component Command Interaction");
 
             try
