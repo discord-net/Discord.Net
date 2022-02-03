@@ -24,7 +24,7 @@ namespace Discord.WebSocket
         private long? _joinedAtTicks;
         private ImmutableArray<ulong> _roleIds;
 
-        internal override SocketGlobalUser GlobalUser { get; }
+        internal override SocketGlobalUser GlobalUser { get; set; }
         /// <summary>
         ///     Gets the guild the user is in.
         /// </summary>
@@ -248,7 +248,13 @@ namespace Discord.WebSocket
             => CDN.GetGuildUserAvatarUrl(Id, Guild.Id, GuildAvatarId, size, format);
 
         private string DebuggerDisplay => $"{Username}#{Discriminator} ({Id}{(IsBot ? ", Bot" : "")}, Guild)";
-        internal new SocketGuildUser Clone() => MemberwiseClone() as SocketGuildUser;
+
+        internal new SocketGuildUser Clone()
+        {
+            var clone = MemberwiseClone() as SocketGuildUser;
+            clone.GlobalUser = GlobalUser.Clone();
+            return clone;
+        }
         #endregion
 
         #region IGuildUser

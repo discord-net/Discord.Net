@@ -29,7 +29,7 @@ namespace Discord.WebSocket
         public abstract bool IsWebhook { get; }
         /// <inheritdoc />
         public UserProperties? PublicFlags { get; private set; }
-        internal abstract SocketGlobalUser GlobalUser { get; }
+        internal abstract SocketGlobalUser GlobalUser { get; set; }
         internal abstract SocketPresence Presence { get; set; }
 
         /// <inheritdoc />

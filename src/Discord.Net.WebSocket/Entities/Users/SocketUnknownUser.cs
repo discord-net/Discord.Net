@@ -29,8 +29,7 @@ namespace Discord.WebSocket
         internal override SocketPresence Presence { get { return new SocketPresence(UserStatus.Offline, null, null); } set { } }
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">This field is not supported for an unknown user.</exception>
-        internal override SocketGlobalUser GlobalUser =>
-            throw new NotSupportedException();
+        internal override SocketGlobalUser GlobalUser { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         internal SocketUnknownUser(DiscordSocketClient discord, ulong id)
             : base(discord, id)

@@ -199,7 +199,7 @@ namespace Discord.WebSocket
 
         string IGuildUser.GetGuildAvatarUrl(ImageFormat format, ushort size) => GuildUser.GetGuildAvatarUrl(format, size);
 
-        internal override SocketGlobalUser GlobalUser => GuildUser.GlobalUser;
+        internal override SocketGlobalUser GlobalUser { get => GuildUser.GlobalUser; set => GuildUser.GlobalUser = value; }
 
         internal override SocketPresence Presence { get => GuildUser.Presence; set => GuildUser.Presence = value; }
 
