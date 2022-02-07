@@ -45,7 +45,7 @@ body:
     id: version
     attributes:
       label: Version
-      description: What version of dnet are you using?
+      description: What version of Discord.Net are you using?
       placeholder: ex. 3.1.0
     validations:
       required: true
