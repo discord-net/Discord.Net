@@ -231,9 +231,6 @@ namespace Discord.Interactions.Builders
         private static void BuildComponentCommand (ComponentCommandBuilder builder, Func<IServiceProvider, IInteractionModuleBase> createInstance, MethodInfo methodInfo,
             InteractionService commandService, IServiceProvider services)
         {
-            if (!methodInfo.GetParameters().All(x => x.ParameterType == typeof(string) || x.ParameterType == typeof(string[])))
-                throw new InvalidOperationException($"Interaction method parameters all must be types of {typeof(string).Name} or {typeof(string[]).Name}");
-
             var attributes = methodInfo.GetCustomAttributes();
 
             builder.MethodName = methodInfo.Name;
@@ -443,6 +440,12 @@ namespace Discord.Interactions.Builders
 
             // Replace pascal casings with '-'
             builder.Name = Regex.Replace(builder.Name, "(?<=[a-z])(?=[A-Z])", "-").ToLower();
+        }
+
+        private static void BuildComponentParameter(ComponentCommandParameterBuilder builder, ParameterInfo paramInfo)
+        {
+            BuildParameter(builder, paramInfo);
+
         }
 
         private static void BuildParameter<TInfo, TBuilder> (ParameterBuilder<TInfo, TBuilder> builder, ParameterInfo paramInfo)

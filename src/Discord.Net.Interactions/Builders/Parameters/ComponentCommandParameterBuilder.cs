@@ -4,7 +4,7 @@ namespace Discord.Interactions.Builders
 {
     public class ComponentCommandParameterBuilder : ParameterBuilder<ComponentCommandParameterInfo, ComponentCommandParameterBuilder>
     {
-        public CompTypeConverter TypeReader { get; private set; }
+        public ComponentTypeConverter TypeConverter { get; private set; }
         protected override ComponentCommandParameterBuilder Instance => this;
 
         public ComponentCommandParameterBuilder(ICommandBuilder command) : base(command) { }
@@ -18,14 +18,14 @@ namespace Discord.Interactions.Builders
         ///     Sets <see cref="ParameterBuilder{TInfo, TBuilder}.ParameterType"/>.
         /// </summary>
         /// <param name="type">New value of the <see cref="ParameterBuilder{TInfo, TBuilder}.ParameterType"/>.</param>
-        /// <param name="services">Service container to be used to resolve the dependencies of this parameters <see cref="TypeConverter"/>.</param>
+        /// <param name="services">Service container to be used to resolve the dependencies of this parameters <see cref="Interactions.TypeConverter"/>.</param>
         /// <returns>
         ///     The builder instance.
         /// </returns>
         public ComponentCommandParameterBuilder SetParameterType(Type type, IServiceProvider services = null)
         {
             base.SetParameterType(type);
-            TypeReader = Command.Module.InteractionService.GetTypeReader(ParameterType,  services);
+            TypeConverter = Command.Module.InteractionService.GetComponentTypeConverter(ParameterType,  services);
             return this;
         }
 

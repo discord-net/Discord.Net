@@ -3,6 +3,7 @@ using Discord.Logging;
 using Discord.Rest;
 using Discord.WebSocket;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,7 +68,8 @@ namespace Discord.Interactions
         private readonly CommandMap<ModalCommandInfo> _modalCommandMap;
         private readonly HashSet<ModuleInfo> _moduleDefs;
         private readonly TypeMap<TypeConverter, IApplicationCommandInteractionDataOption> _typeConverterMap;
-        private readonly TypeMap<CompTypeConverter, IComponentInteractionData> _compTypeConverterMap;
+        private readonly TypeMap<ComponentTypeConverter, IComponentInteractionData> _compTypeConverterMap;
+        private readonly TypeMap<TypeReader, string> _typeReaderMap;
         private readonly ConcurrentDictionary<Type, IAutocompleteHandler> _autocompleteHandlers = new();
         private readonly ConcurrentDictionary<Type, ModalInfo> _modalInfos = new();
         private readonly SemaphoreSlim _lock;
@@ -194,11 +196,23 @@ namespace Discord.Interactions
                 [typeof(Nullable<>)] = typeof(NullableConverter<>),
             });
 
-            _compTypeConverterMap = new TypeMap<CompTypeConverter, IComponentInteractionData>(this, new Dictionary<Type, CompTypeConverter>
-            {
-            }, new Dictionary<Type, Type>
-            {
-            });
+            _compTypeConverterMap = new TypeMap<ComponentTypeConverter, IComponentInteractionData>(this, new Dictionary<Type, ComponentTypeConverter>(),
+                new Dictionary<Type, Type>
+                {
+                    [typeof(Array)] = typeof(DefaultArrayComponentConverter<>),
+                    [typeof(string)] = typeof(DefaultValueConverter<>)
+                });
+
+            _typeReaderMap = new TypeMap<TypeReader, string>(this, new Dictionary<Type, TypeReader>(),
+                new Dictionary<Type, Type>
+                {
+                    [typeof(IChannel)] = typeof(DefaultChannelReader<>),
+                    [typeof(IRole)] = typeof(DefaultRoleReader<>),
+                    [typeof(IUser)] = typeof(DefaultUserReader<>),
+                    [typeof(IMessage)] = typeof(DefaultUserReader<>),
+                    [typeof(IConvertible)] = typeof(DefaultValueReader<>),
+                    [typeof(Enum)] = typeof(EnumReader<>)
+                });
         }
 
         /// <summary>
@@ -809,7 +823,7 @@ namespace Discord.Interactions
         public void AddGenericTypeConverter(Type targetType, Type converterType) =>
             _typeConverterMap.AddGeneric(targetType, converterType);
 
-        internal CompTypeConverter GetComponentTypeConverter(Type type, IServiceProvider services = null) =>
+        internal ComponentTypeConverter GetComponentTypeConverter(Type type, IServiceProvider services = null) =>
             _compTypeConverterMap.Get(type, services);
 
         /// <summary>
@@ -817,7 +831,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <typeparam name="T">Primary target <see cref="Type"/> of the <see cref="TypeReader"/>.</typeparam>
         /// <param name="converter">The <see cref="TypeReader"/> instance.</param>
-        public void AddComponentTypeConverter<T>(CompTypeConverter converter) =>
+        public void AddComponentTypeConverter<T>(ComponentTypeConverter converter) =>
             AddComponentTypeConverter(typeof(T), converter);
 
         /// <summary>
@@ -825,7 +839,7 @@ namespace Discord.Interactions
         /// </summary>
         /// <param name="type">Primary target <see cref="Type"/> of the <see cref="TypeReader"/>.</param>
         /// <param name="converter">The <see cref="TypeReader"/> instance.</param>
-        public void AddComponentTypeConverter(Type type, CompTypeConverter converter) =>
+        public void AddComponentTypeConverter(Type type, ComponentTypeConverter converter) =>
             _compTypeConverterMap.AddConcrete(type, converter);
 
         /// <summary>
@@ -845,8 +859,23 @@ namespace Discord.Interactions
         public void AddGenericComponentTypeConverter(Type targetType, Type converterType) =>
             _compTypeConverterMap.AddGeneric(targetType, converterType);
 
-        public string SerializeWithTypeReader<T>(object obj, IServiceProvider services = null) =>
-            _compTypeConverterMap.Get(typeof(T), services).Serialize(obj);
+        public Task<string> SerializeValue<T>(T obj, IServiceProvider services = null) =>
+            _compTypeConverterMap.Get(typeof(T), services).SerializeAsync(obj);
+
+        internal TypeReader GetTypeReader(Type type, IServiceProvider services = null) =>
+            _typeReaderMap.Get(type, services);
+
+        public void AddTypeReader<T>(TypeReader reader) =>
+            AddTypeReader(typeof(T), reader);
+
+        public void AddTypeReader(Type type, TypeReader reader) =>
+            _typeReaderMap.AddConcrete(type, reader);
+
+        public void AddGenericTypeReader<T>(Type readerType) =>
+            AddGenericTypeReader(typeof(T), readerType);
+
+        public void AddGenericTypeReader(Type targetType, Type readerType) =>
+            _typeReaderMap.AddGeneric(targetType, readerType);
 
         internal IAutocompleteHandler GetAutocompleteHandler(Type autocompleteHandlerType, IServiceProvider services = null)
         {
