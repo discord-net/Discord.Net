@@ -634,6 +634,15 @@ namespace Discord.WebSocket
             remove => _autocompleteExecuted.Remove(value);
         }
         internal readonly AsyncEvent<Func<SocketAutocompleteInteraction, Task>> _autocompleteExecuted = new AsyncEvent<Func<SocketAutocompleteInteraction, Task>>();
+        /// <summary>
+        ///     Fired when a modal is submitted.
+        /// </summary>
+        public event Func<SocketModal, Task> ModalSubmitted
+        {
+            add => _modalSubmitted.Add(value);
+            remove => _modalSubmitted.Remove(value);
+        }
+        internal readonly AsyncEvent<Func<SocketModal, Task>> _modalSubmitted = new AsyncEvent<Func<SocketModal, Task>>();
 
         /// <summary>
         ///     Fired when a guild application command is created.

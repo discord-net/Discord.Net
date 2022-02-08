@@ -32,6 +32,9 @@ namespace Discord.Net.Converters
                 case ComponentType.SelectMenu:
                     messageComponent = new API.SelectMenuComponent();
                     break;
+                case ComponentType.TextInput:
+                    messageComponent = new API.TextInputComponent();
+                    break;
             }
             serializer.Populate(jsonObject.CreateReader(), messageComponent);
             return messageComponent;

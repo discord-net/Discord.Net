@@ -8,7 +8,7 @@ namespace Discord
     public interface IComponentInteractionData : IDiscordInteractionData
     {
         /// <summary>
-        ///     Gets the components Custom Id that was clicked.
+        ///     Gets the component's Custom Id that was clicked.
         /// </summary>
         string CustomId { get; }
 
@@ -21,5 +21,10 @@ namespace Discord
         ///     Gets the value(s) of a <see cref="SelectMenuComponent"/> interaction response.
         /// </summary>
         IReadOnlyCollection<string> Values { get; }
+
+        /// <summary>
+        ///     Gets the value of a <see cref="TextInputComponent"/> interaction response.
+        /// </summary>
+        public string Value { get; }
     }
 }

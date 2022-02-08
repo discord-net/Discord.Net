@@ -21,6 +21,7 @@ namespace Discord.API
                 {
                     ComponentType.Button => new ButtonComponent(x as Discord.ButtonComponent),
                     ComponentType.SelectMenu => new SelectMenuComponent(x as Discord.SelectMenuComponent),
+                    ComponentType.TextInput => new TextInputComponent(x as Discord.TextInputComponent),
                     _ => null
                 };
             }).ToArray();

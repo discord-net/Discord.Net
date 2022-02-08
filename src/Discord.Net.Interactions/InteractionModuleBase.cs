@@ -63,6 +63,13 @@ namespace Discord.Interactions
             var response = await Context.Interaction.GetOriginalResponseAsync().ConfigureAwait(false);
             await response.DeleteAsync().ConfigureAwait(false);
         }
+        
+        /// <inheritdoc cref="IDiscordInteraction.RespondWithModalAsync(Modal, RequestOptions)"/>
+        protected virtual async Task RespondWithModalAsync(Modal modal, RequestOptions options = null) => await Context.Interaction.RespondWithModalAsync(modal);
+        
+        /// <inheritdoc cref="IDiscordInteractionExtentions.RespondWithModalAsync(IDiscordInteraction, IModal, RequestOptions)"/>
+        protected virtual async Task RespondWithModalAsync<T>(string customId, RequestOptions options = null) where T : class, IModal
+            => await Context.Interaction.RespondWithModalAsync<T>(customId, options);
 
         //IInteractionModuleBase
 

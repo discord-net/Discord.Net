@@ -112,6 +112,67 @@ namespace Discord.Interactions
             var parameters = constructor.GetParameters();
             var properties = GetProperties(typeInfo);
 
+            var lambda = CreateLambdaMemberInit(typeInfo, constructor);
+
+            return (services) =>
+            {
+                var args = new object[parameters.Length];
+                var props = new object[properties.Length];
+
+                for (int i = 0; i < parameters.Length; i++)
+                    args[i] = GetMember(commandService, services, parameters[i].ParameterType, typeInfo);
+
+                for (int i = 0; i < properties.Length; i++)
+                    props[i] = GetMember(commandService, services, properties[i].PropertyType, typeInfo);
+
+                var instance = lambda(args, props);
+
+                return instance;
+            };
+        }
+
+        internal static Func<object[], T> CreateLambdaConstructorInvoker(TypeInfo typeInfo)
+        {
+            var constructor = GetConstructor(typeInfo);
+            var parameters = constructor.GetParameters();
+
+            var argsExp = Expression.Parameter(typeof(object[]), "args");
+
+            var parameterExps = new Expression[parameters.Length];
+
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                var indexExp = Expression.Constant(i);
+                var accessExp = Expression.ArrayIndex(argsExp, indexExp);
+                parameterExps[i] = Expression.Convert(accessExp, parameters[i].ParameterType);
+            }
+
+            var newExp = Expression.New(constructor, parameterExps);
+
+            return Expression.Lambda<Func<object[], T>>(newExp, argsExp).Compile();
+        }
+
+        /// <summary>
+        ///     Create a compiled lambda property setter.
+        /// </summary>
+        internal static Action<T, object> CreateLambdaPropertySetter(PropertyInfo propertyInfo)
+        {
+            var instanceParam = Expression.Parameter(typeof(T), "instance");
+            var valueParam = Expression.Parameter(typeof(object), "value");
+
+            var prop = Expression.Property(instanceParam, propertyInfo);
+            var assign = Expression.Assign(prop, Expression.Convert(valueParam, propertyInfo.PropertyType));
+
+            return Expression.Lambda<Action<T, object>>(assign, instanceParam, valueParam).Compile();
+        }
+
+        internal static Func<object[], object[], T> CreateLambdaMemberInit(TypeInfo typeInfo, ConstructorInfo constructor, Predicate<PropertyInfo> propertySelect = null)
+        {
+            propertySelect ??= x => true;
+
+            var parameters = constructor.GetParameters();
+            var properties = GetProperties(typeInfo).Where(x => propertySelect(x)).ToArray();
+
             var argsExp = Expression.Parameter(typeof(object[]), "args");
             var propsExp = Expression.Parameter(typeof(object[]), "props");
 
@@ -137,17 +198,8 @@ namespace Discord.Interactions
             var memberInit = Expression.MemberInit(newExp, memberExps);
             var lambda = Expression.Lambda<Func<object[], object[], T>>(memberInit, argsExp, propsExp).Compile();
 
-            return (services) =>
+            return (args, props) =>
             {
-                var args = new object[parameters.Length];
-                var props = new object[properties.Length];
-
-                for (int i = 0; i < parameters.Length; i++)
-                    args[i] = GetMember(commandService, services, parameters[i].ParameterType, typeInfo);
-
-                for (int i = 0; i < properties.Length; i++)
-                    props[i] = GetMember(commandService, services, properties[i].PropertyType, typeInfo);
-
                 var instance = lambda(args, props);
 
                 return instance;

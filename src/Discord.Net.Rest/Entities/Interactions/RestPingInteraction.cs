@@ -36,6 +36,7 @@ namespace Discord.Rest
         }
 
         public override string Defer(bool ephemeral = false, RequestOptions options = null) => throw new NotSupportedException();
+        public override string RespondWithModal(Modal modal, RequestOptions options = null) => throw new NotSupportedException();
         public override string Respond(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null) => throw new NotSupportedException();
         public override Task<RestFollowupMessage> FollowupAsync(string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null) => throw new NotSupportedException();
         public override Task<RestFollowupMessage> FollowupWithFileAsync(Stream fileStream, string fileName, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null) => throw new NotSupportedException();

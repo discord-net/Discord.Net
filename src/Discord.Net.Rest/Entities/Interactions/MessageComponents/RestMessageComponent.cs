@@ -446,6 +446,46 @@ namespace Discord.Rest
             return SerializePayload(response);
         }
 
+        /// <summary>
+        ///     Responds to the interaction with a modal.
+        /// </summary>
+        /// <param name="modal">The modal to respond with.</param>
+        /// <param name="options">The request options for this <see langword="async"/> request.</param>
+        /// <returns>A string that contains json to write back to the incoming http request.</returns>
+        /// <exception cref="TimeoutException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
+        public override string RespondWithModal(Modal modal, RequestOptions options = null)
+        {
+            if (!InteractionHelper.CanSendResponse(this))
+                throw new TimeoutException($"Cannot defer an interaction after {InteractionHelper.ResponseTimeLimit} seconds of no response/acknowledgement");
+
+            var response = new API.InteractionResponse
+            {
+                Type = InteractionResponseType.Modal,
+                Data = new API.InteractionCallbackData
+                {
+                    CustomId = modal.CustomId,
+                    Title = modal.Title,
+                    Components = modal.Component.Components.Select(x => new Discord.API.ActionRowComponent(x)).ToArray()
+                }
+            };
+
+            lock (_lock)
+            {
+                if (HasResponded)
+                {
+                    throw new InvalidOperationException("Cannot respond or defer twice to the same interaction.");
+                }
+            }
+
+            lock (_lock)
+            {
+                HasResponded = true;
+            }
+
+            return SerializePayload(response);
+        }
+
         //IComponentInteraction
         /// <inheritdoc/>
         IComponentInteractionData IComponentInteraction.Data => Data;

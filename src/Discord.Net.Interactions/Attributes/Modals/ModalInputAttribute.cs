@@ -1,0 +1,32 @@
+using System;
+
+namespace Discord.Interactions
+{
+    /// <summary>
+    ///     Mark an <see cref="IModal"/> property as a modal input field.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+    public abstract class ModalInputAttribute : Attribute
+    {
+        /// <summary>
+        ///     Gets the custom id of the text input.
+        /// </summary>
+        public string CustomId { get; }
+
+        /// <summary>
+        ///     Gets the type of the component.
+        /// </summary>
+        public abstract ComponentType ComponentType { get; }
+
+        /// <summary>
+        ///     Create a new <see cref="ModalInputAttribute"/>.
+        /// </summary>
+        /// <param name="label">The label of the input.</param>
+        /// <param name="customId">The custom id of the input.</param>
+        /// <param name="required">Whether the user is required to input a value.></param>
+        protected ModalInputAttribute(string customId)
+        {
+            CustomId = customId;
+        }
+    }
+}

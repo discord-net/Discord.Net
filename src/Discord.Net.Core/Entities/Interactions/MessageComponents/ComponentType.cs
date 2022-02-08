@@ -18,6 +18,16 @@ namespace Discord
         /// <summary>
         ///     A select menu for picking from choices.
         /// </summary>
-        SelectMenu = 3
+        SelectMenu = 3,
+
+        /// <summary>
+        ///     A box for entering text.
+        /// </summary>
+        TextInput = 4,
+
+        /// <summary>
+        ///     An interaction sent when a model is submitted.
+        /// </summary>
+        ModalSubmit = 5,
     }
 }

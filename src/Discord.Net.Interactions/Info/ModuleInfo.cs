@@ -68,6 +68,8 @@ namespace Discord.Interactions
         /// </summary>
         public IReadOnlyCollection<AutocompleteCommandInfo> AutocompleteCommands { get; }
 
+        public IReadOnlyCollection<ModalCommandInfo> ModalCommands { get; }
+
         /// <summary>
         ///     Gets the declaring type of this module, if <see cref="IsSubModule"/> is <see langword="true"/>.
         /// </summary>
@@ -112,6 +114,7 @@ namespace Discord.Interactions
             ContextCommands = BuildContextCommands(builder).ToImmutableArray();
             ComponentCommands = BuildComponentCommands(builder).ToImmutableArray();
             AutocompleteCommands = BuildAutocompleteCommands(builder).ToImmutableArray();
+            ModalCommands = BuildModalCommands(builder).ToImmutableArray();
             SubModules = BuildSubModules(builder, commandService, services).ToImmutableArray();
             Attributes = BuildAttributes(builder).ToImmutableArray();
             Preconditions = BuildPreconditions(builder).ToImmutableArray();
@@ -166,6 +169,16 @@ namespace Discord.Interactions
             var result = new List<AutocompleteCommandInfo>();
 
             foreach (var commandBuilder in builder.AutocompleteCommands)
+                result.Add(commandBuilder.Build(this, CommandService));
+
+            return result;
+        }
+
+        private IEnumerable<ModalCommandInfo> BuildModalCommands(ModuleBuilder builder)
+        {
+            var result = new List<ModalCommandInfo>();
+
+            foreach (var commandBuilder in builder.ModalCommands)
                 result.Add(commandBuilder.Build(this, CommandService));
 
             return result;

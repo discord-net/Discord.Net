@@ -100,6 +100,10 @@ namespace Discord.WebSocket
         public override Task RespondWithFilesAsync(IEnumerable<FileAttachment> attachments, string text = null, Embed[] embeds = null, bool isTTS = false, bool ephemeral = false, AllowedMentions allowedMentions = null, MessageComponent components = null, Embed embed = null, RequestOptions options = null)
             => throw new NotSupportedException("Autocomplete interactions don't support this method!");
 
+        /// <inheritdoc/>
+        public override Task RespondWithModalAsync(Modal modal, RequestOptions requestOptions = null)
+            => throw new NotSupportedException("Autocomplete interactions cannot have normal responces!");
+
         //IAutocompleteInteraction
         /// <inheritdoc/>
         IAutocompleteInteractionData IAutocompleteInteraction.Data => Data;

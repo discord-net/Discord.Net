@@ -36,6 +36,9 @@ namespace Discord.Interactions
         /// <summary>
         ///     Gets or sets the option to use compiled lambda expressions to create module instances and execute commands. This method improves performance at the cost of memory.
         /// </summary>
+        /// <remarks>
+        ///     For performance reasons, if you frequently use <see cref="Modal"/>s with the service, it is highly recommended that you enable compiled lambdas.
+        /// </remarks>
         public bool UseCompiledLambda { get; set; } = false;
 
         /// <summary>
@@ -56,6 +59,11 @@ namespace Discord.Interactions
         ///     Gets or sets delegate to be used by the <see cref="InteractionService"/> when responding to a Rest based interaction.
         /// </summary>
         public RestResponseCallback RestResponseCallback { get; set; } = (ctx, str) => Task.CompletedTask;
+
+        /// <summary>
+        ///     Gets or sets whether a command execution should exit when a modal command encounters a missing modal component value.
+        /// </summary>
+        public bool ExitOnMissingModalField { get; set; } = false;
     }
 
     /// <summary>

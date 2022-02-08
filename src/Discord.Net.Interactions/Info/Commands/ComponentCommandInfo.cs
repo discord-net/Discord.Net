@@ -35,7 +35,7 @@ namespace Discord.Interactions
         /// <param name="services">Services that will be used while initializing the <see cref="InteractionModuleBase{T}"/>.</param>
         /// <param name="additionalArgs">Provide additional string parameters to the method along with the auto generated parameters.</param>
         /// <returns>
-        ///     A task representing the asyncronous command execution process.
+        ///     A task representing the asynchronous command execution process.
         /// </returns>
         public async Task<IResult> ExecuteAsync(IInteractionContext context, IServiceProvider services, params string[] additionalArgs)
         {
